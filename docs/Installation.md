@@ -9,5 +9,5 @@ Open bash or command prompt and run the following commands on current working di
 ```
 git clone https://github.com/sgoldenlab/tkinter_test.git
 
-pip install -r tkinter_test/tkinter_8_29_19/requirements.txt
+pip install -r tkinter_test/tkinter_gui/requirements.txt
 ```
