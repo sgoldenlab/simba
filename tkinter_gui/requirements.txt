@@ -6,7 +6,7 @@ deeplabcut == 2.0.5
 matplotlib == 2.2.2
 minimal-gantt == 0.2.2
 nugridpy == 0.7.5
-numpy == 1.14.6
+numpy == 1.16
 opencv_python == 3.4.5.20
 openpyxl == 2.6.2
 pandas == 0.21.0
