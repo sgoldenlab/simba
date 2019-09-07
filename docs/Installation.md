@@ -24,3 +24,6 @@ python Launch_tkinter_GUI.py
 ```
 ![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/launch_gui.PNG)
 
+3. It should looks like this.
+
+![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/launch_gui.gif)
