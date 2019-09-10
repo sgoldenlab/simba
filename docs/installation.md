@@ -12,7 +12,7 @@ git clone https://github.com/sgoldenlab/tkinter_test.git
 pip install -r tkinter_test/tkinter_gui/requirements.txt
 ```
 
-# Getting Started
+# How to launch the GUI
 
 1. Open up command prompt from the tkinter_gui folder
 
