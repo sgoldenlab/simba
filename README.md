@@ -6,3 +6,7 @@ This graphical user interface is to ease your life
 ## [Installation](docs/Installation.md) 
 
 How to [install GUI](docs/Installation.md)
+
+## [Tutorial]()
+
+[Getting started]() with the GUI
