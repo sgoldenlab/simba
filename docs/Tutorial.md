@@ -30,6 +30,8 @@ For processing a tracking dataset, the pipelines is split into ? sections. These
 This sections create a new project for your tracking analysis.
 
 #### Step 1: Generate Project Config
+In this step, you will be generating your main project folder with all the sub-directories.
+
 1. Go to `File` and click on `Create a new project` The following windows will pop up.
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/createproject.PNG" width="500" height="600" />
 
@@ -49,4 +51,24 @@ If you are generating a brand new model, just fill in the entry box and leave th
 
 7. `Video Settings` is the metadata of your videos. Filled in the information based on your videos.
 
-8. Click `Generate Project Config` to generate your project.
+8. Click `Generate Project Config` to generate your project. The project folder will be located at the `Project Path` that you specified
+
+#### Step 2: Import Videos into project folder
+In this step, you can choose to import only one video or multiple videos.
+##### To import multiple videos
+1. Click on `Browse Folder` to select your folder that contains all the videos that you wished to be included in your project.
+2. Enter the type of your video *mp4*, *avi*, *mov*,etc. in the `Video type` entry box.
+3. Click `Import multiple videos` 
+>**Note**: It might take awhile for all the videos to be imported.
+##### To import a single video
+1. Click on `Browse File` to select your video
+2. Click `Import a video`
+
+#### Step 3: Import DLC Tracking Data
+In this step, you will import your csv tracking data.
+##### To import multiple csv files
+1. Click on `Browse Folder` to select your folder that contains all the csv files that you wished to be included in your project.
+2. Click `Import csv to project folder` 
+##### To import a single csv file
+1. Click on `Browse File` to select your video
+2. Click `Import single csv to project folder`
