@@ -85,5 +85,5 @@ This sections loads a project that you have created.
 In this step, you will load the *project_config.ini* file that was created.
 
 1. Go to `File` and click on `Load project` The following windows will pop up.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/createproject.PNG" width="500" height="600" />
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadproject.PNG" width="600" height="600" />
 
