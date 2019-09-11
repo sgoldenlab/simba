@@ -5,14 +5,14 @@
 For processing a tracking dataset, the pipelines is split into ? sections. These sections are listed below along with the functions that belong to each section:
 
 
-#### Part 1: Create a new project
+### Part 1: Create a new project
 - In here you set up your project name, directories, and videos settings
 - Then, generate project config
 - Import videos into project folder
 - Import DLC Tracking Data (if have any)
 - Extract Frames into project folder
 
-#### Part 2: Load project.ini file
+### Part 2: Load project.ini file
 - First you load the project.ini that was generated when you created your new project
 - set video parameters and save it as csv
 - Run outlier correction
@@ -29,7 +29,7 @@ For processing a tracking dataset, the pipelines is split into ? sections. These
 ## Part 1: Create a new project
 This sections create a new project for your tracking analysis.
 
-#### Step 1: Generate Project Config
+### Step 1: Generate Project Config
 In this step, you will be generating your main project folder with all the sub-directories.
 
 1. Go to `File` and click on `Create a new project` The following windows will pop up.
@@ -53,27 +53,27 @@ If you are generating a brand new model, just fill in the entry box and leave th
 
 8. Click `Generate Project Config` to generate your project. The project folder will be located at the `Project Path` that you specified
 
-#### Step 2: Import Videos into project folder
+### Step 2: Import Videos into project folder
 In this step, you can choose to import only one video or multiple videos.
-##### To import multiple videos
+#### To import multiple videos
 1. Click on `Browse Folder` to select your folder that contains all the videos that you wished to be included in your project.
 2. Enter the type of your video *mp4*, *avi*, *mov*,etc. in the `Video type` entry box.
 3. Click `Import multiple videos` 
 >**Note**: It might take awhile for all the videos to be imported.
-##### To import a single video
+#### To import a single video
 1. Click on `Browse File` to select your video
 2. Click `Import a video`
 
-#### Step 3: Import DLC Tracking Data
+### Step 3: Import DLC Tracking Data
 In this step, you will import your csv tracking data.
-##### To import multiple csv files
+#### To import multiple csv files
 1. Click on `Browse Folder` to select your folder that contains all the csv files that you wished to be included in your project.
 2. Click `Import csv to project folder` 
-##### To import a single csv file
+#### To import a single csv file
 1. Click on `Browse File` to select your video
 2. Click `Import single csv to project folder`
 
-#### Step 4: Extract frames into project folder
+### Step 4: Extract frames into project folder
 This step will extract all the frames from every videos that are in the videos folder.
 
 Once, all the steps are completed, close the `Project Configuration` window.
@@ -81,7 +81,7 @@ Once, all the steps are completed, close the `Project Configuration` window.
 ## Part 2: Load project
 This sections loads a project that you have created.
 
-#### Step 1: Load Project Config
+### Step 1: Load Project Config
 In this step, you will load the *project_config.ini* file that was created.
 > **Note:** project_config.ini should always be loaded before starting anything else.
 1. Go to `File` and click on `Load project` The following windows will pop up.
@@ -92,10 +92,10 @@ In this step, you will load the *project_config.ini* file that was created.
 
 In this image, you can see, the `Dekstop` is my selected working directory, `tutorial` is my project name, and the last two sections is always going to be `project_folder/project_config.ini` 
 
-#### Step 2 (Optional) : Import more DLC Tracking Data or videos
+### Step 2 (Optional) : Import more DLC Tracking Data or videos
 In this step, you can choose to import more csv files or videos. If you don't you can ignore and skip this step.
 
-#### Step 3: Set video parameters
+### Step 3: Set video parameters
 In this step, you can customize the parameters for each of your videos. You will also be setting the **pixels per milimeter** of for your videos. You will be using a tool that requires the distance of a point to another point in order to calculate the **pixels per milimeter**. The real life distance between two points is call `Distance in mm`.
 
 1. Under **Set video parameters(distances,resolution,etc.)**, the `Distance in mm` here is the distance between two points in milimeter. You can enter the values *(eg: 10,20)* and click `Auto populate Distance in mm in tables` and it will populate the table that you are going to see in the next step. If you leave it empty, it will just be zero.
