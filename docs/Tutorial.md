@@ -72,3 +72,6 @@ In this step, you will import your csv tracking data.
 ##### To import a single csv file
 1. Click on `Browse File` to select your video
 2. Click `Import single csv to project folder`
+
+#### Step 4: Extract frames into project folder
+This step will extract all the frames from every videos that are in the videos folder.
