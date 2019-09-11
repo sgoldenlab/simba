@@ -83,7 +83,7 @@ This sections loads a project that you have created.
 
 #### Step 1: Load Project Config
 In this step, you will load the *project_config.ini* file that was created.
-
+> **Note:** project_config.ini should always be loaded before starting anything else.
 1. Go to `File` and click on `Load project` The following windows will pop up.
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadproject.PNG" width="600" height="600" />
 
@@ -96,6 +96,9 @@ In this image, you can see, the `Dekstop` is my selected working directory, `tut
 In this step, you can choose to import more csv files or videos. If you don't you can ignore and skip this step.
 
 #### Step 3: Set video parameters
-In this step, you can customize the parameters for each of your video.
+In this step, you can customize the parameters for each of your videos. You will also be setting the **pixels per milimeter** of for your videos. You will be using a tool that requires the distance of a point to another point in order to calculate the **pixels per milimeter**. The real life distance between two points is call `Distance in mm`.
 
-1. 
+1. Under **Set video parameters(distances,resolution,etc.)**, the `Distance in mm` here is the distance between two points in milimeter. You can enter the values *(eg: 10,20)* and click `Auto populate Distance in mm in tables` and it will populate the table that you are going to see in the next step. If you leave it empty, it will just be zero.
+
+2. Click on `Set Video Parameters` and the following windows will pop up.
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/videoinfo_table.PNG" width="1000" height="500" />
