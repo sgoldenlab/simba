@@ -87,3 +87,5 @@ In this step, you will load the *project_config.ini* file that was created.
 1. Go to `File` and click on `Load project` The following windows will pop up.
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadproject.PNG" width="600" height="600" />
 
+2. Under **Load Project .ini**, click on `Browse File`. Then, go to the directory that you created your project and click on your project folder. Then, click on *project_folder* and then *project_config.ini*. Once this step is completed, it should look like the following instead of *No file selected*.
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadedprojectini.PNG" width="500" height="60" />
