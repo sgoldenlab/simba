@@ -85,7 +85,7 @@ This sections loads a project that you have created.
 In this step, you will load the *project_config.ini* file that was created.
 > **Note:** project_config.ini should always be loaded before starting anything else.
 1. Go to `File` and click on `Load project` The following windows will pop up.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadproject.PNG" width="600" height="600" />
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadproject.PNG" width="750" height="600" />
 
 2. Under **Load Project.ini**, click on `Browse File`. Then, go to the directory that you created your project and click on your *project folder*. Then, click on *project_folder* and then *project_config.ini*. Once this step is completed, it should look like the following instead of *No file selected*.
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadedprojectini.PNG" width="500" height="60" />
@@ -124,6 +124,29 @@ In this case, I know the two **pink dot that connects** has a distance of 10mm i
 
 9. Repeat the steps for every videos and once it is done, click `Save Data`. This will generate a csv file named **video_info.csv** in `/project_folder/log`
 
-### Step 4: Outlier Correction
+### Step 4: [Outlier Correction](https://github.com/sgoldenlab/social_tracker/blob/master/Outlier_correction.pdf)
+Simon will explain what outlier correction is.
+
+`Movement criterion`
+
+`Location criterion`
+
+1. Filled in `Movement criterion` and `Location criterion`.
+
+2. Click `Correct outlier` to start outlier correction.
+
+### Step 5: Extract Features
+Simon will also explain this
+
+1. Click `Extract Features`
+
+### Step 6: Label Behavior
+This step is to label the behavior in each frames
+
+1. Click on `Select folder with frames`. In your project folder go to `/project_folder/frames/input/`, there should be folders that are named after your videos that contain all the video frames. Select one of the folder and the following window should pop up.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/labelagg.PNG" width="720" height="720" />
+
+
 
 
