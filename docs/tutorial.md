@@ -117,7 +117,7 @@ The windows that pop up is a frame from your first video in the table.
 In this case, I know the two **pink dot that connects** has a distance of 10mm in real life.
 
 7. If you misplace the dots, you can double click on either of them and redo the step. Once you are done, you can hit `Esc`.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/get_coord.gif" width="720" height="405" />
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoord.gif" width="720" height="405" />
 
 8. If every steps are done correctly, the values should populate in the `Pixels/mm` column in the table.
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/videoinfo_table2.PNG" width="1000" height="500" />
