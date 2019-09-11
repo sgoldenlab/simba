@@ -47,3 +47,6 @@ If you are generating a brand new model, just fill in the entry box and leave th
 6. For existing model, you can import the models by clicking `Browse` and select your *.sav* file. At the end, it should look like the following image.
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/classifier2.PNG" width="700" height="160" />
 
+7. `Video Settings` is the metadata of your videos. Filled in the information based on your videos.
+
+8. Click `Generate Project Config` to generate your project.
