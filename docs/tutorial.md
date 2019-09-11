@@ -123,3 +123,7 @@ In this case, I know the two **pink dot that connects** has a distance of 10mm i
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/videoinfo_table2.PNG" width="1000" height="500" />
 
 9. Repeat the steps for every videos and once it is done, click `Save Data`. This will generate a csv file named **video_info.csv** in `/project_folder/log`
+
+### Step 4: Outlier Correction
+
+
