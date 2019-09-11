@@ -75,3 +75,15 @@ In this step, you will import your csv tracking data.
 
 #### Step 4: Extract frames into project folder
 This step will extract all the frames from every videos that are in the videos folder.
+
+Once, all the steps are completed, close the `Project Configuration` window.
+
+## Part 2: Load project
+This sections loads a project that you have created.
+
+#### Step 1: Load Project Config
+In this step, you will load the *project_config.ini* file that was created.
+
+1. Go to `File` and click on `Load project` The following windows will pop up.
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/createproject.PNG" width="500" height="600" />
+
