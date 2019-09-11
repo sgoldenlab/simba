@@ -98,3 +98,4 @@ In this step, you can choose to import more csv files or videos. If you don't yo
 #### Step 3: Set video parameters
 In this step, you can customize the parameters for each of your video.
 
+1. 
