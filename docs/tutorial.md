@@ -147,6 +147,12 @@ This step is to label the behavior in each frames
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/labelagg.PNG" width="720" height="720" />
 
+2. Sophia will work on this...
+
+### Step 7: Train Machine Model
+This step is to train machine model. Simon will explain this as well.
+
+1. Click on `Settings` and the following window will pop up. 
 
 
 
