@@ -150,9 +150,41 @@ This step is to label the behavior in each frames
 2. Sophia will work on this...
 
 ### Step 7: Train Machine Model
-This step is to train machine model. Simon will explain this as well.
+This step is to train the machine model. Simon will explain this as well.
 
 1. Click on `Settings` and the following window will pop up. 
 
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/trainmachinemodel_settings.PNG" width="402" height="403" />
 
+2. First, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
+
+`RF`
+
+`GBC`
+
+`Xboost`
+
+3. Then, set the **Hyperparameters**.
+
+`n estimators`
+
+`max features`
+
+`criterion`
+
+`test size`
+
+`discrimination threshold`
+
+`features importances to plot`  
+
+`min sample leaf`
+
+`Under sample correction value`
+
+`max depth`
+
+4. Click the `SET` button to save your settings into the *config.ini* file.
+
+5. Once, the settings is saved, click on `Train Model`
 
