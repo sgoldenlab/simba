@@ -22,3 +22,20 @@ We would start our video on the 10th second `00:00:10` and end at `00:01:55`.
 4. Click `Cut Video` to trim video and a new shorten video will be generated, the new video will have a name of *Name of original video* + *_shorten* .
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/shortenvideos2.PNG" width="1014" height="114" />
+
+
+### Method 2
+Method 2 cuts of the beginning of the video. In order to use method 2, please check on the check box.
+
+Let's say we have a 2 minute long video and we want to get rid of the first 20 seconds from the start of the video.
+
+1. First, check on the check box `Check this box to use Method 2`
+
+>**Note**: If the checkbox is not checked, method 1 will be used instead of method 2.
+
+2. Enter the amount of time that needs to be trimmed from the start of the video in `Seconds:`, in this case it will be *20*
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/shortenvideos3.PNG" width="435" height="287" />
+
+3. Click `Cut Video` to trim video and a new shorten video will be generated, the new video will have a name of *Name of original video* + *_shorten* .
+
