@@ -1,5 +1,7 @@
 # How to use tools in GUI
 
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/tools.PNG" width="375" height="322" />
+
 ## Shorten Videos
 This is a tool to trim videos using ffmpeg. It contains **Method 1** and **Method 2**
 
@@ -58,4 +60,16 @@ This is a tool to crop videos.
 4. Hit `Enter` **twice** and it will crop the video, the new video will have a name of *Name of original video* + *_cropped*.
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/cropvideo4.PNG" width="900" height="100" />
+
+
+## Downsample Video
+This is a tool to downsample video into smaller size and reduce the resolution of the video.
+
+The downsample video tool has **Customize Resolution** and **Default Resolution**
+
+### Customize Resolution
+This allows you to downsample video into any height and width.
+
+1. First, click 
+
 
