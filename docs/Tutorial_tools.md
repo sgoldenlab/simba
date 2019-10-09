@@ -96,7 +96,38 @@ This allows you to downsample video into any height and width.
 ### Default Resolution 
 This allows you to downsample video quickly within two mouse clicks. There will be more options added into the **Default Resolution** in the future.
 
-1. Click on one of the option `1980 x 1080` or `1280 x 1024`.
+1. First, click on `Browse File` to select a video to downsample.
 
-2. Click on `Downsample Default Resolution Video` and the video will downsample into the selected resolution.
+2. Click on one of the option `1980 x 1080` or `1280 x 1024`.
+
+3. Click on `Downsample Default Resolution Video` and the video will downsample into the selected resolution.
+
+
+## Get Coordinates
+This tool is to get the length(millimeter) per pixel of a video.
+
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool.PNG" width="300" height="200" />
+
+Let's say we want to find out the length(mm) per pixel of a video of a mouse in a cage, we know the width of cage is 130mm.
+
+1. First, click on `Browse File` to select a video.
+
+2. Enter *130* in the `Known length in real life(mm)` entry box.
+
+3. Click `Get Distance`, and the following window should pop up.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool2.PNG" width="600" height="600" />
+
+4. Use your mouse to double *Left click* at the left side of the cage and double *Left click* again on the right side of the cage.
+>**Note:** Double click the point again to change the location of the point.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool3.PNG" width="600" height="600" />
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoord.gif" width="500" height="500" />
+
+5. Once two points are selected, hit `Esc` button and it should print out the mm per pixel on the main GUI interface.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool4.PNG" width="400" height="250" />
+
 
