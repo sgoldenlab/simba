@@ -3,8 +3,8 @@
 <img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/tools.png width="375" height="322" />
 
 - [Shorten Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#shorten-videos)
-- Crop Videos
-- Downsample Videos
+- [Crop Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#crop-video)
+- [Downsample Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#downsample-video)
 - Get Coordinates
 - CLAHE
 - Add Frame Numbers
