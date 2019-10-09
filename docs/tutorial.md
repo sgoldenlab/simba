@@ -235,5 +235,15 @@ Explanation
 `Body part 2`
 
 
+### Step 12: Merge Frames
+I think this is to merge all the plot into a frames 
+
+### Step 13: Create Video
+This step is to generate a video with all the plots
+
+`Bitrate`
+
+`File format`
+
 
 
