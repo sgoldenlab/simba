@@ -2,6 +2,17 @@
 
 <img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/tools.png width="375" height="322" />
 
+- [Shorten Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#shorten-videos)
+- Crop Videos
+- Downsample Videos
+- Get Coordinates
+- CLAHE
+- Add Frame Numbers
+- Greyscale
+- Merge Frames to video
+- Generate Gifs
+- Extract Frames
+
 ## Shorten Videos
 This is a tool to trim videos using ffmpeg. It contains **Method 1** and **Method 2**
 
