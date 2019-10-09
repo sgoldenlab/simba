@@ -1,4 +1,5 @@
 # Tutorial
+This is a step by step tutorial to start using the GUI from nothing. If you have a .sav models and you would like to use this GUI without training any models, please click on this link to tutorial two.
 
 ### Pipeline breakdown:
 
@@ -187,4 +188,52 @@ This step is to train the machine model. Simon will explain this as well.
 4. Click the `SET` button to save your settings into the *config.ini* file.
 
 5. Once, the settings is saved, click on `Train Model`
+
+
+### Step 8: Run Machine Model
+Run machine model explaination goes here
+
+1. Click on `Run RF Model`
+
+### Step 9: Analyze Machine Results
+In this step, there are three main analysis, which are `Analyze`, `Analyze distance/velocity`, and `Analyze severity`.
+
+`Analyze`
+
+`Analyze distance/velocity`
+
+`Analyze severity`
+
+### Step 10: Plot Sklearn Results
+Explanation goes here 
+
+### Step 11: Plot Graphs
+Explanation goes here
+
+#### Gantt plot
+aggression plot
+
+#### Data plot
+idk
+
+#### Path plot
+explanation
+
+`Max Lines`
+
+`Severity Scale`
+
+`Bodyparts`
+
+`plot_severity`
+
+#### Distance plot
+Explanation
+
+`Body part 1`
+
+`Body part 2`
+
+
+
 
