@@ -5,7 +5,7 @@
 - [Shorten Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#shorten-videos)
 - [Crop Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#crop-video)
 - [Downsample Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#downsample-video)
-- Get Coordinates
+- [Get Coordinates](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#get-coordinates)
 - CLAHE
 - Add Frame Numbers
 - Greyscale
@@ -130,5 +130,22 @@ Let's say we want to find out the length(mm) per pixel of a video of a mouse in 
 5. Once two points are selected, hit `Esc` button and it should print out the mm per pixel on the main GUI interface.
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool4.PNG" width="400" height="250" />
+
+## Change formats
+Change formats includes **Change image format** and **Change video format**
+
+### Change image format
+This tool allows to select a folder with multiple images and convert the image format.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/changeimageformat.PNG" width="200" height="200" />
+
+1. Click on `Browse Folder` to select a folder that contains multiple images
+
+2. Choose the original image format that is in the folder
+
+3. Choose the desire output image format
+
+4. Click `Convert Image Format` .
+
 
 
