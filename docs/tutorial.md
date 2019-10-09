@@ -151,7 +151,8 @@ This step is to label the behavior in each frames
 2. Sophia will work on this...
 
 ### Step 7: Train Machine Model
-This step is to train the machine model. Simon will explain this as well.
+This step is to train the machine model. Simon will explain this as well. 
+>**Note:** If you import existing models, you can skip this step and go straight to **Step 8** to run machine model.
 
 1. Click on `Settings` and the following window will pop up. 
 
