@@ -13,7 +13,7 @@ Method 1 has the freedom to cut from the beginning of the video and from the end
 Let's say we have a 2 minute long video and we want to get rid of the first 10 seconds and the last 5 seconds of the video.
 We would start our video on the 10th second `00:00:10` and end at `00:01:55`.
 
-1. First, select the video to trim, click on `Browse File`
+1. First, click on `Browse File` to select the video to trim.
 
 2. Enter the time frame in `Start at:` entry box, in this case it will be *00:00:10*
 
@@ -47,7 +47,7 @@ This is a tool to crop videos.
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/cropvideo.PNG" width="232" height="232" />
 
-1. First, select a video to crop, click on `Browse File`
+1. First, click on `Browse File` to select a video to crop.
 
 2. Then click on `Crop Video` and the following window `Select ROI` will pop up.
 
@@ -65,11 +65,19 @@ This is a tool to crop videos.
 ## Downsample Video
 This is a tool to downsample video into smaller size and reduce the resolution of the video.
 
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/downsamplevid.PNG" width="400" height="300" />
+
 The downsample video tool has **Customize Resolution** and **Default Resolution**
 
 ### Customize Resolution
 This allows you to downsample video into any height and width.
 
-1. First, click 
+1. First, click on `Browse File` to select a video to downsample.
 
+2. Then, enter any values in the `Height` and `Width` entry boxes.
 
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/downsamplevid2.PNG" width="400" height="300" />
+
+3. Click on `Downsample Custom Resolution Video` to downsample the video, the new video will have a name of *Name of original video* + *_downsampled*.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/downsamplevid3.PNG" width="900" height="100" />
