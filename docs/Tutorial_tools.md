@@ -6,6 +6,7 @@
 - [Crop Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#crop-video)
 - [Downsample Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#downsample-video)
 - [Get Coordinates](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#get-coordinates)
+- [Change format](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#change-format)
 - CLAHE
 - Add Frame Numbers
 - Greyscale
@@ -135,7 +136,7 @@ Let's say we want to find out the length(mm) per pixel of a video of a mouse in 
 Change formats includes **Change image format** and **Change video format**
 
 ### Change image format
-This tool allows to select a folder with multiple images and convert the image format.
+This tool allows the user to select a folder with multiple images and convert the image format.
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/changeimageformat.PNG" width="200" height="200" />
 
@@ -147,5 +148,12 @@ This tool allows to select a folder with multiple images and convert the image f
 
 4. Click `Convert Image Format` .
 
+### Change video format
+This tool allows the user to **convert a .avi video to .mp4** and **convert a .mp4 video into a MS Powerpoint supported format**
 
+1. Click on `Browse File` to select a video to convert.
+
+2. Choose one of the following `Convert .avi to .mp4` or `Conert mp4 into Powerpoint supported format`
+
+3. Click `Convert video format`.
 
