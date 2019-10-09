@@ -39,3 +39,20 @@ Let's say we have a 2 minute long video and we want to get rid of the first 20 s
 
 3. Click `Cut Video` to trim video and a new shorten video will be generated, the new video will have a name of *Name of original video* + *_shorten* .
 
+
+## Crop Video
+This is a tool to crop videos.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/cropvideo.PNG" width="232" height="232" />
+
+1. First, select a video to crop, click on `Browse File`
+
+2. Then click on `Crop Video` and the following window `Select ROI` will pop up.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/cropvideo2.PNG" width="363" height="546" />
+
+3. Use your mouse to *Left Click* on the video and drag to crop the video. *You can always left click and drag on the video to recrop your video*
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/cropvideo3.PNG" width="363" height="546" />
+
+4. Hit `Enter` **twice** and it will crop the video, the new video will have a name of *Name of original video* + *_cropped*.
