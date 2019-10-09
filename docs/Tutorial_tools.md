@@ -56,3 +56,6 @@ This is a tool to crop videos.
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/cropvideo3.PNG" width="363" height="546" />
 
 4. Hit `Enter` **twice** and it will crop the video, the new video will have a name of *Name of original video* + *_cropped*.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/cropvideo4.PNG" width="900" height="100" />
+
