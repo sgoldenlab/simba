@@ -117,12 +117,13 @@ Let's say we want to find out the length(mm) per pixel of a video of a mouse in 
 
 3. Click `Get Distance`, and the following window should pop up.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool2.PNG" width="600" height="600" />
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool2.PNG" width="500" height="500" />
 
 4. Use your mouse to double *Left click* at the left side of the cage and double *Left click* again on the right side of the cage.
->**Note:** Double click the point again to change the location of the point.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool3.PNG" width="600" height="600" />
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoordtool3.PNG" width="500" height="500" />
+
+>**Note:** Double click the point again to change the location of the point.
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoord.gif" width="500" height="500" />
 
