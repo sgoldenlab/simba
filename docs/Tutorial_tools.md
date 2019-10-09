@@ -1,6 +1,6 @@
 # How to use tools in GUI
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/tools.PNG" width="375" height="322" />
+<img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/tools.png width="375" height="322" />
 
 ## Shorten Videos
 This is a tool to trim videos using ffmpeg. It contains **Method 1** and **Method 2**
