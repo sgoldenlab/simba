@@ -81,3 +81,11 @@ This allows you to downsample video into any height and width.
 3. Click on `Downsample Custom Resolution Video` to downsample the video, the new video will have a name of *Name of original video* + *_downsampled*.
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/downsamplevid3.PNG" width="900" height="100" />
+
+### Default Resolution 
+This allows you to downsample video quickly within two mouse clicks. There will be more options added into the **Default Resolution** in the future.
+
+1. Click on one of the option `1980 x 1080` or `1280 x 1024`.
+
+2. Click on `Downsample Default Resolution Video` and the video will downsample into the selected resolution.
+
