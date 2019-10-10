@@ -8,11 +8,11 @@
 - [Get Coordinates](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#get-coordinates)
 - [Change formats](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#change-formats)
 - [CLAHE](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#clahe)
-- Add Frame Numbers
-- Grayscale
-- Merge Frames to video
-- Generate Gifs
-- Extract Frames
+- [Add Frame Numbers](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#add-frame-numbers)
+- [Grayscale](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#convert-to-grayscale)
+- [Merge Frames to video]
+- [Generate Gifs]
+- [Extract Frames]
 
 ## Shorten Videos
 This is a tool to trim videos using ffmpeg. It contains **Method 1** and **Method 2**
@@ -181,3 +181,21 @@ This tool allows the user to **convert a .avi video to .mp4** and **convert a .m
 2. Select video and click `Open` and the video will be converted to grayscale.
 
 3. The new video will have a name of *Name of original video* + *_grayscale*.
+
+
+## Merge images to video
+
+1. Click on `Browse Folder` to select a folder with frames 
+
+2. Enter the image format of the frames. Eg: if the image name is *Image001.PNG*, enter *PNG* in the `Image Format` entry box.
+
+3. Enter the desire output video format. Eg: if the video should be a *.mp4*, enter *mp4* in the `Video Format` entry box.
+
+4. Enter the desire frames per second in the `fps` entry box.
+
+5. Enter the desire [bitrate](https://help.encoding.com/knowledge-base/article/understanding-bitrates-in-video-files/) for the video in the `Bitrate` entry box.
+
+6. Click `Merge Images`
+
+
+
