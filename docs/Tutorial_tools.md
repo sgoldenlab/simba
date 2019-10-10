@@ -9,7 +9,7 @@
 - [Change formats](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#change-formats)
 - [CLAHE](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#clahe)
 - Add Frame Numbers
-- Greyscale
+- Grayscale
 - Merge Frames to video
 - Generate Gifs
 - Extract Frames
@@ -165,3 +165,19 @@ This tool allows the user to **convert a .avi video to .mp4** and **convert a .m
 1. Click on the `Browse File` to select a video.
 
 2. Click `Apply CLAHE`, and the new video will have a name of *CLAHE_* *Name of original video* and it will be in a **.avi** format.
+
+## Add Frame Numbers
+
+1. Click on `Add Frame Numbers`, and a new window will pop up.
+
+2. Select video and click `Open` and frame numbers wil be superimposed to the video.
+
+3. The new video will have a name of *Name of original video* + *_frame_no*.
+
+## Convert to grayscale
+
+1. Click on `Convert to grayscale`, and a new window will pop up.
+
+2. Select video and click `Open` and the video will be converted to grayscale.
+
+3. The new video will have a name of *Name of original video* + *_grayscale*.
