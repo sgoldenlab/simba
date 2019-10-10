@@ -7,7 +7,7 @@
 - [Downsample Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#downsample-video)
 - [Get Coordinates](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#get-coordinates)
 - [Change formats](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#change-formats)
-- CLAHE
+- [CLAHE](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#clahe)
 - Add Frame Numbers
 - Greyscale
 - Merge Frames to video
@@ -160,6 +160,6 @@ This tool allows the user to **convert a .avi video to .mp4** and **convert a .m
 3. Click `Convert video format`.
 
 
-## CLAHE
+## [CLAHE](https://docs.opencv.org/3.4/d5/daf/tutorial_py_histogram_equalization.html)
 
 
