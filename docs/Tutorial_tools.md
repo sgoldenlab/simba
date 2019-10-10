@@ -155,7 +155,11 @@ This tool allows the user to **convert a .avi video to .mp4** and **convert a .m
 
 1. Click on `Browse File` to select a video to convert.
 
-2. Choose one of the following `Convert .avi to .mp4` or `Conert mp4 into Powerpoint supported format`
+2. Choose one of the following `Convert .avi to .mp4` or `Convert mp4 into Powerpoint supported format`
 
 3. Click `Convert video format`.
+
+
+## CLAHE
+
 
