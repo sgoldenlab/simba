@@ -162,4 +162,6 @@ This tool allows the user to **convert a .avi video to .mp4** and **convert a .m
 
 ## [CLAHE](https://docs.opencv.org/3.4/d5/daf/tutorial_py_histogram_equalization.html)
 
+1. Click on the `Browse File` to select a video.
 
+2. Click `Apply CLAHE`, and the new video will have a name of *CLAHE_* *Name of original video* and it will be in a **.avi** format.
