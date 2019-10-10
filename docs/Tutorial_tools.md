@@ -10,9 +10,9 @@
 - [CLAHE](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#clahe)
 - [Add Frame Numbers](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#add-frame-numbers)
 - [Grayscale](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#convert-to-grayscale)
-- [Merge Frames to video]
-- [Generate Gifs]
-- [Extract Frames]
+- [Merge Frames to video](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#merge-images-to-video)
+- [Generate Gifs](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#generate-gifs)
+- [Extract Frames]()
 
 ## Shorten Videos
 This is a tool to trim videos using ffmpeg. It contains **Method 1** and **Method 2**
@@ -197,5 +197,13 @@ This tool allows the user to **convert a .avi video to .mp4** and **convert a .m
 
 6. Click `Merge Images`
 
+## Generate Gifs
 
+1. Click on `Browse File` to select a video to convert to a GIF
+
+2. Enter the starting time of the GIF from the video in the `From time(s)` entry box.
+
+3. Enter the duration of the GIF in the `Duration(s)` entry box.
+
+4. Enter the size of the GIF in the `Width` entry box. The output GIF will be scale automatically.
 
