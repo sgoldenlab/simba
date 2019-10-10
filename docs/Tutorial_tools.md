@@ -6,7 +6,7 @@
 - [Crop Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#crop-video)
 - [Downsample Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#downsample-video)
 - [Get Coordinates](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#get-coordinates)
-- [Change format](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#change-format)
+- [Change formats](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#change-formats)
 - CLAHE
 - Add Frame Numbers
 - Greyscale
@@ -150,6 +150,8 @@ This tool allows the user to select a folder with multiple images and convert th
 
 ### Change video format
 This tool allows the user to **convert a .avi video to .mp4** and **convert a .mp4 video into a MS Powerpoint supported format**
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/changevideoformat.PNG" width="200" height="180" />
 
 1. Click on `Browse File` to select a video to convert.
 
