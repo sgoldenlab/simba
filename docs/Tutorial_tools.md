@@ -12,7 +12,7 @@
 - [Grayscale](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#convert-to-grayscale)
 - [Merge Frames to video](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#merge-images-to-video)
 - [Generate Gifs](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#generate-gifs)
-- [Extract Frames]()
+- [Extract Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_tools.md#extract-frames)
 
 ## Shorten Videos
 This is a tool to trim videos using ffmpeg. It contains **Method 1** and **Method 2**
@@ -206,4 +206,38 @@ This tool allows the user to **convert a .avi video to .mp4** and **convert a .m
 3. Enter the duration of the GIF in the `Duration(s)` entry box.
 
 4. Enter the size of the GIF in the `Width` entry box. The output GIF will be scale automatically.
+
+## Extract Frames
+Extract frames consist of **Extract Defined Frames**, **Extract Frames**, and **Extract Frames from seq files**
+
+### Extract Specific Frames
+Extract specific frames allows the user to extract from certain frames to certain frames in a video.
+
+1. Click `Browse File` to select a video.
+
+2. Enter the starting frame number in the `Start Frame` entry box.
+
+3. Enter the ending frame number in the `End Frame` entry box.
+
+4. Click `Extract Frames` to extract the frames from `Start Frame` to `End Frame`.
+
+5. A folder with the video name will be generated and the all the frames will be in the folder. The image will be in *.png* format
+
+### Extract Frames
+Extract frames allows the user to extract every frame from a video.
+
+1. Click `Browse File` to select a video.
+
+2. Click `Extract All Frames` to extract every frames from the video.
+
+3. A folder with the video name will be generated and the all the frames will be in the folder. The image will be in *.png* format
+
+### Extract Frames from seq files
+Extract frames from seq files allows the user to extract every frame from a .seq file.
+
+1. Click `Browse File` to select a video.
+
+2. Click `Extract All Frames` to extract every frames from the video.
+
+3. A folder with the video name will be generated and the all the frames will be in the folder. The image will be in *.png* format
 
