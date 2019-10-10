@@ -3,132 +3,122 @@ import pandas as pd
 from PIL import Image, ImageTk
 import os
 from tkinter import filedialog
-import re
 from configparser import ConfigParser
 from subprocess import *
-import signal
 
-currentVideo = 0
+current_video = ""
 frames_in = []
-
-currentFrameNumber = 0
+current_frame_number = 0
 cur_dir = os.getcwd()
 behaviors = []
-
-newIndex = []
+new_index = []
 columns = []
-df = pd.DataFrame(index=newIndex, columns=columns)
+df = pd.DataFrame(index=new_index, columns=columns)
+jump_size = 0
 
-jumpSize = 0
 
 # Resets variables and dataFrame
 def reset():
-    global newIndex
+    global new_index
     global columns
     global df
     global behaviors
 
     behaviors = []
-    newIndex = []
+    new_index = []
     columns = []
-    df = pd.DataFrame(index=newIndex, columns=columns)
+    df = pd.DataFrame(index=new_index, columns=columns)
 
-# Retrieves behavior names as indicated by user
-def configure():
 
-    configFile = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/project_config.ini"
+# Retrieves behavior names from the config file
+def configure(file_name):
     config = ConfigParser()
-    config.read(configFile)
+    config.read(file_name)
+    number_of_targets = config.get('SML settings', 'No_targets')
 
-    numberOfTargets = config.get('SML settings', 'No_targets')
-
-    for i in range(1, int(numberOfTargets)+1):
+    for i in range(1, int(number_of_targets)+1):
         target = config.get('SML settings', 'target_name_' + str(i))
         columns.append(target)
         behaviors.append(0)
-        # print(columns)
-        # print(behaviors)
         df[columns[i-1]] = 0
 
-class main_interface():
+
+# Initializes all GUI widgets
+class MainInterface:
     def __init__(self):
-        window = Toplevel()
-        folder = Frame(window)
+        self.window = Toplevel()
+        folder = Frame(self.window)
         folder.grid(row=0, column=1, sticky=N)
 
-
-        # Dictionary of behaviors and their variables
-        self.cbDic = {}
-
-        for i in range(len(columns)):
-            self.cbDic[columns[i]] = IntVar(value = behaviors[i])
-        # print(self.cbDic)
-
-        # Navigate button frames
-        self.button_frame = Frame(window, bd=2, width=700, height=300)
+        # Advancing Buttons
+        self.button_frame = Frame(self.window, bd=2, width=700, height=300)
         self.button_frame.grid(row=1, column=0)
 
         self.frameNumber = Label(self.button_frame, text="Frame Number")
         self.frameNumber.grid(row=0, column=1)
-        self.forward = Button(self.button_frame, text=">", command=lambda: load_frame('>', currentFrameNumber, window, self.fbox))
+        self.forward = Button(self.button_frame, text=">",
+                              command=lambda: load_frame(current_frame_number+1, self.window, self.fbox))
         self.forward.grid(row=1, column=3, sticky=E)
         self.forward = Button(self.button_frame, text=">>",
-                              command=lambda: load_frame('jump', len(frames_in) - 1, window, self.fbox))
+                              command=lambda: load_frame(len(frames_in) - 1, self.window, self.fbox))
         self.forward.grid(row=1, column=4, sticky=E)
-        self.back = Button(self.button_frame, text="<", command=lambda: load_frame('<', currentFrameNumber, window, self.fbox))
+        self.back = Button(self.button_frame, text="<",
+                           command=lambda: load_frame(current_frame_number-1, self.window, self.fbox))
         self.back.grid(row=1, column=1, sticky=W)
-        self.back = Button(self.button_frame, text="<<", command=lambda: load_frame('jump', 0, window, self.fbox))
+        self.back = Button(self.button_frame, text="<<", command=lambda: load_frame(0, self.window, self.fbox))
         self.back.grid(row=1, column=0, sticky=W)
 
-        n = StringVar(window, value=currentFrameNumber)
+        n = StringVar(self.window, value=current_frame_number)
         self.fbox = Entry(self.button_frame, width=4, textvariable=n)
         self.fbox.grid(row=1, column=1)
         self.select = Button(self.button_frame, text="Jump to selected frame", command=lambda:
-            load_frame('jump',int(self.fbox.get()),window, self.fbox))
+            load_frame(int(self.fbox.get()), self.window, self.fbox))
         self.select.grid(row=2, column=1, sticky=N)
 
-        # Jump a certain number of frames
-        self.jump_frame = Frame(window)
+        # Jump Buttons
+        self.jump_frame = Frame(self.window)
         self.jump_frame.grid(row=2, column=0)
         self.jump = Label(self.jump_frame, text="Jump Size:")
         self.jump.grid(row=0, column=0, sticky=W)
         self.jump_size = Scale(self.jump_frame, from_=0, to=100, orient=HORIZONTAL, length=200)
-        self.jump_size.set(jumpSize)
+        self.jump_size.set(jump_size)
         self.jump_size.grid(row=0, column=1, sticky=W)
         self.jump_forward = Button(self.jump_frame, text="<<", command=lambda:
-            load_frame('jump', int(self.fbox.get()) - self.jump_size.get(),window, self.fbox))
-
+            load_frame(int(self.fbox.get()) - self.jump_size.get(), self.window, self.fbox))
         self.jump_forward.grid(row=0, column=2, sticky=E)
         self.jump_back = Button(self.jump_frame, text=">>", command=lambda:
-            load_frame('jump', int(self.fbox.get()) + self.jump_size.get(),window, self.fbox))
+            load_frame(int(self.fbox.get()) + self.jump_size.get(), self.window, self.fbox))
         self.jump_back.grid(row=0, column=3, sticky=W)
 
-        # Check behaviors
-        self.check_frame = Frame(window, bd=2, width=300, height=500)
+        # Behavior Checkboxes
+        self.check_frame = Frame(self.window, bd=2, width=300, height=500)
         self.check_frame.grid(row=0, column=1)
 
         self.blabel = Label(self.check_frame, text="Check Behaviors:")
         self.blabel.config(font=("Calibri", 20))
         self.blabel.grid(sticky=N)
 
-        # Generates checkboxes based on user-specified behaviors
+        # Generates corresponding checkboxes according to config file
+        self.cbDic = {}
+
+        for i in range(len(columns)):
+            self.cbDic[columns[i]] = IntVar(value = behaviors[i])
+
         for key in self.cbDic:
             checkbox = Checkbutton(self.check_frame, text=key, variable=self.cbDic[key],
-                                   command=lambda: setValues(self.cbDic))
+                                   command=lambda: set_values(self.cbDic))
             checkbox.grid(sticky=W)
 
-        # Save
-        save = Button(window, text="Save and Advance to the next frame", command=lambda: self.save_checkBoxes(window))
+        # Save Button
+        save = Button(self.window, text="Save and Advance to the next frame",
+                      command=lambda: self.save_checkboxes(self.window))
         save.config(font=("Calibri", 16))
         save.grid(row=1, column=1, sticky=N)
 
-        # Select a range of frames
+        # Saving a Range of Frames
         self.rangeOn = IntVar(value=0)
-
-        self.rangeFrames = Frame(window)
+        self.rangeFrames = Frame(self.window)
         self.rangeFrames.grid(row=1, column=1, sticky=S)
-        # self.selectrangedescription = Label(self.rangeFrames,text='To set multiple frames that contains behavior(s), select range below.')
-        # self.selectrangedescription.grid(row=0)
         self.select_range = Checkbutton(self.rangeFrames, text='Frame Range ', variable=self.rangeOn)
         self.select_range.grid(row=0, column=0, sticky=W)
         self.firstFrame = Entry(self.rangeFrames, width=4)
@@ -138,136 +128,158 @@ class main_interface():
         self.lastFrame = Entry(self.rangeFrames, width=4)
         self.lastFrame.grid(row=0, column=3, sticky=E)
 
-        self.generate = Button(window, text="Generate and Quit", command=lambda: saveVideo(window))
+        # Quit Button
+        self.generate = Button(self.window, text="Generate and Quit", command=lambda: save_video(self.window))
         self.generate.grid(row=2, column=1, sticky=N)
 
-        load_frame('jump', 0, window, self.fbox)
+        # Loads the first frame
+        load_frame(0, self.window, self.fbox)
 
-        videoPlayer = Frame(window, width = 100, height = 100)
-        videoPlayer.grid(row = 0, column = 2, sticky = N)
-
-
-        video = Button(videoPlayer, text = 'Open Current Video', command = lambda: playVideo())
-        video.grid(sticky = W)
-        videoKey = Label(videoPlayer, text = 'Press: \n p = Pause/Play'
+        # Video Player
+        video_player = Frame(self.window, width=100, height=100)
+        video_player.grid(row=0, column=2, sticky=N)
+        video = Button(video_player, text='Open Current Video', command=lambda: play_video())
+        video.grid(sticky=W)
+        video_key = Label(video_player, text='\n\n For Video: \n p = Pause/Play'
                                              '\n\n After pressing pause:'
                                              '\n o = Forward 2 Frames \n e = Forward 10 Frames \n w = Forward 1 Second'
                                              '\n\n t = Back up 2 Frames \n s = Back up 10 Frames \n x = Back up 1 Second'
-                                             '\n\n q = Quit')
-        videoKey.grid(sticky = W)
-        update = Button(videoPlayer, text = 'Show current video frame', command = lambda: updateFrameFromVideo(window, self.fbox))
-        update.grid(sticky = N)
+                                             '\n\n q = Quit \n\n')
+        video_key.grid(sticky=W)
+        update = Button(video_player, text='Show current video frame',
+                        command=lambda: update_frame_from_video(self.window, self.fbox))
+        update.grid(sticky=N)
+        self.bind_keys()
+        key_presses = Label(video_player, text='\n\n Key Presses: \n Right Arrow = +1 Frame'
+                                             '\n Left Arrow = -1 Frame'
+                                             '\n Ctrl + s = Save and +1 Frame'
+                                             '\n Ctrl + l = Last Frame'
+                                             '\n Ctrl + o = First Frame')
+        key_presses.grid(sticky=S)
 
-    def save_checkBoxes(self, master):
+    # Detects user key presses
+    def bind_keys(self):
+        self.window.bind('<Control-s>', lambda x: self.save_checkboxes(self.window))
+        self.window.bind('<Right>', lambda x: load_frame(current_frame_number+1, self.window, self.fbox))
+        self.window.bind('<Left>', lambda x: load_frame(current_frame_number-1, self.window, self.fbox))
+        self.window.bind('<Control-q>', lambda x: save_video(self.window))
+        self.window.bind('<Control-l>', lambda x: load_frame(len(frames_in) - 1, self.window, self.fbox))
+        self.window.bind('Control-o>', lambda x: load_frame(0, self.window, self.fbox))
+
+    # Saves the values of each behavior and advances either to the next or by a set number of frames
+    def save_checkboxes(self, master):
         if self.rangeOn.get():
             s = int(self.firstFrame.get())
             e = int(self.lastFrame.get())
-            saveValues(s, e)
+            print(s, e)
+            save_values(s, e)
             if e < len(frames_in) - 1:
-                load_frame('jump', e + 1, master, self.fbox)
+                load_frame(e + 1, master, self.fbox)
             else:
-                load_frame('jump', e, master, self.fbox)
+                load_frame(e, master, self.fbox)
         else:
-            s = currentFrameNumber
+            s = current_frame_number
             e = s
-            saveValues(s, e)
-            load_frame('>', e, master, self.fbox)
+            save_values(s, e)
+            load_frame(e+1, master, self.fbox)
 
-    # def setJumpSize(self, scale):
-    #     global jumpSize
-    #     jumpSize = scale.get()
 
-# Current frame widgets
-class currentFrame():
-
-    def __init__(self, master):
-
-        # Import and resize image
-        max_size = 1080, 650
-        self.current_image = Image.open(frames_in[currentFrameNumber])
-        # self.current_image = self.current_image.resize((1080, 650), Image.ANTIALIAS)
-        self.current_image.thumbnail(max_size, Image.ANTIALIAS)
-        self.current_frame = ImageTk.PhotoImage(master=master, image=self.current_image)
-
-        self.video_frame = Label(master, image=self.current_frame)
-        self.video_frame.image = self.current_frame
-        self.video_frame.grid(row=0, column=0)
-
-# Video
-def playVideo():
-    scriptDirectory = os.path.dirname(os.path.realpath(__file__))
-    #print(scriptDirectory + "/play_video.py")
-    p = Popen('python ' + str(scriptDirectory) +r"/play_video.py", stdin=PIPE, stdout=PIPE, shell=True)
-    print(p)
-    print(type(p))
-    data = bytes(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2] + '/videos/Video' + str(currentVideo) + '.mp4', 'utf-8')
+# Opens the video that corresponds to the matching labelling folder
+def play_video():
+    script_directory = os.path.dirname(os.path.realpath(__file__))
+    p = Popen('python ' + str(script_directory) + r"/play_video.py", stdin=PIPE, stdout=PIPE, shell=True)
+    main_project_dir = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])
+    video_dir = main_project_dir + '\\videos\\'
+    video_list = os.listdir(video_dir)
+    current_video_name = os.path.basename(os.getcwd())
+    current_full_video_name = [i for i in video_list if current_video_name in i]
+    current_full_video_name = current_full_video_name[0]
+    print(current_full_video_name)
+    data = bytes(video_dir+str(current_full_video_name), 'utf-8')
     p.stdin.write(data)
     p.stdin.close()
     path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
     with open(path, "w") as text_file:
         text_file.write(str(p.pid))
 
-def updateFrameFromVideo(master, entryBox):
+
+# Updates and loads the frame corresponding to the frame the video is paused on
+def update_frame_from_video(master, entrybox):
     f = open(str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/labelling_info.txt", 'r+')
-    #print(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2] + "/labelling_info.txt")
     os.fsync(f.fileno())
-    vidFrameNo = int(f.readline())
-    print(vidFrameNo)
-    load_frame('jump', vidFrameNo, master, entryBox)
+    vid_frame_no = int(f.readline())
+    print(vid_frame_no)
+    load_frame(vid_frame_no, master, entrybox)
     f.close()
 
-# Opening screen
-class chooseFolder():
-    def __init__(self):
-        # Locates user specified folder
-        global currentVideo
-        img_dir = filedialog.askdirectory()
-        os.chdir(img_dir)
-        print("Working directory is %s" % os.getcwd())
-        # folder_label = Label(window, text="Folder selected: %s" % os.getcwd())
-        # folder_label.grid(column=1, sticky=S)
-        dirpath = os.path.basename(os.getcwd())
-        currentVideo = int((re.search(r'\d+', dirpath)).group())
-        print('Current Video: ' + str(currentVideo))
 
-        # Creates new data frame and loads frame
+# Opens a dialogue box where user chooses folder with video frames for labelling, then
+# loads the config file, creates an empty dataframe and loads the interface,
+# Prints working directory, current video name, and number of frames in folder.
+def choose_folder(project_name):
+    global current_video
+    img_dir = filedialog.askdirectory()
+    os.chdir(img_dir)
+    print("Working directory is %s" % os.getcwd())
+    dirpath = os.path.basename(os.getcwd())
+    current_video = dirpath
+    print('Current Video: ' + current_video)
+
+    global frames_in
+    frames_in = []
+    for i in os.listdir(os.curdir):
+        if i.__contains__(".png"):
+            frames_in.append(i)
         reset()
-        global frames_in
-        frames_in = []
-        for i in os.listdir(os.curdir):
-            if i.__contains__(".png"):
-                frames_in.append(i)
 
-        frames_in = sorted(frames_in, key=lambda x: int(x.split('.')[0]))
-        # print(frames_in)
-        numberOfFrames = len(frames_in)
-        print ("Number of Frames: " + str(numberOfFrames))
+    frames_in = sorted(frames_in, key=lambda x: int(x.split('.')[0]))
+    # print(frames_in)
+    number_of_frames = len(frames_in)
+    print("Number of Frames: " + str(number_of_frames))
 
-        configure()
-        main_interface()
-        createDataFrame(numberOfFrames)
+    configure(project_name)
 
-# Loads a new frame
-def load_frame(string, number, master, entry):
-    global currentFrameNumber
-    if number > 0 and string == '<':
-        currentFrameNumber -= 1
-    elif number < len(frames_in)-1 and string == '>':
-        currentFrameNumber += 1
-    elif string == 'jump':
-        currentFrameNumber = number
+    MainInterface()
+    create_data_frame(number_of_frames)
 
-    entry.delete(0, END)
-    entry.insert(0, currentFrameNumber)
-    currentFrame(master)
 
-# Create a new Pandas DataFrame for current Video
-def createDataFrame(number):
+# Loads a new image frame
+def load_frame(number, master, entry):
+    global current_frame_number
+    max_index_frames_in = len(frames_in) - 1
+    try:
+        if number > max_index_frames_in:
+            print("Reached End of Frames")
+            current_frame_number = max_index_frames_in
+        elif number < 0:
+            current_frame_number = 0
+        else:
+            current_frame_number = number
+
+        entry.delete(0, END)
+        entry.insert(0, current_frame_number)
+
+        max_size = 1080, 650
+        current_image = Image.open(frames_in[current_frame_number])
+        current_image.thumbnail(max_size, Image.ANTIALIAS)
+        current_frame = ImageTk.PhotoImage(master=master, image=current_image)
+
+        video_frame = Label(master, image=current_frame)
+        video_frame.image = current_frame
+        video_frame.grid(row=0, column=0)
+
+    except IndexError:
+        pass
+
+
+# Creates a new Pandas DataFrame for current Video
+def create_data_frame(number):
     df.insert(0, 'frames.', list(range(0, number)))
     print(df)
 
-# Changes the global variables for each frame
-def setValues(dictionary):
+
+# Temporarily updates the value of each variable for each frame to either 0 or 1
+def set_values(dictionary):
     global behaviors
     for key, item in dictionary.items():
         # print(item.get())
@@ -277,34 +289,32 @@ def setValues(dictionary):
                 behaviors[i] = item.get()
     # print(behaviors)
 
-# Saves the values in dataFrame
-def saveValues(start, end):
+
+# Saves the values of each behavior in the DataFrame and prints out the updated data frame
+def save_values(start, end):
     if start == end:
         for i in range(len(behaviors)):
-            df.at[currentFrameNumber, columns[i]] = int(behaviors[i])
+            df.at[current_frame_number, columns[i]] = int(behaviors[i])
     if start != end:
         for i in range(start, end+1):
             for b in range(len(behaviors)):
                 df.at[i, columns[b]] = int(behaviors[b])
-    print(df)
+    print(df.ix[current_frame_number - 25: current_frame_number + 25])
+
 
 # Appends data to corresponding features_extracted csv and exports as new csv
-def saveVideo(master):
-    input = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\features_extracted\Video" + \
-            str(currentVideo) + '.csv'
-    output = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\targets_inserted\Video" + \
-            str(currentVideo) + '.csv'
-    data = pd.read_csv(input)
-    # print(data.drop([0,1], axis = 0).head(3))
-    # dropped_data = pd.DataFrame(data.drop([0,1], axis = 0)).reset_index(drop = TRUE)
-
-    df.insert(0, 'video_no', currentVideo)
-    new_data = pd.concat([data, df], axis = 1)
+def save_video(master):
+    input_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\features_extracted\\" \
+                 + current_video + '.csv'
+    output_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\targets_inserted\\" \
+                  + current_video + '.csv'
+    data = pd.read_csv(input_file)
+    df.insert(0, 'video_no', current_video)
+    new_data = pd.concat([data, df], axis=1)
     new_data = new_data.fillna(0)
     new_data.rename(columns={'Unnamed: 0': 'scorer'}, inplace=True)
 
-    new_data.to_csv(output, index = FALSE)
-    print(output)
-    print('Video_' + str(currentVideo) + '.csv targets inserted created')
+    new_data.to_csv(output_file, index=FALSE)
+    print(output_file)
+    print('Video_' + current_video + '.csv targets inserted created')
     master.destroy()
-

@@ -268,8 +268,7 @@ def clahe_batch(directory):
 
     ########### FIND FILES ###########
     for i in os.listdir(directory):
-        if i.__contains__(".mp4"):
-            filesFound.append(i)
+        filesFound.append(i)
 
     os.chdir(directory)
     print('Applying CLAHE, this might take awhile...')
@@ -354,43 +353,3 @@ def cropvid_batch(directory,filenames):
     elif total == 0:
         print('nothing added to the script as no coordinates was selected')
 
-def extract_frames_ini(directory):
-    filesFound = []
-
-    def execute(command):
-        print(command)
-        subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-
-    ########### FIND FILES ###########
-    for i in os.listdir(directory):
-        if i.__contains__(".mp4"):
-            filesFound.append(i)
-
-
-    for i in filesFound:
-        pathDir1 = str(i[:-4])
-        pathDir0 =str(str(os.path.dirname(directory)) +'\\frames\\input' )
-        pathDir = str(str(pathDir0)+'\\' + pathDir1)
-
-        if not os.path.exists(pathDir):
-            os.makedirs(pathDir)
-            picFname = '%d.png'
-
-            saveDirFilenames = os.path.join(pathDir, picFname)
-
-            fname = str(directory)+'\\' + str(i)
-            cap = cv2.VideoCapture(fname)
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            amount_of_frames = cap.get(7)
-            print('The number of frames in this video = ',amount_of_frames)
-            print('Extracting frames... (Might take awhile)')
-            command = str('ffmpeg -i ' + str(fname) + ' ' + '-q:v 1' + ' ' + '-start_number 0' + ' ' + str(saveDirFilenames))
-            print(command)
-            subprocess.call(command, shell=True)
-            print('Frames were extracted for',os.path.basename(pathDir))
-
-
-        else:
-            print(os.path.basename(pathDir),'existed, no action taken, frames should be in there')
-
-    print('All frames were extracted.')

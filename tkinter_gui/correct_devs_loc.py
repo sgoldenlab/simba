@@ -39,7 +39,7 @@ def dev_loc(projectini):
 
     reliableCoordinates = np.zeros((7, 2))
 
-    criterion = config.getint('Outlier settings', 'location_criterion')
+    criterion = config.getfloat('Outlier settings', 'location_criterion')
 
     ########### FIND CSV FILES ###########
     if use_master == 'yes':

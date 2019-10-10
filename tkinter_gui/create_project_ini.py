@@ -91,7 +91,7 @@ def write_inifile(model_list,msconfig,project_path,project_name,no_targets,targe
     f.write('Deque_points = ' +'\n')
     f.write('Behaviour_points = ' + '\n')
     f.write('plot_severity = ' + '\n')
-    f.write('severity_brackets = ' + '\n')
+    f.write('severity_brackets = 10' + '\n')
     f.write('file_format = .bmp' + '\n')
     f.write('\n')
 
@@ -124,6 +124,7 @@ def write_inifile(model_list,msconfig,project_path,project_name,no_targets,targe
     f.write('model_evaluation_path =  \n')
     f.write('discrimination_threshold  = 0.49 \n')
     f.write('Feature_importances_to_plot = 15 \n')
+    f.write('ensemble_method = RF \n')
     f.write('\n')
 
     #outliersettings

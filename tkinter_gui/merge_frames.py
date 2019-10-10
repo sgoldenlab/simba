@@ -124,3 +124,4 @@ def merge_frames_config(configini):
             cv2.imwrite(saveFramePath, final_horizontalConcat)
             print('image saved ' + str(loopy))
             loopy += 1
+        print('Merge frames complete.')

@@ -23,7 +23,7 @@ def extract_features_wotarget(inifile):
     resWidth = config.getint('Frame settings', 'resolution_width')
     resHeight = config.getint('Frame settings', 'resolution_height')
     vidInfPath = config.get('General settings', 'project_path')
-    vidInfPath = os.path.join(vidInfPath, 'project_folder', 'logs')
+    vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
 
@@ -42,13 +42,9 @@ def extract_features_wotarget(inifile):
     filesFound = []
     videosFound = []
     roll_windows = []
-    roll_windows_values = [1, 2, 4, 8, 16, 32]
+    roll_windows_values = [2, 5, 6, 7.5, 15]
     loop = 1
     loopy = 0
-
-    ########### DEFINES FRAMES IN ROLLING WINDOW (0.5s) ###########
-    for i in range(len(roll_windows_values)):
-        roll_windows.append(int(round(fps / roll_windows_values[i])))
 
     ########### FIND CSV FILES ###########
     if use_master == 'yes':
@@ -127,9 +123,12 @@ def extract_features_wotarget(inifile):
             resWidth = config.getint('Frame settings', 'resolution_width')
             resHeight = config.getint('Frame settings', 'resolution_height')
         # get current pixels/mm
-        currPixPerMM = vidinfDf.loc[vidinfDf['Video'] == currVidName]
-        currPixPerMM = float(currPixPerMM['pixels/mm'])
-        print(currPixPerMM)
+        currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
+        currPixPerMM = float(currVideoSettings['pixels/mm'])
+        fps = float(currVideoSettings['fps'])
+        print(currPixPerMM, fps)
+        for i in range(len(roll_windows_values)):
+            roll_windows.append(int(fps / roll_windows_values[i]))
         loopy += 1
         columnHeaders = ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
                          "Ear_right_1_p", "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p",
@@ -368,294 +367,204 @@ def extract_features_wotarget(inifile):
         csv_df['Total_movement_all_bodyparts_both_mice'] = csv_df['Total_movement_all_bodyparts_M1'] + csv_df[
             'Total_movement_all_bodyparts_M2']
 
-        ########### CALC ROLLING WINDOWS MEDIAN###########################################
-        print('Calculating rolling windows: sums...')
+        ########### CALC ROLLING WINDOWS MEDIANS AND MEANS ###########################################
+        print('Calculating rolling windows: medians, medians, and sums...')
 
         for i in range(len(roll_windows_values)):
             currentColName = 'Sum_euclid_distances_hull_median_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Sum_euclidean_distance_hull_M1_M2'].rolling(roll_windows[i],
                                                                                          min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Movement_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Distance_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Centroid_distance'].rolling(roll_windows[i], min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse1_width_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Mouse_1_width'].rolling(roll_windows[i], min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse2_width_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Mouse_2_width'].rolling(roll_windows[i], min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse1_mean_euclid_distances_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M1_mean_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                       min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse2_mean_euclid_distances_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M2_mean_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                       min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse1_smallest_euclid_distances_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M1_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                           min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse2_smallest_euclid_distances_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M2_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                           min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse1_largest_euclid_distances_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M1_largest_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                          min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse2_largest_euclid_distances_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M2_largest_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                          min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Total_movement_all_bodyparts_both_mice_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Total_movement_all_bodyparts_both_mice'].rolling(roll_windows[i],
-                                                                                              min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Total_movement_centroids_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Tail_base_movement_M1_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_base'].rolling(roll_windows[i],
-                                                                                  min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Tail_base_movement_M2_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_base'].rolling(roll_windows[i],
-                                                                                  min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Centroid_movement_M1_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_1_centroid'].rolling(roll_windows[i],
-                                                                                 min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Centroid_movement_M2_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_2_centroid'].rolling(roll_windows[i],
-                                                                                 min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Tail_end_movement_M1_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_end'].rolling(roll_windows[i],
-                                                                                 min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Tail_end_movement_M2_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_end'].rolling(roll_windows[i],
-                                                                                 min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Nose_movement_M1_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_1_nose'].rolling(roll_windows[i], min_periods=1).median()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Nose_movement_M2_median_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_2_nose'].rolling(roll_windows[i], min_periods=1).median()
-
-        ########### CALC ROLLING WINDOWS MEAN###########################################
-        print('Calculating rolling windows: means...')
-
-        for i in range(len(roll_windows_values)):
             currentColName = 'Sum_euclid_distances_hull_mean_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Sum_euclidean_distance_hull_M1_M2'].rolling(roll_windows[i],
                                                                                          min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Movement_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Distance_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Centroid_distance'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse1_width_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Mouse_1_width'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse2_width_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Mouse_2_width'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse1_mean_euclid_distances_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M1_mean_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                       min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse2_mean_euclid_distances_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M2_mean_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                       min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse1_smallest_euclid_distances_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M1_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                           min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse2_smallest_euclid_distances_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M2_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                           min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse1_largest_euclid_distances_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M1_largest_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                          min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Mouse2_largest_euclid_distances_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['M2_largest_euclidean_distance_hull'].rolling(roll_windows[i],
-                                                                                          min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Total_movement_all_bodyparts_both_mice_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Total_movement_all_bodyparts_both_mice'].rolling(roll_windows[i],
-                                                                                              min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Total_movement_centroids_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Tail_base_movement_M1_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_base'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Tail_base_movement_M2_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_base'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Centroid_movement_M1_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_1_centroid'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Centroid_movement_M2_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_2_centroid'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Tail_end_movement_M1_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_end'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Tail_end_movement_M2_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_end'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Nose_movement_M1_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_1_nose'].rolling(roll_windows[i], min_periods=1).mean()
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Nose_movement_M2_mean_' + str(roll_windows_values[i])
-            csv_df[currentColName] = csv_df['Movement_mouse_2_nose'].rolling(roll_windows[i], min_periods=1).mean()
-
-        ########### CALC ROLLING WINDOWS SUM###########################################
-        print('Calculating rolling windows: sum...')
-
-        for i in range(len(roll_windows_values)):
             currentColName = 'Sum_euclid_distances_hull_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Sum_euclidean_distance_hull_M1_M2'].rolling(roll_windows[i],
                                                                                          min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Movement_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).median()
+            currentColName = 'Movement_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Movement_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Distance_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Centroid_distance'].rolling(roll_windows[i], min_periods=1).median()
+            currentColName = 'Distance_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Centroid_distance'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Distance_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Centroid_distance'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Mouse1_width_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Mouse_1_width'].rolling(roll_windows[i], min_periods=1).median()
+            currentColName = 'Mouse1_width_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Mouse_1_width'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Mouse1_width_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Mouse_1_width'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Mouse2_width_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Mouse_2_width'].rolling(roll_windows[i], min_periods=1).median()
+            currentColName = 'Mouse2_width_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Mouse_2_width'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Mouse2_width_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Mouse_2_width'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Mouse1_mean_euclid_distances_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M1_mean_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                       min_periods=1).median()
+            currentColName = 'Mouse1_mean_euclid_distances_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M1_mean_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                       min_periods=1).mean()
             currentColName = 'Mouse1_mean_euclid_distances_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['M1_mean_euclidean_distance_hull'].rolling(roll_windows[i],
                                                                                        min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Mouse2_mean_euclid_distances_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M2_mean_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                       min_periods=1).median()
+            currentColName = 'Mouse2_mean_euclid_distances_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M2_mean_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                       min_periods=1).mean()
             currentColName = 'Mouse2_mean_euclid_distances_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['M2_mean_euclidean_distance_hull'].rolling(roll_windows[i],
                                                                                        min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Mouse1_smallest_euclid_distances_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M1_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                           min_periods=1).median()
+            currentColName = 'Mouse1_smallest_euclid_distances_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M1_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                           min_periods=1).mean()
             currentColName = 'Mouse1_smallest_euclid_distances_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['M1_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
                                                                                            min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Mouse2_smallest_euclid_distances_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M2_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                           min_periods=1).median()
+            currentColName = 'Mouse2_smallest_euclid_distances_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M2_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                           min_periods=1).mean()
             currentColName = 'Mouse2_smallest_euclid_distances_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['M2_smallest_euclidean_distance_hull'].rolling(roll_windows[i],
                                                                                            min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Mouse1_largest_euclid_distances_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M1_largest_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                          min_periods=1).median()
+            currentColName = 'Mouse1_largest_euclid_distances_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M1_largest_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                          min_periods=1).mean()
             currentColName = 'Mouse1_largest_euclid_distances_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['M1_largest_euclidean_distance_hull'].rolling(roll_windows[i],
                                                                                           min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Mouse2_largest_euclid_distances_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M2_largest_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                          min_periods=1).median()
+            currentColName = 'Mouse2_largest_euclid_distances_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['M2_largest_euclidean_distance_hull'].rolling(roll_windows[i],
+                                                                                          min_periods=1).mean()
             currentColName = 'Mouse2_largest_euclid_distances_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['M2_largest_euclidean_distance_hull'].rolling(roll_windows[i],
                                                                                           min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Total_movement_all_bodyparts_both_mice_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Total_movement_all_bodyparts_both_mice'].rolling(roll_windows[i],
+                                                                                              min_periods=1).median()
+            currentColName = 'Total_movement_all_bodyparts_both_mice_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Total_movement_all_bodyparts_both_mice'].rolling(roll_windows[i],
+                                                                                              min_periods=1).mean()
             currentColName = 'Total_movement_all_bodyparts_both_mice_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Total_movement_all_bodyparts_both_mice'].rolling(roll_windows[i],
                                                                                               min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Total_movement_centroids_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).median()
+            currentColName = 'Total_movement_centroids_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Total_movement_centroids_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Total_movement_centroids'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Tail_base_movement_M1_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_base'].rolling(roll_windows[i],
+                                                                                  min_periods=1).median()
+            currentColName = 'Tail_base_movement_M1_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_base'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Tail_base_movement_M1_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_1_tail_base'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Tail_base_movement_M2_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_base'].rolling(roll_windows[i],
+                                                                                  min_periods=1).median()
+            currentColName = 'Tail_base_movement_M2_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_base'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Tail_base_movement_M2_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_2_tail_base'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Centroid_movement_M1_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_centroid'].rolling(roll_windows[i],
+                                                                                 min_periods=1).median()
+            currentColName = 'Centroid_movement_M1_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_centroid'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Centroid_movement_M1_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_1_centroid'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Centroid_movement_M2_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_centroid'].rolling(roll_windows[i],
+                                                                                 min_periods=1).median()
+            currentColName = 'Centroid_movement_M2_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_centroid'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Centroid_movement_M2_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_2_centroid'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Tail_end_movement_M1_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_end'].rolling(roll_windows[i],
+                                                                                 min_periods=1).median()
+            currentColName = 'Tail_end_movement_M1_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_end'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Tail_end_movement_M1_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_1_tail_end'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Tail_end_movement_M2_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_end'].rolling(roll_windows[i],
+                                                                                 min_periods=1).median()
+            currentColName = 'Tail_end_movement_M2_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_end'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Tail_end_movement_M2_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_2_tail_end'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Nose_movement_M1_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_nose'].rolling(roll_windows[i], min_periods=1).median()
+            currentColName = 'Nose_movement_M1_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_nose'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Nose_movement_M1_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_1_nose'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Nose_movement_M2_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_nose'].rolling(roll_windows[i], min_periods=1).median()
+            currentColName = 'Nose_movement_M2_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_nose'].rolling(roll_windows[i], min_periods=1).mean()
             currentColName = 'Nose_movement_M2_sum_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_2_nose'].rolling(roll_windows[i], min_periods=1).sum()
 
@@ -824,7 +733,7 @@ def extract_features_wotarget(inifile):
 
         for k in range(len(roll_windows_values)):
             start = 0
-            end = start + roll_windows_values[k]
+            end = start + int(roll_windows_values[k])
             tortuosity_M1 = []
             tortuosity_M2 = []
             for y in range(len(csv_df)):

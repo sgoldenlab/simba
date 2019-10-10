@@ -2,25 +2,31 @@ import cv2
 import sys
 import os
 import signal
-
+import pandas as pd
 
 currentVideoPath = sys.stdin.readline()
 capture = cv2.VideoCapture(currentVideoPath)
-# capture = cv2.VideoCapture('/Volumes/data/DeepLabCut/Videos/BW/DLC/Video6.mp4')
-fps = 25
 frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
 width = int(capture.get(3))
 height = int(capture.get(4))
 f = open(str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + '/labelling_info.txt', 'w')
+video_info_path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])) + '/logs/video_info.csv'
+vidinfDf = pd.read_csv(video_info_path)
+videoName = os.path.basename(currentVideoPath)
+videoName = videoName.split('.', 2)[0]
+currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == videoName]
+fps = int(currVideoSettings['fps'])
+timeBetFrames = int(1000/fps)
 
 def printOnFrame(currentFrame):
-    currentTime = currentFrame / 25
+    currentTime = currentFrame / fps
+    currentTime = round(currentTime, 2)
     cv2.putText(frame, 'F~ ' + str(currentFrame), (10, (height - 20)), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 255), 2)
     cv2.putText(frame, 'T~ ' + str(currentTime), (10, (height - 80)), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 255), 2)
 
 while True:
     ret, frame = capture.read()
-    key = cv2.waitKey(1) & 0xff
+    key = cv2.waitKey(timeBetFrames) & 0xff
     if key == ord('p'):
         while True:
             key2 = cv2.waitKey(1) or 0xff

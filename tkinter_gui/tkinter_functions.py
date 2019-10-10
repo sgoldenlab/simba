@@ -1,4 +1,5 @@
 import subprocess
+import numpy as np
 import os
 import cv2
 from os import listdir
@@ -8,10 +9,36 @@ from PIL import Image
 import glob
 import pathlib
 
+def generategif(filename,starttime,duration,size):
+    if starttime =='' or duration =='' or size =='':
+        print('Please make sure all the boxes are filled before continue')
+    elif filename != '' and filename != 'No file selected':
+        def execute(command):
+            print(command)
+            subprocess.call(command, shell=True, stdout = subprocess.PIPE)
+
+        currentFile = filename
+        outFile,fileformat = currentFile.split('.')
+        outFile = str(outFile) + '.gif'
+        output = os.path.basename(outFile)
+
+        command = 'ffmpeg -ss ' + str(starttime) + ' -t ' + str(duration) + ' -i ' + str(filename) + ' -filter_complex "[0:v] fps=15,scale=w=' + str(size) + ':h=-1,split [a][b];[a] palettegen=stats_mode=single [p];[b][p] paletteuse=new=1" ' + str(outFile)
+        file = pathlib.Path(outFile)
+        if file.exists():
+            print(output,'already exist')
+        else:
+            print('Generating gif...')
+            execute(command)
+            print('Gif is generated,',output, ' is created')
+        return output
+
+    else:
+        print('Please select a video to start')
+
 
 def downsamplevideo(width,height,filename):
     if width =='' or height == '':
-            print('Please enter width and height to continue')
+        print('Please enter width and height to continue')
     elif filename != '' and filename !='No file selected':
         def execute(command):
             print(command)
@@ -20,7 +47,7 @@ def downsamplevideo(width,height,filename):
         ########### DEFINE COMMAND ###########
 
         currentFile = filename
-        outFile = currentFile.replace('.mp4', '')
+        outFile,fileformat = currentFile.split('.')
         outFile = str(outFile) + '_downsampled.mp4'
         output = os.path.basename(outFile)
 
@@ -47,8 +74,8 @@ def greyscale(filename):
         ########### DEFINE COMMAND ###########
 
         currentFile = filename
-        outFile = currentFile.replace('.mp4', '')
-        outFile = str(outFile) + '_greyscale.mp4'
+        outFile,fileformat = currentFile.split('.')
+        outFile = str(outFile) + '_grayscale.mp4'
         output = os.path.basename(outFile)
 
         command = (str('ffmpeg -i ') + str(currentFile) + ' -vf format=gray '+ outFile)
@@ -57,9 +84,9 @@ def greyscale(filename):
         if file.exists():
             print(output, 'already exist')
         else:
-            print('Converting into greyscale video...(this might take awhile)')
+            print('Converting into grayscale video...(this might take awhile)')
             execute(command)
-            print('Video converted into greyscale! ', output, ' is created')
+            print('Video converted into grayscale! ', output, ' is created')
         return output
 
     else:
@@ -74,7 +101,7 @@ def superimposeframe(filename):
         ########### DEFINE COMMAND ###########
 
         currentFile = filename
-        outFile = currentFile.replace('.mp4', '')
+        outFile,fileformat = currentFile.split('.')
         outFile = str(outFile) + '_frame_no.mp4'
         output = os.path.basename(outFile)
         command = (str('ffmpeg -i ') + str(currentFile) + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+ outFile)
@@ -118,11 +145,11 @@ def shortenvideos1(filename,starttime,endtime):
         ########### DEFINE COMMAND ###########
 
         currentFile = filename
-        outFile = currentFile.replace('.mp4', '')
+        outFile, fileformat = currentFile.split('.')
         outFile = str(outFile) + '_shorten.mp4'
         output = os.path.basename(outFile)
 
-        command = (str('ffmpeg -i ') + str(currentFile) + ' -ss ' + starttime +' -to ' + endtime + ' -c:v copy -c:a copy '+ outFile)
+        command = (str('ffmpeg -i ') + str(currentFile) + ' -ss ' + starttime + ' -to ' + endtime + ' -async 1 '+ outFile)
 
         file = pathlib.Path(outFile)
         if file.exists():
@@ -152,11 +179,11 @@ def shortenvideos2(filename,time):
         ########### DEFINE COMMAND ###########
 
         currentFile = filename
-        outFile = currentFile.replace('.mp4', '')
+        outFile,fileformat = currentFile.split('.')
         outFile = str(outFile) + '_shorten.mp4'
         output = os.path.basename(outFile)
 
-        command = (str('ffmpeg -sseof ') + ' -' + str(time) + ' -i ' + str(currentFile) + ' ' + outFile)
+        command = (str('ffmpeg -ss ') + str(time) + ' -i ' + str(currentFile)+ ' -c:v libx264 -c:a aac ' + outFile)
 
         file = pathlib.Path(outFile)
         if file.exists():
@@ -199,7 +226,7 @@ def convertavitomp4(filename):
         ########### DEFINE COMMAND ###########
 
         currentFile = filename
-        outFile = currentFile.replace('.avi', '')
+        outFile,fileformat = currentFile.split('.')
         outFile = str(outFile) + '_converted.mp4'
         output = os.path.basename(outFile)
 
@@ -228,7 +255,7 @@ def convertpowerpoint(filename):
         ########### DEFINE COMMAND ###########
 
         currentFile = filename
-        outFile = currentFile.replace('.mp4', '')
+        outFile,fileformat = currentFile.split('.')
         outFile = str(outFile) + '_powerpointready.mp4'
         output = os.path.basename(outFile)
 
@@ -318,31 +345,33 @@ def extractspecificframe(filename,startframe1,endframe1):
         cv2.imwrite(filePath,frame)
 
 def clahe(filename):
-
     os.chdir(os.path.dirname(filename))
     print('Applying CLAHE, this might take awhile...')
 
     currentVideo = os.path.basename(filename)
-    saveName = str('CLAHE_') + str(currentVideo[:-4]) + str('.avi')
+    fileName, fileEnding = currentVideo.split('.',2)
+    saveName = str('CLAHE_') + str(fileName) + str('.avi')
     cap = cv2.VideoCapture(currentVideo)
     imageWidth = int(cap.get(3))
     imageHeight = int(cap.get(4))
     fps = cap.get(cv2.CAP_PROP_FPS)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     out = cv2.VideoWriter(saveName, fourcc, fps, (imageWidth, imageHeight), 0)
-    while True:
-        ret, image = cap.read()
-        if ret == True:
-            im = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            claheFilter = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16))
-            claheCorrecttedFrame = claheFilter.apply(im)
-            out.write(claheCorrecttedFrame)
-            if cv2.waitKey(10) & 0xFF == ord('q'):
+    try:
+        while True:
+            ret, image = cap.read()
+            if ret == True:
+                im = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                claheFilter = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16))
+                claheCorrecttedFrame = claheFilter.apply(im)
+                out.write(claheCorrecttedFrame)
+                if cv2.waitKey(10) & 0xFF == ord('q'):
+                    break
+            else:
+                print(str('Completed video ') + str(saveName))
                 break
-        else:
-            print(str('Completed video ') + str(saveName))
-            break
-
+    except:
+        print('clahe not applied')
     cap.release()
     out.release()
     cv2.destroyAllWindows()
@@ -361,7 +390,6 @@ def cropvid(filenames):
         fileName = str(0) + str('.bmp')
         filePath = os.path.join(currentDir, fileName)
         cv2.imwrite(filePath, frame)
-
         #find ROI
 
         img = cv2.imread(filePath)
@@ -393,10 +421,13 @@ def cropvid(filenames):
                 print('Cropping video...')
                 print(command)
                 subprocess.call(command, shell=True)
+                os.remove(filePath)
                 print('video is cropped')
                 return fileOutName
             elif total ==0:
                 print('Video not cropped11')
+
+        os.remove(filePath)
 
     else:
         print('Please select a video to crop')

@@ -90,7 +90,7 @@ def analyze_process_severity(configini):
         loopy += 1
     log_df = log_df.replace('NaN', 0)
     log_df.to_csv(log_fn, index=False)
-
+    print('Severity process done.')
 
 
 

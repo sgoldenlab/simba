@@ -10,8 +10,7 @@ from datetime import datetime
 def ganntplot_config(configini):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
-    configFile = str(configini)
-    config.read(configFile)
+    config.read(configini)
     frames_dir_out = config.get('Frame settings', 'frames_dir_out')
     frames_dir_out = os.path.join(frames_dir_out, 'gantt_plots')
     if not os.path.exists(frames_dir_out):
@@ -60,7 +59,11 @@ def ganntplot_config(configini):
     for ff in range(no_targets):
         currentModelNames = 'target_name_' + str(ff + 1)
         currentModelNames = config.get('SML settings', currentModelNames)
-        currentModelNames = currentModelNames  + '_prediction'
+        currentModelNames = currentModelNames
+        if 'prediction' not in currentModelNames:
+            currentModelNames = currentModelNames + '_prediction'
+        elif 'prediction' in currentModelNames:
+            currentModelNames = currentModelNames
         target_names.append(currentModelNames)
     colours = colours[:len(target_names)]
 
@@ -68,7 +71,7 @@ def ganntplot_config(configini):
     log_fn = config.get('General settings', 'project_name')
     log_fn = log_fn + '.xlsx'
     log_path = config.get('General settings', 'project_path')
-    log_path = os.path.join(log_path, 'project_folder', 'logs')
+    log_path = os.path.join(log_path, 'logs')
     log_fn = os.path.join(log_path, log_fn)
     if not os.path.exists(log_path):
         os.makedirs(log_path)
@@ -137,7 +140,7 @@ def ganntplot_config(configini):
         boutsDf['Start_time'] = boutsDf['Start_frame'] / fps
         boutsDf['End_time'] = boutsDf['End_frame'] / fps
         boutsDf['Bout_time'] = boutsDf['End_time'] - boutsDf['Start_time']
-
+        print(boutsDf)
         # record logs
         log_list = []
         log_list.append(logFolderNm)
@@ -200,6 +203,8 @@ def ganntplot_config(configini):
             ax.yaxis.grid(True)
             filename = (str(k) + '.png')
             savePath = os.path.join(saveDir, filename)
+            if os.path.isfile(savePath):
+                os.remove(savePath)
             plt.savefig(savePath)
             print('Saved gantt plot ' + str(k))
             plt.close('all')

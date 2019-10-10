@@ -125,7 +125,7 @@ def get_coordinates_nilsson(filenames,knownmm):
         if k == 27:
             break
     cv2.destroyAllWindows()
-    print(cordStatus,moveStatus,insertStatus,changeLoop)
+    os.remove(fileName)
     euclidPixelDist = np.sqrt((cordList[0] - cordList[2]) ** 2 + (cordList[1] - cordList[3]) ** 2)
     mm_dist = int(knownmm)
     cordStatus = False

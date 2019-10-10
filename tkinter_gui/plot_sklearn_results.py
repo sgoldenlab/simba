@@ -83,6 +83,7 @@ def plotsklearnresult(configini):
         imagesDirOut = os.path.join(frames_dir_out, videoPathNmOut)
         if not os.path.exists(imagesDirOut):
             os.makedirs(imagesDirOut)
+
         for index, row in currentDf.iterrows():
 
             imageName = str(loop) + '.png'
@@ -179,8 +180,8 @@ def plotsklearnresult(configini):
             x, y = 10, 50
             offset = 25
 
-            if height < width:
-                im = ndimage.rotate(im, 90)
+            # if height < width:
+            #    im = ndimage.rotate(im, 90)
 
             # draw event timers
             for b in range(counters_no):
@@ -188,7 +189,7 @@ def plotsklearnresult(configini):
                 target_timers[b] = round(target_timers[b], 2)
 
             cv2.putText(im, str('Timers'), (10, ((height - height) + textSpacing)), cv2.FONT_HERSHEY_COMPLEX, MfontSize,
-                        (255, 0,), 2)
+                        (0, 255, 0), 2)
             addSpacer = 2
             for k in range(counters_no):
                 cv2.putText(im, (str(target_names[k]) + ' ' + str(target_timers[k]) + str('s')),
@@ -196,13 +197,15 @@ def plotsklearnresult(configini):
                             (0, 0, 255), 2)
                 addSpacer += 1
 
-            cv2.putText(im, str('SML prediction'), (10, (height - height) + textSpacing * addSpacer),
-                        cv2.FONT_HERSHEY_SIMPLEX, MfontSize, (255, 0, 0), 2)
-            addSpacer += 1
+            cv2.putText(im, str('ensemble prediction'), (10, (height - height) + textSpacing * addSpacer),
+                        cv2.FONT_HERSHEY_SIMPLEX, MfontSize, (0, 255, 0), 2)
+            addSpacer += 2
+            colors = [(2, 166, 249), (47, 255, 173), (0, 165, 255), (60, 20, 220), (193, 182, 255), (238, 130, 238),
+                      (144, 128, 112), (32, 165, 218), (0, 0, 128), (209, 206, 0)]
             for p in range(counters_no):
                 if row[targetColumns[p]] == 1:
                     cv2.putText(im, str(target_names[p]), (10, (height - height) + textSpacing * addSpacer),
-                                cv2.FONT_HERSHEY_TRIPLEX, LfontSize, (255, 0, 0), 2)
+                                cv2.FONT_HERSHEY_TRIPLEX, LfontSize, colors[p], 2)
                     target_counters[p] += 1
                     addSpacer += 1
             if "tail_rattle" in target_names:
@@ -217,6 +220,6 @@ def plotsklearnresult(configini):
                 if row[targetColumns[tailRattleIndex]] == 0:
                     firstRattle = True
             cv2.imwrite(imageSaveName, im)
-            print(str(os.path.basename(imageSaveName)))
+            print(str(imageSaveName))
             loop += 1
     print('Complete: Frames generated with machine predictions')

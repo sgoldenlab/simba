@@ -37,7 +37,7 @@ def data_plot_config(configini):
     log_fn = config.get('General settings', 'project_name')
     log_fn = log_fn + '.xlsx'
     log_path = config.get('General settings', 'project_path')
-    log_path = os.path.join(log_path, 'project_folder', 'logs')
+    log_path = os.path.join(log_path, 'logs')
     log_fn = os.path.join(log_path, log_fn)
     if not os.path.exists(log_path):
         os.makedirs(log_path)

@@ -24,7 +24,7 @@ def dev_move(configini):
     configFilelist = []
     use_master = config.get('General settings', 'use_master_config')
 
-    criterion = config.getint('Outlier settings', 'movement_criterion')
+    criterion = config.getfloat('Outlier settings', 'movement_criterion')
 
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'input_csv')

@@ -15,6 +15,7 @@ def rfmodel(inifile):
     config.read(configFile)
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'features_extracted')
+    ensemble_method = config.get('RF settings', 'ensemble_method')
     csv_dir_out = os.path.join(csv_dir, 'machine_results')
     use_master = config.get('General settings', 'use_master_config')
     discrimination_threshold = config.getfloat('RF settings', 'discrimination_threshold')
@@ -82,9 +83,9 @@ def rfmodel(inifile):
         frame_number = inputFileOrganised.pop('frames').values
 
         ########## STANDARDIZE DATA ###########################################
-        scaler = MinMaxScaler()
-        scaled_values = scaler.fit_transform(inputFileOrganised)
-        inputFileOrganised.loc[:, :] = scaled_values
+        # scaler = MinMaxScaler()
+        # scaled_values = scaler.fit_transform(inputFileOrganised)
+        # inputFileOrganised.loc[:,:] = scaled_values
         inputFileOrganised['video_no'] = video_no
         videoNames = inputFileOrganised['video_no'].unique()
 
@@ -100,90 +101,39 @@ def rfmodel(inifile):
 
             for i in range(model_nos):
                 currentModelPath = model_paths[i]
-                print(currentModelPath)
                 model = os.path.join(model_dir, currentModelPath)
                 currModelName = os.path.basename(model)
                 currModelName = currModelName.split('.')
-                currModelName = str(currModelName[0]) + '_prediction'
+                currModelName = str(currModelName[0])
+                if 'prediction' not in currModelName:
+                    currModelName = currModelName + '_prediction'
+                elif 'prediction' in currModelName:
+                    currModelName = currModelName
                 currProbName = 'Probability_' + currModelName
-                print(currProbName)
                 clf = pickle.load(open(model, 'rb'))
                 predictions = clf.predict_proba(currentDf)
                 outputDf[currProbName] = predictions[:, 1]
                 outputDf[currModelName] = np.where(outputDf[currProbName] > discrimination_threshold, 1, 0)
 
                 ########## FIX  'GAPS' ###########################################
-                gaps = outputDf[(outputDf[currModelName] == 1) & (outputDf[currModelName].shift(1) == 0) & (
-                            outputDf[currModelName].shift(2) == 1)]
-                gaps_list = list((gaps['frames']) - 1)
-                for index, row in outputDf.iterrows():
-                    currentIndex = index
-                    if (currentIndex in gaps_list):
-                        outputDf.set_value(currentIndex, currModelName, 1)
-
-                ########## FIX  'GAPS' 2 ###########################################
-                gaps = outputDf[(outputDf[currModelName] == 0) & (outputDf[currModelName].shift(1) == 1) & (
-                            outputDf[currModelName].shift(2) == 0)]
-                gaps_list = list((gaps['frames']) - 1)
-                for index, row in outputDf.iterrows():
-                    currentIndex = index
-                    if (currentIndex in gaps_list):
-                        outputDf.set_value(currentIndex, currModelName, 0)
-
-                ########## FIX  'GAPS' 3 ###########################################
-                gaps = outputDf[(outputDf[currModelName] == 1) & (outputDf[currModelName].shift(1) == 0) & (
-                            outputDf[currModelName].shift(2) == 0) & (outputDf[currModelName].shift(3) == 1)]
-                gaps_list = list((gaps['frames']) - 1)
-                for index, row in outputDf.iterrows():
-                    currentIndex = index
-                    if (currentIndex in gaps_list):
-                        outputDf.set_value(currentIndex, currModelName, 0)
-
-                ########## FIX  'GAPS' 4 ###########################################
-                gaps = outputDf[(outputDf[currModelName] == 1) & (outputDf[currModelName].shift(1) == 0) & (
-                            outputDf[currModelName].shift(2) == 0) & (outputDf[currModelName].shift(3) == 0) & (
-                                            outputDf[currModelName].shift(4) == 1)]
-                gaps_list = list((gaps['frames']) - 1)
-                for index, row in outputDf.iterrows():
-                    currentIndex = index
-                    if (currentIndex in gaps_list):
-                        outputDf.set_value(currentIndex, currModelName, 0)
-
-                ########## FIX  'GAPS' 5 ###########################################
-                gaps = outputDf[(outputDf[currModelName] == 1) & (outputDf[currModelName].shift(1) == 0) & (
-                            outputDf[currModelName].shift(2) == 0) & (outputDf[currModelName].shift(3) == 0) & (
-                                            outputDf[currModelName].shift(4) == 0) & (
-                                            outputDf[currModelName].shift(5) == 1)]
-                gaps_list = list((gaps['frames']) - 1)
-                for index, row in outputDf.iterrows():
-                    currentIndex = index
-                    if (currentIndex in gaps_list):
-                        outputDf.set_value(currentIndex, currModelName, 0)
-
-                ########## FIX  'GAPS' 5 ###########################################
-                gaps = outputDf[(outputDf[currModelName] == 1) & (outputDf[currModelName].shift(1) == 0) & (
-                            outputDf[currModelName].shift(2) == 0) & (outputDf[currModelName].shift(3) == 0) & (
-                                            outputDf[currModelName].shift(4) == 0) & (
-                                            outputDf[currModelName].shift(5) == 0) & (
-                                            outputDf[currModelName].shift(6) == 1)]
-                gaps_list = list((gaps['frames']) - 1)
-                for index, row in outputDf.iterrows():
-                    currentIndex = index
-                    if (currentIndex in gaps_list):
-                        outputDf.set_value(currentIndex, currModelName, 0)
-
-                ########## FIX  'GAPS' 6 ###########################################
-                gaps = outputDf[(outputDf[currModelName] == 1) & (outputDf[currModelName].shift(1) == 0) & (
-                            outputDf[currModelName].shift(2) == 0) & (outputDf[currModelName].shift(3) == 0) & (
-                                            outputDf[currModelName].shift(4) == 0) & (
-                                            outputDf[currModelName].shift(5) == 0) & (
-                                            outputDf[currModelName].shift(6) == 0) & (
-                                            outputDf[currModelName].shift(7) == 1)]
-                gaps_list = list((gaps['frames']) - 1)
-                for index, row in outputDf.iterrows():
-                    currentIndex = index
-                    if (currentIndex in gaps_list):
-                        outputDf.set_value(currentIndex, currModelName, 0)
+                patterns = np.asarray(
+                    [[1, 0, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 1], [1, 0, 0, 1], [1, 0, 1], [0, 1, 1, 0],
+                     [0, 1, 0]])
+                for i in patterns:
+                    currPattern = i
+                    n_obs = len(currPattern)
+                    outputDf['rolling_match'] = (outputDf[currModelName].rolling(window=n_obs, min_periods=n_obs)
+                                                 .apply(lambda x: (x == currPattern).all())
+                                                 .mask(lambda x: x == 0)
+                                                 .bfill(limit=n_obs - 1)
+                                                 .fillna(0)
+                                                 .astype(bool)
+                                                 )
+                    if (currPattern == patterns[5]) or (currPattern == patterns[6]):
+                        outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 0
+                    else:
+                        outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 1
+                    outputDf = outputDf.drop(['rolling_match'], axis=1)
 
             ########## SCORE SEVERITY OF BEHAVIOURS by NOMALIZED MOVEMENT SCORE ###########################################
             mouse1size = (statistics.mean(outputDf['Mouse_1_nose_to_tail']))
@@ -196,7 +146,7 @@ def rfmodel(inifile):
             outputDf['Scaled_movement_M1_M2'] = (outputDf['Scaled_movement_M1'] + outputDf['Scaled_movement_M2']) / 2
             outputDf['Scaled_movement_M1_M2'] = outputDf['Scaled_movement_M1_M2'].round(decimals=2)
 
-            outFname = str('Video') + str(int(currentVideoName)) + str('.csv')
+            outFname = os.path.basename(currFile)
             outFname = os.path.join(csv_dir_out, outFname)
             outputDf.to_csv(outFname)
             print(str(outFname) + str(' completed'))
