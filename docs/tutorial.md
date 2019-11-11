@@ -43,7 +43,8 @@ In this step, you will be generating your main project folder with all the sub-d
 4. Under `SML Settings`, put in the number of predictive classifiers that you wished. For an example, if you had three behaviors in your video, put 3 in the entry box.
 
 5. Click <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/addclassifier.PNG" width="150" height="50" /> and it creates a row as shown in the following image.
-If you are generating a brand new model, just fill in the entry box and leave the path as it is (*No classifier is selected*). Repeat this step for every behaviors.
+**If you are generating a brand new model, just fill in the entry box and leave the path as it is (*No classifier is selected*). Repeat this step for every behaviors.**
+
 > **Note**: Make sure to click the button once and finished it before clicking it again. Do not click to add multiple rows before filling up the information.
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/classifier1.PNG" width="700" height="130" />
 
