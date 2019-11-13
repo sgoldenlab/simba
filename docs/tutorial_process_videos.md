@@ -22,7 +22,7 @@
 
 <img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/processvideo3.PNG width="1000" height="350" />
 
-2. If you wish to crop your videos, click on the `Crop` button.
+2. If you wish to crop your videos, click on the `Crop` button. *The button will turn red once you clicked on it*
 
 3. If you wish to trim your videos, check on the `Shorten` box and enter the **Start Time** and  **End Time** in the HH:MM:SS format.
 
