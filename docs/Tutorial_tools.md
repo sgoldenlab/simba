@@ -151,13 +151,13 @@ This tool allows the user to select a folder with multiple images and convert th
 ### Change video format
 This tool allows the user to convert videos into desired format.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/changevideoformat.PNG" width="200" height="150" />
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/changevideoformat.PNG" width="400" height="400" />
 
 #### Convert multiple videos
 
 1. Click on `Browse Folder` to select the directory that contains all the videos that you wished to convert.
 
-2. Enter the original format (eg: mp4,flv,avi...etc.) in the `Orignal Format` entry box.**Note: do not put in the dots . (eg: .mp4 or .flv etc)
+2. Enter the original format (eg: mp4,flv,avi...etc.) in the `Orignal Format` entry box. **Note: do not put in the dots . (eg: .mp4 or .flv etc)**
 
 3. Enter the format to be converted into in the `Final Format` entry box 
 
