@@ -157,7 +157,7 @@ This tool allows the user to convert videos into desired format.
 
 1. Click on `Browse Folder` to select the directory that contains all the videos that you wished to convert.
 
-2. Enter the original format (eg: mp4,flv,avi...etc.) in the `Orignal Format` entry box. **Note: do not put in the dots . (eg: .mp4 or .flv etc)**
+2. Enter the original format (eg: mp4,flv,avi...etc.) in the `Orignal Format` entry box. **Note: do not put in the dots " . " (eg: .mp4 or .flv etc)**
 
 3. Enter the format to be converted into in the `Final Format` entry box 
 
