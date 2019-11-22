@@ -13,6 +13,10 @@ this is something
 - Evaluate Model
 - Analyze Videos
 
+### Part 3: Improve the Model
+- Extract more frames 
+- Outlier correction
+
 ## Part 1: Create DLC Project
 This section create a new project for your DLC tracking analysis.
 
@@ -160,5 +164,29 @@ load dlc project
 3. Click on `Multi Videos Analysis`
 
 ### Step 11: Plot Video Graph
+
+1. Click on `Browse File` to select the video
+
+2. Click on `Plot Results` 
+
+### Step 12: Create Video
+This step is to generate the video with labelled tracking points.
+
+1. Click on `Browse File to select the video 
+
+2. You can choose to save the frames with tracking points of the video by checking the `Save Frames` checkbox. This will result in a longer waiting time for this process.
+
+3. Click on `Create Video`
+
+## Part 3: Improve the Model
+There are two ways that you can improve the current model.
+
+1. To extract more frames to train the model
+
+2. To correct the tracking points of the existing frames.
+
+### Extract more frames
+This step creates a temp.yaml file to automate the extract frames step.
+
 
 
