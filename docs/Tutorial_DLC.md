@@ -186,7 +186,36 @@ There are two ways that you can improve the current model.
 2. To correct the tracking points of the existing frames.
 
 ### Extract more frames
-This step creates a temp.yaml file to automate the extract frames step.
+This step creates a temp.yaml file to automate the extract frames step. What this basically does is to copy the settings from the *config.yaml* and remove all the videos in it. Then, it adds the new videos that the user specify into the yaml file and generates a *temp.yaml*
+
+### Step 1: Generate temp.yaml from the original config.yaml
+
+#### Single Video
+
+1. Under **Load Model**, click `Browse File` and select the *config.yaml* file 
+
+2. Under **Single Video**, click on `Browse File` and select the video.
+
+3. Click `Add single video`
+
+4. *temp.yaml* will be generated in the same folder as the project folder.
+
+#### Multiple Videos
+
+1. Under **Load Model**, click `Browse File` and select the *config.yaml* file 
+
+2. Under **Multiple Videos**, click on `Browse Folder` and select the folder with only the videos.
+
+3. Click `Add multiple videos`
+
+4. *temp.yaml* will be generated in the same folder as the project folder.
+
+### Step 2: Load temp.yaml 
+
+1. Under **Load Model**, click `Browse File` and select the *temp.yaml* that you have just created.
+
+2. Now you can extract frames of the videos that you have just added.
+
 
 
 
