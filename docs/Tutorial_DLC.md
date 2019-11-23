@@ -71,6 +71,8 @@ load dlc project
 
 ### Step 3: Add additonal videos into project [Optional]
 
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/additionalvideo.PNG" width="350" height="200" />
+
 #### Single Video
 
 1. Under **Single Video**, click on `Browse File` and select the video.
@@ -85,23 +87,25 @@ load dlc project
 
 ### Step 4: Extract Frames DLC
 
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/extractframesdlc.PNG" width="300" height="300" />
+
 1. Enter the numbers of frames that you wish to extract in the `numframes2pick` entry box.
 
 2. Select the **Mode** of selecting the frames. 
 
-`Automatic` selects the frames for you automatically. 
+- `Automatic` selects the frames for you automatically. 
 
-`Manual` allows you to select the frames.
+- `Manual` allows you to select the frames.
 
 3. Select the **Algorithm** to pick the frames. 
 
-`Uniform` selects the frames uniformly in a series format. 
+- `Uniform` selects the frames uniformly in a series format. 
 
-`KMeans` uses k-means clustering algorithm to select the frames randomly based on cluster. 
+- `KMeans` uses k-means clustering algorithm to select the frames randomly based on cluster. 
 
-`Cluster Resize Width` is ......... explain please. The default is set to 30
+- `Cluster Resize Width` is ......... explain please. The default is set to 30
 
-`Cluster Step` is . idk man . The default is set to 1
+- `Cluster Step` is . idk man . The default is set to 1
 
 4. Select **Cluster color**
 
