@@ -115,13 +115,15 @@ load dlc project
 
 ### Step 5: Label Frames
 
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/labelframes.PNG" width="100" height="50" />
+
 1. Under **Label Frames**, click on the `Label Frames` button and *DeepLabCut- Labelling ToolBox* will pop up.
 
 2. At the botton left corner, click on `Load Frames`.
 
-3. Choose the folder with your video name where your extracted frames are saved and click `Select Folder`. *They should be located at workingdirectory/yourproject/labeled-data/
+3. Choose the folder with your video name where your extracted frames are saved and click `Select Folder`. *They should be located at workingdirectory/yourproject/labeled-data/*
 
-4. Then you can start labelling frames. (insert link to label frames from dlc here)
+4. Then you can start labelling frames.(more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#d-label-frames)) 
 
 ### Step 6: Check Labels
 
