@@ -85,7 +85,7 @@ load dlc project
 
 2. Click `Add multiple videos`
 
-### Step 4: Extract Frames DLC
+### Step 4: Extract Frames DLC (more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#c-data-selection-extract-frames))
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/extractframesdlc.PNG" width="300" height="300" />
 
