@@ -51,6 +51,8 @@ blablabla
 ## Part 2: Load DLC Project
 load dlc project
 
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loaddlcmodel.png" width="400" height="200" />
+
 ### Step 1: Check the settings in config.yaml file
 
 1. Go to the project folder.
@@ -62,6 +64,8 @@ load dlc project
 ### Step 2: Load config.yaml file with GUI
 
 1. Go to `Tracking` --> `DeepLabCut` --> `Load DLC Model`. The following window will pop up.
+
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loaddlcmodel2.PNG" width="500" height="400" />
 
 2. Under **Load Model**, click on `Browse File` and load the *config.yaml* file from the project folder.
 
