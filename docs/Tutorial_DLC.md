@@ -185,7 +185,7 @@ There are two ways that you can improve the current model.
 
 2. To correct the tracking points of the existing frames.
 
-### Extract more frames
+## Extract more frames
 This step creates a temp.yaml file to automate the extract frames step. What this basically does is to copy the settings from the *config.yaml* and remove all the videos in it. Then, it adds the new videos that the user specify into the yaml file and generates a *temp.yaml*
 
 ### Step 1: Generate temp.yaml from the original config.yaml
@@ -215,6 +215,30 @@ This step creates a temp.yaml file to automate the extract frames step. What thi
 1. Under **Load Model**, click `Browse File` and select the *temp.yaml* that you have just created.
 
 2. Now you can extract frames of the videos that you have just added.
+
+## Outlier Correction
+
+### Step 1: Load config.yaml
+
+1. Go to `Tracking` --> `DeepLabCut` --> `Load DLC Model`.
+
+2. Under **Load Model**, click on `Browse File` and load the *config.yaml* file from the project folder.
+
+### Step 2: Extract Outliers
+
+1. Under **Extract Outliers**, click `Browse File` to select the videos to be corrected.
+
+2. Click `Extract Outliers`
+
+### Step 3: Label Outliers
+
+1. Under **Label Outliers**, click on `Refine Outliers`. *DeepLabCut - Refinement ToolBox* will pop out.
+
+2. At the bottom left corner, click on `Load labels` and select the machinelabels file and correct the tracking points.
+
+### Step 4: Merge Labelled Outliers
+
+1. Under **Merge Labeled Outliers**, click on `Merge Labelled Outliers`.
 
 
 
