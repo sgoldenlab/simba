@@ -1,19 +1,19 @@
-# Create tracking model using DeepLabCut
+# Create tracking model using [DeepLabCut](http://www.mousemotorlab.org/deeplabcut)
 
 ### Pipeline breakdown
 this is something
 
-### Part 1: Create DLC Project
+### [Part 1: Create DLC Project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
 
-### Part 2: Load DLC Project
-- Extract Frames
-- Label Frames
-- Generate Training Set
-- Download weights and train model
-- Evaluate Model
-- Analyze Videos
+### [Part 2: Load DLC Project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#part-2-load-dlc-project)
+- [Extract Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-4-extract-frames-dlc)
+- [Label Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-5-label-frames)
+- [Generate Training Set](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-7-generate-training-set)
+- [Download weights]() and [train model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-8-train-network)
+- [Evaluate Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-9-evaluate-network)
+- [Analyze Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-10-video-analysis)
 
-### Part 3: Improve the Model
+### [Part 3: Improve the Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#part-3-improve-the-model-1)
 - Extract more frames 
 - Outlier correction
 
