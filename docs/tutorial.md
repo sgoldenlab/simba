@@ -150,7 +150,9 @@ In this case, I know the two **pink dot that connects** has a distance of 10mm i
 
 9. Repeat the steps for every videos and once it is done, click `Save Data`. This will generate a csv file named **video_info.csv** in `/project_folder/log`
 
-### Step 4: [Outlier Correction](https://github.com/sgoldenlab/social_tracker/blob/master/Outlier_correction.pdf)
+### Step 4: Outlier Correction
+
+Outlier corrections.... For more details, please click [here](https://github.com/sgoldenlab/social_tracker/blob/master/Outlier_correction.pdf)
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/outliercorrection.PNG" width="156" height="109" />
 
@@ -158,7 +160,7 @@ In this case, I know the two **pink dot that connects** has a distance of 10mm i
 
 <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/outliercorrection2.PNG" width="300" height="400" />
 
-2. 
+2. Select the body parts for Animal 1 and Animal 2.
 
 ### Step 5: Extract Features
 Simon will also explain this
