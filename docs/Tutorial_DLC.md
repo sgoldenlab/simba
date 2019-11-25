@@ -6,7 +6,7 @@ this is something
 ### [Part 1: Create DLC Project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
 
 ### [Part 2: Load DLC Project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#part-2-load-dlc-project)
-- [Extract Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-4-extract-frames-dlc)
+- [Extract Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-4-extract-frames-dlc-more-details-here)
 - [Label Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-5-label-frames)
 - [Generate Training Set](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-7-generate-training-set)
 - [Download weights]() and [train model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-8-train-network)
