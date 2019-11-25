@@ -127,15 +127,14 @@ In this case, I know the two **pink dot that connects** has a distance of 10mm i
 9. Repeat the steps for every videos and once it is done, click `Save Data`. This will generate a csv file named **video_info.csv** in `/project_folder/log`
 
 ### Step 4: [Outlier Correction](https://github.com/sgoldenlab/social_tracker/blob/master/Outlier_correction.pdf)
-Simon will explain what outlier correction is.
 
-`Movement criterion`
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/outliercorrection.PNG" width="156" height="109" />
 
-`Location criterion`
+1. Click on `Settings` and the following window will pop up.
 
-1. Filled in `Movement criterion` and `Location criterion`.
+<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/outliercorrection2.PNG" width="300" height="400" />
 
-2. Click `Correct outlier` to start outlier correction.
+2. 
 
 ### Step 5: Extract Features
 Simon will also explain this
@@ -161,11 +160,11 @@ This step is to train the machine model. Simon will explain this as well.
 
 2. First, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
 
-`RF`
+- `RF`
 
-`GBC`
+- `GBC`
 
-`Xboost`
+- `Xboost`
 
 3. Then, set the **Hyperparameters**.
 
