@@ -12,15 +12,15 @@ For processing a tracking dataset, the pipelines is split into ? sections. These
 - [Import DLC Tracking Data](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-3-import-dlc-tracking-data) (if have any)
 - [Extract Frames into project folder](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder)
 
-### Part 2: Load project.ini file
-- First you load the project.ini that was generated when you created your new project
-- set video parameters and save it as csv
-- Run outlier correction
-- Extract Features
-- Label Behavior
-- Train Machine Model
-- Run Machine Model
-- Analyze Machine Results
+### Part 2: [Load project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-1-load-project-config)
+- [Load the project.ini](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-1-load-project-config)
+- [Set video parameters](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-3-set-video-parameters)
+- [Outlier correction](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-4-outlier-correction)
+- [Extract Features](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-5-extract-features)
+- [Label Behavior](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-6-label-behavior)
+- [Train Machine Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-7-train-machine-model)
+- [Run Machine Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-8-run-machine-model)
+- [Analyze Machine Results](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
 - Plot Skleran Results
 - Plot Graphs
 - Merge Frames
