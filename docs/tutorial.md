@@ -6,12 +6,11 @@ This is a step by step tutorial to start using the GUI from nothing. If you have
 For processing a tracking dataset, the pipelines is split into ? sections. These sections are listed below along with the functions that belong to each section:
 
 
-### Part 1: Create a new project
-- In here you set up your project name, directories, and videos settings
-- Then, generate project config
-- Import videos into project folder
-- Import DLC Tracking Data (if have any)
-- Extract Frames into project folder
+### Part 1: [Create a new project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
+- Generate project config ([create new classifiers](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#create-new-classifiers) or [import exisiting classifiers](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#import-existing-classifiers))
+- [Import videos into project folder](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-2-import-videos-into-project-folder)
+- [Import DLC Tracking Data](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-3-import-dlc-tracking-data) (if have any)
+- [Extract Frames into project folder](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder)
 
 ### Part 2: Load project.ini file
 - First you load the project.ini that was generated when you created your new project
