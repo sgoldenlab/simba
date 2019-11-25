@@ -21,10 +21,10 @@ For processing a tracking dataset, the pipelines is split into ? sections. These
 - [Train Machine Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-7-train-machine-model)
 - [Run Machine Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-8-run-machine-model)
 - [Analyze Machine Results](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
-- Plot Skleran Results
-- Plot Graphs
-- Merge Frames
-- Create Video
+- [Plot Skleran Results](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-10-plot-sklearn-results)
+- [Plot Graphs](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-11-plot-graphs)
+- [Merge Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-12-merge-frames)
+- [Create Video](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-13-create-video)
 
 ## Part 1: Create a new project
 This sections create a new project for your tracking analysis.
