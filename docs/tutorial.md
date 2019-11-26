@@ -171,9 +171,9 @@ This step is to label the behavior in each frames
 
 1. Click on `Select folder with frames`. In your project folder go to `/project_folder/frames/input/`, there should be folders that are named after your videos that contain all the video frames. Select one of the folder and the following window should pop up.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelagg.PNG" width="720" height="720" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelbe.PNG" width="720" height="720" />
 
-2. Sophia will work on this...
+2. Please click [here](/docs/labelling_aggression_tutorial.md) to learn how to use this labele behavior interface.
 
 ### Step 7: Train Machine Model
 This step is to train the machine model. Simon will explain this as well. 
