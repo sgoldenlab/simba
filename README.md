@@ -4,7 +4,9 @@
 
 ## Pipeline
 
-Insert schematic diagram here
+
+<img src="/images/Flow_chart.png" width="750" height="1000" />
+
 
 ## [Installation](docs/Installation.md) 
 
