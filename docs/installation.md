@@ -14,16 +14,10 @@ pip install -r simba/tkinter_gui/requirements.txt
 
 # How to launch the GUI
 
-1. Open up command prompt from the tkinter_gui folder
-
-![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/cd.PNG)
+1. Open up command prompt from the SimBA folder
 
 2. In the command prompt type
 ```
-python Launch_tkinter_GUI.py
+python SimBA.py
 ```
-![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/launch_gui.PNG)
-
-3. It should looks like this.
-
-![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/launch_gui.gif)
+3. Hit `Enter`.
