@@ -1,6 +1,6 @@
 # Simba
 
-![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/mouse_tracking.gif)
+![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/4videos.gif)
 
 ## Pipeline
 
