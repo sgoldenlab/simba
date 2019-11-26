@@ -36,7 +36,7 @@ Underneath the displayed image, there are options for navigating through all the
 
 `Frame Range` By selecting this box and entering a range of numbers in the adjaecent entry boxes, saving and advancing to the next frame will save all marked behaviors from the first to the last selected frame inclusive. 
 
-`Generate and Quit` This will compile and export the data to a .csv file located in the project folder ...\\targets_inserted\\...
+`Generate and Quit` This will compile and export the data to a .csv file located in the project folder `...\\targets_inserted\\...`
 
 #### Key Shortcuts 
 
@@ -48,6 +48,7 @@ Key shortcuts have been provided on the right side of the window for ease of use
 
 #### Playing Video
 `Open Current Video` Pressing this will open the video that corresponds to the frames folder being analyzed. Refer to Key Shortcuts to pause/play and move forward or backwards in the video by a certain amount of frames.
+
 `Show current video frame` This will jump to and display the current frame of the paused video on the labelling screen.
 
 ![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/openingvideo.gif)
