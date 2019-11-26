@@ -29,9 +29,9 @@ blablabla
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/createdlcmodel2.png" width="400" height="336" />
 
-2. Enter the name of your project in `Project Name`
+2. Enter the name of your project in `Project Name`.
 
-3. Enter your name in the `Experimenter Name`
+3. Enter your name in the `Experimenter Name`.
 
 > **Note:** Spaces are not allowed for your project name and experimenter name.
 
@@ -77,7 +77,7 @@ load dlc project
 
 1. Under **Single Video**, click on `Browse File` and select the video.
 
-2. Click `Add single video`
+2. Click `Add single video`.
 
 #### Multiple Videos
 
@@ -103,11 +103,11 @@ load dlc project
 
 - `KMeans` uses k-means clustering algorithm to select the frames randomly based on cluster. 
 
-- `Cluster Resize Width` is the settings for KMeans. The default is set to 30
+- `Cluster Resize Width` is the settings for KMeans. The default is set to 30.
 
-- `Cluster Step` is the settings for KMeans. The default is set to 1
+- `Cluster Step` is the settings for KMeans. The default is set to 1.
 
-4. Select **Cluster color**
+4. Select **Cluster color**.
 
 5. If you wish to use **OpenCV** to extract frames you can check the `True` checkbox. If you wish to use **ffmpeg** then keep it uncheck.
 
@@ -123,7 +123,7 @@ load dlc project
 
 3. Choose the folder with your video name where your extracted frames are saved and click `Select Folder`. *They should be located at workingdirectory/yourproject/labeled-data/*
 
-4. Then you can start labelling frames.(more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#d-label-frames)) 
+4. Then you can start labelling frames. ( more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#d-label-frames)) 
 
 ### Step 6: Check Labels
 
@@ -135,9 +135,9 @@ load dlc project
 
 ### Step 8: Train Network
 
-`iteration` is 
+`iteration` is the number of iteration.
 
-`init_weight` is the initial weights to train the model
+`init_weight` is the initial weights to train the model.
 
 #### Training a new model
 
@@ -155,7 +155,7 @@ load dlc project
 
 ### Step 9: Evaluate Network
 
-1. Click on `Evaluate Network` to evaluate the trained model
+1. Click on `Evaluate Network` to evaluate the trained model.
 
 ### Step 10: Video Analysis
 
@@ -163,7 +163,7 @@ load dlc project
 
 1. Under **Single Video Analysis**, click on `Browse File` and select one of the video.
 
-2. Click on `Single Video Analysis`
+2. Click on `Single Video Analysis`.
 
 #### Multiple Videos Analysis
 
@@ -171,27 +171,27 @@ load dlc project
 
 2. Enter the video format in `Video type` entry box (eg: mp4, avi). *Do **not** put any " . " dot in the entrybox (eg: .mp4, .flv, .avi, etc.)*
 
-3. Click on `Multi Videos Analysis`
+3. Click on `Multi Videos Analysis`.
 
 ### Step 11: Plot Video Graph
 
-1. Click on `Browse File` to select the video
+1. Click on `Browse File` to select the video.
 
-2. Click on `Plot Results` 
+2. Click on `Plot Results` .
 
 ### Step 12: Create Video
 This step is to generate the video with labelled tracking points.
 
-1. Click on `Browse File to select the video 
+1. Click on `Browse File` to select the video.
 
 2. You can choose to save the frames with tracking points of the video by checking the `Save Frames` checkbox. This will result in a longer waiting time for this process.
 
-3. Click on `Create Video`
+3. Click on `Create Video`.
 
 ## Part 3: Improve the Model
 There are two ways that you can improve the current model.
 
-1. To extract more frames to train the model
+1. To extract more frames to train the model.
 
 2. To correct the tracking points of the existing frames.
 
@@ -202,7 +202,7 @@ This step creates a temp.yaml file to automate the extract frames step. What thi
 
 #### Single Video
 
-1. Under **Load Model**, click `Browse File` and select the *config.yaml* file 
+1. Under **Load Model**, click `Browse File` and select the *config.yaml* file. 
 
 2. Under **Single Video**, click on `Browse File` and select the video.
 
@@ -212,11 +212,11 @@ This step creates a temp.yaml file to automate the extract frames step. What thi
 
 #### Multiple Videos
 
-1. Under **Load Model**, click `Browse File` and select the *config.yaml* file 
+1. Under **Load Model**, click `Browse File` and select the *config.yaml* file. 
 
 2. Under **Multiple Videos**, click on `Browse Folder` and select the folder with only the videos.
 
-3. Click `Add multiple videos`
+3. Click `Add multiple videos`.
 
 4. *temp.yaml* will be generated in the same folder as the project folder.
 
@@ -238,7 +238,7 @@ This step creates a temp.yaml file to automate the extract frames step. What thi
 
 1. Under **Extract Outliers**, click `Browse File` to select the videos to be corrected.
 
-2. Click `Extract Outliers`
+2. Click `Extract Outliers`.
 
 ### Step 3: Label Outliers
 
