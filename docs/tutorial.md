@@ -177,6 +177,8 @@ This step is to label the behavior in each frames
 
 2. Please click [here](/docs/labelling_aggression_tutorial.md) to learn how to use this labelling behavior interface.
 
+3. Click `Generate/Save` and it will generate a *.csv* file in */csv/targets_inserted*
+
 ### Step 7: Train Machine Model
 This step is to train the machine model. Simon will explain this as well. 
 >**Note:** If you import existing models, you can skip this step and go straight to **Step 8** to run machine model.
