@@ -1,7 +1,6 @@
 # Create tracking model using [DeepLabCut](http://www.mousemotorlab.org/deeplabcut)
 
-### Pipeline breakdown
-this is something
+## Pipeline breakdown
 
 ### [Part 1: Create DLC Project](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
 
@@ -33,13 +32,13 @@ This step generates a new DeepLabCut project.
 
 3. Enter your name in the `Experimenter Name`.
 
-> **Note:** Spaces are not allowed for your project name and experimenter name.
+> **Note:** Spaces are not allowed in your project name and experimenter name.
 
-4. If you are only tracking one video, you can click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importsinglevideo.PNG" width="120" height="27" /> and the <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> in **green** color font should change to <img src="https://github.com/sgoldenlab/simba/blob/master/images/videopath.PNG" width="274" height="27" /> in **blue** font. Then click on `Browse File` to select the video.
+4. If you are only tracking one video, you can click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importsinglevideo.PNG" width="120" height="27" /> and the <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> in **green** should change to <img src="https://github.com/sgoldenlab/simba/blob/master/images/videopath.PNG" width="274" height="27" /> in **blue**. Then click on `Browse File` to select a video.
 
-5. If you are tracking multiple videos, click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importmultivideo.PNG" width="120" height="27" /> and the **green** color <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> will appear and click on `Browser Folder` to choose a folder with the videos. The default settings is always to **import multiple videos**.
+5. If you are tracking multiple videos, click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importmultivideo.PNG" width="120" height="27" /> and the **green** color <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> will appear and click on `Browse Folder` to choose a folder with the videos. The default settings is always to **import multiple videos**.
 
-6. Next, select the main directory that your project will be in. In `Working Directory` click `Browser Folder` and choose a directory.
+6. Next, select the main directory that your project will be in. In `Working Directory` click `Browse Folder` and choose a directory.
 
 7. Choose to apply Golden Aggression Config by checking the checkbox.
 
