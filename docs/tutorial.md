@@ -1,5 +1,8 @@
 # Tutorial
 This is a step by step tutorial to start using the GUI.
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/simba.PNG" width="294" height="115" />
+
 ### Pipeline breakdown:
 
 For processing a tracking dataset, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
