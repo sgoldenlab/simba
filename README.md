@@ -5,7 +5,7 @@
 ## Pipeline
 
 
-<img src="/images/Flow_chart.png" width="750" height="1000" />
+<img src="/images/Flow_chart.png" width="750" height="800" />
 
 
 ## [Installation](docs/Installation.md) 
