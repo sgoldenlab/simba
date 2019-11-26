@@ -36,7 +36,9 @@ This step generates a new DeepLabCut project.
 
 4. If you are only tracking one video, you can click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importsinglevideo.PNG" width="120" height="27" /> and the <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> in **green** should change to <img src="https://github.com/sgoldenlab/simba/blob/master/images/videopath.PNG" width="274" height="27" /> in **blue**. Then click on `Browse File` to select a video.
 
-5. If you are tracking multiple videos, click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importmultivideo.PNG" width="120" height="27" /> and the **green** color <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> will appear and click on `Browse Folder` to choose a folder with the videos. The default settings is always to **import multiple videos**.
+5. If you are tracking multiple videos, click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importmultivideo.PNG" width="120" height="27" /> and the **green** <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> will appear. Click on `Browse Folder` to choose a folder with the videos. 
+
+>**Note:** The default settings is always to **import multiple videos**.
 
 6. Next, select the main directory that your project will be in. In `Working Directory` click `Browse Folder` and choose a directory.
 
