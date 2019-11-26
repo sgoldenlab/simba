@@ -1,8 +1,8 @@
-<img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/processvideo.PNG width="264" height="138" />
+<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo.PNG width="264" height="138" />
 
 # Tutorial for processing video in batch
 
-<img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/processvideo_flowdiagram.png width="800" height="310" />
+<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo_flowdiagram.png width="800" height="310" />
 
 ## Step 1: Folder Selection
 
@@ -14,13 +14,13 @@
 
 >**Note**: Please make sure there is no space in your folder name or video name.
 
-<img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/processvideo2.PNG width="450" height="200" />
+<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo2.PNG width="450" height="200" />
 
 ## Step 2: Select parameters
 
 1. A table with the videos in the folder will pop up.
 
-<img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/processvideo3.PNG width="1000" height="350" />
+<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo3.PNG width="1000" height="350" />
 
 2. If you wish to crop your videos, click on the `Crop` button. *The button will turn red once you clicked on it*
 
@@ -40,7 +40,7 @@
 
 2. The final processed videos will be in the `Output Directory` that you have selected.
 
-<img src=https://github.com/sgoldenlab/tkinter_test/blob/master/images/processvideo4.PNG width="500" height="200" />
+<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo4.PNG width="500" height="200" />
 
 3. The **tmp** folder contains the step-by-step processsed videos.
 
