@@ -28,6 +28,8 @@ For processing a tracking dataset, the pipeline is split into a few sections. Th
 ## Part 1: Create a new project
 This section creates a new project for your tracking analysis.
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/createproject2.PNG" width="270" height="150" />
+
 ### Step 1: Generate Project Config
 
 In this step, you will be generating your main project folder with all the sub-directories.
