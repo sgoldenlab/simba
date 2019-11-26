@@ -173,7 +173,7 @@ This step is to label the behavior in each frames
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/labelbe.PNG" width="720" height="720" />
 
-2. Please click [here](/docs/labelling_aggression_tutorial.md) to learn how to use this labele behavior interface.
+2. Please click [here](/docs/labelling_aggression_tutorial.md) to learn how to use this labelling behavior interface.
 
 ### Step 7: Train Machine Model
 This step is to train the machine model. Simon will explain this as well. 
