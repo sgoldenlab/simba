@@ -9,7 +9,7 @@ this is something
 - [Extract Frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-4-extract-frames-dlc-more-details-here)
 - [Label Frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-5-label-frames)
 - [Generate Training Set](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-7-generate-training-set)
-- [Download weights]() and [train model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-8-train-network)
+- [Download Weights]() and [Train Model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-8-train-network)
 - [Evaluate Model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-9-evaluate-network)
 - [Analyze Videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-10-video-analysis)
 
@@ -18,12 +18,12 @@ this is something
 - [Outlier correction](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#outlier-correction)
 
 ## Part 1: Create DLC Project
-This section create a new project for your DLC tracking analysis.
+This section creates a new project for your DLC tracking analysis.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/createdlcmodel.png" width="400" height="200" />
 
 ### Step 1: Generate a new DLC project
-blablabla
+This step generates a new DeepLabCut project.
 
 1. Go to `Tracking` --> `DeepLabCut` --> `Create DLC Model`. The following window will pop up.
 
