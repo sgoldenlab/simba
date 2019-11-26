@@ -1,9 +1,8 @@
 # Tutorial
-This is a step by step tutorial to start using the GUI from nothing. If you have a .sav models and you would like to use this GUI without training any models, please click on this link to tutorial two.
-
+This is a step by step tutorial to start using the GUI.
 ### Pipeline breakdown:
 
-For processing a tracking dataset, the pipelines is split into ? sections. These sections are listed below along with the functions that belong to each section:
+For processing a tracking dataset, the pipeline is split into ? sections. These sections are listed below along with their corresponding functions:
 
 
 ### Part 1: [Create a new project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
@@ -27,7 +26,7 @@ For processing a tracking dataset, the pipelines is split into ? sections. These
 - [Create Video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-13-create-video)
 
 ## Part 1: Create a new project
-This sections create a new project for your tracking analysis.
+This section creates a new project for your tracking analysis.
 
 ### Step 1: Generate Project Config
 
@@ -79,7 +78,7 @@ In this step, you will be generating your main project folder with all the sub-d
 8. Click `Generate Project Config` to generate your project. The project folder will be located at the `Project Path` that you specified
 
 ### Step 2: Import Videos into project folder
-In this step, you can choose to import only one video or multiple videos.
+In this step, you can choose to import either one or multiple videos.
 #### To import multiple videos
 1. Click on `Browse Folder` to select your folder that contains all the videos that you wished to be included in your project.
 2. Enter the type of your video *mp4*, *avi*, *mov*,etc. in the `Video type` entry box.
@@ -99,12 +98,10 @@ In this step, you will import your csv tracking data.
 2. Click `Import single csv to project folder`
 
 ### Step 4: Extract frames into project folder
-This step will extract all the frames from every videos that are in the videos folder.
-
-Once, all the steps are completed, close the `Project Configuration` window.
+This step will extract all the frames from every video that are in the videos folder. Once all the steps are completed, close the `Project Configuration` window.
 
 ## Part 2: Load project
-This sections loads a project that you have created.
+This section loads a project that you have created.
 
 ### Step 1: Load Project Config
 In this step, you will load the *project_config.ini* file that was created.
