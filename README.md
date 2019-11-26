@@ -1,4 +1,4 @@
-# Golden GUI
+# Simba
 Insert introduction with a few gifs
 
 ![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/mouse_tracking.gif)
