@@ -42,11 +42,11 @@ This step generates a new DeepLabCut project.
 
 6. Next, select the main directory that your project will be in. In `Working Directory` click `Browse Folder` and choose a directory.
 
-7. Click `Apply Golden Aggression Config` by checking the box, if you wish to use the Golden Lab's settings
+7. If you wish to use the Golden Lab's settings, check the `Apply Golden Aggression Config` box.
 
-8. You can have a choice of copying all the videos to your DLC project folder by checking the `Copy Videos` checkbox.
+8. You have a choice of copying all the videos to your DLC project folder by checking the `Copy Videos` checkbox.
 
-9. Click `Create Project` to create your DLC project. The project will be located in the **working directory** that was set.
+9. Click `Create Project` to create your DLC project. The project will be located in the **working directory** that was chosen.
 
 
 ## Part 2: Load DLC Project
