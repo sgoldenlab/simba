@@ -18,6 +18,7 @@ How to [install GUI](docs/installation.md)
 - [Process Video using tools](docs/Tutorial_tools.md)
 - [Batch process video](docs/tutorial_process_videos.md)
 - [Simba](docs/tutorial.md)
+- [Label Behavior](docs/labelling_aggression_tutorial.md)
 
 
 ## References
