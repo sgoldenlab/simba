@@ -49,6 +49,7 @@ Key shortcuts have been provided on the right side of the window for ease of use
 #### Playing Video
 `Open Current Video` Pressing this will open the video that corresponds to the frames folder being analyzed. Refer to Key Shortcuts to pause/play and move forward or backwards in the video by a certain amount of frames.
 
+![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/openingvideo.gif)
 > Note: Video name must be the same as the folder name. Video must also be paused before any other actions.
 
 `Show current video frame` This will jump to and display the current frame of the paused video on the labelling screen.
