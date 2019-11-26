@@ -50,11 +50,11 @@ This step generates a new DeepLabCut project.
 
 
 ## Part 2: Load DLC Project
-load dlc project
+This section allows you to load your DeepLabCut project.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/loaddlcmodel.png" width="400" height="200" />
 
-### Step 1: Check the settings in config.yaml file
+### Step 1: Check the settings in the config.yaml file
 
 1. Go to the project folder.
 
@@ -62,7 +62,7 @@ load dlc project
 
 3. Change the settings.
 
-### Step 2: Load config.yaml file with GUI
+### Step 2: Load the config.yaml file
 
 1. Go to `Tracking` --> `DeepLabCut` --> `Load DLC Model`. The following window will pop up.
 
@@ -70,7 +70,7 @@ load dlc project
 
 2. Under **Load Model**, click on `Browse File` and load the *config.yaml* file from the project folder.
 
-### Step 3: Add additonal videos into project [Optional]
+### Step 3: Add additonal videos into the project (Optional)
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/additionalvideo.PNG" width="350" height="200" />
 
