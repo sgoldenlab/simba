@@ -104,9 +104,9 @@ This section allows you to load your DeepLabCut project.
 
 - `KMeans` uses k-means clustering algorithm to select the frames randomly based on cluster. 
 
-- `Cluster Resize Width` is the settings for KMeans. The default is set to 30.
+- `Cluster Resize Width` is the setting for KMeans. The default is set to 30.
 
-- `Cluster Step` is the settings for KMeans. The default is set to 1.
+- `Cluster Step` is the setting for KMeans. The default is set to 1.
 
 4. Select **Cluster color**.
 
