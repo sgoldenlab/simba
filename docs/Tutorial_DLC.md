@@ -70,7 +70,7 @@ This section allows you to load your DeepLabCut project.
 
 2. Under **Load Model**, click on `Browse File` and load the *config.yaml* file from the project folder.
 
-### Step 3: Add additonal videos into the project (Optional)
+### Step 3: Add additonal videos into the project (optional)
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/additionalvideo.PNG" width="350" height="200" />
 
@@ -86,11 +86,11 @@ This section allows you to load your DeepLabCut project.
 
 2. Click `Add multiple videos`
 
-### Step 4: Extract Frames DLC (more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#c-data-selection-extract-frames))
+### Step 4: Extract Frames using DLC (more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#c-data-selection-extract-frames))
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/extractframesdlc.PNG" width="300" height="300" />
 
-1. Enter the numbers of frames that you wish to extract in the `numframes2pick` entry box.
+1. Enter the number of frames you wish to extract in the `numframes2pick` entry box.
 
 2. Select the **Mode** of selecting the frames. 
 
