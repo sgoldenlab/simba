@@ -6,25 +6,25 @@ This is a step by step tutorial to start using the GUI from nothing. If you have
 For processing a tracking dataset, the pipelines is split into ? sections. These sections are listed below along with the functions that belong to each section:
 
 
-### Part 1: [Create a new project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
-- Generate project config ([create new classifiers](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#create-new-classifiers) or [import exisiting classifiers](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#import-existing-classifiers))
-- [Import videos into project folder](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-2-import-videos-into-project-folder)
-- [Import DLC Tracking Data](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-3-import-dlc-tracking-data) (if have any)
-- [Extract Frames into project folder](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder)
+### Part 1: [Create a new project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
+- Generate project config ([create new classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#create-new-classifiers) or [import exisiting classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#import-existing-classifiers))
+- [Import videos into project folder](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-2-import-videos-into-project-folder)
+- [Import DLC Tracking Data](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-3-import-dlc-tracking-data) (if have any)
+- [Extract Frames into project folder](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder)
 
-### Part 2: [Load project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-1-load-project-config)
-- [Load the project.ini](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-1-load-project-config)
-- [Set video parameters](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-3-set-video-parameters)
-- [Outlier correction](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-4-outlier-correction)
-- [Extract Features](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-5-extract-features)
-- [Label Behavior](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-6-label-behavior)
-- [Train Machine Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-7-train-machine-model)
-- [Run Machine Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-8-run-machine-model)
-- [Analyze Machine Results](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
-- [Plot Skleran Results](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-10-plot-sklearn-results)
-- [Plot Graphs](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-11-plot-graphs)
-- [Merge Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-12-merge-frames)
-- [Create Video](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/tutorial.md#step-13-create-video)
+### Part 2: [Load project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config)
+- [Load the project.ini](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config)
+- [Set video parameters](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-3-set-video-parameters)
+- [Outlier correction](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-4-outlier-correction)
+- [Extract Features](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features)
+- [Label Behavior](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-6-label-behavior)
+- [Train Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model)
+- [Run Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model)
+- [Analyze Machine Results](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
+- [Plot Skleran Results](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-plot-sklearn-results)
+- [Plot Graphs](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-plot-graphs)
+- [Merge Frames](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-12-merge-frames)
+- [Create Video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-13-create-video)
 
 ## Part 1: Create a new project
 This sections create a new project for your tracking analysis.
@@ -36,7 +36,7 @@ In this step, you will be generating your main project folder with all the sub-d
 ### Create new Classifiers
 
 1. Go to `File` and click on `Create a new project` The following windows will pop up.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/createproject.PNG" width="500" height="600" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG" width="500" height="600" />
 
 2. `Project Path` is the main working directory that your project will be created. Click on `Browse Folder` and select your working directory
 
@@ -44,11 +44,11 @@ In this step, you will be generating your main project folder with all the sub-d
 
 4. Under `SML Settings`, put in the number of predictive classifiers that you wished. For an example, if you had three behaviors in your video, put 3 in the entry box.
 
-5. Click <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/addclassifier.PNG" width="150" height="50" /> and it creates a row as shown in the following image.
+5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="150" height="50" /> and it creates a row as shown in the following image.
 **Leave the path as it is (*No classifier is selected*). Repeat this step for every behaviors.**
 
 > **Note**: Make sure to click the button once and finished it before clicking it again. Do not click to add multiple rows before filling up the information.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/classifier1.PNG" width="700" height="130" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG" width="700" height="130" />
 
 6. `Video Settings` is the metadata of your videos. Filled in the information based on your videos.
 
@@ -57,7 +57,7 @@ In this step, you will be generating your main project folder with all the sub-d
 ### Import existing Classifiers
 
 1. Go to `File` and click on `Create a new project` The following windows will pop up.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/createproject.PNG" width="500" height="600" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG" width="500" height="600" />
 
 2. `Project Path` is the main working directory that your project will be created. Click on `Browse Folder` and select your working directory
 
@@ -65,14 +65,14 @@ In this step, you will be generating your main project folder with all the sub-d
 
 4. Under `SML Settings`, put in the number of predictive classifiers that you wished. For an example, if you had three behaviors in your video, put 3 in the entry box.
 
-5. Click <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/addclassifier.PNG" width="150" height="50" /> and it creates a row as shown in the following image.
+5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="150" height="50" /> and it creates a row as shown in the following image.
 
 > **Note**: Make sure to click the button once and finished it before clicking it again. Do not click to add multiple rows before filling up the information.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/classifier1.PNG" width="700" height="130" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG" width="700" height="130" />
 
 6. Import the models by clicking `Browse` and select your *.sav* file. At the end, it should look like the following image.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/classifier2.PNG" width="700" height="160" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/classifier2.PNG" width="700" height="160" />
 
 7. `Video Settings` is the metadata of your videos. Filled in the information based on your videos.
 
@@ -110,10 +110,10 @@ This sections loads a project that you have created.
 In this step, you will load the *project_config.ini* file that was created.
 > **Note:** project_config.ini should always be loaded before starting anything else.
 1. Go to `File` and click on `Load project` The following windows will pop up.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadproject.PNG" width="750" height="600" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG" width="750" height="600" />
 
 2. Under **Load Project.ini**, click on `Browse File`. Then, go to the directory that you created your project and click on your *project folder*. Then, click on *project_folder* and then *project_config.ini*. Once this step is completed, it should look like the following instead of *No file selected*.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loadedprojectini.PNG" width="500" height="60" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/loadedprojectini.PNG" width="500" height="60" />
 
 In this image, you can see, the `Dekstop` is my selected working directory, `tutorial` is my project name, and the last two sections is always going to be `project_folder/project_config.ini` 
 
@@ -126,26 +126,26 @@ In this step, you can customize the parameters for each of your videos. You will
 1. Under **Set video parameters(distances,resolution,etc.)**, the `Distance in mm` here is the distance between two points in milimeter. You can enter the values *(eg: 10,20)* and click `Auto populate Distance in mm in tables` and it will populate the table that you are going to see in the next step. If you leave it empty, it will just be zero.
 
 2. Click on `Set Video Parameters` and the following windows will pop up.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/videoinfo_table.PNG" width="1000" height="500" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table.PNG" width="1000" height="500" />
 
 3. As you can see, I imported four videos and they are in the `Video` column. I have set the `Distance_in_mm` to 10 in the previous step, else, it will be 0.
 
 4. Now, I can click on the values in the box and change it until I am satisfied. Then, click `Update distance_in_mm`, this will actually update the whole table.
 
 5. Next, to get the `Pixels/mm`, click on `Video1`,which will be the first video in the table and the following window will pop up.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoord1.PNG" width="300" height="400" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord1.PNG" width="300" height="400" />
 The windows that pop up is a frame from your first video in the table.
 
 6. Now, double **left** click to select two points that you know the distance in real life. 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoord2.PNG" width="300" height="400" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord2.PNG" width="300" height="400" />
 
 In this case, I know the two **pink dot that connects** has a distance of 10mm in real life.
 
 7. If you misplace the dots, you can double click on either of them and redo the step. Once you are done, you can hit `Esc`.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/getcoord.gif" width="720" height="720" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord.gif" width="720" height="720" />
 
 8. If every steps are done correctly, the values should populate in the `Pixels/mm` column in the table.
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/videoinfo_table2.PNG" width="1000" height="500" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table2.PNG" width="1000" height="500" />
 
 9. Repeat the steps for every videos and once it is done, click `Save Data`. This will generate a csv file named **video_info.csv** in `/project_folder/log`
 
@@ -153,11 +153,11 @@ In this case, I know the two **pink dot that connects** has a distance of 10mm i
 
 Outlier corrections.... For more details, please click [here](https://github.com/sgoldenlab/social_tracker/blob/master/Outlier_correction.pdf)
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/outliercorrection.PNG" width="156" height="109" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection.PNG" width="156" height="109" />
 
 1. Click on `Settings` and the following window will pop up.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/outliercorrection2.PNG" width="300" height="400" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection2.PNG" width="300" height="400" />
 
 2. Select the body parts for Animal 1 and Animal 2.
 
@@ -171,7 +171,7 @@ This step is to label the behavior in each frames
 
 1. Click on `Select folder with frames`. In your project folder go to `/project_folder/frames/input/`, there should be folders that are named after your videos that contain all the video frames. Select one of the folder and the following window should pop up.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/labelagg.PNG" width="720" height="720" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelagg.PNG" width="720" height="720" />
 
 2. Sophia will work on this...
 
@@ -181,7 +181,7 @@ This step is to train the machine model. Simon will explain this as well.
 
 1. Click on `Settings` and the following window will pop up. 
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/trainmachinemodel_settings.PNG" width="402" height="403" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/trainmachinemodel_settings.PNG" width="402" height="403" />
 
 2. First, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
 
