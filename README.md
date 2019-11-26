@@ -1,4 +1,4 @@
-# Simba
+# SimBA
 
 ![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/4videos.gif)
 
