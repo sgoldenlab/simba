@@ -2,7 +2,7 @@
 This is a step by step tutorial to start using the GUI.
 ### Pipeline breakdown:
 
-For processing a tracking dataset, the pipeline is split into ? sections. These sections are listed below along with their corresponding functions:
+For processing a tracking dataset, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
 
 
 ### Part 1: [Create a new project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
