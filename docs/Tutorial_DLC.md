@@ -110,7 +110,7 @@ This section allows you to load your DeepLabCut project.
 
 4. To use color information for clustering, check the `True` box under **Cluster Color**
 
-5. If you wish to use **OpenCV** to extract frames, check the `True` box. If you wish to use **ffmpeg**, keep it uncheck.
+5. If you wish to use **OpenCV** to extract frames, check the `True` box. If you wish to use **ffmpeg**, keep it unchecked.
 
 6. Click `Extract Frames` to extract frames.
 
