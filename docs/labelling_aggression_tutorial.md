@@ -43,6 +43,7 @@ Underneath the displayed image, there are options for navigating through all the
 Key shortcuts have been provided on the right side of the window for ease of use. 
 `For Video` is only applicable for navigating the video when opened.
 `Key Presses` allows users to jump from frame to frame as well as save frames using the keyboard. 
+> Important: If using Ctrl + S to save, do NOT hold down keys to save multiple frames.
 
 
 #### Playing Video
