@@ -3,31 +3,31 @@
 ### Pipeline breakdown
 this is something
 
-### [Part 1: Create DLC Project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
+### [Part 1: Create DLC Project](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
 
-### [Part 2: Load DLC Project](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#part-2-load-dlc-project-1)
-- [Extract Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-4-extract-frames-dlc-more-details-here)
-- [Label Frames](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-5-label-frames)
-- [Generate Training Set](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-7-generate-training-set)
-- [Download weights]() and [train model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-8-train-network)
-- [Evaluate Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-9-evaluate-network)
-- [Analyze Videos](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#step-10-video-analysis)
+### [Part 2: Load DLC Project](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-2-load-dlc-project-1)
+- [Extract Frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-4-extract-frames-dlc-more-details-here)
+- [Label Frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-5-label-frames)
+- [Generate Training Set](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-7-generate-training-set)
+- [Download weights]() and [train model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-8-train-network)
+- [Evaluate Model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-9-evaluate-network)
+- [Analyze Videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#step-10-video-analysis)
 
-### [Part 3: Improve the Model](https://github.com/sgoldenlab/tkinter_test/blob/master/docs/Tutorial_DLC.md#part-3-improve-the-model-1)
+### [Part 3: Improve the Model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-3-improve-the-model-1)
 - Extract more frames 
 - Outlier correction
 
 ## Part 1: Create DLC Project
 This section create a new project for your DLC tracking analysis.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/createdlcmodel.png" width="400" height="200" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/createdlcmodel.png" width="400" height="200" />
 
 ### Step 1: Generate a new DLC project
 blablabla
 
 1. Go to `Tracking` --> `DeepLabCut` --> `Create DLC Model`. The following window will pop up.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/createdlcmodel2.png" width="400" height="336" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/createdlcmodel2.png" width="400" height="336" />
 
 2. Enter the name of your project in `Project Name`
 
@@ -35,9 +35,9 @@ blablabla
 
 > **Note:** Spaces are not allowed for your project name and experimenter name.
 
-4. If you are only tracking one video, you can click on <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/importsinglevideo.PNG" width="120" height="27" /> and the <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/videofolder.PNG" width="274" height="27" /> in **green** color font should change to <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/videopath.PNG" width="274" height="27" /> in **blue** font. Then click on `Browse File` to select the video.
+4. If you are only tracking one video, you can click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importsinglevideo.PNG" width="120" height="27" /> and the <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> in **green** color font should change to <img src="https://github.com/sgoldenlab/simba/blob/master/images/videopath.PNG" width="274" height="27" /> in **blue** font. Then click on `Browse File` to select the video.
 
-5. If you are tracking multiple videos, click on <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/importmultivideo.PNG" width="120" height="27" /> and the **green** color <img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/videofolder.PNG" width="274" height="27" /> will appear and click on `Browser Folder` to choose a folder with the videos. The default settings is always to **import multiple videos**.
+5. If you are tracking multiple videos, click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importmultivideo.PNG" width="120" height="27" /> and the **green** color <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> will appear and click on `Browser Folder` to choose a folder with the videos. The default settings is always to **import multiple videos**.
 
 6. Next, select the main directory that your project will be in. In `Working Directory` click `Browser Folder` and choose a directory.
 
@@ -51,7 +51,7 @@ blablabla
 ## Part 2: Load DLC Project
 load dlc project
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loaddlcmodel.png" width="400" height="200" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/loaddlcmodel.png" width="400" height="200" />
 
 ### Step 1: Check the settings in config.yaml file
 
@@ -65,13 +65,13 @@ load dlc project
 
 1. Go to `Tracking` --> `DeepLabCut` --> `Load DLC Model`. The following window will pop up.
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/loaddlcmodel2.PNG" width="500" height="400" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/loaddlcmodel2.PNG" width="500" height="400" />
 
 2. Under **Load Model**, click on `Browse File` and load the *config.yaml* file from the project folder.
 
 ### Step 3: Add additonal videos into project [Optional]
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/additionalvideo.PNG" width="350" height="200" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/additionalvideo.PNG" width="350" height="200" />
 
 #### Single Video
 
@@ -87,7 +87,7 @@ load dlc project
 
 ### Step 4: Extract Frames DLC (more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#c-data-selection-extract-frames))
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/extractframesdlc.PNG" width="300" height="300" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/extractframesdlc.PNG" width="300" height="300" />
 
 1. Enter the numbers of frames that you wish to extract in the `numframes2pick` entry box.
 
@@ -115,7 +115,7 @@ load dlc project
 
 ### Step 5: Label Frames
 
-<img src="https://github.com/sgoldenlab/tkinter_test/blob/master/images/labelframes.PNG" width="100" height="50" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelframes.PNG" width="100" height="50" />
 
 1. Under **Label Frames**, click on the `Label Frames` button and *DeepLabCut- Labelling ToolBox* will pop up.
 
