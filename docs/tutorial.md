@@ -191,7 +191,7 @@ This step is to train the machine model. Simon will explain this as well.
 
 1. Click on `Settings` and the following window will pop up. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/trainmachinemodel_settings.PNG" width="453" height="854" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG" width="453" height="854" />
 
 2. First, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
 
