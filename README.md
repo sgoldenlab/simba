@@ -17,7 +17,7 @@ Several excellent computational frameworks exist that enable high-throughput, co
 
 ## [Installation](docs/Installation.md) 
 
-How to [install GUI](docs/installation.md)
+How to [install SimBA](docs/installation.md)
 
 ## Tutorial
 
