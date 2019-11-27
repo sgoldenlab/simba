@@ -144,15 +144,15 @@ This section allows you to load your DeepLabCut project.
 
 #### Training a new model
 
-1. If you are training a new model and wanted to start from fresh. The `iteration` will be set to 0 by default and the `init_weight` will be set to resnet-50 by default
+1. If you are training a new model and want to start from scratch, click the `Train Network` button and do not change the settings.
 
-2. Hence, do not change the settings and just click the `Train Network` button.
+2. The `iteration` will be set to 0 by default and the `init_weight` will be set to resnet-50 by default
 
-#### Training existed model
+#### Training an existing model
 
 1. If you want to retrain a model, you can select the iteration in the `iteration` entry box and click `Update iteration`.
 
-2. Then, you can click `Browse File` to find the model that you wish to retrain and click `Update init_weight` 
+2. Click `Browse File` to find the model that you wish to retrain and click `Update init_weight` 
 
 3. Click `Train Network` to start training your model.
 
@@ -164,7 +164,7 @@ This section allows you to load your DeepLabCut project.
 
 #### Single Video Analysis
 
-1. Under **Single Video Analysis**, click on `Browse File` and select one of the video.
+1. Under **Single Video Analysis**, click on `Browse File` and select one of the videos.
 
 2. Click on `Single Video Analysis`.
 
@@ -172,7 +172,7 @@ This section allows you to load your DeepLabCut project.
 
 1. Under **Multiple Videos Analysis**, click on `Browse Folder` and select the video folder.
 
-2. Enter the video format in `Video type` entry box (eg: mp4, avi). *Do **not** put any " . " dot in the entrybox (eg: .mp4, .flv, .avi, etc.)*
+2. Enter the video format in the `Video type` entry box (eg: mp4, avi). *Do **not** include any " . " dot in the entrybox (eg: .mp4, .flv, .avi, etc.)*
 
 3. Click on `Multi Videos Analysis`.
 
@@ -183,23 +183,23 @@ This section allows you to load your DeepLabCut project.
 2. Click on `Plot Results` .
 
 ### Step 12: Create Video
-This step is to generate the video with labelled tracking points.
+This step will generate the video with labelled tracking points.
 
 1. Click on `Browse File` to select the video.
 
-2. You can choose to save the frames with tracking points of the video by checking the `Save Frames` checkbox. This will result in a longer waiting time for this process.
+2. You can choose to save the frames with tracking points on the video by checking the `Save Frames` box. This process takes longer.
 
 3. Click on `Create Video`.
 
 ## Part 3: Improve the Model
 There are two ways that you can improve the current model.
 
-1. To extract more frames to train the model.
+1. Extract more frames to train the model.
 
-2. To correct the tracking points of the existing frames.
+2. Correct the tracking points of the existing frames.
 
 ## Extract more frames
-This step creates a temp.yaml file to automate the extract frames step. What this basically does is to copy the settings from the *config.yaml* and remove all the videos in it. Then, it adds the new videos that the user specify into the yaml file and generates a *temp.yaml*
+This step creates a temp.yaml file to automate the **Extract Frames** process. It will copy the settings from the *config.yaml* and remove all the videos in the *config.yaml* file. It will then add the new videos that the user specifies into the yaml file and will generate a *temp.yaml*
 
 ### Step 1: Generate temp.yaml from the original config.yaml
 
@@ -217,7 +217,7 @@ This step creates a temp.yaml file to automate the extract frames step. What thi
 
 1. Under **Load Model**, click `Browse File` and select the *config.yaml* file. 
 
-2. Under **Multiple Videos**, click on `Browse Folder` and select the folder with only the videos.
+2. Under **Multiple Videos**, click on `Browse Folder` and select the folder containing only the videos.
 
 3. Click `Add multiple videos`.
 
@@ -245,9 +245,9 @@ This step creates a temp.yaml file to automate the extract frames step. What thi
 
 ### Step 3: Label Outliers
 
-1. Under **Label Outliers**, click on `Refine Outliers`. *DeepLabCut - Refinement ToolBox* will pop out.
+1. Under **Label Outliers**, click on `Refine Outliers`. The *DeepLabCut - Refinement ToolBox* will pop up.
 
-2. At the bottom left corner, click on `Load labels` and select the machinelabels file and correct the tracking points.
+2. In the bottom left-hand corner, click on `Load labels` and select the machinelabels file to correct the tracking points.
 
 ### Step 4: Merge Labelled Outliers
 
