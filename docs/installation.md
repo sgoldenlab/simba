@@ -14,7 +14,7 @@ pip install -r simba/SimBA/requirements.txt
 
 # How to launch the GUI
 
-1. Open up command prompt from the SimBA folder
+1. Open up command prompt in the SimBA folder
 
 2. In the command prompt type
 ```
