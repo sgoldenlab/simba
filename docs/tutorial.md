@@ -189,11 +189,13 @@ This step is to label the behavior in each frames
 This step is to train the machine model. Simon will explain this as well. 
 >**Note:** If you import existing models, you can skip this step and go straight to **Step 8** to run machine model.
 
+#### Train single model
+
 1. Click on `Settings` and the following window will pop up. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG" width="453" height="854" />
 
-2. First, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
+2. Under **Machine Model**, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
 
 - `RF`
 
@@ -201,29 +203,47 @@ This step is to train the machine model. Simon will explain this as well.
 
 - `Xboost`
 
-3. Then, set the **Hyperparameters**.
+3. Under **Model**, select the model you wish to train from the drop down menu.
 
-`n estimators`
+4. Then, set the **Hyperparameters**.
 
-`max features`
+`RF N estimators`
 
-`criterion`
+`RF Max features`
 
-`test size`
+`RF Criterion`
 
-`discrimination threshold`
+`Train Test Size`
 
-`features importances to plot`  
+`RF Min sample leaf`
 
-`min sample leaf`
+`Under sample ratio`  
 
-`Under sample correction value`
+`Under sample setting`
 
-`max depth`
+`Over sample ratio`
 
-4. Click the `SET` button to save your settings into the *config.ini* file.
+`Over sample setting`
 
-5. Once, the settings is saved, click on `Train Model`
+`N feature importance bars`
+
+5. Click the `Save settings for single model` button to save your settings into the *config.ini* file.
+
+6. Click on `Train Model` in the main window.
+
+#### Train multiple models
+
+1. Click on `Settings`.
+
+2. Under **Machine Model**, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
+
+3. Under **Model**, select the model you wish to train from the drop down menu.
+
+4. Then, set the **Hyperparameters**.
+
+5. Click the `Save settings for multiple models` button. This generates a _meta.csv file. Repeat step 1. to 5. to generate multiple models.
+
+6. Click on `Train Multiple Models` in the main window.
 
 
 ### Step 8: Run Machine Model
