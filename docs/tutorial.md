@@ -1,5 +1,5 @@
-# Tutorial
-This is a step by step tutorial to start using the GUI.
+# SimBA Tutorial
+This is a step by step tutorial to start using SimBA.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/simba.png" width="294" height="115" />
 
