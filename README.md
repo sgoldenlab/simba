@@ -12,7 +12,7 @@ Several excellent computational frameworks exist that enable high-throughput, co
 ## Pipeline
 
 
-<img src="/images/Flow_chart.png" width="750" height="800" />
+<img src="/images/overallflow.PNG" width="980" height="210" />
 
 
 ## [Installation](docs/Installation.md) 
