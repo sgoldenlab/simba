@@ -4,7 +4,6 @@ This is a step by step tutorial to start using SimBA.
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/simba.png" width="294" height="115" />
 
 ### Pipeline breakdown:
-
 For processing a tracking dataset, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/simbaworkflow.PNG" width="989" height="532" />
