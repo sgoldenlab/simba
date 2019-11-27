@@ -206,31 +206,53 @@ This step is to train the machine model. Simon will explain this as well.
 
 3. Under **Model**, select the model you wish to train from the drop down menu.
 
-4. Then, set the **Hyperparameters**.
+4. Under **Hyperparameters**.
 
-`RF N estimators`
+- `RF N estimators`
 
-`RF Max features`
+- `RF Max features`
 
-`RF Criterion`
+- `RF Criterion`
 
-`Train Test Size`
+- `Train Test Size`
 
-`RF Min sample leaf`
+- `RF Min sample leaf`
 
-`Under sample ratio`  
+- `Under sample ratio`  
 
-`Under sample setting`
+- `Under sample setting`
 
-`Over sample ratio`
+- `Over sample ratio`
 
-`Over sample setting`
+- `Over sample setting`
 
-`N feature importance bars`
+- `N feature importance bars`
 
-5. Click the `Save settings for single model` button to save your settings into the *config.ini* file.
+5. Under **Model Evaluation Settings**,
 
-6. Click on `Train Model` in the main window.
+`Generate RF model meta data file`
+
+`Generate Example Decision Tree`
+
+`Generate Classification Report`
+
+`Generate Features Importance Log`
+
+`Generate Features Importance Bar Graph`
+
+`Compute Feature Permutation Importances`
+
+`Generate Sklearn Learning Curve`
+
+`LearningCurve shuffle K splits`
+
+`LearningCurve shuffle Data splits`
+
+`Generate Precision Recall Curves`
+
+6. Click the `Save settings for single model` button to save your settings into the *config.ini* file.
+
+7. Click on `Train Model` in the main window.
 
 #### Train multiple models
 
@@ -255,11 +277,11 @@ Run machine model explaination goes here
 ### Step 9: Analyze Machine Results
 In this step, there are three main analysis, which are `Analyze`, `Analyze distance/velocity`, and `Analyze severity`.
 
-`Analyze`
+- `Analyze`
 
-`Analyze distance/velocity`
+- `Analyze distance/velocity`
 
-`Analyze severity`
+- `Analyze severity`
 
 ### Step 10: Plot Sklearn Results
 Explanation goes here 
