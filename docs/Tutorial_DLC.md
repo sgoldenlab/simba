@@ -122,13 +122,15 @@ This section allows you to load your DeepLabCut project.
 
 2. Click on `Load Frames` located in the bottom left-hand corner.
 
-3. Choose the folder with your video name where your extracted frames are saved and click `Select Folder`. *They should be located at workingdirectory/yourproject/labeled-data/*
+3. Choose the folder with the video name where your extracted frames are saved and click `Select Folder`. *They should be located at workingdirectory/yourproject/labeled-data/*
 
-4. Then you can start labelling frames. ( more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#d-label-frames)) 
+4. Now you can start labelling frames. (more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#d-label-frames)) 
 
-### Step 6: Check Labels
+5. Once all the frames are labelled, move on to **Step 6**.
 
-1. Once all the frames are labelled. Under **Check Labels**, click on `Check Labelled Frames` to check the labelled frames.
+### Step 6: Check Labels 
+
+1. Under **Check Labels**, click on `Check Labelled Frames` to check the labelled frames.
 
 ### Step 7: Generate Training Set
 
@@ -136,15 +138,15 @@ This section allows you to load your DeepLabCut project.
 
 ### Step 8: Train Network
 
-`iteration` is the number of iteration.
+`iteration` is the number of iterations.
 
-`init_weight` is the initial weights to train the model.
+`init_weight` is the initial weight to train the model.
 
 #### Training a new model
 
 1. If you are training a new model and wanted to start from fresh. The `iteration` will be set to 0 by default and the `init_weight` will be set to resnet-50 by default
 
-2. Hence, do not change the settings and just click `Train Network` button.
+2. Hence, do not change the settings and just click the `Train Network` button.
 
 #### Training existed model
 
