@@ -315,7 +315,7 @@ Explanation
 
 
 ### Step 12: Merge Frames
-I think this is to merge all the plot into a frames 
+Merge all chosen plots into a frames.
 
 ### Step 13: Create Video
 This step is to generate a video with all the plots
