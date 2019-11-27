@@ -161,10 +161,16 @@ Outlier corrections.... For more details, please click [here](https://github.com
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection2.PNG" width="300" height="400" />
 
-2. Select the body parts for Animal 1 and Animal 2.
+2. Select the body parts for Animal 1 and Animal 2 that you want to use to calculate a reference value. The reference value will be the mean Euclidian distance in millimeters between the two body parts in all frames.
+
+3. Enter values for `Location Criterion` and `Movement Criterion`. 
+
+- `Movement Criterion`. A bodypart will be flagged and corrected as a "movement outlier" if the bodypart moves the *reference value p x criterion value k* across two sequencial frames.
+
+-`Location Criterion`. A bodypart will be flagged and correct as a "location outlier" if the distance between the bodypart and atleast two other bodyparts belonging to the same animal are bigger than *reference value p x criterion value k* within a frame.
 
 ### Step 5: Extract Features
-Simon will also explain this
+Based on the coordinates of bodyparts in each frames, frame rate, and pixels per millimeter values, the code constructs and exhaustive set of features. This includes metric distances between bodyparts, angles, areas, movement, paths, and the deviations and rank in individual frames and across rolling windows.
 
 1. Click `Extract Features`
 
