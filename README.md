@@ -11,9 +11,9 @@ Several excellent computational frameworks exist that enable high-throughput, co
 
 ## Pipeline
 
-
 <img src="/images/overallflow.PNG" width="980" height="210" />
 
+[Pre-process videos](docs/tutorial_process_videos.md) --> [Create tracking model](docs/Tutorial_DLC.md) --> [Building classfier(s)](docs/tutorial.md) --> [Analysis/Visualization]()
 
 ## [Installation](docs/Installation.md) 
 
