@@ -2,6 +2,8 @@
 
 ## Pipeline breakdown
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/dlcworkflow.png" width="591" height="294" />
+
 ### [Part 1: Create DLC Project](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
 
 ### [Part 2: Load DLC Project](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-2-load-dlc-project-1)
