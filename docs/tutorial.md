@@ -7,6 +7,8 @@ This is a step by step tutorial to start using SimBA.
 
 For processing a tracking dataset, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/simbaworkflow.png" width="989" height="532" />
+
 
 ### Part 1: [Create a new project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
 - Generate project config ([create new classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#create-new-classifiers) or [import exisiting classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#import-existing-classifiers))
