@@ -167,7 +167,7 @@ Outlier corrections.... For more details, please click [here](https://github.com
 
 - `Movement Criterion`. A bodypart will be flagged and corrected as a "movement outlier" if the bodypart moves the *reference value p x criterion value k* across two sequencial frames.
 
--`Location Criterion`. A bodypart will be flagged and correct as a "location outlier" if the distance between the bodypart and atleast two other bodyparts belonging to the same animal are bigger than *reference value p x criterion value k* within a frame.
+- `Location Criterion`. A bodypart will be flagged and correct as a "location outlier" if the distance between the bodypart and atleast two other bodyparts belonging to the same animal are bigger than *reference value p x criterion value k* within a frame.
 
 ### Step 5: Extract Features
 Based on the coordinates of bodyparts in each frames, frame rate, and pixels per millimeter values, the code constructs and exhaustive set of features. This includes metric distances between bodyparts, angles, areas, movement, paths, and the deviations and rank in individual frames and across rolling windows.
