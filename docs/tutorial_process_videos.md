@@ -34,6 +34,10 @@
 
 7. If you wish to apply CLAHE, check on the `CLAHE` box.
 
+8. In the first row, there are `Select All` checkboxes to check all the checkboxes in the given column.
+
+> **Note:** The `Select All` checkbox might be off position. We are working on it to fix it.
+
 ## Step 3: Execute
 
 1. Once the parameters are confirmed, click `Execute`
