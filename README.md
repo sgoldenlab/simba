@@ -21,9 +21,9 @@ How to [install SimBA](docs/installation.md)
 
 ## Tutorial
 
-- [DeepLabCut in the GUI](docs/Tutorial_DLC.md)
 - [Process Video using tools](docs/Tutorial_tools.md)
 - [Batch process video](docs/tutorial_process_videos.md)
+- [DeepLabCut in the GUI](docs/Tutorial_DLC.md)
 - [Simba](docs/tutorial.md)
 - [Label Behavior](docs/labelling_aggression_tutorial.md)
 
