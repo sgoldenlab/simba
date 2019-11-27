@@ -9,7 +9,7 @@ Open bash or command prompt and run the following commands on current working di
 ```
 git clone https://github.com/sgoldenlab/simba.git
 
-pip install -r simba/tkinter_gui/requirements.txt
+pip install -r simba/SimBA/requirements.txt
 ```
 
 # How to launch the GUI
