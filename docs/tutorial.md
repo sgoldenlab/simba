@@ -230,25 +230,25 @@ This step is to train the machine model. Simon will explain this as well.
 
 5. Under **Model Evaluation Settings**,
 
-`Generate RF model meta data file`
+- `Generate RF model meta data file`
 
-`Generate Example Decision Tree`
+- `Generate Example Decision Tree`
 
-`Generate Classification Report`
+- `Generate Classification Report`
 
-`Generate Features Importance Log`
+- `Generate Features Importance Log`
 
-`Generate Features Importance Bar Graph`
+- `Generate Features Importance Bar Graph`
 
-`Compute Feature Permutation Importances`
+- `Compute Feature Permutation Importances`
 
-`Generate Sklearn Learning Curve`
+- `Generate Sklearn Learning Curve`
 
-`LearningCurve shuffle K splits`
+- `LearningCurve shuffle K splits`
 
-`LearningCurve shuffle Data splits`
+- `LearningCurve shuffle Data splits`
 
-`Generate Precision Recall Curves`
+- `Generate Precision Recall Curves`
 
 6. Click the `Save settings for single model` button to save your settings into the *config.ini* file.
 
