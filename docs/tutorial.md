@@ -276,7 +276,7 @@ Run machine model explaination goes here
 
 1. Under **Run Machine Model**, fill in the `Discrimination threshold` and click on `Set` to save the settings.
 
-- `Discrimination threshold
+- `Discrimination threshold`
 
 2. Fill in the ` Mininum behavior bout length` and click on `Set` to save the settings.
 
@@ -287,6 +287,8 @@ Run machine model explaination goes here
 ### Step 9: Analyze Machine Results
 In this step, there are three main analysis, which are `Analyze`, `Analyze distance/velocity`, and `Analyze severity`.
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/analyzemachineresult.PNG" width="331" height="62" />
+
 - `Analyze`
 
 - `Analyze distance/velocity`
@@ -296,8 +298,12 @@ In this step, there are three main analysis, which are `Analyze`, `Analyze dista
 ### Step 10: Plot Sklearn Results
 Explanation goes here 
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="170" height="58" />
+
 ### Step 11: Plot Graphs
 Explanation goes here
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotgraphs.PNG" width="262" height="383" />
 
 #### Gantt plot
 aggression plot
