@@ -272,7 +272,17 @@ This step is to train the machine model. Simon will explain this as well.
 ### Step 8: Run Machine Model
 Run machine model explaination goes here
 
-1. Click on `Run RF Model`
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="348" height="107" />
+
+1. Under **Run Machine Model**, fill in the `Discrimination threshold` and click on `Set` to save the settings.
+
+- `Discrimination threshold
+
+2. Fill in the ` Mininum behavior bout length` and click on `Set` to save the settings.
+
+- `Minimum behavior bout length`
+
+3. Click on `Run RF Model` to run the machine model.
 
 ### Step 9: Analyze Machine Results
 In this step, there are three main analysis, which are `Analyze`, `Analyze distance/velocity`, and `Analyze severity`.
