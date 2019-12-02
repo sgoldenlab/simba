@@ -333,8 +333,12 @@ Explanation
 ### Step 12: Merge Frames
 Merge all chosen plots into a frames.
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes.PNG" width="121" height="62" />
+
 ### Step 13: Create Video
 This step is to generate a video with all the plots
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/createvideoini.PNG" width="200" height="100" />
 
 `Bitrate`
 
