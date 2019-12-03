@@ -349,32 +349,44 @@ Gantt plot generates gantt plot frames for all of the videos in the project
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/gantt_plot.gif" width="300" height="225" />
 
+1. Under **Gantt plot**, click `Generate Gantt plot` and gantt plot frames will be generated in the `project_folder/frames/output/gantt_plots` folder.
+
 #### Data plot
 Generates 'live' data plot frames for all of the videos in the project
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/dataplot.gif" width="300" height="200" />
+
+1. Under **Data plot**, click `Generate Data plot` and data plot frames will be generated in the `project_folder/frames/output/live_data_table` folder.
 
 #### Path plot
 Generates path plot frames for all of the videos in the project
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/pathplot.gif" width="199" height="322" />
 
-`Max Lines`: Integer specifying the max number of lines depicting the path of the animals. For example, if 100, the most recent 100 movements of animal 1 and animal 2 will be plotted as lines.
+1. Under **Path plot**, fill in the entry box.
 
-`Severity Scale`: Integer specifying the scale on which to classify 'severity'. For example, if set to 10, all frames containing attack will be classified from 1 to 10.
+- `Max Lines`: Integer specifying the max number of lines depicting the path of the animals. For example, if 100, the most recent 100 movements of animal 1 and animal 2 will be plotted as lines.
 
-`Bodyparts`: String to specify the bodyparts to use in the path plot. For example, if Nose_1 and Centroid_2, the nose of animal 1 and the centroid of animal 2 will be represented in the path plot.
+- `Severity Scale`: Integer specifying the scale on which to classify 'severity'. For example, if set to 10, all frames containing attack will be classified from 1 to 10.
 
-`plot_severity`: Tick this box to include color-coded circles on the path plot that signify the location and severity of attack interactions.
+- `Bodyparts`: String to specify the bodyparts to use in the path plot. For example, if Nose_1 and Centroid_2, the nose of animal 1 and the centroid of animal 2 will be represented in the path plot.
+
+- `plot_severity`: Tick this box to include color-coded circles on the path plot that signify the location and severity of attack interactions.
+
+2. Click on `Generate Distance plot`, and path plot frames will be generated in the `project_folder/frames/output/path_plots` folder.
 
 #### Distance plot
 Generates distance frames between two body parts for all of the videos in the project
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/distance_plot.gif" width="300" height="225" />
 
-`Body part 1`: String that specifies the the bodypart of animal 1. Eg., Nose_1
+1. Fill in the `Body part 1` and `Body part 2`
 
-`Body part 2`: String that specifies the the bodypart of animal 1. Eg., Nose_2
+- `Body part 1`: String that specifies the the bodypart of animal 1. Eg., Nose_1
+
+- `Body part 2`: String that specifies the the bodypart of animal 1. Eg., Nose_2
+
+2. Click on `Generate Distance plot`, and the distance plot frames will be generated in the `project_folder/frames/output/line_plot` folder.
 
 ### Step 12: Merge Frames
 Merge all the generated plots from the previous step into a frame.
@@ -383,8 +395,10 @@ Merge all the generated plots from the previous step into a frame.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
 
+1. Under **Merge Frames**, click `Merge Frames` and frames with all the graph that were plotted will be combined and generated in the `project_folder/frames/output/merged` folder.
+
 ### Step 13: Create Video
-This step is to generate a video with all the plots
+This step is to generate a video from the merged frames.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/createvideoini.PNG" width="200" height="100" />
 
