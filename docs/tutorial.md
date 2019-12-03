@@ -225,7 +225,7 @@ This step is to train the machine model.
 
 - `Over sample ratio`: The desired ratio of the number of samples in the minority class over the number of samples in the majority class after resampling
 
-- `Over sample setting`: "SMOTE", "SMOTEEN" or "None". If "SMOTE" or "SMOTEEN", synthetic data will be generated in the minority class based on k-means to balance the two classes. (for more details, please click [here](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTE.html)
+- `Over sample setting`: "SMOTE", "SMOTEEN" or "None". If "SMOTE" or "SMOTEEN", synthetic data will be generated in the minority class based on k-means to balance the two classes. (for more details, please click [here](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTE.html))
 
 
 5. Under **Model Evaluation Settings**,
@@ -242,9 +242,9 @@ This step is to train the machine model.
 
 - `N feature importance bars`: Integer definiting the number of top features to be included in the bar chart
 
-- `Compute Feature Permutation Importances`: Creates a .csv file listing the importances (permutation importances) of all features for the classifier. (for more details, please click [here](https://eli5.readthedocs.io/en/latest/blackbox/permutation_importance.html)
+- `Compute Feature Permutation Importances`: Creates a .csv file listing the importances (permutation importances) of all features for the classifier. (for more details, please click [here](https://eli5.readthedocs.io/en/latest/blackbox/permutation_importance.html))
 
-- `Generate Sklearn Learning Curve`: Creates a .csv file listing the f1 score at different test data sizes. (for more details, please click [here](https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html)
+- `Generate Sklearn Learning Curve`: Creates a .csv file listing the f1 score at different test data sizes. (for more details, please click [here](https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html))
 
 - `LearningCurve shuffle K splits`: Number of cross validations applied att each test data size.
 
