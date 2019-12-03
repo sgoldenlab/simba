@@ -402,9 +402,14 @@ This step is to generate a video from the merged frames.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/createvideoini.PNG" width="200" height="100" />
 
-`Bitrate`: [Bitrate](https://en.wikipedia.org/wiki/Bit_rate) is the number of bits per second. The symbol is bit/s. It generally determines the size and quality of video and audio files: the higher the bitrate, the better the quality and the larger the file size
+1. Enter the `Bitrate` and the `File format`  
 
-`File format`: The format of the file, it can be mp4, mov, flv, avi, etc...
+- `Bitrate`: [Bitrate](https://en.wikipedia.org/wiki/Bit_rate) is the number of bits per second. The symbol is bit/s. It generally determines the size and quality of video and audio files: the higher the bitrate, the better the quality and the larger the file size
 
+- `File format`: The format of the output video, it can be mp4, mov, flv, avi, etc...
+
+> **Note**: Please enter the file format without the "."
+
+2. Click `Create Video`
 
 
