@@ -131,7 +131,9 @@ In this step, you can customize the parameters for each of your videos. You will
 1. Under **Set video parameters(distances,resolution,etc.)**, the `Distance in mm` here is the distance between two points in milimeter. You can enter the values *(eg: 10,20)* and click `Auto populate Distance in mm in tables` and it will populate the table that you are going to see in the next step. If you leave it empty, it will just be zero.
 
 2. Click on `Set Video Parameters` and the following windows will pop up.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table.PNG" width="1000" height="500" />
+<p align="center">
+  <img width="700" height="350" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table.PNG">
+</p>
 
 3. As you can see, I imported four videos and they are in the `Video` column. I have set the `Distance_in_mm` to 10 in the previous step, else, it will be 0.
 
@@ -155,8 +157,9 @@ In this step, you can customize the parameters for each of your videos. You will
 </p>
 
 8. If every steps are done correctly, the values should populate in the `Pixels/mm` column in the table.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table2.PNG" width="1000" height="500" />
-
+<p align="center">
+  <img width="700" height="350" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table2.PNG">
+</p>
 9. Repeat the steps for every videos and once it is done, click `Save Data`. This will generate a csv file named **video_info.csv** in `/project_folder/log`
 
 ### Step 4: Outlier Correction
