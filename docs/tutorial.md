@@ -10,7 +10,7 @@ For processing a tracking dataset, the pipeline is split into a few sections. Th
 
 
 ### Part 1: [Create a new project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
-- Generate project config ([create new classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#create-new-classifiers) or [import exisiting classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#import-existing-classifiers))
+- [Generate project config](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config) ([create new classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#create-new-classifiers) or [import exisiting classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#import-existing-classifiers))
 - [Import videos into project folder](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-2-import-videos-into-project-folder)
 - [Import DLC Tracking Data](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-3-import-dlc-tracking-data) (if have any)
 - [Extract Frames into project folder](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder)
@@ -246,7 +246,7 @@ This step is to train the machine model.
 
 - `Generate Sklearn Learning Curve`: Creates a .csv file listing the f1 score at different test data sizes. (for more details, please click [here](https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html))
 
-- `LearningCurve shuffle K splits`: Number of cross validations applied att each test data size.
+- `LearningCurve shuffle K splits`: Number of cross validations applied at each test data size.
 
 - `LearningCurve shuffle Data splits`: Number of test data sizes. 
 
@@ -333,7 +333,7 @@ Explanation
 
 
 ### Step 12: Merge Frames
-Merge all chosen plots into a frames.
+Merge all the generated plots from the previous step into a frame.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes.PNG" width="121" height="62" />
 
@@ -342,9 +342,9 @@ This step is to generate a video with all the plots
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/createvideoini.PNG" width="200" height="100" />
 
-`Bitrate`
+`Bitrate`: Bitrate is the number of bits per second. The symbol is bit/s. It generally determines the size and quality of video and audio files: the higher the bitrate, the better the quality and the larger the file size
 
-`File format`
+`File format`: The format of the file, it can be mp4, mov, flv, avi, etc...
 
 
 
