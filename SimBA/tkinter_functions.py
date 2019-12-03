@@ -510,7 +510,7 @@ def cropvid(filenames):
         fileOut, fileType = videoName.split(".", 2)
         fileOutName = str(fileOut) + str('_cropped.mp4')
         command = str('ffmpeg -i ') + str(videoName) + str(' -vf ') + str('"crop=') + str(width) + ':' + str(
-            height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -crf 0 -c:a copy ') + str(
+            height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -crf 21 -c:a copy ') + str(
             fileOutName)
         total = width + height + topLeftX + topLeftY
 

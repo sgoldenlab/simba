@@ -2014,8 +2014,10 @@ class loadprojectini:
 
         #run machine model
         label_runmachinemodel = LabelFrame(scroll,text='Run Machine Model',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='blue')
-        self.descrimination_threshold = Entry_Box(label_runmachinemodel,'Discrimination threshold','20')
+        self.descrimination_threshold = Entry_Box(label_runmachinemodel,'Discrimination threshold','25')
+        self.shortest_bout = Entry_Box(label_runmachinemodel,'Minimum behavior bout length','25')
         button_set_d_t = Button(label_runmachinemodel,text='Set',command =lambda:self.set_discrimination_threshold(self.descrimination_threshold.entry_get))
+        button_set_shortbout = Button(label_runmachinemodel,text='Set',command = lambda:self.set_shortestbout(self.shortest_bout.entry_get))
         button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command=lambda:rfmodel(self.projectconfigini.file_path))
 
         # machine results
@@ -2126,7 +2128,9 @@ class loadprojectini:
         label_runmachinemodel.grid(row=7,sticky=W)
         self.descrimination_threshold.grid(row=0,sticky=W)
         button_set_d_t.grid(row=0,column=1,sticky=W)
-        button_runmachinemodel.grid(row=1,sticky=W)
+        self.shortest_bout.grid(row=1,column=0,sticky=W)
+        button_set_shortbout.grid(row=1,column=1,sticky=W)
+        button_runmachinemodel.grid(row=2,sticky=W)
 
         label_machineresults.grid(row=8,sticky=W)
         button_process_datalog.grid(row=0,column=0,sticky=W,padx=3)
@@ -2169,6 +2173,18 @@ class loadprojectini:
         button_validate_classifier.grid(row=1,sticky=W)
 
         scroll.update()
+
+    def set_shortestbout(self,sb):
+        sb = int(sb)
+
+        configini = self.projectconfigini.file_path
+        config = ConfigParser()
+        config.read(configini)
+
+        config.set('validation/run model', 'shortest_bout', str(sb))
+        with open(configini, 'w') as configfile:
+            config.write(configfile)
+        print('Mininum behavior bout length set to', sb)
 
     def set_discrimination_threshold(self,dt):
         dt = float(dt)

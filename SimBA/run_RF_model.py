@@ -22,6 +22,11 @@ def rfmodel(inifile):
         os.makedirs(csv_dir_out)
     model_dir = config.get('SML settings', 'model_dir')
     model_nos = config.getint('SML settings', 'No_targets')
+    shortest_bout = config.getint('validation/run model', 'shortest_bout')
+    vidInfPath = config.get('General settings', 'project_path')
+    vidInfPath = os.path.join(vidInfPath, 'logs')
+    vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
+    vidinfDf = pd.read_csv(vidInfPath)
     currentAttackGapList = []
     filesFound = []
     model_paths = []
@@ -62,10 +67,7 @@ def rfmodel(inifile):
 
     for i in filesFound:
         currFile = i
-        if use_master == 'no':
-            configFile = configFilelist[loopy]
-            config = ConfigParser()
-            config.read(configFile)
+        currentFileName = os.path.basename(currFile)
         loopy += 1
         inputFile = pd.read_csv(currFile, index_col=0)
         inputFileOrganised = inputFile.drop(
@@ -80,63 +82,67 @@ def rfmodel(inifile):
              "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p", ], axis=1)
         video_no = inputFileOrganised.pop('video_no').values
         frame_number = inputFileOrganised.pop('frames').values
-        inputFileOrganised['video_no'] = video_no
-        videoNames = inputFileOrganised['video_no'].unique()
+        currVidInfoDf = vidinfDf.loc[vidinfDf['Video'] == str(currentFileName.replace('.csv', ''))]
+        currVidFps = int(currVidInfoDf['fps'])
+        outputDf = inputFile.copy()
+        outputDf.reset_index()
+        outputDf['frames'] = outputDf.index
+        video_no = outputDf.pop('video_no').values
 
-        for i in videoNames:
-            currentVideoName = i
-            vNm_list.append('Video' + str(currentVideoName))
-            currentDf = (inputFileOrganised.loc[inputFileOrganised['video_no'] == currentVideoName])
-            outputDf = (inputFile.loc[inputFile['video_no'] == currentVideoName])
-            outputDf.reset_index()
-            outputDf['frames'] = outputDf.index
+        # CREATE LIST OF GAPS BASED ON SHORTEST BOUT
+        framesToPlug = int(currVidFps * (shortest_bout / 1000))
+        framesToPlugList = list(range(1, framesToPlug + 1))
+        framesToPlugList.reverse()
+        patternListofLists = []
+        for k in framesToPlugList:
+            zerosInList = [0] * k
+            currList = [1]
+            currList.extend(zerosInList)
+            currList.extend([1])
+            patternListofLists.append(currList)
+        patternListofLists.append([0, 1, 1, 0])
+        patternListofLists.append([0, 1, 0])
+        patterns = np.asarray(patternListofLists)
 
-            video_no = currentDf.pop('video_no').values
+        for b in range(model_nos):
+            currentModelPath = model_paths[b]
+            model = os.path.join(model_dir, currentModelPath)
+            currModelName = os.path.basename(model)
+            currModelName = currModelName.split('.')
+            currModelName = str(currModelName[0])
+            currProbName = 'Probability_' + currModelName
+            clf = pickle.load(open(model, 'rb'))
+            predictions = clf.predict_proba(inputFileOrganised)
+            outputDf[currProbName] = predictions[:, 1]
+            outputDf[currModelName] = np.where(outputDf[currProbName] > discrimination_threshold, 1, 0)
 
-            for i in range(model_nos):
-                currentModelPath = model_paths[i]
-                model = os.path.join(model_dir, currentModelPath)
-                currModelName = os.path.basename(model)
-                currModelName = currModelName.split('.')
-                currModelName = str(currModelName[0])
-                currProbName = 'Probability_' + currModelName
-                clf = pickle.load(open(model, 'rb'))
-                predictions = clf.predict_proba(currentDf)
-                outputDf[currProbName] = predictions[:, 1]
-                outputDf[currModelName] = np.where(outputDf[currProbName] > discrimination_threshold, 1, 0)
+            ########## FIX  'GAPS' ###########################################
+            for l in patterns:
+                currPattern = l
+                n_obs = len(currPattern)
+                outputDf['rolling_match'] = (outputDf[currModelName].rolling(window=n_obs, min_periods=n_obs)
+                                             .apply(lambda x: (x == currPattern).all())
+                                             .mask(lambda x: x == 0)
+                                             .bfill(limit=n_obs - 1)
+                                             .fillna(0)
+                                             .astype(bool)
+                                             )
+                if (currPattern == patterns[-2]) or (currPattern == patterns[-1]):
+                    outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 0
+                else:
+                    outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 1
+                outputDf = outputDf.drop(['rolling_match'], axis=1)
 
-                ########## FIX  'GAPS' ###########################################
-                patterns = np.asarray(
-                    [[1, 0, 0, 0, 0, 0, 1], [1, 0, 0, 0, 0, 1], [1, 0, 0, 0, 1], [1, 0, 0, 1], [1, 0, 1], [0, 1, 1, 0],
-                     [0, 1, 0]])
-                for i in patterns:
-                    currPattern = i
-                    n_obs = len(currPattern)
-                    outputDf['rolling_match'] = (outputDf[currModelName].rolling(window=n_obs, min_periods=n_obs)
-                                                 .apply(lambda x: (x == currPattern).all())
-                                                 .mask(lambda x: x == 0)
-                                                 .bfill(limit=n_obs - 1)
-                                                 .fillna(0)
-                                                 .astype(bool)
-                                                 )
-                    if (currPattern == patterns[5]) or (currPattern == patterns[6]):
-                        outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 0
-                    else:
-                        outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 1
-                    outputDf = outputDf.drop(['rolling_match'], axis=1)
+        mouse1size = (statistics.mean(outputDf['Mouse_1_nose_to_tail']))
+        mouse2size = (statistics.mean(outputDf['Mouse_2_nose_to_tail']))
+        mouse1Max = mouse1size * 8
+        mouse2Max = mouse2size * 8
+        outputDf['Scaled_movement_M1'] = (outputDf['Total_movement_all_bodyparts_M1'] / (mouse1Max))
+        outputDf['Scaled_movement_M2'] = (outputDf['Total_movement_all_bodyparts_M2'] / (mouse2Max))
+        outputDf['Scaled_movement_M1_M2'] = (outputDf['Scaled_movement_M1'] + outputDf['Scaled_movement_M2']) / 2
+        outputDf['Scaled_movement_M1_M2'] = outputDf['Scaled_movement_M1_M2'].round(decimals=2)
 
-            ########## SCORE SEVERITY OF BEHAVIOURS by NOMALIZED MOVEMENT SCORE ###########################################
-            mouse1size = (statistics.mean(outputDf['Mouse_1_nose_to_tail']))
-            mouse2size = (statistics.mean(outputDf['Mouse_2_nose_to_tail']))
-            mouse1Max = mouse1size * 8
-            mouse2Max = mouse2size * 8
-
-            outputDf['Scaled_movement_M1'] = (outputDf['Total_movement_all_bodyparts_M1'] / (mouse1Max))
-            outputDf['Scaled_movement_M2'] = (outputDf['Total_movement_all_bodyparts_M2'] / (mouse2Max))
-            outputDf['Scaled_movement_M1_M2'] = (outputDf['Scaled_movement_M1'] + outputDf['Scaled_movement_M2']) / 2
-            outputDf['Scaled_movement_M1_M2'] = outputDf['Scaled_movement_M1_M2'].round(decimals=2)
-
-            outFname = os.path.basename(currFile)
-            outFname = os.path.join(csv_dir_out, outFname)
-            outputDf.to_csv(outFname)
-            print(str(outFname) + str(' completed'))
+        outFname = os.path.basename(currFile)
+        outFname = os.path.join(csv_dir_out, outFname)
+        outputDf.to_csv(outFname)
+        print(str(outFname) + str(' completed'))
