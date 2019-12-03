@@ -126,6 +126,8 @@ In this step, you can choose to import more csv files or videos. If you don't yo
 ### Step 3: Set video parameters
 In this step, you can customize the parameters for each of your videos. You will also be setting the **pixels per milimeter** of for your videos. You will be using a tool that requires the distance of a point to another point in order to calculate the **pixels per milimeter**. The real life distance between two points is call `Distance in mm`.
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/setvidparameter.PNG" width="476" height="97" />
+
 1. Under **Set video parameters(distances,resolution,etc.)**, the `Distance in mm` here is the distance between two points in milimeter. You can enter the values *(eg: 10,20)* and click `Auto populate Distance in mm in tables` and it will populate the table that you are going to see in the next step. If you leave it empty, it will just be zero.
 
 2. Click on `Set Video Parameters` and the following windows will pop up.
@@ -141,12 +143,10 @@ In this step, you can customize the parameters for each of your videos. You will
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord1.PNG">
 </p>
 
-6. Now, double **left** click to select two points that you know the distance in real life. 
+6. Now, double **left** click to select two points that you know the distance in real life. In this case, I know the two **pink dot that connects** has a distance of 10mm in real life.
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord2.PNG">
 </p>
-
-In this case, I know the two **pink dot that connects** has a distance of 10mm in real life.
 
 7. If you misplace the dots, you can double click on either of them and redo the step. Once you are done, you can hit `Esc`.
 
