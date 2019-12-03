@@ -381,7 +381,7 @@ Merge all the generated plots from the previous step into a frame.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes.PNG" width="121" height="62" />
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="300" height="174" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
 
 ### Step 13: Create Video
 This step is to generate a video with all the plots
