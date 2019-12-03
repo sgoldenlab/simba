@@ -352,6 +352,8 @@ Gantt plot generates gantt plot frames for all of the videos in the project
 #### Data plot
 Generates 'live' data plot frames for all of the videos in the project
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/dataplot.gif" width="300" height="200" />
+
 #### Path plot
 Generates path plot frames for all of the videos in the project
 
@@ -374,11 +376,12 @@ Generates distance frames between two body parts for all of the videos in the pr
 
 `Body part 2`: String that specifies the the bodypart of animal 1. Eg., Nose_2
 
-
 ### Step 12: Merge Frames
 Merge all the generated plots from the previous step into a frame.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes.PNG" width="121" height="62" />
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="300" height="174" />
 
 ### Step 13: Create Video
 This step is to generate a video with all the plots
