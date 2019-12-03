@@ -278,11 +278,11 @@ Run machine model explaination goes here
 
 1. Under **Run Machine Model**, fill in the `Discrimination threshold` and click on `Set` to save the settings.
 
-- `Discrimination threshold`
+- `Discrimination threshold`: The level of probability required to define that the frame belongs to the target class
 
 2. Fill in the ` Mininum behavior bout length` and click on `Set` to save the settings.
 
-- `Minimum behavior bout length`
+- `Minimum behavior bout length`:  The shortest possible length a behavioural bout can be. For example, the random forest makes the following aggression predictions for 5 consecutive frames in a 50 fps video: 1,0,0,0,1.This would mean, if we don't have a minimum bout length, that the animals fought twice in a few milliseconds. In reality they fought once standing still for a few milliseconds in the middle of the fight. This setting correct the 0s to 1s.
 
 3. Click on `Run RF Model` to run the machine model.
 
@@ -298,7 +298,7 @@ In this step, there are three main analysis, which are `Analyze`, `Analyze dista
 - `Analyze severity`
 
 ### Step 10: Plot Sklearn Results
-Explanation goes here 
+Plot Sklearn result creates the frames with the animals and the predictions overlayed and the body-part circles overlayed
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="170" height="58" />
 
