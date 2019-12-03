@@ -151,7 +151,7 @@ In this case, I know the two **pink dot that connects** has a distance of 10mm i
 7. If you misplace the dots, you can double click on either of them and redo the step. Once you are done, you can hit `Esc`.
 
 <p align="center">
-  <img width="600" height="600" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord.gif">
+  <img width="400" height="500" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord.gif">
 </p>
 
 8. If every steps are done correctly, the values should populate in the `Pixels/mm` column in the table.
