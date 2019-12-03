@@ -135,11 +135,11 @@ In this step, you can customize the parameters for each of your videos. You will
 
 4. Now, I can click on the values in the box and change it until I am satisfied. Then, click `Update distance_in_mm`, this will actually update the whole table.
 
-5. Next, to get the `Pixels/mm`, click on `Video1`,which will be the first video in the table and the following window will pop up.
+5. Next, to get the `Pixels/mm`, click on `Video1`,which will be the first video in the table and the following window will pop up. The windows that pop up is a frame from your first video in the table.
+
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord1.PNG">
 </p>
-The windows that pop up is a frame from your first video in the table.
 
 6. Now, double **left** click to select two points that you know the distance in real life. 
 <p align="center">
@@ -149,7 +149,10 @@ The windows that pop up is a frame from your first video in the table.
 In this case, I know the two **pink dot that connects** has a distance of 10mm in real life.
 
 7. If you misplace the dots, you can double click on either of them and redo the step. Once you are done, you can hit `Esc`.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord.gif" width="720" height="720" />
+
+<p align="center">
+  <img width="600" height="600" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord.gif">
+</p>
 
 8. If every steps are done correctly, the values should populate in the `Pixels/mm` column in the table.
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table2.PNG" width="1000" height="500" />
