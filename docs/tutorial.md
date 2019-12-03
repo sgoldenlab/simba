@@ -336,8 +336,10 @@ Plot Sklearn result creates the frames with the animals and the predictions over
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="170" height="58" />
 
+1. Under **Plot Sklearn Results**, click `Plot Sklearn Results`.
+
 ### Step 11: Plot Graphs
-Explanation goes here
+The user is able to choose what plot to generate, **Gantt plot**, **Data plot**, **Path plot**, and **Distance plot**
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/plotgraphs.PNG" width="262" height="383" />
 
