@@ -86,7 +86,10 @@ In this step, you will be generating your main project folder with all the sub-d
 </p>
 
 6. Import the models by clicking `Browse` and select your *.sav* file. At the end, it should look like the following image.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/classifier2.PNG" width="700" height="160" />
+
+<p align="center">
+  <img width="700" height="160" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier2.PNG">
+</p>
 
 7. `Video Settings` is the metadata of your videos. Filled in the information based on your videos.
 
@@ -122,10 +125,16 @@ This section loads a project that you have created.
 In this step, you will load the *project_config.ini* file that was created.
 > **Note:** project_config.ini should always be loaded before starting anything else.
 1. Go to `File` and click on `Load project` The following windows will pop up.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG" width="750" height="600" />
+
+<p align="center">
+  <img width="750" height="600" src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG">
+</p>
 
 2. Under **Load Project.ini**, click on `Browse File`. Then, go to the directory that you created your project and click on your *project folder*. Then, click on *project_folder* and then *project_config.ini*. Once this step is completed, it should look like the following instead of *No file selected*.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/loadedprojectini.PNG" width="500" height="60" />
+
+<p align="center">
+  <img width="500" height="60" src="https://github.com/sgoldenlab/simba/blob/master/images/loadedprojectini.PNG">
+</p>
 
 In this image, you can see, the `Dekstop` is my selected working directory, `tutorial` is my project name, and the last two sections is always going to be `project_folder/project_config.ini` 
 
@@ -179,7 +188,9 @@ Outlier correction is used to correct gross tracking inaccuracies by detecting o
 
 1. Click on `Settings` and the following window will pop up.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection2.PNG" width="300" height="400" />
+<p align="center">
+  <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection2.PNG">
+</p>
 
 2. Select the body parts for Animal 1 and Animal 2 that you want to use to calculate a reference value. The reference value will be the mean Euclidian distance in millimeters between the two body parts in all frames.
 
