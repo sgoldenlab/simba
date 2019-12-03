@@ -347,11 +347,15 @@ The user is able to choose what plot to generate, **Gantt plot**, **Data plot**,
 #### Gantt plot
 Gantt plot generates gantt plot frames for all of the videos in the project
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/gantt_plot.gif" width="300" height="225" />
+
 #### Data plot
 Generates 'live' data plot frames for all of the videos in the project
 
 #### Path plot
 Generates path plot frames for all of the videos in the project
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/pathplot.gif" width="199" height="322" />
 
 `Max Lines`: Integer specifying the max number of lines depicting the path of the animals. For example, if 100, the most recent 100 movements of animal 1 and animal 2 will be plotted as lines.
 
@@ -363,6 +367,8 @@ Generates path plot frames for all of the videos in the project
 
 #### Distance plot
 Generates distance frames between two body parts for all of the videos in the project
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/distance_plot.gif" width="300" height="225" />
 
 `Body part 1`: String that specifies the the bodypart of animal 1. Eg., Nose_1
 
