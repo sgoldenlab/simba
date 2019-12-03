@@ -154,7 +154,7 @@ In this case, I know the two **pink dot that connects** has a distance of 10mm i
 
 ### Step 4: Outlier Correction
 
-Outlier corrections.... For more details, please click [here](https://github.com/sgoldenlab/social_tracker/blob/master/Outlier_correction.pdf)
+Outlier correction is used to correct gross tracking inaccuracies by detecting outliers based on movements and locations of body-parts in relation to the animal body-length.( For more details, please click [here](https://github.com/sgoldenlab/social_tracker/blob/master/Outlier_correction.pdf)
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection.PNG" width="156" height="109" />
 
@@ -176,7 +176,7 @@ Based on the coordinates of bodyparts in each frames, frame rate, and pixels per
 1. Click `Extract Features`
 
 ### Step 6: Label Behavior
-This step is to label the behavior in each frames
+This step is to label the behavior in each frames of a video.
 
 1. Click on `Select folder with frames`. In your project folder go to `/project_folder/frames/input/`, there should be folders that are named after your videos that contain all the video frames. Select one of the folder and the following window should pop up.
 
@@ -187,7 +187,8 @@ This step is to label the behavior in each frames
 3. Click `Generate/Save` and it will generate a *.csv* file in */csv/targets_inserted*
 
 ### Step 7: Train Machine Model
-This step is to train the machine model. Simon will explain this as well. 
+This step is to train the machine model.
+
 >**Note:** If you import existing models, you can skip this step and go straight to **Step 8** to run machine model.
 
 #### Train single model
@@ -198,57 +199,58 @@ This step is to train the machine model. Simon will explain this as well.
 
 2. Under **Machine Model**, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
 
-- `RF` is a machine model based on Random Forest ensemble method
+- `RF`: Random forest
 
-- `GBC` is a machine model based on Gradient Boosting ensemble method 
+- `GBC`: Gradient boost classifier
 
-- `Xboost` is a machine model based on XGBoost ensemble method
+- `Xgboost`: eXtreme Gradient boost
 
 3. Under **Model**, select the model you wish to train from the drop down menu.
 
-4. Under **Hyperparameters**.
+4. Under **Hyperparameters**, select the hyperparameter settings for your model.(for more details, please click [here](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html))
 
-- `RF N estimators`
+- `RF N estimators`: Number of decision trees in the decision ensemble
 
-- `RF Max features`
+- `RF Max features`: Number of features to consider when looking for the best split. 
 
-- `RF Criterion`
+- `RF Criterion`: The metric used to measure the quality of each split, i.e "gini" or "entropy"
 
-- `Train Test Size`
+- `Train Test Size`: The ratio of the dataset withheld for testing the model (e.g., 0.20)
 
-- `RF Min sample leaf`
+- `RF Min sample leaf`: The minimum number of samples required to be at a leaf node. 
 
-- `Under sample ratio`  
+- `Under sample ratio`: The ratio of samples of the majority class to the minority class in the training data set. Applied only if "Under sample setting" is set to "Random undersample"  
 
-- `Under sample setting`
+- `Under sample setting`: "Random undersample" or "None". If "Random undersample", a random sample of the majority class will be used in the train set. The size of this sample will be taken as a ratio of the minority class and should be specified in the "under sample ratio" box below.
 
-- `Over sample ratio`
+- `Over sample ratio`: The desired ratio of the number of samples in the minority class over the number of samples in the majority class after resampling
 
-- `Over sample setting`
+- `Over sample setting`: "SMOTE", "SMOTEEN" or "None". If "SMOTE" or "SMOTEEN", synthetic data will be generated in the minority class based on k-means to balance the two classes. (for more details, please click [here](https://imbalanced-learn.readthedocs.io/en/stable/generated/imblearn.over_sampling.SMOTE.html)
 
-- `N feature importance bars`
 
 5. Under **Model Evaluation Settings**,
 
-- `Generate RF model meta data file`
+- `Generate RF model meta data file`: Generate a .csv file containing hyperparameter settings associated with the model. 
 
-- `Generate Example Decision Tree`
+- `Generate Example Decision Tree`: Save a random decision tree in .pdf format. Depends on [graphviz](https://graphviz.gitlab.io/)
 
-- `Generate Classification Report`
+- `Generate Classification Report`: Save a classification report in .png format. Depends on [yellowbrick](www.scikit-yb.org/)
 
-- `Generate Features Importance Log`
+- `Generate Features Importance Log`: Create a .csv file listing the importances (gini importances) of all features for the classifier. 
 
-- `Generate Features Importance Bar Graph`
+- `Generate Features Importance Bar Graph`: Creates a bar chart of the top N features based on gini importances. 
 
-- `Compute Feature Permutation Importances`
+- `N feature importance bars`: Integer definiting the number of top features to be included in the bar chart
 
-- `Generate Sklearn Learning Curve`
+- `Compute Feature Permutation Importances`: Creates a .csv file listing the importances (permutation importances) of all features for the classifier. (for more details, please click [here](https://eli5.readthedocs.io/en/latest/blackbox/permutation_importance.html)
 
-- `LearningCurve shuffle K splits`
+- `Generate Sklearn Learning Curve`: Creates a .csv file listing the f1 score at different test data sizes. (for more details, please click [here](https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html)
 
-- `LearningCurve shuffle Data splits`
+- `LearningCurve shuffle K splits`: Number of cross validations applied att each test data size.
 
-- `Generate Precision Recall Curves`
+- `LearningCurve shuffle Data splits`: Number of test data sizes. 
+
+- `Generate Precision Recall Curves`: Creates a .csv file listing precision at different recall values. 
 
 6. Click the `Save settings for single model` button to save your settings into the *config.ini* file.
 
