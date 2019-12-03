@@ -41,7 +41,9 @@ In this step, you will be generating your main project folder with all the sub-d
 ### Create new Classifiers
 
 1. Go to `File` and click on `Create a new project` The following windows will pop up.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG" width="500" height="600" />
+<p align="center">
+  <img width="500" height="600" src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG">
+</p>
 
 2. `Project Path` is the main working directory that your project will be created. Click on `Browse Folder` and select your working directory
 
@@ -53,7 +55,10 @@ In this step, you will be generating your main project folder with all the sub-d
 **Leave the path as it is (*No classifier is selected*). Repeat this step for every behaviors.**
 
 > **Note**: Make sure to click the button once and finished it before clicking it again. Do not click to add multiple rows before filling up the information.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG" width="700" height="130" />
+
+<p align="center">
+  <img width="700" height="130" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
+</p>
 
 6. `Video Settings` is the metadata of your videos. Filled in the information based on your videos.
 
@@ -62,7 +67,9 @@ In this step, you will be generating your main project folder with all the sub-d
 ### Import existing Classifiers
 
 1. Go to `File` and click on `Create a new project` The following windows will pop up.
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG" width="500" height="600" />
+<p align="center">
+  <img width="500" height="600" src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG">
+</p>
 
 2. `Project Path` is the main working directory that your project will be created. Click on `Browse Folder` and select your working directory
 
@@ -74,7 +81,9 @@ In this step, you will be generating your main project folder with all the sub-d
 
 > **Note**: Make sure to click the button once and finished it before clicking it again. Do not click to add multiple rows before filling up the information.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG" width="700" height="130" />
+<p align="center">
+  <img width="700" height="130" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
+</p>
 
 6. Import the models by clicking `Browse` and select your *.sav* file. At the end, it should look like the following image.
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/classifier2.PNG" width="700" height="160" />
