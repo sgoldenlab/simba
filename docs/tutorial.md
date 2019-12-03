@@ -325,11 +325,12 @@ In this step, there are three main analysis, which are `Analyze`, `Analyze dista
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/analyzemachineresult.PNG" width="331" height="62" />
 
-- `Analyze`
+- `Analyze`: Generates descriptive statistics for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. The datetime stamped output csv file is saved in the logs folder.
 
-- `Analyze distance/velocity`
+- `Analyze distance/velocity`: Generated descriptive statistics for mean and median movements and distances between animals. The datetime stamped output csv file is saved in the logs folder.
 
-- `Analyze severity`
+- `Analyze severity`: Calculates the ‘severity’ of each frame classified as containing attack based on a user-defined scale. .  For example, on a 10-point scale, if the total body-part movement distances of both animals were in the top 10% percentile of movements in the video and a frame was scored as aggression, the aggressive attack was scored as a 10.
+The datetime stamped output csv file is saved in the logs folder.
 
 ### Step 10: Plot Sklearn Results
 Plot Sklearn result creates the frames with the animals and the predictions overlayed and the body-part circles overlayed
@@ -344,28 +345,28 @@ The user is able to choose what plot to generate, **Gantt plot**, **Data plot**,
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/plotgraphs.PNG" width="262" height="383" />
 
 #### Gantt plot
-aggression plot
+Gantt plot generates gantt plot frames for all of the videos in the project
 
 #### Data plot
-idk
+Generates 'live' data plot frames for all of the videos in the project
 
 #### Path plot
-explanation
+Generates path plot frames for all of the videos in the project
 
-`Max Lines`
+`Max Lines`: Integer specifying the max number of lines depicting the path of the animals. For example, if 100, the most recent 100 movements of animal 1 and animal 2 will be plotted as lines.
 
-`Severity Scale`
+`Severity Scale`: Integer specifying the scale on which to classify 'severity'. For example, if set to 10, all frames containing attack will be classified from 1 to 10.
 
-`Bodyparts`
+`Bodyparts`: String to specify the bodyparts to use in the path plot. For example, if Nose_1 and Centroid_2, the nose of animal 1 and the centroid of animal 2 will be represented in the path plot.
 
-`plot_severity`
+`plot_severity`: Tick this box to include color-coded circles on the path plot that signify the location and severity of attack interactions.
 
 #### Distance plot
-Explanation
+Generates distance frames between two body parts for all of the videos in the project
 
-`Body part 1`
+`Body part 1`: String that specifies the the bodypart of animal 1. Eg., Nose_1
 
-`Body part 2`
+`Body part 2`: String that specifies the the bodypart of animal 1. Eg., Nose_2
 
 
 ### Step 12: Merge Frames
