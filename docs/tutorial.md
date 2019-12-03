@@ -210,7 +210,9 @@ This step is to label the behavior in each frames of a video.
 
 1. Click on `Select folder with frames`. In your project folder go to `/project_folder/frames/input/`, there should be folders that are named after your videos that contain all the video frames. Select one of the folder and the following window should pop up.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelbe.PNG" width="720" height="720" />
+<p align="center">
+  <img width="720" height="720" src="https://github.com/sgoldenlab/simba/blob/master/images/labelbe.PNG">
+</p>
 
 2. Please click [here](/docs/labelling_aggression_tutorial.md) to learn how to use this labelling behavior interface.
 
@@ -225,7 +227,9 @@ This step is to train the machine model.
 
 1. Click on `Settings` and the following window will pop up. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG" width="453" height="854" />
+<p align="center">
+  <img width="450" height="850" src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG">
+</p>
 
 2. Under **Machine Model**, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
 
