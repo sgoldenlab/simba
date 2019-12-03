@@ -198,11 +198,11 @@ This step is to train the machine model. Simon will explain this as well.
 
 2. Under **Machine Model**, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
 
-- `RF`
+- `RF` is a machine model based on Random Forest ensemble method
 
-- `GBC`
+- `GBC` is a machine model based on Gradient Boosting ensemble method 
 
-- `Xboost`
+- `Xboost` is a machine model based on XGBoost ensemble method
 
 3. Under **Model**, select the model you wish to train from the drop down menu.
 
