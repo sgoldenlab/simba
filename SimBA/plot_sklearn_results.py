@@ -198,8 +198,8 @@ def plotsklearnresult(configini):
             x, y = 10, 50
             offset = 25
 
-            # if height < width:
-            #    im = ndimage.rotate(im, 90)
+            if height < width:
+               im = ndimage.rotate(im, 90)
 
             # draw event timers
             for b in range(counters_no):
