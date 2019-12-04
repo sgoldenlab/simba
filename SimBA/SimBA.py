@@ -43,6 +43,7 @@ from train_multiple_models_from_meta import *
 from train_model_2 import *
 import cv2
 
+
 class processvid_title(Frame):
     def __init__(self,parent=None,widths="",color=None,shortenbox =None,downsambox =None,graybox=None,framebox=None,clahebox=None,**kw):
         self.color = color if color is not None else 'black'
@@ -1614,7 +1615,6 @@ class mergeframeffmpeg:
         self.label_bitrate = Entry_Box(label_settings,'Bitrate','10')
         self.label_fps = Entry_Box(label_settings,'fps','10')
 
-
         #button
         button_mergeimg = Button(label_settings, text='Merge Images', command=self.mergeframeffmpegcommand)
 
@@ -1641,7 +1641,7 @@ class mergeframeffmpeg:
         fps = self.label_fps.entry_get
 
         mergemovieffmpeg(self.folderpath1selected.folder_path,fps,vidformat,bitrate,imgformat)
-        self.vmerge.set('Videos Created.')
+        print('Video created.')
 
 class creategif:
 
@@ -2587,13 +2587,15 @@ class Scrollable(Frame):
         self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
 
     def on_mousewheel(self, event):
-        scrollSpeed = event.delta
-        if platform.system() == 'Darwin':
+        try:
             scrollSpeed = event.delta
-        elif platform.system() == 'Windows':
-            scrollSpeed = int(event.delta/120)
-        self.canvas.yview_scroll(-1*(scrollSpeed), "units")
-
+            if platform.system() == 'Darwin':
+                scrollSpeed = event.delta
+            elif platform.system() == 'Windows':
+                scrollSpeed = int(event.delta/120)
+            self.canvas.yview_scroll(-1*(scrollSpeed), "units")
+        except:
+            pass
     def __fill_canvas(self, event):
         "Enlarge the windows item to the canvas width"
 
@@ -2605,6 +2607,7 @@ class Scrollable(Frame):
 
         self.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
+
 
 class ToolTip(object):
 

@@ -53,18 +53,20 @@ def extract_seqframescommand(filename):
         print('Please select a video to convert')
 
 def posFrame(f,nframes):
-
-    f.seek(1024,0)#header size is 1024. 
-    pos=np.arange(nframes)
-    frameSize=np.arange(nframes)
-    pos[0]=1024
-    extra=4#determined by manual test
-    frameSize[0]=int.from_bytes(f.read(4),'little')
-    for i in range(1,nframes):
-        pos[i]=pos[i-1]+frameSize[i-1]+extra
-        f.seek(frameSize[i-1]+extra,1)#find next frame
-        frameSize[i]=int.from_bytes(f.read(4),'little')
-    return pos,frameSize
+    f.seek(1024, 0)  # header size is 1024.
+    pos = np.arange(nframes, dtype=np.int64)
+    frameSize = np.arange(nframes, dtype=np.int64)
+    pos[0] = 1024
+    extra = 4  # determined by manual test
+    frameSize[0] = int.from_bytes(f.read(4), 'little')
+    for i in range(1, nframes):
+        pos[i] = pos[i - 1] + frameSize[i - 1] + extra
+        f.seek(frameSize[i - 1] + extra, 1)  # find next frame
+        frameSize[i] = int.from_bytes(f.read(4), 'little')
+        while frameSize[i] == 0:
+            frameSize[i] = int.from_bytes(f.read(4), 'little')
+            pos[i] = pos[i] + extra
+    return pos, frameSize
         
 def readHeader(f):
 
