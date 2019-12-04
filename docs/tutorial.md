@@ -231,6 +231,8 @@ This step is to train the machine model.
   <img width="450" height="850" src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG">
 </p>
 
+>**Note:** If you have a .csv of meta data to load, you can click `Browse File` and then click `Load`. This will autofill all the settings in this step.
+
 2. Under **Machine Model**, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
 
 - `RF`: Random forest
