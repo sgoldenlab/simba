@@ -8,7 +8,7 @@ data_files_folder = 'Z:\DeepLabCut\misc\LinLab\data'
 
 #If the video files were shortened after Caltech Behavior Annotator, but before DLC tracking, enter the path to a csv that contains the #frames that were removed here.
 #If the videos are not cut, set the 'Initial frames removed' in this csv file to be 0. For an example of the layout of this csv file,go to this link: https://github.com/sgoldenlab/simba/blob/master/video_information_updated_CRIM13.csv
-videoInfoFilePath = r"Z:\DeepLabCut\misc\LinLab\info_files\video_information_updated.csv"
+videoInfoFilePath = r"Z:\DeepLabCut\misc\LinLab\info_files\video_information_updatedhttps://github.com/sgoldenlab/simba/blob/master/video_information_updated_CRIM13.csv"
 
 # Specify a list of behaviour names that were annotated
 behaviourList = ['attack_intruder', 'sniff_investigation', 'grooming', 'rearing', 'stay_corner']
