@@ -1,6 +1,6 @@
 # SimBA
 
-Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in images of variables qualities to automatically segment and analyse behavior. The system does not require computer science and programing experience, and SimBa is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBa. An post issues here and we'll work on solving bugs as they appear!
+Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in images of variables qualities to automatically segment and analyse behavior. SimBA does not require computer science and programing experience, and SimBa is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBa. An post issues here and we'll work on solving bugs as they appear!
 
 - The simBA pipeline requires no programing knowledge 
 - Specialized commercial or custom-made equipment is not required
