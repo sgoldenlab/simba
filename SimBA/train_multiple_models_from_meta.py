@@ -83,7 +83,9 @@ def train_multimodel(configini):
         if not os.path.exists(metaDataFolder):
             os.makedirs(metaDataFolder)
         metaDataPath = os.path.join(metaDataFolder, metaDataFn)
-        metaDataHeaders = ["Classifier_name", "Ensamble_method", "Under_sampling_setting", "Under_sampling_ratio", "Over_sampling_method", "Over_sampling_ratio", "Estimators", "Max_features", "RF_criterion", "RF_min_sample_leaf", "Feature_list"]
+        metaDataHeaders = ["Classifier_name", "Ensamble_method", "Under_sampling_setting", "Under_sampling_ratio",
+                           "Over_sampling_method", "Over_sampling_ratio", "Estimators", "Max_features", "RF_criterion",
+                           "RF_min_sample_leaf", "train_test_ratio", "Feature_list"]
         with open(metaDataPath, 'w', newline='') as f:
             out_writer = csv.writer(f)
             out_writer.writerow(metaDataHeaders)
@@ -93,7 +95,7 @@ def train_multimodel(configini):
     meta_files_folder = config.get('create ensemble settings', 'meta_files_folder')
     metaFilesList = []
     for i in os.listdir(meta_files_folder):
-        if i.__contains__(".meta"):
+        if i.__contains__("_meta"):
             metaFile = os.path.join(meta_files_folder, i)
             metaFilesList.append(metaFile)
     print('Total number of models to be created: ' + str(len(metaFilesList)))
@@ -107,13 +109,12 @@ def train_multimodel(configini):
 
         #READ IN DATA FOLDER AND REMOVE ALL NON-FEATURE VARIABLES (POP DLC COORDINATE DATA AND TARGET DATA)
         features = pd.DataFrame()
-        df = pd.DataFrame()
         for i in os.listdir(data_folder):
             if i.__contains__(".csv"):
                 currentFn = os.path.join(data_folder, i)
                 df = pd.read_csv(currentFn)
                 features = features.append(df, ignore_index=True)
-        features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
+        features = features.loc[:, ~features.columns.str.contains('Unnamed')]
         frame_number = features.pop('frames').values
         video_number = features.pop('video_no').values
         targetFrame = features.pop(classifierName).values
@@ -138,15 +139,16 @@ def train_multimodel(configini):
         class_names = class_names = ['Not_' + classifierName, classifierName]
         feature_list = list(features.columns)
 
-        under_sample_setting = currMetaFile['Under_sampling_setting'].iloc[0]
-        under_sample_ratio = currMetaFile['Under_sampling_ratio'].iloc[0]
-        over_sample_setting = currMetaFile['Over_sampling_setting'].iloc[0]
-        over_sample_ratio = currMetaFile['Over_sampling_ratio'].iloc[0]
-        model_to_run = currMetaFile['Ensamble_method'].iloc[0]
-        RF_n_estimators = currMetaFile['Estimators'].iloc[0]
+        under_sample_setting = currMetaFile['under_sample_setting'].iloc[0]
+        under_sample_ratio = currMetaFile['under_sample_ratio'].iloc[0]
+        over_sample_setting = currMetaFile['over_sample_setting'].iloc[0]
+        over_sample_ratio = currMetaFile['over_sample_ratio'].iloc[0]
+        model_to_run = 'RF' #currMetaFile['Ensamble_method'].iloc[0]
+        RF_n_estimators = currMetaFile['RF_n_estimators'].iloc[0]
         RF_criterion = currMetaFile['RF_criterion'].iloc[0]
         RF_min_sample_leaf = currMetaFile['RF_min_sample_leaf'].iloc[0]
-        RF_max_features = currMetaFile['Max_features'].iloc[0]
+        RF_max_features = currMetaFile['RF_max_features'].iloc[0]
+
 
         #PRINT INFORMATION TABLE ON THE MODEL BEING CREATED
         print('MODEL ' + str(loopy) + str(' settings'))
@@ -175,7 +177,6 @@ def train_multimodel(configini):
             print('Performing SMOTE oversampling..')
             smt = SMOTE(sampling_strategy=over_sample_ratio)
             data_train, target_train = smt.fit_sample(data_train, target_train)
-        print(type(data_train))
         # RUN THE DECISION ENSEMBLE SET BY THE USER
         #run random forest
         if model_to_run == 'RF':
@@ -185,23 +186,24 @@ def train_multimodel(configini):
             print("Accuracy " + str(classifierName) + ' model:', metrics.accuracy_score(target_test, clf_pred))
 
             #RUN RANDOM FOREST EVALUATIONS
-            generate_example_decision_tree = config.get('create ensemble settings', 'generate_example_decision_tree')
+            generate_example_decision_tree = currMetaFile['generate_example_decision_tree'].iloc[0]
             if generate_example_decision_tree == 'yes':
                 estimator = clf.estimators_[3]
                 generateExampleDecisionTree(estimator, classifierName, saveFileNo)
 
-            generate_classification_report = config.get('create ensemble settings', 'generate_classification_report')
+            generate_classification_report =currMetaFile['generate_classification_report'].iloc[0]
             if generate_classification_report == 'yes':
                 generateClassificationReport(clf, class_names, classifierName, saveFileNo)
 
-            generate_features_importance_log = config.get('create ensemble settings', 'generate_features_importance_log')
+            generate_features_importance_log =currMetaFile['generate_features_importance_log'].iloc[0]
             if generate_features_importance_log == 'yes':
                 importances = list(clf.feature_importances_)
                 log_df = generateFeatureImportanceLog(importances, classifierName, saveFileNo)
 
-            generate_features_importance_bar_graph = config.get('create ensemble settings', 'generate_features_importance_bar_graph')
-            N_feature_importance_bars = config.getint('create ensemble settings', 'N_feature_importance_bars')
+            generate_features_importance_bar_graph = currMetaFile['generate_features_importance_bar_graph'].iloc[0]
+
             if generate_features_importance_bar_graph == 'yes':
+                N_feature_importance_bars = currMetaFile['n_feature_importance_bars'].iloc[0]
                 generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars, classifierName, saveFileNo)
 
             # SAVE MODEL META DATA

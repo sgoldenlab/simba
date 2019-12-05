@@ -146,7 +146,7 @@ def write_inifile(model_list,msconfig,project_path,project_name,no_targets,targe
     f.write('XGB_n_estimators = \n')
     f.write('XGB_max_depth = \n')
     f.write('XGB_learning_rate = \n')
-    f.write('meta_files_folder = \n')
+    f.write('meta_files_folder = ' + project_folder + '\\configs\\ \n' )
     f.write('LearningCurve_shuffle_k_splits = \n')
     f.write('LearningCurve_shuffle_data_splits = \n')
     f.write('\n')

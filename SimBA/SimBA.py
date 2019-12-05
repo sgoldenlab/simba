@@ -2471,6 +2471,8 @@ class trainmachinemodel_settings:
             self.learningcurvedatasplit = self.LC_datasplit.entry_get
         else:
             self.generate_learning_c = 'no'
+            self.learningcurveksplit = self.LC_ksplit.entry_get
+            self.learningcurvedatasplit = self.LC_datasplit.entry_get
 
         if self.box8.get() == 1:
             self.generate_precision_recall_c = 'yes'
@@ -2539,16 +2541,16 @@ class trainmachinemodel_settings:
         config.set('create ensemble settings', 'over_sample_setting', str(over_s_settings))
         config.set('create ensemble settings', 'classifier',str(classifier_settings))
         config.set('create ensemble settings', 'N_feature_importance_bars', str(n_importance))
-        config.set('create ensemble settings', 'RF_meta_data', str(rfmetadata))
-        config.set('create ensemble settings', 'generate_example_decision_tree', str(generate_example_d_tree))
-        config.set('create ensemble settings', 'generate_classification_report', str(generate_classification_report))
-        config.set('create ensemble settings', 'generate_features_importance_log', str(generate_features_imp_log))
-        config.set('create ensemble settings', 'generate_features_importance_bar_graph', str(generate_features_bar_graph))
-        config.set('create ensemble settings', 'compute_permutation_importance', str(compute_permutation_imp))
-        config.set('create ensemble settings', 'generate_learning_curve', str(generate_learning_c))
-        config.set('create ensemble settings', 'generate_precision_recall_curve', str(generate_precision_recall_c))
-        config.set('create ensemble settings', 'LearningCurve_shuffle_k_splits',str(learningcurveksplit))
-        config.set('create ensemble settings', 'LearningCurve_shuffle_data_splits',str(learningcurvedatasplit))
+        config.set('create ensemble settings', 'RF_meta_data', str(self.rfmetadata))
+        config.set('create ensemble settings', 'generate_example_decision_tree', str(self.generate_example_d_tree))
+        config.set('create ensemble settings', 'generate_classification_report', str(self.generate_classification_report))
+        config.set('create ensemble settings', 'generate_features_importance_log', str(self.generate_features_imp_log))
+        config.set('create ensemble settings', 'generate_features_importance_bar_graph', str(self.generate_features_bar_graph))
+        config.set('create ensemble settings', 'compute_permutation_importance', str(self.compute_permutation_imp))
+        config.set('create ensemble settings', 'generate_learning_curve', str(self.generate_learning_c))
+        config.set('create ensemble settings', 'generate_precision_recall_curve', str(self.generate_precision_recall_c))
+        config.set('create ensemble settings', 'LearningCurve_shuffle_k_splits',str(self.learningcurveksplit))
+        config.set('create ensemble settings', 'LearningCurve_shuffle_data_splits',str(self.learningcurvedatasplit))
 
 
         with open(configini, 'w') as configfile:

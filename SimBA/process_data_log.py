@@ -1,6 +1,5 @@
 import pandas as pd
 import os
-import numpy as np
 from configparser import ConfigParser
 from datetime import datetime
 
@@ -13,21 +12,14 @@ def analyze_process_data_log(configini):
     config.read(configFile)
     frames_dir_out = config.get('Frame settings', 'frames_dir_out')
     frames_dir_out = os.path.join(frames_dir_out, 'gantt_plots')
-    fps = config.getint('Frame settings', 'fps')
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'machine_results')
     no_targets = config.getint('SML settings', 'No_targets')
-    use_master = config.get('General settings', 'use_master_config')
     boutEnd = 0
-    boutStart = 0
     boutEnd_list = [0]
     boutStart_list = []
     filesFound = []
     target_names = []
-    data_event = []
-    log_list = []
-    colourTupleX = list(np.arange(3.5, 203.5, 5))
-    configFilelist = []
     vidInfPath = config.get('General settings', 'project_path')
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
@@ -36,30 +28,24 @@ def analyze_process_data_log(configini):
     loopy = 0
 
     ########### FIND CSV FILES ###########
-    if use_master == 'yes':
-        for i in os.listdir(csv_dir_in):
-            if i.__contains__(".csv"):
-                file = os.path.join(csv_dir_in, i)
-                filesFound.append(file)
-    if use_master == 'no':
-        config_folder_path = config.get('General settings', 'config_folder')
-        for i in os.listdir(config_folder_path):
-            if i.__contains__(".ini"):
-                configFilelist.append(os.path.join(config_folder_path, i))
-                iniVidName = i.split(".")[0]
-                csv_fn = iniVidName + '.csv'
-                file = os.path.join(csv_dir_in, csv_fn)
-                filesFound.append(file)
+    for i in os.listdir(csv_dir_in):
+        if i.__contains__(".csv"):
+            file = os.path.join(csv_dir_in, i)
+            filesFound.append(file)
 
     ########### GET TARGET COLUMN NAMES ###########
     for ff in range(no_targets):
         currentModelNames = 'target_name_' + str(ff+1)
         currentModelNames = config.get('SML settings', currentModelNames)
-        currentModelNames = currentModelNames + '_prediction'
         target_names.append(currentModelNames)
+    for i in range((len(target_names))):
+        if '_prediction' in target_names[i]:
+            continue
+        else:
+            b = target_names[i] + '_prediction'
+            target_names[i] = b
 
     ########### logfile path ###########
-    log_fn = config.get('General settings', 'project_name')
     log_fn = 'sklearn_' + str(dateTime) + '.csv'
     log_path = config.get('General settings', 'project_path')
     log_path = os.path.join(log_path, 'logs')
@@ -82,11 +68,6 @@ def analyze_process_data_log(configini):
     for i in filesFound:
         boutsDf = pd.DataFrame(columns=['Event', 'Start_frame', 'End_frame'])
         currentFile = i
-        if use_master == 'no':
-            configFile = configFilelist[loopy]
-            config = ConfigParser()
-            config.read(configFile)
-            fps = config.getint('Frame settings', 'fps')
         currVidName = os.path.basename(currentFile)
         currVidName = currVidName.replace('.csv', '')
         fps = vidinfDf.loc[vidinfDf['Video'] == currVidName]
@@ -97,7 +78,6 @@ def analyze_process_data_log(configini):
         currCol = [x for x in currCol if "Probability" not in x]
         dataDf = readDf.filter(currCol, axis=1)
         dataDf['frames'] = readDf['frames']
-        rowCount = dataDf.shape[0]
         folderNm = os.path.basename(currentFile)
         logFolderNm = 'Video' + str(folderNm.split('.')[0])
         folderName = str(folderNm.split('.')[0]) + str('_gantt')
@@ -122,7 +102,6 @@ def analyze_process_data_log(configini):
             boutStart_list = [0]
             boutEnd_list = [0]
             boutEnd = 0
-            boutStart = 0
 
         #Convert to time
         boutsDf['Start_time'] = boutsDf['Start_frame'] / fps

@@ -3,6 +3,7 @@ import cv2
 import os
 import pandas as pd
 import re
+from scipy import ndimage
 from configparser import ConfigParser
 
 def plotsklearnresult(configini):
@@ -22,7 +23,6 @@ def plotsklearnresult(configini):
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-
     currentDir = os.getcwd()
     filesFound = []
     firstRattle = True
@@ -61,11 +61,6 @@ def plotsklearnresult(configini):
         else:
             b = target_names[i] + '_prediction'
             target_names[i] = b
-
-
-
-
-
     if any("tail_rattle" in s for s in target_names):
         tailRattleIndex = [i for i, x in enumerate(target_names) if x == 'tail_rattle_prediction'][0]
 
@@ -103,7 +98,6 @@ def plotsklearnresult(configini):
             os.makedirs(imagesDirOut)
 
         for index, row in currentDf.iterrows():
-
             imageName = str(loop) + '.png'
             imageNameSave = str(loop) + '.bmp'
             image = os.path.join(imagesDirIn, imageName)
@@ -111,13 +105,13 @@ def plotsklearnresult(configini):
             im = cv2.imread(image)
             (height, width) = im.shape[:2]
 
-            if height < 400:
+            if height <= 400:
                 LfontSize = 0.5
                 MfontSize = 0.5
                 SfontSize = 0.5
                 textSpacing = 16
                 bodyPartCircleSize = 5
-            if width > 400:
+            if height > 400:
                 LfontSize = 1.5
                 MfontSize = 1.2
                 SfontSize = 1.0
