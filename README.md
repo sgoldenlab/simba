@@ -2,14 +2,14 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?style=for-the-badge&logo=appveyor)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community)
 
-Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in images of variables qualities to automatically segment and analyse behavior. SimBA does not require computer science and programing experience, and SimBa is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBa. An post issues here and we'll work on solving bugs as they appear!
+Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in images of variables qualities to automatically segment and analyse behavior. SimBA does not require computer science and programing experience, and SimBA is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBa. An post issues here and we'll work on solving bugs as they appear!
 
-- The simBA pipeline requires no programing knowledge 
+- The SimBA pipeline requires no programing knowledge 
 - Specialized commercial or custom-made equipment is not required
 - Extensive annotations are not required
 - The pipeline is flexible and can be used to create and validate classifiers for different behaviors and environment 
 
-SimBa currently does not support analysis of video recordings of multiple similarly coat-colored animals, and is vslided using videos filmed from above at 90 degree angle. However we and others are working hard on getting multi-animal tracking of similarly coat colored animals and multiple recording angles supported! :muscle:
+SimBA currently does not support analysis of video recordings of multiple similarly coat-colored animals, and is vslided using videos filmed from above at 90 degree angle. However we and others are working hard on getting multi-animal tracking of similarly coat colored animals and multiple recording angles supported! :muscle:
 
 
 ![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/4videos.gif)
