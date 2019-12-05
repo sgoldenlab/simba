@@ -1,10 +1,13 @@
 # SimBA
 
-Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. Yet limitations related to ease of use, generalizability, and hardware-requirements impede the widespread implementation of the computational analysis of complex social behaviors such as aggression. Here we address these issues by designing SimBA (Simple Behavioral Analysis), a pipeline for developing classifiers for aggression-related behaviors:  
-- The pipeline requires no programing knowledge 
+Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in images of variables qualities to automatically segment and analyse behavior. The system does not require computer science and programing experience, and SimBa is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBa. An post issues here and we'll work on solving bugs as they appear!
+
+- The simBA pipeline requires no programing knowledge 
 - Specialized commercial or custom-made equipment is not required
 - Extensive annotations are not required
 - The pipeline is flexible and can be used to create and validate classifiers for different behaviors and environment 
+
+SimBa currently does not support analysis of video recordings of multiple similarly coat-colored animals, and is vslided using videos filmed from above at 90 degree angle. However we and others are working hard on getting multi-animal tracking of similarly coat colored animals and multiple recording angles supported! :muscle:
 
 
 ![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/4videos.gif)
