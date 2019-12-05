@@ -2,7 +2,7 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-pink.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community)
 
-Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in images of variables qualities to automatically segment and analyse behavior. SimBA does not require computer science and programing experience, and SimBA is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBa. An post issues here and we'll work on solving bugs as they appear!
+Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in images of variables qualities to automatically segment and analyse behavior. SimBA does not require computer science and programing experience, and SimBA is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBA. An post issues here and we'll work on solving bugs as they appear!
 
 - The SimBA pipeline requires no programing knowledge 
 - Specialized commercial or custom-made equipment is not required
@@ -18,7 +18,7 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 <img src="/images/overallflow.PNG" width="989" height="169" />
 
-[Pre-process videos](docs/tutorial_process_videos.md) --> [Create tracking model](docs/Tutorial_DLC.md) --> [Building classfier(s)](docs/tutorial.md) --> [Analysis/Visualization]()
+[Pre-process videos](docs/tutorial_process_videos.md) --> [Create tracking model](docs/Tutorial_DLC.md) --> [Building classfier(s)](docs/tutorial.md) --> [Analysis/Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
 
 ## [Installation](docs/Installation.md) 
 
