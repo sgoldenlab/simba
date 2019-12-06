@@ -274,17 +274,27 @@ This step is to train the machine model.
 ### Step 8: Run Machine Model
 Run machine model explaination goes here
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="348" height="107" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="343" height="132" />
 
-1. Under **Run Machine Model**, fill in the `Discrimination threshold` and click on `Set` to save the settings.
+1.  Under **Run Machine Model**, click on `Model Selection`. The following window with the classifier defined in the *project.ini* file will pop up.
+
+<p align="center">
+  <img width="312" height="256" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
+</p>
+
+2. Click on `Browse File` and select the model (*.sav*) to run.
+
+3. Once all the model is chosen, click on `Set Model`.
+
+4. Fill in the `Discrimination threshold` and click on `Set` to save the settings.
 
 - `Discrimination threshold`: The level of probability required to define that the frame belongs to the target class
 
-2. Fill in the ` Mininum behavior bout length` and click on `Set` to save the settings.
+5. Fill in the ` Mininum behavior bout length` and click on `Set` to save the settings.
 
 - `Minimum behavior bout length`:  The shortest possible length a behavioural bout can be. For example, the random forest makes the following aggression predictions for 5 consecutive frames in a 50 fps video: 1,0,0,0,1.This would mean, if we don't have a minimum bout length, that the animals fought twice in a few milliseconds. In reality they fought once standing still for a few milliseconds in the middle of the fight. This setting correct the 0s to 1s.
 
-3. Click on `Run RF Model` to run the machine model.
+6. Click on `Run RF Model` to run the machine model.
 
 ### Step 9: Analyze Machine Results
 In this step, there are three main analysis, which are `Analyze`, `Analyze distance/velocity`, and `Analyze severity`.
