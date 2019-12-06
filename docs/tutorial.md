@@ -40,7 +40,7 @@ In this step, you will be generating your main project folder with all the sub-d
 
 1. Go to `File` and click on `Create a new project` The following windows will pop up.
 <p align="center">
-  <img width="500" height="600" src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG">
+  <img width="485" height="694" src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG">
 </p>
 
 2. `Project Path` is the main working directory that your project will be created. Click on `Browse Folder` and select your working directory
@@ -91,7 +91,7 @@ In this step, you will load the *project_config.ini* file that was created.
 1. Go to `File` and click on `Load project` The following windows will pop up.
 
 <p align="center">
-  <img width="750" height="600" src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG">
+  <img width="782" height="563" src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG">
 </p>
 
 2. Under **Load Project.ini**, click on `Browse File`. Then, go to the directory that you created your project and click on your *project folder*. Then, click on *project_folder* and then *project_config.ini*. Once this step is completed, it should look like the following instead of *No file selected*.
@@ -192,7 +192,7 @@ This step is to train the machine model.
 1. Click on `Settings` and the following window will pop up. 
 
 <p align="center">
-  <img width="450" height="850" src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG">
+  <img width="378" height="712" src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG">
 </p>
 
 >**Note:** If you have a .csv of meta data to load, you can click `Browse File` and then click `Load`. This will autofill all the settings in this step.
