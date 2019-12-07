@@ -32,6 +32,9 @@ How to [install SimBA](docs/installation.md)
 - [SimBA](docs/tutorial.md)
 - [Label Behavior](docs/labelling_aggression_tutorial.md)
 
+## Resource
+[DeepLabCut tracking weights](https://osf.io/5t4y9/)
+
 ## License
 This project is licensed under the GNU Lesser General Public License v3.0. Note that the software is provided "as is", without warranty of any kind, express or implied. If you use the code or data, please cite us :)
 
