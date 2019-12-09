@@ -2,6 +2,22 @@ import os
 import shutil
 import cv2
 import subprocess
+import sys
+
+def splitall(path):
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:  # sentinel for absolute paths
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path: # sentinel for relative paths
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
 
 
 def extract_frames_ini(directory):
@@ -63,9 +79,10 @@ def copy_frame_folders(source,inifile):
         elif not os.path.exists(dest1 + '\\' + f):
             print('Copying frames of',f)
             shutil.copytree(filetocopy, dest1+'\\'+f)
-            print(f, 'copied to', dest1)
+            nametoprint = os.path.join('',*(splitall(dest1)[-4:]))
+            print(f, 'copied to', nametoprint)
 
-    print('Finished copying frames!')
+    print('Finished copying frames.')
 
 def copy_multivideo_ini(inifile,source,filetype):
     print('Copying videos...')
@@ -86,9 +103,10 @@ def copy_multivideo_ini(inifile,source,filetype):
 
         elif not os.path.exists(dest1+'\\'+f):
             shutil.copy(filetocopy, dest1)
-            print(f, 'copied to', dest1)
+            nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
+            print(f, 'copied to', nametoprint)
 
-    print('Finished copying videos!')
+    print('Finished copying videos.')
 
 def copy_allcsv_ini(inifile,source):
     print('Copying csv files...')
@@ -110,9 +128,10 @@ def copy_allcsv_ini(inifile,source):
 
         elif not os.path.exists(dest1+'\\'+f):
             shutil.copy(filetocopy, dest1)
-            print(f, 'copied to', dest1)
+            nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
+            print(f, 'copied to', nametoprint)
 
-    print('Finished copying csv files!')
+    print('Finished importing tracking data.')
 
 def copy_singlevideo_ini(inifile,source):
     print('Copying video...')
@@ -123,9 +142,10 @@ def copy_singlevideo_ini(inifile,source):
         print(os.path.basename(source), 'already exist in', dest1)
     else:
         shutil.copy(source, dest1)
-        print(os.path.basename(source),'copied to',dest1)
+        nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
+        print(os.path.basename(source),'copied to',nametoprint)
 
-    print('Finished copying video!')
+    print('Finished copying video.')
 
 def copy_singlecsv_ini(inifile,source):
     print('Copying csv file...')
@@ -136,6 +156,7 @@ def copy_singlecsv_ini(inifile,source):
         print(os.path.basename(source), 'already exist in', dest1)
     else:
         shutil.copy(source, dest1)
-        print(os.path.basename(source),'copied to',dest1)
+        nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
+        print(os.path.basename(source), 'copied to', nametoprint)
 
-    print('Finished copying csv file!')
+    print('Finished importing tracking data.')

@@ -2,16 +2,13 @@ import pandas as pd
 import os
 from configparser import ConfigParser
 from datetime import datetime
+import numpy as np
 
 def analyze_process_data_log(configini):
-
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
-
     config = ConfigParser()
     configFile = str(configini)
     config.read(configFile)
-    frames_dir_out = config.get('Frame settings', 'frames_dir_out')
-    frames_dir_out = os.path.join(frames_dir_out, 'gantt_plots')
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'machine_results')
     no_targets = config.getint('SML settings', 'No_targets')
@@ -38,12 +35,7 @@ def analyze_process_data_log(configini):
         currentModelNames = 'target_name_' + str(ff+1)
         currentModelNames = config.get('SML settings', currentModelNames)
         target_names.append(currentModelNames)
-    for i in range((len(target_names))):
-        if '_prediction' in target_names[i]:
-            continue
-        else:
-            b = target_names[i] + '_prediction'
-            target_names[i] = b
+    print('Analyzing ' + str(len(target_names)) + ' classifier result(s) in ' + str(len(filesFound)) + ' video file(s).')
 
     ########### logfile path ###########
     log_fn = 'sklearn_' + str(dateTime) + '.csv'
@@ -55,13 +47,13 @@ def analyze_process_data_log(configini):
 
     headers = ['Video']
     for i in target_names:
-        head1 = str(i) + '_event_Nos'
-        head2 = str(i) + '_Tot_event_duration'
-        head3 = str(i) + '_mean_event_duration'
-        head4 = str(i) + '_median_event_duration'
-        head5 = str(i) + '_time_to_first_occurance'
-        head6 = str(i) + '_mean_event_interval'
-        head7 = str(i) + '_median_event_interval'
+        head1 = str(i) + ' events'
+        head2 = str(i) + ' sum duration (s)'
+        head3 = str(i) + ' mean duration (s)'
+        head4 = str(i) + ' median duration (s)'
+        head5 = str(i) + ' first occurance (s)'
+        head6 = str(i) + ' mean interval (s)'
+        head7 = str(i) + ' median interval (s)'
         headers.extend([head1, head2, head3, head4, head5, head6, head7])
     log_df = pd.DataFrame(columns=headers)
 
@@ -71,20 +63,17 @@ def analyze_process_data_log(configini):
         currVidName = os.path.basename(currentFile)
         currVidName = currVidName.replace('.csv', '')
         fps = vidinfDf.loc[vidinfDf['Video'] == currVidName]
-        fps = int(fps['fps'])
+        try:
+            fps = int(fps['fps'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         loopy+=1
-        readDf = pd.read_csv(currentFile)
-        currCol = [col for col in readDf.columns if 'prediction' in col]
-        currCol = [x for x in currCol if "Probability" not in x]
-        dataDf = readDf.filter(currCol, axis=1)
-        dataDf['frames'] = readDf['frames']
+        print('Analyzing video' + str(loopy) + '/' + str(len(filesFound)) + '...')
+        dataDf = pd.read_csv(currentFile)
+        dataDf['frames'] = np.arange(len(dataDf))
         folderNm = os.path.basename(currentFile)
-        logFolderNm = 'Video' + str(folderNm.split('.')[0])
-        folderName = str(folderNm.split('.')[0]) + str('_gantt')
-        saveDir = os.path.join(frames_dir_out, folderName)
-        if not os.path.exists(saveDir):
-            os.makedirs(saveDir)
-        for bb in currCol:
+        logFolderNm = str(folderNm.split('.')[0])
+        for bb in target_names:
             currTarget = bb
             for indexes, rows in dataDf[dataDf['frames'] >= boutEnd].iterrows():
                 if rows[currTarget] == 1:
@@ -114,14 +103,14 @@ def analyze_process_data_log(configini):
         for i in target_names:
             currDf = boutsDf.loc[boutsDf['Event'] == i]
             try:
-                firstOccur = currDf['Start_time'].iloc[0]
+                firstOccur = round(currDf['Start_time'].iloc[0], 4)
             except IndexError:
                 firstOccur = 0
             eventNOs = len(currDf)
-            TotEventDur = round(currDf['Bout_time'].sum(), 2)
+            TotEventDur = round(currDf['Bout_time'].sum(), 4)
             try:
-                MeanEventDur = TotEventDur / eventNOs
-                MedianEventDur = currDf['Bout_time'].median()
+                MeanEventDur = round(TotEventDur / eventNOs, 4)
+                MedianEventDur = round(currDf['Bout_time'].median(), 4)
             except ZeroDivisionError:
                 MeanEventDur = 0
                 MedianEventDur = 0
@@ -131,7 +120,7 @@ def analyze_process_data_log(configini):
             currDf_combined = pd.concat([currDf, currDf_shifted], axis=1, join='inner')
             currDf_combined['Event_interval'] = currDf_combined['Start_time_shifted'] - currDf_combined['End_time']
             meanEventInterval = currDf_combined["Event_interval"].mean()
-            medianEventInterval = currDf_combined['Bout_time'].median()
+            medianEventInterval = currDf_combined['Event_interval'].median()
             log_list.append(eventNOs)
             log_list.append(TotEventDur)
             log_list.append(MeanEventDur)
@@ -141,9 +130,9 @@ def analyze_process_data_log(configini):
             log_list.append(medianEventInterval)
         log_df.loc[loop] = log_list
         loop += 1
-        print('Files# processed for bout data: ' + str(loop))
-
+        print('File # processed for machine predictions: ' + str(loop) + '/' + str(len(filesFound)))
     log_df.to_csv(log_fn, index=False)
+    print('All files processed for machine predictions: data file saved @' + str(log_fn))
 
 
 

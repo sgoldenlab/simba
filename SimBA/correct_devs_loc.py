@@ -4,14 +4,10 @@ import statistics
 import numpy as np
 import math
 from configparser import ConfigParser
-from openpyxl import load_workbook
-import openpyxl
 from datetime import datetime
 
 
 def dev_loc(projectini):
-    print('Running outlier correction : location...')
-
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     configFile = str(projectini)
 
@@ -24,49 +20,34 @@ def dev_loc(projectini):
     csv_dir_out = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
-
     filesFound = []
     vNm_list = []
     fixedPositions_M1_list = []
     fixedPositions_M2_list = []
     frames_processed_list = []
-    counts_total_M1 = [0] * 7
-    counts_total_M2 = [0] * 7
     counts_total_M1_list = []
     counts_total_M2_list = []
-    configFilelist = []
     loopy = 0
-
     reliableCoordinates = np.zeros((7, 2))
 
     criterion = config.getfloat('Outlier settings', 'location_criterion')
 
     ########### FIND CSV FILES ###########
-    if use_master == 'yes':
-        for i in os.listdir(csv_dir_in):
-            if i.__contains__(".csv"):
-                file = os.path.join(csv_dir_in, i)
-                filesFound.append(file)
-    if use_master == 'no':
-        config_folder_path = config.get('General settings', 'config_folder')
-        for i in os.listdir(config_folder_path):
-            if i.__contains__(".ini"):
-                configFilelist.append(os.path.join(config_folder_path, i))
-                iniVidName = i.split(".")[0]
-                csv_fn = iniVidName + '.csv'
-                file = os.path.join(csv_dir_in, csv_fn)
-                filesFound.append(file)
+    for i in os.listdir(csv_dir_in):
+        if i.__contains__(".csv"):
+            file = os.path.join(csv_dir_in, i)
+            filesFound.append(file)
+    print('Processing ' + str(len(filesFound)) + ' files for location outliers...')
 
     ########### logfile path ###########
-    log_fn = config.get('General settings', 'project_name')
-    log_fn = 'Outliers_corrected_movement_location_' + str(dateTime) + '.csv'
+    log_fn = 'Outliers_location_' + str(dateTime) + '.csv'
     log_path = config.get('General settings', 'project_path')
     log_path = os.path.join(log_path, 'logs')
     log_fn = os.path.join(log_path, log_fn)
     if not os.path.exists(log_path):
         os.makedirs(log_path)
 
-    columns = ['Video', 'Frames_processed', 'Mouse1_locations_corrected', 'Mouse2_locations_corrected']
+    columns = ['Video', 'Frames_processed']
     log_df = pd.DataFrame(columns=columns)
 
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
@@ -78,13 +59,9 @@ def dev_loc(projectini):
         outputArray = np.array([0] * 14)
         outputArray_2 = np.array([0] * 14)
         tailCoords_out = np.array([0] * 4)
-        if use_master == 'no':
-            configFile = configFilelist[loopy]
-            config = ConfigParser()
-            config.read(configFile)
-            criterion = config.getint('Outlier settings', 'location_criterion')
         loopy += 1
         currentFile = i
+        videoFileBaseName = os.path.basename(currentFile).replace('.csv', '')
         csv_df = pd.read_csv(currentFile, header=0,
                              names=["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
                                     "Ear_right_1_p", "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y",
@@ -97,12 +74,10 @@ def dev_loc(projectini):
                                     "Lat_left_2_x", "Lat_left_2_y",
                                     "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x",
                                     "Tail_base_2_y", "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p",
-                                    "video_no", "frames"])
+                                    ])
         csv_df = csv_df.apply(pd.to_numeric)
 
-        vNm = csv_df['video_no'].iloc[0]
-        vNm = 'Video' + str(vNm)
-        vNm_list.append(vNm)
+        vNm_list.append(videoFileBaseName)
 
         ########### MEAN MOUSE SIZES ###########################################
         csv_df['Mouse_1_nose_to_tail'] = np.sqrt(
@@ -221,19 +196,13 @@ def dev_loc(projectini):
                            "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x",
                            "Tail_base_2_y", "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p"]]
         df_headers = pd.read_csv(currentFile, nrows=0)
-        df_headers['video_no'] = 0
-        df_headers['frames'] = 0
-        csv_out['video_no'] = csv_df['video_no']
-        csv_out['frames'] = csv_df['frames']
         csv_out.columns = df_headers.columns
         csv_out = pd.concat([df_headers, csv_out])
         csv_out = csv_out.reset_index()
         csv_out = csv_out.drop('index', axis=1)
         fname = os.path.basename(currentFile)
-        fileName, fileEnding = fname.split('.')
-        printNm = fileName.split('_')[0]
-        fileOut = str(fileName) + str('.csv')
-        csvOutPath = os.path.join(csv_dir_out, fileOut)
+        fnamePrint = fname.replace('.csv', '')
+        csvOutPath = os.path.join(csv_dir_out, fname)
         csv_out.to_csv(csvOutPath, index=False)
         frames_processed = len(comb_out_array)
         frames_processed_list.append(frames_processed)
@@ -243,31 +212,27 @@ def dev_loc(projectini):
         counts_total_M2_list.append(counts_total_M2)
         counts_total_M1_np = np.array(counts_total_M1_list)
         counts_total_M2_np = np.array(counts_total_M2_list)
-        percentBDcorrected = (fixedPositions_M1 + fixedPositions_M2) / (frames_processed * 14)
+        percentBDcorrected = round((fixedPositions_M1 + fixedPositions_M2) / (frames_processed * 14), 6)
 
-        print(str(printNm) + ' corrected data. ' + str(
-            frames_processed) + ' total frames processed.  Mouse 1 body parts corrected: ' + str(
-            fixedPositions_M1) + ' Mouse 2 body parts corrected: ' + str(
-            fixedPositions_M2) + '. Percent body parts corrected: ' + str(percentBDcorrected))
+        print(str(fnamePrint) + '. Tot frames: ' + str(frames_processed) + '. Outliers animal 1: ' + str(fixedPositions_M1) + '. Outliers animal 2: ' + str(fixedPositions_M2) + '. % outliers: ' + str(round(percentBDcorrected, 3)))
 
     log_df['Video'] = vNm_list
     log_df['Frames_processed'] = frames_processed_list
-    log_df['Mouse1_locations_corrected'] = fixedPositions_M1_list
-    log_df['Mouse2_locations_corrected'] = fixedPositions_M2_list
-    log_df['Mouse1_left_ear'] = counts_total_M1_np[:, 0]
-    log_df['Mouse1_right_ear'] = counts_total_M1_np[:, 1]
-    log_df['Mouse1_nose'] = counts_total_M1_np[:, 2]
-    log_df['Mouse1_centroid'] = counts_total_M1_np[:, 3]
-    log_df['Mouse1_lateral_left'] = counts_total_M1_np[:, 4]
-    log_df['Mouse1_lateral_right'] = counts_total_M1_np[:, 5]
-    log_df['Mouse1_tail_base'] = counts_total_M1_np[:, 6]
-    log_df['Mouse2_left_ear'] = counts_total_M2_np[:, 0]
-    log_df['Mouse2_right_ear'] = counts_total_M2_np[:, 1]
-    log_df['Mouse2_nose'] = counts_total_M2_np[:, 2]
-    log_df['Mouse2_centroid'] = counts_total_M2_np[:, 3]
-    log_df['Mouse2_lateral_left'] = counts_total_M2_np[:, 4]
-    log_df['Mouse2_lateral_right'] = counts_total_M2_np[:, 5]
-    log_df['Mouse2_tail_base'] = counts_total_M2_np[:, 6]
-    log_df['% bodyparts corrected'] = (log_df['Mouse1_locations_corrected'] + log_df['Mouse2_locations_corrected']) / (
-                log_df['Frames_processed'] * 14)
+    log_df['Animal1_centroid'] = counts_total_M1_np[:, 3]
+    log_df['Animal1_left_ear'] = counts_total_M1_np[:, 0]
+    log_df['Animal1_right_ear'] = counts_total_M1_np[:, 1]
+    log_df['Animal1_lateral_left'] = counts_total_M1_np[:, 4]
+    log_df['Animal1_lateral_right'] = counts_total_M1_np[:, 5]
+    log_df['Animal1_nose'] = counts_total_M1_np[:, 2]
+    log_df['Animal1_tail_base'] = counts_total_M1_np[:, 6]
+    log_df['Animal2_centroid'] = counts_total_M2_np[:, 3]
+    log_df['Animal2_left_ear'] = counts_total_M2_np[:, 0]
+    log_df['Animal2_right_ear'] = counts_total_M2_np[:, 1]
+    log_df['Animal2_lateral_left'] = counts_total_M2_np[:, 4]
+    log_df['Animal2_lateral_right'] = counts_total_M2_np[:, 5]
+    log_df['Animal2_nose'] = counts_total_M2_np[:, 2]
+    log_df['Animal2_tail_base'] = counts_total_M2_np[:, 6]
+    log_df['Sum'] = log_df['Animal1_centroid'] + log_df['Animal1_left_ear'] + log_df['Animal1_right_ear'] + log_df['Animal1_lateral_left'] + log_df['Animal1_lateral_right'] + log_df['Animal1_nose'] + log_df['Animal2_centroid'] + log_df['Animal2_left_ear'] + log_df['Animal2_right_ear'] + log_df['Animal2_lateral_left'] + log_df['Animal2_lateral_right'] + log_df['Animal2_nose'] + log_df['Animal2_tail_base']
+    log_df['% body parts corrected'] = log_df['Sum'] / (log_df['Frames_processed'] * 14)
     log_df.to_csv(log_fn, index=False)
+    print('Log for corrected "location outliers" saved in project_folder/logs')

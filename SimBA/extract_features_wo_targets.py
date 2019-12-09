@@ -2,7 +2,6 @@ from __future__ import division
 import os
 import pandas as pd
 import math
-import statistics
 import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
@@ -13,15 +12,8 @@ def extract_features_wotarget(inifile):
     configFile = str(inifile)
     config.read(configFile)
     csv_dir = config.get('General settings', 'csv_path')
-    model_nos = config.getint('SML settings', 'No_targets')
     csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     csv_dir_out = os.path.join(csv_dir, 'features_extracted')
-    use_master = config.get('General settings', 'use_master_config')
-    configFilelist = []
-    # frames_dir_in = config.get('Frame settings', 'frames_dir_in')
-    # fps = config.getint('Frame settings', 'fps')
-    # resWidth = config.getint('Frame settings', 'resolution_width')
-    # resHeight = config.getint('Frame settings', 'resolution_height')
     vidInfPath = config.get('General settings', 'project_path')
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
@@ -29,8 +21,6 @@ def extract_features_wotarget(inifile):
 
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
-    fps = config.getint('Frame settings', 'fps')
-
     def count_values_in_range(series, values_in_range_min, values_in_range_max):
         return series.between(left=values_in_range_min, right=values_in_range_max).sum()
 
@@ -40,53 +30,19 @@ def extract_features_wotarget(inifile):
         return ang + 360 if ang < 0 else ang
 
     filesFound = []
-    videosFound = []
     roll_windows = []
     roll_windows_values = [2, 5, 6, 7.5, 15]
-    loop = 1
     loopy = 0
 
     ########### FIND CSV FILES ###########
-    if use_master == 'yes':
-        for i in os.listdir(csv_dir_in):
-            if i.__contains__(".csv"):
-                fname = os.path.join(csv_dir_in, i)
-                filesFound.append(fname)
-    if use_master == 'no':
-        config_folder_path = config.get('General settings', 'config_folder')
-        for i in os.listdir(config_folder_path):
-            if i.__contains__(".ini"):
-                configFilelist.append(os.path.join(config_folder_path, i))
-                iniVidName = i.split(".")[0]
-                csv_fn = iniVidName + '.csv'
-                file = os.path.join(csv_dir_in, csv_fn)
-                filesFound.append(file)
-    print('Reading array...')
+    for i in os.listdir(csv_dir_in):
+        if i.__contains__(".csv"):
+            fname = os.path.join(csv_dir_in, i)
+            filesFound.append(fname)
+    print('Extracting features from ' + str(len(filesFound)) + ' files...')
 
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
     for i in filesFound:
-        Mouse1_polyglon_coords = np.zeros((1, 2), dtype=float)
-        Mouse2_polyglon_coords = np.zeros((1, 2), dtype=float)
-        M1polyglon = []
-        M2polyglon = []
-        movementM1 = [0, ]
-        movementM2 = [0, ]
-        M1_bodyAngle = []
-        M2_bodyAngle = []
-        movementM1_nose = [0, ]
-        movementM2_nose = [0, ]
-        movementM1_tail_end_list = [0, ]
-        movementM2_tail_end_list = [0, ]
-        movementM1_tail_base_list = [0, ]
-        movementM2_tail_base_list = [0, ]
-        movement_M1_left_ear = [0, ]
-        movement_M1_right_ear = [0, ]
-        movement_M2_left_ear = [0, ]
-        movement_M2_right_ear = [0, ]
-        movement_M1_left_lat = [0, ]
-        movement_M1_right_lat = [0, ]
-        movement_M2_left_lat = [0, ]
-        movement_M2_right_lat = [0, ]
         M1_hull_large_euclidean_list = []
         M1_hull_small_euclidean_list = []
         M1_hull_mean_euclidean_list = []
@@ -95,38 +51,18 @@ def extract_features_wotarget(inifile):
         M2_hull_small_euclidean_list = []
         M2_hull_mean_euclidean_list = []
         M2_hull_sum_euclidean_list = []
-        loop = 0
-        M1_nose_to_M2_lat_left = []
-        M1_nose_to_M2_lat_right = []
-        M2_nose_to_M1_lat_left = []
-        M2_nose_to_M1_lat_right = []
-        M1_nose_to_M2_tail_base = []
-        M2_nose_to_M1_tail_base = []
-        mouse1Nose_to_centroid = []
-        mouse2Nose_to_centroid = []
-        mouse1size = []
-        mouse2size = []
-        mouse1width = []
-        mouse2width = []
-        mouse1ears = []
-        mouse2ears = []
-        centDist = []
-        f2fdist = []
         currentFile = i
         currVidName = os.path.basename(currentFile)
         currVidName = currVidName.replace('.csv', '')
-        if use_master == 'no':
-            configFile = configFilelist[loopy]
-            config = ConfigParser()
-            config.read(configFile)
-            fps = config.getint('Frame settings', 'fps')
-            resWidth = config.getint('Frame settings', 'resolution_width')
-            resHeight = config.getint('Frame settings', 'resolution_height')
         # get current pixels/mm
         currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
-        currPixPerMM = float(currVideoSettings['pixels/mm'])
+        try:
+            currPixPerMM = float(currVideoSettings['pixels/mm'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         fps = float(currVideoSettings['fps'])
-        print(currPixPerMM, fps)
+        print('Processing ' + '"' + str(currVidName) + '".' + ' Fps: ' + str(fps) + ". mm/ppx: " + str(currPixPerMM))
+
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))
         loopy += 1
@@ -140,16 +76,12 @@ def extract_features_wotarget(inifile):
                          "Nose_2_x", "Nose_2_y", "Nose_2_p", "Center_2_x", "Center_2_y", "Center_2_p", "Lat_left_2_x",
                          "Lat_left_2_y",
                          "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x",
-                         "Tail_base_2_y", "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p", "video_no",
-                         "frames"]
+                         "Tail_base_2_y", "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p"]
         csv_df = pd.read_csv(currentFile, names=columnHeaders)
-        currVidNo = list(csv_df['video_no'].unique())
-        print('Processing video ' + str(currVidNo[1]) + '...')
         csv_df = csv_df.fillna(0)
         csv_df = csv_df.drop(csv_df.index[[0]])
         csv_df = csv_df.apply(pd.to_numeric)
         csv_df = csv_df.reset_index()
-        csv_df['frames'] = csv_df.index
         csv_df = csv_df.reset_index(drop=True)
 
         print('Evaluating convex hulls...')
@@ -343,11 +275,6 @@ def extract_features_wotarget(inifile):
         csv_df['Sum_euclidean_distance_hull_M1_M2'] = (
                     csv_df['M1_sum_euclidean_distance_hull'] + csv_df['M2_sum_euclidean_distance_hull'])
 
-        ########### MEAN MOUSE SIZES ###########################################
-        mean1size_Nose_Tail = statistics.mean(csv_df['Mouse_1_nose_to_tail'])
-        mean2size_Nose_Tail = statistics.mean(csv_df['Mouse_2_nose_to_tail'])
-        Mouse_1_mean_seize_polygon = statistics.mean(csv_df['Mouse_1_poly_area'])
-        Mouse_2_mean_seize_polygon = statistics.mean(csv_df['Mouse_2_poly_area'])
 
         ########### COLLAPSED MEASURES ###########################################
         csv_df['Total_movement_centroids'] = csv_df['Movement_mouse_1_centroid'] + csv_df['Movement_mouse_2_centroid']
@@ -759,12 +686,12 @@ def extract_features_wotarget(inifile):
                 start += 1
                 end += 1
             currentColName1 = str('Tortuosity_Mouse1_') + str(roll_windows_values[k])
-            currentColName2 = str('Tortuosity_Mouse2_') + str(roll_windows_values[k])
+            #currentColName2 = str('Tortuosity_Mouse2_') + str(roll_windows_values[k])
             csv_df[currentColName1] = tortuosity_M1
-            csv_df[currentColName1] = tortuosity_M2
+            #csv_df[currentColName2] = tortuosity_M2
 
         ########### CALC THE NUMBER OF LOW PROBABILITY DETECTIONS & TOTAL PROBABILITY VALUE FOR ROW###########################################
-        print('Calculating probability scores...')
+        print('Calculating pose probability scores...')
         csv_df['Sum_probabilities'] = (
                     csv_df['Ear_left_1_p'] + csv_df['Ear_right_1_p'] + csv_df['Nose_1_p'] + csv_df['Center_1_p'] +
                     csv_df['Lat_left_1_p'] + csv_df['Lat_right_1_p'] + csv_df['Tail_base_1_p'] + csv_df[
@@ -798,4 +725,5 @@ def extract_features_wotarget(inifile):
         fileOut = str(fileName[0]) + str('.csv')
         saveFN = os.path.join(csv_dir_out, fileOut)
         csv_df.to_csv(saveFN)
-    print('Feature extraction complete')
+        print('Feature extraction complete for ' + '"' + str(currVidName) + '".')
+    print('All feature extraction complete.')

@@ -54,7 +54,7 @@ class MainInterface:
         self.button_frame = Frame(self.window, bd=2, width=700, height=300)
         self.button_frame.grid(row=1, column=0)
 
-        self.frameNumber = Label(self.button_frame, text="Frame Number")
+        self.frameNumber = Label(self.button_frame, text="Frame number")
         self.frameNumber.grid(row=0, column=1)
         self.forward = Button(self.button_frame, text=">",
                               command=lambda: load_frame(current_frame_number+1, self.window, self.fbox))
@@ -110,7 +110,7 @@ class MainInterface:
             checkbox.grid(sticky=W)
 
         # Save Button
-        save = Button(self.window, text="Save and Advance to the next frame",
+        save = Button(self.window, text="Save and advance to the next frame",
                       command=lambda: self.save_checkboxes(self.window))
         save.config(font=("Calibri", 16))
         save.grid(row=1, column=1, sticky=N)
@@ -119,7 +119,7 @@ class MainInterface:
         self.rangeOn = IntVar(value=0)
         self.rangeFrames = Frame(self.window)
         self.rangeFrames.grid(row=1, column=1, sticky=S)
-        self.select_range = Checkbutton(self.rangeFrames, text='Frame Range ', variable=self.rangeOn)
+        self.select_range = Checkbutton(self.rangeFrames, text='Frame range ', variable=self.rangeOn)
         self.select_range.grid(row=0, column=0, sticky=W)
         self.firstFrame = Entry(self.rangeFrames, width=7)
         self.firstFrame.grid(row=0, column=1, sticky=E)
@@ -129,7 +129,7 @@ class MainInterface:
         self.lastFrame.grid(row=0, column=3, sticky=E)
 
         # Quit Button
-        self.generate = Button(self.window, text="Generate/Save csv", command=lambda: save_video(self.window))
+        self.generate = Button(self.window, text="Generate / Save csv", command=lambda: save_video(self.window))
         self.generate.grid(row=2, column=1, sticky=N)
 
         # Loads the first frame
@@ -138,23 +138,23 @@ class MainInterface:
         # Video Player
         video_player = Frame(self.window, width=100, height=100)
         video_player.grid(row=0, column=2, sticky=N)
-        video = Button(video_player, text='Open Current Video', command=lambda: play_video())
+        video = Button(video_player, text='Open Video', command=lambda: play_video())
         video.grid(sticky=N, pady = 10)
-        video_key = Label(video_player, text='\n\n For Video: \n p = Pause/Play'
+        video_key = Label(video_player, text='\n\n  Keyboard shortcuts for video navigation: \n p = Pause/Play'
                                              '\n\n After pressing pause:'
-                                             '\n o = Forward 2 Frames \n e = Forward 10 Frames \n w = Forward 1 Second'
-                                             '\n\n t = Back up 2 Frames \n s = Back up 10 Frames \n x = Back up 1 Second'
-                                             '\n\n q = Quit \n\n')
+                                             '\n o = +2 frames \n e = +10 frames \n w = +1 second'
+                                             '\n\n t = -2 frames \n s = -10 frames \n x = -1 second'
+                                             '\n\n q = Close video window \n\n')
         video_key.grid(sticky=W)
         update = Button(video_player, text='Show current video frame',
                         command=lambda: update_frame_from_video(self.window, self.fbox))
         update.grid(sticky=N)
         self.bind_keys()
-        key_presses = Label(video_player, text='\n\n Key Presses: \n Right Arrow = +1 Frame'
-                                             '\n Left Arrow = -1 Frame'
-                                             '\n Ctrl + s = Save and +1 Frame'
-                                             '\n Ctrl + l = Last Frame'
-                                             '\n Ctrl + o = First Frame')
+        key_presses = Label(video_player, text='\n\n Keyboard shortcuts for frame navigation: \n Right Arrow = +1 frame'
+                                             '\n Left Arrow = -1 frame'
+                                             '\n Ctrl + s = Save and +1 frame'
+                                             '\n Ctrl + l = Last frame'
+                                             '\n Ctrl + o = First frame')
         key_presses.grid(sticky=S)
 
     # Detects user key presses
@@ -240,7 +240,7 @@ def choose_folder(project_name):
     configure(project_name)
 
     MainInterface()
-    create_data_frame(number_of_frames)
+    #create_data_frame(number_of_frames)
 
 
 # Loads a new image frame
@@ -273,9 +273,8 @@ def load_frame(number, master, entry):
 
 
 # Creates a new Pandas DataFrame for current Video
-def create_data_frame(number):
-    df.insert(0, 'frames.', list(range(0, number)))
-    print(df)
+# def create_data_frame(number):
+#     df.insert(0, 'frames.', list(range(0, number)))
 
 
 # Temporarily updates the value of each variable for each frame to either 0 or 1
@@ -309,15 +308,10 @@ def save_video(master):
     output_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\targets_inserted\\" \
                   + current_video + '.csv'
     data = pd.read_csv(input_file)
-    try:
-        df.insert(0, 'video_no', current_video)
-    except ValueError:
-        print('')
     new_data = pd.concat([data, df], axis=1)
     new_data = new_data.fillna(0)
     new_data.rename(columns={'Unnamed: 0': 'scorer'}, inplace=True)
-
     new_data.to_csv(output_file, index=FALSE)
     print(output_file)
-    print(current_video + '.csv targets inserted created')
+    print(current_video + 'Annotation file for "' + str(current_video) + '"' + ' created.')
     # master.destroy()

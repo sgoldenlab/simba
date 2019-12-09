@@ -4,18 +4,10 @@ import numpy as np
 from configparser import ConfigParser
 
 def merge_frames_config(configini):
-
-    dataDirs = []
-    pathDirs = []
-    lineDirs = []
-    frameDirs = []
-    ganttDirs = []
-    currentDirs = []
-    currentFrames = []
-
     configFile = str(configini)
     config = ConfigParser()
     config.read(configFile)
+    loop=1
     frames_dir_in = config.get('Frame settings', 'frames_dir_out')
     frames_dir_out = os.path.join(frames_dir_in, "merged")
     if not os.path.exists(frames_dir_out):
@@ -25,7 +17,6 @@ def merge_frames_config(configini):
     path_plot_dirs = os.path.join(frames_dir_in, "path_plots")
     data_plot_dirs = os.path.join(frames_dir_in, "live_data_table")
     line_plot_dirs = os.path.join(frames_dir_in, "line_plot")
-    use_master = config.get('General settings', 'use_master_config')
 
     sklearnDir = [f.path for f in os.scandir(sklearnDir) if f.is_dir()]
     gantt_plot_dirs = [f.path for f in os.scandir(gantt_plot_dirs) if f.is_dir()]
@@ -38,24 +29,8 @@ def merge_frames_config(configini):
     dataDirs = [s for s in data_plot_dirs if "_data_plots" in s]
     pathDirs = [s for s in path_plot_dirs if "_path_dot" in s]
     lineDirs = [s for s in line_plot_dirs if "_distance_plot" in s]
-
-    configFilelist = []
-
-    if use_master == 'no':
-        config_folder_path = config.get('General settings', 'config_folder')
-        for i in os.listdir(config_folder_path):
-            if i.__contains__(".ini"):
-                currVid = i.strip(".ini")
-                configFilelist.append(currVid)
-        frameDirs = [s for s in frameDirs if s in configFilelist]
-        ganttDirs = [s for s in gantt_plot_dirs if "gantt" in s]
-        dataDirs = [s for s in data_plot_dirs if "_data_plots" in s]
-        pathDirs = [s for s in path_plot_dirs if "_path_dot" in s]
-        lineDirs = [s for s in line_plot_dirs if "_distance_plot" in s]
-
     videoNos = len(frameDirs)
-    loopy = 0
-    configFilelist = []
+    print('Merging frames for ' + str(videoNos) + ' videos...')
 
     def image_resize(image, width=None, height=None, inter=cv2.INTER_AREA):
         dim = None
@@ -83,7 +58,6 @@ def merge_frames_config(configini):
         pathList = sorted(pathList, key=lambda x: int(x.split('.')[0]))
         lineList = os.listdir(lineDirs[i])
         lineList = sorted(lineList, key=lambda x: int(x.split('.')[0]))
-        print(ganttList)
 
         for y in frameList:
             currentFrame = os.path.join(frameDirs[i], frameList[loopy])
@@ -97,10 +71,6 @@ def merge_frames_config(configini):
             pathFrame = cv2.imread(currentPath)
             lineFrame = cv2.imread(currentLine)
             imageSize = imageFrame.shape
-            ganttSize = ganttFrame.shape
-            dataSize = dataFrame.shape
-            pathSize = pathFrame.shape
-            lineSize = lineFrame.shape
             resizedGantt = image_resize(ganttFrame, height=int(imageSize[0]))
             resizedGantSize = resizedGantt.shape
             resizedData = image_resize(dataFrame, width=int(resizedGantSize[1]))
@@ -122,6 +92,7 @@ def merge_frames_config(configini):
                 os.makedirs(outPath)
             saveFramePath = os.path.join(outPath, imageSaveName)
             cv2.imwrite(saveFramePath, final_horizontalConcat)
-            print('image saved ' + str(loopy))
+            print('Merged frame ' + str(loopy) + '/' + str(len(frameList)) + ' for video ' + str(loop) + '/' + str(videoNos))
             loopy += 1
-        print('Merge frames complete.')
+        loop+=1
+    print('Merge frames complete.')

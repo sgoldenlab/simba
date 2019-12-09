@@ -1,12 +1,11 @@
 import os
 
-def write_inifile(model_list,msconfig,project_path,project_name,no_targets,target_list,fpssettings,resolution_width,resolution_height):
+def write_inifile(msconfig,project_path,project_name,no_targets,target_list,fpssettings,resolution_width,resolution_height):
 
 ############create directories################
     directory = project_path
     #generate main directories in project path
     project_folder = str(directory +'\\' + project_name + '\\project_folder')
-    dlcmodels_folder = str(directory + '\\'+ project_name +'\\DLC_models')
     models_folder = str(directory + '\\' + project_name +'\\models')
     #generate sub-directories in main directories
     config_folder = str(project_folder + '\\configs')
@@ -20,13 +19,12 @@ def write_inifile(model_list,msconfig,project_path,project_name,no_targets,targe
     machine_results_folder = str(csv_folder + '\\machine_results')
     outlier_corrected_movement_folder = str(csv_folder + '\\outlier_corrected_movement')
     outlier_corrected_location_folder = str(csv_folder + '\\outlier_corrected_movement_location')
-    sml_behaviors_folder = str(csv_folder + '\\sml_behaviors')
     targets_inserted_folder = str(csv_folder + '\\targets_inserted')
     #frames
     input_folder = str(frames_folder + '\\input')
     output_folder = str(frames_folder + '\\output')
 
-    folder_list = [project_folder,dlcmodels_folder,models_folder,config_folder,csv_folder,frames_folder,logs_folder,videos_folder,features_extracted_folder,input_csv_folder,machine_results_folder,outlier_corrected_movement_folder,outlier_corrected_location_folder,sml_behaviors_folder,targets_inserted_folder,input_folder,output_folder]
+    folder_list = [project_folder,models_folder,config_folder,csv_folder,frames_folder,logs_folder,videos_folder,features_extracted_folder,input_csv_folder,machine_results_folder,outlier_corrected_movement_folder,outlier_corrected_location_folder,targets_inserted_folder,input_folder,output_folder]
 
     for i in folder_list:
         try:
@@ -61,13 +59,7 @@ def write_inifile(model_list,msconfig,project_path,project_name,no_targets,targe
     for i in range(int(no_targets)):
         f.write('target_name_' + str(i+1) + ' = ' + str(target_list[i]) + '\n')
 
-    f.write('target_file = ' + str(csv_folder) + '\\sml_behaviours\\video_behaviours.xlsx' +'\n')
-
-    #for loop for targetname
-    for i in range(int(no_targets)):
-        f.write('Model_path_chosen_' + str(i+1) + ' = ' + str(model_list[i]) + '\n')
     f.write('\n')
-
 
     #frame settings
     f.write('[Frame settings]\n')
@@ -147,8 +139,8 @@ def write_inifile(model_list,msconfig,project_path,project_name,no_targets,targe
     f.write('XGB_max_depth = \n')
     f.write('XGB_learning_rate = \n')
     f.write('meta_files_folder = ' + project_folder + '\\configs\\ \n' )
-    f.write('LearningCurve_shuffle_k_splits = \n')
-    f.write('LearningCurve_shuffle_data_splits = \n')
+    f.write('LearningCurve_shuffle_k_splits = 0 \n')
+    f.write('LearningCurve_shuffle_data_splits = 0 \n')
     f.write('\n')
 
     #validation/run model

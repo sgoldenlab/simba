@@ -1,6 +1,5 @@
 import pandas as pd
 import pickle
-from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import statistics
 import os
@@ -8,33 +7,27 @@ from configparser import ConfigParser
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-def rfmodel(inifile):
-    print('Running RF model...')
+def rfmodel(inifile,dt,sb):
     config = ConfigParser()
     configFile = str(inifile)
     config.read(configFile)
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'features_extracted')
     csv_dir_out = os.path.join(csv_dir, 'machine_results')
-    use_master = config.get('General settings', 'use_master_config')
-    discrimination_threshold = config.getfloat('validation/run model', 'discrimination_threshold')
+    discrimination_threshold = float(dt)
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
     model_dir = config.get('SML settings', 'model_dir')
     model_nos = config.getint('SML settings', 'No_targets')
-    shortest_bout = config.getint('validation/run model', 'shortest_bout')
+    shortest_bout = int(sb)
     vidInfPath = config.get('General settings', 'project_path')
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-    currentAttackGapList = []
     filesFound = []
     model_paths = []
     target_names = []
     loop = 1
-    vNm_list = []
-    log_df = pd.DataFrame()
-    configFilelist = []
     loopy = 0
 
     ########### GET MODEL PATHS AND NAMES ###########
@@ -46,29 +39,20 @@ def rfmodel(inifile):
         model_paths.append(currentModelPaths)
         target_names.append(currentModelNames)
         loop += 1
-    loop = 0
-    target_frames_found = []
+
 
     ########### FIND CSV FILES ###########
-    if use_master == 'yes':
-        for i in os.listdir(csv_dir_in):
-            if i.__contains__(".csv"):
-                file = os.path.join(csv_dir_in, i)
-                filesFound.append(file)
-    if use_master == 'no':
-        config_folder_path = config.get('General settings', 'config_folder')
-        for i in os.listdir(config_folder_path):
-            if i.__contains__(".ini"):
-                configFilelist.append(os.path.join(config_folder_path, i))
-                iniVidName = i.split(".")[0]
-                csv_fn = iniVidName + '.csv'
-                file = os.path.join(csv_dir_in, csv_fn)
-                filesFound.append(file)
+    for i in os.listdir(csv_dir_in):
+        if i.__contains__(".csv"):
+            file = os.path.join(csv_dir_in, i)
+            filesFound.append(file)
+    print('Running ' + str(len(target_names)) + ' model(s) on ' + str(len(filesFound)) + ' video file(s).')
 
     for i in filesFound:
         currFile = i
         currentFileName = os.path.basename(currFile)
         loopy += 1
+        print('Analyzing video ' + str(loopy) + '/' + str(len(filesFound)) + '...')
         inputFile = pd.read_csv(currFile, index_col=0)
         inputFileOrganised = inputFile.drop(
             ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
@@ -80,14 +64,13 @@ def rfmodel(inifile):
              "Nose_2_p", "Center_2_x", "Center_2_y", "Center_2_p", "Lat_left_2_x", "Lat_left_2_y",
              "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x", "Tail_base_2_y",
              "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p", ], axis=1)
-        video_no = inputFileOrganised.pop('video_no').values
-        frame_number = inputFileOrganised.pop('frames').values
         currVidInfoDf = vidinfDf.loc[vidinfDf['Video'] == str(currentFileName.replace('.csv', ''))]
-        currVidFps = int(currVidInfoDf['fps'])
+        try:
+            currVidFps = int(currVidInfoDf['fps'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         outputDf = inputFile.copy()
         outputDf.reset_index()
-        outputDf['frames'] = outputDf.index
-        video_no = outputDf.pop('video_no').values
 
         # CREATE LIST OF GAPS BASED ON SHORTEST BOUT
         framesToPlug = int(currVidFps * (shortest_bout / 1000))
@@ -107,9 +90,7 @@ def rfmodel(inifile):
         for b in range(model_nos):
             currentModelPath = model_paths[b]
             model = os.path.join(model_dir, currentModelPath)
-            currModelName = os.path.basename(model)
-            currModelName = currModelName.split('.')
-            currModelName = str(currModelName[0])
+            currModelName = target_names[b]
             currProbName = 'Probability_' + currModelName
             clf = pickle.load(open(model, 'rb'))
             predictions = clf.predict_proba(inputFileOrganised)
@@ -142,7 +123,8 @@ def rfmodel(inifile):
         outputDf['Scaled_movement_M1_M2'] = (outputDf['Scaled_movement_M1'] + outputDf['Scaled_movement_M2']) / 2
         outputDf['Scaled_movement_M1_M2'] = outputDf['Scaled_movement_M1_M2'].round(decimals=2)
 
-        outFname = os.path.basename(currFile)
-        outFname = os.path.join(csv_dir_out, outFname)
+        fileBaseName = os.path.basename(currFile)
+        outFname = os.path.join(csv_dir_out, fileBaseName)
         outputDf.to_csv(outFname)
-        print(str(outFname) + str(' completed'))
+        print('Predictions generated for ' + str(fileBaseName) + '...')
+    print('Finished generating predictions. Predictions are saved @ project_folder/csv/machine_results')

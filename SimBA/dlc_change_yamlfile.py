@@ -6,29 +6,31 @@ import deeplabcut
 
 
 def generatetempyaml(yamlfile,videolist):
+    try:
+        #copy yaml and rename
+        tempyaml = os.path.dirname(yamlfile) +'\\temp.yaml'
+        shutil.copy(yamlfile,tempyaml)
 
-    #copy yaml and rename
-    tempyaml = os.path.dirname(yamlfile) +'\\temp.yaml'
-    shutil.copy(yamlfile,tempyaml)
+        #adding new videos to tempyaml
+        deeplabcut.add_new_videos(tempyaml,[videolist],copy_videos=True)
 
-    #adding new videos to tempyaml
-    deeplabcut.add_new_videos(tempyaml,[videolist],copy_videos=True)
+        with open(tempyaml) as f:
+            read_yaml = yaml.load(f, Loader=yaml.FullLoader)
 
-    with open(tempyaml) as f:
-        read_yaml = yaml.load(f, Loader=yaml.FullLoader)
+        original_videosets = read_yaml['video_sets'].keys()
 
-    original_videosets = read_yaml['video_sets'].keys()
+        keys=[]
+        for i in original_videosets:
+            keys.append(i)
+        #remove the original video to get only newly added videos
+        read_yaml['video_sets'].pop(keys[0],None)
 
-    keys=[]
-    for i in original_videosets:
-        keys.append(i)
-    #remove the original video to get only newly added videos
-    read_yaml['video_sets'].pop(keys[0],None)
+        with open(tempyaml, 'w') as outfile:
+            yaml.dump(read_yaml, outfile, default_flow_style=False)
 
-    with open(tempyaml, 'w') as outfile:
-        yaml.dump(read_yaml, outfile, default_flow_style=False)
-
-    print('temp.yaml generated.')
+        print('temp.yaml generated.')
+    except FileNotFoundError:
+        print('Please select a video file.')
 
 def generatetempyaml_multi(yamlfile,videolist):
 

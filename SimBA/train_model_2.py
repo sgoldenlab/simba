@@ -8,7 +8,6 @@ from yellowbrick.classifier import ClassificationReport
 from xgboost.sklearn import XGBClassifier
 from imblearn.combine import SMOTEENN
 from imblearn.over_sampling import SMOTE
-from sklearn import metrics
 from sklearn.tree import export_graphviz
 from subprocess import call
 import pickle
@@ -20,9 +19,7 @@ from eli5.sklearn import PermutationImportance
 import matplotlib.pyplot as plt
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
-from sklearn.metrics import precision_recall_curve, average_precision_score
-
-
+from sklearn.metrics import precision_recall_curve
 warnings.simplefilter(action='ignore', category=FutureWarning)
 pd.options.mode.chained_assignment = None
 
@@ -48,7 +45,6 @@ def trainmodel2(inifile):
     train_test_size = config.getfloat('create ensemble settings', 'train_test_size')
     log_path = config.get('General settings', 'project_path')
     log_path = os.path.join(log_path, 'project_folder', 'logs')
-    targetFrame = pd.DataFrame()
     features = pd.DataFrame()
 
     def generateClassificationReport(clf, class_names):
@@ -56,7 +52,7 @@ def trainmodel2(inifile):
             visualizer = ClassificationReport(clf, classes=class_names, support=True)
             visualizer.score(data_test, target_test)
             visualizerPath = os.path.join(tree_evaluations_out, str(classifierName) + '_classificationReport.png')
-            g = visualizer.poof(outpath=visualizerPath)
+            g = visualizer.poof(outpath=visualizerPath, clear_figure=True)
         except KeyError:
             print(('Warning, not enough data for classification report: ') + str(classifierName))
 
@@ -98,9 +94,15 @@ def trainmodel2(inifile):
         metaDataFn = str(classifierName) + '_meta.csv'
         metaDataPath = os.path.join(modelDir_out, metaDataFn)
         print(metaDataPath)
-        metaDataHeaders = ["Classifier_name", "Ensamble_method", "Under_sampling_setting", "Under_sampling_ratio",
-                           "Over_sampling_method", "Over_sampling_ratio", "Estimators", "Max_features", "RF_criterion",
-                           "RF_min_sample_leaf", "train_test_ratio", "Feature_list"]
+        metaDataHeaders = ["Classifier_name", "RF_criterion", "RF_max_features", "RF_min_sample_leaf",
+                           "RF_n_estimators", "compute_feature_permutation_importance",
+                           "generate_classification_report", "generate_example_decision_tree",
+                           "generate_features_importance_bar_graph", "generate_features_importance_log",
+                           "generate_precision_recall_curves", "generate_rf_model_meta_data_file",
+                           "generate_sklearn_learning_curves", "learning_curve_data_splits",
+                           "learning_curve_k_splits", "n_feature_importance_bars",
+                           "over_sample_ratio", "over_sample_setting", "train_test_size", "under_sample_ratio",
+                           "under_sample_setting"]
         with open(metaDataPath, 'w', newline='') as f:
             out_writer = csv.writer(f)
             out_writer.writerow(metaDataHeaders)
@@ -121,13 +123,9 @@ def trainmodel2(inifile):
         dfvals.to_csv(fname, index=False)
 
     def LearningCurve(features, targetFrame, shuffle_splits, dataset_splits):
-        cv = ShuffleSplit(n_splits=shuffle_splits, test_size=0.2, random_state=0)
-        model = RandomForestClassifier(n_estimators=2000, max_features=RF_max_features, n_jobs=-1,
-                                       criterion=RF_criterion, min_samples_leaf=RF_min_sample_leaf, bootstrap=True,
-                                       verbose=0)
-        train_sizes, train_scores, test_scores = learning_curve(model, features, targetFrame, cv=cv, scoring='f1',
-                                                                shuffle=True, n_jobs=-1,
-                                                                train_sizes=np.linspace(0.01, 1.0, dataset_splits))
+        cv = ShuffleSplit(n_splits=shuffle_splits, test_size=train_test_size, random_state=0)
+        model = RandomForestClassifier(n_estimators=RF_n_estimators, max_features=RF_max_features, n_jobs=-1, criterion=RF_criterion, min_samples_leaf=RF_min_sample_leaf, bootstrap=True, verbose=0)
+        train_sizes, train_scores, test_scores = learning_curve(model, features, targetFrame, cv=cv, scoring='f1', shuffle=True, n_jobs=-1, train_sizes=np.linspace(0.01, 1.0, dataset_splits))
         train_sizes = np.linspace(0.01, 1.0, dataset_splits)
         train_mean = np.mean(train_scores, axis=1)
         test_mean = np.mean(test_scores, axis=1)
@@ -143,16 +141,17 @@ def trainmodel2(inifile):
         learningCurve_df.to_csv(fname, index=False)
 
     # READ IN DATA FOLDER AND REMOVE ALL NON-FEATURE VARIABLES (POP DLC COORDINATE DATA AND TARGET DATA)
+    print('Reading in annotated files...')
     for i in os.listdir(data_folder):
         if i.__contains__(".csv"):
             currentFn = os.path.join(data_folder, i)
             df = pd.read_csv(currentFn, index_col=False)
             features = features.append(df, ignore_index=True)
-            print(str(i) + ' appended to model dataframe...')
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
-    frame_number = features.pop('frames').values
-    video_number = features.pop('video_no').values
-    targetFrame = features.pop(classifierName).values
+    try:
+        targetFrame = features.pop(classifierName).values
+    except KeyError:
+        print('Error: the dataframe does not contain any target annotations. Please check the csv files in the project_folder/csv/target_inserted folder')
     features = features.fillna(0)
     features = features.drop(
         ["scorer", "Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
@@ -171,7 +170,8 @@ def trainmodel2(inifile):
         if currentModelNames != classifierName:
             target_names.append(currentModelNames)
         loop += 1
-    loop = 0
+    print('# of models to be created: ' + str(loop))
+
     for i in range(len(target_names)):
         currentModelName = target_names[i]
         features.pop(currentModelName).values
@@ -179,10 +179,9 @@ def trainmodel2(inifile):
     feature_list = list(features.columns)
 
     # IF SET BY USER - PERFORM UNDERSAMPLING AND OVERSAMPLING IF SET BY USER
-    data_train, data_test, target_train, target_test = train_test_split(features, targetFrame,
-                                                                        test_size=train_test_size)
+    data_train, data_test, target_train, target_test = train_test_split(features, targetFrame, test_size=train_test_size)
     if under_sample_setting == 'Random undersample':
-        print('Performing undersampling..')
+        print('Performing undersampling...')
         trainDf = data_train
         trainDf[classifierName] = target_train
         targetFrameRows = trainDf.loc[trainDf[classifierName] == 1]
@@ -193,78 +192,87 @@ def trainmodel2(inifile):
         target_train = trainDf.pop(classifierName).values
         data_train = trainDf
     if over_sample_setting == 'SMOTEENN':
-        print('Performing SMOTEEN oversampling..')
+        print('Performing SMOTEEN oversampling...')
         smt = SMOTEENN(sampling_strategy=over_sample_ratio)
         data_train, target_train = smt.fit_sample(data_train, target_train)
     if over_sample_setting == 'SMOTE':
-        print('Performing SMOTE oversampling..')
+        print('Performing SMOTE oversampling...')
         smt = SMOTE(sampling_strategy=over_sample_ratio)
         data_train, target_train = smt.fit_sample(data_train, target_train)
 
     # RUN THE DECISION ENSEMBLE SET BY THE USER
     # run random forest
     if model_to_run == 'RF':
+        print('Training model ' + str(classifierName) + '...')
         RF_n_estimators = config.getint('create ensemble settings', 'RF_n_estimators')
         RF_max_features = config.get('create ensemble settings', 'RF_max_features')
         RF_criterion = config.get('create ensemble settings', 'RF_criterion')
         RF_min_sample_leaf = config.getint('create ensemble settings', 'RF_min_sample_leaf')
-        RF_n_jobs = config.getint('create ensemble settings', 'RF_n_jobs')
         clf = RandomForestClassifier(n_estimators=RF_n_estimators, max_features=RF_max_features, n_jobs=-1,
                                      criterion=RF_criterion, min_samples_leaf=RF_min_sample_leaf, bootstrap=True,
                                      verbose=1)
-        clf.fit(data_train, target_train)
-        clf_pred = clf.predict(data_test)
-        print("Accuracy " + str(classifierName) + ' model:', metrics.accuracy_score(target_test, clf_pred))
+        try:
+            clf.fit(data_train, target_train)
+        except ValueError:
+            print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
 
         # #RUN RANDOM FOREST EVALUATIONS
         compute_permutation_importance = config.get('create ensemble settings', 'compute_permutation_importance')
         if compute_permutation_importance == 'yes':
+            print('Calculating permutation importances...')
             computePermutationImportance(data_test, target_test, clf)
+
         generate_learning_curve = config.get('create ensemble settings', 'generate_learning_curve')
+        shuffle_splits = config.getint('create ensemble settings', 'LearningCurve_shuffle_k_splits')
+        dataset_splits = config.getint('create ensemble settings', 'LearningCurve_shuffle_data_splits')
         if generate_learning_curve == 'yes':
-            shuffle_splits = config.getint('create ensemble settings', 'LearningCurve_shuffle_k_splits')
-            dataset_splits = config.getint('create ensemble settings', 'LearningCurve_shuffle_data_splits')
+            print('Calculating learning curves...')
             LearningCurve(features, targetFrame, shuffle_splits, dataset_splits)
 
         generate_precision_recall_curve = config.get('create ensemble settings', 'generate_precision_recall_curve')
         if generate_precision_recall_curve == 'yes':
+            print('Calculating precision recall curve...')
             precisionRecallDf = pd.DataFrame()
             probabilities = clf.predict_proba(data_test)[:, 1]
             precision, recall, _ = precision_recall_curve(target_test, probabilities, pos_label=1)
-            average_precision = average_precision_score(target_test, probabilities)
             precisionRecallDf['precision'] = precision
             precisionRecallDf['recall'] = recall
-            # precisionRecallDf = precisionRecallDf.round(5)
-            # precisionRecallDf = precisionRecallDf.drop_duplicates('precision')
             PRCpath = os.path.join(tree_evaluations_out, str(classifierName) + '_precision_recall.csv')
             precisionRecallDf.to_csv(PRCpath)
 
         generate_example_decision_tree = config.get('create ensemble settings', 'generate_example_decision_tree')
         if generate_example_decision_tree == 'yes':
+            print('Generating example decision tree using graphviz...')
             estimator = clf.estimators_[3]
             generateExampleDecisionTree(estimator)
 
         generate_classification_report = config.get('create ensemble settings', 'generate_classification_report')
         if generate_classification_report == 'yes':
+            print('Generating yellowbrick classification report...')
             generateClassificationReport(clf, class_names)
 
         generate_features_importance_log = config.get('create ensemble settings', 'generate_features_importance_log')
         if generate_features_importance_log == 'yes':
+            print('Generating feature importance log...')
             importances = list(clf.feature_importances_)
             log_df = generateFeatureImportanceLog(importances)
 
-        generate_features_importance_bar_graph = config.get('create ensemble settings',
-                                                            'generate_features_importance_bar_graph')
+        generate_features_importance_bar_graph = config.get('create ensemble settings', 'generate_features_importance_bar_graph')
         N_feature_importance_bars = config.getint('create ensemble settings', 'N_feature_importance_bars')
         if generate_features_importance_bar_graph == 'yes':
+            print('Generating feature importance bar graph...')
             generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars)
 
         # SAVE MODEL META DATA
         RF_meta_data = config.get('create ensemble settings', 'RF_meta_data')
         if RF_meta_data == 'yes':
-            metaDataList = [classifierName, model_to_run, under_sample_setting, under_sample_ratio, over_sample_setting,
-                            over_sample_ratio, RF_n_estimators, RF_max_features, RF_criterion, RF_min_sample_leaf,
-                            class_names, train_test_size, feature_list]
+            metaDataList = [classifierName, RF_criterion, RF_max_features, RF_min_sample_leaf, RF_n_estimators,
+                            compute_permutation_importance, generate_classification_report,
+                            generate_example_decision_tree, generate_features_importance_bar_graph,
+                            generate_features_importance_log,
+                            generate_precision_recall_curve, RF_meta_data, generate_learning_curve, dataset_splits,
+                            shuffle_splits, N_feature_importance_bars, over_sample_ratio, under_sample_setting,
+                            train_test_size, under_sample_ratio, over_sample_setting]
             generateMetaData(metaDataList)
 
     # run gradient boost model
@@ -312,15 +320,13 @@ def trainmodel2(inifile):
                             colsample_bylevel=1, reg_alpha=0, reg_lambda=0, scale_pos_weight=1, seed=1, missing=None,
                             verbosity=3)
         clf.fit(data_train, target_train, verbose=True)
-        clf_pred = clf.predict(data_test)
-        print(str(classifierName) + str(" Accuracy train: ") + str(clf.score(data_train, target_train)))
-        print(str(classifierName) + str(" Accuracy test: ") + str(clf.score(data_test, target_test)))
 
     # SAVE MODEL
     modelfn = str(classifierName) + '.sav'
     modelPath = os.path.join(modelDir_out, modelfn)
     pickle.dump(clf, open(modelPath, 'wb'))
-    print('Classifier ' + str(classifierName) + ' saved @' + str(modelPath))
+    print('Classifier ' + str(classifierName) + ' saved @ ' + str('models/generated_models ') + 'folder')
+    print('The evaluation files can be found in models/generated_models/model_evaluations folders')
 
 
 

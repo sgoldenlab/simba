@@ -3,27 +3,19 @@ import os
 import numpy as np
 import statistics
 import math
-import re
 from configparser import ConfigParser
 from datetime import datetime
-from openpyxl import load_workbook
-import openpyxl
 
 
 def dev_move(configini):
-    print('Running outlier correction : movement...')
 
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     filesFound = []
     configFile = str(configini)
     config = ConfigParser()
     config.read(configFile)
-    vNm_list = []
     loop = 0
     loopy = 0
-    configFilelist = []
-    use_master = config.get('General settings', 'use_master_config')
-
     criterion = config.getfloat('Outlier settings', 'movement_criterion')
 
     csv_dir = config.get('General settings', 'csv_path')
@@ -31,14 +23,13 @@ def dev_move(configini):
     csv_dir_out = os.path.join(csv_dir, 'outlier_corrected_movement')
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
-    headers = ['Video', "frames_processed", 'Center_M1', "Ear_left_M1", "Ear_right_M1", "Lat_left_M1", "Lat_right_M1",
-               "Nose_M1", "Tail_base_M1", "Tail_end_M1", 'Center_M2', "Ear_left_M2", "Ear_right_M2", "Lat_left_M2",
-               "Lat_right_M2", "Nose_M2", "Tail_base_M2", "Tail_end_M2", "total_bodyparts_corrected"]
+    headers = ['Video', "frames_processed", 'Animal1_centroid', "Animal1_left_ear", "Animal1_right_ear", "Animal1_lateral_left", "Animal1_lateral_right",
+               "Animal1_nose", "Animal1_tail_base", "Animal1_tail_end", 'Animal2_centroid', "Animal2_left_ear", "Animal2_right_ear", "Animal2_lateral_left",
+               "Animal2_lateral_right", "Animal2_nose", "Animal2_tail_base", "Animal2_tail_end", "Sum"]
     log_df = pd.DataFrame(columns=headers)
 
     ########### logfile path ###########
-    log_fn = config.get('General settings', 'project_name')
-    log_fn = 'Outliers_corrected_movement_' + str(dateTime) + '.csv'
+    log_fn = 'Outliers_movement_' + str(dateTime) + '.csv'
     log_path = config.get('General settings', 'project_path')
     log_path = os.path.join(log_path, 'logs')
     log_fn = os.path.join(log_path, log_fn)
@@ -108,30 +99,17 @@ def dev_move(configini):
         return df
 
     ########### FIND CSV FILES ###########
-    if use_master == 'yes':
-        for i in os.listdir(csv_dir_in):
-            if i.__contains__(".csv"):
-                file = os.path.join(csv_dir_in, i)
-                filesFound.append(file)
-    if use_master == 'no':
-        config_folder_path = config.get('General settings', 'config_folder')
-        for i in os.listdir(config_folder_path):
-            if i.__contains__(".ini"):
-                configFilelist.append(os.path.join(config_folder_path, i))
-                iniVidName = i.split(".")[0]
-                csv_fn = iniVidName + '.csv'
-                file = os.path.join(csv_dir_in, csv_fn)
-                filesFound.append(file)
+    for i in os.listdir(csv_dir_in):
+        if i.__contains__(".csv"):
+            file = os.path.join(csv_dir_in, i)
+            filesFound.append(file)
+    print('Processing ' + str(len(filesFound)) + ' files for movement outliers...')
 
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
     for i in filesFound:
-        if use_master == 'no':
-            configFile = configFilelist[loopy]
-            config = ConfigParser()
-            config.read(configFile)
-            criterion = config.getint('Outlier settings', 'movement_criterion')
         loopy += 1
         currentFile = i
+        baseNameFile = os.path.basename(currentFile).replace('.csv', '')
         csv_df = pd.read_csv(currentFile,
                              names=["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
                                     "Ear_right_1_p", "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y",
@@ -148,12 +126,6 @@ def dev_move(configini):
         csv_df = csv_df.drop(csv_df.index[[0, 1, 2]])
         csv_df = csv_df.apply(pd.to_numeric)
 
-        if 'video_no' not in csv_df.columns:
-            videoNumber = os.path.basename(currentFile)
-            vNm = videoNumber
-            vNm_list.append(vNm)
-            videoNumber = re.sub("\D", "", videoNumber)
-            csv_df['video_no'] = videoNumber
         if 'frames' not in csv_df.columns:
             csv_df['frames'] = csv_df.index
 
@@ -353,10 +325,9 @@ def dev_move(configini):
 
         # csv_df_combined = csv_df_combined.drop(csv_df_combined.index[0:2])
         df_headers = pd.read_csv(currentFile, nrows=0)
-        df_headers['video_no'] = 0
-        df_headers['frames'] = 0
-        csv_df_combined['video_no'] = csv_df['video_no']
         csv_df_combined['frames'] = np.arange(len(csv_df_combined))
+        framesProcessed = csv_df_combined['frames'].max()
+        csv_df_combined = csv_df_combined.drop(['frames'], axis=1)
         csv_df_combined.columns = df_headers.columns
         csv_df_combined = pd.concat([df_headers, csv_df_combined])
         fileName = os.path.basename(currentFile)
@@ -368,8 +339,8 @@ def dev_move(configini):
         fixed_M1_pos = []
         fixed_M2_pos = []
         currentFixedList = []
-        currentFixedList.append(int(videoNumber))
-        currentFixedList.append(csv_df_combined['frames'].max())
+        currentFixedList.append(baseNameFile)
+        currentFixedList.append(framesProcessed)
         for k in list(dict_pos):
             if k.endswith('_x'):
                 del dict_pos[k]
@@ -386,12 +357,9 @@ def dev_move(configini):
         log_df.loc[loop] = currentFixedList
 
         loop = loop + 1
-        print(('Video ') + str(videoNumber) + str(' corrected. Total frames processed: ') + str(
-            csv_df_combined['frames'].max()) + '. Total bodyparts corrected mouse 1: ' + str(
-            sum(fixed_M1_pos)) + '. ' + 'Total bodyparts corrected mouse 2: ' + str(
-            sum(fixed_M2_pos)) + '. Percent body parts corrected: ' + str(
-            totalfixed / (csv_df_combined['frames'].max() * 16)) + '.')
+        print(str(baseNameFile) + '. Tot frames: '+ str(framesProcessed) + '. Outliers animal 1: ' + str(sum(fixed_M1_pos)) + '. ' + 'Outliers animal 2: ' + str(sum(fixed_M2_pos)) + '. % outliers: ' + str(round(totalfixed / (framesProcessed * 16), 3)) + '.')
 
-    log_df['%bodyparts_corrected'] = log_df['total_bodyparts_corrected'] / (log_df['frames_processed'] * 16)
-    log_df['Video'] = str('Video ') + log_df['Video'].apply(str)
+    log_df['% body parts corrected'] = log_df['Sum'] / (log_df['frames_processed'] * 16)
+    log_df['Video'] = log_df['Video'].apply(str)
     log_df.to_csv(log_fn, index=False)
+    print('Log for corrected "movement outliers" saved in project_folder/logs')

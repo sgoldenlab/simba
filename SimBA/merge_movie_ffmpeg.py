@@ -1,8 +1,5 @@
 import subprocess
 import os
-import cv2
-from os import listdir
-from os.path import isfile, join
 from configparser import ConfigParser
 import pandas as pd
 
@@ -19,6 +16,7 @@ def generatevideo_config_ffmpeg(configini):
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    print('Creating ' + str(len(allDirs)) + ' video(s)...')
 
     for dir in allDirs:
         currentDir = dir
@@ -29,14 +27,13 @@ def generatevideo_config_ffmpeg(configini):
         width = int(videoInfoDf['Resolution_width'])
         height = int(videoInfoDf['Resolution_height'])
         fileOut = str(currentDir) + str(fileformat)
-        currentFileList = [f for f in listdir(currentDir) if isfile(join(currentDir, f))]
-        imgPath = os.path.join(currentDir, currentFileList[0])
-        img = cv2.imread(imgPath)
         ffmpegFileName = os.path.join(currentDir, '%d.bmp')
-        command = str('ffmpeg -r ' + str(fps) + str(' -f image2 -s ') + str(height) + 'x' + str(width) + ' -i ' + str(
-            ffmpegFileName) + ' -vcodec libx264 -b ' + str(bitrate) + 'k ' + str(fileOut))
-        print(command)
+        print('Creating video ' + '"' + str(VideoName) + '"' + ' @' + str(fileOut))
+        command = str('ffmpeg -r ' + str(fps) + str(' -f image2 -s ') + str(height) + 'x' + str(width) + ' -i ' + str(ffmpegFileName) + ' -vcodec libx264 -b ' + str(bitrate) + 'k ' + str(fileOut))
         subprocess.call(command, shell=True)
+        print('Video ' + str(VideoName) + ' created.')
+    print('All video(s) created.')
+
 
 
 

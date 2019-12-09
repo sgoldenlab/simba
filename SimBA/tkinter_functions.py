@@ -17,7 +17,6 @@ def batch_convert_videoformat(directory,format1,format2):
             filesFound.append(i)
 
     def execute(command):
-        print(command)
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
 
     ########### DEFINE COMMAND ###########
@@ -30,7 +29,7 @@ def batch_convert_videoformat(directory,format1,format2):
         command = (str('ffmpeg -y -i ') + str(directory)+ '\\' + str(currentFile) + ' -c:v libx264 -crf 5 -preset medium -c:a libmp3lame -b:a 320k ' + str(directory) + '\\' + outFile)
 
         execute(command)
-        print('Video converted! ',output, ' is created')
+        print('Video converted! ',output, ' created.')
 
 
 
@@ -39,7 +38,6 @@ def generategif(filename,starttime,duration,size):
         print('Please make sure all the boxes are filled before continue')
     elif filename != '' and filename != 'No file selected':
         def execute(command):
-            print(command)
             subprocess.call(command, shell=True, stdout = subprocess.PIPE)
 
         currentFile = filename
@@ -54,7 +52,7 @@ def generategif(filename,starttime,duration,size):
         else:
             print('Generating gif...')
             execute(command)
-            print('Gif is generated,',output, ' is created')
+            print('Gif ', output, ' created.')
         return output
 
     else:
@@ -66,7 +64,6 @@ def downsamplevideo(width,height,filename):
         print('Please enter width and height to continue')
     elif filename != '' and filename !='No file selected':
         def execute(command):
-            print(command)
             subprocess.call(command, shell=True, stdout = subprocess.PIPE)
 
         ########### DEFINE COMMAND ###########
@@ -83,7 +80,7 @@ def downsamplevideo(width,height,filename):
         else:
             print('Downsampling video...')
             execute(command)
-            print('Video Downsampled! ',output, ' is created')
+            print('Video downsampled! ',output, 'created')
         return output
 
     else:
@@ -93,7 +90,6 @@ def greyscale(filename):
     if filename:
 
         def execute(command):
-            print(command)
             subprocess.call(command, shell=True, stdout = subprocess.PIPE)
 
         ########### DEFINE COMMAND ###########
@@ -120,7 +116,6 @@ def greyscale(filename):
 def superimposeframe(filename):
     if filename:
         def execute(command):
-            print(command)
             subprocess.call(command, shell=True, stdout = subprocess.PIPE)
 
         ########### DEFINE COMMAND ###########
@@ -164,14 +159,13 @@ def shortenvideos1(filename,starttime,endtime):
     elif filename != '' and filename != 'No file selected':
 
         def execute(command):
-            print(command)
             subprocess.call(command, shell=True, stdout = subprocess.PIPE)
 
         ########### DEFINE COMMAND ###########
 
         currentFile = filename
         outFile, fileformat = currentFile.split('.')
-        outFile = str(outFile) + '_shorten.mp4'
+        outFile = str(outFile) + '_clipped.mp4'
         output = os.path.basename(outFile)
 
         command = (str('ffmpeg -i ') + str(currentFile) + ' -ss ' + starttime + ' -to ' + endtime + ' -async 1 '+ outFile)
@@ -180,9 +174,9 @@ def shortenvideos1(filename,starttime,endtime):
         if file.exists():
             print(output, 'already exist')
         else:
-            print('Cutting video....')
+            print('Clipping video....')
             execute(command)
-            print(output,' is generated!')
+            print(output,' generated!')
         return output
 
 
@@ -274,7 +268,6 @@ def convertpowerpoint(filename):
     if filename:
 
         def execute(command):
-            print(command)
             subprocess.call(command, shell=True, stdout = subprocess.PIPE)
 
         ########### DEFINE COMMAND ###########
@@ -290,9 +283,9 @@ def convertpowerpoint(filename):
         if file.exists():
             print(output, 'already exist')
         else:
-            print('Making video into powerpoint compatible format... ')
+            print('Creating video in powerpoint compatible format... ')
             execute(command)
-            print('Video converted! ', output, ' is generated!')
+            print('Video converted! ', output, ' generated!')
         return output
     else:
         print('Please select a video to convert')
@@ -404,7 +397,7 @@ def mergemovebatch(dir,framespersec,vidformat,bit,imgformat):
         print(command)
         subprocess.call(command, shell=True)
 
-def changefps(dir,fps):
+def changefps_multivideo(dir,fps):
 
     currdir = os.listdir(dir)
     fpss = str(fps)
@@ -415,6 +408,15 @@ def changefps(dir,fps):
         command = str('ffmpeg -i ') + str(video) + ' -filter:v fps=fps=' + fpss + ' ' + output
         print(command)
         subprocess.call(command,shell=True)
+
+def changefps_singlevideo(filename,fps):
+    video = filename
+    outputname = (os.path.basename(video))[:-4]+ '_fps_' + str(fps)+ (os.path.basename(video))[-4:]
+    output = os.path.join(os.path.dirname(video),outputname)
+    command = str('ffmpeg -i ') + str(video) + ' -filter:v fps=fps=' + str(fps) + ' ' + output
+    print(command)
+    subprocess.call(command, shell=True)
+    print('Fps changed to',str(fps))
 
 # def rename(dir):
 #     filename = os.listdir(dir)
@@ -433,9 +435,7 @@ def extractspecificframe(filename,startframe1,endframe1):
     if not os.path.exists(pathDir):
         os.makedirs(pathDir)
 
-    print(amount_of_frames)
-
-    frames_OI = list(range(int(startframe1),int(endframe1)))
+    frames_OI = list(range(int(startframe1),int(endframe1)+1))
     #frames_OI.extend(range(7000,7200))
     #frames_OI.extend(range(9200,9350))
 
@@ -504,7 +504,6 @@ def cropvid(filenames):
         topLeftY = ROI[1]
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-        print(width,height,topLeftX,topLeftY)
 
         #crop video with ffmpeg
         fileOut, fileType = videoName.split(".", 2)
@@ -525,10 +524,10 @@ def cropvid(filenames):
                 print(command)
                 subprocess.call(command, shell=True)
                 os.remove(filePath)
-                print('video is cropped')
+                print('Cropped video saved!')
                 return fileOutName
             elif total ==0:
-                print('Video not cropped11')
+                print('Video not cropped')
 
         os.remove(filePath)
 

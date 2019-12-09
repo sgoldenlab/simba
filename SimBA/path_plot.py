@@ -5,22 +5,17 @@ from collections import deque
 import numpy as np
 import re
 from configparser import ConfigParser
-from datetime import datetime
 import seaborn as sns
 import imutils
 
 def path_plot_config(configini):
-
-    dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     pd.options.mode.chained_assignment = None
-
     config = ConfigParser()
     configFile = str(configini)
     config.read(configFile)
     frames_dir_out = config.get('Frame settings', 'frames_dir_out')
     frames_dir_out = os.path.join(frames_dir_out, 'path_plots')
-    use_master = config.get('General settings', 'use_master_config')
-    maxDequeLines = config.getint('Path plot settings', 'Deque_points')
+    maxDequeLines = config.getint('Path plot settings', 'deque_points')
     fileFormat = config.get('Path plot settings', 'file_format')
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
@@ -28,13 +23,10 @@ def path_plot_config(configini):
     csv_dir_in = os.path.join(csv_dir, 'machine_results')
     severity_brackets = config.getint('Path plot settings', 'severity_brackets')
     filesFound = []
-    configFilelist = []
-    loopy = 0
     vidInfPath = config.get('General settings', 'project_path')
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-    print(vidinfDf)
 
     severityGrades = list(np.arange(0, 1.0, ((10 / severity_brackets) / 10)))
     severityGrades.append(10)
@@ -54,63 +46,42 @@ def path_plot_config(configini):
         severityColour.append((b, g, r))
 
     ########### FIND CSV FILES ###########
-    if use_master == 'yes':
-        for i in os.listdir(csv_dir_in):
-            if i.__contains__(".csv"):
-                file = os.path.join(csv_dir_in, i)
-                filesFound.append(file)
-    if use_master == 'no':
-        config_folder_path = config.get('General settings', 'config_folder')
-        for i in os.listdir(config_folder_path):
-            if i.__contains__(".ini"):
-                configFilelist.append(os.path.join(config_folder_path, i))
-                iniVidName = i.split(".")[0]
-                csv_fn = iniVidName + '.csv'
-                file = os.path.join(csv_dir_in, csv_fn)
-                filesFound.append(file)
+    for i in os.listdir(csv_dir_in):
+        if i.__contains__(".csv"):
+            file = os.path.join(csv_dir_in, i)
+            filesFound.append(file)
+    print('Generating path plots for ' + str(len(filesFound)) + ' video(s)...')
     loopy = 0
-    loopys = 0
 
     for i in filesFound:
-        # fps = config.getint('Frame settings', 'fps')
-        maxDequeLines = 100
+        loopy+=1
         trackedBodyPart = config.get('Line plot settings', 'Bodyparts')
         severityBool = config.get('Path plot settings', 'plot_severity')
-        if use_master == 'no':
-            configFile = configFilelist[loopys]
-            config = ConfigParser()
-            config.read(configFile)
-            fps = config.getint('Frame settings', 'fps')
-            maxDequeLines = config.getint('Line plot settings', 'MaxLines')
-            trackedBodyPart = config.get('Line plot settings', 'Bodyparts')
-            resWidth = config.getint('Frame settings', 'resolution_width')
-            fps = config.getint('Frame settings', 'fps')
-            resHeight = config.getint('Frame settings', 'resolution_height')
-            severityBool = config.get('Path plot settings', 'plot_severity')
-        loopys += 1
         listPaths_mouse1 = deque(maxlen=maxDequeLines)
         listPaths_mouse2 = deque(maxlen=maxDequeLines)
         severityCircles = []
         loop = 0
         currentFile = i
         csv_df = pd.read_csv(currentFile, index_col=[0])
+        rowCount = csv_df.shape[0]
         CurrentVideoName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
-        print(videoSettings)
-        fps = int(videoSettings['fps'])
-        resWidth = int(videoSettings['Resolution_width'])
-        resHeight = int(videoSettings['Resolution_height'])
+        try:
+            resWidth = int(videoSettings['Resolution_width'])
+            resHeight = int(videoSettings['Resolution_height'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         filter_col = [col for col in csv_df if col.startswith(trackedBodyPart)][0:6]
         filter_col = [x for x in filter_col if "_p" not in x]
         shifted_headings = [x + '_shifted' for x in filter_col]
-        filter_col.append('attack_prediction')
+        filter_col.append('attack')
         filter_col.append('Scaled_movement_M1_M2')
         csv_df = csv_df[filter_col]
         csv_df_shifted = csv_df.shift(periods=1)
         csv_df_shifted = csv_df_shifted.rename(
             columns={filter_col[0]: shifted_headings[0], filter_col[1]: shifted_headings[1],
                      filter_col[2]: shifted_headings[2], filter_col[3]: shifted_headings[3]})
-        csv_df_shifted = csv_df_shifted.drop('attack_prediction', axis=1)
+        csv_df_shifted = csv_df_shifted.drop('attack', axis=1)
         csv_df_shifted = csv_df_shifted.drop('Scaled_movement_M1_M2', axis=1)
         csv_df_combined = pd.concat([csv_df, csv_df_shifted], axis=1, join='inner')
         csv_df_combined = csv_df_combined.fillna(0)
@@ -124,16 +95,13 @@ def path_plot_config(configini):
         if not os.path.exists(savePath):
             os.makedirs(savePath)
 
-        img_size = (maxImageSizeColumn_y + 10, maxImageSizeColumn_x + 10, 3)
-        img = np.ones(img_size) * 255
+        img_size = (maxImageSizeColumn_y, maxImageSizeColumn_x, 3)
 
         for index, row in csv_df_combined.iterrows():
             img = np.ones(img_size) * 255
             overlay = img.copy()
-            m1tuple = (
-            int(row[columnNames[0]]), int(row[columnNames[1]]), int(row[columnNames[6]]), (int(row[columnNames[7]])))
-            m2tuple = (
-            int(row[columnNames[2]]), int(row[columnNames[3]]), int(row[columnNames[8]]), (int(row[columnNames[9]])))
+            m1tuple = (int(row[columnNames[0]]), int(row[columnNames[1]]), int(row[columnNames[6]]), (int(row[columnNames[7]])))
+            m2tuple = (int(row[columnNames[2]]), int(row[columnNames[3]]), int(row[columnNames[8]]), (int(row[columnNames[9]])))
             if index == 0:
                 m1tuple = (0, 0, 0, 0)
                 m2tuple = (0, 0, 0, 0)
@@ -166,9 +134,10 @@ def path_plot_config(configini):
             cv2.circle(image_new, (m2tuple[0], m2tuple[1]), 20, (0, 128, 0), -1)
             saveName = str(loop) + str(fileFormat)
             imageSaveName = os.path.join(savePath, saveName)
-            image_new = imutils.resize(image_new, width=200)
+            image_new = imutils.resize(image_new, width=400)
             if img_size[0] < img_size[1]:
-                image_new = ndimage.rotate(image_new, 90)
+                image_new = imutils.rotate_bound(image_new, 90.0000)
             cv2.imwrite(imageSaveName, image_new)
             loop += 1
-            print(str('Image generated:' + str(loop)))
+            print('Path plot ' + str(loop) + '/' + str(rowCount) + ' for video ' + str(loopy) + '/' + str(len(filesFound)))
+    print('Finished generating path plots. Plots are saved @ project_folder/frames/output/path_plots')
