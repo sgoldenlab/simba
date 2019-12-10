@@ -27,7 +27,6 @@ def ganntplot_config(configini):
     colours = ['red', 'green', 'pink', 'orange', 'blue', 'purple', 'lavender', 'grey', 'sienna', 'tomato', 'azure',
                'crimson', 'aqua', 'plum', 'teal', 'maroon', 'lime', 'coral']
     colourTupleX = list(np.arange(3.5, 203.5, 5))
-    configFilelist = []
     loopy = 0
 
     ########### FIND CSV FILES ###########
@@ -49,14 +48,12 @@ def ganntplot_config(configini):
     for i in filesFound:
         boutsDf = pd.DataFrame(columns=['Event', 'Start_frame', 'End_frame'])
         currentFile = i
-        if use_master == 'no':
-            configFile = configFilelist[loopy]
-            config = ConfigParser()
-            config.read(configFile)
-            fps = config.getint('Frame settings', 'fps')
         CurrentVideoName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
-        fps = int(videoSettings['fps'])
+        try:
+            fps = int(videoSettings['fps'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         loopy += 1
         dataDf = pd.read_csv(currentFile)
         dataDf['frames'] = np.arange(len(dataDf))

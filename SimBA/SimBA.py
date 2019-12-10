@@ -307,6 +307,7 @@ class processvid_menu:
 
         #compiling all the commands into list
         all_list = copyvideos + crop + shorten + downsample + grayscale + superimpose
+        print(len(all_list))
         #creating text file
         filepath = self.outputdir + '\\' + 'process_video_define.txt'
 
@@ -373,13 +374,24 @@ class batch_processvideo:
         self.outputfolder = FolderSelect(label_videoselection,'Output directory:',title='Select a folder for your output videos')
 
         #create list of all videos in the videos folder
-        button_cL = Button(label_videoselection,text='Confirm',command=lambda:processvid_menu(self.folder1Select.folder_path,self.outputfolder.folder_path))
+        button_cL = Button(label_videoselection,text='Confirm',command=self.confirmtable)
 
         #organize
         label_videoselection.grid(row=0,sticky=W)
         self.folder1Select.grid(row=0,sticky=W)
         self.outputfolder.grid(row=1,sticky=W)
         button_cL.grid(row=2,sticky=W)
+
+    def confirmtable(self):
+
+        if (self.outputfolder.folder_path!='No folder selected')and(self.folder1Select.folder_path!='No folder selected'):
+            processvid_menu(self.folder1Select.folder_path, self.outputfolder.folder_path)
+        elif (self.outputfolder.folder_path=='No folder selected'):
+            print('Please select an output folder')
+        elif (self.folder1Select.folder_path == 'No folder selected'):
+            print('Please select a folder with videos')
+        else:
+            print('Please select folder with videos and the output directory')
 
 class outlier_settings:
     def __init__(self,configini):
@@ -489,43 +501,46 @@ class outlier_settings:
         button_setvalues.grid(row=3,pady=10)
 
     def set_outliersettings(self):
-        movement_bodyPart1_mouse1 = self.var1.get()
-        movement_bodyPart2_mouse1 = self.var2.get()
-        movement_bodyPart1_mouse2 = self.var3.get()
-        movement_bodyPart2_mouse2 = self.var4.get()
+        try:
+            movement_bodyPart1_mouse1 = self.var1.get()
+            movement_bodyPart2_mouse1 = self.var2.get()
+            movement_bodyPart1_mouse2 = self.var3.get()
+            movement_bodyPart2_mouse2 = self.var4.get()
 
-        location_bodyPart1_mouse1 = self.mvar1.get()
-        location_bodyPart2_mouse1 = self.mvar2.get()
-        location_bodyPart1_mouse2 = self.mvar3.get()
-        location_bodyPart2_mouse2 = self.mvar4.get()
+            location_bodyPart1_mouse1 = self.mvar1.get()
+            location_bodyPart2_mouse1 = self.mvar2.get()
+            location_bodyPart1_mouse2 = self.mvar3.get()
+            location_bodyPart2_mouse2 = self.mvar4.get()
 
-        movementcriterion = self.movement_criterion.entry_get
-        locationcriterion = self.location_criterion.entry_get
+            movementcriterion = self.movement_criterion.entry_get
+            locationcriterion = self.location_criterion.entry_get
 
-        mean_or_median = self.medianvar.get()
+            mean_or_median = self.medianvar.get()
 
-        # export settings to config ini file
-        configini = self.configini
-        config = ConfigParser()
-        config.read(configini)
+            # export settings to config ini file
+            configini = self.configini
+            config = ConfigParser()
+            config.read(configini)
 
-        config.set('Outlier settings', 'movement_criterion', str(movementcriterion))
-        config.set('Outlier settings', 'location_criterion', str(locationcriterion))
-        config.set('Outlier settings', 'movement_bodyPart1_mouse1', str(movement_bodyPart1_mouse1))
-        config.set('Outlier settings', 'movement_bodyPart2_mouse1', str(movement_bodyPart2_mouse1))
-        config.set('Outlier settings', 'movement_bodyPart1_mouse2', str(movement_bodyPart1_mouse2))
-        config.set('Outlier settings', 'movement_bodyPart2_mouse2', str(movement_bodyPart2_mouse2))
-        config.set('Outlier settings', 'location_bodyPart1_mouse1', str(location_bodyPart1_mouse1))
-        config.set('Outlier settings', 'location_bodyPart2_mouse1', str(location_bodyPart2_mouse1))
-        config.set('Outlier settings', 'location_bodyPart1_mouse2', str(location_bodyPart1_mouse2))
-        config.set('Outlier settings', 'location_bodyPart2_mouse2', str(location_bodyPart2_mouse2))
-        config.set('Outlier settings', 'mean_or_median', str(mean_or_median))
+            config.set('Outlier settings', 'movement_criterion', str(movementcriterion))
+            config.set('Outlier settings', 'location_criterion', str(locationcriterion))
+            config.set('Outlier settings', 'movement_bodyPart1_mouse1', str(movement_bodyPart1_mouse1))
+            config.set('Outlier settings', 'movement_bodyPart2_mouse1', str(movement_bodyPart2_mouse1))
+            config.set('Outlier settings', 'movement_bodyPart1_mouse2', str(movement_bodyPart1_mouse2))
+            config.set('Outlier settings', 'movement_bodyPart2_mouse2', str(movement_bodyPart2_mouse2))
+            config.set('Outlier settings', 'location_bodyPart1_mouse1', str(location_bodyPart1_mouse1))
+            config.set('Outlier settings', 'location_bodyPart2_mouse1', str(location_bodyPart2_mouse1))
+            config.set('Outlier settings', 'location_bodyPart1_mouse2', str(location_bodyPart1_mouse2))
+            config.set('Outlier settings', 'location_bodyPart2_mouse2', str(location_bodyPart2_mouse2))
+            config.set('Outlier settings', 'mean_or_median', str(mean_or_median))
 
 
-        with open(configini, 'w') as configfile:
-            config.write(configfile)
+            with open(configini, 'w') as configfile:
+                config.write(configfile)
 
-        print('Outlier settings updated in project_config.ini')
+            print('Outlier settings updated in project_config.ini')
+        except:
+            print('Fail to update settings, please load config.ini file to proceed.')
 
 class FolderSelect(Frame):
     def __init__(self,parent=None,folderDescription="",color=None,title=None,**kw):
@@ -945,16 +960,14 @@ class create_project_DLC:
         #Experimenter name
         self.label_experimentername = Entry_Box(self.label_dlc_createproject,'Experimenter name','16')
 
-
         #button 1
         button_videofol = Button(self.label_dlc_createproject,text='Import Single Video',command=self.changetovideo2,fg='blue')
         #button 2
         button_videofo2 = Button(self.label_dlc_createproject,text='Import Multiple Videos',command=self.changetovideo,fg='green4')
 
         # Video Path
-        self.videopath1selected = FolderSelect(self.label_dlc_createproject, 'Video folder             ',title='Select folder with videos',color='green4')
+        self.videopath1selected = FolderSelect(self.label_dlc_createproject, 'Video Folder          ',title='Select folder with videos',color='green4')
         self.videopath1selected.grid(row=4, sticky=W)
-
 
         #video folder
         self.folderpath1selected = FolderSelect(self.label_dlc_createproject,'Project directory   ',title='Select main directory')
@@ -988,15 +1001,14 @@ class create_project_DLC:
 
     def changetovideo(self):
         self.videopath1selected.grid_remove()
-        self.videopath1selected = FolderSelect(self.label_dlc_createproject, 'Video Folder             ',title='Select folder with videos',color='green4')
+        self.videopath1selected = FolderSelect(self.label_dlc_createproject, 'Video Folder          ',title='Select folder with videos',color='green4')
         self.videopath1selected.grid(row=4, sticky=W)
 
 
     def changetovideo2(self):
         self.videopath1selected.grid_remove()
-        self.videopath1selected = FileSelect(self.label_dlc_createproject, 'Video path                ',color='blue',title='Select a video file')
+        self.videopath1selected = FileSelect(self.label_dlc_createproject, 'Video path             ',color='blue',title='Select a video file')
         self.videopath1selected.grid(row=4, sticky=W)
-
 
     def createprojectcommand(self):
         projectname = self.label_projectname.entry_get
@@ -1009,21 +1021,27 @@ class create_project_DLC:
         if 'FileSelect' in str(type(self.videopath1selected)):
             videolist = [self.videopath1selected.file_path]
         else:
-            videolist = []
+            try:
+                videolist = []
 
-            for i in os.listdir(self.videopath1selected.folder_path):
-                if ('.avi' or '.mp4') in i:
-                    i = self.videopath1selected.folder_path + '\\' + i
-                    videolist.append(i)
-
+                for i in os.listdir(self.videopath1selected.folder_path):
+                    if ('.avi' or '.mp4') in i:
+                        i = self.videopath1selected.folder_path + '\\' + i
+                        videolist.append(i)
+            except:
+                print('Please select a video folder to import videos')
 
         if self.var_changeyaml.get()==1:
-            config_path = deeplabcut.create_new_project(str(projectname), str(experimentalname), videolist,working_directory=str(self.folderpath1selected.folder_path), copy_videos=copyvid)
-            changedlc_config(config_path)
-
+            if (projectname !='') and (experimentalname !='') and ('No'and'selected' not in videolist) and (self.folderpath1selected.folder_path!='No folder selected'):
+                config_path = deeplabcut.create_new_project(str(projectname), str(experimentalname), videolist,working_directory=str(self.folderpath1selected.folder_path), copy_videos=copyvid)
+                changedlc_config(config_path)
+            else:
+                print('Please make sure all the information are filled in')
         else:
-            config_path = deeplabcut.create_new_project(str(projectname), str(experimentalname), videolist,working_directory=str(self.folderpath1selected.folder_path), copy_videos=copyvid)
-
+            if (projectname != '') and (experimentalname != '') and ('No' and 'selected' not in videolist) and (self.folderpath1selected.folder_path != 'No folder selected'):
+                config_path = deeplabcut.create_new_project(str(projectname), str(experimentalname), videolist,working_directory=str(self.folderpath1selected.folder_path), copy_videos=copyvid)
+            else:
+                print('Please make sure all the information are filled in')
 class Load_DLC_Model:
 
     def __init__(self):
@@ -1243,44 +1261,49 @@ class Load_DLC_Model:
         scrollbar_lm.update()
 
     def dlc_addsinglevideo(self):
-
         try:
-            deeplabcut.add_new_videos(self.label_set_configpath.file_path, [str(self.label_set_singlevid.file_path)],
-                                      copy_videos=True)
+            deeplabcut.add_new_videos(self.label_set_configpath.file_path, [str(self.label_set_singlevid.file_path)],copy_videos=True)
         except FileNotFoundError:
             print('...')
-            print('Failed to copy videos, no file selected')
+            print('Fail to add video, please load .yaml file and select video file')
 
     def generateyamlmulti(self):
-        config_path = self.label_set_configpath.file_path
-        directory = self.label_genyamlmultivideo.folder_path
-        filesFound = []
+        try:
 
-        ########### FIND FILES ###########
-        for i in os.listdir(directory):
-            if '.avi' or '.mp4' in i:
-                a = os.path.join(directory, i)
-                filesFound.append(a)
-                print(a)
-        print(filesFound)
+            config_path = self.label_set_configpath.file_path
+            directory = self.label_genyamlmultivideo.folder_path
+            filesFound = []
 
-        generatetempyaml_multi(config_path,filesFound)
+            ########### FIND FILES ###########
+            for i in os.listdir(directory):
+                if '.avi' or '.mp4' in i:
+                    a = os.path.join(directory, i)
+                    filesFound.append(a)
+                    print(a)
+            print(filesFound)
 
+            generatetempyaml_multi(config_path,filesFound)
+        except FileNotFoundError:
+            print('Fail to add videos, please load .yaml file and select video folder')
 
     def dlc_addmultivideo_command(self):
-        config_path = self.label_set_configpath.file_path
-        directory = self.label_video_folder.folder_path
-        filesFound = []
+        try:
+            config_path = self.label_set_configpath.file_path
+            directory = self.label_video_folder.folder_path
+            filesFound = []
 
-        ########### FIND FILES ###########
-        for i in os.listdir(directory):
-            if 'avi' or '.mp4' in i:
-                a = os.path.join(directory, i)
-                deeplabcut.add_new_videos(config_path, [str(a)], copy_videos=True)
+            ########### FIND FILES ###########
+            for i in os.listdir(directory):
+                if 'avi' or '.mp4' in i:
+                    a = os.path.join(directory, i)
+                    deeplabcut.add_new_videos(config_path, [str(a)], copy_videos=True)
 
-        print("Videos added.")
+            print("Videos added.")
+        except FileNotFoundError:
+            print('Fail to add videos, please load .yaml file and select video folder')
 
     def dlc_extractframes_command(self):
+
         config_path = self.label_set_configpath.file_path
         select_numfram2pick(config_path,self.label_numframes2pick.entry_get)
 
@@ -1313,67 +1336,89 @@ class Load_DLC_Model:
             useopencv = True
         else:
             useopencv = False
-
-        print(config_path,modes,algorithm,clusterstep,clusterresizewidth,clustercolor,useopencv)
-        deeplabcut.extract_frames(config_path,mode=modes,algo=algorithm,crop=False,userfeedback=False,cluster_step=clusterstep,cluster_resizewidth=clusterresizewidth,cluster_color=clustercolor,opencv=useopencv)
-
+        try:
+            print(config_path,modes,algorithm,clusterstep,clusterresizewidth,clustercolor,useopencv)
+            deeplabcut.extract_frames(config_path,mode=modes,algo=algorithm,crop=False,userfeedback=False,cluster_step=clusterstep,cluster_resizewidth=clusterresizewidth,cluster_color=clustercolor,opencv=useopencv)
+        except:
+            print('Fail to extract frames, please make sure all the information is filled in')
 
     def dlc_label_frames_command(self):
         config_path = self.label_set_configpath.file_path
         deeplabcut.label_frames(config_path)
 
     def dlc_check_labels_command(self):
-        config_path = self.label_set_configpath.file_path
-        deeplabcut.check_labels(config_path)
+        try:
+            config_path = self.label_set_configpath.file_path
+            deeplabcut.check_labels(config_path)
+        except FileNotFoundError:
+            print('Please load .yaml file to continue')
 
     def dlc_generate_trainingsets_command(self):
-        config_path = self.label_set_configpath.file_path
-        deeplabcut.create_training_dataset(config_path, num_shuffles=1)
+        try:
+            config_path = self.label_set_configpath.file_path
+            deeplabcut.create_training_dataset(config_path, num_shuffles=1)
+        except FileNotFoundError:
+            print('Please load .yaml file to continue')
 
     def dlc_train_network_command(self):
-        config_path = self.label_set_configpath.file_path
-        deeplabcut.train_network(config_path, shuffle=1, gputouse=0)
+        try:
+            config_path = self.label_set_configpath.file_path
+            deeplabcut.train_network(config_path, shuffle=1, gputouse=0)
+        except FileNotFoundError:
+            print('Please load .yaml file to continue')
 
     def dlc_evaluate_network_command(self):
-        config_path = self.label_set_configpath.file_path
-        deeplabcut.evaluate_network(config_path, plotting=True)
+        try:
+            config_path = self.label_set_configpath.file_path
+            deeplabcut.evaluate_network(config_path, plotting=True)
+        except FileNotFoundError:
+            print('Please load .yaml file to continue')
 
     def dlc_video_analysis_command1(self):
+        try:
+            config_path = self.label_set_configpath.file_path
 
-        config_path = self.label_set_configpath.file_path
+            vid_name = os.path.basename(self.videoanalysispath.file_path)
+            vid_type = vid_name[-4:]
 
-        vid_name = os.path.basename(self.videoanalysispath.file_path)
-        vid_type = vid_name[-4:]
-
-        deeplabcut.analyze_videos(config_path, [str(self.videoanalysispath.file_path)], shuffle=1,save_as_csv=True, videotype=vid_type)
+            deeplabcut.analyze_videos(config_path, [str(self.videoanalysispath.file_path)], shuffle=1,save_as_csv=True, videotype=vid_type)
+        except FileNotFoundError:
+            print('Please load .yaml file and select video path to continue')
 
     def dlc_video_analysis_command2(self):
+        try:
+            config_path = self.label_set_configpath.file_path
 
-        config_path = self.label_set_configpath.file_path
+            folder_path = self.videofolderpath.folder_path
+            vid_type = self.video_type.entry_get
 
-        folder_path = self.videofolderpath.folder_path
-        vid_type = self.video_type.entry_get
+            deeplabcut.analyze_videos(config_path, [str(folder_path)], shuffle=1,save_as_csv=True, videotype=vid_type)
+        except FileNotFoundError:
+            print('Please load .yaml file and select folder with videos to continue')
 
-        deeplabcut.analyze_videos(config_path, [str(folder_path)], shuffle=1,save_as_csv=True, videotype=vid_type)
 
     def dlc_plot_videoresults_command(self):
-        config_path = self.label_set_configpath.file_path
+        try:
 
-        deeplabcut.plot_trajectories(config_path, [str(self.videoplotpath.file_path)])
+            config_path = self.label_set_configpath.file_path
+            deeplabcut.plot_trajectories(config_path, [str(self.videoplotpath.file_path)])
+        except FileNotFoundError:
+            print('Please load .yaml file and select a video file to plot graph')
 
     def dlc_create_video_command(self):
-        config_path = self.label_set_configpath.file_path
+        try:
+            config_path = self.label_set_configpath.file_path
 
-        if self.var_saveframes==1:
-            saveframes=True
+            if self.var_saveframes==1:
+                saveframes=True
+            else:
+                saveframes=False
+            vid_name = os.path.basename(self.createvidpath.file_path)
+            vid_type = vid_name[-4:]
 
-        else:
-            saveframes=False
-
-        vid_name = os.path.basename(self.createvidpath.file_path)
-        vid_type = vid_name[-4:]
-
-        deeplabcut.create_labeled_video(config_path, [str(self.createvidpath.file_path)],save_frames=saveframes, videotype=vid_type)
+            deeplabcut.create_labeled_video(config_path, [str(self.createvidpath.file_path)],save_frames=saveframes, videotype=vid_type)
+        except FileNotFoundError:
+            print('Please select .yaml file and select a video to continue.')
 
 class shorten_video:
 
@@ -1820,11 +1865,11 @@ class project_config:
         label_multivideoimport = LabelFrame(label_importvideo, text='Import multiple videos', pady=5, padx=5)
         self.multivideofolderpath = FolderSelect(label_multivideoimport, 'Folder path',title='Select Folder with videos')
         self.video_type = Entry_Box(label_multivideoimport, 'Format (i.e., mp4, avi):', '18')
-        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command=lambda: copy_multivideo_ini(self.configinifile,self.multivideofolderpath.folder_path,self.video_type.entry_get),fg='red')
+        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command= self.import_multivid,fg='red')
         # singlevideo
         label_singlevideoimport = LabelFrame(label_importvideo, text='Import single video', pady=5, padx=5)
         self.singlevideopath = FileSelect(label_singlevideoimport, "Video path",title='Select a video file')
-        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',command=lambda: copy_singlevideo_ini(self.configinifile,self.singlevideopath.file_path),fg='red')
+        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',command= self.import_singlevid,fg='red')
 
 
         #import all csv file into project folder
@@ -1832,11 +1877,11 @@ class project_config:
         #multicsv
         label_multicsvimport = LabelFrame(label_import_csv, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport,'Folder Select:',title='Select Folder with .csv(s)')
-        button_import_csv = Button(label_multicsvimport,text='Import csv to project folder',command=lambda:copy_allcsv_ini(self.configinifile,self.folder_csv.folder_path),fg='red')
+        button_import_csv = Button(label_multicsvimport,text='Import csv to project folder',command = self.import_multicsv,fg='red')
         #singlecsv
         label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv files', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport,'File Select',title='Select a .csv file')
-        button_importsinglecsv = Button(label_singlecsvimport,text='Import single csv to project folder',command=lambda :copy_singlecsv_ini(self.configinifile,self.file_csv.file_path),fg='red')
+        button_importsinglecsv = Button(label_singlecsvimport,text='Import single csv to project folder',command=self.import_singlecsv,fg='red')
 
 
         #extract videos in projects
@@ -1890,6 +1935,31 @@ class project_config:
 
         projectconfig.update()
 
+    def import_singlecsv(self):
+        try:
+            copy_singlecsv_ini(self.configinifile, self.file_csv.file_path)
+        except:
+            print('Please select csv file to proceed')
+
+    def import_multicsv(self):
+        try:
+            copy_allcsv_ini(self.configinifile, self.folder_csv.folder_path)
+        except:
+            print('Please select folder with csv to proceed')
+
+    def import_multivid(self):
+
+        try:
+            copy_multivideo_ini(self.configinifile, self.multivideofolderpath.folder_path, self.video_type.entry_get)
+        except:
+            print('Please select a folder containing the videos and enter the correct video format to proceed')
+
+    def import_singlevid(self):
+        try:
+            copy_singlevideo_ini(self.configinifile, self.singlevideopath.file_path)
+        except:
+            print('Please select a video to proceed')
+
     def addBox(self,scroll):
 
         frame = Frame(self.label_smlsettings)
@@ -1905,24 +1975,11 @@ class project_config:
         ent1 = Entry(frame)
         ent1.grid(row=0, column=1,sticky=W)
         self.all_entries.append(ent1)
-
-        # self.modelPath = StringVar()
-        # modelpath = Button(frame,text='Browse',command=self.setFilepath)
-        # modelpath.grid(row=0,column=2,sticky=W)
-        # CreateToolTip(modelpath,'Path to existing model. If generating a new model, leave path blank')
-        #
-        # chosenfile = Entry(frame,textvariable=self.modelPath,width=80)
-        # chosenfile.grid(row=0,column=3,sticky=W)
-        # self.modelPath.set('No classifier is selected')
-        #
-        # self.allmodels.append(chosenfile)
         scroll.update()
 
     def setFilepath(self):
         file_selected = askopenfilename()
         self.modelPath.set(file_selected)
-
-
 
     def make_projectini(self):
         #get input from user
@@ -1938,7 +1995,7 @@ class project_config:
         target_list = []
         for number, ent1 in enumerate(self.all_entries):
             target_list.append(ent1.get())
-        print(target_list)
+        #print(target_list)
 
         # model_list = []
         # for numbers, ent2 in enumerate(self.allmodels):
@@ -1957,33 +2014,14 @@ class project_config:
         except:
             print('Please fill in the information correctly.')
 
-        # dest1 = str(str(project_path)+'\\'+str(project_name) +'\\models\\')
-        # count=0
-        # for f in model_list:
-        #     try:
-        #         filetocopy = os.path.basename(f)
-        #
-        #         if filetocopy[-4:] != '.sav':
-        #             print('The classifier selected is not a .sav file')
-        #
-        #         elif os.path.exists(dest1+str(target_list[count])+'.sav'):
-        #             print(f, 'already exist in', dest1)
-        #
-        #         elif not os.path.exists(dest1 + '\\' + filetocopy):
-        #             print('Copying previous models...')
-        #             shutil.copy(f, dest1)
-        #             os.rename(dest1+filetocopy,dest1+str(target_list[count])+'.sav')
-        #             print(f, 'copied to', dest1)
-        #             count += 1
-        #     except FileNotFoundError:
-        #         print('No path inserted: The user has decided to create their own models')
-        #
-        # print('Finished generating Project Config.')
 
     def extract_frames(self):
-        videopath = str(os.path.dirname(self.configinifile) + '\\videos')
+        try:
+            videopath = str(os.path.dirname(self.configinifile) + '\\videos')
 
-        extract_frames_ini(videopath)
+            extract_frames_ini(videopath)
+        except:
+            print('Please make sure videos are imported and located in /project_folder/videos')
 
 class loadprojectini:
     def __init__(self):
@@ -2005,12 +2043,11 @@ class loadprojectini:
         # multicsv
         label_multicsvimport = LabelFrame(label_import_csv, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:',title='Select Folder with .csv(s)')
-        button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',command=lambda: copy_allcsv_ini(self.projectconfigini.file_path, self.folder_csv.folder_path),fg='red')
+        button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',command= self.importdlctracking_multi,fg='red')
         # singlecsv
         label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv files', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport, 'File selected',title='Select a .csv file')
-        button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',command=lambda: copy_singlecsv_ini(self.projectconfigini.file_path, self.file_csv.file_path),fg='red')
-
+        button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',command= self.importdlctracking_single,fg='red')
 
         #import videos
         label_importvideo = LabelFrame(label_import, text='Import further videos into project folder', font=("Helvetica",12,'bold'), padx=15,pady=5,fg='blue')
@@ -2018,12 +2055,11 @@ class loadprojectini:
         label_multivideoimport = LabelFrame(label_importvideo, text='Import multiple videos', pady=5, padx=5)
         self.multivideofolderpath = FolderSelect(label_multivideoimport, 'Folder path',title='Select Folder with videos')
         self.video_type = Entry_Box(label_multivideoimport, 'File format (i.e., mp4/avi):', '20')
-        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command=lambda: copy_multivideo_ini(self.projectconfigini.file_path,self.multivideofolderpath.folder_path, self.video_type.entry_get), fg='red')
+        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command=self.importvideo_multi, fg='red')
         # singlevideo
         label_singlevideoimport = LabelFrame(label_importvideo, text='Import single video', pady=5, padx=5)
         self.singlevideopath = FileSelect(label_singlevideoimport, "Video Path",title='Select a video file')
-        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',
-                                          command=lambda: copy_singlevideo_ini(self.projectconfigini.file_path,self.singlevideopath.file_path),fg='red')
+        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',command= self.importvideo_single,fg='red')
 
         #extract frames in project folder
         label_extractframes = LabelFrame(label_import, text='Extract further frames into project folder', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='blue')
@@ -2032,13 +2068,13 @@ class loadprojectini:
         #import frames
         label_importframefolder = LabelFrame(label_import, text='Import frame folders', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='blue')
         self.frame_folder = FolderSelect(label_importframefolder,'Main frame directory',title='Select the main directory with frame folders')
-        button_importframefolder = Button(label_importframefolder,text='Import frames',command = lambda :copy_frame_folders(self.frame_folder.folder_path,self.projectconfigini.file_path))
+        button_importframefolder = Button(label_importframefolder,text='Import frames',command = self.importframefolder )
 
         #get coordinates
         label_setscale = LabelFrame(scroll,text='Video parameters (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='blue')
         self.distanceinmm = Entry_Box(label_setscale, 'Known distance (mm)', '18')
         button_setdistanceinmm = Button(label_setscale, text='Autopopulate table',command=lambda: self.set_distancemm(self.distanceinmm.entry_get))
-        button_setscale = Button(label_setscale,text='Set video parameters',command=lambda:video_info_table(self.projectconfigini.file_path))
+        button_setscale = Button(label_setscale,text='Set video parameters',command=self.setvideoparameter)
 
         #outlier correction
         label_outliercorrection = LabelFrame(scroll,text='Outlier correction',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
@@ -2050,7 +2086,7 @@ class loadprojectini:
 
         #extract features
         label_extractfeatures = LabelFrame(scroll,text='Extract Features',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
-        button_extractfeatures = Button(label_extractfeatures,text='Extract Features',command=lambda:extract_features_wotarget(self.projectconfigini.file_path))
+        button_extractfeatures = Button(label_extractfeatures,text='Extract Features',command=self.extractfeatures)
 
         #label Behavior
         label_labelaggression = LabelFrame(scroll,text='Label Behavior',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
@@ -2058,9 +2094,9 @@ class loadprojectini:
 
         #train machine model
         label_trainmachinemodel = LabelFrame(scroll,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='blue')
-        button_trainmachinesettings = Button(label_trainmachinemodel,text='Settings',command=lambda:trainmachinemodel_settings(self.projectconfigini.file_path))
-        button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command=lambda:trainmodel2(self.projectconfigini.file_path))
-        button_train_multimodel = Button(label_trainmachinemodel, text='Train multiple models, one for each saved settings',fg='green',command=lambda: train_multimodel(self.projectconfigini.file_path))
+        button_trainmachinesettings = Button(label_trainmachinemodel,text='Settings',command=self.trainmachinemodelsetting)
+        button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command=self.trainsinglemodel)
+        button_train_multimodel = Button(label_trainmachinemodel, text='Train multiple models, one for each saved settings',fg='green',command=self.trainmultimodel)
 
         ##Single classifier valid
         label_model_validation = LabelFrame(scroll,text='Validate Model on Single Video',pady=5, padx=5,font=("Helvetica",12,'bold'),fg='blue')
@@ -2068,35 +2104,33 @@ class loadprojectini:
         self.modelfile = FileSelect(label_model_validation,'Select model file  ',title='Select the model (.sav) file')
         self.dis_threshold = Entry_Box(label_model_validation,'Discrimination threshold','28')
         self.min_behaviorbout = Entry_Box(label_model_validation,'Minimum behavior bout length(ms)','28')
-        button_validate_model = Button(label_model_validation,text='validate',command = lambda:validate_model_one_vid(self.projectconfigini.file_path,self.csvfile.file_path,self.modelfile.file_path,self.dis_threshold.entry_get,self.min_behaviorbout.entry_get))
+        button_validate_model = Button(label_model_validation,text='validate',command = self.validatemodelsinglevid)
 
         #run machine model
         label_runmachinemodel = LabelFrame(scroll,text='Run Machine Model',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='blue')
-        button_run_rfmodelsettings = Button(label_runmachinemodel,text='Model Selection',command=lambda:runmachinemodelsettings(self.projectconfigini.file_path))
+        button_run_rfmodelsettings = Button(label_runmachinemodel,text='Model Selection',command=self.modelselection)
         self.descrimination_threshold = Entry_Box(label_runmachinemodel,'Discrimination threshold','28')
         self.shortest_bout = Entry_Box(label_runmachinemodel,'Minimum behavior bout length(ms)','28')
-        # button_set_d_t = Button(label_runmachinemodel,text='Set',command =lambda:self.set_discrimination_threshold(self.descrimination_threshold.entry_get))
-        # button_set_shortbout = Button(label_runmachinemodel,text='Set',command = lambda:self.set_shortestbout(self.shortest_bout.entry_get))
-        button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command=lambda:rfmodel(self.projectconfigini.file_path,self.descrimination_threshold.entry_get,self.shortest_bout.entry_get))
+        button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command=self.runrfmodel)
 
         # machine results
         label_machineresults = LabelFrame(scroll,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='blue')
-        button_process_datalog = Button(label_machineresults,text='Analyze',command=lambda:analyze_process_data_log(self.projectconfigini.file_path))
-        button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=lambda:analyze_process_movement(self.projectconfigini.file_path))
-        button_process_severity = Button(label_machineresults,text='Analyze attack severity',command=lambda:analyze_process_severity(self.projectconfigini.file_path))
+        button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
+        button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=self.analyzeprocessmovement)
+        button_process_severity = Button(label_machineresults,text='Analyze attack severity',command=self.analyzseverity)
 
         #plot sklearn res
         label_plotsklearnr = LabelFrame(scroll,text='Sklearn visualization',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
-        button_plotsklearnr = Button(label_plotsklearnr,text='Visualiza classification results',command =lambda:plotsklearnresult(self.projectconfigini.file_path))
+        button_plotsklearnr = Button(label_plotsklearnr,text='Visualize classification results',command =self.plotsklearn_result)
 
         #plotpathing
         label_plotall = LabelFrame(scroll,text='Visualizations',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
         #ganttplot
         label_ganttplot = LabelFrame(label_plotall,text='Gantt plot',pady=5,padx=5)
-        button_ganttplot = Button(label_ganttplot,text='Generate gantt plot',command=lambda:ganntplot_config(self.projectconfigini.file_path))
+        button_ganttplot = Button(label_ganttplot,text='Generate gantt plot',command=self.plotgantt)
         #dataplot
         label_dataplot = LabelFrame(label_plotall,text='Data plot',pady=5,padx=5)
-        button_dataplot = Button(label_dataplot,text='Generate data plot',command=lambda:data_plot_config(self.projectconfigini.file_path))
+        button_dataplot = Button(label_dataplot,text='Generate data plot',command=self.plotdataplot)
         #path plot
         label_pathplot = LabelFrame(label_plotall,text='Path plot',pady=5,padx=5)
         self.Deque_points = Entry_Box(label_pathplot,'Max Lines','15')
@@ -2120,7 +2154,7 @@ class loadprojectini:
 
         #Merge frames
         label_mergeframes = LabelFrame(scroll,text='Merge Frames',pady=5,padx=5,font=("Helvetica",12,'bold'),fg='blue')
-        button_mergeframe = Button(label_mergeframes,text='Merge Frames',command=lambda:merge_frames_config(self.projectconfigini.file_path))
+        button_mergeframe = Button(label_mergeframes,text='Merge Frames',command=self.mergeframesofplot)
 
         #create video
         label_createvideo = LabelFrame(scroll, text='Create Video', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='blue')
@@ -2131,9 +2165,7 @@ class loadprojectini:
         ## classifier validation
         label_classifier_validation = LabelFrame(scroll, text='Classifier Validation', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='blue')
         self.seconds = Entry_Box(label_classifier_validation,'Seconds','8')
-        button_validate_classifier = Button(label_classifier_validation,text='Validate',command =lambda:classifier_validation_command(self.projectconfigini.file_path,self.seconds.entry_get))
-
-
+        button_validate_classifier = Button(label_classifier_validation,text='Validate',command =self.classifiervalidation)
 
         #organize
         label_loadprojectini.grid(row=0,sticky=W)
@@ -2241,105 +2273,225 @@ class loadprojectini:
         self.seconds.grid(row=0,sticky=W)
         button_validate_classifier.grid(row=1,sticky=W)
 
-
-
         scroll.update()
 
-    # def set_shortestbout(self,sb):
-    #     sb = int(sb)
-    #
-    #     configini = self.projectconfigini.file_path
-    #     config = ConfigParser()
-    #     config.read(configini)
-    #
-    #     config.set('validation/run model', 'shortest_bout', str(sb))
-    #     with open(configini, 'w') as configfile:
-    #         config.write(configfile)
-    #     print('Mininum behavior bout length set to', sb)
-    #
-    # def set_discrimination_threshold(self,dt):
-    #     dt = float(dt)
-    #     configini = self.projectconfigini.file_path
-    #     config = ConfigParser()
-    #     config.read(configini)
-    #
-    #     config.set('validation/run model', 'discrimination_threshold', str(dt))
-    #     with open(configini, 'w') as configfile:
-    #         config.write(configfile)
-    #     print('Discrimination threshold set to',dt)
+    def classifiervalidation(self):
+        try:
+            classifier_validation_command(self.projectconfigini.file_path, self.seconds.entry_get)
+        except:
+            print('Please load config.ini to validate classifier')
+
+    def mergeframesofplot(self):
+        try:
+            merge_frames_config(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini to merge frames')
+
+    def plotdataplot(self):
+        try:
+            data_plot_config(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini to generate data plot')
+
+    def plotgantt(self):
+        try:
+            ganntplot_config(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini to generate gantt plot')
+
+    def plotsklearn_result(self):
+        try:
+            plotsklearnresult(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini to plot sklearn result')
+
+    def analyzseverity(self):
+        try:
+            analyze_process_severity(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini to analyze severity')
+
+    def analyzeprocessmovement(self):
+        try:
+            analyze_process_movement(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini to analyze distance/velocity')
+
+    def analyzedatalog(self):
+        try:
+            analyze_process_data_log(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini to analyze machine prediction')
+
+    def runrfmodel(self):
+        try:
+            rfmodel(self.projectconfigini.file_path, self.descrimination_threshold.entry_get,
+                    self.shortest_bout.entry_get)
+        except:
+            print('Please load config.ini file to run rf model.')
+
+    def modelselection(self):
+        try:
+            runmachinemodelsettings(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini file to select model.')
+
+    def validatemodelsinglevid(self):
+        try:
+            validate_model_one_vid(self.projectconfigini.file_path, self.csvfile.file_path, self.modelfile.file_path,
+                                   self.dis_threshold.entry_get, self.min_behaviorbout.entry_get)
+        except:
+            print('Please load config.ini to validate')
+
+    def trainmultimodel(self):
+        try:
+            train_multimodel(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini file to train multiple machine models')
+
+    def trainsinglemodel(self):
+        try:
+            trainmodel2(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini file to train machine model')
+
+    def trainmachinemodelsetting(self):
+        try:
+            trainmachinemodel_settings(self.projectconfigini.file_path)
+        except:
+            print('Please load config.ini file to change machine model settings')
+
+    def extractfeatures(self):
+        try:
+            extract_features_wotarget(self.projectconfigini.file_path)
+        except:
+            print('Fail to extract features, please load config.ini file under "Load Project .ini"')
+
+    def setvideoparameter(self):
+        try:
+            video_info_table(self.projectconfigini.file_path)
+        except:
+            print('Fail to set video parameters, please load config.ini file under "Load Project .ini"')
+
+    def importframefolder(self):
+        if (self.projectconfigini.file_path!='No file selected') and (self.frame_folder.folder_path != 'No folder selected'):
+            copy_frame_folders(self.frame_folder.folder_path, self.projectconfigini.file_path)
+        else:
+            print('Fail to import frame folder, please select a main directory containing all the frame folders')
+
+    def importvideo_single(self):
+        if (self.projectconfigini.file_path != 'No file selected') and (self.singlevideopath.file_path != 'No file selected'):
+            copy_singlevideo_ini(self.projectconfigini.file_path, self.singlevideopath.file_path)
+        else:
+            print('Fail to import video, please select a video to import')
+
+    def importvideo_multi(self):
+        if (self.projectconfigini.file_path != 'No file selected') and (self.multivideofolderpath.folder_path != 'No folder selected') and (self.video_type.entry_get == ''):
+            copy_multivideo_ini(self.projectconfigini.file_path, self.multivideofolderpath.folder_path,self.video_type.entry_get)
+        else:
+            print('Fail to import videos, please select folder with videos and enter the file format')
+
+    def importdlctracking_single(self):
+        if (self.projectconfigini.file_path != 'No file selected') and (self.file_csv.file_path != 'No file selected'):
+            copy_singlecsv_ini(self.projectconfigini.file_path, self.file_csv.file_path)
+        else:
+            print('Fail to import csv file , please select a csv file to import and load config.ini file')
+
+    def importdlctracking_multi(self):
+        if (self.projectconfigini.file_path !='No file selected') and (self.folder_csv.folder_path!= 'No folder selected'):
+            copy_allcsv_ini(self.projectconfigini.file_path, self.folder_csv.folder_path)
+        else:
+            print('Fail to import csv file, please select folder with the .csv files and load config.ini file')
 
     def set_distancemm(self, distancemm):
-        configini = self.projectconfigini.file_path
-        config = ConfigParser()
-        config.read(configini)
+        try:
+            configini = self.projectconfigini.file_path
+            config = ConfigParser()
+            config.read(configini)
 
-        config.set('Frame settings', 'distance_mm', distancemm)
-        with open(configini, 'w') as configfile:
-            config.write(configfile)
+            config.set('Frame settings', 'distance_mm', distancemm)
+            with open(configini, 'w') as configfile:
+                config.write(configfile)
+        except:
+            print('Fail to set distance, please load config.ini file under "Load Project .ini"')
 
     def generate_video(self):
-        print('Generating video...')
-        configini = self.projectconfigini.file_path
-        bitrate = self.bitrate.entry_get
-        fileformat = '.'+ self.fileformt.entry_get
+        try:
+            print('Generating video...')
+            configini = self.projectconfigini.file_path
+            bitrate = self.bitrate.entry_get
+            fileformat = '.'+ self.fileformt.entry_get
 
-        config = ConfigParser()
-        config.read(configini)
+            config = ConfigParser()
+            config.read(configini)
 
-        config.set('Create movie settings', 'file_format', str(fileformat))
-        config.set('Create movie settings', 'bitrate', str(bitrate))
-        with open(configini, 'w') as configfile:
-            config.write(configfile)
+            config.set('Create movie settings', 'file_format', str(fileformat))
+            config.set('Create movie settings', 'bitrate', str(bitrate))
+            with open(configini, 'w') as configfile:
+                config.write(configfile)
 
-        generatevideo_config_ffmpeg(configini)
-        print('Video generated.')
+            generatevideo_config_ffmpeg(configini)
+            print('Video generated.')
+        except:
+            print('Fail to generate video, please load config.ini')
 
     def extract_frames_loadini(self):
-        configini = self.projectconfigini.file_path
-        videopath = str(os.path.dirname(configini) + '\\videos')
+        try:
+            configini = self.projectconfigini.file_path
+            videopath = str(os.path.dirname(configini) + '\\videos')
 
-        extract_frames_ini(videopath)
-
+            extract_frames_ini(videopath)
+        except:
+            print('Please make sure that there are videos in the project_folder/videos directory')
 
     def correct_outlier(self):
-        configini = self.projectconfigini.file_path
-        dev_move(configini)
-        dev_loc(configini)
-        print('Outlier correction complete.')
-
+        try:
+            configini = self.projectconfigini.file_path
+            dev_move(configini)
+            dev_loc(configini)
+            print('Outlier correction complete.')
+        except:
+            print('Fail to run outlier correct, please load config.ini and try again.')
 
     def distanceplotcommand(self):
-        configini = self.projectconfigini.file_path
-        config = ConfigParser()
-        config.read(configini)
+        try:
+            configini = self.projectconfigini.file_path
+            config = ConfigParser()
+            config.read(configini)
 
-        config.set('Distance plot', 'POI_1', self.poi1.entry_get)
-        config.set('Distance plot', 'POI_2', self.poi2.entry_get)
-        with open(configini, 'w') as configfile:
-            config.write(configfile)
+            config.set('Distance plot', 'POI_1', self.poi1.entry_get)
+            config.set('Distance plot', 'POI_2', self.poi2.entry_get)
+            with open(configini, 'w') as configfile:
+                config.write(configfile)
 
-        line_plot_config(configini)
-        print('Distance plot complete.')
+            line_plot_config(configini)
+            print('Distance plot complete.')
+        except:
+            print('Please load config.ini to generate distance plot.')
 
     def pathplotcommand(self):
-        configini = self.projectconfigini.file_path
-        config = ConfigParser()
-        config.read(configini)
+        try:
+            configini = self.projectconfigini.file_path
+            config = ConfigParser()
+            config.read(configini)
 
-        config.set('Path plot settings', 'deque_points', self.Deque_points.entry_get)
-        config.set('Path plot settings', 'severity_brackets', self.severity_brackets.entry_get)
-        config.set('Line plot settings', 'Bodyparts', self.Bodyparts.entry_get)
+            config.set('Path plot settings', 'deque_points', self.Deque_points.entry_get)
+            config.set('Path plot settings', 'severity_brackets', self.severity_brackets.entry_get)
+            config.set('Line plot settings', 'Bodyparts', self.Bodyparts.entry_get)
 
-        if self.plotsvvar.get()==1:
-            config.set('Path plot settings', 'plot_severity', 'yes')
-        else:
-            config.set('Path plot settings', 'plot_severity', 'no')
+            if self.plotsvvar.get()==1:
+                config.set('Path plot settings', 'plot_severity', 'yes')
+            else:
+                config.set('Path plot settings', 'plot_severity', 'no')
 
-        with open(configini, 'w') as configfile:
-            config.write(configfile)
+            with open(configini, 'w') as configfile:
+                config.write(configfile)
 
-        path_plot_config(configini)
-        print('Path plot complete.')
+            path_plot_config(configini)
+            print('Path plot complete.')
+        except:
+            print('Please load config.ini to generate path plot')
+
     def callback(self,url):
         webbrowser.open_new(url)
 
@@ -2874,6 +3026,7 @@ class App(object):
         links.add_command(label='Feature list',command=lambda: webbrowser.open_new(str(r'https://github.com/sgoldenlab/simba/blob/master/Feature_description.csv')))
         links.add_command(label='Github', command=lambda: webbrowser.open_new(str(r'https://github.com/sgoldenlab/simba')))
         links.add_command(label='Gitter Chatroom', command=lambda: webbrowser.open_new(str(r'https://gitter.im/SimBA-Resource/community')))
+        links.add_command(label='Install FFmpeg',command =lambda: webbrowser.open_new(str(r'https://m.wikihow.com/Install-FFmpeg-on-Windows')))
         sixthMenu.add_cascade(label="Links",menu=links)
         sixthMenu.add_command(label='About', command= aboutgui)
 

@@ -54,6 +54,7 @@ def extract_features_wotarget(inifile):
         currentFile = i
         currVidName = os.path.basename(currentFile)
         currVidName = currVidName.replace('.csv', '')
+
         # get current pixels/mm
         currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
         try:
@@ -632,11 +633,6 @@ def extract_features_wotarget(inifile):
 
         for i in range(len(roll_windows_values)):
             currentColName = 'Movement_mean_' + str(roll_windows_values[i])
-            currentDev_colName = currentColName + '_percentile_rank'
-            csv_df[currentDev_colName] = (csv_df[currentColName].mean() - csv_df[currentColName])
-
-        for i in range(len(roll_windows_values)):
-            currentColName = 'Distance_mean_' + str(roll_windows_values[i])
             currentDev_colName = currentColName + '_percentile_rank'
             csv_df[currentDev_colName] = (csv_df[currentColName].mean() - csv_df[currentColName])
 

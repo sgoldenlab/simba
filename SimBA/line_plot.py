@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import numpy as np
-import re
 import matplotlib.pyplot as plt
 from configparser import ConfigParser
 
@@ -39,7 +38,10 @@ def line_plot_config(configini):
         currentFile = i
         CurrentVideoName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
-        fps = int(videoSettings['fps'])
+        try:
+            fps = int(videoSettings['fps'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         loopy += 1
         distanceOI_mm = []
         xTick = []

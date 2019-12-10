@@ -114,7 +114,10 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb):
         image = os.path.join(frames_dir_in, imageName)
         imageSaveName = os.path.join(frames_dir_out_validation_sklearn, imageNameSave)
         im = cv2.imread(image)
-        (height, width) = im.shape[:2]
+        try:
+            (height, width) = im.shape[:2]
+        except AttributeError:
+            print('ERROR: SimBA cannot find the appropriate frames. Please check the project_folder/frames/input folder.')
         fscale = 0.05
         cscale = 0.2
         space_scale = 1.1

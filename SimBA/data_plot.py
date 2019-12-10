@@ -1,17 +1,17 @@
 import os
 import pandas as pd
-import re
 import statistics
 import numpy as np
 import cv2
-from configparser import ConfigParser
-from datetime import datetime
+from configparser import ConfigParser, MissingSectionHeaderError
 
 def data_plot_config(configini):
     config = ConfigParser()
     configFile = str(configini)
-    config.read(configFile)
-
+    try:
+        config.read(configFile)
+    except MissingSectionHeaderError:
+        print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     frames_dir_out = config.get('Frame settings', 'frames_dir_out')
     frames_dir_out = os.path.join(frames_dir_out, 'live_data_table')
     if not os.path.exists(frames_dir_out):
@@ -24,7 +24,6 @@ def data_plot_config(configini):
     vidinfDf = pd.read_csv(vidInfPath)
     filesFound = []
     loopy = 0
-    VideoNo_list = []
 
     ########### FIND CSV FILES ###########
     for i in os.listdir(csv_dir_in):
@@ -41,14 +40,15 @@ def data_plot_config(configini):
         currentFile = i
         CurrentVideoName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
-        fps = int(videoSettings['fps'])
+        try:
+            fps = int(videoSettings['fps'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         loopy += 1
         csv_df = pd.read_csv(currentFile)
         rowCount = csv_df.shape[0]
-        VideoNo = os.path.basename(currentFile)
-        VideoNo = 'Video' + str(re.sub("[^0-9]", "", VideoNo))
-        VideoNo_list.append(VideoNo)
-        imagesDirOut = VideoNo + str('_data_plots')
+        VideoName = os.path.basename(currentFile).replace('.csv', '')
+        imagesDirOut = VideoName + str('_data_plots')
         savePath = os.path.join(frames_dir_out, imagesDirOut)
         if not os.path.exists(savePath):
             os.makedirs(savePath)

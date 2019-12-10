@@ -1,4 +1,4 @@
-from configparser import ConfigParser
+from configparser import ConfigParser, MissingSectionHeaderError
 import os
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -26,7 +26,10 @@ pd.options.mode.chained_assignment = None
 def trainmodel2(inifile):
     configFile = str(inifile)
     config = ConfigParser()
-    config.read(configFile)
+    try:
+        config.read(configFile)
+    except MissingSectionHeaderError:
+        print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     modelDir = config.get('SML settings', 'model_dir')
     modelDir_out = os.path.join(modelDir, 'generated_models')
     if not os.path.exists(modelDir_out):
@@ -34,16 +37,20 @@ def trainmodel2(inifile):
     tree_evaluations_out = os.path.join(modelDir_out, 'model_evaluations')
     if not os.path.exists(tree_evaluations_out):
         os.makedirs(tree_evaluations_out)
-    model_nos = config.getint('SML settings', 'No_targets')
-    data_folder = config.get('create ensemble settings', 'data_folder')
-    model_to_run = config.get('create ensemble settings', 'model_to_run')
-    classifierName = config.get('create ensemble settings', 'classifier')
-    under_sample_setting = config.get('create ensemble settings', 'under_sample_setting')
-    under_sample_ratio = config.getfloat('create ensemble settings', 'under_sample_ratio')
-    over_sample_setting = config.get('create ensemble settings', 'over_sample_setting')
-    over_sample_ratio = config.getfloat('create ensemble settings', 'over_sample_ratio')
-    train_test_size = config.getfloat('create ensemble settings', 'train_test_size')
+    try:
+        model_nos = config.getint('SML settings', 'No_targets')
+        data_folder = config.get('create ensemble settings', 'data_folder')
+        model_to_run = config.get('create ensemble settings', 'model_to_run')
+        classifierName = config.get('create ensemble settings', 'classifier')
+        under_sample_setting = config.get('create ensemble settings', 'under_sample_setting')
+        under_sample_ratio = config.getfloat('create ensemble settings', 'under_sample_ratio')
+        over_sample_setting = config.get('create ensemble settings', 'over_sample_setting')
+        over_sample_ratio = config.getfloat('create ensemble settings', 'over_sample_ratio')
+        train_test_size = config.getfloat('create ensemble settings', 'train_test_size')
+    except ValueError:
+        print('ERROR: Project_config.ini contains errors in the [create ensemble settings] or [SML settings] sections. Please check the project_config.ini file.')
     log_path = config.get('General settings', 'project_path')
+
     log_path = os.path.join(log_path, 'project_folder', 'logs')
     features = pd.DataFrame()
 

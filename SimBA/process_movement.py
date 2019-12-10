@@ -59,13 +59,15 @@ def analyze_process_movement(configini):
         currentFile = i
         currVidName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(currVidName.replace('.csv', ''))]
-        fps = int(videoSettings['fps'])
+        try:
+            fps = int(videoSettings['fps'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         csv_df = pd.read_csv(currentFile)
         VideoNo = os.path.basename(currentFile)
         VideoNo = 'Video' + str(re.sub("[^0-9]", "", VideoNo))
         VideoNo_list.append(VideoNo)
         df_lists = [csv_df[i:i+fps] for i in range(0,csv_df.shape[0],fps)]
-
         for i in df_lists:
             currentDf = i
             mmMove_nose_M1 = currentDf["Movement_mouse_1_centroid"].mean()

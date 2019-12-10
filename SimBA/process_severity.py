@@ -53,7 +53,10 @@ def analyze_process_severity(configini):
         currentFile = i
         CurrentVideoName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
-        fps = int(videoSettings['fps'])
+        try:
+            fps = int(videoSettings['fps'])
+        except TypeError:
+            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         csv_df = pd.read_csv(currentFile, index_col=[0])
         for pp in range(severity_brackets):
             lowerBound = severityGrades[pp]

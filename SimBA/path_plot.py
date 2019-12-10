@@ -15,13 +15,19 @@ def path_plot_config(configini):
     config.read(configFile)
     frames_dir_out = config.get('Frame settings', 'frames_dir_out')
     frames_dir_out = os.path.join(frames_dir_out, 'path_plots')
-    maxDequeLines = config.getint('Path plot settings', 'deque_points')
+    try:
+        maxDequeLines = config.getint('Path plot settings', 'deque_points')
+    except ValueError:
+        print('ERROR: "Max lines" not set.')
     fileFormat = config.get('Path plot settings', 'file_format')
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'machine_results')
-    severity_brackets = config.getint('Path plot settings', 'severity_brackets')
+    try:
+        severity_brackets = config.getint('Path plot settings', 'severity_brackets')
+    except ValueError:
+        print('ERROR: "Severity scale" not set.')
     filesFound = []
     vidInfPath = config.get('General settings', 'project_path')
     vidInfPath = os.path.join(vidInfPath, 'logs')

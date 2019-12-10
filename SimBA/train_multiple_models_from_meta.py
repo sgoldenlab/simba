@@ -1,4 +1,4 @@
-from configparser import ConfigParser
+from configparser import ConfigParser, MissingSectionHeaderError
 import os
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -22,10 +22,12 @@ from sklearn.model_selection import ShuffleSplit
 
 def train_multimodel(configini):
     pd.options.mode.chained_assignment = None
-
     configFile = configini
     config = ConfigParser()
-    config.read(configFile)
+    try:
+        config.read(configFile)
+    except MissingSectionHeaderError:
+        print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     modelDir = config.get('SML settings', 'model_dir')
     modelSavePath = os.path.join(modelDir, 'validations')
     if not os.path.exists(modelSavePath):
@@ -235,7 +237,9 @@ def train_multimodel(configini):
             try:
                 clf.fit(data_train, target_train)
             except ValueError:
-                print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
+                print('ERROR: The model contains an incompatible array. This may happen when trying to train a model with 0 examples of the behavior of interest')
+            except ModuleNotFoundError:
+                print('ERROR: ModuleNotFoundError. This can happen with incompatible versions of NumPy.')
             #RUN RANDOM FOREST EVALUATIONS
             generate_example_decision_tree = currMetaFile['generate_example_decision_tree'].iloc[0]
             if generate_example_decision_tree == 'yes':

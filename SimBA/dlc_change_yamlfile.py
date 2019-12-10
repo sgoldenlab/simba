@@ -57,7 +57,6 @@ def generatetempyaml_multi(yamlfile,videolist):
         yaml.dump(read_yaml, outfile, default_flow_style=False)
 
 
-
 def updateiteration(yamlfile,iteration):
     yamlPath = yamlfile
     with open(yamlPath) as f:
@@ -96,16 +95,17 @@ def update_init_weight(yamlfile,initweights):
     print(os.path.basename(initweights),'selected')
 
 def select_numfram2pick(yamlfile,numframe):
+    try:
+        yamlPath = yamlfile
+        with open(yamlPath) as f:
+            read_yaml = yaml.load(f, Loader=yaml.FullLoader)
 
-    yamlPath = yamlfile
-    with open(yamlPath) as f:
-        read_yaml = yaml.load(f, Loader=yaml.FullLoader)
+        read_yaml["numframes2pick"] = int(numframe)
 
-    read_yaml["numframes2pick"] = int(numframe)
-
-    with open(yamlPath, 'w') as outfile:
-        yaml.dump(read_yaml, outfile, default_flow_style=False)
-
+        with open(yamlPath, 'w') as outfile:
+            yaml.dump(read_yaml, outfile, default_flow_style=False)
+    except:
+        print('Please load .yaml file and enter the number of frames to pick to proceed')
 def add_multi_video_yaml(yamlfile,directory):
     filesFound = []
 

@@ -30,9 +30,10 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,fpss
         try:
             # Create target Directory
             os.makedirs(i)
-            print("Directory ", os.path.basename(i), " created ")
+           # print("Directory ", os.path.basename(i), " created ")
         except FileExistsError:
-            print("Directory ", os.path.basename(i), " already exists")
+            pass
+           # print("Directory ", os.path.basename(i), " already exists")
 
 
 ########create text file ##################

@@ -4,12 +4,15 @@ import os
 import pandas as pd
 import re
 from scipy import ndimage
-from configparser import ConfigParser
+from configparser import ConfigParser, MissingSectionHeaderError
 
 def plotsklearnresult(configini):
     config = ConfigParser()
     configFile = str(configini)
-    config.read(configFile)
+    try:
+        config.read(configFile)
+    except MissingSectionHeaderError:
+        print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, "machine_results")
     frames_dir_in = config.get('Frame settings', 'frames_dir_in')
@@ -70,7 +73,10 @@ def plotsklearnresult(configini):
             image = os.path.join(imagesDirIn, imageName)
             imageSaveName = os.path.join(imagesDirOut, imageNameSave)
             im = cv2.imread(image)
-            (height, width) = im.shape[:2]
+            try:
+                (height, width) = im.shape[:2]
+            except AttributeError:
+                print('ERROR: SimBA cannot find the appropriate frames. Please check the project_folder/frames/input folder.')
             fscale = 0.03
             cscale = 0.2
             space_scale = 0.8

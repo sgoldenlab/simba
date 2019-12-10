@@ -3,14 +3,17 @@ import pickle
 import numpy as np
 import statistics
 import os
-from configparser import ConfigParser
+from configparser import ConfigParser, MissingSectionHeaderError
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def rfmodel(inifile,dt,sb):
     config = ConfigParser()
     configFile = str(inifile)
-    config.read(configFile)
+    try:
+        config.read(configFile)
+    except MissingSectionHeaderError:
+        print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'features_extracted')
     csv_dir_out = os.path.join(csv_dir, 'machine_results')
@@ -39,7 +42,6 @@ def rfmodel(inifile,dt,sb):
         model_paths.append(currentModelPaths)
         target_names.append(currentModelNames)
         loop += 1
-
 
     ########### FIND CSV FILES ###########
     for i in os.listdir(csv_dir_in):
@@ -93,7 +95,12 @@ def rfmodel(inifile,dt,sb):
             currModelName = target_names[b]
             currProbName = 'Probability_' + currModelName
             clf = pickle.load(open(model, 'rb'))
-            predictions = clf.predict_proba(inputFileOrganised)
+            try:
+                predictions = clf.predict_proba(inputFileOrganised)
+            except ValueError:
+                print('Error: the model expects a different number of features than the input file contains.')
+            except ModuleNotFoundError:
+                print('ERROR: ModuleNotFoundErrorr. This can happen with incompatible versions of NumPy.')
             outputDf[currProbName] = predictions[:, 1]
             outputDf[currModelName] = np.where(outputDf[currProbName] > discrimination_threshold, 1, 0)
 

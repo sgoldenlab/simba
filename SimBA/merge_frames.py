@@ -70,7 +70,10 @@ def merge_frames_config(configini):
             dataFrame = cv2.imread(currentData)
             pathFrame = cv2.imread(currentPath)
             lineFrame = cv2.imread(currentLine)
-            imageSize = imageFrame.shape
+            try:
+                imageSize = imageFrame.shape
+            except AttributeError:
+                print('ERROR: SimBA cannot find the appropriate frames. Please check the project_folder/frames/sklearn_results folder.')
             resizedGantt = image_resize(ganttFrame, height=int(imageSize[0]))
             resizedGantSize = resizedGantt.shape
             resizedData = image_resize(dataFrame, width=int(resizedGantSize[1]))
