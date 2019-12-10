@@ -35,9 +35,9 @@ How to [install SimBA](docs/installation.md)
 
 ## Resource
 ![](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)
-[Random forest models](https://osf.io/d69jt/)
-[DeepLabCut labelled images](https://osf.io/uhjzf/)
-[DeepLabCut tracking weights](https://osf.io/5t4y9/)
+- [Random forest models](https://osf.io/d69jt/)
+- [DeepLabCut labelled images](https://osf.io/uhjzf/)
+- [DeepLabCut tracking weights](https://osf.io/5t4y9/)
 
 ## License
 This project is licensed under the GNU Lesser General Public License v3.0. Note that the software is provided "as is", without warranty of any kind, express or implied. If you use the code or data, please cite us :)
