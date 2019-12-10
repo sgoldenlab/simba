@@ -21,9 +21,9 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 [Pre-process videos](docs/tutorial_process_videos.md) --> [Create tracking model](docs/Tutorial_DLC.md) --> [Building classfier(s)](docs/tutorial.md) --> [Analysis/Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
 
-## [Installation](docs/Installation.md) ⚙️
+## Installation ⚙️
 
-How to [install SimBA](docs/installation.md)
+- [Install SimBA](docs/installation.md)
 
 ## Tutorial 📚
 
