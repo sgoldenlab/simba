@@ -40,7 +40,7 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 - [Sam Golden Lab UW](https://goldenneurolab.com/)
 
-## License
+## License 📃
 This project is licensed under the GNU Lesser General Public License v3.0. Note that the software is provided "as is", without warranty of any kind, express or implied. If you use the code or data, please cite us :)
 
 ## References 📜
