@@ -34,7 +34,7 @@ How to [install SimBA](docs/installation.md)
 - [Label Behavior](docs/labelling_aggression_tutorial.md)
 
 ## Resource
-![](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)
+![](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.tif)
 [DeepLabCut tracking weights](https://osf.io/5t4y9/)
 
 ## License
