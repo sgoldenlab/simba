@@ -11,7 +11,7 @@ Several excellent computational frameworks exist that enable high-throughput, co
 - Extensive annotations are not required
 - The pipeline is flexible and can be used to create and validate classifiers for different behaviors and environments 
 
-SimBA currently does not support analysis of video recordings of multiple similarly coat-colored animals, and is vslided using videos filmed from above at 90 degree angle. However we and others are working hard on getting multi-animal tracking of similarly coat colored animals and multiple recording angles supported! :muscle: 
+SimBA currently does not support analysis of video recordings of multiple similarly coat-colored animals, and is vaidated using videos filmed from above at 90° angle. However we and others are working hard on getting multi-animal tracking of similarly coat colored animals and multiple recording angles supported! :muscle: 
 
 ![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/4videos.gif)
 
