@@ -27,11 +27,11 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 ## Tutorial 📚
 
-- [Process Video using tools](docs/Tutorial_tools.md)
-- [Batch process video](docs/tutorial_process_videos.md)
-- [DeepLabCut in the GUI](docs/Tutorial_DLC.md)
-- [SimBA](docs/tutorial.md)
-- [Label Behavior](docs/labelling_aggression_tutorial.md)
+- [Process video using tools](docs/Tutorial_tools.md) 🔨
+- [Batch pre-process video](docs/tutorial_process_videos.md) 🏭
+- [DeepLabCut in the GUI](docs/Tutorial_DLC.md) 📗
+- [SimBA](docs/tutorial.md) 📘
+- [Label behavior](docs/labelling_aggression_tutorial.md) 🏷️
 
 ## Resource 💾
 - [Random forest models](https://osf.io/d69jt/) 🌲
