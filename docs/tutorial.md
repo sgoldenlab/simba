@@ -114,6 +114,12 @@ In this image, you can see, the `Dekstop` is my selected working directory, `tut
 ### Step 2 (Optional) : Import more DLC Tracking Data or videos
 In this step, you can choose to import more csv files or videos. If you don't you can ignore and skip this step.
 
+1. Click on the `{ Further imports (data/video/frames) ]` tab and from there you can import more data or videos into the project folder. The .csv files imported will be located in `project_folder/csv/input` and the videos imported will be located in `project_folder/videos`.
+
+2. Once the videos are imported, you can extract frames by clicking `Extract frames` under **Extract further frames into project folder**
+
+3. If you have existing frames of the videos in the project folder, you can import the folder containing the frames into the project by clicking `Browse Folder` to choose the frame folder and click `Import frames`. The folder will be imported to `project_folder/frames/input`
+
 ### Step 3: Set video parameters
 In this step, you can customize the parameters for each of your videos. You will also be setting the **pixels per milimeter** of for your videos. You will be using a tool that requires the distance of a point to another point in order to calculate the **pixels per milimeter**. The real life distance between two points is call `Distance in mm`.
 
