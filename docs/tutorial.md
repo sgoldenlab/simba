@@ -89,6 +89,8 @@ In this step, you will import your csv tracking data.
 ### Step 4: Extract frames into project folder
 This step will extract all the frames from every video that are in the videos folder. Once all the steps are completed, close the `Project Configuration` window.
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/extractframeintop.PNG" width="491" height="126" />
+
 ## Part 2: Load project
 This section loads a project that you have created.
 
