@@ -131,7 +131,7 @@ In this step, you can customize the parameters for each of your videos. You will
 
 2. Click on `Set Video Parameters` and the following windows will pop up.
 <p align="center">
-  <img width="700" height="350" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table.PNG">
+  <img width="1037" height="259" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table.PNG">
 </p>
 
 3. As you can see, I imported four videos and they are in the `Video` column. I have set the `Distance_in_mm` to 10 in the previous step, else, it will be 0.
