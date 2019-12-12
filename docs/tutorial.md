@@ -125,7 +125,7 @@ In this step, you can choose to import more csv files or videos. If you don't yo
 ### Step 3: Set video parameters
 In this step, you can customize the parameters for each of your videos. You will also be setting the **pixels per milimeter** of for your videos. You will be using a tool that requires the distance of a point to another point in order to calculate the **pixels per milimeter**. The real life distance between two points is call `Distance in mm`.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/setvidparameter.PNG" width="476" height="97" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/setvidparameter.PNG" width="391" height="96" />
 
 1. Under **Set video parameters(distances,resolution,etc.)**, the `Distance in mm` here is the distance between two points in milimeter. You can enter the values *(eg: 10,20)* and click `Auto populate Distance in mm in tables` and it will populate the table that you are going to see in the next step. If you leave it empty, it will just be zero.
 
