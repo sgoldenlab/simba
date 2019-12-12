@@ -61,22 +61,29 @@ In this step, you will be generating your main project folder with all the sub-d
 
 ### Step 2: Import Videos into project folder
 In this step, you can choose to import either one or multiple videos.
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/importvids.PNG" width="346" height="251" />
+
 #### To import multiple videos
-1. Click on `Browse Folder` to select your folder that contains all the videos that you wished to be included in your project.
-2. Enter the type of your video *mp4*, *avi*, *mov*,etc. in the `Video type` entry box.
-3. Click `Import multiple videos` 
+1. Navigate to the `[ Import videos into project folder ]` tab.
+2. Under `Import multiple videos`, click on `Browse Folder` to select your folder that contains all the videos that you wished to be included in your project.
+3. Enter the type of your video *mp4*, *avi*, *mov*,etc. in the `Video type` entry box.
+4. Click `Import multiple videos` 
 >**Note**: It might take awhile for all the videos to be imported.
 #### To import a single video
-1. Click on `Browse File` to select your video
+1. Under `Import single video`, click on `Browse File` to select your video
 2. Click `Import a video`
 
 ### Step 3: Import DLC Tracking Data
 In this step, you will import your csv tracking data.
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/importcsv.PNG" width="300" height="202" />
+
 #### To import multiple csv files
-1. Click on `Browse Folder` to select your folder that contains all the csv files that you wished to be included in your project.
+1. Navigate to the `[ Import tracking data ]`. Under `Import multiple csv file`, click on `Browse Folder` to select your folder that contains all the csv files that you wished to be included in your project.
 2. Click `Import csv to project folder` 
 #### To import a single csv file
-1. Click on `Browse File` to select your video
+1. Under `Import single csv file`, click on `Browse File` to select your video
 2. Click `Import single csv to project folder`
 
 ### Step 4: Extract frames into project folder
