@@ -114,6 +114,8 @@ In this image, you can see, the `Dekstop` is my selected working directory, `tut
 ### Step 2 (Optional) : Import more DLC Tracking Data or videos
 In this step, you can choose to import more csv files or videos. If you don't you can ignore and skip this step.
 
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/importdlc.PNG" width="658" height="434" />
+
 1. Click on the `[ Further imports (data/video/frames) ]` tab and from there you can import more data or videos into the project folder. The .csv files imported will be located in `project_folder/csv/input` and the videos imported will be located in `project_folder/videos`.
 
 2. Once the videos are imported, you can extract frames by clicking `Extract frames` under **Extract further frames into project folder**
