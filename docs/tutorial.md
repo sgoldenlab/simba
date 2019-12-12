@@ -49,10 +49,10 @@ In this step, you will be generating your main project folder with all the sub-d
 
 4. Under `SML Settings`, put in the number of predictive classifiers that you wished. For an example, if you had three behaviors in your video, put 3 in the entry box.
 
-5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="154" height="25" /> and it creates a row as shown in the following image. Fill in the box with a behavior classifier.
+5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> and it creates a row as shown in the following image. Fill in the box with a behavior classifier.
 
 <p align="center">
-  <img width="385" height="128" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
+  <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
 </p>
 
 6. `Video Settings` is the metadata of your videos. Filled in the information based on your videos.
