@@ -40,7 +40,7 @@ In this step, you will be generating your main project folder with all the sub-d
 
 1. Go to `File` and click on `Create a new project` The following windows will pop up.
 <p align="center">
-  <img width="699" height="484" src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG">
+  <img width="702" height="432" src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG">
 </p>
 
 2. Navigate to `[ Generate project config ]` tab. Under **General Settings**, `Project Path` is the main working directory that your project will be created. Click on `Browse Folder` and select your working directory
