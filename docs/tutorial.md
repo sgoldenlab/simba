@@ -100,7 +100,7 @@ In this step, you will load the *project_config.ini* file that was created.
 1. Go to `File` and click on `Load project` The following windows will pop up.
 
 <p align="center">
-  <img width="782" height="563" src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG">
+  <img width="1255" height="503" src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG">
 </p>
 
 2. Under **Load Project.ini**, click on `Browse File`. Then, go to the directory that you created your project and click on your *project folder*. Then, click on *project_folder* and then *project_config.ini*. Once this step is completed, it should look like the following instead of *No file selected*.
