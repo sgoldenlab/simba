@@ -80,7 +80,7 @@ In this step, you will import your csv tracking data.
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/importcsv.PNG" width="300" height="202" />
 
 #### To import multiple csv files
-1. Navigate to the `[ Import tracking data ]`. Under `Import multiple csv file`, click on `Browse Folder` to select your folder that contains all the csv files that you wished to be included in your project.
+1. Navigate to the `[ Import tracking data ]` tab. Under `Import multiple csv file`, click on `Browse Folder` to select your folder that contains all the csv files that you wished to be included in your project.
 2. Click `Import csv to project folder` 
 #### To import a single csv file
 1. Under `Import single csv file`, click on `Browse File` to select your video
