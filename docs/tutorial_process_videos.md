@@ -3,20 +3,22 @@
 # Tutorial for processing video in batch
 Videos are processed via ffmpeg in python. Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install ffmpeg.
 
-
-<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo.PNG width="264" height="138" />
-
 ## Pipeline
 
 <img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo_flowdiagram.png width="800" height="310" />
 
 ## Step 1: Folder Selection
 
-1. Under **Folder Selection**, `Directory with videos in it`, select a folder with **only** videos by clicking `Browse Folder`
 
-2. Under `Output Directory`, select an output directory where all the processed videos will be saved by clicking `Browse Folder`
+1. `Process Videos` --> `Batch pre-process videos`.
 
-3. Click `Confirm` to confirm the directories selected.
+<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo.PNG width="264" height="138" />
+
+2. Under **Folder Selection**, `Directory with videos in it`, select a folder with **only** videos by clicking `Browse Folder`
+
+3. Under `Output Directory`, select an output directory where all the processed videos will be saved by clicking `Browse Folder`
+
+4. Click `Confirm` to confirm the directories selected.
 
 >**Note**: Please make sure there is no space in your folder name or video name.
 
