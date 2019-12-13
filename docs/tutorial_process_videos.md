@@ -1,7 +1,7 @@
 
 
 # Tutorial for processing video in batch
-Videos are processed via ffmpeg in python. Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install ffmpeg.
+Videos are processed via **ffmpeg** in **python**. Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install ffmpeg.
 
 ## Pipeline
 
