@@ -287,6 +287,22 @@ This step is to train the machine model.
 
 6. Click on `Train Multiple Models` in the main window.
 
+### Optional step before running machine model
+Before running machine model, the user can validate the model *(.sav)*.
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/validatemodel.PNG" width="348" height="162" />
+
+1. Under **Validate Model on Single Video**, `Select features file`, click on `Browse File`. Select a *.csv* files in the `project_folder/csv/output/features_extracted` directory.
+
+2. Under `Select model file`, click on `Browse File` to select a model (*.sav*).
+
+3. Set the `Discrimination threshold` and `Minimum behavior bout length (ms)`
+
+- `Discrimination threshold`
+
+- `Minimum behavior bout length (ms)`
+
+4. Click `Validate` to validate the selected model.
 
 ### Step 8: Run Machine Model
 Run machine model explaination goes here
