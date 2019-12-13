@@ -20,7 +20,7 @@
 
 1. A table with the videos in the folder will pop up.
 
-<img src=https://github.com/sgoldenlab/simba/blob/master/images/batchprocessvideo.PNG width="1102" height="232" />
+<img src=https://github.com/sgoldenlab/simba/blob/master/images/batchprocessvideo.PNG width="1102" height="200" />
 
 2. If you wish to crop your videos, click on the `Crop` button. *The button will turn red once you clicked on it*
 
