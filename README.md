@@ -13,10 +13,10 @@ Several excellent computational frameworks exist that enable high-throughput, co
 
 SimBA currently does not support analysis of video recordings of multiple similarly coat-colored animals, and is vaidated using videos filmed from above at 90° angle. However we and others are working hard on getting multi-animal tracking of similarly coat colored animals and multiple recording angles supported! :muscle: 
 
-#### Mice
+#### Mouse
 ![](https://github.com/sgoldenlab/simba/blob/master/images/mouse_videos.gif)
 
-#### Rats
+#### Rat
 ![](https://github.com/sgoldenlab/simba/blob/master/images/rat_videos.gif)
 
 ## Pipeline 👷
