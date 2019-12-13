@@ -15,7 +15,6 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/mouse_videos.gif)
 ![](https://github.com/sgoldenlab/simba/blob/master/images/rat_videos.gif)
-![](https://github.com/sgoldenlab/simba/blob/master/images/crim_videos.gif)
 
 ## Pipeline 👷
 
