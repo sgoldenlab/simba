@@ -48,10 +48,17 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 ## Resource 💾
 
-
+### Models
+Below is a link to download trained models to apply it on your dataset
 - [Random forest models](https://osf.io/d69jt/) 🌲
+
+### Labelled images
 - [DeepLabCut labelled images](https://osf.io/uhjzf/) 📷
+
+### Tracking weights
 - [DeepLabCut tracking weights](https://osf.io/5t4y9/) 🏋️
+
+### Golden Lab webpage
 - [Sam Golden Lab UW](https://goldenneurolab.com/) 🧪🧫🐁
 
 
