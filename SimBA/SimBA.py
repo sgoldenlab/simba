@@ -163,6 +163,7 @@ class processvid_menu:
         vidprocessmenu = Toplevel()
         vidprocessmenu.minsize(1100, 400)
         vidprocessmenu.wm_title("Batch process video table")
+        vidprocessmenu.iconbitmap('golden_lab.ico')
 
         scroll =  Scrollable(vidprocessmenu)
 
@@ -177,7 +178,7 @@ class processvid_menu:
             self.row.append(processvideotable(tableframe,str(self.filesFound[i]), str(len(maxname)),self.videofolder,self.outputdir))
             self.row[i].grid(row=i+1, sticky=W)
 
-        but = Button(scroll,text='Execute',command =self.execute_processvideo,font=('Times',12,'bold'),fg='red')
+        but = Button(scroll,text='Execute',command =self.execute_processvideo,font=('Times',12,'bold'),fg='navy')
         but.grid(row=2)
 
         tableframe.grid(row=1)
@@ -364,6 +365,7 @@ class batch_processvideo:
         batchprocess = Toplevel()
         batchprocess.minsize(400, 200)
         batchprocess.wm_title("Batch process video")
+        batchprocess.iconbitmap('golden_lab.ico')
 
 
         #Video Selection Tab
@@ -400,6 +402,7 @@ class outlier_settings:
         outlier_set = Toplevel()
         outlier_set.minsize(400, 400)
         outlier_set.wm_title("Outlier Settings")
+        outlier_set.iconbitmap('golden_lab.ico')
 
         # location
         label_location_correction = LabelFrame(outlier_set, text='Location correction',font=('Times',12,'bold'),pady=5,padx=5)
@@ -660,20 +663,7 @@ class Button_getcoord(Frame):
     def getppm(self,count):
         ppms = self.ppm_list[count].get()
         return ppms
-#
-# class classifier_validationmenu:
-#
-#     def __init__(self):
-#         # Popup window
-#         classvalidmenu = Toplevel()
-#         classvalidmenu.minsize(200, 200)
-#         classvalidmenu.wm_title("Classifier validation")
-#
-#         csv_folder = FolderSelect(classvalidmenu,'Csv folder')
-#         folder_vid_folder = FolderSelect(classvalidmenu,'Primary video folder')
-#         output_folder = FolderSelect(classvalidmenu,'Output folder')
-#
-#         fps = Entry_Box(classvalidmenu,'fps','10')
+
 
 def Exit():
     app.root.destroy()
@@ -700,6 +690,7 @@ class video_info_table:
         self.tkintertable = Toplevel()
         self.tkintertable.minsize(1000, 500)
         self.tkintertable.wm_title("Video Info")
+        self.tkintertable.iconbitmap('golden_lab.ico')
 
         self.xscrollbar = Scrollable(self.tkintertable,width=32)
         self.myframe = LabelFrame(self.xscrollbar,text='Table')
@@ -828,6 +819,7 @@ class video_downsample:
         videosdownsample = Toplevel()
         videosdownsample.minsize(200, 200)
         videosdownsample.wm_title("Downsample Video Resolution")
+        videosdownsample.iconbitmap('golden_lab.ico')
 
         # Video Path
         self.videopath1selected = FileSelect(videosdownsample, "Video path",title='Select a video file')
@@ -912,6 +904,7 @@ class Red_light_Convertion:
         redlightconversion = Toplevel()
         redlightconversion.minsize(200, 200)
         redlightconversion.wm_title("CLAHE")
+        redlightconversion.iconbitmap('golden_lab.ico')
 
         #CLAHE
         label_clahe = LabelFrame(redlightconversion,text='Contrast Limited Adaptive Histogram Equalization',font='bold',padx=5,pady=5)
@@ -931,6 +924,7 @@ class crop_video:
         cropvideo = Toplevel()
         cropvideo.minsize(200, 200)
         cropvideo.wm_title("Crop Video")
+        cropvideo.iconbitmap('golden_lab.ico')
 
         # Video Path
         label_cropvideo = LabelFrame(cropvideo,text='Crop Video',font='bold',padx=5,pady=5)
@@ -951,7 +945,7 @@ class create_project_DLC:
         createproject = Toplevel()
         createproject.minsize(400, 250)
         createproject.wm_title("Create Project")
-        createproject.configure(bg='gray90')
+        createproject.iconbitmap('golden_lab.ico')
 
         self.label_dlc_createproject = LabelFrame(createproject,text='Create Project',font =("Helvetica",12,'bold'))
         #project name
@@ -1047,18 +1041,41 @@ class Load_DLC_Model:
     def __init__(self):
         # Popup window
         loadmodel = Toplevel()
-        loadmodel.minsize(800, 700)
+        loadmodel.minsize(200, 200)
         loadmodel.wm_title("Load DLC Model")
+        loadmodel.iconbitmap('golden_lab.ico')
 
-        scrollbar_lm = Scrollable(loadmodel, width=25)
-        scrollbar_lm.config(bg='gray90')
+        tab_parent = ttk.Notebook(loadmodel)
+
+        tab1 = ttk.Frame(tab_parent)
+        tab2 = ttk.Frame(tab_parent)
+        tab3 = ttk.Frame(tab_parent)
+        tab4 = ttk.Frame(tab_parent)
+        tab7 = ttk.Frame(tab_parent)
+        tab8 = ttk.Frame(tab_parent)
+        tab9 = ttk.Frame(tab_parent)
+        tab10 = ttk.Frame(tab_parent)
+        tab11 = ttk.Frame(tab_parent)
+        tab12 = ttk.Frame(tab_parent)
+        tab13 = ttk.Frame(tab_parent)
+        tab14 = ttk.Frame(tab_parent)
+        tab15 = ttk.Frame(tab_parent)
+
+        tab_parent.add(tab1, text=f'{"[ Load model ]": ^20s}')
+        tab_parent.add(tab2,text=f'{"[ Generate temp yaml ]": ^20s}')
+        tab_parent.add(tab3, text=f'{"[ Add videos into project ]": ^20s}')
+        tab_parent.add(tab4, text=f'{"[ Extract / label frames ]": ^20s}')
+        tab_parent.add(tab7, text=f'{"[ Generate training set ]": ^20s}')
+        tab_parent.add(tab10, text=f'{"[ Video analysis ]": ^20s}')
+        tab_parent.add(tab13, text=f'{"[ Extract outliers ]": ^20s}')
+        tab_parent.grid(row=0)
 
         #Load Model : configpath
-        labelframe_loadmodel = LabelFrame(scrollbar_lm, text='Load Model', font=("Helvetica",12,'bold'),padx=5,pady=5)
+        labelframe_loadmodel = LabelFrame(tab1, text='Load Model', font=("Helvetica",12,'bold'),padx=5,pady=5)
         self.label_set_configpath = FileSelect(labelframe_loadmodel, 'DLC config path (.yaml): ',title='Select a .yaml file')
 
         # generate yaml file
-        label_generatetempyaml = LabelFrame(scrollbar_lm,text='Generate Temp yaml (for extracting frames from subset of videos)', font=("Helvetica",12,'bold') ,padx=5,pady=5,fg='green')
+        label_generatetempyaml = LabelFrame(tab2,text='Generate Temp yaml (for extracting frames from subset of videos)', font=("Helvetica",12,'bold') ,padx=5,pady=5)
         label_tempyamlsingle = LabelFrame(label_generatetempyaml,text='Single video',padx=5,pady=5)
         self.label_genyamlsinglevideo = FileSelect(label_tempyamlsingle,'Select video:',title='Select a video file')
         button_generatetempyaml_single = Button(label_tempyamlsingle,text='Add single video',command=lambda:generatetempyaml(self.label_set_configpath.file_path,self.label_genyamlsinglevideo.file_path))
@@ -1069,7 +1086,7 @@ class Load_DLC_Model:
         label_tempyml2 = Label(label_generatetempyaml,text='       Then, you can proceed to extract frames.',font=('Times',10,'italic'))
 
         #singlevid multivid
-        labelframe_singlemultivid = LabelFrame(scrollbar_lm,text='Add Videos into project',font=("Helvetica",12,'bold'),padx=5,pady=5)
+        labelframe_singlemultivid = LabelFrame(tab3,text='Add Videos into project',font=("Helvetica",12,'bold'),padx=5,pady=5)
         labelframe_singlevid = LabelFrame(labelframe_singlemultivid,text='Single Video',padx=5,pady=5)
         labelframe_multivid = LabelFrame(labelframe_singlemultivid,text='Multiple Videos',padx=5,pady=5)
         self.label_set_singlevid = FileSelect(labelframe_singlevid, 'Select Single Video: ',title='Select a video file')
@@ -1078,7 +1095,7 @@ class Load_DLC_Model:
         button_add_multi_video = Button(labelframe_multivid,text='Add multiple videos',command = self.dlc_addmultivideo_command,fg='red')
 
         ###########extract frames########
-        label_extractframes = LabelFrame(scrollbar_lm, text='Extract Frames DLC', font=("Helvetica",12,'bold'),padx=15,pady=5)
+        label_extractframes = LabelFrame(tab4, text='Extract Frames DLC', font=("Helvetica",12,'bold'),padx=15,pady=5)
         # mode
         self.label_numframes2pick = Entry_Box(label_extractframes,'numframes2pick:','26')
         label_mode = Label(label_extractframes, text='Mode', font="Verdana 10 underline")
@@ -1108,19 +1125,19 @@ class Load_DLC_Model:
         button_extractframe = Button(label_extractframes, text='Extract Frames', command=self.dlc_extractframes_command)
 
         ##########label Frames#####
-        label_labelframes = LabelFrame(scrollbar_lm, text='Label Frames', font=("Helvetica",12,'bold'),padx=15,pady=5)
+        label_labelframes = LabelFrame(tab4, text='Label Frames', font=("Helvetica",12,'bold'),padx=15,pady=5)
         self.button_label_frames = Button(label_labelframes, text='Label Frames', command=self.dlc_label_frames_command)
 
         ##########Check Labels#####
-        label_checklabels = LabelFrame(scrollbar_lm, text='Check Labels', font=("Helvetica",12,'bold'),padx=15,pady=5)
+        label_checklabels = LabelFrame(tab4, text='Check Labels', font=("Helvetica",12,'bold'),padx=15,pady=5)
         self.button_check_labels = Button(label_checklabels, text='Check Labelled Frames', command=self.dlc_check_labels_command)
 
         ####generate training sets#####
-        label_generate_trainingsets = LabelFrame(scrollbar_lm,text='Generate Training Set',font =("Helvetica",12,'bold'),padx=15,pady=5)
+        label_generate_trainingsets = LabelFrame(tab7,text='Generate Training Set',font =("Helvetica",12,'bold'),padx=15,pady=5)
         self.button_generate_trainingsets = Button(label_generate_trainingsets, text='Generate training set',command=self.dlc_generate_trainingsets_command)
 
         #####train network####
-        label_train_network = LabelFrame(scrollbar_lm,text= 'Train Network',font =("Helvetica",12,'bold'),padx=15,pady=5)
+        label_train_network = LabelFrame(tab7,text= 'Train Network',font =("Helvetica",12,'bold'),padx=15,pady=5)
         self.label_iteration = Entry_Box(label_train_network,'iteration','10')
         self.button_update_iteration = Button(label_train_network,text='Update iteration',command =lambda:updateiteration(self.label_set_configpath.file_path,self.label_iteration.entry_get))
         self.init_weight = FileSelect(label_train_network,'init_weight     ',title='Select training weight, eg: .DATA-00000-OF-00001 File')
@@ -1128,11 +1145,11 @@ class Load_DLC_Model:
         self.button_train_network = Button(label_train_network, text='Train Network',command=self.dlc_train_network_command)
 
         #######evaluate network####
-        label_eva_network = LabelFrame(scrollbar_lm,text='Evaluate Network',font = ("Helvetica",12,'bold'),padx=15,pady=5)
+        label_eva_network = LabelFrame(tab7,text='Evaluate Network',font = ("Helvetica",12,'bold'),padx=15,pady=5)
         self.button_evaluate_network = Button(label_eva_network, text='Evaluate Network',command=self.dlc_evaluate_network_command)
 
         #####video analysis####
-        label_video_analysis = LabelFrame(scrollbar_lm,text='Video Analysis',font=("Helvetica",12,'bold'),padx=15,pady=5)
+        label_video_analysis = LabelFrame(tab10,text='Video Analysis',font=("Helvetica",12,'bold'),padx=15,pady=5)
         #singlevideoanalysis
         label_singlevideoanalysis = LabelFrame(label_video_analysis,text='Single Video Analysis',pady=5,padx=5)
         self.videoanalysispath = FileSelect(label_singlevideoanalysis, "Video path",title='Select a video file')
@@ -1144,14 +1161,14 @@ class Load_DLC_Model:
         button_multivideoanalysis = Button(label_multivideoanalysis,text='Multi Videos Analysis',command=self.dlc_video_analysis_command2)
 
         #### plot####
-        label_plot = LabelFrame(scrollbar_lm,text='Plot Video Graph',font=("Helvetica",12,'bold'),padx=15,pady=5)
+        label_plot = LabelFrame(tab10,text='Plot Video Graph',font=("Helvetica",12,'bold'),padx=15,pady=5)
         # videopath
         self.videoplotpath = FileSelect(label_plot, "Video path",title='Select a video file')
         # plot button
         button_plot = Button(label_plot, text='Plot Results', command=self.dlc_plot_videoresults_command)
 
         #####create video####
-        label_createvideo = LabelFrame(scrollbar_lm,text='Create Video',font=("Helvetica",12,'bold'),padx=15,pady=5)
+        label_createvideo = LabelFrame(tab10,text='Create Video',font=("Helvetica",12,'bold'),padx=15,pady=5)
         # videopath
         self.createvidpath = FileSelect(label_createvideo, "Video path",title='Select a video file')
         # save frames
@@ -1161,16 +1178,16 @@ class Load_DLC_Model:
         button_createvideo = Button(label_createvideo, text='Create Video', command=self.dlc_create_video_command)
 
         ######Extract Outliers####
-        label_extractoutlier = LabelFrame(scrollbar_lm,text='Extract Outliers',font=("Helvetica",12,'bold'),pady=5,padx=5)
+        label_extractoutlier = LabelFrame(tab13,text='Extract Outliers',font=("Helvetica",12,'bold'),pady=5,padx=5)
         self.label_extractoutliersvideo = FileSelect(label_extractoutlier,'Videos to correct:',title='Select a video file')
         button_extractoutliers = Button(label_extractoutlier,text='Extract Outliers',command =lambda:deeplabcut.extract_outlier_frames(self.label_set_configpath.file_path, [str(self.label_extractoutliersvideo.file_path)],automatic=True) )
 
         ####label outliers###
-        label_labeloutliers = LabelFrame(scrollbar_lm,text='Label Outliers',font =("Helvetica",12,'bold'),pady=5,padx=5)
+        label_labeloutliers = LabelFrame(tab13,text='Label Outliers',font =("Helvetica",12,'bold'),pady=5,padx=5)
         button_refinelabels = Button(label_labeloutliers,text='Refine Outliers',command=lambda:deeplabcut.refine_labels(self.label_set_configpath.file_path))
 
         ####merge labeled outliers ###
-        label_mergeoutliers = LabelFrame(scrollbar_lm,text='Merge Labelled Outliers',font=("Helvetica",12,'bold'),pady=5,padx=5)
+        label_mergeoutliers = LabelFrame(tab13,text='Merge Labelled Outliers',font=("Helvetica",12,'bold'),pady=5,padx=5)
         button_mergelabeledoutlier = Button(label_mergeoutliers,text='Merge Labelled Outliers',command=lambda:deeplabcut.merge_datasets(self.label_set_configpath.file_path))
 
         #organize
@@ -1195,7 +1212,7 @@ class Load_DLC_Model:
         self.label_video_folder.grid(row=0,sticky=W)
         button_add_multi_video.grid(row=1,sticky=W)
 
-        label_extractframes.grid(row=3, sticky=W,pady=5)
+        label_extractframes.grid(row=3,column=0, sticky=W,pady=5,padx=5)
         self.label_numframes2pick.grid(row=0,sticky=W)
         label_mode.grid(row=1, sticky=W)
         checkbox_auto.grid(row=2, sticky=W)
@@ -1211,10 +1228,10 @@ class Load_DLC_Model:
         checkbox_useopencv.grid(row=12, sticky=W)
         button_extractframe.grid(row=13,sticky=W)
 
-        label_labelframes.grid(row=4,sticky=W,pady=5)
+        label_labelframes.grid(row=3,column=1,sticky=W+N,pady=5,padx=5)
         self.button_label_frames.grid(row=0,sticky=W)
 
-        label_checklabels.grid(row=5,sticky=W,pady=15)
+        label_checklabels.grid(row=3,column=2,sticky=W+N,pady=5,padx=5)
         self.button_check_labels.grid(row=0,sticky=W)
 
         label_generate_trainingsets.grid(row=6,sticky=W,pady=5)
@@ -1258,7 +1275,6 @@ class Load_DLC_Model:
         label_mergeoutliers.grid(row=14,sticky=W,pady=5)
         button_mergelabeledoutlier.grid(row=0,sticky=W)
 
-        scrollbar_lm.update()
 
     def dlc_addsinglevideo(self):
         try:
@@ -1427,7 +1443,7 @@ class shorten_video:
         shortenvid = Toplevel()
         shortenvid.minsize(200, 200)
         shortenvid.wm_title("Clip video")
-        shortenvid.configure(bg='gray90')
+        shortenvid.iconbitmap('golden_lab.ico')
 
         # videopath
         self.videopath1selected = FileSelect(shortenvid, "Video path",title='Select a video file')
@@ -1438,15 +1454,15 @@ class shorten_video:
         self.label_starttime = Entry_Box(label_cutvideomethod1,'Start at:','8')
         self.label_endtime = Entry_Box(label_cutvideomethod1, 'End at:',8)
         CreateToolTip(label_cutvideomethod1,
-                      'Method 1 will retrieve the specified time input.(eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video')
+                      'Method 1 will retrieve the specified time input.(eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)')
 
         #express time frame
         label_cutvideomethod2 = LabelFrame(shortenvid,text='Method 2',font='bold',padx=5,pady=5)
-        label_method2 = Label(label_cutvideomethod2,text='Method 2 will retrieve from the end of the video.(eg: an input of 3 seconds will get rid of the first 3 seconds of the video')
+        label_method2 = Label(label_cutvideomethod2,text='Method 2 will retrieve from the end of the video.(eg: an input of 3 seconds will get rid of the first 3 seconds of the video)')
         # self.var_express = IntVar()
         # checkbox_express = Checkbutton(label_cutvideomethod2, text='Check this box to use Method 2', variable=self.var_express)
         self.label_time = Entry_Box(label_cutvideomethod2,'Seconds:','8')
-        CreateToolTip(label_cutvideomethod2,'Method 2 will retrieve from the end of the video.(eg: an input of 3 seconds will get rid of the first 3 seconds of the video')
+        CreateToolTip(label_cutvideomethod2,'Method 2 will retrieve from the end of the video.(eg: an input of 3 seconds will get rid of the first 3 seconds of the video)')
 
         #button to cut video
         button_cutvideo1 = Button(label_cutvideomethod1, text='Cut Video', command=lambda:shortenvideos1(self.videopath1selected.file_path,self.label_starttime.entry_get,self.label_endtime.entry_get))
@@ -1468,24 +1484,6 @@ class shorten_video:
         button_cutvideo2.grid(row=3)
 
 
-    # def shortenvideocommand(self):
-    #
-    #     if self.var_express.get() == 0:
-    #         print('Method 1 chosen')
-    #         starttime = self.label_starttime.entry_get
-    #         endtime = self.label_endtime.entry_get
-    #
-    #         vid = shortenvideos1(self.videopath1selected.file_path,starttime,endtime)
-    #
-    #
-    #     elif self.var_express.get()==1:
-    #         print('Method 2 chosen')
-    #         time = self.label_time.entry_get
-    #         vid = shortenvideos2(self.videopath1selected.file_path,time)
-
-
-
-
 class change_imageformat:
 
     def __init__(self):
@@ -1494,6 +1492,7 @@ class change_imageformat:
         chgimgformat = Toplevel()
         chgimgformat.minsize(200, 200)
         chgimgformat.wm_title("Change image format")
+        chgimgformat.iconbitmap('golden_lab.ico')
 
         #select directory
         self.folderpath1selected = FolderSelect(chgimgformat,"Image directory",title='Select folder with images')
@@ -1556,6 +1555,7 @@ class convert_video:
         convertvid = Toplevel()
         convertvid.minsize(400, 400)
         convertvid.wm_title("Convert video format")
+        convertvid.iconbitmap('golden_lab.ico')
 
         #multi video
         label_multivideo = LabelFrame(convertvid, text='Convert multiple videos',font=("Helvetica",12,'bold'),padx=5,pady=5)
@@ -1603,6 +1603,7 @@ class extract_specificframes:
         extractsf = Toplevel()
         extractsf.minsize(200, 200)
         extractsf.wm_title("Extract defined Frames")
+        extractsf.iconbitmap('golden_lab.ico')
 
         # videopath
         self.videopath1selected = FileSelect(extractsf, "Video path",title='Select a video file')
@@ -1640,6 +1641,7 @@ def extract_allframes():
     extractaf = Toplevel()
     extractaf.minsize(200, 200)
     extractaf.wm_title("Extract all frames")
+    extractaf.iconbitmap('golden_lab.ico')
 
     # videopath
     videopath = FileSelect(extractaf, "Video path",title='Select a video file')
@@ -1656,6 +1658,7 @@ class changefps:
         fpsmenu = Toplevel()
         fpsmenu.minsize(200, 200)
         fpsmenu.wm_title("Change frame rate of video")
+        fpsmenu.iconbitmap('golden_lab.ico')
 
         # videopath
         videopath = FileSelect(fpsmenu, "Video path",title='Select a video file')
@@ -1677,6 +1680,7 @@ class extract_seqframe:
         extractseqtoplevel = Toplevel()
         extractseqtoplevel.minsize(200, 200)
         extractseqtoplevel.wm_title("Extract All Frames from Seq files")
+        extractseqtoplevel.iconbitmap('golden_lab.ico')
 
         # videopath
         videopath = FileSelect(extractseqtoplevel, "Video Path",title='Select a video file')
@@ -1695,6 +1699,7 @@ class mergeframeffmpeg:
         mergeffmpeg = Toplevel()
         mergeffmpeg.minsize(250, 250)
         mergeffmpeg.wm_title("Merge images to video")
+        mergeffmpeg.iconbitmap('golden_lab.ico')
 
         # select directory
         self.folderpath1selected = FolderSelect(mergeffmpeg,"Working Directory",title='Select folder with frames')
@@ -1717,11 +1722,8 @@ class mergeframeffmpeg:
 
         label_to.grid(row=1,column=1)
         self.label_vidformat.grid(row=1,column=2,sticky=W)
-
         self.label_fps.grid(row=2,column=0,sticky=W,pady=5)
-
         self.label_bitrate.grid(row=3,column=0,sticky=W,pady=5)
-
         button_mergeimg.grid(row=4,column=1,sticky=E,pady=10)
 
 
@@ -1742,6 +1744,7 @@ class creategif:
         create_gif = Toplevel()
         create_gif.minsize(250, 250)
         create_gif.wm_title("Generate Gif from video")
+        create_gif.iconbitmap('golden_lab.ico')
 
         #Create Gif
         label_creategif = LabelFrame(create_gif,text='Video to Gif',padx=5,pady=5,font='bold')
@@ -1795,6 +1798,7 @@ class get_coordinates_from_video:
         getcoord = Toplevel()
         getcoord.minsize(200, 200)
         getcoord.wm_title('Get Coordinates in Video')
+        getcoord.iconbitmap('golden_lab.ico')
 
         # settings files selected
         self.videopath1selected = FileSelect(getcoord, "Video selected",title='Select a video file')
@@ -1831,14 +1835,27 @@ class project_config:
         self.allmodels = []
         # Popup window
         toplevel = Toplevel()
-        toplevel.minsize(580, 800)
+        toplevel.minsize(700, 400)
         toplevel.wm_title("Project Configuration")
+        toplevel.iconbitmap('golden_lab.ico')
 
         projectconfig = Scrollable(toplevel, width=25)
-        projectconfig.config(bg='gray89')
 
+        tab_parent = ttk.Notebook(projectconfig)
+
+        tab1 = ttk.Frame(tab_parent)
+        tab2 = ttk.Frame(tab_parent)
+        tab3 = ttk.Frame(tab_parent)
+        tab4 = ttk.Frame(tab_parent)
+
+        tab_parent.add(tab1,text=f'{"[ Generate project config ]": ^20s}')
+        tab_parent.add(tab2, text=f'{"[ Import videos into project folder ]": ^20s}')
+        tab_parent.add(tab3, text=f'{"[ Import tracking data ]": ^20s}')
+        tab_parent.add(tab4, text=f'{"[ Extract frames into project folder ]": ^20s}')
+
+        tab_parent.grid(row=0)
         # General Settings
-        label_generalsettings = LabelFrame(projectconfig, text='General Settings',fg='blue',font =("Helvetica",12,'bold'),padx=5,pady=5)
+        label_generalsettings = LabelFrame(tab1, text='General Settings',fg='black',font =("Helvetica",12,'bold'),padx=5,pady=5)
         self.directory1Select = FolderSelect(label_generalsettings, "Project Path:", title='Select Main Directory')
         self.label_project_name = Entry_Box(label_generalsettings, 'Project Name:', '0')
         label_project_namedescrip = Label(label_generalsettings, text='(project name cannot contain spaces)')
@@ -1846,49 +1863,50 @@ class project_config:
         #SML Settings
         self.label_smlsettings = LabelFrame(label_generalsettings, text='SML Settings',padx=5,pady=5)
         self.label_notarget = Entry_Box(self.label_smlsettings,'Number of predictive classifiers (behaviors):','33')
-        addboxButton = Button(self.label_smlsettings, text='<Add predictive classifier>', fg="Red", command=lambda:self.addBox(projectconfig))
+        addboxButton = Button(self.label_smlsettings, text='<Add predictive classifier>', fg="navy", command=lambda:self.addBox(projectconfig))
 
-        #Frame settings
-        label_frame_settings = LabelFrame(label_generalsettings, text='Video Settings',padx=5,pady=5)
-        label_framesettings_des = Label(label_frame_settings,text='Videos should be preprocessed using \'Tools\'')
-        label_framesettings_des_2 = Label(label_frame_settings,text='The video settings can be changed later for each individual video')
-        self.label_fps_settings = Entry_Box(label_frame_settings, 'Frames per second (fps):','19')
-        self.label_resolution_width = Entry_Box(label_frame_settings,'Resolution width (x-axis):','19')
-        self.label_resolution_height = Entry_Box(label_frame_settings,'Resolution height (y-axis):','19')
+        # #Frame settings
+        # label_frame_settings = LabelFrame(label_generalsettings, text='Video Settings',padx=5,pady=5)
+        # label_framesettings_des = Label(label_frame_settings,text='Videos should be preprocessed using \'Tools\'')
+        # label_framesettings_des_2 = Label(label_frame_settings,text='The video settings can be changed later for each individual video')
+        # self.label_fps_settings = Entry_Box(label_frame_settings, 'Frames per second (fps):','19')
+        # self.label_resolution_width = Entry_Box(label_frame_settings,'Resolution width (x-axis):','19')
+        # self.label_resolution_height = Entry_Box(label_frame_settings,'Resolution height (y-axis):','19')
 
         #generate project ini
-        button_generateprojectini = Button(label_generalsettings, text='Generate Project Config ', command=self.make_projectini, font=("Helvetica",10,'bold'),fg='red')
+        button_generateprojectini = Button(label_generalsettings, text='Generate Project Config ', command=self.make_projectini, font=("Helvetica",10,'bold'),fg='navy')
 
         #####import videos
-        label_importvideo = LabelFrame(projectconfig, text='Import Videos into project folder',fg='blue', font=("Helvetica",12,'bold'), padx=15, pady=5)
+        label_importvideo = LabelFrame(tab2, text='Import Videos into project folder',fg='black', font=("Helvetica",12,'bold'), padx=15, pady=5)
         # multi video
         label_multivideoimport = LabelFrame(label_importvideo, text='Import multiple videos', pady=5, padx=5)
         self.multivideofolderpath = FolderSelect(label_multivideoimport, 'Folder path',title='Select Folder with videos')
         self.video_type = Entry_Box(label_multivideoimport, 'Format (i.e., mp4, avi):', '18')
-        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command= self.import_multivid,fg='red')
+        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command= self.import_multivid,fg='navy')
         # singlevideo
         label_singlevideoimport = LabelFrame(label_importvideo, text='Import single video', pady=5, padx=5)
         self.singlevideopath = FileSelect(label_singlevideoimport, "Video path",title='Select a video file')
-        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',command= self.import_singlevid,fg='red')
+        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',command= self.import_singlevid,fg='navy')
 
 
         #import all csv file into project folder
-        label_import_csv = LabelFrame(projectconfig,text='Import DLC Tracking Data',fg='blue',font=("Helvetica",12,'bold'),pady=5,padx=5)
+        label_import_csv = LabelFrame(tab3,text='Import DLC Tracking Data',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
         #multicsv
         label_multicsvimport = LabelFrame(label_import_csv, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport,'Folder Select:',title='Select Folder with .csv(s)')
-        button_import_csv = Button(label_multicsvimport,text='Import csv to project folder',command = self.import_multicsv,fg='red')
+        button_import_csv = Button(label_multicsvimport,text='Import csv to project folder',command = self.import_multicsv,fg='navy')
         #singlecsv
         label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv files', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport,'File Select',title='Select a .csv file')
-        button_importsinglecsv = Button(label_singlecsvimport,text='Import single csv to project folder',command=self.import_singlecsv,fg='red')
+        button_importsinglecsv = Button(label_singlecsvimport,text='Import single csv to project folder',command=self.import_singlecsv,fg='navy')
 
 
         #extract videos in projects
-        label_extractframes = LabelFrame(projectconfig,text='Extract Frames into project folder',fg='blue',font=("Helvetica",12,'bold'),pady=5,padx=5)
+        label_extractframes = LabelFrame(tab4,text='Extract Frames into project folder',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
         label_note = Label(label_extractframes,text='Video frames are used for visualizations')
-        label_caution = Label(label_extractframes,text='Caution: this extract all frames from all videos in project and is computationally expensive if there is a lot of videos at high frame rates/resolution')
-        button_extractframes = Button(label_extractframes,text='Extract frames',command=self.extract_frames,fg='red')
+        label_caution = Label(label_extractframes,text='Caution: This extract all frames from all videos in project,')
+        label_caution2 = Label(label_extractframes,text='and is computationally expensive if there is a lot of videos at high frame rates/resolution.')
+        button_extractframes = Button(label_extractframes,text='Extract frames',command=self.extract_frames,fg='navy')
 
         #organize
         label_generalsettings.grid(row=0,sticky=W)
@@ -1900,12 +1918,12 @@ class project_config:
         self.label_notarget.grid(row=0,column=0,sticky=W,pady=5)
         addboxButton.grid(row=1,column=0,sticky=W,pady=6)
 
-        label_frame_settings.grid(row=5,column=0,sticky=W,pady=5)
-        label_framesettings_des.grid(row=0,sticky=W)
-        label_framesettings_des_2.grid(row=1,sticky=W)
-        self.label_fps_settings.grid(row=2,column=0,sticky=W)
-        self.label_resolution_width.grid(row=3,column=0,sticky=W)
-        self.label_resolution_height.grid(row=4,column=0,sticky=W)
+        # label_frame_settings.grid(row=5,column=0,sticky=W,pady=5)
+        # label_framesettings_des.grid(row=0,sticky=W)
+        # label_framesettings_des_2.grid(row=1,sticky=W)
+        # self.label_fps_settings.grid(row=2,column=0,sticky=W)
+        # self.label_resolution_width.grid(row=3,column=0,sticky=W)
+        # self.label_resolution_height.grid(row=4,column=0,sticky=W)
 
         button_generateprojectini.grid(row=6, pady=5, ipadx=5, ipady=5)
 
@@ -1931,7 +1949,8 @@ class project_config:
         label_extractframes.grid(row=6,sticky=W)
         label_note.grid(row=0,sticky=W)
         label_caution.grid(row=1,sticky=W)
-        button_extractframes.grid(row=2,sticky=W)
+        label_caution2.grid(row=2,sticky=W)
+        button_extractframes.grid(row=3,sticky=W)
 
         projectconfig.update()
 
@@ -2001,16 +2020,10 @@ class project_config:
         # for numbers, ent2 in enumerate(self.allmodels):
         #     model_list.append(ent2.get())
 
-
-        #frame settings
-        fpssettings = self.label_fps_settings.entry_get
-        resolution_width = self.label_resolution_width.entry_get
-        resolution_height = self.label_resolution_height.entry_get
-
         try:
-           self.configinifile = write_inifile(msconfig,project_path,project_name,no_targets,target_list,fpssettings,resolution_width,resolution_height)
-           print(self.configinifile)
-
+            self.configinifile = write_inifile(msconfig,project_path,project_name,no_targets,target_list)
+            print(self.configinifile)
+            print('Project created in',os.path.basename(project_path))
         except:
             print('Please fill in the information correctly.')
 
@@ -2026,58 +2039,86 @@ class project_config:
 class loadprojectini:
     def __init__(self):
         simongui = Toplevel()
-        simongui.minsize(1350, 700)
+        simongui.minsize(1100, 450)
         simongui.wm_title("Load project")
+        simongui.iconbitmap('golden_lab.ico')
 
-        scroll = Scrollable(simongui,width=32)
+        # scroll = Scrollable(simongui,width=32)
+
+        tab_parent = ttk.Notebook(simongui)
+
+        tab1 = ttk.Frame(tab_parent)
+        tab2 = ttk.Frame(tab_parent)
+        tab3 = ttk.Frame(tab_parent)
+        tab4 = ttk.Frame(tab_parent)
+        tab5 = ttk.Frame(tab_parent)
+        tab6 = ttk.Frame(tab_parent)
+        tab7 = ttk.Frame(tab_parent)
+        tab8 = ttk.Frame(tab_parent)
+        tab9 = ttk.Frame(tab_parent)
+        tab10 = ttk.Frame(tab_parent)
+
+        tab_parent.add(tab1,text = f"{'[ Load Project ]':20s}")
+        tab_parent.add(tab2, text= f"{'[ Further imports (data/video/frames) ]':20s}")
+        tab_parent.add(tab3, text=f"{'[ Video parameters ]':20s}")
+        tab_parent.add(tab4, text=f"{'[ Outlier correction ]':20s}")
+        tab_parent.add(tab5, text=f"{'[ Extract features ]':20s}")
+        tab_parent.add(tab6, text=f"{'[ Label behavior] ':20s}")
+        tab_parent.add(tab7, text=f"{'[ Train machine model ]':20s}")
+        tab_parent.add(tab8, text=f"{'[ Run machine model ]':20s}")
+        tab_parent.add(tab9, text=f"{'[ Visualizations ]':20s}")
+        tab_parent.add(tab10, text=f"{'[ Classifier validation ]':20s}")
+
+        tab_parent.grid(row=0)
+        tab_parent.enable_traversal()
 
         #load project ini
-        label_loadprojectini = LabelFrame(scroll,text='Load Project .ini',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
+        label_loadprojectini = LabelFrame(tab1,text='Load Project .ini',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         self.projectconfigini= FileSelect(label_loadprojectini,'File Select:',title='Select config.ini file')
 
         #label import
-        label_import = LabelFrame(scroll)
+        label_import = LabelFrame(tab2)
 
         #import all csv file into project folder
-        label_import_csv = LabelFrame(label_import, text='Import further DLC tracking data', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='blue')
+        label_import_csv = LabelFrame(label_import, text='Import further DLC tracking data', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='black')
         # multicsv
         label_multicsvimport = LabelFrame(label_import_csv, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:',title='Select Folder with .csv(s)')
-        button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',command= self.importdlctracking_multi,fg='red')
+        button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',command= self.importdlctracking_multi,fg='navy')
         # singlecsv
         label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv files', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport, 'File selected',title='Select a .csv file')
-        button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',command= self.importdlctracking_single,fg='red')
+        button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',command= self.importdlctracking_single,fg='navy')
 
         #import videos
-        label_importvideo = LabelFrame(label_import, text='Import further videos into project folder', font=("Helvetica",12,'bold'), padx=15,pady=5,fg='blue')
+        label_importvideo = LabelFrame(label_import, text='Import further videos into project folder', font=("Helvetica",12,'bold'), padx=15,pady=5,fg='black')
         # multi video
         label_multivideoimport = LabelFrame(label_importvideo, text='Import multiple videos', pady=5, padx=5)
         self.multivideofolderpath = FolderSelect(label_multivideoimport, 'Folder path',title='Select Folder with videos')
         self.video_type = Entry_Box(label_multivideoimport, 'File format (i.e., mp4/avi):', '20')
-        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command=self.importvideo_multi, fg='red')
+        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command=self.importvideo_multi, fg='black')
         # singlevideo
         label_singlevideoimport = LabelFrame(label_importvideo, text='Import single video', pady=5, padx=5)
         self.singlevideopath = FileSelect(label_singlevideoimport, "Video Path",title='Select a video file')
-        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',command= self.importvideo_single,fg='red')
+        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',command= self.importvideo_single,fg='black')
 
         #extract frames in project folder
-        label_extractframes = LabelFrame(label_import, text='Extract further frames into project folder', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='blue')
+        label_extractframes = LabelFrame(label_import, text='Extract further frames into project folder', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
         button_extractframes = Button(label_extractframes, text='Extract frames', command=self.extract_frames_loadini)
 
         #import frames
-        label_importframefolder = LabelFrame(label_import, text='Import frame folders', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='blue')
+        label_importframefolder = LabelFrame(label_import, text='Import frame folders', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
         self.frame_folder = FolderSelect(label_importframefolder,'Main frame directory',title='Select the main directory with frame folders')
         button_importframefolder = Button(label_importframefolder,text='Import frames',command = self.importframefolder )
 
         #get coordinates
-        label_setscale = LabelFrame(scroll,text='Video parameters (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='blue')
+        label_setscale = LabelFrame(tab3,text='Video parameters (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
         self.distanceinmm = Entry_Box(label_setscale, 'Known distance (mm)', '18')
         button_setdistanceinmm = Button(label_setscale, text='Autopopulate table',command=lambda: self.set_distancemm(self.distanceinmm.entry_get))
         button_setscale = Button(label_setscale,text='Set video parameters',command=self.setvideoparameter)
 
         #outlier correction
-        label_outliercorrection = LabelFrame(scroll,text='Outlier correction',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
+        label_outliercorrection = LabelFrame(tab4,text='Outlier correction',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         label_link = Label(label_outliercorrection,text='[link to description]',cursor='hand2',font='Verdana 10 underline')
         button_settings_outlier = Button(label_outliercorrection,text='Settings',command = lambda:outlier_settings(self.projectconfigini.file_path))
         button_outliercorrection = Button(label_outliercorrection,text='Run outlier correction',command=self.correct_outlier)
@@ -2085,46 +2126,47 @@ class loadprojectini:
         label_link.bind("<Button-1>",lambda e: self.callback('https://github.com/sgoldenlab/simba/blob/master/Outlier_settings.pdf'))
 
         #extract features
-        label_extractfeatures = LabelFrame(scroll,text='Extract Features',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
+        label_extractfeatures = LabelFrame(tab5,text='Extract Features',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         button_extractfeatures = Button(label_extractfeatures,text='Extract Features',command=self.extractfeatures)
 
         #label Behavior
-        label_labelaggression = LabelFrame(scroll,text='Label Behavior',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
+        label_labelaggression = LabelFrame(tab6,text='Label Behavior',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         button_labelaggression = Button(label_labelaggression, text='Select folder with frames',command= lambda:choose_folder(self.projectconfigini.file_path))
 
         #train machine model
-        label_trainmachinemodel = LabelFrame(scroll,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='blue')
+        label_trainmachinemodel = LabelFrame(tab7,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_trainmachinesettings = Button(label_trainmachinemodel,text='Settings',command=self.trainmachinemodelsetting)
         button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command=self.trainsinglemodel)
         button_train_multimodel = Button(label_trainmachinemodel, text='Train multiple models, one for each saved settings',fg='green',command=self.trainmultimodel)
 
         ##Single classifier valid
-        label_model_validation = LabelFrame(scroll,text='Validate Model on Single Video',pady=5, padx=5,font=("Helvetica",12,'bold'),fg='blue')
+        label_model_validation = LabelFrame(tab8,text='Validate Model on Single Video',pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
         self.csvfile = FileSelect(label_model_validation,'Select features file',title='Select .csv file in /project_folder/csv/features_extracted')
         self.modelfile = FileSelect(label_model_validation,'Select model file  ',title='Select the model (.sav) file')
         self.dis_threshold = Entry_Box(label_model_validation,'Discrimination threshold','28')
-        self.min_behaviorbout = Entry_Box(label_model_validation,'Minimum behavior bout length(ms)','28')
-        button_validate_model = Button(label_model_validation,text='validate',command = self.validatemodelsinglevid)
+        self.min_behaviorbout = Entry_Box(label_model_validation,'Minimum behavior bout length (ms)','28')
+        button_validate_model = Button(label_model_validation,text='Validate',command = self.validatemodelsinglevid)
 
         #run machine model
-        label_runmachinemodel = LabelFrame(scroll,text='Run Machine Model',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='blue')
+        label_runmachinemodel = LabelFrame(tab8,text='Run Machine Model',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_run_rfmodelsettings = Button(label_runmachinemodel,text='Model Selection',command=self.modelselection)
         self.descrimination_threshold = Entry_Box(label_runmachinemodel,'Discrimination threshold','28')
-        self.shortest_bout = Entry_Box(label_runmachinemodel,'Minimum behavior bout length(ms)','28')
+        self.shortest_bout = Entry_Box(label_runmachinemodel,'Minimum behavior bout length (ms)','28')
         button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command=self.runrfmodel)
 
         # machine results
-        label_machineresults = LabelFrame(scroll,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='blue')
+        label_machineresults = LabelFrame(tab8,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
         button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=self.analyzeprocessmovement)
+        self.severityscale = Entry_Box(label_machineresults,'Severity scale 0 -',15)
         button_process_severity = Button(label_machineresults,text='Analyze attack severity',command=self.analyzseverity)
 
         #plot sklearn res
-        label_plotsklearnr = LabelFrame(scroll,text='Sklearn visualization',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
+        label_plotsklearnr = LabelFrame(tab9,text='Sklearn visualization',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         button_plotsklearnr = Button(label_plotsklearnr,text='Visualize classification results',command =self.plotsklearn_result)
 
         #plotpathing
-        label_plotall = LabelFrame(scroll,text='Visualizations',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='blue')
+        label_plotall = LabelFrame(tab9,text='Visualizations',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         #ganttplot
         label_ganttplot = LabelFrame(label_plotall,text='Gantt plot',pady=5,padx=5)
         button_ganttplot = Button(label_ganttplot,text='Generate gantt plot',command=self.plotgantt)
@@ -2133,7 +2175,7 @@ class loadprojectini:
         button_dataplot = Button(label_dataplot,text='Generate data plot',command=self.plotdataplot)
         #path plot
         label_pathplot = LabelFrame(label_plotall,text='Path plot',pady=5,padx=5)
-        self.Deque_points = Entry_Box(label_pathplot,'Max Lines','15')
+        self.Deque_points = Entry_Box(label_pathplot,'Max lines','15')
         self.severity_brackets = Entry_Box(label_pathplot,'Severity Scale: 0 - ','15')
         self.Bodyparts = Entry_Box(label_pathplot, 'Bodyparts', '15')
         self.plotsvvar = IntVar()
@@ -2153,17 +2195,17 @@ class loadprojectini:
         CreateToolTip(self.poi1,'The bodyparts from config yaml. eg: Ear_left_1,Ear_right_1,Nose_1,Center_1,Lateral_left_1,Lateral_right_1,Tail_base_1,Tail_end_1,Ear_left_2,Ear_right_2,Nose_2,Center_2,Lateral_left_2,Lateral_right_2,Tail_base_2,Tail_end_2')
 
         #Merge frames
-        label_mergeframes = LabelFrame(scroll,text='Merge Frames',pady=5,padx=5,font=("Helvetica",12,'bold'),fg='blue')
-        button_mergeframe = Button(label_mergeframes,text='Merge Frames',command=self.mergeframesofplot)
+        label_mergeframes = LabelFrame(tab9,text='Merge frames',pady=5,padx=5,font=("Helvetica",12,'bold'),fg='black')
+        button_mergeframe = Button(label_mergeframes,text='Merge frames',command=self.mergeframesofplot)
 
         #create video
-        label_createvideo = LabelFrame(scroll, text='Create Video', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='blue')
+        label_createvideo = LabelFrame(tab9, text='Create Video', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
         self.bitrate = Entry_Box(label_createvideo,'Bitrate',8)
         self.fileformt = Entry_Box(label_createvideo,'File format',8)
         button_createvideo = Button(label_createvideo, text='Create Video',command=self.generate_video)
 
         ## classifier validation
-        label_classifier_validation = LabelFrame(scroll, text='Classifier Validation', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='blue')
+        label_classifier_validation = LabelFrame(tab10, text='Classifier Validation', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
         self.seconds = Entry_Box(label_classifier_validation,'Seconds','8')
         button_validate_classifier = Button(label_classifier_validation,text='Validate',command =self.classifiervalidation)
 
@@ -2171,8 +2213,8 @@ class loadprojectini:
         label_loadprojectini.grid(row=0,sticky=W)
         self.projectconfigini.grid(row=0,sticky=W)
 
-        label_import.grid(row=1,sticky=W,pady=5)
-        label_import_csv.grid(row=0, sticky=N, pady=5)
+        label_import.grid(row=0,column=0,sticky=W,pady=5)
+        label_import_csv.grid(row=0, sticky=N+W, pady=5)
         label_multicsvimport.grid(row=0, sticky=W)
         self.folder_csv.grid(row=0, sticky=W)
         button_import_csv.grid(row=1, sticky=W)
@@ -2180,7 +2222,7 @@ class loadprojectini:
         self.file_csv.grid(row=0, sticky=W)
         button_importsinglecsv.grid(row=1, sticky=W)
 
-        label_importvideo.grid(row=0,column=1, sticky=N, pady=5,padx=5)
+        label_importvideo.grid(row=1,column=0, sticky=N+W, pady=5,padx=5)
         label_multivideoimport.grid(row=0, sticky=W)
         self.multivideofolderpath.grid(row=0, sticky=W)
         self.video_type.grid(row=1, sticky=W)
@@ -2190,10 +2232,10 @@ class loadprojectini:
         button_importsinglevideo.grid(row=1, sticky=W)
 
 
-        label_extractframes.grid(row=0,column=2,sticky=N,pady=5,padx=5)
+        label_extractframes.grid(row=0,column=1,sticky=N+W,pady=5,padx=5)
         button_extractframes.grid(row=0,sticky=W)
 
-        label_importframefolder.grid(row=0,column=3,sticky=N,pady=5,padx=5)
+        label_importframefolder.grid(row=1,column=1,sticky=N+W,pady=5,padx=5)
         self.frame_folder.grid(row=0,sticky=W)
         button_importframefolder.grid(row=1,sticky=W)
 
@@ -2218,14 +2260,14 @@ class loadprojectini:
         button_trainmachinemodel.grid(row=0,column=1,sticky=W,padx=5)
         button_train_multimodel.grid(row=0,column=2,sticky=W,padx=5)
 
-        label_model_validation.grid(row=7,sticky=W)
+        label_model_validation.grid(row=7,sticky=W,pady=5)
         self.csvfile.grid(row=0,sticky=W)
         self.modelfile.grid(row=1,sticky=W)
         self.dis_threshold.grid(row=2,sticky=W)
         self.min_behaviorbout.grid(row=3,sticky=W)
         button_validate_model.grid(row=4,sticky=W)
 
-        label_runmachinemodel.grid(row=8,sticky=W)
+        label_runmachinemodel.grid(row=8,sticky=W,pady=5)
         button_run_rfmodelsettings.grid(row=0,sticky=W)
         self.descrimination_threshold.grid(row=1,sticky=W)
         # button_set_d_t.grid(row=1,column=1,sticky=W)
@@ -2233,15 +2275,16 @@ class loadprojectini:
         # button_set_shortbout.grid(row=2,column=1,sticky=W)
         button_runmachinemodel.grid(row=3,sticky=W)
 
-        label_machineresults.grid(row=9,sticky=W)
-        button_process_datalog.grid(row=0,column=0,sticky=W,padx=3)
-        button_process_movement.grid(row=0,column=1,sticky=W,padx=3)
-        button_process_severity.grid(row=0,column=2,sticky=W,padx=3)
+        label_machineresults.grid(row=9,sticky=W,pady=5)
+        button_process_datalog.grid(row=1,column=0,sticky=W,padx=3)
+        button_process_movement.grid(row=1,column=1,sticky=W,padx=3)
+        self.severityscale.grid(row=0,column=2,sticky=W)
+        button_process_severity.grid(row=1,column=2,sticky=W,padx=3)
 
-        label_plotsklearnr.grid(row=10,sticky=W)
+        label_plotsklearnr.grid(row=10,column=0,sticky=W+N,padx=5)
         button_plotsklearnr.grid(row=0,sticky=W)
 
-        label_plotall.grid(row=11,sticky=W)
+        label_plotall.grid(row=10,column=1,sticky=W+N,padx=5)
         #gantt
         label_ganttplot.grid(row=0,sticky=W)
         button_ganttplot.grid(row=0,sticky=W)
@@ -2261,10 +2304,10 @@ class loadprojectini:
         self.poi2.grid(row=2,sticky=W)
         button_distanceplot.grid(row=3,sticky=W)
 
-        label_mergeframes.grid(row=12,sticky=W)
+        label_mergeframes.grid(row=10,column=2,sticky=W+N,padx=5)
         button_mergeframe.grid(row=0,sticky=W)
 
-        label_createvideo.grid(row=13,sticky=W)
+        label_createvideo.grid(row=10,column=3,sticky=W+N,padx=5)
         self.bitrate.grid(row=0,sticky=W)
         self.fileformt.grid(row=1,sticky=W)
         button_createvideo.grid(row=2,sticky=W)
@@ -2273,7 +2316,7 @@ class loadprojectini:
         self.seconds.grid(row=0,sticky=W)
         button_validate_classifier.grid(row=1,sticky=W)
 
-        scroll.update()
+        # scroll.update()
 
     def classifiervalidation(self):
         try:
@@ -2307,7 +2350,7 @@ class loadprojectini:
 
     def analyzseverity(self):
         try:
-            analyze_process_severity(self.projectconfigini.file_path)
+            analyze_process_severity(self.projectconfigini.file_path,self.severityscale.entry_get)
         except:
             print('Please load config.ini to analyze severity')
 
@@ -2502,6 +2545,7 @@ class trainmachinemodel_settings:
         trainmms = Toplevel()
         trainmms.minsize(400, 400)
         trainmms.wm_title("Machine model settings")
+        trainmms.iconbitmap('golden_lab.ico')
 
         #load metadata
         load_data_frame = LabelFrame(trainmms, text='Load Metadata',font=('Helvetica',10,'bold'), pady=5, padx=5)
@@ -2793,6 +2837,7 @@ class runmachinemodelsettings:
         runmms = Toplevel()
         runmms.minsize(200, 200)
         runmms.wm_title("Select model to run")
+        runmms.iconbitmap('golden_lab.ico')
 
         ### read inifile and get the model
         config = ConfigParser()
@@ -2848,15 +2893,15 @@ class Scrollable(Frame):
 
     def __init__(self, frame, width=16):
 
-        scrollbarX = Scrollbar(frame, width=width, orient='horizontal')
-        scrollbarX.pack(side=BOTTOM, fill=X, expand=False)
+        # scrollbarX = Scrollbar(frame, width=width, orient='horizontal')
+        # scrollbarX.pack(side=BOTTOM, fill=X, expand=False)
         scrollbarY = Scrollbar(frame, width=width)
         scrollbarY.pack(side=RIGHT, fill=Y, expand=False)
 
-        self.canvas = Canvas(frame, xscrollcommand=scrollbarX.set, yscrollcommand=scrollbarY.set)
+        self.canvas = Canvas(frame, yscrollcommand=scrollbarY.set)
         self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-        scrollbarX.config(command=self.canvas.xview)
+        # scrollbarX.config(command=self.canvas.xview)
         scrollbarY.config(command=self.canvas.yview)
 
         self.canvas.bind('<Configure>', self.__fill_canvas)
@@ -2937,6 +2982,7 @@ class aboutgui:
         about.minsize(200, 200)
         about.wm_title("About")
         about.iconbitmap('golden_lab.ico')
+        aboutgui.iconbitmap('golden_lab.ico')
 
         canvas = Canvas(about,width=551,height=268,bg='black')
         canvas.pack()
@@ -2949,11 +2995,16 @@ class App(object):
     def __init__(self):
         self.root = Tk()
         self.root.title('SimBA')
-        self.root.minsize(300,300)
-        self.root.geometry("800x600")
+        self.root.minsize(750,750)
+        self.root.geometry("750x750")
         self.root.iconbitmap('golden_lab.ico')
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
+
+        img = PhotoImage(file='golden.png')
+        background = Label(self.root, image=img, bd=0)
+        background.pack(fill='both', expand=True)
+        background.image = img
 
         ### drop down menu###
         menu = Menu(self.root)
@@ -2962,7 +3013,7 @@ class App(object):
         #first menu
         fileMenu = Menu(menu)
         menu.add_cascade(label='File', menu=fileMenu)
-        fileMenu.add_command(label='Create a new project', command=project_config)
+        fileMenu.add_command(label='Create a new project',command=project_config)
         fileMenu.add_command(label='Load project', command=loadprojectini)
         fileMenu.add_separator()
         fileMenu.add_command(label='Exit', command=Exit)
@@ -3031,11 +3082,9 @@ class App(object):
         sixthMenu.add_command(label='About', command= aboutgui)
 
         #Status bar at the bottom
-        self.frame = Frame(self.root, bd=2, relief=SUNKEN, width=300, height=300)
-        self.frame.grid(row=0, column=0, sticky=E + N + W + S)
-        self.frame.rowconfigure(0, weight=1)
-        self.frame.columnconfigure(0, weight=1)
-        self.txt = Text(self.frame)
+        self.frame = Frame(background, bd=2, relief=SUNKEN, width=300, height=300)
+        self.frame.pack(expand=True)
+        self.txt = Text(self.frame, bg='white')
         self.txt.config(state=DISABLED)
         self.txt.pack(expand=True, fill='both')
         sys.stdout = StdRedirector(self.txt)
@@ -3084,4 +3133,5 @@ if __name__ == '__main__':
 
 
 app = App()
+print('Welcome fellow scientists :)')
 app.root.mainloop()

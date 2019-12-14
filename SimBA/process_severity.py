@@ -5,7 +5,7 @@ from configparser import ConfigParser
 from datetime import datetime
 dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
 
-def analyze_process_severity(configini):
+def analyze_process_severity(configini,severitbrac):
     print('Processing attack severity...')
     config = ConfigParser()
     configFile = str(configini)
@@ -13,7 +13,7 @@ def analyze_process_severity(configini):
     filesFound = []
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'machine_results')
-    severity_brackets = config.getint('Path plot settings', 'severity_brackets')
+    severity_brackets = int(severitbrac)
     vidInfPath = config.get('General settings', 'project_path')
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')

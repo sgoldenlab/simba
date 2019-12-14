@@ -1,6 +1,6 @@
 import os
 
-def write_inifile(msconfig,project_path,project_name,no_targets,target_list,fpssettings,resolution_width,resolution_height):
+def write_inifile(msconfig,project_path,project_name,no_targets,target_list):
 
 ############create directories################
     directory = project_path
@@ -64,9 +64,6 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,fpss
 
     #frame settings
     f.write('[Frame settings]\n')
-    f.write('fps = ' + str(fpssettings) +'\n')
-    f.write('resolution_width = ' + str(resolution_width) +'\n')
-    f.write('resolution_height = ' + str(resolution_height) +'\n')
     f.write('frames_dir_in = ' + str(input_folder) + '\n')
     f.write('frames_dir_out = ' + str(output_folder) + '\n')
     f.write('mm_per_pixel = '+'\n')

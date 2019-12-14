@@ -164,7 +164,7 @@ class MainInterface:
         self.window.bind('<Left>', lambda x: load_frame(current_frame_number-1, self.window, self.fbox))
         self.window.bind('<Control-q>', lambda x: save_video(self.window))
         self.window.bind('<Control-l>', lambda x: load_frame(len(frames_in) - 1, self.window, self.fbox))
-        self.window.bind('Control-o>', lambda x: load_frame(0, self.window, self.fbox))
+        self.window.bind('<Control-o>', lambda x: load_frame(0, self.window, self.fbox))
 
     # Saves the values of each behavior and advances either to the next or by a set number of frames
     def save_checkboxes(self, master):
@@ -298,7 +298,7 @@ def save_values(start, end):
         for i in range(start, end+1):
             for b in range(len(behaviors)):
                 df.at[i, columns[b]] = int(behaviors[b])
-    print(df.ix[current_frame_number - 25: current_frame_number + 25])
+    print(df.ix[current_frame_number])
 
 
 # Appends data to corresponding features_extracted csv and exports as new csv

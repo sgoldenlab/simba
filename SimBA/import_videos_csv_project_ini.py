@@ -115,17 +115,20 @@ def copy_allcsv_ini(inifile,source):
     print('Copying csv files...')
     source = str(source)+'\\'
     dest = str(os.path.dirname(inifile))
-    dest1 = str((dest)+ '\\' + 'csv'+ '\\'+ 'input_csv')
+    dest1 = str((dest)+ '\\' + 'csv'+ '\\'+ 'input_csv'+'\\raw_data')
+    dest2 = str((dest) + '\\' + 'csv' + '\\' + 'input_csv\\')
     files = []
-    print(dest1)
-    print(source)
+
+    if not os.path.exists(dest1):
+        os.makedirs(dest1)
+
     ########### FIND FILES ###########
     for i in os.listdir(source):
         if i.__contains__(".csv"):
             files.append(i)
-
+    ###copy files to project_folder/csv/raw_tracking_csv
     for f in files:
-        filetocopy=source +'\\'+f
+        filetocopy = source +'\\'+f
         if os.path.exists(dest1+'\\'+f):
             print(f, 'already exist in', dest1)
 
@@ -133,7 +136,23 @@ def copy_allcsv_ini(inifile,source):
             shutil.copy(filetocopy, dest1)
             nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
             print(f, 'copied to', nametoprint)
+    ### copy files to input_csv
+    for f in files:
+        filetocopy = source +'\\'+f
+        if os.path.exists(dest2+'\\'+f):
+            print(f, 'already exist in', dest2)
 
+        elif not os.path.exists(dest2+'\\'+f):
+            shutil.copy(filetocopy, dest2)
+            nametoprint = os.path.join('', *(splitall(dest2)[-4:]))
+            print(f, 'copied to', nametoprint)
+    ##rename files in input csv
+    for i in os.listdir(dest2):
+        if ('.csv') and ('DeepCut') in i:
+            finali = i.split('DeepCut')[0]
+            os.rename(dest2+i,dest2+finali+'.csv')
+        else:
+            pass
     print('Finished importing tracking data.')
 
 def copy_singlevideo_ini(inifile,source):
@@ -156,7 +175,11 @@ def copy_singlevideo_ini(inifile,source):
 def copy_singlecsv_ini(inifile,source):
     print('Copying csv file...')
     dest = str(os.path.dirname(inifile))
-    dest1 = str((dest) + '\\' + 'csv' + '\\' + 'input_csv')
+    dest1 = str((dest) + '\\' + 'csv' + '\\' + 'input_csv\\raw_data\\')
+    dest2 = str((dest) + '\\' + 'csv' + '\\' + 'input_csv\\')
+
+    if not os.path.exists(dest1):
+        os.makedirs(dest1)
 
     if os.path.exists(dest1+'\\'+os.path.basename(source)):
         print(os.path.basename(source), 'already exist in', dest1)
@@ -164,5 +187,20 @@ def copy_singlecsv_ini(inifile,source):
         shutil.copy(source, dest1)
         nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
         print(os.path.basename(source), 'copied to', nametoprint)
+
+    if os.path.exists(dest2+'\\'+os.path.basename(source)):
+        print(os.path.basename(source), 'already exist in', dest1)
+    else:
+        shutil.copy(source, dest2)
+        nametoprint = os.path.join('', *(splitall(dest2)[-4:]))
+        print(os.path.basename(source), 'copied to', nametoprint)
+
+    ##rename files in input csv
+    for i in os.listdir(dest2):
+        if ('.csv') and ('DeepCut') in i:
+            finali = i.split('DeepCut')[0]
+            os.rename(dest2+i,dest2+finali+'.csv')
+        else:
+            pass
 
     print('Finished importing tracking data.')
