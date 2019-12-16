@@ -220,7 +220,7 @@ This step creates a temp.yaml file to automate the **Extract Frames** process. I
 
 1. Under **Load Model**, click `Browse File` and select the *config.yaml* file. 
 
-2. Under **Multiple Videos**, click on `Browse Folder` and select the folder containing only the videos.
+2. Under `[Generate temp yaml]` tab --> `Multiple videos`, click on `Browse Folder` and select the folder containing only the videos.
 
 3. Click `Add multiple videos`.
 
