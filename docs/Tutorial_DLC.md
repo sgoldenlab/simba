@@ -54,7 +54,7 @@ This step generates a new DeepLabCut project.
 ## Part 2: Load DLC Project
 This section allows you to load your DeepLabCut project.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/loaddlcmodel.png" width="400" height="200" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/loaddlcmodel.png" width="569" height="353" />
 
 ### Step 1: Check the settings in the config.yaml file
 
