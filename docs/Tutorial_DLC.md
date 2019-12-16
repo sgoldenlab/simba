@@ -205,11 +205,12 @@ This step creates a temp.yaml file to automate the **Extract Frames** process. I
 
 ### Step 1: Generate temp.yaml from the original config.yaml
 
+
 #### Single Video
 
 1. Under **Load Model**, click `Browse File` and select the *config.yaml* file. 
 
-2. Under **Single Video**, click on `Browse File` and select the video.
+2. Under `[Generate temp yaml]` tab --> `Single video`, click on `Browse File` and select the video.
 
 3. Click `Add single video`
 
