@@ -26,6 +26,7 @@ SimBA currently does not support analysis of video recordings of multiple simila
 ## Pipeline 👷
 
 <img src="/images/overallflow.PNG" width="989" height="169" />
+
 ![](https://github.com/sgoldenlab/simba/blob/master/images/overallflow.PNG)
 
 ### Step 1: [Pre-process videos](docs/tutorial_process_videos.md) 
