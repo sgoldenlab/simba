@@ -19,6 +19,10 @@ SimBA currently does not support analysis of video recordings of multiple simila
 #### Rat
 ![](https://github.com/sgoldenlab/simba/blob/master/images/rat_videos.gif)
 
+#### SimBA GUI workflow
+![](https://github.com/sgoldenlab/simba/blob/master/images/SimBA_tkinter.png)
+
+
 ## Pipeline 👷
 
 <img src="/images/overallflow.PNG" width="989" height="169" />
