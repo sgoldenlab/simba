@@ -57,7 +57,7 @@ Below is a link to download trained models to apply it on your dataset
 - [Random forest models](https://osf.io/d69jt/) 🌲
 
 ### SimBA visualization examples
-- [YouTube playlist](https://www.youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl)📺
+- [YouTube playlist] (https://www.youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl)📺
 
 ### Labelled images
 - [DeepLabCut labelled images](https://osf.io/uhjzf/) 📷
