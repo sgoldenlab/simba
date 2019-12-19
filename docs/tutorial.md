@@ -344,7 +344,7 @@ The datetime stamped output csv file is saved in the logs folder.
 ### Step 10: Visualization
 Plot Sklearn result creates the frames with the animals and the predictions overlayed and the body-part circles overlayed
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="1246" height="503" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="1246" height="380" />
 
 1. Under **Sklearn visualization**, click `Visualize classification results`.
 
