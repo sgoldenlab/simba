@@ -24,7 +24,7 @@ For processing a tracking dataset, the pipeline is split into a few sections. Th
 - [Train Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model)
 - [Run Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model)
 - [Analyze Machine Results](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
-- [Plot Sklearn Results](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-plot-sklearn-results)
+- [Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-visualization)
 - [Plot Graphs](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-plot-graphs)
 - [Merge Frames](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-12-merge-frames)
 - [Create Video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-13-create-video)
@@ -341,12 +341,12 @@ In this step, there are three main analysis, which are `Analyze`, `Analyze dista
 - `Analyze severity`: Calculates the ‘severity’ of each frame classified as containing attack based on a user-defined scale. .  For example, on a 10-point scale, if the total body-part movement distances of both animals were in the top 10% percentile of movements in the video and a frame was scored as aggression, the aggressive attack was scored as a 10.
 The datetime stamped output csv file is saved in the logs folder.
 
-### Step 10: Plot Sklearn Results
+### Step 10: Visualization
 Plot Sklearn result creates the frames with the animals and the predictions overlayed and the body-part circles overlayed
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="170" height="58" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="1246" height="503" />
 
-1. Under **Plot Sklearn Results**, click `Plot Sklearn Results`.
+1. Under **Sklearn visualization**, click `Visualize classification results`.
 
 ### Step 11: Plot Graphs
 The user is able to choose what plot to generate, **Gantt plot**, **Data plot**, **Path plot**, and **Distance plot**
