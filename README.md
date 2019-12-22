@@ -77,3 +77,9 @@ This project is licensed under the GNU Lesser General Public License v3.0. Note 
 
 
 [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)](https://osf.io/d69jt/) [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/twitter.png)](https://twitter.com/GoldenNeuron?s=20)
+
+## Contributors 🤼
+- [Simon Nilsson](https://github.com/sronilsson)
+- [Jia Jie Choong](https://github.com/inoejj)
+- [Sophia Hwang](https://github.com/sophihwang26)
+- [Xiaoyu Tong](https://github.com/Xiaoyu-Tong)
