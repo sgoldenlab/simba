@@ -1,7 +1,7 @@
 # Labelling Behavior
 
 ## 1. Loading project_config file 
-`File > Load Project > Load Project.ini > Browse File` Select your config file for the current project. This step **must** be done before proceeding to the next step.
+`File > Load Project > Load Project.ini > Browse File` Select the config file (project_config.ini) for the current project. This step **must** be done before proceeding to the next step.
 
 ## 2. Opening labelling behavior window
 In the 'Load project' window, under `Label Behavior` select `Select folder with frames`. This will prompt you to select a **folder** of video frames. Upon selecting, a new window should pop up displaying the first frame in the folder. 

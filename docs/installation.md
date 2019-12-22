@@ -1,4 +1,4 @@
-# Pre-requisite
+# Pre-requisites
 1. [Python 3.6](https://www.python.org/downloads/release/python-360/)
 2. [Git](https://git-scm.com/downloads) 
 3. [DeepLabCut](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/installation.md)
