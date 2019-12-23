@@ -12,9 +12,9 @@ The video parameters specified by the user will be processed in the following se
 ## Step 1: Folder Selection
 
 
-1. `Process Videos` --> `Batch pre-process videos`.
+1. To get started, on the very top of the tabs in the window, click on `Process Videos` --> `Batch pre-process videos`.
 
-<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo.PNG width="264" height="138" />
+<img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo.PNG width="285" height="111" />
 
 2. Under **Folder Selection**, `Directory with videos in it`, select a folder with **only** videos by clicking `Browse Folder`
 
