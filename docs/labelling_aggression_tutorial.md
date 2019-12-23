@@ -6,7 +6,7 @@
 ## 2. Opening labelling behavior window
 In the 'Load project' window, under `Label Behavior` select `Select folder with frames`. This will prompt you to select a **folder** containing video frames (in png format). When the folder is selected a new window pops up displaying the first frame of the video. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelling_table.PNG" width="600" height="450" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelling_table.PNG" width="752" height="802" />
 
 > Note: At any time, users can refer to the main screen to see the values of the frame, as well as the values of the previous and next 25 frames.
 
