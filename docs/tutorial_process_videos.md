@@ -1,9 +1,11 @@
 
 
 # Tutorial for processing video in batch
-Videos are processed via **ffmpeg** in **python**. Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install ffmpeg.
+The batch pre-processing tools allows users to change video parameters (clip/trim/crop etc.) for multiple videos independently. Once the required parameters has been set for all the videos, the user press `Execute` and the new videos will be generated. Videos are processed via **FFmpeg** Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install FFmpeg on your computer. 
 
 ## Pipeline
+
+The video parameters specified by the user will be processed in the following sequence. If the user leaves certain parameters unchanged in, they will be ignored in the pipeline.   
 
 <img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo_flowdiagram.png width="800" height="310" />
 
