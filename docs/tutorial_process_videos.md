@@ -35,7 +35,9 @@ The video parameters specified by the user will be processed in the following se
 
 <img src=https://github.com/sgoldenlab/simba/blob/master/images/batchprocessvideo.PNG width="1102" height="200" />
 
-2. If you wish to crop your videos, click on the `Crop` button. *The button will turn red once you clicked on it*
+2. If you wish to crop your videos, click on the `Crop` button. *(The button will turn red once you clicked on it)* A frame from the video will pop up. Left click on the frame and drag it to crop the video. Once it is done, double tap "Enter" on your keyboard.
+
+![](/images/cropvideoroi.gif)
 
 3. If you wish to trim your videos, check on the `Shorten` box and enter the **Start Time** and  **End Time** in the HH:MM:SS format.
 
