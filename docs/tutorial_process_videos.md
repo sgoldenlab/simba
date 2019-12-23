@@ -17,13 +17,15 @@ The video parameters specified by the user will be processed in the following se
 
 ![](/images/batchprocessvideo1.PNG)
 
-2. Under **Folder Selection**, `Directory with videos in it`, select a folder with **only** videos by clicking `Browse Folder`
+2. Under **Folder Selection**, `Video directory`, click on `Browse Folder` and navigate to a folder that contains videos to process and click 'Select Folder`.
 
-3. Under `Output Directory`, select an output directory where all the processed videos will be saved by clicking `Browse Folder`
+![](/images/selectfolderwithvideos.PNG)
+
+3. Under `Output Directory`, lick on `Browse Folder` and navigate to a folder*(usually an empty folder)* that you wished to saved your processed videos and click 'Select Folder`.
 
 4. Click `Confirm` to confirm the directories selected.
 
->**Note**: Please make sure there is no space in your folder name or video name.
+>**Note**: Please make sure there is no spaces in your folder name or video name.
 
 <img src=https://github.com/sgoldenlab/simba/blob/master/images/processvideo2.PNG width="450" height="200" />
 
