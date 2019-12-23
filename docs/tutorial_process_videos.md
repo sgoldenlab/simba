@@ -63,3 +63,5 @@ The video parameters specified by the user will be processed in the following se
 
 4. The **process_archieve** folder contains the **.txt** file of the process that were ran. 
 
+5. The **Output Directory** will have all the final processed video.
+
