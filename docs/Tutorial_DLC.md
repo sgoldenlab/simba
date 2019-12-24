@@ -4,7 +4,7 @@
 ## Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
 
-![alt-text-1](/images/dlcworkflow.PNG "dlcworkflow.PNG)
+![alt-text-1](/images/dlcworkflow.PNG "dlcworkflow.PNG")
 
 ### [Part 1: Create DLC Project](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
 
