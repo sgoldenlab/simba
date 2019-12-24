@@ -1,6 +1,6 @@
 # How to use tools to process videos in SimBA
 
-<img src=https://github.com/sgoldenlab/simba/blob/master/images/tools.png width="375" height="322" />
+![alt-text-1](/images/tools2.PNG "tools2")
 
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
 - [Crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
