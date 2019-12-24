@@ -1,6 +1,8 @@
-# Create tracking model using [DeepLabCut](http://www.mousemotorlab.org/deeplabcut)
+# Using SimBA to create and access [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) tracking models
+*Note*: This part of SimBA was written early on when [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) was accessed by the command line and did not come with the very nice GUI it comes with today. At that early point we added this part of SimBA to make DeepLabCut accessable for all members of the Sam Golden lab. If users prefer to work in the DeepLabCut interface to create and access pose estimation models, the tracking data can instead be generated elsewhere and this step can be skipped. The tracking data can instead be imported directly in csv file format when creating the [behavioral classifiers]9https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).     
 
 ## Pipeline breakdown
+For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut)
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/dlcworkflow.PNG" width="591" height="294" />
 
@@ -18,35 +20,35 @@
 - [Extract more frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#extract-more-frames) 
 - [Outlier correction](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#outlier-correction)
 
-## Part 1: Create DLC Project
-This section creates a new project for your DLC tracking analysis.
+## Part 1: Create DLC Model
+Here you can create a new project for your DLC pose-estimation tracking analysis.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/createdlcmodel.png" width="400" height="200" />
 
-### Step 1: Generate a new DLC project
+### Step 1: Generate a new DLC model. 
 This step generates a new DeepLabCut project.
 
 1. Go to `Tracking` --> `DeepLabCut` --> `Create DLC Model`. The following window will pop up.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/createdlcmodel2.png" width="400" height="336" />
 
-2. Enter the name of your project in `Project Name`.
+2. Enter the name of your project in the `Project name` entry box.
 
-3. Enter your name in the `Experimenter Name`.
+3. Enter your name in the `Experimenter name` entry box.
 
 > **Note:** Spaces are not allowed in your project name and experimenter name.
 
-4. If you are only tracking one video, you can click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importsinglevideo.PNG" width="120" height="27" /> and the <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> in **green** should change to <img src="https://github.com/sgoldenlab/simba/blob/master/images/videopath.PNG" width="274" height="27" /> in **blue**. Then click on `Browse File` to select a video.
+4. Next, import your videos into your project. If you are only tracking one video, you can click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importsinglevideo.PNG" width="120" height="27" /> and the <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> in **green** should change to <img src="https://github.com/sgoldenlab/simba/blob/master/images/videopath.PNG" width="274" height="27" /> in **blue**. Then click on `Browse File` to select a video file.
 
-5. If you are tracking multiple videos, click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importmultivideo.PNG" width="120" height="27" /> and the **green** <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> will appear. Click on `Browse Folder` to choose a folder with the videos. 
+5. If you are importing multiple videos into your project, click on <img src="https://github.com/sgoldenlab/simba/blob/master/images/importmultivideo.PNG" width="120" height="27" /> and the **green** <img src="https://github.com/sgoldenlab/simba/blob/master/images/videofolder.PNG" width="274" height="27" /> will appear. Click on `Browse Folder` to choose a folder containing the videos you want to import into your project. 
 
->**Note:** The default settings is always to **import multiple videos**.
+>**Note:** The default settings is to **import multiple videos**.
 
-6. Next, select the main directory that your project will be in. In `Working Directory` click `Browse Folder` and choose a directory.
+6. Next, select the main directory that your project will be located in. Next to `Project directory`, click on `Browse Folder` and choose a directory.
 
-7. If you wish to use the Golden Lab's settings, check the `Apply Golden Aggression Config` box.
+7. If you wish to use the Golden Lab's settings, check the `Apply Golden Aggression Config` box. This setting is used to track two mice, and eight body parts on each of the two mice.
 
-8. You have a choice of copying all the videos to your DLC project folder by checking the `Copy Videos` checkbox.
+8. You can either copy all the videos to your DLC project folder, or create shortcuts to the videos. By checking the `Copy Videos` checkbox, the videos will be copied to your project folder. If 
 
 9. Click `Create Project` to create your DLC project. The project will be located in the **working directory** that was chosen.
 
