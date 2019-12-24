@@ -4,13 +4,14 @@ The behavioural annotator GUI is used to label (annotate) frames extracted from 
 Note that SimBA performs similar functions such as the open-source [JWatcher](http://www.jwatcher.ucla.edu/) or commercial [Noldus Observer](https://www.noldus.com/human-behavior-research/products/the-observer-xt) systems, with the exception that SimBA automates the backend integration of behavioral annotation with creating predictive classifiers. If you already have such annotations stored in alterantive file formats, like [JWatcher](http://www.jwatcher.ucla.edu/) or [Noldus Observer](https://www.noldus.com/human-behavior-research/products/the-observer-xt), they can be appended directly to the tracking data and no behavioral annotations needs to be done in SimBA. For example, the [Crim13 dataset](http://www.vision.caltech.edu/Video_Datasets/CRIM13/CRIM13/Main.html) was annotated using [Piotr’s Matlab Toolbox](https://github.com/pdollar/toolbox) and we appended the annotations to the tracking data using a version of [this script](https://github.com/sgoldenlab/simba/blob/master/misc/Caltech_2_DLC.py). 
 
 If you already have annotation videos created with these alternative tools, or any other behavioral annotator, and would like to use them to create predictive classifiers, please let us know as we would like to write scripts that could process these data for SimBA. If you have created such scripts yourself, please consider contributing them to the community!  
+
 **We will provide support in either scenario**.
 
 ## Step 1. Loading project_config file 
 In the main SimBA menu, click on `File > Load Project > Load Project.ini > Browse File` and select the config file (project_config.ini) for the current project. This step **must** be done before proceeding to the next step.
 
-## 2. Opening labelling behavior window
-In the 'Load project' window, under `Label Behavior` click on `Select folder with frames`. This will prompt you to select a **folder** containing video frames (in png format). When the folder is selected a new window pops up displaying the first frame of the video. If you don't have frames for the videos that you want to label, they need to be created. For information on how to create the frames in SimBA check these parts of the tutorial: [1](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames), [2](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder). 
+## Step 2. Opening labelling behavior window
+In the 'Load project' window, under `Label Behavior` click on `Select folder with frames`. This will prompt you to select a **folder** containing video frames (in png format). Following folder selection a new window will display the first frame of the video. If you have not extracted the frames for the videos that you want to label, they need to be created now. For information on how to extract video frames in SimBA, please check these parts of the tutorial: [1](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames), [2](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder). 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/labellingtable.PNG" width="752" height="802" />
 
@@ -34,9 +35,9 @@ Underneath the displayed image, there are options for navigating through all the
 
 `>` advance to the next frame 
 
-`Jump Size` Here the user can select a range of framed by which to advance or jump backwards. When the user then press the `<<` or `>>` buttons to the right of the scale the frames advance, or go back, the Jump Size frame amount. 
+`Jump Size` You can select a range of frames to advance or jump backwards. When you then press the `<<` or `>>` buttons to the right of the scale, the frames advance or go back the Jump Size frame count indicated. 
 
-`Jump to selected frame` The user also have the option to manually enter frame number into this entry box, then clicking this button to display the corresponding image.
+`Jump to selected frame` You have the option to manually enter a frame number into this entry box, which will then display the corresponding image.
 
 `Frame Range` By selecting this box and entering a range of numbers in the adjacent entry boxes, saving and advancing to the next frame will save all frames in the Frame Range, inclusive, as containing the marked behaviors. 
 
