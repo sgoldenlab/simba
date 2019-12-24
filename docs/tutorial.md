@@ -1,12 +1,12 @@
 # SimBA Tutorial
-This is a step by step tutorial to start using SimBA.
+This is a step by step tutorial to start using SimBA to create behavioral classifiers.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/simba.png" width="294" height="115" />
+![alt-text-1](/images/simba.png "simba")
 
 ### Pipeline breakdown:
-For processing a tracking dataset, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
+For processing datasets, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/simbaworkflow.PNG" width="989" height="532" />
+![alt-text-1](/images/simbaworkflow.PNG "simbaworkflow")
 
 
 ### Part 1: [Create a new project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
@@ -32,16 +32,15 @@ For processing a tracking dataset, the pipeline is split into a few sections. Th
 ## Part 1: Create a new project
 This section describes how to create a new project for your tracking analysis.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/createproject2.PNG" width="270" height="150" />
+![](/images/createproject2.PNG "createproject2")
 
 ### Step 1: Generate Project Config
 
-In this step you create generating your main project folder with all the required sub-directories.
+In this step you create your main project folder with all the required sub-directories.
 
-1. Go to `File` and click on `Create a new project`. The following windows will pop up.
-<p align="center">
-  <img width="702" height="732" src="https://github.com/sgoldenlab/simba/blob/master/images/createproject.PNG">
-</p>
+1. In the main SimBA window, click on `File` and and `Create a new project`. The following windows will pop up.
+
+![](/images/createproject.PNG "createproject")
 
 2. Navigate to the `[ Generate project config ]` tab. Under **General Settings**, specify a `Project Path` which is the directory that will contain your main project folder.
 
@@ -55,68 +54,69 @@ In this step you create generating your main project folder with all the require
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
 </p>
 
-6. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few options in the dropdown menu.
+6. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - **as yet not validaded** - options, accessable in the dropdown menu.
 
 7. Click `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. 
 
-### Step 2: Import Videos into project folder
+### Step 2: Import videos into project folder
 In this step, you can choose to import either one or multiple videos. The imported videos are used for visualizing predictions and standardizing distances across videos by calculating metric distances from pixel distances. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/importvids.PNG" width="346" height="251" />
+![](/images/createproject.PNG "createproject")
 
 #### To import multiple videos
 1. Navigate to the `[ Import videos into project folder ]` tab.
-2. Under `Import multiple videos`, click on `Browse Folder` to select your folder that contains all the videos that you wish to import into your project.
-3. Enter the file type of your video *mp4*, *avi*, *mov*, etc. in the `Video type` entry box.
+2. Under the `Import multiple videos` heading, click on `Browse Folder` to select a folder that contains all the videos that you wish to import into your project.
+3. Enter the file type of your videos. (e.g., *mp4*, *avi*, *mov*, etc) in the `Video type` entry box.
 4. Click `Import multiple videos` 
 >**Note**: It might take awhile for all the videos to be imported.
 #### To import a single video
-1. Under `Import single video`, click on `Browse File` to select your video
-2. Click `Import a video`
+1. Under `Import single video` heading, click on `Browse File` to select your video.
+2. Click on `Import a video`.
 
 ### Step 3: Import DLC Tracking Data
 In this step, you will import your pose-estimation data from DeepLabCut in csv file format.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/importcsv.PNG" width="300" height="202" />
+![](/images/importcsv.PNG "importcsv")
 
-#### To import multiple csv files
-1. Navigate to the `[ Import tracking data ]` tab. Under `Import multiple csv files`, click on `Browse Folder` to select the folder that contains the csv files that you wish to import into your project.
-2. Click on `Import csv to project folder` 
+
+#### To import multiple DLC csv files
+1. Navigate to the `[ Import tracking data ]` tab. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the csv files that you wish to import into your project.
+2. Click on `Import csv to project folder`. 
 #### To import a single csv file
-1. Under `Import single csv file`, click on `Browse File` to select the csv file containing your pose estimation data.
-2. Click on `Import single csv to project folder`
+1. Under the `Import single csv files` heading, click on `Browse File` to select the csv file containing your pose estimation data.
+2. Click on `Import single csv to project folder`.
 
 ### Step 4: Extract frames into project folder
-This step will extract all the frames from every video that are in the videos folder. The frames are used for behavioral labeling when creating classifiers, and for visualizing the results of classifiers. Once the step is completed, close the `Project Configuration` window.
+This step will extract all the frames from every video that are imported into the project follwoing **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the results of classifiers. Once the step is completed, close the `Project Configuration` window.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/extractframeintop.PNG" width="491" height="126" />
+![](/images/extractframeintop.PNG "extractframeintop")
 
 ## Part 2: Load project
-This section loads a project that you have created.
+This section describes hos to load and work with a project that you have generated when you created a project.
 
 ### Step 1: Load Project Config
 In this step, you will load the *project_config.ini* file that was created.
-> **Note:** project_config.ini should always be loaded before starting anything else.
-1. Go to `File` and click on `Load project` The following windows will pop up.
+> **Note:** project_config.ini should always be loaded before any other process.
+1. In the main SimBA window, click on `File` and `Load project`. The following windows will pop up.
 
 <p align="center">
   <img width="1255" height="380" src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG">
 </p>
 
-2. Under **Load Project.ini**, click on `Browse File`. Then, go to the directory that you created your project and click on your *project folder*. Then, click on *project_folder* and then *project_config.ini*. Once this step is completed, it should look like the following instead of *No file selected*.
+2. Under the **Load Project.ini** tab, click on `Browse File`. Then, go to the directory that you created your project in and click on your *project folder*. Locate the *project_config.ini* file and select it. Once this step is completed, it should look like the following instead of *No file selected*.
 
 <p align="center">
   <img width="500" height="60" src="https://github.com/sgoldenlab/simba/blob/master/images/loadedprojectini.PNG">
 </p>
 
-In this image, you can see, the `Dekstop` is my selected working directory, `tutorial` is my project name, and the last two sections of the folder path is always going to be `project_folder/project_config.ini` 
+In this image, you can see the `Desktop` is my selected working directory, `tutorial` is my project name, and the last two sections of the folder path is always going to be `project_folder/project_config.ini`.
 
 ### Step 2 (Optional) : Import more DLC Tracking Data or videos
-In this step, you can choose to import more pose estimation data in csv file format and/or more videos. If this sin't relevant then you can ignore and skip this step.
+In this step, you can choose to import more pose estimation data in csv file format and/or more videos. If this isn't relevant then you can skip this step.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/importdlc.PNG" width="658" height="434" />
+![](/images/importdlc.PNG "importdlc")
 
-1. Click on the `[ Further imports (data/video/frames) ]` tab and from there you can import more data or videos into the project folder. The imported .csv files will be located in `project_folder/csv/input` and the imported videos will be located in `project_folder/videos`.
+1. Click on the `[ Further imports (data/video/frames) ]` tab. From here you can import more data or videos into the project folder. The imported .csv files will be placed in the `project_folder/csv/input` directory, and the imported videos will be located in `project_folder/videos` directory. 
 
 2. Once the videos are imported, you can extract frames from the additional videos by clicking `Extract frames` under the **Extract further frames into project folder** heading. 
 
