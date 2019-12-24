@@ -1,4 +1,4 @@
-# Labelling Behavior
+# SimBA behavioral annotator
 
 ## 1. Loading project_config file 
 `File > Load Project > Load Project.ini > Browse File` Select the config file (project_config.ini) for the current project. This step **must** be done before proceeding to the next step.
