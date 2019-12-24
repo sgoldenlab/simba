@@ -1,5 +1,5 @@
 # Using SimBA to create and access [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) tracking models
-*Note*: This part of SimBA was written early on when [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) was accessed by the command line and did not come with the very nice GUI it comes with today. At that early point we added this part of SimBA to make DeepLabCut accessable for all members of the Sam Golden lab. If users prefer to work in the DeepLabCut interface to create and access pose estimation models, the tracking data can instead be generated elsewhere and this step can be skipped. The tracking data can instead be imported directly in csv file format when creating the [behavioral classifiers]9https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).     
+*Note*: This part of SimBA was written early on when [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) was accessed by the command line and did not come with the very nice GUI it comes with today. At that early point we added this part of SimBA to make DeepLabCut accessable for all members of the Sam Golden lab. If users prefer to work in the DeepLabCut interface to create and access pose estimation models, the tracking data can instead be generated elsewhere and this step can be skipped. The tracking data can instead be imported directly in csv file format when creating the [behavioral classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).     
 
 ## Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
@@ -30,11 +30,11 @@ This step generates a new DeepLabCut project.
 
 1. Go to `Tracking` --> `DeepLabCut` --> `Create DLC Model`. The following window will pop up.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/createdlcmodel2.png" width="400" height="336" />
+![alt-text-1](/images/createdlcmodel2.png "createdlcmodel2")
 
 2. Enter the name of your project in the `Project name` entry box.
 
-3. Enter your name in the `Experimenter name` entry box.
+3. Enter your name in the experimenter in the `Experimenter name` entry box.
 
 > **Note:** Spaces are not allowed in your project name and experimenter name.
 
@@ -46,61 +46,61 @@ This step generates a new DeepLabCut project.
 
 6. Next, select the main directory that your project will be located in. Next to `Project directory`, click on `Browse Folder` and choose a directory.
 
-7. If you wish to use the Golden Lab's settings, check the `Apply Golden Aggression Config` box. This setting is used to track two mice, and eight body parts on each of the two mice.
+7. If you wish to use the Golden Lab's settings, check the `Apply Golden Aggression Config` box. This setting is used to track two mice, and eight body parts on each of the two mice. For more information about these bosy parts and how they are labeled, please see. If you Wish to generate your on DeepLabCut tracking config, please leave this box un-ticked.
 
-8. You can either copy all the videos to your DLC project folder, or create shortcuts to the videos. By checking the `Copy Videos` checkbox, the videos will be copied to your project folder. If 
+8. You can either copy all the videos to your DLC project folder, or create shortcuts to the videos. By checking the `Copy Videos` checkbox, the videos will be copied to your project folder. If you leave this box un-ticked, shortcuts to your videos will be created. 
 
-9. Click `Create Project` to create your DLC project. The project will be located in the **working directory** that was chosen.
+9. Click on `Create Project` to create your DLC project. The project will be located in the chosen **working directory**.
 
 
 ## Part 2: Load DLC Project
-This section allows you to load your DeepLabCut project.
+These menues are used to load created DeepLabCut projects.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/loaddlcmodel.png" width="402" height="206" />
+![alt-text-1](/images/loaddlcmodel.png "loaddlcmodel")
 
-### Step 1: Check the settings in the config.yaml file
+### Step 1: Check the settings in the DeepLabCut config.yaml file
 
 1. Go to the project folder.
 
 2. Double click on the config.yaml file and open it in Notepad.
 
-3. Change the settings.
+3. Change the settings if necessery. 
 
-### Step 2: Load the config.yaml file
+### Step 2: Load the DeepLabCut config.yaml file
 
-1. Go to `Tracking` --> `DeepLabCut` --> `Load DLC Model`. The following window will pop up.
+1. In the main SimBA window, click on `Tracking` --> `DeepLabCut` --> `Load DLC Model`. The following window will pop up.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/loaddlcmodel2.PNG" width="569" height="353" />
+![alt-text-1](/images/loaddlcmodel2.png "loaddlcmodel2")
 
-2. Under **Load Model**, click on `Browse File` and load the *config.yaml* file from the project folder.
+2. Under the **Load Model** tab, click on `Browse File` and load the *config.yaml* file from your project folder.
 
-### Step 3: Add additonal videos into the project (optional)
+### Step 3: Add additonal videos to the project (optional)
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/additionalvideo.PNG" width="350" height="200" />
+![alt-text-1](/images/additionalvideo.PNG "additionalvideo")
 
 #### Single Video
 
-1. Under **Single Video**, click on `Browse File` and select the video.
+1. Under the **Single Video** heading, click on `Browse File` and select the video you wish to add to the project.
 
-2. Click `Add single video`.
+2. Click on `Add single video`.
 
 #### Multiple Videos
 
-1. Under **Multiple Videos**, click on `Browse Folder` and select the folder with only the videos.
+1. Under the **Multiple Videos** heading, click on `Browse Folder` and select the folder containing the videos you wish to add to the project.
 
-2. Click `Add multiple videos`
+2. Click on `Add multiple videos`.
 
-### Step 4: Extract Frames using DLC (more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#c-data-selection-extract-frames))
+### Step 4: Extract frames using DLC (for more details see the [DeepLabcut repository](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#c-data-selection-extract-frames))
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/extractframesdlc.PNG" width="300" height="300" />
+![alt-text-1](/images/extractframesdlc.PNG "extractframesdlc")
 
-1. Enter the number of frames you wish to extract in the `numframes2pick` entry box.
+1. Enter the number of frames you wish to extract from the videos in the `numframes2pick` entry box.
 
 2. Select the **Mode** of selecting the frames. 
 
-- `Automatic` selects the frames for you automatically. 
+- `Automatic` selects the frames to extract automatically. 
 
-- `Manual` allows you to select the frames.
+- `Manual` allows you to select the frames to extract.
 
 3. Select the **Algorithm** to pick the frames. 
 
@@ -112,7 +112,7 @@ This section allows you to load your DeepLabCut project.
 
 - `Cluster Step` is the setting for KMeans. The default is set to 1.
 
-4. To use color information for clustering, check the `True` box under **Cluster Color**
+4. To use color information for clustering, check the `True` box under **Cluster Color**.
 
 5. If you wish to use **OpenCV** to extract frames, check the `True` box. If you wish to use **ffmpeg**, keep it unchecked.
 
