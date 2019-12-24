@@ -2,9 +2,9 @@
 *Note*: This part of SimBA was written early on when [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) was accessed by the command line and did not come with the very nice GUI it comes with today. At that early point we added this part of SimBA to make DeepLabCut accessable for all members of the Sam Golden lab. If users prefer to work in the DeepLabCut interface to create and access pose estimation models, the tracking data can instead be generated elsewhere and this step can be skipped. The tracking data can instead be imported directly in csv file format when creating the [behavioral classifiers]9https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).     
 
 ## Pipeline breakdown
-For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut)
+For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/dlcworkflow.PNG" width="591" height="294" />
+![alt-text-1](/images/dlcworkflow.PNG "dlcworkflow.PNG)
 
 ### [Part 1: Create DLC Project](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
 
