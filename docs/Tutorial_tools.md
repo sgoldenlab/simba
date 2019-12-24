@@ -1,4 +1,4 @@
-# How to use tools in GUI
+# How to use tools to process videos in SimBA
 
 <img src=https://github.com/sgoldenlab/simba/blob/master/images/tools.png width="375" height="322" />
 
