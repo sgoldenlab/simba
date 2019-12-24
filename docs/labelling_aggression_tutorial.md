@@ -50,7 +50,7 @@ Keyboard shortcut information is displayed on the right side of the window for e
 `Show current video frame` This will display the current frame of the paused video on the labelling screen.
 
 ![](https://github.com/sgoldenlab/tkinter_test/blob/master/images/openingvideo.gif)
-> Note: Video name must be the same as the folder name. The video must also be paused by pressing `p` before any other keyboard command (such as moving forward or backwards a set number of frames). 
+> *Note*: Video name must be the same as the folder name. The video must also be paused by pressing `p` before any other keyboard command (such as moving forward or backwards a set number of frames). 
 
 
 
