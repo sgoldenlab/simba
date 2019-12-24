@@ -70,7 +70,7 @@ These menues are used to load created DeepLabCut projects.
 
 1. In the main SimBA window, click on `Tracking` --> `DeepLabCut` --> `Load DLC Model`. The following window will pop up.
 
-![alt-text-1](/images/loaddlcmodel2.png "loaddlcmodel2")
+![alt-text-1](/images/loaddlcmodel2.PNG "loaddlcmodel2")
 
 2. Under the **Load Model** tab, click on `Browse File` and load the *config.yaml* file from your project folder.
 
