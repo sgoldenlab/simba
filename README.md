@@ -4,9 +4,7 @@
 [![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community)
 [![Download: Weights](https://img.shields.io/badge/Download-Weights-orange.svg)](https://osf.io/5t4y9/)
 
-<p align="center">
-  <img width="700" height="633" src="/images/simba_logo.jpg">
-</p>
+![alt-text-1](/images/simba_logo.jpg "simba logo")
 
 Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in pose-estimation data and images of variables qualities to automatically segment and analyse behavior. SimBA does not require computer science and programing experience, and SimBA is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBA. Feel free to post issues and bugs here or contact us directly and we'll work on squashing them as they appear.
 
