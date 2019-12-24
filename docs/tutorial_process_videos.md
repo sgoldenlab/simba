@@ -1,7 +1,7 @@
 
 
 # Tutorial for processing videos in batch
-This video pre-processing tools allows users to change multiple video parameters (clip/trim/crop etc.) for many videos independently in a batch. Once the required parameters has been set for all the videos, the user press `Execute` and the new videos will be generated according to the user input. Videos are processed using **FFmpeg**. Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install FFmpeg on your computer. 
+This video pre-processing tool allows users to change multiple video parameters (clip/trim/crop etc.) for many videos independently in a batch. Once the required parameters has been set for all the videos, the user press `Execute` and the new videos will be generated according to the user input. Videos are processed using **FFmpeg**. Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install FFmpeg on your computer. 
 
 ## Pipeline
 
