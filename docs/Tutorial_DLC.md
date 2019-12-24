@@ -1,5 +1,5 @@
 # Using SimBA to create and access [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) tracking models
-*Note*: This part of SimBA was written early on when [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) was accessed by the command line and did not come with the very nice GUI it comes with today. At that early point we added this part of SimBA to make DeepLabCut accessable for all members of the Sam Golden lab. If users prefer to work in the DeepLabCut interface to create and access pose estimation models, the tracking data can instead be generated elsewhere and this step can be skipped. The tracking data can instead be imported directly in csv file format when creating the [behavioral classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).     
+*Note*: This part of SimBA was written early on - when [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) was accessed by the command line - and did not come with the very nice GUI it comes with today. At that early point we added this part of SimBA to make DeepLabCut accessable for all members of the Sam Golden lab. If users prefer to work in the DeepLabCut interface to create and access pose estimation models, the tracking data can instead be generated elsewhere and this step can be skipped. The tracking data can instead be imported directly in csv file format when creating the [behavioral classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).     
 
 ## Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
@@ -52,7 +52,6 @@ This step generates a new DeepLabCut project.
 
 9. Click on `Create Project` to create your DLC project. The project will be located in the chosen **working directory**.
 
-
 ## Part 2: Load DLC Project
 These menues are used to load created DeepLabCut projects.
 
@@ -80,29 +79,29 @@ These menues are used to load created DeepLabCut projects.
 
 #### Single Video
 
-1. Under the **Single Video** heading, click on `Browse File` and select the video you wish to add to the project.
+1. Under the **Add videos into project** tab and **Single Video** heading, click on `Browse File` and select the video you wish to add to the project.
 
 2. Click on `Add single video`.
 
 #### Multiple Videos
 
-1. Under the **Multiple Videos** heading, click on `Browse Folder` and select the folder containing the videos you wish to add to the project.
+1. Under the **Add videos into project** tab and **Multiple Videos** heading, click on `Browse Folder` and select the folder containing the videos you wish to add to the project.
 
 2. Click on `Add multiple videos`.
 
-### Step 4: Extract frames using DLC (for more details see the [DeepLabcut repository](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#c-data-selection-extract-frames))
+### Step 4: Extract frames for labeling body parts using DLC. For more details, see the [DeepLabcut repository](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#c-data-selection-extract-frames))
 
 ![alt-text-1](/images/extractframesdlc.PNG "extractframesdlc")
 
-1. Enter the number of frames you wish to extract from the videos in the `numframes2pick` entry box.
+1. Under the **Extract/label frames tab** tab and **Extract Frames DLC** heading, enter the number of frames you wish to extract from the videos in the `numframes2pick` entry box.
 
-2. Select the **Mode** of selecting the frames. 
+2. Select the **Mode** of extracting the frames. 
 
 - `Automatic` selects the frames to extract automatically. 
 
 - `Manual` allows you to select the frames to extract.
 
-3. Select the **Algorithm** to pick the frames. 
+3. Select the **Algorithm** to pick the extracted frames. 
 
 - `Uniform` selects the frames uniformly in a series format. 
 
@@ -120,15 +119,15 @@ These menues are used to load created DeepLabCut projects.
 
 ### Step 5: Label Frames
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelframes.PNG" width="100" height="50" />
+![alt-text-1](/images/labelframes.PNG "labelframes")
 
-1. Under **Label Frames**, click on `Label Frames` and *DeepLabCut- Labelling ToolBox* will pop up.
+1. Under **Label Frames** heading in the **Extract/label frames tab** tab, click on `Label Frames` and the *DeepLabCut- Labelling ToolBox* will pop up.
 
 2. Click on `Load Frames` located in the bottom left-hand corner.
 
 3. Choose the folder with the video name where your extracted frames are saved and click `Select Folder`. *They should be located at workingdirectory/yourproject/labeled-data/*
 
-4. Now you can start labelling frames. (more details [here](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#d-label-frames)) 
+4. Now you can start labelling frames. For more details, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/functionDetails.md#d-label-frames).
 
 5. Once all the frames are labelled, move on to **Step 6**.
 
@@ -136,47 +135,34 @@ These menues are used to load created DeepLabCut projects.
 
 1. Under **Check Labels**, click on `Check Labelled Frames` to check the labelled frames.
 
-### Step 7: Generate Training Set
+### Step 7: Generate training set
 
-1. Under **Generate Training Set**, click on the ` Generate training set` button to generate the training data set.
+1. Under **Generate Training Set**, click on the `Generate training set` button to generate the training data set.
 
 ### Step 8: Train Network
+Train the model using a generated training set.
 
-`iteration` is the number of iterations.
+1. In the `iteration` entry box, fill in an integer representing the model iteration number. Once done, click on **Update iteration**.  If left blank, then the iteration number will be the most recently used, or 0. 
 
-`init_weight` is the initial weight to train the model.
-
-#### Training a new model
-
-1. If you are training a new model and want to start from scratch, click the `Train Network` button and do not change the settings.
-
-2. The `iteration` will be set to 0 by default and the `init_weight` will be set to resnet-50 by default
-
-#### Training an existing model
-
-1. If you want to retrain a model, you can select the iteration in the `iteration` entry box and click `Update iteration`.
-
-2. Click `Browse File` to find the model that you wish to retrain and click `Update init_weight` 
-
-3. Click `Train Network` to start training your model.
+2. In the `init_weight` box, specify the path to the initial weights. If this is left blank it will default to resnet-50. If you want to use other weights, click on `Browse File`. Pre-trained weights for mouse and rat resident-intruder protocols using 16 body-parts, as well as other pre-trained weights, can be downloaded [here](https://osf.io/5t4y9/). 
 
 ### Step 9: Evaluate Network
 
-1. Click on `Evaluate Network` to evaluate the trained model.
+1. Click on `Evaluate Network` to evaluate the trained model. For more details, see the [DeepLabCut repository](https://alexemg.github.io/DeepLabCut/docs/functionDetails.html#h-evaluate-the-trained-network).
 
 ### Step 10: Video Analysis
 
 #### Single Video Analysis
 
-1. Under **Single Video Analysis**, click on `Browse File` and select one of the videos.
+1. Under the **Video Analysis** tab and the **Single Video Analysis** header, click on `Browse File` and select one a video.
 
 2. Click on `Single Video Analysis`.
 
 #### Multiple Videos Analysis
 
-1. Under **Multiple Videos Analysis**, click on `Browse Folder` and select the video folder.
+1. Under the **Video Analysis** tab and the **Multiple Videos Analysis** header, click on `Browse Folder` and select a folder containing the videos.
 
-2. Enter the video format in the `Video type` entry box (eg: mp4, avi). *Do **not** include any " . " dot in the entrybox (eg: .mp4, .flv, .avi, etc.)*
+2. Enter the video format in the `Video type` entry box (eg: mp4, avi). *Do **not** include any " . " dot in the entrybox (e.g,:  do not enter .mp4, .flv, .avi, etc.)*
 
 3. Click on `Multi Videos Analysis`.
 
@@ -184,10 +170,10 @@ These menues are used to load created DeepLabCut projects.
 
 1. Click on `Browse File` to select the video.
 
-2. Click on `Plot Results` .
+2. Click on `Plot Results`. For more details, see the [DeepLabCut documentation](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/UseOverviewGuide.md)
 
 ### Step 12: Create Video
-This step will generate the video with labelled tracking points.
+This step will generate a video with labelled tracking points.
 
 1. Click on `Browse File` to select the video.
 
@@ -200,19 +186,18 @@ There are two ways that you can improve the current model.
 
 1. Extract more frames to train the model.
 
-2. Correct the tracking points of the existing frames.
+2. Correct the tracking points of frames with predictions made by the model.
 
 ## Extract more frames
-This step creates a temp.yaml file to automate the **Extract Frames** process. It will copy the settings from the *config.yaml* and remove all the videos in the *config.yaml* file. It will then add the new videos that the user specifies into the yaml file and will generate a *temp.yaml*
+This step automates the **Extract Frames** process, to only extract frames from select videos. This function will copy the settings from the DLC *config.yaml* and remove all the videos in the *config.yaml* file. It will then add the new videos that the user specifies into a new, temporary yaml file, and extract frames from only these videos. 
 
 ### Step 1: Generate temp.yaml from the original config.yaml
-
 
 #### Single Video
 
 1. Under **Load Model**, click `Browse File` and select the *config.yaml* file. 
 
-2. Under `[Generate temp yaml]` tab --> `Single video`, click on `Browse File` and select the video.
+2. Under `[Generate temp yaml]` tab --> `Single video`, and click on `Browse File` and select the video.
 
 3. Click `Add single video`
 
@@ -256,7 +241,7 @@ This step creates a temp.yaml file to automate the **Extract Frames** process. I
 
 ### Step 4: Merge Labelled Outliers
 
-1. Under **Merge Labeled Outliers**, click on `Merge Labelled Outliers`.
+1. Under **Merge Labeled Outliers**, click on `Merge Labelled Outliers`. 
 
 
 
