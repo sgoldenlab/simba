@@ -1,4 +1,4 @@
-# SimBA
+# SimBA (Simple Behavioral Analysis)
 
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-pink.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community)
@@ -6,14 +6,17 @@
 
 ![alt-text-1](/images/simba_logo.jpg "simba logo")
 
-Several excellent computational frameworks exist that enable high-throughput, consistent, and unbiased scoring of freely moving animals. We attempt to distribute a plug-and play pipeline and system that enabled users in preclinical social neuroscience to feed in pose-estimation data and images of variables qualities to automatically segment and analyse behavior. SimBA does not require computer science and programing experience, and SimBA is optimized for any video recording quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBA. Feel free to post issues and bugs here or contact us directly and we'll work on squashing them as they appear.
+Several excellent computational frameworks exist that enable high-throughput and consistent tracking of freely moving unmarked animals. Here we introduce and distribute a plug-and play pipeline that enabled users to use these pose-estimation approaches in combination with behavioral annotatation and generatation of supervised machine-learning behavioral predictive classifiers. We have developed this pipeline for the analysis of complex social behaviors, but have included the flexibility for users to generate predictive classifiers across other behavioral modalities with minimal effort and no specialized computuational background.  
+
+SimBA does not require computer science and programing experience, and SimBA is optimized for wide-ranging video acquisition parameters and quality. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBA. Feel free to post issues and bugs here or contact us directly and we'll work on squashing them as they appear. We hope that users will contribute to the community!
 
 - The SimBA pipeline requires no programing knowledge 
 - Specialized commercial or custom-made equipment is not required
 - Extensive annotations are not required
-- The pipeline is flexible and can be used to create and validate classifiers for different behaviors and environments 
+- The pipeline is flexible and can be used to create and validate classifiers for different behaviors and environments
+- Currently included behavioral classifiers have been validated in mice and rats
 
-SimBA currently does not support analysis of video recordings of multiple similarly coat-colored animals, and is vaidated using videos filmed from above at 90° angle using pose-estimation data from 8 body parts per animal. However we and others are working hard on getting multi-animal tracking of similarly coat colored animals going, and multiple recording angles supported! :muscle: 
+SimBA currently does not support analysis of video recordings of multiple similarly colored animals, and is validated using videos filmed from above at 90° angle using pose-estimation data from 8 body parts per animal. However we and others are developeing multi-animal tracking of similarly colored and sized animals, and multiple recording angles supported! :muscle: We also include other body -part tracking schemes within the GUI pipeline (i.e., 1 or 2 mice, 3 to 8 body parts per mouse), but please consider these a work in progress. 
 
 #### Mouse
 ![](https://github.com/sgoldenlab/simba/blob/master/images/mouse_videos.gif)
