@@ -8,6 +8,13 @@ This video pre-processing tool allows you to change multiple video parameters (c
 
 **Note: Processing numerous high-resolution or high-duration videos takes time. We strongly suggest that you not execute a batch until you are ready to commit computuational time to the process.**
 
+We strongly suggest pre-processing in the following scenarios:
+
+1) Red-light: If you have recorded in red-light conditions, we suggest converting to gray-scale and using CLAHE.
+2) Reflections: If your recordings include reflections on the walls of your testing apparatus, we suggest cropping to remove the reflections.
+3) Artifacts: If your recordings include frames where your hands (or other unintended features) are included in the video, at either the start or the end, we suggest trimming the videos to remove these frames.
+4) Resolution: If your recordings are significantly higher resolution than needed, we suggest downsampling to decrease processing time.
+
 ## Pipeline
 
 The video parameters that you specify will be processed in the following sequence. If the user leaves certain parameters unchanged, then they are ignored in the pipeline.  
@@ -18,7 +25,7 @@ The video parameters that you specify will be processed in the following sequenc
 
 ![alt-text-1](/images/processvideo.PNG "processvideo")
 
-1. To begin batch pre-processing, in the main SimBA window click on `Process Videos` --> `Batch pre-process videos`. The window shown below will pop open. 
+1. To begin batch pre-processing, in the main SimBA window click on `Process Videos` --> `Batch pre-process videos`. The window shown below will display. 
 
 ![](/images/batchprocessvideo1.PNG)
 
