@@ -79,4 +79,4 @@ The video parameters that you specify will be processed in the following sequenc
 
 5. The **Output Directory** will contain all the final processed videos.
 
-## NEXT STEP: [Create tracking model](docs/Tutorial_DLC.md) 
+!### NEXT STEP: [Create tracking model](docs/Tutorial_DLC.md) 
