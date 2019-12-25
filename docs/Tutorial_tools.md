@@ -17,7 +17,8 @@ We have developed tools and incorporated them into the overall SimBA pipeline. H
 - [Extract frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames)
 
 ## Shorten Videos
-This is a tool used to trim videos lengths. The tool contains two methods: **Method 1** and **Method 2**. 
+This is a tool used to trim videos lengths. The tool contains two methods: 
+**Method 1** and **Method 2**. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/shortenvideos.PNG" width="330" height="287" />
 
@@ -41,7 +42,9 @@ We would start our video on at `00:00:10`, and end the video at `00:01:55`.
 
 
 ### Method 2
-Method 2 cuts of the beginning of the video. Let's say we have a 2 minute long video and we want to get rid of the first 20 seconds from the start of the video.
+Method 2 cuts of the beginning of the video. 
+
+Let's say we have a 2 minute long video and we want to get rid of the first 20 seconds from the start of the video.
 
 1. Enter the amount of time that needs to be trimmed from the start of the video in `Seconds:`, in this case it will be *20*
 
@@ -100,7 +103,7 @@ This tool allows the user to downsample a video quickly.
 3. Click on `Downsample to default resolution` and the video will downsample into the selected resolution. The video will be located in the same folder as the original video.
 
 
-## Get Coordinates
+## Get Coordinates (calibrate distance)
 This tool is to get the length (millimeter) per pixel of a video.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/getcoordtool.PNG" width="300" height="200" />
@@ -115,7 +118,7 @@ Let's say we want to find out the metric length per pixel of a video of a mouse 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/getcoordtool2.PNG" width="500" height="500" />
 
-4. Use your mouse to double *Left click* at the left side of the cage and double *Left click* again on the right side of the cage.
+4. Use your mouse to double *Left click* at the left side of the cage and double *Left click* again on the right side of the cage. These are the known distance of 130 mm.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/getcoordtool3.PNG" width="500" height="500" />
 
@@ -152,7 +155,7 @@ This tool allows the user to convert the file format of a single or multiple vid
 
 1. Click on `Browse Folder` to select the directory that contains the videos that you want to convert.
 
-2. Enter the original file format (eg: mp4, flv, avi etc.) in the `Input format` entry box. **Note: do not put in the dots in the file format name" . " (eg: .mp4 or .flv etc)**.
+2. Enter the original file format (eg: mp4, flv, avi etc.) in the `Input format` entry box. **Note: do not put dots ('.') in the file format name (eg: mp4 or flv, etc)**.
 
 3. Enter the desired output format in the `Output format` entry box .
 
@@ -174,7 +177,7 @@ This tool allows the user to convert the file format of a single or multiple vid
 2. Click `Apply CLAHE`. The new video will have a name of *CLAHE_* *Name of original video*. The new file will be in a **.avi** format will be located in the same folder as the original video.
 
 ## Superimpose frame numbers on video
-This tool creates a video with the frame numbers prited on top of the video. 
+This tool creates a video with the frame numbers printed on top of the video. 
 
 1. Click on `Superimpose frame numbers on video` and a new window will pop up.
 
@@ -221,7 +224,7 @@ This tool creates a video with the frame numbers prited on top of the video.
 Extract frames consist of **Extract defined frames**, **Extract frames**, and **Extract frames from seq files**
 
 ### Extract defined Frames
-This tool allows users to create frames from a video by inputting specific start- and end-frame numbers.
+This tool allows users to extract frames from a video by inputting specific start- and end-frame numbers. This is useful if you want to extract a subset of frames from a larger video, without first needing to generate a new video of the desired length.
 
 1. Click `Browse File` to select a video.
 
