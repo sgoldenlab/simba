@@ -1,6 +1,6 @@
 # How to use tools to process videos in SimBA
 
-We have developed tools and incorporated them into the overall SimBA pipeline. However, many of the tools are useful on their own or in "one-off" situations. To make these easily accessible, these tools have been incorporated into their own space within the GUI, and are described below.
+We have developed tools video and image processing tools and incorporated them into the overall SimBA pipeline. However, many of the tools are useful on their own or in "one-off" situations. To make these easily accessible, the tools have been incorporated into their own space within the GUI, and are described below.
 
 ![alt-text-1](/images/tools2.PNG "tools2")
 

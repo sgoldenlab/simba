@@ -2,18 +2,18 @@
 
 # Tutorial for processing videos in batch
 
-It is often helpful, and sometimes neccessary, to pre-process experimental videos prior to analysis. This is generally accomplished through the use of open-source  approaches like **FFmpeg** or commercial software, but can be a time consuming and cumbersome when applying to numerous similar videos. To streamline this process, SimBA incorporates **FFmpeg** into a a batch-process GUI. 
+It is often helpful, and sometimes necessary, to pre-process experimental videos prior to analysis. This is generally accomplished through the use of open-source approaches like **FFmpeg** or commercial software, but can be a time consuming and cumbersome when applying to numerous similar videos. To streamline this process, SimBA incorporates **FFmpeg** into a a batch-process GUI. 
 
-This video pre-processing tool allows you to change multiple video parameters (clip/trim/crop, etc.) for multiple videos in a batch-process that is rapdly configured and then executed when ready. Once the required parameters has been set for all the videos, the user press `Execute` and the new videos will be generated according to the user input. Videos are processed using **FFmpeg**. Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install FFmpeg on your computer. 
+This video pre-processing tool allows you to change multiple video parameters (clip/trim/crop, etc.) for multiple videos in a batch-process that is rapidly configured and then executed when ready. Once the required parameters has been set for all the videos, the user press `Execute` and the new videos will be generated according to the user input. Videos are processed using **FFmpeg**. Click [here](https://m.wikihow.com/Install-FFmpeg-on-Windows) to learn how to install FFmpeg on your computer. 
 
-**Note: Processing numerous high-resolution or high-duration videos takes time. We strongly suggest that you not execute a batch until you are ready to commit computuational time to the process.**
+**Note: Processing numerous high-resolution or long-duration videos takes time. We strongly suggest that you not execute a batch until you are ready to commit computational time to the process.**
 
-We strongly suggest pre-processing in the following scenarios:
+We suggest pre-processing videos in the following scenarios:
 
 1) Red-light: If you have recorded in red-light conditions, we suggest converting to gray-scale and using CLAHE.
 2) Reflections: If your recordings include reflections on the walls of your testing apparatus, we suggest cropping to remove the reflections.
 3) Artifacts: If your recordings include frames where your hands (or other unintended features) are included in the video, at either the start or the end, we suggest trimming the videos to remove these frames.
-4) Resolution: If your recordings are significantly higher resolution than needed, we suggest downsampling to decrease processing time.
+4) Resolution: If your recordings are significantly higher resolution than needed, we suggest down-sampling to decrease processing time.
 
 ## Pipeline
 
