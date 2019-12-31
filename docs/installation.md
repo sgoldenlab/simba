@@ -22,3 +22,22 @@ pip install -r simba/SimBA/requirements.txt
 python SimBA.py
 ```
 3. Hit `Enter`.
+
+# List of python dependencies
+* [Pillow](https://github.com/python-pillow/Pillow)
+* [deeplabcut](https://github.com/AlexEMG/DeepLabCut)
+* [eli5](https://github.com/TeamHG-Memex/eli5)
+* [imblearn](https://github.com/scikit-learn-contrib/imbalanced-learn/tree/master/imblearn)
+* [imutils](https://github.com/jrosebr1/imutils)
+* [matplotlib](https://github.com/matplotlib/matplotlib)
+* [numpy](https://github.com/numpy/numpy)
+* [opencv_python](https://github.com/skvark/opencv-python)
+* [openpyxl](https://github.com/chronossc/openpyxl)
+* [pandas](https://github.com/pandas-dev/pandas)
+* [scipy](https://github.com/scipy/scipy)
+* [seaborn](https://github.com/mwaskom/seaborn)
+* [sklearn](https://github.com/scikit-learn/scikit-learn)
+* [tabulate](https://bitbucket.org/astanin/python-tabulate/src/master/)
+* [tqdm](https://github.com/tqdm/tqdm)
+* [xgboost](https://github.com/dmlc/xgboost)
+* [yellowbrick](https://github.com/DistrictDataLabs/yellowbrick)
