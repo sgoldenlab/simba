@@ -1,6 +1,7 @@
+
 # How to use tools to process videos in SimBA
 
-We have developed tools video and image processing tools and incorporated them into the overall SimBA pipeline. However, many of the tools are useful on their own or in "one-off" situations. To make these easily accessible, the tools have been incorporated into their own space within the GUI, and are described below.
+We have developed video and image processing tools and incorporated them into the overall SimBA pipeline. However, many of the tools are useful on their own or in "one-off" situations. To make these easily accessible, the tools have been incorporated into their own space within the GUI, and are described below.
 
 ![alt-text-1](/images/tools2.PNG "tools2")
 
@@ -17,7 +18,7 @@ We have developed tools video and image processing tools and incorporated them i
 - [Extract frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames)
 
 ## Shorten Videos
-This is a tool used to trim videos lengths. The tool contains two methods: 
+This is a tool used to trim video lengths. The tool contains two different methods: 
 **Method 1** and **Method 2**. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/shortenvideos.PNG" width="330" height="287" />
@@ -34,11 +35,11 @@ We would start our video on at `00:00:10`, and end the video at `00:01:55`.
 
 3. Enter the end time in `End at:` entry box, in this case it will be *00:01:55*. The settings should look like the image below.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/shortenvideos1.PNG" width="435" height="287" />
+![alt-text-1](/images/shortenvideos1.PNG "shortenvideos1")
 
 4. Click `Cut Video` to trim the video and a new shorter video will be generated. The new shorter video will have a name of *Name of original video* + *_shorten* and will be located in the same folder as the original video.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/shortenvideos2.PNG" width="1014" height="114" />
+![alt-text-1](/images/shortenvideos2.PNG "shortenvideos2")
 
 
 ### Method 2
@@ -48,10 +49,9 @@ Let's say we have a 2 minute long video and we want to get rid of the first 20 s
 
 1. Enter the amount of time that needs to be trimmed from the start of the video in `Seconds:`, in this case it will be *20*
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/shortenvideos3.PNG" width="435" height="287" />
+![alt-text-1](/images/shortenvideos3.PNG "shortenvideos3")
 
 2. Click `Cut Video` to trim video and a new shorten video will be generated, the new video will have a name of *Name of original video* + *_shorten* and will be located in the same folder as the original video.
-
 
 ## Crop Video
 This is a tool to crop videos.
