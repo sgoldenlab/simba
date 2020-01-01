@@ -7,7 +7,7 @@ SimBA requires tracking data as input (currently in **.csv** file format), and t
 
 ![alt-text-1](/images/body_part_labelling_schematic.png "Body_part_labelling_schematic.png")
 
-SimBA use the tracking data to construct a battery of *features* (for a list of features with example descriptions, click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv). The number of labelled body parts, and which body parts are labelled, determines which features can be calculated. We have validated SimBA by labelling 16 body parts (8 body parts on two individual mice) and we strongly advice users to use the same body part labelling schematic if possible. To set the DeepLabCut config to use the 16 body part schematic, check the `Apply Golden Aggression Config' box (See **Step 1**, below). Pre-trained models using the 16 body part schematic and two animals can also be downloaded through [OSF](https://osf.io/5t4y9/). However, SimBA will also accept alternative body labelling schematics (see the above figure). This includes:
+SimBA use the tracking data to construct a battery of *features* (for a list of features with example descriptions, click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv)). The number of labelled body parts, and which body parts are labelled and tracked, determines which features can be calculated. We have validated SimBA by labelling 16 body parts (8 body parts on two individual mice) and we strongly advice users to use the same body part labelling schematic if possible. To set the DeepLabCut config to use the 16 body part schematic, check the `Apply Golden Aggression Config' box (See **Step 1**, below). Pre-trained models using the 16 body part schematic and two animals can also be downloaded through [OSF](https://osf.io/5t4y9/). However, SimBA will also accept alternative body labelling schematics (see the above figure). This currently includes:
 
    * 7 body parts on two individual mice recorded 90° above angle
    * 4 body parts on two individual mice recorded 90° above angle   
@@ -16,7 +16,7 @@ SimBA use the tracking data to construct a battery of *features* (for a list of 
    * 4 body parts on a single mouse recorded 90° above angle
    * 9 body parts on a single mouse recorded 45° side angle
    
-**Important**: So far we have only validated machine learning models that use 16 body parts on two individual animals. 
+**Important**: So far we have only validated machine learning models that use features calculated from 16 labelled body parts on two individual animals. 
 
 ## Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
