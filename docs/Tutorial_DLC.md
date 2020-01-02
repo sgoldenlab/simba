@@ -1,7 +1,9 @@
 # Using SimBA to create/edit [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) tracking models. 
 
 **!!!**
+
 **IF YOU ALREADY HAVE GENERATED A DLC TRACKING MODEL AND CREATED .CSV DATAFRAMES FOR YOUR EXPERIMENTAL VIDEOS (USING THE ANNOTATION CONFIGURATION DETAILED IN THE FIGURE BELOW), PLEASE SKIP THIS ENTIRE PAGE AND MOVE ON TO STEP 3: BUILDING CLASSIFIERS**
+
 **!!!**
 
 See **"Pose estimation body-part labelling"** below for supported rodent annotation formats. You **MUST USE** one of these formats if you would like to use our included feature list for creating predictive classifiers. We **strongly** suggest using 8 body parts per rodent. **Again, if you have generated your DLC tracking using another body part labelling configuration, it will not work "right out of the box"!**
