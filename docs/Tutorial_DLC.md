@@ -24,9 +24,11 @@ DeepLabCut is currently fully supported by the SimBA pipeline. We **strongly** s
 
 SimBA uses the tracking data to construct a battery of *features* (for a list of features with example descriptions, click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv)). The number of labelled body parts, and which body parts are labelled and tracked, determines which features can be calculated. 
 
-We have validated SimBA by labelling 16 body parts (8 body parts on two individual mice) and we **strongly** advice users to use the same body part labelling schematic. Please note that the **order** of body part annotation is important, and matches the labelling schematic above.
+We have validated SimBA by labelling 16 body parts (8 body parts on two individual mice) and we **strongly** advice users to use the same body part labelling schematic. 
 
-To set the DeepLabCut config to use the 16 body part schematic, check the `Apply Golden Aggression Config' box (See **Step 1**, below). Pre-trained DLC tracking models using the 16 body part schematic and two animals can also be downloaded through [OSF](https://osf.io/5t4y9/), covering a range of acquisition parameters (color video, blank and white video, etc).
+Please note that the **order** of body part annotation is important, and matches the labelling schematic above.
+
+If using SimBA, set the DeepLabCut config to use the 16 body part schematic by checking the `Apply Golden Aggression Config' box (See **Step 1**, below). Pre-trained DLC tracking models using the 16 body part schematic and two animals can also be downloaded through [OSF](https://osf.io/5t4y9/), covering a range of acquisition parameters (color video, blank and white video, etc).
 
 However, SimBA will also accept alternative body labelling schematics (see the above figure). These alternative schematics currently include:
 
@@ -41,14 +43,6 @@ However, SimBA will also accept alternative body labelling schematics (see the a
 
 ## Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
-
-**Parts 1 and 2** can be skipped if you have already generated your DLC tracking model. Again, you must use the "16 point, 2 rodent configuration" to use the included feature list. 
-
-**Part 3** should be used regardless of whether a new model is being generated from scratch, or a previous model imported. 
-
-If you are amending a model generated from different video acquisition parameters than your experimental videos (ie, using someone elses DLC tracking model), we **strongly** suggest extracting more frames from your own experimental videos and incorporating them into the model. In our own hands, this has always significantly improved tracking, while requiring very little new annotation. We suggest 200-300 new frames.
-
-Outlier correction should be used no matter what.
 
 ![alt-text-1](/images/dlcworkflow.PNG "dlcworkflow.PNG")
 
