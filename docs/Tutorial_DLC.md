@@ -41,8 +41,10 @@ However, SimBA will also accept alternative body labelling schematics (see the a
    
 **Important**: So far we have only validated machine learning models that use features calculated from 16 labelled body parts on two individual animals. The other configurations are "use at your own risk" and may require trouble-shooting.
 
-## Pipeline breakdown
+## SimBA-DLC Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
+
+**Note**: All videos should have been pre-processed, see [Step 1](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md), prior to DLC tracking.
 
 ![alt-text-1](/images/dlcworkflow.PNG "dlcworkflow.PNG")
 
