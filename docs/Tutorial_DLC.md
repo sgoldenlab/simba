@@ -6,7 +6,9 @@
 
 **!!!**
 
-See **"Pose estimation body-part labelling"** below for supported rodent annotation formats. You **MUST USE** one of these formats if you would like to use our included feature list for creating predictive classifiers. We **strongly** suggest using 8 body parts per rodent. **Again, if you have generated your DLC tracking using another body part labelling configuration, it will not work "right out of the box"!**
+See **"Pose estimation body-part labelling"** below for supported rodent annotation formats. You **must use** one of these formats if you would like to use our included feature list for creating predictive classifiers. We **strongly** suggest using 8 body parts per rodent. 
+
+**Again, if you have generated your DLC tracking using another body part labelling configuration, it will not work "right out of the box"!**
 
 **NOTE:** Some versions of DeepLabCut saves data in *hdf5* format by default. For information on how to output DeepLabCut data in csv file format, [go to the DeepLabcut repository](https://github.com/AlexEMG/DeepLabCut/blob/master/deeplabcut/pose_estimation_tensorflow/predict_videos.py).
 
