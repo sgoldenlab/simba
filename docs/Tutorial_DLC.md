@@ -1,4 +1,6 @@
-# Using SimBA to create (optional) and import (required) [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) tracking models. 
+# Using SimBA to create and import [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) tracking models. 
+
+**IF YOU ALREADY HAVE GENERATED A DLC TRACKING MODEL AND CREATED .CSV DATAFRAMES FOR YOUR EXPERIMENTAL VIDEOS, PLEASE SKIP THIS ENTIRE PAGE AND MOVE ON TO STEP 3: BUILDING CLASSIFIERS**
 
 DeepLabCut is currently fully supported by the SimBA pipeline. We strongly suggest that users generate their DLC tracking model using the DLC GUI. This will provide the most up-to-date and pleasurable annotation experience, followed by loading the generated DLC model into SimBA. Future iterations will include tracking support for mask R-CNN, LEAP, DeepPoseKit, etc, as requested by the community.
 
@@ -34,11 +36,11 @@ However, SimBA will also accept alternative body labelling schematics (see the a
 ## Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
 
-Parts 1 and 2 can be skipped if you have already generated your DLC tracking model. Again, you must use the "16 point, 2 rodent configuration" to use the included feature list. 
+**Parts 1 and 2** can be skipped if you have already generated your DLC tracking model. Again, you must use the "16 point, 2 rodent configuration" to use the included feature list. 
 
-Part 3 should be used regardless of whether a new model is being generated from scratch, or a previous model imported. 
+**Part 3** should be used regardless of whether a new model is being generated from scratch, or a previous model imported. 
 
-If you are amending a model generated from different video acquisition parameters than your experimental videos, we **strongly** suggest extracting more frames from your experimental videos and incorporating them into the model. In our own hands, this has always significantly improved tracking, while requiring very little new annotation. We suggest 200-300 new frames.
+If you are amending a model generated from different video acquisition parameters than your experimental videos (ie, using someone elses DLC tracking model), we **strongly** suggest extracting more frames from your own experimental videos and incorporating them into the model. In our own hands, this has always significantly improved tracking, while requiring very little new annotation. We suggest 200-300 new frames.
 
 Outlier correction should be used no matter what.
 
@@ -56,7 +58,7 @@ Outlier correction should be used no matter what.
 
 ### [Part 3: Improve the Model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-3-improve-the-model-1)
 - [Extract more frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#extract-more-frames) 
-- [Outlier correction](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#outlier-correction)
+- [Tracking point correction](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#tracking-point-correction)
 
 ## Part 1: Create DLC Model
 Use this menu to create a new project for your DeepLabCut pose-estimation tracking analysis.
@@ -257,7 +259,7 @@ This step automates the **Extract Frames** process to only extract frames from s
 
 2. Now you can extract frames of the videos that you have just added. Return to **Part 1, Step 4** to update the model with the new frames.
 
-## Outlier Correction
+## Tracking Point Correction
 
 ### Step 1: Load config.yaml
 
