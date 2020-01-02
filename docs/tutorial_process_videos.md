@@ -57,7 +57,7 @@ The video parameters that you specify will be processed in the following sequenc
 
 5. If you wish to change a specific video to grayscale, check the `Grayscale` box.
 
-6. If you wish to superimpose the frme numbers onto all frames of a specific video, check on the `Add Frame #` box.
+6. If you wish to superimpose the specific frame numbers onto the frames of the video, check on the `Add Frame #` box. For an example output video with frame numbers overlaid, click [here](https://youtu.be/TMQmNr8Ssyg). 
 
 7. If you wish to apply CLAHE, check on the `CLAHE` box. For more information on CLAHE, click [here](https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html)
 
