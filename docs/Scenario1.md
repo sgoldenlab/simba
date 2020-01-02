@@ -9,8 +9,8 @@ Three days of resident-intruder testing between aggressive CD-1 mice and subordi
 
 Also, so that we do not overfit the predictive classifiers to the experimental data, a different set of pilot videos have been recorded of resident-inturder pairings using identical video acquisition parameters. A total of 20 pilot videos were recorded.
 
-# **Scenario 1**
-
+# **Scenario 1**: From scratch...
+In this scenario you have the above pilot data, the experimental videos, and SimBA. All videos have been pre-processed and DLC tracked. You now would like to generate a new predictive classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)".
 
 ### Pipeline breakdown:
 For processing datasets, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
@@ -39,13 +39,13 @@ For processing datasets, the pipeline is split into a few sections. These sectio
 - [Create Video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-13-create-video)
 
 ## Part 1: Create a new project
-This section describes how to create a new project for your tracking analysis.
+This section describes how to create a new project for behavioral classifier predictions.
 
 ![](/images/createproject2.PNG "createproject2")
 
 ### Step 1: Generate Project Config
 
-In this step you create your main project folder with all the required sub-directories.
+In this step you create your main project folder, which will then auto-populate with all the required sub-directories.
 
 1. In the main SimBA window, click on `File` and and `Create a new project`. The following windows will pop up.
 
@@ -55,20 +55,24 @@ In this step you create your main project folder with all the required sub-direc
 
 3. `Project Name` is the name of your project. *Keep in mind that the project name cannot contain spaces. Instead use underscore "_"* 
 
-4. Under `SML Settings`, put in the number of predictive classifiers that you wish to create. For an example, if you had three behaviors in your video, put 3 in the entry box.
+4. Under `SML Settings`, put in the number of predictive classifiers that you wish to create. For an example, in Scenario 1 we would like to create a single classifier. We will put in the number 1. Note that in the real world you would probably want to create multiple classifiers concurrently, to decrease the number of times a video would need to be manually annotated. For simplicity, we will use only one classifier.
 
-5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior that you want to classify. 
+5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> a single time and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior (BtWGaNP) that you want to classify. If you click too many times, as long as you leave the extra boxes empty, all is well.
 
 <p align="center">
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
 </p>
 
-6. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - ** yet not validaded** - options, accessible in the dropdown menu.
+6. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - **yet not validaded** - options, accessible in the dropdown menu. This selection is the annotation configuration you should have previously used with DLC, see **[Pose estimation body-part labelling](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling)**.
 
-7. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. 
+7. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. The Project will remain open, and the main console will report that the project has been created.
 
 ### Step 2: Import videos into project folder
-In this step, you can choose to import either one or multiple videos. The imported videos are used for visualizing predictions and standardizing distances across videos by calculating metric distances from pixel distances. 
+In this step, in general, you can choose to import either one or multiple videos. The imported videos are used for visualizing predictions and standardizing distances across videos by calculating metric distances from pixel distances. 
+
+In Scenario 1, we now want to import the 20 pilot videos that we will use to train the classifier for Behavior BtWGaNP. 
+
+There are several considerations when selecting the number of videos for training classifers. Most importantly, the number of videos is not as important as the total number of behavioral events present within the videos. Using something that is frequent, such as attacks, may only require a handfull of videos; using something that is less frrequent, such as lateral threat displays, will require more videos for the same number of events. Further, the expression of these behaviors should be representative of the overall experimental data (ie, the attacks exhibited should generalize to how attacks normally look, and not only be extremely robust or extemely weak). Lastly, you need enough videos that some can be left over to validate the generated predicitive classifiers against. We do not want to test the classifiers on videos that have been used to generate the classifiers. We import 20 videos, having idenitfied that 10 videos contain enough events of Behavior BtWGaNP to get an acceptable sample, and that the remaining 10 will be used for validation. Videos are placed within these two sets at random.
 
 ![](/images/createproject.PNG "createproject")
 
