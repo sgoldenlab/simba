@@ -221,7 +221,7 @@ This tool creates a video with the frame numbers printed on top of the video.
 5. Click on `Generate gif` to create the gif. 
 
 ## Extract Frames
-Extract frames consist of **Extract defined frames**, **Extract frames**, and **Extract frames from seq files**
+The Extract frames menu has two options: **Extract defined frames**, **Extract frames**, and **Extract frames from seq files**.
 
 ### Extract defined Frames
 This tool allows users to extract frames from a video by inputting specific start- and end-frame numbers. This is useful if you want to extract a subset of frames from a larger video, without first needing to generate a new video of the desired length.
