@@ -42,7 +42,9 @@ However, SimBA will also accept alternative body labelling schematics (see the a
 **Important**: So far we have only validated machine learning models that use features calculated from 16 labelled body parts on two individual animals. The other configurations are "use at your own risk" and may require trouble-shooting.
 
 ## SimBA-DLC Pipeline breakdown
-For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
+For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut). 
+
+The SimBA-DLC pipeline is confirmed compatible with DLC v2.0.9.
 
 **Note**: All videos should have been pre-processed, see [Step 1: Video pre-processing](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md), prior to DLC tracking.
 
@@ -89,11 +91,13 @@ This step generates a new DeepLabCut project.
 
 6. Next, select the main directory that your project will be located in. Next to `Project directory`, click on `Browse Folder` and choose a directory.
 
-7. If you wish to use the settings used by the Golden lab (This setting is used to track two mice, and eight body parts on each of the two mice) check the `Apply Golden Aggression Config' box. For more information, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config). If you wish to generate your on DeepLabCut tracking config, please leave this box un-ticked.
+7. If you wish to use the settings used by the Golden lab (this setting is used to track two mice, and eight body parts on each of the two mice) check the `Apply Golden Aggression Config' box. For more information, see above section and figure. If you wish to generate your own DeepLabCut tracking config, using a different annotation configuration, please leave this box un-ticked.
 
-8. You can either copy all the videos to your DeepLabCut project folder, or create shortcuts to the videos. By checking the `Copy Videos` checkbox, the videos will be copied to your project folder. If this box is left un-ticked, shortcuts to your videos will be created. 
+8. You can either copy all the videos to your DeepLabCut project folder, or create shortcuts to the videos. By checking the `Copy Videos` checkbox, the videos will be copied to your project folder. If this box is left un-ticked, shortcuts to your videos will be created. This can be useful if you wish to save storage space, or if you have very large or numerous video files.
 
 9. Click on `Create Project` to create your DeepLabCut project. The project will be located in the chosen **working directory**.
+
+10. You will need to Load this project to use it. Move to Part 2 below.
 
 ## Part 2: Load DLC Project
 These menus are used to load created DeepLabCut projects.
@@ -117,6 +121,8 @@ These menus are used to load created DeepLabCut projects.
 2. Under the **Load Model** tab, click on `Browse File` and load the *config.yaml* file from your project folder.
 
 ### Step 3: Add additional videos to the project (optional)
+
+This step can be useful if you would like to add new videos to refine your tracking model that were not avilable previously.
 
 ![alt-text-1](/images/additionalvideo.PNG "additionalvideo")
 
@@ -183,11 +189,13 @@ These menus are used to load created DeepLabCut projects.
 1. Under **Generate Training Set**, click on the `Generate training set` button to generate a new training set.
 
 ### Step 8: Train Network
-Train the model using a training set.
+Train the model using a training set. Note that there are two scenarios:
 
-1. In the `iteration` entry box, fill in an integer (e.g., 0) representing the model iteration number. Once done, click on **Update iteration**.  If left blank, then the iteration number will be the most recently used. If the iteration number isn't specified, and you are working with a new project, it will default to 0. 
+1. **Training from scratch**: In the `iteration` entry box, fill in an integer (e.g., 0) representing the model iteration number. Once done, click on **Update iteration**.  If left blank, then the iteration number will be the most recently used. If the iteration number isn't specified, and you are working with a new project, it will default to 0. 
 
-2. In the `init_weight` box, specify the path to the initial weights. If this is left blank it will default to resnet-50. If you want to use other weights, click on `Browse File`. Pre-trained weights for mouse and rat resident-intruder protocols using 16 body-parts, as well as other pre-trained weights, can be downloaded [here](https://osf.io/5t4y9/). Downloaded weights may consist of three files (*.index, .meta, .data*). In the `init_weight` box, specify the path to any of the three downloaded files. 
+2. **Training from previous weights**: In the `init_weight` box, specify the path to the initial weights. If this is left blank it will default to resnet-50. If you want to use other weights, click on `Browse File`. 
+
+Pre-trained weights for mouse and rat resident-intruder protocols using 16 body-parts, as well as other pre-trained weights, can be downloaded [here](https://osf.io/5t4y9/). Downloaded weights may consist of three files (*.index, .meta, .data*). In the `init_weight` box, specify the path to any of the three downloaded files. 
 
 ### Step 9: Evaluate Network
 
