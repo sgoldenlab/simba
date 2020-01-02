@@ -1,4 +1,4 @@
-# Using SimBA to create (optional) and access (required) [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) tracking models. 
+# Using SimBA to create (optional) and import (required) [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) tracking models. 
 
 DeepLabCut is currently fully supported by the SimBA pipeline. We strongly suggest that users generate their DLC tracking model using the DLC GUI. This will provide the most up-to-date and pleasurable annotation experience, followed by loading the generated DLC model into SimBA. Future iterations will include tracking support for mask R-CNN, LEAP, DeepPoseKit, etc, as requested by the community.
 
