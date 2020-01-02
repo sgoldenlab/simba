@@ -13,7 +13,7 @@ git clone https://github.com/sgoldenlab/simba.git
 pip install -r simba/SimBA/requirements.txt
 ```
 
-# How to launch the GUI
+# How to launch SimBA
 
 1. Open up command prompt in the SimBA folder
 
