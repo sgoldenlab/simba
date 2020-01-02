@@ -43,7 +43,7 @@ Underneath the displayed image, there are options for navigating through all the
 
 `Generate and Quit` This will compile and export the data to a .csv file located in the `project folder\csv\targets_inserted\` that contain the behavioral annotations. 
 
-#### Key Shortcuts 
+#### Keyboard Shortcuts 
 
 Keyboard shortcut information is displayed on the right side of the window for ease of use. 
 `For Video` shortcuts are only applicable for navigating the video when opened, and have no effect on the displayed frame. 
