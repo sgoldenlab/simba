@@ -417,7 +417,7 @@ Merge all the generated plots from the previous step into single frames.
 
 1. Under **Merge Frames**, click `Merge Frames` and frames with all the generated plots will be combined and saved in the `project_folder/frames/output/merged` folder.
 
-### Step 13: Create Video
+### Step 13: Create Videos
 This step is to generate a video from the merged frames.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/createvideoini.PNG" width="200" height="100" />
