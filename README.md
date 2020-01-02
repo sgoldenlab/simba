@@ -41,7 +41,7 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 ### Step 4: [Analysis/Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
 
-###  * [Full tutorial for building classifiers in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).
+### [Click here for the full tutorial on building classifiers in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).
 
 ## Installation ⚙️
 
