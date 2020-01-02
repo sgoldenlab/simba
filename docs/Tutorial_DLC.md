@@ -254,7 +254,7 @@ This step automates the **Extract Frames** process to only extract frames from s
 
 1. Under **Label Outliers**, click on `Refine Outliers`. The *DeepLabCut - Refinement ToolBox* will pop open.
 
-2. In the bottom left-hand corner, click on `Load labels` and select the *machinelabels* file to start to correct the tracking points. For more information on how to correct outliers in DeepLabCut, go to the [DeepLabCut repository](https://alexemg.github.io/DeepLabCut/docs/functionDetails.html#j-refinement-extract-outlier-frames)
+2. In the bottom left-hand corner, click on `Load labels` and select the *machinelabels* file to start to correct the tracking points. For more information on how to correct outliers in DeepLabCut, go to the [DeepLabCut repository](https://alexemg.github.io/DeepLabCut/docs/functionDetails.html#j-refinement-extract-outlier-frames).
 
 ### Step 4: Merge Labelled Outliers
 
