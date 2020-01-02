@@ -44,7 +44,8 @@ However, SimBA will also accept alternative body labelling schematics (see the a
 ## SimBA-DLC Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
 
-**Note**: All videos should have been pre-processed, see [Step 1](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md), prior to DLC tracking.
+**Note**: All videos should have been pre-processed, see [Step 1: Video pre-processing](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md), prior to DLC tracking.
+
 
 ![alt-text-1](/images/dlcworkflow.PNG "dlcworkflow.PNG")
 
