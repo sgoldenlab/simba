@@ -34,6 +34,14 @@ However, SimBA will also accept alternative body labelling schematics (see the a
 ## Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut).
 
+Parts 1 and 2 can be skipped if you have already generated your DLC tracking model. Again, you must use the "16 point, 2 rodent configuration" to use the included feature list. 
+
+Part 3 should be used regardless of whether a new model is being generated from scratch, or a previous model imported. 
+
+If you are amending a model generated from different video acquisition parameters than your experimental videos, we **strongly** suggest extracting more frames from your experimental videos and incorporating them into the model. In our own hands, this has always significantly improved tracking, while requiring very little new annotation. We suggest 200-300 new frames.
+
+Outlier correction should be used no matter what.
+
 ![alt-text-1](/images/dlcworkflow.PNG "dlcworkflow.PNG")
 
 ### [Part 1: Create DLC Project](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#part-1-create-dlc-project-1)
@@ -247,7 +255,7 @@ This step automates the **Extract Frames** process to only extract frames from s
 
 1. Under **Load Model**, click `Browse File` and select the *temp.yaml* that you have just created.
 
-2. Now you can extract frames of the videos that you have just added.
+2. Now you can extract frames of the videos that you have just added. Return to **Part 1, Step 4** to update the model with the new frames.
 
 ## Outlier Correction
 
