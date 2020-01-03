@@ -34,7 +34,7 @@ At this point we have Experimental data that has been corrected for outliers and
   <img width="312" height="256" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
 </p>
 
-3. Click on `Browse File` and select the model (*.sav*) file associated with the classifier name. If you are following along from Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), the *.sav* file will be saved in your earlier project, in the `project_folder\models\generated_models` directory. You can also select an *.sav* file located in any other 
+3. Click on `Browse File` and select the model (*.sav*) file associated with the classifier name. If you are following along from [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), the *.sav* file will be saved in your earlier project, in the `project_folder\models\generated_models` directory. You can also select an *.sav* file located in any other 
 
 
 
