@@ -145,7 +145,7 @@ More importantly, you also set the **pixels per millimeter** for all of your vid
 
 2. Click on `Set Video Parameters` and the following windows will pop up.
 <p align="center">
-  <img width="1037" height="259" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table.PNG">
+  <img width="1037" height="259" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table_20vid.PNG">
 </p>
 
 3. In the above example we imported the 20 pilot videos and their names are listed the leftmost `Video` column. SimbA auto-populated the known distance to 0 millimeter in the previous step, and this is now displayed in the `Distance in mm` column. 
