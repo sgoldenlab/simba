@@ -209,7 +209,9 @@ Based on the coordinates of body parts in each frame - and the frame rate and th
 
 Notably, if you use a different DLC annotation configuration, such as 3 body parts with 2 mice, then the feature list will be significantly reduced and subsequently negatively influence prediction performance.
 
-1. Click on `Extract Features`.
+1. Click on `Extract Features`. New .csv files, that contain the feature data and the pose-estimation data, should be generated and saved in the `project_folder\csv\features_extracted` folder. 
+
+**Important**: We want to validate the classifier for behavior BtWGaNP on a separate video, and that video should not be used in the training and testing steps. In the current Scenario, we have generated 20 files containing features and they are stored in the `project_folder\csv\features_extracted` folder. To store away one of these files for later validation, navigate to the `project_folder\csv\features_extracted` folder, and cut one file out of the `project_folder\csv\features_extracted` folder, and paste it somewhere else outside of your `project_folder`. This way, SimBA won't see the file in later steps, and it will be omitted from inclusion for when creating the model. We will later define the directory path to this file, and try to predict behavior BtWGaNP in this file from the classifer generated using data in the other 19 files.  
 
 ### Step 6: Label Behavior (ie, create predictive classifiers)
 This step is used to label the behaviors in each frames of a video. This data will be concatenated with the exttracted features and used for creating behavioral classifiers. 
@@ -233,9 +235,9 @@ If you already have annotation videos created with these alternative tools, or a
 ### Step 7: Train Machine Model
 This step is used for training new machine models for behavioral classifications. There are a large number of parameters, called Hyperparameters, that influence Random Forest models. We have currated a list of Hyperparameters and made it easy to tweak, and validate, their values. For a more in-depth explanation, please see [sklearn.ensemble.RandomForestClassifier documentation](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) or join the discussion on our [Gitter page](https://gitter.im/SimBA-Resource/community). This is a lot to look at, please read this whole section before starting anything.
 
-**Note**: SimBA allows you to generate predictive classifiers in two different *modes*. You can either (i) specify a single set of Hyperparameters, and train a single or batch train multiple different predictive classifiers using that specific set of hyperparameters, or alternatively you can (ii) specify many different Hyperparameter settings, and batch train multiple different models, each using a different set of Hyperparameters. The second option is relevant for the current Scenario. For example, here we may want to generate five different classifiers that predict the behavior BtWGaNP, evaluate each one, and proceed to the Experimental data with the classifier that that best captures behavior BtWGaNP in the pilot data. Thus, the first section of this part of the tutorial describes the different Hyperparameter settings, and what you can do to avoid setting them manually (*HINT*: load metadata), while the second part of the tutorial section describes how to proceed with either of the two *modes* of generating classifiers.       
+**Note**: SimBA allows you to generate predictive classifiers in two different *modes*. You can either (i) specify a single set of Hyperparameters, and train a single or batch train multiple different predictive classifiers using that specific set of hyperparameters, or alternatively you can (ii) specify many different Hyperparameter settings, and batch train multiple different models, each using a different set of Hyperparameters. The second option is relevant for the current Scenario. For example, here we may want to generate five different classifiers that predict the behavior BtWGaNP, evaluate each one, and proceed to the Experimental data with the classifier that that best captures behavior BtWGaNP in the pilot data. Thus, the first section of this part of the tutorial describes the different Hyperparameter settings, and what you can do to avoid setting them manually (*HINT*: you canload metadata), while the second part of the tutorial section describes how to proceed with either of the two *modes* of generating classifiers.       
 
-#### Train model
+#### Train predictive classifier(s): settings
 
 1. Click on `Settings` and the following window will pop up. 
 
@@ -303,38 +305,17 @@ Here is a brief description of the different Model evaluation settings, together
 
 - `Generate Precision Recall Curves`: Creates a .csv file listing precision at different recall values. This is useful for titration of the false positive vs. false negative classifications of the models.  
 
-##### Train predictive classifier(s)
+#### Train predictive classifier(s): start the machine training
 
-Once all the entry boxes have been filled in with the desired Hyperparameters and Model Evaluation Settings have been chosen, the user can either click on `Save settings into global environment` or `Save settings for specific model`. If you click on `Save settings into global environment`, the settings will be saved in to your *project_config.ini* file. This settings can subsequently  be retreived and executed many predictive classifiers (**mode 1**). However, if you click on `Save settings for specific model`, a config file will be generated in the background that contains the desired settings. To generate 5 different config files, simply update the Hyperparameters and Model Evaluation Settings, and after each time they are updated, press on `Save settings for specific model` (**mode 2**). See below for more information.
+Once all the entry boxes have been filled in with the desired Hyperparameters and Model Evaluation Settings, the user can either click on `Save settings into global environment` or `Save settings for specific model`. If you click on `Save settings into global environment`, the settings will be saved in to your *project_config.ini* file located in your `project_folder`. This settings can subsequently be retreived and executed to generate a predictive classifier (**mode 1**). However, if you click on `Save settings for specific model`, a config file will be generated in the background (in the `/project_folder/configs` folder) that contains the desired settings. To generate 5 different config files, simply update the Hyperparameters and Model Evaluation Settings five different times, representing the five different predictive classifiers you want to generate, and after each time you have updated the values, press on `Save settings for specific model` (**mode 2**). See below for more information.
 
-(i) To save the settings into the global environment, and generate a single predictive classifier using these settings, click on `Save settings into global environment`, and **exit the machine model settings**. Next, click on the blue button: `Train single model from global environment`. While the model is training, text indicating its progress will be printed in the 
+(i) **Mode 1**: To save the settings into the global environment, and generate a single predictive classifier using these settings, click on `Save settings into global environment`, and then **exit the machine model settings window by closing it**. Next, click on the blue button: `Train single model from global environment`. While the model is training, text is printed in the main SimBA window indicating its progress. A message saying that training is complete will also be printed in the terminal window.  The model, in *.sav file format*, will be saved in the `project_folder\models\generated_models` folder. If you have chosen to generate model evaluation files, then they will be  be saved in the `project_folder\models\generated_models\model_evaluations` folder. 
 
-
-will be saved in to your *project_config.ini* file. This settings can subsequently  be retreived and executed many predictive classifiers (**mode 1**)
-
-(ii) Alternatively, click on the `Save settings for specific model` button to save the settings for one model. To generate multiple models - for either multiple different behaviors and/or using multiple different hyper-parameters - re-define the Machine model settings and click on `Save settings for specific model` again. Each time the `Save settings for specific model` is clicked, a new config file is generated in the */project_folder/configs* folder. In the next step (see below), a model for each config file will be created if pressing the **Train multiple models, one for each saved settings** button. **You must exit this menu when finished**.
-
-8. If training a single model, click on `Train Model`.
-
-#### To train multiple models
-
-Imagine you would like to train the same predictive classifier, but slightly changing a Hyperparameter between models so that you can see the effect. Rather than run single models in sequence, SimBA provides a batch function. In this way, you can save numerous Hyperparameter configurations, save them to a batch, and then run them all at once (overnight!). This is a very useful tool for "locking-in" your classifier parameters.
-
-1. Click on `Settings`.
-
-2. Under **Machine Model**, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
-
-3. Under **Model**, select the model you wish to train from the drop down menu.
-
-4. Then, set the **Hyperparameters**.
-
-5. Click the `Save settings for multiple models` button. This generates a _meta.csv file. Repeat the steps to generate multiple models. **You must exit this menu when finished.**
-
-6. Click on `Train Multiple Models`.
+(ii) **Mode 2**: Alternatively, click on the `Save settings for specific model` button to save the settings for one model. To generate multiple models - for multiple different Hyperparameters used to predict behavior BtWGaNP - re-define the Machine model settings and click on `Save settings for specific model` again. Each time the `Save settings for specific model` is clicked, a new config file is generated in the */project_folder/configs* folder. Next, **exit the machine model settings window by closing it**. and click on the green button: `Train multiple models, one for each saved setting`. This will generate one model for each of the config files in the */project_folder/configs* folder. The model, in *.sav file format*, will be saved in the `project_folder\models\generated_models` folder. Model evaluation files will be saved in the `project_folder\models\generated_models\model_evaluations` folder. 
 
 ### Critical validation step before running machine model on new data
 
-This step is critical for decreasing false-positive and false-negative predictions.
+If you have chosen to generate Classification reports and other metrics of classifier performance, it is definitly worth studying them to ensure that the model(s) performance is acceptable. However, a classifiers performance is perhaps most readily validated by visualizing its predictions on a new video, which have not been used for training or testing. This step is critical for making sure that model performance is sufficent for running it on your experimental data. 
 
 You can validate each model *( saved in .sav format)* file. This should be done in a "gold-standard" video that has been fully manually annotated for your behavior of interest, but has not been included in the training dataset.  
 
