@@ -150,33 +150,35 @@ More importantly, you also set the **pixels per millimeter** for all of your vid
 
 3. In the above example we imported the 20 pilot videos and their names are listed the leftmost `Video` column. SimbA auto-populated the known distance to 0 millimeter in the previous step, and this is now displayed in the `Distance in mm` column. 
 
-4. You can click on the values in the entry boxes and change them until you are satisfied. Then, click on `Update distance_in_mm` and this will update the whole table.
+4. You can click on the values in the entry boxes and change them until you are satisfied. By default, the entry boxes are populated with the meta data from the video files. 
 
-5. Next, to get the `Pixels/mm` for the first video, click on `Video1` and the following window will pop up. The window that pops up displays the first frame of `Video1`.
+5. Regardless if you updated the values in the table or not, click on `Update distance_in_mm` at the top of the window: this will save the information displayed in the table into a .csv file. The .csv file is saved as *video_info.csv* and is stored in the `project_folder\logs` folder. After clicking on the `Update distance_in_mm` button, you can proceed to the next step. 
+
+6. Next, to get the `Pixels/mm` for the first video, click on `Video1` and the following window will pop up. The window that pops up displays the first frame of `Video1`.
 
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord1.PNG">
 </p>
 
-6. Now, double **left** click to select two points that defines the known distance in real life. In this case, we know that the two **pink connected dots** represent a distance of 100 millimeter in real life.
+7. Now, double **left** click to select two points that defines the known distance in real life. In this case, we know that the two **pink connected dots** represent a distance of 100 millimeter in real life.
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord2.PNG">
 </p>
 
-7. If you misplaced one or both of the dots, you can double click on either of the dots to place them somewhere else in the image. Once you are done, hit `Esc`.
+8. If you misplaced one or both of the dots, you can double click on either of the dots to place them somewhere else in the image. Once you are done, hit `Esc`.
 
 <p align="center">
   <img width="400" height="500" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord.gif">
 </p>
 
-8. If every step is done correctly, the `Pixels/mm` column in the table should populate with the number of pixels that represent one millimeter, 
+9. If every step is done correctly, the `Pixels/mm` column in the table should populate with the number of pixels that represent one millimeter, 
 <p align="center">
   <img width="700" height="350" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table2.PNG">
 </p>
 
-9. Repeat the steps for every video in the table, and once it is done, click on `Save Data`. This will generate a csv file named **video_info.csv** in `/project_folder/log` folder that contains a table with your video meta data. 
+10. Repeat the steps for every video in the table, and once it is done, click on `Save Data`. This will update the csv file named **video_info.csv** in `/project_folder/log` folder that contains a table with your video meta data. 
 
-10. You can also chose to add further columns to the meta data file (e.g., AnimalID or experimental group) by clicking on the `Add Column` button. This information will be saved in additional columns to your **video_info.csv** file.
+11. You can also chose to add further columns to the meta data file (e.g., AnimalID or experimental group) by clicking on the `Add Column` button. This information will be saved in additional columns to your **video_info.csv** file.
 
 ### Step 4: Outlier Correction
 
@@ -317,141 +319,26 @@ Once all the entry boxes have been filled in with the desired Hyperparameters an
 
 If you have chosen to generate Classification reports and other metrics of classifier performance, it is definitly worth studying them to ensure that the model(s) performance is acceptable. However, a classifiers performance is perhaps most readily validated by visualizing its predictions on a new video, which have not been used for training or testing. This step is critical for making sure that model performance is sufficent for running it on your experimental data. 
 
-You can validate each model *( saved in .sav format)* file. This should be done in a "gold-standard" video that has been fully manually annotated for your behavior of interest, but has not been included in the training dataset.  
+You can validate each model *( saved in .sav format)* file. This should be done in a "gold-standard" video that has been fully manually annotated for your behavior of interest, but has not been included in the training dataset. If you followed the tutorial, you may remember that we stored away one .csv file away in a safe place earlier, a file which we had exracted the features in but we did not use this file for training and testing of the classifier. Now is the time to use it. 
 
-In this validation step the user specifies the path to a previously created model in .sav file format, and a .csv file containing the features extracted from a video (Step 5 above). This process will (i) run the predictions on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click [here](https://youtu.be/UOLSj7DGKRo) for an example validation video.
+In this validation step the user specifies the path to a previously created model in .sav file format, and  the path to a .csv file containing the features extracted from a video (Step 5 above). This process will (i) run the predictions on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click [here](https://youtu.be/UOLSj7DGKRo) for an example validation video for predicting *copulation*. 
 
-This allows you to rapidly access the results of the Hyperparameters you have selected on a "gold-standard" behavioral video. If the predictions are not good, you can go back to tweak the appropriate parameters without first running through numerous other videos.
+This process allows you to rapidly access the results of the Hyperparameters you have selected on a "gold-standard" behavioral video. If the predictions are not good, you can go back to tweak the appropriate parameters without first running through numerous other videos or adding or refining your annotations. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/validatemodel.PNG" width="348" height="162" />
 
-1. Under **Validate Model on Single Video** and `Select features file`, click on `Browse File`. Select a *.csv* files in the `project_folder/csv/output/features_extracted` directory.
+1. Under **Validate Model on Single Video** and `Select features file`, click on `Browse File`. Select a *.csv* files in the `project_folder/csv/output/features_extracted` directory. In this Scenario, select the .csv file you have stored in a safe place outside of the project folder. 
 
-2. Under `Select model file`, click on `Browse File` to select a model (*.sav file*).
+2. Under `Select model file`, click on `Browse File` to select a model (*.sav file*). Your *.sav file(s)* should be saved in the `project_folder\models\generated_models` folder.
 
 3. Set the `Discrimination threshold` and `Minimum behavior bout length (ms)`:
 
-- `Discrimination threshold`: The level of probability required to define that the frame belongs to the target class. Accepts a float value between 0.0-1.0. For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html).
+- `Discrimination threshold`: This value represents the level of probability required to define that the frame belongs to the target class and it accepts a float value between 0.0 and 1.0.  In other words, how certain does the computer have to be that behavior BtWGaNP occurs in a frame, in order for the frame to be classified as containing behavior BtWGaNP? For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this Scenario, we suggest using a 0.5 discrimination threshold.
 
-- `Minimum behavior bout length (ms)`: The minimum length of a classified behavioral bout. **Example**: The random forest makes the following attack predictions for 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals fought for 80ms (4 frames), took a brake for 20ms (1 frame), then fought again for another 80ms (4 frames). You may want to classify this as a single 180ms attack bout rather than two separate 80ms attack bouts. With this setting you can do this. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms attack bout. 
+- `Minimum behavior bout length (ms)`: This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a brake for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. 
 
-4. Click on `Validate` to run the validation of the selected model. This will apply the selected model to the feature data and generate a video with behavioral predictions overlaid on the frames together with a gantt plot depicting predicted behavioral bouts. Click [here](https://youtu.be/UOLSj7DGKRo) for an example. 
+4. Click on `Validate` to run the validation of the selected model. This will apply the selected model to the feature data of the specified file and generate a video with behavioral predictions overlaid on the frames together with a gantt plot depicting predicted behavioral bouts. Click [here](https://youtu.be/UOLSj7DGKRo) for an example validation video and expected output. The video will be stored in the `\project_folder\frames\validation` folder.
 
-### Step 8: Run Machine Model
-This step runs behavioral classifiers on new data. For this Scenario, this will be the 
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="343" height="132" />
-
-1.  Under the **Run Machine Model** heading, click on `Model Selection`. The following window with the classifier names defined in the *project_config.ini* file will pop up.
-
-<p align="center">
-  <img width="312" height="256" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
-</p>
-
-2. Click on `Browse File` and select the model (*.sav*) file associated with each of the classifier names. 
-
-3. Once all the models have been chosen, click on `Set Model` to save the paths. 
-
-4. Fill in the `Discrimination threshold` and click on `Set` to save the settings.
-
-- `Discrimination threshold`: The level of probability required to define that the frame belongs to the target class (see above). 
-
-5. Fill in the `Minimum behavior bout length` and click on `Set` to save the settings.
-
-- `Minimum behavior bout length (ms)`:  The minimum length of a classified behavioral bout(see above). 
-
-6. Click on `Run RF Model` to run the machine model on the new data. 
-
-### Step 9: Analyze Machine Results
-Access this menu through the `Load project` menu and the `Run machine model` tab. This step performs summary analyses and presents descriptive statistics in .csv file format. There are three forms of summary analyses: `Analyze`, `Analyze distance/velocity`, and `Analyze severity`.
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/analyzemachineresult.PNG" width="331" height="62" />
-
-- `Analyze`: This button generates descriptive statistics for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. 
-
-- `Analyze distance/velocity`: This button generates descriptive statistics for mean and median movements and distances between animals. The date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. 
-
-- `Analyze severity`: Calculates the ‘severity’ of each frame classified as containing attack behavior based on a user-defined scale. **Example:** the user sets a 10-point scale. One frame is predicted to contain an attack, and the total body-part movements of both animals in that frame is in the top 10% percentile of movements in the entire video. In this frame, the attack will be scored as a 10 on the 10-point scale. A date-time stamped output .csv file containing the 'severity' data is saved in the `/project_folder/log` folder.
-
-### Step 10: Visualization
-These steps generate visualizations of features and machine learning classification results. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots and data plots. In this step the different frames can also be merged into video mp4 format. 
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="1246" height="380" />
-
-1. Under the **Sklearn visualization** heading, click on `Visualize classification results`.
-This step grabs the frames of the videos in the project, and draws circles at the location of the tracked body parts, the convex hull of the animal, and prints the behavioral predictions on top of the frame. For an example, click [here](https://www.youtube.com/watch?v=7AVUWz71rG4&t=519s).
-
-### Step 11: Plot graphs
-The user can also create a range of plots: **gantt plot**, **Data plot**, **Path plot**, and **Distance plot**.
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotgraphs.PNG" width="262" height="383" />
-
-#### Gantt plot
-Gantt plot generates gantt plots that display the length and frequencies of behavioral bouts for all the videos in the project.
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/gantt_plot.gif" width="300" height="225" />
-
-1. Under the **Gantt plot** heading, click on `Generate Gantt plot` and gantt plot frames will be generated in the `project_folder/frames/output/gantt_plots` folder.
-
-#### Data plot
-Generates 'live' data plot frames for all of the videos in the project that display current distances and velocities. 
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/dataplot.gif" width="300" height="200" />
-
-1. Under the **Data plot** heading, click on `Generate Data plot` and data plot frames will be generated in the `project_folder/frames/output/live_data_table` folder.
-
-#### Path plot
-Generates path plots displaying the current location of the animal trajectories, and location and severity of attack behavior, for all of the videos in the project.
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/pathplot.gif" width="199" height="322" />
-
-1. Under the **Path plot** heading, fill in the following user defined values.
-
-- `Max Lines`: Integer specifying the max number of lines depicting the path of the animals. For example, if 100, the most recent 100 movements of animal 1 and animal 2 will be plotted as lines.
-
-- `Severity Scale`: Integer specifying the scale on which to classify 'severity'. For example, if set to 10, all frames containing attack behavior will be classified from 1 to 10 (see above). 
-
-- `Bodyparts`: String to specify the bodyparts  tracked in the path plot. For example, if Nose_1 and Centroid_2, the nose of animal 1 and the centroid of animal 2 will be represented in the path plot.
-
-- `plot_severity`: Tick this box to include color-coded circles on the path plot that signify the location and severity of attack interactions.
-
-2. Click on `Generate Path plot`, and path plot frames will be generated in the `project_folder/frames/output/path_plots` folder.
-
-#### Distance plot
-Generates distance line plots between two body parts for all of the videos in the project.
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/distance_plot.gif" width="300" height="225" />
-
-1. Fill in the `Body part 1` and `Body part 2`
-
-- `Body part 1`: String that specifies the the bodypart of animal 1. Eg., Nose_1
-
-- `Body part 2`: String that specifies the the bodypart of animal 1. Eg., Nose_2
-
-2. Click on `Generate Distance plot`, and the distance plot frames will be generated in the `project_folder/frames/output/line_plot` folder.
-
-### Step 12: Merge Frames
-Merge all the generated plots from the previous step into single frames.
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes.PNG" width="121" height="62" />
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
-
-1. Under **Merge Frames**, click `Merge Frames` and frames with all the generated plots will be combined and saved in the `project_folder/frames/output/merged` folder.
-
-### Step 13: Create Videos
-This step is to generate a video from the merged frames.
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/createvideoini.PNG" width="200" height="100" />
-
-1. Enter the `Bitrate` and the `File format`  
-
-- `Bitrate`: [Bitrate](https://en.wikipedia.org/wiki/Bit_rate) is the number of bits per second. The symbol is bit/s. It generally determines the size and quality of video and audio files: the higher the bitrate, the better the quality and the larger the file size. If unsure, try setting bitrate to 2400.
-
-- `File format`: The format of the output video, it can be mp4, mov, flv, avi, etc...
-
-> **Note**: Please enter the file format without the ".".
-
-2. Click on `Create Video`. 
+Congrats! You have now generated RF models that can be run on new, experimental data, and we hope those models are doing a good job at recognizing the behaviors of intrest. Proceed to [Scenario2] to use the BtWGaNP classifier to evaluate your experimental data.  
 
 
