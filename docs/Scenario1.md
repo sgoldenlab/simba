@@ -19,9 +19,9 @@ For processing datasets, the pipeline is split into a few sections. These sectio
 
 
 ### Part 1: [Create a new project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
-- [Generate project config](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config) ([create new classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#create-new-classifiers) or [import exisiting classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#import-existing-classifiers))
+- [Generate project config](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config) ([create new classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#create-new-classifiers))
 - [Import videos into project folder](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-2-import-videos-into-project-folder)
-- [Import DLC Tracking Data](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-3-import-dlc-tracking-data) (if have any)
+- [Import DLC Tracking Data](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-3-import-dlc-tracking-data) 
 - [Extract Frames into project folder](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder)
 
 ### Part 2: [Load project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config)
@@ -78,34 +78,33 @@ There are several considerations when selecting the number of videos for trainin
 
 #### To import multiple videos
 1. Navigate to the `[ Import videos into project folder ]` tab.
-2. Under the `Import multiple videos` heading, click on `Browse Folder` to select a folder that contains all the videos that you wish to import into your project.
+2. Under the `Import multiple videos` heading, click on `Browse Folder` to select a folder that contains **all the pilot videos** to import into your project.
 3. Enter the file type of your videos. (e.g., *mp4*, *avi*, *mov*, etc) in the `Video type` entry box.
 4. Click on `Import multiple videos`. 
->**Note**: If you have a lot of videos, it might take a few minutes before all the videos are imported.
-#### To import a single video
-1. Under the `Import single video` heading, click on `Browse File` to select your video.
-2. Click on `Import a video`.
+>**Note**: If you have a lot of videos, or exceptionally high resolution or frame rate videos, it might take a few minutes before all the videos are imported.
 
 ### Step 3: Import DLC Tracking Data
-In this step, you will import your pose-estimation tracking data from DeepLabCut in csv file format.
+In this step, you will import your pose-estimation tracking data from DeepLabCut in .CSV file format. For the pilot videos, this means that you should have 20 individual .CSV files corresponding to each of the individual videos.
+
+**Note**: DLC outputs .CSV files with exceptionally long file names. We have included a function that will automatically copy the DLC .CSV, remove the excess DLC notations from the filename, and paste the new .CSV within the SimBA project. The new .CSV will now have the same name as the corresponding video. The originical DLC output .CSV will still be present in its original folder.
 
 ![](/images/importcsv.PNG "importcsv")
 
 #### To import multiple DLC csv files
 1. Navigate to the `[ Import tracking data ]` tab. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the csv files that you wish to import into your project.
 2. Click on `Import csv to project folder`. 
-#### To import a single csv file
-1. Under the `Import single csv files` heading, and click on `Browse File` to select the csv file containing your pose estimation data.
-2. Click on `Import single csv to project folder`.
+
+>**Note**: SimBA also provides the ability to import single videos and their corressponding .CSV files. This is not used in Scenario 1.
 
 ### Step 4: Extract frames into project folder
-This step will extract all the frames from every video that are imported into the project following **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the classification results. Once the step is completed, close the `Project Configuration` window.
->**Note**: Splitting videos up into frames can take time if you have a lot of high resolution videos at high frame rates. The frames can also take up a lot of hard drive space. 
+This step will extract all the frames from every pilot video that is imported into the project following **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the classification results. 
+>**Note**: Splitting videos up into frames can take time if you have a lot of high resolution videos at high frame rates. The frames can also take up a lot of hard drive space. This is a good point to grab a coffee, or perhaps the latest edition of Machine Intelligence Daily.
+Once the step is completed, close the `Project Configuration` window. The main console will remain open.
 
 ![](/images/extractframeintop.PNG "extractframeintop")
 
 ## Part 2: Load project
-This section describes how to load and work with created projects.
+In Part 1, we created a project. To continue working with this project, we **must** load it. This section describes how to load and work with created projects.
 
 ### Step 1: Load Project Config
 In this step you will load the *project_config.ini* file that was created.
@@ -124,8 +123,8 @@ In this step you will load the *project_config.ini* file that was created.
 
 In this image, you can see the `Desktop` is my selected working directory, `tutorial` is my project name, and the last two sections of the folder path is always going to be `project_folder/project_config.ini`.
 
-### Step 2 (Optional) : Import more DLC Tracking Data or videos
-In this step, you can choose to import more pose estimation data in csv file format and/or more videos. If this isn't relevant then you can skip this step.
+### Step 2 (Optional step) : Import more DLC Tracking Data or videos
+In this step, you can choose to import more pose estimation data in csv file format and/or more videos. If this isn't relevant then you can skip this step. This is not relevant to Scenaro 1, so please skip to Step 3 (but remain aware you can do this if needed later).
 
 ![](/images/importdlc.PNG "importdlc")
 
@@ -136,20 +135,22 @@ In this step, you can choose to import more pose estimation data in csv file for
 3. If you already have existing frames of the videos in the project folder, you can import the folder that contains the frames into the project. Under the **Import frame folders** heading, click on `Browse Folder` to choose the folder thar contains the frames, and click on `Import frames`. The frames will be imported into the `project_folder/frames/input` folder. 
 
 ### Step 3: Set video parameters
-In this step, you can customize the meta parameters for each of your videos (fps, resolution, metric distances) and provide additional custom video information (Animal ID, group etc). You also set the **pixels per millimeter** for your videos. You will be using a tool that requires the known distance between two points (e.g., the cage width or the cage height) in order to calculate **pixels per millimeter**. The real life distance between the two points is called `Distance in mm`.
+In this step, you can customize the meta parameters for each of your videos (fps, resolution, metric distances) and provide additional custom video information (Animal ID, group etc). This can be very helpful when analyzing data later on. Are there any groups, conditions, days, treatments, etc, that will make your analysis easier?
+
+More importantly, you also set the **pixels per millimeter** for all of your videos. You will be using a tool that requires the known distance between two points (e.g., the cage width or the cage height) in order to calculate **pixels per millimeter**. 
+
+1. Under **Set video parameters(distances,resolution,etc.)**, the entry box named `Distance in mm` is the known distance between two points in the videos in **millimeters**. If the known distance is the same in all the videos in the project, then enter the value *(e.g,: 245)* and click on `Auto populate Distance in mm in tables`. and it will auto-populate the table in the next step (see below). If you leave the `Distance in mm` entry box empty, the known distance will default to zero and you will fill in the value for each video individually. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/setvidparameter.PNG" width="391" height="96" />
-
-1. Under **Set video parameters(distances,resolution,etc.)**, the entry box named `Distance in mm` is the known distance between two points in the videos in millimeter. If the known distance is the same in all the videos in the project, then enter the value *(e.g,: 245)* and click on `Auto populate Distance in mm in tables`. and it will auto-populate the table in the next step (see below). If you leave the `Distance in mm` entry box empty, the known distance will default to zero and you will fill in the value for each video individually. 
 
 2. Click on `Set Video Parameters` and the following windows will pop up.
 <p align="center">
   <img width="1037" height="259" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table.PNG">
 </p>
 
-3. In the above example I imported four videos and their names are listed the leftmost `Video` column. I auto-populated the known distance to 10 millimeter in the previous step, and this is now displayed in the `Distance in mm` column. 
+3. In the above example we imported the 20 pilot videos and their names are listed the leftmost `Video` column. SimbA auto-populated the known distance to 0 millimeter in the previous step, and this is now displayed in the `Distance in mm` column. 
 
-4. I can click on the values in the entry boxes and change them until I am satisfied. Then, I click on `Update distance_in_mm` and this will update the whole table.
+4. You can click on the values in the entry boxes and change them until you are satisfied. Then, click on `Update distance_in_mm` and this will update the whole table.
 
 5. Next, to get the `Pixels/mm` for the first video, click on `Video1` and the following window will pop up. The window that pops up displays the first frame of `Video1`.
 
@@ -157,7 +158,7 @@ In this step, you can customize the meta parameters for each of your videos (fps
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord1.PNG">
 </p>
 
-6. Now, double **left** click to select two points that defines the known distance in real life. In this case, I know that the two **pink connected dots** represent a distance of 10 millimeter in real life.
+6. Now, double **left** click to select two points that defines the known distance in real life. In this case, we know that the two **pink connected dots** represent a distance of 100 millimeter in real life.
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord2.PNG">
 </p>
@@ -179,7 +180,7 @@ In this step, you can customize the meta parameters for each of your videos (fps
 
 ### Step 4: Outlier Correction
 
-Outlier correction is used to correct gross tracking inaccuracies by detecting outliers based on movements and locations of body parts in relation to the animal body length. For more details, please click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf)
+Outlier correction is used to correct gross tracking inaccuracies by detecting outliers based on movements and locations of body parts in relation to the animal body length. For more details, please click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf). The annotation options are based upon the yaml.config settings, and we suggest that defaults be kept. The only values that must be manually entered in the Settings menu are the Location and Movement Criterion, explained below.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection.PNG" width="156" height="109" />
 
@@ -189,13 +190,13 @@ Outlier correction is used to correct gross tracking inaccuracies by detecting o
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection2.PNG">
 </p>
 
-2. Select the body parts for Animal 1 and Animal 2 that you want to use to calculate a reference value. The reference value will be the mean or median Euclidian distance in millimeters between the two body parts of the two animals in all frames.
+2. Select the body parts for Animal 1 and Animal 2 that you want to use to calculate a reference value. The reference value will be the mean or median Euclidian distance in millimeters between the two body parts of the two animals in all frames. Again, we suggest you keep the default settings.
 
 3. Enter values for the `Movement criterion` and the `Location criterion`. 
 
-- `Movement criterion`. A body part coordinate will be flagged and corrected as a "movement outlier" if the body part moves the *reference value \times the criterion value* across two sequential frames.
+- `Movement criterion`. A body part coordinate will be flagged and corrected as a "movement outlier" if the body part moves the *reference value multiplied by the criterion value* across two sequential frames. The reference value is the mean or median length of the animal between the selected two body parts. The criteron value is a multiplier of the reference value. For example, the distance between Nose_1 and Tail_base_1 is 100mm and the movement criterion is 0.5, any body part that moves 50mm across two sequential frames will be corrected. **We suggest a movement criterion value between 0.7 to 1.5**.
 
-- `Location criterion`. A body part coordinate will be flagged and correct as a "location outlier" if the distance between the body part and at least two other body parts belonging to the same animal are longer than the *reference value \times the criterion value* within a frame.
+- `Location criterion`. A body part coordinate will be flagged and correct as a "location outlier" if the distance between the body part and at least two other body parts belonging to the same animal are longer than the *reference value multiplied by the criterion value* within a single frame. The reference value is the mean or median length of the animal between the selected two body parts. The criteron value is a multiplier of the reference value. For example, the distance between Nose_1 and Tail_base_1 is 100mm and the location criterion is 1.5, any body part located greater than 150 mm from two other body parts will be corrected. **We suggest a location criterion value of 1.5 or greater**.
 
 Body parts flagged as movement or location outliers will be re-placed in their last reliable coordinate. 
 
@@ -206,10 +207,18 @@ Body parts flagged as movement or location outliers will be re-placed in their l
 ### Step 5: Extract Features
 Based on the coordinates of body parts in each frame - and the frame rate and the pixels per millimeter values - the feature extraction step calculates a larger set of features used for behavioral classification. Features are values such as metric distances between body parts, angles, areas, movement, paths, and their deviations and rank in individual frames and across rolling windows. This set of features will depend on the body-parts tracked during pose-estimation (which is defined when creating the project). Click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) for an example list of features when tracking 2 mice and 16 body parts. 
 
+Notably, if you use a different DLC annotation configuration, such as 3 body parts with 2 mice, then the feature list will be significantly reduced and subsequently negatively influence prediction performance.
+
 1. Click on `Extract Features`.
 
-### Step 6: Label Behavior
-This step is used for label the behaviors in each frames of a video. This data will be concatenated with the features and used for creating behavioral classifiers. 
+### Step 6: Label Behavior (ie, create predictive classifiers)
+This step is used to label the behaviors in each frames of a video. This data will be concatenated with the exttracted features and used for creating behavioral classifiers. 
+
+Note that SimBA performs similar functions such as the open-source JWatcher or commercial Noldus Observer systems, with the exception that SimBA automates the backend integration of behavioral annotation with creating predictive classifiers. If you already have such annotations stored in alterantive file formats, like JWatcher or Noldus Observer, they can be appended directly to the tracking data and no behavioral annotations needs to be done in SimBA. For example, the Crim13 dataset was annotated using Piotr’s Matlab Toolbox and we appended the annotations to the tracking data using a version of this script.
+
+If you already have annotation videos created with these alternative tools, or any other behavioral annotator, and would like to use them to create predictive classifiers, please let us know as we would like to write scripts that could process these data for SimBA. If you have created such scripts yourself, please consider contributing them to the community!
+
+**Note**: This is a very critical step. A computer will only learn what you teach it, so if your annotations are not correct then the classifiers will fail. **SimBA uses every single frame**, and therefore the "start" and "stop" frames for a given behavior are very important. Please take the time to create clear and well-defined operationalized definitions of the complete behavior, including start and stop frames. As an example, here are machine learning operationalized definitions of [mouse] and [rat] predictive classifiers for aggressive behaviors.  
 
 1. Click on `Select folder with frames`. In your project folder navigate to the `/project_folder/frames/input/` folder, and you should see folders that are named after your videos. These folders contain the extracted video frames. Select one of the folder and the following window should pop up.
 
@@ -222,11 +231,9 @@ This step is used for label the behaviors in each frames of a video. This data w
 3. Once finished, click on `Generate/Save` and it will generate a new *.csv* file in */csv/targets_inserted* folder. 
 
 ### Step 7: Train Machine Model
-This step is used for training new machine models for behavioral classifications. 
+This step is used for training new machine models for behavioral classifications. There are a large number of parameters, called Hyperparameters, that influence Random Forest models. We have currated a list of Hyperparameters and made it easy to tweak, and validate, their values. For a more in-depth explanation, please see [sklearn.ensemble.RandomForestClassifier documentation](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) or join the discussion on our [Gitter page](https://gitter.im/SimBA-Resource/community). This is a lot to look at, please read this whole section before starting anything.
 
->**Note:** If you import existing models, you can skip this step and go straight to **Step 8** to run machine models on new video data.
-
-#### Train single model
+#### Train model
 
 1. Click on `Settings` and the following window will pop up. 
 
@@ -235,6 +242,8 @@ This step is used for training new machine models for behavioral classifications
 </p>
 
 >**Note:** If you have a .csv file containing hyper-parameter meta data, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the hyper-parameter entry boxes and model evaluation settings. 
+
+For the Scenario 1, we [provide] a Metadata file that will populate the hyperparameters with some default settings. Please save to disk and load.
 
 2. Under **Machine Model**, choose a machine model from the drop down menu: `RF` ,`GBC`,`Xboost`.
 
@@ -293,11 +302,13 @@ This step is used for training new machine models for behavioral classifications
 
 6. Click on the `Save settings into global environment` button to save your settings into the *project_config.ini* file and use the settings to train a single model. 
 
-7. Alternatively, click on the `Save settings for specific model` button to save the settings for one model. To generate multiple models - for either multiple different behaviors and/or using multiple different hyper-parameters - re-define the Machine model settings and click on `Save settings for specific model` again. Each time the `Save settings for specific model` is clicked, a new config file is generated in the */project_folder/configs* folder. In the next step (see below), a model for each config file will be created if pressing the **Train multiple models, one for each saved settings** button.   
+7. Alternatively, click on the `Save settings for specific model` button to save the settings for one model. To generate multiple models - for either multiple different behaviors and/or using multiple different hyper-parameters - re-define the Machine model settings and click on `Save settings for specific model` again. Each time the `Save settings for specific model` is clicked, a new config file is generated in the */project_folder/configs* folder. In the next step (see below), a model for each config file will be created if pressing the **Train multiple models, one for each saved settings** button. **You must exit this menu when finished.**
 
 8. If training a single model, click on `Train Model`.
 
 #### To train multiple models
+
+Imagine you would like to train the same predictive classifier, but slightly changing a Hyperparameter between models so that you can see the effect. Rather than run single models in sequence, SimBA provides a batch function. In this way, you can save numerous Hyperparameter configurations, save them to a batch, and then run them all at once (overnight!). This is a very useful tool for "locking-in" your classifier parameters.
 
 1. Click on `Settings`.
 
@@ -307,12 +318,19 @@ This step is used for training new machine models for behavioral classifications
 
 4. Then, set the **Hyperparameters**.
 
-5. Click the `Save settings for multiple models` button. This generates a _meta.csv file. Repeat the steps to generate multiple models.
+5. Click the `Save settings for multiple models` button. This generates a _meta.csv file. Repeat the steps to generate multiple models. **You must exit this menu when finished.**
 
 6. Click on `Train Multiple Models`.
 
-### Optional step before running machine model on new data
-The user can validate each model *( saved in .sav format)* file. In this validation step the user specifies the path to a previously created model in .sav file format, and a .csv file containing the features extracted from a video. This process will (i) run the classifications on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click[here](https://youtu.be/UOLSj7DGKRo) for an example validation video.
+### Critical validation step before running machine model on new data
+
+This step is critical for decreasing false-positive and false-negative predictions.
+
+You can validate each model *( saved in .sav format)* file. This should be done in a "gold-standard" video that has been fully manually annotated for your behavior of interest, but has not been included in the training dataset.  
+
+In this validation step the user specifies the path to a previously created model in .sav file format, and a .csv file containing the features extracted from a video (Step 5 above). This process will (i) run the predictions on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click [here](https://youtu.be/UOLSj7DGKRo) for an example validation video.
+
+This allows you to rapidly access the results of the Hyperparameters you have selected on a "gold-standard" behavioral video. If the predictions are not good, you can go back to tweak the appropriate parameters without first running through numerous other videos.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/validatemodel.PNG" width="348" height="162" />
 
@@ -329,7 +347,7 @@ The user can validate each model *( saved in .sav format)* file. In this validat
 4. Click on `Validate` to run the validation of the selected model. This will apply the selected model to the feature data and generate a video with behavioral predictions overlaid on the frames together with a gantt plot depicting predicted behavioral bouts. Click [here](https://youtu.be/UOLSj7DGKRo) for an example. 
 
 ### Step 8: Run Machine Model
-This step runs behavioral classifiers on new data. 
+This step runs behavioral classifiers on new data. For this Scenario, this will be the 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="343" height="132" />
 
