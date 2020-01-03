@@ -20,7 +20,7 @@ DeepLabCut is currently fully supported by the SimBA pipeline. We **strongly** s
 
 ## Pose estimation body-part labelling
 
-![alt-text-1](/images/body_part_labelling_schematic.png "Body_part_labelling_schematic.jpg")
+![alt-text-1](/images/body_part_labelling_schematic.jpg "Body_part_labelling_schematic.jpg")
 
 SimBA uses the tracking data to construct a battery of *features* (for a list of features with example descriptions, click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv)). The number of labelled body parts, and which body parts are labelled and tracked, determines which features can be calculated. 
 
