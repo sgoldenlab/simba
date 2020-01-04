@@ -57,17 +57,17 @@ At this point we have the Day 2 data, that has been corrected for outliers and w
 
 **Note**: You should not have to re-define the paths to the model files in this Scenario, and therefore you do not have to open the  `Model Selection` windpw. If you decide to however open the `Model Selection` window anyway, you'll see that the paths are empty. This does not matter. The paths have been saved in the background into your *project_config.ini* file located in your `project_folder` the first time you defined the paths (i.e., when you analyzed the data for Day1). If you open the *project_config.ini*  you can see the previously defined paths to your predictive classifier(s).  
 
-3. **The `Discrimination threshold` and the `Minimum behavior bout length` entry boxes.** For a reminder of the functions of these entry boxes, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data). in this Scenario, and similar to `Model Selection`, you can leave this entry boxes empty. They were defined the first time you ran the project (for Day 1 of the experiment) and the values are stored in the *project_config.ini* file located in your `project_folder`. If you want to check what values they are, open the *project_config.ini* and check under the [validation/run model] heading. 
+3. **The `Discrimination threshold` and the `Minimum behavior bout length` entry boxes.** For a reminder of the functions of these entry boxes, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data). In this Scenario, and similar to `Model Selection` above, you can leave this entry boxes empty. They were defined the first time you ran the project (for Day 1 of the experiment) and the values are stored in the *project_config.ini* file located in your `project_folder`. If you want to check what values they are, open the *project_config.ini* and check under the [validation/run model] heading. 
 
 Click on Run RF Model to run the machine model on the data for Day 2 of the experiment. 
 
 ## Part 4: Analyze Machine Results
 
-See 
+See Scenario 2- [Part 4: Analyze Machine Results](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results) for how to generate descriptive statistics for the behavioral predictions made on the data for Day 2 of the experiment. 
 
+## Part 5: Visualizing machine predictions
 
-
-
+See Scenario 2 - [Part 5 - Visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) for how to generate visualizations of features and machine learning classification results for Day 2 of the experiment. 
 
 
 
