@@ -38,13 +38,35 @@ Once the data is imported, you should see the new data for Day 2 in the `project
 
 ## Part 3: Process the data for Day 2 of the experiment. 
 
-Next, we need to process the data for Day 2 of the experiment. 
-
-we will need to [correcting outliers in the tracking](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf) f
+Next, we need to process the data for Day 2 of the experiment. This includes (i) [correcting outliers in the tracking](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf), and (ii) [extracting features](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv). To proceed the newly added data imported during **Part 2** of this Scenario,  follow the instructions for **Step 1 to 5** in either the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) or [Part I of the full length tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config]).
 
 
+## Part 4: Run the predictive classifier on the data for Day 2. 
 
-However, **Step 1-5**, which we need to compplete,  deals with [correcting outliers in the tracking](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf), and [extracting features](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) from our experimental data.
+At this point we have the Day 2 data, that has been corrected for outliers and with features extracted, and we now want to predict behavior BtWGaNP in these videos, just like we did in [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md). The process to do this is documented in [Part 3 of tutorial for Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data), and is repeated below.
+
+1. In the Load Project menu, navigate to the **Run Machine Model** tab and you should see the following window. 
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="343" height="132" />
+
+2. **The `Model Selection` window** .If you click on `Model Selection`. The following window, containing the classifier names that were defined when you created the project, will pop up.
+
+<p align="center">
+  <img width="312" height="256" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
+</p>
+
+**Note**: You should not have to re-define the paths to the model files in this Scenario, and therefore you do not have to open the  `Model Selection` windpw. If you decide to however open the `Model Selection` window anyway, you'll see that the paths are empty. This does not matter. The paths have been saved in the background into your *project_config.ini* file located in your `project_folder` the first time you defined the paths (i.e., when you analyzed the data for Day1). If you open the *project_config.ini*  you can see the previously defined paths to your predictive classifier(s).  
+
+3. **The `Discrimination threshold` and the `Minimum behavior bout length` entry boxes.** For a reminder of the functions of these entry boxes, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data). in this Scenario, and similar to `Model Selection`, you can leave this entry boxes empty. They were defined the first time you ran the project (for Day 1 of the experiment) and the values are stored in the *project_config.ini* file located in your `project_folder`. If you want to check what values they are, open the *project_config.ini* and check under the [validation/run model] heading. 
+
+Click on Run RF Model to run the machine model on the data for Day 2 of the experiment. 
+
+## Part 4: Analyze Machine Results
+
+See 
+
+
+
 
 
 
