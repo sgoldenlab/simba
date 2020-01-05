@@ -73,6 +73,6 @@ See [Scenario 2 - Part 4: Analyze Machine Results](https://github.com/sgoldenlab
 See [Scenario 2 - Part 5 - Visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) for how to generate visualizations of the features and machine learning classification results for Day 2 of the experiment. 
 
 ## Part 6: Move on to Day 3 data
-And so on, and so forth. We have described two approaches to data organization in Simba above, select which approach suites your needs best.
+And so on, and so forth. We have described two approaches to data organization in SimBA above, select which approach suites your needs best.
 
 **PLEASE REPORT BUGS VIA GITHUB, OR JOIN THE SIMBA [GITTER](https://gitter.im/SimBA-Resource/community) FOR DISCUSSION**
