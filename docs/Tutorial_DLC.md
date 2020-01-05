@@ -14,7 +14,7 @@ See **"Pose estimation body-part labelling"** below for supported rodent annotat
 
 DeepLabCut is currently fully supported by the SimBA pipeline. We **strongly** suggest that users generate their DLC tracking model using the DLC GUI. This will provide the most up-to-date and pleasurable annotation experience, followed by loading the generated DLC tracking data and raw videos into SimBA. Future iterations will include tracking support for mask R-CNN, LEAP, DeepPoseKit, etc, as requested by the community.
 
-**IF YOU STILL WOULD LIKE TO GENERATE YOUR DLC TRACKING MODEL AND .CSV DATAFRAMES VIA SIMBA, CONTINUE**
+**IF YOU STILL WOULD LIKE TO GENERATE YOUR DLC TRACKING MODEL AND .CSV DATAFRAMES VIA SIMBA, CONTINUE...**
 
 **NOTE:** This section of SimBA was written early on - when [DeepLabCut](http://www.mousemotorlab.org/deeplabcut) was accessed exclusively by the command line and did not come with the excellent graphical user interface it comes with today. At that early point we added DeepLabCut commands to SimBA to make many of the important DeepLabCut functions accessible for all members of the lab, regardless of previous programming experience. We have left these features in the current build, as an option for use.
 
