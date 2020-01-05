@@ -297,9 +297,9 @@ Here is a brief description of the different Model evaluation settings available
 
 - `N feature importance bars`: Integer defining the number of top features to be included in the bar graph (e.g., 15). 
 
-- `Compute Feature Permutation Importance's`: Creates a .csv file listing the importance's (permutation importance's) of all features for the classifier. For more details, please click [here](https://eli5.readthedocs.io/en/latest/blackbox/permutation_importance.html)). **Note:** Calculating permutation importance's is computationally expensive and takes a long time. 
+- `Compute Feature Permutation Importance's`: Creates a CSV file listing the importance's (permutation importance's) of all features for the classifier. For more details, please click [here](https://eli5.readthedocs.io/en/latest/blackbox/permutation_importance.html)). Note that calculating permutation importance's is computationally expensive and takes a long time. For an example CSV file that list featue permutation importances, click [here] (https://github.com/sgoldenlab/simba/blob/master/images/BtWGaNP_prediction_permutations_importances.csv). 
 
-- `Generate Sklearn Learning Curve`: Creates a .csv file listing the f1 score at different test data sizes. For more details, please click [here](https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html)). This is useful for estimating the benefit of annotating further data. 
+- `Generate Sklearn Learning Curve`: Creates a CSV file listing the f1 score at different test data sizes. For more details on learning curves, please click [here](https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html)). For more information on the f1 performance score, click [here](https://en.wikipedia.org/wiki/F1_score). The learning curve is useful for estimating the benefit of annotating further data. For an example CSV file of the learning curve generated through SimBA, click [here](https://github.com/sgoldenlab/simba/blob/master/images/BtWGaNP_prediction_learning_curve.csv). 
 
 - `LearningCurve shuffle K splits`: Number of cross validations applied at each test data size in the learning curve. 
 
