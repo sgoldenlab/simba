@@ -1,4 +1,4 @@
-# SimBA Tutorial
+# Generic SimBA Tutorial
 This is a step by step tutorial to start using SimBA to create behavioral classifiers.
 
 ![alt-text-1](/images/simba.png "simba")
