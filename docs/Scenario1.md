@@ -90,7 +90,7 @@ In Scenario 1, we now want to import the 20 pilot videos that we will use to tra
 ### Step 3: Import DLC Tracking Data
 In this step, you will import your pose-estimation tracking data from DeepLabCut in CSV file format. For the pilot videos, this means that you should have 20 individual CSV files corresponding to each of the individual videos.
 
->*Note*: DLC outputs CSV files with exceptionally long file names. We have included a function that will automatically copy the DLC CSV, remove the excess DLC notations from the filename, and paste the new .SV within the SimBA project. The new CSV will now have the same name as the corresponding video. The original DLC output CSV will still be present in its original folder.
+>*Note*: DLC outputs CSV files with exceptionally long file names. We have included a function that will automatically copy the DLC CSV, remove the excess DLC notations from the filename, and paste the new CSV within the SimBA project. The new CSV will now have the same name as the corresponding video. The original DLC output CSV will still be present in its original folder.
 
 ![](/images/importcsv.PNG "importcsv")
 
@@ -98,7 +98,7 @@ In this step, you will import your pose-estimation tracking data from DeepLabCut
 1. Navigate to the `[ Import tracking data ]` tab. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the csv files that you wish to import into your project.
 2. Click on `Import csv to project folder`. 
 
->*Note*: SimBA also provides the ability to import single videos and their corressponding .CSV files. For more information, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1). This method is not used in the current Scenario 1.
+>*Note*: SimBA also provides the ability to import single videos and their corressponding .CSV files. For more information, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1). This method is not used in Scenario 1.
 
 ### Step 4: Extract frames into project folder
 This step will extract all the frames from every pilot video that is imported into the project following **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the classification results. 
