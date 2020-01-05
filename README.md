@@ -15,6 +15,7 @@ SimBA does not require computer science and programing experience, and SimBA is 
 - Extensive annotations are not required
 - The pipeline is flexible and can be used to create and validate classifiers for different behaviors and environments
 - Currently included behavioral classifiers have been validated in mice and rats
+- SimBA is written for Windows
 
 SimBA currently does not support analysis of video recordings of multiple similarly colored animals, and is validated using videos filmed from above at 90° angle using pose-estimation data from 8 body parts per animal. However we and others are developeing multi-animal tracking of similarly colored and sized animals, and multiple recording angles supported! :muscle: We also include other body -part tracking schemes within the GUI pipeline (i.e., 1 or 2 mice, 3 to 8 body parts per mouse), but please consider these a work in progress. 
 
