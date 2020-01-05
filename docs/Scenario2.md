@@ -8,11 +8,17 @@ All scenarios assume that the videos have been [pre-processed](https://github.co
 Three days of resident-intruder testing between aggressive CD-1 mice and subordinante C57 intruders. Each day of testing has 10 pairs of mice, for a total of 30 videos recorded across 3 days. Recordings are 3 minutes in duration, in color, at 30fps.
 
 # **Scenario 2**: Using a classifier on new experimental data...
-In this scenario you have either (i) generated a classifier yourself which performance you are happy with. For example, you have followed [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), and generated the classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)" and its working well. Or, you have (ii) got a behavioral classifier generated somewhere else, and now you want to use the classifier to score Behavior BtWGaNP on your experimental videos. For example, you have downloaded the classifier from [this](https://osf.io/d69jt/) website.
+In this scenario you have either are now ready to do one of two things. 
+
+(i) You have generated a classifier yourself which performance you are happy with. For example, you have followed [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), and generated the classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)" and its working well. 
+
+(ii) Or, you have received a behavioral classifier generated somewhere else, and now you want to use the classifier to score Behavior BtWGaNP on your experimental videos. For example, you have downloaded the classifier from [this](https://osf.io/d69jt/) website.
 
 ## Part 1: 'Clean up your project', or create a new project. 
 
-We will need start with a project directory tree that does not contain any other data than the data we want to analyze. If you are coming along from [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), you will have a project tree already. However, this project tree contains the files used to create the BtWGaNP classifier: if you look in the subdirectories of the `project_folder/csv/input` directory, you will see the 19 csv files we used to generate the project. If we continue using this project, SimBA will see these csv files and analyze these files in addition to your Experimental data. Thus, one option is to remove these files from the subdirectories of our project (see the tutorial for [Scenario 4](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md#part-1-clean-up-your-project--or-alternatively-create-a-new-project) where we take this approach). Another alternative is to [create a new](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project) project that only contains the data from our Experiment. In this Scenario, we will create a [new project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project). 
+We will need start with a project directory tree that does not contain any other data than the data we want to analyze. If you are coming along from [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), you will have a project tree already. However, this project tree contains the files used to create the BtWGaNP classifier: if you look in the subdirectories of the `project_folder/csv/input` directory, you will see the 19 csv files we used to generate the project. If we continue using this project, SimBA will see these csv files and analyze these files in addition to your Experimental data. Thus, one option is to manually remove these files from the subdirectories of our project (see the tutorial for [Scenario 4](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md#part-1-clean-up-your-project--or-alternatively-create-a-new-project) where we take this approach). 
+
+Another alternative is to [create a new](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project) project that only contains the data from our Experiment. In this Scenario, we will create a [new project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project). 
 
 Go ahead and create a new project with your experimental data, follow the instructions for creating a new project in either of these tutorials: [1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1), [2](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config). Instead of using your pilot data as indicated in the tutorial from [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1), use the data and videos for the Experiment you want to analyze.
 
@@ -20,19 +26,23 @@ Go ahead and create a new project with your experimental data, follow the instru
 
 ## Part 2: Load project and process your tracking data
 
-In [Part 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-1-clean-up-your-project-or-create-a-new-project) above, we created a project that contains your experimental data. To continue working with this project, we **must** load it. To load the project and process your experimental data, follow the instructions for **Step 1 to 5** in either the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) or [Part I of the full length tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config]). In this current Scenario 3, you can **ignore Steps 6-7 of the tutorials**, which deals with annotating data and creating classifiers. 
+In [Part 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-1-clean-up-your-project-or-create-a-new-project) above, we created a project that contains your experimental data. To continue working with this project, we **must** load it. To load the project and process your experimental data, follow the instructions for **Step 1 to 5** in either the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) or [Part I of the generic tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config]). 
 
-However, **Step 1-5** of the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md), which we need to complete,  deals with [correcting outliers in the tracking](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf), and [extracting features](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) which we will need to do before analyzing our experimental data.
+In this current Scenario 2, you can **ignore Steps 6-7 of the tutorials**, which deals with annotating data and creating classifiers. 
+
+However, **Step 1-5** of the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md), which we need to complete,  performs [correcting outliers in the tracking](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf) and [extracting features](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv), which we will need to do before analyzing our experimental data.
 
 ## Part 3: Run the classifier on new data
 
-At this point we have Experimental data, that has been corrected for outliers and with features extracted, and we want to predict behavior BtWGaNP in these videos. *Note*: If you haven't generated the predictive classifier yourself, and you have instead downloaded the predictive classifier or been given the predictive calssifier by someone else, we will also include information on how you can use that classifier to predict behaviors in your videos. 
+At this point we have Experimental data, which has been corrected for outliers and with features extracted, and we want to predict behavior BtWGaNP in these videos. 
+
+*Note*: If you haven't generated the predictive classifier yourself, and you have instead downloaded the predictive classifier or been given the predictive calssifier by someone else, we will also include information on how you can use that classifier to predict behaviors in your videos. 
 
 1. In the Load Project menu, navigate to the **Run Machine Model** tab and you should see the following window. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="343" height="132" />
 
-2. Click on `Model Selection`. The following window, containing the classifier names that were defined when you created the project, will pop up.
+2. Click on `Model Selection`. The following window, containing the classifier names that were defined when you created the project, will pop up. The image below depicts a full suite of behavioral predictive classifiers relevant to aggression behavior, but yours should only show Behavior BtWGaNP. 
 
 <p align="center">
   <img width="312" height="256" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
@@ -42,19 +52,23 @@ At this point we have Experimental data, that has been corrected for outliers an
 
 4. Once the path has been selected, click on `Set Model` to save the path.
 
->**Note**: In the real world you may want want to run mutiple classifiers on each video, one for each of the behaviors you are intrested in. In such a scenario you have defined mutiple predictive calssifier names when you created the project. Each one will be displayed in the `Model Selection`, and you can specify a different path to a different *.sav* file for each of them. 
+>**Note**: In the real world you may want want to run mutiple classifiers on each video, one for each of the behaviors you are intrested in. **In such a scenario you have defined mutiple predictive calssifier names when you created the project in Step 1**. Each one will be displayed in the `Model Selection`, and you can specify a different path to a different *.sav* file for each of them. 
 
 >**Important**: Each random forest expects a specific number of features. The number of calculated features is determined by the number of body-parts tracked in pose-estimation in DLC. *For example*: if the input dataset contains the coordinates of three body parts, then a fewer number of features can be calculated than if 8 body parts were tracked. This means that you will get an error if you run a random forest model *.sav* file that has been generated using 8 body parts on a new dataset that contains only 3 body parts.
 
 5. Fill in the `Discrimination threshold` and click on `Set` to save the settings.
 
-- `Discrimination threshold`: This value represents the level of probability required to define that the frame belongs to the target class and it accepts a float value between 0.0 and 1.0.  In other words, how certain does the computer have to be that behavior BtWGaNP occurs in a frame, in order for the frame to be classified as containing behavior BtWGaNP? For example, if the discrimination theshold is set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this current tutorial, we suggest using a 0.5 discrimination threshold. *Note*: You can titrate the discrimination threhold to best fit your data. Decreasing the threshold will predict that the classified behavior is *more* frequent, while increasing the threshold will predict that the behaviors as *less* frequent.
+- `Discrimination threshold`: This value represents the level of probability required to define that the frame belongs to the target class and it accepts a float value between 0.0 and 1.0.  In other words, how certain does the computer have to be that behavior BtWGaNP occurs in a frame, in order for the frame to be classified as containing behavior BtWGaNP? For example, if the discrimination theshold is set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this current tutorial, we suggest using a 0.5 discrimination threshold. 
+
+*Note*: You can titrate the discrimination threhold to best fit your data. Decreasing the threshold will predict that the classified behavior is *more* frequent, while increasing the threshold will predict that the behaviors as *less* frequent.
 
 6. Fill in the `Minimum behavior bout length` and click on `Set` to save the settings.
 
 - `Minimum behavior bout length (ms)`:  This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a brake for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. If your videos in your project are recorded at different frame rates then SimBA will account for this when correcting for the `Minimum behavior bout length`. 
 
-7. Click on `Run RF Model` to run the machine model on the new experimental data. You can follow the progress in the main SimBA terminal window. A message will be printed once all the behaviors have been predicted in the experimental videos. *Note*: New CSV files, that contain the predictions together with the features and pose-estimation data, are saved in the `project_folder/csv/machine_results` directory. 
+7. Click on `Run RF Model` to run the machine model on the new experimental data. You can follow the progress in the main SimBA terminal window. A message will be printed once all the behaviors have been predicted in the experimental videos. 
+
+*Note*: New CSV files, that contain the predictions together with the features and pose-estimation data, are saved in the `project_folder/csv/machine_results` directory. 
 
 ## Part 4:  Analyze Machine Results
 
@@ -70,13 +84,15 @@ Once the classifications have been generated, we want to create descriptive stat
 
 ![alt-text-1](/images/movement_log.JPG "movement_log")
 
-3. `Analyze severity`: This button and analysis is only relevant of your behavior can be graded on a scale ranging from mild (the behavior occurs in the presence of very little body part movements) to severe (the behavior occurs in the presence of a lot of body part movements). For instance, attacks could be graded this way, with 'mild' or 'moderate' attacks happening when the animals aren't moving as much as they are in other parts of the video, while 'severe' attacks occur when both animals are tussling at full force.  This button and code calculates the ‘severity’ of each frame classified as containing the behavior based on a user-defined scale. **Example:** the user sets a 10-point scale. One frame is predicted to contain an attack, and the total body-part movements of both animals in that frame is in the top 10% percentile of movements in the entire video. In this frame, the attack will be scored as a 10 on the 10-point scale. Clicking the button will run the 'severity' statistics on all the csv files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder.
+3. `Analyze severity`: This button and analysis is only relevant of your behavior can be graded on a scale ranging from mild (the behavior occurs in the presence of very little body part movements) to severe (the behavior occurs in the presence of a lot of body part movements). For instance, attacks could be graded this way, with 'mild' or 'moderate' attacks happening when the animals aren't moving as much as they are in other parts of the video, while 'severe' attacks occur when both animals are tussling at full force.  This button and code calculates the ‘severity’ of each frame classified as containing the behavior based on a user-defined scale. 
+
+**Example:** the user sets a 10-point scale. One frame is predicted to contain an attack, and the total body-part movements of both animals in that frame is in the top 10% percentile of movements in the entire video. In this frame, the attack will be scored as a 10 on the 10-point scale. Clicking the button will run the 'severity' statistics on all the csv files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder.
 
 Congrats! You have now used machine models to classify behaviors in new data. To visualize the machine predictions by rendering images and videos with the behavioral predictions overlaid, and plots describing on-going behaviors and bouts, proceed to [*Part 5*](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) of the current tutorial. 
 
 ## Part 5:  Visualizing machine predictions
 
-In this part of the tutorial we will create visualizations of features and machine learning classifications that you have generated. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots and data plots (see below). In this step the different frames can also be merged into video mp4 format. Please note that generating images and videos of the animals with prediction overlays requires that the frames for the videos to have been generated in **Part 1** of this tutorial. Also note that the rendering of images and videos can take up a lot of hardrive space, especially if your videos are recorded at high frame rates, are long duration, or high resolution. One suggestion, if you are short on harddrive space, is to only generate frames for a few select videos (more information below).  
+In this part of the tutorial we will create visualizations of features and machine learning classifications that you have generated. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots and data plots (see below). In this step the different frames can also be merged into video mp4 format. Please note that generating images and videos of the animals with prediction overlays requires that the frames for the videos to have been generated (extracted) in **Part 1** of this tutorial. Also note that the rendering of images and videos can take up a lot of hardrive space, especially if your videos are recorded at high frame rates, are long duration, or high resolution. One suggestion, if you are short on harddrive space, is to only generate frames for a few select videos (more information below).  
 
 1. In the `Load Project` menu, click on the `Visualization` tab and you will see the following screen. 
 
@@ -130,7 +146,7 @@ The generation of the distance plots requires two user-defined parameters:
 
 - `Body part 2`: String that specifies the the bodypart of animal 1 (e.g., Nose_2)
 
-If you are using the recommended [16 body-part, 2 mice setting for pose estimation tracking](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) hover your computer mouse over the title of the entry box to see alternatives for `Body part 1` and `Body part 2`/
+If you are using the recommended [16 body-part, 2 mice setting for pose estimation tracking](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) hover your computer mouse over the title of the entry box to see alternatives for `Body part 1` and `Body part 2`/.
 
 Click on `Generate Distance plot`, and the distance plot frames will be generated in the `project_folder/frames/output/line_plot` folder.
 
@@ -161,20 +177,3 @@ To create a video from the frames, SimBA requires two user-defined parameters: t
 The output video(s) from the merged frames will be stored in the `project_folder\frames\output\merged` directory. 
 
 >*Note*: If the videos are very large, and you would like to down-sample the resolution of the videos to make them smaller, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [Downsample video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video) tool. In the SimBA tools menu, you can also [crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video), and [trim](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos) specific videos as well as many more things.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
