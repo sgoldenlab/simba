@@ -14,7 +14,7 @@ In these Scenario you have the above pilot data, the experimental videos, and Si
 
 In this first Scenario, we will **use the pilot data to generate the classifier for behavior BtWGaNP.** 
 
-In later scenario tutorials, we will use this predictive classifier to classify behaviours for Day 1 of the experiment ([Scenario 2]https://github.com/sgoldenlab/simba/edit/master/docs/Scenario2.md)), add new behavioural data with the goal of improving the behavioral classifier ([Scenario 3]https://github.com/sgoldenlab/simba/edit/master/docs/Scenario3.md)), and finally use the predictive classifier to classify behaviour BtWGaNP for Day 2 and 3 of the experiment ([Scenario 4]https://github.com/sgoldenlab/simba/edit/master/docs/Scenario4.md)). 
+In later scenario tutorials, we will use this predictive classifier to classify behaviours for Day 1 of the experiment ([Scenario 2](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario2.md)), add new behavioural data with the goal of improving the behavioral classifier ([Scenario 3](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario3.md)), and finally use the predictive classifier to classify behaviour BtWGaNP for Day 2 and 3 of the experiment ([Scenario 4](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario4.md)). 
 
 ### Pipeline breakdown:
 For processing datasets, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
