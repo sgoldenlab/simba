@@ -148,7 +148,7 @@ Importantly, in these menues, you also set the **pixels per millimeter** for all
 
 ![](/images/videoinfo_table_20vid.PNG "videoinfo_table_20vid.PNG")
 
-3. In the above example we imported the 20 pilot videos and their names are listed the left most `Video` column. SimbA auto-populated the known distance to 0 millimeter in the previous step, and this is now displayed in the `Distance in mm` column. 
+3. In the above example we imported the 20 pilot videos and their names are listed the left most `Video` column. SimbA auto-populated the known distance to 245 millimeter in the previous step, and this is now displayed in the `Distance in mm` column. 
 
 4. You can click on the values in the entry boxes and change them until you are satisfied. By default, the entry boxes are populated with the meta data from the video files. 
 
