@@ -10,7 +10,7 @@ Three days of resident-intruder testing between aggressive CD-1 mice and subordi
 Also, so that we do not overfit the predictive classifiers to the experimental data, a different set of pilot videos have been recorded of resident-inturder pairings using identical video acquisition parameters. A total of 20 pilot videos were recorded.
 
 # **Scenario 1**: From scratch...
-In these Scenario you have the above pilot data, the experimental videos, and SimBA. All videos have been pre-processed and DLC tracked using the "16 body-part, 2 mice" configuration. You now would like to generate a new predictive classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)". 
+In these Scenarios you have the above pilot raw videos and DLC tracking data, the experimental videos and DLC tracking data, and SimBA. All videos have been pre-processed and DLC tracked using the "16 body-part, 2 mice" configuration. You now would like to generate a new predictive classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)". 
 
 In this first Scenario, we will **use the pilot data to generate the classifier for behavior BtWGaNP.** 
 
