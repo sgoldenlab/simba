@@ -4,13 +4,13 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 All scenarios assume that the videos have been [pre-processed](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md) and that [DLC behavioral tracking .CSV dataframes](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md) have been created.
 
-# **Hypothetical Experiment**:
+# **Hypothetical data set**:
 Three days of resident-intruder testing between aggressive CD-1 mice and subordinante C57 intruders. Each day of testing has 10 pairs of mice, for a total of 30 videos recorded across 3 days. Recordings are 3 minutes in duration, in color, at 30fps.
 
 Also, so that we do not overfit the predictive classifiers to the experimental data, a different set of pilot videos have been recorded of resident-inturder pairings using identical video acquisition parameters. A total of 20 pilot videos were recorded.
 
 # **Scenario 1**: From scratch...
-In this scenario you have the above pilot data, the experimental videos, and SimBA. All videos have been pre-processed and DLC tracked. You now would like to generate a new predictive classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)".
+In these Scenario,you have the above pilot data, the experimental videos, and SimBA. All videos have been pre-processed and DLC tracked. You now would like to generate a new predictive classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)". In this first Scenario, we eill j=use the pilot data to generate the classifier for behavior BtWGaNP. In later scenario tutorials, we will use this predictive classifier to classify behaviours for Day 1 of the experiment ([Scenario 2]https://github.com/sgoldenlab/simba/edit/master/docs/Scenario2.md)), add behavioural data with the goal of improving the behavioral classifier ([Scenario 3]https://github.com/sgoldenlab/simba/edit/master/docs/Scenario3.md)), and use the predictive classifier to classify behaviour BtWGaNP for Day 2 of the experiment ([Scenario 4]https://github.com/sgoldenlab/simba/edit/master/docs/Scenario4.md))
 
 ### Pipeline breakdown:
 For processing datasets, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
@@ -53,17 +53,17 @@ In this step you create your main project folder, which will then auto-populate 
 
 2. Navigate to the `[ Generate project config ]` tab. Under **General Settings**, specify a `Project Path` which is the directory that will contain your main project folder.
 
-3. `Project Name` is the name of your project. *Keep in mind that the project name cannot contain spaces. Instead use underscore "_"* 
+3. `Project Name` is the name of your project. *Keep in mind that the project name cannot contain spaces. We suggest to Instead use underscore "_"* 
 
-4. Under `SML Settings`, put in the number of predictive classifiers that you wish to create. For an example, in Scenario 1 we would like to create a single classifier. We will put in the number 1. Note that in the real world you would probably want to create multiple classifiers concurrently, to decrease the number of times a video would need to be manually annotated. For simplicity, we will use only one classifier.
+4. In the `SML Settings` sub-menu, put in the number of predictive classifiers that you wish to create. For an example, in Scenario 1 we would like to create a single classifier. We will enter the number 1. Note that in the real world you would probably want to create multiple classifiers concurrently as this would decrease the number of times a video would need to be manually annotated. For simplicity, we will here create a single classifier.
 
-5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> a single time and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior (BtWGaNP) that you want to classify. If you click too many times, as long as you leave the extra boxes empty, all is well.
+5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> a single time, and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior (BtWGaNP) that you want to classify. If you click too many times, as long as you leave the extra boxes empty, all is well.
 
 <p align="center">
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
 </p>
 
-6. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - **yet not validaded** - options, accessible in the dropdown menu. This selection is the annotation configuration you should have previously used with DLC, see **[Pose estimation body-part labelling](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling)**.
+6. The sub-menu `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - **yet not validaded** - options, accessible in the dropdown menu. This selection is the annotation configuration you should have previously used when labelling images in DeepLabCut, see **[Pose estimation body-part labelling](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling)** for more information.
 
 7. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. The Project will remain open, and the main console will report that the project has been created.
 
@@ -72,7 +72,7 @@ In this step, in general, you can choose to import either one or multiple videos
 
 In Scenario 1, we now want to import the 20 pilot videos that we will use to train the classifier for Behavior BtWGaNP. 
 
-There are several considerations when selecting the number of videos for training classifers. Most importantly, the number of videos is not as important as the total number of behavioral events present within the videos. Using something that is frequent, such as attacks, may only require a handfull of videos; using something that is less frrequent, such as lateral threat displays, will require more videos for the same number of events. Further, the expression of these behaviors should be representative of the overall experimental data (ie, the attacks exhibited should generalize to how attacks normally look, and not only be extremely robust or extemely weak). Lastly, you need enough videos that some can be left over to validate the generated predicitive classifiers against. We do not want to test the classifiers on videos that have been used to generate the classifiers. We import 20 videos, having idenitfied that 10 videos contain enough events of Behavior BtWGaNP to get an acceptable sample, and that the remaining 10 will be used for validation. Videos are placed within these two sets at random.
+>*Note*: There are several considerations when selecting the number of videos for training classifers. Most importantly, the number of videos is not as important as the total number of behavioral events present within the videos. Using something that is frequent, such as attacks, may only require a handfull of videos; using something that is less frrequent, such as lateral threat displays, will require more videos for the same number of events. Further, the expression of these behaviors should be representative of the overall experimental data (i.e., attack behviors exhibited should generalize to how attacks normally look, and not only be extremely robust or extemely weak). Lastly, you need enough videos that some can be left over to validate the generated predicitive classifiers against. We do not want to test the classifiers on videos that have been used to generate the classifiers. Here we import 20 videos, having identified that 19 videos contain enough events of Behavior BtWGaNP to get an acceptable sample, and that the remaining video will be used for validation. As a sanity check, we can also create rendered visualizations of the data that is processed in the subsequent days and phases of Scenarios [2-4](https://github.com/sgoldenlab/simba/tree/master/docs). We will also evaluate the accuracy of the predictive classifier using various [evaluation tools](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model) built-in to SimBA. 
 
 ![](/images/createproject.PNG "createproject")
 
@@ -81,12 +81,12 @@ There are several considerations when selecting the number of videos for trainin
 2. Under the `Import multiple videos` heading, click on `Browse Folder` to select a folder that contains **all the pilot videos** to import into your project.
 3. Enter the file type of your videos. (e.g., *mp4*, *avi*, *mov*, etc) in the `Video type` entry box.
 4. Click on `Import multiple videos`. 
->**Note**: If you have a lot of videos, or exceptionally high resolution or frame rate videos, it might take a few minutes before all the videos are imported.
+>*Note*: If you have a lot of videos, or exceptionally high resolution/frame rate/duration videos, it might take a few minutes before all the videos are imported. The main SimBA terminal window will report when the process is complete.
 
 ### Step 3: Import DLC Tracking Data
-In this step, you will import your pose-estimation tracking data from DeepLabCut in .CSV file format. For the pilot videos, this means that you should have 20 individual .CSV files corresponding to each of the individual videos.
+In this step, you will import your pose-estimation tracking data from DeepLabCut in CSV file format. For the pilot videos, this means that you should have 20 individual CSV files corresponding to each of the individual videos.
 
-**Note**: DLC outputs .CSV files with exceptionally long file names. We have included a function that will automatically copy the DLC .CSV, remove the excess DLC notations from the filename, and paste the new .CSV within the SimBA project. The new .CSV will now have the same name as the corresponding video. The originical DLC output .CSV will still be present in its original folder.
+>*Note*: DLC outputs CSV files with exceptionally long file names. We have included a function that will automatically copy the DLC CSV, remove the excess DLC notations from the filename, and paste the new .SV within the SimBA project. The new CSV will now have the same name as the corresponding video. The original DLC output CSV will still be present in its original folder.
 
 ![](/images/importcsv.PNG "importcsv")
 
@@ -94,28 +94,28 @@ In this step, you will import your pose-estimation tracking data from DeepLabCut
 1. Navigate to the `[ Import tracking data ]` tab. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the csv files that you wish to import into your project.
 2. Click on `Import csv to project folder`. 
 
->**Note**: SimBA also provides the ability to import single videos and their corressponding .CSV files. This is not used in Scenario 1.
+>*Note*: SimBA also provides the ability to import single videos and their corressponding .CSV files. For more information, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1). This method is not used in the current Scenario 1.
 
 ### Step 4: Extract frames into project folder
 This step will extract all the frames from every pilot video that is imported into the project following **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the classification results. 
->**Note**: Splitting videos up into frames can take time if you have a lot of high resolution videos at high frame rates. The frames can also take up a lot of hard drive space. This is a good point to grab a coffee, or perhaps the latest edition of Machine Intelligence Daily.
-Once the step is completed, close the `Project Configuration` window. The main console will remain open.
+
+>*Note*: Splitting videos up into frames can take time if you have a lot of high resolution videos at high frame rates. The frames can also take up a lot of hard drive space. This is a good point to grab a coffee, or perhaps the latest edition of Machine Intelligence Daily. Once the step is completed, close the `Project Configuration` window. The main console will remain open. The main SimBA terminal window will report when the process is complete. 
 
 ![](/images/extractframeintop.PNG "extractframeintop")
 
 ## Part 2: Load project
-In Part 1, we created a project. To continue working with this project, we **must** load it. This section describes how to load and work with created projects.
+In Part 1, we created a project. To continue working with this project, we **must** load it. This section describes how to load and work with SimBA projects.
 
 ### Step 1: Load Project Config
 In this step you will load the *project_config.ini* file that was created.
-> **Note:** A project_config.ini should always be loaded before any other process.
+> *Note:* A project_config.ini should **always** be loaded before any other process.
 1. In the main SimBA window, click on `File` and `Load project`. The following windows will pop up.
 
 <p align="center">
   <img width="1255" height="380" src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG">
 </p>
 
-2. Under the **Load Project.ini** tab, click on `Browse File`. Then, go to the directory that you created your project in and click on your *project folder*. Locate the *project_config.ini* file and select it. Once this step is completed, it should look like the following, and you should no longer see the text *No file selected*.
+2. Under the `Load Project` tab, click on `Browse File`. Then, navigate to the directory that you created your project in and click on your *project folder*. Locate the *project_config.ini* file and select it. Once this step is completed, the `Load Project` tab should look like the following, and you should no longer see the text *No file selected*:
 
 <p align="center">
   <img width="500" height="60" src="https://github.com/sgoldenlab/simba/blob/master/images/loadedprojectini.PNG">
@@ -124,7 +124,7 @@ In this step you will load the *project_config.ini* file that was created.
 In this image, you can see the `Desktop` is my selected working directory, `tutorial` is my project name, and the last two sections of the folder path is always going to be `project_folder/project_config.ini`.
 
 ### Step 2 (Optional step) : Import more DLC Tracking Data or videos
-In this step, you can choose to import more pose estimation data in csv file format and/or more videos. If this isn't relevant then you can skip this step. This is not relevant to Scenaro 1, so please skip to Step 3 (but remain aware you can do this if needed later).
+In this step, you can choose to import more pose estimation data from DeepLabCut in CSV file format and/or more videos. If this isn't relevant then you can skip this step. This is relevant for for [Scenario 4](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md#part-2-load-the-project-and-import-your-new-data). However, this is not relevant for the current Scenaro 1, so please skip to Step 3 (but remain aware you can do this if needed later).
 
 ![](/images/importdlc.PNG "importdlc")
 
@@ -137,9 +137,9 @@ In this step, you can choose to import more pose estimation data in csv file for
 ### Step 3: Set video parameters
 In this step, you can customize the meta parameters for each of your videos (fps, resolution, metric distances) and provide additional custom video information (Animal ID, group etc). This can be very helpful when analyzing data later on. Are there any groups, conditions, days, treatments, etc, that will make your analysis easier?
 
-More importantly, you also set the **pixels per millimeter** for all of your videos. You will be using a tool that requires the known distance between two points (e.g., the cage width or the cage height) in order to calculate **pixels per millimeter**. 
+Importantly, you also set the **pixels per millimeter** for all of your videos. You will be using a tool that requires the known distance between two points (e.g., the cage width or the cage height) in order to calculate **pixels per millimeter**. We calculate this measure in each video so that we can standardize variables in metrics, and no longer become bound by working with pixel ocations. This means that it does not matter if your camera moved slighly across different recordings. 
 
-1. Under **Set video parameters(distances,resolution,etc.)**, the entry box named `Distance in mm` is the known distance between two points in the videos in **millimeters**. If the known distance is the same in all the videos in the project, then enter the value *(e.g,: 245)* and click on `Auto populate Distance in mm in tables`. and it will auto-populate the table in the next step (see below). If you leave the `Distance in mm` entry box empty, the known distance will default to zero and you will fill in the value for each video individually. 
+1. Under **Set video parameters(distances,resolution,etc.)**, the entry box named `Distance in mm` is the known distance between two points in the videos in **millimeters**. If the known distance is the same in all the videos in the project, then enter the value *(e.g,: 245)* and click on `Auto populate Distance in mm in tables`. This will auto-populate the table in the next step (see below). If you leave the `Distance in mm` entry box empty, the known distance will default to zero and you will fill in the value for each video individually. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/setvidparameter.PNG" width="391" height="96" />
 
@@ -151,7 +151,7 @@ More importantly, you also set the **pixels per millimeter** for all of your vid
 
 4. You can click on the values in the entry boxes and change them until you are satisfied. By default, the entry boxes are populated with the meta data from the video files. 
 
-5. Regardless if you updated the values in the table or not, click on `Update distance_in_mm` at the top of the window: this will save the information displayed in the table into a .csv file. The .csv file is saved as *video_info.csv* and is stored in the `project_folder\logs` folder. After clicking on the `Update distance_in_mm` button, you can proceed to the next step. 
+5. Regardless if you updated the values in the table or not, click on `Update distance_in_mm` at the top of the window: this will save the information displayed in the table into a CSV file. The CSV file is saved as *video_info.csv* and is stored in the `project_folder\logs` folder. After clicking on the `Update distance_in_mm` button, you can proceed to the next step. 
 
 6. Next, to get the `Pixels/mm` for the first video, click on `Video1` and the following window will pop up. The window that pops up displays the first frame of `Video1`.
 
@@ -159,7 +159,7 @@ More importantly, you also set the **pixels per millimeter** for all of your vid
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord1.PNG">
 </p>
 
-7. Now, double **left** click to select two points that defines the known distance in real life. In this case, we know that the two **pink connected dots** represent a distance of 100 millimeter in real life.
+7. Now, double **left** click to select two points that defines the known distance in real life. In this case, we know that the two **pink connected dots** represent a distance of 245 millimeter in real life.
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord2.PNG">
 </p>
@@ -175,13 +175,13 @@ More importantly, you also set the **pixels per millimeter** for all of your vid
   <img width="700" height="350" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table2.PNG">
 </p>
 
-10. Repeat the steps for every video in the table, and once it is done, click on `Save Data`. This will update the csv file named **video_info.csv** in `/project_folder/log` folder that contains a table with your video meta data. 
+10. Repeat the steps for every video in the table, and once it is done, click on `Save Data`. This will update the CSV file named **video_info.csv** in `/project_folder/log` directory that contains your video meta data. 
 
 11. You can also chose to add further columns to the meta data file (e.g., AnimalID or experimental group) by clicking on the `Add Column` button. This information will be saved in additional columns to your **video_info.csv** file.
 
 ### Step 4: Outlier Correction
 
-Outlier correction is used to correct gross tracking inaccuracies by detecting outliers based on movements and locations of body parts in relation to the animal body length. For more details, please click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf). The annotation options are based upon the yaml.config settings, and we suggest that defaults be kept. The only values that must be manually entered in the Settings menu are the Location and Movement Criterion, explained below.
+Outlier correction is used to correct gross tracking inaccuracies by detecting outliers based on movements and locations of body parts in relation to the animal body length. For more details, click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf). The annotation options are based upon the yaml.config settings, and we suggest that defaults be kept. The only values that must be manually entered in the Settings menu are the *Location Criterion* and the *Movement Criterion*, explained below.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection.PNG" width="156" height="109" />
 
@@ -201,9 +201,11 @@ Outlier correction is used to correct gross tracking inaccuracies by detecting o
 
 Body parts flagged as movement or location outliers will be re-placed in their last reliable coordinate. 
 
-4. Chose to calculate the median or mean Euclidian distance in millimeters between the two body parts and click on `Confirm Config`. 
+4. Chose to calculate the *median or mean* Euclidian distance in millimeters between the two body parts at the bottom of the `Settings` window and click on `Confirm Config`. 
 
-5. Click to run the outlier correction. You can follow the progress in the main SimBA window. Once complete, two new csv log files will appear in the `/project_folder/log` folder. These two files contain the number of body parts corrected following the two outlier correction methods for each video in the project.  
+5. Click to run the outlier correction. You can follow the progress in the main SimBA window. Once complete, two new CSV log files will appear in the `/project_folder/log` folder. These two files contain the number of body parts corrected following the two outlier correction methods for each video in the project:
+
+
 
 ### Step 5: Extract Features
 Based on the coordinates of body parts in each frame - and the frame rate and the pixels per millimeter values - the feature extraction step calculates a larger set of features used for behavioral classification. Features are values such as metric distances between body parts, angles, areas, movement, paths, and their deviations and rank in individual frames and across rolling windows. This set of features will depend on the body-parts tracked during pose-estimation (which is defined when creating the project). Click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) for an example list of features when tracking 2 mice and 16 body parts. 
@@ -292,7 +294,7 @@ Here is a brief description of the different Model evaluation settings, together
 
 - `Generate Features Importance Log`: Creates a .csv file that lists the importance's [(gini importances)](https://scikit-learn.org/stable/auto_examples/ensemble/plot_forest_importances.html) of all features for the classifier.
 
-- `Generate Features Importance Bar Graph`: Creates a bar chart of the top N features based on gini importances. Specify N in the `N feature importance bars` entry box below.
+- `Generate Features Importance Bar Graph`: Creates a bar chart of the top N features based on gini importances. Specify N in the `N feature importance bars` entry box below. **REQUIRES** 
 
 - `N feature importance bars`: Integer defining the number of top features to be included in the bar graph (e.g., 15). 
 
