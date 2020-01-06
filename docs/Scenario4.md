@@ -10,13 +10,13 @@ Three days of resident-intruder testing between aggressive CD-1 mice and subordi
 Also, so that we do not overfit the predictive classifiers to the experimental data, a different set of pilot videos have been recorded of resident-inturder pairings using identical video acquisition parameters. A total of 20 pilot videos were recorded.
 
 # **Scenario 4**: Analyzing amd adding new Experimental data to a previously started project. 
-In this Scenario, you have already generated a predictive classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)" (see [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md)), and you have used the classifier to analyze Day 1 of your Experimental data (see [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md)). You may have also updated your classifier to make it better in [Scenario 3](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md). You now wish to use the BtWGaNP classifier to analyse Days 2 and 3 of your Experimental data. 
+In this current Scenario, you have already generated a predictive classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)" (see [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md)), and you have used the classifier to analyze Day 1 of your Experimental data (see [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md)). You may have also updated your classifier to make it better in [Scenario 3](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md). You now wish to use the BtWGaNP classifier to analyse Days 2 and 3 of your Experimental data. 
 
-**Note:** This Scenario is very similar to [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md), however, we will take a slightly different approach to analyzing additional data in SimBA (see below). 
+>**Note:** This Scenario is very similar to [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md), however, we will take a slightly different approach to analyzing additional data in SimBA (see *Part 1* below). 
 
 ## Part 1: 'Clean up your previous project' (.. or alternatively create a new project). 
 
-We will need start with a project directory tree that does not contain any other CSV data than the data we want to analyze. If you are coming along from [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md) or [Scenario 2](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario2.md), you will have one or several project trees already. However, the project trees may contains the files used to create the BtWGaNP classifier ([Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md)), or data from Day 1 of the experiments ([Scenario 2](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md)). If you look in the different sub-directories of the `project_folder/csv` folder in your previous projects, you will see the CSV files we used to generate the project and/or have analyzed previously. If we continue using one of these project as is, SimBA will see these csv files and analyze these files in addition to your new as yet un-analyzed experimental data from Day 2 and 3 of the experiment. 
+We will need start with a project directory tree that does not contain any other CSV data than the data we want to analyze. If you are coming along from [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md) or [Scenario 2](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario2.md), you will have one or several project trees already. However, the project trees may contain the files used to create the BtWGaNP classifier ([Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md)), or data from Day 1 of the experiments ([Scenario 2](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md)). If you look in the different sub-directories of the `project_folder/csv` folder in your previous projects, you will see the CSV files we used to generate the project and/or have analyzed previously. If we continue using one of these project as is, SimBA will see these CSV files and analyze these files in addition to your new as yet un-analyzed experimental data from Day 2 and 3 of the experiment. 
 
 As these files have been analyzed before, we shouldn't have to analyze them again. In [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md), we created a new project to avoid mixing the files that were used to create the predictive classifier for behavior BtWGaNP with the new experimental files we were to analyze. 
 
@@ -24,9 +24,9 @@ Another option is to "remove" these files from the immediate sub-directories of 
 
 ![](/images/dir_info.JPG "dir_info")
 
-**Important**: In this example we hide the files during *Step 1* in a sub-directory of `project_folder/csv/input` folder. You will need to repeat the process for the (i) `project_folder/csv/outlier_corrected_movement`, (ii) `project_folder/csv/outlier_corrected_movement_location`, (iii) `project_folder/csv/features_extracted`, and (iv) `project_folder/csv/machine_results` folders. This way you will keep the Day 1 analysis files stored safely and they won't interfere with the analysis of Day 2. 
+**Important**: In this example we hide the files during *Step 1* in a sub-directory of `project_folder/csv/input` folder. You will need to repeat the process for the (i) `project_folder/csv/outlier_corrected_movement`, (ii) `project_folder/csv/outlier_corrected_movement_location`, (iii) `project_folder/csv/features_extracted`, and (iv) `project_folder/csv/machine_results` folders. This way you will keep the Day 1 analysis files stored safely and they won't interfere with the analysis of Day 2 and Day 3. 
 
-*Note*: In [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), the data analysis also generated additional [CSV files indicating how many outliers were corrected](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction), and further [CSV files containing descriptive statistics of the classified behaviors](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results). These files are stored in the  `project_folder/csv/logs` folder and you may also want to cut/paste them to a new sub-directory. The sub-directory containing the Day 1 analysis files does not have to be in the `project_folder`, but can be *anywhere* except directly within the `project_folder/csv` sub-directories. 
+>*Note*: In [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), the data analysis also generated additional [CSV files indicating how many outliers were corrected](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction), and further [CSV files containing descriptive statistics of the classified behaviors](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results). These files are stored in the  `project_folder/csv/logs` folder and you may also want to cut/paste them to a new sub-directory to have better control over the outputted data. Also note that the sub-directory containing the Day 1 analysis files does not have to be in the `project_folder`, but can be *anywhere* except directly within the `project_folder/csv` sub-directories. 
 
 ## Part 2: Load the project and import your new data.
 
@@ -42,13 +42,13 @@ Once the data is imported, you should see the new imported data for Day 2 in the
 
 ![](/images/dir_info.JPG "dir_info")
 
-## Part 3: Process the data for Day 2 of the experiment. 
+## Part 3: Process the data for Day 2-3 of the experiment. 
 
-Next, we need to process the data for Day 2 of the experiment. This process includes (i) [correcting outliers in the tracking](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf), and (ii) [extracting features](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv). To process the newly added data imported during **Part 2** of this Scenario,  follow the instructions for **Step 1 to 5** in either the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) or [Part I of the full length tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config]).
+Next, we will need to process the data for Day 2-3 of the experiment. This process includes (i) [correcting outliers in the tracking](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf), and (ii) [extracting features](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv). To process the newly added data imported during **Part 2** of this current Scenario,  follow the instructions for **Step 3 to 5** in [Part 2 of Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters).
 
-## Part 4: Run the predictive classifier on the data for Day 2. 
+## Part 4: Run the predictive classifier on the data for Day 2-3. 
 
-At this point we have the Day 2 data within the project, and the data has been corrected for outliers and the features have been extracted. We now want to predict behavior BtWGaNP in these videos - just like we did in [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md). The process to do this is documented in [Part 3 of tutorial for Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data), and is repeated here below.
+At this point we have the Day 2-3 data within the project, and the data has been corrected for outliers and the features have been extracted. We now want to predict behavior BtWGaNP in these videos - just like we did in [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md). The process to do this is documented in [Part 3 of tutorial for Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data), and is repeated here below.
 
 1. In the Load Project menu, navigate to the **Run Machine Model** tab and you should see the following window. 
 
@@ -60,9 +60,9 @@ At this point we have the Day 2 data within the project, and the data has been c
   <img width="312" height="256" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
 </p>
 
->**Note**: You should not have to re-define the paths to the model files in this Scenario, and therefore you should not have to open the  `Model Selection` window. However, if you do decide to however open the `Model Selection` window , you'll see that the paths are empty. It does not matter. The paths have been saved in the background into your *project_config.ini* file located in your `project_folder` the first time you defined the paths (i.e., when you analyzed the data for Day 1). If you open the *project_config.ini* you can see the previously defined paths to your predictive classifier(s) near the top of the text file.  
+>**Note**: You should not have to re-define the paths to the model files in this Scenario, and therefore you should not have to open the  `Model Selection` window. However, if you do decide to however open the `Model Selection` window , you'll see that the paths are empty. It does not matter. The paths have been saved in the background into your *project_config.ini* file located in your `project_folder` the first time you defined the paths (i.e., when you analyzed the data for Day 1 during [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md)). If you open the *project_config.ini* you can see the previously defined paths to your predictive classifier(s) near the top of the text file.  
 
-3. **The `Discrimination threshold` and the `Minimum behavior bout length` entry boxes.** For a reminder of the functions of these entry boxes, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data).
+3. **Fill in the `Discrimination threshold` and the `Minimum behavior bout length` entry boxes.** For a reminder of the functions of these entry boxes, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data).
 
 Click on Run RF Model to run the machine model on the data for Day 2 of the experiment. 
 
@@ -72,7 +72,4 @@ See [Scenario 2 - Part 4: Analyze Machine Results](https://github.com/sgoldenlab
 ## Part 5: Visualizing machine predictions
 See [Scenario 2 - Part 5 - Visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) for how to generate visualizations of the features and machine learning classification results for Day 2 of the experiment. 
 
-## Part 6: Move on to Day 3 data
-And so on, and so forth. We have described two approaches to data organization in SimBA above, select which approach suites your needs best.
-
-**PLEASE REPORT BUGS VIA GITHUB, OR JOIN THE SIMBA [GITTER](https://gitter.im/SimBA-Resource/community) FOR DISCUSSION**
+**PLEASE HELP REPORT BUGS VIA GITHUB, OR JOIN THE SIMBA [GITTER](https://gitter.im/SimBA-Resource/community) FOR DISCUSSION**
