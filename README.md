@@ -44,7 +44,7 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 ### [Click here for the full *generic* tutorial on building classifiers in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md).
 
-## Tutorials
+## Scenario tutorials
 
 To faciliate the initial use of SimBA, we provide several use scenarios. We have created these scenarios around a hypothetical experiment that take a user from initial use (completely new start) all the way through analyzing a complete experiment and then adding additional experimental datasets to an initial project.
 
@@ -62,15 +62,11 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Install SimBA](docs/installation.md)
 
 ## Tutorial 📚
-
-
-- [Process video using tools](docs/Tutorial_tools.md) 🔨
-- [Batch pre-process video](docs/tutorial_process_videos.md) 🏭
+- [Process video using SimBA tools](docs/Tutorial_tools.md) 🔨
+- [Batch pre-process video using SimBA](docs/tutorial_process_videos.md) 🏭
 - [Using DeepLabCut through SimBA](docs/Tutorial_DLC.md) 📗
-- [SimBA](docs/tutorial.md) 📘
-- [Label behavior](docs/labelling_aggression_tutorial.md) 🏷️
-
-
+- [SimBA generic tutorial](docs/tutorial.md) 📘
+- [SimBA behavioral annotation interface](docs/labelling_aggression_tutorial.md) 🏷️
 
 ## Resource 💾
 
