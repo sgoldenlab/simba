@@ -15,7 +15,7 @@ In this series of Scenarios, you have the above pilot videos and DLC tracking da
 ### Pipeline breakdown:
 For processing datasets, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
 
-![alt-text-1](/images/Vis_build.JPG "simbaworkflow")
+![alt-text-1](/images/Vis_build_2.JPG "simbaworkflow")
 
 
 ### Part 1: [Create a new project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
