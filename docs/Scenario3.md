@@ -72,7 +72,7 @@ You now have all the annotated files that will be used to create your predictive
 
 You now have all the necessery data organised and you are ready to generate a new predictive classifier that includes the data used to generate the original classfier, plus the data from new annotated videos. To generate a new predictive classifier with these data, see [**Step 7**](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model) and onwards in the [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) tutorial.
 
-Once you have completed **Part 5** of the Current Scenario 3, you may want to proceed to either:
+Once you have completed **Part 5** of the current Scenario 3, you may want to proceed to either:
 
 - Visualize and validate the new classifier on a video not used during training of the classifier. For validating a classifier on a new video, see Scenario 1 - [Critical validation step before running machine model on new data](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data).
 
