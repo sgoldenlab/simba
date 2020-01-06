@@ -9,7 +9,7 @@ Three days of resident-intruder testing between aggressive CD-1 mice and subordi
 
 Also, so that we do not overfit the predictive classifiers to the experimental data, a different set of pilot videos have been recorded of resident-inturder pairings using identical video acquisition parameters. A total of 20 pilot videos were recorded.
 
-# **Scenario 4**: Analyzing amd adding new Experimental data to a previously started project. 
+# **Scenario 4**: Analyzing and adding new Experimental data to a previously started project. 
 In this current Scenario, you have already generated a predictive classifier for "Behavior that Will Get a Nature Paper (Behavior BtWGaNP)" (see [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md)), and you have used the classifier to analyze Day 1 of your Experimental data (see [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md)). You may have also updated your classifier to make it better in [Scenario 3](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md). You now wish to use the BtWGaNP classifier to analyse Days 2 and 3 of your Experimental data. 
 
 >**Note:** This Scenario is very similar to [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md), however, we will take a slightly different approach to analyzing additional data in SimBA (see *Part 1* below). 
@@ -24,7 +24,7 @@ Another option is to "remove" these files from the immediate sub-directories of 
 
 ![](/images/dir_info.JPG "dir_info")
 
-**Important**: In this example we hide the files during *Step 1* in a sub-directory of `project_folder/csv/input` folder. You will need to repeat the process for the (i) `project_folder/csv/outlier_corrected_movement`, (ii) `project_folder/csv/outlier_corrected_movement_location`, (iii) `project_folder/csv/features_extracted`, and (iv) `project_folder/csv/machine_results` folders. This way you will keep the Day 1 analysis files stored safely and they won't interfere with the analysis of Day 2 and Day 3. 
+**Important**: In this example we hide the files during *Step 1* in a sub-directory of `project_folder/csv/input` folder. You will need to repeat the process for the (i) `project_folder/csv/outlier_corrected_movement`, (ii) `project_folder/csv/outlier_corrected_movement_location`, (iii) `project_folder/csv/features_extracted`, and (iv) `project_folder/csv/machine_results` folders. This way you will keep the Day 1 analysis files stored safely and they won't interfere with the analysis of Day 2 and Day 3.
 
 >*Note*: In [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), the data analysis also generated additional [CSV files indicating how many outliers were corrected](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction), and further [CSV files containing descriptive statistics of the classified behaviors](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results). These files are stored in the  `project_folder/csv/logs` folder and you may also want to cut/paste them to a new sub-directory to have better control over the outputted data. Also note that the sub-directory containing the Day 1 analysis files does not have to be in the `project_folder`, but can be *anywhere* except directly within the `project_folder/csv` sub-directories. 
 
@@ -72,4 +72,4 @@ See [Scenario 2 - Part 4: Analyze Machine Results](https://github.com/sgoldenlab
 ## Part 5: Visualizing machine predictions
 See [Scenario 2 - Part 5 - Visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) for how to generate visualizations of the features and machine learning classification results for Day 2 of the experiment. 
 
-**PLEASE HELP REPORT BUGS VIA GITHUB, OR JOIN THE SIMBA [GITTER](https://gitter.im/SimBA-Resource/community) FOR DISCUSSION**
+**PLEASE HELP BY REPORTING BUGS VIA GITHUB, OR JOIN THE SIMBA [GITTER](https://gitter.im/SimBA-Resource/community) FOR DISCUSSION**
