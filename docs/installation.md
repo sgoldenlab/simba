@@ -23,6 +23,8 @@ python SimBA.py
 ```
 3. Hit `Enter`.
 
+>*Note:* For this launch to work you need to [add python to the path](https://datatofish.com/add-python-to-windows-path/). 
+
 # List of python dependencies
 * [Pillow](https://github.com/python-pillow/Pillow)
 * [deeplabcut](https://github.com/AlexEMG/DeepLabCut)
