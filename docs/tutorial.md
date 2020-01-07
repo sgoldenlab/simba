@@ -1,9 +1,10 @@
 # Generic SimBA Tutorial
-This is a step by step tutorial to start using SimBA to create behavioral classifiers.
+This is a generic step by step tutorial to start using SimBA to create behavioral classifiers. For more information about the menus and options and their use cases, see the [SimBA Scenario tutorials](https://github.com/sgoldenlab/simba#scenario-tutorials)
 
 ![alt-text-1](/images/simba.png "simba")
 
-### Pipeline breakdown:
+### Pipeline breakdown
+
 For processing datasets, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
 
 ![alt-text-1](/images/Vis_build_2.JPG "simbaworkflow")
