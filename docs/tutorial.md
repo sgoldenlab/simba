@@ -62,7 +62,7 @@ In this step you create your main project folder with all the required sub-direc
 ### Step 2: Import videos into project folder
 In this step, you can choose to import either one or multiple videos. The imported videos are used for visualizing predictions and standardizing distances across videos by calculating metric distances from pixel distances. 
 
-![](/images/createproject.PNG "createproject")
+![](/images/Import_videos.PNG "Import_videos")
 
 #### To import multiple videos
 1. Navigate to the `[ Import videos into project folder ]` tab.
