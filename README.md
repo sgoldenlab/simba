@@ -38,7 +38,7 @@ SimBA currently does not support analysis of video recordings of multiple simila
 
 ### Step 2: [Create tracking model and generate pose-estimation data](docs/Tutorial_DLC.md) 
 
-### Step 3: [Building classfier(s)](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model)
+### Step 3: [Building classfier(s)](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-6-label-behavior)
 
 ### Step 4: [Analysis/Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
 
