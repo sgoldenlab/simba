@@ -75,7 +75,7 @@ In this current Scenario 1, we now want to import the 20 pilot videos that we wi
 
 >*Note*: There are several considerations when selecting the number of videos for training classifers. Most importantly, the number of videos is not as important as the total number of behavioral events present within the videos. Using something that is frequent, such as attacks, may only require a handfull of videos; using something that is less frrequent, such as lateral threat displays, will require more videos for the same number of events. Further, the expression of these behaviors should be representative of the overall experimental data (i.e., attack behaviors exhibited should generalize to how attacks normally look, and not only be extremely robust or extemely weak). Lastly, you need enough videos that some can be left over to validate the generated predicitive classifiers against. We do not want to test the classifiers on videos that have been used to generate the classifiers. **Here we import 20 videos, having identified that 19 videos contain enough events of Behavior BtWGaNP to get an acceptable sample, and that the remaining video will be used for validation**. As a sanity check, we can also create rendered visualizations of the data that is processed in the subsequent days and phases of Scenarios [2-4](https://github.com/sgoldenlab/simba/tree/master/docs). We will also evaluate the accuracy of the predictive classifier using various [evaluation tools](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model) built into SimBA. 
 
-![](/images/createproject.PNG "createproject")
+![](/images/Import_videos.PNG "Import_videos")
 
 #### To import multiple videos
 1. Navigate to the `[ Import videos into project folder ]` tab.
