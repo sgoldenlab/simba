@@ -251,7 +251,9 @@ This step is used for training new machine models for behavioral classifications
   <img width="378" height="712" src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG">
 </p>
 
->*Note:* If you have a CSV file containing hyperparameter metadata, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the Hyperparameter entry boxes and model evaluation settings. For the Scenario 1, we [provide](https://github.com/sgoldenlab/simba/blob/master/misc/BtWGaNP_meta.csv) a Metadata file that will populate the Hyperparameter entry boxes and evaluation settings with some default values. Please save this file to disk and load it.
+>*Note I:* If you have a CSV file containing hyperparameter metadata, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the Hyperparameter entry boxes and model evaluation settings. For the Scenario 1, we [provide](https://github.com/sgoldenlab/simba/blob/master/misc/BtWGaNP_meta.csv) a Metadata file that will populate the Hyperparameter entry boxes and evaluation settings with some default values. Please save this file to disk and load it.
+
+>*Note II:* If you open the *BtWGaNP_meta.csv* file, you'll see that the left-most column - with the heading *Classifier_name* - contains one entry: *BtWGaNP*. This *Classifier_name* entry is only for reference, and does not affect the classfier you are generating. If you are generating a classifier using a different classifier name, let's say *attack*, you can leave the entries in the *BtWGaNP_meta.csv* file as is without causing any errors. 
 
 2. Under **Machine Model**, choose a machine model from the drop down menu: `RF` ,`GBC`,`Xboost`. For this Scenario, choose RF (*Note:*: GBC and Xgboost options are still under development). 
 
