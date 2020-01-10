@@ -202,7 +202,7 @@ Outlier correction is used to correct gross tracking inaccuracies by detecting o
 
 - `Location criterion`. A body part coordinate will be flagged and correct as a "location outlier" if the distance between the body part and at least two other body parts belonging to the same animal are longer than the *reference value multiplied by the criterion value* within a single frame. The reference value is the mean or median length of the animal between the selected two body parts. The criteron value is a multiplier of the reference value. For example, the distance between Nose_1 and Tail_base_1 is 100mm and the location criterion is 1.5, any body part located greater than 150 mm from two other body parts will be corrected. **We suggest a location criterion value of 1.5 or greater**.
 
->*Note:* Movement outliers and corrected prior to location outliers. Specifically, (i) movement outliers are first corrected, and (ii) location outliers are then corrected on the dataframe that contains the movement corrected data. That means that there is likely to be *fewer* location outliers than movement outliers corrected.   
+>*Note:* Movement outliers are corrected prior to location outliers. Specifically, (i) movement outliers are first corrected, and (ii) location outliers are then corrected on the dataframe that contains the movement corrected data. That means that there is likely to be *fewer* location outliers than movement outliers corrected.   
 
 Body parts flagged as movement or location outliers will be re-placed in their last reliable coordinate. 
 
@@ -253,7 +253,7 @@ This step is used for training new machine models for behavioral classifications
   <img width="378" height="712" src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG">
 </p>
 
->*Note I:* If you have a CSV file containing hyperparameter metadata, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the Hyperparameter entry boxes and model evaluation settings. For the Scenario 1, we [provide](https://github.com/sgoldenlab/simba/blob/master/misc/BtWGaNP_meta.csv) a Metadata file that will populate the Hyperparameter entry boxes and evaluation settings with some default values. Please save this file to disk and load it.
+>*Note I:* If you have a CSV file containing hyperparameter metadata, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the Hyperparameter entry boxes and model evaluation settings. For the Scenario 1, we [provide](https://github.com/sgoldenlab/simba/blob/master/misc/BtWGaNP_meta.csv) a Metadata file that will populate the Hyperparameter entry boxes and evaluation settings with some default values. Please save this file to disk and load it. If you downloaded SimBA through our github page, the Metadata file should be in the *simba/misc* directory. 
 
 >*Note II:* If you open the *BtWGaNP_meta.csv* file, you'll see that the left-most column - with the heading *Classifier_name* - contains one entry: *BtWGaNP*. This *Classifier_name* entry is only for reference, and does not affect the classfier you are generating. If you are generating a classifier using a different classifier name, let's say *attack*, you can leave the entries in the *BtWGaNP_meta.csv* file as is without causing any errors. 
 
