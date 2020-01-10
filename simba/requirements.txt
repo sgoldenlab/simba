@@ -8,7 +8,7 @@
 # next_superimposeframe.py: 7
 # raw_scripts\labelling_aggression.py: 3
 # tkinter_functions.py: 8
-Pillow == 5.4.1
+Pillow == 6.2.0
 
 # Launch_tkinter_GUI.py: 5
 # dlc_change_yamlfile.py: 5
