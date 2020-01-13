@@ -17,7 +17,7 @@ SimBA does not require computer science and programing experience, and SimBA is 
 - Currently included behavioral classifiers have been validated in mice and rats
 - SimBA is written for Windows
 
-SimBA currently does not support analysis of video recordings of multiple similarly colored animals, and is validated using videos filmed from above at 90° angle using pose-estimation data from 8 body parts per animal. However we and others are developeing multi-animal tracking of similarly colored and sized animals, and multiple recording angles supported! :muscle: We also include other body -part tracking schemes within the GUI pipeline (i.e., 1 or 2 mice, 3 to 8 body parts per mouse), but please consider these a work in progress. 
+**SimBA currently does not support analysis of video recordings of multiple similarly colored animals, and is validated using videos filmed from above at 90° angle using pose-estimation data from 8 body parts per animal**. However we and others are developeing multi-animal tracking of similarly colored and sized animals, and multiple recording angles supported! :muscle: We also include other body -part tracking schemes within the GUI pipeline (i.e., 1 or 2 mice, 3 to 8 body parts per mouse), but please consider these a work in progress. 
 
 **Listserv for release information:** If you would like to receive notification for new releases of SimBA, please **[fill out this form](https://forms.gle/R47RWN4stNSJBj9D9)** and you will be added to the listserv.
 
