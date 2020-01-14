@@ -18,16 +18,16 @@ You can choose to install SimBA as a standalone package or install SimBA with De
 Open bash or command prompt and run the following commands on current working directory
 
 ```
-git clone https://github.com/sgoldenlab/simba.git
+git clone -b master https://github.com/sgoldenlab/simba.git
 
-pip install -r simba/SimBA/requirements.txt
+pip install -r simba/simba/requirements.txt
 ```
 
 ### Install SimBA standalone package
 Open bash or command prompt and run the following commands on current working directory
 
 ```
-git clone https://github.com/sgoldenlab/simba.git
+git clone -b SimBA_no_DLC https://github.com/sgoldenlab/simba.git
 
 pip install -r simba/SimBA/requirements.txt
 ```
