@@ -7,14 +7,23 @@ You can choose to install SimBA as a standalone package or install SimBA with De
 2) If you do not want to use DeepLabCut on your local machine, and instead use Google Colab or have DeepLabCut installed elsewhere, please install SimBA from the **SimBA_no_DLC** branch. This does not require a GPU. Please see full instructions below.
 
 # Requirements
-1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- MUST BE 3.6**
+1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- VALIDATED WITH 3.6.0**
 2. [Git](https://git-scm.com/downloads) 
 3. [DeepLabCut](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/installation.md)
 4. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
 
 # Installing SimBA 
 
-### Use SimBA with integrated DeepLabCut (use this installation method when running DeepLabCut locally using a GPU)  
+### Install SimBAxDLC with integrated DeepLabCut (use this installation method when running DeepLabCut locally using a GPU)  
+Open bash or command prompt and run the following commands on current working directory
+
+```
+git clone https://github.com/sgoldenlab/simba.git
+
+pip install -r simba/SimBA/requirements.txt
+```
+
+### Install SimBA standalone package
 Open bash or command prompt and run the following commands on current working directory
 
 ```
