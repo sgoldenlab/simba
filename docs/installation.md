@@ -9,8 +9,8 @@ You can choose to install SimBA as a standalone package or install SimBA with De
 # Requirements
 1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- VALIDATED WITH 3.6.0**
 2. [Git](https://git-scm.com/downloads) 
-3. [DeepLabCut](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/installation.md)
-4. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
+3. [DeepLabCut](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/installation.md)  
+4. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)  **<-- NO JOKE, YOU MUST INSTALL THIS CORRRECTLY, CLICK LINK**
 
 # Installing SimBA 
 
