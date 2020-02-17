@@ -101,7 +101,7 @@ In this step you will load the *project_config.ini* file that was created.
 1. In the main SimBA window, click on `File` and `Load project`. The following windows will pop up.
 
 <p align="center">
-  <img width="1255" height="380" src="https://github.com/sgoldenlab/simba/blob/master/images/loadproject.PNG">
+  <img width="302" height="232" src="https://github.com/sgoldenlab/simba/blob/master/images/loadprojectini.PNG">
 </p>
 
 2. Under the **Load Project.ini** tab, click on `Browse File`. Then, go to the directory that you created your project in and click on your *project folder*. Locate the *project_config.ini* file and select it. Once this step is completed, it should look like the following, and you should no longer see the text *No file selected*.
