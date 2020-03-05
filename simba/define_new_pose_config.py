@@ -29,7 +29,7 @@ def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNam
         bpNumber = i
         sideImage = np.zeros((100, imWidth, 3), np.uint8)
         sideImageHeight, sideImageWidth = sideImage.shape[0], sideImage.shape[1]
-        cv2.putText(sideImage, 'Left click ' + BpNameList[i] + '. Press ESC to continue.', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (144, 0, 255), 2)
+        cv2.putText(sideImage, 'Double left click ' + BpNameList[i] + '. Press ESC to continue.', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (144, 0, 255), 2)
         ix, iy = -1, -1
         while (1):
             cv2.setMouseCallback('Define pose', draw_circle)
