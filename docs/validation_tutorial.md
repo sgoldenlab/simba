@@ -8,7 +8,9 @@
 
 3. Under **[Run machine model]** tab --> **validate Model on Single Video**, select your features file (.csv). It should be located in `project_folder/csv/features_extracted`.
 
-![](/images/validatemodel_graph.PNG)
+![](/images/validatemodel_graph1.PNG)
+
+**Note: If you check the 'Generate Gantt plot' box, the final validation video will include the gantt chart. However, to do this you must extract frames which drastically increases the amount of time needed to generate the video. We suggest leaving it unchecked unless you really want it.**
 
 4. Select a model file (.sav).
 
