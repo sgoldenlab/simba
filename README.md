@@ -29,7 +29,7 @@ SimBA does not require computer science and programing experience, and SimBA is 
 - Currently included behavioral classifiers have been validated in mice and rats
 - SimBA is written for Windows
 
-**SimBA currently does not support analysis of video recordings of multiple similarly colored animals. SimBA provides several validated classifer libraries using videos filmed from above at 90° angle with pose-estimation data from 8 body parts per animal. SimBA now accepts any user-defined pose-estimation annotation schemes with the inclusion of the Flexible Annotation Module in v1.1**. 
+**SimBA currently does not support analysis of video recordings of multiple similarly colored animals. SimBA provides several validated classifer libraries using videos filmed from above at 90° angle with pose-estimation data from 8 body parts per animal. SimBA now accepts any user-defined pose-estimation annotation schemes with the inclusion of the [Flexible Annotation Module in v1.1](https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md)**. 
 
 **Installation note:** SimBA can be installed either with TensorFlow compatability (for generating DeepLabCut and DeepPoseKit pose-estimation models), or without TensorFlow (for stand-alone use with classifiers and other functions). Please choose the appropriate branch for your needs, more details are found in the [Installation Documentation](https://github.com/sgoldenlab/simba/blob/master/README.md#installation-%EF%B8%8F).
 
