@@ -4199,10 +4199,10 @@ class aboutgui:
 
     def __init__(self):
         about = Toplevel()
-        about.minsize(551, 314)
+        about.minsize(657, 398)
         about.wm_title("About")
 
-        canvas = Canvas(about,width=551,height=314,bg='black')
+        canvas = Canvas(about,width=657,height=398,bg='black')
         canvas.pack()
 
         img = PhotoImage(file='TheGoldenLab_aboutme.png')
