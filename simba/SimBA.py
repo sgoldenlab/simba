@@ -88,7 +88,8 @@ from dpk_script.train_model import trainDPKmodel
 from dpk_script.Predict_new_video import predictnewvideoDPK
 from dpk_script.Visualize_video import visualizeDPK
 from reset_poseConfig import reset_DiagramSettings
-
+import threading
+import multiprocessing
 simBA_version = 1.1
 
 
@@ -284,7 +285,7 @@ class processvid_menu:
 
         self.title.grid(row=0, sticky=W)
 
-        but = Button(scroll,text='Execute',command =self.execute_processvideo,font=('Times',12,'bold'),fg='navy')
+        but = Button(scroll,text='Execute',command = lambda: threading.Thread(target=self.execute_processvideo).start(),font=('Times',12,'bold'),fg='navy')
         but.grid(row=2)
 
         tableframe.grid(row=1)
