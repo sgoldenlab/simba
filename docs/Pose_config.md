@@ -32,6 +32,8 @@ The table contains one row for each body-part specified in the `# of Bodyparts` 
 
 3. After clicking on `Save Pose Configs`, a window named `Define pose` pops open that shows the frame that was chosen in the `Image Path` entry box. This image also displays some instructions at the top - like the image here below to the left. Follow the instructions at the top of the window to label all of your defined body parts, like the gif below on the right: 
 
+**NOTE: DOUBLE LEFT MOUSE CLICK TO PLACE BODY PART. PRESS ESC TO ADVANCE TO THE NEXT BODY PART**
+
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Pose_config_image_4.PNG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/Draw_pose.gif" width="425"/>
 
 The window will close once all the body-parts have been marked. Double left mouse-click to assign a body-part location. Press `Esc` to move to the next body-part after a body-part as been assigned. 
