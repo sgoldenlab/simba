@@ -338,9 +338,11 @@ You can validate each model *(saved in SAV format)* file. This should be done in
 
 In this validation step the user specifies the path to a previously created model in SAV file format, and the path to a CSV file [that contain the features extracted from a video (Step 5 above)](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features). The first process will run the predictions on the video, and visualize the probabilities in a user-interactable line chart, that together with a user-interactable visualization of the video can be used to gauge the ideal discrimination threshold. The second process will create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts. Click [here](https://youtu.be/UOLSj7DGKRo) for an expected output validation video for predicting the behavior *copulation*. 
 
-This process allows you to rapidly access the results of the Hyperparameters you have selected on a "gold-standard" behavioral video. If the predictions are not good, you can go back to tweak the appropriate parameters without first running through numerous other videos or adding and/or refining your annotations. 
+This process allows you to rapidly access the results of the Hyperparameters you have selected on a "gold-standard" behavioral video. If the predictions are not good, you can go back to tweak the appropriate parameters without first running through numerous other videos or adding and/or refining your annotations.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/validatemodel.PNG" width="348" height="162" />
+For more details, please [click here](/docs/validation_tutorial.md#validate-model-on-single-video)
+
+![](/images/validatemodel_graph.PNG)
 
 1. Under the **Run machine model tab** and *Validate Model on Single Video* heading, click on `Browse File` next to `Select features file`. In this current Scenario 1, select the CSV file you have stored [in a safe place outside of the project folder](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features). 
 
@@ -348,17 +350,30 @@ This process allows you to rapidly access the results of the Hyperparameters you
 
 4. Next, click on `Generate plot`. Two windows should pop open, a *Prediction probability* line graph for your chosen behaviour (left) and an interactive display of your video (right):
 
-![](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/images/validategraph.gif "validation1")
+- `Graph window`: model prediction probability versus frame numbers will be plot. The graph is interactive, click on the graph and the frame window will display the selected frames.
+
+- `Frame window`: Frames of the chosen video with controls.
+
+![](/images/validategraph1.PNG)
+
 
 Clicking on the graph on the line displays the corresponding frame in the video on the right. Use the buttons below the image on the right to scan through the images around the peaks on the line graph in order to identity the *classification probability* that separates all the BtWGaNP behaviors from non-BtWGaNP behaviors. Once complete, make a note of the ideal threshold and close the two windows. 
 
-5. Set the identified `Discrimination threshold` and `Minimum behavior bout length (ms)`:
+5. Click on the points on the graph and picture displayed on the other window will jump to the corresponding frame. There will be a red line to show the points that you have clicked.
+
+![](/images/validategraph2.PNG)
+
+6. Once it jumps to the desired frame, you can navigate through the frames to determine if the behavior is present. This step is to find the optimal threshold to validate your model.
+
+![](/images/validategraph.gif)
+
+7. Set the identified `Discrimination threshold` and `Minimum behavior bout length (ms)`:
 
 - `Discrimination threshold`: This value represents the level of probability required to define that the frame belongs to the target class (i.e., the BtWGaNP class) and it accepts a float value between 0.0 and 1.0.  In other words, how certain does the computer have to be that behavior BtWGaNP occurs in a frame, in order for the frame to be classified as containing behavior BtWGaNP? For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For further information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this Scenario. Go ahead and enter the classification threshold identified in the previous *Step 4*. 
 
 - `Minimum behavior bout length (ms)`: This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a brake for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. 
 
-4. Click on `Validate` to run the validation of the selected model on you specified video. This will apply the selected model to the feature data of the specified file and generate a video with behavioral predictions overlaid on the frames together with a gantt plot depicting predicted behavioral bouts - like the below gif. Click [here](https://youtu.be/UOLSj7DGKRo) for an expected full output example validation video. The video will be stored in the `\project_folder\frames\validation` folder. Note that rendering frames and videos can take a while if your video is long, high-frame rate, or high resolution. 
+8. Click on `Validate` to run the validation of the selected model on you specified video. This will apply the selected model to the feature data of the specified file and generate a video with behavioral predictions overlaid on the frames together with a gantt plot depicting predicted behavioral bouts - like the below gif. Click [here](https://youtu.be/UOLSj7DGKRo) for an expected full output example validation video. The video will be stored in the `\project_folder\frames\validation` folder. Note that rendering frames and videos can take a while if your video is long, high-frame rate, or high resolution. 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/validation_example_2.gif "validation2")
 
