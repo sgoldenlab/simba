@@ -16,6 +16,7 @@ from tkinter import tix
 import subprocess
 import platform
 import shutil
+from tabulate import tabulate
 import datetime
 from dlc_change_yamlfile import select_numfram2pick,updateiteration,update_init_weight,generatetempyaml,generatetempyaml_multi
 from extract_features_wo_targets import extract_features_wotarget
@@ -272,14 +273,18 @@ class processvid_menu:
 
         tableframe = LabelFrame(scroll)
 
-        # table title
-        self.title = processvid_title(tableframe, str(len(maxname)),shortenbox=self.selectall_shorten,downsambox=self.selectall_downsample,graybox=self.selectall_grayscale,framebox=self.selectall_addframe,clahebox=self.selectall_clahe)
-        self.title.grid(row=0,sticky= W)
+            # table title
+        self.title = processvid_title(tableframe, str(len(maxname)), shortenbox=self.selectall_shorten,
+                                      downsambox=self.selectall_downsample, graybox=self.selectall_grayscale,
+                                      framebox=self.selectall_addframe, clahebox=self.selectall_clahe)
 
         #### loop for tables######
         for i in range(len(self.filesFound)):
             self.row.append(processvideotable(tableframe,str(self.filesFound[i]), str(len(maxname)),self.videofolder,self.outputdir))
             self.row[i].grid(row=i+1, sticky=W)
+
+
+        self.title.grid(row=0, sticky=W)
 
         but = Button(scroll,text='Execute',command =self.execute_processvideo,font=('Times',12,'bold'),fg='navy')
         but.grid(row=2)
@@ -4257,8 +4262,6 @@ class App(object):
         labellingtoolmenu.add_command(label='labelme', command=lambda: subprocess.call(["labelme"]))
         #third menu organize
         thirdMenu.add_cascade(label='DeepLabCut', menu=dlcmenu)
-        # thirdMenu.add_command(label='YOLOv3', command=lambda: print('coming soon'))
-        # thirdMenu.add_command(label='Mask RCNN', command=lambda: print('coming soon'))
         thirdMenu.add_cascade(label='DeepPoseKit', menu=dpkmenu)
         thirdMenu.add_command(label='LEAP', command=lambda: print('coming soon'))
         thirdMenu.add_cascade(label='Labelling tools', menu=labellingtoolmenu)
@@ -4347,15 +4350,17 @@ class SplashScreen:
 if __name__ == '__main__':
     root = Tk()
     root.overrideredirect(True)
-    # progressbar = ttk.Progressbar(orient=HORIZONTAL, length=5000, mode='determinate')
-    # progressbar.pack(side="bottom")
     app = SplashScreen(root)
-    # progressbar.start()
     root.after(1000, root.destroy)
     root.mainloop()
 
 
 app = App()
 print('Welcome fellow scientists :)' + '\n' + 'SimBA version ' + str(simBA_version))
+print('\n')
+print(tabulate([['Region of Interest support (ROI Module)'], ['DeepPoseKit support (DPK Module)'], ['Flexible Annotation Module'], ['Interactive thresholding'], ['Heatmap visualizations'], ['Extended validation tools'], ['Multi-crop'],['...many bug fixes']], headers=['March 2020 Updates/Fixes'], tablefmt='fancy_grid'))
+
+
+
 maincwd=os.getcwd()
 app.root.mainloop()
