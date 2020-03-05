@@ -24,7 +24,6 @@ from run_RF_model import rfmodel
 from merge_frames import merge_frames_config
 from prob_graph import *
 from runmodel_1st import *
-from plot_sklearn_results import plotsklearnresult
 from path_plot import path_plot_config
 from gantt import ganntplot_config
 from data_plot import data_plot_config
@@ -89,7 +88,7 @@ from dpk_script.Predict_new_video import predictnewvideoDPK
 from dpk_script.Visualize_video import visualizeDPK
 from reset_poseConfig import reset_DiagramSettings
 
-simBA_version = 1.0
+simBA_version = 1.1
 
 
 class roitableRow(Frame):
