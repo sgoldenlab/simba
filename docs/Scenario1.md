@@ -365,7 +365,7 @@ Clicking on the graph on the line displays the corresponding frame in the video 
 
 5. Once it jumps to the desired frame, you can navigate through the frames to determine if the behavior is present. This step is to find the optimal threshold to validate your model.
 
-![](/images/validategraph.gif)
+![](/images/validategraph1.gif)
 
 6. Set the identified `Discrimination threshold` and `Minimum behavior bout length (ms)`:
 
@@ -374,6 +374,8 @@ Clicking on the graph on the line displays the corresponding frame in the video 
 - `Minimum behavior bout length (ms)`: This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a brake for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. 
 
 7. Click on `Validate` to run the validation of the selected model on you specified video. This will apply the selected model to the feature data of the specified file and generate a video with behavioral predictions overlaid on the frames together with a gantt plot depicting predicted behavioral bouts - like the below gif. Click [here](https://youtu.be/UOLSj7DGKRo) for an expected full output example validation video. The video will be stored in the `\project_folder\frames\validation` folder. Note that rendering frames and videos can take a while if your video is long, high-frame rate, or high resolution. 
+
+**Note: If you check the `Generate Gantt plot` box, the final validation video will include the gantt chart. However, to do this you must extract frames which drastically increases the amount of time needed to generate the video. We suggest leaving it unchecked unless you really want it.
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/validation_example_2.gif "validation2")
 
