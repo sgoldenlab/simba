@@ -91,10 +91,9 @@ This is a tool to used to multi-crop videos. For example, if you recorded four d
 5. Next to *# of crop*, type in the number of cropped videos you wich to generate from each single input video (e.g., 4). Click on **Crop** to proceed. When you click on **Crop**, the first frame of the first video in the specified folder will be displayed, and the name of the video and rectangle number is printed overlaid: 
 
 ![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Multi_crop_example.gif "Multi_crop_1")
-
 6. Left click the mouse and drag from the top left corner to the bottom right corner of the first video you wish to generate. When finished with the first video, press `Enter`. Repeat this step for the next videos you wish to generate from Video 1. Once Video1 is complete, repeat these steps for all the videos in the user-specified *Video Folder*.
 
-7. The cropped output videos will be located in the user-defined *Output folder* defined in Step 3. 
+7. The cropped output videos will be located in the user-defined *Output folder* as defined in Step 3. 
 
 
 ## Downsample video
