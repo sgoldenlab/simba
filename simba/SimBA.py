@@ -5,7 +5,7 @@ import os
 import time
 import subprocess
 import itertools
-# import deeplabcut
+import deeplabcut
 import csv
 import sys
 from tkinter import *
