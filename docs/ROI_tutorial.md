@@ -133,7 +133,7 @@ To proceed and generate machine learning classifiers that use these features, co
 
 You can now generate visualizations of the ROI data for each of the videos in your project. To generate the visualizations, click on `Visualize ROI tracking` in the `Visualize ROI` submenu of the **ROI** tab. This will generate visualizations of the ROI and tracking data, like in these gifs:
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_visualization_1.gif" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_visualization_2.gif" width="425"/>
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_visualization_1.gif" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_open_field_new.gif" width="425"/>
 
 Clicking on `Visualize ROI tracking` will generate visualizations for all of the files located in the `project_folder/csv/features_extracted` folder. The visualization process will use the body-parts specified in `Analyze ROI data` step described in [Part 2 above](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/ROI_tutorial.md#part-2-analyzing-roi-data). 
 
