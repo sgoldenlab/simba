@@ -1,35 +1,34 @@
-# SimBA or SimBAxDLC?
+# SimBAxTF or SimBA?
 **!!! IMPORTANT !!!**
-You can choose to install SimBA as a standalone package or install SimBA with DeepLabCut integration.  
+You can choose to install SimBA as a standalone package or install SimBA with [TensorFlow](https://github.com/tensorflow/tensorflow) integration.  
 
-1) If you would like to be able to call DeepLabCut commands via the SimBA interface, and either have already installed DeepLabCut or would like to now install DeepLabCut on your local machine (requires a GPU), please install SimBAxDLC from the **master** branch.  Please see full instructions below.
+1) If you would like to be able to call [DeepLabCut](https://github.com/AlexEMG/DeepLabCut) or [DeepPoseKit](https://github.com/jgraving/DeepPoseKit) commands via the SimBA interface (whuch requires a local GPU), please install SimBAxTF from the **master** branch.  Please see full instructions below.
 
-2) If you do not want to use DeepLabCut on your local machine, and instead use Google Colab or have DeepLabCut installed elsewhere, please install SimBA from the **SimBA_no_DLC** branch. This does not require a GPU. Please see full instructions below.
+2) If you do **not** want to use TensorFlow on your local machine, and instead use Google Colab or have DeepLabCut/DeepPoseKit installed elsewhere, please install SimBA from the **SimBA_no_TF** branch. This does not require a GPU, or local installations of DeepLabCut or DeepPoseKit. Please see full instructions below.
 
 # Requirements
 1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- VALIDATED WITH 3.6.0**
 2. [Git](https://git-scm.com/downloads) 
-3. [DeepLabCut](https://github.com/AlexEMG/DeepLabCut/blob/master/docs/installation.md)
-4. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
+3. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
 
 # Installing SimBA 
 
-### Install SimBAxDLC with integrated DeepLabCut (use this installation method when running DeepLabCut locally using a GPU)  
+### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut or DeepPoseKit locally using a GPU)
 Open bash or command prompt and run the following commands on current working directory
 
 ```
 git clone -b master https://github.com/sgoldenlab/simba.git
 
-pip install -r simba/simba/requirements.txt
+pip3 install -r simba/simba/requirements.txt
 ```
 
-### Install SimBA standalone package
+### Install SimBA standalone package (without TensorFlow or integrated DeepLabCut/DeepPoseKit support)
 Open bash or command prompt and run the following commands on current working directory
 
 ```
-git clone -b SimBA_no_DLC https://github.com/sgoldenlab/simba.git
+git clone -b SimBA_no_TF https://github.com/sgoldenlab/simba.git
 
-pip install -r simba/SimBA/requirements.txt
+pip3 install -r simba/SimBA/requirements.txt
 ```
 
 # How to launch SimBA
