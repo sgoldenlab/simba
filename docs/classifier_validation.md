@@ -1,10 +1,10 @@
-# Classifier Validation
+# Post-classification Validation (detecting false-positives)
 
-Classifier validation generates videos in the project that contains all the bouts of the target behavior that the machine predicts.
+Post-classification validation generates a video for each .CSV in the project that contains the concatenated clips of all the events of the target behavior that the predictive classifier identifies.
 
 ![](/images/classifiervalidation1.PNG)
 
-- `Seconds` is the seconds to add at the starting of a bout and the end of the bout. Let's say there was a bout of **2 seconds of an attack**, entering 1 in the **Seconds** entry box will add 1 second before the 2 second attack and 1 second after.
+- `Seconds` is the duration to add in seconds to the start of an event and to the end of the event. Let's say there was a event of **2 seconds of an attack**, entering 1 in the **Seconds** entry box will add 1 second before the 2 second attack and 1 second after.
 
 - `Target` is the target behavior to implement into this step.
 
