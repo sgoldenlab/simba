@@ -159,22 +159,6 @@ def extract_features_wotarget_16(inifile):
             (csv_df.Nose_1_x - csv_df.Center_1_x) ** 2 + (csv_df.Nose_1_y - csv_df.Center_1_y) ** 2)) / currPixPerMM
         csv_df['Mouse_2_Nose_to_centroid'] = (np.sqrt(
             (csv_df.Nose_2_x - csv_df.Center_2_x) ** 2 + (csv_df.Nose_2_y - csv_df.Center_2_y) ** 2)) / currPixPerMM
-        csv_df['Mouse_1_Nose_to_lateral_left'] = (np.sqrt(
-            (csv_df.Nose_1_x - csv_df.Lat_left_1_x) ** 2 + (csv_df.Nose_1_y - csv_df.Lat_left_1_y) ** 2)) / currPixPerMM
-        csv_df['Mouse_2_Nose_to_lateral_left'] = (np.sqrt(
-            (csv_df.Nose_2_x - csv_df.Lat_left_2_x) ** 2 + (csv_df.Nose_2_y - csv_df.Lat_left_2_y) ** 2)) / currPixPerMM
-        csv_df['Mouse_1_Nose_to_lateral_right'] = (np.sqrt(
-            (csv_df.Nose_1_x - csv_df.Lat_right_1_x) ** 2 + (csv_df.Nose_1_y - csv_df.Lat_right_1_y) ** 2)) / currPixPerMM
-        csv_df['Mouse_2_Nose_to_lateral_right'] = (np.sqrt(
-            (csv_df.Nose_2_x - csv_df.Lat_right_2_x) ** 2 + (csv_df.Nose_2_y - csv_df.Lat_right_2_y) ** 2)) / currPixPerMM
-        csv_df['Mouse_1_Centroid_to_lateral_left'] = (np.sqrt(
-            (csv_df.Center_1_x - csv_df.Lat_left_1_x) ** 2 + (csv_df.Center_1_y - csv_df.Lat_left_1_y) ** 2)) / currPixPerMM
-        csv_df['Mouse_2_Centroid_to_lateral_left'] = (np.sqrt(
-            (csv_df.Center_2_x - csv_df.Lat_left_2_x) ** 2 + (csv_df.Center_2_y - csv_df.Lat_left_2_y) ** 2)) / currPixPerMM
-        csv_df['Mouse_1_Centroid_to_lateral_right'] = (np.sqrt(
-            (csv_df.Center_1_x - csv_df.Lat_right_1_x) ** 2 + (csv_df.Center_1_y - csv_df.Lat_right_1_y) ** 2)) / currPixPerMM
-        csv_df['Mouse_2_Centroid_to_lateral_right'] = (np.sqrt(
-            (csv_df.Center_2_x - csv_df.Lat_right_2_x) ** 2 + (csv_df.Center_2_y - csv_df.Lat_right_2_y) ** 2)) / currPixPerMM
         csv_df['Centroid_distance'] = (np.sqrt(
             (csv_df.Center_2_x - csv_df.Center_1_x) ** 2 + (csv_df.Center_2_y - csv_df.Center_1_y) ** 2)) / currPixPerMM
         csv_df['Nose_to_nose_distance'] = (np.sqrt(

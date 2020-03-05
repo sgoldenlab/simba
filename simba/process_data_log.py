@@ -4,6 +4,7 @@ from configparser import ConfigParser
 from datetime import datetime
 import numpy as np
 
+
 def analyze_process_data_log(configini):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
@@ -110,9 +111,12 @@ def analyze_process_data_log(configini):
             TotEventDur = round(currDf['Bout_time'].sum(), 4)
             try:
                 MeanEventDur = round(TotEventDur / eventNOs, 4)
-                MedianEventDur = round(currDf['Bout_time'].median(), 4)
             except ZeroDivisionError:
                 MeanEventDur = 0
+            try:
+                MedianEventDur = round(currDf['Bout_time'].median(), 10)
+
+            except ZeroDivisionError:
                 MedianEventDur = 0
             currDf_shifted = currDf.shift(periods=-1)
             currDf_shifted = currDf_shifted.drop(columns=['Event', 'Start_frame', 'End_frame', 'End_time', 'Bout_time'])
@@ -131,6 +135,7 @@ def analyze_process_data_log(configini):
         log_df.loc[loop] = log_list
         loop += 1
         print('File # processed for machine predictions: ' + str(loop) + '/' + str(len(filesFound)))
+    log_df.fillna(0, inplace=True)
     log_df.to_csv(log_fn, index=False)
     print('All files processed for machine predictions: data file saved @' + str(log_fn))
 

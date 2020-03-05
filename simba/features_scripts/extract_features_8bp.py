@@ -15,7 +15,7 @@ def extract_features_wotarget_8(inifile):
     csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     csv_dir_out = os.path.join(csv_dir, 'features_extracted')
     vidInfPath = config.get('General settings', 'project_path')
-    vidInfPath = os.path.join(vidInfPath,'project_folder', 'logs')
+    vidInfPath = os.path.join(vidInfPath,'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
 

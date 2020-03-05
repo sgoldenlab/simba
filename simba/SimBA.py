@@ -1,8 +1,12 @@
+import warnings
+warnings.filterwarnings('ignore',category=FutureWarning)
+warnings.filterwarnings('ignore',category=DeprecationWarning)
 import os
 import time
 import subprocess
 import itertools
-import deeplabcut
+# import deeplabcut
+import csv
 import sys
 from tkinter import *
 from tkinter.filedialog import askopenfilename,askdirectory
@@ -18,6 +22,8 @@ from extract_features_wo_targets import extract_features_wotarget
 from sklearn_DLC_RF_train_model import RF_trainmodel
 from run_RF_model import rfmodel
 from merge_frames import merge_frames_config
+from prob_graph import *
+from runmodel_1st import *
 from plot_sklearn_results import plotsklearnresult
 from path_plot import path_plot_config
 from gantt import ganntplot_config
@@ -36,14 +42,25 @@ from process_movement import analyze_process_movement
 import webbrowser
 from process_videos_automation import *
 from extract_seqframes import *
-from classifier_validation import *
+from classifierValidation import validate_classifier
 from train_multiple_models_from_meta import *
 from train_model_2 import *
+from multiplecrop import *
 import cv2
 from validate_model_on_single_video import *
+from ROI_freehand_draw_3 import roiFreehand
+from ROI_analysis_2 import *
+from ROI_plot import *
+from ROI_draw_defined import *
+from ROI_multiply import *
+from ROI_reset import *
+from ROI_add_to_features import *
+from plot_heatmap import plotHeatMap
 import warnings
 from outlier_scripts.movement.correct_devs_mov_16bp import dev_move_16
 from outlier_scripts.location.correct_devs_loc_16bp import dev_loc_16
+from outlier_scripts.movement.correct_devs_mov_user_defined import dev_move_user_defined
+from outlier_scripts.location.correct_devs_loc_user_defined import dev_loc_user_defined
 from outlier_scripts.movement.correct_devs_mov_14bp import dev_move_14
 from outlier_scripts.location.correct_devs_loc_14bp import dev_loc_14
 from outlier_scripts.movement.correct_devs_mov_9bp import dev_move_9
@@ -55,21 +72,83 @@ from outlier_scripts.movement.correct_devs_mov_4bp import dev_move_4
 from outlier_scripts.location.correct_devs_loc_4bp import dev_loc_4
 from features_scripts.extract_features_16bp import extract_features_wotarget_16
 from features_scripts.extract_features_14bp import extract_features_wotarget_14
-from features_scripts.extract_features_14bp import extract_features_wotarget_14
 from features_scripts.extract_features_9bp import extract_features_wotarget_9
 from features_scripts.extract_features_8bp import extract_features_wotarget_8
 from features_scripts.extract_features_7bp import extract_features_wotarget_7
 from features_scripts.extract_features_4bp import extract_features_wotarget_4
-from sklearn_plot_scripts.plot_sklearn_results_14_16bp import plotsklearnresult_16
-from sklearn_plot_scripts.plot_sklearn_results_9bp import plotsklearnresult_9
-from sklearn_plot_scripts.plot_sklearn_results_7_8bp import plotsklearnresult_8
-from sklearn_plot_scripts.plot_sklearn_results_4bp import plotsklearnresult_4
+from features_scripts.extract_features_user_defined import extract_features_wotarget_user_defined
+from sklearn_plot_scripts.plot_sklearn_results_2 import plotsklearnresult
+from dpk_create_project_ini import write_dpkfile
+from drop_bp_cords import define_bp_drop_down
+from drop_bp_cords import bodypartConfSchematic
+from define_new_pose_config import define_new_pose_configuration
+from dpk_script.create_annotation_set import createAnnotationSet
+from dpk_script.annotator import dpkAnnotator
+from dpk_script.train_model import trainDPKmodel
+from dpk_script.Predict_new_video import predictnewvideoDPK
+from dpk_script.Visualize_video import visualizeDPK
+from reset_poseConfig import reset_DiagramSettings
 
 simBA_version = 1.0
-warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
+class roitableRow(Frame):
+    def __init__(self, parent =None ,dirname='',filename = '',widths = "" ,indexs='',projectini=''):
+        self.projectini = projectini
+        self.filename = os.path.join(dirname,filename)
+        Frame.__init__(self,master=parent)
+        var=StringVar()
+        self.index = Entry(self,textvariable=var,width=4)
+        var.set(indexs)
+        self.index.grid(row=0,column=0)
+        self.lblName = Label(self,text=filename,width =widths,anchor=W)
+        self.lblName.grid(row=0,column=1,sticky=W)
+        self.btnset = Button(self,text='Draw',command=self.draw)
+        self.btnset.grid(row=0,column=2)
+        self.btnreset = Button(self,text='Reset',command =self.reset)
+        self.btnreset.grid(row=0,column=3)
+        self.btnapplyall = Button(self, text='Apply to all', command=self.applyall)
+        self.btnapplyall.grid(row=0, column=4)
 
+    def draw(self):
+        roiFreehand(self.projectini,self.filename)
+
+    def reset(self):
+        ROI_reset(self.projectini, self.filename)
+
+    def applyall(self):
+        multiplyFreeHand(self.projectini, self.filename)
+
+class roitableMenu:
+    def __init__(self,videofolder,inifile):
+        self.filesFound = []
+        self.row = []
+        self.videofolder = videofolder
+
+        ### FIND FILES #####
+        for i in os.listdir(videofolder):
+            if i.endswith(('.avi', '.mp4', '.mov', 'flv')):
+                self.filesFound.append(i)
+
+        ### longest string in list
+        maxname = max(self.filesFound, key=len)
+
+        ## popup window
+        roimenu = Toplevel()
+        roimenu.minsize(500, 400)
+        roimenu.wm_title("ROI Table")
+
+        scroll = Scrollable(roimenu)
+
+        tableframe = LabelFrame(scroll,text='Video Name',labelanchor=NW)
+
+        #### loop for tables######
+        for i in range(len(self.filesFound)):
+            self.row.append(roitableRow(tableframe, self.videofolder,str(self.filesFound[i]), str(len(maxname)),str(i+1)+'.',projectini=inifile))
+            self.row[i].grid(row=i + 1, sticky=W)
+
+        tableframe.grid(row=0)
+        scroll.update()
 
 class processvid_title(Frame):
     def __init__(self,parent=None,widths="",color=None,shortenbox =None,downsambox =None,graybox=None,framebox=None,clahebox=None,**kw):
@@ -188,7 +267,7 @@ class processvid_menu:
         vidprocessmenu = Toplevel()
         vidprocessmenu.minsize(1100, 400)
         vidprocessmenu.wm_title("Batch process video table")
-        vidprocessmenu.iconbitmap(maincwd+'\\'"golden_lab.ico")
+        vidprocessmenu.lift()
 
         scroll =  Scrollable(vidprocessmenu)
 
@@ -390,8 +469,6 @@ class batch_processvideo:
         batchprocess = Toplevel()
         batchprocess.minsize(400, 200)
         batchprocess.wm_title("Batch process video")
-        batchprocess.iconbitmap(maincwd+'\\'"golden_lab.ico")
-
 
         #Video Selection Tab
         label_videoselection = LabelFrame(batchprocess,text='Folder selection',font='bold',padx=5,pady=5)
@@ -423,73 +500,83 @@ class batch_processvideo:
 class outlier_settings:
     def __init__(self,configini):
         self.configini = configini
+        #get the no of animals
+        config = ConfigParser()
+        configFile = str(configini)
+        config.read(configFile)
+        animalno = config.getint('General settings','animal_no')
+        # get list
+        bpcsv = (os.path.join(os.path.dirname(configini),'logs','measures','pose_configs','bp_names','project_bp_names.csv'))
+        bplist = []
+        with open(bpcsv) as f:
+            for row in f:
+                bplist.append(row)
+        bplist = list(map(lambda x: x.replace('\n',''),bplist))
+
+        if animalno != 1:
+            animal1bp = [f for f in bplist if '1' in f]
+            animal2bp = [f for f in bplist if '2' in f]
+        else:
+            animal1bp = bplist
+
         # Popup window
         outlier_set = Toplevel()
         outlier_set.minsize(400, 400)
         outlier_set.wm_title("Outlier Settings")
-        outlier_set.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
-
-        # location
+        # location correction for one animal
         label_location_correction = LabelFrame(outlier_set, text='Location correction',font=('Times',12,'bold'),pady=5,padx=5)
         label_choosem1bp1 = Label(label_location_correction, text='Choose Animal 1, body part 1:')
         label_choosem1bp2 = Label(label_location_correction, text='Choose Animal 1, body part 2:')
-        label_choosem2bp1 = Label(label_location_correction, text='Choose Animal 2, body part 1:')
-        label_choosem2bp2 = Label(label_location_correction, text='Choose Animal 2, body part 2:')
-        self.location_criterion = Entry_Box(label_location_correction,'Location criterion', '15')
-        options = ['Ear_left_1',
-                              'Ear_right_1',
-                              'Nose_1',
-                              'Center_1',
-                              'Lateral_left_1',
-                              'Lateral_right_1',
-                              'Tail_base_1',
-                              'Tail_end_1']
-        options2 = ['Ear_left_2',
-                              'Ear_right_2',
-                              'Nose_2',
-                              'Center_2',
-                              'Lateral_left_2',
-                              'Lateral_right_2',
-                              'Tail_base_2',
-                              'Tail_end_2']
-
         self.var1 = StringVar()
-        self.var1.set(options[2])  # set as default value
+        self.var1.set(animal1bp[0])  # set as default value
         self.var2 = StringVar()
-        self.var2.set(options[6])  # set as default value
-        self.var3 = StringVar()
-        self.var3.set(options2[2])  # set as default value
-        self.var4 = StringVar()
-        self.var4.set(options2[6])  # set as default value
-
-        dropdown_m1bp1 = OptionMenu(label_location_correction, self.var1, *options)
-        dropdown_m1bp2 = OptionMenu(label_location_correction, self.var2, *options)
-        dropdown_m2bp1 = OptionMenu(label_location_correction, self.var3, *options2)
-        dropdown_m2bp2 = OptionMenu(label_location_correction, self.var4, *options2)
-
-        #movement
-        label_movement_correction = LabelFrame(outlier_set, text='Movement correction',font=('Times',12,'bold'),pady=5,padx=5)
+        self.var2.set(animal1bp[1])  # set as default value
+        dropdown_m1bp1 = OptionMenu(label_location_correction, self.var1, *animal1bp)
+        dropdown_m1bp2 = OptionMenu(label_location_correction, self.var2, *animal1bp)
+        self.location_criterion = Entry_Box(label_location_correction, 'Location criterion', '15')
+        # movement
+        label_movement_correction = LabelFrame(outlier_set, text='Movement correction', font=('Times', 12, 'bold'),
+                                               pady=5, padx=5)
         mlabel_choosem1bp1 = Label(label_movement_correction, text='Choose Animal 1, body part 1:')
         mlabel_choosem1bp2 = Label(label_movement_correction, text='Choose Animal 1, body part 2:')
-        mlabel_choosem2bp1 = Label(label_movement_correction, text='Choose Animal 2, body part 1:')
-        mlabel_choosem2bp2 = Label(label_movement_correction, text='Choose Animal 2, body part 2:')
+        self.mvar1 = StringVar()
+        self.mvar1.set(animal1bp[0])  # set as default value
+        self.mvar2 = StringVar()
+        self.mvar2.set(animal1bp[1])  # set as default value
+        mdropdown_m1bp1 = OptionMenu(label_movement_correction, self.mvar1, *animal1bp)
+        mdropdown_m1bp2 = OptionMenu(label_movement_correction, self.mvar2, *animal1bp)
         self.movement_criterion = Entry_Box(label_movement_correction, 'Movement criterion', '15')
 
-        self.mvar1 = StringVar()
-        self.mvar1.set(options[2])  # set as default value
-        self.mvar2 = StringVar()
-        self.mvar2.set(options[6])  # set as default value
-        self.mvar3 = StringVar()
-        self.mvar3.set(options2[2])  # set as default value
-        self.mvar4 = StringVar()
-        self.mvar4.set(options2[6])  # set as default value
-
-        mdropdown_m1bp1 = OptionMenu(label_movement_correction, self.mvar1, *options)
-        mdropdown_m1bp2 = OptionMenu(label_movement_correction, self.mvar2, *options)
-        mdropdown_m2bp1 = OptionMenu(label_movement_correction, self.mvar3, *options2)
-        mdropdown_m2bp2 = OptionMenu(label_movement_correction, self.mvar4, *options2)
-
+        # if two animals
+        if animalno != 1:
+            label_choosem2bp1 = Label(label_location_correction, text='Choose Animal 2, body part 1:')
+            label_choosem2bp2 = Label(label_location_correction, text='Choose Animal 2, body part 2:')
+            animal2bp = [f for f in bplist if '2' in f]
+            self.var3 = StringVar()
+            self.var3.set(animal2bp[0])  # set as default value
+            self.var4 = StringVar()
+            self.var4.set(animal2bp[1])  # set as default value
+            dropdown_m2bp1 = OptionMenu(label_location_correction, self.var3, *animal2bp)
+            dropdown_m2bp2 = OptionMenu(label_location_correction, self.var4, *animal2bp)
+            #movement
+            mlabel_choosem2bp1 = Label(label_movement_correction, text='Choose Animal 2, body part 1:')
+            mlabel_choosem2bp2 = Label(label_movement_correction, text='Choose Animal 2, body part 2:')
+            self.mvar3 = StringVar()
+            self.mvar3.set(animal2bp[0])  # set as default value
+            self.mvar4 = StringVar()
+            self.mvar4.set(animal2bp[1])  # set as default value
+            mdropdown_m2bp1 = OptionMenu(label_movement_correction, self.mvar3, *animal2bp)
+            mdropdown_m2bp2 = OptionMenu(label_movement_correction, self.mvar4, *animal2bp)
+            #organize for animal2
+            label_choosem2bp1.grid(row=2, column=0, sticky=W)
+            label_choosem2bp2.grid(row=3, column=0, sticky=W)
+            dropdown_m2bp1.grid(row=2, column=1, sticky=W)
+            dropdown_m2bp2.grid(row=3, column=1, sticky=W)
+            mlabel_choosem2bp1.grid(row=2, column=0, sticky=W)
+            mlabel_choosem2bp2.grid(row=3, column=0, sticky=W)
+            mdropdown_m2bp1.grid(row=2, column=1, sticky=W)
+            mdropdown_m2bp2.grid(row=3, column=1, sticky=W)
         #mean or median
         medianlist = ['mean','median']
         self.medianvar =StringVar()
@@ -504,88 +591,94 @@ class outlier_settings:
         label_location_correction.grid(row=1,sticky=W)
         label_choosem1bp1.grid(row=0,column=0,sticky=W)
         label_choosem1bp2.grid(row=1,column=0,sticky=W)
-        label_choosem2bp1.grid(row=2,column=0,sticky=W)
-        label_choosem2bp2.grid(row=3,column=0,sticky=W)
         self.location_criterion.grid(row=4,sticky=W)
-
         dropdown_m1bp1.grid(row=0, column=1, sticky=W)
         dropdown_m1bp2.grid(row=1, column=1, sticky=W)
-        dropdown_m2bp1.grid(row=2, column=1, sticky=W)
-        dropdown_m2bp2.grid(row=3, column=1, sticky=W)
+
 
         label_movement_correction.grid(row=0, sticky=W)
         mlabel_choosem1bp1.grid(row=0, column=0, sticky=W)
         mlabel_choosem1bp2.grid(row=1, column=0, sticky=W)
-        mlabel_choosem2bp1.grid(row=2, column=0, sticky=W)
-        mlabel_choosem2bp2.grid(row=3, column=0, sticky=W)
         self.movement_criterion.grid(row=4, sticky=W)
 
         mdropdown_m1bp1.grid(row=0, column=1, sticky=W)
         mdropdown_m1bp2.grid(row=1, column=1, sticky=W)
-        mdropdown_m2bp1.grid(row=2, column=1, sticky=W)
-        mdropdown_m2bp2.grid(row=3, column=1, sticky=W)
 
         label_median.grid(row=2,column=0,sticky=W)
         mediandropdown.grid(row=2,sticky=W)
         button_setvalues.grid(row=3,pady=10)
 
     def set_outliersettings(self):
+        # export settings to config ini file
+        configini = self.configini
+        config = ConfigParser()
+        config.read(configini)
+        animalno = config.getint('General settings', 'animal_no')
         try:
-            movement_bodyPart1_mouse1 = self.var1.get()
-            movement_bodyPart2_mouse1 = self.var2.get()
-            movement_bodyPart1_mouse2 = self.var3.get()
-            movement_bodyPart2_mouse2 = self.var4.get()
+            if animalno == 1:
+                movement_bodyPart1_mouse1 = self.var1.get()
+                movement_bodyPart2_mouse1 = self.var2.get()
+                location_bodyPart1_mouse1 = self.mvar1.get()
+                location_bodyPart2_mouse1 = self.mvar2.get()
+                movementcriterion = self.movement_criterion.entry_get
+                locationcriterion = self.location_criterion.entry_get
+                mean_or_median = self.medianvar.get()
+                config.set('Outlier settings', 'movement_criterion', str(movementcriterion))
+                config.set('Outlier settings', 'location_criterion', str(locationcriterion))
+                config.set('Outlier settings', 'movement_bodyPart1_mouse1', str(movement_bodyPart1_mouse1))
+                config.set('Outlier settings', 'movement_bodyPart2_mouse1', str(movement_bodyPart2_mouse1))
+                config.set('Outlier settings', 'location_bodyPart1_mouse1', str(location_bodyPart1_mouse1))
+                config.set('Outlier settings', 'location_bodyPart2_mouse1', str(location_bodyPart2_mouse1))
+                config.set('Outlier settings', 'mean_or_median', str(mean_or_median))
 
-            location_bodyPart1_mouse1 = self.mvar1.get()
-            location_bodyPart2_mouse1 = self.mvar2.get()
-            location_bodyPart1_mouse2 = self.mvar3.get()
-            location_bodyPart2_mouse2 = self.mvar4.get()
-
-            movementcriterion = self.movement_criterion.entry_get
-            locationcriterion = self.location_criterion.entry_get
-
-            mean_or_median = self.medianvar.get()
-
-            # export settings to config ini file
-            configini = self.configini
-            config = ConfigParser()
-            config.read(configini)
-
-            config.set('Outlier settings', 'movement_criterion', str(movementcriterion))
-            config.set('Outlier settings', 'location_criterion', str(locationcriterion))
-            config.set('Outlier settings', 'movement_bodyPart1_mouse1', str(movement_bodyPart1_mouse1))
-            config.set('Outlier settings', 'movement_bodyPart2_mouse1', str(movement_bodyPart2_mouse1))
-            config.set('Outlier settings', 'movement_bodyPart1_mouse2', str(movement_bodyPart1_mouse2))
-            config.set('Outlier settings', 'movement_bodyPart2_mouse2', str(movement_bodyPart2_mouse2))
-            config.set('Outlier settings', 'location_bodyPart1_mouse1', str(location_bodyPart1_mouse1))
-            config.set('Outlier settings', 'location_bodyPart2_mouse1', str(location_bodyPart2_mouse1))
-            config.set('Outlier settings', 'location_bodyPart1_mouse2', str(location_bodyPart1_mouse2))
-            config.set('Outlier settings', 'location_bodyPart2_mouse2', str(location_bodyPart2_mouse2))
-            config.set('Outlier settings', 'mean_or_median', str(mean_or_median))
-
+            if animalno == 2:
+                movement_bodyPart1_mouse2 = self.var3.get()
+                location_bodyPart1_mouse2 = self.mvar3.get()
+                movement_bodyPart2_mouse2 = self.var4.get()
+                location_bodyPart2_mouse2 = self.mvar4.get()
+                movement_bodyPart1_mouse1 = self.var1.get()
+                movement_bodyPart2_mouse1 = self.var2.get()
+                location_bodyPart1_mouse1 = self.mvar1.get()
+                location_bodyPart2_mouse1 = self.mvar2.get()
+                mean_or_median = self.medianvar.get()
+                movementcriterion = self.movement_criterion.entry_get
+                locationcriterion = self.location_criterion.entry_get
+                config.set('Outlier settings', 'movement_criterion', str(movementcriterion))
+                config.set('Outlier settings', 'location_criterion', str(locationcriterion))
+                config.set('Outlier settings', 'movement_bodyPart1_mouse2', str(movement_bodyPart1_mouse2))
+                config.set('Outlier settings', 'movement_bodyPart2_mouse2', str(movement_bodyPart2_mouse2))
+                config.set('Outlier settings', 'location_bodyPart1_mouse2', str(location_bodyPart1_mouse2))
+                config.set('Outlier settings', 'location_bodyPart2_mouse2', str(location_bodyPart2_mouse2))
+                config.set('Outlier settings', 'mean_or_median', str(mean_or_median))
+                config.set('Outlier settings', 'movement_bodyPart1_mouse1', str(movement_bodyPart1_mouse1))
+                config.set('Outlier settings', 'movement_bodyPart2_mouse1', str(movement_bodyPart2_mouse1))
+                config.set('Outlier settings', 'location_bodyPart1_mouse1', str(location_bodyPart1_mouse1))
+                config.set('Outlier settings', 'location_bodyPart2_mouse1', str(location_bodyPart2_mouse1))
 
             with open(configini, 'w') as configfile:
                 config.write(configfile)
 
             print('Outlier settings updated in project_config.ini')
         except:
-            print('Fail to update settings, please load config.ini file to proceed.')
+            print('Please make sure all fields are filled in correctly.')
 
 class FolderSelect(Frame):
-    def __init__(self,parent=None,folderDescription="",color=None,title=None,**kw):
+    def __init__(self,parent=None,folderDescription="",color=None,title=None,lblwidth =None,**kw):
         self.title=title
         self.color = color if color is not None else 'black'
+        self.lblwidth = lblwidth if lblwidth is not None else 0
+        self.parent = parent
         Frame.__init__(self,master=parent,**kw)
         self.folderPath = StringVar()
-        self.lblName = Label(self, text=folderDescription,fg=str(self.color))
-        self.lblName.grid(row=0,column=0)
+        self.lblName = Label(self, text=folderDescription,fg=str(self.color),width=str(self.lblwidth),anchor=W)
+        self.lblName.grid(row=0,column=0,sticky=W)
         self.entPath = Label(self, textvariable=self.folderPath,relief=SUNKEN)
         self.entPath.grid(row=0,column=1)
         self.btnFind = Button(self, text="Browse Folder",command=self.setFolderPath)
         self.btnFind.grid(row=0,column=2)
         self.folderPath.set('No folder selected')
     def setFolderPath(self):
-        folder_selected = askdirectory(title=str(self.title))
+        folder_selected = askdirectory(title=str(self.title),parent=self.parent)
         if folder_selected:
             self.folderPath.set(folder_selected)
         else:
@@ -595,21 +688,37 @@ class FolderSelect(Frame):
     def folder_path(self):
         return self.folderPath.get()
 
+class DropDownMenu(Frame):
+    def __init__(self,parent=None,dropdownLabel='',choice_dict={},labelwidth='',**kw):
+        Frame.__init__(self,master=parent,**kw)
+        self.dropdownvar = StringVar()
+        self.lblName = Label(self,text=dropdownLabel,width=labelwidth,anchor=W)
+        self.lblName.grid(row=0,column=0)
+        self.choices = choice_dict
+        self.popupMenu = OptionMenu(self,self.dropdownvar,*self.choices)
+        self.popupMenu.grid(row=0,column=1)
+    def getChoices(self):
+        return self.dropdownvar.get()
+    def setChoices(self,choice):
+        self.dropdownvar.set(choice)
+
 class FileSelect(Frame):
-    def __init__(self,parent=None,fileDescription="",color=None,title=None,**kw):
+    def __init__(self,parent=None,fileDescription="",color=None,title=None,lblwidth=None,**kw):
         self.title=title
         self.color = color if color is not None else 'black'
+        self.lblwidth = lblwidth if lblwidth is not None else 0
+        self.parent=parent
         Frame.__init__(self,master=parent,**kw)
         self.filePath = StringVar()
-        self.lblName = Label(self, text=fileDescription,fg=str(self.color))
-        self.lblName.grid(row=0,column=0)
+        self.lblName = Label(self, text=fileDescription,fg=str(self.color),width=str(self.lblwidth),anchor=W)
+        self.lblName.grid(row=0,column=0,sticky=W)
         self.entPath = Label(self, textvariable=self.filePath,relief=SUNKEN)
         self.entPath.grid(row=0,column=1)
         self.btnFind = Button(self, text="Browse File",command=self.setFilePath)
         self.btnFind.grid(row=0,column=2)
         self.filePath.set('No file selected')
     def setFilePath(self):
-        file_selected = askopenfilename(title=self.title)
+        file_selected = askopenfilename(title=self.title,parent=self.parent)
         if file_selected:
             self.filePath.set(file_selected)
         else:
@@ -696,7 +805,6 @@ class Button_getcoord(Frame):
         ppms = self.ppm_list[count].get()
         return ppms
 
-
 def Exit():
     app.root.destroy()
 
@@ -704,7 +812,7 @@ class video_info_table:
 
     def __init__(self,configini):
 
-        self.filesFound = [0]
+        self.filesFound = [0]  #initiate files found
         video_info_csv = str(os.path.dirname(configini)+'\\logs\\video_info.csv')
         config = ConfigParser()
         self.configFile = str(configini)
@@ -720,7 +828,6 @@ class video_info_table:
         self.tkintertable = Toplevel()
         self.tkintertable.minsize(1000, 500)
         self.tkintertable.wm_title("Video Info")
-        self.tkintertable.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         self.xscrollbar = Scrollable(self.tkintertable,width=32)
         self.myframe = LabelFrame(self.xscrollbar,text='Table')
@@ -740,7 +847,7 @@ class video_info_table:
         count = 0
         for i in self.filesFound:
             vid= cv2.VideoCapture(os.path.join(str(self.config_videofolders),str(i)))
-            print((os.path.join(str(self.config_videofolders),str(i))))
+            #print((os.path.join(str(self.config_videofolders),str(i))))
             self.table_col[0].setvariable(count,str(count)+'.')
             self.table_col[1].setvariable(count,i)
             self.table_col[2].setvariable(count, int(vid.get(cv2.CAP_PROP_FPS)))
@@ -783,11 +890,14 @@ class video_info_table:
                 else:
                     videosdict[keys] = 0
             pixellist = list(videosdict.values())
-
+            self.pixel_list = pixellist
+            self.getdata()
             self.button = Button_getcoord(self.xscrollbar, self.data_lists[1], self.data_lists[5],pixellist)
             self.button.grid(row=6, column=1)
-            self.pixel_list = pixellist
+
         else:
+            self.pixel_list= None
+            self.getdata()
             self.button = Button_getcoord(self.xscrollbar,self.data_lists[1],self.data_lists[5])
             self.button.grid(row=6,column=1)
 
@@ -814,7 +924,7 @@ class video_info_table:
     def addBox(self,scroll):
         self.new_col_list.append(0)
         self.next_column = len(self.new_col_list)
-        print(self.next_column)
+        #print(self.next_column)
         self.table_col.append(newcolumn(self.myframe,self.filesFound,'20'))
         self.table_col[(self.next_column)-1].grid(row=0,column=self.next_column)
         scroll.update()
@@ -829,7 +939,7 @@ class video_info_table:
 
         # add path to videos for get coord
         self.data_lists[1] = [str(self.config_videofolders)+'\\'+s for s in self.data_lists[1]]
-        if self.pixel_list:
+        if self.pixel_list!= None:
             self.button = Button_getcoord(self.xscrollbar, self.data_lists[1], self.data_lists[5],self.pixel_list)
             self.button.grid(row=6, column=1)
         else:
@@ -878,7 +988,7 @@ class video_downsample:
         videosdownsample = Toplevel()
         videosdownsample.minsize(200, 200)
         videosdownsample.wm_title("Downsample Video Resolution")
-        videosdownsample.iconbitmap(maincwd+'\\'"golden_lab.ico")
+
 
         # Video Path
         self.videopath1selected = FileSelect(videosdownsample, "Video path",title='Select a video file')
@@ -963,7 +1073,7 @@ class Red_light_Convertion:
         redlightconversion = Toplevel()
         redlightconversion.minsize(200, 200)
         redlightconversion.wm_title("CLAHE")
-        redlightconversion.iconbitmap(maincwd+'\\'"golden_lab.ico")
+
 
         #CLAHE
         label_clahe = LabelFrame(redlightconversion,text='Contrast Limited Adaptive Histogram Equalization',font='bold',padx=5,pady=5)
@@ -983,7 +1093,7 @@ class crop_video:
         cropvideo = Toplevel()
         cropvideo.minsize(200, 200)
         cropvideo.wm_title("Crop Video")
-        cropvideo.iconbitmap(maincwd+'\\'"golden_lab.ico")
+
 
         # Video Path
         label_cropvideo = LabelFrame(cropvideo,text='Crop Video',font='bold',padx=5,pady=5)
@@ -1004,7 +1114,7 @@ class create_project_DLC:
         createproject = Toplevel()
         createproject.minsize(400, 250)
         createproject.wm_title("Create Project")
-        createproject.iconbitmap(maincwd+'\\'"golden_lab.ico")
+
 
         self.label_dlc_createproject = LabelFrame(createproject,text='Create Project',font =("Helvetica",12,'bold'))
         #project name
@@ -1023,7 +1133,10 @@ class create_project_DLC:
         self.videopath1selected.grid(row=4, sticky=W)
 
         #video folder
-        self.folderpath1selected = FolderSelect(self.label_dlc_createproject,'Project directory   ',title='Select main directory')
+        self.folderpath1selected = FolderSelect(self.label_dlc_createproject,f'Project directory   ',title='Select main directory')
+
+        #bodypart configuration file
+        self.bodypartconfigfile = FileSelect(self.label_dlc_createproject, 'Bp config file ', title='Select a csv file')
 
         # # statusbar
         # self.projectcreated = IntVar()
@@ -1048,9 +1161,10 @@ class create_project_DLC:
         button_videofol.grid(row=2,sticky=W,pady=5)
         button_videofo2.grid(row=3,sticky=W,pady=5)
         self.folderpath1selected.grid(row=5,sticky=W)
-        checkbox2.grid(row=6,column=0,sticky=W)
-        checkbox1.grid(row=7,sticky=W)
-        button_createproject.grid(row=8,column=3,pady=10,padx=5)
+        self.bodypartconfigfile.grid(row=6, sticky=W)
+        checkbox2.grid(row=7,column=0,sticky=W)
+        checkbox1.grid(row=8,sticky=W)
+        button_createproject.grid(row=9,column=3,pady=10,padx=5)
 
     def changetovideo(self):
         self.videopath1selected.grid_remove()
@@ -1084,10 +1198,14 @@ class create_project_DLC:
             except:
                 print('Please select a video folder to import videos')
 
+        if 'FileSelect' in str(type(self.bodypartconfigfile)):
+            bodyPartConfigFile = (self.bodypartconfigfile.file_path)
+
+
         if self.var_changeyaml.get()==1:
             if (projectname !='') and (experimentalname !='') and ('No'and'selected' not in videolist) and (self.folderpath1selected.folder_path!='No folder selected'):
                 config_path = deeplabcut.create_new_project(str(projectname), str(experimentalname), videolist,working_directory=str(self.folderpath1selected.folder_path), copy_videos=copyvid)
-                changedlc_config(config_path)
+                changedlc_config(config_path, 0)
             else:
                 print('Please make sure all the information are filled in')
         else:
@@ -1095,6 +1213,474 @@ class create_project_DLC:
                 config_path = deeplabcut.create_new_project(str(projectname), str(experimentalname), videolist,working_directory=str(self.folderpath1selected.folder_path), copy_videos=copyvid)
             else:
                 print('Please make sure all the information are filled in')
+        if bodyPartConfigFile != 'No file selected':
+            changedlc_config(config_path, bodyPartConfigFile)
+
+class createDPK_project:
+    def __init__(self):
+        cdpkmenu = Toplevel()
+        cdpkmenu.minsize(300,200)
+        cdpkmenu.wm_title('Create DeepPoseKit project')
+
+        cdpk_label = LabelFrame(cdpkmenu,pady=5,padx=5)
+        self.inifile = FileSelect(cdpk_label,'SimBA project.ini file',lblwidth='18')
+        self.projectName = Entry_Box(cdpk_label,'Project Name','18')
+
+        #button
+        generate_Button = Button(cdpk_label,text='Generate project',command=self.generateProject)
+
+        #organize
+        cdpk_label.grid(row=0,sticky=W)
+        self.inifile.grid(row=0,sticky=W)
+        self.projectName.grid(row=1,sticky=W)
+        generate_Button.grid(row=2,sticky=W)
+
+    def generateProject(self):
+        projectdir = os.path.dirname(self.inifile.file_path)
+        write_dpkfile(projectdir,self.projectName.entry_get)
+        print('DeepPoseKit project generated.')
+
+
+class deepPoseKitMenu:
+    def __init__(self,inifile):
+        self.configini = inifile
+        # Popup window
+        dpkMenu = Toplevel()
+        dpkMenu.minsize(400, 400)
+        dpkMenu.wm_title("DeepPoseKit")
+
+        #parent tab
+        tab_parent = ttk.Notebook(dpkMenu)
+        #children tab
+        tab0 = ttk.Frame(tab_parent)
+        tab1 = ttk.Frame(tab_parent)
+        tab2 = ttk.Frame(tab_parent)
+        tab3 = ttk.Frame(tab_parent)
+        tab4 = ttk.Frame(tab_parent)
+        tab5 = ttk.Frame(tab_parent)
+
+        tab_parent.add(tab0, text=f'{"[ Import Videos ]": ^20s}')
+        tab_parent.add(tab1, text=f'{"[ Create annotation set ]": ^20s}')
+        tab_parent.add(tab2, text=f'{"[ Annotater ]": ^20s}')
+        tab_parent.add(tab3, text=f'{"[ Train model ]": ^20s}')
+        tab_parent.add(tab4, text=f'{"[ Predict new video ]": ^20s}')
+        tab_parent.add(tab5, text=f'{"[ Visualize video ]": ^20s}')
+
+        tab_parent.grid(row=0)
+
+        #import videos
+        label_importvideo = LabelFrame(tab0, text='Import videos into DPK project', font=("Helvetica",12,'bold'), padx=15,pady=5,fg='black')
+        # multi video
+        label_multivideoimport = LabelFrame(label_importvideo, text='Import multiple videos', pady=5, padx=5)
+        self.multivideofolderpath = FolderSelect(label_multivideoimport, 'Folder path',title='Select Folder with videos')
+        self.video_type = Entry_Box(label_multivideoimport, 'File format (i.e., mp4/avi):', '20')
+        button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command=self.importvideo_multi, fg='black')
+        # singlevideo
+        label_singlevideoimport = LabelFrame(label_importvideo, text='Import single video', pady=5, padx=5)
+        self.singlevideopath = FileSelect(label_singlevideoimport, "Video Path",title='Select a video file')
+        button_importsinglevideo = Button(label_singlevideoimport, text='Import a video',command= self.importvideo_single,fg='black')
+
+        #Create annotation
+        createann_label = LabelFrame(tab1,pady=5,padx=5)
+        annOutputName = Entry_Box(createann_label,'Annotation Output Name','21')
+        readBatchSize = Entry_Box(createann_label,'Read Batch Size','21')
+        kmeanbSize = Entry_Box(createann_label, 'k means batch size', '21')
+        kmeanNcluster = Entry_Box(createann_label, 'k means n clusters', '21')
+        kmeanmaxIter = Entry_Box(createann_label, 'k means max iterations', '21')
+        kmeanNinit = Entry_Box(createann_label, 'k means n init', '21')
+        crateaAnnButton = Button(createann_label,text='Create Annotation',command=lambda:self.dpkStep1(annOutputName.entry_get,readBatchSize.entry_get,kmeanbSize.entry_get,kmeanNcluster.entry_get,kmeanmaxIter.entry_get,kmeanNinit.entry_get))
+
+        ## set
+        readBatchSize.entry_set('100')
+        kmeanbSize.entry_set('100')
+        kmeanNcluster.entry_set('10')
+        kmeanmaxIter.entry_set('1000')
+        kmeanNinit.entry_set('10')
+
+        #Annotator
+        annfile_label = LabelFrame(tab2,pady=5,padx=5)
+        annfile = FileSelect(annfile_label,'Annotation file',lblwidth='18')
+        #button
+        runann_button = Button(annfile_label,text='Run',command=lambda:dpkAnnotator(self.configini,annfile.file_path))
+
+        def activate(box, *args):
+            for entry in args:
+                if box.get() == 0:
+                    entry.set_state(DISABLED)
+                elif box.get() == 1:
+                    entry.set_state(NORMAL)
+
+        #train model deeposekit
+        trainmodel_label = LabelFrame(tab3,pady=5,padx=5)
+        annpath = FileSelect(trainmodel_label,'Annotations path',lblwidth='18')
+        savemodelPath = Entry_Box(trainmodel_label,'Output model name','18')
+        epochs = Entry_Box(trainmodel_label,'epochs','18')
+        dsFactor = Entry_Box(trainmodel_label,'Downsample factor','18')
+        validationSplit = Entry_Box(trainmodel_label,'Validation split','18')
+        sigma = Entry_Box(trainmodel_label,'Sigma','18')
+        graphscale = Entry_Box(trainmodel_label,'Graph scale','18')
+        TorFoptions = {'True','False'}
+        augmenter = DropDownMenu(trainmodel_label,'Augmenter',TorFoptions,'18')
+        validationbatchSize = Entry_Box(trainmodel_label,'Validation batch size','18')
+        modelgrowthrate = Entry_Box(trainmodel_label,'Model growth rate','18')
+        modelbatchsize = Entry_Box(trainmodel_label,'Model Batch Size','18')
+
+        #logger
+        loggervar = IntVar(value=1)
+        loggervalidBatchSize = Entry_Box(trainmodel_label, 'Logger validation batch size', '18')
+        loggercheckbox = Checkbutton(trainmodel_label, text='Logger', variable=loggervar,
+                                     command=lambda: activate(loggervar, loggervalidBatchSize))
+
+        # lr factor
+        reducevar = IntVar(value=1)
+        reducelrfactor = Entry_Box(trainmodel_label, 'Reduce LR factor', '18')
+        reducelrcheckbox = Checkbutton(trainmodel_label, text='Reduce_Lr', variable=reducevar,
+                                       command=lambda: activate(reducevar, reducelrfactor))
+
+        checkpointscheckbox = DropDownMenu(trainmodel_label,'Model Checkpoints',TorFoptions,'18')
+        earlyStopcheckbox = DropDownMenu(trainmodel_label,'Early stop',TorFoptions,'18')
+
+        ## choose model
+        modelsoption = {'DeepLabCut','LEAP','StackedDenseNet','StackedHourglass'}
+        self.nnArchitecture = DropDownMenu(trainmodel_label,'NN_architecture',modelsoption,'18')
+        modelsettingsbutton = Button(trainmodel_label,text='Model Settings',command=self.modelsettingschoice)
+
+        #button
+        trainmodelbutton = Button(trainmodel_label,text='Train model',command = lambda:self.traindpk(annpath.file_path,savemodelPath.entry_get,epochs.entry_get,dsFactor.entry_get,validationSplit.entry_get,sigma.entry_get,
+                                                                                                     graphscale.entry_get,augmenter.getChoices(),validationbatchSize.entry_get,modelgrowthrate.entry_get,modelbatchsize.entry_get,
+                                                                                                     loggervar.get(),loggervalidBatchSize.entry_get,reducevar.get(),reducelrfactor.entry_get,checkpointscheckbox.getChoices(),earlyStopcheckbox.getChoices(),self.nnArchitecture.getChoices()))
+
+        #set
+        epochs.entry_set('200')
+        dsFactor.entry_set('2')
+        validationSplit.entry_set('0.05')
+        sigma.entry_set('5')
+        graphscale.entry_set('1')
+        augmenter.setChoices('True')
+        validationbatchSize.entry_set('2')
+        modelgrowthrate.entry_set('32')
+        modelbatchsize.entry_set('2')
+        loggervalidBatchSize.entry_set('2')
+        reducelrfactor.entry_set('0.2')
+        checkpointscheckbox.setChoices('True')
+        earlyStopcheckbox.setChoices('True')
+        self.nnArchitecture.setChoices('StackedDenseNet')
+
+        #predict new video
+        predictvid_label = LabelFrame(tab4,pady=5,padx=5)
+        modelPath = FileSelect(predictvid_label,'Model path', lblwidth='12')
+        vidfolderpredict = FolderSelect(predictvid_label,'Video Folder',lblwidth='12')
+        #button
+        predictbutton = Button(predictvid_label,text='Predict',command=lambda:self.runprediction(modelPath.file_path,vidfolderpredict.folder_path))
+
+        #Visualize video
+        visualize_label = LabelFrame(tab5,pady=5,padx=5)
+        #button
+        visualizeButton = Button(visualize_label,text='Run',command=lambda:visualizeDPK(self.configini))
+
+        #organize
+        #import videos
+        label_importvideo.grid(row=0)
+        # multi video
+        label_multivideoimport.grid(row=0,sticky=W)
+        self.multivideofolderpath.grid(row=0,sticky=W)
+        self.video_type.grid(row=1,sticky=W)
+        button_multivideoimport.grid(row=2,sticky=W)
+        # singlevideo
+        label_singlevideoimport.grid(row=1,sticky=W)
+        self.singlevideopath.grid(row=0,sticky=W)
+        button_importsinglevideo.grid(row=1,sticky=W)
+
+        ##create annotation
+        createann_label.grid(row=0,sticky=W,pady=1)
+        annOutputName.grid(row=1, sticky=W, pady=1)
+        readBatchSize.grid(row=2, sticky=W, pady=1)
+        kmeanbSize.grid(row=3, sticky=W, pady=1)
+        kmeanNcluster.grid(row=4, sticky=W, pady=1)
+        kmeanmaxIter.grid(row=5, sticky=W, pady=1)
+        kmeanNinit.grid(row=6, sticky=W, pady=1)
+        crateaAnnButton.grid(row=7,pady=5)
+
+        ##annotator
+        annfile_label.grid(row=1,sticky=W,pady=1)
+        annfile.grid(row=0,sticky=W,pady=1)
+        runann_button.grid(row=2,pady=5)
+        ##trainmodel
+        trainmodel_label.grid(row=2,sticky=W,pady=1)
+        annpath.grid(row=0,sticky=W,pady=1)
+        savemodelPath.grid(row=1,sticky=W,pady=1)
+        epochs.grid(row=2, sticky=W, pady=1)
+        dsFactor.grid(row=3, sticky=W, pady=1)
+        validationSplit.grid(row=4, sticky=W, pady=1)
+        sigma.grid(row=5, sticky=W, pady=1)
+        graphscale.grid(row=6, sticky=W, pady=1)
+        augmenter.grid(row=7, sticky=W, pady=1)
+        validationbatchSize.grid(row=8, sticky=W, pady=1)
+        modelgrowthrate.grid(row=9, sticky=W, pady=1)
+        modelbatchsize.grid(row=10, sticky=W, pady=1)
+        loggercheckbox.grid(row=11, sticky=W, pady=1)
+        loggervalidBatchSize.grid(row=12, sticky=W, pady=1)
+        reducelrcheckbox.grid(row=13, sticky=W, pady=1)
+        reducelrfactor.grid(row=14, sticky=W, pady=1)
+        checkpointscheckbox.grid(row=15, sticky=W, pady=1)
+        earlyStopcheckbox.grid(row=16, sticky=W, pady=1)
+        self.nnArchitecture.grid(row=17, sticky=W, pady=1)
+        modelsettingsbutton.grid(row=18, sticky=W, pady=5)
+        trainmodelbutton.grid(row=19, pady=5)
+
+
+        ##predictnewvideo
+        predictvid_label.grid(row=3,sticky=W,pady=1)
+        modelPath.grid(row=0,sticky=W,pady=1)
+        vidfolderpredict.grid(row=1,sticky=W,pady=1)
+        predictbutton.grid(row=4,pady=5)
+        ##visualize
+        visualize_label.grid(row=4,sticky=W,pady=1)
+        visualizeButton.grid(row=2,pady=5)
+
+    def importvideo_single(self):
+        if (self.configini != 'No file selected') and (self.singlevideopath.file_path != 'No file selected'):
+            copy_singlevideo_DPKini(self.configini, self.singlevideopath.file_path)
+        else:
+            print('Fail to import video, please select a video to import')
+
+    def importvideo_multi(self):
+        if (self.configini != 'No file selected') and (
+                self.multivideofolderpath.folder_path != 'No folder selected') and (self.video_type.entry_get != ''):
+            copy_multivideo_DPKini(self.configini, self.multivideofolderpath.folder_path, self.video_type.entry_get)
+        else:
+            print('Fail to import videos, please select folder with videos and enter the file format')
+
+    def runprediction(self,modelpath,videofolder):
+        configini = self.configini
+        config = ConfigParser()
+        config.read(configini)
+        config.set('predict settings', 'modelPath',str(modelpath))
+        # write
+        with open(configini, 'w') as configfile:
+            config.write(configfile)
+
+        predictnewvideoDPK(configini,videofolder)
+
+    def traindpk(self,annotationfilepath,outputmodelName,epochs,dsfactor,validationsplit,sigma,graphscale,augmenter,validationbatchsize,modelgrowthrate,modelbatchsize,logger,loggerentry,reduce,reducefactor,checkpoint,earlystop,architure):
+        #get the config
+        configini = self.configini
+        config = ConfigParser()
+        config.read(configini)
+        ## main training settings
+        config.set('train model settings', 'epochs', str(epochs))
+        config.set('train model settings', 'downsampleFactor', str(dsfactor))
+        config.set('train model settings', 'validation_split', str(validationsplit))
+        config.set('train model settings', 'sigma', str(sigma))
+        config.set('train model settings', 'graph_scale', str(graphscale))
+        config.set('train model settings', 'augmenterCheck', str(augmenter))
+        config.set('train model settings', 'validation_batch_size', str(validationbatchsize))
+        config.set('train model settings', 'modelGrowthRate', str(modelgrowthrate))
+        config.set('train model settings', 'model_batch_size', str(modelbatchsize))
+        config.set('train model settings', 'loggerCheck', str(logger))
+        config.set('train model settings', 'logger_validation_batch_size', str(loggerentry))
+        config.set('train model settings', 'reducelrCheck', str(reduce))
+        config.set('train model settings', 'reduce_lr_factor', str(reducefactor))
+        config.set('train model settings', 'earlyStopCheck', str(earlystop))
+        config.set('train model settings', 'modelcheckPointCheck', str(checkpoint))
+        config.set('train model settings', 'NN_architecture', str(architure))
+
+        #write
+        with open(configini, 'w') as configfile:
+            config.write(configfile)
+
+        trainDPKmodel(configini,outputmodelName,annotationfilepath)
+
+
+    def dpkStep1(self,annOutputName,readBatchSize,kmeansize,kmeancluster,kmeanmaxiter,kmeanNinit):
+        print('Creating annotation set.')
+        configini = self.configini
+
+        config = ConfigParser()
+        config.read(configini)
+
+        config.set('create annotation settings', 'annotation_output_name', str(annOutputName))
+        config.set('create annotation settings', 'read_batch_size', str(readBatchSize))
+        config.set('create annotation settings', 'k_means_batch_size', str(kmeansize))
+        config.set('create annotation settings', 'k_means_n_custers', str(kmeancluster))
+        config.set('create annotation settings', 'k_means_max_iterations', str(kmeanmaxiter))
+        config.set('create annotation settings', 'k_means_n_init', str(kmeanNinit))
+        with open(configini, 'w') as configfile:
+            config.write(configfile)
+
+        createAnnotationSet(configini)
+        print('Annotation set created')
+
+    def modelsettingschoice(self):
+        print(self.nnArchitecture.getChoices())
+        if (self.nnArchitecture.getChoices() == 'StackedDenseNet') or (self.nnArchitecture.getChoices() == 'StackedHourglass'):
+            self.stackMenu()
+
+        elif (self.nnArchitecture.getChoices() == 'DeepLabCut'):
+            self.deeplabcutMenu()
+
+        elif(self.nnArchitecture.getChoices() =='LEAP'):
+            self.leapmenu()
+
+    def stackMenu(self):
+        stacktoplevel = Toplevel()
+        stacktoplevel.minsize(300, 200)
+        stacktoplevel.wm_title("StackedDenseNet / StackHourglass")
+
+        stacklabel = LabelFrame(stacktoplevel,pady=5,padx=5)
+        n_stacks = Entry_Box(stacklabel,'N_stacks','15')
+        n_transitions = Entry_Box(stacklabel,'N_transitions','15')
+        growthrate = Entry_Box(stacklabel,'Growth rate','15')
+        bottleneckFactor = Entry_Box(stacklabel,'Bottleneck factor','15')
+        compressionfactor = Entry_Box(stacklabel,'Compression factor','15')
+        TorFalseOptions = {'True','False'}
+        pretrained = DropDownMenu(stacklabel,'Pretrained',TorFalseOptions,'15')
+        subpixel = DropDownMenu(stacklabel, 'Subpixel', TorFalseOptions, '15')
+
+        #set initial dropdown
+        n_stacks.entry_set('1')
+        n_transitions.entry_set('1')
+        growthrate.entry_set('48')
+        bottleneckFactor.entry_set('1')
+        compressionfactor.entry_set('0.5')
+        pretrained.setChoices('False')
+        subpixel.setChoices('True')
+
+        # button
+        stackmenubutton = Button(stacklabel,text='Save settings',command= lambda:self.savestacksettings(n_stacks.entry_get, n_transitions.entry_get,growthrate.entry_get,bottleneckFactor.entry_get,compressionfactor.entry_get,pretrained.getChoices(),subpixel.getChoices()))
+
+        #organize
+        stacklabel.grid(row=0,sticky=W)
+        n_stacks.grid(row=0,sticky=W,pady=1)
+        n_transitions.grid(row=1,sticky=W,pady=1)
+        growthrate.grid(row=2,sticky=W,pady=1)
+        bottleneckFactor.grid(row=3,sticky=W,pady=1)
+        compressionfactor.grid(row=4,sticky=W,pady=1)
+        pretrained.grid(row=5,sticky=W,pady=1)
+        subpixel.grid(row=6,sticky=W,pady=1)
+        stackmenubutton.grid(row=7,pady=5)
+    def savestacksettings(self,nstack,ntransitions,growthrate,bneckfactor,compressfactor,pretrain,subpixel):
+        configini = self.configini
+        config = ConfigParser()
+        config.read(configini)
+
+        config.set('StackedDenseNet/StackedHourglass settings', 'n_stacks', str(nstack))
+        config.set('StackedDenseNet/StackedHourglass settings', 'n_transitions', str(ntransitions))
+        config.set('StackedDenseNet/StackedHourglass settings', 'growth_rate', str(growthrate))
+        config.set('StackedDenseNet/StackedHourglass settings', 'bottleneckfactor', str(bneckfactor))
+        config.set('StackedDenseNet/StackedHourglass settings', 'compression_factor', str(compressfactor))
+        config.set('StackedDenseNet/StackedHourglass settings', 'pretrained', str(pretrain))
+        config.set('StackedDenseNet/StackedHourglass settings', 'subpixel', str(subpixel))
+
+        with open(configini, 'w') as configfile:
+            config.write(configfile)
+
+        print('Settings saved.')
+
+    def deeplabcutMenu(self):
+        dlctoplevel = Toplevel()
+        dlctoplevel.minsize(300, 200)
+        dlctoplevel.wm_title("DeepLabCut")
+
+        dlclabel = LabelFrame(dlctoplevel,pady=5,padx=5)
+        weightsoptions = {'imagenet','none'}
+        backboneoptions = {'resnet50','resnet101','resnet152','mobilenetv2','densenet121','densenet169','densenet201','xception'}
+        torFalseoptions = {'True','False'}
+        ##dropdowns
+        weight = DropDownMenu(dlclabel,'Weights',weightsoptions,'10')
+        backbone = DropDownMenu(dlclabel,'Backbone',backboneoptions,'10')
+        alpha = Entry_Box(dlclabel,'Alpha','10')
+        subpixel = DropDownMenu(dlclabel,'Subpixel',torFalseoptions,'10')
+
+        ##sets
+        #alpha.set(1)
+        weight.setChoices('imagenet')
+        backbone.setChoices('resnet50')
+        subpixel.setChoices('True')
+
+        #button
+        dlcsettingsbutton = Button(dlclabel,text='Save Settings',command=lambda:self.savedlcsettings(weight.getChoices(),backbone.getChoices(),alpha.entry_get,subpixel.getChoices()))
+
+        #organize
+        dlclabel.grid(row=0,sticky=W)
+        weight.grid(row=0,sticky=W,pady=1)
+        backbone.grid(row=1, sticky=W, pady=1)
+        alpha.grid(row=2, sticky=W, pady=1)
+        subpixel.grid(row=3, sticky=W, pady=1)
+        dlcsettingsbutton.grid(row=4,pady=5)
+    def savedlcsettings(self,weight,backbone,alpha,subpixel):
+        configini = self.configini
+        config = ConfigParser()
+        config.read(configini)
+
+        config.set('DeepLabCut settings', 'weights', str(weight))
+        config.set('DeepLabCut settings', 'backbone', str(backbone))
+        config.set('DeepLabCut settings', 'alpha', str(alpha))
+        config.set('DeepLabCut settings', 'subpixel', str(subpixel))
+
+        with open(configini, 'w') as configfile:
+            config.write(configfile)
+
+        print('Settings saved.')
+
+    def leapmenu(self):
+        leaptoplevel = Toplevel()
+        leaptoplevel.minsize(300, 200)
+        leaptoplevel.wm_title("LEAP")
+
+        leaplabel = LabelFrame(leaptoplevel,pady=5,padx=5)
+        filters = Entry_Box(leaplabel,'Filters','10')
+        torFalseoption = {'True','False'}
+        upsamplinglayers = DropDownMenu(leaplabel,'Upsampling layers',torFalseoption,'15')
+        batchnorm = DropDownMenu(leaplabel,'Batchnorm',torFalseoption,'15')
+        poolingoption = {'max','average'}
+        pooling = DropDownMenu(leaplabel,'Pooling',poolingoption,'15')
+        interpolationoption = {'nearest','bilinear','bicubic'}
+        interpolation = DropDownMenu(leaplabel,'Interpolation',interpolationoption,'15')
+        initializeroption = {'glorot_uniform','lecun_normal'}
+        initializer = DropDownMenu(leaplabel,'Initializer',initializeroption,'15')
+        subpixel = DropDownMenu(leaplabel,'Subpixel',torFalseoption,'15')
+
+        #sets
+        filters.set('64')
+        upsamplinglayers.setChoices('False')
+        batchnorm.setChoices('False')
+        pooling.setChoices('max')
+        interpolation.setChoices('nearest')
+        initializer.setChoices('glorot_uniform')
+        subpixel.setChoices('True')
+        #button
+        leapbutton = Button(leaplabel,text='Save settings',command=lambda:self.saveleapsettings(filters.entry_get,upsamplinglayers.getChoices(),batchnorm.getChoices(),pooling.getChoices(),interpolation.getChoices(),initializer.getChoices(),subpixel.getChoices()))
+
+
+        #organize
+        leaplabel.grid(row=0,sticky=W)
+        filters.grid(row=0,sticky=W)
+        upsamplinglayers.grid(row=1,sticky=W)
+        batchnorm.grid(row=2,sticky=W)
+        pooling.grid(row=3,sticky=W)
+        interpolation.grid(row=4,sticky=W)
+        initializer.grid(row=5,sticky=W)
+        subpixel.grid(row=6,sticky=W)
+        leapbutton.grid(row=7,pady=5)
+    def saveleapsettings(self,filters,upsampling,batchnorm,pooling,interpolation,initializer,subpixel):
+        configini = self.configini
+        config = ConfigParser()
+        config.read(configini)
+
+        config.set('LEAP settings', 'filters', str(filters))
+        config.set('LEAP settings', 'upsampling_layers', str(upsampling))
+        config.set('LEAP settings', 'batchnorm', str(batchnorm))
+        config.set('LEAP settings', 'pooling', str(pooling))
+        config.set('LEAP settings', 'interpolation', str(interpolation))
+        config.set('LEAP settings', 'subpixel', str(subpixel))
+        config.set('LEAP settings', 'initializer', str(initializer))
+
+        with open(configini, 'w') as configfile:
+            config.write(configfile)
+
+        print('Settings saved.')
+
 class Load_DLC_Model:
 
     def __init__(self):
@@ -1102,7 +1688,7 @@ class Load_DLC_Model:
         loadmodel = Toplevel()
         loadmodel.minsize(200, 200)
         loadmodel.wm_title("Load DLC Model")
-        loadmodel.iconbitmap(maincwd+'\\'"golden_lab.ico")
+
 
         tab_parent = ttk.Notebook(loadmodel)
 
@@ -1502,7 +2088,6 @@ class shorten_video:
         shortenvid = Toplevel()
         shortenvid.minsize(200, 200)
         shortenvid.wm_title("Clip video")
-        shortenvid.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         # videopath
         self.videopath1selected = FileSelect(shortenvid, "Video path",title='Select a video file')
@@ -1550,7 +2135,6 @@ class change_imageformat:
         chgimgformat = Toplevel()
         chgimgformat.minsize(200, 200)
         chgimgformat.wm_title("Change image format")
-        chgimgformat.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         #select directory
         self.folderpath1selected = FolderSelect(chgimgformat,"Image directory",title='Select folder with images')
@@ -1613,7 +2197,6 @@ class convert_video:
         convertvid = Toplevel()
         convertvid.minsize(400, 400)
         convertvid.wm_title("Convert video format")
-        convertvid.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         #multi video
         label_multivideo = LabelFrame(convertvid, text='Convert multiple videos',font=("Helvetica",12,'bold'),padx=5,pady=5)
@@ -1661,7 +2244,6 @@ class extract_specificframes:
         extractsf = Toplevel()
         extractsf.minsize(200, 200)
         extractsf.wm_title("Extract defined Frames")
-        extractsf.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         # videopath
         self.videopath1selected = FileSelect(extractsf, "Video path",title='Select a video file')
@@ -1699,7 +2281,6 @@ def extract_allframes():
     extractaf = Toplevel()
     extractaf.minsize(200, 200)
     extractaf.wm_title("Extract all frames")
-    extractaf.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
     # videopath
     videopath = FileSelect(extractaf, "Video path",title='Select a video file')
@@ -1711,12 +2292,32 @@ def extract_allframes():
     videopath.grid(row=0,column=0)
     button_extractaf.grid(row=1,column=0)
 
+class multicropmenu:
+    def __init__(self):
+        multimenu = Toplevel()
+        multimenu.minsize(200, 200)
+        multimenu.wm_title("Multi Crop")
+
+        self.inputfolder = FolderSelect(multimenu,"Video Folder  ")
+        self.outputfolder = FolderSelect(multimenu,"Output Folder")
+
+        self.videotype = Entry_Box(multimenu,"Video type","10")
+        self.croptimes = Entry_Box(multimenu,"# of crops","10")
+
+        button_multicrop = Button(multimenu,text='Crop',command=lambda:multicrop(self.videotype.entry_get,self.inputfolder.folder_path,self.outputfolder.folder_path,self.croptimes.entry_get))
+
+        #organize
+        self.inputfolder.grid(row=0,sticky=W,pady=2)
+        self.outputfolder.grid(row=1,sticky=W,pady=2)
+        self.videotype.grid(row=2,sticky=W,pady=2)
+        self.croptimes.grid(row=3,sticky=W,pady=2)
+        button_multicrop.grid(row=4,pady=10)
+
 class changefps:
     def __init__(self):
         fpsmenu = Toplevel()
         fpsmenu.minsize(200, 200)
         fpsmenu.wm_title("Change frame rate of video")
-        fpsmenu.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         # videopath
         videopath = FileSelect(fpsmenu, "Video path",title='Select a video file')
@@ -1738,7 +2339,6 @@ class extract_seqframe:
         extractseqtoplevel = Toplevel()
         extractseqtoplevel.minsize(200, 200)
         extractseqtoplevel.wm_title("Extract All Frames from Seq files")
-        extractseqtoplevel.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         # videopath
         videopath = FileSelect(extractseqtoplevel, "Video Path",title='Select a video file')
@@ -1757,7 +2357,6 @@ class mergeframeffmpeg:
         mergeffmpeg = Toplevel()
         mergeffmpeg.minsize(250, 250)
         mergeffmpeg.wm_title("Merge images to video")
-        mergeffmpeg.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         # select directory
         self.folderpath1selected = FolderSelect(mergeffmpeg,"Working Directory",title='Select folder with frames')
@@ -1802,7 +2401,7 @@ class creategif:
         create_gif = Toplevel()
         create_gif.minsize(250, 250)
         create_gif.wm_title("Generate Gif from video")
-        create_gif.iconbitmap(maincwd+'\\'"golden_lab.ico")
+
 
         #Create Gif
         label_creategif = LabelFrame(create_gif,text='Video to Gif',padx=5,pady=5,font='bold')
@@ -1856,7 +2455,6 @@ class get_coordinates_from_video:
         getcoord = Toplevel()
         getcoord.minsize(200, 200)
         getcoord.wm_title('Get Coordinates in Video')
-        getcoord.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         # settings files selected
         self.videopath1selected = FileSelect(getcoord, "Video selected",title='Select a video file')
@@ -1892,26 +2490,26 @@ class project_config:
         self.all_entries = []
         self.allmodels = []
         # Popup window
-        toplevel = Toplevel()
-        toplevel.minsize(700, 700)
-        toplevel.wm_title("Project Configuration")
-        toplevel.iconbitmap(maincwd+'\\'"golden_lab.ico")
+        self.toplevel = Toplevel()
+        self.toplevel.minsize(700, 700)
+        self.toplevel.wm_title("Project Configuration")
+        #scroll
+        projectconfig = Scrollable(self.toplevel, width=25)
 
-        projectconfig = Scrollable(toplevel, width=25)
-
+        #tab
         tab_parent = ttk.Notebook(projectconfig)
-
         tab1 = ttk.Frame(tab_parent)
         tab2 = ttk.Frame(tab_parent)
         tab3 = ttk.Frame(tab_parent)
         tab4 = ttk.Frame(tab_parent)
-
+        #tab title
         tab_parent.add(tab1,text=f'{"[ Generate project config ]": ^20s}')
         tab_parent.add(tab2, text=f'{"[ Import videos into project folder ]": ^20s}')
         tab_parent.add(tab3, text=f'{"[ Import tracking data ]": ^20s}')
         tab_parent.add(tab4, text=f'{"[ Extract frames into project folder ]": ^20s}')
-
+        #initiate tab
         tab_parent.grid(row=0)
+
         # General Settings
         self.label_generalsettings = LabelFrame(tab1, text='General Settings',fg='black',font =("Helvetica",12,'bold'),padx=5,pady=5)
         self.directory1Select = FolderSelect(self.label_generalsettings, "Project Path:", title='Select Main Directory')
@@ -1923,29 +2521,26 @@ class project_config:
         self.label_notarget = Entry_Box(self.label_smlsettings,'Number of predictive classifiers (behaviors):','33')
         addboxButton = Button(self.label_smlsettings, text='<Add predictive classifier>', fg="navy", command=lambda:self.addBox(projectconfig))
 
-
-
         ##dropdown for # of mice
         dropdownbox = LabelFrame(self.label_generalsettings, text='Animal Settings')
-        label_dropdownmice = Label(dropdownbox,text='# of mice')
-        self.option_mice = ['1 animal, 4bp','1 animal, 7bp','1 animal, 8bp','1 animal, 9bp','2 animals, 8 bp','2 animals, 14bp','2 animals, 16bp','14bp modelling']
+        label_dropdownmice = Label(dropdownbox,text='# config')
+        self.option_mice, optionsBasePhotosList = bodypartConfSchematic()
         self.var = StringVar()
         self.var.set(self.option_mice[6])
         micedropdown = OptionMenu(dropdownbox,self.var,*self.option_mice)
 
         self.var.trace("w", self.change_image)
 
-        self.photos = [PhotoImage(file=os.path.join(os.getcwd(),(r"mouse_diagrams\Picture1.png"))),
-                  PhotoImage(file=os.path.join(os.getcwd(),(r"mouse_diagrams\Picture3.png"))),
-                       PhotoImage(file=os.path.join(os.getcwd(),(r"mouse_diagrams\Picture5.png"))),
-                       PhotoImage(file=os.path.join(os.getcwd(), (r"mouse_diagrams\Picture7.png"))),
-                       PhotoImage(file=os.path.join(os.getcwd(),(r"mouse_diagrams\Picture8.png"))),
-                       PhotoImage(file=os.path.join(os.getcwd(),(r"mouse_diagrams\Picture10.png"))),PhotoImage(file=os.path.join(os.getcwd(),(r"mouse_diagrams\Picture11.png"))),
-                       PhotoImage(file=os.path.join(os.getcwd(),(r"mouse_diagrams\14bp.png")))]
+        self.photos = []
+        for i in range(len(optionsBasePhotosList)):
+            self.photos.append(PhotoImage(file=os.path.join(os.getcwd(),(optionsBasePhotosList[i]))))
+
 
         self.label = Label(self.label_generalsettings, image=self.photos[6])
         self.label.grid(row=10,sticky=W)
 
+        #reset button
+        resetbutton = Button(self.label_generalsettings,text='Reset user-defined pose configs',command=self.resetSettings)
 
         #generate project ini
         button_generateprojectini = Button(self.label_generalsettings, text='Generate Project Config ', command=self.make_projectini, font=("Helvetica",10,'bold'),fg='navy')
@@ -1988,16 +2583,14 @@ class project_config:
         self.label_project_name.grid(row=2,column=0,sticky=W)
         label_project_namedescrip.grid(row=3,sticky=W)
 
-        self.label_smlsettings.grid(row=4,column=0,sticky=W,pady=5)
+        self.label_smlsettings.grid(row=4,column=0,sticky=W,pady=5,columnspan=2)
         self.label_notarget.grid(row=0,column=0,sticky=W,pady=5)
         addboxButton.grid(row=1,column=0,sticky=W,pady=6)
 
-        dropdownbox.grid(row=5,sticky=W)
+        dropdownbox.grid(row=5,column=0,sticky=W)
+        resetbutton.grid(row=5,column=1,sticky=W)
         label_dropdownmice.grid(row=0,column=0,sticky=W)
         micedropdown.grid(row=0,column=1,sticky=W)
-
-        # label_dropdownbodyparts.grid(row=1,column=0,sticky=W)
-        # bodypartsdropdown.grid(row=1,column=1,sticky=W)
 
         button_generateprojectini.grid(row=20, pady=5, ipadx=5, ipady=5)
 
@@ -2028,8 +2621,91 @@ class project_config:
 
         projectconfig.update()
 
+    def resetSettings(self):
+        popup = Tk()
+        popup.minsize(300, 100)
+        popup.wm_title("Warning!")
+        popupframe = LabelFrame(popup)
+        label = Label(popupframe, text='Do you want to reset user-defined pose-configs?')
+        label.grid(row=0,columnspan=2)
+        B1 = Button(popupframe,text='Yes', command= lambda:reset_DiagramSettings(popup))
+        B2 = Button(popupframe, text="No", command=popup.destroy)
+        popupframe.grid(row=0,columnspan=2)
+        B1.grid(row=1,column=0,sticky=W)
+        B2.grid(row=1,column=1,sticky=W)
+
+        popup.mainloop()
+
+
+    def poseconfigSettings(self):
+        # Popup window
+        poseconfig = Toplevel()
+        poseconfig.minsize(400, 400)
+        poseconfig.wm_title("Pose Configuration")
+
+        # define name for poseconfig settings
+        self.configname = Entry_Box(poseconfig,'Pose config name','15')
+
+        # no of animals
+        self.noOfAnimals = Entry_Box(poseconfig,'# of Animals','15')
+
+        # no of bodyparts
+        self.noOfBp = Entry_Box(poseconfig,'# of Bodyparts','15')
+
+        # path to image
+        self.imgPath = FileSelect(poseconfig,'Image Path')
+
+        # button for bodypart table
+        tablebutton = Button(poseconfig,text='Confirm',command= lambda :self.bpTable(poseconfig))
+        #button for saving poseconfig
+        self.saveposeConfigbutton = Button(poseconfig,text='Save Pose Config',command=lambda:self.savePoseConfig(poseconfig))
+        self.saveposeConfigbutton.config(state='disabled')
+
+        #organize
+        self.configname.grid(row=0,sticky=W)
+        self.noOfAnimals.grid(row=1,sticky=W)
+        self.noOfBp.grid(row=2,sticky=W)
+        self.imgPath.grid(row=3,sticky=W,pady=2)
+        tablebutton.grid(row=4,pady=5)
+        self.saveposeConfigbutton.grid(row=6,pady=5)
+
+    def savePoseConfig(self, master):
+        configName = self.configname.entry_get
+        noAnimals = self.noOfAnimals.entry_get
+        noBps = self.noOfBp.entry_get
+        Imagepath = self.imgPath.file_path
+        BpNameList = []
+        for i in self.bpnamelist:
+            BpNameList.append(i.entry_get)
+        define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNameList, noAnimals)
+        master.destroy()
+        self.toplevel.destroy()
+        project_config()
+
+
+    def bpTable(self,master):
+        print(self.noOfBp.entry_get)
+        noofbp = int(self.noOfBp.entry_get)
+        self.bpnamelist = [0]*noofbp
+
+        frame = LabelFrame(master,text='Bodyparts\' name')
+
+        scroll = Scrollable(frame)
+
+        frame.grid(row=5,sticky=W)
+        for i in range(noofbp):
+            self.bpnamelist[i] = Entry_Box(scroll,str(i+1),'2')
+            self.bpnamelist[i].grid(row=i)
+
+        self.saveposeConfigbutton.config(state='normal')
+
+        scroll.update()
+
     def change_image(self,*args):
-        self.label.config(image=self.photos[self.option_mice.index(str(self.var.get()))])
+        if (self.var.get() != 'Create pose config...'):
+            self.label.config(image=self.photos[self.option_mice.index(str(self.var.get()))])
+        else:
+            self.poseconfigSettings()
 
     def import_singlecsv(self):
         try:
@@ -2111,13 +2787,20 @@ class project_config:
             bp = '16'
         elif listindex == 7:
             bp = '987'
+        else:
+            bp = 'user_defined'
 
-        try:
-            self.configinifile = write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp)
-            print(self.configinifile)
-            print('Project created in',os.path.basename(project_path))
-        except:
-            print('Please fill in the information correctly.')
+        noAnimalsPath = os.path.join(os.getcwd(), 'pose_configurations', 'no_animals', 'no_animals.csv')
+        with open(noAnimalsPath, "r", encoding='utf8') as f:
+            cr = csv.reader(f, delimiter=",")  # , is default
+            rows = list(cr)  # create a list of rows for instance
+        animalNo = str(rows[listindex])
+        self.configinifile = write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo)
+        #print(self.configinifile)
+        print(os.path.basename(project_path))
+        print('Project ' + '"' + str(project_name) + '"' + " created in folder " + '"' + str(os.path.basename(project_path)) + '"')
+        # except:
+        #     print('Please fill in the information correctly.')
 
 
     def extract_frames(self):
@@ -2128,18 +2811,43 @@ class project_config:
         except:
             print('Please make sure videos are imported and located in /project_folder/videos')
 
+class loadprojectMenu:
+    def __init__(self,inputcommand):
+        lpMenu = Toplevel()
+        lpMenu.minsize(300, 200)
+        lpMenu.wm_title("Load Project .ini file")
+
+        # load project ini
+        label_loadprojectini = LabelFrame(lpMenu, text='Load Project .ini', font=("Helvetica", 12, 'bold'), pady=5,
+                                          padx=5, fg='black')
+        self.projectconfigini = FileSelect(label_loadprojectini,'File Select:', title='Select config.ini file')
+
+        #button
+        launchloadprojectButton = Button(lpMenu,text='Load Project',command=lambda:self.launch(lpMenu,inputcommand))
+
+        #organize
+        label_loadprojectini.grid(row=0)
+        self.projectconfigini.grid(row=0,sticky=W)
+        launchloadprojectButton.grid(row=1,pady=10)
+
+    def launch(self,master,command):
+        if (self.projectconfigini.file_path.endswith('.ini')):
+            master.destroy()
+            print(self.projectconfigini.file_path)
+            command(self.projectconfigini.file_path)
+        else:
+            print('Please select the project_config.ini file')
+
 class loadprojectini:
-    def __init__(self):
+    def __init__(self,configini):
+        ##
+        self.projectconfigini = configini
         simongui = Toplevel()
         simongui.minsize(1100, 450)
         simongui.wm_title("Load project")
-        simongui.iconbitmap(maincwd+'\\'"golden_lab.ico")
-
-        # scroll = Scrollable(simongui,width=32)
 
         tab_parent = ttk.Notebook(simongui)
 
-        tab1 = ttk.Frame(tab_parent)
         tab2 = ttk.Frame(tab_parent)
         tab3 = ttk.Frame(tab_parent)
         tab4 = ttk.Frame(tab_parent)
@@ -2149,24 +2857,21 @@ class loadprojectini:
         tab8 = ttk.Frame(tab_parent)
         tab9 = ttk.Frame(tab_parent)
         tab10 = ttk.Frame(tab_parent)
+        tab11 = ttk.Frame(tab_parent)
 
-        tab_parent.add(tab1,text = f"{'[ Load Project ]':20s}")
         tab_parent.add(tab2, text= f"{'[ Further imports (data/video/frames) ]':20s}")
         tab_parent.add(tab3, text=f"{'[ Video parameters ]':20s}")
         tab_parent.add(tab4, text=f"{'[ Outlier correction ]':20s}")
+        tab_parent.add(tab6, text=f"{'[ ROI ]':10s}")
         tab_parent.add(tab5, text=f"{'[ Extract features ]':20s}")
-        tab_parent.add(tab6, text=f"{'[ Label behavior] ':20s}")
-        tab_parent.add(tab7, text=f"{'[ Train machine model ]':20s}")
-        tab_parent.add(tab8, text=f"{'[ Run machine model ]':20s}")
-        tab_parent.add(tab9, text=f"{'[ Visualizations ]':20s}")
-        tab_parent.add(tab10, text=f"{'[ Classifier validation ]':20s}")
+        tab_parent.add(tab7, text=f"{'[ Label behavior] ':20s}")
+        tab_parent.add(tab8, text=f"{'[ Train machine model ]':20s}")
+        tab_parent.add(tab9, text=f"{'[ Run machine model ]':20s}")
+        tab_parent.add(tab10, text=f"{'[ Visualizations ]':20s}")
+        tab_parent.add(tab11, text=f"{'[ Classifier validation ]':20s}")
 
         tab_parent.grid(row=0)
         tab_parent.enable_traversal()
-
-        #load project ini
-        label_loadprojectini = LabelFrame(tab1,text='Load Project .ini',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-        self.projectconfigini= FileSelect(label_loadprojectini,'File Select:',title='Select config.ini file')
 
         #label import
         label_import = LabelFrame(tab2)
@@ -2209,56 +2914,116 @@ class loadprojectini:
         button_setdistanceinmm = Button(label_setscale, text='Autopopulate table',command=lambda: self.set_distancemm(self.distanceinmm.entry_get))
         button_setscale = Button(label_setscale,text='Set video parameters',command=self.setvideoparameter)
 
+        #ROI
+        ### define roi
+        self.roi_define = LabelFrame(tab6, text='Define ROI')
+        ## rectangle
+        self.rec_entry = Entry_Box(self.roi_define, "# of rectangles", "12")
+        ## circle
+        self.cir_entry = Entry_Box(self.roi_define, "# of circles", "12")
+        # polygons
+        self.pol_entry = Entry_Box(self.roi_define, "# of polygons", "12")
+        # button
+        showname = Button(self.roi_define, text="Show Shape Definitions Table", command= lambda:self.table(self.roi_define,self.rec_entry.entry_get,self.cir_entry.entry_get,self.pol_entry.entry_get))
+
+        # organize
+        self.roi_define.grid(row=0, sticky=W)
+        self.rec_entry.grid(row=1, sticky=W)
+        self.cir_entry.grid(row=2, sticky=W)
+        self.pol_entry.grid(row=3, sticky=W)
+        showname.grid(row=4,pady=10)
+        #load roi
+        self.loadroi =  LabelFrame(tab6,text='Load ROI')
+        self.getentrybutton = Button(self.loadroi, text="Load defined ROI table", command=self.loaddefinedroi)
+        #organize
+        self.loadroi.grid(row=0,column=1,sticky=N)
+        self.getentrybutton.grid(row=0)
+
+        ###analyze roi
+        self.roi_draw = LabelFrame(tab6, text='Analyze ROI')
+        # button
+        analyzeROI = Button(self.roi_draw, text='Analyze ROI data',command= lambda:self.roi_settings('Analyze ROI Data','not append'))
+
+        ##organize
+        self.roi_draw.grid(row=0, column=2, sticky=N)
+        analyzeROI.grid(row=0)
+
+
+        ###plot roi
+        self.roi_draw1 = LabelFrame(tab6, text='Visualize ROI')
+        # button
+        visualizeROI = Button(self.roi_draw1, text='Visualize ROI tracking', command=lambda: roiPlot(self.projectconfigini))
+        ##organize
+        self.roi_draw1.grid(row=0, column=3, sticky=N)
+        visualizeROI.grid(row=0)
+
+
         #outlier correction
         label_outliercorrection = LabelFrame(tab4,text='Outlier correction',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         label_link = Label(label_outliercorrection,text='[link to description]',cursor='hand2',font='Verdana 10 underline')
-        button_settings_outlier = Button(label_outliercorrection,text='Settings',command = lambda: outlier_settings(self.projectconfigini.file_path))
+        button_settings_outlier = Button(label_outliercorrection,text='Settings',command = lambda: outlier_settings(self.projectconfigini))
         button_outliercorrection = Button(label_outliercorrection,text='Run outlier correction',command=self.correct_outlier)
 
-        label_link.bind("<Button-1>",lambda e: self.callback('https://github.com/sgoldenlab/simba/blob/master/Outlier_settings.pdf'))
+        label_link.bind("<Button-1>",lambda e: self.callback('https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf'))
 
         #extract features
         label_extractfeatures = LabelFrame(tab5,text='Extract Features',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         button_extractfeatures = Button(label_extractfeatures,text='Extract Features',command=self.extractfeatures)
+        #roiappend
+        appendDf = Button(label_extractfeatures, text='Append ROI data to features', command=self.appendroisettings)
+        appendDf.grid(row=1,pady=10)
 
         #label Behavior
-        label_labelaggression = LabelFrame(tab6,text='Label Behavior',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-        button_labelaggression = Button(label_labelaggression, text='Select folder with frames',command= lambda:choose_folder(self.projectconfigini.file_path))
+        label_labelaggression = LabelFrame(tab7,text='Label Behavior',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
+        button_labelaggression = Button(label_labelaggression, text='Select folder with frames',command= lambda:choose_folder(self.projectconfigini))
 
         #train machine model
-        label_trainmachinemodel = LabelFrame(tab7,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
+        label_trainmachinemodel = LabelFrame(tab8,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_trainmachinesettings = Button(label_trainmachinemodel,text='Settings',command=self.trainmachinemodelsetting)
         button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command=self.trainsinglemodel)
         button_train_multimodel = Button(label_trainmachinemodel, text='Train multiple models, one for each saved settings',fg='green',command=self.trainmultimodel)
 
         ##Single classifier valid
-        label_model_validation = LabelFrame(tab8,text='Validate Model on Single Video',pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
-        self.csvfile = FileSelect(label_model_validation,'Select features file',title='Select .csv file in /project_folder/csv/features_extracted')
-        self.modelfile = FileSelect(label_model_validation,'Select model file  ',title='Select the model (.sav) file')
-        self.dis_threshold = Entry_Box(label_model_validation,'Discrimination threshold','28')
-        self.min_behaviorbout = Entry_Box(label_model_validation,'Minimum behavior bout length (ms)','28')
-        button_validate_model = Button(label_model_validation,text='Validate',command = self.validatemodelsinglevid)
+        label_model_validation = LabelFrame(tab9, text='Validate Model on Single Video', pady=5, padx=5,
+                                            font=("Helvetica", 12, 'bold'), fg='black')
+        self.csvfile = FileSelect(label_model_validation, 'Select features file',
+                                  title='Select .csv file in /project_folder/csv/features_extracted')
+        self.modelfile = FileSelect(label_model_validation, 'Select model file  ', title='Select the model (.sav) file')
+        button_runvalidmodel = Button(label_model_validation, text='Run Model',
+                                      command=lambda: validate_model_one_vid_1stStep(self.projectconfigini,
+                                                                                     self.csvfile.file_path,
+                                                                                     self.modelfile.file_path))
+        button_generateplot = Button(label_model_validation, text="Generate plot", command=self.updateThreshold)
+        self.dis_threshold = Entry_Box(label_model_validation, 'Discrimination threshold', '28')
+        self.min_behaviorbout = Entry_Box(label_model_validation, 'Minimum behavior bout length (ms)', '28')
+        self.ganttvar = IntVar()
+        self.generategantt = Checkbutton(label_model_validation,text='Generate Gantt plot',variable=self.ganttvar)
+        button_validate_model = Button(label_model_validation, text='Validate', command=self.validatemodelsinglevid)
 
         #run machine model
-        label_runmachinemodel = LabelFrame(tab8,text='Run Machine Model',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
-        button_run_rfmodelsettings = Button(label_runmachinemodel,text='Model Selection',command=self.modelselection)
-        self.descrimination_threshold = Entry_Box(label_runmachinemodel,'Discrimination threshold','28')
-        self.shortest_bout = Entry_Box(label_runmachinemodel,'Minimum behavior bout length (ms)','28')
+        label_runmachinemodel = LabelFrame(tab9,text='Run Machine Model',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
+        button_run_rfmodelsettings = Button(label_runmachinemodel,text='Model Settings',command=self.modelselection)
+        # self.descrimination_threshold = Entry_Box(label_runmachinemodel,'Discrimination threshold','28')
+        # self.shortest_bout = Entry_Box(label_runmachinemodel,'Minimum behavior bout length (ms)','28')
         button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command=self.runrfmodel)
 
         # machine results
-        label_machineresults = LabelFrame(tab8,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
+        label_machineresults = LabelFrame(tab9,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
-        button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=self.analyzeprocessmovement)
+        button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=lambda:self.roi_settings('Analyze distances/velocity','processmovement'))
         self.severityscale = Entry_Box(label_machineresults,'Severity scale 0 -',15)
         button_process_severity = Button(label_machineresults,text='Analyze attack severity',command=self.analyzseverity)
 
         #plot sklearn res
-        label_plotsklearnr = LabelFrame(tab9,text='Sklearn visualization',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
+        label_plotsklearnr = LabelFrame(tab10,text='Sklearn visualization',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
+        self.videovar = IntVar()
+        self.genframevar = IntVar()
+        videocheck = Checkbutton(label_plotsklearnr,text='Generate video',variable=self.videovar)
+        framecheck = Checkbutton(label_plotsklearnr,text='Generate frame',variable=self.genframevar)
         button_plotsklearnr = Button(label_plotsklearnr,text='Visualize classification results',command =self.plotsklearn_result)
 
         #plotpathing
-        label_plotall = LabelFrame(tab9,text='Visualizations',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
+        label_plotall = LabelFrame(tab10,text='Visualizations',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         #ganttplot
         label_ganttplot = LabelFrame(label_plotall,text='Gantt plot',pady=5,padx=5)
         button_ganttplot = Button(label_ganttplot,text='Generate gantt plot',command=self.plotgantt)
@@ -2286,25 +3051,47 @@ class loadprojectini:
 
         CreateToolTip(self.poi1,'The bodyparts from config yaml. eg: Ear_left_1,Ear_right_1,Nose_1,Center_1,Lateral_left_1,Lateral_right_1,Tail_base_1,Tail_end_1,Ear_left_2,Ear_right_2,Nose_2,Center_2,Lateral_left_2,Lateral_right_2,Tail_base_2,Tail_end_2')
 
+        #Heatplot
+        label_heatmap = LabelFrame(label_plotall, text='Heatmap', pady=5, padx=5)
+        self.BinSize = Entry_Box(label_heatmap, 'Bin size (px)', '15')
+        self.MaxScale = Entry_Box(label_heatmap, '# Scale increments', '15')
+        self.Inc = Entry_Box(label_heatmap, 'Scale increment (s)', '15')
+
+        hmchoices = {'viridis','plasma','inferno','magma','jet','gnuplot2'}
+        self.hmMenu = DropDownMenu(label_heatmap,'Color Palette',hmchoices,'15')
+        self.hmMenu.setChoices('jet')
+        # get target
+        config = ConfigParser()
+        configFile = str(self.projectconfigini)
+        config.read(configFile)
+        notarget = config.getint('SML settings','no_targets')
+        targetlist = {}
+        for i in range(notarget):
+            targetlist[(config.get('SML settings','target_name_'+str(i+1)))]=(config.get('SML settings','target_name_'+str(i+1)))
+        self.targetMenu = DropDownMenu(label_heatmap,'Target',targetlist,'15')
+        self.targetMenu.setChoices(targetlist[(config.get('SML settings','target_name_'+str(1)))])
+
+        button_heatmap = Button(label_heatmap, text='Generate heatmap', command=self.heatmapcommand)
+
         #Merge frames
-        label_mergeframes = LabelFrame(tab9,text='Merge frames',pady=5,padx=5,font=("Helvetica",12,'bold'),fg='black')
+        label_mergeframes = LabelFrame(tab10,text='Merge frames',pady=5,padx=5,font=("Helvetica",12,'bold'),fg='black')
         button_mergeframe = Button(label_mergeframes,text='Merge frames',command=self.mergeframesofplot)
 
         #create video
-        label_createvideo = LabelFrame(tab9, text='Create Video', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
+        label_createvideo = LabelFrame(tab10, text='Create Video', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
         self.bitrate = Entry_Box(label_createvideo,'Bitrate',8)
         self.fileformt = Entry_Box(label_createvideo,'File format',8)
         button_createvideo = Button(label_createvideo, text='Create Video',command=self.generate_video)
 
         ## classifier validation
-        label_classifier_validation = LabelFrame(tab10, text='Classifier Validation', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
+        label_classifier_validation = LabelFrame(tab11, text='Classifier Validation', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
         self.seconds = Entry_Box(label_classifier_validation,'Seconds','8')
+        self.cvTarget = DropDownMenu(label_classifier_validation,'Target',targetlist,'15')
+        self.cvTarget.setChoices(targetlist[(config.get('SML settings', 'target_name_' + str(1)))])
         button_validate_classifier = Button(label_classifier_validation,text='Validate',command =self.classifiervalidation)
 
-        #organize
-        label_loadprojectini.grid(row=0,sticky=W)
-        self.projectconfigini.grid(row=0,sticky=W)
 
+        #organize
         label_import.grid(row=0,column=0,sticky=W,pady=5)
         label_import_csv.grid(row=0, sticky=N+W, pady=5)
         label_multicsvimport.grid(row=0, sticky=W)
@@ -2323,7 +3110,6 @@ class loadprojectini:
         self.singlevideopath.grid(row=0, sticky=W)
         button_importsinglevideo.grid(row=1, sticky=W)
 
-
         label_extractframes.grid(row=0,column=1,sticky=N+W,pady=5,padx=5)
         button_extractframes.grid(row=0,sticky=W)
 
@@ -2336,7 +3122,7 @@ class loadprojectini:
         button_setdistanceinmm.grid(row=0,column=1)
         button_setscale.grid(row=1,column=0,sticky=W)
 
-        label_outliercorrection.grid(row=3,sticky=W)
+        label_outliercorrection.grid(row=0,sticky=W)
         label_link.grid(row=0,sticky=W)
         button_settings_outlier.grid(row=1,sticky=W)
         button_outliercorrection.grid(row=3,sticky=W)
@@ -2352,20 +3138,23 @@ class loadprojectini:
         button_trainmachinemodel.grid(row=0,column=1,sticky=W,padx=5)
         button_train_multimodel.grid(row=0,column=2,sticky=W,padx=5)
 
-        label_model_validation.grid(row=7,sticky=W,pady=5)
-        self.csvfile.grid(row=0,sticky=W)
-        self.modelfile.grid(row=1,sticky=W)
-        self.dis_threshold.grid(row=2,sticky=W)
-        self.min_behaviorbout.grid(row=3,sticky=W)
-        button_validate_model.grid(row=4,sticky=W)
+        label_model_validation.grid(row=7, sticky=W, pady=5)
+        self.csvfile.grid(row=0, sticky=W)
+        self.modelfile.grid(row=1, sticky=W)
+        button_runvalidmodel.grid(row=2, sticky=W)
+        button_generateplot.grid(row=3, sticky=W)
+        self.dis_threshold.grid(row=4, sticky=W)
+        self.min_behaviorbout.grid(row=5, sticky=W)
+        self.generategantt.grid(row=6,sticky=W)
+        button_validate_model.grid(row=7, sticky=W)
 
         label_runmachinemodel.grid(row=8,sticky=W,pady=5)
         button_run_rfmodelsettings.grid(row=0,sticky=W)
-        self.descrimination_threshold.grid(row=1,sticky=W)
+        # self.descrimination_threshold.grid(row=1,sticky=W)
         # button_set_d_t.grid(row=1,column=1,sticky=W)
-        self.shortest_bout.grid(row=2,column=0,sticky=W)
+        # self.shortest_bout.grid(row=2,column=0,sticky=W)
         # button_set_shortbout.grid(row=2,column=1,sticky=W)
-        button_runmachinemodel.grid(row=3,sticky=W)
+        button_runmachinemodel.grid(row=3,sticky=W,pady=5)
 
         label_machineresults.grid(row=9,sticky=W,pady=5)
         button_process_datalog.grid(row=1,column=0,sticky=W,padx=3)
@@ -2374,7 +3163,9 @@ class loadprojectini:
         button_process_severity.grid(row=1,column=2,sticky=W,padx=3)
 
         label_plotsklearnr.grid(row=10,column=0,sticky=W+N,padx=5)
-        button_plotsklearnr.grid(row=0,sticky=W)
+        videocheck.grid(row=0,sticky=W)
+        framecheck.grid(row=1,sticky=W)
+        button_plotsklearnr.grid(row=2,sticky=W)
 
         label_plotall.grid(row=10,column=1,sticky=W+N,padx=5)
         #gantt
@@ -2395,6 +3186,15 @@ class loadprojectini:
         self.poi1.grid(row=1,sticky=W)
         self.poi2.grid(row=2,sticky=W)
         button_distanceplot.grid(row=3,sticky=W)
+        #heat
+        label_heatmap.grid(row=4, sticky=W)
+        self.BinSize.grid(row=0, sticky=W)
+        self.Inc.grid(row=2, sticky=W)
+        self.MaxScale.grid(row=1, sticky=W)
+        self.hmMenu.grid(row=3,sticky=W)
+        self.targetMenu.grid(row=4,sticky=W)
+        button_heatmap.grid(row=5, sticky=W)
+
 
         label_mergeframes.grid(row=10,column=2,sticky=W+N,padx=5)
         button_mergeframe.grid(row=0,sticky=W)
@@ -2406,137 +3206,405 @@ class loadprojectini:
 
         label_classifier_validation.grid(row=14,sticky=W)
         self.seconds.grid(row=0,sticky=W)
-        button_validate_classifier.grid(row=1,sticky=W)
+        self.cvTarget.grid(row=1,sticky=W)
+        button_validate_classifier.grid(row=2,sticky=W)
 
-        # scroll.update()
+    def loaddefinedroi(self):
+
+        h5dir = os.path.dirname(self.projectconfigini) + '\\logs\\measures'
+        h5list = os.listdir(h5dir)
+        result = [i for i in h5list if '.h5' in i]
+        if result == []:
+            print('Please define ROI Shapes')
+        else:
+            videodir = os.path.join(os.path.dirname(self.projectconfigini), 'videos')
+
+            roitableMenu(videodir, self.projectconfigini)
+
+
+    def appendroisettings(self):
+        apdroisettings = Toplevel()
+        apdroisettings.minsize(400, 400)
+        apdroisettings.wm_title("Append Roi Settings")
+
+        # first choice frame
+        firstMenu = LabelFrame(apdroisettings, text='Select number of animals')
+
+        ## set up drop down for animals
+        noOfAnimalVar = IntVar()
+        animalOptions = {1, 2}
+        noOfAnimalVar.set(1)
+
+        animalMenu = OptionMenu(firstMenu, noOfAnimalVar, *animalOptions)
+        animalLabel = Label(firstMenu, text="# of animals")
+        setAnimalButton = Button(firstMenu, text="Confirm",
+                                 command=lambda: self.run_roiAnalysisSettings(apdroisettings, noOfAnimalVar,'append'))
+
+        # organize
+        firstMenu.grid(row=0, sticky=W)
+        animalLabel.grid(row=0, column=0, sticky=W)
+        animalMenu.grid(row=0, column=1, sticky=W)
+        setAnimalButton.grid(row=0, column=2, sticky=W)
+
+    def roi_settings(self,title,selection):
+
+        roisettings = Toplevel()
+        roisettings.minsize(400, 400)
+        roisettings.wm_title(title)
+
+        #first choice frame
+        firstMenu = LabelFrame(roisettings,text='Select number of animals')
+
+        ## set up drop down for animals
+        noOfAnimalVar = IntVar()
+        animalOptions = {1,2}
+        noOfAnimalVar.set(1)
+
+        animalMenu = OptionMenu(firstMenu,noOfAnimalVar,*animalOptions)
+        animalLabel = Label(firstMenu,text="# of animals")
+
+        setAnimalButton = Button(firstMenu,text="Confirm",command=lambda:self.run_roiAnalysisSettings(roisettings,noOfAnimalVar,selection))
+
+
+        #organize
+        firstMenu.grid(row=0,sticky=W)
+        animalLabel.grid(row=0,column=0,sticky=W)
+        animalMenu.grid(row=0,column=1,sticky=W)
+        setAnimalButton.grid(row=0,column=2,sticky=W)
+
+    def run_roiAnalysisSettings(self,master,noofanimal,appendornot):
+        try:
+            self.secondMenu.destroy()
+        except:
+            pass
+
+        self.secondMenu = LabelFrame(master,text="Choose bodyparts")
+        runButton = Button(self.secondMenu,text='Run',command =lambda:self.run_analyze_roi(noofanimal.get(),animalbody1var.get(),animalbody2var.get(),appendornot))
+        ## 1 animal
+        animal1 = LabelFrame(self.secondMenu,text='Animal 1')
+        animalbody1 = Label(animal1,text='Bodypart')
+        animalbody1var = StringVar()
+        configini = self.projectconfigini
+        options, options2 = define_bp_drop_down(configini)
+        animalbody1var.set(options[0])
+        animalbodymenu1 = OptionMenu(animal1, animalbody1var, *options)
+
+        ## 2 animals
+        animal2 = LabelFrame(self.secondMenu, text='Animal 2')
+        animalbody2 = Label(animal2, text='Bodypart')
+        animalbody2var = StringVar()
+        animalbody2var.set(options2[0])
+        animalbodymenu2 = OptionMenu(animal2,animalbody2var,*options2)
+
+        #organize
+        self.secondMenu.grid(row=1, sticky=W)
+        runButton.grid(row=3,padx=10,pady=10)
+        if noofanimal.get()==1:
+            animal1.grid(row=0,column=0,sticky=W)
+            animalbody1.grid(row=0,column=0,sticky=W)
+            animalbodymenu1.grid(row=0,column=1,sticky=W)
+        elif noofanimal.get()==2:
+            animal1.grid(row=0, column=0, sticky=W)
+            animalbody1.grid(row=0, column=0, sticky=W)
+            animalbodymenu1.grid(row=0, column=1, sticky=W)
+
+            animal2.grid(row=0, column=1, sticky=W)
+            animalbody2.grid(row=0, column=0, sticky=W)
+            animalbodymenu2.grid(row=0, column=1, sticky=W)
+
+    def run_analyze_roi(self,noofanimal,animal1bp,animal2bp,appendornot):
+        configini = self.projectconfigini
+        config = ConfigParser()
+        config.read(configini)
+
+        if appendornot == 'processmovement':
+            config.set('process movements', 'no_of_animals', str(noofanimal))
+            config.set('process movements', 'animal_1_bp', str(animal1bp))
+            config.set('process movements', 'animal_2_bp', str(animal2bp))
+            with open(configini, 'w') as configfile:
+                config.write(configfile)
+        else:
+            config.set('ROI settings', 'no_of_animals', str(noofanimal))
+            config.set('ROI settings', 'animal_1_bp', str(animal1bp))
+            config.set('ROI settings', 'animal_2_bp', str(animal2bp))
+            with open(configini, 'w') as configfile:
+                config.write(configfile)
+
+        if appendornot == 'append':
+            ROItoFeatures(configini)
+        elif appendornot =='not append':
+            roiAnalysis(configini,'outlier_corrected_movement_location')
+        elif appendornot == 'processmovement':
+            analyze_process_movement(configini)
+        else:
+            roiAnalysis(configini,'features_extracted')
+
+    def updateThreshold(self):
+        updateThreshold_graph(self.projectconfigini, self.csvfile.file_path, self.modelfile.file_path)
+
+    def getEntry(self):
+        # rectangle
+        recName = []
+        recWidth = []
+        recHeight = []
+        rec_shape = []
+        try:
+            for i in range(len(self.rect_list)):
+                rec_shape.append("Rectangle")
+                recName.append(self.rect_list[i].get())
+                recWidth.append(int(self.rec_width_list[i].get()))
+                recHeight.append(int(self.rec_height_list[i].get()))
+
+            rec_df = pd.DataFrame(list(zip(rec_shape, recName, recWidth, recHeight)), columns=['Shape_type', 'Name', 'width', 'height'])
+
+        except:
+            rec_df = pd.DataFrame()
+
+        # circle
+        cirName = []
+        cirRadius = []
+        cir_shape = []
+        try:
+            for i in range(len(self.cir_entry_list)):
+                cir_shape.append("Circle")
+                cirName.append(self.cir_entry_list[i].get())
+                cirRadius.append(int(self.cir_radius_list[i].get()))
+            cir_df = pd.DataFrame(list(zip(cir_shape, cirName, cirRadius)), columns=['Shape_type', 'Name', 'Radius'])
+        except:
+            cir_df = pd.DataFrame()
+
+        ## polygon
+        polName = []
+        polShape = []
+
+        try:
+            for i in range(len(self.pol_list)):
+                polShape.append("Polygon")
+                polName.append(self.pol_list[i].get())
+            pol_df = pd.DataFrame(list(zip(polShape, polName)), columns=['Shape_type', 'Name'])
+        except:
+            pol_df = pd.DataFrame()
+
+        if not os.path.exists(os.path.join(os.path.dirname(self.projectconfigini),"logs","measures")):
+            os.makedirs(os.path.join(os.path.dirname(self.projectconfigini),"logs","measures"))
+
+        ### to h5
+        storePath = os.path.join(os.path.dirname(self.projectconfigini),"logs","measures",'ROI_index.h5')
+        store = pd.HDFStore(storePath, mode='w')
+        store['rectangles'] = rec_df
+        store['circleDf'] = cir_df
+        store['polygons'] = pol_df
+        store.close()
+
+        videodir = os.path.join(os.path.dirname(self.projectconfigini),'videos')
+
+        roitableMenu(videodir,self.projectconfigini)
+
+    def table(self,master,rectangle,circle,polygon):
+        # refresh the frames
+        try:
+            self.rectbox.destroy()
+            self.cirbox.destroy()
+            self.polbox.destroy()
+        except:
+            pass
+
+        try:
+            ## make rectangle table
+            self.rectbox = LabelFrame(master)
+            self.rectbox.grid(row=6, sticky=W, pady=10)
+            self.rect_list = list(range(int(rectangle)))
+            self.rec_width_list = list(range(int(rectangle)))
+            self.rec_height_list = list(range(int(rectangle)))
+            rect_var = list(range(int(rectangle)))
+            rec_name_list = list(range(int(rectangle)))
+
+            #
+            rectangleName = Label(self.rectbox, text="Rectangle Name")
+            rectangleName.grid(row=0, column=1)
+
+            rectangleWidth = Label(self.rectbox, text="Width")
+            rectangleWidth.grid(row=0, column=2)
+
+            rectangleHeight = Label(self.rectbox, text="Height")
+            rectangleHeight.grid(row=0, column=3)
+
+            for i in range(len(self.rect_list)):
+                rec_name_list[i] = Label(self.rectbox, text="Rect_" + str(i + 1))
+                rec_name_list[i].grid(row=int(i) + 1, padx=5, sticky=W)
+                self.rect_list[i] = Entry(self.rectbox)
+                self.rect_list[i].grid(row=int(i) + 1, column=1, padx=5)
+                rect_var[i]=StringVar()
+                self.rec_width_list[i] = Entry(self.rectbox,textvariable=rect_var[i])
+
+                self.rec_width_list[i].grid(row=int(i) + 1, column=2, padx=5)
+                self.rec_height_list[i] = Entry(self.rectbox,textvariable=rect_var[i])
+                self.rec_height_list[i].grid(row=int(i) + 1, column=3, padx=5)
+
+                rect_var[i].set('0')
+        except:
+            pass
+
+        try:
+            ## make circle table
+            self.cirbox = LabelFrame(master)
+            self.cirbox.grid(row=7, sticky=W)
+            cir_list = list(range(int(circle)))
+            self.cir_entry_list = list(range(int(circle)))
+            self.cir_radius_list = list(range(int(circle)))
+            cir_var = list(range(int(circle)))
+
+            circleName = Label(self.cirbox, text="Circle Name")
+            circleName.grid(row=0, column=1)
+
+            radiusName = Label(self.cirbox, text='Radius')
+            radiusName.grid(row=0, column=2)
+
+            for i in range(len(cir_list)):
+                cir_list[i] = Label(self.cirbox, text=("Cir_" + str(i + 1)))
+                cir_list[i].grid(row=int(i) + 1, padx=5, sticky=W)
+                self.cir_entry_list[i] = Entry(self.cirbox)
+                self.cir_entry_list[i].grid(row=int(i) + 1, column=1, padx=5)
+                cir_var[i] =  StringVar()
+                self.cir_radius_list[i] = Entry(self.cirbox,textvariable=cir_var[i])
+                self.cir_radius_list[i].grid(row=int(i) + 1, column=2, padx=5)
+                cir_var[i].set('0')
+        except:
+            pass
+
+        try:
+            ## make polygon table/.;p
+            self.polbox = LabelFrame(master)
+            self.polbox.grid(row=8, sticky=W)
+            self.pol_list = list(range(int(polygon)))
+            pol_name = list(range(int(polygon)))
+            polygonName = Label(self.polbox, text="Polygon Name")
+            polygonName.grid(row=0, column=1)
+            for i in range(len(pol_name)):
+                pol_name[i] = Label(self.polbox, text="Pol_" + str(i + 1))
+                pol_name[i].grid(row=int(i) + 1, column=0, sticky=W)
+                self.pol_list[i] = Entry(self.polbox)
+                self.pol_list[i].grid(row=int(i) + 1, column=1, padx=5)
+        except:
+            pass
+
+
+        setbutton = Button(master,text='Set Shape Definitions',command=self.setvariables)
+        setbutton.grid(row=10)
+
+    def setvariables(self):
+        measuresdir = os.path.join(os.path.dirname(self.projectconfigini),'logs','measures')
+        try:
+            os.remove(os.path.join(measuresdir,'ROI_definitions.h5'))
+            os.remove(os.path.join(measuresdir, 'ROI_index.h5'))
+        except:
+            pass
+
+        self.getEntry()
 
     def classifiervalidation(self):
-
-        classifier_validation_command(self.projectconfigini.file_path, self.seconds.entry_get)
-
+        print('Generating video...')
+        validate_classifier(self.projectconfigini, self.seconds.entry_get,self.cvTarget.getChoices())
+        print('Videos generated')
 
     def mergeframesofplot(self):
-        merge_frames_config(self.projectconfigini.file_path)
-
+        merge_frames_config(self.projectconfigini)
 
     def plotdataplot(self):
-        data_plot_config(self.projectconfigini.file_path)
-
+        data_plot_config(self.projectconfigini)
 
     def plotgantt(self):
-        ganntplot_config(self.projectconfigini.file_path)
-
+        ganntplot_config(self.projectconfigini)
 
     def plotsklearn_result(self):
-        configini = self.projectconfigini.file_path
+        configini = self.projectconfigini
         config = ConfigParser()
         config.read(configini)
-        pose_estimation_body_parts = config.getint('create ensemble settings', 'pose_estimation_body_parts')
-        print('Pose-estimation body part setting for plotting: ' + str(pose_estimation_body_parts))
-
-        if (pose_estimation_body_parts == 16) or (pose_estimation_body_parts == 14) or (pose_estimation_body_parts == 987):
-            plotsklearnresult_16(self.projectconfigini.file_path)
-        if pose_estimation_body_parts == 9:
-            plotsklearnresult_9(self.projectconfigini.file_path)
-        if pose_estimation_body_parts == 8 or 7:
-            plotsklearnresult_8(self.projectconfigini.file_path)
-        if pose_estimation_body_parts == 4:
-            plotsklearnresult_4(self.projectconfigini.file_path)
-
+        plotsklearnresult(self.projectconfigini,self.videovar.get(),self.genframevar.get())
 
     def analyzseverity(self):
-        analyze_process_severity(self.projectconfigini.file_path,self.severityscale.entry_get)
-
-
-    def analyzeprocessmovement(self):
-        analyze_process_movement(self.projectconfigini.file_path)
-
+        analyze_process_severity(self.projectconfigini,self.severityscale.entry_get)
 
     def analyzedatalog(self):
-        analyze_process_data_log(self.projectconfigini.file_path)
-
+        analyze_process_data_log(self.projectconfigini)
 
     def runrfmodel(self):
-        rfmodel(self.projectconfigini.file_path, self.descrimination_threshold.entry_get,
-                self.shortest_bout.entry_get)
-
+        rfmodel(self.projectconfigini)
 
     def modelselection(self):
-        runmachinemodelsettings(self.projectconfigini.file_path)
+        runmachinemodelsettings(self.projectconfigini)
 
     def validatemodelsinglevid(self):
-        validate_model_one_vid(self.projectconfigini.file_path, self.csvfile.file_path, self.modelfile.file_path,
-                                   self.dis_threshold.entry_get, self.min_behaviorbout.entry_get)
-
+        validate_model_one_vid(self.projectconfigini, self.csvfile.file_path, self.modelfile.file_path,
+                                   self.dis_threshold.entry_get, self.min_behaviorbout.entry_get,self.ganttvar.get())
 
     def trainmultimodel(self):
-        train_multimodel(self.projectconfigini.file_path)
+        train_multimodel(self.projectconfigini)
 
     def trainsinglemodel(self):
-        trainmodel2(self.projectconfigini.file_path)
-
+        trainmodel2(self.projectconfigini)
 
     def trainmachinemodelsetting(self):
-        trainmachinemodel_settings(self.projectconfigini.file_path)
-
+        trainmachinemodel_settings(self.projectconfigini)
 
     def extractfeatures(self):
-        configini = self.projectconfigini.file_path
+        configini = self.projectconfigini
         config = ConfigParser()
         config.read(configini)
-        pose_estimation_body_parts = config.getint('create ensemble settings', 'pose_estimation_body_parts')
+        pose_estimation_body_parts = config.get('create ensemble settings', 'pose_estimation_body_parts')
         print('Pose-estimation body part setting for feature extraction: ' + str(pose_estimation_body_parts))
 
-        if pose_estimation_body_parts == 16:
-            extract_features_wotarget_16(self.projectconfigini.file_path)
-        if (pose_estimation_body_parts == 14) or (pose_estimation_body_parts == 987):
-            extract_features_wotarget_14(self.projectconfigini.file_path)
-        if pose_estimation_body_parts == 9:
-            extract_features_wotarget_9(self.projectconfigini.file_path)
-        if pose_estimation_body_parts == 8:
-            extract_features_wotarget_8(self.projectconfigini.file_path)
-        if pose_estimation_body_parts == 7:
-            extract_features_wotarget_7(self.projectconfigini.file_path)
-        if pose_estimation_body_parts == 4:
-            extract_features_wotarget_4(self.projectconfigini.file_path)
+        if pose_estimation_body_parts == '16':
+            extract_features_wotarget_16(self.projectconfigini)
+        if (pose_estimation_body_parts == '14') or (pose_estimation_body_parts == '987'):
+            extract_features_wotarget_14(self.projectconfigini)
+        if pose_estimation_body_parts == '9':
+            extract_features_wotarget_9(self.projectconfigini)
+        if pose_estimation_body_parts == '8':
+            extract_features_wotarget_8(self.projectconfigini)
+        if pose_estimation_body_parts == '7':
+            extract_features_wotarget_7(self.projectconfigini)
+        if pose_estimation_body_parts == '4':
+            extract_features_wotarget_4(self.projectconfigini)
+        if pose_estimation_body_parts == 'user_defined':
+            extract_features_wotarget_user_defined(self.projectconfigini)
 
     def setvideoparameter(self):
-        video_info_table(self.projectconfigini.file_path)
-
+        video_info_table(self.projectconfigini)
 
     def importframefolder(self):
-        if (self.projectconfigini.file_path!='No file selected') and (self.frame_folder.folder_path != 'No folder selected'):
-            copy_frame_folders(self.frame_folder.folder_path, self.projectconfigini.file_path)
+        if (self.projectconfigini!='No file selected') and (self.frame_folder.folder_path != 'No folder selected'):
+            copy_frame_folders(self.frame_folder.folder_path, self.projectconfigini)
         else:
             print('Fail to import frame folder, please select a main directory containing all the frame folders')
 
     def importvideo_single(self):
-        if (self.projectconfigini.file_path != 'No file selected') and (self.singlevideopath.file_path != 'No file selected'):
-            copy_singlevideo_ini(self.projectconfigini.file_path, self.singlevideopath.file_path)
+        if (self.projectconfigini != 'No file selected') and (self.singlevideopath.file_path != 'No file selected'):
+            copy_singlevideo_ini(self.projectconfigini, self.singlevideopath.file_path)
         else:
             print('Fail to import video, please select a video to import')
 
     def importvideo_multi(self):
-        if (self.projectconfigini.file_path != 'No file selected') and (self.multivideofolderpath.folder_path != 'No folder selected') and (self.video_type.entry_get != ''):
-            copy_multivideo_ini(self.projectconfigini.file_path, self.multivideofolderpath.folder_path,self.video_type.entry_get)
+        if (self.projectconfigini != 'No file selected') and (self.multivideofolderpath.folder_path != 'No folder selected') and (self.video_type.entry_get != ''):
+            copy_multivideo_ini(self.projectconfigini, self.multivideofolderpath.folder_path,self.video_type.entry_get)
         else:
             print('Fail to import videos, please select folder with videos and enter the file format')
 
     def importdlctracking_single(self):
-        if (self.projectconfigini.file_path != 'No file selected') and (self.file_csv.file_path != 'No file selected'):
-            copy_singlecsv_ini(self.projectconfigini.file_path, self.file_csv.file_path)
+        if (self.projectconfigini != 'No file selected') and (self.file_csv.file_path != 'No file selected'):
+            copy_singlecsv_ini(self.projectconfigini, self.file_csv.file_path)
         else:
             print('Fail to import csv file , please select a csv file to import and load config.ini file')
 
     def importdlctracking_multi(self):
-        if (self.projectconfigini.file_path !='No file selected') and (self.folder_csv.folder_path!= 'No folder selected'):
-            copy_allcsv_ini(self.projectconfigini.file_path, self.folder_csv.folder_path)
+        if (self.projectconfigini !='No file selected') and (self.folder_csv.folder_path!= 'No folder selected'):
+            copy_allcsv_ini(self.projectconfigini, self.folder_csv.folder_path)
         else:
             print('Fail to import csv file, please select folder with the .csv files and load config.ini file')
 
     def set_distancemm(self, distancemm):
 
-        configini = self.projectconfigini.file_path
+        configini = self.projectconfigini
         config = ConfigParser()
         config.read(configini)
 
@@ -2544,11 +3612,10 @@ class loadprojectini:
         with open(configini, 'w') as configfile:
             config.write(configfile)
 
-
     def generate_video(self):
 
         print('Generating video...')
-        configini = self.projectconfigini.file_path
+        configini = self.projectconfigini
         bitrate = self.bitrate.entry_get
         fileformat = '.'+ self.fileformt.entry_get
 
@@ -2565,40 +3632,41 @@ class loadprojectini:
 
 
     def extract_frames_loadini(self):
-        configini = self.projectconfigini.file_path
+        configini = self.projectconfigini
         videopath = str(os.path.dirname(configini) + '\\videos')
 
         extract_frames_ini(videopath)
 
     def correct_outlier(self):
-        configini = self.projectconfigini.file_path
+        configini = self.projectconfigini
         config = ConfigParser()
         config.read(configini)
-        pose_estimation_body_parts = config.getint('create ensemble settings', 'pose_estimation_body_parts')
+        pose_estimation_body_parts = config.get('create ensemble settings', 'pose_estimation_body_parts')
         print('Pose-estimation body part setting for outlier correction: ' + str(pose_estimation_body_parts))
-        if (pose_estimation_body_parts == 16) or (pose_estimation_body_parts == 987):
+        if (pose_estimation_body_parts == '16') or (pose_estimation_body_parts == '987'):
             dev_move_16(configini)
             dev_loc_16(configini)
-        if pose_estimation_body_parts == 14:
+        if pose_estimation_body_parts == '14':
             dev_move_14(configini)
             dev_loc_14(configini)
-        if pose_estimation_body_parts == 9:
+        if pose_estimation_body_parts == '9':
             dev_move_9(configini)
-        if pose_estimation_body_parts == 8:
+        if pose_estimation_body_parts == '8':
             dev_move_8(configini)
             dev_loc_8(configini)
-        if pose_estimation_body_parts == 7:
+        if pose_estimation_body_parts == '7':
             dev_move_7(configini)
             dev_loc_7(configini)
-        if pose_estimation_body_parts == 4:
+        if pose_estimation_body_parts == '4':
             dev_move_4(configini)
             dev_loc_4(configini)
+        if pose_estimation_body_parts == 'user_defined':
+            dev_move_user_defined(configini)
+            dev_loc_user_defined(configini)
         print('Outlier correction complete.')
 
-
     def distanceplotcommand(self):
-
-        configini = self.projectconfigini.file_path
+        configini = self.projectconfigini
         config = ConfigParser()
         config.read(configini)
 
@@ -2612,7 +3680,7 @@ class loadprojectini:
 
     def pathplotcommand(self):
 
-        configini = self.projectconfigini.file_path
+        configini = self.projectconfigini
         config = ConfigParser()
         config.read(configini)
 
@@ -2631,6 +3699,19 @@ class loadprojectini:
         path_plot_config(configini)
         print('Path plot complete.')
 
+    def heatmapcommand(self):
+        configini = self.projectconfigini
+        config = ConfigParser()
+        config.read(configini)
+        config.set('Heatmap settings', 'bin_size_pixels', self.BinSize.entry_get)
+        config.set('Heatmap settings', 'Scale_max_seconds', self.MaxScale.entry_get)
+        config.set('Heatmap settings', 'Scale_increments_seconds', self.Inc.entry_get)
+        config.set('Heatmap settings', 'Palette', self.hmMenu.getChoices())
+        config.set('Heatmap settings', 'Target', self.targetMenu.getChoices())
+        with open(configini, 'w') as configfile:
+            config.write(configfile)
+        plotHeatMap(configini)
+
     def callback(self,url):
         webbrowser.open_new(url)
 
@@ -2641,7 +3722,6 @@ class trainmachinemodel_settings:
         trainmms = Toplevel()
         trainmms.minsize(400, 400)
         trainmms.wm_title("Machine model settings")
-        trainmms.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         #load metadata
         load_data_frame = LabelFrame(trainmms, text='Load Metadata',font=('Helvetica',10,'bold'), pady=5, padx=5)
@@ -2689,6 +3769,7 @@ class trainmachinemodel_settings:
         self.box6 = IntVar()
         self.box7 = IntVar()
         self.box8 = IntVar()
+        self.box9 = IntVar()
 
         # model evaluations for entrybox
         self.LC_ksplit = Entry_Box(self.label_settings_box, 'LearningCurve shuffle K splits', '25',status=DISABLED)
@@ -2705,17 +3786,18 @@ class trainmachinemodel_settings:
 
         checkbutton1 = Checkbutton(self.label_settings_box,text='Generate RF model meta data file',variable = self.box1)
         checkbutton2 = Checkbutton(self.label_settings_box, text='Generate Example Decision Tree (requires "graphviz")', variable=self.box2)
-        checkbutton3 = Checkbutton(self.label_settings_box, text='Generate Classification Report', variable=self.box3)
-        checkbutton4 = Checkbutton(self.label_settings_box, text='Generate Features Importance Log', variable=self.box4)
-        checkbutton5 = Checkbutton(self.label_settings_box, text='Generate Features Importance Bar Graph', variable=self.box5,
-                                   command = lambda:activate(self.box5, self.label_n_feature_importance_bars))
-        checkbutton6 = Checkbutton(self.label_settings_box, text='Compute Feature Permutation Importances (Note: CPU intensive)', variable=self.box6)
-        checkbutton7 = Checkbutton(self.label_settings_box, text='Generate Sklearn Learning Curves (Note: CPU intensive)', variable=self.box7,
-                                   command = lambda:activate(self.box7, self.LC_datasplit, self.LC_ksplit))
-        checkbutton8 = Checkbutton(self.label_settings_box, text='Generate Precision Recall Curves', variable=self.box8)
+        checkbutton3 = Checkbutton(self.label_settings_box, text='Generate Fancy Example Decision Tree ("dtreeviz")', variable=self.box3)
+        checkbutton4 = Checkbutton(self.label_settings_box, text='Generate Classification Report', variable=self.box4)
+        checkbutton5 = Checkbutton(self.label_settings_box, text='Generate Features Importance Log', variable=self.box5)
+        checkbutton6 = Checkbutton(self.label_settings_box, text='Generate Features Importance Bar Graph', variable=self.box6,
+                                   command = lambda:activate(self.box6, self.label_n_feature_importance_bars))
+        checkbutton7 = Checkbutton(self.label_settings_box, text='Compute Feature Permutation Importances (Note: CPU intensive)', variable=self.box7)
+        checkbutton8 = Checkbutton(self.label_settings_box, text='Generate Sklearn Learning Curves (Note: CPU intensive)', variable=self.box8,
+                                   command = lambda:activate(self.box8, self.LC_datasplit, self.LC_ksplit))
+        checkbutton9 = Checkbutton(self.label_settings_box, text='Generate Precision Recall Curves', variable=self.box9)
 
         self.check_settings = [checkbutton1, checkbutton2, checkbutton3, checkbutton4, checkbutton5, checkbutton6,
-                               checkbutton7, checkbutton8]
+                               checkbutton7, checkbutton8, checkbutton9]
 
 
         # setting drop downs for modelname
@@ -2743,6 +3825,7 @@ class trainmachinemodel_settings:
         # button
         button_settings_to_ini = Button(trainmms, text='Save settings into global environment', font=('Helvetica', 10, 'bold'),fg='blue', command=self.set_values)
         button_save_meta = Button(trainmms, text='Save settings for specific model', font=('Helvetica', 10, 'bold'),fg='green' ,command=self.save_new)
+        button_remove_meta = Button(trainmms,text='Clear cache',font=('Helvetica', 10, 'bold'),fg='red',command = self.clearcache)
 
         # organize
         load_data_frame.grid(row=0, sticky=W, pady=5, padx=5)
@@ -2776,15 +3859,24 @@ class trainmachinemodel_settings:
         checkbutton3.grid(row=2,sticky=W)
         checkbutton4.grid(row=3,sticky=W)
         checkbutton5.grid(row=4,sticky=W)
-        self.label_n_feature_importance_bars.grid(row=5, sticky=W)
-        checkbutton6.grid(row=6,sticky=W)
+        checkbutton6.grid(row=5,sticky=W)
+        self.label_n_feature_importance_bars.grid(row=6, sticky=W)
         checkbutton7.grid(row=7,sticky=W)
-        self.LC_ksplit.grid(row=8, sticky=W)
-        self.LC_datasplit.grid(row=9, sticky=W)
-        checkbutton8.grid(row=10,sticky=W)
+        checkbutton8.grid(row=8, sticky=W)
+        self.LC_ksplit.grid(row=9, sticky=W)
+        self.LC_datasplit.grid(row=10, sticky=W)
+        checkbutton9.grid(row=11, sticky=W)
 
         button_settings_to_ini.grid(row=6,pady=5)
         button_save_meta.grid(row=7)
+        button_remove_meta.grid(row=8,pady=5)
+
+    def clearcache(self):
+        configs_dir = os.path.join(os.path.dirname(self.configini),'configs')
+        filelist = [f for f in os.listdir(configs_dir) if f.endswith('.csv')]
+        for f in filelist:
+            os.remove(os.path.join(configs_dir,f))
+            print(f,'deleted')
 
     def load_RFvalues(self):
 
@@ -2792,7 +3884,7 @@ class trainmachinemodel_settings:
         # metadata = metadata.drop(['Feature_list'], axis=1)
         for m in metadata.columns:
             self.meta_dict[m] = metadata[m][0]
-        print(self.load_choosedata.file_path,'loaded')
+        print('Meta data file loaded')
 
         for key in self.meta_dict:
             cur_list = key.lower().split(sep='_')
@@ -2822,33 +3914,39 @@ class trainmachinemodel_settings:
             self.generate_example_d_tree = 'no'
 
         if self.box3.get() == 1:
+            self.generate_example_decision_tree_fancy = 'yes'
+        else:
+            self.generate_example_decision_tree_fancy  = 'no'
+
+        if self.box4.get() == 1:
             self.generate_classification_report = 'yes'
         else:
             self.generate_classification_report = 'no'
 
-        if self.box4.get() == 1:
+        if self.box5.get() == 1:
             self.generate_features_imp_log = 'yes'
         else:
             self.generate_features_imp_log = 'no'
 
-        if self.box5.get() == 1:
+        if self.box6.get() == 1:
             self.generate_features_bar_graph = 'yes'
         else:
             self.generate_features_bar_graph = 'no'
         self.n_importance = self.label_n_feature_importance_bars.entry_get
-        if self.box6.get() == 1:
+
+        if self.box7.get() == 1:
             self.compute_permutation_imp = 'yes'
         else:
             self.compute_permutation_imp = 'no'
 
-        if self.box7.get() == 1:
+        if self.box8.get() == 1:
             self.generate_learning_c = 'yes'
         else:
             self.generate_learning_c = 'no'
         self.learningcurveksplit = self.LC_ksplit.entry_get
         self.learningcurvedatasplit = self.LC_datasplit.entry_get
 
-        if self.box8.get() == 1:
+        if self.box9.get() == 1:
             self.generate_precision_recall_c = 'yes'
         else:
             self.generate_precision_recall_c = 'no'
@@ -2925,6 +4023,7 @@ class trainmachinemodel_settings:
         config.set('create ensemble settings', 'generate_precision_recall_curve', str(self.generate_precision_recall_c))
         config.set('create ensemble settings', 'LearningCurve_shuffle_k_splits',str(self.learningcurveksplit))
         config.set('create ensemble settings', 'LearningCurve_shuffle_data_splits',str(self.learningcurvedatasplit))
+        config.set('create ensemble settings', 'generate_example_decision_tree_fancy',str(self.generate_example_decision_tree_fancy))
 
 
         with open(configini, 'w') as configfile:
@@ -2936,12 +4035,13 @@ class runmachinemodelsettings:
     def __init__(self,inifile):
         self.row1 = []
         self.row2 = []
+        self.row3 = []
+        self.row4 = []
         self.targetname = []
         # Popup window
         runmms = Toplevel()
         runmms.minsize(200, 200)
         runmms.wm_title("Select model to run")
-        runmms.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         ### read inifile and get the model
         config = ConfigParser()
@@ -2957,17 +4057,32 @@ class runmachinemodelsettings:
 
         ###loop for table
         table = LabelFrame(runmms)
+        #set title
         tn = Label(table,text='Classifier',font=("Helvetica",10,'bold'))
         tn.grid(row=0,column=0,sticky=W,pady=5)
 
         selectmodel = Label(table,text='Model path (.sav)',font=("Helvetica",10,'bold'))
-        selectmodel.grid(row=0,column=1,sticky=W)
+        selectmodel.grid(row=0,column=1)
+
+        thresholdtitle = Label(table,text='Threshold',font=("Helvetica",10,'bold') )
+        thresholdtitle.grid(row=0,column=2,sticky=W)
+
+        minbouttitle = Label(table,text='Minimum Bout',font=("Helvetica",10,'bold'))
+        minbouttitle.grid(row=0,column=3,sticky=W)
+
+        # main loop for content of table
         for i in range(len(self.targetname)):
             self.row1.append(Label(table,text=str(self.targetname[i])))
             self.row1[i].grid(row=i+2,column=0,sticky=W)
 
             self.row2.append(FileSelect(table,title='Select model (.sav) file'))
             self.row2[i].grid(row=i+2,column=1,sticky=W)
+
+            self.row3.append(Entry(table))
+            self.row3[i].grid(row=i+2,column=2,sticky=W,padx=5)
+
+            self.row4.append(Entry(table))
+            self.row4[i].grid(row=i+2,column=3,sticky=W,padx=5)
 
         button_set = Button(runmms,text='Set model(s)',command =lambda:self.set_modelpath_to_ini(inifile),font=("Helvetica",10,'bold'),fg='red')
 
@@ -2981,6 +4096,8 @@ class runmachinemodelsettings:
 
         for i in range(len(self.targetname)):
             config.set('SML settings','model_path_'+(str(i+1)),str(self.row2[i].file_path))
+            config.set('threshold_settings', 'threshold_' + (str(i + 1)), str(self.row3[i].get()))
+            config.set('Minimum_bout_lengths', 'min_bout_' + (str(i + 1)), str(self.row4[i].get()))
 
         with open(configini, 'w') as configfile:
             config.write(configfile)
@@ -3085,8 +4202,6 @@ class aboutgui:
         about = Toplevel()
         about.minsize(551, 314)
         about.wm_title("About")
-        about.iconbitmap(maincwd+'\\'"golden_lab.ico")
-
 
         canvas = Canvas(about,width=551,height=314,bg='black')
         canvas.pack()
@@ -3101,7 +4216,6 @@ class App(object):
         self.root.title('SimBA')
         self.root.minsize(750,750)
         self.root.geometry("750x750")
-        self.root.iconbitmap("golden_lab.ico")
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
@@ -3118,7 +4232,7 @@ class App(object):
         fileMenu = Menu(menu)
         menu.add_cascade(label='File', menu=fileMenu)
         fileMenu.add_command(label='Create a new project',command=project_config)
-        fileMenu.add_command(label='Load project', command=loadprojectini)
+        fileMenu.add_command(label='Load project', command=lambda:loadprojectMenu(loadprojectini))
         fileMenu.add_separator()
         fileMenu.add_command(label='Exit', command=Exit)
 
@@ -3134,15 +4248,19 @@ class App(object):
         dlcmenu = Menu(thirdMenu)
         dlcmenu.add_command(label='Create DLC Model',command=create_project_DLC)
         dlcmenu.add_command(label='Load DLC Model',command=Load_DLC_Model)
+        #deepPoseKit
+        dpkmenu = Menu(thirdMenu)
+        dpkmenu.add_command(label='Create DeepPoseKit project', command=createDPK_project)
+        dpkmenu.add_command(label='Load DeepPoseKit project', command=lambda:loadprojectMenu(deepPoseKitMenu))
         #labelling tool
         labellingtoolmenu = Menu(thirdMenu)
-        labellingtoolmenu.add_command(label='labellmg', command=lambda: print('coming soon'))
-        labellingtoolmenu.add_command(label='labelme', command=lambda: print('coming soon'))
+        labellingtoolmenu.add_command(label='labelImg', command=lambda: subprocess.call(["labelImg"]))
+        labellingtoolmenu.add_command(label='labelme', command=lambda: subprocess.call(["labelme"]))
         #third menu organize
         thirdMenu.add_cascade(label='DeepLabCut', menu=dlcmenu)
-        thirdMenu.add_command(label='YOLOv3', command=lambda: print('coming soon'))
-        thirdMenu.add_command(label='Mask RCNN', command=lambda: print('coming soon'))
-        thirdMenu.add_command(label='DeepPoseKit', command=lambda: print('coming soon'))
+        # thirdMenu.add_command(label='YOLOv3', command=lambda: print('coming soon'))
+        # thirdMenu.add_command(label='Mask RCNN', command=lambda: print('coming soon'))
+        thirdMenu.add_cascade(label='DeepPoseKit', menu=dpkmenu)
         thirdMenu.add_command(label='LEAP', command=lambda: print('coming soon'))
         thirdMenu.add_cascade(label='Labelling tools', menu=labellingtoolmenu)
 
@@ -3151,6 +4269,7 @@ class App(object):
         menu.add_cascade(label='Tools',menu=fifthMenu)
         fifthMenu.add_command(label='Clip videos',command=shorten_video)
         fifthMenu.add_command(label='Crop videos',command=crop_video)
+        fifthMenu.add_command(label='Multi-crop',command=multicropmenu)
         fifthMenu.add_command(label='Downsample videos',command=video_downsample)
         fifthMenu.add_command(label='Get mm/ppx',command = get_coordinates_from_video)
         fifthMenu.add_command(label='Change fps',command =changefps)
@@ -3158,6 +4277,7 @@ class App(object):
         changeformatMenu = Menu(fifthMenu)
         changeformatMenu.add_command(label='Change image file formats',command=change_imageformat)
         changeformatMenu.add_command(label='Change video file formats',command=convert_video)
+        changeformatMenu.add_command(label='Change .seq to .mp4', command=lambda:convertseqVideo(askdirectory(title='Please select video folder to convert')))
         fifthMenu.add_cascade(label='Change formats',menu=changeformatMenu)
 
         fifthMenu.add_command(label='CLAHE enhance video',command=Red_light_Convertion)

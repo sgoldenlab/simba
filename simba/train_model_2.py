@@ -1,6 +1,10 @@
+import warnings
+warnings.filterwarnings('ignore',category=FutureWarning)
+warnings.filterwarnings('ignore',category=DeprecationWarning)
 from configparser import ConfigParser, MissingSectionHeaderError
 import os
 import pandas as pd
+from dtreeviz.trees import *
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import train_test_split
@@ -20,8 +24,11 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
 from sklearn.metrics import precision_recall_curve
-warnings.simplefilter(action='ignore', category=FutureWarning)
-pd.options.mode.chained_assignment = None
+import graphviz
+import graphviz.backend
+from dtreeviz.shadow import *
+from sklearn import tree
+from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
 
 def trainmodel2(inifile):
     configFile = str(inifile)
@@ -43,7 +50,7 @@ def trainmodel2(inifile):
         model_to_run = config.get('create ensemble settings', 'model_to_run')
         classifierName = config.get('create ensemble settings', 'classifier')
         train_test_size = config.getfloat('create ensemble settings', 'train_test_size')
-        pose_estimation_body_parts = config.getint('create ensemble settings', 'pose_estimation_body_parts')
+        pose_estimation_body_parts = config.get('create ensemble settings', 'pose_estimation_body_parts')
     except ValueError:
         print('ERROR: Project_config.ini contains errors in the [create ensemble settings] or [SML settings] sections. Please check the project_config.ini file.')
     log_path = config.get('General settings', 'project_path')
@@ -70,8 +77,8 @@ def trainmodel2(inifile):
         log_df = pd.DataFrame()
         log_df['Feature_name'] = feature_importance_list_varNm
         log_df['Feature_importance'] = feature_importance_list_importance
-        logPath = os.path.join(log_path, str(classifierName) + '_feature_importance_log.csv')
-        log_df.to_csv(logPath)
+        savePath = os.path.join(tree_evaluations_out, str(classifierName) + '_feature_importance_log.csv')
+        log_df.to_csv(savePath)
         return log_df
 
     def generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars):
@@ -81,6 +88,7 @@ def trainmodel2(inifile):
         ax = log_df.plot.bar(x='Feature_name', y='Feature_importance', legend=False, rot=90, fontsize=6)
         figName = str(classifierName) + '_feature_bars.png'
         figSavePath = os.path.join(tree_evaluations_out, figName)
+        plt.ylabel('Feature_importance (mean decrease impurity)')
         plt.tight_layout()
         plt.savefig(figSavePath, dpi=600)
         plt.close('all')
@@ -97,15 +105,7 @@ def trainmodel2(inifile):
     def generateMetaData(metaDataList):
         metaDataFn = str(classifierName) + '_meta.csv'
         metaDataPath = os.path.join(modelDir_out, metaDataFn)
-        metaDataHeaders = ["Classifier_name", "RF_criterion", "RF_max_features", "RF_min_sample_leaf",
-                           "RF_n_estimators", "compute_feature_permutation_importance",
-                           "generate_classification_report", "generate_example_decision_tree",
-                           "generate_features_importance_bar_graph", "generate_features_importance_log",
-                           "generate_precision_recall_curves", "generate_rf_model_meta_data_file",
-                           "generate_sklearn_learning_curves", "learning_curve_data_splits",
-                           "learning_curve_k_splits", "n_feature_importance_bars",
-                           "over_sample_ratio", "over_sample_setting", "train_test_size", "under_sample_ratio",
-                           "under_sample_setting"]
+        metaDataHeaders = GenerateMetaDataFileHeaders()
         with open(metaDataPath, 'w', newline='') as f:
             out_writer = csv.writer(f)
             out_writer.writerow(metaDataHeaders)
@@ -143,6 +143,14 @@ def trainmodel2(inifile):
         fname = os.path.join(tree_evaluations_out, str(classifierName) + '_learning_curve.csv')
         learningCurve_df.to_csv(fname, index=False)
 
+    def dviz_classification_visualization(data_train, target_train, classifierName):
+        clf = tree.DecisionTreeClassifier(max_depth=5, random_state=666)
+        clf.fit(data_train, target_train)
+        svg_tree = dtreeviz(clf, data_train, target_train, target_name=classifierName, feature_names=data_train.columns, orientation="TD", class_names=[classifierName, 'not_' + classifierName], fancy=True, histtype='strip', X=None, label_fontsize=12, ticks_fontsize=8, fontname="Arial")
+        fname = os.path.join(tree_evaluations_out, str(classifierName) + 'fancy_decision_tree_example.svg')
+        svg_tree.save(fname)
+
+
     # READ IN DATA FOLDER AND REMOVE ALL NON-FEATURE VARIABLES (POP DLC COORDINATE DATA AND TARGET DATA)
     print('Reading in ' + str(len(os.listdir(data_folder))) + ' annotated files...')
     for i in os.listdir(data_folder):
@@ -152,51 +160,13 @@ def trainmodel2(inifile):
             features = features.append(df, ignore_index=True)
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     features = features.drop(["scorer"], axis=1, errors='ignore')
+    totalTargetframes = features[classifierName].sum()
     try:
         targetFrame = features.pop(classifierName).values
     except KeyError:
         print('Error: the dataframe does not contain any target annotations. Please check the csv files in the project_folder/csv/target_inserted folder')
     features = features.fillna(0)
-    if pose_estimation_body_parts == 16:
-        features = features.drop(
-            ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-             "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p", "Lat_left_1_x",
-             "Lat_left_1_y",
-             "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x", "Tail_base_1_y",
-             "Tail_base_1_p", "Tail_end_1_x", "Tail_end_1_y", "Tail_end_1_p", "Ear_left_2_x",
-             "Ear_left_2_y", "Ear_left_2_p", "Ear_right_2_x", "Ear_right_2_y", "Ear_right_2_p", "Nose_2_x", "Nose_2_y",
-             "Nose_2_p", "Center_2_x", "Center_2_y", "Center_2_p", "Lat_left_2_x", "Lat_left_2_y",
-             "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x", "Tail_base_2_y",
-             "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p"], axis=1)
-    if pose_estimation_body_parts == 14:
-        features = features.drop(
-            ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-             "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p", "Lat_left_1_x",
-             "Lat_left_1_y",
-             "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x", "Tail_base_1_y",
-             "Tail_base_1_p", "Ear_left_2_x", "Ear_left_2_y", "Ear_left_2_p", "Ear_right_2_x", "Ear_right_2_y",
-             "Ear_right_2_p", "Nose_2_x", "Nose_2_y",
-             "Nose_2_p", "Center_2_x", "Center_2_y", "Center_2_p", "Lat_left_2_x", "Lat_left_2_y",
-             "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x", "Tail_base_2_y",
-             "Tail_base_2_p"], axis=1)
-    if pose_estimation_body_parts == 8:
-        features = features.drop(
-            ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-             "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p", "Lat_left_1_x",
-             "Lat_left_1_y",
-             "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x", "Tail_base_1_y",
-             "Tail_base_1_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p"], axis=1)
-    if pose_estimation_body_parts == 7:
-        features = features.drop(
-            ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-             "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p", "Lat_left_1_x",
-             "Lat_left_1_y",
-             "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x", "Tail_base_1_y",
-             "Tail_base_1_p"], axis=1)
-    if pose_estimation_body_parts == 4:
-        features = features.drop(
-            ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-             "Nose_1_x", "Nose_1_y", "Nose_1_p", "Tail_base_1_x", "Tail_base_1_y", "Tail_base_1_p"], axis=1)
+    features = drop_bp_cords(features, inifile)
     target_names = []
     loop = 1
     for i in range(model_nos):
@@ -211,7 +181,7 @@ def trainmodel2(inifile):
         currentModelName = target_names[i]
         features.pop(currentModelName).values
     class_names = class_names = ['Not_' + classifierName, classifierName]
-    feature_list = list(features.columns)
+    feature_list = list(features)
     print('# of features in dataset: ' + str(len(feature_list)))
 
     # IF SET BY USER - PERFORM UNDERSAMPLING AND OVERSAMPLING IF SET BY USER
@@ -221,7 +191,7 @@ def trainmodel2(inifile):
     trainDf = data_train
     trainDf[classifierName] = target_train
     targetFrameRows = trainDf.loc[trainDf[classifierName] == 1]
-    print('# of ' + str(classifierName) + ' frames in dataset: ' + str(len(targetFrameRows)))
+    print('# of ' + str(classifierName) + ' frames in dataset: ' + str(totalTargetframes))
     if under_sample_setting == 'Random undersample':
         print('Performing undersampling...')
         under_sample_ratio = config.getfloat('create ensemble settings', 'under_sample_ratio')
@@ -315,6 +285,11 @@ def trainmodel2(inifile):
         if generate_features_importance_bar_graph != 'yes':
             N_feature_importance_bars = 'NaN'
 
+        generate_example_decision_tree_fancy = config.get('create ensemble settings','generate_example_decision_tree_fancy')
+        if generate_example_decision_tree_fancy == 'yes':
+            print('Generating fancy decision tree example...')
+            dviz_classification_visualization(data_train, target_train, classifierName)
+
         # SAVE MODEL META DATA
         RF_meta_data = config.get('create ensemble settings', 'RF_meta_data')
         if RF_meta_data == 'yes':
@@ -323,8 +298,8 @@ def trainmodel2(inifile):
                             generate_example_decision_tree, generate_features_importance_bar_graph,
                             generate_features_importance_log,
                             generate_precision_recall_curve, RF_meta_data, generate_learning_curve, dataset_splits,
-                            shuffle_splits, N_feature_importance_bars, over_sample_ratio, under_sample_setting,
-                            train_test_size, under_sample_ratio, over_sample_setting]
+                            shuffle_splits, N_feature_importance_bars, over_sample_ratio, over_sample_setting, train_test_size,
+                            under_sample_ratio, under_sample_ratio]
             generateMetaData(metaDataList)
 
     # run gradient boost model

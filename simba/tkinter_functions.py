@@ -8,6 +8,7 @@ import yaml
 from PIL import Image
 import glob
 import pathlib
+import csv
 
 def batch_convert_videoformat(directory,format1,format2):
     filesFound = []
@@ -533,33 +534,50 @@ def cropvid(filenames):
 
     else:
         print('Please select a video to crop')
-def changedlc_config(config_path):
+def changedlc_config(config_path, bodyPartConfigFile):
 
     config_path = config_path
 
-    with open(config_path) as f:
-        read_yaml = yaml.load(f)
+    if bodyPartConfigFile == 0:
+        with open(config_path) as f:
+            read_yaml = yaml.load(f)
 
-    read_yaml["bodyparts"] = ['Ear_left_1',
-                              'Ear_right_1',
-                              'Nose_1',
-                              'Center_1',
-                              'Lateral_left_1',
-                              'Lateral_right_1',
-                              'Tail_base_1',
-                              'Tail_end_1',
-                              'Ear_left_2',
-                              'Ear_right_2',
-                              'Nose_2',
-                              'Center_2',
-                              'Lateral_left_2',
-                              'Lateral_right_2',
-                              'Tail_base_2',
-                              'Tail_end_2']
+        read_yaml["bodyparts"] = ['Ear_left_1',
+                                  'Ear_right_1',
+                                  'Nose_1',
+                                  'Center_1',
+                                  'Lateral_left_1',
+                                  'Lateral_right_1',
+                                  'Tail_base_1',
+                                  'Tail_end_1',
+                                  'Ear_left_2',
+                                  'Ear_right_2',
+                                  'Nose_2',
+                                  'Center_2',
+                                  'Lateral_left_2',
+                                  'Lateral_right_2',
+                                  'Tail_base_2',
+                                  'Tail_end_2']
 
-    with open(config_path, 'w') as outfile:
-        yaml.dump(read_yaml, outfile, default_flow_style=False)
+        with open(config_path, 'w') as outfile:
+            yaml.dump(read_yaml, outfile, default_flow_style=False)
 
+    if (type(bodyPartConfigFile) == str):
+        if os.path.exists(bodyPartConfigFile):
+            print(bodyPartConfigFile)
+            with open(bodyPartConfigFile, "r", encoding='utf8') as f:
+                cr = csv.reader(f, delimiter=",")  # , is default
+                rows = list(cr)  # create a list of rows for instance
+            rows = [i[0] for i in rows]
+            print(rows)
+            with open(config_path) as d:
+                read_yaml = yaml.load(d)
+            print(rows)
+            read_yaml["bodyparts"] = rows
+            with open(config_path, 'w') as outfile:
+                yaml.dump(read_yaml, outfile, default_flow_style=False)
+        else:
+            print('Not a valid body part file')
 
 def changeimageformat(directory,filetypein,filetypeout):
 

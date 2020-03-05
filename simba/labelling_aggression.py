@@ -5,6 +5,7 @@ import os
 from tkinter import filedialog
 from configparser import ConfigParser
 from subprocess import *
+import matplotlib.pyplot as plt
 
 current_video = ""
 frames_in = []
@@ -157,6 +158,12 @@ class MainInterface:
                                              '\n Ctrl + o = First frame')
         key_presses.grid(sticky=S)
 
+    def Rfbox(self):
+        return self.fbox
+
+    def guimaster(self):
+        return self.window
+
     # Detects user key presses
     def bind_keys(self):
         self.window.bind('<Control-s>', lambda x: self.save_checkboxes(self.window))
@@ -182,6 +189,82 @@ class MainInterface:
             e = s
             save_values(s, e)
             load_frame(e+1, master, self.fbox)
+
+class MainInterface2:
+    def __init__(self):
+        self.window = Toplevel()
+        folder = Frame(self.window)
+        folder.grid(row=0, column=1, sticky=N)
+
+        # Advancing Buttons
+        self.button_frame = Frame(self.window, bd=2, width=700, height=300)
+        self.button_frame.grid(row=1, column=0)
+
+        self.frameNumber = Label(self.button_frame, text="Frame number")
+        self.frameNumber.grid(row=0, column=1)
+        self.forward = Button(self.button_frame, text=">",
+                              command=lambda: load_frame(current_frame_number+1, self.window, self.fbox))
+        self.forward.grid(row=1, column=3, sticky=E)
+        self.forward = Button(self.button_frame, text=">>",
+                              command=lambda: load_frame(len(frames_in) - 1, self.window, self.fbox))
+        self.forward.grid(row=1, column=4, sticky=E)
+        self.back = Button(self.button_frame, text="<",
+                           command=lambda: load_frame(current_frame_number-1, self.window, self.fbox))
+        self.back.grid(row=1, column=1, sticky=W)
+        self.back = Button(self.button_frame, text="<<", command=lambda: load_frame(0, self.window, self.fbox))
+        self.back.grid(row=1, column=0, sticky=W)
+
+        n = StringVar(self.window, value=current_frame_number)
+        self.fbox = Entry(self.button_frame, width=7, textvariable=n)
+        self.fbox.grid(row=1, column=1)
+        self.select = Button(self.button_frame, text="Jump to selected frame", command=lambda:
+            load_frame(int(self.fbox.get()), self.window, self.fbox))
+        self.select.grid(row=2, column=1, sticky=N)
+
+        # Jump Buttons
+        self.jump_frame = Frame(self.window)
+        self.jump_frame.grid(row=2, column=0)
+        self.jump = Label(self.jump_frame, text="Jump Size:")
+        self.jump.grid(row=0, column=0, sticky=W)
+        self.jump_size = Scale(self.jump_frame, from_=0, to=100, orient=HORIZONTAL, length=200)
+        self.jump_size.set(jump_size)
+        self.jump_size.grid(row=0, column=1, sticky=W)
+        self.jump_forward = Button(self.jump_frame, text="<<", command=lambda:
+            load_frame(int(self.fbox.get()) - self.jump_size.get(), self.window, self.fbox))
+        self.jump_forward.grid(row=0, column=2, sticky=E)
+        self.jump_back = Button(self.jump_frame, text=">>", command=lambda:
+            load_frame(int(self.fbox.get()) + self.jump_size.get(), self.window, self.fbox))
+        self.jump_back.grid(row=0, column=3, sticky=W)
+
+
+        # Loads the first frame
+        load_frame(0, self.window, self.fbox)
+
+        # Video Player
+        video_player = Frame(self.window, width=100, height=100)
+        video_player.grid(row=0, column=2, sticky=N)
+        key_presses = Label(video_player, text='\n\n Keyboard shortcuts for frame navigation: \n Right Arrow = +1 frame'
+                                             '\n Left Arrow = -1 frame'
+                                             '\n Ctrl + s = Save and +1 frame'
+                                             '\n Ctrl + l = Last frame'
+                                             '\n Ctrl + o = First frame')
+        key_presses.grid(sticky=S)
+        self.bind_keys()
+    def Rfbox(self):
+        return self.fbox
+
+    def guimaster(self):
+        return self.window
+
+    # Detects user key presses
+    def bind_keys(self):
+        self.window.bind('<Control-s>', lambda x: self.save_checkboxes(self.window))
+        self.window.bind('<Right>', lambda x: load_frame(current_frame_number+1, self.window, self.fbox))
+        self.window.bind('<Left>', lambda x: load_frame(current_frame_number-1, self.window, self.fbox))
+        self.window.bind('<Control-q>', lambda x: save_video(self.window))
+        self.window.bind('<Control-l>', lambda x: load_frame(len(frames_in) - 1, self.window, self.fbox))
+        self.window.bind('<Control-o>', lambda x: load_frame(0, self.window, self.fbox))
+
 
 
 # Opens the video that corresponds to the matching labelling folder
@@ -220,7 +303,6 @@ def choose_folder(project_name):
     global current_video
     img_dir = filedialog.askdirectory()
     os.chdir(img_dir)
-    print("Working directory is %s" % os.getcwd())
     dirpath = os.path.basename(os.getcwd())
     current_video = dirpath
     print('Current Video: ' + current_video)
@@ -242,9 +324,60 @@ def choose_folder(project_name):
     MainInterface()
     #create_data_frame(number_of_frames)
 
+def choose_folder2(framedir):
+    global current_video, guiwindow
+    img_dir = framedir
+    os.chdir(img_dir)
+
+    global frames_in
+    frames_in = []
+    for i in os.listdir(os.curdir):
+        if i.__contains__(".png"):
+            frames_in.append(i)
+        reset()
+
+    frames_in = sorted(frames_in, key=lambda x: int(x.split('.')[0]))
+    # print(frames_in)
+    number_of_frames = len(frames_in)
+    print("Number of Frames: " + str(number_of_frames))
+
+    guiwindow = MainInterface2()
+
+
+    return guiwindow
+
+
 
 # Loads a new image frame
 def load_frame(number, master, entry):
+    global current_frame_number
+    max_index_frames_in = len(frames_in) - 1
+    try:
+        if number > max_index_frames_in:
+            print("Reached End of Frames")
+            current_frame_number = max_index_frames_in
+        elif number < 0:
+            current_frame_number = 0
+        else:
+            current_frame_number = number
+
+        entry.delete(0, END)
+        entry.insert(0, current_frame_number)
+
+        max_size = 1080, 650
+        current_image = Image.open(frames_in[current_frame_number])
+        current_image.thumbnail(max_size, Image.ANTIALIAS)
+        current_frame = ImageTk.PhotoImage(master=master, image=current_image)
+
+        video_frame = Label(master, image=current_frame)
+        video_frame.image = current_frame
+        video_frame.grid(row=0, column=0)
+
+    except IndexError:
+        pass
+
+# Loads a new image frame
+def load_frame2(number, master,entry):
     global current_frame_number
     max_index_frames_in = len(frames_in) - 1
     try:
@@ -298,7 +431,7 @@ def save_values(start, end):
         for i in range(start, end+1):
             for b in range(len(behaviors)):
                 df.at[i, columns[b]] = int(behaviors[b])
-    print(df.ix[current_frame_number])
+    #print(df.ix[current_frame_number])
 
 
 # Appends data to corresponding features_extracted csv and exports as new csv
@@ -313,5 +446,5 @@ def save_video(master):
     new_data.rename(columns={'Unnamed: 0': 'scorer'}, inplace=True)
     new_data.to_csv(output_file, index=FALSE)
     print(output_file)
-    print(current_video + 'Annotation file for "' + str(current_video) + '"' + ' created.')
+    print('Annotation file for "' + str(current_video) + '"' + ' created.')
     # master.destroy()

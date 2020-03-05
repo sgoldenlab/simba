@@ -6,6 +6,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
 from configparser import ConfigParser
+import glob
 
 def extract_features_wotarget_9(inifile):
     configFile = str(inifile)
@@ -29,16 +30,12 @@ def extract_features_wotarget_9(inifile):
             math.atan2(cy - by, cx - bx) - math.atan2(ay - by, ax - bx))
         return ang + 360 if ang < 0 else ang
 
-    filesFound = []
     roll_windows = []
     roll_windows_values = [2, 5, 6, 7.5, 15]
     loopy = 0
 
-    ########### FIND CSV FILES ###########
-    for i in os.listdir(csv_dir_in):
-        if i.__contains__(".csv"):
-            fname = os.path.join(csv_dir_in, i)
-            filesFound.append(fname)
+    filesFound = glob.glob(csv_dir_in + '/*.csv')
+    print('Extracting features from ' + str(len(filesFound)) + ' files...')
     print('Extracting features from ' + str(len(filesFound)) + ' file(s)...')
 
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
@@ -50,6 +47,7 @@ def extract_features_wotarget_9(inifile):
         currentFile = i
         currVidName = os.path.basename(currentFile)
         currVidName = currVidName.replace('.csv', '')
+
         # get current pixels/mm
         currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
         try:

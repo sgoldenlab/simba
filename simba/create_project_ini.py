@@ -1,6 +1,10 @@
 import os
+import csv
+import re
 
-def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
+def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo):
+    simbaDir = os.getcwd()
+    animalNo = re.sub("[^0-9]", "", animalNo)
 
 ############create directories################
     directory = project_path
@@ -12,6 +16,9 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
     csv_folder = str(project_folder + '\\csv')
     frames_folder = str(project_folder + '\\frames')
     logs_folder = str(project_folder + '\\logs')
+    measures_folder = os.path.join(logs_folder, 'measures')
+    pose_configs_folder = os.path.join(measures_folder, 'pose_configs')
+    bp_names_folder = os.path.join(pose_configs_folder, 'bp_names')
     videos_folder = str(project_folder + '\\videos')
     #csv folder
     features_extracted_folder = str(csv_folder + '\\features_extracted')
@@ -24,16 +31,16 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
     input_folder = str(frames_folder + '\\input')
     output_folder = str(frames_folder + '\\output')
 
-    folder_list = [project_folder,models_folder,config_folder,csv_folder,frames_folder,logs_folder,videos_folder,features_extracted_folder,input_csv_folder,machine_results_folder,outlier_corrected_movement_folder,outlier_corrected_location_folder,targets_inserted_folder,input_folder,output_folder]
+    folder_list = [project_folder,models_folder,config_folder,csv_folder,frames_folder,logs_folder,videos_folder,features_extracted_folder,input_csv_folder,machine_results_folder,outlier_corrected_movement_folder,outlier_corrected_location_folder,targets_inserted_folder,input_folder,output_folder, measures_folder, pose_configs_folder, bp_names_folder]
 
     for i in folder_list:
         try:
             # Create target Directory
             os.makedirs(i)
-           # print("Directory ", os.path.basename(i), " created ")
+            # print("Directory ", os.path.basename(i), " created ")
         except FileExistsError:
             pass
-           # print("Directory ", os.path.basename(i), " already exists")
+            # print("Directory ", os.path.basename(i), " already exists")
 
 
 ########create text file ##################
@@ -46,6 +53,7 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
     f.write('csv_path = ' + str(csv_folder) +'\n')
     f.write('use_master_config = ' + str(msconfig) +'\n')
     f.write('config_folder = ' + str(config_folder)+ '\n')
+    f.write('animal_no = ' + str(animalNo) + '\n')
     f.write('\n')
 
     #sml setings
@@ -62,6 +70,18 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
 
     f.write('\n')
 
+    ###threshold settings
+    f.write('[threshold_settings]\n')
+    for i in range(int(no_targets)):
+        f.write('threshold_' +str(i+1) + ' = ' +'\n')
+    f.write('\n')
+
+    ###Minimum bout length settings
+    f.write('[Minimum_bout_lengths]\n')
+    for i in range(int(no_targets)):
+        f.write('min_bout_' + str(i + 1) + ' = ' + '\n')
+    f.write('\n')
+
     #frame settings
     f.write('[Frame settings]\n')
     f.write('frames_dir_in = ' + str(input_folder) + '\n')
@@ -69,7 +89,6 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
     f.write('mm_per_pixel = '+'\n')
     f.write('distance_mm = 0'+'\n')
     f.write('\n')
-
 
     #line plot settings
     f.write('[Line plot settings]\n')
@@ -97,6 +116,29 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
     f.write('POI_2 = ' + '\n')
     f.write('\n')
 
+    #heatmap plot
+    f.write('[Heatmap settings]\n')
+    f.write('bin_size_pixels = ' + '\n')
+    f.write('Scale_max_seconds = ' + '\n')
+    f.write('Scale_increments_seconds = ' + '\n')
+    f.write('Palette = ' + '\n')
+    f.write('target_behaviour = ' + '\n')
+    f.write('\n')
+
+    #ROI settings
+    f.write('[ROI settings]\n')
+    f.write('animal_1_bp  = ' + '\n')
+    f.write('animal_2_bp  = ' + '\n')
+    f.write('directionality_data = ' + '\n')
+    f.write('visualize_feature_data = ' + '\n')
+    f.write('\n')
+
+    # process movements settings
+    f.write('[process movements]\n')
+    f.write('Animal_no  = ' + '\n')
+    f.write('animal_1_bp  = ' + '\n')
+    f.write('animal_2_bp  = ' + '\n')
+
     #create movie settings
     f.write('[Create movie settings]\n')
     f.write('file_format = ' + '\n')
@@ -106,6 +148,7 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
     #ensemble settings
     f.write('[create ensemble settings]\n')
     f.write('pose_estimation_body_parts = ' + str(bp) + '\n')
+    f.write('pose_config_label_path = ' + str(directory +'\\' + project_name + '\\project_folder\\logs\\measures\\pose_configs\\bp_names\\project_bp_names.csv') + '\n')
     f.write('model_to_run = RF\n')
     f.write('load_model =\n')
     f.write('data_folder = ' + str(csv_folder+'\\targets_inserted') + '\n')
@@ -122,7 +165,7 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
     f.write('RF_criterion = entropy \n')
     f.write('RF_meta_data =  \n')
     f.write('generate_example_decision_tree =  \n')
-    f.write('generate_classification_report =  \n')
+    f.write('generate_example_decision_tree_fancy =  \n')
     f.write('generate_features_importance_log =  \n')
     f.write('generate_features_importance_bar_graph =  \n')
     f.write('compute_permutation_importance =  \n')
@@ -155,13 +198,27 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp):
     f.write('discrimination_threshold = ' + '\n')
     f.write('\n')
 
-#outliersettings
+    #outliersettings
     f.write('[Outlier settings]\n')
     f.write('movement_criterion = \n')
     f.write('location_criterion = \n')
     f.close
 
     configfile = str(project_folder + "\\project_config.ini")
+
+
+    ########create project_bp_names ##################
+    bodyPartListFile = os.path.join(simbaDir, 'pose_configurations', 'bp_names', 'bp_names.csv')
+    with open(bodyPartListFile, "r", encoding='utf8') as f:
+        cr = csv.reader(f, delimiter=",")  # , is default
+        rows = list(cr)  # create a list of rows for instance
+    chosenBodyParts = rows[listindex]
+    chosenBodyParts = list(filter(None, chosenBodyParts))
+    projectBpfile = os.path.join(bp_names_folder, 'project_bp_names.csv')
+    f = open(projectBpfile, 'w+')
+    for i in chosenBodyParts:
+        f.write(i + '\n')
+    f.close
 
     return configfile
 

@@ -88,3 +88,55 @@ def readHeader(f):
     info.fps=fps[0]
     info.codec='imageFormat'+str(info.imageFormat)
     return info
+
+
+def convertseqVideo(videos,outtype='mp4',clahe=False,startF=None,endF=None):
+    import os
+    import io
+    import cv2
+    from tqdm import tqdm
+    from PIL import Image
+    from skimage import color
+    from skimage.util import img_as_ubyte
+    '''Convert videos to contrast adjusted videos of other formats'''
+    ## get videos into a list in video folder
+    videoDir = videos
+    videolist = []
+    for i in os.listdir(videoDir):
+        if i.endswith('.seq'):
+            videolist.append(os.path.join(videoDir,i))
+
+
+    for video in videolist:
+        vname = str(video)[:-4]
+        f = open(video,'rb')
+        info = readHeader(f)
+        nframes = info.numFrames
+        pos,frameSize = posFrame(f,nframes)
+        fps=info.fps
+        size = (info.width, info.height)
+        extra=4
+        if startF is None:
+            startF=0
+        if endF is None:
+            endF=nframes
+        if outtype=='avi':
+            print('Coming soon')
+        if outtype=='mp4':
+            outname=os.path.join(vname + '.mp4')
+            videowriter=cv2.VideoWriter(outname,cv2.VideoWriter_fourcc('m','p','4','v'),fps,size,isColor=True)
+        for index in tqdm(range(startF,endF)):
+            f.seek(pos[index]+extra*(index+1),0)
+            imgdata=f.read(frameSize[index])
+            image=Image.open(io.BytesIO(imgdata))
+            image=img_as_ubyte(image)
+            if clahe:
+                image=cv2.createCLAHE(clipLimit=2,tileGridSize=(16,16)).apply(image)
+            image=color.gray2rgb(image)
+            frame=image
+            videowriter.write(frame)
+        f.close()
+        videowriter.release()
+
+    print('Finish conversion.')
+

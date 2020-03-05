@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings('ignore',category=FutureWarning)
+warnings.filterwarnings('ignore',category=DeprecationWarning)
 from configparser import ConfigParser, MissingSectionHeaderError
 import os
 import pandas as pd
@@ -18,7 +21,7 @@ from eli5.sklearn import PermutationImportance
 import numpy as np
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
-
+from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
 
 def train_multimodel(configini):
     pd.options.mode.chained_assignment = None
@@ -40,7 +43,6 @@ def train_multimodel(configini):
         os.makedirs(modelPath)
     model_nos = config.getint('SML settings', 'No_targets')
     data_folder = config.get('create ensemble settings', 'data_folder')
-    pose_estimation_body_parts = config.getint('create ensemble settings', 'pose_estimation_body_parts')
     features = pd.DataFrame()
 
     def generateClassificationReport(clf, class_names, classifierName, saveFileNo):
@@ -91,15 +93,7 @@ def train_multimodel(configini):
             os.makedirs(metaDataFolder)
         print('Meta data file saved.')
         metaDataPath = os.path.join(metaDataFolder, metaDataFn)
-        metaDataHeaders = ["Classifier_name", "RF_criterion", "RF_max_features", "RF_min_sample_leaf",
-                           "RF_n_estimators", "compute_feature_permutation_importance",
-                           "generate_classification_report", "generate_example_decision_tree",
-                           "generate_features_importance_bar_graph", "generate_features_importance_log",
-                           "generate_precision_recall_curves", "generate_rf_model_meta_data_file",
-                           "generate_sklearn_learning_curves", "learning_curve_data_splits",
-                           "learning_curve_k_splits", "n_feature_importance_bars",
-                           "over_sample_ratio", "over_sample_setting", "train_test_size", "under_sample_ratio",
-                           "under_sample_setting"]
+        metaDataHeaders = GenerateMetaDataFileHeaders()
 
         with open(metaDataPath, 'w', newline='') as f:
             out_writer = csv.writer(f)
@@ -147,64 +141,34 @@ def train_multimodel(configini):
             metaFilesList.append(metaFile)
     print('# of models to be created: ' + str(len(metaFilesList)))
     loopy = 0
+
+    # READ IN DATA FOLDER AND REMOVE ALL NON-FEATURE VARIABLES (POP DLC COORDINATE DATA AND TARGET DATA)
+    features = pd.DataFrame()
+    print('Reading in ' + str(len(os.listdir(data_folder))) + ' annotated files...')
+
+    for p in os.listdir(data_folder):
+        if (".csv") in p:
+            currentFn = os.path.join(data_folder, p)
+            df = pd.read_csv(currentFn)
+            features = features.append(df, ignore_index=True)
+    features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
+    baseFeatureFrame = features.drop(["scorer"], axis=1, errors='ignore')
+
+
     for i in metaFilesList:
         loopy+=1
+        features = baseFeatureFrame.copy()
         currMetaFile = pd.read_csv(i, index_col=False)
         classifierName = currMetaFile['Classifier_name'].iloc[0]
+        classifierName = currMetaFile['Classifier_name'].iloc[0]
         saveFileNo = (len(os.listdir(modelPath)) + 1)
-
-        #READ IN DATA FOLDER AND REMOVE ALL NON-FEATURE VARIABLES (POP DLC COORDINATE DATA AND TARGET DATA)
-        features = pd.DataFrame()
-        print('Reading in ' + str(len(os.listdir(data_folder))) + ' annotated files...')
-        for p in os.listdir(data_folder):
-            if (".csv") in p:
-                currentFn = os.path.join(data_folder, p)
-                df = pd.read_csv(currentFn)
-                features = features.append(df, ignore_index=True)
-        features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
-        features = features.drop(["scorer"], axis=1, errors='ignore')
+        totalTargetframes = features[classifierName].sum()
         try:
             targetFrame = features.pop(classifierName).values
         except KeyError:
             print('Error: the dataframe does not contain any target annotations. Please check the csv files in the project_folder/csv/target_inserted folder')
         features = features.fillna(0)
-        if pose_estimation_body_parts == 16:
-            features = features.drop(
-                ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-                 "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p", "Lat_left_1_x",
-                 "Lat_left_1_y",
-                 "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x", "Tail_base_1_y",
-                 "Tail_base_1_p", "Tail_end_1_x", "Tail_end_1_y", "Tail_end_1_p", "Ear_left_2_x",
-                 "Ear_left_2_y", "Ear_left_2_p", "Ear_right_2_x", "Ear_right_2_y", "Ear_right_2_p", "Nose_2_x",
-                 "Nose_2_y", "Nose_2_p", "Center_2_x", "Center_2_y", "Center_2_p", "Lat_left_2_x", "Lat_left_2_y",
-                 "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x", "Tail_base_2_y",
-                 "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p", ], axis=1)
-        if pose_estimation_body_parts == 14:
-            features = features.drop(
-                ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-                 "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p", "Lat_left_1_x",
-                 "Lat_left_1_y", "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x", "Tail_base_1_y",
-                 "Tail_base_1_p", "Ear_left_2_x", "Ear_left_2_y", "Ear_left_2_p", "Ear_right_2_x", "Ear_right_2_y",
-                 "Ear_right_2_p", "Nose_2_x", "Nose_2_y", "Nose_2_p", "Center_2_x", "Center_2_y", "Center_2_p", "Lat_left_2_x", "Lat_left_2_y",
-                 "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x", "Tail_base_2_y",
-                 "Tail_base_2_p"], axis=1)
-        if pose_estimation_body_parts == 8:
-            features = features.drop(
-                ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-                 "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p", "Lat_left_1_x",
-                 "Lat_left_1_y", "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x", "Tail_base_1_y",
-                 "Tail_base_1_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p"], axis=1)
-        if pose_estimation_body_parts == 7:
-            features = features.drop(
-                ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-                 "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p", "Lat_left_1_x",
-                 "Lat_left_1_y", "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x", "Tail_base_1_y",
-                 "Tail_base_1_p"], axis=1)
-        if pose_estimation_body_parts == 4:
-            features = features.drop(
-                ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y", "Ear_right_1_p",
-                 "Nose_1_x", "Nose_1_y", "Nose_1_p", "Tail_base_1_x", "Tail_base_1_y", "Tail_base_1_p", ], axis=1)
-        print('# ' + str(len(features.columns)) + ' features.')
+        features = drop_bp_cords(features, configini)
         target_names = []
         loop=1
 
@@ -235,16 +199,16 @@ def train_multimodel(configini):
 
         #PRINT INFORMATION TABLE ON THE MODEL BEING CREATED
         print('MODEL ' + str(loopy) + str(' settings'))
-        tableView = [["Model name", classifierName], ["Ensemble method", model_to_run], ["Estimators (trees)", RF_n_estimators], ["Max features", RF_max_features], ["Under sampling setting", under_sample_setting], ["Under sampling ratio", under_sample_ratio], ["Over sampling setting", over_sample_setting], ["Under sampling ratio", under_sample_ratio], ["criterion", RF_criterion], ["Min sample leaf", RF_min_sample_leaf]]
+        tableView = [["Model name", classifierName], ["Ensemble method", model_to_run], ["Estimators (trees)", RF_n_estimators], ["Max features", RF_max_features], ["Under sampling setting", under_sample_setting], ["Under sampling ratio", under_sample_ratio], ["Over sampling setting", over_sample_setting], ["Over sampling ratio", over_sample_ratio], ["criterion", RF_criterion], ["Min sample leaf", RF_min_sample_leaf]]
         headers = ["Setting", "value"]
         print(tabulate(tableView, headers, tablefmt="grid"))
+        print('# ' + str(len(features.columns)) + ' features.')
 
         # IF SET BY USER - PERFORM UNDERSAMPLING AND OVERSAMPLING IF SET BY USER
         data_train, data_test, target_train, target_test = train_test_split(features, targetFrame, test_size=train_test_size)
         trainDf = data_train
         trainDf[classifierName] = target_train
-        targetFrameRows = trainDf.loc[trainDf[classifierName] == 1]
-        print('# of ' + str(classifierName) + ' frames in dataset: ' + str(len(targetFrameRows)))
+        print('# of ' + str(classifierName) + ' frames in dataset: ' + str(totalTargetframes))
         if under_sample_setting == 'Random undersample':
             print('Performing undersampling...')
             targetFrameRows = trainDf.loc[trainDf[classifierName] == 1]
@@ -282,6 +246,7 @@ def train_multimodel(configini):
                 print('ERROR: The model contains an incompatible array. This may happen when trying to train a model with 0 examples of the behavior of interest')
             except ModuleNotFoundError:
                 print('ERROR: ModuleNotFoundError. This can happen with incompatible versions of NumPy.')
+
             #RUN RANDOM FOREST EVALUATIONS
             generate_example_decision_tree = currMetaFile['generate_example_decision_tree'].iloc[0]
             if generate_example_decision_tree == 'yes':
@@ -329,7 +294,6 @@ def train_multimodel(configini):
                 print('Calculating learning curves...')
                 LearningCurve(features, targetFrame, shuffle_splits, dataset_splits)
 
-
             # SAVE MODEL META DATA
             RF_meta_data = currMetaFile['generate_rf_model_meta_data_file'].iloc[0]
             if RF_meta_data == 'yes':
@@ -339,9 +303,11 @@ def train_multimodel(configini):
                                 generate_example_decision_tree, generate_features_importance_bar_graph,
                                 generate_features_importance_log,
                                 generate_precision_recall_curve, RF_meta_data, generate_learning_curve, dataset_splits,
-                                shuffle_splits, N_feature_importance_bars, over_sample_ratio, under_sample_setting,
-                                train_test_size, under_sample_ratio, over_sample_setting]
+                                shuffle_splits,
+                                N_feature_importance_bars, over_sample_ratio, over_sample_setting, train_test_size,
+                                under_sample_ratio, under_sample_ratio]
                 generateMetaData(metaDataList, classifierName, saveFileNo)
+
 
         #SAVE MODEL
         modelfn = str(classifierName) + '_' + str(saveFileNo) + '.sav'

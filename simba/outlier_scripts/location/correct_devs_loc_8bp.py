@@ -22,7 +22,6 @@ def dev_loc_8(projectini):
     counts_total_M1_list = []
     loopy = 0
     reliableCoordinates = np.zeros((7, 2))
-
     criterion = config.getfloat('Outlier settings', 'location_criterion')
 
     ########### FIND CSV FILES ###########

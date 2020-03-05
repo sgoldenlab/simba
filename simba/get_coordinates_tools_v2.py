@@ -55,13 +55,10 @@ def get_coordinates_nilsson(filenames,knownmm):
     fileName = str(0) + str('.bmp')
     filePath = os.path.join(currentDir, fileName)
     cv2.imwrite(filePath, frame)
-
     img = cv2.imread(filePath)
     (imageHeight, imageWidth) = img.shape[:2]
-    fscale = 0.03
-    cscale = 0.5
-    fontScale = min(imageWidth, imageHeight) / (25 / fscale)
-    circleScale = int(min(imageWidth, imageHeight) / (25 / cscale))
+    circleScale = int(max(imageWidth, imageHeight) / (max(imageWidth, imageWidth) * 0.05))
+    fontScale = max(imageWidth, imageWidth) / (max(imageWidth, imageWidth) * 1.8)
     origImage = img.copy()
     overlay = img.copy()
     ix,iy = -1,-1
@@ -82,9 +79,9 @@ def get_coordinates_nilsson(filenames,knownmm):
                 overlay = origImage.copy()
                 cv2.circle(overlay, (cordList[0], cordList[1]), circleScale, (144, 0, 255), -1)
                 cv2.circle(overlay, (cordList[2], cordList[3]), circleScale, (144, 0, 255), -1)
-                cv2.line(overlay, (cordList[0], cordList[1]), (cordList[2], cordList[3]), (144, 0, 255), 6)
-            cv2.putText(overlay, 'Click on circle to move', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, fontScale, (255, 0, 255), 2)
-            cv2.putText(overlay, 'Press ESC to save and exit', (20, 60), cv2.FONT_HERSHEY_TRIPLEX, fontScale, (255, 0, 255), 2)
+                cv2.line(overlay, (cordList[0], cordList[1]), (cordList[2], cordList[3]), (144, 0, 255), int(circleScale/4))
+            cv2.putText(overlay, 'Click on circle to move', (20, 20), cv2.FONT_HERSHEY_TRIPLEX, fontScale, (255, 0, 255), 2)
+            cv2.putText(overlay, 'Press ESC to save and exit', (20, 50), cv2.FONT_HERSHEY_TRIPLEX, fontScale, (255, 0, 255), 2)
             cv2.imshow('Select coordinates: double left mouse click at two locations. Press ESC when done', overlay)
             cv2.setMouseCallback(
                 'Select coordinates: double left mouse click at two locations. Press ESC when done',
@@ -108,7 +105,7 @@ def get_coordinates_nilsson(filenames,knownmm):
             if coordChange[0] == 1:
                 cv2.circle(img, (cordList[2], cordList[3]), circleScale, (144, 0, 255), -1)
                 cv2.circle(img, (newCordList[-2], newCordList[-1]), circleScale, (144, 0, 255), -1)
-                cv2.line(img, (cordList[2], cordList[3]), (newCordList[-2], newCordList[-1]), (144, 0, 255), 6)
+                cv2.line(img, (cordList[2], cordList[3]), (newCordList[-2], newCordList[-1]), (144, 0, 255), int(circleScale/4))
                 cordList = [newCordList[-2], newCordList[-1], cordList[2], cordList[3]]
                 cordStatus = True
                 moveStatus = False
@@ -117,7 +114,7 @@ def get_coordinates_nilsson(filenames,knownmm):
             if coordChange[0] == 2:
                 cv2.circle(img, (cordList[0], cordList[1]), circleScale, (144, 0, 255), -1)
                 cv2.circle(img, (newCordList[-2], newCordList[-1]), circleScale, (144, 0, 255), -1)
-                cv2.line(img, (cordList[0], cordList[1]), (newCordList[-2], newCordList[-1]), (144, 0, 255), 6)
+                cv2.line(img, (cordList[0], cordList[1]), (newCordList[-2], newCordList[-1]), (144, 0, 255), int(circleScale/4))
                 cordList = [cordList[0], cordList[1], newCordList[-2], newCordList[-1]]
                 cordStatus = True
                 moveStatus = False
