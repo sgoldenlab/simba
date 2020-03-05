@@ -15,6 +15,7 @@
 - Interactive classifer discrimination thresholding - [Documentation](/docs/validation_tutorial.md#validate-model-on-single-video)
 - Individual discrimination thresholds for classifiers - [Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data)
 - Heatmap visualizations -[Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions)
+- Multi-crop tool - [Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos)
 - Post-classification validation method for false-positives - [Documentation](/docs/classifier_validation.md#classifier-validation)
 - Many, many, many bug-fixes
 
