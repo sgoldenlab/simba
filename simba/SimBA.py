@@ -704,7 +704,7 @@ class video_info_table:
 
     def __init__(self,configini):
 
-        self.filesFound = [0]  #initiate files found
+        self.filesFound = [0]
         video_info_csv = str(os.path.dirname(configini)+'\\logs\\video_info.csv')
         config = ConfigParser()
         self.configFile = str(configini)
@@ -720,6 +720,7 @@ class video_info_table:
         self.tkintertable = Toplevel()
         self.tkintertable.minsize(1000, 500)
         self.tkintertable.wm_title("Video Info")
+        self.tkintertable.iconbitmap(maincwd+'\\'"golden_lab.ico")
 
         self.xscrollbar = Scrollable(self.tkintertable,width=32)
         self.myframe = LabelFrame(self.xscrollbar,text='Table')
@@ -739,7 +740,7 @@ class video_info_table:
         count = 0
         for i in self.filesFound:
             vid= cv2.VideoCapture(os.path.join(str(self.config_videofolders),str(i)))
-            #print((os.path.join(str(self.config_videofolders),str(i))))
+            print((os.path.join(str(self.config_videofolders),str(i))))
             self.table_col[0].setvariable(count,str(count)+'.')
             self.table_col[1].setvariable(count,i)
             self.table_col[2].setvariable(count, int(vid.get(cv2.CAP_PROP_FPS)))
@@ -782,14 +783,11 @@ class video_info_table:
                 else:
                     videosdict[keys] = 0
             pixellist = list(videosdict.values())
-            self.pixel_list = pixellist
-            self.getdata()
+
             self.button = Button_getcoord(self.xscrollbar, self.data_lists[1], self.data_lists[5],pixellist)
             self.button.grid(row=6, column=1)
-
+            self.pixel_list = pixellist
         else:
-            self.pixel_list= None
-            self.getdata()
             self.button = Button_getcoord(self.xscrollbar,self.data_lists[1],self.data_lists[5])
             self.button.grid(row=6,column=1)
 
@@ -816,7 +814,7 @@ class video_info_table:
     def addBox(self,scroll):
         self.new_col_list.append(0)
         self.next_column = len(self.new_col_list)
-        #print(self.next_column)
+        print(self.next_column)
         self.table_col.append(newcolumn(self.myframe,self.filesFound,'20'))
         self.table_col[(self.next_column)-1].grid(row=0,column=self.next_column)
         scroll.update()
@@ -831,7 +829,7 @@ class video_info_table:
 
         # add path to videos for get coord
         self.data_lists[1] = [str(self.config_videofolders)+'\\'+s for s in self.data_lists[1]]
-        if self.pixel_list!= None:
+        if self.pixel_list:
             self.button = Button_getcoord(self.xscrollbar, self.data_lists[1], self.data_lists[5],self.pixel_list)
             self.button.grid(row=6, column=1)
         else:

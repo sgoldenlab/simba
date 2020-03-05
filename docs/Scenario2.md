@@ -40,37 +40,35 @@ At this point we have Experimental data, which has been corrected for outliers a
 
 1. In the Load Project menu, navigate to the **Run Machine Model** tab and you should see the following window. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="343" height="132" />
+![](https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG "rfmodelsettings1")
 
 2. Click on `Model Selection`. The following window, containing the classifier names that were defined when you created the project, will pop up. The image below depicts a full suite of behavioral predictive classifiers relevant to aggression behavior, but yours should only show Behavior BtWGaNP. 
 
-<p align="center">
-  <img width="312" height="256" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
-</p>
+![](https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG "rfmodelsettings")
 
 3. Click on `Browse File` and select the model (*.sav*) file associated with the classifier name. If you are following along from [Scenario 1](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md), the *.sav* file will be saved in your earlier project, in the `project_folder\models\generated_models` directory or the `project_folder\models\validation\model_files` directory. You can also select an *.sav* file located in any other directory. For example, if you have downloaded a random forest model from [our OSF repository](https://osf.io/d69jt/), you can specify the path to that file here. 
 
-4. Once the path has been selected, click on `Set Model` to save the path.
+Once the path has been selected, go ahead and modify the discrimination `Threshold` and `Minimum Bout` for each classifier separately. If you want to explore the optimal threshold for your classifier, go ahead and read [Scenario 1 - Critical validation step before running machine model on new data](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data) on how to use the `Validate Model on Single Video` menu (this information is also repeated in brief in Step 4 below). The `Threshold` entry box accepts a value between 0 and 1. The `Minimum Bout` is a time value in milliseconds that represents the minimum length of a classified behavioral bout. To read more about the `Minimum Bout` - go ahead and read [Scenario 1 - Critical validation step before running machine model on new data](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data)(this information is also repeated in brief in Step 4 below). 
 
 >**Note**: In the real world you may want want to run mutiple classifiers on each video, one for each of the behaviors you are intrested in. **In such a scenario you have defined mutiple predictive calssifier names when you created the project in Step 1**. Each one will be displayed in the `Model Selection`, and you can specify a different path to a different *.sav* file for each of them. 
 
->**Important**: Each random forest expects a specific number of features. The number of calculated features is determined by the number of body-parts tracked in pose-estimation in DeepLabCut. *For example*: if the input dataset contains the coordinates of three body parts, then a fewer number of features can be calculated than if 8 body parts were tracked. This means that you will get an error if you run a random forest model *.sav* file that has been generated using 8 body parts on a new dataset that contains only 3 body parts.
+>**Important**: Each random forest expects a specific number of features. The number of calculated features is determined by the number of body-parts tracked in pose-estimation in DeepLabCut or DeepPoseKit. *For example*: if the input dataset contains the coordinates of three body parts, then a fewer number of features can be calculated than if 8 body parts were tracked. This means that you will get an error if you run a random forest model *.sav* file that has been generated using 8 body parts on a new dataset that contains only 3 body parts.
 
-5. Fill in the `Discrimination threshold` and click on `Set` to save the settings.
+4. Fill in the `Discrimination threshold` and click on `Set` to save the settings.
 
-- `Discrimination threshold`: This value represents the level of probability required to define that the frame belongs to the target class and it accepts a float value between 0.0 and 1.0.  In other words, how certain does the computer have to be that behavior BtWGaNP occurs in a frame, in order for the frame to be classified as containing behavior BtWGaNP? For example, if the discrimination theshold is set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this current tutorial, we suggest using a 0.5 discrimination threshold. 
+- `Discrimination threshold`: This value represents the level of probability required to define that the frame belongs to the target class and it accepts a float value between 0.0 and 1.0.  In other words, how certain does the computer have to be that behavior BtWGaNP occurs in a frame, in order for the frame to be classified as containing behavior BtWGaNP? For example, if the discrimination theshold is set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html).
 
 >*Note*: You can titrate the discrimination threshold to best fit your data. Decreasing the threshold will predict that the classified behavior is *more* frequent, while increasing the threshold will predict that the behaviors as *less* frequent.
 
-6. Fill in the `Minimum behavior bout length` and click on `Set` to save the settings.
+5. Fill in the `Minimum behavior bout length` and click on `Set` to save the settings.
 
 - `Minimum behavior bout length (ms)`:  This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a brake for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. If your videos in your project are recorded at different frame rates then SimBA will account for this when correcting for the `Minimum behavior bout length`. 
 
-7. Click on `Run RF Model` to run the machine model on the new experimental data. You can follow the progress in the main SimBA terminal window. A message will be printed once all the behaviors have been predicted in the experimental videos. New CSV files, that contain the predictions together with the features and pose-estimation data, are saved in the `project_folder/csv/machine_results` directory. 
+6. Click on `Run RF Model` to run the machine model on the new experimental data. You can follow the progress in the main SimBA terminal window. A message will be printed once all the behaviors have been predicted in the experimental videos. New CSV files, that contain the predictions together with the features and pose-estimation data, are saved in the `project_folder/csv/machine_results` directory. 
 
 ## Part 4:  Analyze Machine Results
 
-Once the classifications have been generated, we want to create descriptive statistics for the behavioral predictions. For example, we might like to know how much time the animals in each video enganged in behavior BtWGaNP, how long it took for each animal to start enganging in behavior BtWGaNP, how many bouts of behavior BtWGaNP did occur in each video, and what where the mean/median interval and bout length for behavior BtWGaNP. We may also want some descriptive statistics on the movements, distances and velocities of the animals. If applicable, we can also generate an index on how 'severe' behavior BtWGaNP was. To generate such descriptive statistics summaries, click on the `Run machine model` tab in the `Load project` menu. In the sub-menu `Analyze machine results`, you should see the following menu with three buttons:
+Once the classifications have been generated, we may want to analyze descriptive statistics for the behavioral predictions. For example, we might like to know how much time the animals in each video enganged in behavior BtWGaNP, how long it took for each animal to start enganging in behavior BtWGaNP, how many bouts of behavior BtWGaNP did occur in each video, and what where the mean/median interval and bout length for behavior BtWGaNP. We may also want some descriptive statistics on the movements, distances and velocities of the animals. If applicable, we can also generate an index on how 'severe' behavior BtWGaNP was. To generate such descriptive statistics summaries, click on the `Run machine model` tab in the `Load project` menu. In the sub-menu `Analyze machine results`, you should see the following menu with three buttons:
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/analyzemachineresult.PNG" width="331" height="62" />
 
@@ -90,11 +88,12 @@ Congrats! You have now used machine models to classify behaviors in new data. To
 
 ## Part 5:  Visualizing machine predictions
 
-In this part of the tutorial we will create visualizations of features and machine learning classifications that you have generated. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots and data plots (see below). In this step the different frames can also be merged into video mp4 format. Please note that generating images and videos of the animals with prediction overlays requires that the frames for the videos to have been generated (extracted) in **Part 1** of this tutorial. Also note that the rendering of images and videos can take up a lot of hardrive space, especially if your videos are recorded at high frame rates, are long duration, or high resolution. One suggestion, if you are short on harddrive space, is to only generate frames for a few select videos (more information below).  
+In this part of the tutorial we will create visualizations of features and machine learning classifications that you have generated. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots, heat plots and data plot. In this step the different frames can also be merged into video mp4 format. Please note that generating images and videos of the animals with prediction overlays requires that the frames for the videos to have been generated (extracted) in **Part 1** of this tutorial. Also note that the rendering of images and videos can take up a lot of hardrive space, especially if your videos are recorded at high frame rates, are long duration, or high resolution. One suggestion, if you are short on harddrive space, is to only generate frames for a few select videos (more information below). We are currently working on updating SimBA to give the user the oppurtunity to work with compressed videos rather than frames during the `visualization` steps.   
 
-1. In the `Load Project` menu, click on the `Visualization` tab and you will see the following screen. 
+1. In the `Load Project` menu, click on the `Visualization` tab and you will see the following menus. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="1246" height="380" />
+
+![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Visualization_menu_2.PNG "viz")
 
 2. **Visualize predictions**. On the left of the `Visualization` menu, there is a sub-menu with the heading `Sklearn visualization`. This button grabs the frames of the videos in the project, and draws circles at the location of the tracked body parts, the convex hull of the animal, and prints the behavioral predictions on top of the frame together with the classified time spent enganging in the behavior.  
 
@@ -146,7 +145,7 @@ After specifying these values, click on `Generate Path plot`.
 
 >*Note*: After clicking on `Generate Path plot`, the code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one path plot frame for each frame of the video and save it in the `project_folder\frames\output\path_plots` directory, contained within a new folder named after the video file. if you would like to generate path plots for only a select csv file, remove the files you want to omit from visualizing path plots for from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the path frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
 
-5. **Generate distance plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the last sub-menu titled `Distance plot` to create frames that display the distances between the animals, like in this example gif:
+5. **Generate distance plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the fourth sub-menu titled `Distance plot` to create frames that display the distances between the animals, like in this example gif:
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/distance_plot.gif" width="300" height="225" />
 
@@ -161,6 +160,37 @@ If you are using the recommended [16 body-part, 2 mice setting for pose estimati
 Click on `Generate Distance plot`, and the distance plot frames will be generated in the `project_folder/frames/output/line_plot` folder.
 
 >*Note*: After clicking on `Generate Distance plot`, the code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one distance plot frame for each frame of the video and save it in the `project_folder\frames\output\line_plot` directory, contained within a new folder named after the video file. if you would like to generate path plots for only a select csv file, remove the files you want to omitt from visualizing distance plots for from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the distance frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
+
+
+6. **Generate heatmap**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the fifth sub-menu titled `Heatmap` to create frames displaying a heatmap and spatial information on where the classified behaviors occur according to user-defined scale. SimBA accepts six different palettes for heatmaps:
+
+<p align="center">
+  <img width="400" height="137" src="https://github.com/sgoldenlab/simba/blob/master/images/SimBA_pallettes.PNG">
+</p>
+
+
+| palette | gif |palette|gif |
+| ------------- | ------------- |------------- |------------- |
+| magma         | <img src="https://github.com/sgoldenlab/simba/blob/master/images/magma_heatmap.gif" width="300" height="350">  |inferno        |<img src="https://github.com/sgoldenlab/simba/blob/master/images/inferno_heatmap.gif" width="300" height="350">   |
+| jet           | <img src="https://github.com/sgoldenlab/simba/blob/master/images/jet_heatmap.gif" width="300" height="350">  |plasma        |<img src="https://github.com/sgoldenlab/simba/blob/master/images/plasma_heatmap.gif" width="300" height="350">   |
+| viridis       | <img src="https://github.com/sgoldenlab/simba/blob/master/images/viridis_heatmap.gif" width="300" height="350">   |gnuplot       |<img src="https://github.com/sgoldenlab/simba/blob/master/images/gnuplot_heatmap.gif" width="300" height="350">   |
+
+
+To generate heatmaps, SimBA needs several user-defined variables:
+
+- `Bin size(px)` : Pose-estimation coupled with supervised machine learning in SimBA gives information on the location of an event at the single pixel resolution, which is too-high of a resolution to be useful in heatmap generation. In this entry box, insert an integer value (e.g., 100) that dictates, in pixels, how big a location is. For example, if the user inserts *100*, and the video is filmed using 1000x1000 pixels, then SimBA will generate a heatmap based on 10x10 locations (each being 100x100 pixels large).   
+
+- `# Scale increments` : How many color increments on the heatmap that should be generated. For example, if the user inputs *11*, then a 11-point scale will be created (as in the gifs above). 
+
+- `Scale increment (s)` : How many seconds should constitute a color increment. For example, if the users specifies *0.1*, then a 100ms increase in the time of enganging in the bahvior in a specific location results in a color increment. 
+
+- `Color Palette` : Which color pallette to use to plot the heatmap. See the gifs above for different output examples. 
+
+- `Target` : Which target behavior to plot in the heatmap. 
+
+Once filled in, click on `Generate heatmap`:
+
+>*Note*: After clicking on `Generate heatmap`, the code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one heatmap frame for each frame of the video and save it in the `project_folder\frames\output\heatmap` directory, contained within a new folder named after the video file. if you would like to generate heatmaps for only a select csv file, remove the files you want to omitt from visualizing distance plots for from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the heatmap frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
 
 6. **Merge Frames**. If you have followed through all of **Part 5** of this tutorial, you should have generated several graphs of your machine classifications and extracted data (i.e., gantt plots, line plots, path plots, data plots, sklearn plots). These images are stored in different sub-directories in the `project_folder\frames\output` folder. Now you may want to merge all these frames into single frames, and later into a video, to more readily observe the behavior of interest and its different expression in experimental groups, like in the following video example:   
 

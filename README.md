@@ -67,9 +67,11 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 ## Tutorial 📚
 - [Process video using SimBA tools](docs/Tutorial_tools.md) 🔨
 - [Batch pre-process video using SimBA](docs/tutorial_process_videos.md) 🏭
+- [Using DeepPoseKit in SimBA](docs/DeepPoseKit_in_SimBA.md) 📙
 - [Using DeepLabCut through SimBA](docs/Tutorial_DLC.md) 📗
 - [SimBA generic tutorial](docs/tutorial.md) 📘
 - [SimBA behavioral annotation interface](docs/labelling_aggression_tutorial.md) 🏷️
+- [Using user-defined ROIs in SimBA](/docs/ROI_tutorial.md) 🗺️
 
 ## Resource 💾
 

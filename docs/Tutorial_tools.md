@@ -3,10 +3,11 @@
 
 We have developed video and image processing tools and incorporated them into the overall SimBA pipeline. However, many of the tools are useful on their own or in "one-off" situations. To make these easily accessible, the tools have been incorporated into their own space within the GUI, and are described below.
 
-![alt-text-1](/images/tools2.PNG "tools2")
+![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Tools_menu_1.png "tools2")
 
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
 - [Crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
+- [Multi-crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
 - [Downsample videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video)
 - [Get mm/ppx](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#get-coordinates)
 - [Change formats](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#change-formats)
@@ -16,6 +17,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Merge frames to video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video)
 - [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs)
 - [Extract frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames)
+- [Convert .seq to .mp4](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_tools.md#convert--seq-files-to-mp4-files)
 
 ## Shorten Videos
 This is a tool used to trim video lengths. The tool contains two different methods: 
@@ -71,6 +73,28 @@ This is a tool to crop videos.
 4. Hit `Enter` **twice** and SimBA will crop the video. The new video will have a name of *Name of original video* + *_cropped* and will be located in the same folder as the original video.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/cropvideo4.PNG" width="900" height="100" />
+
+## Multi-crop videos
+
+This is a tool to used to multi-crop videos. For example, if you recorded four different environments with a single camera, you can use this tool to split single recordings into 4 different videos. This tool operates on all videos in a folder that is defined by the user. The user is required to draw the number of defined rectangles on **each** of the videos in the specified folder.  
+
+1. First, click on Multi-crop and the following menu will pop-open:
+
+![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Multi_crop_1.JPG "Multi_crop_1")
+
+2. Next to *Video Folder*, click on `Browse Folder` and select a folder containing the videos you which to multi-crop. 
+
+3. Next to *Output folder*, click on `Browse Folder` and select a folder that should house the cropped output videos. 
+
+4. Next to *Video type*, type the file format of yout input videos (e.g., mp4, avi etc). 
+
+5. Next to *# of crop*, type in the number of cropped videos you wich to generate from each single input video (e.g., 4). Click on **Crop** to proceed. When you click on **Crop**, the first frame of the first video in the specified folder will be displayed, and the name of the video and rectangle number is printed overlaid: 
+
+![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Multi_crop_example.gif "Multi_crop_1")
+
+6. Left click the mouse and drag from the top left corner to the bottom right corner of the first video you wish to generate. When finished with the first video, press `Enter`. Repeat this step for the next videos you wish to generate from Video 1. Once Video1 is complete, repeat these steps for all the videos in the user-specified *Video Folder*.
+
+7. The cropped output videos will be located in the user-defined *Output folder* defined in Step 3. 
 
 
 ## Downsample video
@@ -255,3 +279,13 @@ Use this tool to extract all the frames from a video in **seq** file format.
 2. Click on `Extract All Frames` to extract all the frames from the video.
 
 3. A folder with the video name will be generated and the all the extracted frames will be located in the folder. The frames will be in *.png* file format.
+
+### Convert . seq files to .mp4 files
+Use this tool to convert .seq files to .mp4 files.
+
+1. Click on `Tools`, then `Change formats`, and click on `Change .seq to .mp4`.
+
+2. A window will pop up and you can then navigate and select the video folder that contains the mp4's. 
+
+3. The conversion progress can be followed through the progress bar printed in the terminal window. 
+

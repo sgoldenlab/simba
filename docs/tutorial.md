@@ -104,13 +104,15 @@ In this step you will load the *project_config.ini* file that was created.
   <img width="302" height="232" src="https://github.com/sgoldenlab/simba/blob/master/images/loadprojectini.PNG">
 </p>
 
-2. Under the **Load Project.ini** tab, click on `Browse File`. Then, go to the directory that you created your project in and click on your *project folder*. Locate the *project_config.ini* file and select it. Once this step is completed, it should look like the following, and you should no longer see the text *No file selected*.
+2. Click on `Browse File`. Then, go to the directory that you created your project in and click on your *project folder*. Locate the *project_config.ini* file and select it. Once this step is completed, it should look like the following, and you should no longer see the text *No file selected*.
 
 <p align="center">
   <img width="500" height="60" src="https://github.com/sgoldenlab/simba/blob/master/images/loadedprojectini.PNG">
 </p>
 
 In this image, you can see the `Desktop` is my selected working directory, `tutorial` is my project name, and the last two sections of the folder path is always going to be `project_folder/project_config.ini`.
+
+3. Click on `Load Project`.
 
 ### Step 2 (Optional) : Import more DLC Tracking Data or videos
 In this step, you can choose to import more pose estimation data in csv file format and/or more videos. If this isn't relevant then you can skip this step.
@@ -171,7 +173,7 @@ Outlier correction is used to correct gross tracking inaccuracies by detecting o
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection.PNG" width="156" height="109" />
 
-1. Click on `Settings` and the following window will pop up.
+1. Click on `Settings` and the following window will pop up. The Outlier Settings window varies with the number of animals in the project. The images below shows settings for two animals.
 
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection2.PNG">
@@ -302,49 +304,69 @@ This step is used for training new machine models for behavioral classifications
 ### Optional step before running machine model on new data
 The user can validate each model *( saved in .sav format)* file. In this validation step the user specifies the path to a previously created model in .sav file format, and a .csv file containing the features extracted from a video. This process will (i) run the classifications on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click[here](https://youtu.be/UOLSj7DGKRo) for an example validation video.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/validatemodel.PNG" width="348" height="162" />
+1. Click `Browse File` and select the *project_config.ini* file and click `Load Project`.
 
-1. Under **Validate Model on Single Video** and `Select features file`, click on `Browse File`. Select a *.csv* files in the `project_folder/csv/output/features_extracted` directory.
+2. Under **[Run machine model]** tab --> **validate Model on Single Video**, select your features file (.csv). It should be located in `project_folder/csv/features_extracted`.
 
-2. Under `Select model file`, click on `Browse File` to select a model (*.sav file*).
+![](/images/validatemodel_graph.PNG)
 
-3. Set the `Discrimination threshold` and `Minimum behavior bout length (ms)`:
+3. Under `Select model file`, click on `Browse File` to select a model *(.sav file)*.
 
-- `Discrimination threshold`: The level of probability required to define that the frame belongs to the target class. Accepts a float value between 0.0-1.0. For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html).
+4. Click on `Run Model`.
+
+5. Once, it is completed, it should print *"Predictions generated."*, now you can click on `Generate plot`. A graph window and a frame window will pop up.
+
+- `Graph window`: model prediction probability versus frame numbers will be plot. The graph is interactive, click on the graph and the frame window will display the selected frames.
+
+- `Frame window`: Frames of the chosen video with controls.
+
+![](/images/validategraph1.PNG)
+
+7. Click on the points on the graph and picture displayed on the other window will jump to the corresponding frame. There will be a red line to show the points that you have clicked.
+
+![](/images/validategraph2.PNG)
+
+8. Once it jumps to the desired frame, you can navigate through the frames to determine if the behavior is present. This step is to find the optimal threshold to validate your model.
+
+![](/images/validategraph.gif)
+
+9. Once the threshold is determined, enter the threshold into the `Discrimination threshold` entry box and the desire minimum behavior bouth length into the `Minimum behavior bout lenght(ms)` entrybox.
+
+- `Discrimination threshold`: The level of probability required to define that the frame belongs to the target class. Accepts a float value between 0.0-1.0. For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html)
 
 - `Minimum behavior bout length (ms)`: The minimum length of a classified behavioral bout. **Example**: The random forest makes the following attack predictions for 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals fought for 80ms (4 frames), took a brake for 20ms (1 frame), then fought again for another 80ms (4 frames). You may want to classify this as a single 180ms attack bout rather than two separate 80ms attack bouts. With this setting you can do this. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms attack bout. 
 
-4. Click on `Validate` to run the validation of the selected model. This will apply the selected model to the feature data and generate a video with behavioral predictions overlaid on the frames together with a gantt plot depicting predicted behavioral bouts. Click [here](https://youtu.be/UOLSj7DGKRo) for an example. 
+10. Click `Validate` to validate your model. **Note that this step will take a long time as it will generate a lot of frames.**
 
 ### Step 8: Run Machine Model
 This step runs behavioral classifiers on new data. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/runrfmodel.PNG" width="343" height="132" />
+![](/images/runrfmodel.PNG)
 
 1.  Under the **Run Machine Model** heading, click on `Model Selection`. The following window with the classifier names defined in the *project_config.ini* file will pop up.
 
 <p align="center">
-  <img width="312" height="256" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
+  <img width="511" height="232" src="https://github.com/sgoldenlab/simba/blob/master/images/rfmodelsettings.PNG">
 </p>
 
 2. Click on `Browse File` and select the model (*.sav*) file associated with each of the classifier names. 
 
 3. Once all the models have been chosen, click on `Set Model` to save the paths. 
 
-4. Fill in the `Discrimination threshold` and click on `Set` to save the settings.
+4. Fill in the `Discrimination threshold`.
 
 - `Discrimination threshold`: The level of probability required to define that the frame belongs to the target class (see above). 
 
-5. Fill in the `Minimum behavior bout length` and click on `Set` to save the settings.
+5. Fill in the `Minimum behavior bout length`.
 
 - `Minimum behavior bout length (ms)`:  The minimum length of a classified behavioral bout(see above). 
 
-6. Click on `Run RF Model` to run the machine model on the new data. 
+6. Click on `Set model(s)` and then click on `Run RF Model` to run the machine model on the new data. 
 
 ### Step 9: Analyze Machine Results
 Access this menu through the `Load project` menu and the `Run machine model` tab. This step performs summary analyses and presents descriptive statistics in .csv file format. There are three forms of summary analyses: `Analyze`, `Analyze distance/velocity`, and `Analyze severity`.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/analyzemachineresult.PNG" width="331" height="62" />
+![](/images/analyzemachineresult.PNG)
 
 - `Analyze`: This button generates descriptive statistics for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. 
 
@@ -352,18 +374,21 @@ Access this menu through the `Load project` menu and the `Run machine model` tab
 
 - `Analyze severity`: Calculates the ‘severity’ of each frame classified as containing attack behavior based on a user-defined scale. **Example:** the user sets a 10-point scale. One frame is predicted to contain an attack, and the total body-part movements of both animals in that frame is in the top 10% percentile of movements in the entire video. In this frame, the attack will be scored as a 10 on the 10-point scale. A date-time stamped output .csv file containing the 'severity' data is saved in the `/project_folder/log` folder.
 
-### Step 10: Visualization
+- `Severity scale 0 -`:
+
+
+### Step 10: Sklearn Visualization
 These steps generate visualizations of features and machine learning classification results. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots and data plots. In this step the different frames can also be merged into video mp4 format. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotsklearn.PNG" width="1246" height="380" />
+![](/images/visualization.PNG)
 
 1. Under the **Sklearn visualization** heading, click on `Visualize classification results`.
 This step grabs the frames of the videos in the project, and draws circles at the location of the tracked body parts, the convex hull of the animal, and prints the behavioral predictions on top of the frame. For an example, click [here](https://www.youtube.com/watch?v=7AVUWz71rG4&t=519s).
 
-### Step 11: Plot graphs
-The user can also create a range of plots: **gantt plot**, **Data plot**, **Path plot**, and **Distance plot**.
+### Step 11: Visualizations
+The user can also create a range of plots: **gantt plot**, **Data plot**, **Path plot**, **Distance plot**, and **Heatmap**.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/plotgraphs.PNG" width="262" height="383" />
+![](/images/visualizations.PNG)
 
 #### Gantt plot
 Gantt plot generates gantt plots that display the length and frequencies of behavioral bouts for all the videos in the project.
@@ -408,6 +433,38 @@ Generates distance line plots between two body parts for all of the videos in th
 - `Body part 2`: String that specifies the the bodypart of animal 1. Eg., Nose_2
 
 2. Click on `Generate Distance plot`, and the distance plot frames will be generated in the `project_folder/frames/output/line_plot` folder.
+
+#### Heatmap
+Generates heatmap of behavior that happened in the video.
+
+1. Fill in the `Bin size(px)`, `# Scale increments`, and `Scale increment (s)`. Then from the dropdown box, select `Color Palette`, and `Target`.
+
+- `Bin size(px)` : 
+
+- `# Scale increments` :
+
+- `Scale increment (s)` :
+
+- `Color Palette` :
+
+<p align="center">
+  <img width="400" height="137" src="https://github.com/sgoldenlab/simba/blob/master/images/SimBA_pallettes.PNG">
+</p>
+
+
+
+magma             |  gnuplot2
+:-------------------------:|:-------------------------:
+![](https://github.com/sgoldenlab/simba/blob/master/images/magma_heatmap.gif)  |  ![](https://github.com/sgoldenlab/simba/blob/master/images/gnuplot_heatmap.gif)
+jet|viridis
+![](https://github.com/sgoldenlab/simba/blob/master/images/jet_heatmap.gif)  |  ![](https://github.com/sgoldenlab/simba/blob/master/images/viridis_heatmap.gif)
+inferno|plasma
+![](https://github.com/sgoldenlab/simba/blob/master/images/inferno_heatmap.gif)  |  ![](https://github.com/sgoldenlab/simba/blob/master/images/plasma_heatmap.gif)
+
+
+- `Target` :
+
+2. Click `Generate heatmap` to generate heatmap of the target behavior.
 
 ### Step 12: Merge Frames
 Merge all the generated plots from the previous step into single frames.

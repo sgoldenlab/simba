@@ -28,7 +28,7 @@ We have validated SimBA by labelling 16 body parts (8 body parts on two individu
 
 Please note that the **order** of body part annotation is important, and matches the labelling schematic above.
 
-If using SimBA, set the DeepLabCut config to use the 16 body part schematic by checking the `Apply Golden Aggression Config' box (See **Step 1**, below). Pre-trained DLC tracking models using the 16 body part schematic and two animals can also be downloaded through [OSF](https://osf.io/5t4y9/), covering a range of acquisition parameters (color video, blank and white video, etc).
+If using SimBA, set the DeepLabCut config to use the 16 body part schematic by checking the `Apply Golden Aggression Config` box (See **Step 1**, below). Pre-trained DLC tracking models using the 16 body part schematic and two animals can also be downloaded through [OSF](https://osf.io/5t4y9/), covering a range of acquisition parameters (color video, blank and white video, etc).
 
 However, SimBA will also accept alternative body labelling schematics (see the above figure). These alternative schematics currently include:
 
@@ -40,6 +40,9 @@ However, SimBA will also accept alternative body labelling schematics (see the a
    * 9 body parts on a single mouse recorded 45° side angle
    
 **Important**: So far we have only validated machine learning models that use features calculated from 16 labelled body parts on two individual animals. The other configurations are "use at your own risk" and may require trouble-shooting.
+
+> *Note* : SimBA now also supports user-created body-part annotation schemes. These annotations schemes can be created in the SimBA project configuration menu - click [HERE](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Pose_config.md) to learn more.
+
 
 ## SimBA-DLC Pipeline breakdown
 For detailed information on the DeepLabCut workflow, see the [DeepLabCut repository](https://github.com/AlexEMG/DeepLabCut). 
@@ -75,7 +78,7 @@ This step generates a new DeepLabCut project.
 
 1. In the main SimBA window, click on `Tracking` --> `DeepLabCut` --> `Create DLC Model`. The following window will pop up.
 
-![alt-text-1](/images/createdlcmodel2.png "createdlcmodel2")
+![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/DLC_menu2.PNG "createdlcmodel2")
 
 2. Enter the name of your project in the `Project name` entry box.
 
@@ -91,13 +94,15 @@ This step generates a new DeepLabCut project.
 
 6. Next, select the main directory that your project will be located in. Next to `Project directory`, click on `Browse Folder` and choose a directory.
 
-7. If you wish to use the settings used by the Golden lab (this setting is used to track two mice, and eight body parts on each of the two mice) check the `Apply Golden Aggression Config' box. For more information, see above section and figure. If you wish to generate your own DeepLabCut tracking config, using a different annotation configuration, please leave this box un-ticked.
+7. **Optional**: If you have previously created a SimBA project, **and** a user-defined body-part configuration schematic in SimBA, you may want to use this configuration in your DeepLabCut tracking project. If so, go ahead and click on `Browse File` next to the text `Bp config file`. These body-part configurations are saved in you SimBA project, in a CSV file located in the  `project_folder/logs/measures/pose_configs/bp_names\project_bp_names.csv` file. Navigate to this file and select it. If you **do not** want to use a SimBA-created bosy-part configuration file, leave the `Bp config file` entry box empty. 
 
-8. You can either copy all the videos to your DeepLabCut project folder, or create shortcuts to the videos. By checking the `Copy Videos` checkbox, the videos will be copied to your project folder. If this box is left un-ticked, shortcuts to your videos will be created. This can be useful if you wish to save storage space, or if you have very large or numerous video files.
+8. If you wish to use the settings used by the Golden lab (this setting is used to track two mice, and eight body parts on each of the two mice) check the `Apply Golden Aggression Config` box. For more information, see above section and figure. If you wish to generate your own DeepLabCut tracking config, using a different annotation configuration, please leave this box un-ticked.
 
-9. Click on `Create Project` to create your DeepLabCut project. The project will be located in the chosen **working directory**.
+9. You can either copy all the videos to your DeepLabCut project folder, or create shortcuts to the videos. By checking the `Copy Videos` checkbox, the videos will be copied to your project folder. If this box is left un-ticked, shortcuts to your videos will be created. This can be useful if you wish to save storage space, or if you have very large or numerous video files.
 
-10. You will need to Load this project to use it. Move to Part 2 below.
+10. Click on `Create Project` to create your DeepLabCut project. The project will be located in the chosen **working directory**.
+
+11. You will need to Load this project to use it. Move to Part 2 below.
 
 ## Part 2: Load DLC Project
 These menus are used to load created DeepLabCut projects.
