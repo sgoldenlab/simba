@@ -344,7 +344,7 @@ For more details, please [click here](/docs/validation_tutorial.md#validate-mode
 
 ![](/images/validatemodel_graph1.PNG)
 
-**Note: If you check the `Generate Gantt plot` box, the final validation video will include the gantt chart. However, to do this you must extract frames which drastically increases the amount of time needed to generate the video. We suggest leaving it unchecked unless you really want it.**
+**Note: If you check the 'Generate Gantt plot' box, the final validation will include two seperate videos - 1 of the behavior and 1 of the gantt plot. However, this takes longer and we suggest leaving it unchecked unless you really want the gantt plot. This may or may not be combined to a single video in the future!**
 
 1. Under the **Run machine model tab** and *Validate Model on Single Video* heading, click on `Browse File` next to `Select features file`. In this current Scenario 1, select the CSV file you have stored [in a safe place outside of the project folder](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features). 
 
