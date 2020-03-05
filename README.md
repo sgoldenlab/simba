@@ -12,7 +12,7 @@
 - Region of Interest support (ROI Module) - [Documentation](/docs/ROI_tutorial.md)
 - DeepPoseKit support (DPK Module) - [Documentation](/docs/DeepPoseKit_in_SimBA.md)
 - SimBA accepts user-defined pose-configurations (Flexible Annotation Module) - [Documentation](/docs/Pose_config.md)
-- Interactive classifer discrimination thresholding - [Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data)
+- Interactive classifer discrimination thresholding - [Documentation](/docs/validation_tutorial.md#validate-model-on-single-video)
 - Individual discrimination thresholds for classifiers - [Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data)
 - Heatmap visualizations -[Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions)
 - Extended validation methods (visualize a user-set number of classified events)-[Documentation](/docs/classifier_validation.md#classifier-validation)
