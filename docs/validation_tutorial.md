@@ -10,7 +10,7 @@
 
 ![](/images/validatemodel_graph1.PNG)
 
-**Note: If you check the 'Generate Gantt plot' box, the final validation video will include the gantt chart. However, to do this you must extract frames which drastically increases the amount of time needed to generate the video. We suggest leaving it unchecked unless you really want it.**
+**Note: If you check the 'Generate Gantt plot' box, the final validation will include two seperate videos - 1 of the behavior and 1 of the gantt plot. However, this takes longer and we suggest leaving it unchecked unless you really want the gantt plot. This may or may not be combined to a single video in the future!**
 
 4. Select a model file (.sav).
 
