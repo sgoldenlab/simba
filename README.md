@@ -43,7 +43,7 @@ SimBA does not require computer science and programing experience, and SimBA is 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/rat_videos.gif)
 
 #### SimBA GUI workflow
-![](https://github.com/sgoldenlab/simba/blob/master/images/SimBA_tkinter_2.png)
+![](https://github.com/sgoldenlab/simba/blob/master/images/SimBA_tkinter_3.png)
 
 
 ## Pipeline 👷
