@@ -13,3 +13,14 @@
 * GPU: NVIDEA RTX2080Ti
 * RAM: 32GB
 * HDD: SSD 
+
+
+### SIMBA PERFORMANCE METRICS 
+
+
+
+
+![alt-text-1](/images/Comutation_time_Xeon.JPG "XEON")
+
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Comutation_time_Xeon.JPG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/Comutation_time_i9.JPG" width="425"/>
