@@ -93,7 +93,7 @@ def roiByDefinition(inifile):
             removeStatus = True
         updateImage(centroids, toRemoveShapeName)
 
-    videofilesFound = glob.glob(videofilesFolder + '/*.mp4')
+    videofilesFound = glob.glob(videofilesFolder + '/*.mp4') + glob.glob(videofilesFolder + '/*.avi')
     cap = cv2.VideoCapture(videofilesFound[0])
     cap.set(1, 0)
     ret, frame = cap.read()
@@ -101,7 +101,7 @@ def roiByDefinition(inifile):
     filePath = os.path.join(videofilesFolder, fileName)
     cv2.imwrite(filePath,frame)
     img = cv2.imread(filePath)
-    CurrVidName = os.path.basename(videofilesFound[0]).replace('.mp4', '')
+    CurrVidName = os.path.splitext(os.path.basename(videofilesFound[0]))[0]
     CurrVidSet = vidinfDf.loc[vidinfDf['Video'] == CurrVidName]
     try:
         videoHeight = int(CurrVidSet['Resolution_height'])
@@ -190,7 +190,7 @@ def roiByDefinition(inifile):
     duplicatedRec, duplicatedCirc = (rectangularDf.copy(), circleDf.copy())
 
     for othervids in videofilesFound[1:]:
-        currVidName = os.path.basename(othervids).replace('.mp4', '')
+        currVidName = os.path.splitext(os.path.basename(othervids))[0]
         duplicatedRec['Video'], duplicatedCirc['Video'] = (currVidName, currVidName)
         rectangularDf = rectangularDf.append(duplicatedRec, ignore_index=True)
         circleDf = circleDf.append(duplicatedCirc, ignore_index=True)
@@ -246,7 +246,7 @@ def roiByDefinition(inifile):
         cv2.imwrite(filePath, frame)
         img = cv2.imread(filePath)
         overlay = img.copy()
-        CurrVidName = os.path.basename(videos).replace('.mp4', '')
+        CurrVidName = os.path.splitext(os.path.basename(videos))[0]
         currRectangleDf = rectangularDf.loc[rectanglesInfo['Video'] == str(CurrVidName)]
         currCirclesDf = circleDf.loc[circleInfo['Video'] == str(CurrVidName)]
         centroids = pd.DataFrame(columns=['Video', "Shape", "Name", "CenterX", "CenterY"])

@@ -136,7 +136,7 @@ def roiFreehand(inifile, currVid):
     print(textScale)
 
 
-    CurrVidName = os.path.basename(currVid).replace('.mp4', '')
+    CurrVidName = os.path.splitext(os.path.basename(currVid))[0]
     instructionHeight, instructionWidth = (400, 1000)
     ROIcoordinatesPath = os.path.join(logFolderPath, 'measures', 'ROI_definitions.h5')
 
@@ -433,7 +433,7 @@ def roiFreehand(inifile, currVid):
         cv2.imwrite(filePath, frame)
         img = cv2.imread(filePath)
         overlay = img.copy()
-        CurrVidName = os.path.basename(currVid).replace('.mp4', '')
+        CurrVidName = os.path.splitext(os.path.basename(currVid))[0]
         centroids = pd.DataFrame(columns=['Video', "Shape", "Name", "CenterX", "CenterY"])
         toRemoveShapeName = ''
         removeStatus = True

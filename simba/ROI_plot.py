@@ -65,7 +65,10 @@ def roiPlot(inifile):
         fileCounter +=1
         CurrVidFn = os.path.basename(i)
         CurrentVideoName = os.path.basename(i).replace('.csv', '')
-        currentVideo = os.path.join(videoDirIn, CurrentVideoName + '.mp4')
+        if os.path.isfile(os.path.join(videoDirIn, CurrentVideoName + '.mp4')):
+            currentVideo = os.path.join(videoDirIn, CurrentVideoName + '.mp4')
+        else:
+            currentVideo = os.path.join(videoDirIn, CurrentVideoName + '.avi')
         cap = cv2.VideoCapture(currentVideo)
         fps = cap.get(cv2.CAP_PROP_FPS)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))

@@ -4,7 +4,7 @@ from configparser import ConfigParser
 import os
 
 def multiplyFreeHand(inifile, currVid):
-    CurrVidName = os.path.basename(currVid).replace('.mp4', '')
+    CurrVidName = os.path.splitext(os.path.basename(currVid))[0]
     config = ConfigParser()
     configFile = str(inifile)
     config.read(configFile)
@@ -27,10 +27,10 @@ def multiplyFreeHand(inifile, currVid):
         if (len(rectangularDf) == 0 and len(circleDf) == 0 and len(polygonDf) == 0):
             print('Cannot apply ROIs to all: no records exist for ' + str(CurrVidName))
         else:
-            videofilesFound = glob.glob(videoPath + '/*.mp4')
+            videofilesFound = glob.glob(videoPath + '/*.mp4') + glob.glob(videoPath + '/*.avi')
             duplicatedRec, duplicatedCirc, duplicatedPoly = (rectangularDf.copy(), circleDf.copy(), polygonDf.copy())
             for vids in videofilesFound:
-                currVidName = os.path.basename(vids).replace('.mp4', '')
+                currVidName = os.path.splitext(os.path.basename(vids))[0]
                 duplicatedRec['Video'], duplicatedCirc['Video'], duplicatedPoly['Video'] = (currVidName, currVidName, currVidName)
                 rectangularDf = rectangularDf.append(duplicatedRec, ignore_index=True)
                 circleDf = circleDf.append(duplicatedCirc, ignore_index=True)
