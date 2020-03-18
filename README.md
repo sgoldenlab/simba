@@ -86,21 +86,24 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [SimBA generic tutorial](docs/tutorial.md) 📘
 - [SimBA behavioral annotation interface](docs/labelling_aggression_tutorial.md) 🏷️
 - [Using user-defined ROIs in SimBA](/docs/ROI_tutorial.md) 🗺️
+- [Recommended hardware](https://github.com/sgoldenlab/simba/blob/master/misc/system_requirements.md) 🖥️
 
 ## Resource 💾
 
+All data (classifiers etc.) is available on our [Open Science Framework repository](https://osf.io/tmu6y/). For a schematic overview of the data respository folder structure (as of March-20-2020), click [HERE](https://github.com/sgoldenlab/simba/blob/master/images/OSF_folder_structure_031820.jpg).
+
 ### Models
-Below is a link to download trained models to apply it on your dataset
-- [Random forest models](https://osf.io/d69jt/) 🌲
+Below is a link to download trained  behavior classification models to apply it on your dataset
+- [Random forest models](https://osf.io/kwge8/) 🌲
 
 ### SimBA visualization examples
 - [YouTube playlist](https://www.youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl) 📺
 
 ### Labelled images
-- [DeepLabCut labelled images](https://osf.io/uhjzf/) 📷
+- [Annotated images for tracking models](https://osf.io/sr3ck/) 📷
 
 ### Tracking weights
-- [DeepLabCut tracking weights](https://osf.io/5t4y9/) 🏋️
+- [DeepLabCut tracking weights](https://osf.io/sr3ck/) 🏋️
 
 ### Golden Lab webpage
 - [Sam Golden Lab UW](https://goldenneurolab.com/) 🧪🧫🐁
