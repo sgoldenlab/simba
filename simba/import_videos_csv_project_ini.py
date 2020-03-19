@@ -3,6 +3,7 @@ import shutil
 import cv2
 import subprocess
 import sys
+import glob
 
 def splitall(path):
     allparts = []
@@ -104,7 +105,7 @@ def copy_singlevideo_ini(inifile,source):
     try:
         print('Copying video...')
         dest = str(os.path.dirname(inifile))
-        dest1 = str((dest) + '\\' + 'videos')
+        dest1 = os.path.join(dest, 'videos')
 
         if os.path.exists(dest1+'\\'+os.path.basename(source)):
             print(os.path.basename(source), 'already exist in', dest1)
@@ -148,133 +149,71 @@ def copy_multivideo_DPKini(inifile,source,filetype):
 def copy_multivideo_ini(inifile,source,filetype):
     try:
         print('Copying videos...')
-        source = str(source)+'\\'
-        dest = str(os.path.dirname(inifile))
-        dest1 = str((dest)+ '\\' + 'videos')
-        files = []
-
-        ########### FIND FILES ###########
-        for i in os.listdir(source):
-            if i.__contains__(str('.'+filetype)):
-                files.append(i)
-
-        for f in files:
-            filetocopy=source +'\\'+f
-            if os.path.exists(dest1+'\\'+f):
-                print(f, 'already exist in', dest1)
-
-            elif not os.path.exists(dest1+'\\'+f):
-                shutil.copy(filetocopy, dest1)
-                nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
-                print(f, 'copied to', nametoprint)
-
+        dest1 = os.path.join(os.path.dirname(inifile), 'videos')
+        files = glob.glob(source + '/*.' + filetype)
+        for file in files:
+            filebasename = os.path.basename(file)
+            if os.path.exists(os.path.join(dest1, filebasename)):
+                print(filebasename, 'already exist in project')
+            elif not os.path.exists(os.path.join(dest1, filebasename)):
+                shutil.copy(file, dest1)
+                print(filebasename, 'copied to project_folder/videos')
         print('Finished copying videos.')
     except:
         print('Please select a folder and enter in the file type')
 
+
 def copy_allcsv_ini(inifile,source):
     print('Copying csv files...')
-    source = str(source)+'\\'
     dest = str(os.path.dirname(inifile))
-    dest1 = str((dest)+ '\\' + 'csv'+ '\\'+ 'input_csv'+'\\original_filename')
-    dest2 = str((dest) + '\\' + 'csv' + '\\' + 'input_csv\\')
-    files = []
-
+    dest1 = os.path.join(dest, 'csv', 'input_csv', 'original_filename')
     if not os.path.exists(dest1):
         os.makedirs(dest1)
+    dest2 = os.path.join(dest, 'csv', 'input_csv')
+    files = glob.glob(source + '/*.csv')
 
-    ########### FIND FILES ###########
-    for i in os.listdir(source):
-        if i.__contains__(".csv"):
-            files.append(i)
-    ###copy files to project_folder/csv/raw_tracking_csv
-    for f in files:
-        filetocopy = source +'\\'+f
-        if os.path.exists(dest1+'\\'+f):
-            print(f, 'already exist in', dest1)
-
-        elif not os.path.exists(dest1+'\\'+f):
-            shutil.copy(filetocopy, dest1)
-            nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
-            print(f, 'copied to', nametoprint)
-    ### copy files to input_csv
-    for f in files:
-        filetocopy = source +'\\'+f
-        if os.path.exists(dest2+'\\'+f):
-            print(f, 'already exist in', dest2)
-
-        elif not os.path.exists(dest2+'\\'+f):
-            shutil.copy(filetocopy, dest2)
-            nametoprint = os.path.join('', *(splitall(dest2)[-4:]))
-            print(f, 'copied to', nametoprint)
-
-    ##rename files in input csv
-    for i in os.listdir(dest2):
-        if ('.csv') and ('DeepCut') in i:
-            finali = i.split('DeepCut')[0]
-            os.rename(dest2+i,dest2+finali+'.csv')
-        else:
-            pass
+    ###copy files to project_folder
+    for file in files:
+        filebasename = os.path.basename(file)
+        if os.path.exists(os.path.join(dest1, filebasename)):
+            print(file, 'already exist in', dest1)
+        elif not os.path.exists(os.path.join(dest1, filebasename)):
+            shutil.copy(file, dest1)
+            shutil.copy(file, dest2)
+            print(filebasename, 'copied into SimBA project')
+            if ('.csv') and ('DeepCut') in filebasename:
+                newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
+                newFname = os.path.join(dest2, newFname)
+                try:
+                    os.rename(os.path.join(dest2,filebasename),os.path.join(dest2,newFname))
+                except FileExistsError:
+                    os.remove(os.path.join(dest2,filebasename))
+                    print(filebasename + ' already exist in project')
+            else:
+                pass
     print('Finished importing tracking data.')
-
-
-# def copy_allcsv_ini_patternmatch(inifile,source):
-#     print('Copying csv files...')
-#     source = str(source)+'\\'
-#     dest = str(os.path.dirname(inifile))
-#     dest2 = str((dest) + '\\' + 'csv' + '\\' + 'input_csv\\')
-#     destvid = str(dest) + '\\videos\\'
-#     files = []
-#     videos=[]
-#
-#     ########### FIND FILES ###########
-#     for i in os.listdir(source):
-#         if i.__contains__(".csv"):
-#             files.append(i)
-#
-#     ### find videos
-#     for i in os.listdir(destvid):
-#         if i.__contains__('.mp4'):
-#             i = i.split('.')[0]
-#             videos.append(i)
-#
-#     for f in files:
-#         for i in videos:
-#             if i in f:
-#                 shutil.copy(source +'\\'+f,dest2)
-#                 os.rename(dest2+f,dest2+i+'.csv')
-#
-#     print('Finished importing tracking data.')
 
 def copy_singlecsv_ini(inifile,source):
     print('Copying csv file...')
     dest = str(os.path.dirname(inifile))
-    dest1 = str((dest) + '\\' + 'csv' + '\\' + 'input_csv\\original_filename\\')
-    dest2 = str((dest) + '\\' + 'csv' + '\\' + 'input_csv\\')
-
+    dest1 = os.path.join(dest, 'csv', 'input_csv', 'original_filename')
     if not os.path.exists(dest1):
         os.makedirs(dest1)
-
-    if os.path.exists(dest1+'\\'+os.path.basename(source)):
-        print(os.path.basename(source), 'already exist in', dest1)
+    dest2 = os.path.join(dest, 'csv', 'input_csv')
+    filebasename = os.path.basename(source)
+    if os.path.exists(os.path.join(dest1, filebasename)):
+        print(filebasename, 'already exist in project')
     else:
         shutil.copy(source, dest1)
-        nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
-        print(os.path.basename(source), 'copied to', nametoprint)
-
-    if os.path.exists(dest2+'\\'+os.path.basename(source)):
-        print(os.path.basename(source), 'already exist in', dest1)
-    else:
         shutil.copy(source, dest2)
-        nametoprint = os.path.join('', *(splitall(dest2)[-4:]))
-        print(os.path.basename(source), 'copied to', nametoprint)
-
-    ##rename files in input csv
-    for i in os.listdir(dest2):
-        if ('.csv') and ('DeepCut') in i:
-            finali = i.split('DeepCut')[0]
-            os.rename(dest2+i,dest2+finali+'.csv')
+        if ('.csv') and ('DeepCut') in filebasename:
+            newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
+            newFname = os.path.join(dest2, newFname)
+            try:
+                os.rename(os.path.join(dest2, filebasename), os.path.join(dest2, newFname))
+            except FileExistsError:
+                os.remove(os.path.join(dest2, filebasename))
+                print(filebasename + ' already exist in project')
         else:
             pass
-
     print('Finished importing tracking data.')
