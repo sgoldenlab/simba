@@ -6,7 +6,7 @@
 # labelling_aggression.py: 3
 # tkinter_functions.py: 8
 # validate_model_on_single_video.py: 16
-Pillow == 5.4.1
+Pillow == 6.2.0
 pyyaml == 5.3.1
 
 # ROI_analysis_2.py: 6,7
