@@ -8,6 +8,11 @@
 
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
+## March-18-2020 COVID-19 Update
+The Golden Lab, like many labs, has physically closed and transitioned to remote access only. On the positive side, this means most of the SimBA developers are sitting at home in front of the computers... most of the day... everyday. 
+
+This is a great oppurtunity to jump on our [Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community) if you have any questions, or even if you would simply like to discuss potential applications for SimBA in your work.  Please come by, stay inside, wash your hands, and check on your lab mates reguarly!
+
 ## March-05-2020: SimBA version 1.1 release
 ### New Features
 - Region of Interest support (ROI Module) - [Documentation](/docs/ROI_tutorial.md)
