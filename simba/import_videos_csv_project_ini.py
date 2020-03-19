@@ -181,8 +181,11 @@ def copy_allcsv_ini(inifile,source):
             shutil.copy(file, dest1)
             shutil.copy(file, dest2)
             print(filebasename, 'copied into SimBA project')
-            if ('.csv') and ('DeepCut') in filebasename:
-                newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
+            if (('.csv') and ('DeepCut') in filebasename) or (('.csv') and ('DLC_') in filebasename):
+                if (('.csv') and ('DeepCut') in filebasename):
+                    newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
+                if (('.csv') and ('DLC_') in filebasename):
+                    newFname = str(filebasename.split('DLC_')[0]) + '.csv'
                 newFname = os.path.join(dest2, newFname)
                 try:
                     os.rename(os.path.join(dest2,filebasename),os.path.join(dest2,newFname))
@@ -206,8 +209,11 @@ def copy_singlecsv_ini(inifile,source):
     else:
         shutil.copy(source, dest1)
         shutil.copy(source, dest2)
-        if ('.csv') and ('DeepCut') in filebasename:
-            newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
+        if (('.csv') and ('DeepCut') in filebasename) or (('.csv') and ('DLC_') in filebasename):
+            if (('.csv') and ('DeepCut') in filebasename):
+                newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
+            if (('.csv') and ('DLC_') in filebasename):
+                newFname = str(filebasename.split('DLC_')[0]) + '.csv'
             newFname = os.path.join(dest2, newFname)
             try:
                 os.rename(os.path.join(dest2, filebasename), os.path.join(dest2, newFname))
