@@ -33,6 +33,15 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
     inputFile = inputFile.loc[:, ~inputFile.columns.str.contains('^Unnamed')]
     outputDf = inputFile
     inputFileOrganised = drop_bp_cords(inputFile, inifile)
+    if (classifier_name == 'attack_prediction') or (classifier_name == 'anogenital_prediction') or (classifier_name == 'pursuit_prediction'):
+        try:
+            inputFileOrganised = inputFileOrganised.drop(
+                ['Mouse_1_Nose_to_lateral_left', 'Mouse_2_Nose_to_lateral_left', 'Mouse_1_Nose_to_lateral_right',
+                 'Mouse_2_Nose_to_lateral_right', 'Mouse_1_Centroid_to_lateral_left',
+                 'Mouse_2_Centroid_to_lateral_left', 'Mouse_1_Centroid_to_lateral_right',
+                 'Mouse_2_Centroid_to_lateral_right'], axis=1)
+        except KeyError:
+            pass
     print('Running model...')
     clf = pickle.load(open(classifier_path, 'rb'))
     ProbabilityColName = 'Probability_' + classifier_name
@@ -47,7 +56,7 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
     outputPath = os.path.join(vidInfPath, 'frames', 'output', 'validation')
     if not os.path.exists(outputPath):
         os.makedirs(outputPath)
-    outputFileName = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.csv', '.mp4')))
+    outputFileName = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.csv', '_' + classifier_name + '.avi')))
     vidInfPath = os.path.join(vidInfPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
     fps = vidinfDf.loc[vidinfDf['Video'] == str(sample_feature_file_Name.replace('.csv', ''))]
@@ -103,9 +112,10 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
     Ylocs = Ylocs.rename(columns=lambda x: x.strip('_y'))
     bodypartColNames = list(Xlocs.columns)
     targetColumn = classifier_name
-    vidFileName = os.path.basename(outFname.replace('.csv', '.mp4'))
-    print(vidFileName)
-    currVideoFile = os.path.join(videoInputFolder, vidFileName)
+    if os.path.exists(os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.mp4')))):
+        currVideoFile = os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.mp4')))
+    if os.path.exists(os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.avi')))):
+        currVideoFile = os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.avi')))
     print(currVideoFile)
     cap = cv2.VideoCapture(currVideoFile)
     ## find vid size and fps
@@ -114,6 +124,7 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    print(width, height)
     writer = cv2.VideoWriter(outputFileName, fourcc, fps, (width, height))
     fscale = 0.05
     cscale = 0.2
@@ -161,7 +172,7 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
     print(generategantt)
     if int(generategantt) == 1:
         #generate gantt
-        outputFileNameGantt = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.csv', '_gantt.avi')))
+        outputFileNameGantt = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.csv', '_' + classifier_name + '_gantt.avi')))
         writer2 = cv2.VideoWriter(outputFileNameGantt, fourcc, fps, (640, 480))
         boutEnd = 0
         boutEnd_list = [0]
