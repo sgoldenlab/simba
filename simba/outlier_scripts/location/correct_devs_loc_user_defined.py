@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import statistics
 import numpy as np
-import math
 from configparser import ConfigParser
 from datetime import datetime
 import glob
