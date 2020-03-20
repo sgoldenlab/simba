@@ -55,6 +55,7 @@ from ROI_draw_defined import *
 from ROI_multiply import *
 from ROI_reset import *
 from ROI_add_to_features import *
+from ROI_process_movement import *
 from plot_heatmap import plotHeatMap
 import warnings
 from outlier_scripts.movement.correct_devs_mov_16bp import dev_move_16
@@ -89,7 +90,6 @@ from dpk_script.Predict_new_video import predictnewvideoDPK
 from dpk_script.Visualize_video import visualizeDPK
 from reset_poseConfig import reset_DiagramSettings
 import threading
-import multiprocessing
 simBA_version = 1.1
 
 
@@ -2336,6 +2336,27 @@ class changefps:
         label_fps.grid(row=1,sticky=W)
         button_fps.grid(row=2)
 
+class changefpsmulti:
+    def __init__(self):
+        multifpsmenu = Toplevel()
+        multifpsmenu.minsize(400, 200)
+        multifpsmenu.wm_title("Change frame rate of videos in a folder")
+
+        # videopath
+        videopath = FolderSelect(multifpsmenu, "Folder path", title='Select folder with videos')
+
+        # fps
+        label_fps = Entry_Box(multifpsmenu, 'Output fps', '10')
+
+        # button
+        button_fps = Button(multifpsmenu, text='Convert',
+                            command=lambda: changefps_multivideo(videopath.folder_path, label_fps.entry_get))
+        # organize
+        videopath.grid(row=0, sticky=W)
+        label_fps.grid(row=1, sticky=W)
+        button_fps.grid(row=2)
+
+
 class extract_seqframe:
 
     def __init__(self):
@@ -2951,7 +2972,6 @@ class loadprojectini:
         self.roi_draw.grid(row=0, column=2, sticky=N)
         analyzeROI.grid(row=0)
 
-
         ###plot roi
         self.roi_draw1 = LabelFrame(tab6, text='Visualize ROI')
         # button
@@ -2959,6 +2979,15 @@ class loadprojectini:
         ##organize
         self.roi_draw1.grid(row=0, column=3, sticky=N)
         visualizeROI.grid(row=0)
+
+        #processmovementinroi (duplicate)
+        processmovementdupLabel = LabelFrame(tab6,text='Analyze distances/velocity')
+        button_process_movement1 = Button(processmovementdupLabel, text='Analyze distances/velocity',
+                                         command=lambda: self.roi_settings('Analyze distances/velocity',
+                                                                           'processmovement'))
+        #organize
+        processmovementdupLabel.grid(row=0,column=4,sticky=N)
+        button_process_movement1.grid(row=0)
 
 
         #outlier correction
@@ -2971,7 +3000,7 @@ class loadprojectini:
 
         #extract features
         label_extractfeatures = LabelFrame(tab5,text='Extract Features',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-        button_extractfeatures = Button(label_extractfeatures,text='Extract Features',command=self.extractfeatures)
+        button_extractfeatures = Button(label_extractfeatures,text='Extract Features',command = lambda: threading.Thread(target=self.extractfeatures).start())
         #roiappend
         appendDf = Button(label_extractfeatures, text='Append ROI data to features', command=self.appendroisettings)
         appendDf.grid(row=1,pady=10)
@@ -2983,8 +3012,8 @@ class loadprojectini:
         #train machine model
         label_trainmachinemodel = LabelFrame(tab8,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_trainmachinesettings = Button(label_trainmachinemodel,text='Settings',command=self.trainmachinemodelsetting)
-        button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command=self.trainsinglemodel)
-        button_train_multimodel = Button(label_trainmachinemodel, text='Train multiple models, one for each saved settings',fg='green',command=self.trainmultimodel)
+        button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command = lambda: threading.Thread(target=self.trainsinglemodel).start())
+        button_train_multimodel = Button(label_trainmachinemodel, text='Train multiple models, one for each saved settings',fg='green',command = lambda: threading.Thread(target=self.trainmultimodel).start())
 
         ##Single classifier valid
         label_model_validation = LabelFrame(tab9, text='Validate Model on Single Video', pady=5, padx=5,
@@ -3338,7 +3367,7 @@ class loadprojectini:
         elif appendornot =='not append':
             roiAnalysis(configini,'outlier_corrected_movement_location')
         elif appendornot == 'processmovement':
-            analyze_process_movement(configini)
+            ROI_process_movement(configini)
         else:
             roiAnalysis(configini,'features_extracted')
 
@@ -3529,7 +3558,38 @@ class loadprojectini:
         analyze_process_severity(self.projectconfigini,self.severityscale.entry_get)
 
     def analyzedatalog(self):
-        analyze_process_data_log(self.projectconfigini)
+        # Popup window
+        datalogmenu = Toplevel()
+        datalogmenu.minsize(400, 400)
+        datalogmenu.wm_title("Analyze process log settings")
+
+        dlmlabel = LabelFrame(datalogmenu)
+
+        #use for loop to create intvar
+        var=[]
+        for i in range(7):
+            var.append(IntVar())
+
+        #use loop to create checkbox?
+        checkbox = [0]*7
+        titlebox =['events','sum duration (s)','mean duration (s)','median duration (s)','first occurance (s)','mean interval (s)','median interval (s)']
+        for i in range(7):
+            checkbox[i] = Checkbutton(dlmlabel,text=titlebox[i],variable=var[i])
+            checkbox[i].grid(row=i,sticky=W)
+        #organize
+        dlmlabel.grid(row=0)
+        button1 = Button(dlmlabel,text='Analyze',command=lambda:self.findDatalogList(titlebox,var))
+        button1.grid(row=10)
+
+    def findDatalogList(self,titleBox,Var):
+        finallist = []
+        for index,i in enumerate(Var):
+            if i.get()==0:
+                finallist.append(titleBox[index])
+
+        #run analyze
+        analyze_process_data_log(self.projectconfigini,finallist)
+
 
     def runrfmodel(self):
         rfmodel(self.projectconfigini)
@@ -4267,13 +4327,18 @@ class App(object):
 
         #fifth menu
         fifthMenu = Menu(menu)
+        #changefpsmenu
+        fpsMenu = Menu(fifthMenu)
+        fpsMenu.add_command(label='Change fps for single video', command=changefps)
+        fpsMenu.add_command(label='Change fps for multiple videos',command=changefpsmulti)
         menu.add_cascade(label='Tools',menu=fifthMenu)
         fifthMenu.add_command(label='Clip videos',command=shorten_video)
         fifthMenu.add_command(label='Crop videos',command=crop_video)
         fifthMenu.add_command(label='Multi-crop',command=multicropmenu)
         fifthMenu.add_command(label='Downsample videos',command=video_downsample)
         fifthMenu.add_command(label='Get mm/ppx',command = get_coordinates_from_video)
-        fifthMenu.add_command(label='Change fps',command =changefps)
+        fifthMenu.add_cascade(label='Change fps',menu =fpsMenu)
+        #changefpsmenu organize
 
         changeformatMenu = Menu(fifthMenu)
         changeformatMenu.add_command(label='Change image file formats',command=change_imageformat)
