@@ -105,7 +105,7 @@ def dev_move_user_defined(configini):
         currentFile = i
         baseNameFile = os.path.basename(currentFile).replace('.csv', '')
         csv_df = pd.read_csv(currentFile, names=bodyPartHeaders, index_col=None)
-        csv_df = csv_df.drop(csv_df.index[[0]])
+        csv_df = csv_df.drop(csv_df.index[[0, 1, 2]])
         csv_df = csv_df.apply(pd.to_numeric)
     ########### CREATE SHIFTED DATAFRAME FOR DISTANCE CALCULATIONS ###########################################
         csv_df_shifted = csv_df.shift(periods=1)
@@ -135,15 +135,13 @@ def dev_move_user_defined(configini):
             col_corr_1y = bpcorrected_list1y[idx]
             csv_df_combined = correct_value_position(csv_df_combined, col1x, col1y, col_corr_1x, col_corr_1y, dict_pos)
         csv_df_combined = csv_df_combined.reset_index()
-        scorer = pd.read_csv(currentFile).scorer.iloc[0:]
-        scorer = list(scorer)
         csv_out = pd.DataFrame()
         for cols in range(len(x_cols)):
             csv_out = pd.concat([csv_out, csv_df_combined[x_cols[cols]], csv_df_combined[y_cols[cols]], df_p_cols[p_cols[cols]]], axis=1)
-        csv_out.insert(loc=0, column='scorer', value=scorer)
+        csv_out = csv_out.rename_axis('scorer')
         fileOut = str(baseNameFile) + str('.csv')
         pathOut = os.path.join(csv_dir_out, fileOut)
-        csv_out.to_csv(pathOut, index=False)
+        csv_out.to_csv(pathOut)
         fixed_M1_pos = []
         currentFixedList = []
         currentFixedList.append(baseNameFile)
