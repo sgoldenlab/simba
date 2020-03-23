@@ -11,6 +11,7 @@ import random
 def plotsklearnresult(configini,videoSetting, frameSetting):
     config = ConfigParser()
     configFile = str(configini)
+    print('x')
     try:
         config.read(configFile)
     except MissingSectionHeaderError:
@@ -74,7 +75,15 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
         if animalsNo == 2:
             animal_1_BpHeaderList = [s for s in animalBpHeaderList if "_1_" in s]
             animal_2_BpHeaderList = [s for s in animalBpHeaderList if "_2_" in s]
-        videoPathName = os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.mp4'))
+        if os.path.exists(os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.mp4'))):
+            videoPathName = os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.mp4'))
+        elif os.path.exists(os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.avi'))):
+            videoPathName = os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.avi'))
+        else:
+            print('Cannot locate video ' + str(CurrentVideoName.replace('.csv', '')) + 'in mp4 or avi format')
+            break
+        print(CurrentVideoName)
+        print(videoPathName)
         cap = cv2.VideoCapture(videoPathName)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
