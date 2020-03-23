@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import cv2
 from labelling_aggression import *
-
+import threading
 def updateThreshold_graph(inifile,csv,model):
     ## find the csv for df
     configFile = str(inifile) ## get ini file
@@ -55,7 +55,9 @@ def updateThreshold_graph(inifile,csv,model):
     plt.title('Click on the points of the graph to display the corresponding frames.')
     plt.grid()
     cid = fig.canvas.mpl_connect('button_press_event', onclick) ##incoporate mouse click event
-    plt.show()
+
+    threading.Thread(plt.show()).start()
+
 
 
 
