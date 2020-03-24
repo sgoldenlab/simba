@@ -29,20 +29,13 @@ def updateThreshold_graph(inifile,csv,model):
 
         if event.dblclick:
             if event.button ==1: ##get point 1 on double left click
-                plt.cla()
-                ax.plot(probs)
-                plt.xlabel('frame #', fontsize=16)
-                plt.ylabel(str(classifierName) + ' probability', fontsize=16)
-                plt.title('Click on the points of the graph to display the corresponding frames.')
-                imageNo = str(int(event.xdata)) + '.png' ## x axis is the frame, hence, this will grab the image
                 probability = probs[int(event.xdata)].astype(str)
-                imagePath = os.path.join(currFramesDir, imageNo) ## combine into real image dir
-                # showImage(imagePath, probability)
                 load_frame2(int(event.xdata),master.guimaster(),master.Rfbox())
                 print("Selected frame has a probability of",probability, ", please enter the threshold into the entry box and validate.")
-                plt.axvline(x=int(event.xdata),color='r')
+                a = plt.axvline(x=int(event.xdata),color='r')
                 fig.canvas.draw()
                 fig.canvas.flush_events()
+                a.remove()
 
 
 
