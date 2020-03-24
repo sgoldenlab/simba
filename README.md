@@ -8,10 +8,10 @@
 
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
-## March-18-2020 COVID-19 Update
-The Golden Lab, like many labs, has physically closed and transitioned to remote access only. On the positive side, this means most of the SimBA developers are sitting at home in front of the computers... most of the day... everyday. 
+## March-23-2020 COVID-19 Update
+As the scientific communty continues to respond to COVID-19, hopefully by closing their labs and instituting social distancing, we are committed to helping SimBA users (or just anyone interesting in ML and behavioral neuroscience) get up and running remotely. 
 
-This is a great oppurtunity to jump on our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you have any questions, or even if you would simply like to discuss potential applications for SimBA in your work.  Please come by, stay inside, wash your hands, and check on your lab mates reguarly!
+Please join our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you have any questions, or even if you would simply like to discuss potential applications for SimBA in your work.  Please come by, stay inside, wash your hands, and check on your lab mates reguarly!
 
 ## March-05-2020: SimBA version 1.1 release
 ### New Features
