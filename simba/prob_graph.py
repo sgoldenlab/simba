@@ -55,8 +55,10 @@ def updateThreshold_graph(inifile,csv,model):
     plt.title('Click on the points of the graph to display the corresponding frames.')
     plt.grid()
     cid = fig.canvas.mpl_connect('button_press_event', onclick) ##incoporate mouse click event
-
+    plt.ion()
     threading.Thread(plt.show()).start()
+    plt.pause(.001)
+
 
 
 
