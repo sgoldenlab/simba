@@ -2,7 +2,8 @@ import os
 import glob
 import numpy as np
 import cv2
-
+import random
+import imutils
 
 def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNameList, animalNumber):
     global ix, iy
@@ -13,23 +14,31 @@ def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNam
         global centerCordStatus
         if (event == cv2.EVENT_LBUTTONDBLCLK):
             if centerCordStatus == False:
-                cv2.circle(overlay,(x,y-sideImageHeight),10,colors[-i],-1)
-                cv2.putText(overlay,str(bpNumber+1), (x+4,y-sideImageHeight), cv2.FONT_HERSHEY_SIMPLEX, 0.7, colors[i], 2)
+                cv2.circle(overlay,(x,y-sideImageHeight),10,colorList[-i],-1)
+                cv2.putText(overlay,str(bpNumber+1), (x+4,y-sideImageHeight), cv2.FONT_HERSHEY_SIMPLEX, 0.7, colorList[i], 2)
                 cv2.imshow('Define pose', overlay)
                 centerCordStatus = True
-
     im = cv2.imread(Imagepath)
     imHeight, imWidth = im.shape[0], im.shape[1]
+    if imWidth < 300:
+        im = imutils.resize(im, width=800)
+        imHeight, imWidth = im.shape[0], im.shape[1]
+        im = np.uint8(im)
+    fontScale = max(imWidth, imHeight) / (max(imWidth, imHeight) * 1.2)
     cv2.namedWindow('Define pose', cv2.WINDOW_NORMAL)
     overlay = im.copy()
+    colorList = []
+    for color in range(len(BpNameList)):
+        r, g, b = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        colorTuple = (r, g, b)
+        colorList.append(colorTuple)
     for i in range(len(BpNameList)):
-        colors = [(255, 0, 255), (0,0,255), (255,204,102), (102,102,255), (152, 255, 255), (153,153,255), (51,153,255), (255, 102, 102), (152,255,102), (0,153,204), ( 204, 153, 0), (153, 204,255), (102, 255, 153), (80, 80, 255), (255, 0, 255), (0,0,255), (255,204,102), (102,102,255), (152, 255, 255), (153,153,255), (51,153,255), (255, 102, 102), (152,255,102), (0,153,204), ( 204, 153, 0), (153, 204,255), (102, 255, 153), (80, 80, 255), (255, 0, 255), (0,0,255), (255,204,102), (102,102,255), (152, 255, 255), (153,153,255), (51,153,255), (255, 102, 102), (152,255,102), (0,153,204), ( 204, 153, 0), (153, 204,255), (102, 255, 153), (80, 80, 255),(255, 0, 255), (0,0,255), (255,204,102), (102,102,255), (152, 255, 255), (153,153,255), (51,153,255), (255, 102, 102), (152,255,102), (0,153,204), ( 204, 153, 0), (153, 204,255), (102, 255, 153), (80, 80, 255)]
         cv2.namedWindow('Define pose', cv2.WINDOW_NORMAL)
         centerCordStatus = False
         bpNumber = i
         sideImage = np.zeros((100, imWidth, 3), np.uint8)
         sideImageHeight, sideImageWidth = sideImage.shape[0], sideImage.shape[1]
-        cv2.putText(sideImage, 'Double left click ' + BpNameList[i] + '. Press ESC to continue.', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (144, 0, 255), 2)
+        cv2.putText(sideImage, 'Double left click ' + BpNameList[i] + '. Press ESC to continue.', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, fontScale, colorList[i], 2)
         ix, iy = -1, -1
         while (1):
             cv2.setMouseCallback('Define pose', draw_circle)
@@ -49,7 +58,6 @@ def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNam
     newImageName = 'Picture' + str(imageNos+1) + '.png'
     imageOutPath = os.path.join(imagePath, newImageName)
     BpNameList = ','.join(BpNameList)
-    print(BpNameList)
 
     with open(namePath, 'a') as fd:
         fd.write(configName + '\n')
