@@ -116,7 +116,6 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
         currVideoFile = os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.mp4')))
     if os.path.exists(os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.avi')))):
         currVideoFile = os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.avi')))
-    print(currVideoFile)
     cap = cv2.VideoCapture(currVideoFile)
     ## find vid size and fps
     fps = cap.get(cv2.CAP_PROP_FPS)
@@ -124,8 +123,11 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    print(width, height)
-    writer = cv2.VideoWriter(outputFileName, fourcc, fps, (width, height))
+    if height < width:
+        videoHeight, videoWidth = width, height
+    if height > width:
+        videoHeight, videoWidth = height, width
+    writer = cv2.VideoWriter(outputFileName, fourcc, fps, (videoWidth, videoHeight))
     fscale = 0.05
     cscale = 0.2
     space_scale = 1.1
@@ -151,7 +153,7 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
             target_timer = (1/fps) * target_counter
             target_timer = round(target_timer, 2)
             if height < width:
-                im = ndimage.rotate(frame, 90)
+                frame = ndimage.rotate(frame, 90)
             cv2.putText(frame, str('Timer'), (10, ((height-height)+spacingScale)), cv2.FONT_HERSHEY_COMPLEX, fontScale, (0, 255, 0), 2)
             addSpacer = 2
             cv2.putText(frame, (str(classifier_name) + ' ' + str(target_timer) + str('s')), (10, (height-height)+spacingScale*addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 0, 255), 2)
@@ -168,12 +170,14 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
         if frame is None:
             print('Video ' + str(currVideoFile) + ' saved.')
             cap.release()
+            writer.release()
             break
-    print(generategantt)
+
     if int(generategantt) == 1:
         #generate gantt
         outputFileNameGantt = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.csv', '_' + classifier_name + '_gantt.avi')))
-        writer2 = cv2.VideoWriter(outputFileNameGantt, fourcc, fps, (640, 480))
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        writer2 = cv2.VideoWriter(outputFileNameGantt, fourcc, int(fps), (640, 480))
         boutEnd = 0
         boutEnd_list = [0]
         boutStart_list = []
@@ -225,6 +229,8 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
             ar = np.asarray(image)
             open_cv_image = ar[:, :, ::-1]
             open_cv_image = cv2.cvtColor(open_cv_image, cv2.COLOR_RGB2BGR)
+            open_cv_image = cv2.resize(open_cv_image, (640, 480))
+            open_cv_image = np.uint8(open_cv_image)
             buffer_.close()
             writer2.write(open_cv_image)
             plt.close('all')
@@ -234,5 +240,4 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
         print('Gantt ' + str(os.path.basename(outputFileNameGantt)) + ' saved.')
     else:
         pass
-
     print('Validation videos saved @' + 'project_folder/frames/output/validation')
