@@ -17,7 +17,6 @@ import subprocess
 import platform
 import shutil
 from tabulate import tabulate
-import datetime
 from dlc_change_yamlfile import select_numfram2pick,updateiteration,update_init_weight,generatetempyaml,generatetempyaml_multi
 from extract_features_wo_targets import extract_features_wotarget
 from sklearn_DLC_RF_train_model import RF_trainmodel
@@ -90,6 +89,7 @@ from dpk_script.Predict_new_video import predictnewvideoDPK
 from dpk_script.Visualize_video import visualizeDPK
 from reset_poseConfig import reset_DiagramSettings
 import threading
+
 simBA_version = 1.1
 
 
@@ -155,8 +155,8 @@ class processvid_title(Frame):
     def __init__(self,parent=None,widths="",color=None,shortenbox =None,downsambox =None,graybox=None,framebox=None,clahebox=None,**kw):
         self.color = color if color is not None else 'black'
         Frame.__init__(self,master=parent,**kw)
-        self.lblName = Label(self, text= 'Video Name',fg=str(self.color),width=widths,font=("Helvetica",10,'bold'))
-        self.lblName.grid(row=0,column=0)
+        self.lblName = Label(self, text= 'Video Name',fg=str(self.color),width=int(widths)+5,font=("Helvetica",10,'bold'))
+        self.lblName.grid(row=0,column=0,sticky=W)
         self.lblName3 = Label(self, text='Start Time',width = 13,font=("Helvetica",10,'bold'))
         self.lblName3.grid(row=0, column=1,columnspan=2)
         self.lblName4 = Label(self, text='End Time',width = 15,font=("Helvetica",10,'bold'))
@@ -272,7 +272,7 @@ class processvid_menu:
 
         tableframe = LabelFrame(scroll)
 
-            # table title
+        # table title
         self.title = processvid_title(tableframe, str(len(maxname)), shortenbox=self.selectall_shorten,
                                       downsambox=self.selectall_downsample, graybox=self.selectall_grayscale,
                                       framebox=self.selectall_addframe, clahebox=self.selectall_clahe)
@@ -282,12 +282,12 @@ class processvid_menu:
             self.row.append(processvideotable(tableframe,str(self.filesFound[i]), str(len(maxname)),self.videofolder,self.outputdir))
             self.row[i].grid(row=i+1, sticky=W)
 
-
+        #organize table title
         self.title.grid(row=0, sticky=W)
-
+        #button to trigger process video
         but = Button(scroll,text='Execute',command = lambda: threading.Thread(target=self.execute_processvideo).start(),font=('Times',12,'bold'),fg='navy')
         but.grid(row=2)
-
+        #organize
         tableframe.grid(row=1)
         scroll.update()
 
@@ -300,13 +300,12 @@ class processvid_menu:
 
     def selectall_addframe(self):
         for i in range(len(self.filesFound)):
-            if self.title.frameno.get()==1:
+            if self.title.frameno.get() == 1:
                 self.row[i].superimposevid.select()
             else:
                 self.row[i].superimposevid.deselect()
 
     def selectall_grayscale(self):
-
         for i in range(len(self.filesFound)):
             if self.title.grayscale.get()==1:
                 self.row[i].grayscalevid.select()
@@ -376,7 +375,7 @@ class processvid_menu:
         tmp_folder = os.path.join(self.outputdir,'tmp')
         if os.path.exists(tmp_folder):
             shutil.rmtree(tmp_folder)
-        os.mkdir(tmp_folder)
+        os.mkdir(tmp_folder) #make temp folder
 
         # remove process txt file if process were killed half way
         try:
@@ -449,7 +448,7 @@ class processvid_menu:
         except FileExistsError:
             print("Directory", dir, "already exists")
 
-        currentDT = datetime.datetime.now()
+        currentDT = datetime.now()
         currentDT = str(currentDT.month) + '_' + str(currentDT.day) + '_' + str(currentDT.year) + '_' + str(
             currentDT.hour) + 'hour' + '_' + str(currentDT.minute) + 'min' + '_' + str(currentDT.second) + 'sec'
         try:
@@ -460,7 +459,7 @@ class processvid_menu:
 
         print('Process video completed.')
 
-class batch_processvideo:
+class batch_processvideo: ##pre process video first menu (ask for input and output folder)
 
     def __init__(self):
         self.croplist = []
@@ -508,7 +507,7 @@ class outlier_settings:
         configFile = str(configini)
         config.read(configFile)
         animalno = config.getint('General settings','animal_no')
-        # get list
+        # get list from csv
         bpcsv = (os.path.join(os.path.dirname(configini),'logs','measures','pose_configs','bp_names','project_bp_names.csv'))
         bplist = []
         with open(bpcsv) as f:
@@ -763,12 +762,10 @@ class newcolumn(Frame):
             self.entPath[i].grid(row=i,pady=3)
 
     def entry_get(self,row):
-        a = self.entPath[row].get()
-        return a
+        return self.entPath[row].get()
 
     def setvariable(self,row,vars):
-        b = self.entPathvars[row].set(vars)
-        return b
+        return self.entPathvars[row].set(vars)
 
 class Button_getcoord(Frame):
 
