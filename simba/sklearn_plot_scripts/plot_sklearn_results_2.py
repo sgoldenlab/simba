@@ -11,7 +11,6 @@ import random
 def plotsklearnresult(configini,videoSetting, frameSetting):
     config = ConfigParser()
     configFile = str(configini)
-    print('x')
     try:
         config.read(configFile)
     except MissingSectionHeaderError:
@@ -82,15 +81,17 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
         else:
             print('Cannot locate video ' + str(CurrentVideoName.replace('.csv', '')) + 'in mp4 or avi format')
             break
-        print(CurrentVideoName)
-        print(videoPathName)
         cap = cv2.VideoCapture(videoPathName)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         outputFileName = os.path.join(frames_dir_out, CurrentVideoName)
-        writer = cv2.VideoWriter(outputFileName.replace('.csv', '.mp4'), fourcc, fps, (width, height))
+        if height < width:
+            videoHeight, videoWidth = width, height
+        if height > width:
+            videoHeight, videoWidth = height, width
+        writer = cv2.VideoWriter(outputFileName.replace('.csv', '.mp4'), fourcc, fps, (videoWidth, videoHeight))
         space_scale = 1.1
         fontScale = max(width, height) / (max(width, height) * 1.2)
         circleScale = int(max(width, height) / (max(width, height) * 0.05))
@@ -117,7 +118,7 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
                     currYval = animal1_BPsY.loc[animal1_BPsY.index[currRow], animalBpHeaderListY[cords]]
                     cv2.circle(frame, (int(currXval), int(currYval)), circleScale, colorList[cords], -1, lineType=cv2.LINE_AA)
                 if height < width:
-                    frame = ndimage.rotate(frame, 90)
+                   frame = ndimage.rotate(frame, 90)
                 # draw event timers
                 for b in range(counters_no):
                     target_timers[b] = (1 / fps) * target_counters[b]
@@ -139,7 +140,6 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
                         cv2.putText(frame, str(target_names[p]), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_TRIPLEX, int(fontScale*2), colors[p], 2)
                         target_counters[p] += 1
                         addSpacer += 1
-                frame = np.uint8(frame)
                 if videoSetting == 1:
                     writer.write(frame)
                 if frameSetting == 1:
