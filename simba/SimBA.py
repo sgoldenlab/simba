@@ -64,12 +64,12 @@ from outlier_scripts.location.correct_devs_loc_user_defined import dev_loc_user_
 from outlier_scripts.movement.correct_devs_mov_14bp import dev_move_14
 from outlier_scripts.location.correct_devs_loc_14bp import dev_loc_14
 from outlier_scripts.movement.correct_devs_mov_9bp import dev_move_9
-from outlier_scripts.movement.correct_devs_mov_8bp import dev_move_8
-from outlier_scripts.location.correct_devs_loc_8bp import dev_loc_8
-from outlier_scripts.movement.correct_devs_mov_7bp import dev_move_7
-from outlier_scripts.location.correct_devs_loc_7bp import dev_loc_7
-from outlier_scripts.movement.correct_devs_mov_4bp import dev_move_4
-from outlier_scripts.location.correct_devs_loc_4bp import dev_loc_4
+# from outlier_scripts.movement.correct_devs_mov_8bp import dev_move_8
+# from outlier_scripts.location.correct_devs_loc_8bp import dev_loc_8
+# from outlier_scripts.movement.correct_devs_mov_7bp import dev_move_7
+# from outlier_scripts.location.correct_devs_loc_7bp import dev_loc_7
+# from outlier_scripts.movement.correct_devs_mov_4bp import dev_move_4
+# from outlier_scripts.location.correct_devs_loc_4bp import dev_loc_4
 from features_scripts.extract_features_16bp import extract_features_wotarget_16
 from features_scripts.extract_features_14bp import extract_features_wotarget_14
 from features_scripts.extract_features_9bp import extract_features_wotarget_9
@@ -88,6 +88,7 @@ from dpk_script.train_model import trainDPKmodel
 from dpk_script.Predict_new_video import predictnewvideoDPK
 from dpk_script.Visualize_video import visualizeDPK
 from reset_poseConfig import reset_DiagramSettings
+from plot_threshold import plot_threshold
 import threading
 
 simBA_version = 1.1
@@ -2866,8 +2867,11 @@ class loadprojectini:
         simongui = Toplevel()
         simongui.minsize(1100, 450)
         simongui.wm_title("Load project")
+        simongui.columnconfigure(0, weight=1)
+        simongui.rowconfigure(0, weight=1)
 
-        tab_parent = ttk.Notebook(simongui)
+        scroll = Scrollable(simongui)
+        tab_parent = ttk.Notebook(scroll)
 
         tab2 = ttk.Frame(tab_parent)
         tab3 = ttk.Frame(tab_parent)
@@ -3102,6 +3106,13 @@ class loadprojectini:
 
         button_heatmap = Button(label_heatmap, text='Generate heatmap', command=self.heatmapcommand)
 
+        #plot threshold
+        label_plotThreshold = LabelFrame(label_plotall,text='Plot Threshold',pady=5,padx=5)
+        self.behaviorMenu = DropDownMenu(label_plotThreshold,'Target',targetlist,'15')
+        self.behaviorMenu.setChoices(targetlist[(config.get('SML settings','target_name_'+str(1)))])
+        plotThresholdButton = Button(label_plotThreshold,text='Plot threshold',command=lambda:plot_threshold(self.projectconfigini,self.behaviorMenu.getChoices()))
+
+
         #Merge frames
         label_mergeframes = LabelFrame(tab10,text='Merge frames',pady=5,padx=5,font=("Helvetica",12,'bold'),fg='black')
         button_mergeframe = Button(label_mergeframes,text='Merge frames',command=self.mergeframesofplot)
@@ -3223,7 +3234,11 @@ class loadprojectini:
         self.hmMenu.grid(row=3,sticky=W)
         self.targetMenu.grid(row=4,sticky=W)
         button_heatmap.grid(row=5, sticky=W)
-
+        #threshold
+        label_plotThreshold.grid(row=5, sticky=W)
+        self.behaviorMenu.grid(row=0, sticky=W)
+        self.behaviorMenu.grid(row=1, sticky=W)
+        plotThresholdButton.grid(row=2, sticky=W)
 
         label_mergeframes.grid(row=10,column=2,sticky=W+N,padx=5)
         button_mergeframe.grid(row=0,sticky=W)
@@ -3237,6 +3252,9 @@ class loadprojectini:
         self.seconds.grid(row=0,sticky=W)
         self.cvTarget.grid(row=1,sticky=W)
         button_validate_classifier.grid(row=2,sticky=W)
+
+        #scrollbar update
+        scroll.update()
 
     def loaddefinedroi(self):
 
@@ -3709,18 +3727,7 @@ class loadprojectini:
         if pose_estimation_body_parts == '14':
             dev_move_14(configini)
             dev_loc_14(configini)
-        if pose_estimation_body_parts == '9':
-            dev_move_9(configini)
-        if pose_estimation_body_parts == '8':
-            dev_move_8(configini)
-            dev_loc_8(configini)
-        if pose_estimation_body_parts == '7':
-            dev_move_7(configini)
-            dev_loc_7(configini)
-        if pose_estimation_body_parts == '4':
-            dev_move_4(configini)
-            dev_loc_4(configini)
-        if pose_estimation_body_parts == 'user_defined':
+        if (pose_estimation_body_parts == 'user_defined') or (pose_estimation_body_parts == '4') or (pose_estimation_body_parts == '7') or (pose_estimation_body_parts == '8') or (pose_estimation_body_parts == '9'):
             dev_move_user_defined(configini)
             dev_loc_user_defined(configini)
         print('Outlier correction complete.')
@@ -4174,15 +4181,18 @@ class Scrollable(Frame):
 
     def __init__(self, frame, width=16):
 
-        # scrollbarX = Scrollbar(frame, width=width, orient='horizontal')
-        # scrollbarX.pack(side=BOTTOM, fill=X, expand=False)
+        scrollbarX = Scrollbar(frame, width=width, orient='horizontal')
+        scrollbarX.pack(side=BOTTOM, fill=X, expand=False)
         scrollbarY = Scrollbar(frame, width=width)
         scrollbarY.pack(side=RIGHT, fill=Y, expand=False)
 
-        self.canvas = Canvas(frame, yscrollcommand=scrollbarY.set)
+        sizegrip= ttk.Sizegrip(frame)
+        sizegrip.pack(in_=scrollbarX, side=BOTTOM, anchor="se")
+
+        self.canvas = Canvas(frame, yscrollcommand=scrollbarY.set,xscrollcommand=scrollbarX.set)
         self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
 
-        # scrollbarX.config(command=self.canvas.xview)
+        scrollbarX.config(command=self.canvas.xview)
         scrollbarY.config(command=self.canvas.yview)
 
         self.canvas.bind('<Configure>', self.__fill_canvas)
@@ -4209,6 +4219,7 @@ class Scrollable(Frame):
         "Enlarge the windows item to the canvas width"
 
         canvas_width = event.width
+
         self.canvas.itemconfig(self.windows_item, width = canvas_width)
 
     def update(self):
@@ -4216,6 +4227,15 @@ class Scrollable(Frame):
 
         self.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
+
+
+
+
+def get_frame(self):
+    '''
+      Return the "frame" useful to place inner controls.
+    '''
+    return self.canvas
 
 class ToolTip(object):
 
