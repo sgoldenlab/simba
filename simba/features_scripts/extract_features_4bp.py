@@ -15,7 +15,7 @@ def extract_features_wotarget_4(inifile):
     csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     csv_dir_out = os.path.join(csv_dir, 'features_extracted')
     vidInfPath = config.get('General settings', 'project_path')
-    vidInfPath = os.path.join(vidInfPath, 'project_folder', 'logs')
+    vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
 
@@ -63,9 +63,9 @@ def extract_features_wotarget_4(inifile):
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))
         loopy += 1
-        columnHeaders = ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
-                         "Ear_right_1_p", "Nose_1_x", "Nose_1_y", "Nose_1_p", "Tail_base_1_x",
-                         "Tail_base_1_y", "Tail_base_1_p"]
+        columnHeaders = ["Ear_left_x", "Ear_left_y", "Ear_left_p", "Ear_right_x", "Ear_right_y",
+                         "Ear_right_p", "Nose_x", "Nose_y", "Nose_p", "Tail_base_x",
+                         "Tail_base_y", "Tail_base_p"]
         csv_df = pd.read_csv(currentFile, names=columnHeaders, low_memory=False)
         csv_df = csv_df.fillna(0)
         csv_df = csv_df.drop(csv_df.index[[0]])
