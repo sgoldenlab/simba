@@ -3786,9 +3786,11 @@ class trainmachinemodel_settings:
     def __init__(self,inifile):
         self.configini = str(inifile)
         # Popup window
-        trainmms = Toplevel()
-        trainmms.minsize(400, 400)
-        trainmms.wm_title("Machine model settings")
+        trainmmsettings = Toplevel()
+        trainmmsettings.minsize(400, 400)
+        trainmmsettings.wm_title("Machine model settings")
+
+        trainmms = Scrollable(trainmmsettings)
 
         #load metadata
         load_data_frame = LabelFrame(trainmms, text='Load Metadata',font=('Helvetica',10,'bold'), pady=5, padx=5)
@@ -3937,6 +3939,8 @@ class trainmachinemodel_settings:
         button_settings_to_ini.grid(row=6,pady=5)
         button_save_meta.grid(row=7)
         button_remove_meta.grid(row=8,pady=5)
+
+        trainmms.update()
 
     def clearcache(self):
         configs_dir = os.path.join(os.path.dirname(self.configini),'configs')
