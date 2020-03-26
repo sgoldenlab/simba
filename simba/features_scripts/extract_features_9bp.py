@@ -78,7 +78,7 @@ def extract_features_wotarget_9(inifile):
 
         print('Evaluating convex hulls...')
         ########### MOUSE AREAS ###########################################
-        csv_df['Mouse_1_poly_area'] = csv_df.apply(lambda x: ConvexHull(np.array(
+        csv_df['Mouse_poly_area'] = csv_df.apply(lambda x: ConvexHull(np.array(
             [[x['Mouse1_left_ear_x'], x["Mouse1_left_ear_y"]],
              [x['Mouse1_right_ear_x'], x["Mouse1_right_ear_y"]],
              [x['Mouse1_left_hand_x'], x["Mouse1_left_hand_y"]],
@@ -88,7 +88,7 @@ def extract_features_wotarget_9(inifile):
              [x['Mouse1_right_foot_x'], x["Mouse1_right_foot_y"]],
              [x['Mouse1_back_x'], x["Mouse1_back_y"]],
              [x['Mouse1_nose_x'], x["Mouse1_nose_y"]]])).area, axis=1)
-        csv_df['Mouse_poly_area'] = csv_df['Mouse_1_poly_area'] / currPixPerMM
+        csv_df['Mouse_poly_area'] = csv_df['Mouse_poly_area'] / currPixPerMM
 
         ########### CREATE SHIFTED DATAFRAME FOR DISTANCE CALCULATIONS ###########################################
         csv_df_shifted = csv_df.shift(periods=1)
@@ -446,8 +446,8 @@ def extract_features_wotarget_9(inifile):
         csv_df['Sum_probabilities_deviation_percentile_rank'] = csv_df['Sum_probabilities_deviation'].rank(pct=True)
         csv_df['Sum_probabilities_percentile_rank'] = csv_df['Sum_probabilities_deviation_percentile_rank'].rank(pct=True)
         csv_df_probability = csv_df.filter(
-            ['Ear_left_1_p', 'Ear_right_1_p', 'Nose_1_p', 'Center_1_p', 'Lat_left_1_p', 'Lat_right_1_p',
-             'Tail_base_1_p', 'Tail_end_1_p'])
+            ['Ear_left_p', 'Ear_right_p', 'Nose_p', 'Center_p', 'Lat_left_p', 'Lat_right_p',
+             'Tail_base_p', 'Tail_end_p'])
         values_in_range_min, values_in_range_max = 0.0, 0.1
         csv_df["Low_prob_detections_0.1"] = csv_df_probability.apply(
             func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
