@@ -72,16 +72,17 @@ from outlier_scripts.movement.correct_devs_mov_9bp import dev_move_9
 # from outlier_scripts.location.correct_devs_loc_4bp import dev_loc_4
 from features_scripts.extract_features_16bp import extract_features_wotarget_16
 from features_scripts.extract_features_14bp import extract_features_wotarget_14
+from features_scripts.extract_features_14bp_from_16bp import extract_features_wotarget_14_from_16
 from features_scripts.extract_features_9bp import extract_features_wotarget_9
 from features_scripts.extract_features_8bp import extract_features_wotarget_8
 from features_scripts.extract_features_7bp import extract_features_wotarget_7
 from features_scripts.extract_features_4bp import extract_features_wotarget_4
 from features_scripts.extract_features_user_defined import extract_features_wotarget_user_defined
 from sklearn_plot_scripts.plot_sklearn_results_2 import plotsklearnresult
-from dpk_create_project_ini import write_dpkfile
 from drop_bp_cords import define_bp_drop_down
 from drop_bp_cords import bodypartConfSchematic
 from define_new_pose_config import define_new_pose_configuration
+from dpk_create_project_ini import write_dpkfile
 from dpk_script.create_annotation_set import createAnnotationSet
 from dpk_script.annotator import dpkAnnotator
 from dpk_script.train_model import trainDPKmodel
@@ -3634,8 +3635,10 @@ class loadprojectini:
 
         if pose_estimation_body_parts == '16':
             extract_features_wotarget_16(self.projectconfigini)
-        if (pose_estimation_body_parts == '14') or (pose_estimation_body_parts == '987'):
+        if (pose_estimation_body_parts == '14'):
             extract_features_wotarget_14(self.projectconfigini)
+        if (pose_estimation_body_parts == '987'):
+            extract_features_wotarget_14_from_16(self.projectconfigini)
         if pose_estimation_body_parts == '9':
             extract_features_wotarget_9(self.projectconfigini)
         if pose_estimation_body_parts == '8':
