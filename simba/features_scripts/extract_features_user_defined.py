@@ -70,19 +70,16 @@ def extract_features_wotarget_user_defined(inifile):
         csv_df_combined = pd.concat([csv_df, csv_df_shifted], axis=1, join='inner')
         csv_df_combined = csv_df_combined.fillna(0)
         csv_df_combined = csv_df_combined.reset_index(drop=True)
-
         print('Calculating euclidean distances...')
 
         ########### EUCLIDEAN DISTANCES BETWEEN BODY PARTS###########################################
         distanceColNames = []
-        for firstBp in bodypartNames:
-            otherBodyParts = bodypartNames.copy()
-            otherBodyParts.remove(firstBp)
-            for secondBp in otherBodyParts:
-                colName = 'distance_' + str(firstBp) + '_to_' + str(secondBp)
+        for idx in range(len(bodypartNames)-1):
+            for idy in range(idx+1, len(bodypartNames)):
+                colName = 'distance_' + str(bodypartNames[idx]) + '_to_' + str(bodypartNames[idy])
                 distanceColNames.append(colName)
-                firstBpX , firstBpY = (firstBp + '_x', firstBp + '_y')
-                secondBpX, secondBpY = (secondBp + '_x', secondBp + '_y')
+                firstBpX , firstBpY = (bodypartNames[idx] + '_x', bodypartNames[idx] + '_y')
+                secondBpX, secondBpY = (bodypartNames[idy] + '_x', bodypartNames[idy] + '_y')
                 csv_df[colName] = (np.sqrt((csv_df[firstBpX] - csv_df[secondBpX]) ** 2 + (csv_df[firstBpY]- csv_df[secondBpY]) ** 2)) / currPixPerMM
 
         ########### MOVEMENTS OF ALL BODY PARTS ###########################################
@@ -109,23 +106,22 @@ def extract_features_wotarget_user_defined(inifile):
             for selectedCol in combinedLists_1:
                 colName = 'Mean_' + str(selectedCol) + '_' + str(roll_windows_values[i])
                 csv_df[colName] = csv_df[selectedCol].rolling(roll_windows[i], min_periods=1).mean()
-                colName = 'Median_' + str(selectedCol) + '_' + str(roll_windows_values[i])
-                csv_df[colName] = csv_df[selectedCol].rolling(roll_windows[i], min_periods=1).median()
                 colName = 'Sum_' + str(selectedCol) + '_' + str(roll_windows_values[i])
                 csv_df[colName] = csv_df[selectedCol].rolling(roll_windows[i], min_periods=1).sum()
 
         print('Calculating body part movements...')
         ########### BODY PART MOVEMENTS RELATIVE TO EACH OTHER ###########################################
         movementDiffcols = []
-        for firstMovement in movementColNames:
-            otherMovements = movementColNames.copy()
-            otherMovements.remove(firstMovement)
-            for secondMovement in otherMovements:
-                colName = 'Movement_difference_' + firstMovement + '_' + secondMovement
+        for idx in range(len(movementColNames)-1):
+            for idy in range(idx+1, len(movementColNames)):
+                colName = 'Movement_difference_' + movementColNames[idx] + '_' + movementColNames[idy]
                 movementDiffcols.append(colName)
-                csv_df[colName] = abs(csv_df[firstMovement]-csv_df[secondMovement])
+                csv_df[colName] = abs(csv_df[movementColNames[idx]]-csv_df[movementColNames[idy]])
+                movementDiffcols.append(colName)
+                csv_df[colName] = abs(csv_df[movementColNames[idx]]-csv_df[movementColNames[idy]])
 
         print('Calculating deviations and rank...')
+
         ########### DEVIATIONS FROM MEAN ###########################################
         combinedLists_2 = combinedLists_1 + movementDiffcols
         for column in combinedLists_2:
@@ -150,10 +146,8 @@ def extract_features_wotarget_user_defined(inifile):
         values_in_range_min, values_in_range_max = 0.000000000, 0.75
         csv_df["Low_prob_detections_0.75"] = probabilityDf.apply(func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
 
-
-
         ########### SAVE DF ###########################################
-        csv_df = csv_df.loc[:, ~csv_df.T.duplicated(keep='first')]
+        #csv_df = csv_df.loc[:, ~csv_df.T.duplicated(keep='first')]
         csv_df = csv_df.reset_index(drop=True)
         csv_df = csv_df.fillna(0)
         #csv_df = csv_df.drop(columns=['index'])
@@ -161,4 +155,5 @@ def extract_features_wotarget_user_defined(inifile):
         savePath = os.path.join(csv_dir_out, fileOutName)
         csv_df.to_csv(savePath)
         print('Feature extraction complete for ' + '"' + str(currVidName) + '".')
+
     print('All feature extraction complete.')
