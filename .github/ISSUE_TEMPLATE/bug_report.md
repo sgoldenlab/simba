@@ -25,7 +25,6 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
  - Python Version [e.g. 3.6.0]
  - Are you using anaconda?
  
