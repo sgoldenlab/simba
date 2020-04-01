@@ -63,7 +63,7 @@ from outlier_scripts.movement.correct_devs_mov_user_defined import dev_move_user
 from outlier_scripts.location.correct_devs_loc_user_defined import dev_loc_user_defined
 from outlier_scripts.movement.correct_devs_mov_14bp import dev_move_14
 from outlier_scripts.location.correct_devs_loc_14bp import dev_loc_14
-from outlier_scripts.movement.correct_devs_mov_9bp import dev_move_9
+# from outlier_scripts.movement.correct_devs_mov_9bp import dev_move_9
 # from outlier_scripts.movement.correct_devs_mov_8bp import dev_move_8
 # from outlier_scripts.location.correct_devs_loc_8bp import dev_loc_8
 # from outlier_scripts.movement.correct_devs_mov_7bp import dev_move_7
@@ -90,6 +90,7 @@ from dpk_script.Predict_new_video import predictnewvideoDPK
 from dpk_script.Visualize_video import visualizeDPK
 from reset_poseConfig import reset_DiagramSettings
 from plot_threshold import plot_threshold
+from merge_frames_movie import mergeframesPlot
 import threading
 
 simBA_version = 1.1
@@ -141,7 +142,7 @@ class roitableMenu:
         roimenu.minsize(500, 400)
         roimenu.wm_title("ROI Table")
 
-        scroll = Scrollable(roimenu)
+        scroll = hxtScrollbar(roimenu)
 
         tableframe = LabelFrame(scroll,text='Video Name',labelanchor=NW)
 
@@ -151,7 +152,7 @@ class roitableMenu:
             self.row[i].grid(row=i + 1, sticky=W)
 
         tableframe.grid(row=0)
-        scroll.update()
+
 
 class processvid_title(Frame):
     def __init__(self,parent=None,widths="",color=None,shortenbox =None,downsambox =None,graybox=None,framebox=None,clahebox=None,**kw):
@@ -270,7 +271,8 @@ class processvid_menu:
         vidprocessmenu.wm_title("Batch process video table")
         vidprocessmenu.lift()
 
-        scroll =  Scrollable(vidprocessmenu)
+        scroll =  Canvas(hxtScrollbar(vidprocessmenu))
+        scroll.pack(fill="both",expand=True)
 
         tableframe = LabelFrame(scroll)
 
@@ -291,7 +293,7 @@ class processvid_menu:
         but.grid(row=2)
         #organize
         tableframe.grid(row=1)
-        scroll.update()
+
 
     def selectall_clahe(self):
         for i in range(len(self.filesFound)):
@@ -528,8 +530,10 @@ class outlier_settings:
         outlier_set.minsize(400, 400)
         outlier_set.wm_title("Outlier Settings")
 
+        scroll = LabelFrame(hxtScrollbar(outlier_set))
+        scroll.grid()
         # location correction for one animal
-        label_location_correction = LabelFrame(outlier_set, text='Location correction',font=('Times',12,'bold'),pady=5,padx=5)
+        label_location_correction = LabelFrame(scroll, text='Location correction',font=('Times',12,'bold'),pady=5,padx=5)
         label_choosem1bp1 = Label(label_location_correction, text='Choose Animal 1, body part 1:')
         label_choosem1bp2 = Label(label_location_correction, text='Choose Animal 1, body part 2:')
         self.var1 = StringVar()
@@ -540,7 +544,7 @@ class outlier_settings:
         dropdown_m1bp2 = OptionMenu(label_location_correction, self.var2, *animal1bp)
         self.location_criterion = Entry_Box(label_location_correction, 'Location criterion', '15')
         # movement
-        label_movement_correction = LabelFrame(outlier_set, text='Movement correction', font=('Times', 12, 'bold'),
+        label_movement_correction = LabelFrame(scroll, text='Movement correction', font=('Times', 12, 'bold'),
                                                pady=5, padx=5)
         mlabel_choosem1bp1 = Label(label_movement_correction, text='Choose Animal 1, body part 1:')
         mlabel_choosem1bp2 = Label(label_movement_correction, text='Choose Animal 1, body part 2:')
@@ -585,11 +589,11 @@ class outlier_settings:
         medianlist = ['mean','median']
         self.medianvar =StringVar()
         self.medianvar.set(medianlist[0])
-        label_median = LabelFrame(outlier_set,text='Median or Mean',font=('Times',12,'bold'),pady=5,padx=5)
+        label_median = LabelFrame(scroll,text='Median or Mean',font=('Times',12,'bold'),pady=5,padx=5)
         mediandropdown = OptionMenu(label_median, self.medianvar, *medianlist)
 
         #button
-        button_setvalues = Button(outlier_set,text='Confirm',command = self.set_outliersettings,font=('Arial',12,'bold'),fg='red')
+        button_setvalues = Button(scroll,text='Confirm',command = self.set_outliersettings,font=('Arial',12,'bold'),fg='red')
 
         #organize
         label_location_correction.grid(row=1,sticky=W)
@@ -693,7 +697,7 @@ class FolderSelect(Frame):
         return self.folderPath.get()
 
 class DropDownMenu(Frame):
-    def __init__(self,parent=None,dropdownLabel='',choice_dict={},labelwidth='',**kw):
+    def __init__(self,parent=None,dropdownLabel='',choice_dict=None,labelwidth='',**kw):
         Frame.__init__(self,master=parent,**kw)
         self.dropdownvar = StringVar()
         self.lblName = Label(self,text=dropdownLabel,width=labelwidth,anchor=W)
@@ -705,6 +709,8 @@ class DropDownMenu(Frame):
         return self.dropdownvar.get()
     def setChoices(self,choice):
         self.dropdownvar.set(choice)
+
+
 
 class FileSelect(Frame):
     def __init__(self,parent=None,fileDescription="",color=None,title=None,lblwidth=None,**kw):
@@ -810,6 +816,57 @@ class Button_getcoord(Frame):
 def Exit():
     app.root.destroy()
 
+
+def onMousewheel(event, canvas):
+    try:
+        scrollSpeed = event.delta
+        if platform.system() == 'Darwin':
+            scrollSpeed = event.delta
+        elif platform.system() == 'Windows':
+            scrollSpeed = int(event.delta / 120)
+        canvas.yview_scroll(-1 * (scrollSpeed), "units")
+    except:
+        pass
+
+def bindToMousewheel(event, canvas):
+    canvas.bind_all("<MouseWheel>", lambda event: onMousewheel(event, canvas))
+
+def unbindToMousewheel(event, canvas):
+    canvas.unbind_all("<MouseWheel>")
+
+def onFrameConfigure(canvas):
+    '''Reset the scroll region to encompass the inner frame'''
+    canvas.configure(scrollregion=canvas.bbox("all"))
+
+def hxtScrollbar(master):
+        '''
+        Create canvas.
+        Create a frame and put it in the canvas.
+        Create two scrollbar and insert command of canvas x and y view
+        Use canvas to create a window, where window = frame
+        Bind the frame to the canvas
+        '''
+
+        acanvas = Canvas(master, borderwidth=0, background="#ffffff")
+        frame = Frame(acanvas, background="#ffffff")
+        vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
+        vsb2 = Scrollbar(master, orient='horizontal', command=acanvas.xview)
+        acanvas.configure(yscrollcommand=vsb.set)
+        acanvas.configure(xscrollcommand=vsb2.set)
+        vsb.pack(side="right", fill="y")
+        vsb2.pack(side="bottom", fill="x")
+        acanvas.pack(side="left", fill="both", expand=True)
+
+        acanvas.create_window((10, 10), window=frame, anchor="nw")
+
+        # bind the frame to the canvas
+        frame.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
+        acanvas.bind('<Enter>', lambda event: bindToMousewheel(event, acanvas))
+        acanvas.bind('<Leave>', lambda event: unbindToMousewheel(event,acanvas))
+        return frame
+
+
+
 class video_info_table:
 
     def __init__(self,configini):
@@ -831,7 +888,8 @@ class video_info_table:
         self.tkintertable.minsize(1000, 500)
         self.tkintertable.wm_title("Video Info")
 
-        self.xscrollbar = Scrollable(self.tkintertable,width=32)
+        self.xscrollbar = Canvas(hxtScrollbar(self.tkintertable))
+        self.xscrollbar.pack(expand=True,fill=BOTH)
         self.myframe = LabelFrame(self.xscrollbar,text='Table')
         self.myframe.grid(row=6)
 
@@ -915,21 +973,19 @@ class video_info_table:
         get_data_button = Button(self.xscrollbar, text='Update distance_in_mm', command=self.getdata)
         get_data_button.grid(row=3,sticky=W)
 
-        add_column_button = Button(self.xscrollbar,text='<Add Column>',command=lambda:self.addBox(self.xscrollbar),fg='red')
+        add_column_button = Button(self.xscrollbar,text='<Add Column>',command=self.addBox,fg='red')
         add_column_button.grid(row=4,sticky=W)
 
         generate_csv_button = Button(self.xscrollbar,text='Save Data',command=self.generate_video_info_csv,font='bold',fg='red')
         generate_csv_button.grid(row=5)
 
-        self.xscrollbar.update()
 
-    def addBox(self,scroll):
+    def addBox(self):
         self.new_col_list.append(0)
         self.next_column = len(self.new_col_list)
         #print(self.next_column)
         self.table_col.append(newcolumn(self.myframe,self.filesFound,'20'))
         self.table_col[(self.next_column)-1].grid(row=0,column=self.next_column)
-        scroll.update()
 
     def getdata(self):
         self.data_lists =[]
@@ -2516,11 +2572,9 @@ class project_config:
         self.toplevel = Toplevel()
         self.toplevel.minsize(700, 700)
         self.toplevel.wm_title("Project Configuration")
-        #scroll
-        projectconfig = Scrollable(self.toplevel, width=25)
 
         #tab
-        tab_parent = ttk.Notebook(projectconfig)
+        tab_parent = ttk.Notebook(hxtScrollbar(self.toplevel))
         tab1 = ttk.Frame(tab_parent)
         tab2 = ttk.Frame(tab_parent)
         tab3 = ttk.Frame(tab_parent)
@@ -2542,7 +2596,7 @@ class project_config:
         #SML Settings
         self.label_smlsettings = LabelFrame(self.label_generalsettings, text='SML Settings',padx=5,pady=5)
         self.label_notarget = Entry_Box(self.label_smlsettings,'Number of predictive classifiers (behaviors):','33')
-        addboxButton = Button(self.label_smlsettings, text='<Add predictive classifier>', fg="navy", command=lambda:self.addBox(projectconfig))
+        addboxButton = Button(self.label_smlsettings, text='<Add predictive classifier>', fg="navy", command=lambda:self.addBox(self.label_notarget.entry_get))
 
         ##dropdown for # of mice
         dropdownbox = LabelFrame(self.label_generalsettings, text='Animal Settings')
@@ -2607,7 +2661,7 @@ class project_config:
         label_project_namedescrip.grid(row=3,sticky=W)
 
         self.label_smlsettings.grid(row=4,column=0,sticky=W,pady=5,columnspan=2)
-        self.label_notarget.grid(row=0,column=0,sticky=W,pady=5)
+        self.label_notarget.grid(row=0,column=0,sticky=W,pady=5,columnspan=2)
         addboxButton.grid(row=1,column=0,sticky=W,pady=6)
 
         dropdownbox.grid(row=5,column=0,sticky=W)
@@ -2642,8 +2696,6 @@ class project_config:
         label_caution2.grid(row=2,sticky=W)
         button_extractframes.grid(row=3,sticky=W)
 
-        projectconfig.update()
-
     def resetSettings(self):
         popup = Tk()
         popup.minsize(300, 100)
@@ -2658,7 +2710,6 @@ class project_config:
         B2.grid(row=1,column=1,sticky=W)
 
         popup.mainloop()
-
 
     def poseconfigSettings(self):
         # Popup window
@@ -2713,16 +2764,14 @@ class project_config:
 
         frame = LabelFrame(master,text='Bodyparts\' name')
 
-        scroll = Scrollable(frame)
-
         frame.grid(row=5,sticky=W)
+
         for i in range(noofbp):
-            self.bpnamelist[i] = Entry_Box(scroll,str(i+1),'2')
+            self.bpnamelist[i] = Entry_Box(frame,str(i+1),'2')
             self.bpnamelist[i].grid(row=i)
 
         self.saveposeConfigbutton.config(state='normal')
 
-        scroll.update()
 
     def change_image(self,*args):
         if (self.var.get() != 'Create pose config...'):
@@ -2755,22 +2804,26 @@ class project_config:
         except:
             print('Please select a video to proceed')
 
-    def addBox(self,scroll):
+    def addBox(self,noTarget):
+        try:
+            for i in self.lab:
+                i.destroy()
+            for i in self.ent1:
+                i.destroy()
+        except:
+            pass
 
-        frame = Frame(self.label_smlsettings)
-        frame.grid()
+        self.all_entries = []
+        self.lab=[0]*int(noTarget)
+        self.ent1=[0]*int(noTarget)
+        for i in range(int(noTarget)):
+            self.lab[i]= Label(self.label_smlsettings, text=str('Classifier ') + str(i + 1))
+            self.lab[i].grid(row=i+2, column=0, sticky=W)
+            self.ent1[i] = Entry(self.label_smlsettings)
+            self.ent1[i].grid(row=i+2, column=1, sticky=W)
 
-        # I use len(all_entries) to get nuber of next free column
-        next_column = len(self.all_entries)
+        self.all_entries = self.ent1
 
-        # add label in first row
-        lab = Label(frame, text=str('Classifier ') + str(next_column + 1))
-        lab.grid(row=0, column=0,sticky=W)
-
-        ent1 = Entry(frame)
-        ent1.grid(row=0, column=1,sticky=W)
-        self.all_entries.append(ent1)
-        scroll.update()
 
     def setFilepath(self):
         file_selected = askopenfilename()
@@ -2863,16 +2916,27 @@ class loadprojectMenu:
 
 class loadprojectini:
     def __init__(self,configini):
-        ##
+        #save project ini as attribute
         self.projectconfigini = configini
+        #bodyparts
+        bodypartscsv= os.path.join((os.path.dirname(self.projectconfigini)),'logs','measures','pose_configs','bp_names','project_bp_names.csv')
+        bp_set = pd.read_csv(bodypartscsv,header=None)[0].to_list()
+        # get target
+        config = ConfigParser()
+        configFile = str(self.projectconfigini)
+        config.read(configFile)
+        notarget = config.getint('SML settings','no_targets')
+        targetlist = {}
+        for i in range(notarget):
+            targetlist[(config.get('SML settings','target_name_'+str(i+1)))]=(config.get('SML settings','target_name_'+str(i+1)))
+        #starting of gui
         simongui = Toplevel()
         simongui.minsize(1100, 450)
         simongui.wm_title("Load project")
         simongui.columnconfigure(0, weight=1)
         simongui.rowconfigure(0, weight=1)
 
-        scroll = Scrollable(simongui)
-        tab_parent = ttk.Notebook(scroll)
+        tab_parent = ttk.Notebook(hxtScrollbar(simongui))
 
         tab2 = ttk.Frame(tab_parent)
         tab3 = ttk.Frame(tab_parent)
@@ -3045,8 +3109,11 @@ class loadprojectini:
         label_machineresults = LabelFrame(tab9,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
         button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=lambda:self.roi_settings('Analyze distances/velocity','processmovement'))
-        self.severityscale = Entry_Box(label_machineresults,'Severity scale 0 -',15)
-        button_process_severity = Button(label_machineresults,text='Analyze attack severity',command=self.analyzseverity)
+        label_severity = LabelFrame(tab9,text='Analyze Severity',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
+        self.severityscale = Entry_Box(label_severity,'Severity scale 0 -',15)
+        self.severityTarget = DropDownMenu(label_severity,'Target',targetlist,'15')
+        self.severityTarget.setChoices(targetlist[(config.get('SML settings', 'target_name_' + str(1)))])
+        button_process_severity = Button(label_severity,text='Analyze target severity',command=self.analyzseverity)
 
         #plot sklearn res
         label_plotsklearnr = LabelFrame(tab10,text='Sklearn visualization',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
@@ -3064,23 +3131,29 @@ class loadprojectini:
         #dataplot
         label_dataplot = LabelFrame(label_plotall,text='Data plot',pady=5,padx=5)
         button_dataplot = Button(label_dataplot,text='Generate data plot',command=self.plotdataplot)
+
         #path plot
         label_pathplot = LabelFrame(label_plotall,text='Path plot',pady=5,padx=5)
         self.Deque_points = Entry_Box(label_pathplot,'Max lines','15')
         self.severity_brackets = Entry_Box(label_pathplot,'Severity Scale: 0 - ','15')
-        self.Bodyparts = Entry_Box(label_pathplot, 'Bodyparts', '15')
+        self.noofAnimal = DropDownMenu(label_pathplot,'Number of animals',[1,2],'15')
+        self.noofAnimal.setChoices(1)
+        confirmAnimals = Button(label_pathplot,text='Confirm',command=lambda:self.tracknoofanimal(label_pathplot,bp_set))
         self.plotsvvar = IntVar()
         checkboxplotseverity = Checkbutton(label_pathplot,text='plot_severity',variable=self.plotsvvar)
         button_pathplot = Button(label_pathplot,text='Generate Path plot',command=self.pathplotcommand)
 
         CreateToolTip(self.Deque_points,'Maximum number of path lines in deque list')
-        CreateToolTip(self.Bodyparts, 'If golden aggression config: Nose, Left ear, Right ear, Centroid, Left lateral, Right lateral, Tail base, Tail end')
+        # CreateToolTip(self.Bodyparts, 'If golden aggression config: Nose, Left ear, Right ear, Centroid, Left lateral, Right lateral, Tail base, Tail end')
         CreateToolTip(self.severity_brackets,'Set number of brackets to severity measures')
 
         #distanceplot
         label_distanceplot = LabelFrame(label_plotall,text='Distance plot',pady=5,padx=5)
-        self.poi1 = Entry_Box(label_distanceplot, 'Body part 1', '15')
-        self.poi2 =Entry_Box(label_distanceplot, 'Body part 2', '15')
+        self.poi1 = DropDownMenu(label_distanceplot,'Body part 1',bp_set,'15')
+        self.poi2 = DropDownMenu(label_distanceplot,'Body part 2',bp_set,'15')
+        #set choice
+        self.poi1.setChoices((bp_set)[0])
+        self.poi2.setChoices((bp_set)[len(bp_set)//2])
         button_distanceplot= Button(label_distanceplot,text='Generate Distance plot',command=self.distanceplotcommand)
 
         CreateToolTip(self.poi1,'The bodyparts from config yaml. eg: Ear_left_1,Ear_right_1,Nose_1,Center_1,Lateral_left_1,Lateral_right_1,Tail_base_1,Tail_end_1,Ear_left_2,Ear_right_2,Nose_2,Center_2,Lateral_left_2,Lateral_right_2,Tail_base_2,Tail_end_2')
@@ -3094,14 +3167,7 @@ class loadprojectini:
         hmchoices = {'viridis','plasma','inferno','magma','jet','gnuplot2'}
         self.hmMenu = DropDownMenu(label_heatmap,'Color Palette',hmchoices,'15')
         self.hmMenu.setChoices('jet')
-        # get target
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        notarget = config.getint('SML settings','no_targets')
-        targetlist = {}
-        for i in range(notarget):
-            targetlist[(config.get('SML settings','target_name_'+str(i+1)))]=(config.get('SML settings','target_name_'+str(i+1)))
+        #get target called on top
         self.targetMenu = DropDownMenu(label_heatmap,'Target',targetlist,'15')
         self.targetMenu.setChoices(targetlist[(config.get('SML settings','target_name_'+str(1)))])
 
@@ -3115,14 +3181,20 @@ class loadprojectini:
 
 
         #Merge frames
-        label_mergeframes = LabelFrame(tab10,text='Merge frames',pady=5,padx=5,font=("Helvetica",12,'bold'),fg='black')
-        button_mergeframe = Button(label_mergeframes,text='Merge frames',command=self.mergeframesofplot)
+        label_mergeframes = LabelFrame(tab10, text='Merge frames', pady=5, padx=5, font=("Helvetica", 12, 'bold'),
+                                       fg='black')
+        # use for loop to create intvar
+        mergeFramesvar = []
+        for i in range(7):
+            mergeFramesvar.append(IntVar())
+        # use loop to create checkbox?
+        mfCheckbox = [0] * 7
+        mfTitlebox = ['Sklearn', 'Gantt', 'Path', "'Live' data", 'Distance','Probability']
+        for i in range(6):
+            mfCheckbox[i] = Checkbutton(label_mergeframes, text=mfTitlebox[i], variable=mergeFramesvar[i])
+            mfCheckbox[i].grid(row=i, sticky=W)
 
-        #create video
-        label_createvideo = LabelFrame(tab10, text='Create Video', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
-        self.bitrate = Entry_Box(label_createvideo,'Bitrate',8)
-        self.fileformt = Entry_Box(label_createvideo,'File format',8)
-        button_createvideo = Button(label_createvideo, text='Create Video',command=self.generate_video)
+        button_mergeframe = Button(label_mergeframes,text='Merge frames',command= lambda:self.mergeframesofplot(mergeFramesvar))
 
         ## classifier validation
         label_classifier_validation = LabelFrame(tab11, text='Classifier Validation', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
@@ -3198,17 +3270,20 @@ class loadprojectini:
         button_runmachinemodel.grid(row=3,sticky=W,pady=5)
 
         label_machineresults.grid(row=9,sticky=W,pady=5)
-        button_process_datalog.grid(row=1,column=0,sticky=W,padx=3)
-        button_process_movement.grid(row=1,column=1,sticky=W,padx=3)
-        self.severityscale.grid(row=0,column=2,sticky=W)
-        button_process_severity.grid(row=1,column=2,sticky=W,padx=3)
+        button_process_datalog.grid(row=2,column=0,sticky=W,padx=3)
+        button_process_movement.grid(row=2,column=1,sticky=W,padx=3)
+        #severity
+        label_severity.grid(row=10,sticky=W,pady=5)
+        self.severityscale.grid(row=0,sticky=W)
+        self.severityTarget.grid(row=1,sticky=W)
+        button_process_severity.grid(row=2,sticky=W,pady=8)
 
-        label_plotsklearnr.grid(row=10,column=0,sticky=W+N,padx=5)
+        label_plotsklearnr.grid(row=11,column=0,sticky=W+N,padx=5)
         videocheck.grid(row=0,sticky=W)
         framecheck.grid(row=1,sticky=W)
         button_plotsklearnr.grid(row=2,sticky=W)
 
-        label_plotall.grid(row=10,column=1,sticky=W+N,padx=5)
+        label_plotall.grid(row=11,column=1,sticky=W+N,padx=5)
         #gantt
         label_ganttplot.grid(row=0,sticky=W)
         button_ganttplot.grid(row=0,sticky=W)
@@ -3219,9 +3294,10 @@ class loadprojectini:
         label_pathplot.grid(row=2,sticky=W)
         self.Deque_points.grid(row=0,sticky=W)
         self.severity_brackets.grid(row=2,sticky=W)
-        self.Bodyparts.grid(row=3,sticky=W)
-        checkboxplotseverity.grid(row=4,sticky=W)
-        button_pathplot.grid(row=5,sticky=W)
+        self.noofAnimal.grid(row=3,sticky=W)
+        confirmAnimals.grid(row=3,column=1,sticky=W)
+        checkboxplotseverity.grid(row=7,sticky=W)
+        button_pathplot.grid(row=8,sticky=W)
         #distance
         label_distanceplot.grid(row=3,sticky=W)
         self.poi1.grid(row=1,sticky=W)
@@ -3241,21 +3317,38 @@ class loadprojectini:
         self.behaviorMenu.grid(row=1, sticky=W)
         plotThresholdButton.grid(row=2, sticky=W)
 
-        label_mergeframes.grid(row=10,column=2,sticky=W+N,padx=5)
-        button_mergeframe.grid(row=0,sticky=W)
-
-        label_createvideo.grid(row=10,column=3,sticky=W+N,padx=5)
-        self.bitrate.grid(row=0,sticky=W)
-        self.fileformt.grid(row=1,sticky=W)
-        button_createvideo.grid(row=2,sticky=W)
+        label_mergeframes.grid(row=11,column=2,sticky=W+N,padx=5)
+        button_mergeframe.grid(row=10,sticky=W)
 
         label_classifier_validation.grid(row=14,sticky=W)
         self.seconds.grid(row=0,sticky=W)
         self.cvTarget.grid(row=1,sticky=W)
         button_validate_classifier.grid(row=2,sticky=W)
 
-        #scrollbar update
-        scroll.update()
+    def tracknoofanimal(self,master,bplist):
+        try:
+            self.Bodyparts1.destroy()
+        except:
+            pass
+        try:
+            self.Bodyparts2.destroy()
+        except:
+            pass
+
+        if self.noofAnimal.getChoices()=='1':
+            self.Bodyparts1 = DropDownMenu(master, 'Animal 1 bodypart', bplist, '15')
+            self.Bodyparts1.setChoices((bplist)[0])
+            self.Bodyparts1.grid(row=4,sticky=W)
+            self.Bodyparts2 = DropDownMenu(master, 'Animal 2 bodypart', bplist, '15')
+            self.Bodyparts2.setChoices(None)
+
+        elif self.noofAnimal.getChoices() == '2':
+            self.Bodyparts1 = DropDownMenu(master, 'Animal 1 bodypart', bplist, '15')
+            self.Bodyparts1.setChoices((bplist)[0])
+            self.Bodyparts1.grid(row=4, sticky=W)
+            self.Bodyparts2 = DropDownMenu(master, 'Animal 2 bodypart', bplist, '15')
+            self.Bodyparts2.setChoices((bplist)[len(bplist) // 2])
+            self.Bodyparts2.grid(row=5, sticky=W)
 
     def loaddefinedroi(self):
 
@@ -3555,8 +3648,13 @@ class loadprojectini:
         validate_classifier(self.projectconfigini, self.seconds.entry_get,self.cvTarget.getChoices())
         print('Videos generated')
 
-    def mergeframesofplot(self):
-        merge_frames_config(self.projectconfigini)
+    def mergeframesofplot(self,var):
+        inputList = []
+        for i in var:
+            inputList.append(i.get())
+
+        mergeframesPlot(self.projectconfigini,inputList)
+
 
     def plotdataplot(self):
         data_plot_config(self.projectconfigini)
@@ -3571,7 +3669,7 @@ class loadprojectini:
         plotsklearnresult(self.projectconfigini,self.videovar.get(),self.genframevar.get())
 
     def analyzseverity(self):
-        analyze_process_severity(self.projectconfigini,self.severityscale.entry_get)
+        analyze_process_severity(self.projectconfigini,self.severityscale.entry_get,self.severityTarget.getChoices())
 
     def analyzedatalog(self):
         # Popup window
@@ -3693,25 +3791,6 @@ class loadprojectini:
         with open(configini, 'w') as configfile:
             config.write(configfile)
 
-    def generate_video(self):
-
-        print('Generating video...')
-        configini = self.projectconfigini
-        bitrate = self.bitrate.entry_get
-        fileformat = '.'+ self.fileformt.entry_get
-
-        config = ConfigParser()
-        config.read(configini)
-
-        config.set('Create movie settings', 'file_format', str(fileformat))
-        config.set('Create movie settings', 'bitrate', str(bitrate))
-        with open(configini, 'w') as configfile:
-            config.write(configfile)
-
-        generatevideo_config_ffmpeg(configini)
-        print('Video generated.')
-
-
     def extract_frames_loadini(self):
         configini = self.projectconfigini
         videopath = str(os.path.dirname(configini) + '\\videos')
@@ -3740,8 +3819,8 @@ class loadprojectini:
         config = ConfigParser()
         config.read(configini)
 
-        config.set('Distance plot', 'POI_1', self.poi1.entry_get)
-        config.set('Distance plot', 'POI_2', self.poi2.entry_get)
+        config.set('Distance plot', 'POI_1', self.poi1.getChoices())
+        config.set('Distance plot', 'POI_2', self.poi2.getChoices())
         with open(configini, 'w') as configfile:
             config.write(configfile)
 
@@ -3754,9 +3833,11 @@ class loadprojectini:
         config = ConfigParser()
         config.read(configini)
 
+        config.set('Path plot settings', 'no_animal_pathplot', self.noofAnimal.getChoices())
         config.set('Path plot settings', 'deque_points', self.Deque_points.entry_get)
         config.set('Path plot settings', 'severity_brackets', self.severity_brackets.entry_get)
-        config.set('Line plot settings', 'Bodyparts', self.Bodyparts.entry_get)
+        config.set('Path plot settings', 'animal_1_bp', self.Bodyparts1.getChoices())
+        config.set('Path plot settings', 'animal_2_bp', self.Bodyparts2.getChoices())
 
         if self.plotsvvar.get()==1:
             config.set('Path plot settings', 'plot_severity', 'yes')
@@ -3793,7 +3874,8 @@ class trainmachinemodel_settings:
         trainmmsettings.minsize(400, 400)
         trainmmsettings.wm_title("Machine model settings")
 
-        trainmms = Scrollable(trainmmsettings)
+        trainmms = Canvas(hxtScrollbar(trainmmsettings))
+        trainmms.pack(expand=True,fill=BOTH)
 
         #load metadata
         load_data_frame = LabelFrame(trainmms, text='Load Metadata',font=('Helvetica',10,'bold'), pady=5, padx=5)
@@ -3943,7 +4025,6 @@ class trainmachinemodel_settings:
         button_save_meta.grid(row=7)
         button_remove_meta.grid(row=8,pady=5)
 
-        trainmms.update()
 
     def clearcache(self):
         configs_dir = os.path.join(os.path.dirname(self.configini),'configs')
@@ -4177,66 +4258,6 @@ class runmachinemodelsettings:
             config.write(configfile)
 
         print('Model paths saved in project_config.ini')
-
-
-class Scrollable(Frame):
-    """
-       Make a frame scrollable with scrollbar on the right.
-       After adding or removing widgets to the scrollable frame,
-       call the update() method to refresh the scrollable area.
-    """
-
-    def __init__(self, frame, width=16):
-
-        scrollbarX = Scrollbar(frame, width=width, orient='horizontal')
-        scrollbarX.pack(side=BOTTOM, fill=X, expand=False)
-        scrollbarY = Scrollbar(frame, width=width)
-        scrollbarY.pack(side=RIGHT, fill=Y, expand=False)
-
-        sizegrip= ttk.Sizegrip(frame)
-        sizegrip.pack(in_=scrollbarX, side=BOTTOM, anchor="se")
-
-        self.canvas = Canvas(frame, yscrollcommand=scrollbarY.set,xscrollcommand=scrollbarX.set)
-        self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
-
-        scrollbarX.config(command=self.canvas.xview)
-        scrollbarY.config(command=self.canvas.yview)
-
-        self.canvas.bind('<Configure>', self.__fill_canvas)
-
-        # base class initialization
-        Frame.__init__(self, frame)
-
-        # assign this obj (the inner frame) to the windows item of the canvas
-        self.windows_item = self.canvas.create_window(0,0, window=self, anchor=NW)
-
-        self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
-
-    def on_mousewheel(self, event):
-        try:
-            scrollSpeed = event.delta
-            if platform.system() == 'Darwin':
-                scrollSpeed = event.delta
-            elif platform.system() == 'Windows':
-                scrollSpeed = int(event.delta/120)
-            self.canvas.yview_scroll(-1*(scrollSpeed), "units")
-        except:
-            pass
-    def __fill_canvas(self, event):
-        "Enlarge the windows item to the canvas width"
-
-        canvas_width = event.width
-
-        self.canvas.itemconfig(self.windows_item, width = canvas_width)
-
-    def update(self):
-        "Update the canvas and the scrollregion"
-
-        self.update_idletasks()
-        self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
-
-
-
 
 def get_frame(self):
     '''

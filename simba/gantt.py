@@ -3,64 +3,52 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 from configparser import ConfigParser
+import glob
 
 def ganntplot_config(configini):
     config = ConfigParser()
     config.read(configini)
-    frames_dir_out = config.get('Frame settings', 'frames_dir_out')
-    frames_dir_out = os.path.join(frames_dir_out, 'gantt_plots')
+    projectPath = config.get('General settings', 'project_path')
+    frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'gantt_plots')
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
-    csv_dir = config.get('General settings', 'csv_path')
-    csv_dir_in = os.path.join(csv_dir, 'machine_results')
+    csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
     no_targets = config.getint('SML settings', 'No_targets')
-    use_master = config.get('General settings', 'use_master_config')
-    vidInfPath = config.get('General settings', 'project_path')
-    vidInfPath = os.path.join(vidInfPath, 'logs')
-    vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
+    vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
     boutEnd = 0
     boutEnd_list = [0]
-    boutStart_list = []
-    filesFound = []
-    target_names = []
+    boutStart_list, target_names = [], []
     colours = ['red', 'green', 'pink', 'orange', 'blue', 'purple', 'lavender', 'grey', 'sienna', 'tomato', 'azure',
                'crimson', 'aqua', 'plum', 'teal', 'maroon', 'lime', 'coral']
     colourTupleX = list(np.arange(3.5, 203.5, 5))
-    loopy = 0
+    VideoCounter = 0
 
     ########### FIND CSV FILES ###########
-    if use_master == 'yes':
-        for i in os.listdir(csv_dir_in):
-            if i.__contains__(".csv"):
-                file = os.path.join(csv_dir_in, i)
-                filesFound.append(file)
+    filesFound = glob.glob(csv_dir_in + "/*.csv")
     print('Generating gantt plots for ' + str(len(filesFound)) + ' video(s)...')
 
     ########### GET TARGET COLUMN NAMES ###########
     for ff in range(no_targets):
         currentModelNames = 'target_name_' + str(ff + 1)
         currentModelNames = config.get('SML settings', currentModelNames)
-        currentModelNames = currentModelNames
         target_names.append(currentModelNames)
     colours = colours[:len(target_names)]
 
-    for i in filesFound:
+    for currentFile in filesFound:
         boutsDf = pd.DataFrame(columns=['Event', 'Start_frame', 'End_frame'])
-        currentFile = i
-        CurrentVideoName = os.path.basename(currentFile)
-        videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
+        CurrentVideoName = os.path.basename(currentFile.replace('.csv', ''))
+        print('Analyzing file ' + str(CurrentVideoName) + '...')
+        videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName)]
         try:
             fps = int(videoSettings['fps'])
         except TypeError:
             print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
-        loopy += 1
+        VideoCounter += 1
         dataDf = pd.read_csv(currentFile)
         dataDf['frames'] = np.arange(len(dataDf))
         rowCount = dataDf.shape[0]
-        folderNm = os.path.basename(currentFile)
-        folderName = str(folderNm.split('.')[0]) + str('_gantt')
-        saveDir = os.path.join(frames_dir_out, folderName)
+        saveDir = os.path.join(frames_dir_out, CurrentVideoName)
         if not os.path.exists(saveDir):
             os.makedirs(saveDir)
         for bb in target_names:
@@ -115,7 +103,7 @@ def ganntplot_config(configini):
             if os.path.isfile(savePath):
                 os.remove(savePath)
             plt.savefig(savePath)
-            print('Gantt plot ' + str(k) + '/' + str(rowCount) + ' for video ' + str(loopy) + '/' + str(len(filesFound)))
+            print('Gantt plot ' + str(k) + '/' + str(rowCount) + ' for video ' + str(VideoCounter) + '/' + str(len(filesFound)))
             plt.close('all')
         loop += 1
     print('Finished generating gantt plots. Plots are saved @ project_folder/frames/output/gantt')

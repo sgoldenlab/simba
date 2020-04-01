@@ -123,6 +123,7 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     f.write('Scale_increments_seconds = ' + '\n')
     f.write('Palette = ' + '\n')
     f.write('target_behaviour = ' + '\n')
+    f.write('body_part = ' + '\n')
     f.write('\n')
 
     #ROI settings
@@ -135,9 +136,9 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
 
     # process movements settings
     f.write('[process movements]\n')
-    f.write('Animal_no  = ' + '\n')
     f.write('animal_1_bp  = ' + '\n')
     f.write('animal_2_bp  = ' + '\n')
+    f.write('no_of_animals  = ' + '\n')
 
     #create movie settings
     f.write('[Create movie settings]\n')

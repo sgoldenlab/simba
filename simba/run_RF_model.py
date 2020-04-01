@@ -72,6 +72,7 @@ def rfmodel(inifile):
         outputDf.reset_index()
 
         for b in range(model_nos):
+
             # CREATE LIST OF GAPS BASED ON SHORTEST BOUT
             shortest_bout = min_bout_list[b]
             framesToPlug = int(currVidFps * (shortest_bout / 1000))

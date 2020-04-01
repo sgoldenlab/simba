@@ -12,19 +12,16 @@ def plotHeatMap(inifile):
         config.read(configFile)
     except MissingSectionHeaderError:
         print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
-    csv_dir = config.get('General settings', 'csv_path')
-    csv_dir_in = os.path.join(csv_dir, "machine_results")
-    animalbp1 = config.get('Outlier settings','movement_bodypart1_mouse1')
+    projectPath = config.get('General settings', 'project_path')
+    csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
+    animalbp1 = config.get('Heatmap settings','body_part')
     trackedBodyParts = [str(animalbp1)+'_x', str(animalbp1)+ '_y']
-    frames_dir_out = config.get('Frame settings', 'frames_dir_out')
-    frames_dir_out = os.path.join(frames_dir_out, 'heatmaps')
+    frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'heatmaps')
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
     binInput = config.getint('Heatmap settings', 'bin_size_pixels')
-    vidInfPath = config.get('General settings', 'project_path')
-    videoInputPath = os.path.join(vidInfPath, "videos")
-    vidInfPath = os.path.join(vidInfPath, 'logs')
-    vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
+    videoInputPath = os.path.join(projectPath, 'videos')
+    vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
     maxColorScale = config.getint('Heatmap settings', 'Scale_max_seconds')
     increments_in_seconds = config.getfloat('Heatmap settings', 'Scale_increments_seconds')
@@ -43,7 +40,6 @@ def plotHeatMap(inifile):
     for currVid in filesFound:
         loopCounter = 1
         currVidBaseName = os.path.basename(currVid)
-        fileName = currVidBaseName.replace('.csv', '')
         videoName = currVidBaseName.replace('.csv', '.mp4')
         currVideo = os.path.join(videoInputPath, videoName)
         cap = cv2.VideoCapture(currVideo)
@@ -134,4 +130,3 @@ def plotHeatMap(inifile):
         print('All heatmaps generated')
         cv2.destroyAllWindows()
         writer.release()
-

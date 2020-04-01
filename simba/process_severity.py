@@ -5,11 +5,10 @@ from configparser import ConfigParser
 from datetime import datetime
 dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
 
-def analyze_process_severity(configini,severitbrac):
-    print('Processing attack severity...')
+def analyze_process_severity(configini,severitbrac,targetBehavior):
+    print('Processing',targetBehavior, 'severity...')
     config = ConfigParser()
-    configFile = str(configini)
-    config.read(configFile)
+    config.read(configini)
     filesFound = []
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'machine_results')
@@ -61,7 +60,7 @@ def analyze_process_severity(configini,severitbrac):
         for pp in range(severity_brackets):
             lowerBound = severityGrades[pp]
             upperBound = severityGrades[pp + 1]
-            currGrade = len(csv_df[(csv_df['Attack'] == 1) & (csv_df['Scaled_movement_M1_M2'] > lowerBound) & (csv_df['Scaled_movement_M1_M2'] <= upperBound)])
+            currGrade = len(csv_df[(csv_df[str(targetBehavior)] == 1) & (csv_df['Scaled_movement_M1_M2'] > lowerBound) & (csv_df['Scaled_movement_M1_M2'] <= upperBound)])
             severityLogFrames[pp] = currGrade
         log_list = []
         log_list.append(str(CurrentVideoName.replace('.csv', '')))

@@ -98,4 +98,4 @@ def merge_frames_config(configini):
             print('Merged frame ' + str(loopy) + '/' + str(len(frameList)) + ' for video ' + str(loop) + '/' + str(videoNos))
             loopy += 1
         loop+=1
-    print('Merge frames complete.')
+    print('Merge frames complete. Videos saved @ project_folder/frames/output/merged')

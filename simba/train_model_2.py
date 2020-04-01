@@ -29,6 +29,8 @@ import graphviz.backend
 from dtreeviz.shadow import *
 from sklearn import tree
 from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
+from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score
+from sklearn.model_selection import cross_val_score, cross_validate
 
 def trainmodel2(inifile):
     configFile = str(inifile)
@@ -126,9 +128,11 @@ def trainmodel2(inifile):
         dfvals.to_csv(fname, index=False)
 
     def LearningCurve(features, targetFrame, shuffle_splits, dataset_splits):
+        newDataTargets = np.concatenate((target_train, target_test), axis=0)
+        newDataFeatures = np.concatenate((data_train, data_test), axis=0)
         cv = ShuffleSplit(n_splits=shuffle_splits, test_size=train_test_size, random_state=0)
         model = RandomForestClassifier(n_estimators=RF_n_estimators, max_features=RF_max_features, n_jobs=-1, criterion=RF_criterion, min_samples_leaf=RF_min_sample_leaf, bootstrap=True, verbose=0)
-        train_sizes, train_scores, test_scores = learning_curve(model, features, targetFrame, cv=cv, scoring='f1', shuffle=True, n_jobs=-1, train_sizes=np.linspace(0.01, 1.0, dataset_splits))
+        train_sizes, train_scores, test_scores = learning_curve(model, newDataFeatures, newDataTargets, cv=cv, scoring='f1', shuffle=True, n_jobs=-1, verbose=1, train_sizes=np.linspace(0.01, 1.0, dataset_splits))
         train_sizes = np.linspace(0.01, 1.0, dataset_splits)
         train_mean = np.mean(train_scores, axis=1)
         test_mean = np.mean(test_scores, axis=1)
@@ -158,6 +162,7 @@ def trainmodel2(inifile):
             currentFn = os.path.join(data_folder, i)
             df = pd.read_csv(currentFn, index_col=0)
             features = features.append(df, ignore_index=True)
+    features.to_csv('test2.csv')
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     features = features.drop(["scorer"], axis=1, errors='ignore')
     totalTargetframes = features[classifierName].sum()
@@ -182,6 +187,7 @@ def trainmodel2(inifile):
         features.pop(currentModelName).values
     class_names = class_names = ['Not_' + classifierName, classifierName]
     feature_list = list(features)
+    features.to_csv('test.csv')
     print('# of features in dataset: ' + str(len(feature_list)))
 
     # IF SET BY USER - PERFORM UNDERSAMPLING AND OVERSAMPLING IF SET BY USER
@@ -229,9 +235,20 @@ def trainmodel2(inifile):
                                      criterion=RF_criterion, min_samples_leaf=RF_min_sample_leaf, bootstrap=True,
                                      verbose=1)
         try:
-            clf.fit(data_train, target_train)
+           clf.fit(data_train, target_train)
         except ValueError:
-            print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
+           print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
+
+        # scoring = ['precision', 'recall', 'f1']
+        # newDataTargets = np.concatenate((target_train, target_test), axis=0)
+        # #newDataTargets = np.where((newDataTargets == 0) | (newDataTargets == 1), newDataTargets ** 1, newDataTargets)
+        # newDataFeatures = np.concatenate((data_train, data_test), axis=0)
+        # #newDataFeatures = np.where((newDataFeatures == 0) | (newDataFeatures == 1), newDataFeatures ** 1, newDataFeatures)
+        # cv = ShuffleSplit(n_splits=5, test_size=train_test_size)
+        # results = cross_validate(clf, newDataFeatures, newDataTargets, cv=cv, scoring=scoring)
+        # results = pd.DataFrame.from_dict(results)
+        # crossValresultsFname = os.path.join(tree_evaluations_out, str(classifierName) + '_cross_val_100.csv')
+        # results.to_csv(crossValresultsFname)
 
         # #RUN RANDOM FOREST EVALUATIONS
         compute_permutation_importance = config.get('create ensemble settings', 'compute_permutation_importance')
@@ -254,9 +271,12 @@ def trainmodel2(inifile):
             print('Calculating precision recall curve...')
             precisionRecallDf = pd.DataFrame()
             probabilities = clf.predict_proba(data_test)[:, 1]
-            precision, recall, _ = precision_recall_curve(target_test, probabilities, pos_label=1)
+            precision, recall, thresholds = precision_recall_curve(target_test, probabilities, pos_label=1)
             precisionRecallDf['precision'] = precision
             precisionRecallDf['recall'] = recall
+            thresholds = list(thresholds)
+            thresholds.insert(0, 0.00)
+            precisionRecallDf['thresholds'] = thresholds
             PRCpath = os.path.join(tree_evaluations_out, str(classifierName) + '_precision_recall.csv')
             precisionRecallDf.to_csv(PRCpath)
 

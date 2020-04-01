@@ -153,13 +153,16 @@ def train_multimodel(configini):
             features = features.append(df, ignore_index=True)
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     baseFeatureFrame = features.drop(["scorer"], axis=1, errors='ignore')
+    try:
+        baseFeatureFrame = baseFeatureFrame.drop(['video_no', 'frames'], axis=1)
+    except KeyError:
+        pass
 
 
     for i in metaFilesList:
         loopy+=1
         features = baseFeatureFrame.copy()
         currMetaFile = pd.read_csv(i, index_col=False)
-        classifierName = currMetaFile['Classifier_name'].iloc[0]
         classifierName = currMetaFile['Classifier_name'].iloc[0]
         saveFileNo = (len(os.listdir(modelPath)) + 1)
         totalTargetframes = features[classifierName].sum()
@@ -281,9 +284,12 @@ def train_multimodel(configini):
                 print('Calculating precision recall curves...')
                 precisionRecallDf = pd.DataFrame()
                 probabilities = clf.predict_proba(data_test)[:, 1]
-                precision, recall, _ = precision_recall_curve(target_test, probabilities, pos_label=1)
+                precision, recall, thresholds = precision_recall_curve(target_test, probabilities, pos_label=1)
                 precisionRecallDf['precision'] = precision
                 precisionRecallDf['recall'] = recall
+                thresholds = list(thresholds)
+                thresholds.insert(0, 0.00)
+                precisionRecallDf['thresholds'] = thresholds
                 PRCpath = os.path.join(ensemble_evaluations_out, str(classifierName) + '_precision_recall.csv')
                 precisionRecallDf.to_csv(PRCpath)
 
@@ -305,7 +311,7 @@ def train_multimodel(configini):
                                 generate_precision_recall_curve, RF_meta_data, generate_learning_curve, dataset_splits,
                                 shuffle_splits,
                                 N_feature_importance_bars, over_sample_ratio, over_sample_setting, train_test_size,
-                                under_sample_ratio, under_sample_ratio]
+                                under_sample_ratio, under_sample_setting]
                 generateMetaData(metaDataList, classifierName, saveFileNo)
 
 
