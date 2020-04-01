@@ -162,7 +162,6 @@ def trainmodel2(inifile):
             currentFn = os.path.join(data_folder, i)
             df = pd.read_csv(currentFn, index_col=0)
             features = features.append(df, ignore_index=True)
-    features.to_csv('test2.csv')
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     features = features.drop(["scorer"], axis=1, errors='ignore')
     totalTargetframes = features[classifierName].sum()
@@ -187,7 +186,6 @@ def trainmodel2(inifile):
         features.pop(currentModelName).values
     class_names = class_names = ['Not_' + classifierName, classifierName]
     feature_list = list(features)
-    features.to_csv('test.csv')
     print('# of features in dataset: ' + str(len(feature_list)))
 
     # IF SET BY USER - PERFORM UNDERSAMPLING AND OVERSAMPLING IF SET BY USER
