@@ -5,7 +5,7 @@ from datetime import datetime
 import numpy as np
 
 
-def analyze_process_data_log(configini):
+def analyze_process_data_log(configini,chosenlist):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
     configFile = str(configini)
@@ -27,7 +27,7 @@ def analyze_process_data_log(configini):
 
     ########### FIND CSV FILES ###########
     for i in os.listdir(csv_dir_in):
-        if i.__contains__(".csv"):
+        if i.endswith(".csv"):
             file = os.path.join(csv_dir_in, i)
             filesFound.append(file)
 
@@ -136,6 +136,11 @@ def analyze_process_data_log(configini):
         loop += 1
         print('File # processed for machine predictions: ' + str(loop) + '/' + str(len(filesFound)))
     log_df.fillna(0, inplace=True)
+    # drop columns not chosen
+    for i in chosenlist:
+        log_df = log_df[log_df.columns.drop(list(log_df.filter(regex=str(i))))]
+
+
     log_df.to_csv(log_fn, index=False)
     print('All files processed for machine predictions: data file saved @' + str(log_fn))
 
