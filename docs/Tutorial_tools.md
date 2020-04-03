@@ -6,7 +6,7 @@ We have developed video and image processing tools and incorporated them into th
 ![alt-text-1](/images/toolsmenu.png)
 
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
-- [Fixed Crop Videos]()
+- [Fixed Crop Videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#fixed-crop-videos)
 - [Crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
 - [Multi-crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos)
 - [Downsample videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video)
