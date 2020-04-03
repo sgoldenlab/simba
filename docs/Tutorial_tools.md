@@ -6,8 +6,8 @@ We have developed video and image processing tools and incorporated them into th
 ![alt-text-1](/images/toolsmenu.png)
 
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
-- [Fixed Crop Videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#fixed-crop-videos)
 - [Crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
+- [Fixed Crop Videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#fixed-crop-videos)
 - [Multi-crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos)
 - [Downsample videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video)
 - [Get mm/ppx](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#get-coordinates)
@@ -56,19 +56,6 @@ Let's say we have a 2 minute long video and we want to get rid of the first 20 s
 
 2. Click `Cut Video` to trim video and a new shorten video will be generated, the new video will have a name of *Name of original video* + *_shorten* and will be located in the same folder as the original video.
 
-## Fixed Crop Videos
-This tool allows the user to crop once and apply the same dimension to the rest of the videos in the folder.
-
-![](/images/fixcropvid.PNG)
-
-1. Under `Video directory`, select the input video folder by clicking `Browse Folder`.
-
-2. Then, select an output folder.
-
-3. Click on `Confirm` and an image will pop up, use your mouse to *Left Click* on the video and drag the rectangle bounding box to contain the area of the video you wish to keep. *You can always left click and drag on the video to recrop your video*
-
-4. Hit `Enter` **twice** and SimBA will crop the video. The new video will have a name of *Name of original video* + *_cropped* and will be located in the output folder.
-
 ## Crop Video
 This is a tool to crop videos.
 
@@ -87,6 +74,19 @@ This is a tool to crop videos.
 4. Hit `Enter` **twice** and SimBA will crop the video. The new video will have a name of *Name of original video* + *_cropped* and will be located in the same folder as the original video.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/cropvideo4.PNG" width="900" height="100" />
+
+## Fixed Crop Videos
+This tool allows the user to crop once and apply the same dimension to the rest of the videos in the folder.
+
+![](/images/fixcropvid.PNG)
+
+1. Under `Video directory`, select the input video folder by clicking `Browse Folder`.
+
+2. Then, select an output folder.
+
+3. Click on `Confirm` and an image will pop up, use your mouse to *Left Click* on the video and drag the rectangle bounding box to contain the area of the video you wish to keep. *You can always left click and drag on the video to recrop your video*
+
+4. Hit `Enter` **twice** and SimBA will crop the video. The new video will have a name of *Name of original video* + *_cropped* and will be located in the output folder.
 
 ## Multi-crop videos
 
