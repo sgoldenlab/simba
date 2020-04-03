@@ -89,13 +89,14 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
         outputFileName = os.path.join(frames_dir_out, CurrentVideoName)
         if height < width:
             videoHeight, videoWidth = width, height
-        if height > width:
+        if height >= width:
             videoHeight, videoWidth = height, width
         writer = cv2.VideoWriter(outputFileName.replace('.csv', '.mp4'), fourcc, fps, (videoWidth, videoHeight))
-        space_scale = 1.1
-        fontScale = max(width, height) / (max(width, height) * 1.2)
-        circleScale = int(max(width, height) / (max(width, height) * 0.05))
-        spacingScale = int(min(width, height) / (25 / space_scale))
+        mySpaceScale, myRadius, myResolution, myFontScale  = 60, 20, 1500, 1.5
+        maxResDimension = max(width, height)
+        circleScale = int(myRadius / (myResolution / maxResDimension))
+        fontScale = float(myFontScale / (myResolution / maxResDimension))
+        spacingScale = int(mySpaceScale / (myResolution / maxResDimension))
         currRow = 0
         while (cap.isOpened()):
             ret, frame = cap.read()
