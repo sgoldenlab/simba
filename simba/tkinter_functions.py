@@ -400,15 +400,20 @@ def mergemovebatch(dir,framespersec,vidformat,bit,imgformat):
 
 def changefps_multivideo(dir,fps):
 
-    currdir = os.listdir(dir)
+    currdir = []
     fpss = str(fps)
-
+    #######FIND ONLY VIDEOS IN THE FOLDER (FILTER)#######
+    for i in os.listdir(dir):
+        if i.endswith(('.avi', '.mp4', '.mov', 'flv')):
+            currdir.append(i)
+    ## loop through each video and change fps
     for i in currdir:
         video = os.path.join(dir,i)
-        output = os.path.join(dir,fpss + i)
-        command = str('ffmpeg -i ') +'"'+ str(video)+'"' + ' -filter:v fps=fps=' + fpss + ' '+'"' + output+'"'
+        output = os.path.join(dir,'fps_'+ fpss+'_'+ i)
+        command = str('ffmpeg -i ') + str(video) + ' -filter:v fps=fps=' + fpss + ' '+'"' + output+'"'
         print(command)
         subprocess.call(command,shell=True)
+    print('Process completed. All videos\' fps were changed to',str(fps))
 
 def changefps_singlevideo(filename,fps):
     video = filename
@@ -534,6 +539,62 @@ def cropvid(filenames):
 
     else:
         print('Please select a video to crop')
+
+def youOnlyCropOnce(inputdir,outputdir):
+    filesFound=[]
+    ########### FIND FILES ###########
+    for i in os.listdir(inputdir):
+        if i.endswith(('.avi', '.mp4', '.mov', 'flv')):
+            filesFound.append(os.path.join(inputdir,i))
+    filenames=filesFound[0]
+    #extract one frame
+    currentDir = str(os.path.dirname(filenames))
+    videoName = str(os.path.basename(filenames))
+    os.chdir(currentDir)
+    cap = cv2.VideoCapture(videoName)
+    cap.set(1, 0)
+    ret, frame = cap.read()
+    fileName = str(0) + str('.bmp')
+    filePath = os.path.join(currentDir, fileName)
+    cv2.imwrite(filePath, frame)
+    #find ROI
+
+    img = cv2.imread(filePath)
+    cv2.namedWindow('Select ROI', cv2.WINDOW_NORMAL)
+    ROI = cv2.selectROI("Select ROI", img)
+    width = abs(ROI[0] - (ROI[2] + ROI[0]))
+    height = abs(ROI[2] - (ROI[3] + ROI[2]))
+    topLeftX = ROI[0]
+    topLeftY = ROI[1]
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    for i in filesFound:
+        #crop video with ffmpeg
+        fileOut, fileType = i.split(".", 2)
+        fileOutName = outputdir + '\\'+ os.path.basename(str(fileOut)) + str('_cropped.')+ str(fileType)
+        command = str('ffmpeg -i ') +'"'+ str(i) +'"'+ str(' -vf ') + str('"crop=') + str(width) + ':' + str(
+            height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -crf 21 -c:a copy ') +'"'+ str(
+            fileOutName)+'"'
+        total = width + height + topLeftX + topLeftY
+
+        file = pathlib.Path(fileOutName)
+        if file.exists():
+            print(os.path.basename(fileOutName), 'already exist')
+        else:
+            if width==0 and height ==0:
+                print('Video not cropped')
+            elif total != 0:
+                print('Cropping video...')
+                print(command)
+                subprocess.call(command, shell=True)
+            elif total ==0:
+                print('Video not cropped')
+
+    os.remove(filePath)
+    print('Process completed.')
+
+
 def changedlc_config(config_path, bodyPartConfigFile):
 
     config_path = config_path

@@ -465,16 +465,15 @@ class processvid_menu:
 
 class batch_processvideo: ##pre process video first menu (ask for input and output folder)
 
-    def __init__(self):
-        self.croplist = []
-        self.shortenlist = []
-        self.downsamplelist =[]
-        self.grayscalelist = []
-        self.superimposelist = []
+    def __init__(self,command):
+        self.command=command
         # Popup window
         batchprocess = Toplevel()
         batchprocess.minsize(400, 200)
-        batchprocess.wm_title("Batch process video")
+        if self.command=='batchprocessvideo':
+            batchprocess.wm_title("Batch process video")
+        else:
+            batchprocess.wm_title("Fixed crop videos")
 
         #Video Selection Tab
         label_videoselection = LabelFrame(batchprocess,text='Folder selection',font='bold',padx=5,pady=5)
@@ -493,15 +492,17 @@ class batch_processvideo: ##pre process video first menu (ask for input and outp
         button_cL.grid(row=2,sticky=W)
 
     def confirmtable(self):
-
-        if (self.outputfolder.folder_path!='No folder selected')and(self.folder1Select.folder_path!='No folder selected'):
-            processvid_menu(self.folder1Select.folder_path, self.outputfolder.folder_path)
-        elif (self.outputfolder.folder_path=='No folder selected'):
-            print('Please select an output folder')
-        elif (self.folder1Select.folder_path == 'No folder selected'):
-            print('Please select a folder with videos')
-        else:
-            print('Please select folder with videos and the output directory')
+        if self.command=='batchprocessvideo':
+            if (self.outputfolder.folder_path!='No folder selected')and(self.folder1Select.folder_path!='No folder selected'):
+                processvid_menu(self.folder1Select.folder_path, self.outputfolder.folder_path)
+            elif (self.outputfolder.folder_path=='No folder selected'):
+                print('Please select an output folder')
+            elif (self.folder1Select.folder_path == 'No folder selected'):
+                print('Please select a folder with videos')
+            else:
+                print('Please select folder with videos and the output directory')
+        elif self.command=='crop':
+            youOnlyCropOnce(self.folder1Select.folder_path,self.outputfolder.folder_path)
 
 class outlier_settings:
     def __init__(self,configini):
@@ -846,9 +847,9 @@ def hxtScrollbar(master):
         Use canvas to create a window, where window = frame
         Bind the frame to the canvas
         '''
-
-        acanvas = Canvas(master, borderwidth=0, background="#ffffff")
-        frame = Frame(acanvas, background="#ffffff")
+        bg = master.cget("background")
+        acanvas = Canvas(master, borderwidth=0, background=bg)
+        frame = Frame(acanvas, background=bg)
         vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
         vsb2 = Scrollbar(master, orient='horizontal', command=acanvas.xview)
         acanvas.configure(yscrollcommand=vsb.set)
@@ -860,7 +861,7 @@ def hxtScrollbar(master):
         acanvas.create_window((10, 10), window=frame, anchor="nw")
 
         # bind the frame to the canvas
-        frame.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
+        acanvas.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
         acanvas.bind('<Enter>', lambda event: bindToMousewheel(event, acanvas))
         acanvas.bind('<Leave>', lambda event: unbindToMousewheel(event,acanvas))
         return frame
@@ -3141,6 +3142,8 @@ class loadprojectini:
         confirmAnimals = Button(label_pathplot,text='Confirm',command=lambda:self.tracknoofanimal(label_pathplot,bp_set))
         self.plotsvvar = IntVar()
         checkboxplotseverity = Checkbutton(label_pathplot,text='plot_severity',variable=self.plotsvvar)
+        self.severityTargetpp = DropDownMenu(label_pathplot, 'Target', targetlist, '15')
+        self.severityTargetpp.setChoices(targetlist[(config.get('SML settings', 'target_name_' + str(1)))])
         button_pathplot = Button(label_pathplot,text='Generate Path plot',command=self.pathplotcommand)
 
         CreateToolTip(self.Deque_points,'Maximum number of path lines in deque list')
@@ -3297,7 +3300,8 @@ class loadprojectini:
         self.noofAnimal.grid(row=3,sticky=W)
         confirmAnimals.grid(row=3,column=1,sticky=W)
         checkboxplotseverity.grid(row=7,sticky=W)
-        button_pathplot.grid(row=8,sticky=W)
+        self.severityTargetpp.grid(row=8,sticky=W)
+        button_pathplot.grid(row=9,sticky=W)
         #distance
         label_distanceplot.grid(row=3,sticky=W)
         self.poi1.grid(row=1,sticky=W)
@@ -3838,6 +3842,7 @@ class loadprojectini:
         config.set('Path plot settings', 'severity_brackets', self.severity_brackets.entry_get)
         config.set('Path plot settings', 'animal_1_bp', self.Bodyparts1.getChoices())
         config.set('Path plot settings', 'animal_2_bp', self.Bodyparts2.getChoices())
+        config.set('Path plot settings','severity_target',self.severityTargetpp.getChoices())
 
         if self.plotsvvar.get()==1:
             config.set('Path plot settings', 'plot_severity', 'yes')
@@ -4347,7 +4352,7 @@ class App(object):
         # Process video
         pvMenu = Menu(menu)
         menu.add_cascade(label='Process Videos', menu=pvMenu)
-        pvMenu.add_command(label='Batch pre-process videos', command=batch_processvideo)
+        pvMenu.add_command(label='Batch pre-process videos', command=lambda:batch_processvideo("batchprocessvideo"))
 
         #third menu
         thirdMenu = Menu(menu)
@@ -4378,6 +4383,7 @@ class App(object):
         fpsMenu.add_command(label='Change fps for multiple videos',command=changefpsmulti)
         menu.add_cascade(label='Tools',menu=fifthMenu)
         fifthMenu.add_command(label='Clip videos',command=shorten_video)
+        fifthMenu.add_command(label='Fixed crop videos', command=lambda:batch_processvideo('crop'))
         fifthMenu.add_command(label='Crop videos',command=crop_video)
         fifthMenu.add_command(label='Multi-crop',command=multicropmenu)
         fifthMenu.add_command(label='Downsample videos',command=video_downsample)
