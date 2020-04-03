@@ -134,8 +134,6 @@ def roiFreehand(inifile, currVid):
     print(DrawScale)
     textScale = min(img.shape[0], img.shape[1]) / 1500
     print(textScale)
-
-
     CurrVidName = os.path.splitext(os.path.basename(currVid))[0]
     instructionHeight, instructionWidth = (400, 1000)
     ROIcoordinatesPath = os.path.join(logFolderPath, 'measures', 'ROI_definitions.h5')

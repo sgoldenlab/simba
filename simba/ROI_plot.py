@@ -74,8 +74,10 @@ def roiPlot(inifile):
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        DrawScale = int(max(width, height) / 100)
-        textScale = max(width, height) / (max(width, height) * 1.6)
+        mySpaceScale, myRadius, myResolution, myFontScale = 60, 20, 1500, 1.5
+        maxResDimension = max(width, height)
+        DrawScale = int(myRadius / (myResolution / maxResDimension))
+        textScale = float(myFontScale / (myResolution / maxResDimension))
         space_scale = 1.1
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName)]
@@ -106,7 +108,7 @@ def roiPlot(inifile):
             ret, img = cap.read()
             if ret == True:
                 addSpacer = 2
-                spacingScale = int(min(width, height) / (25 / space_scale))
+                spacingScale = int(mySpaceScale / (myResolution / maxResDimension))
                 borderImage = cv2.copyMakeBorder(img, 0,0,0,int(width), borderType=cv2.BORDER_CONSTANT, value=[0, 0, 0])
                 borderImageHeight, borderImageWidth = borderImage.shape[0], borderImage.shape[1]
                 if noAnimals == 2:

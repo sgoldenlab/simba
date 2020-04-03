@@ -125,15 +125,14 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     if height < width:
         videoHeight, videoWidth = width, height
-    if height > width:
+    if height >= width:
         videoHeight, videoWidth = height, width
     writer = cv2.VideoWriter(outputFileName, fourcc, fps, (videoWidth, videoHeight))
-    fscale = 0.05
-    cscale = 0.2
-    space_scale = 1.1
-    fontScale = min(width, height) / (25 / fscale)
-    circleScale = int(min(width, height) / (25 / cscale))
-    spacingScale = int(min(width, height) / (25 / space_scale))
+    mySpaceScale, myRadius, myResolution, myFontScale = 60, 20, 1500, 1.5
+    maxResDimension = max(width, height)
+    circleScale = int(myRadius / (myResolution / maxResDimension))
+    fontScale = float(myFontScale / (myResolution / maxResDimension))
+    spacingScale = int(mySpaceScale / (myResolution / maxResDimension))
     currRow = 0
     colorList = []
     for color in range(len(bodypartColNames)):
