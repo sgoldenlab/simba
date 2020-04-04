@@ -465,15 +465,12 @@ class processvid_menu:
 
 class batch_processvideo: ##pre process video first menu (ask for input and output folder)
 
-    def __init__(self,command):
-        self.command=command
+    def __init__(self):
         # Popup window
         batchprocess = Toplevel()
         batchprocess.minsize(400, 200)
-        if self.command=='batchprocessvideo':
-            batchprocess.wm_title("Batch process video")
-        else:
-            batchprocess.wm_title("Fixed crop videos")
+        batchprocess.wm_title("Batch process video")
+
 
         #Video Selection Tab
         label_videoselection = LabelFrame(batchprocess,text='Folder selection',font='bold',padx=5,pady=5)
@@ -492,17 +489,16 @@ class batch_processvideo: ##pre process video first menu (ask for input and outp
         button_cL.grid(row=2,sticky=W)
 
     def confirmtable(self):
-        if self.command=='batchprocessvideo':
-            if (self.outputfolder.folder_path!='No folder selected')and(self.folder1Select.folder_path!='No folder selected'):
-                processvid_menu(self.folder1Select.folder_path, self.outputfolder.folder_path)
-            elif (self.outputfolder.folder_path=='No folder selected'):
-                print('Please select an output folder')
-            elif (self.folder1Select.folder_path == 'No folder selected'):
-                print('Please select a folder with videos')
-            else:
-                print('Please select folder with videos and the output directory')
-        elif self.command=='crop':
-            youOnlyCropOnce(self.folder1Select.folder_path,self.outputfolder.folder_path)
+
+        if (self.outputfolder.folder_path!='No folder selected')and(self.folder1Select.folder_path!='No folder selected'):
+            processvid_menu(self.folder1Select.folder_path, self.outputfolder.folder_path)
+        elif (self.outputfolder.folder_path=='No folder selected'):
+            print('Please select an output folder')
+        elif (self.folder1Select.folder_path == 'No folder selected'):
+            print('Please select a folder with videos')
+        else:
+            print('Please select folder with videos and the output directory')
+
 
 class outlier_settings:
     def __init__(self,configini):
@@ -1150,20 +1146,35 @@ class crop_video:
     def __init__(self):
         # Popup window
         cropvideo = Toplevel()
-        cropvideo.minsize(200, 200)
+        cropvideo.minsize(300, 300)
         cropvideo.wm_title("Crop Video")
 
-
-        # Video Path
+        # Normal crop
         label_cropvideo = LabelFrame(cropvideo,text='Crop Video',font='bold',padx=5,pady=5)
         self.videopath1selected = FileSelect(label_cropvideo,"Video path",title='Select a video file')
         # CropVideo
         button_cropvid = Button(label_cropvideo, text='Crop Video', command=lambda:cropvid(self.videopath1selected.file_path))
 
+        # fixed crop
+        label_videoselection = LabelFrame(cropvideo, text='Fixed coordinates crop for multiple videos', font='bold', padx=5, pady=5)
+        self.folder1Select = FolderSelect(label_videoselection, 'Video directory:', title='Select Folder with videos')
+        # output video
+        self.outputfolder = FolderSelect(label_videoselection, 'Output directory:',
+                                         title='Select a folder for your output videos')
+
+        # create list of all videos in the videos folder
+        button_cL = Button(label_videoselection, text='Confirm', command=lambda: youOnlyCropOnce(self.folder1Select.folder_path,self.outputfolder.folder_path))
+
+
         #organize
         label_cropvideo.grid(row=0,sticky=W)
         self.videopath1selected.grid(row=0,sticky=W)
         button_cropvid.grid(row=1,sticky=W,pady=10)
+        #fixedcrop
+        label_videoselection.grid(row=1,sticky=W,pady=10,padx=5)
+        self.folder1Select.grid(row=0,sticky=W,pady=5)
+        self.outputfolder.grid(row=1,sticky=W,pady=5)
+        button_cL.grid(row=2,sticky=W,pady=5)
 
 class create_project_DLC:
 
@@ -4352,7 +4363,7 @@ class App(object):
         # Process video
         pvMenu = Menu(menu)
         menu.add_cascade(label='Process Videos', menu=pvMenu)
-        pvMenu.add_command(label='Batch pre-process videos', command=lambda:batch_processvideo("batchprocessvideo"))
+        pvMenu.add_command(label='Batch pre-process videos', command=batch_processvideo)
 
         #third menu
         thirdMenu = Menu(menu)
@@ -4383,7 +4394,6 @@ class App(object):
         fpsMenu.add_command(label='Change fps for multiple videos',command=changefpsmulti)
         menu.add_cascade(label='Tools',menu=fifthMenu)
         fifthMenu.add_command(label='Clip videos',command=shorten_video)
-        fifthMenu.add_command(label='Fixed crop videos', command=lambda:batch_processvideo('crop'))
         fifthMenu.add_command(label='Crop videos',command=crop_video)
         fifthMenu.add_command(label='Multi-crop',command=multicropmenu)
         fifthMenu.add_command(label='Downsample videos',command=video_downsample)
