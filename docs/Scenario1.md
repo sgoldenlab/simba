@@ -33,10 +33,10 @@ For processing datasets, the pipeline is split into a few sections. These sectio
 - [Train Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model)
 - [Run Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model)
 - [Analyze Machine Results](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
-- [Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-visualization)
-- [Plot Graphs](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-plot-graphs)
+- [Visualization](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations)
+- [Plot Graphs](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#gantt-plot)
 - [Merge Frames](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-12-merge-frames)
-- [Create Video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-13-create-video)
+- [Create Video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-13-create-videos)
 
 ## Part 1: Create a new project
 This section describes how to create a new project for behavioral classifier predictions.
