@@ -78,7 +78,7 @@ Repeat this step for all of the videos in the project. Once complete, close the 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/Load_ROI_table.JPG)
 
-Likewise, if you'd like to delete all the shapes you have drawn for all of the videos and start fresh with new shapes, go back and repeat the above [Part 1 - Step 3](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/ROI_tutorial.md#part-1-defining-rois-in-simba).
+Likewise, if you'd like to delete all the shapes you have drawn for all of the videos and start fresh with new shapes, go back and repeat the above [Part 1 - Step 3](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-1-defining-rois-in-simba).
 
 # Part 2. Analyzing ROI data.
 
@@ -122,7 +122,7 @@ Using the directionality measure described in the image above, we can calculate 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/ROI_append.JPG)
 
-This menu is very similar to the Analyzing ROI data submenu described in [Part 2 - Step 2](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/ROI_tutorial.md#part-2-analyzing-roi-data) above. First, begin by selecting the number of animals (or body-parts) you wish to use to calculate the ROI features for, and then click `Confirm`. A second sub-menu will appear below, named `Choose bodyparts`. This menu will contain as many dropdown menus as the number of animals (or body-parts) selected in the `Select number of animals` menu. Each of these drop-down menus will contain the body-parts used to track the animals. The body-part(s) choosen in this menu will determine which body-parts is used to calculate ROI-based features. For example, if you select the `Nose` body-part, the cumulative time spent in each of the ROIs, as well as all other features, will be calculated based on the `Nose` body-part. Once you have chosen your body-parts, then click on `Run`. 
+This menu is very similar to the Analyzing ROI data submenu described in [Part 2 - Step 2](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data) above. First, begin by selecting the number of animals (or body-parts) you wish to use to calculate the ROI features for, and then click `Confirm`. A second sub-menu will appear below, named `Choose bodyparts`. This menu will contain as many dropdown menus as the number of animals (or body-parts) selected in the `Select number of animals` menu. Each of these drop-down menus will contain the body-parts used to track the animals. The body-part(s) choosen in this menu will determine which body-parts is used to calculate ROI-based features. For example, if you select the `Nose` body-part, the cumulative time spent in each of the ROIs, as well as all other features, will be calculated based on the `Nose` body-part. Once you have chosen your body-parts, then click on `Run`. 
 
 3. Once complete, a statement will be printed in the main SimBA terminal window noting that the process is complete. New CSV files will be generated for each of the videos in the project, located in the `project_folder/csv/features_extracted` folder. If you open these files using Microsoft Excel or OpenOffice Calc (watch out, they might be fairly large and therefore difficult to navigate manually) you will see several new columns at the end of the CSV: these columns contain the ROI-based features. 
 
@@ -135,6 +135,6 @@ You can now generate visualizations of the ROI data for each of the videos in yo
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_visualization_1.gif" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_OF.gif" width="425"/>
 
-Clicking on `Visualize ROI tracking` will generate visualizations for all of the files located in the `project_folder/csv/features_extracted` folder. The visualization process will use the body-parts specified in `Analyze ROI data` step described in [Part 2 above](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/ROI_tutorial.md#part-2-analyzing-roi-data). 
+Clicking on `Visualize ROI tracking` will generate visualizations for all of the files located in the `project_folder/csv/features_extracted` folder. The visualization process will use the body-parts specified in `Analyze ROI data` step described in [Part 2 above](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data). 
 
 The visualization process will generate **one** output video for every input video. For example, if you are generating visualizations for Video1, then the output mp4 video will be located in the following path: `project_folder/frames/output/ROI_analysis/Video1.mp4`.
