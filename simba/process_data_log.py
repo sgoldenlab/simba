@@ -6,6 +6,7 @@ import numpy as np
 
 
 def analyze_process_data_log(configini,chosenlist):
+
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
     configFile = str(configini)
@@ -48,15 +49,16 @@ def analyze_process_data_log(configini,chosenlist):
 
     headers = ['Video']
     for i in target_names:
-        head1 = str(i) + ' events'
-        head2 = str(i) + ' sum duration (s)'
-        head3 = str(i) + ' mean duration (s)'
-        head4 = str(i) + ' median duration (s)'
-        head5 = str(i) + ' first occurance (s)'
+        head1 = str(i) + ' first occurance (s)'
+        head2 = str(i) + ' # bout events'
+        head3 = str(i) + ' total events duration (s)'
+        head4 = str(i) + ' mean bout duration duration (s)'
+        head5 = str(i) + ' median bout duration duration (s))'
         head6 = str(i) + ' mean interval (s)'
         head7 = str(i) + ' median interval (s)'
         headers.extend([head1, head2, head3, head4, head5, head6, head7])
     log_df = pd.DataFrame(columns=headers)
+
 
     for i in filesFound:
         boutsDf = pd.DataFrame(columns=['Event', 'Start_frame', 'End_frame'])
@@ -72,67 +74,52 @@ def analyze_process_data_log(configini,chosenlist):
         print('Analyzing video ' + str(loopy) + '/' + str(len(filesFound)) + '...')
         dataDf = pd.read_csv(currentFile)
         dataDf['frames'] = np.arange(len(dataDf))
-        folderNm = os.path.basename(currentFile)
-        logFolderNm = str(folderNm.split('.')[0])
-        for bb in target_names:
-            currTarget = bb
-            for indexes, rows in dataDf[dataDf['frames'] >= boutEnd].iterrows():
-                if rows[currTarget] == 1:
-                    boutStart = rows['frames']
-                    for index, row in dataDf[dataDf['frames'] >= boutStart].iterrows():
-                        if row[currTarget] == 0:
-                            boutEnd = row['frames']
-                            if boutEnd_list[-1] != boutEnd:
-                                boutStart_list.append(boutStart)
-                                boutEnd_list.append(boutEnd)
-                                values = [currTarget, boutStart, boutEnd]
-                                boutsDf.loc[(len(boutsDf))] = values
-                                break
-                            break
-            boutStart_list = [0]
-            boutEnd_list = [0]
-            boutEnd = 0
-
-        #Convert to time
-        boutsDf['Start_time'] = boutsDf['Start_frame'] / fps
-        boutsDf['End_time'] = boutsDf['End_frame'] / fps
-        boutsDf['Bout_time'] = boutsDf['End_time'] - boutsDf['Start_time']
-
-        #record logs
-        log_list = []
-        log_list.append(logFolderNm)
-        for i in target_names:
-            currDf = boutsDf.loc[boutsDf['Event'] == i]
+        boutsList, nameList, startTimeList, endTimeList = [], [], [], []
+        for currTarget in target_names:
+            groupDf = pd.DataFrame()
+            v = (dataDf[currTarget] != dataDf[currTarget].shift()).cumsum()
+            u = dataDf.groupby(v)[currTarget].agg(['all', 'count'])
+            m = u['all'] & u['count'].ge(1)
+            groupDf['groups'] = dataDf.groupby(v).apply(lambda x: (x.index[0], x.index[-1]))[m]
+            for indexes, rows in groupDf.iterrows():
+                currBout = list(rows['groups'])
+                boutTime = ((currBout[-1] - currBout[0]) + 1) / fps
+                startTime = (currBout[0] + 1) / fps
+                endTime = (currBout[1]) / fps
+                endTimeList.append(endTime)
+                startTimeList.append(startTime)
+                boutsList.append(boutTime)
+                nameList.append(currTarget)
+        boutsDf = pd.DataFrame(list(zip(nameList, startTimeList, endTimeList, boutsList)), columns=['Event', 'Start Time', 'End Time', 'Duration'])
+        boutsDf['Shifted start'] = boutsDf['Start Time'].shift(-1)
+        boutsDf['Interval duration'] = boutsDf['Shifted start'] - boutsDf['End Time']
+        firstOccurList, eventNOsList, TotEventDurList, MeanEventDurList, MedianEventDurList, TotEventDurList, meanIntervalList, medianIntervalList = [], [], [], [], [], [], [], []
+        for targets in target_names:
+            currDf = boutsDf.loc[boutsDf['Event'] == targets]
             try:
-                firstOccur = round(currDf['Start_time'].iloc[0], 4)
+                firstOccurList.append(round(boutsDf['Start Time'].min(), 3))
             except IndexError:
-                firstOccur = 0
-            eventNOs = len(currDf)
-            TotEventDur = round(currDf['Bout_time'].sum(), 4)
+                firstOccurList.append(0)
+            eventNOsList.append(len(currDf))
+            TotEventDurList.append(round(currDf['Duration'].sum(), 3))
             try:
-                MeanEventDur = round(TotEventDur / eventNOs, 4)
+                meanIntervalList.append(round(currDf['Interval duration'].mean(), 3))
             except ZeroDivisionError:
-                MeanEventDur = 0
+                meanIntervalList.append(0)
             try:
-                MedianEventDur = round(currDf['Bout_time'].median(), 10)
-
+                medianIntervalList.append(round(currDf['Interval duration'].median(), 3))
             except ZeroDivisionError:
-                MedianEventDur = 0
-            currDf_shifted = currDf.shift(periods=-1)
-            currDf_shifted = currDf_shifted.drop(columns=['Event', 'Start_frame', 'End_frame', 'End_time', 'Bout_time'])
-            currDf_shifted = currDf_shifted.rename(columns={'Start_time': 'Start_time_shifted'})
-            currDf_combined = pd.concat([currDf, currDf_shifted], axis=1, join='inner')
-            currDf_combined['Event_interval'] = currDf_combined['Start_time_shifted'] - currDf_combined['End_time']
-            meanEventInterval = currDf_combined["Event_interval"].mean()
-            medianEventInterval = currDf_combined['Event_interval'].median()
-            log_list.append(eventNOs)
-            log_list.append(TotEventDur)
-            log_list.append(MeanEventDur)
-            log_list.append(MedianEventDur)
-            log_list.append(firstOccur)
-            log_list.append(meanEventInterval)
-            log_list.append(medianEventInterval)
-        log_df.loc[loop] = log_list
+                medianIntervalList.append(0)
+            try:
+                MeanEventDurList.append(round(currDf["Duration"].mean(), 3))
+            except ZeroDivisionError:
+                MeanEventDurList.append(0)
+            try:
+                MedianEventDurList.append(round(currDf['Duration'].median(), 3))
+            except ZeroDivisionError:
+                MedianEventDurList.append(0)
+        currentVidList = [currVidName] + firstOccurList + eventNOsList + TotEventDurList + MeanEventDurList + MedianEventDurList + meanIntervalList + medianIntervalList
+        log_df.loc[loop] = currentVidList
         loop += 1
         print('File # processed for machine predictions: ' + str(loop) + '/' + str(len(filesFound)))
     log_df.fillna(0, inplace=True)
