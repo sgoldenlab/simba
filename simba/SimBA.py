@@ -63,6 +63,7 @@ from outlier_scripts.movement.correct_devs_mov_user_defined import dev_move_user
 from outlier_scripts.location.correct_devs_loc_user_defined import dev_loc_user_defined
 from outlier_scripts.movement.correct_devs_mov_14bp import dev_move_14
 from outlier_scripts.location.correct_devs_loc_14bp import dev_loc_14
+from outlier_scripts.skip_outlierCorrection import skip_outlier_c
 # from outlier_scripts.movement.correct_devs_mov_9bp import dev_move_9
 # from outlier_scripts.movement.correct_devs_mov_8bp import dev_move_8
 # from outlier_scripts.location.correct_devs_loc_8bp import dev_loc_8
@@ -881,6 +882,15 @@ class video_info_table:
             if i.endswith(('.avi','.mp4','.mov','flv')):
                 self.filesFound.append(i)
 
+        # if csv exist, find the difference and append
+        if os.path.exists(video_info_csv):
+            df = pd.read_csv(video_info_csv)
+            videodf = df['Video'].to_list()
+            videodf = [s +'.mp4' for s in videodf]
+            videodf = list(set(videodf) - set(self.filesFound))
+            self.filesFound += videodf
+        print(self.filesFound)
+        ##GUI
         self.tkintertable = Toplevel()
         self.tkintertable.minsize(1000, 500)
         self.tkintertable.wm_title("Video Info")
@@ -899,18 +909,25 @@ class video_info_table:
             self.table_col.append(newcolumn(self.myframe,self.filesFound,self.col_width[i]))
             self.table_col[i].grid(row=0,column=i, sticky=W)
 
-
         ###set values for base####
         count = 0
         for i in self.filesFound:
-            vid= cv2.VideoCapture(os.path.join(str(self.config_videofolders),str(i)))
-            #print((os.path.join(str(self.config_videofolders),str(i))))
-            self.table_col[0].setvariable(count,str(count)+'.')
-            self.table_col[1].setvariable(count,i)
-            self.table_col[2].setvariable(count, int(vid.get(cv2.CAP_PROP_FPS)))
-            self.table_col[3].setvariable(count, int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)))
-            self.table_col[4].setvariable(count, int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-            self.table_col[5].setvariable(count,config_distancemm)
+            currvid= os.path.join(str(self.config_videofolders),str(i))
+            if os.path.exists(currvid) or i==0:
+                vid= cv2.VideoCapture(currvid)
+                self.table_col[0].setvariable(count,str(count)+'.')
+                self.table_col[1].setvariable(count,i)
+                self.table_col[2].setvariable(count, int(vid.get(cv2.CAP_PROP_FPS)))
+                self.table_col[3].setvariable(count, int(vid.get(cv2.CAP_PROP_FRAME_WIDTH)))
+                self.table_col[4].setvariable(count, int(vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+                self.table_col[5].setvariable(count,config_distancemm)
+            else:
+                self.table_col[0].setvariable(count, str(count) + '.')
+                self.table_col[1].setvariable(count, i)
+                self.table_col[2].setvariable(count, int(df.loc[df['Video']==i.split('.')[0]].values.tolist()[0][1]))
+                self.table_col[3].setvariable(count, int(df.loc[df['Video']==i.split('.')[0]].values.tolist()[0][2]))
+                self.table_col[4].setvariable(count, int(df.loc[df['Video']==i.split('.')[0]].values.tolist()[0][3]))
+                self.table_col[5].setvariable(count, config_distancemm)
             count+=1
 
         #set title
@@ -1030,9 +1047,20 @@ class video_info_table:
         df=df.reset_index()
         df=df.drop(['index'],axis=1)
         df=df.drop(['level_0'],axis=1)
+
         logfolder=str(os.path.dirname(self.configFile))+'\\logs\\'
         csv_filename = 'video_info.csv'
         output=logfolder+csv_filename
+        print(df)
+        # # get difference
+        # if os.path.exists(output):
+        #     inidf = pd.read_csv(output)
+        #     differencedf = inidf.merge(df, how = 'outer' ,indicator=True).loc[lambda x : x['_merge']=='right_only']
+        #     differencedf = differencedf.drop(['_merge'], axis=1)
+        #     finaldf = pd.concat([inidf,differencedf])
+        # else:
+        #     finaldf=df
+
         df.to_csv(str(output),index=False)
         print(os.path.dirname(output),'generated.')
 
@@ -3014,7 +3042,7 @@ class loadprojectini:
         label_setscale = LabelFrame(tab3,text='Video parameters (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
         self.distanceinmm = Entry_Box(label_setscale, 'Known distance (mm)', '18')
         button_setdistanceinmm = Button(label_setscale, text='Autopopulate table',command=lambda: self.set_distancemm(self.distanceinmm.entry_get))
-        button_setscale = Button(label_setscale,text='Set video parameters',command=self.setvideoparameter)
+        button_setscale = Button(label_setscale,text='Set video parameters',command=lambda:video_info_table(self.projectconfigini))
 
         #ROI
         ### define roi
@@ -3073,6 +3101,7 @@ class loadprojectini:
         label_link = Label(label_outliercorrection,text='[link to description]',cursor='hand2',font='Verdana 10 underline')
         button_settings_outlier = Button(label_outliercorrection,text='Settings',command = lambda: outlier_settings(self.projectconfigini))
         button_outliercorrection = Button(label_outliercorrection,text='Run outlier correction',command=self.correct_outlier)
+        button_skipOC = Button(label_outliercorrection,text='Skip outlier correction (CAUTION)',fg='red', command=lambda:skip_outlier_c(self.projectconfigini))
 
         label_link.bind("<Button-1>",lambda e: self.callback('https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf'))
 
@@ -3090,7 +3119,7 @@ class loadprojectini:
         #train machine model
         label_trainmachinemodel = LabelFrame(tab8,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_trainmachinesettings = Button(label_trainmachinemodel,text='Settings',command=self.trainmachinemodelsetting)
-        button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command = lambda: threading.Thread(target=self.trainsinglemodel).start())
+        button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command = lambda: threading.Thread(target=trainmodel2(self.projectconfigini)).start())
         button_train_multimodel = Button(label_trainmachinemodel, text='Train multiple models, one for each saved settings',fg='green',command = lambda: threading.Thread(target=self.trainmultimodel).start())
 
         ##Single classifier valid
@@ -3253,6 +3282,7 @@ class loadprojectini:
         label_link.grid(row=0,sticky=W)
         button_settings_outlier.grid(row=1,sticky=W)
         button_outliercorrection.grid(row=3,sticky=W)
+        button_skipOC.grid(row=4,sticky=W,pady=5)
 
         label_extractfeatures.grid(row=4,sticky=W)
         button_extractfeatures.grid(row=0,sticky=W)
@@ -3733,8 +3763,6 @@ class loadprojectini:
     def trainmultimodel(self):
         train_multimodel(self.projectconfigini)
 
-    def trainsinglemodel(self):
-        trainmodel2(self.projectconfigini)
 
     def trainmachinemodelsetting(self):
         trainmachinemodel_settings(self.projectconfigini)
@@ -3763,8 +3791,7 @@ class loadprojectini:
         if pose_estimation_body_parts == 'user_defined':
             extract_features_wotarget_user_defined(self.projectconfigini)
 
-    def setvideoparameter(self):
-        video_info_table(self.projectconfigini)
+
 
     def importframefolder(self):
         if (self.projectconfigini!='No file selected') and (self.frame_folder.folder_path != 'No folder selected'):
