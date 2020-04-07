@@ -14,9 +14,6 @@ def analyze_process_data_log(configini,chosenlist):
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'machine_results')
     no_targets = config.getint('SML settings', 'No_targets')
-    boutEnd = 0
-    boutEnd_list = [0]
-    boutStart_list = []
     filesFound = []
     target_names = []
     vidInfPath = config.get('General settings', 'project_path')
@@ -48,15 +45,11 @@ def analyze_process_data_log(configini,chosenlist):
         os.makedirs(log_path)
 
     headers = ['Video']
-    for i in target_names:
-        head1 = str(i) + ' first occurance (s)'
-        head2 = str(i) + ' # bout events'
-        head3 = str(i) + ' total events duration (s)'
-        head4 = str(i) + ' mean bout duration duration (s)'
-        head5 = str(i) + ' median bout duration duration (s))'
-        head6 = str(i) + ' mean interval (s)'
-        head7 = str(i) + ' median interval (s)'
-        headers.extend([head1, head2, head3, head4, head5, head6, head7])
+    headers_to_insert = [' first occurance (s)', ' # bout events', ' total events duration (s)', ' mean bout duration duration (s)', ' median bout duration duration (s)', ' mean interval (s)', ' median interval (s)']
+    for headerVar in headers_to_insert:
+        for target in target_names:
+            currHead = str(target) + headerVar
+            headers.extend([currHead])
     log_df = pd.DataFrame(columns=headers)
 
 
@@ -97,7 +90,7 @@ def analyze_process_data_log(configini,chosenlist):
         for targets in target_names:
             currDf = boutsDf.loc[boutsDf['Event'] == targets]
             try:
-                firstOccurList.append(round(boutsDf['Start Time'].min(), 3))
+                firstOccurList.append(round(currDf['Start Time'].min(), 3))
             except IndexError:
                 firstOccurList.append(0)
             eventNOsList.append(len(currDf))
