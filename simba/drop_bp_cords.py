@@ -7,6 +7,7 @@ import sys
 
 
 def drop_bp_cords(dataFrame, inifile):
+    print(dataFrame.columns)
     config = ConfigParser()
     configFile = str(inifile)
     config.read(configFile)
@@ -18,6 +19,7 @@ def drop_bp_cords(dataFrame, inifile):
     for bodypart in poseConfigList:
         colHead1, colHead2, colHead3 = (bodypart + '_x', bodypart + '_y', bodypart + '_p')
         columnHeaders.extend((colHead1, colHead2, colHead3))
+    print(columnHeaders)
     dataFrame = dataFrame.drop(columnHeaders, axis=1)
 
     return dataFrame
@@ -44,39 +46,12 @@ def define_bp_drop_down(configini):
         animal1bp = bplist
         return animal1bp,['No body parts']
 
-#
-# def define_bp_drop_down_sn(configini):
-#     config = ConfigParser()
-#     config.read(configini)
-#     pose_estimation_body_parts = config.get('create ensemble settings', 'pose_estimation_body_parts')
-#     options1 = []
-#     options2 = []
-#     if (pose_estimation_body_parts == '16') or (pose_estimation_body_parts == '8'):
-#         options1 = ['Ear_left_1','Ear_right_1','Nose_1', 'Center_1','Lateral_left_1','Lateral_right_1','Tail_base_1', 'Tail_end_1']
-#         options2 = ['Ear_left_2', 'Ear_right_2', 'Nose_2', 'Center_2', 'Lateral_left_2', 'Lateral_right_2', 'Tail_base_2', 'Tail_end_2']
-#     if (pose_estimation_body_parts == '14') or (pose_estimation_body_parts == '7'):
-#         options1 = ['Ear_left_1','Ear_right_1','Nose_1', 'Center_1','Lateral_left_1','Lateral_right_1','Tail_base_1']
-#         options2 = ['Ear_left_2', 'Ear_right_2', 'Nose_2', 'Center_2', 'Lateral_left_2', 'Lateral_right_2', 'Tail_base_2']
-#     if pose_estimation_body_parts == '4':
-#         options1 = ['Ear_left_1','Ear_right_1','Nose_1','Tail_base_1']
-#         options2 = ['Ear_left_2', 'Ear_right_2', 'Nose_2', 'Tail_base_2']
-#     if pose_estimation_body_parts == 'user_defined':
-#         project_path = config.get('General settings', 'project_path')
-#         bodyparthListPath = os.path.join(project_path, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
-#         poseConfigDf = pd.read_csv(bodyparthListPath, header=None)
-#         options1 = list(poseConfigDf[0])
-#         options2 = options1
-#
-#     return options1, options2
-
-def define_movement_cols(pose_estimation_body_parts, columnNames):
-    if (pose_estimation_body_parts == '16') or (pose_estimation_body_parts == '14'):
-        columnNames = ['Video', 'Mean_velocity_Animal_1_cm/s', 'Median_velocity_Animal_1_cm/s', 'Mean_velocity_Animal_2_cm/s',
-               'Median_velocity_Animal_2_cm/s', 'Total_movement_Animal_1_cm', 'Total_movement_Animal_2_cm',
-               'Mean_centroid_distance_cm', 'Median_centroid_distance_cm', 'Mean_nose_to_nose_distance_cm',
-               'Median_nose_to_nose_distance_cm']
-    if pose_estimation_body_parts == 'user_defined':
-        columnNames = ['Video', 'Mean_velocity_Animal_1_cm/s', 'Median_velocity_Animal_1_cm/s', 'Total_movement_Animal_1_cm']
+def define_movement_cols(noAnimals):
+    if noAnimals == 1:
+        columnNames = ['Video', 'Frames processed', 'Total movement', 'Mean velocity', 'Median velocity']
+    if noAnimals == 2:
+        columnNames = ['Video', 'Frames processed', 'Total movement animal 1', 'Mean velocity animal 1', 'Median velocity animal 1', 'Total movement animal 2', 'Mean velocity animal 2', 'Median velocity animal 2', 'Mean animal distance', 'Median animal distance']
+    print(columnNames)
     return columnNames
 
 def bodypartConfSchematic():
@@ -118,4 +93,24 @@ def getBpNames(inifile):
         Ycols.append(colHead2)
         Pcols.append(colHead3)
     return Xcols, Ycols, Pcols
+
+def getBpHeaders(inifile):
+    colHeads = []
+    config = ConfigParser()
+    configFile = str(inifile)
+    config.read(configFile)
+    project_path = config.get('General settings', 'project_path')
+    bodyparthListPath = os.path.join(project_path, 'logs', 'measures', 'pose_configs', 'bp_names','project_bp_names.csv')
+    poseConfigDf = pd.read_csv(bodyparthListPath, header=None)
+    poseConfigList = list(poseConfigDf[0])
+    for bodypart in poseConfigList:
+        colHead1, colHead2, colHead3 = (bodypart + '_x', bodypart + '_y', bodypart + '_p')
+        colHeads.append(colHead1)
+        colHeads.append(colHead2)
+        colHeads.append(colHead3)
+    print(poseConfigList)
+
+    return colHeads
+
+
 
