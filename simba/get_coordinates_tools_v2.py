@@ -57,8 +57,10 @@ def get_coordinates_nilsson(filenames,knownmm):
     cv2.imwrite(filePath, frame)
     img = cv2.imread(filePath)
     (imageHeight, imageWidth) = img.shape[:2]
-    circleScale = int(max(imageWidth, imageHeight) / (max(imageWidth, imageWidth) * 0.05))
-    fontScale = max(imageWidth, imageWidth) / (max(imageWidth, imageWidth) * 1.8)
+    maxResDimension = max(imageWidth, imageHeight)
+    mySpaceScale, myRadius, myResolution, myFontScale = 60, 20, 1500, 1.5
+    circleScale = int(myRadius / (myResolution / maxResDimension))
+    fontScale = float(myFontScale / (myResolution / maxResDimension))
     origImage = img.copy()
     overlay = img.copy()
     ix,iy = -1,-1
@@ -74,12 +76,11 @@ def get_coordinates_nilsson(filenames,knownmm):
             if k == 27:
                 break
         if (cordStatus == True) and (moveStatus == False) and (insertStatus == False):
-
             if changeLoop == True:
                 overlay = origImage.copy()
                 cv2.circle(overlay, (cordList[0], cordList[1]), circleScale, (144, 0, 255), -1)
                 cv2.circle(overlay, (cordList[2], cordList[3]), circleScale, (144, 0, 255), -1)
-                cv2.line(overlay, (cordList[0], cordList[1]), (cordList[2], cordList[3]), (144, 0, 255), int(circleScale/4))
+                cv2.line(overlay, (cordList[0], cordList[1]), (cordList[2], cordList[3]), (144, 0, 255), int(circleScale/5))
             cv2.putText(overlay, 'Click on circle to move', (20, 20), cv2.FONT_HERSHEY_TRIPLEX, fontScale, (255, 0, 255), 2)
             cv2.putText(overlay, 'Press ESC to save and exit', (20, 50), cv2.FONT_HERSHEY_TRIPLEX, fontScale, (255, 0, 255), 2)
             cv2.imshow('Select coordinates: double left mouse click at two locations. Press ESC when done', overlay)
@@ -87,7 +88,6 @@ def get_coordinates_nilsson(filenames,knownmm):
                 'Select coordinates: double left mouse click at two locations. Press ESC when done',
                 select_cord_to_change)
         if (moveStatus == True) and (insertStatus == False):
-
             if changeLoop == True:
                 img = origImage.copy()
                 changeLoop = False
