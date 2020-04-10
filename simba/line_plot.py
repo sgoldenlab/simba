@@ -27,8 +27,8 @@ def line_plot_config(configini):
     filesFound = glob.glob(csv_dir_in + "/*.csv")
     print('Generating line plots for ' + str(len(filesFound)) + ' video(s)...')
 
-    loop = 0
     for currentFile in filesFound:
+        loop = 0
         CurrentVideoName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
         try:
