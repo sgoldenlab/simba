@@ -450,5 +450,5 @@ def save_video(master):
         print('Annotation file for "' + str(current_video) + '"' + ' created.')
         # master.destroy()
     except PermissionError:
-        print('You don not have permission to save the annotation file - check that the file is not open in a different application. If you are working of a server make sure the file is not open on a different computer.')
+        print('You do not have permission to save the annotation file - check that the file is not open in a different application. If you are working of a server make sure the file is not open on a different computer.')
 
