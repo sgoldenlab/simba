@@ -444,7 +444,11 @@ def save_video(master):
     new_data = pd.concat([data, df], axis=1)
     new_data = new_data.fillna(0)
     new_data.rename(columns={'Unnamed: 0': 'scorer'}, inplace=True)
-    new_data.to_csv(output_file, index=FALSE)
-    print(output_file)
-    print('Annotation file for "' + str(current_video) + '"' + ' created.')
-    # master.destroy()
+    try:
+        new_data.to_csv(output_file, index=FALSE)
+        print(output_file)
+        print('Annotation file for "' + str(current_video) + '"' + ' created.')
+        # master.destroy()
+    except PermissionError:
+        print('You don not have permission to save the annotation file - check that the file is not open in a different application. If you are working of a server make sure the file is not open on a different computer.')
+
