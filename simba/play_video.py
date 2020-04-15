@@ -126,7 +126,11 @@ while True:
                 path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
                 txtFile = open(path)
                 line = txtFile.readline()
-                os.kill(int(line), signal.SIGTERM)
+                try:
+                    os.kill(int(line), signal.SIGTERM)
+                except OSError:
+                    print('OSError: Cannot save/read latest image file CSV. Please try again')
+
     currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
     printOnFrame(currentFrame)
     cv2.namedWindow('Video', cv2.WINDOW_NORMAL)
@@ -135,6 +139,7 @@ while True:
         break
     if cv2.getWindowProperty('Video', 1) == -1:
         break
+
 capture.release()
 f.close()
 cv2.destroyAllWindows()
