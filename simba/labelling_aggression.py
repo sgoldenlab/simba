@@ -274,9 +274,13 @@ def play_video():
     main_project_dir = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])
     video_dir = main_project_dir + '\\videos\\'
     video_list = os.listdir(video_dir)
-    current_video_name = os.path.basename(os.getcwd())
-    current_full_video_name = [i for i in video_list if current_video_name in i]
-    current_full_video_name = current_full_video_name[0]
+    # current_video_name = os.path.basename(os.getcwd())
+    print(video_list,video_dir)
+    current_full_video_name = [i for i in video_list if current_video in i]
+    try:
+        current_full_video_name = current_full_video_name[0]
+    except IndexError:
+        print("Video not found in project_folder/videos, please make sure you have the video in the video folder")
     print(current_full_video_name)
     data = bytes(video_dir+str(current_full_video_name), 'utf-8')
     p.stdin.write(data)
@@ -300,7 +304,8 @@ def update_frame_from_video(master, entrybox):
 # loads the config file, creates an empty dataframe and loads the interface,
 # Prints working directory, current video name, and number of frames in folder.
 def choose_folder(project_name):
-    global current_video
+    global current_video, projectini
+    projectini = project_name
     img_dir = filedialog.askdirectory()
     os.chdir(img_dir)
     dirpath = os.path.basename(os.getcwd())
@@ -350,8 +355,13 @@ def choose_folder2(framedir):
 
 # Loads a new image frame
 def load_frame(number, master, entry):
-    global current_frame_number
+    global current_frame_number,video_frame
     max_index_frames_in = len(frames_in) - 1
+    try:
+        video_frame.destroy()
+    except:
+        pass
+
     try:
         if number > max_index_frames_in:
             print("Reached End of Frames")
@@ -364,22 +374,31 @@ def load_frame(number, master, entry):
         entry.delete(0, END)
         entry.insert(0, current_frame_number)
 
+        video_frame = Label(master, image='')
+        video_frame.grid(row=0, column=0)
+
         max_size = 1080, 650
         current_image = Image.open(frames_in[current_frame_number])
         current_image.thumbnail(max_size, Image.ANTIALIAS)
         current_frame = ImageTk.PhotoImage(master=master, image=current_image)
 
-        video_frame = Label(master, image=current_frame)
+
         video_frame.image = current_frame
-        video_frame.grid(row=0, column=0)
+        video_frame.config(image=current_frame)
+        current_image.close()
 
     except IndexError:
         pass
 
 # Loads a new image frame
 def load_frame2(number, master,entry):
-    global current_frame_number
+    global current_frame_number,video_frame
     max_index_frames_in = len(frames_in) - 1
+    try:
+        video_frame.destroy()
+    except:
+        pass
+
     try:
         if number > max_index_frames_in:
             print("Reached End of Frames")
@@ -392,14 +411,17 @@ def load_frame2(number, master,entry):
         entry.delete(0, END)
         entry.insert(0, current_frame_number)
 
+        video_frame = Label(master, image='')
+        video_frame.grid(row=0, column=0)
+
         max_size = 1080, 650
         current_image = Image.open(frames_in[current_frame_number])
         current_image.thumbnail(max_size, Image.ANTIALIAS)
         current_frame = ImageTk.PhotoImage(master=master, image=current_image)
 
-        video_frame = Label(master, image=current_frame)
         video_frame.image = current_frame
-        video_frame.grid(row=0, column=0)
+        video_frame.config(image=current_frame)
+        current_image.close()
 
     except IndexError:
         pass
@@ -448,7 +470,20 @@ def save_video(master):
         new_data.to_csv(output_file, index=FALSE)
         print(output_file)
         print('Annotation file for "' + str(current_video) + '"' + ' created.')
-        # master.destroy()
+        # saved last frame number on
+        frameLog = os.path.join(os.path.dirname(projectini),'logs',"lastframe_log.ini")
+        if not os.path.exists(frameLog):
+            f = open(frameLog,"w+")
+            f.write('[Last saved frames]\n')
+            f.close()
+
+        config = ConfigParser()
+        config.read(frameLog)
+        config.set('Last saved frames', str(current_video), str(current_frame_number))
+        # write
+        with open(frameLog, 'w') as configfile:
+            config.write(configfile)
+
     except PermissionError:
-        print('You do not have permission to save the annotation file - check that the file is not open in a different application. If you are working of a server make sure the file is not open on a different computer.')
+        print('You don not have permission to save the annotation file - check that the file is not open in a different application. If you are working of a server make sure the file is not open on a different computer.')
 
