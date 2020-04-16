@@ -3131,7 +3131,7 @@ class loadprojectini:
         #label Behavior
         label_labelaggression = LabelFrame(tab7,text='Label Behavior',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         button_labelaggression = Button(label_labelaggression, text='Select folder with frames (create new video annotation)',command= lambda:choose_folder(self.projectconfigini))
-        button_load_labelaggression = Button(label_labelaggression,text='Select folder with frames (load / modify existing video annotation)',command= lambda: load_folder(self.projectconfigini))
+        button_load_labelaggression = Button(label_labelaggression,text='Select folder with frames (continue existing video annotation)',command= lambda: load_folder(self.projectconfigini))
 
         #train machine model
         label_trainmachinemodel = LabelFrame(tab8,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
