@@ -32,6 +32,7 @@ from merge_movie_ffmpeg import generatevideo_config_ffmpeg
 from import_videos_csv_project_ini import *
 from configparser import ConfigParser
 from labelling_aggression import *
+from load_labelling_aggression import load_folder
 from PIL import Image, ImageTk
 import tkinter.ttk as ttk
 from get_coordinates_tools_v2 import get_coordinates_nilsson
@@ -55,6 +56,7 @@ from ROI_multiply import *
 from ROI_reset import *
 from ROI_add_to_features import *
 from ROI_process_movement import *
+from ROI_visualize_features import ROItoFeatures
 from plot_heatmap import plotHeatMap
 import warnings
 from outlier_scripts.movement.correct_devs_mov_16bp import dev_move_16
@@ -2377,23 +2379,35 @@ def extract_allframes():
 
     # Popup window
     extractaf = Toplevel()
-    extractaf.minsize(200, 200)
+    extractaf.minsize(300, 300)
     extractaf.wm_title("Extract all frames")
 
+    #single video
+    singlelabel = LabelFrame(extractaf,text='Single video',padx=5,pady=5,font='bold')
     # videopath
-    videopath = FileSelect(extractaf, "Video path",title='Select a video file')
+    videopath = FileSelect(singlelabel, "Video path",title='Select a video file')
 
     #button
-    button_extractaf = Button(extractaf, text='Extract All Frames', command= lambda:extract_allframescommand(videopath.file_path))
+    button_extractaf = Button(singlelabel, text='Extract Frames (Single video)', command= lambda:extract_allframescommand(videopath.file_path))
+
+    #multivideo
+    multilabel = LabelFrame(extractaf,text='Multiple videos',padx=5,pady=5,font='bold')
+    folderpath = FolderSelect(multilabel,'Folder path',title=' Select video folder')
+    button_extractmulti = Button(multilabel,text='Extract Frames (Multiple videos)',command=lambda:batch_extract_allframes(folderpath.folder_path))
 
     #organize
-    videopath.grid(row=0,column=0)
-    button_extractaf.grid(row=1,column=0)
+    singlelabel.grid(row=0,sticky=W,pady=10)
+    videopath.grid(row=0,sticky=W)
+    button_extractaf.grid(row=1,sticky=W,pady=10)
+
+    multilabel.grid(row=1,sticky=W,pady=10)
+    folderpath.grid(row=0,sticky=W)
+    button_extractmulti.grid(row=1,sticky=W,pady=10)
 
 class multicropmenu:
     def __init__(self):
         multimenu = Toplevel()
-        multimenu.minsize(200, 200)
+        multimenu.minsize(300, 300)
         multimenu.wm_title("Multi Crop")
 
         self.inputfolder = FolderSelect(multimenu,"Video Folder  ")
@@ -3082,9 +3096,11 @@ class loadprojectini:
         self.roi_draw1 = LabelFrame(tab6, text='Visualize ROI')
         # button
         visualizeROI = Button(self.roi_draw1, text='Visualize ROI tracking', command=lambda: roiPlot(self.projectconfigini))
+        visualizeROIfeature = Button(self.roi_draw1, text='Visualize ROI features', command=lambda: ROItoFeatures(self.projectconfigini))
         ##organize
         self.roi_draw1.grid(row=0, column=3, sticky=N)
         visualizeROI.grid(row=0)
+        visualizeROIfeature.grid(row=1,pady=10)
 
         #processmovementinroi (duplicate)
         processmovementdupLabel = LabelFrame(tab6,text='Analyze distances/velocity')
@@ -3114,7 +3130,8 @@ class loadprojectini:
 
         #label Behavior
         label_labelaggression = LabelFrame(tab7,text='Label Behavior',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-        button_labelaggression = Button(label_labelaggression, text='Select folder with frames',command= lambda:choose_folder(self.projectconfigini))
+        button_labelaggression = Button(label_labelaggression, text='Select folder with frames (create new video annotation)',command= lambda:choose_folder(self.projectconfigini))
+        button_load_labelaggression = Button(label_labelaggression,text='Select folder with frames (load / modify existing video annotation)',command= lambda: load_folder(self.projectconfigini))
 
         #train machine model
         label_trainmachinemodel = LabelFrame(tab8,text='Train Machine Models',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
@@ -3289,6 +3306,7 @@ class loadprojectini:
 
         label_labelaggression.grid(row=5,sticky=W)
         button_labelaggression.grid(row=0,sticky=W)
+        button_load_labelaggression.grid(row=1,sticky=W,pady=10)
 
         label_trainmachinemodel.grid(row=6,sticky=W)
         button_trainmachinesettings.grid(row=0,column=0,sticky=W,padx=5)
@@ -3985,7 +4003,7 @@ class trainmachinemodel_settings:
         checkbutton2 = Checkbutton(self.label_settings_box, text='Generate Example Decision Tree (requires "graphviz")', variable=self.box2)
         checkbutton3 = Checkbutton(self.label_settings_box, text='Generate Fancy Example Decision Tree ("dtreeviz")', variable=self.box3)
         checkbutton4 = Checkbutton(self.label_settings_box, text='Generate Classification Report', variable=self.box4)
-        checkbutton5 = Checkbutton(self.label_settings_box, text='Generate Features Importance Log', variable=self.box5)
+        # checkbutton5 = Checkbutton(self.label_settings_box, text='Generate Features Importance Log', variable=self.box5)
         checkbutton6 = Checkbutton(self.label_settings_box, text='Generate Features Importance Bar Graph', variable=self.box6,
                                    command = lambda:activate(self.box6, self.label_n_feature_importance_bars))
         checkbutton7 = Checkbutton(self.label_settings_box, text='Compute Feature Permutation Importances (Note: CPU intensive)', variable=self.box7)
@@ -3993,7 +4011,7 @@ class trainmachinemodel_settings:
                                    command = lambda:activate(self.box8, self.LC_datasplit, self.LC_ksplit))
         checkbutton9 = Checkbutton(self.label_settings_box, text='Generate Precision Recall Curves', variable=self.box9)
 
-        self.check_settings = [checkbutton1, checkbutton2, checkbutton3, checkbutton4, checkbutton5, checkbutton6,
+        self.check_settings = [checkbutton1, checkbutton2, checkbutton3, checkbutton4, checkbutton6,
                                checkbutton7, checkbutton8, checkbutton9]
 
 
@@ -4055,7 +4073,7 @@ class trainmachinemodel_settings:
         checkbutton2.grid(row=1,sticky=W)
         checkbutton3.grid(row=2,sticky=W)
         checkbutton4.grid(row=3,sticky=W)
-        checkbutton5.grid(row=4,sticky=W)
+        # checkbutton5.grid(row=4,sticky=W)
         checkbutton6.grid(row=5,sticky=W)
         self.label_n_feature_importance_bars.grid(row=6, sticky=W)
         checkbutton7.grid(row=7,sticky=W)
