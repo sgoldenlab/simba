@@ -276,9 +276,9 @@ This tool allows users to extract frames from a video by inputting specific star
 5. A folder with the video name will be generated and the all the extracted frames will be located in the folder. The frames will be in *.png* file format. 
 
 ### Extract frames
-#### Single video
-
 Use this tool to extract every frame from a single video or multiple videos.
+
+#### Single video
 
 1. Click on `Browse File` to select a video file. 
 
