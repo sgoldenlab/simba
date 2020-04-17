@@ -3052,6 +3052,15 @@ class loadprojectini:
         self.frame_folder = FolderSelect(label_importframefolder,'Main frame directory',title='Select the main directory with frame folders')
         button_importframefolder = Button(label_importframefolder,text='Import frames',command = self.importframefolder )
 
+        #import new classifier
+        label_newclassifier = LabelFrame(label_import,text='Add new classifier(s)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
+        self.classifierentry = Entry_Box(label_newclassifier,'Classifier','8')
+        button_addclassifier = Button(label_newclassifier,text='Add classifier',command=lambda:self.addclassifier(self.classifierentry.entry_get))
+
+        #remove classifier
+        label_removeclassifier = LabelFrame(label_import,text='Remove exisiting classifier(s)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
+        button_removeclassifier = Button(label_removeclassifier,text='Choose a classifier to remove',command=self.removeclassifiermenu)
+
         #get coordinates
         label_setscale = LabelFrame(tab3,text='Video parameters (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
         self.distanceinmm = Entry_Box(label_setscale, 'Known distance (mm)', '18')
@@ -3290,6 +3299,13 @@ class loadprojectini:
         self.frame_folder.grid(row=0,sticky=W)
         button_importframefolder.grid(row=1,sticky=W)
 
+        label_newclassifier.grid(row=0,column=2,sticky=N+W,pady=5,padx=5)
+        self.classifierentry.grid(row=0,column=0,sticky=W)
+        button_addclassifier.grid(row=1,column=0,sticky=W)
+
+        label_removeclassifier.grid(row=1,column=2,sticky=N+W,pady=5,padx=5)
+        button_removeclassifier.grid(row=0)
+
         label_setscale.grid(row=2,sticky=W,pady=5,padx=5)
         self.distanceinmm.grid(row=0,column=0,sticky=W)
         button_setdistanceinmm.grid(row=0,column=1)
@@ -3387,6 +3403,78 @@ class loadprojectini:
         self.seconds.grid(row=0,sticky=W)
         self.cvTarget.grid(row=1,sticky=W)
         button_validate_classifier.grid(row=2,sticky=W)
+
+    def addclassifier(self,newclassifier):
+        config = ConfigParser()
+        configFile = str(self.projectconfigini)
+        config.read(configFile)
+        #get current no of target
+        notarget = config.getint('SML settings', 'no_targets')
+        ## increase the size of the latest no of target and create a new modelpath and target name
+        notarget+=1
+        modelpath = 'model_path_' + str(notarget)
+        targetname = 'target_name_' + str(notarget)
+        #write the new values into ini file
+        config.set('SML settings', modelpath, '')
+        config.set('SML settings', targetname, str(newclassifier))
+        config.set('SML settings', 'no_targets', str(notarget))
+        with open(self.projectconfigini, 'w') as configfile:
+            config.write(configfile)
+
+        print(str(newclassifier),'added.')
+
+    def removeclassifiermenu(self):
+        rcMenu = Toplevel()
+        rcMenu.minsize(200, 200)
+        rcMenu.wm_title("Warning: Remove classifier(s) settings")
+
+        # get target
+        config = ConfigParser()
+        configFile = str(self.projectconfigini)
+        config.read(configFile)
+        notarget = config.getint('SML settings', 'no_targets')
+        targetlist = []
+        for i in range(notarget):
+            targetlist.append(config.get('SML settings', 'target_name_' + str(i + 1)))
+
+        labelcr = LabelFrame(rcMenu,text='Select a classifier to remove')
+        classifiertoremove = DropDownMenu(labelcr,'Classifier',targetlist,'8')
+        classifiertoremove.setChoices(targetlist[0])
+
+        button = Button(labelcr,text='Remove classifier',command=lambda:self.removeclassifier(classifiertoremove.getChoices(),targetlist))
+
+        #organize
+        labelcr.grid(row=0,sticky=W)
+        classifiertoremove.grid(row=0,sticky=W)
+        button.grid(row=1,pady=10)
+
+    def removeclassifier(self,choice,targetlist):
+        config = ConfigParser()
+        configFile = str(self.projectconfigini)
+        config.read(configFile)
+
+        ## try to remove the selected classifier
+        try:
+            targetlist.remove(choice)
+            print(str(choice), 'is removed.')
+        except ValueError:
+            print(choice,'no longer exist in the project_config.ini')
+
+        config.remove_option('SML settings','no_targets')
+        for i in range(len(targetlist)+1):
+            config.remove_option('SML settings','model_path_'+str(i+1))
+            config.remove_option('SML settings', 'target_name_' + str(i + 1))
+
+
+        config.set('SML settings', 'no_targets', str(len(targetlist)))
+        for i in range(len(targetlist)):
+            config.set('SML settings','model_path_'+str(i+1),'')
+            config.set('SML settings','target_name_'+str(i+1),str(targetlist[i]))
+
+        with open(self.projectconfigini, 'w') as configfile:
+            config.write(configfile)
+
+
 
     def tracknoofanimal(self,master,bplist):
         try:
