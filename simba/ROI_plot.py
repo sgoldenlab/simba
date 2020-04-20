@@ -78,7 +78,6 @@ def roiPlot(inifile):
         maxResDimension = max(width, height)
         DrawScale = int(myRadius / (myResolution / maxResDimension))
         textScale = float(myFontScale / (myResolution / maxResDimension))
-        space_scale = 1.1
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName)]
         currFps = int(videoSettings['fps'])
@@ -89,7 +88,6 @@ def roiPlot(inifile):
         circleTimes, circleEntries = ([[0] * len(trackedBodyParts) for i in range(noCircles)], [[0] * len(trackedBodyParts) for i in range(noCircles)])
         polygonTime, polyGonEntries = ([[0] * len(trackedBodyParts) for i in range(noPolygons)], [[0] * len(trackedBodyParts) for i in range(noPolygons)])
         currFrameFolderOut = os.path.join(frames_dir_out, CurrentVideoName + '.mp4')
-
         Rectangles = (rectanglesInfo.loc[rectanglesInfo['Video'] == str(CurrentVideoName)])
         Circles = (circleInfo.loc[circleInfo['Video'] == str(CurrentVideoName)])
         Polygons = (polygonInfo.loc[polygonInfo['Video'] == str(CurrentVideoName)])

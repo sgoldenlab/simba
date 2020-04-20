@@ -321,7 +321,7 @@ def batch_extract_allframes(dir):
     curdir = os.listdir(dir)
     vid=[]
     for i in curdir:
-        if ('.mp4') in i:
+        if i.endswith(('.avi','.mp4','.mov','flv')):
             vid.append(i)
 
     for index,i in enumerate(vid):

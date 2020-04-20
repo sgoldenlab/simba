@@ -225,59 +225,6 @@ def ROItoFeatures(inifile):
         print('New feature file with ROI data saved: ' + str(r'project_folder\csv\features_extracted') + str(r'\\') + str(CurrVidFn))
     print('All ROI feature data appended to feature files.')
 
-        # loop = 0
-        # if visualizeSetting == 'yes':
-        #     cv2.namedWindow('image', cv2.WINDOW_NORMAL)
-        #     currFileImagePath = os.path.join(imageInputFolder, CurrentVideoName)
-        #     for index, row in currDf.iterrows():
-        #         currImage = os.path.join(currFileImagePath, str(loop) + '.png')
-        #         img = cv2.imread(currImage)
-        #         imHeight, imWidth = (img.shape[0], img.shape[1])
-        #         sideImage = np.zeros((imHeight, int(imWidth/2), 3), np.uint8)
-        #         for rectangle in range(len(rectangleFeatures)):
-        #             startX, startY = (10, 20)
-        #             xprintAdd, yprintAdd = (0, 0)
-        #             topLeftX, topLeftY, bottomRightX, bottomRightY = (int(rectangleFeatures[rectangle, 1]), int(rectangleFeatures[rectangle, 2]), int(rectangleFeatures[rectangle, 3]), int(rectangleFeatures[rectangle, 4]))
-        #             cv2.rectangle(img, (topLeftX, topLeftY), (bottomRightX, bottomRightY), (255, 0, 0), 10)
-        #             for i in Rectangle_col_inside_value:
-        #                 xprintAdd = 0
-        #                 rectangleName = i
-        #                 cv2.putText(sideImage, str(rectangleName), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 2)
-        #                 rectangleStatus = row[rectangleName]
-        #                 xprintAdd += 500
-        #                 if rectangleStatus == 1:
-        #                     cv2.putText(sideImage, str('True'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 2)
-        #                 else:
-        #                     cv2.putText(sideImage, str('False'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 2)
-        #                 yprintAdd += 40
-        #             for b in Rectangle_col_distance:
-        #                 xprintAdd = 0
-        #                 rectangleName = b
-        #                 cv2.putText(sideImage, str(rectangleName), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 2)
-        #                 rectangleStatus = row[rectangleName]
-        #                 rectangleStatus = round(rectangleStatus/10, 2)
-        #                 xprintAdd += 500
-        #                 cv2.putText(sideImage, str(rectangleStatus), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 2)
-        #                 yprintAdd += 40
-        #             for p in Rectangle_col_facing:
-        #                 xprintAdd = 0
-        #                 rectangleName = p
-        #                 cv2.putText(sideImage, str(rectangleName), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 2)
-        #                 rectangleStatus = row[rectangleName]
-        #                 xprintAdd += 500
-        #                 if rectangleStatus == 1:
-        #                     cv2.putText(sideImage, str('True'), (startX + xprintAdd, startY + yprintAdd),cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 2)
-        #                 else:
-        #                     cv2.putText(sideImage, str('False'), (startX + xprintAdd, startY + yprintAdd),cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 255, 255), 2)
-        #                 yprintAdd += 40
-        #         loop+=1
-        #         imageConcat = np.concatenate((img, sideImage), axis=1)
-        #         cv2.imshow('image', imageConcat)
-        #         k = cv2.waitKey(0)
-        #         if k == 27:  # Esc key to stop
-        #             break
-        #
-
 
 
 
