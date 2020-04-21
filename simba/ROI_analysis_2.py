@@ -168,6 +168,6 @@ def roiAnalysis(inifile,inputcsv):
         outputDfTimeFilePath , outputDfEntryFilePath = (os.path.join(logFolderPath, 'ROI_time_data_' + dateTime + '.csv'), os.path.join(logFolderPath, 'ROI_entry_data_' + dateTime + '.csv'))
         outputDfTime.to_csv(outputDfTimeFilePath, index=False)
         outputDfEntries.to_csv(outputDfEntryFilePath, index=False)
-        print('ROI data saved in' + 'project_folder\logs.')
+        print('ROI data saved in ' + 'project_folder\logs.')
 
 
