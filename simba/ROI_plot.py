@@ -131,10 +131,10 @@ def roiPlot(inifile):
                                 rectangleEntryCheck[rectangle][bodyparts] = False
                         else:
                             rectangleEntryCheck[rectangle][bodyparts] = True
-                        cv2.putText(borderImage, str(rectangleTimes[rectangle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/6))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 2)
+                        cv2.putText(borderImage, str(rectangleTimes[rectangle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 2)
                         addSpacer += 1
                         cv2.putText(borderImage, str(rectangleName) + ' ' + str(trackedBodyPartNames[bodyparts]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 2)
-                        cv2.putText(borderImage, str(rectangleEntries[rectangle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/6))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 2)
+                        cv2.putText(borderImage, str(rectangleEntries[rectangle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 2)
                         addSpacer += 1
 
                 for circle in range(noCircles):

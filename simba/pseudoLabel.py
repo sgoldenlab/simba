@@ -6,11 +6,13 @@ import os
 from tkinter import filedialog
 from configparser import ConfigParser
 from subprocess import *
-import matplotlib.pyplot as plt
 import numpy as np
+'''
+parameters: inifile should be a .ini file, framedir should be a directory with a type(str), targets=list  
+'''
 
-
-def semisuperviseLabel(inifile,framedir,target):
+def semisuperviseLabel(inifile,framedir,targets,threshold_list):
+    print(threshold_list)
     projectpath = os.path.dirname(inifile)
     csvfile = os.path.join(projectpath,'csv','machine_results',os.path.basename(framedir)+'.csv')
     nameofvid = os.path.basename(csvfile).split('.csv')[0]
@@ -18,39 +20,22 @@ def semisuperviseLabel(inifile,framedir,target):
     ##read in csv file
     df = pd.read_csv(csvfile)
     frames_dir = framedir
-
-    df_userinput = df[target]
-
-    probabilityColumnName = 'Probability_' + target
-    print(df[[probabilityColumnName]])
-    probs = df[[probabilityColumnName]].to_numpy()
-
-    class plotgraphx:
-        def __init__(self,probabilityColumnName,currFramesDir,master):
-            self.probcolname = probabilityColumnName
-            self.framedir = currFramesDir
-            self.master = master
-
-            self.fig, self.ax = plt.subplots()
-            self.ax.plot(probs)
-            plt.xlabel('frame #', fontsize=16)
-            plt.ylabel(str(probabilityColumnName) + ' probability', fontsize=16)
-            plt.title('Click on the points of the graph to display the corresponding frames.')
-            plt.grid()
-            cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)  ##incoporate mouse click event
-            plt.show()
+    threshold ={}
+    for i in range(len(threshold_list)):
+        name = threshold_list[i].labelname.split('_')[0]
+        threshold[name]=float(threshold_list[i].entry_get)
 
 
-        def onclick(self,event):
-            if event.dblclick:
-                if event.button == 1:  ##get point 1 on double left click
-                    probability = probs[int(event.xdata)].astype(str)
-                    self.master.advance_frame(int(event.xdata))
-                    print("Selected frame has a probability of", probability)
-                    a = plt.axvline(x=int(event.xdata), color='r')
-                    self.fig.canvas.draw()
-                    self.fig.canvas.flush_events()
-                    a.remove()
+    ## get dataframe of probability target columns
+    df_prob_targets = []
+    probabilityColumnNames = []
+    df_targets = pd.DataFrame(columns=targets)
+    for target in targets:
+        probabilityColumnName = 'Probability_' + target
+        df_prob_targets.append(df[[probabilityColumnName]].to_numpy())
+        probabilityColumnNames.append(probabilityColumnName)
+        df_targets[target] = [1 if x > threshold[target] else 0 for x in df[[probabilityColumnName]].to_numpy()] #change new df according to threshold
+
 
     class MainInterface:
         def __init__(self,framesfolder):
@@ -76,6 +61,7 @@ def semisuperviseLabel(inifile,framedir,target):
             self.back = Button(self.button_frame, text="<", command= lambda: self.advance_frame(self.currentframeNo -1))
             self.forwardmax = Button(self.button_frame,text=">>", command = lambda :self.advance_frame(len(self.framesin)-1))
             self.backmax = Button(self.button_frame,text="<<", command = lambda :self.advance_frame(0))
+            self.select = Button(self.button_frame, text="Jump to selected frame", command=lambda:self.advance_frame(int(self.fbox.get())))
 
 
             ## define first frames
@@ -106,6 +92,7 @@ def semisuperviseLabel(inifile,framedir,target):
             self.fbox.grid(row=1, column=1)
             self.forwardmax.grid(row=1,column=4,sticky=W)
             self.backmax.grid(row=1,column=0,sticky=W)
+            self.select.grid(row=2, column=1, sticky=N)
             #jump
             self.jump_frame.grid(row=2, column=0)
             self.jump.grid(row=0, column=0, sticky=W)
@@ -121,11 +108,18 @@ def semisuperviseLabel(inifile,framedir,target):
             self.blabel.config(font=("Calibri", 16))
             self.blabel.grid(sticky=N)
 
-            self.checkVar = IntVar()
-            self.checkVar.set(df_userinput.iloc[self.currentframeNo])
-            self.checkbox = Checkbutton(self.check_frame, text=target, variable = self.checkVar,
-                                   command=lambda: self.saveBehavior(self.currentframeNo))
-            self.checkbox.grid(sticky=W)
+            # Generates corresponding checkboxes according to config file
+            #dictionary way
+            self.checkVar ={}
+            self.checkbox ={}
+            count =0
+            for i in targets:
+                self.checkVar[i] = IntVar()
+                self.checkbox[i] = Checkbutton(self.check_frame,text=i,variable=self.checkVar[i],command =lambda: self.saveBehavior(self.currentframeNo,i))
+                self.checkbox[i].grid(row=count + 1, sticky=W)
+                self.checkVar[i].set(df_targets[i].iloc[self.currentframeNo])
+                count+=1
+
 
             ## Saving a Range of Frames
             self.rangeOn = IntVar(value=0)
@@ -150,15 +144,19 @@ def semisuperviseLabel(inifile,framedir,target):
             self.generate.grid(row=10, column=1, sticky=N)
 
         def save_video(self, dataframe):
-            dataframe.to_csv(os.path.join(projectpath,'csv','targets_inserted',nameofvid+'.csv'), index=FALSE)
+            for i in targets:
+                dataframe[i] = df_targets[i]
 
-        def saveBehavior(self, frame):
-            df_userinput[frame] = self.checkVar.get() ##get the frame numbre from the fbox and set it to equals to row in the df, then get 1 or 0
+            dataframe.to_csv(os.path.join(projectpath,'csv','targets_inserted',nameofvid + '.csv'), index=FALSE)
+
+        def saveBehavior(self, frame,target):
+            df_targets[target].loc[frame] = self.checkVar[target].get() ##get the frame numbre from the fbox and set it to equals to row in the df, then get 1 or 0
 
         def saveRangeOfBehavior(self, start, end):
             if self.rangeOn.get():
                 for i in range(start, end+1):
-                    self.saveBehavior(i)
+                    for j in targets:
+                        self.saveBehavior(i,j)
 
         def advance_frame(self,frame):
             ## define max frames ( last frames)
@@ -179,7 +177,9 @@ def semisuperviseLabel(inifile,framedir,target):
                 ## remove entry box (frame number) and refresh
                 self.fbox.delete(0, END)
                 self.fbox.insert(0, self.currentframeNo)
-                self.checkVar.set(df_userinput.iloc[self.currentframeNo]) ##set the checkbox based on df
+                # self.checkVar.set(df_userinput.iloc[self.currentframeNo]) ##set the checkbox based on df
+                for i in targets:
+                    self.checkVar[i].set(df_targets[i].iloc[self.currentframeNo])
 
                 ## refresh the frames showed in tkinter
                 max_size = 1080, 650
@@ -194,16 +194,10 @@ def semisuperviseLabel(inifile,framedir,target):
                 self.video_frame.config(image=current_frame)
                 current_image.close()
 
-                #print
-                if self.checkVar.get()==1:
-                    print('The machine thinks it is a(n)', target)
-                else:
-                    print('The machine thinks it is NOT a(n)',target)
 
             except IndexError:
                 pass
 
-    a = MainInterface(frames_dir)
-    plotgraphx(probabilityColumnName,frames_dir,a)
+    MainInterface(frames_dir)
 
 

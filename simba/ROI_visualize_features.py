@@ -237,6 +237,7 @@ def ROItoFeatures(inifile):
                     loop += 1
             polygonCenterCord = np.delete(polygonCenterCord, 0, 0)
         loop = 0
+
         ### CALCULATE IF ANIMAL IS DIRECTING TOWARDS THE CENTER OF THE RECTANGLES AND CIRCLES
         if directionalitySetting == 'yes':
             for index, row in currDf.iterrows():
@@ -292,9 +293,15 @@ def ROItoFeatures(inifile):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         cap = cv2.VideoCapture(currVideoPath)
         vid_input_width, vid_input_height = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        sideImage = np.zeros((vid_input_height, vid_input_width,3), np.uint8)
+
+        ### small image correction
+        smallImageCorrectionValue = 1
+        if vid_input_width < 400:
+            smallImageCorrectionValue = 2
+
+        sideImage = np.zeros((vid_input_height, vid_input_width*smallImageCorrectionValue,3), np.uint8)
         writer = cv2.VideoWriter(outputfilename, fourcc, int(fps), (int(vid_input_width + sideImage.shape[1]), vid_input_height))
-        mySpaceScaleY, mySpaceScaleX, myRadius, myResolution, myFontScale = 20, 400, 5, 1500, 0.5
+        mySpaceScaleY, mySpaceScaleX, myRadius, myResolution, myFontScale = 40, 800, 20, 1500, 1
         maxResDimension = max(int(vid_input_width + sideImage.shape[1]), vid_input_height)
         textScale = float(myFontScale / (myResolution / maxResDimension))
         DrawScale = int(myRadius / (myResolution / maxResDimension))
@@ -313,14 +320,14 @@ def ROItoFeatures(inifile):
         while (cap.isOpened()):
             ret, img = cap.read()
             if ret == True:
-                sideImage = np.zeros((vid_input_height, vid_input_width, 3), np.uint8)
+                sideImage = np.zeros((vid_input_height, vid_input_width*smallImageCorrectionValue, 3), np.uint8)
                 if noAnimals == 2:
                     currentPoints = (int(currDf.loc[currDf.index[loop], trackedBodyParts[0]]), int(currDf.loc[currDf.index[loop], trackedBodyParts[1]]), int(currDf.loc[currDf.index[loop], trackedBodyParts[2]]), int(currDf.loc[currDf.index[loop], trackedBodyParts[3]]))
                     cv2.circle(img, (currentPoints[0], currentPoints[2]), DrawScale, (0, 255, 0), -1)
                     cv2.circle(img, (currentPoints[1], currentPoints[3]), DrawScale, (0, 140, 255), -1)
                     animalList = ['_Animal_1_', '_Animal_2_']
                 if noAnimals == 1:
-                    currentPoints = (int(currDf.loc[currDf.index[loop], trackedBodyParts[0]]), int(currDf.loc[currDf.index[loop], trackedBodyParts[0]]))
+                    currentPoints = (int(currDf.loc[currDf.index[loop], trackedBodyParts[0]]), int(currDf.loc[currDf.index[loop], trackedBodyParts[1]]))
                     cv2.circle(img, (currentPoints[0], currentPoints[1]), DrawScale, (0, 255, 0), -1)
                     animalList = ['_Animal_1_']
                 for rectangle in range(len(Rectangles)):
