@@ -246,6 +246,7 @@ def ROItoFeatures(inifile):
                     for bodyparts in range(len(trackedBodyPartNames)):
                         p, q, n, m, coord = ([] for i in range(5))
                         currROIColName = Rectangle_col_facing[loop]
+                        currROIColName
                         p.extend((row[EarLeftCoords[bodyparts]], row[EarLeftCoords[bodyparts+arrayIndex]]))
                         q.extend((row[EarRightCoords[bodyparts]], row[EarRightCoords[bodyparts + arrayIndex]]))
                         n.extend((row[NoseCoords[bodyparts]], row[NoseCoords[bodyparts + arrayIndex]]))
@@ -253,6 +254,13 @@ def ROItoFeatures(inifile):
                         center_facing_check = line_length(p, q, n, m, coord)
                         if center_facing_check[0] == True:
                             currDf.loc[index, currROIColName] = 1
+                            x0 = min(center_facing_check[1][0], row[NoseCoords[bodyparts]])
+                            y0 = min(center_facing_check[1][1], row[NoseCoords[bodyparts + arrayIndex]])
+                            deltaX = abs((center_facing_check[1][0] - row[NoseCoords[bodyparts]]) / 2)
+                            deltaY = abs((center_facing_check[1][1] - row[NoseCoords[bodyparts + arrayIndex]]) / 2)
+                            Xmid, Ymid  = int(x0 + deltaX), int(y0 + deltaY)
+                            currDf.loc[index, currROIColName + '_x'] = Xmid
+                            currDf.loc[index, currROIColName + '_y'] = Ymid
                         loop += 1
                 loop = 0
                 for circle in range(len(Circles)):
@@ -266,6 +274,13 @@ def ROItoFeatures(inifile):
                         center_facing_check = line_length(p, q, n, m, coord)
                         if center_facing_check[0] == True:
                             currDf.loc[index, currROIColName] = 1
+                            x0 = min(center_facing_check[1][0], row[NoseCoords[bodyparts]])
+                            y0 = min(center_facing_check[1][1], row[NoseCoords[bodyparts + arrayIndex]])
+                            deltaX = abs((center_facing_check[1][0] - row[NoseCoords[bodyparts]]) / 2)
+                            deltaY = abs((center_facing_check[1][1] - row[NoseCoords[bodyparts + arrayIndex]]) / 2)
+                            Xmid, Ymid = int(x0 + deltaX), int(y0 + deltaY)
+                            currDf.loc[index, currROIColName + '_x'] = Xmid
+                            currDf.loc[index, currROIColName + '_y'] = Ymid
                         loop += 1
                 loop = 0
                 for polygon in range(len(Polygons)):
@@ -279,11 +294,17 @@ def ROItoFeatures(inifile):
                         center_facing_check = line_length(p, q, n, m, coord)
                         if center_facing_check[0] == True:
                             currDf.loc[index, currROIColName] = 1
+                            x0 = min(center_facing_check[1][0], row[NoseCoords[bodyparts]])
+                            y0 = min(center_facing_check[1][1], row[NoseCoords[bodyparts + arrayIndex]])
+                            deltaX = abs((center_facing_check[1][0] - row[NoseCoords[bodyparts]]) / 2)
+                            deltaY = abs((center_facing_check[1][1] - row[NoseCoords[bodyparts + arrayIndex]]) / 2)
+                            Xmid, Ymid = int(x0 + deltaX), int(y0 + deltaY)
+                            currDf.loc[index, currROIColName + '_x'] = Xmid
+                            currDf.loc[index, currROIColName + '_y'] = Ymid
                         loop += 1
         currDf = currDf.fillna(0)
         currDf = currDf.replace(np.inf, 0)
         print('ROI features calculated for ' + CurrVidFn + '.')
-
         print('Visualizing ROI features for ' + CurrVidFn + '...')
         outputFolderName = os.path.join(projectPath, 'frames', 'ROI_features')
         currVideoPath = os.path.join(projectPath, 'videos', CurrentVideoName + '.mp4')
@@ -343,15 +364,25 @@ def ROItoFeatures(inifile):
                 startX, startY, xprintAdd, yprintAdd = 10, 30, 0, 0
                 for rec in range(len(Rectangles)):
                     CurrRecName = rectangleFeatures[rec, 0]
+                    topLeftX, topLeftY, bottomRightX, bottomRightY = (int(rectangleFeatures[rec, 1]), int(rectangleFeatures[rec, 2]), int(rectangleFeatures[rec, 3]), int(rectangleFeatures[rec, 4]))
+                    rectangleCentroid_x, rectangleCentroid_y = int((bottomRightX - topLeftX)/2 + topLeftX), int((bottomRightY - topLeftY) / 2 + topLeftY)
                     for CurrAnimalName in animalList:
                         for variable in variableList:
                             columnName = CurrRecName + CurrAnimalName + variable
                             rectangleStatus = currDf.loc[loop, columnName]
                             cv2.putText(sideImage, str(columnName), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[rec], 2)
                             xprintAdd += XspacingScale
-                            if (variable == 'in_zone') or (variable == 'facing'):
+                            if (variable == 'in_zone'):
                                 if rectangleStatus == 1:
                                     cv2.putText(sideImage, str('True'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[rec], 2)
+                                if rectangleStatus == 0:
+                                    cv2.putText(sideImage, str('False'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[rec], 2)
+                            if (variable == 'facing'):
+                                rectangleStatus_x, rectangleStatus_y = currDf.loc[loop, columnName + '_x'], currDf.loc[loop, columnName + '_y']
+                                if rectangleStatus == 1:
+                                    cv2.putText(sideImage, str('True'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[rec], 2)
+                                    cv2.circle(img, (int(rectangleCentroid_x), int(rectangleCentroid_y)), DrawScale, (0, 255, 0), -1)
+                                    cv2.line(img, (int(rectangleStatus_x), int(rectangleStatus_y)), (int(rectangleCentroid_x), int(rectangleCentroid_y)), (0, 255, 0), 2)
                                 if rectangleStatus == 0:
                                     cv2.putText(sideImage, str('False'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[rec], 2)
                             if (variable == 'distance'):
@@ -361,17 +392,24 @@ def ROItoFeatures(inifile):
                             xprintAdd = 0
                 for circ in range(len(Circles)):
                     CurrCircName = circleFeatures[circ, 0]
+                    centerX, centerY, radius = (int(circleFeatures[circ, 1]), int(circleFeatures[circ, 2]), int(circleFeatures[circ, 3]))
                     for CurrAnimalName in animalList:
                         for variable in variableList:
                             columnName = CurrCircName + CurrAnimalName + variable
                             circStatus = currDf.loc[loop, columnName]
                             cv2.putText(sideImage, str(columnName), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[len(Rectangles)+circ+1], 2)
                             xprintAdd += XspacingScale
-                            if (variable == 'in_zone') or (variable == 'facing'):
+                            if (variable == 'in_zone'):
                                 if circStatus == 1:
                                     cv2.putText(sideImage, str('True'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[len(Rectangles)+circ+1], 2)
                                 if circStatus == 0:
                                     cv2.putText(sideImage, str('False'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[len(Rectangles)+circ+1], 2)
+                            if (variable == 'facing'):
+                                circleStatus_x, circleStatus_y = currDf.loc[loop, columnName + '_x'], currDf.loc[loop, columnName + '_y']
+                                if circStatus == 1:
+                                    cv2.putText(sideImage, str('True'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[len(Rectangles)+circ+1], 2)
+                                    cv2.circle(img, (int(centerX), int(centerY)), DrawScale, (0, 255, 0), -1)
+                                    cv2.line(img, (int(circleStatus_x), int(circleStatus_y)),(int(centerX), int(centerY)), (0, 255, 0), 2)
                             if (variable == 'distance'):
                                 circStatus = round(circStatus / 10, 2)
                                 cv2.putText(sideImage, str(circStatus), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[len(Rectangles)+circ+1], 2)
