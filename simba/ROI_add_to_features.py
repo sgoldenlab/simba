@@ -224,10 +224,3 @@ def ROItoFeatures(inifile):
         currDf.to_csv(i)
         print('New feature file with ROI data saved: ' + str(r'project_folder\csv\features_extracted') + str(r'\\') + str(CurrVidFn))
     print('All ROI feature data appended to feature files.')
-
-
-
-
-
-
-

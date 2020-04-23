@@ -57,7 +57,7 @@ from ROI_multiply import *
 from ROI_reset import *
 from ROI_add_to_features import *
 from ROI_process_movement import *
-from ROI_visualize_features import ROItoFeatures
+from ROI_visualize_features import ROItoFeaturesViz
 from plot_heatmap import plotHeatMap
 import warnings
 from outlier_scripts.movement.correct_devs_mov_16bp import dev_move_16
@@ -741,6 +741,7 @@ class FileSelect(Frame):
 class Entry_Box(Frame):
     def __init__(self,parent=None,fileDescription="",labelwidth='',status = None,**kw):
         self.status = status if status is not None else NORMAL
+        self.labelname = fileDescription
         Frame.__init__(self,master=parent,**kw)
         self.filePath = StringVar()
         self.lblName = Label(self, text=fileDescription,width=labelwidth,anchor=W)
@@ -3106,7 +3107,7 @@ class loadprojectini:
         self.roi_draw1 = LabelFrame(tab6, text='Visualize ROI')
         # button
         visualizeROI = Button(self.roi_draw1, text='Visualize ROI tracking', command=lambda: roiPlot(self.projectconfigini))
-        visualizeROIfeature = Button(self.roi_draw1, text='Visualize ROI features', command=lambda: ROItoFeatures(self.projectconfigini))
+        visualizeROIfeature = Button(self.roi_draw1, text='Visualize ROI features', command=lambda: ROItoFeaturesViz(self.projectconfigini))
         ##organize
         self.roi_draw1.grid(row=0, column=3, sticky=N)
         visualizeROI.grid(row=0)
@@ -3145,10 +3146,15 @@ class loadprojectini:
 
         #pseudolabel
         label_pseudo = LabelFrame(tab7,text='Pseudo Labelling',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-        pLabel_framedir = FolderSelect(label_pseudo,'Frame folder',lblwidth='15')
-        pLabel_dropdown = DropDownMenu(label_pseudo,'Target',targetlist,'15')
-        pLabel_dropdown.setChoices(list(targetlist)[0])
-        pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.folder_path,pLabel_dropdown.getChoices()))
+        pLabel_framedir = FolderSelect(label_pseudo,'Frame folder',lblwidth='10')
+        plabelframe_threshold = LabelFrame(label_pseudo,text='Threshold',pady=5,padx=5)
+        plabel_threshold =[0]*len(targetlist)
+        count=0
+        for i in list(targetlist):
+            plabel_threshold[count] = Entry_Box(plabelframe_threshold,str(i),'10')
+            plabel_threshold[count].grid(row=count+2,sticky=W)
+            count+=1
+        pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.folder_path,list(targetlist),plabel_threshold))
 
 
         #train machine model
@@ -3335,8 +3341,8 @@ class loadprojectini:
 
         label_pseudo.grid(row=6,sticky=W,pady=10)
         pLabel_framedir.grid(row=0,sticky=W)
-        pLabel_dropdown.grid(row=1,sticky=W)
-        pLabel_button.grid(row=4,sticky=W)
+        plabelframe_threshold.grid(row=2,sticky=W)
+        pLabel_button.grid(row=3,sticky=W)
 
         label_trainmachinemodel.grid(row=6,sticky=W)
         button_trainmachinesettings.grid(row=0,column=0,sticky=W,padx=5)

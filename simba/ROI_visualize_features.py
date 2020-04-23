@@ -11,7 +11,7 @@ from shapely.wkt import loads as load_wkt
 from shapely.geometry import mapping
 from shapely import geometry
 
-def ROItoFeatures(inifile):
+def ROItoFeaturesViz(inifile):
     config = ConfigParser()
     config.read(inifile)
     noAnimals = config.getint('ROI settings', 'no_of_animals')
