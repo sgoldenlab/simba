@@ -77,7 +77,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 ### Scenario 3: [Updating a classifier with further annotated data](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md)
 
-### Scenario 4: [Analyzing and adding new Experimental data to a previously started project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md)
+### Scenario 4: [Analyzing and adding new Experimental data to a previously started project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md)
 
 
 ## Installation ⚙️
