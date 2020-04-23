@@ -32,7 +32,7 @@ from merge_movie_ffmpeg import generatevideo_config_ffmpeg
 from import_videos_csv_project_ini import *
 from configparser import ConfigParser
 from labelling_aggression import *
-from pseudoLabel import semisuperviseLabel
+# from pseudoLabel import semisuperviseLabel
 from load_labelling_aggression import load_folder
 from PIL import Image, ImageTk
 import tkinter.ttk as ttk
@@ -3144,17 +3144,17 @@ class loadprojectini:
         button_labelaggression = Button(label_labelaggression, text='Select folder with frames (create new video annotation)',command= lambda:choose_folder(self.projectconfigini))
         button_load_labelaggression = Button(label_labelaggression,text='Select folder with frames (continue existing video annotation)',command= lambda: load_folder(self.projectconfigini))
 
-        #pseudolabel
-        label_pseudo = LabelFrame(tab7,text='Pseudo Labelling',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-        pLabel_framedir = FolderSelect(label_pseudo,'Frame folder',lblwidth='10')
-        plabelframe_threshold = LabelFrame(label_pseudo,text='Threshold',pady=5,padx=5)
-        plabel_threshold =[0]*len(targetlist)
-        count=0
-        for i in list(targetlist):
-            plabel_threshold[count] = Entry_Box(plabelframe_threshold,str(i),'10')
-            plabel_threshold[count].grid(row=count+2,sticky=W)
-            count+=1
-        pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.folder_path,list(targetlist),plabel_threshold))
+        # #pseudolabel
+        # label_pseudo = LabelFrame(tab7,text='Pseudo Labelling',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
+        # pLabel_framedir = FolderSelect(label_pseudo,'Frame folder',lblwidth='10')
+        # plabelframe_threshold = LabelFrame(label_pseudo,text='Threshold',pady=5,padx=5)
+        # plabel_threshold =[0]*len(targetlist)
+        # count=0
+        # for i in list(targetlist):
+        #     plabel_threshold[count] = Entry_Box(plabelframe_threshold,str(i),'10')
+        #     plabel_threshold[count].grid(row=count+2,sticky=W)
+        #     count+=1
+        # pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.folder_path,list(targetlist),plabel_threshold))
 
 
         #train machine model
@@ -3339,10 +3339,10 @@ class loadprojectini:
         button_labelaggression.grid(row=0,sticky=W)
         button_load_labelaggression.grid(row=1,sticky=W,pady=10)
 
-        label_pseudo.grid(row=6,sticky=W,pady=10)
-        pLabel_framedir.grid(row=0,sticky=W)
-        plabelframe_threshold.grid(row=2,sticky=W)
-        pLabel_button.grid(row=3,sticky=W)
+        # label_pseudo.grid(row=6,sticky=W,pady=10)
+        # pLabel_framedir.grid(row=0,sticky=W)
+        # plabelframe_threshold.grid(row=2,sticky=W)
+        # pLabel_button.grid(row=3,sticky=W)
 
         label_trainmachinemodel.grid(row=6,sticky=W)
         button_trainmachinesettings.grid(row=0,column=0,sticky=W,padx=5)
