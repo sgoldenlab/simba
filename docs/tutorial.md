@@ -201,7 +201,7 @@ Based on the coordinates of body parts in each frame - and the frame rate and th
 ### Step 6: Label Behavior
 This step is used for label the behaviors in each frames of a video. This data will be concatenated with the features and used for creating behavioral classifiers. 
 
-There are two options, one is to start a **new video annotation** and one is to **continue on where you last left off**. Both are the same except, the latter will start with the frame where you last saved. For example, one day, you are labelling behavior and you feel tired and sick of annotating the videos. You can now click `Generate/Save` button to save your work for your coworker to continue. Your coworker can continue by clicking ` Select folder with frames(continue existing video annotation)` and select the the video folder that you have annotated half way and take it from there!
+There are two options, one is to start a **new video annotation** and one is to **continue on where you last left off**. Both are essentially the same, except the latter will start with the frame where you last saved. For example, one day, you started a new video by clicking `Select folder with frames (create new video annotation` and you feel tired and sick of annotating the videos. You can now click `Generate/Save` button to save your work for your coworker to continue. Your coworker can continue by clicking ` Select folder with frames(continue existing video annotation)` and select the the video folder that you have annotated half way and take it from there!
 
 ![](/images/label_behaviornew.PNG)
 
