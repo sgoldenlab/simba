@@ -201,6 +201,10 @@ Based on the coordinates of body parts in each frame - and the frame rate and th
 ### Step 6: Label Behavior
 This step is used for label the behaviors in each frames of a video. This data will be concatenated with the features and used for creating behavioral classifiers. 
 
+There are two options, one is to start a **new video annotation** and one is to **continue on where you last left off**. Both are the same except, the latter will start with the frame where you last saved. For example, one day, you are labelling behavior and you feel tired and sick of annotating the videos. You can now click `Generate/Save` button to save your work for your coworker to continue. Your coworker can continue by clicking ` Select folder with frames(continue existing video annotation)` and select the the video folder that you have annotated half way and take it from there!
+
+![](/images/label_behaviornew.PNG)
+
 1. Click on `Select folder with frames`. In your project folder navigate to the `/project_folder/frames/input/` folder, and you should see folders that are named after your videos. These folders contain the extracted video frames. Select one of the folder and the following window should pop up.
 
 <p align="center">
@@ -209,7 +213,7 @@ This step is used for label the behaviors in each frames of a video. This data w
 
 2. Please click [here](/docs/labelling_aggression_tutorial.md) to learn how to use the behavior annotation interface.
 
-3. Once finished, click on `Generate/Save` and it will generate a new *.csv* file in */csv/targets_inserted* folder. 
+3. Once finished, click on `Generate/Save` and it will generate a new *.csv* file in */csv/targets_inserted* folder.
 
 ### Step 7: Train Machine Model
 This step is used for training new machine models for behavioral classifications. 
