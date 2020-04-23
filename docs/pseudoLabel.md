@@ -1,6 +1,6 @@
 # Pseudo Label
 Before running pseudo label, the video has to go through [**Run machine model**](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model) and has .csv file in the `/project_folder/csv/output/machine_results` folder.
-With this tool, user is able to look at the machine annotation and correct them.
+With this tool, users are able to look at the machine annotation and correct them.
 
 ![](/images/pseudolabel.PNG)
 
