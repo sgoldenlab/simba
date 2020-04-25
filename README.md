@@ -8,8 +8,11 @@
 
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
-## March-23-2020 COVID-19 Update
-As the scientific communty continues to respond to COVID-19, hopefully by closing their labs and instituting social distancing, we are committed to helping SimBA users (or just anyone interesting in ML and behavioral neuroscience) get up and running remotely. 
+## April-25-2020 Update
+
+A pre-print manuscript on SimBA has now been released on bioRxiv!
+
+**[Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
 Please join our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you have any questions, or even if you would simply like to discuss potential applications for SimBA in your work.  Please come by, stay inside, wash your hands, and check on your lab mates reguarly!
 
