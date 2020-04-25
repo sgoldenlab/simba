@@ -10,7 +10,7 @@
 
 ## April-25-2020 Update
 
-A pre-print manuscript on SimBA has now been released on bioRxiv!
+A pre-print manuscript on SimBA has now released on bioRxiv! The manuscripts details the use of SimBA for generation of social predictive classifiers in rat and mouse resident-intruder protocols - please check it out using the link below. All data, pose-estimation models, and the final classifiers generated in the manuscript, can be accessed through our [OSF repository](https://osf.io/tmu6y/) and through the [Resource](https://github.com/sgoldenlab/simba#resource-) menu further down this page.
 
 **[Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
