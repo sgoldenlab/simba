@@ -23,6 +23,11 @@ def data_plot_config(configini):
     ########### FIND CSV FILES ###########
     filesFound = glob.glob(csv_dir_in + "/*.csv")
 
+    if noAnimals == 1:
+        move1ColName = "Movement_mouse_centroid"
+    if noAnimals == 2:
+        move1ColName = "Movement_mouse_1_centroid"
+
     print('Generating data plots for ' + str(len(filesFound)) + ' video(s)...')
 
     for currentFile in filesFound:
@@ -42,8 +47,10 @@ def data_plot_config(configini):
             os.makedirs(savePath)
         df_lists = [csv_df[i:i + fps] for i in range(0, csv_df.shape[0], fps)]
 
+
+
         for currentDf in df_lists:
-            mmMove_nose_M1 = currentDf["Movement_mouse_1_centroid"].mean()
+            mmMove_nose_M1 = currentDf[move1ColName].mean()
             list_nose_movement_M1.append(mmMove_nose_M1)
             current_velocity_M1_cm_sec = round(mmMove_nose_M1, 2)
             meanVelocity_M1 = statistics.mean(list_nose_movement_M1)
