@@ -71,3 +71,6 @@ python SimBA.py
 | [yellowbrick](https://github.com/DistrictDataLabs/yellowbrick)| 0.9.1 |
 | [xgboost](https://github.com/dmlc/xgboost)| 0.9 |
 | [tabulate](https://bitbucket.org/astanin/python-tabulate/src/master/)| 0.8.3 |
+| [tables](https://www.pytables.org/)| ≥ 3.5.1 |
+
+
