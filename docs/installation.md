@@ -57,7 +57,7 @@ python SimBA.py
 | [deepposekit](https://github.com/jgraving/DeepPoseKit) | 0.3.5 |
 | [dtreeviz](https://github.com/parrt/dtreeviz)   | 0.8.1  |
 | [opencv_python](https://github.com/skvark/opencv-python)| 3.4.5.20 |
-| [numpy](https://github.com/numpy/numpy)|0.18.1 |
+| [numpy](https://github.com/numpy/numpy)|1.18.1 |
 | [imgaug](https://imgaug.readthedocs.io/en/latest/)| 0.4.0 |
 | [pandas](https://github.com/pandas-dev/pandas)| 0.25.3 |
 | [scikit_image](https://scikit-image.org/)| 0.14.2  |
