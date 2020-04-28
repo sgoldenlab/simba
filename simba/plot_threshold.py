@@ -31,7 +31,7 @@ def plot_threshold(configini, behavior):
         for index, row in currDf.iterrows():
             probabilityList.append(row[colName])
             plt.ylim([0,highestTheshold])
-            plt.plot(probabilityList, color="m", linewidth=10)
+            plt.plot(probabilityList, color="m", linewidth=6)
             plt.plot(index, probabilityList[-1], "o", markersize=20, color="m")
             plt.ylabel('probability ' + behavior)
             xTick.append(index)
@@ -50,5 +50,5 @@ def plot_threshold(configini, behavior):
             figSavePath = os.path.join(framesDirOut, str(index) + '.png')
             plt.savefig(figSavePath)
             plt.close('all')
-            print('Line plot ' + str(index) + '/' + str(len(currDf)) + ' for video ' + str(fileCounter) + '/' + str(len(filesFound)))
+            print('Probability plot ' + str(index) + '/' + str(len(currDf)) + ' for video ' + str(fileCounter) + '/' + str(len(filesFound)))
         print('Finished generating line plots. Plots are saved @ project_folder/frames/output/line_plot')

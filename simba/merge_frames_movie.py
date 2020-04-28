@@ -4,7 +4,7 @@ from scipy import ndimage
 import os
 import numpy as np
 from configparser import ConfigParser
-import math
+import glob
 
 def mergeframesPlot(configini,inputList):
     dirStatusList = inputList
@@ -61,8 +61,6 @@ def mergeframesPlot(configini,inputList):
 
         return int(outputImageHeight), int(outputImageWidh)
 
-
-
     if not os.path.exists(framesDir):
         os.makedirs(framesDir)
     dirsList, toDelList = [], []
@@ -73,27 +71,39 @@ def mergeframesPlot(configini,inputList):
             foldersInFolder = [f.path for f in os.scandir(folderPath) if f.is_dir()]
             dirsList.append(foldersInFolder)
 
-    print(dirsList)
+    pathForCount = str(dirsList[0][0])
+    imageCount = len(glob.glob(pathForCount + '/*.png'))
 
+    ### check that all folders contain an equal number of frames ###
+    for folder in range(len(dirsList)):
+        pathForCount = str(dirsList[folder][0])
+        currImageCount = len(glob.glob(pathForCount + '/*.png'))
+        if currImageCount != imageCount:
+            print('Error: The number of frames in each frame category do not match. Please check the fodlers in the frames/output directory')
+            break
+
+    print(dirsList)
     for video in range(len(dirsList[0])):
         try:
             currentVidFolders = [item[video] for item in dirsList]
         except IndexError:
-            print('Error: all frame categories have not been created for the videos.')
+            print('Error: all the selected frame categories have not been created for the videos.')
         vidBaseName = os.path.basename(currentVidFolders[0])
         currVidInfo = vidLogsDf.loc[vidLogsDf['Video'] == str(vidBaseName)]
         try:
             fps = int(currVidInfo['fps'])
         except TypeError:
-            print('Error: make sure your image folders are represented in your video info log file.')
+            print('Error: make sure your videos you are merging are represented in your video info log file.')
             break
-        img = cv2.imread(os.path.join(currentVidFolders[video], '0.png'))
+        img = cv2.imread(os.path.join(currentVidFolders[0], '0.png'))
         imgHeight, imgWidth = img.shape[0], img.shape[1]
         y_offsets = [0, int((imgHeight / 2))]
         mergedFilePath = os.path.join(framesDir, vidBaseName + '.mp4')
         imageLen = len(os.listdir(currentVidFolders[0]))
         largePanelFlag, rotationFlag = False, False
         outputImageHeight, outputImageWidh = outPutFrameSize(totalImages, inputList[0], imgHeight, imgWidth)
+        print((totalImages, inputList[0], imgHeight, imgWidth))
+        print(outputImageHeight, outputImageWidh)
         outputImage = np.zeros((outputImageHeight, outputImageWidh, 3))
         for images in range(imageLen):
             y_offset, x_offset, imageNumber, panelCounter = 0, 0, 0, 0
@@ -141,9 +151,9 @@ def mergeframesPlot(configini,inputList):
             outputImage = np.uint8(outputImage)
             writer.write(outputImage)
             print('Image ' + str(images + 1) + '/' + str(imageLen) + '. Video ' + str(video + 1) + '/' + str(len(dirsList[0])))
-        print('All movies generated')
-        cv2.destroyAllWindows()
-        writer.release()
+    print('All movies generated')
+    cv2.destroyAllWindows()
+    writer.release()
 
 
 
