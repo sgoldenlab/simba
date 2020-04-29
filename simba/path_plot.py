@@ -24,6 +24,7 @@ def path_plot_config(configini):
         print('ERROR: "Max lines" not set.')
     csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
     severityBool = config.get('Path plot settings', 'plot_severity')
+    severityTarget = config.get('Path plot settings','severity_target')
     trackedBodyPart1 = config.get('Path plot settings', 'animal_1_bp')
     trackedBodyPart2 = config.get('Path plot settings', 'animal_2_bp')
     try:
@@ -81,7 +82,7 @@ def path_plot_config(configini):
             os.makedirs(savePath)
         img_size = (maxImageSizeColumn_y, maxImageSizeColumn_x, 3)
         if severityBool == 'yes':
-            csv_df_combined['fighting'] = csv_df['fighting'].values
+            csv_df_combined[severityTarget] = csv_df[severityTarget].values
             csv_df_combined['Scaled_movement_M1_M2'] = csv_df['Scaled_movement_M1_M2'].values
 
         for index, row in csv_df_combined.iterrows():
@@ -127,7 +128,7 @@ def path_plot_config(configini):
             imageSaveName = os.path.join(savePath, str(loop) + '.png')
             image_new = imutils.resize(image_new, width=400)
             if img_size[0] < img_size[1]:
-                image_new = imutils.rotate_bound(image_new, 90.0000)
+                image_new = imutils.rotate_bound(image_new, 270.0000)
             cv2.imwrite(imageSaveName, image_new)
             loop += 1
             print('Path plot ' + str(loop) + '/' + str(len(csv_df_combined)) + ' for video ' + str(fileCounter) + '/' + str(len(filesFound)))
