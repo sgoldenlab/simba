@@ -302,7 +302,9 @@ def update_frame_from_video(master, entrybox):
 # loads the config file, creates an empty dataframe and loads the interface,
 # Prints working directory, current video name, and number of frames in folder.
 def load_folder(project_name):
-    global current_video
+
+    global current_video,df, projectini
+    projectini = project_name
     img_dir = filedialog.askdirectory()
     os.chdir(img_dir)
     print("Working directory is %s" % os.getcwd())
@@ -404,15 +406,30 @@ def save_values(start, end):
 
 # Appends data to corresponding features_extracted csv and exports as new csv
 def save_video(master):
-    input_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\features_extracted\\" \
-                 + current_video + '.csv'
-    output_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\targets_inserted\\" \
-                  + current_video + '.csv'
-    data = pd.read_csv(input_file)
-    new_data = pd.concat([data, df], axis=1)
-    new_data = new_data.fillna(0)
-    new_data.rename(columns={'Unnamed: 0': 'scorer'}, inplace=True)
-    new_data.to_csv(output_file, index=FALSE)
-    print(output_file)
-    print(current_video + 'Annotation file for "' + str(current_video) + '"' + ' created.')
-    # master.destroy()
+    try:
+        output_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\targets_inserted\\" \
+                      + current_video + '.csv'
+
+        df.to_csv(output_file, index=FALSE)
+
+        print(output_file)
+        print(current_video + 'Annotation file for "' + str(current_video) + '"' + ' created.')
+
+        # saved last frame number on
+        frameLog = os.path.join(os.path.dirname(projectini), 'logs', "lastframe_log.ini")
+        if not os.path.exists(frameLog):
+            f = open(frameLog, "w+")
+            f.write('[Last saved frames]\n')
+            f.close()
+
+        config = ConfigParser()
+        config.read(frameLog)
+        config.set('Last saved frames', str(current_video), str(current_frame_number))
+        # write
+        with open(frameLog, 'w') as configfile:
+            config.write(configfile)
+
+    except PermissionError:
+        print(
+            'You don not have permission to save the annotation file - check that the file is not open in a different application. If you are working of a server make sure the file is not open on a different computer.')
+
