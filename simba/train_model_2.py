@@ -31,8 +31,10 @@ from sklearn import tree
 from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import cross_val_score, cross_validate
+# import timeit
 
 def trainmodel2(inifile):
+    # startTime = timeit.default_timer()
     configFile = str(inifile)
     config = ConfigParser()
     try:
@@ -162,6 +164,7 @@ def trainmodel2(inifile):
             currentFn = os.path.join(data_folder, i)
             df = pd.read_csv(currentFn, index_col=0)
             features = features.append(df, ignore_index=True)
+            print(features)
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     features = features.drop(["scorer"], axis=1, errors='ignore')
     totalTargetframes = features[classifierName].sum()
@@ -289,14 +292,15 @@ def trainmodel2(inifile):
             print('Generating yellowbrick classification report...')
             generateClassificationReport(clf, class_names)
 
-        generate_features_importance_log = config.get('create ensemble settings', 'generate_features_importance_log')
-        if generate_features_importance_log == 'yes':
-            print('Generating feature importance log...')
-            importances = list(clf.feature_importances_)
-            log_df = generateFeatureImportanceLog(importances)
+        # generate_features_importance_log = config.get('create ensemble settings', 'generate_features_importance_log')
+        # if generate_features_importance_log == 'yes':
 
         generate_features_importance_bar_graph = config.get('create ensemble settings', 'generate_features_importance_bar_graph')
         if generate_features_importance_bar_graph == 'yes':
+            print('Generating feature importance log...')
+            importances = list(clf.feature_importances_)
+            log_df = generateFeatureImportanceLog(importances)
+            generate_features_importance_log = 'yes'
             N_feature_importance_bars = config.getint('create ensemble settings', 'N_feature_importance_bars')
             print('Generating feature importance bar graph...')
             generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars)
@@ -372,6 +376,8 @@ def trainmodel2(inifile):
     pickle.dump(clf, open(modelPath, 'wb'))
     print('Classifier ' + str(classifierName) + ' saved @ ' + str('models/generated_models ') + 'folder')
     print('Evaluation files are in models/generated_models/model_evaluations folders')
-
+    # stop = timeit.default_timer()
+    # execution_time = stop - startTime
+    # print(execution_time)
 
 
