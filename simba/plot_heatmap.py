@@ -27,7 +27,7 @@ def plotHeatMap(inifile):
     increments_in_seconds = config.getfloat('Heatmap settings', 'Scale_increments_seconds')
     colorPalette = config.get('Heatmap settings', 'palette')
     targetcolumnName = config.get('Heatmap settings', 'target')
-    colorList = []
+    colorList, loopCounter = [], 0
     cmap = cm.get_cmap(str(colorPalette), maxColorScale+1)
     for i in range(cmap.N):
         rgb = list((cmap(i)[:3]))
@@ -38,7 +38,7 @@ def plotHeatMap(inifile):
     filesFound = glob.glob(csv_dir_in + '/*.csv')
     print(filesFound)
     for currVid in filesFound:
-        loopCounter = 1
+        loopCounter += 1
         currVidBaseName = os.path.basename(currVid)
         if os.path.exists(os.path.join(projectPath,'videos', currVidBaseName.replace('.csv', '.mp4'))):
             currVideo = os.path.join(projectPath,'videos', currVidBaseName.replace('.csv', '.mp4'))
@@ -131,7 +131,6 @@ def plotHeatMap(inifile):
             imageConcat = np.uint8(imageConcat)
             writer.write(imageConcat)
             print('Image ' + str(index) + '/' + str(count_row) + '. Video ' + str(loopCounter) + '/' + str(len(filesFound)))
-        loopCounter+=1
         print('All heatmaps generated')
         cv2.destroyAllWindows()
         writer.release()
