@@ -51,29 +51,25 @@ def ganntplot_config(configini):
         saveDir = os.path.join(frames_dir_out, CurrentVideoName)
         if not os.path.exists(saveDir):
             os.makedirs(saveDir)
-        for bb in target_names:
-            currTarget = bb
-            for indexes, rows in dataDf[dataDf['frames'] >= boutEnd].iterrows():
-                if rows[currTarget] == 1:
-                    boutStart = rows['frames']
-                    for index, row in dataDf[dataDf['frames'] >= boutStart].iterrows():
-                        if row[currTarget] == 0:
-                            boutEnd = row['frames']
-                            if boutEnd_list[-1] != boutEnd:
-                                boutStart_list.append(boutStart)
-                                boutEnd_list.append(boutEnd)
-                                values = [currTarget, boutStart, boutEnd]
-                                boutsDf.loc[(len(boutsDf))] = values
-                                break
-                            break
-            boutStart_list = [0]
-            boutEnd_list = [0]
-            boutEnd = 0
-
-        # Convert to time
-        boutsDf['Start_time'] = boutsDf['Start_frame'] / fps
-        boutsDf['End_time'] = boutsDf['End_frame'] / fps
-        boutsDf['Bout_time'] = boutsDf['End_time'] - boutsDf['Start_time']
+        boutsList, nameList, startTimeList, endTimeList,endFrameList = [], [], [], [], []
+        for currTarget in target_names:
+            groupDf = pd.DataFrame()
+            v = (dataDf[currTarget] != dataDf[currTarget].shift()).cumsum()
+            u = dataDf.groupby(v)[currTarget].agg(['all', 'count'])
+            m = u['all'] & u['count'].ge(1)
+            groupDf['groups'] = dataDf.groupby(v).apply(lambda x: (x.index[0], x.index[-1]))[m]
+            for indexes, rows in groupDf.iterrows():
+                currBout = list(rows['groups'])
+                boutTime = ((currBout[-1] - currBout[0]) + 1) / fps
+                startTime = (currBout[0] + 1) / fps
+                endTime = (currBout[1]) / fps
+                endFrame = (currBout[1])
+                endTimeList.append(endTime)
+                startTimeList.append(startTime)
+                boutsList.append(boutTime)
+                nameList.append(currTarget)
+                endFrameList.append(endFrame)
+        boutsDf = pd.DataFrame(list(zip(nameList, startTimeList, endTimeList, endFrameList, boutsList)),columns=['Event', 'Start_time', 'End Time', 'End_frame', 'Bout_time'])
 
         ################### PLOT #######################
         loop = 0
