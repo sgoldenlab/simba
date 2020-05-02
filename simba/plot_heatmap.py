@@ -40,13 +40,18 @@ def plotHeatMap(inifile):
     for currVid in filesFound:
         loopCounter = 1
         currVidBaseName = os.path.basename(currVid)
-        videoName = currVidBaseName.replace('.csv', '.mp4')
-        currVideo = os.path.join(videoInputPath, videoName)
+        if os.path.exists(os.path.join(projectPath,'videos', currVidBaseName.replace('.csv', '.mp4'))):
+            currVideo = os.path.join(projectPath,'videos', currVidBaseName.replace('.csv', '.mp4'))
+        elif os.path.exists(os.path.join(projectPath,'videos', currVidBaseName.replace('.csv', '.avi'))):
+            currVideo = os.path.join(projectPath,'videos', currVidBaseName.replace('.csv', '.avi'))
+        else:
+            print('Cannot locate video ' + str(currVidBaseName.replace('.csv', '')) + 'in mp4 or avi format')
+            break
         cap = cv2.VideoCapture(currVideo)
         fps = cap.get(cv2.CAP_PROP_FPS)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        outputfilename = os.path.join(frames_dir_out, videoName)
+        outputfilename = os.path.join(frames_dir_out, currVidBaseName.replace('.csv', '.mp4'))
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         writer = cv2.VideoWriter(outputfilename, fourcc, fps, (int(width + (width /5)), height))
         outputWidth = int(width + (width /5))
