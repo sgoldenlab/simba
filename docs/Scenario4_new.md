@@ -48,9 +48,9 @@ Another option is to "remove" these files from the immediate sub-directories of 
 
 ![](/images/importdlc.PNG "importdlc")
 
-Once the data is imported, you should see the new imported data for Day 2 in the `project_folder/csv/input` directory, similar to after *Step 2* in the below image:
+Once the data is imported, you should see the new imported data for Day 2 in the `project_folder/csv/input` directory:
 
-![](/images/dir_info.JPG "dir_info")
+![](https://github.com/sgoldenlab/simba/blob/master/images/Archive_3.JPG "rfmodelsettings")
 
 ## Part 3: Process the data for Day 2-3 of the experiment. 
 
