@@ -48,8 +48,6 @@ Another option is to "remove" these files from the immediate sub-directories of 
 
 ![](/images/importdlc.PNG "importdlc")
 
->*Note:* If you wish to visualize the data from imported videos, as decribed in Scenario 2 - [Part 5: Visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions), you will need to create the frames for the newly added videos. Go ahead and click on the `Extract frames` button. If the frames are stored somewhere else, they do not have to be generated again and you can instead copy them in to the project by using the `Import frame folders` menu. 
-
 Once the data is imported, you should see the new imported data for Day 2 in the `project_folder/csv/input` directory, similar to after *Step 2* in the below image:
 
 ![](/images/dir_info.JPG "dir_info")
