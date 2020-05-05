@@ -785,6 +785,7 @@ class Button_getcoord(Frame):
         self.entPath = []
         self.ppm_list = []
         self.ppmvar = []
+        self.filename = filename
         labelgetcoord =Label(self,text='Get coord')
         labelgetcoord.grid(row=0,pady=6)
 
@@ -814,6 +815,10 @@ class Button_getcoord(Frame):
     def getppm(self,count):
         ppms = self.ppm_list[count].get()
         return ppms
+
+    def set_allppm(self,value):
+        for i in range(len(self.filename) - 1):
+            self.ppmvar[i].set(value)
 
 def Exit():
     app.root.destroy()
@@ -997,6 +1002,9 @@ class video_info_table:
         generate_csv_button = Button(self.xscrollbar,text='Save Data',command=self.generate_video_info_csv,font='bold',fg='red')
         generate_csv_button.grid(row=5)
 
+        setppmbutton = Button(self.xscrollbar,text='Duplicate video 1 pixel/mm (CAUTION!)',command= self.setAll_ppm)
+        setppmbutton.grid(row =5,column=1)
+
 
     def addBox(self):
         self.new_col_list.append(0)
@@ -1067,6 +1075,11 @@ class video_info_table:
 
         df.to_csv(str(output),index=False)
         print(os.path.dirname(output),'generated.')
+
+    def setAll_ppm(self):
+        firstvalue = self.button.getppm(0)
+        self.button.set_allppm(firstvalue)
+
 
 class video_downsample:
 
@@ -3063,6 +3076,11 @@ class loadprojectini:
         label_removeclassifier = LabelFrame(label_import,text='Remove exisiting classifier(s)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
         button_removeclassifier = Button(label_removeclassifier,text='Choose a classifier to remove',command=self.removeclassifiermenu)
 
+        ## archive all csvs
+        label_archivecsv =  LabelFrame(label_import,text='Archive processed files', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
+        archiveentrybox = Entry_Box(label_archivecsv,'Archive folder name', '16')
+        button_archivecsv = Button(label_archivecsv,text='Archive',command = lambda: archive_all_csvs(self.projectconfigini,archiveentrybox.entry_get))
+
         #get coordinates
         label_setscale = LabelFrame(tab3,text='Video parameters (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
         self.distanceinmm = Entry_Box(label_setscale, 'Known distance (mm)', '18')
@@ -3298,7 +3316,7 @@ class loadprojectini:
         self.file_csv.grid(row=0, sticky=W)
         button_importsinglecsv.grid(row=1, sticky=W)
 
-        label_importvideo.grid(row=1,column=0, sticky=N+W, pady=5,padx=5)
+        label_importvideo.grid(row=1,column=0, sticky=N+W, pady=5,padx=5,rowspan=2)
         label_multivideoimport.grid(row=0, sticky=W)
         self.multivideofolderpath.grid(row=0, sticky=W)
         self.video_type.grid(row=1, sticky=W)
@@ -3310,7 +3328,7 @@ class loadprojectini:
         label_extractframes.grid(row=0,column=1,sticky=N+W,pady=5,padx=5)
         button_extractframes.grid(row=0,sticky=W)
 
-        label_importframefolder.grid(row=1,column=1,sticky=N+W,pady=5,padx=5)
+        label_importframefolder.grid(row=1,column=1,sticky=N+W,pady=5,padx=5,rowspan=2)
         self.frame_folder.grid(row=0,sticky=W)
         button_importframefolder.grid(row=1,sticky=W)
 
@@ -3320,6 +3338,11 @@ class loadprojectini:
 
         label_removeclassifier.grid(row=1,column=2,sticky=N+W,pady=5,padx=5)
         button_removeclassifier.grid(row=0)
+
+        label_archivecsv.grid(row=2,column=2,sticky=W,pady=5,padx=5)
+        archiveentrybox.grid(row=0)
+        button_archivecsv.grid(row=1,pady=10)
+
 
         label_setscale.grid(row=2,sticky=W,pady=5,padx=5)
         self.distanceinmm.grid(row=0,column=0,sticky=W)

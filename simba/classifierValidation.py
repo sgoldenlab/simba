@@ -64,8 +64,15 @@ def validate_classifier(configini,seconds,target):
         #unlist list of list
         totalframes = list(chain(*finalbout_list))
 
-        currVideo = csvname + '.mp4'
-        cap = cv2.VideoCapture(os.path.join(os.path.dirname(configini),'videos',currVideo))
+        if os.path.exists(os.path.join(os.path.dirname(configini),'videos', csvname.replace('.csv', '.mp4'))):
+            currVideo = os.path.join(os.path.dirname(configini),'videos', csvname.replace('.csv', '.mp4'))
+        elif os.path.exists(os.path.join(os.path.dirname(configini),'videos', csvname.replace('.csv', '.avi'))):
+            currVideo = os.path.join(os.path.dirname(configini),'videos', csvname.replace('.csv', '.avi'))
+        else:
+            print('Cannot locate video ' + str(csvname.replace('.csv', '')) + 'in mp4 or avi format')
+            break
+
+        cap = cv2.VideoCapture(currVideo)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         frame_width = int(cap.get(3))
         frame_height = int(cap.get(4))

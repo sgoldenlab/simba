@@ -9,6 +9,42 @@ from PIL import Image
 import glob
 import pathlib
 import csv
+import shutil
+from datetime import datetime
+
+def archive_all_csvs(inifile,archivename):
+    csv_dir = os.path.join(os.path.dirname(inifile),'csv')
+    csv_subdir = []
+    for i in os.listdir(csv_dir):
+        folder = os.path.join(csv_dir,i)
+        if os.path.isdir(folder):
+            csv_subdir.append(folder)
+
+    for i in csv_subdir:
+        listtemp = []
+        for j in os.listdir(i):
+            if j.endswith('.csv'):
+                csv_temp = os.path.join(i,j)
+                listtemp.append(csv_temp)
+
+        # create new folder
+        if len(listtemp) != 0:
+            dest1 = os.path.join(i,archivename)
+            if not os.path.exists(dest1):
+                os.mkdir(dest1)
+        else:
+            print('No csv to archive in',i)
+            pass
+
+        for i in listtemp:
+            shutil.move(i,dest1)
+            print(i,'archived')
+
+    print('Archive completed.')
+
+
+
+
 
 def batch_convert_videoformat(directory,format1,format2):
     filesFound = []
