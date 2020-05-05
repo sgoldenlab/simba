@@ -20,4 +20,8 @@ We will need start with a project directory tree that does not contain any other
 
 As these files have been analyzed before, we shouldn't have to analyze them again. In [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md), we created a new project to avoid mixing the files that were used to create the predictive classifier for behavior BtWGaNP with the new experimental files we were to analyze. 
 
-Another option is to "remove" these files from the immediate sub-directories of our `project_folder/csv` folder. This way SimBA cannot see them, and won't analyze the already analyzed files again. In this current Scenario, we will hide the already analyzed files from the project created in [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md), by ***manually** putting the files in a different directory. To hide the Day 1 files from SimBA, one option is to move the files to a sub-directory called Day 1, as in *Step 1* in the below image:
+Another option is to "remove" these files from the immediate sub-directories of our `project_folder/csv` folder. This way SimBA cannot see them, and won't analyze the already analyzed files again. In this current Scenario, we will hide the already analyzed files from the project created in [Scenario 2](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md). In previous versions of SimBA (and **not** required in the current SimBA version), users had to manually put the CSV  files in a different directory to hide the files from SimBA and prevent them from being analyzed again. 
+
+1. In the current version of SimBA (as of 05-04-2020), instead, begin by loading loading your `project_config.ini` through the `File->Load Project` button in the main SimBA terminal window. 
+
+2. Navigate to the 
