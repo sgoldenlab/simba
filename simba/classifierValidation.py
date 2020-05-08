@@ -4,6 +4,7 @@ from operator import itemgetter
 from itertools import *
 import cv2
 from configparser import ConfigParser
+import glob
 
 
 def validate_classifier(configini,seconds,target):
@@ -13,18 +14,15 @@ def validate_classifier(configini,seconds,target):
     config = ConfigParser()
     configFile = str(configini)
     config.read(configFile)
-    csv_path = config.get('General settings','csv_path')
-    inputcsvfolder = os.path.join(csv_path, 'machine_results')  ##get csv folder
-
+    projectPath = config.get('General settings', 'project_path')
+    inputcsvfolder = os.path.join(projectPath, 'csv', 'machine_results')
+    videoFolder = os.path.join(projectPath, 'videos')
 
     ##get all the csv in the folder
-    csvList = []
-    for i in os.listdir(inputcsvfolder):
-        if i.endswith('.csv'):
-            csvList.append(os.path.join(inputcsvfolder,i))
+    csvList = glob.glob(inputcsvfolder + '/*.csv')
 
     ## get fps from videoinfo csv
-    videoinfocsv = os.path.dirname(csv_path) + '\\logs\\video_info.csv'
+    videoinfocsv = os.path.join(projectPath, 'logs', 'video_info.csv')
     fpsdf = pd.read_csv(videoinfocsv)
 
     #main loop
@@ -33,7 +31,7 @@ def validate_classifier(configini,seconds,target):
         csvname = os.path.basename(i).split('.')[0]
         fps = int(fpsdf['fps'].loc[(fpsdf['Video'] == csvname)])
         targetcolumn = df[target]
-        probabilitycolumn = df['Probability_'+target]
+        probabilitycolumn = df['Probability_' + target]
         framesBehavior = [i for i, e in enumerate(targetcolumn) if e != 0]  ##get frame numbers with behavior into a list( df column = 1)
 
         #get all bouts in a list
@@ -64,10 +62,11 @@ def validate_classifier(configini,seconds,target):
         #unlist list of list
         totalframes = list(chain(*finalbout_list))
 
-        if os.path.exists(os.path.join(os.path.dirname(configini),'videos', csvname.replace('.csv', '.mp4'))):
-            currVideo = os.path.join(os.path.dirname(configini),'videos', csvname.replace('.csv', '.mp4'))
-        elif os.path.exists(os.path.join(os.path.dirname(configini),'videos', csvname.replace('.csv', '.avi'))):
-            currVideo = os.path.join(os.path.dirname(configini),'videos', csvname.replace('.csv', '.avi'))
+
+        if os.path.exists(os.path.join(videoFolder, str(csvname) + '.mp4')):
+            currVideo = os.path.join(videoFolder, str(csvname) + '.mp4')
+        elif os.path.exists(os.path.join(videoFolder, str(csvname) + '.avi')):
+            currVideo = os.path.join(videoFolder, str(csvname) + '.avi')
         else:
             print('Cannot locate video ' + str(csvname.replace('.csv', '')) + 'in mp4 or avi format')
             break
