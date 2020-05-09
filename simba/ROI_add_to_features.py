@@ -73,7 +73,9 @@ def ROItoFeatures(inifile):
             NoseCoords = ['Nose_1_x', 'Nose_2_x' , 'Nose_1_y', 'Nose_2_y']
             EarLeftCoords = ['Ear_left_1_x', 'Ear_left_2_x' , 'Ear_left_1_y', 'Ear_left_2_y']
             EarRightCoords = ['Ear_right_1_x', 'Ear_right_2_x' , 'Ear_right_1_y', 'Ear_right_2_y']
-            directionalityCordHeaders.extend(NoseCoords, EarLeftCoords, EarRightCoords)
+            directionalityCordHeaders.extend(NoseCoords)
+            directionalityCordHeaders.extend(EarLeftCoords)
+            directionalityCordHeaders.extend(EarRightCoords)
             if set(directionalityCordHeaders).issubset(currDf.columns):
                 directionalitySetting = 'yes'
             else:

@@ -153,7 +153,7 @@ def roiPlot(inifile):
                         cv2.putText(borderImage, str(circleTimes[circle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/6))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 2)
                         addSpacer += 1
                         cv2.putText(borderImage, str(circleName) + ' ' + str(trackedBodyPartNames[bodyparts]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 2)
-                        cv2.putText(borderImage, str(circleEntries[circle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/6))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 2)
+                        cv2.putText(borderImage, str(circleEntries[circle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 2)
                         addSpacer += 1
 
                 for polygon in range(noPolygons):
@@ -179,7 +179,7 @@ def roiPlot(inifile):
                         cv2.putText(borderImage, str(polygonTime[polygon][bodyparts]), ((int(borderImageWidth-(borderImageWidth/6))), (height - (height + 10) + spacingScale * addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 2)
                         addSpacer += 1
                         cv2.putText(borderImage, str(PolygonName) + ' ' + str(trackedBodyPartNames[bodyparts]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 2)
-                        cv2.putText(borderImage, str(polyGonEntries[polygon][bodyparts]), ((int(borderImageWidth-(borderImageWidth/6))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 2)
+                        cv2.putText(borderImage, str(polyGonEntries[polygon][bodyparts]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 2)
                         addSpacer += 1
                 #borderImage = cv2.cvtColor(borderImage, cv2.COLOR_RGB2BGR)
                 borderImage = np.uint8(borderImage)
@@ -190,4 +190,4 @@ def roiPlot(inifile):
                 print('Video ' + str(CurrentVideoName) + ' saved.')
                 cap.release()
                 break
-    print('All ROI videos generated in "project_folder/frames/ROI"')
+    print('All ROI videos generated in "project_folder/frames/ROI_analysis"')

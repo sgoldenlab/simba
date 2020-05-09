@@ -7,8 +7,6 @@ import glob
 import cv2
 from pylab import *
 from shapely.geometry import Point
-from shapely.wkt import loads as load_wkt
-from shapely.geometry import mapping
 from shapely import geometry
 
 def ROItoFeaturesViz(inifile):
@@ -306,7 +304,7 @@ def ROItoFeaturesViz(inifile):
         currDf = currDf.replace(np.inf, 0)
         print('ROI features calculated for ' + CurrVidFn + '.')
         print('Visualizing ROI features for ' + CurrVidFn + '...')
-        outputFolderName = os.path.join(projectPath, 'frames', 'ROI_features')
+        outputFolderName = os.path.join(projectPath, 'frames', 'output', 'ROI_features')
         currVideoPath = os.path.join(projectPath, 'videos', CurrentVideoName + '.mp4')
         if not os.path.exists(outputFolderName):
             os.makedirs(outputFolderName)
@@ -323,7 +321,8 @@ def ROItoFeaturesViz(inifile):
         sideImage = np.zeros((vid_input_height, vid_input_width*smallImageCorrectionValue,3), np.uint8)
         writer = cv2.VideoWriter(outputfilename, fourcc, int(fps), (int(vid_input_width + sideImage.shape[1]), vid_input_height))
         mySpaceScaleY, mySpaceScaleX, myRadius, myResolution, myFontScale = 40, 800, 20, 1500, 1
-        maxResDimension = max(int(vid_input_width + sideImage.shape[1]), vid_input_height)
+        #maxResDimension = max(int(vid_input_width + sideImage.shape[1]), vid_input_height)
+        maxResDimension = max(vid_input_width, vid_input_height)
         textScale = float(myFontScale / (myResolution / maxResDimension))
         DrawScale = int(myRadius / (myResolution / maxResDimension))
         YspacingScale = int(mySpaceScaleY / (myResolution / maxResDimension))
@@ -410,6 +409,8 @@ def ROItoFeaturesViz(inifile):
                                     cv2.putText(sideImage, str('True'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[len(Rectangles)+circ+1], 2)
                                     cv2.circle(img, (int(centerX), int(centerY)), DrawScale, (0, 255, 0), -1)
                                     cv2.line(img, (int(circleStatus_x), int(circleStatus_y)),(int(centerX), int(centerY)), (0, 255, 0), 2)
+                                if circStatus == 0:
+                                    cv2.putText(sideImage, str('False'), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[len(Rectangles) + circ + 1], 2)
                             if (variable == 'distance'):
                                 circStatus = round(circStatus / 10, 2)
                                 cv2.putText(sideImage, str(circStatus), (startX + xprintAdd, startY + yprintAdd), cv2.FONT_HERSHEY_TRIPLEX, textScale, colorList[len(Rectangles)+circ+1], 2)
@@ -435,6 +436,11 @@ def ROItoFeaturesViz(inifile):
                             xprintAdd = 0
                 imageConcat = np.concatenate((img, sideImage), axis=1)
                 imageConcat = np.uint8(imageConcat)
+                # cv2.imshow('image', imageConcat)
+                # key = cv2.waitKey(500)  # pauses for 3 seconds before fetching next image
+                # if key == 27:  # if ESC is pressed, exit loop
+                #     cv2.destroyAllWindows()
+                #     break
                 writer.write(imageConcat)
                 print('Image ' + str(loop + 1) + ' / ' + str(len(currDf)) + '. Video ' + str(videoCounter) + ' / ' + str(len(filesFound)) + '.')
                 loop += 1
@@ -442,3 +448,4 @@ def ROItoFeaturesViz(inifile):
                 print('Video ' + str(CurrentVideoName) + ' saved.')
                 cap.release()
                 break
+    print('All ROI videos generated in "project_folder/frames/ROI_features"')
