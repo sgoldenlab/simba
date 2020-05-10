@@ -12,6 +12,7 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename,askdirectory
 from tkinter_functions import *
 from create_project_ini import write_inifile
+from json2csv import json2csv_file, json2csv_folder
 from tkinter import tix
 import subprocess
 import platform
@@ -2705,15 +2706,30 @@ class project_config:
 
 
         #import all csv file into project folder
-        label_import_csv = LabelFrame(tab3,text='Import DLC Tracking Data',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
+        label_import_csv = LabelFrame(tab3,text='Import CSV Tracking Data',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
         #multicsv
         label_multicsvimport = LabelFrame(label_import_csv, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport,'Folder Select:',title='Select Folder with .csv(s)')
         button_import_csv = Button(label_multicsvimport,text='Import csv to project folder',command = self.import_multicsv,fg='navy')
         #singlecsv
-        label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv files', pady=5, padx=5)
+        label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv file', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport,'File Select',title='Select a .csv file')
         button_importsinglecsv = Button(label_singlecsvimport,text='Import single csv to project folder',command=self.import_singlecsv,fg='navy')
+
+        # import json into projectfolder
+        label_import_json = LabelFrame(tab3, text='Import JSON Tracking Data', fg='black', font=("Helvetica", 12, 'bold'),
+                                      pady=5, padx=5)
+        # multijson
+        label_multijsonimport = LabelFrame(label_import_json, text='Import multiple .json files', pady=5, padx=5)
+        self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:', title='Select Folder with .json(s)')
+        button_import_json = Button(label_multijsonimport, text='Import json to project folder',
+                                   command=lambda:json2csv_folder(self.configinifile,self.folder_json.folder_path), fg='navy')
+        # singlecsv
+        label_singlejsonimport = LabelFrame(label_import_json, text='Import single .json file', pady=5, padx=5)
+        self.file_csv = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
+        button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder',
+                                        command=lambda:json2csv_file(self.configinifile,self.file_csv.file_path), fg='navy')
+
 
 
         #extract videos in projects
@@ -2758,8 +2774,17 @@ class project_config:
         self.file_csv.grid(row=0,sticky=W)
         button_importsinglecsv.grid(row=1,sticky=W)
 
+        # import json into projectfolder
+        label_import_json.grid(row=6,sticky=W,pady=5)
+        label_multijsonimport.grid(row=0,sticky=W)
+        self.folder_json.grid(row=0,sticky=W)
+        button_import_json.grid(row=1,sticky=W)
+        label_singlejsonimport.grid(row=1,sticky=W)
+        self.file_csv.grid(row=0,sticky=W)
+        button_importsinglejson.grid(row=1,sticky=W)
 
-        label_extractframes.grid(row=6,sticky=W)
+
+        label_extractframes.grid(row=7,sticky=W)
         label_note.grid(row=0,sticky=W)
         label_caution.grid(row=1,sticky=W)
         label_caution2.grid(row=2,sticky=W)
@@ -3036,7 +3061,7 @@ class loadprojectini:
         label_import = LabelFrame(tab2)
 
         #import all csv file into project folder
-        label_import_csv = LabelFrame(label_import, text='Import further DLC tracking data', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='black')
+        label_import_csv = LabelFrame(label_import, text='Import further CSV tracking data', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='black')
         # multicsv
         label_multicsvimport = LabelFrame(label_import_csv, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:',title='Select Folder with .csv(s)')
@@ -3045,6 +3070,18 @@ class loadprojectini:
         label_singlecsvimport = LabelFrame(label_import_csv, text='Import single csv files', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport, 'File selected',title='Select a .csv file')
         button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',command= self.importdlctracking_single,fg='navy')
+
+        # import json into projectfolder
+        label_import_json = LabelFrame(label_import, text='Import further JSON tracking data', fg='black',font=("Helvetica", 12, 'bold'),pady=5, padx=5)
+        # multijson
+        label_multijsonimport = LabelFrame(label_import_json, text='Import multiple .json files', pady=5, padx=5)
+        self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:', title='Select Folder with .json(s)')
+        button_import_json = Button(label_multijsonimport, text='Import json to project folder',command=lambda: json2csv_folder(self.projectconfigini, self.folder_json.folder_path),fg='navy')
+        # singlejson
+        label_singlejsonimport = LabelFrame(label_import_json, text='Import single .json file', pady=5, padx=5)
+        self.file_csv = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
+        button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder',
+                                         command=lambda: json2csv_file(self.projectconfigini, self.file_csv.file_path),fg='navy')
 
         #import videos
         label_importvideo = LabelFrame(label_import, text='Import further videos into project folder', font=("Helvetica",12,'bold'), padx=15,pady=5,fg='black')
@@ -3316,6 +3353,15 @@ class loadprojectini:
         self.file_csv.grid(row=0, sticky=W)
         button_importsinglecsv.grid(row=1, sticky=W)
 
+        # import json into projectfolder
+        label_import_json.grid(row=0,column=1, sticky=W, pady=5)
+        label_multijsonimport.grid(row=0, sticky=W)
+        self.folder_json.grid(row=0, sticky=W)
+        button_import_json.grid(row=1, sticky=W)
+        label_singlejsonimport.grid(row=1, sticky=W)
+        self.file_csv.grid(row=0, sticky=W)
+        button_importsinglejson.grid(row=1, sticky=W)
+
         label_importvideo.grid(row=1,column=0, sticky=N+W, pady=5,padx=5,rowspan=2)
         label_multivideoimport.grid(row=0, sticky=W)
         self.multivideofolderpath.grid(row=0, sticky=W)
@@ -3325,10 +3371,10 @@ class loadprojectini:
         self.singlevideopath.grid(row=0, sticky=W)
         button_importsinglevideo.grid(row=1, sticky=W)
 
-        label_extractframes.grid(row=0,column=1,sticky=N+W,pady=5,padx=5)
+        label_extractframes.grid(row=1,column=1,sticky=N+W,pady=5,padx=5)
         button_extractframes.grid(row=0,sticky=W)
 
-        label_importframefolder.grid(row=1,column=1,sticky=N+W,pady=5,padx=5,rowspan=2)
+        label_importframefolder.grid(row=2,column=1,sticky=N+W,pady=5,padx=5,rowspan=2)
         self.frame_folder.grid(row=0,sticky=W)
         button_importframefolder.grid(row=1,sticky=W)
 
@@ -3880,7 +3926,7 @@ class loadprojectini:
 
         #use loop to create checkbox?
         checkbox = [0]*7
-        titlebox =['events','sum duration (s)','mean duration (s)','median duration (s)','first occurance (s)','mean interval (s)','median interval (s)']
+        titlebox =['# bout events', 'total events duration (s)','mean bout duration (s)', 'median bout duration (s)', 'first occurance (s)', 'mean interval (s)', 'median interval (s)']
         for i in range(7):
             checkbox[i] = Checkbutton(dlmlabel,text=titlebox[i],variable=var[i])
             checkbox[i].grid(row=i,sticky=W)

@@ -32,7 +32,7 @@ def analyze_process_data_log(configini,chosenlist):
     log_fn = os.path.join(projectPath, 'logs', log_fn)
 
     headers = ['Video']
-    headers_to_insert = [' # bout events', ' total events duration (s)',  ' mean bout duration duration (s)', ' median bout duration duration (s)', ' first occurance (s)', ' mean interval (s)', ' median interval (s)']
+    headers_to_insert = [' # bout events', ' total events duration (s)',  ' mean bout duration (s)', ' median bout duration (s)', ' first occurance (s)', ' mean interval (s)', ' median interval (s)']
     for headerVar in headers_to_insert:
         for target in target_names:
             currHead = str(target) + headerVar
