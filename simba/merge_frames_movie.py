@@ -5,6 +5,8 @@ import os
 import numpy as np
 from configparser import ConfigParser
 import glob
+import time
+
 
 def mergeframesPlot(configini,inputList):
     dirStatusList = inputList
@@ -63,7 +65,8 @@ def mergeframesPlot(configini,inputList):
 
     if not os.path.exists(framesDir):
         os.makedirs(framesDir)
-    dirsList, toDelList = [], []
+
+    dirsList, fakePathList = [], []
     totalImages = sum(inputList)
     for status, foldername in zip(dirStatusList, dirFolders):
         if status == 1:
@@ -82,13 +85,43 @@ def mergeframesPlot(configini,inputList):
             print('Error: The number of frames in each frame category do not match. Please check the fodlers in the frames/output directory')
             break
 
-    print(dirsList)
+
+    # ### check that all folders contain each video
+    videoPathList, toDelList = [], []
+    flat_list = [item for sublist in dirsList for item in sublist]
+    for item in flat_list:
+        videoPathList.append(os.path.basename(item))
+    uniqVideo = set(videoPathList)
+    for status, foldername in zip(dirStatusList, dirFolders):
+        if status == 1:
+            for basename in uniqVideo:
+                folderPath = os.path.join(frameDirIn, foldername, basename)
+                isdir = os.path.isdir(folderPath)
+                if isdir == False:
+                    toDelList.append(os.path.basename(folderPath))
+    if toDelList:
+        print('Videos ' + str(toDelList) + ' do not contain frames for all selected categories and will not be generated')
+        time.sleep(5)
+    toDel2 = []
+    for list in dirsList:
+        for path in list:
+            currBase = os.path.basename(path)
+            for deleteWords in toDelList:
+                if deleteWords == currBase:
+                    toDel2.append(path)
+    for i in toDel2:
+        dirsList = [[ele for ele in sub if ele != i] for sub in dirsList]
+
+    for list in dirsList:
+        sorted(list, key=str.lower)
+
     for video in range(len(dirsList[0])):
         try:
             currentVidFolders = [item[video] for item in dirsList]
         except IndexError:
             print('Error: all the selected frame categories have not been created for the videos.')
         vidBaseName = os.path.basename(currentVidFolders[0])
+        print(vidBaseName)
         currVidInfo = vidLogsDf.loc[vidLogsDf['Video'] == str(vidBaseName)]
         try:
             fps = int(currVidInfo['fps'])
@@ -102,8 +135,6 @@ def mergeframesPlot(configini,inputList):
         imageLen = len(os.listdir(currentVidFolders[0]))
         largePanelFlag, rotationFlag = False, False
         outputImageHeight, outputImageWidh = outPutFrameSize(totalImages, inputList[0], imgHeight, imgWidth)
-        print((totalImages, inputList[0], imgHeight, imgWidth))
-        print(outputImageHeight, outputImageWidh)
         outputImage = np.zeros((outputImageHeight, outputImageWidh, 3))
         for images in range(imageLen):
             y_offset, x_offset, imageNumber, panelCounter = 0, 0, 0, 0
@@ -154,21 +185,6 @@ def mergeframesPlot(configini,inputList):
     print('All movies generated')
     cv2.destroyAllWindows()
     writer.release()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -25,7 +25,7 @@ def plot_threshold(configini, behavior):
         fps = int(currVidInfo['fps'])
         highestTheshold = float(currDf[colName].max())
         print(highestTheshold)
-        framesDirOut = os.path.join(projectPath, 'frames', 'output', 'probability_plots', currVidName, behavior)
+        framesDirOut = os.path.join(projectPath, 'frames', 'output', 'probability_plots', currVidName)
         if not os.path.exists(framesDirOut):
             os.makedirs(framesDirOut)
         for index, row in currDf.iterrows():
