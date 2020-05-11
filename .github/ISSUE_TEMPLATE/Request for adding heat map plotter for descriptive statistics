@@ -1,0 +1,18 @@
+name: Request for adding heat map plotter for descriptive statistics 
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+**Is your feature request related to a problem? Please describe.**
+I have tracked birds with DeepLabCut, I want to use the data that I got from DeepLabCut to make heat map using the tools of Simba. 
+
+**Describe the solution you'd like**
+
+**Describe alternatives you've considered**
+
+
+**Additional context**
+
