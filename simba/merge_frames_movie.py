@@ -7,7 +7,6 @@ from configparser import ConfigParser
 import glob
 import time
 
-
 def mergeframesPlot(configini,inputList):
     dirStatusList = inputList
     dirFolders = ["sklearn_results", "gantt_plots", "path_plots", "live_data_table", "line_plot", "probability_plots"]
@@ -74,20 +73,20 @@ def mergeframesPlot(configini,inputList):
             foldersInFolder = [f.path for f in os.scandir(folderPath) if f.is_dir()]
             dirsList.append(foldersInFolder)
 
-    pathForCount = str(dirsList[0][0])
-    imageCount = len(glob.glob(pathForCount + '/*.png'))
-
-    ### check that all folders contain an equal number of frames ###
+    ### check that all folders contain an equal number of frames and they are not zero ###
+    toDelList = []
     for folder in range(len(dirsList)):
-        pathForCount = str(dirsList[folder][0])
-        currImageCount = len(glob.glob(pathForCount + '/*.png'))
-        if currImageCount != imageCount:
-            print('Error: The number of frames in each frame category do not match. Please check the fodlers in the frames/output directory')
-            break
-
+        imageCounts = []
+        currFolders = [item[folder] for item in dirsList]
+        for category in currFolders:
+            imageCounts.append(len(glob.glob(category + '/*.png')))
+        checkIfSame = all(x == imageCounts[0] for x in imageCounts)
+        if (checkIfSame == False) or (0 in imageCounts) or (None in imageCounts):
+            if os.path.basename(category) not in toDelList:
+            toDelList.append(os.path.basename(category))
 
     # ### check that all folders contain each video
-    videoPathList, toDelList = [], []
+    videoPathList = []
     flat_list = [item for sublist in dirsList for item in sublist]
     for item in flat_list:
         videoPathList.append(os.path.basename(item))
@@ -100,8 +99,8 @@ def mergeframesPlot(configini,inputList):
                 if isdir == False:
                     toDelList.append(os.path.basename(folderPath))
     if toDelList:
-        print('Videos ' + str(toDelList) + ' do not contain frames for all selected categories and will not be generated')
-        time.sleep(5)
+        print('Videos ' + str(toDelList) + ' have missing frame folders, frame folders that are empty, or frame folder categories where the number of frames do not match. SimBA will not generate merged videos from these frames.')
+        time.sleep(6)
     toDel2 = []
     for list in dirsList:
         for path in list:
@@ -111,7 +110,6 @@ def mergeframesPlot(configini,inputList):
                     toDel2.append(path)
     for i in toDel2:
         dirsList = [[ele for ele in sub if ele != i] for sub in dirsList]
-
     for list in dirsList:
         sorted(list, key=str.lower)
 
