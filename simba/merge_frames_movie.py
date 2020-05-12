@@ -83,7 +83,7 @@ def mergeframesPlot(configini,inputList):
         checkIfSame = all(x == imageCounts[0] for x in imageCounts)
         if (checkIfSame == False) or (0 in imageCounts) or (None in imageCounts):
             if os.path.basename(category) not in toDelList:
-            toDelList.append(os.path.basename(category))
+                toDelList.append(os.path.basename(category))
 
     # ### check that all folders contain each video
     videoPathList = []
