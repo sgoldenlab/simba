@@ -13,10 +13,10 @@ def plot_threshold(configini, behavior):
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
     videoLog = pd.read_csv(vidLogFilePath)
     filesFound = glob.glob(fileFolder +"/*.csv")
-    probabilityList, xTick, xLabel = [], [], []
-
     fileCounter = 0
+    
     for file in filesFound:
+        probabilityList, xTick, xLabel = [], [], []
         fileCounter += 1
         colName = 'Probability_' + behavior
         currDf = pd.read_csv(file, usecols=[colName])
