@@ -41,7 +41,7 @@ However, SimBA will also accept alternative body labelling schematics (see the a
    
 **Important**: So far we have only validated machine learning models that use features calculated from 16 labelled body parts on two individual animals. The other configurations are "use at your own risk" and may require trouble-shooting.
 
-> *Note* : SimBA now also supports user-created body-part annotation schemes. These annotations schemes can be created in the SimBA project configuration menu - click [HERE](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Pose_config.md) to learn more.
+> *Note* : SimBA now also supports user-created body-part annotation schemes. These annotations schemes can be created in the SimBA project configuration menu - click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md) to learn more.
 
 
 ## SimBA-DLC Pipeline breakdown
