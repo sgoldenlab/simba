@@ -37,6 +37,8 @@ simba
 ```
 3. Hit `Enter`.
 
+>*Note:* If you installed simba on a virtual environment (anaconda), after installation, run `conda install shapely` for simba to works.
+
 
 # Installing SimBA Option 2
 
@@ -58,7 +60,7 @@ git clone -b SimBA_no_TF https://github.com/sgoldenlab/simba.git
 pip3 install -r simba/SimBA/requirements.txt
 ```
 
-# How to launch SimBA
+# How to launch SimBA (installing by cloning)
 
 1. Open up command prompt in the SimBA folder
 
