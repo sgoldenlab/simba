@@ -27,7 +27,15 @@ Open bash or command prompt and run the following commands on current working di
 pip install simba-uw-no-tf
 ```
 
+# How to launch SimBA ( installed using pip install simba-uw-tf)
 
+1. Open up command prompt anywhere.
+
+2. In the command prompt type
+```
+simba
+```
+3. Hit `Enter`.
 
 
 # Installing SimBA Option 2
