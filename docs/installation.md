@@ -11,7 +11,26 @@ You can choose to install SimBA as a standalone package or install SimBA with [T
 2. [Git](https://git-scm.com/downloads) 
 3. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
 
-# Installing SimBA 
+# Installing SimBA Option 1
+
+### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut or DeepPoseKit locally using a GPU)
+Open bash or command prompt and run the following commands on current working directory
+
+```
+pip install simba-uw-tf
+```
+
+### Install SimBA standalone package (without TensorFlow or integrated DeepLabCut/DeepPoseKit support)
+Open bash or command prompt and run the following commands on current working directory
+
+```
+pip install simba-uw-no-tf
+```
+
+
+
+
+# Installing SimBA Option 2
 
 ### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut or DeepPoseKit locally using a GPU)
 Open bash or command prompt and run the following commands on current working directory
