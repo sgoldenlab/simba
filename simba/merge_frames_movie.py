@@ -77,7 +77,10 @@ def mergeframesPlot(configini,inputList):
     toDelList = []
     for folder in range(len(dirsList)):
         imageCounts = []
-        currFolders = [item[folder] for item in dirsList]
+        try:
+            currFolders = [item[folder] for item in dirsList]
+        except IndexError:
+            currFolders = dirsList[folder]
         for category in currFolders:
             imageCounts.append(len(glob.glob(category + '/*.png')))
         checkIfSame = all(x == imageCounts[0] for x in imageCounts)
