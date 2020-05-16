@@ -306,6 +306,8 @@ def trainmodel2(inifile):
             generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars)
         if generate_features_importance_bar_graph != 'yes':
             N_feature_importance_bars = 'NaN'
+            generate_features_importance_log = 'no'
+
 
         generate_example_decision_tree_fancy = config.get('create ensemble settings','generate_example_decision_tree_fancy')
         if generate_example_decision_tree_fancy == 'yes':

@@ -170,6 +170,7 @@ def train_multimodel(configini):
             targetFrame = features.pop(classifierName).values
         except KeyError:
             print('Error: the dataframe does not contain any target annotations. Please check the csv files in the project_folder/csv/target_inserted folder')
+            break
         features = features.fillna(0)
         features = drop_bp_cords(features, configini)
         target_names = []
@@ -262,17 +263,23 @@ def train_multimodel(configini):
                 print('Generating yellowbrick classification report...')
                 generateClassificationReport(clf, class_names, classifierName, saveFileNo)
 
-            generate_features_importance_log =currMetaFile['generate_features_importance_log'].iloc[0]
-            if generate_features_importance_log == 'yes':
-                print('Generating feature importance log...')
-                importances = list(clf.feature_importances_)
-                log_df = generateFeatureImportanceLog(importances, classifierName, saveFileNo)
+            # generate_features_importance_log =currMetaFile['generate_features_importance_log'].iloc[0]
+            # if generate_features_importance_log == 'yes':
+            #     print('Generating feature importance log...')
+            #     importances = list(clf.feature_importances_)
+            #     log_df = generateFeatureImportanceLog(importances, classifierName, saveFileNo)
 
             generate_features_importance_bar_graph = currMetaFile['generate_features_importance_bar_graph'].iloc[0]
             N_feature_importance_bars = currMetaFile['n_feature_importance_bars'].iloc[0]
             if generate_features_importance_bar_graph == 'yes':
+                print('Generating feature importance log...')
+                importances = list(clf.feature_importances_)
+                log_df = generateFeatureImportanceLog(importances, classifierName, saveFileNo)
                 print('Generating feature importance bar graph...')
                 generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars, classifierName, saveFileNo)
+            if generate_features_importance_bar_graph == 'no':
+                N_feature_importance_bars = 'NaN'
+                generate_features_importance_log = 'no'
 
             compute_permutation_importance = currMetaFile['compute_feature_permutation_importance'].iloc[0]
             if compute_permutation_importance == 'yes':
