@@ -141,7 +141,7 @@ The visualization process will generate **one** output video for every input vid
 
 # Part 5. Miscellaneous ROI tools
 
-Users can generate heatmaps - in video or image formats - that represents the time spend in different regions of the arena. Note, this tool does **not** depend on *user-drawn* ROIs: instead this tool is for visualizing time spent in all regions of the arena according to user defined region sizes and user-defined color-scales. As an example, this tool is used for generating images, or videos, resembling this:
+Users can generate heatmaps - in video or image formats - that represents the time spend in different regions of the arena. Note, this tool does **not** depend on *user-drawn* ROIs: instead this tool is for visualizing time spent in all regions of the arena according to user defined region sizes and user-defined color-scales. As an example, this tool is used for generating images, or videos, resembling this image below. For an example of the heatmap tool output in video format, check the [SimBA YouTube playlist](https://youtu.be/O41x96kXUHE). 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/heat_1.png)
 
