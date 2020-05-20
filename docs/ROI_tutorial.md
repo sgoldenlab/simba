@@ -138,3 +138,45 @@ You can now generate visualizations of the ROI data for each of the videos in yo
 Clicking on `Visualize ROI tracking` will generate visualizations for all of the files located in the `project_folder/csv/features_extracted` folder. The visualization process will use the body-parts specified in `Analyze ROI data` step described in [Part 2 above](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data). 
 
 The visualization process will generate **one** output video for every input video. For example, if you are generating visualizations for Video1, then the output mp4 video will be located in the following path: `project_folder/frames/output/ROI_analysis/Video1.mp4`.
+
+# Part 5. Miscellaneous ROI tools
+
+Users can generate heatmaps - in video or image formats - that represents the time spend in different regions of the arena. Note, this tool does **not** depend on *user-drawn* ROIs: instead this tool is for visualizing time spent in all regions of the arena according to user defined region sizes and user-defined color-scales. As an example, this tool is used for generating images, or videos containing, resembling this:
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Heatmap_loc_example.png)
+
+These heatmap images, or videos, are colour-coded according to the time spent in different parts of the areana. To generate such heatmaps, begin by clicking on the `Create heatmaps` button in the ROI tab:
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Button4.PNG)
+
+When clicking on `Create heatmaps`, the following menu pops open which accepts several required user-defined parameters:
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Button5.PNG)
+
+`1. Bodypart:` SimBA can, currently, only generate heatmaps representing the time spent in different regions of the image based on a single body-part. Use the drop-down menu to select the body-part you wish to use to generate the heatmaps. 
+
+`2. Bin size (mm):` To generate heatmaps, SimBA needs to divide the image into different square regions. Use this entry-box to define the size of each square region. To get a better sense of what a `Bin size (mm)` is, and how SimBA goes about generating the heatmaps, see the image below (1). For example, enter *50* in this entry box to get regions that are 5x5cm in size. 
+
+`3. # increments:` The created heatmaps have adjoining colorbars. In this entry box, define the number of values that should be represented in the colorbar. Note: the counting of the colorbars in SimBA begins at zero. This means that if you want 10 values in your colorbar, in addition to zero, you should enter the value *11*. To get a better sense of what `# increments` represents, see the image below (2).
+
+`4. Seconds per increment:` Use this entry box to define the increments, in seconds, between each subsequent color in the colorbar. For example, if you enter the value `1`, then the first, second, and third value in your colorbar will be 0s, 1s, and 2s. If you enter `5` in this entry-box, then the first, second, and third value in your colorbar will be 0s, 5s, and 10s. To get a better sense of what `Seconds per increment` represents, see the image below (2).
+
+`5. Palette`. Use the drop-down to specify the palette of the heatmaps. For reference of how the palette looks like, see the the [SimBA visualization tutorials - Step 9](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#heatmap) 
+
+`6. Save last image only`. Users may want to (i) generate videos, where each frame of the video represents the cumulative time spent in each region up until the current point in time, or (ii) generate single images that represents the cumulative time spent in each region across the entire videos. Tick the `Save last image only`box to generate a single PNG images for each video in the project. Untick the `Save last image only`box to generate one heatmap video for each video in the project. 
+
+Once this information is entered, click `Run`. Generated heatmap videos/frames are saved in the `project_folder/frames/output/heatmap_location` directory. 
+
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Heatmap_parameters.PNG)
+
+
+
+
+
+
+
+
+
+
+
