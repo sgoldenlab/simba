@@ -274,6 +274,7 @@ def train_multimodel(configini):
             if generate_features_importance_bar_graph == 'yes':
                 print('Generating feature importance log...')
                 importances = list(clf.feature_importances_)
+                generate_features_importance_log = 'yes'
                 log_df = generateFeatureImportanceLog(importances, classifierName, saveFileNo)
                 print('Generating feature importance bar graph...')
                 generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars, classifierName, saveFileNo)
