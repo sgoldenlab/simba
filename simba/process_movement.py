@@ -8,7 +8,6 @@ import glob
 from drop_bp_cords import define_movement_cols
 
 def analyze_process_movement(configini):
-    configini = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Trouble_040720\project_folder\project_config.ini"
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
     configFile = str(configini)
