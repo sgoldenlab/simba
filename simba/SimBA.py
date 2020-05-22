@@ -3333,7 +3333,8 @@ class loadprojectini:
         # machine results
         label_machineresults = LabelFrame(tab9,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
-        button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=lambda:self.roi_settings('Analyze distances/velocity','processmovement'))
+        button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=lambda:self.roi_settings('Analyze distances/velocity',
+                                                                           'processmovement'))
         label_severity = LabelFrame(tab9,text='Analyze Severity',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         self.severityscale = Entry_Box(label_severity,'Severity scale 0 -',15)
         self.severityTarget = DropDownMenu(label_severity,'Target',targetlist,'15')
@@ -3387,9 +3388,9 @@ class loadprojectini:
 
         #Heatplot
         label_heatmap = LabelFrame(label_plotall, text='Heatmap', pady=5, padx=5)
-        self.BinSize = Entry_Box(label_heatmap, 'Bin size (px)', '15')
-        self.MaxScale = Entry_Box(label_heatmap, '# Scale increments', '15')
-        self.Inc = Entry_Box(label_heatmap, 'Scale increment (s)', '15')
+        self.BinSize = Entry_Box(label_heatmap, 'Bin size (mm)', '15')
+        self.MaxScale = Entry_Box(label_heatmap, '# increments', '15')
+        self.Inc = Entry_Box(label_heatmap, 'Seconds per increment', '15')
 
         hmchoices = {'viridis','plasma','inferno','magma','jet','gnuplot2'}
         self.hmMenu = DropDownMenu(label_heatmap,'Color Palette',hmchoices,'15')
@@ -3397,7 +3398,13 @@ class loadprojectini:
         #get target called on top
         self.targetMenu = DropDownMenu(label_heatmap,'Target',targetlist,'15')
         self.targetMenu.setChoices(targetlist[(config.get('SML settings','target_name_'+str(1)))])
-
+        #bodyparts
+        bp1, bp2 = define_bp_drop_down(configini)
+        bpoptions = bp1 + bp2
+        self.bp1 = DropDownMenu(label_heatmap,'Bodypart',bpoptions,'15')
+        self.bp1.setChoices(bpoptions[0])
+        self.intimgvar = IntVar()
+        lstimg = Checkbutton(label_heatmap,text='Save last image only (if unticked heatmap videos are created)',variable=self.intimgvar)
         button_heatmap = Button(label_heatmap, text='Generate heatmap', command=self.heatmapcommand)
 
         #plot threshold
@@ -3558,7 +3565,9 @@ class loadprojectini:
         self.MaxScale.grid(row=1, sticky=W)
         self.hmMenu.grid(row=3,sticky=W)
         self.targetMenu.grid(row=4,sticky=W)
-        button_heatmap.grid(row=5, sticky=W)
+        self.bp1.grid(row=5,sticky=W)
+        lstimg.grid(row=6,sticky=W)
+        button_heatmap.grid(row=7, sticky=W)
         #threshold
         label_plotThreshold.grid(row=5, sticky=W)
         self.behaviorMenu.grid(row=0, sticky=W)
@@ -4251,9 +4260,11 @@ class loadprojectini:
         config.set('Heatmap settings', 'Scale_increments_seconds', self.Inc.entry_get)
         config.set('Heatmap settings', 'Palette', self.hmMenu.getChoices())
         config.set('Heatmap settings', 'Target', self.targetMenu.getChoices())
+        config.set('Heatmap settings', 'body_part', self.bp1.getChoices())
         with open(configini, 'w') as configfile:
             config.write(configfile)
-        plotHeatMap(configini)
+        plotHeatMap(configini,self.bp1.getChoices(),int(self.BinSize.entry_get),int(self.MaxScale.entry_get),
+                    int(self.Inc.entry_get),self.hmMenu.getChoices(),self.intimgvar.get() , self.targetMenu.getChoices())
 
     def callback(self,url):
         webbrowser.open_new(url)

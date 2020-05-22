@@ -327,6 +327,7 @@ def load_folder(project_name):
     configure(project_name)
     curr_target_csv= os.path.join(os.path.dirname(project_name),'csv','targets_inserted',os.path.basename(img_dir)+'.csv')
     df = pd.read_csv(curr_target_csv)
+    df = df.fillna(0)
 
     ##load last saved frames
     try:
