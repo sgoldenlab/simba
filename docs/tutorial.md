@@ -55,9 +55,11 @@ In this step you create your main project folder with all the required sub-direc
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
 </p>
 
-6. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - ** yet not validaded** - options, accessible in the dropdown menu.
+6. `Type of Tracking` allows the user to choose multi-animal tracking or the classic tracking.
 
-7. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. 
+7. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - ** yet not validaded** - options, accessible in the dropdown menu.
+
+8. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. 
 
 ### Step 2: Import videos into project folder
 In this step, you can choose to import either one or multiple videos. The imported videos are used for visualizing predictions and standardizing distances across videos by calculating metric distances from pixel distances. 
