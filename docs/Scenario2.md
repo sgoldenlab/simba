@@ -90,21 +90,21 @@ Congrats! You have now used machine models to classify behaviors in new data. To
 
 ## Part 5:  Visualizing machine predictions
 
-In this part of the tutorial we will create visualizations of features and machine learning classifications that you have generated. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots, heat plots and data plot. In this step the different frames can also be merged into video mp4 format. Please note that generating images and videos of the animals with prediction overlays requires that the frames for the videos to have been generated (extracted) in **Part 1** of this tutorial. Also note that the rendering of images and videos can take up a lot of hardrive space, especially if your videos are recorded at high frame rates, are long duration, or high resolution. One suggestion, if you are short on harddrive space, is to only generate frames for a few select videos (more information below). We are currently working on updating SimBA to give the user the oppurtunity to work with compressed videos rather than frames during the `visualization` steps.   
+In this part of the tutorial we will create visualizations of features and machine learning classifications that you have generated. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots, heat maps and data plot. In this step the different frames can also be merged into video mp4 format. Please note that the rendering of images and videos can take up a lot of hardrive space, especially if your videos are recorded at high frame rates, are long duration, or high resolution. One suggestion, if you are short on harddrive space, is to only generate frames for a few select videos (more information below). We are currently working on updating SimBA to give the user the oppurtunity to work with compressed videos rather than frames during the `visualization` steps.   
 
-1. In the `Load Project` menu, click on the `Visualization` tab and you will see the following menus. 
+1. In the `Load Project` menu, click on the `Visualization` tab and you will see the following menu. 
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Visualization_menu_2.PNG "viz")
+![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Visualize_01.PNG "viz")
 
-2. **Visualize predictions**. On the left of the `Visualization` menu, there is a sub-menu with the heading `Sklearn visualization`. This button grabs the frames of the videos in the project, and draws circles at the location of the tracked body parts, the convex hull of the animal, and prints the behavioral predictions on top of the frame together with the classified time spent enganging in the behavior.  
+2. **Visualize predictions**. On the left of the `Visualization` menu, there is a sub-menu with the heading `Visualize classification results`. This button grabs the frames of the videos in the project, and draws circles at the location of the tracked body parts, the convex hull of the animal, and prints the behavioral predictions on top of the frame together with the classified time spent enganging in the behavior. If you would like to generate image frames over the predictions (one image for each frame in the videos), tick the `Generate frame` box. If you would like to generate a MP4 video, tick the `Generate video` box. If you would like to generate both frames and videos, tick both `Generate video` and `Generate frame` boxes
 
->*Note I*: SimBA uses a "one-click-interface" unless explicitly stated. For example, if you click on `Sklearn visualization` twice, the images will be generated twice. 
+>*Note I*: SimBA uses a "one-click-interface" unless explicitly stated. For example, if you click on `Visualize classification results` twice, the images will be generated twice. 
 
->*Note II*: The code will run through each CSV file in your `project_folder\csv\machine_results` directory, find a matching folder of frames in your `project_folder\frames\input` directory, and save new frames in the `project_folder\frames\output\sklearn_results` directory, contained within a new folder named after the video file. If you would like to generate visualizations for only a select CSV file, remove the files you want to omit from visualizing from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do *not* want to visualize in this temporary folder. 
+>*Note II*: The code will run through each CSV file in your `project_folder\csv\machine_results` directory, find a matching folder of frames in your `project_folder\frames\input` directory, and save new frames (or videos) in the `project_folder\frames\output\sklearn_results` directory, contained within a new folder named after the video file. If you would like to generate visualizations for only a select CSV file, remove the files you want to omit from visualizing from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. 
 
->*Note III*: If you do not want to create any further visualizations (e.g., gantt plots, path plots, data plots, or distance plots), you can stop at this point of the tutorial. Furthermore, if you want to create a video from the frames generated in the `project_folder\frames\output\sklearn_results` directory, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video` tool](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video). You could use the [`Merge images to video` tool](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) This will generate a video like the following [example](https://www.youtube.com/watch?v=lGzbS7OaVEg&feature=youtu.be).
+>*Note III*: If you do not want to create any further visualizations (e.g., gantt plots, path plots, data plots, or distance plots), you can stop at this point of the tutorial.
 
-3. **Generate gantt plots**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the first button named `Generate gantt plot` to create a gantt plot (a.k.a, horizontal bar chart or harmonogram) displaying the occurances, length, and frequencies of behavioural bouts of interest. These charts are similar to the ones generated by [popular propriatory software for behavioral analysis](https://www.noldus.com/the-observer-xt/data-analysis), and can look like this when generated through SimBA: 
+3. **Generate gantt plots**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the first button named `Generate gantt plot` to create a gantt plot (a.k.a, horizontal bar chart or harmonogram) displaying the occurances, length, and frequencies of behavioural bouts of interest. These charts are similar to the ones generated by [popular propriatory software for behavioral analysis](https://www.noldus.com/the-observer-xt/data-analysis), and could look like this when created in SimBA: 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/gantt_plot.gif" width="300" height="225" />
 
@@ -114,7 +114,7 @@ In this part of the tutorial we will create visualizations of features and machi
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/dataplot.gif" width="300" height="200" />
 
-The data plots currently displays the below metrics. These metrics can, currently, **not** be defined by the user.
+The data plots currently displays the below metrics if the data contains the tracking for 2 animals. These metrics can, currently, **not** be defined by the user.
   * Distance between the noses of the two animals
   * Distance between the centroids of the two animals
   * Current velocity of Animal 1
@@ -124,6 +124,12 @@ The data plots currently displays the below metrics. These metrics can, currentl
   * Total distance moved for Animal 1
   * Total distance moved for Animal 2
  
+ If the data contains the tracking of 1 animal, the data plots currently displays the below metrics.
+   * Current velocity of the Animal
+   * Mean velocity of Animal
+   * Total distance moved for the Animal
+
+
 >*Note*: The code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one data frame for each frame of the video and save it in the `project_folder\frames\output\live_data_table` directory, contained within a new folder named after the video file. If you would like to generate data plots for only a select csv file, remove the files you want to omitt from visualizing  gantt charts from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the data frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
 
 4. **Generate path plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the third menu named `Path plot` to generate graphs depicting the movement of the animals, the location of the animals, where the behaviors of interest occurs. The 'severity' and location of a behavior can also be visulized with a color-coded heat map. The output may look something like this:
@@ -189,35 +195,28 @@ To generate heatmaps, SimBA needs several user-defined variables:
 
 - `Target` : Which target behavior to plot in the heatmap. 
 
+
+6. **Plot thresholds**. 
+
 Once filled in, click on `Generate heatmap`:
 
 >*Note*: After clicking on `Generate heatmap`, the code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one heatmap frame for each frame of the video and save it in the `project_folder\frames\output\heatmap` directory, contained within a new folder named after the video file. if you would like to generate heatmaps for only a select csv file, remove the files you want to omitt from visualizing distance plots for from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the heatmap frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
 
-6. **Merge Frames**. If you have followed through all of **Part 5** of this tutorial, you should have generated several graphs of your machine classifications and extracted data (i.e., gantt plots, line plots, path plots, data plots, sklearn plots). These images are stored in different sub-directories in the `project_folder\frames\output` folder. Now you may want to merge all these frames into single frames, and later into a video, to more readily observe the behavior of interest and its different expression in experimental groups, like in the following video example:   
+6. **Merge Frames**. If you have followed through all of **Part 5** of this tutorial, you should have generated several graphs of your machine classifications and extracted data (i.e., gantt plots, line plots, path plots, data plots, sklearn plots). These images are stored in different sub-directories in the `project_folder\frames\output` folder. Now you may want to merge all these frames into single videos video, to more readily observe the behavior of interest and its different expression in experimental groups, like in the following video example:   
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
 
-To merge all the generated plots from the previous step into single frames, navigate to the following button in the `Visualization` menu and click it: 
+To merge all the generated plots from the previous step into single frames, navigate to `Merge frames` sub-menu in the `Visualization` tab:
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes.PNG" width="121" height="62" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Visualize_02.PNG" width="121" height="62" />
 
-When clicking on `Merge Frames`, all the generated plots for each video will be combined and saved in the `project_folder/frames/output/merged` folder, in subfolders named after each video. 
+This menu contains several tick-box options, representing the different frame category types that you can include into a single merged MP4 video. Tick the boxes of the frame types that you wish to include in your video, and leave the frame category types that you do not want to include in the video un-ticked. When happy, click on `Merge frames` to begin creating your video(s). You can follow the progress in the main SimBA terminal window. The output video(s) from the merged frames will be stored in the `project_folder\frames\output\merged` directory. 
 
->*Note*: After clicking on `Merge Frames`, the code will look in each folder contained in the `project_folder\frames\output` directory, for subfolders with matching names (e.g. `project_folder\frames\output\gantt_plots\Video1`, `project_folder\frames\output\line_plot\Video1`, `project_folder\frames\output\sklearn_results\Video1` etc...). If any of the folders are missing, or if any of the matching folder differs in the numer of frames contained within them, you will get an error. 
+**IMPORTANT**: Merging the frames into videos require that the frames have first been created. Thus, for example, if one of the frame category types that you wish to include in videos is the **Gantt plot** frames, then the Gantt plot frames need to have been created for the videos. 
 
-7. **Create Videos**. At this point, you may want to merge the frames contained within subfolders of the `project_folder/frames/output/merged` directory to video files, with one video for each of the subdirectories in the `project_folder/frames/output/merged` folder. In the `Visualization` menu, navigate to the following sub-menu:
+*Note I*: When you click on `Merge frames`, SimBA thrawls the different sub-directories of the `project_folder/frames/output` folder, with the specific sub-directories thrawled determined by the tick-boxes the user ticks in the `Merge frames` sub-menu. For example, if the user ticks the `Sklearn` and `Gantt` boxes, and has two videos in the project `Video1` and `Video2`, then SimBA thrawls the `project_folder/frames/output/sklearn_results` for a subfolder called `Video1`, and a subfolder called `Video2`. It then looks in project_folder/frames/output/gantt for subfolders called `Video1` and `Video2`. If the `Video1` subfolder exist in the `project_folder/frames/output/sklearn_results`, but does not exist in the `project_folder/frames/output/gantt` directory, then the `Video1` video will not be generated.Next, if the above criterion is fulfilled, for each video, the SimBA function looks inside the `project_folder/frames/output/gantt/Video1` directory and the `project_folder/frames/output/sklearn_results/Video2` dorectory, and it counts the number of images in each directory. If they are not exactly the same (e.g., there is 500 gantt images and 501 sklearn images for `Video2`) then the merged `Video2` video will not be generated. The function does the same for each video in the project. Please follow the progress or see any error messages in the main SimBA terminal window. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/createvideoini.PNG" width="200" height="100" />
-
-To create a video from the frames, SimBA requires two user-defined parameters: two video file format, and the bitrate:
-
-- `Bitrate`: Bitrate is the number of bits per second. It generally determines the size and quality of video and audio files: the higher the bitrate, the better the quality and the larger the file size. If unsure, try setting the bitrate to something small,like **2400**. To read more about bitrate, click [here](https://help.encoding.com/knowledge-base/article/understanding-bitrates-in-video-files/). 
-
-- `File format`: Enter the format of the output video, it can be mp4, mov, flv, avi, mpeg. Please enter the file format without the ".". (e.g., enter *mp4*, not *.mp4*). 
-
-The output video(s) from the merged frames will be stored in the `project_folder\frames\output\merged` directory. 
-
->*Note*: If the videos are very large, and you would like to down-sample the resolution of the videos to make them smaller, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [Downsample video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video) tool. In the SimBA tools menu, you can also [crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video), and [trim](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos) specific videos as well as many more things.
+>*Note II*: If the videos are very large, and you would like to down-sample the resolution of the videos to make them smaller, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [Downsample video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video) tool. In the SimBA tools menu, you can also [crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video), and [trim](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos) specific videos as well as many more things.
 
 Go to [Scenario 3](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md) to read about how to update a classifier with further annotated data.
 
