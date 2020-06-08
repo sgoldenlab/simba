@@ -13,6 +13,19 @@ When you have successfully generated your machine predictions, you will have CSV
 
 ## Step 2: Run pseudo-labelling 
 
+After [loading your project in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config), navigate to the `Label behavior` tab and uou should see the following menu:
+
+![](/images/Pseudo_1.PNG)
+
+1. In the sub-menu titled `Pseudo Labelling`, there is a entry-box called `Frame folder`. Click on `Browse` and select to the folder containing the frames for the video you wish to correct the machine predictions for.  
+
+2. Beneath the `Frame folder` entry-box, there is a sub-menu titled 'Threshold'. Within this sub-menu there are entry-boxes, with one entry-box for each classifier in the project. In these entry-boxes, insert a value between 0.00 and 1.00 which represents the classifcation threshold for each classifier. If you are un-familiar with classification thresholds, hyou can read more about them in the tutorial for [Scenario 1 - Step 8](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model), or [Scenario 2 - Part3](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data). In brief, the classification threshold represents how sure the computer has to be before it classifies a frame as containing the behavior - a value of 0.80, for example, would mean that the computer has to be 80% sure that it contains the behavior to classify it as containing the behaviour. When the thresholds have been entered, click on `
+
+3. 
+
+
+
+
 
 
 
