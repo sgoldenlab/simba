@@ -105,6 +105,18 @@ Please note that you can only import the h5 tracking data after you have importe
 
 6. Click `Import h5` to start importing.
 
+#### To import slp files (SLEAP)
+
+1. From the `File type` drop down menu, select `SLP (SLEAP)`.
+
+2. Under ` Animal settings`, enter the number of animals in the videos in the `No of animals` entry box, and click `Confirm`.
+
+3. Enter the names for each of the animal in the video.
+
+4. Select the folder that contains all the slp files by clicking `Browse Folder`.
+
+5. Click on `Import .slp`.
+
 ### Step 4: Extract frames into project folder
 This step will extract all the frames from every video that are imported into the project following **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the classification results. Once the step is completed, close the `Project Configuration` window.
 >**Note**: Splitting videos up into frames can take time if you have a lot of high resolution videos at high frame rates. The frames can also take up a lot of hard drive space. 
