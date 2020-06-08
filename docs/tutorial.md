@@ -76,17 +76,34 @@ In this step, you can choose to import either one or multiple videos. The import
 1. Under the `Import single video` heading, click on `Browse File` to select your video.
 2. Click on `Import a video`.
 
-### Step 3: Import DLC Tracking Data
-In this step, you will import your pose-estimation tracking data from DeepLabCut in csv file format.
+### Step 3: Import Tracking Data
+In this step, you will import your pose-estimation tracking data.
 
 ![](/images/importcsv.PNG "importcsv")
 
-#### To import multiple DLC csv files
-1. Navigate to the `[ Import tracking data ]` tab. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the csv files that you wish to import into your project.
-2. Click on `Import csv to project folder`. 
-#### To import a single csv file
-1. Under the `Import single csv files` heading, and click on `Browse File` to select the csv file containing your pose estimation data.
-2. Click on `Import single csv to project folder`.
+#### To import csv/json files
+1. Navigate to the `[ Import tracking data ]` tab. Under the `Import tracking data` click on the `File type` drop down menu.
+
+2. From the drop down menu, .csv files = `CSV (DLC/DeepPoseKit)`, and .json files = `JSON (BENTO)`.
+
+3. To import multiple files, choose the folder that contains the files by clicking `Browse Folder`, then click `Import csv to project folder`.
+
+4. To import a single file, choose the file by clicking `Browse File`, then click `Import single csv to project folder`.
+
+#### To import h5 files (multi-animal DLC)
+Please note that you can only import the h5 tracking data after you have imported the videos into the project folder.
+
+1. From the `File type` drop down menu, select `H5 (multi-animal DLC)`.
+
+2. Under ` Animal settings`, enter the number of animals in the videos in the `No of animals` entry box, and click `Confirm`.
+
+3. Enter the names for each of the animal in the video.
+
+4. `Tracking type` is the type of tracking from DeepLabCut multi animal tracking.
+
+5. Select the folder that contains all the h5 files by clicking `Browse Folder`.
+
+6. Click `Import h5` to start importing.
 
 ### Step 4: Extract frames into project folder
 This step will extract all the frames from every video that are imported into the project following **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the classification results. Once the step is completed, close the `Project Configuration` window.
