@@ -41,7 +41,9 @@ In this step you create your main project folder with all the required sub-direc
 
 1. In the main SimBA window, click on `File` and and `Create a new project`. The following windows will pop up.
 
-![](/images/createproject.PNG "createproject")
+<p align="center">
+<img src="/images/createproject.PNG" width="60%">
+</p>
 
 2. Navigate to the `[ Generate project config ]` tab. Under **General Settings**, specify a `Project Path` which is the directory that will contain your main project folder.
 
