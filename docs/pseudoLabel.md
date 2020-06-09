@@ -31,10 +31,16 @@ This interface, however, contains one key difference: the `Check Behavior` menu 
 
 ![](/images/Visualize_06.PNG)
 
-Now navigate the frames and the machine model predictions, by using the arrow keys, and view the video by clicking the `Open video` button. Proceed to correct any ticks that may be missing in the `Check behavior` menu, or remove ticks that are incorrectly present. Again, please see the [SimBA behavioral annotator GUI tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/labelling_aggression_tutorial.md) for more information on how to use this interface. Once you have finished correcting the machine-generated predictions, click on `Save csv`. A new CSV, named after the video, with the corrected labels, is saved in the `project_folder/csv/targets_inserted` folder and can be used, together with other annotated CSV files, to re-generate new machine models. 
+Now navigate the frames and the machine model predictions, by using the arrow keys, and view the video by clicking the `Open video` button. Proceed to correct any ticks that may be missing in the `Check behavior` menu, or remove ticks that are incorrectly present. Again, please see the [SimBA behavioral annotator GUI tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/labelling_aggression_tutorial.md) for more information on how to use this interface. Once you have finished correcting the machine-generated predictions, click on `Save csv`. A new CSV, named after the video, with the corrected labels, is saved in the `project_folder/csv/targets_inserted` folder and can be used, together with other annotated CSV files, to re-generate new machine classiciation models for the behaviors of interest. 
 
-If you want to correct further videos with machine-generated predictions, close the labelling interface, and navigate back to the sub-menu titled `Pseudo Labelling` and the `Frame folder` entry-box and select a new folder containing frames from a different video. 
+*>Note:* If the representations of the machine predictions (e.g., the tick-boxes) are too sensative (e.g., too many boxes are ticked when they shouldn't be ticked) or too weak (e.g., too many boxes are un-ticked when they should be ticked), consider closing the labelling interface window, revise the thresholds in the `Pseudo Labelling - thesholds` sub-menu, and re-start the labelling interface by clicking the `Correct labels` button.  
 
-*>Note:* What happens during this process, is that SimBA grabs the CSV file associated with the name of the frame folder from the `project_folder/csv/machine_results` directory when the user clicks the `Correct labels` button. Moreover, when the user clicks the `Save csv` button, a new CSV file is generated in the `project_folder/csv/targets_inserted` folder, and this new file is identical to the file in the  `project_folder/csv/machine_results` folder, except the relevant prediction columns have been ammended to reflect the users changes in the `Check behavior` tick-box menu. 
+If you want to correct further videos with machine-generated predictions, then close the labelling interface, and navigate back to the sub-menu titled `Pseudo Labelling` and the `Frame folder` entry-box and select a new folder containing frames from a different video. 
+
+*>Note:* What happens during this process, is that SimBA grabs the CSV file associated with the name of the frame folder from the `project_folder/csv/machine_results` directory when the user clicks the `Correct labels` button. Moreover, when the user clicks the `Save csv` button, a new CSV file is generated in the `project_folder/csv/targets_inserted` folder, and this new file is identical to the file in the  `project_folder/csv/machine_results` folder, except that the relevant prediction columns have been ammended to reflect the users changes in the `Check behavior` tick-box menu. 
+
+
+
+
 
 
