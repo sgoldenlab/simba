@@ -10,7 +10,7 @@ Before using the 'pseudo-labelling' tool in SimBA, we need to generate some mach
 
 When you've successfully generated your machine predictions, you will have CSV files containing your machine classifications, with one CSV file for each video in your project, in your `project_folder/csv/machine_results` directory. We will now use the 'Pseudo-labelling` tool in SimBA to look at these machine classifications and correct them when necessery.
 
-## Step 2: Run pseudo-labelling 
+## Step 2: Using Pseudo-labelling in SimBA 
 
 After [loading your project in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config), navigate to the `Label behavior` tab and uou should see the following menu:
 
