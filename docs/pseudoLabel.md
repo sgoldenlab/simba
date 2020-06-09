@@ -40,11 +40,7 @@ If you want to correct further videos with machine-generated predictions, then c
 
 Congrats! You have now successfully generated more machince model training data using 'Pseudo-labelling' in SimBA. 
 
-For details tutorial on how to generate machine models based on pseudo-labelled data and all other data in your `project_folder/csv/targets_inserted` directory, go to the 
-
-
-
-located in the `project_folder/csv/targets_inserted` folder, see the [Train Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model) tutorial. 
+For details tutorial on how to generate machine classifiers based on the pseudo-labelled data, and all other CSV data files in your `project_folder/csv/targets_inserted` directory,  see the [Train Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model) tutorial. 
 
 
 
