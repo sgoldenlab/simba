@@ -11,6 +11,7 @@
 
 **SimBA w/o TF** [![Downloads](https://pepy.tech/badge/simba-uw-no-tf/month)](https://pepy.tech/project/simba-uw-no-tf/month)
 
+**Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
@@ -22,14 +23,11 @@
 - Plenty of new quality-of-life features (e.g., time-bin analyzes / improved visualizations options) - [Documentation](/docs/Scenario1.md)
 - Many, many, many, many bug-fixes
 
+Please join our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you have any questions, or even if you would simply like to discuss potential applications for SimBA in your work.  Please come by, stay inside, wash your hands, and check on your lab mates reguarly!
 
 ## April-25-2020: SimBA pre-print manuscript release
 
-A pre-print SimBA manuscript on bioRxiv! The manuscript details the use of SimBA for generation of social predictive classifiers in rat and mouse resident-intruder protocols - please check it out using the link below. All data, pose-estimation models, and the final classifiers generated in the manuscript, can be accessed through our [OSF repository](https://osf.io/tmu6y/) and through the [Resource](https://github.com/sgoldenlab/simba#resource-) menu further down this page.
-
-**[Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
-
-Please join our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you have any questions, or even if you would simply like to discuss potential applications for SimBA in your work.  Please come by, stay inside, wash your hands, and check on your lab mates reguarly!
+A pre-print SimBA manuscript on bioRxiv! The manuscript details the use of SimBA for generation of social predictive classifiers in rat and mouse resident-intruder protocols - please check it out using the link above. All data, pose-estimation models, and the final classifiers generated in the manuscript, can be accessed through our [OSF repository](https://osf.io/tmu6y/) and through the [Resource](https://github.com/sgoldenlab/simba#resource-) menu further down this page.
 
 ## March-05-2020: SimBA version 1.1 release
 ### New Features
