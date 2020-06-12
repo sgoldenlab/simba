@@ -15,7 +15,7 @@
 
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
-## June-13-2020: SimBA version 1.2 release
+## June-12-2020: SimBA version 1.2 release
 - Multi-animal DLC support - [Documentation](/docs/Multi_animal_pose.md)
 - Multi-animal SLEAP support - [Documentation](/docs/Multi_animal_pose.md)
 - SimBA 'pseudo-labelling' module - [Documentation](/docs/pseudoLabel.md)
