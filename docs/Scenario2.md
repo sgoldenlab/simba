@@ -70,17 +70,32 @@ Once the path has been selected, go ahead and modify the discrimination `Thresho
 
 ## Part 4:  Analyze Machine Results
 
-Once the classifications have been generated, we may want to analyze descriptive statistics for the behavioral predictions. For example, we might like to know how much time the animals in each video enganged in behavior BtWGaNP, how long it took for each animal to start enganging in behavior BtWGaNP, how many bouts of behavior BtWGaNP did occur in each video, and what where the mean/median interval and bout length for behavior BtWGaNP. We may also want some descriptive statistics on the movements, distances and velocities of the animals. If applicable, we can also generate an index on how 'severe' behavior BtWGaNP was. To generate such descriptive statistics summaries, click on the `Run machine model` tab in the `Load project` menu. In the sub-menu `Analyze machine results`, you should see the following menu with three buttons:
+Once the classifications have been generated, we may want to analyze descriptive statistics for the behavioral predictions. For example, we might like to know how much time the animals in each video enganged in behavior BtWGaNP, how long it took for each animal to start enganging in behavior BtWGaNP, how many bouts of behavior BtWGaNP did occur in each video, and what where the mean/median interval and bout length for behavior BtWGaNP. We may also want some descriptive statistics on the movements, distances and velocities of the animals. If applicable, we can also generate an index on how 'severe' behavior BtWGaNP was. To generate such descriptive statistics summaries, click on the `Run machine model` tab in the `Load project` menu. In the sub-menu `Analyze machine results`, you should see the following menu with four buttons:
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/analyzemachineresult.PNG" width="331" height="62" />
+![alt-text-1](/images/Analyze_1.PNG "data_log")
 
-1. `Analyze`: This button generates descriptive statistics for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. Clicking the button will run the desciptive statistics on all the csv files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. The analysis log file should look something like this (click on image to enlarge):
+1. `Analyze machine predictions`: This button generates descriptive statistics for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. Clicking the button will display a pop up window with tick-boxes for the different metric options, and the user ticks the metrics that the output file should contain. The pop up window should look like this:
+
+![alt-text-1](/images/Analyze_2.PNG "data_log")
+
+Clicking on `Analyze` runs the selected desciptive statistics on all the CSV files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. The analysis log file should look something like this (click on image to enlarge):
 
 ![alt-text-1](/images/data_log.JPG "data_log")
 
-2. `Analyze distance/velocity`: This button generates descriptive statistics for mean and median movements and distances between animals. Clicking the button will run the desciptive statistics on all the csv files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. The log file should look like this (click on image to enlarge):
+2. `Analyze distance/velocity`: This button generates descriptive statistics for mean and median movements and distances between animals. Clicking the button will display a pop-up window where the user selects how many animal, and which bosy-parts, the user wants to use to calculate the distance and velocity metrics. The pop up window should look like this:
+
+![alt-text-1](/images/Analyze_3.PNG "data_log")
+
+Clicking the `Run` buttons calculates the descriptive statistics on all the CSV files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. The log file should look like this (click on image to enlarge):
 
 ![alt-text-1](/images/movement_log.JPG "movement_log")
+
+4. `Time bins: machine predictions`: This button generates descriptive statistics in **user-defined time-bins** for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. Clicking on `Time bins: machine predictions` brings up a pop-up menu where the user selects the size of each time bin in seconds. The pop up should look like this:
+
+![alt-text-1](/images/Analyze_4.PNG "data_log")
+
+5. `Time bins: Distance / velocity`: This button generates descriptive statistics for mean and median movements and distances between animals in **user-defined time-bins**. 
+
 
 3. `Analyze severity`: This button and analysis is only relevant if your behavior can be graded on a scale ranging from mild (the behavior occurs in the presence of very little body part movements) to severe (the behavior occurs in the presence of a lot of body part movements). For instance, attacks could be graded this way, with 'mild' or 'moderate' attacks happening when the animals aren't moving as much as they are in other parts of the video, while 'severe' attacks occur when both animals are tussling at full force.  This button and code calculates the ‘severity’ of each frame classified as containing the behavior based on a user-defined scale. This calculation requires that the user defines the 'scale' of severity. This can be filled in the entry box above the `Analyze severity` button. An example of the expected output can be downloaded [here](https://github.com/sgoldenlab/simba/blob/master/images/BtWGaNP_severity.csv).  **Note:** This code currently only works for the predictive classifier 'Attack'.   
 
