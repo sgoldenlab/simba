@@ -5,7 +5,6 @@ import glob
 import re
 import sys
 
-
 def drop_bp_cords(dataFrame, inifile):
     print(dataFrame.columns)
     config = ConfigParser()
@@ -19,7 +18,6 @@ def drop_bp_cords(dataFrame, inifile):
     for bodypart in poseConfigList:
         colHead1, colHead2, colHead3 = (bodypart + '_x', bodypart + '_y', bodypart + '_p')
         columnHeaders.extend((colHead1, colHead2, colHead3))
-    print(columnHeaders)
     dataFrame = dataFrame.drop(columnHeaders, axis=1)
 
     return dataFrame
@@ -108,9 +106,4 @@ def getBpHeaders(inifile):
         colHeads.append(colHead1)
         colHeads.append(colHead2)
         colHeads.append(colHead3)
-    print(poseConfigList)
-
     return colHeads
-
-
-

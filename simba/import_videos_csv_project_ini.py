@@ -147,7 +147,10 @@ def copy_multivideo_DPKini(inifile,source,filetype):
 
 
 def copy_multivideo_ini(inifile,source,filetype):
-    try:
+
+    if filetype not in ('avi', 'mp4'):
+        print('SimBA only works with .avi and .mp4 files. Please convert your videos to .mp4 or .avi to continue. ')
+    else:
         print('Copying videos...')
         dest1 = os.path.join(os.path.dirname(inifile), 'videos')
         files = glob.glob(source + '/*.' + filetype)
@@ -159,8 +162,6 @@ def copy_multivideo_ini(inifile,source,filetype):
                 shutil.copy(file, dest1)
                 print(filebasename, 'copied to project_folder/videos')
         print('Finished copying videos.')
-    except:
-        print('Please select a folder and enter in the file type')
 
 
 def copy_allcsv_ini(inifile,source):

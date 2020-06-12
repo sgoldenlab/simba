@@ -36,10 +36,6 @@ def updateThreshold_graph(inifile,csv,model):
                 fig.canvas.draw()
                 fig.canvas.flush_events()
                 a.remove()
-
-
-
-
     #plot graphs
     fig, ax = plt.subplots()
     ax.plot(probs)

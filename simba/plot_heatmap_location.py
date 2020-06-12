@@ -88,6 +88,7 @@ def plotHeatMapLocation(inifile, animalbp1, mmSize, noIncrements, secIncrements,
                 frac = int((NbinsXCheck - int(NbinsXCheck)) * 100)
                 newWidth = int(width - (frac*0.5))
                 im_scale_bar = im_scale_bar[0:height, 0:newWidth]
+
         print('Calculating heatmap from file: ' + str(currVidBaseName) + '...')
         for index, row in currDf.iterrows():
             cordX, cordY = (row[trackedBodyParts[0]], row[trackedBodyParts[1]])

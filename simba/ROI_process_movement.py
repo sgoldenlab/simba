@@ -89,7 +89,7 @@ def ROI_process_movement(configini):
                 movement_list_bp_2.append(mean_mm_move_bp2)
                 for index, row in currentDf.iterrows():
                     bodypart_distance = (np.sqrt((row[columns2keep[0]] - row[columns2keep[4]]) ** 2 + (row[columns2keep[1]] - row[columns2keep[5]]) ** 2)) / currPixPerMM
-                    bodyPart_distance_list.append(bodypart_distance)
+                    bodyPart_distance_list.append(bodypart_distance / 10)
         frames_processed_list.append(len(csv_df))
         meanVeloM1.append(statistics.mean(movement_list_bp_1))
         medianVeloM1.append(statistics.median(movement_list_bp_1))

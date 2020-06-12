@@ -7,19 +7,15 @@
 # tkinter_functions.py: 8
 # validate_model_on_single_video.py: 16
 Pillow == 5.4.1
-pyyaml == 5.3.1
 
 # ROI_analysis_2.py: 6,7
 # ROI_freehand_draw_3.py: 6
 # ROI_plot.py: 6,7
-Shapely == 1.7
+# Shapely == 1.6.4.post2
 
 # SimBA.py: 8
 # dlc_change_yamlfile.py: 5
 deeplabcut == 2.0.9
-wxpython == 4.0.4
-protobuf == 3.6.0
-
 
 # dpk_script\Predict_new_video.py: 7
 # dpk_script\annotator.py: 4
@@ -267,7 +263,7 @@ seaborn == 0.9.0
 # train_model\train_model_user_defined.py: 9,10,11,16,25,26,27,31
 # train_model_2.py: 8,9,10,15,24,25,26,30
 # train_multiple_models_from_meta.py: 7,8,12,13,22,23
-scikit-learn == 0.22.2
+sklearn == 0.0
 
 # train_multiple_models_from_meta.py: 18
 tabulate == 0.8.3

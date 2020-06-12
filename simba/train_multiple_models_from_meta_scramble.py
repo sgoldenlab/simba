@@ -2,7 +2,7 @@ import warnings
 warnings.filterwarnings('ignore',category=FutureWarning)
 warnings.filterwarnings('ignore',category=DeprecationWarning)
 from configparser import ConfigParser, MissingSectionHeaderError
-import os, glob
+import os
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -144,12 +144,12 @@ def train_multimodel(configini):
 
     # READ IN DATA FOLDER AND REMOVE ALL NON-FEATURE VARIABLES (POP DLC COORDINATE DATA AND TARGET DATA)
     features = pd.DataFrame()
-    print('Reading in ' + str(len(glob.glob(data_folder + '/*.csv'))) + ' annotated files...')
+    print('Reading in ' + str(len(os.listdir(data_folder))) + ' annotated files...')
 
     for p in os.listdir(data_folder):
         if (".csv") in p:
             currentFn = os.path.join(data_folder, p)
-            df = pd.read_csv(currentFn, index_col=0)
+            df = pd.read_csv(currentFn)
             features = features.append(df, ignore_index=True)
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     baseFeatureFrame = features.drop(["scorer"], axis=1, errors='ignore')
@@ -214,17 +214,14 @@ def train_multimodel(configini):
         trainDf[classifierName] = target_train
         print('# of ' + str(classifierName) + ' frames in dataset: ' + str(totalTargetframes))
         if under_sample_setting == 'Random undersample':
-            try:
-                print('Performing undersampling...')
-                targetFrameRows = trainDf.loc[trainDf[classifierName] == 1]
-                nonTargetFrameRows = trainDf.loc[trainDf[classifierName] == 0]
-                nontargetFrameRowsSize = int(len(targetFrameRows) * under_sample_ratio)
-                nonTargetFrameRows = nonTargetFrameRows.sample(nontargetFrameRowsSize, replace=False)
-                trainDf = pd.concat([targetFrameRows, nonTargetFrameRows])
-                target_train = trainDf.pop(classifierName).values
-                data_train = trainDf
-            except ValueError:
-                print('Undersampling failed: the undersampling ratio for the specific model is likely too high - there are not enough non-events too sample. Fix this by decreasing the undersampling ratio.')
+            print('Performing undersampling...')
+            targetFrameRows = trainDf.loc[trainDf[classifierName] == 1]
+            nonTargetFrameRows = trainDf.loc[trainDf[classifierName] == 0]
+            nontargetFrameRowsSize = int(len(targetFrameRows) * under_sample_ratio)
+            nonTargetFrameRows = nonTargetFrameRows.sample(nontargetFrameRowsSize, replace=False)
+            trainDf = pd.concat([targetFrameRows, nonTargetFrameRows])
+            target_train = trainDf.pop(classifierName).values
+            data_train = trainDf
         if under_sample_setting != 'Random undersample':
             target_train = trainDf.pop(classifierName).values
             under_sample_ratio = 'NaN'
@@ -240,6 +237,7 @@ def train_multimodel(configini):
             data_train, target_train = smt.fit_sample(data_train, target_train)
         if (over_sample_setting != 'SMOTEENN') or (over_sample_setting != 'SMOTE'):
             over_sample_ratio = 'NaN'
+        data_train = data_train.sample(frac=1).reset_index(drop=True)
 
 
         # RUN THE DECISION ENSEMBLE SET BY THE USER
@@ -266,24 +264,17 @@ def train_multimodel(configini):
                 print('Generating yellowbrick classification report...')
                 generateClassificationReport(clf, class_names, classifierName, saveFileNo)
 
-            # generate_features_importance_log =currMetaFile['generate_features_importance_log'].iloc[0]
-            # if generate_features_importance_log == 'yes':
-            #     print('Generating feature importance log...')
-            #     importances = list(clf.feature_importances_)
-            #     log_df = generateFeatureImportanceLog(importances, classifierName, saveFileNo)
+            generate_features_importance_log =currMetaFile['generate_features_importance_log'].iloc[0]
+            if generate_features_importance_log == 'yes':
+                print('Generating feature importance log...')
+                importances = list(clf.feature_importances_)
+                log_df = generateFeatureImportanceLog(importances, classifierName, saveFileNo)
 
             generate_features_importance_bar_graph = currMetaFile['generate_features_importance_bar_graph'].iloc[0]
             N_feature_importance_bars = currMetaFile['n_feature_importance_bars'].iloc[0]
             if generate_features_importance_bar_graph == 'yes':
-                print('Generating feature importance log...')
-                importances = list(clf.feature_importances_)
-                generate_features_importance_log = 'yes'
-                log_df = generateFeatureImportanceLog(importances, classifierName, saveFileNo)
                 print('Generating feature importance bar graph...')
                 generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars, classifierName, saveFileNo)
-            if generate_features_importance_bar_graph == 'no':
-                N_feature_importance_bars = 'NaN'
-                generate_features_importance_log = 'no'
 
             compute_permutation_importance = currMetaFile['compute_feature_permutation_importance'].iloc[0]
             if compute_permutation_importance == 'yes':

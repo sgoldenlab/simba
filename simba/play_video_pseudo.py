@@ -4,20 +4,18 @@ import os
 import signal
 import pandas as pd
 
+
 currentVideoPath = sys.stdin.readline()
-print(currentVideoPath)
+mainprojectdir = os.path.dirname(os.path.dirname(currentVideoPath))
 capture = cv2.VideoCapture(currentVideoPath)
 frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
 width = int(capture.get(3))
 height = int(capture.get(4))
-f = open(str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + '/labelling_info.txt', 'w')
-video_info_path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])) + '/logs/video_info.csv'
-print(video_info_path)
+f = open(os.path.join(mainprojectdir,'labelling_info.txt'), 'w')
+video_info_path = os.path.join(mainprojectdir,'logs','video_info.csv')
 vidinfDf = pd.read_csv(video_info_path)
 videoName = os.path.basename(currentVideoPath)
 videoName = videoName.split('.', 2)[0]
-# currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == videoName]
-# fps = int(currVideoSettings['fps'])
 fps = capture.get(cv2.CAP_PROP_FPS)
 timeBetFrames = int(1000/fps)
 
@@ -117,7 +115,7 @@ while True:
             if key2 == ord('q'):
                 capture.release()
                 cv2.destroyAllWindows()
-                path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
+                path = os.path.join(mainprojectdir,'subprocess.txt')
                 txtFile = open(path)
                 line = txtFile.readline()
                 os.kill(int(line), signal.SIGTERM)
@@ -125,7 +123,7 @@ while True:
             if cv2.getWindowProperty('Video', 1) == -1:
                 capture.release()
                 cv2.destroyAllWindows()
-                path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
+                path = os.path.join(mainprojectdir,'subprocess.txt')
                 txtFile = open(path)
                 line = txtFile.readline()
                 try:
@@ -145,7 +143,7 @@ while True:
 capture.release()
 f.close()
 cv2.destroyAllWindows()
-path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
+path = os.path.join(mainprojectdir,'subprocess.txt')
 txtFile = open(path)
 line = txtFile.readline()
 os.kill(int(line), signal.SIGTERM)

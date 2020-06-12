@@ -75,7 +75,7 @@ def superimposeframe_auto(outputdir,filesFound):
         outFile = currentFile.replace('.mp4', '')
         outFile = str(outFile) + '_frame_no.mp4'
         output = os.path.basename(outFile)
-        command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'\\' + os.path.basename(currentFile)+ '"' + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy ' + '"'+ str(outputdir) + '\\' + output + '"'+ '\n'
+        command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'\\' + os.path.basename(currentFile)+ '"' + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy ' + '"'+ str(outputdir) + '\\' + output + '"'+ '\n'
                    'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + os.path.dirname(outputdir)+'\\'+'tmp\"' +'\n'
                    'copy \"' + str(outputdir) + '\\' + output + '\" \"' + os.path.dirname(outputdir)+'\\'+'tmp\"' + '\n'
                    'rename \"' + os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
@@ -89,7 +89,7 @@ def superimposeframe_queue(outputdir,filesFound):
     outFile = currentFile.replace('.mp4', '')
     outFile = str(outFile) + '_frame_no.mp4'
     output = os.path.basename(outFile)
-    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'\\' + os.path.basename(currentFile) + '"'+ ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+ '"'+ str(outputdir) + '\\' + output + '"'+ '\n'
+    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'\\' + os.path.basename(currentFile) + '"'+ ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+ '"'+ str(outputdir) + '\\' + output + '"'+ '\n'
                'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + (outputdir)+'\\'+'tmp\"' +'\n'
                'copy \"' + str(outputdir) + '\\' + output + '\" \"' + (outputdir)+'\\'+'tmp\"' + '\n'
                'rename \"' + os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
@@ -218,7 +218,6 @@ def cropvid_auto(filenames,outputdir):
 
 def cropvid_queue(filenames,outputdir):
     global width,height
-
     #extract one frame
     currentDir = str(os.path.dirname(filenames))
     videoName = str(os.path.basename(filenames))
@@ -246,8 +245,6 @@ def cropvid_queue(filenames,outputdir):
     fileOut, fileType = videoName.split(".", 2)
     fileOutName = str(fileOut) + str('_cropped.mp4')
 
-
-
     total = width+height+topLeftX +topLeftY
 
     if total != 0:
@@ -263,6 +260,7 @@ def cropvid_queue(filenames,outputdir):
         pass
     if os.path.exists(filePath):
         os.remove(filePath)
+
 
 def clahe_batch(directory):
 

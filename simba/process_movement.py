@@ -13,7 +13,7 @@ def analyze_process_movement(configini):
     configFile = str(configini)
     config.read(configFile)
     projectPath = config.get('General settings', 'project_path')
-    csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
+    csv_dir_in = os.path.join(projectPath, 'csv', 'outlier_corrected_movement_location')
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidLogFilePath)
     noAnimals = config.getint('process movements', 'no_of_animals')
@@ -76,8 +76,8 @@ def analyze_process_movement(configini):
             totalMovement_animal2 = sum(movementListAnimal2)
             meanVelocity_animal_2 = statistics.mean(velocityAnimal2List)
             medianVelocity_animal_2 = statistics.median(velocityAnimal2List)
-            meanDistance = statistics.mean(distanceList)
-            medianDistance = statistics.median(distanceList)
+            meanDistance = statistics.mean(distanceList) / 10
+            medianDistance = statistics.median(distanceList) / 10
             currentVidList = [currVideoName, frameCounter, totalMovement_animal1, meanVelocity_animal_1, medianVelocity_animal_1, totalMovement_animal2, meanVelocity_animal_2, medianVelocity_animal_2, meanDistance, medianDistance]
         log_df.loc[fileCounter] = currentVidList
         fileCounter += 1

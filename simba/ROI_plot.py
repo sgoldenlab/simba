@@ -150,7 +150,7 @@ def roiPlot(inifile):
                                 circleEntryCheck[circle][bodyparts] = False
                         else:
                             circleEntryCheck[circle][bodyparts] = True
-                        cv2.putText(borderImage, str(circleTimes[circle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 2)
+                        cv2.putText(borderImage, str(circleTimes[circle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/6))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 2)
                         addSpacer += 1
                         cv2.putText(borderImage, str(circleName) + ' ' + str(trackedBodyPartNames[bodyparts]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 2)
                         cv2.putText(borderImage, str(circleEntries[circle][bodyparts]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 2)
@@ -176,7 +176,7 @@ def roiPlot(inifile):
                                 polygonEntryCheck[polygon][bodyparts] = False
                         else:
                             polygonEntryCheck[polygon][bodyparts] = True
-                        cv2.putText(borderImage, str(polygonTime[polygon][bodyparts]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale * addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 2)
+                        cv2.putText(borderImage, str(polygonTime[polygon][bodyparts]), ((int(borderImageWidth-(borderImageWidth/6))), (height - (height + 10) + spacingScale * addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 2)
                         addSpacer += 1
                         cv2.putText(borderImage, str(PolygonName) + ' ' + str(trackedBodyPartNames[bodyparts]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 2)
                         cv2.putText(borderImage, str(polyGonEntries[polygon][bodyparts]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 2)

@@ -112,6 +112,3 @@ def analyze_process_data_log(configini,chosenlist):
     print(log_df.columns)
     log_df.to_csv(log_fn, index=False)
     print('All files processed for machine predictions: data file saved @' + str(log_fn))
-
-
-

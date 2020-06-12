@@ -84,6 +84,7 @@ def path_plot_config(configini):
         if severityBool == 'yes':
             csv_df_combined[severityTarget] = csv_df[severityTarget].values
             csv_df_combined['Scaled_movement_M1_M2'] = csv_df['Scaled_movement_M1_M2'].values
+            columnNames = list(csv_df_combined)
 
         for index, row in csv_df_combined.iterrows():
             img = np.ones(img_size) * 255
@@ -104,6 +105,7 @@ def path_plot_config(configini):
                 if noAnimals == 2:
                     tupleM2 = listPaths_mouse2[i]
                     cv2.line(img, (tupleM2[2], tupleM2[3]), (tupleM2[0], tupleM2[1]), (0, 255, 0), 2)
+
             if severityBool == 'yes':
                 attackPrediction = int(row[columnNames[8]])
                 severityScore = float(row[columnNames[9]])
@@ -116,9 +118,10 @@ def path_plot_config(configini):
                         upperBound = severityGrades[i + 1]
                         if (severityScore > lowerBound) and (severityScore <= upperBound):
                             severityCircles.append((locationEventX, locationEventY, severityColour[i]))
-                    for y in range(len(severityCircles)):
-                        currEventX, currEventY, colour = severityCircles[y]
-                        cv2.circle(overlay, (int(currEventX), int(currEventY)), 20, colour, -1)
+                for y in range(len(severityCircles)):
+                    currEventX, currEventY, colour = severityCircles[y]
+                    cv2.circle(overlay, (int(currEventX), int(currEventY)), 20, colour, -1)
+            print(len(severityCircles))
             image_new = cv2.addWeighted(overlay, 0.2, img, 1 - 0.2, 0)
             m1tuple = (int(row[columnNames[0]]), int(row[columnNames[1]]))
             cv2.circle(image_new, (m1tuple[0], m1tuple[1]), 20, (255, 0, 0), -1)

@@ -126,6 +126,9 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     f.write('body_part = ' + '\n')
     f.write('\n')
 
+    # heatmap plot
+    f.write('[Heatmap location]\n')
+
     #ROI settings
     f.write('[ROI settings]\n')
     f.write('animal_1_bp  = ' + '\n')
@@ -199,6 +202,10 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     f.write('discrimination_threshold = ' + '\n')
     f.write('\n')
 
+    # Multi animal settings
+    f.write('[Multi animal IDs]\n')
+    f.write('ID_list = ' + '\n')
+
     #outliersettings
     f.write('[Outlier settings]\n')
     f.write('movement_criterion = \n')
@@ -213,6 +220,11 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     with open(bodyPartListFile, "r", encoding='utf8') as f:
         cr = csv.reader(f, delimiter=",")  # , is default
         rows = list(cr)  # create a list of rows for instance
+
+    if listindex==9:
+        return configfile
+
+
     chosenBodyParts = rows[listindex]
     chosenBodyParts = list(filter(None, chosenBodyParts))
     projectBpfile = os.path.join(bp_names_folder, 'project_bp_names.csv')

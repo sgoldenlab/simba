@@ -16,10 +16,13 @@ def ganntplot_config(configini):
     no_targets = config.getint('SML settings', 'No_targets')
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-    boutStart_list, target_names, VideoCounter = [], [], 0
+    boutEnd = 0
+    boutEnd_list = [0]
+    boutStart_list, target_names = [], []
     colours = ['red', 'green', 'pink', 'orange', 'blue', 'purple', 'lavender', 'grey', 'sienna', 'tomato', 'azure',
                'crimson', 'aqua', 'plum', 'teal', 'maroon', 'lime', 'coral']
     colourTupleX = list(np.arange(3.5, 203.5, 5))
+    VideoCounter = 0
 
     ########### FIND CSV FILES ###########
     filesFound = glob.glob(csv_dir_in + "/*.csv")
@@ -33,6 +36,7 @@ def ganntplot_config(configini):
     colours = colours[:len(target_names)]
 
     for currentFile in filesFound:
+        boutsDf = pd.DataFrame(columns=['Event', 'Start_frame', 'End_frame'])
         CurrentVideoName = os.path.basename(currentFile.replace('.csv', ''))
         print('Analyzing file ' + str(CurrentVideoName) + '...')
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName)]
@@ -47,25 +51,29 @@ def ganntplot_config(configini):
         saveDir = os.path.join(frames_dir_out, CurrentVideoName)
         if not os.path.exists(saveDir):
             os.makedirs(saveDir)
-        boutsList, nameList, startTimeList, endTimeList,endFrameList = [], [], [], [], []
-        for currTarget in target_names:
-            groupDf = pd.DataFrame()
-            v = (dataDf[currTarget] != dataDf[currTarget].shift()).cumsum()
-            u = dataDf.groupby(v)[currTarget].agg(['all', 'count'])
-            m = u['all'] & u['count'].ge(1)
-            groupDf['groups'] = dataDf.groupby(v).apply(lambda x: (x.index[0], x.index[-1]))[m]
-            for indexes, rows in groupDf.iterrows():
-                currBout = list(rows['groups'])
-                boutTime = ((currBout[-1] - currBout[0]) + 1) / fps
-                startTime = (currBout[0] + 1) / fps
-                endTime = (currBout[1]) / fps
-                endFrame = (currBout[1])
-                endTimeList.append(endTime)
-                startTimeList.append(startTime)
-                boutsList.append(boutTime)
-                nameList.append(currTarget)
-                endFrameList.append(endFrame)
-        boutsDf = pd.DataFrame(list(zip(nameList, startTimeList, endTimeList, endFrameList, boutsList)),columns=['Event', 'Start_time', 'End Time', 'End_frame', 'Bout_time'])
+        for bb in target_names:
+            currTarget = bb
+            for indexes, rows in dataDf[dataDf['frames'] >= boutEnd].iterrows():
+                if rows[currTarget] == 1:
+                    boutStart = rows['frames']
+                    for index, row in dataDf[dataDf['frames'] >= boutStart].iterrows():
+                        if row[currTarget] == 0:
+                            boutEnd = row['frames']
+                            if boutEnd_list[-1] != boutEnd:
+                                boutStart_list.append(boutStart)
+                                boutEnd_list.append(boutEnd)
+                                values = [currTarget, boutStart, boutEnd]
+                                boutsDf.loc[(len(boutsDf))] = values
+                                break
+                            break
+            boutStart_list = [0]
+            boutEnd_list = [0]
+            boutEnd = 0
+
+        # Convert to time
+        boutsDf['Start_time'] = boutsDf['Start_frame'] / fps
+        boutsDf['End_time'] = boutsDf['End_frame'] / fps
+        boutsDf['Bout_time'] = boutsDf['End_time'] - boutsDf['Start_time']
 
         ################### PLOT #######################
         loop = 0

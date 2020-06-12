@@ -5,7 +5,6 @@ import os
 import numpy as np
 from configparser import ConfigParser
 import glob
-import time
 
 def mergeframesPlot(configini,inputList):
     dirStatusList = inputList
@@ -64,8 +63,7 @@ def mergeframesPlot(configini,inputList):
 
     if not os.path.exists(framesDir):
         os.makedirs(framesDir)
-
-    dirsList, fakePathList = [], []
+    dirsList, toDelList = [], []
     totalImages = sum(inputList)
     for status, foldername in zip(dirStatusList, dirFolders):
         if status == 1:
@@ -73,58 +71,24 @@ def mergeframesPlot(configini,inputList):
             foldersInFolder = [f.path for f in os.scandir(folderPath) if f.is_dir()]
             dirsList.append(foldersInFolder)
 
-    ### check that all folders contain an equal number of frames and they are not zero ###
-    toDelList = []
+    pathForCount = str(dirsList[0][0])
+    imageCount = len(glob.glob(pathForCount + '/*.png'))
+
+    ### check that all folders contain an equal number of frames ###
     for folder in range(len(dirsList)):
-        imageCounts = []
-        try:
-            currFolders = [item[folder] for item in dirsList]
-        except IndexError:
-            currFolders = dirsList[folder]
-        for category in currFolders:
-            imageCounts.append(len(glob.glob(category + '/*.png')))
-        checkIfSame = all(x == imageCounts[0] for x in imageCounts)
-        if (checkIfSame == False) or (0 in imageCounts) or (None in imageCounts):
-            if os.path.basename(category) not in toDelList:
-                toDelList.append(os.path.basename(category))
-                print(os.path.basename(category) + str(' has zero frames or an unequal number of frames in one or several frame categories.'))
+        pathForCount = str(dirsList[folder][0])
+        currImageCount = len(glob.glob(pathForCount + '/*.png'))
+        if currImageCount != imageCount:
+            print('Error: The number of frames in each frame category do not match. Please check the fodlers in the frames/output directory')
+            break
 
-    # ### check that all folders contain each video
-    videoPathList = []
-    flat_list = [item for sublist in dirsList for item in sublist]
-    for item in flat_list:
-        videoPathList.append(os.path.basename(item))
-    uniqVideo = set(videoPathList)
-    for status, foldername in zip(dirStatusList, dirFolders):
-        if status == 1:
-            for basename in uniqVideo:
-                folderPath = os.path.join(frameDirIn, foldername, basename)
-                isdir = os.path.isdir(folderPath)
-                if isdir == False:
-                    toDelList.append(os.path.basename(folderPath))
-                    print(os.path.basename(folderPath) + str(' do not have frames for each user-specified frame category'))
-    if toDelList:
-        print('Videos ' + str(toDelList) + ' have missing frame folders, frame folders that are empty, or frame folder categories where the number of frames do not match. SimBA will not generate merged videos from these frames.')
-        time.sleep(6)
-    toDel2 = []
-    for list in dirsList:
-        for path in list:
-            currBase = os.path.basename(path)
-            for deleteWords in toDelList:
-                if deleteWords == currBase:
-                    toDel2.append(path)
-    for i in toDel2:
-        dirsList = [[ele for ele in sub if ele != i] for sub in dirsList]
-    for list in dirsList:
-        sorted(list, key=str.lower)
-
+    print(dirsList)
     for video in range(len(dirsList[0])):
         try:
             currentVidFolders = [item[video] for item in dirsList]
         except IndexError:
             print('Error: all the selected frame categories have not been created for the videos.')
         vidBaseName = os.path.basename(currentVidFolders[0])
-        print(vidBaseName)
         currVidInfo = vidLogsDf.loc[vidLogsDf['Video'] == str(vidBaseName)]
         try:
             fps = int(currVidInfo['fps'])
@@ -188,6 +152,21 @@ def mergeframesPlot(configini,inputList):
     print('All movies generated')
     cv2.destroyAllWindows()
     writer.release()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

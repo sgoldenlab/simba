@@ -20,7 +20,6 @@ def roiFreehand(inifile, currVid):
     global recWidth, recHeight, firstLoop, polygonDf
     global rectangularDf, circleDf, polygonDf
 
-
     warnings.filterwarnings('ignore',category=pd.io.pytables.PerformanceWarning)
     pd.options.mode.chained_assignment = None
 

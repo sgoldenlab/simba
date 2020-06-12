@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 from operator import itemgetter
-from itertools import *
 import cv2
 from configparser import ConfigParser
 import glob

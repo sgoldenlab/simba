@@ -7,6 +7,7 @@ from configparser import ConfigParser
 from subprocess import *
 import matplotlib.pyplot as plt
 
+
 current_video = ""
 frames_in = []
 current_frame_number = 0
@@ -250,6 +251,8 @@ class MainInterface2:
                                              '\n Ctrl + o = First frame')
         key_presses.grid(sticky=S)
         self.bind_keys()
+
+
     def Rfbox(self):
         return self.fbox
 
@@ -274,7 +277,6 @@ def play_video():
     main_project_dir = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])
     video_dir = main_project_dir + '\\videos\\'
     video_list = os.listdir(video_dir)
-    # current_video_name = os.path.basename(os.getcwd())
     print(video_list,video_dir)
     current_full_video_name = [i for i in video_list if current_video in i]
     try:

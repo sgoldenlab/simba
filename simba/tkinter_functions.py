@@ -161,7 +161,7 @@ def superimposeframe(filename):
         outFile,fileformat = currentFile.split('.')
         outFile = str(outFile) + '_frame_no.mp4'
         output = os.path.basename(outFile)
-        command = (str('ffmpeg -i ') +'"'+ str(currentFile)+'"' + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+'"'+ outFile+'"')
+        command = (str('ffmpeg -i ') +'"'+ str(currentFile)+'"' + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+'"'+ outFile+'"')
 
         file = pathlib.Path(outFile)
         if file.exists():

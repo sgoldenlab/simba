@@ -200,14 +200,17 @@ def trainmodel2(inifile):
     targetFrameRows = trainDf.loc[trainDf[classifierName] == 1]
     print('# of ' + str(classifierName) + ' frames in dataset: ' + str(totalTargetframes))
     if under_sample_setting == 'Random undersample':
-        print('Performing undersampling...')
-        under_sample_ratio = config.getfloat('create ensemble settings', 'under_sample_ratio')
-        nonTargetFrameRows = trainDf.loc[trainDf[classifierName] == 0]
-        nontargetFrameRowsSize = int(len(targetFrameRows) * under_sample_ratio)
-        nonTargetFrameRows = nonTargetFrameRows.sample(nontargetFrameRowsSize, replace=False)
-        trainDf = pd.concat([targetFrameRows, nonTargetFrameRows])
-        target_train = trainDf.pop(classifierName).values
-        data_train = trainDf
+        try:
+            print('Performing undersampling...')
+            under_sample_ratio = config.getfloat('create ensemble settings', 'under_sample_ratio')
+            nonTargetFrameRows = trainDf.loc[trainDf[classifierName] == 0]
+            nontargetFrameRowsSize = int(len(targetFrameRows) * under_sample_ratio)
+            nonTargetFrameRows = nonTargetFrameRows.sample(nontargetFrameRowsSize, replace=False)
+            trainDf = pd.concat([targetFrameRows, nonTargetFrameRows])
+            target_train = trainDf.pop(classifierName).values
+            data_train = trainDf
+        except ValueError:
+            print('Undersampling failed: the undersampling ratio for the model is likely too high - there are not enough non-events too sample. Fix this by decreasing the undersampling ratio.')
     if under_sample_setting != 'Random undersample':
         target_train = trainDf.pop(classifierName).values
         under_sample_ratio = 'NaN'

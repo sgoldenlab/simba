@@ -33,7 +33,7 @@ from merge_movie_ffmpeg import generatevideo_config_ffmpeg
 from import_videos_csv_project_ini import *
 from configparser import ConfigParser
 from labelling_aggression import *
-# from pseudoLabel import semisuperviseLabel
+from pseudoLabel import semisuperviseLabel
 from load_labelling_aggression import load_folder
 from PIL import Image, ImageTk
 import tkinter.ttk as ttk
@@ -96,11 +96,16 @@ from dpk_script.Visualize_video import visualizeDPK
 from reset_poseConfig import reset_DiagramSettings
 from plot_threshold import plot_threshold
 from merge_frames_movie import mergeframesPlot
-from plot_heatmap_location import plotHeatMapLocation
+from plot_heatmap_location_new import plotHeatMapLocation
+from appendMars import append_dot_ANNOTT
+from read_DLCmulti_h5_function import importMultiDLCpose
+from sleap_bottom_up_convert import importSLEAPbottomUP
+from timeBins_movement import time_bins_movement
+from timeBins_classifiers import time_bins_classifier
 import threading
 import datetime
 
-simBA_version = 1.1
+simBA_version = 1.2
 
 
 class roitableRow(Frame):
@@ -534,7 +539,7 @@ class processvid_menu:
         except FileExistsError:
             print("Directory", dir, "already exists")
 
-        currentDT = datetime.now()
+        currentDT = datetime.datetime.now()
         currentDT = str(currentDT.month) + '_' + str(currentDT.day) + '_' + str(currentDT.year) + '_' + str(
             currentDT.hour) + 'hour' + '_' + str(currentDT.minute) + 'min' + '_' + str(currentDT.second) + 'sec'
         try:
@@ -833,6 +838,10 @@ class Entry_Box(Frame):
 
     def set_state(self,setstatus):
         self.entPath.config(state=setstatus)
+
+    def destroy(self):
+        self.lblName.destroy()
+        self.entPath.destroy()
 
 class newcolumn(Frame):
     def __init__(self,parent=None,lengthoflist=[],width='',**kw):
@@ -2652,7 +2661,6 @@ class new_window:
         folder = askdirectory(title='Select Frame Folder')
         os.chdir(folder)
         print("Working directory is %s" % os.getcwd())
-        # self.label = Label(new_window, text="Folder selected: %s" % os.getcwd()).grid(row=3, column=1)
 
     def __init__(self, script_name):
         window = Tk()
@@ -2742,25 +2750,41 @@ class project_config:
         addboxButton = Button(self.label_smlsettings, text='<Add predictive classifier>', fg="navy", command=lambda:self.addBox(self.label_notarget.entry_get))
 
         ##dropdown for # of mice
-        dropdownbox = LabelFrame(self.label_generalsettings, text='Animal Settings')
-        label_dropdownmice = Label(dropdownbox,text='# config')
+        self.dropdownbox = LabelFrame(self.label_generalsettings, text='Animal Settings')
+        ## choose multi animal or not
+        self.singleORmulti = DropDownMenu(self.dropdownbox,'Type of Tracking',['Classic tracking','Multi tracking'],'15',
+                                     com=self.trackingselect)
+        self.singleORmulti.setChoices('Classic tracking')
+        #choice
+        self.frame2 = Frame(self.dropdownbox)
+
+        label_dropdownmice = Label(self.frame2, text='# config')
         self.option_mice, optionsBasePhotosList = bodypartConfSchematic()
+        # del multi animal
+        del self.option_mice[9:12]
+        del optionsBasePhotosList[9:12]
+
         self.var = StringVar()
         self.var.set(self.option_mice[6])
-        micedropdown = OptionMenu(dropdownbox,self.var,*self.option_mice)
+        micedropdown = OptionMenu(self.frame2, self.var, *self.option_mice)
 
         self.var.trace("w", self.change_image)
 
         self.photos = []
         for i in range(len(optionsBasePhotosList)):
-            self.photos.append(PhotoImage(file=os.path.join(os.getcwd(),(optionsBasePhotosList[i]))))
+            self.photos.append(PhotoImage(file=os.path.join(os.path.dirname(__file__),(optionsBasePhotosList[i]))))
 
-
-        self.label = Label(self.label_generalsettings, image=self.photos[6])
-        self.label.grid(row=10,sticky=W)
-
+        self.label = Label(self.frame2, image=self.photos[6])
+        self.label.grid(row=10,sticky=W,columnspan=2)
         #reset button
-        resetbutton = Button(self.label_generalsettings,text='Reset user-defined pose configs',command=self.resetSettings)
+        resetbutton = Button(self.frame2,text='Reset user-defined pose configs',command=self.resetSettings)
+        #organize
+        self.singleORmulti.grid(row=0,sticky=W)
+        self.frame2.grid(row=1,sticky=W)
+        label_dropdownmice.grid(row=0,column=0,sticky=W)
+        micedropdown.grid(row=0,column=1,sticky=W)
+        self.label.grid(row=1,sticky=W,columnspan=2)
+        resetbutton.grid(row=0,sticky=W,column=2)
 
         #generate project ini
         button_generateprojectini = Button(self.label_generalsettings, text='Generate Project Config ', command=self.make_projectini, font=("Helvetica",10,'bold'),fg='navy')
@@ -2780,15 +2804,16 @@ class project_config:
 
         #import all csv file into project folder
         self.label_import_csv = LabelFrame(tab3,text='Import Tracking Data',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
-        self.filetype = DropDownMenu(self.label_import_csv,'File type',['csv','json'],'12',com=self.fileselected)
-        self.filetype.setChoices('csv')
+        self.filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)','SLP (SLEAP)'],'12',com=self.fileselected)
+        self.filetype.setChoices('CSV (DLC/DeepPoseKit)')
 
+        self.frame = Frame(self.label_import_csv)
         #multicsv
-        label_multicsvimport = LabelFrame(self.label_import_csv, text='Import multiple csv files', pady=5, padx=5)
+        label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport,'Folder Select:',title='Select Folder with .csv(s)')
         button_import_csv = Button(label_multicsvimport,text='Import csv to project folder',command = self.import_multicsv,fg='navy')
         #singlecsv
-        label_singlecsvimport = LabelFrame(self.label_import_csv, text='Import single csv file', pady=5, padx=5)
+        label_singlecsvimport = LabelFrame(self.frame, text='Import single csv file', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport,'File Select',title='Select a .csv file')
         button_importsinglecsv = Button(label_singlecsvimport,text='Import single csv to project folder',command=self.import_singlecsv,fg='navy')
 
@@ -2810,10 +2835,7 @@ class project_config:
         self.label_notarget.grid(row=0,column=0,sticky=W,pady=5,columnspan=2)
         addboxButton.grid(row=1,column=0,sticky=W,pady=6)
 
-        dropdownbox.grid(row=5,column=0,sticky=W)
-        resetbutton.grid(row=5,column=1,sticky=W)
-        label_dropdownmice.grid(row=0,column=0,sticky=W)
-        micedropdown.grid(row=0,column=1,sticky=W)
+        self.dropdownbox.grid(row=5,column=0,sticky=W)
 
         button_generateprojectini.grid(row=20, pady=5, ipadx=5, ipady=5)
 
@@ -2828,6 +2850,7 @@ class project_config:
 
         self.label_import_csv.grid(row=5,sticky=W,pady=5)
         self.filetype.grid(row=0,sticky=W)
+        self.frame.grid(row=1,sticky=W)
         label_multicsvimport.grid(row=1,sticky=W)
         self.folder_csv.grid(row=0,sticky=W)
         button_import_csv.grid(row=1,sticky=W)
@@ -2841,47 +2864,192 @@ class project_config:
         label_caution2.grid(row=2,sticky=W)
         button_extractframes.grid(row=3,sticky=W)
 
-    def fileselected(self,val):
+    def trackingselect(self,val):
+        try:
+            self.frame2.destroy()
+        except:
+            pass
+        # choice
+        self.frame2 = Frame(self.dropdownbox)
+        if val == 'Classic tracking':
+            label_dropdownmice = Label(self.frame2, text='# config')
+            self.option_mice, optionsBasePhotosList = bodypartConfSchematic()
+            # del multi animal
+            del self.option_mice[9:12]
+            del optionsBasePhotosList[9:12]
 
-        if self.filetype.getChoices()=='csv':
+            self.var = StringVar()
+            self.var.set(self.option_mice[6])
+            micedropdown = OptionMenu(self.frame2, self.var, *self.option_mice)
+
+            self.var.trace("w", self.change_image)
+
+            self.photos = []
+            for i in range(len(optionsBasePhotosList)):
+                self.photos.append(PhotoImage(file=os.path.join(os.path.dirname(__file__), (optionsBasePhotosList[i]))))
+
+            self.label = Label(self.frame2, image=self.photos[6])
+            self.label.grid(row=10, sticky=W, columnspan=2)
+            # reset button
+            resetbutton = Button(self.frame2, text='Reset user-defined pose configs', command=self.resetSettings)
+            # organize
+            self.frame2.grid(row=1, sticky=W)
+            label_dropdownmice.grid(row=0, column=0, sticky=W)
+            micedropdown.grid(row=0, column=1, sticky=W)
+            self.label.grid(row=1, sticky=W, columnspan=2)
+            resetbutton.grid(row=0, sticky=W, column=2)
+        else:
+            if val == 'Multi tracking':
+                label_dropdownmice = Label(self.frame2, text='# config')
+                self.option_mice, optionsBasePhotosList = bodypartConfSchematic()
+                # del single animal
+                del self.option_mice[0:9]
+                del optionsBasePhotosList[0:9]
+
+                self.var = StringVar()
+                self.var.set(self.option_mice[2])
+                micedropdown = OptionMenu(self.frame2, self.var, *self.option_mice)
+
+                self.var.trace("w", self.change_image)
+
+                self.photos = []
+                for i in range(len(optionsBasePhotosList)):
+                    self.photos.append(
+                        PhotoImage(file=os.path.join(os.path.dirname(__file__), (optionsBasePhotosList[i]))))
+
+                self.label = Label(self.frame2, image=self.photos[2])
+                self.label.grid(row=10, sticky=W, columnspan=2)
+                # reset button
+                resetbutton = Button(self.frame2, text='Reset user-defined pose configs', command=self.resetSettings)
+                # organize
+                self.frame2.grid(row=1, sticky=W)
+                label_dropdownmice.grid(row=0, column=0, sticky=W)
+                micedropdown.grid(row=0, column=1, sticky=W)
+                self.label.grid(row=1, sticky=W, columnspan=2)
+                resetbutton.grid(row=0, sticky=W, column=2)
+
+    def fileselected(self,val):
+        try:
+            self.frame.destroy()
+        except:
+            pass
+
+        self.frame = Frame(self.label_import_csv)
+
+        if self.filetype.getChoices()=='CSV (DLC/DeepPoseKit)':
             # multicsv
-            label_multicsvimport = LabelFrame(self.label_import_csv, text='Import multiple csv files', pady=5, padx=5)
+            label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
             self.folder_csv = FolderSelect(label_multicsvimport, 'Folder Select:', title='Select Folder with .csv(s)')
             button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',
                                        command=self.import_multicsv, fg='navy')
             # singlecsv
-            label_singlecsvimport = LabelFrame(self.label_import_csv, text='Import single csv file', pady=5, padx=5)
+            label_singlecsvimport = LabelFrame(self.frame, text='Import single csv file', pady=5, padx=5)
             self.file_csv = FileSelect(label_singlecsvimport, 'File Select', title='Select a .csv file')
             button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',
                                             command=self.import_singlecsv, fg='navy')
+            self.frame.grid(row=1,sticky=W)
             label_multicsvimport.grid(row=1, sticky=W)
             self.folder_csv.grid(row=0, sticky=W)
             button_import_csv.grid(row=1, sticky=W)
             label_singlecsvimport.grid(row=2, sticky=W)
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglecsv.grid(row=1, sticky=W)
-        else:
+        elif self.filetype.getChoices()=='JSON (BENTO)':
             # multijson
-            label_multijsonimport = LabelFrame(self.label_import_csv, text='Import multiple json files', pady=5, padx=5)
+            label_multijsonimport = LabelFrame(self.frame, text='Import multiple json files', pady=5, padx=5)
             self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:',
                                             title='Select Folder with .json(s)')
             button_import_json = Button(label_multijsonimport, text='Import json to project folder',
                                         command=lambda: json2csv_folder(self.configinifile,
                                                                         self.folder_json.folder_path), fg='navy')
             # singlecsv
-            label_singlejsonimport = LabelFrame(self.label_import_csv, text='Import single json file', pady=5, padx=5)
+            label_singlejsonimport = LabelFrame(self.frame, text='Import single json file', pady=5, padx=5)
             self.file_json = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
             button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder',
                                              command=lambda: json2csv_file(self.configinifile, self.file_json.file_path),
                                              fg='navy')
             # import json into projectfolder
-
+            self.frame.grid(row=1, sticky=W)
             label_multijsonimport.grid(row=1, sticky=W)
             self.folder_json.grid(row=0, sticky=W)
             button_import_json.grid(row=1, sticky=W)
             label_singlejsonimport.grid(row=2, sticky=W)
             self.file_json.grid(row=0, sticky=W)
             button_importsinglejson.grid(row=1, sticky=W)
+
+        elif self.filetype.getChoices() in ('H5 (multi-animal DLC)','SLP (SLEAP)'):
+            animalsettings = LabelFrame(self.frame,text='Animal settings',pady=5,padx=5)
+            noofanimals = Entry_Box(animalsettings,'No of animals','15')
+            animalnamebutton = Button(animalsettings,text='Confirm',command=lambda:self.animalnames(noofanimals.entry_get,animalsettings))
+
+            if self.filetype.getChoices() == 'H5 (multi-animal DLC)':
+                options =['skeleton','box']
+                self.dropdowndlc = DropDownMenu(self.frame,'Tracking type',options,'15')
+                self.dropdowndlc.setChoices(options[1])
+
+                self.h5path = FolderSelect(self.frame,'Path to h5 files',lblwidth=15)
+                labelinstruction = Label(self.frame,text='Please import videos before importing the multi animal DLC tracking data')
+                runsettings = Button(self.frame,text='Import h5',command=self.importh5)
+                #organize
+                self.dropdowndlc.grid(row=2, sticky=W)
+            else:
+                self.h5path = FolderSelect(self.frame, 'Path to .slp files', lblwidth=15)
+                labelinstruction = Label(self.frame,
+                                         text='Please import videos before importing the multi animal SLEAP tracking data')
+                runsettings = Button(self.frame, text='Import .slp', command=self.importh5)
+            #organize
+            self.frame.grid(row=1,sticky=W)
+            animalsettings.grid(row=1,sticky=W)
+            noofanimals.grid(row=0,sticky=W)
+            animalnamebutton.grid(row=0,column=1,sticky=W)
+
+
+            self.h5path.grid(row=3,sticky=W)
+            labelinstruction.grid(row=4,pady=10,sticky=W)
+            runsettings.grid(row=5,pady=10)
+
+    def importh5(self):
+        idlist = []
+        for i in self.animalnamelist:
+            idlist.append(i.entry_get)
+
+        id_ini = idlist.copy()
+        id_ini = str(id_ini)
+        id_ini = id_ini.replace('\'','')
+        id_ini = id_ini.replace('[', '')
+        id_ini = id_ini.replace(']', '')
+        id_ini = id_ini.replace(' ', '')
+        config = ConfigParser()
+        configFile = str(self.configinifile)
+        config.read(configFile)
+        # write the new values into ini file
+        config.set('Multi animal IDs', 'ID_list',id_ini)
+
+        with open(self.configinifile, 'w') as configfile:
+            config.write(configfile)
+
+
+        if self.filetype.getChoices() == 'H5 (multi-animal DLC)':
+            importMultiDLCpose(self.configinifile,self.h5path.folder_path,self.dropdowndlc.getChoices(),idlist)
+        else:
+            ##SLEAP
+            importSLEAPbottomUP(self.configinifile,self.h5path.folder_path,idlist)
+
+    def animalnames(self,noofanimal,master):
+        try:
+            self.frame2.destroy()
+        except:
+            pass
+
+        no_animal = int(noofanimal)
+        self.animalnamelist =[0]*no_animal
+
+        self.frame2 = Frame(master)
+        self.frame2.grid(row=1,sticky=W)
+
+        for i in range(no_animal):
+            self.animalnamelist[i] = Entry_Box(self.frame2,'Animal ' + str(i+1) + ' name','15')
+            self.animalnamelist[i].grid(row=i,sticky=W)
 
     def resetSettings(self):
         popup = Tk()
@@ -2979,7 +3147,6 @@ class project_config:
             print('Please select folder with csv to proceed')
 
     def import_multivid(self):
-
         try:
             copy_multivideo_ini(self.configinifile, self.multivideofolderpath.folder_path, self.video_type.entry_get)
         except:
@@ -3034,36 +3201,58 @@ class project_config:
         ### animal settings
         listindex = self.option_mice.index(str(self.var.get()))
 
-        if listindex == 0:
-            bp = '4'
-        elif listindex == 1:
-            bp = '7'
-        elif listindex == 2:
-            bp = '8'
-        elif listindex == 3:
-            bp = '9'
-        elif listindex == 4:
-            bp = '8'
-        elif listindex == 5:
-            bp='14'
-        elif listindex == 6:
-            bp = '16'
-        elif listindex == 7:
-            bp = '987'
-        else:
-            bp = 'user_defined'
+        if self.singleORmulti.getChoices()=='Classic tracking':
+            if listindex == 0:
+                bp = '4'
+            elif listindex == 1:
+                bp = '7'
+            elif listindex == 2:
+                bp = '8'
+            elif listindex == 3:
+                bp = '9'
+            elif (listindex == 4):
+                bp = '8'
+            elif (listindex == 5):
+                bp='14'
+            elif (listindex == 6):
+                bp = '16'
+            elif listindex == 7:
+                bp = '987'
+            elif listindex == 8:
+                bp = 'user_defined'
+            else:
+                bp = 'user_defined'
 
-        noAnimalsPath = os.path.join(os.getcwd(), 'pose_configurations', 'no_animals', 'no_animals.csv')
+        elif self.singleORmulti.getChoices() =='Multi tracking':
+            if listindex == 0:
+                bp = '8'
+            elif listindex == 1:
+                bp = '14'
+            elif listindex == 2:
+                bp = '16'
+            else:
+                bp = 'user_defined'
+
+        if (self.singleORmulti.getChoices() =='Classic tracking') and (bp=='user_defined') and (listindex >8):
+            listindex = listindex + 3
+        elif (self.singleORmulti.getChoices()=='Multi tracking') and (bp=='user_defined') and (listindex >2):
+            pass
+
+        noAnimalsPath = os.path.join(os.path.dirname(__file__), 'pose_configurations', 'no_animals', 'no_animals.csv')
         with open(noAnimalsPath, "r", encoding='utf8') as f:
             cr = csv.reader(f, delimiter=",")  # , is default
             rows = list(cr)  # create a list of rows for instance
+
+        if (self.singleORmulti.getChoices()=='Multi tracking'):
+            listindex += 9
+
+        print(listindex)
+
         animalNo = str(rows[listindex])
         self.configinifile = write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo)
         #print(self.configinifile)
-        print(os.path.basename(project_path))
         print('Project ' + '"' + str(project_name) + '"' + " created in folder " + '"' + str(os.path.basename(project_path)) + '"')
-        # except:
-        #     print('Please fill in the information correctly.')
+
 
 
     def extract_frames(self):
@@ -3155,14 +3344,16 @@ class loadprojectini:
 
         #import all csv file into project folder
         self.label_import_csv = LabelFrame(label_import, text='Import further tracking data', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='black')
-        filetype = DropDownMenu(self.label_import_csv,'File type',['csv','json'],'15',com=self.fileselected)
-        filetype.setChoices('csv')
+        filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)','SLP (SLEAP)'],'15',com=self.fileselected)
+        filetype.setChoices('CSV (DLC/DeepPoseKit)')
+
+        self.frame = Frame(self.label_import_csv)
         # multicsv
-        label_multicsvimport = LabelFrame(self.label_import_csv, text='Import multiple csv files', pady=5, padx=5)
+        label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:',title='Select Folder with .csv(s)')
         button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',command= self.importdlctracking_multi,fg='navy')
         # singlecsv
-        label_singlecsvimport = LabelFrame(self.label_import_csv, text='Import single csv files', pady=5, padx=5)
+        label_singlecsvimport = LabelFrame(self.frame, text='Import single csv files', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport, 'File selected',title='Select a .csv file')
         button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',command= self.importdlctracking_single,fg='navy')
 
@@ -3260,11 +3451,14 @@ class loadprojectini:
         self.hmlvar = IntVar()
         self.hmlvar.set(1)
         button_hmlocation = Button(processmovementdupLabel,text='Create heat maps',command=lambda:self.run_roiAnalysisSettings(Toplevel(),self.hmlvar,'locationheatmap'))
+
+        button_timebins_M = Button(processmovementdupLabel,text='Time bins: Distance/velocity',command = lambda: self.timebinmove('mov'))
+
         #organize
         processmovementdupLabel.grid(row=0,column=4,sticky=N)
         button_process_movement1.grid(row=0)
         button_hmlocation.grid(row=1)
-
+        button_timebins_M.grid(row=2)
 
         #outlier correction
         label_outliercorrection = LabelFrame(tab4,text='Outlier correction',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
@@ -3287,17 +3481,21 @@ class loadprojectini:
         button_labelaggression = Button(label_labelaggression, text='Select folder with frames (create new video annotation)',command= lambda:choose_folder(self.projectconfigini))
         button_load_labelaggression = Button(label_labelaggression,text='Select folder with frames (continue existing video annotation)',command= lambda: load_folder(self.projectconfigini))
 
-        # #pseudolabel
-        # label_pseudo = LabelFrame(tab7,text='Pseudo Labelling',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-        # pLabel_framedir = FolderSelect(label_pseudo,'Frame folder',lblwidth='10')
-        # plabelframe_threshold = LabelFrame(label_pseudo,text='Threshold',pady=5,padx=5)
-        # plabel_threshold =[0]*len(targetlist)
-        # count=0
-        # for i in list(targetlist):
-        #     plabel_threshold[count] = Entry_Box(plabelframe_threshold,str(i),'10')
-        #     plabel_threshold[count].grid(row=count+2,sticky=W)
-        #     count+=1
-        # pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.folder_path,list(targetlist),plabel_threshold))
+        #third party annotation
+        label_thirdpartyann = LabelFrame(tab7,text='Import Third-Party behavior labels',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
+        button_importmars = Button(label_thirdpartyann,text='Import MARS Annotation (select folder with .annot files)',command=self.importMARS)
+
+        #pseudolabel
+        label_pseudo = LabelFrame(tab7,text='Pseudo Labelling',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
+        pLabel_framedir = FolderSelect(label_pseudo,'Frame folder',lblwidth='10')
+        plabelframe_threshold = LabelFrame(label_pseudo,text='Threshold',pady=5,padx=5)
+        plabel_threshold =[0]*len(targetlist)
+        count=0
+        for i in list(targetlist):
+            plabel_threshold[count] = Entry_Box(plabelframe_threshold,str(i),'20')
+            plabel_threshold[count].grid(row=count+2,sticky=W)
+            count+=1
+        pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.folder_path,list(targetlist),plabel_threshold))
 
 
         #train machine model
@@ -3333,8 +3531,12 @@ class loadprojectini:
         # machine results
         label_machineresults = LabelFrame(tab9,text='Analyze Machine Results',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
+
         button_process_movement = Button(label_machineresults,text='Analyze distances/velocity',command=lambda:self.roi_settings('Analyze distances/velocity',
                                                                            'processmovement'))
+        button_movebins = Button(label_machineresults,text='Time bins: Distance/velocity',command=lambda:self.timebinmove('mov'))
+        button_classifierbins = Button(label_machineresults,text='Time bins: Machine predictions',command=lambda:self.timebinmove('classifier'))
+
         label_severity = LabelFrame(tab9,text='Analyze Severity',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         self.severityscale = Entry_Box(label_severity,'Severity scale 0 -',15)
         self.severityTarget = DropDownMenu(label_severity,'Target',targetlist,'15')
@@ -3389,8 +3591,7 @@ class loadprojectini:
         #Heatplot
         label_heatmap = LabelFrame(label_plotall, text='Heatmap', pady=5, padx=5)
         self.BinSize = Entry_Box(label_heatmap, 'Bin size (mm)', '15')
-        self.MaxScale = Entry_Box(label_heatmap, '# increments', '15')
-        self.Inc = Entry_Box(label_heatmap, 'Seconds per increment', '15')
+        self.MaxScale = Entry_Box(label_heatmap, 'max', '15')
 
         hmchoices = {'viridis','plasma','inferno','magma','jet','gnuplot2'}
         self.hmMenu = DropDownMenu(label_heatmap,'Color Palette',hmchoices,'15')
@@ -3442,6 +3643,7 @@ class loadprojectini:
         label_import.grid(row=0,column=0,sticky=W,pady=5)
         self.label_import_csv.grid(row=0, sticky=N + W, pady=5)
         filetype.grid(row=0,sticky=W)
+        self.frame.grid(row=1,sticky=W)
         label_multicsvimport.grid(row=1, sticky=W)
         self.folder_csv.grid(row=0, sticky=W)
         button_import_csv.grid(row=1, sticky=W)
@@ -3495,10 +3697,13 @@ class loadprojectini:
         button_labelaggression.grid(row=0,sticky=W)
         button_load_labelaggression.grid(row=1,sticky=W,pady=10)
 
-        # label_pseudo.grid(row=6,sticky=W,pady=10)
-        # pLabel_framedir.grid(row=0,sticky=W)
-        # plabelframe_threshold.grid(row=2,sticky=W)
-        # pLabel_button.grid(row=3,sticky=W)
+        label_pseudo.grid(row=6,sticky=W,pady=10)
+        pLabel_framedir.grid(row=0,sticky=W)
+        plabelframe_threshold.grid(row=2,sticky=W)
+        pLabel_button.grid(row=3,sticky=W)
+
+        label_thirdpartyann.grid(row=7, sticky=W)
+        button_importmars.grid(row=0, sticky=W)
 
         label_trainmachinemodel.grid(row=6,sticky=W)
         button_trainmachinesettings.grid(row=0,column=0,sticky=W,padx=5)
@@ -3526,6 +3731,8 @@ class loadprojectini:
         label_machineresults.grid(row=9,sticky=W,pady=5)
         button_process_datalog.grid(row=2,column=0,sticky=W,padx=3)
         button_process_movement.grid(row=2,column=1,sticky=W,padx=3)
+        button_movebins.grid(row=3,column=1,sticky=W,padx=3)
+        button_classifierbins.grid(row=3,column=0,sticky=W,padyx=3)
         #severity
         label_severity.grid(row=10,sticky=W,pady=5)
         self.severityscale.grid(row=0,sticky=W)
@@ -3561,7 +3768,6 @@ class loadprojectini:
         #heat
         label_heatmap.grid(row=4, sticky=W)
         self.BinSize.grid(row=0, sticky=W)
-        self.Inc.grid(row=2, sticky=W)
         self.MaxScale.grid(row=1, sticky=W)
         self.hmMenu.grid(row=3,sticky=W)
         self.targetMenu.grid(row=4,sticky=W)
@@ -3582,18 +3788,47 @@ class loadprojectini:
         self.cvTarget.grid(row=1,sticky=W)
         button_validate_classifier.grid(row=2,sticky=W)
 
+    def timebinmove(self,var):
+        timebintoplevel = Toplevel()
+        timebintoplevel.minsize(200, 80)
+        timebintoplevel.wm_title("Time bins settings")
+
+        tb_labelframe = LabelFrame(timebintoplevel)
+        tb_entry = Entry_Box(tb_labelframe,'Set time bin size','15')
+        if var == 'mov':
+            tb_button = Button(tb_labelframe,text='Run',command=lambda:time_bins_movement(self.projectconfigini,int(tb_entry.entry_get)))
+        else:
+            tb_button = Button(tb_labelframe, text='Run',
+                               command=lambda: time_bins_classifier(self.projectconfigini, int(tb_entry.entry_get)))
+        ##organize
+        tb_labelframe.grid(row=0,sticky=W)
+        tb_entry.grid(row=1,sticky=W)
+        tb_button.grid(row=2,pady=10)
+
+    def importMARS(self):
+        ann_folder = askdirectory()
+        append_dot_ANNOTT(self.projectconfigini, ann_folder)
+
     def fileselected(self,val):
-        if val == 'csv':
+        try:
+            self.frame.destroy()
+        except:
+            pass
+
+        self.frame = Frame(self.label_import_csv)
+
+        if val == 'CSV (DLC/DeepPoseKit)':
             # multicsv
-            label_multicsvimport = LabelFrame(self.label_import_csv, text='Import multiple csv files', pady=5, padx=5)
+            label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
             self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:', title='Select Folder with .csv(s)')
             button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',
                                        command=self.importdlctracking_multi, fg='navy')
             # singlecsv
-            label_singlecsvimport = LabelFrame(self.label_import_csv, text='Import single csv files', pady=5, padx=5)
+            label_singlecsvimport = LabelFrame(self.frame, text='Import single csv files', pady=5, padx=5)
             self.file_csv = FileSelect(label_singlecsvimport, 'File selected', title='Select a .csv file')
             button_importsinglecsv = Button(label_singlecsvimport, text='Import single csv to project folder',
                                             command=self.importdlctracking_single, fg='navy')
+            self.frame.grid(row=1, sticky=W)
             label_multicsvimport.grid(row=1, sticky=W)
             self.folder_csv.grid(row=0, sticky=W)
             button_import_csv.grid(row=1, sticky=W)
@@ -3601,10 +3836,10 @@ class loadprojectini:
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglecsv.grid(row=1, sticky=W)
 
-        else:
+        elif val =='JSON (BENTO)':
             # import json into projectfolder
             # multijson
-            label_multijsonimport = LabelFrame(self.label_import_csv, text='Import multiple json files', pady=5,
+            label_multijsonimport = LabelFrame(self.frame, text='Import multiple json files', pady=5,
                                                padx=5)
             self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:',
                                             title='Select Folder with .json(s)')
@@ -3612,18 +3847,80 @@ class loadprojectini:
                                         command=lambda: json2csv_folder(self.projectconfigini,
                                                                         self.folder_json.folder_path), fg='navy')
             # singlejson
-            label_singlejsonimport = LabelFrame(self.label_import_csv, text='Import single json file', pady=5, padx=5)
+            label_singlejsonimport = LabelFrame(self.frame, text='Import single json file', pady=5, padx=5)
             self.file_csv = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
             button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder',
                                              command=lambda: json2csv_file(self.projectconfigini,
                                                                            self.file_csv.file_path), fg='navy')
             # import json into projectfolder
+            self.frame.grid(row=1, sticky=W)
             label_multijsonimport.grid(row=1, sticky=W)
             self.folder_json.grid(row=0, sticky=W)
             button_import_json.grid(row=1, sticky=W)
             label_singlejsonimport.grid(row=2, sticky=W)
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglejson.grid(row=1, sticky=W)
+
+        elif val in ('SLP (SLEAP)','H5 (multi-animal DLC)'):
+            animalsettings = LabelFrame(self.frame, text='Animal settings', pady=5, padx=5)
+            noofanimals = Entry_Box(animalsettings, 'No of animals', '15')
+            animalnamebutton = Button(animalsettings, text='Confirm',
+                                      command=lambda: self.animalnames(noofanimals.entry_get, animalsettings))
+            if val == 'H5 (multi-animal DLC)':
+                options = ['skeleton', 'box']
+                self.dropdowndlc = DropDownMenu(self.frame, 'Tracking type', options, '15')
+                self.dropdowndlc.setChoices(options[1])
+
+                self.h5path = FolderSelect(self.frame, 'Path to h5 files', lblwidth=15)
+                labelinstruction = Label(self.frame,
+                                         text='Please import videos before importing the \n'
+                                              ' multi animal DLC tracking data')
+                runsettings = Button(self.frame, text='Import h5', command=self.importh5)
+                #organize
+                self.dropdowndlc.grid(row=2, sticky=W)
+            else:
+                self.h5path = FolderSelect(self.frame, 'Path to .slp files', lblwidth=15)
+                labelinstruction = Label(self.frame,
+                                         text='Please import videos before importing the \n'
+                                              ' multi animal SLEAP tracking data')
+                runsettings = Button(self.frame, text='Import .slp', command=self.importh5)
+            # organize
+            self.frame.grid(row=1, sticky=W)
+            animalsettings.grid(row=1, sticky=W)
+            noofanimals.grid(row=0, sticky=W)
+            animalnamebutton.grid(row=0, column=1, sticky=W)
+
+            #save val into memory for dlc or sleap
+            self.val = val
+
+            self.h5path.grid(row=3, sticky=W)
+            labelinstruction.grid(row=4, pady=10, sticky=W)
+            runsettings.grid(row=5, pady=10)
+
+    def importh5(self):
+        idlist = []
+        for i in self.animalnamelist:
+            idlist.append(i.entry_get)
+        if self.val =='H5 (multi-animal DLC)':
+            importMultiDLCpose(self.projectconfigini, self.h5path.folder_path, self.dropdowndlc.getChoices(), idlist)
+        else:
+            importSLEAPbottomUP(self.projectconfigini,self.h5path.folder_path,idlist)
+
+    def animalnames(self, noofanimal, master):
+        try:
+            self.frame2.destroy()
+        except:
+            pass
+
+        no_animal = int(noofanimal)
+        self.animalnamelist = [0] * no_animal
+
+        self.frame2 = Frame(master)
+        self.frame2.grid(row=1, sticky=W)
+
+        for i in range(no_animal):
+            self.animalnamelist[i] = Entry_Box(self.frame2, 'Animal ' + str(i + 1) + ' name', '15')
+            self.animalnamelist[i].grid(row=i, sticky=W)
 
     def addclassifier(self,newclassifier):
         config = ConfigParser()
@@ -3824,8 +4121,7 @@ class loadprojectini:
 
         if appendornot == 'locationheatmap':
             self.binsizepixels = Entry_Box(self.secondMenu,'Bin size (mm)','21')
-            self.scalemaxsec = Entry_Box(self.secondMenu,'# increments','21')
-            self.scaleincresec = Entry_Box(self.secondMenu,'Seconds per increment','21')
+            self.scalemaxsec = Entry_Box(self.secondMenu,'max','21')
             self.pal_var = StringVar()
             paloptions = ['magma','jet','inferno','plasma','viridis','gnuplot2']
             palette = OptionMenu(self.secondMenu,self.pal_var,*paloptions)
@@ -3839,7 +4135,6 @@ class loadprojectini:
             #organize
             self.binsizepixels.grid(row=1,sticky=W)
             self.scalemaxsec.grid(row=2,sticky=W)
-            self.scaleincresec.grid(row=3,sticky=W)
             palette.grid(row=4,sticky=W)
             lastimg.grid(row=5,sticky=W)
 
@@ -3859,7 +4154,6 @@ class loadprojectini:
         elif appendornot == 'locationheatmap':
             config.set('Heatmap location', 'body_part', str(animal1bp))
             config.set('Heatmap location', 'Palette', str(self.pal_var.get()))
-            config.set('Heatmap location', 'Scale_increments_seconds', str(self.scaleincresec.entry_get))
             config.set('Heatmap location', 'Scale_max_seconds', str(self.scalemaxsec.entry_get))
             config.set('Heatmap location', 'bin_size_pixels', str(self.binsizepixels.entry_get))
             with open(configini, 'w') as configfile:
@@ -3879,7 +4173,7 @@ class loadprojectini:
         elif appendornot == 'processmovement':
             ROI_process_movement(configini)
         elif appendornot == 'locationheatmap':
-            plotHeatMapLocation(configini,animal1bp,int(self.binsizepixels.entry_get),int(self.scalemaxsec.entry_get),int(self.scaleincresec.entry_get),self.pal_var.get(),self.lastimgvar.get())
+            plotHeatMapLocation(configini,animal1bp,int(self.binsizepixels.entry_get),str(self.scalemaxsec.entry_get),self.pal_var.get(),self.lastimgvar.get())
         else:
             roiAnalysis(configini,'features_extracted')
 
@@ -4257,14 +4551,13 @@ class loadprojectini:
         config.read(configini)
         config.set('Heatmap settings', 'bin_size_pixels', self.BinSize.entry_get)
         config.set('Heatmap settings', 'Scale_max_seconds', self.MaxScale.entry_get)
-        config.set('Heatmap settings', 'Scale_increments_seconds', self.Inc.entry_get)
         config.set('Heatmap settings', 'Palette', self.hmMenu.getChoices())
         config.set('Heatmap settings', 'Target', self.targetMenu.getChoices())
         config.set('Heatmap settings', 'body_part', self.bp1.getChoices())
         with open(configini, 'w') as configfile:
             config.write(configfile)
-        plotHeatMap(configini,self.bp1.getChoices(),int(self.BinSize.entry_get),int(self.MaxScale.entry_get),
-                    int(self.Inc.entry_get),self.hmMenu.getChoices(),self.intimgvar.get() , self.targetMenu.getChoices())
+        plotHeatMap(configini,self.bp1.getChoices(),int(self.BinSize.entry_get),str(self.MaxScale.entry_get)
+                    ,self.hmMenu.getChoices(), self.targetMenu.getChoices(),self.intimgvar.get() )
 
     def callback(self,url):
         webbrowser.open_new(url)
@@ -4716,8 +5009,8 @@ class aboutgui:
 
         canvas = Canvas(about,width=657,height=398,bg='black')
         canvas.pack()
-
-        img = PhotoImage(file='TheGoldenLab_aboutme.png')
+        scriptdir = os.path.dirname(__file__)
+        img = PhotoImage(file=os.path.join(scriptdir,'TheGoldenLab_aboutme.png'))
         canvas.create_image(0,0,image=img,anchor='nw')
         canvas.image = img
 
@@ -4730,7 +5023,8 @@ class App(object):
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
 
-        img = PhotoImage(file='golden.png')
+        scriptdir = os.path.dirname(__file__)
+        img = PhotoImage(file=os.path.join(scriptdir,'golden.png'))
         background = Label(self.root, image=img, bd=0)
         background.pack(fill='both', expand=True)
         background.image = img
@@ -4848,7 +5142,8 @@ class SplashScreen:
         self.Window()
 
     def Splash(self):
-        self.image = Image.open(r".\TheGoldenLab.png")
+        scriptdir = os.path.dirname(__file__)
+        self.image = Image.open(os.path.join(scriptdir,"TheGoldenLab.png"))
         self.imgSplash = ImageTk.PhotoImage(self.image)
 
     def Window(self):
@@ -4866,12 +5161,12 @@ if __name__ == '__main__':
     root.after(1000, root.destroy)
     root.mainloop()
 
-
 app = App()
 print('Welcome fellow scientists :)' + '\n' + 'SimBA version ' + str(simBA_version))
 print('\n')
-print(tabulate([['Region of Interest support (ROI Module)'], ['DeepPoseKit support (DPK Module)'], ['Flexible Annotation Module'], ['Interactive thresholding'], ['Heatmap visualizations'], ['Extended validation tools'], ['Multi-crop'],['...many bug fixes']], headers=['March 2020 Updates/Fixes'], tablefmt='fancy_grid'))
-
+print(tabulate([['multi-Animal DeepLabCut support (>= v2.2b5)'], ['SLEAP support'], ['"Psuedo-labeling" module'],
+                ['...many bug fixes']], headers=['June 2020 Updates/Fixes'], tablefmt='fancy_grid'))
+# print(tabulate([['Region of Interest support (ROI Module)'], ['DeepPoseKit support (DPK Module)'], ['Flexible Annotation Module'], ['Interactive thresholding'], ['Heatmap visualizations'], ['Extended validation tools'], ['Multi-crop'],['...many bug fixes']], headers=['March 2020 Updates/Fixes'], tablefmt='fancy_grid'))
 
 
 maincwd=os.getcwd()
