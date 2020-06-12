@@ -14,6 +14,14 @@
 
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
+## June-13-2020: SimBA version 1.2 release
+- Multi-animal DLC support - [Documentation](/docs/Multi_animal_pose.md)
+- Multi-animal SLEAP support - [Documentation](/docs/Multi_animal_pose.md)
+- SimBA 'pseudo-labelling' module - [Documentation](/docs/pseudoLabel.md)
+- Plenty of new quality-of-life features (e.g., time-bin analyzes / improved visualizations options) - [Documentation](/docs/Scenario1.md)
+- Many, many, many, many bug-fixes
+
+
 ## April-25-2020: SimBA pre-print manuscript release
 
 A pre-print SimBA manuscript on bioRxiv! The manuscript details the use of SimBA for generation of social predictive classifiers in rat and mouse resident-intruder protocols - please check it out using the link below. All data, pose-estimation models, and the final classifiers generated in the manuscript, can be accessed through our [OSF repository](https://osf.io/tmu6y/) and through the [Resource](https://github.com/sgoldenlab/simba#resource-) menu further down this page.
