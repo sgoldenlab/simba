@@ -659,6 +659,8 @@ def extract_features_wotarget_14(inifile):
             csv_df[currentColName1] = tortuosity_M1
             #csv_df[currentColName2] = tortuosity_M2
 
+        print(csv_df)
+
         ########### CALC THE NUMBER OF LOW PROBABILITY DETECTIONS & TOTAL PROBABILITY VALUE FOR ROW###########################################
         print('Calculating pose probability scores...')
         csv_df['Sum_probabilities'] = (

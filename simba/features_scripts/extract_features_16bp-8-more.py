@@ -7,7 +7,7 @@ from scipy.spatial import ConvexHull
 import scipy
 from configparser import ConfigParser
 
-def extract_features_wotarget_14_from_16(inifile):
+def extract_features_wotarget_16(inifile):
     config = ConfigParser()
     configFile = str(inifile)
     config.read(configFile)
@@ -18,7 +18,6 @@ def extract_features_wotarget_14_from_16(inifile):
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
     def count_values_in_range(series, values_in_range_min, values_in_range_max):
@@ -63,7 +62,6 @@ def extract_features_wotarget_14_from_16(inifile):
             print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         fps = float(currVideoSettings['fps'])
         print('Processing ' + '"' + str(currVidName) + '".' + ' Fps: ' + str(fps) + ". mm/ppx: " + str(currPixPerMM))
-
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))
         loopy += 1
@@ -78,7 +76,10 @@ def extract_features_wotarget_14_from_16(inifile):
                          "Lat_left_2_y",
                          "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x",
                          "Tail_base_2_y", "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p"]
-        csv_df = pd.read_csv(currentFile, names=columnHeaders)
+        csv_df = pd.read_csv(currentFile, names=columnHeaders, low_memory=False)
+        print(csv_df)
+        print('x')
+        csv_df = csv_df.reset_index(drop=True)
         csv_df = csv_df.fillna(0)
         csv_df = csv_df.drop(csv_df.index[[0]])
         csv_df = csv_df.apply(pd.to_numeric)
@@ -144,17 +145,17 @@ def extract_features_wotarget_14_from_16(inifile):
         print('Calculating euclidean distances...')
         ########### EUCLIDEAN DISTANCES ###########################################
         csv_df['Mouse_1_nose_to_tail'] = (np.sqrt((csv_df.Nose_1_x - csv_df.Tail_base_1_x) ** 2 + (
-                csv_df.Nose_1_y - csv_df.Tail_base_1_y) ** 2)) / currPixPerMM
+                    csv_df.Nose_1_y - csv_df.Tail_base_1_y) ** 2)) / currPixPerMM
         csv_df['Mouse_2_nose_to_tail'] = (np.sqrt((csv_df.Nose_2_x - csv_df.Tail_base_2_x) ** 2 + (
-                csv_df.Nose_2_y - csv_df.Tail_base_2_y) ** 2)) / currPixPerMM
+                    csv_df.Nose_2_y - csv_df.Tail_base_2_y) ** 2)) / currPixPerMM
         csv_df['Mouse_1_width'] = (np.sqrt((csv_df.Lat_left_1_x - csv_df.Lat_right_1_x) ** 2 + (
-                csv_df.Lat_left_1_y - csv_df.Lat_right_1_y) ** 2)) / currPixPerMM
+                    csv_df.Lat_left_1_y - csv_df.Lat_right_1_y) ** 2)) / currPixPerMM
         csv_df['Mouse_2_width'] = (np.sqrt((csv_df.Lat_left_2_x - csv_df.Lat_right_2_x) ** 2 + (
-                csv_df.Lat_left_2_y - csv_df.Lat_right_2_y) ** 2)) / currPixPerMM
+                    csv_df.Lat_left_2_y - csv_df.Lat_right_2_y) ** 2)) / currPixPerMM
         csv_df['Mouse_1_Ear_distance'] = (np.sqrt((csv_df.Ear_left_1_x - csv_df.Ear_right_1_x) ** 2 + (
-                csv_df.Ear_left_1_y - csv_df.Ear_right_1_y) ** 2)) / currPixPerMM
+                    csv_df.Ear_left_1_y - csv_df.Ear_right_1_y) ** 2)) / currPixPerMM
         csv_df['Mouse_2_Ear_distance'] = (np.sqrt((csv_df.Ear_left_2_x - csv_df.Ear_right_2_x) ** 2 + (
-                csv_df.Ear_left_2_y - csv_df.Ear_right_2_y) ** 2)) / currPixPerMM
+                    csv_df.Ear_left_2_y - csv_df.Ear_right_2_y) ** 2)) / currPixPerMM
         csv_df['Mouse_1_Nose_to_centroid'] = (np.sqrt(
             (csv_df.Nose_1_x - csv_df.Center_1_x) ** 2 + (csv_df.Nose_1_y - csv_df.Center_1_y) ** 2)) / currPixPerMM
         csv_df['Mouse_2_Nose_to_centroid'] = (np.sqrt(
@@ -182,61 +183,67 @@ def extract_features_wotarget_14_from_16(inifile):
         csv_df['M1_Nose_to_M2_lat_left'] = (np.sqrt(
             (csv_df.Nose_1_x - csv_df.Lat_left_2_x) ** 2 + (csv_df.Nose_1_y - csv_df.Lat_left_2_y) ** 2)) / currPixPerMM
         csv_df['M1_Nose_to_M2_lat_right'] = (np.sqrt((csv_df.Nose_1_x - csv_df.Lat_right_2_x) ** 2 + (
-                csv_df.Nose_1_y - csv_df.Lat_right_2_y) ** 2)) / currPixPerMM
+                    csv_df.Nose_1_y - csv_df.Lat_right_2_y) ** 2)) / currPixPerMM
         csv_df['M2_Nose_to_M1_lat_left'] = (np.sqrt(
             (csv_df.Nose_2_x - csv_df.Lat_left_1_x) ** 2 + (csv_df.Nose_2_y - csv_df.Lat_left_1_y) ** 2)) / currPixPerMM
         csv_df['M2_Nose_to_M1_lat_right'] = (np.sqrt((csv_df.Nose_2_x - csv_df.Lat_right_1_x) ** 2 + (
-                csv_df.Nose_2_y - csv_df.Lat_right_1_y) ** 2)) / currPixPerMM
+                    csv_df.Nose_2_y - csv_df.Lat_right_1_y) ** 2)) / currPixPerMM
         csv_df['M1_Nose_to_M2_tail_base'] = (np.sqrt((csv_df.Nose_1_x - csv_df.Tail_base_2_x) ** 2 + (
-                csv_df.Nose_1_y - csv_df.Tail_base_2_y) ** 2)) / currPixPerMM
+                    csv_df.Nose_1_y - csv_df.Tail_base_2_y) ** 2)) / currPixPerMM
         csv_df['M2_Nose_to_M1_tail_base'] = (np.sqrt((csv_df.Nose_2_x - csv_df.Tail_base_1_x) ** 2 + (
-                csv_df.Nose_2_y - csv_df.Tail_base_1_y) ** 2)) / currPixPerMM
+                    csv_df.Nose_2_y - csv_df.Tail_base_1_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_1_centroid'] = (np.sqrt(
             (csv_df_combined.Center_1_x_shifted - csv_df_combined.Center_1_x) ** 2 + (
-                    csv_df_combined.Center_1_y_shifted - csv_df_combined.Center_1_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Center_1_y_shifted - csv_df_combined.Center_1_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_2_centroid'] = (np.sqrt(
             (csv_df_combined.Center_2_x_shifted - csv_df_combined.Center_2_x) ** 2 + (
-                    csv_df_combined.Center_2_y_shifted - csv_df_combined.Center_2_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Center_2_y_shifted - csv_df_combined.Center_2_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_1_nose'] = (np.sqrt(
             (csv_df_combined.Nose_1_x_shifted - csv_df_combined.Nose_1_x) ** 2 + (
-                    csv_df_combined.Nose_1_y_shifted - csv_df_combined.Nose_1_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Nose_1_y_shifted - csv_df_combined.Nose_1_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_2_nose'] = (np.sqrt(
             (csv_df_combined.Nose_2_x_shifted - csv_df_combined.Nose_2_x) ** 2 + (
-                    csv_df_combined.Nose_2_y_shifted - csv_df_combined.Nose_2_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Nose_2_y_shifted - csv_df_combined.Nose_2_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_1_tail_base'] = (np.sqrt(
             (csv_df_combined.Tail_base_1_x_shifted - csv_df_combined.Tail_base_1_x) ** 2 + (
-                    csv_df_combined.Tail_base_1_y_shifted - csv_df_combined.Tail_base_1_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Tail_base_1_y_shifted - csv_df_combined.Tail_base_1_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_2_tail_base'] = (np.sqrt(
             (csv_df_combined.Tail_base_2_x_shifted - csv_df_combined.Tail_base_2_x) ** 2 + (
-                    csv_df_combined.Tail_base_2_y_shifted - csv_df_combined.Tail_base_2_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Tail_base_2_y_shifted - csv_df_combined.Tail_base_2_y) ** 2)) / currPixPerMM
+        csv_df['Movement_mouse_1_tail_end'] = (np.sqrt(
+            (csv_df_combined.Tail_end_1_x_shifted - csv_df_combined.Tail_end_1_x) ** 2 + (
+                        csv_df_combined.Tail_end_1_y_shifted - csv_df_combined.Tail_end_1_y) ** 2)) / currPixPerMM
+        csv_df['Movement_mouse_2_tail_end'] = (np.sqrt(
+            (csv_df_combined.Tail_end_2_x_shifted - csv_df_combined.Tail_end_2_x) ** 2 + (
+                        csv_df_combined.Tail_end_2_y_shifted - csv_df_combined.Tail_end_2_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_1_left_ear'] = (np.sqrt(
             (csv_df_combined.Ear_left_1_x_shifted - csv_df_combined.Ear_left_1_x) ** 2 + (
-                    csv_df_combined.Ear_left_1_x - csv_df_combined.Ear_left_1_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Ear_left_1_x - csv_df_combined.Ear_left_1_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_2_left_ear'] = (np.sqrt(
             (csv_df_combined.Ear_left_2_x_shifted - csv_df_combined.Ear_left_2_x) ** 2 + (
-                    csv_df_combined.Ear_left_2_y_shifted - csv_df_combined.Ear_left_2_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Ear_left_2_y_shifted - csv_df_combined.Ear_left_2_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_1_right_ear'] = (np.sqrt(
             (csv_df_combined.Ear_right_1_x_shifted - csv_df_combined.Ear_right_1_x) ** 2 + (
-                    csv_df_combined.Ear_right_1_x - csv_df_combined.Ear_right_1_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Ear_right_1_x - csv_df_combined.Ear_right_1_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_2_right_ear'] = (np.sqrt(
             (csv_df_combined.Ear_right_2_x_shifted - csv_df_combined.Ear_right_2_x) ** 2 + (
-                    csv_df_combined.Ear_right_2_y_shifted - csv_df_combined.Ear_right_2_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Ear_right_2_y_shifted - csv_df_combined.Ear_right_2_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_1_lateral_left'] = (np.sqrt(
             (csv_df_combined.Lat_left_1_x_shifted - csv_df_combined.Lat_left_1_x) ** 2 + (
-                    csv_df_combined.Lat_left_1_x - csv_df_combined.Lat_left_1_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Lat_left_1_x - csv_df_combined.Lat_left_1_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_2_lateral_left'] = (np.sqrt(
             (csv_df_combined.Lat_left_2_x_shifted - csv_df_combined.Lat_left_2_x) ** 2 + (
-                    csv_df_combined.Lat_left_2_y_shifted - csv_df_combined.Lat_left_2_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Lat_left_2_y_shifted - csv_df_combined.Lat_left_2_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_1_lateral_right'] = (np.sqrt(
             (csv_df_combined.Lat_right_1_x_shifted - csv_df_combined.Lat_right_1_x) ** 2 + (
-                    csv_df_combined.Lat_right_1_x - csv_df_combined.Lat_right_1_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Lat_right_1_x - csv_df_combined.Lat_right_1_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_2_lateral_right'] = (np.sqrt(
             (csv_df_combined.Lat_right_2_x_shifted - csv_df_combined.Lat_right_2_x) ** 2 + (
-                    csv_df_combined.Lat_right_2_y_shifted - csv_df_combined.Lat_right_2_y) ** 2)) / currPixPerMM
+                        csv_df_combined.Lat_right_2_y_shifted - csv_df_combined.Lat_right_2_y) ** 2)) / currPixPerMM
         csv_df['Mouse_1_polygon_size_change'] = (
-                csv_df_combined['Mouse_1_poly_area_shifted'] - csv_df_combined['Mouse_1_poly_area'])
+                    csv_df_combined['Mouse_1_poly_area_shifted'] - csv_df_combined['Mouse_1_poly_area'])
         csv_df['Mouse_2_polygon_size_change'] = (
-                csv_df_combined['Mouse_2_poly_area_shifted'] - csv_df_combined['Mouse_2_poly_area'])
+                    csv_df_combined['Mouse_2_poly_area_shifted'] - csv_df_combined['Mouse_2_poly_area'])
 
         print('Calculating hull variables...')
         ########### HULL - EUCLIDEAN DISTANCES ###########################################
@@ -284,19 +291,20 @@ def extract_features_wotarget_14_from_16(inifile):
         csv_df['M2_mean_euclidean_distance_hull'] = list(map(lambda x: x / currPixPerMM, M2_hull_mean_euclidean_list))
         csv_df['M2_sum_euclidean_distance_hull'] = list(map(lambda x: x / currPixPerMM, M2_hull_sum_euclidean_list))
         csv_df['Sum_euclidean_distance_hull_M1_M2'] = (
-                csv_df['M1_sum_euclidean_distance_hull'] + csv_df['M2_sum_euclidean_distance_hull'])
+                    csv_df['M1_sum_euclidean_distance_hull'] + csv_df['M2_sum_euclidean_distance_hull'])
 
 
         ########### COLLAPSED MEASURES ###########################################
         csv_df['Total_movement_centroids'] = csv_df['Movement_mouse_1_centroid'] + csv_df['Movement_mouse_2_centroid']
+        csv_df['Total_movement_tail_ends'] = csv_df['Movement_mouse_1_tail_end'] + csv_df['Movement_mouse_2_tail_end']
         csv_df['Total_movement_all_bodyparts_M1'] = csv_df['Movement_mouse_1_centroid'] + csv_df[
-            'Movement_mouse_1_nose'] + csv_df['Movement_mouse_1_tail_base'] + \
+            'Movement_mouse_1_nose'] + csv_df['Movement_mouse_1_tail_end'] + csv_df['Movement_mouse_1_tail_base'] + \
                                                     csv_df['Movement_mouse_1_left_ear'] + csv_df[
                                                         'Movement_mouse_1_right_ear'] + csv_df[
                                                         'Movement_mouse_1_lateral_left'] + csv_df[
                                                         'Movement_mouse_1_lateral_right']
         csv_df['Total_movement_all_bodyparts_M2'] = csv_df['Movement_mouse_2_centroid'] + csv_df[
-            'Movement_mouse_2_nose'] + csv_df['Movement_mouse_2_tail_base'] + \
+            'Movement_mouse_2_nose'] + csv_df['Movement_mouse_2_tail_end'] + csv_df['Movement_mouse_2_tail_base'] + \
                                                     csv_df['Movement_mouse_2_left_ear'] + csv_df[
                                                         'Movement_mouse_2_right_ear'] + csv_df[
                                                         'Movement_mouse_2_lateral_left'] + csv_df[
@@ -472,6 +480,24 @@ def extract_features_wotarget_14_from_16(inifile):
             csv_df[currentColName] = csv_df['Movement_mouse_2_centroid'].rolling(roll_windows[i], min_periods=1).sum()
 
         for i in range(len(roll_windows_values)):
+            currentColName = 'Tail_end_movement_M1_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_end'].rolling(roll_windows[i],
+                                                                                 min_periods=1).median()
+            currentColName = 'Tail_end_movement_M1_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_end'].rolling(roll_windows[i], min_periods=1).mean()
+            currentColName = 'Tail_end_movement_M1_sum_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_1_tail_end'].rolling(roll_windows[i], min_periods=1).sum()
+
+        for i in range(len(roll_windows_values)):
+            currentColName = 'Tail_end_movement_M2_median_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_end'].rolling(roll_windows[i],
+                                                                                 min_periods=1).median()
+            currentColName = 'Tail_end_movement_M2_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_end'].rolling(roll_windows[i], min_periods=1).mean()
+            currentColName = 'Tail_end_movement_M2_sum_' + str(roll_windows_values[i])
+            csv_df[currentColName] = csv_df['Movement_mouse_2_tail_end'].rolling(roll_windows[i], min_periods=1).sum()
+
+        for i in range(len(roll_windows_values)):
             currentColName = 'Nose_movement_M1_median_' + str(roll_windows_values[i])
             csv_df[currentColName] = csv_df['Movement_mouse_1_nose'].rolling(roll_windows[i], min_periods=1).median()
             currentColName = 'Nose_movement_M1_mean_' + str(roll_windows_values[i])
@@ -488,7 +514,24 @@ def extract_features_wotarget_14_from_16(inifile):
             csv_df[currentColName] = csv_df['Movement_mouse_2_nose'].rolling(roll_windows[i], min_periods=1).sum()
 
         ########### BODY PARTS RELATIVE TO EACH OTHER ##################
-        ################# EMPETY ##########################
+        csv_df['Tail_end_relative_to_tail_base_centroid_nose'] = csv_df['Movement_mouse_1_tail_end'] - (
+                    csv_df['Movement_mouse_1_tail_base'] + csv_df['Movement_mouse_1_centroid'] + csv_df[
+                'Movement_mouse_1_nose'])
+        for i in range(len(roll_windows_values)):
+            currentColName_M1 = 'Tail_end_relative_to_tail_base_centroid_nose_M1_' + str(roll_windows_values[i])
+            tail_end_col_name = 'Tail_end_movement_M1_mean_' + str(roll_windows_values[i])
+            tail_base_col_name = 'Tail_base_movement_M1_mean_' + str(roll_windows_values[i])
+            centroid_col_name = 'Centroid_movement_M1_mean_' + str(roll_windows_values[i])
+            nose_col_name = 'Nose_movement_M1_mean_' + str(roll_windows_values[i])
+            currentColName_M2 = 'Tail_end_relative_to_tail_base_centroid_nose_M2_mean_' + str(roll_windows_values[i])
+            tail_end_col_name_M2 = 'Tail_end_movement_M2_mean_' + str(roll_windows_values[i])
+            tail_base_col_name_M2 = 'Tail_base_movement_M2_mean_' + str(roll_windows_values[i])
+            centroid_col_name_M2 = 'Centroid_movement_M2_mean_' + str(roll_windows_values[i])
+            nose_col_name_M2 = 'Nose_movement_M2_mean_' + str(roll_windows_values[i])
+            csv_df[currentColName_M1] = csv_df[tail_end_col_name] - (
+                    csv_df[tail_base_col_name] + csv_df[centroid_col_name] + csv_df[nose_col_name])
+            csv_df[currentColName_M2] = csv_df[tail_end_col_name_M2] - (
+                    csv_df[tail_base_col_name_M2] + csv_df[centroid_col_name_M2] + csv_df[nose_col_name_M2])
 
         ########### ANGLES ###########################################
         print('Calculating angles...')
@@ -506,24 +549,24 @@ def extract_features_wotarget_14_from_16(inifile):
         ########### DEVIATIONS ###########################################
         print('Calculating deviations...')
         csv_df['Total_movement_all_bodyparts_both_mice_deviation'] = (
-                csv_df['Total_movement_all_bodyparts_both_mice'].mean() - csv_df[
-            'Total_movement_all_bodyparts_both_mice'])
+                    csv_df['Total_movement_all_bodyparts_both_mice'].mean() - csv_df[
+                'Total_movement_all_bodyparts_both_mice'])
         csv_df['Sum_euclid_distances_hull_deviation'] = (
-                csv_df['Sum_euclidean_distance_hull_M1_M2'].mean() - csv_df['Sum_euclidean_distance_hull_M1_M2'])
+                    csv_df['Sum_euclidean_distance_hull_M1_M2'].mean() - csv_df['Sum_euclidean_distance_hull_M1_M2'])
         csv_df['M1_smallest_euclid_distances_hull_deviation'] = (
-                csv_df['M1_smallest_euclidean_distance_hull'].mean() - csv_df[
-            'M1_smallest_euclidean_distance_hull'])
+                    csv_df['M1_smallest_euclidean_distance_hull'].mean() - csv_df[
+                'M1_smallest_euclidean_distance_hull'])
         csv_df['M1_largest_euclid_distances_hull_deviation'] = (
-                csv_df['M1_largest_euclidean_distance_hull'].mean() - csv_df['M1_largest_euclidean_distance_hull'])
+                    csv_df['M1_largest_euclidean_distance_hull'].mean() - csv_df['M1_largest_euclidean_distance_hull'])
         csv_df['M1_mean_euclid_distances_hull_deviation'] = (
-                csv_df['M1_mean_euclidean_distance_hull'].mean() - csv_df['M1_mean_euclidean_distance_hull'])
+                    csv_df['M1_mean_euclidean_distance_hull'].mean() - csv_df['M1_mean_euclidean_distance_hull'])
         csv_df['Centroid_distance_deviation'] = (csv_df['Centroid_distance'].mean() - csv_df['Centroid_distance'])
         csv_df['Total_angle_both_mice_deviation'] = (
-                csv_df['Total_angle_both_mice'].mean() - csv_df['Total_angle_both_mice'])
+                    csv_df['Total_angle_both_mice'].mean() - csv_df['Total_angle_both_mice'])
         csv_df['Movement_mouse_1_deviation_centroid'] = (
-                csv_df['Movement_mouse_1_centroid'].mean() - csv_df['Movement_mouse_1_centroid'])
+                    csv_df['Movement_mouse_1_centroid'].mean() - csv_df['Movement_mouse_1_centroid'])
         csv_df['Movement_mouse_2_deviation_centroid'] = (
-                csv_df['Movement_mouse_2_centroid'].mean() - csv_df['Movement_mouse_2_centroid'])
+                    csv_df['Movement_mouse_2_centroid'].mean() - csv_df['Movement_mouse_2_centroid'])
         csv_df['Mouse_1_polygon_deviation'] = (csv_df['Mouse_1_poly_area'].mean() - csv_df['Mouse_1_poly_area'])
         csv_df['Mouse_2_polygon_deviation'] = (csv_df['Mouse_2_poly_area'].mean() - csv_df['Mouse_2_poly_area'])
 
@@ -663,17 +706,19 @@ def extract_features_wotarget_14_from_16(inifile):
         ########### CALC THE NUMBER OF LOW PROBABILITY DETECTIONS & TOTAL PROBABILITY VALUE FOR ROW###########################################
         print('Calculating pose probability scores...')
         csv_df['Sum_probabilities'] = (
-                csv_df['Ear_left_1_p'] + csv_df['Ear_right_1_p'] + csv_df['Nose_1_p'] + csv_df['Center_1_p'] +
-                csv_df['Lat_left_1_p'] + csv_df['Lat_right_1_p'] + csv_df['Tail_base_1_p'] + csv_df['Ear_left_2_p'] + csv_df['Ear_right_2_p'] + csv_df['Nose_2_p'] +
-                csv_df['Center_2_p'] + csv_df['Lat_left_2_p'] + csv_df['Lat_right_2_p'] + csv_df['Tail_base_2_p'])
+                    csv_df['Ear_left_1_p'] + csv_df['Ear_right_1_p'] + csv_df['Nose_1_p'] + csv_df['Center_1_p'] +
+                    csv_df['Lat_left_1_p'] + csv_df['Lat_right_1_p'] + csv_df['Tail_base_1_p'] + csv_df[
+                        'Tail_end_1_p'] + csv_df['Ear_left_2_p'] + csv_df['Ear_right_2_p'] + csv_df['Nose_2_p'] +
+                    csv_df['Center_2_p'] + csv_df['Lat_left_2_p'] + csv_df['Lat_right_2_p'] + csv_df['Tail_base_2_p'] +
+                    csv_df['Tail_end_2_p'])
         csv_df['Sum_probabilities_deviation'] = (csv_df['Sum_probabilities'].mean() - csv_df['Sum_probabilities'])
         csv_df['Sum_probabilities_deviation_percentile_rank'] = csv_df['Sum_probabilities_deviation'].rank(pct=True)
         csv_df['Sum_probabilities_percentile_rank'] = csv_df['Sum_probabilities_deviation_percentile_rank'].rank(
             pct=True)
         csv_df_probability = csv_df.filter(
             ['Ear_left_1_p', 'Ear_right_1_p', 'Nose_1_p', 'Center_1_p', 'Lat_left_1_p', 'Lat_right_1_p',
-             'Tail_base_1_p', 'Ear_left_2_p', 'Ear_right_2_p', 'Nose_2_p', 'Center_2_p', 'Lat_left_2_p',
-             'Lat_right_2_p', 'Tail_base_2_p'])
+             'Tail_base_1_p', 'Tail_end_1_p', 'Ear_left_2_p', 'Ear_right_2_p', 'Nose_2_p', 'Center_2_p', 'Lat_left_2_p',
+             'Lat_right_2_p', 'Tail_base_2_p', 'Tail_end_2_p'])
         values_in_range_min, values_in_range_max = 0.0, 0.1
         csv_df["Low_prob_detections_0.1"] = csv_df_probability.apply(
             func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
