@@ -18,6 +18,7 @@
 - Multi-animal DLC support - [Documentation](/docs/Multi_animal_pose.md)
 - Multi-animal SLEAP support - [Documentation](/docs/Multi_animal_pose.md)
 - SimBA 'pseudo-labelling' module - [Documentation](/docs/pseudoLabel.md)
+- Easy install of SimBA via `pip` - [Documentation](/docs/installation.md)
 - Plenty of new quality-of-life features (e.g., time-bin analyzes / improved visualizations options) - [Documentation](/docs/Scenario1.md)
 - Many, many, many, many bug-fixes
 
