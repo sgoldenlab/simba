@@ -13,7 +13,7 @@ You can choose to install SimBA as a standalone package or install SimBA with [T
 
 # Installing SimBA Option 1
 
-### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut or DeepPoseKit locally using a GPU)
+### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut, DeepPoseKit, or SLEAP locally using a GPU)
 Open bash or command prompt and run the following commands on current working directory
 
 ```
