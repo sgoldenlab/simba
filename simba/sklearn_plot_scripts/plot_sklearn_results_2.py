@@ -3,7 +3,7 @@ import cv2
 import os
 import pandas as pd
 from scipy import ndimage
-from configparser import ConfigParser, NoSectionError
+from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError
 import glob
 from drop_bp_cords import getBpNames
 from pylab import *
