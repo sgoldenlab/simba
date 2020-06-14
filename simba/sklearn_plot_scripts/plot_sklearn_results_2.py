@@ -3,7 +3,7 @@ import cv2
 import os
 import pandas as pd
 from scipy import ndimage
-from configparser import ConfigParser, MissingSectionHeaderError
+from configparser import ConfigParser, NoSectionError
 import glob
 from drop_bp_cords import getBpNames
 from pylab import *
@@ -31,7 +31,7 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
         mulltiAnimalIDList= config.get('Multi animal IDs', 'id_list')
         mulltiAnimalIDList = mulltiAnimalIDList.split(",")
         mulltiAnimalStatus = True
-    except MissingSectionHeaderError:
+    except NoSectionError:
         mulltiAnimalStatus = False
     vidinfDf = pd.read_csv(vidInfPath)
     target_names, colorList_animal_1, colorList_animal_2, loopy = [], [], [], 0
