@@ -56,15 +56,13 @@ def dev_loc_user_defined(projectini):
 
 
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
-
     loop=0
-    for i in filesFound:
+    for currentFile in filesFound:
         currentFixedList = []
         fixedPositions_M1 = 0
         counts_total_M1 = [0] * len(bodyPartsList)
         outputArray = np.array([0] * (2*len(bodyPartsList)))
         loopy += 1
-        currentFile = i
         videoFileBaseName = os.path.basename(currentFile).replace('.csv', '')
         csv_df = pd.read_csv(currentFile, names=bodyPartHeaders, low_memory=False)
         csv_df = csv_df.drop(csv_df.index[[0]])
@@ -81,6 +79,7 @@ def dev_loc_user_defined(projectini):
             currentArray = row.to_numpy()
             currentArray = currentArray.reshape((len(bodyPartsList), -1))
             nbody_parts = len(currentArray)
+            print(nbody_parts)
             counts = [0] * nbody_parts
             for i in range(0, (nbody_parts - 1)):
                 for j in range((i + 1), (nbody_parts)):

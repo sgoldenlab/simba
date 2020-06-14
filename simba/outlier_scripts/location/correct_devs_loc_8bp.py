@@ -51,12 +51,12 @@ def dev_loc_8(projectini):
         currentFile = i
         videoFileBaseName = os.path.basename(currentFile).replace('.csv', '')
         csv_df = pd.read_csv(currentFile, header=0,
-                             names=["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
-                                    "Ear_right_1_p", "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y",
-                                    "Center_1_p", "Lat_left_1_x", "Lat_left_1_y",
-                                    "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x",
-                                    "Tail_base_1_y", "Tail_base_1_p", "Tail_end_1_x",
-                                    "Tail_end_1_y", "Tail_end_1_p"])
+                             names=["Ear_left_x", "Ear_left_y", "Ear_left_p", "Ear_right_x", "Ear_right_y",
+                                    "Ear_right_p", "Nose_x", "Nose_y", "Nose_p", "Center_x", "Center_y",
+                                    "Center_p", "Lat_left_x", "Lat_left_y",
+                                    "Lat_left_p", "Lat_right_x", "Lat_right_y", "Lat_right_p", "Tail_base_x",
+                                    "Tail_base_y", "Tail_base_p", "Tail_end_x",
+                                    "Tail_end_y", "Tail_end_p"])
         csv_df = csv_df.apply(pd.to_numeric)
 
         vNm_list.append(videoFileBaseName)

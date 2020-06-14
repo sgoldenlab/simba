@@ -13,8 +13,7 @@ def dev_move_user_defined(configini):
     configFile = str(configini)
     config = ConfigParser()
     config.read(configFile)
-    loop = 0
-    loopy = 0
+    loop, loopy = 0, 0
     criterion = config.getfloat('Outlier settings', 'movement_criterion')
     bodyPart1 = config.get('Outlier settings', 'location_bodypart1_mouse1')
     bodyPart2 = config.get('Outlier settings', 'location_bodypart2_mouse1')
@@ -27,9 +26,7 @@ def dev_move_user_defined(configini):
     bodyPartHeaders = []
     columnHeadersShifted = []
     xy_headers = []
-    p_cols = []
-    x_cols = []
-    y_cols = []
+    p_cols, x_cols, y_cols = [], [], []
     for i in bodyPartsList:
         col1, col2, col3 = (str(i) + '_x', str(i) + '_y', str(i) + '_p')
         col4, col5, col6 = (col1 + '_x_shifted', col2 + '_y_shifted', col3 + '_p_shifted')
@@ -39,18 +36,11 @@ def dev_move_user_defined(configini):
         y_cols.append(col2)
         bodyPartHeaders.extend((col1, col2, col3))
         xy_headers.extend((col1, col2))
-    csv_dir = config.get('General settings', 'csv_path')
-    csv_dir_in = os.path.join(csv_dir, 'input_csv')
-    csv_dir_out = os.path.join(csv_dir, 'outlier_corrected_movement')
-    if not os.path.exists(csv_dir_out):
-        os.makedirs(csv_dir_out)
+    csv_dir_in = os.path.join(projectPath, 'csv', 'input_csv')
+    csv_dir_out = os.path.join(projectPath, 'csv', 'outlier_corrected_movement')
+
     ########### logfile path ###########
-    log_fn = 'Outliers_movement_' + str(dateTime) + '.csv'
-    log_path = config.get('General settings', 'project_path')
-    log_path = os.path.join(log_path, 'logs')
-    log_fn = os.path.join(log_path, log_fn)
-    if not os.path.exists(log_path):
-        os.makedirs(log_path)
+    log_fn = os.path.join(projectPath, 'log', 'Outliers_movement_' + str(dateTime) + '.csv')
 
     def add_correction_prefix(col, bpcorrected_list):
         colc = 'Corrected_' + col
@@ -100,9 +90,8 @@ def dev_move_user_defined(configini):
     logDfColumns.extend(bodyPartsList)
     logDfColumns.append(str('% corrected'))
     log_df = pd.DataFrame(columns=logDfColumns)
-    for i in filesFound:
+    for currentFile in filesFound:
         loopy += 1
-        currentFile = i
         baseNameFile = os.path.basename(currentFile).replace('.csv', '')
         csv_df = pd.read_csv(currentFile, names=bodyPartHeaders, index_col=None)
         csv_df = csv_df.drop(csv_df.index[[0, 1, 2]])

@@ -5,6 +5,7 @@ import numpy as np
 from configparser import ConfigParser
 from datetime import datetime
 
+
 def dev_loc_4(projectini):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     configFile = str(projectini)
@@ -51,10 +52,11 @@ def dev_loc_4(projectini):
         loopy += 1
         currentFile = i
         videoFileBaseName = os.path.basename(currentFile).replace('.csv', '')
+
         csv_df = pd.read_csv(currentFile, header=0,
-                             names=["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
-                                    "Ear_right_1_p", "Nose_1_x", "Nose_1_y", "Nose_1_p", "Tail_base_1_x",
-                                    "Tail_base_1_y", "Tail_base_1_p"])
+                             names=["Ear_left_x", "Ear_left_y", "Ear_left_p", "Ear_right_x", "Ear_right_y",
+                                    "Ear_right_p", "Nose_x", "Nose_y", "Nose_p", "Tail_base_x",
+                                    "Tail_base_y", "Tail_base_p"])
         csv_df = csv_df.apply(pd.to_numeric)
 
         vNm_list.append(videoFileBaseName)
@@ -68,8 +70,8 @@ def dev_loc_4(projectini):
 
         for index, row in csv_df.iterrows():
             currentArray = np.array(
-                [[row['Ear_left_1_x'], row["Ear_left_1_y"]], [row['Ear_right_1_x'], row["Ear_right_1_y"]],
-                 [row['Nose_1_x'], row["Nose_1_y"]], [row['Tail_base_1_x'], row["Tail_base_1_y"]]]).astype(int)
+                [[row['Ear_left_x'], row["Ear_left_y"]], [row['Ear_right_x'], row["Ear_right_y"]],
+                 [row['Nose_x'], row["Nose_y"]], [row['Tail_base_x'], row["Tail_base_y"]]]).astype(int)
             nbody_parts = len(currentArray)
             counts = [0] * nbody_parts
             for i in range(0, (nbody_parts - 1)):
