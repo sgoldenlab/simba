@@ -37,7 +37,7 @@ simba
 ```
 3. Hit `Enter`.
 
->*Note:* If you installed simba on a virtual environment (anaconda), after installation, run `conda install shapely` for simba to work.
+>*Note:* If you installed SimBA on a virtual environment (anaconda), after installation, you may have to run run `conda install shapely` for SimBA to work.
 
 
 # Installing SimBA Option 2
