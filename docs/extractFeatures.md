@@ -11,6 +11,8 @@ it should look something like this `def extract_features_userdef(inifile):`
 
 ## How to run your own script
 
+![](/images/extractfusrdef.PNG)
+
 1. First, load your project and navigate to the `[Extract Features]` tab.
 
 2. Under **Extract Features**, check the checkbox `Apply user defined feature extraction script`.
