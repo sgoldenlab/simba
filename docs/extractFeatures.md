@@ -11,9 +11,11 @@ it should look something like this `def extract_features_userdef(inifile):`
 
 ## How to run your own script
 
-1. Under **Extract Features**, check the checkbox `Apply user defined feature extraction script`.
+1. First, load your project and navigate to the `[Extract Features]` tab.
 
-2. Select your script by clicking on `Browse File`.
+2. Under **Extract Features**, check the checkbox `Apply user defined feature extraction script`.
 
-3. Click on `Extract Features` button to run your script through SimBA.
+3. Select your script by clicking on `Browse File`.
+
+4. Click on `Extract Features` button to run your script through SimBA.
 
