@@ -1,4 +1,4 @@
-User can now use their own extract features script to run 
+User can now use their own extract features script to run. Click [here](https://osf.io/cmkub/) to download the sample script.
 
 ## Pre-requisite
 
