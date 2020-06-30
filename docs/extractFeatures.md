@@ -13,6 +13,8 @@ User can now use their own extract features script to run. Click [here](https://
 4. In the python script, the main function should be name **extract_features_userdef** that allows the config ini file to pass in as an argument. Hence,
 it should look something like this `def extract_features_userdef(inifile):`
 
+![](/images/defextractf.PNG)
+
 ## How to run your own script
 
 ![](/images/extractfusrdef.PNG)
