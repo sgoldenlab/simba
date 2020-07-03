@@ -36,4 +36,6 @@ In some scenarios, however, employing SimBAs' built-in feature-extraction script
 
 * For example outlines of SimBA feature extraction files, for either designing your own feature extraction script within SimBA, or modifying existing feature extraction scripts, please see the SimBA [OSF repository](https://osf.io/emxyw/)
 
-4. After selecting the feature extraction script you would like to use in you project, click on 
+4. After selecting the feature extraction script you would like to use in you project, click on `Extract Features` in the `Extract Features` submenu. 
+
+
