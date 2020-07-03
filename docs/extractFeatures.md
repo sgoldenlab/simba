@@ -8,44 +8,32 @@ In some scenarios, however, employing SimBAs' built-in feature-extraction script
 
 2. As SimBA is developing - the default hard-coded feature extraction files could, at times, be updated (i) with further, additional, features that we have found powerful for classifying particular social behaviors, or (ii) originally calculated features that we have found to lack predictive power in social settings may be removed to speed up computational time. The ability to deploy user-defined 'feature extraction' scrips make new versions of SimBA back-compatible, and users can specify to use feature extraction scripts that came with any prior version of SimBA within the newest latest-and-the-greatest SimBA GUI environment.      
 
-3. By default, when using user-defined pose-estimation body-part configurations in SimBA, a generic feature battery of features is calculated in SimBA which encompass the distance between all body-parts and their velocities in rolling windows.  This may  not be optimal - as this generic feature set could include many features that are not relevant for the behavior of interest, while also missing some key features that could increase predictive accuracy if they were included. If the user is tracking a large number of body-parts using a user-defined pose-estimation configuration, the feature set can also turn very large. The ability to to use user-generated feature extraction scripts in SimBA overcomes all these hurdles.       
+3. By default, when using user-defined pose-estimation body-part configurations in SimBA, a generic feature battery of features is calculated in SimBA which encompass the distance between all body-parts and their velocities in rolling windows.  This may  not be optimal - as this generic feature set could include many features that are not relevant for the behavior of interest, while also missing some key features that could increase predictive accuracy if they were included. If the user is tracking a large number of body-parts using a user-defined pose-estimation configuration, the feature set can also turn very large. The ability to to use user-generated feature extraction scripts in SimBA overcomes all these hurdles.
+
+4. 
 
 ### Step 1: Use a user-defined feature extraction script in SimBA
 
-1. Before using a user-defined feture extraction script in SimBA, import the pose-estimation tracking files and correct outliers. Instructions for how to import pose-estimation tracking files and correcting outliers can be found in the walk-through tutorial for [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) and [Part I](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config%5D) or the generic SimBA tutorial.  
+1. Before using a user-defined feture extraction script in SimBA, load your project, import the pose-estimation tracking files and correct outliers. Instructions for how to load your project, importing pose-estimation tracking files and correcting outliers can be found in the walk-through tutorial for [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) and [Part I](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config%5D) or the generic SimBA tutorial.  
 
-2. Navigate to the 
+2. Navigate to the `Extract features` tab in SimBA. and you should see the following window with the "User-defined feature extraction" menu circled in red in the image. 
 
-User can now use their own extract features script to run. Click [here](https://osf.io/cmkub/) to download the sample script.
+![alt-text-1](/images/feat_1.JPG "Feat_1")
 
-## Pre-requisite
+3. Tick the `Apply user defined feature extraction script` box, and click the `Browse File` button next to the `Script Path` entry-box. Go ahead and select the path to the folder containing your feature extraction script. There are some critical rules that the feature extraction script needs to follow in order to work within the SimBA GUI environment and your project and those rules are outlined below. 
 
-![](/images/effolder.PNG)
+* The feature extraction script should be located in a folder which contains **two** files in total: (i) the feature extraction script itself and a file called `__init__.py`. The `__init__.py` file should be completely empty. The folder **should not** have any spaces in it's name. For example, you may have a folder called `My_feature_extraction_script` on your Desktop (**not `My feature extraction script`**), which content looks like this:
 
-1. The user should have an empty `__init__.py` file in the script path.
+![alt-text-1](/images/feat_3.JPG "Feat_3")
 
-2. The name of the extract features script can be any name but it cannot contain any spaces. Eg: *arbitraryscriptname.py* is good, while *arbitrary script name .py* is bad.
+* The feature extraction script itself (e.g., `My_feature_extraction_script.py` in the image above) can be named anything. However, it also cannot contain any spaces in the filename. For example, *My_feature_extraction_script.py* is good, while *My feature extraction script.py* is bad.
 
-3. The name of the folder that contains the script should not contain any spaces too.
-
-4. In the python script, the main function should be name **extract_features_userdef** that allows the config ini file to pass in as an argument. Hence,
-it should look something like this `def extract_features_userdef(inifile):`
-
+* The inside of the *My_feature_extraction_script.py* should contain a function accepeting a single argument. This main function should be name **extract_features_userdef**, and takes the main project config file as argument. Hence, the function and its argument should look like this: 
 
 <p align="center">
   <img width="288" height="35" src="/images/defextractf.PNG">
 </p>
 
+* For example outlines of SimBA feature extraction files, for either designing your own feature extraction script within SimBA, or modifying existing feature extraction scripts, please see the SimBA [OSF repository](https://osf.io/emxyw/)
 
-## How to run your own script
-
-![](/images/extractfusrdef.PNG)
-
-1. First, load your project and navigate to the `[Extract Features]` tab.
-
-2. Under **Extract Features**, check the checkbox `Apply user defined feature extraction script`.
-
-3. Select your script by clicking on `Browse File`.
-
-4. Click on `Extract Features` button to run your script through SimBA.
-
+4. After selecting the feature extraction script you would like to use in you project, click on 
