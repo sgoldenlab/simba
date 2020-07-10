@@ -8,7 +8,7 @@ The data-sets we share on OSF are typically very large (many GBs) so they have b
 
 
 
-2. Download all the .zip files you can see in the folder and place them together in a folder on your computer. In this example, I would click on each of the six files, and each time click download using the botton around the top right of the screen in the OSF interface that shows up. 
+2. Download all the .zip files you can see in the folder and place them together in a folder on your computer. In this example, I would click on each of the six files, and each time click download using the button located around the top right of the screen in the OSF interface that shows up when I click on the file. 
 
 
 
