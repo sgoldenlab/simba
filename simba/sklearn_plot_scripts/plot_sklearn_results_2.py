@@ -5,7 +5,7 @@ import pandas as pd
 from scipy import ndimage
 from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError
 import glob
-from drop_bp_cords import getBpNames
+from simba.drop_bp_cords import getBpNames
 from pylab import *
 import random
 
@@ -27,16 +27,16 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
         os.makedirs(frames_dir_out)
     counters_no = config.getint('SML settings', 'No_targets')
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
-    try:
-        mulltiAnimalIDList= config.get('Multi animal IDs', 'id_list')
-        mulltiAnimalIDList = mulltiAnimalIDList.split(",")
+    mulltiAnimalIDList= config.get('Multi animal IDs', 'id_list')
+    mulltiAnimalIDList = mulltiAnimalIDList.split(",")
+    if mulltiAnimalIDList[0] != '':
         mulltiAnimalStatus = True
-    except NoSectionError:
+    if mulltiAnimalIDList[0] == '':
         mulltiAnimalStatus = False
+    print(mulltiAnimalStatus)
     vidinfDf = pd.read_csv(vidInfPath)
     target_names, colorList_animal_1, colorList_animal_2, loopy = [], [], [], 0
     Xcols, Ycols, Pcols = getBpNames(configini)
-
     cmap = cm.get_cmap('hot', len(Xcols) + 1)
     for i in range(cmap.N):
         rgb = list((cmap(i)[:3]))
@@ -50,7 +50,6 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
             rgb = [i * 255 for i in rgb]
             rgb.reverse()
             colorList_animal_2.append(rgb)
-
     filesFound = glob.glob(csv_dir_in + '/*.csv')
     print('Processing ' + str(len(filesFound)) + ' videos ...')
 
@@ -96,18 +95,21 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
             animalBpHeaderList.append(animal1_BPsX.columns[i])
             animalBpHeaderList.append(animal1_BPsY.columns[i])
         animalBpHeaderListX, animalBpHeaderListY, animalBpHeaderList = ([x for x in animalBpHeaderListX if "Tail_end" not in x], [x for x in animalBpHeaderListY if "Tail_end" not in x], [x for x in animalBpHeaderList if "Tail_end" not in x])
+
         if (animalsNo == 2) and (poseConfSetting == 'user_defined'):
             animal_1_BpHeaderList = [s for s in animalBpHeaderList if mulltiAnimalIDList[0] in s]
             animal_2_BpHeaderList = [s for s in animalBpHeaderList if mulltiAnimalIDList[1] in s]
-        if (animalsNo == 2) and (poseConfSetting != 'user_defined'):
+        elif (animalsNo == 2) and (poseConfSetting != 'user_defined'):
             animal_1_BpHeaderList = [s for s in animalBpHeaderList if '_1_' in s]
             animal_2_BpHeaderList = [s for s in animalBpHeaderList if '_2_' in s]
+        else:
+            animal_1_BpHeaderList = animalBpHeaderList.copy()
         if os.path.exists(os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.mp4'))):
             videoPathName = os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.mp4'))
         elif os.path.exists(os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.avi'))):
             videoPathName = os.path.join(projectPath,'videos', CurrentVideoName.replace('.csv', '.avi'))
         else:
-            print('Cannot locate video ' + str(CurrentVideoName.replace('.csv', '')) + 'in mp4 or avi format')
+            print('Cannot locate video ' + str(CurrentVideoName.replace('.csv', '')) + ' in mp4 or avi format')
             break
         cap = cv2.VideoCapture(videoPathName)
         width, height, frames = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -118,7 +120,7 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
         if height >= width:
             videoHeight, videoWidth = height, width
         writer = cv2.VideoWriter(outputFileName.replace('.csv', '.mp4'), fourcc, fps, (videoWidth, videoHeight))
-        mySpaceScale, myRadius, myResolution, myFontScale  = 60, 12, 1500, 1.5
+        mySpaceScale, myRadius, myResolution, myFontScale = 60, 12, 1500, 1.5
         maxResDimension = max(width, height)
         circleScale, fontScale, spacingScale = int(myRadius / (myResolution / maxResDimension)), float(myFontScale / (myResolution / maxResDimension)), int(mySpaceScale / (myResolution / maxResDimension))
         currRow = 0
@@ -133,7 +135,7 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
                     currAnimal1 = np.reshape(currAnimal1, (-1, 2))
                     M1polyglon_array_hull = cv2.convexHull((currAnimal1.astype(int)))
                     cv2.drawContours(frame, [M1polyglon_array_hull.astype(int)], 0, (255, 255, 255), 2)
-                if animalsNo == 2 and (poseConfSetting != 'user_defined'):
+                if (animalsNo == 2) and (poseConfSetting != 'user_defined'):
                     currAnimal1, currAnimal2 = (currentDf.loc[currentDf.index[currRow], animal_1_BpHeaderList],currentDf.loc[currentDf.index[currRow], animal_2_BpHeaderList])
                     currAnimal1, currAnimal2  = (np.array(currAnimal1).astype(int), np.array(currAnimal2).astype(int))
                     currAnimal1, currAnimal2 = (np.reshape(currAnimal1, (-1, 2)), np.reshape(currAnimal2, (-1, 2)))
@@ -145,14 +147,14 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
                     currYval = animal1_BPsY.loc[animal1_BPsY.index[currRow], animalBpHeaderListY[cords]]
                     if animalBpHeaderListX[cords] in animal_1_BpHeaderList:
                         color = colorList_animal_1[cords]
-                    if animalBpHeaderListX[cords] in animal_2_BpHeaderList:
+                    elif animalBpHeaderListX[cords] in animal_2_BpHeaderList:
                         color = colorList_animal_2[cords]
                     cv2.circle(frame, (int(currXval), int(currYval)), circleScale, color, -1, lineType=cv2.LINE_AA)
                     if (mulltiAnimalStatus == True) and ('Center' in animalBpHeaderListX[cords]) and (animalBpHeaderListX[cords] in animal_1_BpHeaderList):
                         IDlabelLoc.append([currXval, currYval])
                     if (mulltiAnimalStatus == True) and ('Center' in animalBpHeaderListX[cords]) and (animalBpHeaderListX[cords] in animal_2_BpHeaderList):
                         IDlabelLoc.append([currXval, currYval])
-                if not IDlabelLoc:
+                if (not IDlabelLoc) and (mulltiAnimalStatus == True):
                     animal1_x, animal1_y = currentDf.at[currRow, animal_1_BpHeaderList[0]], currentDf.at[currRow, animal_1_BpHeaderList[1]]
                     animal2_x, animal2_y = currentDf.at[currRow, animal_2_BpHeaderList[0]], currentDf.at[currRow, animal_2_BpHeaderList[1]]
                     IDlabelLoc.append([animal1_x, animal1_y])
@@ -170,25 +172,25 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
                         cv2.putText(frame, str(mulltiAnimalIDList[0]), (newX1, newY1), cv2.FONT_HERSHEY_COMPLEX, fontScale, (0,0,255), 4)
                         cv2.putText(frame, str(mulltiAnimalIDList[1]), (newX2, newY2), cv2.FONT_HERSHEY_COMPLEX, fontScale, (255,0,0), 4)
 
-                # # draw event timers
-                # for b in range(counters_no):
-                #     target_timers[b] = (1 / fps) * target_counters[b]
-                #     target_timers[b] = round(target_timers[b], 2)
-                #
-                # cv2.putText(frame, str('Timers'), (10, ((height - height) + spacingScale)), cv2.FONT_HERSHEY_COMPLEX, fontScale, (0, 255, 0), 4)
-                # addSpacer = 2
-                # for k in range(counters_no):
-                #     cv2.putText(frame, (str(target_names[k]) + ' ' + str(target_timers[k]) + str('s')), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 0, 0), 4)
-                #     addSpacer += 1
-                # cv2.putText(frame, str('ensemble prediction'), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 255, 0), 4)
-                #
-                # addSpacer += 1
-                # for p in range(counters_no):
-                #     TargetVal = int(currentDf.loc[currRow, [target_names[p]]])
-                #     if TargetVal == 1:
-                #         cv2.putText(frame, str(target_names[p]), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_TRIPLEX, int(fontScale*1.8), colors[p], 4)
-                #         target_counters[p] += 1
-                #         addSpacer += 1
+                # draw event timers
+                for b in range(counters_no):
+                    target_timers[b] = (1 / fps) * target_counters[b]
+                    target_timers[b] = round(target_timers[b], 2)
+
+                cv2.putText(frame, str('Timers'), (10, ((height - height) + spacingScale)), cv2.FONT_HERSHEY_COMPLEX, fontScale, (0, 255, 0), 4)
+                addSpacer = 2
+                for k in range(counters_no):
+                    cv2.putText(frame, (str(target_names[k]) + ' ' + str(target_timers[k]) + str('s')), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 0, 0), 4)
+                    addSpacer += 1
+                cv2.putText(frame, str('ensemble prediction'), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 255, 0), 4)
+
+                addSpacer += 1
+                for p in range(counters_no):
+                    TargetVal = int(currentDf.loc[currRow, [target_names[p]]])
+                    if TargetVal == 1:
+                        cv2.putText(frame, str(target_names[p]), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_TRIPLEX, int(fontScale*1.8), colors[p], 4)
+                        target_counters[p] += 1
+                        addSpacer += 1
                 if videoSetting == 1:
                     writer.write(frame)
                 if frameSetting == 1:
@@ -199,7 +201,7 @@ def plotsklearnresult(configini,videoSetting, frameSetting):
                     break
                 currRow+=1
                 print('Frame ' + str(currRow) + '/' + str(frames) + '. Video ' + str(loopy) + '/' + str(len(filesFound)))
-            if (frame is None) or currRow >= 17000:
+            if frame is None:
                 print('Video ' + str(os.path.basename(CurrentVideoName.replace('.csv', '.mp4'))) + ' saved.')
                 cap.release()
                 break
