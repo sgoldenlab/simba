@@ -139,16 +139,16 @@ def extract_features_wotarget_8(inifile):
                     csv_df_combined.Tail_end_y_shifted - csv_df_combined.Tail_end_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_left_ear'] = (np.sqrt(
             (csv_df_combined.Ear_left_x_shifted - csv_df_combined.Ear_left_x) ** 2 + (
-                    csv_df_combined.Ear_left_x - csv_df_combined.Ear_left_y) ** 2)) / currPixPerMM
+                    csv_df_combined.Ear_left_y_shifted - csv_df_combined.Ear_left_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_right_ear'] = (np.sqrt(
             (csv_df_combined.Ear_right_x_shifted - csv_df_combined.Ear_right_x) ** 2 + (
-                    csv_df_combined.Ear_right_x - csv_df_combined.Ear_right_y) ** 2)) / currPixPerMM
+                    csv_df_combined.Ear_right_y_shifted - csv_df_combined.Ear_right_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_lateral_left'] = (np.sqrt(
             (csv_df_combined.Lat_left_x_shifted - csv_df_combined.Lat_left_x) ** 2 + (
-                    csv_df_combined.Lat_left_x - csv_df_combined.Lat_left_y) ** 2)) / currPixPerMM
+                    csv_df_combined.Lat_left_y_shifted - csv_df_combined.Lat_left_y) ** 2)) / currPixPerMM
         csv_df['Movement_mouse_lateral_right'] = (np.sqrt(
             (csv_df_combined.Lat_right_x_shifted - csv_df_combined.Lat_right_x) ** 2 + (
-                    csv_df_combined.Lat_right_x - csv_df_combined.Lat_right_y) ** 2)) / currPixPerMM
+                    csv_df_combined.Lat_right_y_shifted - csv_df_combined.Lat_right_y) ** 2)) / currPixPerMM
         csv_df['Mouse_polygon_size_change'] = (
                 csv_df_combined['Mouse_poly_area_shifted'] - csv_df_combined['Mouse_poly_area'])
 
