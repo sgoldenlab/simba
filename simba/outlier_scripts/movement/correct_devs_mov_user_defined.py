@@ -40,7 +40,7 @@ def dev_move_user_defined(configini):
     csv_dir_out = os.path.join(projectPath, 'csv', 'outlier_corrected_movement')
 
     ########### logfile path ###########
-    log_fn = os.path.join(projectPath, 'log', 'Outliers_movement_' + str(dateTime) + '.csv')
+    log_fn = os.path.join(projectPath, 'logs', 'Outliers_movement_' + str(dateTime) + '.csv')
 
     def add_correction_prefix(col, bpcorrected_list):
         colc = 'Corrected_' + col
