@@ -334,9 +334,11 @@ This step is used for training new machine models for behavioral classifications
 
 4. Then, set the **Hyperparameters**.
 
-5. Click the `Save settings for multiple models` button. This generates a _meta.csv file. Repeat the steps to generate multiple models.
+5. Click the `Save settings for specific model` button. This generates a meta.csv file, located in your `project_folder/configs` directory, which contains your selected hyperparameters. Repeat the steps to generate multiple models. On model will be generated for each of the meta.csv files in the `project_folder/configs` directory.
 
-6. Click on `Train Multiple Models`.
+6. Close the `Machine models settings` window. 
+
+7. Click on the green `Train Multiple Models, one for each saved settings` button.
 
 ### Optional step before running machine model on new data
 The user can validate each model *( saved in .sav format)* file. In this validation step the user specifies the path to a previously created model in .sav file format, and a .csv file containing the features extracted from a video. This process will (i) run the classifications on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click[here](https://youtu.be/UOLSj7DGKRo) for an example validation video.
