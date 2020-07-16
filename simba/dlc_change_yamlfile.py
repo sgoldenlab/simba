@@ -4,7 +4,6 @@ import os
 import shutil
 import deeplabcut
 
-
 def generatetempyaml(yamlfile,videolist):
     try:
         #copy yaml and rename
@@ -106,14 +105,14 @@ def select_numfram2pick(yamlfile,numframe):
             yaml.dump(read_yaml, outfile, default_flow_style=False)
     except:
         print('Please load .yaml file and enter the number of frames to pick to proceed')
+
 def add_multi_video_yaml(yamlfile,directory):
     filesFound = []
 
     ########### FIND FILES ###########
     for i in os.listdir(directory):
-        if i.__contains__(".mp4"):
+        if ('.avi' in i) or ('.mp4' in i):
             a=os.path.join(directory,i)
-            print(a)
             filesFound.append(a)
 
 

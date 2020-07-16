@@ -5,7 +5,7 @@ from datetime import datetime
 import statistics
 import numpy as np
 import glob
-from drop_bp_cords import getBpNames
+from simba.drop_bp_cords import getBpNames
 
 
 def time_bins_movement(configini,binLength):

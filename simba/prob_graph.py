@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import cv2
-from labelling_aggression import *
+from simba.labelling_aggression import *
 import threading
 def updateThreshold_graph(inifile,csv,model):
     ## find the csv for df

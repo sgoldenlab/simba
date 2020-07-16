@@ -4,6 +4,7 @@ from operator import itemgetter
 import cv2
 from configparser import ConfigParser
 import glob
+from itertools import groupby, chain
 
 
 def validate_classifier(configini,seconds,target):
@@ -23,15 +24,18 @@ def validate_classifier(configini,seconds,target):
     ## get fps from videoinfo csv
     videoinfocsv = os.path.join(projectPath, 'logs', 'video_info.csv')
     fpsdf = pd.read_csv(videoinfocsv)
+    fileCounter = 0
 
     #main loop
     for i in csvList:
+        print('Processing file: ' + os.path.basename(csvList) + ' File ' + fileCounter + ' / ' + str(len(csvList)))
         df = pd.read_csv(i)
         csvname = os.path.basename(i).split('.')[0]
         fps = int(fpsdf['fps'].loc[(fpsdf['Video'] == csvname)])
         targetcolumn = df[target]
         probabilitycolumn = df['Probability_' + target]
         framesBehavior = [i for i, e in enumerate(targetcolumn) if e != 0]  ##get frame numbers with behavior into a list( df column = 1)
+
 
         #get all bouts in a list
         bouts = []

@@ -7,7 +7,7 @@ import numpy as np
 import statistics
 import os
 from configparser import ConfigParser, MissingSectionHeaderError
-from drop_bp_cords import drop_bp_cords
+from simba.drop_bp_cords import drop_bp_cords
 import glob
 warnings.simplefilter(action='ignore', category=FutureWarning)
 

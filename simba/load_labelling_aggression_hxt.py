@@ -36,6 +36,7 @@ def configure(file_name):
     config.read(file_name)
     number_of_targets = config.get('SML settings', 'No_targets')
 
+
     for i in range(1, int(number_of_targets)+1):
         target = config.get('SML settings', 'target_name_' + str(i))
         columns.append(target)
@@ -177,7 +178,6 @@ class MainInterface:
         if self.rangeOn.get():
             s = int(self.firstFrame.get())
             e = int(self.lastFrame.get())
-            print(s, e)
             save_values(s, e)
             if e < len(frames_in) - 1:
                 load_frame(e + 1, master, self.fbox)
@@ -188,8 +188,6 @@ class MainInterface:
             e = s
             save_values(s, e)
             load_frame(e+1, master, self.fbox)
-
-        print(df)
 
 class MainInterface2:
     def __init__(self):
@@ -304,10 +302,9 @@ def load_folder(project_name):
     global current_video
     img_dir = filedialog.askdirectory()
     os.chdir(img_dir)
-    print("Working directory is %s" % os.getcwd())
     dirpath = os.path.basename(os.getcwd())
     current_video = dirpath
-    print('Current Video: ' + current_video)
+    print('Loading video ' + current_video + '...')
     ## get the frames
     global frames_in
     frames_in = []
@@ -325,7 +322,6 @@ def load_folder(project_name):
     curr_target_csv= os.path.join(os.path.dirname(project_name),'csv','targets_inserted',os.path.basename(img_dir)+'.csv')
     df = pd.read_csv(curr_target_csv)
     df = df.fillna(0)
-    print(df)
     MainInterface()
     #create_data_frame(number_of_frames)
 
@@ -344,7 +340,7 @@ def choose_folder2(framedir):
     frames_in = sorted(frames_in, key=lambda x: int(x.split('.')[0]))
     # print(frames_in)
     number_of_frames = len(frames_in)
-    print("Number of Frames: " + str(number_of_frames))
+    print("Number of Frames in current video: " + str(number_of_frames))
 
     guiwindow = MainInterface2()
 
@@ -427,15 +423,24 @@ def set_values(dictionary):
 
 
 # Saves the values of each behavior in the DataFrame and prints out the updated data frame
+
 def save_values(start, end):
+    global columns
+    contprintLoop = True
+    print('\n')
     if start == end:
         for i in range(len(behaviors)):
             df.at[current_frame_number, columns[i]] = int(behaviors[i])
+            if behaviors[i] != 0:
+                print('Annotated behavior: ' + columns[i] + '. Frame: ' + str(start) + '.')
+
     if start != end:
         for i in range(start, end+1):
             for b in range(len(behaviors)):
                 df.at[i, columns[b]] = int(behaviors[b])
-    print(df.ix[current_frame_number])
+                if behaviors[b] != 0 and (contprintLoop == True):
+                    print('Annotated behavior: ' + columns[b] + '. Start frame: ' + str(start) + '. End frame: ' + str(end))
+            contprintLoop = False
 
 
 # Appends data to corresponding features_extracted csv and exports as new csv

@@ -16,37 +16,46 @@ def path_plot_config(configini):
     noAnimals = config.getint('Path plot settings', 'no_animal_pathplot')
     projectPath = config.get('General settings', 'project_path')
     frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'path_plots')
+
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
+
     try:
         maxDequeLines = config.getint('Path plot settings', 'deque_points')
     except ValueError:
         print('ERROR: "Max lines" not set.')
+
     csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
     severityBool = config.get('Path plot settings', 'plot_severity')
     severityTarget = config.get('Path plot settings','severity_target')
     trackedBodyPart1 = config.get('Path plot settings', 'animal_1_bp')
     trackedBodyPart2 = config.get('Path plot settings', 'animal_2_bp')
+
     try:
         severity_brackets = config.getint('Path plot settings', 'severity_brackets')
     except ValueError:
         print('"Severity scale" not set.')
         severity_brackets = 1
+
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
     severityGrades = list(np.arange(0, 1.0, ((10 / severity_brackets) / 10)))
     severityGrades.append(10)
+
     severityColourRGB, severityColour  = [], []
     clrs = sns.color_palette('Reds', n_colors=severity_brackets)
+
     for color in clrs:
         for value in color:
             value *= 255
             value = int(value)
             severityColourRGB.append(value)
     severityColourList = [severityColourRGB[i:i + 3] for i in range(0, len(severityColourRGB), 3)]
+
     for color in severityColourList:
         r, g, b = color[0], color[1], color[2]
         severityColour.append((b, g, r))
+
     filesFound = glob.glob(csv_dir_in + "/*.csv")
     print('Generating path plots for ' + str(len(filesFound)) + ' video(s)...')
     fileCounter = 0
@@ -59,13 +68,16 @@ def path_plot_config(configini):
         csv_df = pd.read_csv(currentFile, index_col=[0])
         CurrentVideoName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
+
         try:
             resWidth = int(videoSettings['Resolution_width'])
             resHeight = int(videoSettings['Resolution_height'])
         except TypeError:
             print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
+
         if noAnimals == 1:
             trackedBodyPartHeadings = [trackedBodyPart1 + '_x', trackedBodyPart1 + '_y']
+
         elif noAnimals == 2:
             trackedBodyPartHeadings = [trackedBodyPart1 + '_x', trackedBodyPart1 + '_y', trackedBodyPart2 + '_x', trackedBodyPart2 + '_y']
 
@@ -78,9 +90,12 @@ def path_plot_config(configini):
         columnNames = list(csv_df_combined)
         maxImageSizeColumn_x, maxImageSizeColumn_y = resWidth, resHeight
         savePath = os.path.join(frames_dir_out, CurrentVideoName.replace('.csv', ''))
+
         if not os.path.exists(savePath):
             os.makedirs(savePath)
+
         img_size = (maxImageSizeColumn_y, maxImageSizeColumn_x, 3)
+
         if severityBool == 'yes':
             csv_df_combined[severityTarget] = csv_df[severityTarget].values
             csv_df_combined['Scaled_movement_M1_M2'] = csv_df['Scaled_movement_M1_M2'].values
@@ -122,6 +137,8 @@ def path_plot_config(configini):
                     currEventX, currEventY, colour = severityCircles[y]
                     cv2.circle(overlay, (int(currEventX), int(currEventY)), 20, colour, -1)
             print(len(severityCircles))
+
+
             image_new = cv2.addWeighted(overlay, 0.2, img, 1 - 0.2, 0)
             m1tuple = (int(row[columnNames[0]]), int(row[columnNames[1]]))
             cv2.circle(image_new, (m1tuple[0], m1tuple[1]), 20, (255, 0, 0), -1)

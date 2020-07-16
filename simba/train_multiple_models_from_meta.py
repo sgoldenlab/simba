@@ -21,7 +21,7 @@ from eli5.sklearn import PermutationImportance
 import numpy as np
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
-from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
+from simba.drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
 
 def train_multimodel(configini):
     pd.options.mode.chained_assignment = None
@@ -230,12 +230,10 @@ def train_multimodel(configini):
             under_sample_ratio = 'NaN'
         if over_sample_setting == 'SMOTEENN':
             print('Performing SMOTEEN oversampling...')
-            over_sample_ratio = config.getfloat('create ensemble settings', 'over_sample_ratio')
             smt = SMOTEENN(sampling_strategy=over_sample_ratio)
             data_train, target_train = smt.fit_sample(data_train, target_train)
         if over_sample_setting == 'SMOTE':
             print('Performing SMOTE oversampling...')
-            over_sample_ratio = config.getfloat('create ensemble settings', 'over_sample_ratio')
             smt = SMOTE(sampling_strategy=over_sample_ratio)
             data_train, target_train = smt.fit_sample(data_train, target_train)
         if (over_sample_setting != 'SMOTEENN') or (over_sample_setting != 'SMOTE'):

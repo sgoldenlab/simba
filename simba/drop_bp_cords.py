@@ -28,8 +28,7 @@ def define_bp_drop_down(configini):
     config.read(configFile)
     animalno = config.getint('General settings', 'animal_no')
     # get list
-    bpcsv = (os.path.join(os.path.dirname(configini), 'logs', 'measures', 'pose_configs', 'bp_names',
-                          'project_bp_names.csv'))
+    bpcsv = (os.path.join(os.path.dirname(configini), 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv'))
     bplist = []
     with open(bpcsv) as f:
         for row in f:
@@ -53,8 +52,8 @@ def define_movement_cols(noAnimals):
     return columnNames
 
 def bodypartConfSchematic():
-    optionsBaseListImagesPath = os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), 'pose_configurations', 'schematics')
-    optionsBaseListNamesPath = os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), 'pose_configurations', 'configuration_names', 'pose_config_names.csv')
+    optionsBaseListImagesPath = os.path.join(os.path.dirname(__file__), 'pose_configurations', 'schematics')
+    optionsBaseListNamesPath = os.path.join(os.path.dirname(__file__), 'pose_configurations', 'configuration_names', 'pose_config_names.csv')
     optionsBaseNameList = pd.read_csv(optionsBaseListNamesPath, header=None)
     optionsBaseNameList = list(optionsBaseNameList[0])
     optionsBaseNameList.append('Create pose config...')

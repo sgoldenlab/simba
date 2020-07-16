@@ -6,12 +6,13 @@ import cv2
 from configparser import ConfigParser, MissingSectionHeaderError
 import glob
 
-def data_plot_config(configini):
+def data_plot_config(configini, SelectedBp):
     config = ConfigParser()
     configFile = str(configini)
     config.read(configFile)
     noAnimals = config.getint('General settings', 'animal_no')
     projectPath = config.get('General settings', 'project_path')
+    poseConfigSetting = config.get('create ensemble settings', 'pose_estimation_body_parts')
     frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'live_data_table')
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
@@ -20,13 +21,20 @@ def data_plot_config(configini):
     vidinfDf = pd.read_csv(vidInfPath)
     videoCounter = 0
 
+    ##### FIND RELEVANT COLUMN
+    if poseConfigSetting != 'user_defined':
+        if noAnimals == 1:
+            move1ColName = "Movement_mouse_centroid"
+        if noAnimals == 2:
+            move1ColName = "Movement_mouse_1_centroid"
+    if poseConfigSetting == 'user_defined':
+        if noAnimals == 1:
+            move1ColName = "movement_" + SelectedBp
+        if noAnimals == 2:
+            move1ColName = "movement_" + SelectedBp + '_1'
+
     ########### FIND CSV FILES ###########
     filesFound = glob.glob(csv_dir_in + "/*.csv")
-
-    if noAnimals == 1:
-        move1ColName = "Movement_mouse_centroid"
-    if noAnimals == 2:
-        move1ColName = "Movement_mouse_1_centroid"
 
     print('Generating data plots for ' + str(len(filesFound)) + ' video(s)...')
 
@@ -47,8 +55,6 @@ def data_plot_config(configini):
             os.makedirs(savePath)
         df_lists = [csv_df[i:i + fps] for i in range(0, csv_df.shape[0], fps)]
 
-
-
         for currentDf in df_lists:
             mmMove_nose_M1 = currentDf[move1ColName].mean()
             list_nose_movement_M1.append(mmMove_nose_M1)
@@ -58,7 +64,10 @@ def data_plot_config(configini):
             total_Movement_M1 = sum(list_nose_movement_M1)
             total_Movement_M1 = round(total_Movement_M1, 2)
             if noAnimals == 2:
-                mmMove_nose_M2 = currentDf["Movement_mouse_2_centroid"].mean()
+                if poseConfigSetting != 'user_defined':
+                    mmMove_nose_M2 = currentDf["Movement_mouse_2_centroid"].mean()
+                if poseConfigSetting == 'user_defined':
+                    mmMove_nose_M2 = currentDf["movement_" + SelectedBp + '_2'].mean()
                 list_nose_movement_M2.append(mmMove_nose_M2)
                 current_velocity_M2_cm_sec = round(mmMove_nose_M2, 2)
                 meanVelocity_M2 = statistics.mean(list_nose_movement_M2)
@@ -84,15 +93,15 @@ def data_plot_config(configini):
                     cv2.putText(img, str(total_Movement_M2) + str(' cm'), (275, 100), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (0, 0, 255), 1)
                     cv2.putText(img, str(current_velocity_M2_cm_sec) + str(' cm/s'), (275, 120), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (0, 100, 0), 1)
 
-                    centroid_distance_cm = (int(row["Centroid_distance"])) / 10
-                    centroid_distance_cm = round(centroid_distance_cm, 2)
-                    nose_2_nose_dist_cm = (int(row["Nose_to_nose_distance"])) / 10
-                    nose_2_nose_dist_cm = round(nose_2_nose_dist_cm, 2)
-
-                    cv2.putText(img, str('Centroid distance: '), (5, 140), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (153, 50, 204), 1)
-                    cv2.putText(img, str('Nose to nose distance: '), (5, 160), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (153, 50, 204), 1)
-                    cv2.putText(img, str(centroid_distance_cm) + str(' cm'), (275, 140), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (153, 50, 204), 1)
-                    cv2.putText(img, str(nose_2_nose_dist_cm) + str(' cm'), (275, 160), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (153, 50, 204), 1)
+                    if poseConfigSetting != 'user_defined':
+                        centroid_distance_cm = (int(row["Centroid_distance"])) / 10
+                        centroid_distance_cm = round(centroid_distance_cm, 2)
+                        nose_2_nose_dist_cm = (int(row["Nose_to_nose_distance"])) / 10
+                        nose_2_nose_dist_cm = round(nose_2_nose_dist_cm, 2)
+                        cv2.putText(img, str('Centroid distance: '), (5, 140), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (153, 50, 204), 1)
+                        cv2.putText(img, str('Nose to nose distance: '), (5, 160), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (153, 50, 204), 1)
+                        cv2.putText(img, str(centroid_distance_cm) + str(' cm'), (275, 140), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (153, 50, 204), 1)
+                        cv2.putText(img, str(nose_2_nose_dist_cm) + str(' cm'), (275, 160), cv2.FONT_HERSHEY_TRIPLEX, 0.5, (153, 50, 204), 1)
                 imageSaveName = os.path.join(savePath, str(loop) + '.png')
                 cv2.imwrite(imageSaveName, img)
                 print('Live plot ' + str(loop) + '/' + str(len(csv_df)) + ' for video ' + str(videoCounter) + '/' + str(len(filesFound)))

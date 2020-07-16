@@ -34,6 +34,7 @@ def reset():
 
 # Retrieves behavior names from the config file
 def configure(file_name):
+    global columns
     config = ConfigParser()
     config.read(file_name)
     number_of_targets = config.get('SML settings', 'No_targets')
@@ -179,7 +180,6 @@ class MainInterface:
         if self.rangeOn.get():
             s = int(self.firstFrame.get())
             e = int(self.lastFrame.get())
-            print(s, e)
             save_values(s, e)
             if e < len(frames_in) - 1:
                 load_frame(e + 1, master, self.fbox)
@@ -312,7 +312,7 @@ def choose_folder(project_name):
     os.chdir(img_dir)
     dirpath = os.path.basename(os.getcwd())
     current_video = dirpath
-    print('Current Video: ' + current_video)
+    print('Loading video ' + current_video + '...')
 
     global frames_in
     frames_in = []
@@ -448,15 +448,22 @@ def set_values(dictionary):
 
 # Saves the values of each behavior in the DataFrame and prints out the updated data frame
 def save_values(start, end):
+    global columns
+    contprintLoop = True
+    print('\n')
     if start == end:
         for i in range(len(behaviors)):
             df.at[current_frame_number, columns[i]] = int(behaviors[i])
+            if behaviors[i] != 0:
+                print('Annotated behavior: ' + columns[i] + '. Frame: ' + str(start) + '.')
+
     if start != end:
         for i in range(start, end+1):
             for b in range(len(behaviors)):
                 df.at[i, columns[b]] = int(behaviors[b])
-    #print(df.ix[current_frame_number])
-
+                if behaviors[b] != 0 and (contprintLoop == True):
+                    print('Annotated behavior: ' + columns[b] + '. Start frame: ' + str(start) + '. End frame: ' + str(end))
+            contprintLoop = False
 
 # Appends data to corresponding features_extracted csv and exports as new csv
 def save_video(master):

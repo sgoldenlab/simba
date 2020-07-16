@@ -9,7 +9,7 @@ import cv2
 from scipy import ndimage
 import warnings
 import random
-from drop_bp_cords import drop_bp_cords
+from simba.drop_bp_cords import drop_bp_cords
 import matplotlib.pyplot as plt
 import numpy as np
 import io

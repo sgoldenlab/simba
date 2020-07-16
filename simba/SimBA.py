@@ -10,45 +10,40 @@ import csv
 import sys
 from tkinter import *
 from tkinter.filedialog import askopenfilename,askdirectory
-from tkinter_functions import *
-from create_project_ini import write_inifile
-from json2csv import json2csv_file, json2csv_folder
 from tkinter import tix
 import subprocess
 import platform
 import shutil
 from tabulate import tabulate
-from dlc_change_yamlfile import select_numfram2pick,updateiteration,update_init_weight,generatetempyaml,generatetempyaml_multi
-from extract_features_wo_targets import extract_features_wotarget
-from sklearn_DLC_RF_train_model import RF_trainmodel
+from configparser import ConfigParser
+from PIL import Image, ImageTk
+import tkinter.ttk as ttk
+import webbrowser
+import cv2
+from tkinter_functions import *
+from create_project_ini import write_inifile
+from json2csv import json2csv_file, json2csv_folder
 from run_RF_model import rfmodel
-from merge_frames import merge_frames_config
 from prob_graph import *
 from runmodel_1st import *
 from path_plot import path_plot_config
 from gantt import ganntplot_config
 from data_plot import data_plot_config
 from line_plot import line_plot_config
-from merge_movie_ffmpeg import generatevideo_config_ffmpeg
 from import_videos_csv_project_ini import *
-from configparser import ConfigParser
 from labelling_aggression import *
 from pseudoLabel import semisuperviseLabel
 from load_labelling_aggression import load_folder
-from PIL import Image, ImageTk
-import tkinter.ttk as ttk
 from get_coordinates_tools_v2 import get_coordinates_nilsson
 from process_data_log import analyze_process_data_log
 from process_severity import analyze_process_severity
-from process_movement import analyze_process_movement
-import webbrowser
 from process_videos_automation import *
 from extract_seqframes import *
 from classifierValidation import validate_classifier
 from train_multiple_models_from_meta import *
 from train_model_2 import *
 from multiplecrop import *
-import cv2
+from dlc_change_yamlfile import *
 from validate_model_on_single_video import *
 from ROI_freehand_draw_3 import roiFreehand
 from ROI_analysis_2 import *
@@ -60,7 +55,7 @@ from ROI_add_to_features import *
 from ROI_process_movement import *
 from ROI_visualize_features import ROItoFeaturesViz
 from plot_heatmap import plotHeatMap
-import warnings
+
 from outlier_scripts.movement.correct_devs_mov_16bp import dev_move_16
 from outlier_scripts.location.correct_devs_loc_16bp import dev_loc_16
 from outlier_scripts.movement.correct_devs_mov_user_defined import dev_move_user_defined
@@ -68,13 +63,6 @@ from outlier_scripts.location.correct_devs_loc_user_defined import dev_loc_user_
 from outlier_scripts.movement.correct_devs_mov_14bp import dev_move_14
 from outlier_scripts.location.correct_devs_loc_14bp import dev_loc_14
 from outlier_scripts.skip_outlierCorrection import skip_outlier_c
-# from outlier_scripts.movement.correct_devs_mov_9bp import dev_move_9
-# from outlier_scripts.movement.correct_devs_mov_8bp import dev_move_8
-# from outlier_scripts.location.correct_devs_loc_8bp import dev_loc_8
-# from outlier_scripts.movement.correct_devs_mov_7bp import dev_move_7
-# from outlier_scripts.location.correct_devs_loc_7bp import dev_loc_7
-# from outlier_scripts.movement.correct_devs_mov_4bp import dev_move_4
-# from outlier_scripts.location.correct_devs_loc_4bp import dev_loc_4
 from features_scripts.extract_features_16bp import extract_features_wotarget_16
 from features_scripts.extract_features_14bp import extract_features_wotarget_14
 from features_scripts.extract_features_14bp_from_16bp import extract_features_wotarget_14_from_16
@@ -102,6 +90,7 @@ from read_DLCmulti_h5_function import importMultiDLCpose
 from sleap_bottom_up_convert import importSLEAPbottomUP
 from timeBins_movement import time_bins_movement
 from timeBins_classifiers import time_bins_classifier
+from ez_lineplot import draw_line_plot
 import threading
 import datetime
 
@@ -981,7 +970,7 @@ class video_info_table:
             videodf = [s +'.mp4' for s in videodf]
             videodf = list(set(videodf) - set(self.filesFound))
             self.filesFound += videodf
-        print(self.filesFound)
+
         ##GUI
         self.tkintertable = Toplevel()
         self.tkintertable.minsize(1000, 500)
@@ -1146,15 +1135,7 @@ class video_info_table:
         logfolder=str(os.path.dirname(self.configFile))+'\\logs\\'
         csv_filename = 'video_info.csv'
         output=logfolder+csv_filename
-        print(df)
-        # # get difference
-        # if os.path.exists(output):
-        #     inidf = pd.read_csv(output)
-        #     differencedf = inidf.merge(df, how = 'outer' ,indicator=True).loc[lambda x : x['_merge']=='right_only']
-        #     differencedf = differencedf.drop(['_merge'], axis=1)
-        #     finaldf = pd.concat([inidf,differencedf])
-        # else:
-        #     finaldf=df
+
 
         df.to_csv(str(output),index=False)
         print(os.path.dirname(output),'generated.')
@@ -1388,9 +1369,8 @@ class create_project_DLC:
         else:
             try:
                 videolist = []
-
                 for i in os.listdir(self.videopath1selected.folder_path):
-                    if ('.avi' or '.mp4') in i:
+                    if ('.avi' in i) or ('.mp4' in i):
                         i = self.videopath1selected.folder_path + '\\' + i
                         videolist.append(i)
             except:
@@ -3246,11 +3226,9 @@ class project_config:
         if (self.singleORmulti.getChoices()=='Multi tracking'):
             listindex += 9
 
-        print(listindex)
-
         animalNo = str(rows[listindex])
         self.configinifile = write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo)
-        #print(self.configinifile)
+
         print('Project ' + '"' + str(project_name) + '"' + " created in folder " + '"' + str(os.path.basename(project_path)) + '"')
 
 
@@ -3292,16 +3270,28 @@ class loadprojectMenu:
 
 class loadprojectini:
     def __init__(self,configini):
+
         #save project ini as attribute
         self.projectconfigini = configini
+
         #bodyparts
         bodypartscsv= os.path.join((os.path.dirname(self.projectconfigini)),'logs','measures','pose_configs','bp_names','project_bp_names.csv')
         bp_set = pd.read_csv(bodypartscsv,header=None)[0].to_list()
+
         # get target
         config = ConfigParser()
         configFile = str(self.projectconfigini)
         config.read(configFile)
         notarget = config.getint('SML settings','no_targets')
+        pose_config_setting = config.get('create ensemble settings','pose_estimation_body_parts')
+        animalNumber = config.getint('General settings','animal_no')
+        if pose_config_setting == 'user_defined':
+            bpSet_2 = bp_set.copy()
+            print(bpSet_2)
+            if animalNumber > 1:
+                bpSet_2 = [x[:-2] for x in bpSet_2]
+                bpSet_2 = list(set(bpSet_2))
+                print(bpSet_2)
         targetlist = {}
         for i in range(notarget):
             targetlist[(config.get('SML settings','target_name_'+str(i+1)))]=(config.get('SML settings','target_name_'+str(i+1)))
@@ -3453,12 +3443,14 @@ class loadprojectini:
         button_hmlocation = Button(processmovementdupLabel,text='Create heat maps',command=lambda:self.run_roiAnalysisSettings(Toplevel(),self.hmlvar,'locationheatmap'))
 
         button_timebins_M = Button(processmovementdupLabel,text='Time bins: Distance/velocity',command = lambda: self.timebinmove('mov'))
+        button_lineplot = Button(processmovementdupLabel, text='Generate path plot', command=self.quicklineplot)
 
         #organize
         processmovementdupLabel.grid(row=0,column=4,sticky=N)
         button_process_movement1.grid(row=0)
         button_hmlocation.grid(row=1)
         button_timebins_M.grid(row=2)
+        button_lineplot.grid(row=3)
 
         #outlier correction
         label_outliercorrection = LabelFrame(tab4,text='Outlier correction',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
@@ -3556,9 +3548,15 @@ class loadprojectini:
         #ganttplot
         label_ganttplot = LabelFrame(label_plotall,text='Gantt plot',pady=5,padx=5)
         button_ganttplot = Button(label_ganttplot,text='Generate gantt plot',command=self.plotgantt)
+
         #dataplot
         label_dataplot = LabelFrame(label_plotall,text='Data plot',pady=5,padx=5)
+        print(pose_config_setting)
+        if pose_config_setting == 'user_defined':
+            self.SelectedBp = DropDownMenu(label_dataplot, 'Select body part', bpSet_2, '15')
+            self.SelectedBp.setChoices((bpSet_2)[0])
         button_dataplot = Button(label_dataplot,text='Generate data plot',command=self.plotdataplot)
+
 
         #path plot
         label_pathplot = LabelFrame(label_plotall,text='Path plot',pady=5,padx=5)
@@ -3581,6 +3579,7 @@ class loadprojectini:
         label_distanceplot = LabelFrame(label_plotall,text='Distance plot',pady=5,padx=5)
         self.poi1 = DropDownMenu(label_distanceplot,'Body part 1',bp_set,'15')
         self.poi2 = DropDownMenu(label_distanceplot,'Body part 2',bp_set,'15')
+
         #set choice
         self.poi1.setChoices((bp_set)[0])
         self.poi2.setChoices((bp_set)[len(bp_set)//2])
@@ -3732,7 +3731,7 @@ class loadprojectini:
         button_process_datalog.grid(row=2,column=0,sticky=W,padx=3)
         button_process_movement.grid(row=2,column=1,sticky=W,padx=3)
         button_movebins.grid(row=3,column=1,sticky=W,padx=3)
-        button_classifierbins.grid(row=3,column=0,sticky=W,padyx=3)
+        button_classifierbins.grid(row=3,column=0,sticky=W,padx=3)
         #severity
         label_severity.grid(row=10,sticky=W,pady=5)
         self.severityscale.grid(row=0,sticky=W)
@@ -3750,7 +3749,9 @@ class loadprojectini:
         button_ganttplot.grid(row=0,sticky=W)
         #data
         label_dataplot.grid(row=1,sticky=W)
-        button_dataplot.grid(row=0,sticky=W)
+        if pose_config_setting == 'user_defined':
+            self.SelectedBp.grid(row=1, sticky=W)
+        button_dataplot.grid(row=2,sticky=W)
         #path
         label_pathplot.grid(row=2,sticky=W)
         self.Deque_points.grid(row=0,sticky=W)
@@ -3788,13 +3789,38 @@ class loadprojectini:
         self.cvTarget.grid(row=1,sticky=W)
         button_validate_classifier.grid(row=2,sticky=W)
 
+    def quicklineplot(self):
+        lptoplevel = Toplevel()
+        lptoplevel.minsize(300,200)
+        lptoplevel.wm_title('Plot path plot')
+
+        videodir = os.path.join(os.path.dirname(self.projectconfigini),'videos')
+        vid_list = os.listdir(videodir)
+
+        bpdir = os.path.join(os.path.dirname(self.projectconfigini),'logs','measures','pose_configs','bp_names','project_bp_names.csv')
+        bplist = pd.read_csv(bpdir,header=None)[0].to_list()
+
+        lplabelframe = LabelFrame(lptoplevel)
+        videoSelected = DropDownMenu(lplabelframe, 'Video', vid_list, '15')
+        videoSelected.setChoices(vid_list[0])
+        bpSelected = DropDownMenu(lplabelframe, 'Body part', bplist, '15')
+        bpSelected.setChoices(bplist[0])
+
+        lpbutton = Button(lplabelframe,text='Generate path plot',command= lambda:draw_line_plot(self.projectconfigini,videoSelected.getChoices(),bpSelected.getChoices()))
+
+        #organize
+        lplabelframe.grid(row=0,sticky=W)
+        videoSelected.grid(row=1, sticky=W)
+        bpSelected.grid(row=2, sticky=W)
+        lpbutton.grid(row=3, pady=12)
+
     def timebinmove(self,var):
         timebintoplevel = Toplevel()
         timebintoplevel.minsize(200, 80)
         timebintoplevel.wm_title("Time bins settings")
 
         tb_labelframe = LabelFrame(timebintoplevel)
-        tb_entry = Entry_Box(tb_labelframe,'Set time bin size','15')
+        tb_entry = Entry_Box(tb_labelframe,'Set time bin size (s)','15')
         if var == 'mov':
             tb_button = Button(tb_labelframe,text='Run',command=lambda:time_bins_movement(self.projectconfigini,int(tb_entry.entry_get)))
         else:
@@ -4352,9 +4378,15 @@ class loadprojectini:
 
         mergeframesPlot(self.projectconfigini,inputList)
 
-
     def plotdataplot(self):
-        data_plot_config(self.projectconfigini)
+        configini = self.projectconfigini
+        config = ConfigParser()
+        config.read(configini)
+        pose_config_setting = config.get('create ensemble settings', 'pose_estimation_body_parts')
+        if pose_config_setting == 'user_defined':
+            data_plot_config(self.projectconfigini, self.SelectedBp.getChoices())
+        else:
+            data_plot_config(self.projectconfigini, 'Centroid')
 
     def plotgantt(self):
         ganntplot_config(self.projectconfigini)
@@ -4882,6 +4914,27 @@ class trainmachinemodel_settings:
 
         print('Settings exported to project_config.ini')
 
+
+class makelineplot:
+    def __init__(self):
+        # Popup window
+        lpToplevel = Toplevel()
+        lpToplevel.minsize(200, 200)
+        lpToplevel.wm_title("Make line plot")
+
+        lpLabelframe = LabelFrame(lpToplevel)
+        lpvideo = FileSelect(lpLabelframe,'Video',lblwidth='10')
+        lpcsv = FileSelect(lpLabelframe,'csv file',lblwidth='10')
+        bpentry = Entry_Box(lpLabelframe,'Bodypart','10')
+
+        lpbutton = Button(lpLabelframe,text='Generate plot',command =lambda: draw_line_plot(lpvideo.file_path,lpcsv.file_path,bpentry.entry_get))
+        #organize
+        lpLabelframe.grid(row=0,sticky=W)
+        lpvideo.grid(row=0,sticky=W)
+        lpcsv.grid(row=1,sticky=W)
+        bpentry.grid(row=2,sticky=W)
+        lpbutton.grid(row=3,pady=10)
+
 class runmachinemodelsettings:
     def __init__(self,inifile):
         self.row1 = []
@@ -5079,6 +5132,7 @@ class App(object):
         fifthMenu.add_command(label='Multi-crop',command=multicropmenu)
         fifthMenu.add_command(label='Downsample videos',command=video_downsample)
         fifthMenu.add_command(label='Get mm/ppx',command = get_coordinates_from_video)
+        fifthMenu.add_command(label='Make line plot', command=makelineplot)
         fifthMenu.add_cascade(label='Change fps',menu =fpsMenu)
         #changefpsmenu organize
 
@@ -5105,7 +5159,8 @@ class App(object):
         menu.add_cascade(label='Help',menu=sixthMenu)
         #labelling tool
         links = Menu(sixthMenu)
-        links.add_command(label='Download weights',command = lambda:webbrowser.open_new(str(r'https://osf.io/5t4y9/')))
+        links.add_command(label='Download weights',command = lambda:webbrowser.open_new(str(r'https://osf.io/sr3ck/')))
+        links.add_command(label='Download classifiers', command=lambda: webbrowser.open_new(str(r'https://osf.io/kwge8/')))
         links.add_command(label='Ex. feature list',command=lambda: webbrowser.open_new(str(r'https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv')))
         links.add_command(label='SimBA github', command=lambda: webbrowser.open_new(str(r'https://github.com/sgoldenlab/simba')))
         links.add_command(label='Gitter Chatroom', command=lambda: webbrowser.open_new(str(r'https://gitter.im/SimBA-Resource/community')))
@@ -5157,9 +5212,13 @@ class SplashScreen:
 if __name__ == '__main__':
     root = Tk()
     root.overrideredirect(True)
+    # progressbar = ttk.Progressbar(orient=HORIZONTAL, length=5000, mode='determinate')
+    # progressbar.pack(side="bottom")
     app = SplashScreen(root)
+    # progressbar.start()
     root.after(1000, root.destroy)
     root.mainloop()
+
 
 app = App()
 print('Welcome fellow scientists :)' + '\n' + 'SimBA version ' + str(simBA_version))

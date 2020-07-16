@@ -3,7 +3,7 @@ import csv
 import re
 
 def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo):
-    simbaDir = os.getcwd()
+    simbaDir = os.path.dirname(__file__)
     animalNo = re.sub("[^0-9]", "", animalNo)
 
 ############create directories################
@@ -205,6 +205,7 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     # Multi animal settings
     f.write('[Multi animal IDs]\n')
     f.write('ID_list = ' + '\n')
+    f.write('\n')
 
     #outliersettings
     f.write('[Outlier settings]\n')

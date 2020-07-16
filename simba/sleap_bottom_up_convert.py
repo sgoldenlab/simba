@@ -30,14 +30,16 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
     videoFolder = os.path.join(projectPath, 'videos')
     outputDfFolder = os.path.join(projectPath, 'csv', 'input_csv')
     animalsNo = len(currIDList)
+    print(animalsNo)
     bpNamesCSVPath = os.path.join(projectPath, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
     poseEstimationSetting = config.get('create ensemble settings', 'pose_estimation_body_parts')
     print('Converting .slp into csv dataframes...')
+    csvPaths = []
 
     for filename in filesFound:
         print('Processing ' + str(os.path.basename(filename)) + '...')
         f = h5py.File(filename, 'r')
-        bpNames, orderVarList, OrderedBpList, MultiIndexCol, dfHeader, csvFilesFound, colorList, csvPaths, xy_heads, bp_cord_names, bpNameList, projBpNameList = [], [], [], [], [], [], [], [], [], [], [], []
+        bpNames, orderVarList, OrderedBpList, MultiIndexCol, dfHeader, csvFilesFound, colorList, xy_heads, bp_cord_names, bpNameList, projBpNameList = [], [], [], [], [], [], [], [], [], [], []
         final_dictionary = f.visititems(func)
         videoName = os.path.basename(final_dictionary['provenance']['video.path']).replace('.mp4', '')
         savePath = os.path.join(outputDfFolder, videoName + '.csv')
@@ -119,10 +121,10 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
             startCurrFrame = endCurrFrame
             frameCounter+=1
 
-    dataDf.fillna(0, inplace=True)
-    dataDf.to_csv(savePath, index=False)
-    csvPaths.append(savePath)
-    print('Saved file ' + savePath)
+        dataDf.fillna(0, inplace=True)
+        dataDf.to_csv(savePath, index=False)
+        csvPaths.append(savePath)
+        print('Saved file ' + savePath)
 
     ###### ASSIGN IDENTITIES
 
@@ -142,8 +144,6 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
         rgb = [i * 255 for i in rgb]
         rgb.reverse()
         colorList.append(rgb)
-
-
 
     for csvFile in csvPaths:
         indBpCordList, frameNumber, addSpacer, EuclidDistanceList, changeList = [], 0, 2, [], []
@@ -266,6 +266,9 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
         if poseEstimationSetting == 'user_defined':
             for i in outDfcols:
                 currBpName = i[:-2]
+                for identityNo in range(len(currIDList)):
+                    if str(currIDList[identityNo]) in currBpName:
+                        currBpName = currBpName + '_' + str(identityNo+1)
                 toBpCSVlist.append(currBpName) if currBpName not in toBpCSVlist else toBpCSVlist
             f = open(bpNamesCSVPath, 'w+')
             for i in toBpCSVlist:

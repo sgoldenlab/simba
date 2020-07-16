@@ -75,6 +75,8 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         mySpaceScale, myRadius, myResolution, myFontScale = 40, 10, 1500, 1.2
         maxResDimension = max(width, height)
+        if maxResDimension == 0:
+            print('Make sure you have imported the correct video(s) into your SimBA project.')
         circleScale = int(myRadius / (myResolution / maxResDimension))
         fontScale = float(myFontScale / (myResolution / maxResDimension))
         spacingScale = int(mySpaceScale / (myResolution / maxResDimension))
@@ -108,9 +110,9 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
             if (chooseFrame == False) and (assignBpCords == True):
                 sideImage = np.ones((int(height / 2), width, 3))
                 cv2.putText(sideImage, 'Current video: ' + str(vidBasename), (10, int(spacingScale)),cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 255), 3)
-                cv2.putText(sideImage, 'Can you assign identities based on the displayed frame ?', (10, int(spacingScale * (addSpacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 255), 3)
+                cv2.putText(sideImage, 'Can you assign identities based on the displayed frame ?', (10, int(spacingScale * (addSpacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 255), 2)
                 cv2.putText(sideImage, 'Press "x" to display new, random, frame', (10, int(spacingScale * (addSpacer * 3))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 0), 3)
-                cv2.putText(sideImage, 'Press "c" to continue to start assigning identities using this frame', (10, int(spacingScale * (addSpacer * 4))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 255, 0), 3)
+                cv2.putText(sideImage, 'Press "c" to continue to start assigning identities using this frame', (10, int(spacingScale * (addSpacer * 4))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 255, 0), 2)
                 imageConcat = np.concatenate((overlay, sideImage), axis=0)
                 imageConcat = np.uint8(imageConcat)
                 cv2.imshow('Define animal IDs', imageConcat)
@@ -125,8 +127,8 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
 
             if assigningIDs == True:
                 sideImage = np.ones((int(height / 2), width, 3))
-                cv2.putText(sideImage, 'Double left mouse click on:', (10,  int(spacingScale)), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 255), 3)
-                cv2.putText(sideImage, str(currIDList[currIDcounter]), (10, int(spacingScale * (addSpacer*2))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 0), 3)
+                cv2.putText(sideImage, 'Double left mouse click on:', (10,  int(spacingScale)), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 255), 2)
+                cv2.putText(sideImage, str(currIDList[currIDcounter]), (10, int(spacingScale * (addSpacer*2))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 0), 2)
                 imageConcat = np.concatenate((overlay, sideImage), axis=0)
                 imageConcat = np.uint8(imageConcat)
                 cv2.setMouseCallback('Define animal IDs', define_ID)
@@ -140,9 +142,9 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
                 cv2.namedWindow('Define animal IDs', cv2.WINDOW_NORMAL)
                 sideImage = np.ones((int(height/2), width, 3))
                 cv2.putText(sideImage, 'Current video: ' + str(vidBasename), (10, int(spacingScale)), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 255), 3)
-                cv2.putText(sideImage, 'Are you happy with your assigned identities ?', (10, int(spacingScale * (addSpacer*2))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 255), 3)
-                cv2.putText(sideImage, 'Press "c" to continue (to finish, or proceed to the next video)', (10, int(spacingScale * (addSpacer*3))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 0), 3)
-                cv2.putText(sideImage, 'Press "x" to re-start assigning identities', (10, int(spacingScale * (addSpacer*4))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 255, 255), 3)
+                cv2.putText(sideImage, 'Are you happy with your assigned identities ?', (10, int(spacingScale * (addSpacer*2))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 255), 2)
+                cv2.putText(sideImage, 'Press "c" to continue (to finish, or proceed to the next video)', (10, int(spacingScale * (addSpacer*3))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (255, 255, 0), 2)
+                cv2.putText(sideImage, 'Press "x" to re-start assigning identities', (10, int(spacingScale * (addSpacer*4))), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 255, 255), 2)
                 imageConcat = np.concatenate((overlay, sideImage), axis=0)
                 imageConcat = np.uint8(imageConcat)
                 cv2.imshow('Define animal IDs', imageConcat)

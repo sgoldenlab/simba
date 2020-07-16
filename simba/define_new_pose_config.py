@@ -50,10 +50,11 @@ def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNam
                 break
 
     overlay = cv2.resize(overlay, (250,300))
-    imagePath = os.path.join(os.getcwd(), 'pose_configurations', 'schematics')
-    namePath = os.path.join(os.getcwd(), 'pose_configurations', 'configuration_names', 'pose_config_names.csv')
-    bpPath = os.path.join(os.getcwd(), 'pose_configurations', 'bp_names', 'bp_names.csv')
-    noAnimalsPath = os.path.join(os.getcwd(), 'pose_configurations', 'no_animals', 'no_animals.csv')
+    scriptdir = os.path.dirname(__file__)
+    imagePath = os.path.join(scriptdir, 'pose_configurations', 'schematics')
+    namePath = os.path.join(scriptdir, 'pose_configurations', 'configuration_names', 'pose_config_names.csv')
+    bpPath = os.path.join(scriptdir, 'pose_configurations', 'bp_names', 'bp_names.csv')
+    noAnimalsPath = os.path.join(scriptdir, 'pose_configurations', 'no_animals', 'no_animals.csv')
     imageNos = len(glob.glob(imagePath + '/*.png'))
     newImageName = 'Picture' + str(imageNos+1) + '.png'
     imageOutPath = os.path.join(imagePath, newImageName)
