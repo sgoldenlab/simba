@@ -5,7 +5,7 @@ import pandas as pd
 from scipy import ndimage
 from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError
 import glob
-from simba.drop_bp_cords import getBpNames
+from drop_bp_cords import getBpNames
 from pylab import *
 import random
 
