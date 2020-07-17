@@ -5,7 +5,7 @@ import pickle
 from configparser import ConfigParser
 import os
 import pandas as pd
-from simba.drop_bp_cords import drop_bp_cords
+from drop_bp_cords import drop_bp_cords
 import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning)

@@ -28,7 +28,7 @@ import graphviz
 import graphviz.backend
 from dtreeviz.shadow import *
 from sklearn import tree
-from simba.drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
+from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import cross_val_score, cross_validate
 # import timeit

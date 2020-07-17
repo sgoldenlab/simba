@@ -5,7 +5,7 @@ from datetime import datetime
 import statistics
 import numpy as np
 import glob
-from simba.drop_bp_cords import define_movement_cols
+from drop_bp_cords import define_movement_cols
 
 def ROI_process_movement(configini):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')

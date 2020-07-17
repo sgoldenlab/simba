@@ -5,7 +5,7 @@ from configparser import ConfigParser, MissingSectionHeaderError
 import os
 import cv2
 import numpy as np
-from simba.drop_bp_cords import getBpHeaders
+from drop_bp_cords import getBpHeaders
 import math
 
 def plotHeatMapLocation(inifile, animalbp1, mmSize, noIncrements, colorPalette, lastImageOnlyBol):

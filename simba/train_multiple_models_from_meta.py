@@ -21,7 +21,7 @@ from eli5.sklearn import PermutationImportance
 import numpy as np
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
-from simba.drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
+from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
 
 def train_multimodel(configini):
     pd.options.mode.chained_assignment = None
