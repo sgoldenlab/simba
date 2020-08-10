@@ -61,9 +61,9 @@
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/group_colors.png "Group Color Selection")
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/colorscales.png "Colorscale Selection")
-
 * ```Colorscale Gradient for Individual Group```
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/colorscales.png "Colorscale Selection")
 
 `UPDATE COLORS`
 
