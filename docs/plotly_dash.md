@@ -3,14 +3,27 @@
 
 # PART 1: Graphs and Plot Overview
 
+![](https://github.com/sgoldenlab/simba/blob/master/images/cover%20photo.PNG "SimBA Plotly Overview")
+
 ### Part 1: Graph Overview
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/overall_bar.JPG "Graph Interface Overview")
 
 ### Part 2: Graph Types and Features
 
+![](https://github.com/sgoldenlab/simba/blob/master/images/probability.JPG "Probability Graph Example")
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/bargraph.JPG "Bar Graph Example")
+
 ### Part 3: Plot Settings
 
+![](https://github.com/sgoldenlab/simba/blob/master/images/probability_features.png "Plotly Graph Features")
 
 # PART 2: Plot Dashboard
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/data_tab.JPG "Data Tab")
+![](https://github.com/sgoldenlab/simba/blob/master/images/graphsettings_tab.JPG "Graph Settings Tab")
+![](https://github.com/sgoldenlab/simba/blob/master/images/downloadsettings_tab.JPG "Download Settings Tab")
 
 ## Part 1: Data
 
