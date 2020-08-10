@@ -29,6 +29,8 @@
 
 ### Select Behavior to Plot
 
+![](https://github.com/sgoldenlab/simba/blob/master/images/plot_behavior.JPG "Plot Behavior Selection")
+
 * ```Behaviors:```
 
 * ```Category:```
@@ -37,11 +39,15 @@
 
 ### Plotting Group Means
 
+![](https://github.com/sgoldenlab/simba/blob/master/images/group_means.JPG "Group Selection")
+
 * ```Select Group(s):```
 
 `Show Total Mean`
 
 ### Plotting Individual Groups
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/individual_groups.JPG "Individual Group Selection")
 
 * ```Select Single Group to Plot:```
 
@@ -53,11 +59,17 @@
 
 ### Group Color Properties
 
+![](https://github.com/sgoldenlab/simba/blob/master/images/group_colors.png "Group Color Selection")
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/colorscales.png "Colorscale Selection")
+
 * ```Colorscale Gradient for Individual Group```
 
 `UPDATE COLORS`
 
 ### Probability Graph Properties
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/probability_propertiesJPG.JPGg "Probability Graph Properties Selection")
 
 * ```Set Multi Group Frames:```
 `SUBMIT`
@@ -75,6 +87,8 @@
 
 ### Additional Properties
 
+![](https://github.com/sgoldenlab/simba/blob/master/images/additional_properties.JPG "Additional Properties Selection")
+
 * ```Graph X Axis in Seconds```
 
 * ```Show Grid Lines```
@@ -88,6 +102,8 @@
 `DOWNLOAD INDIVIDUAL GROUP CSV`
 
 ## Part 3: Download Settings
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/download_image.JPG "Image Download Settings")
 
 * ```Image Height:```
 
