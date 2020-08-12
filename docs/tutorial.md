@@ -490,7 +490,7 @@ To generate heatmaps, SimBA needs several user-defined variables:
 
 - `Save last image only`: Users can either choose to generate a "heatmap video" for every video in your project. These videos contain one frame for every frame in your video. Alternative, users may want to generate a **single image** representing the final heatmap and all of the events in each video - with one png for every video in your project. If you'd like to generate single images, tick this box. If you do not tick this box, then videos will be generated (which is significantly more time-consuming).  
 
-2. Click `Generate heatmap` to generate heatmap of the target behavior.
+2. Click `Generate heatmap` to generate heatmap of the target behavior. For more information on heatmaps based on behavioral events in SimBA - check the [tutorial for scenario 2 - visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions)
 
 ### Step 12: Merge Frames
 Merge all the generated plots from the previous step into single frames.
