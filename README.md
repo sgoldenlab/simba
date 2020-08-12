@@ -9,7 +9,7 @@
 
 | First Header  | Second Header |
 | ------------- | ------------- |
-| **SimBAxTF**  | [![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf/month  |
+| **SimBAxTF**  | [![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf/month)  |
 | Content Cell  | Content Cell  |
 
 
