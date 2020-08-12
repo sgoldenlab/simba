@@ -6,25 +6,11 @@
 [![SimBA: listserv](https://img.shields.io/static/v1?label=SimBA&message=listserv&color=blue)](https://docs.google.com/forms/d/e/1FAIpQLSfjbjae0XqNcl7GYOxmqvRsCveG-cmf4p4hBNNJ8gu5vPLHng/viewform)
 [![DOI](https://zenodo.org/badge/206670333.svg)](https://zenodo.org/badge/latestdoi/206670333)
 
-
-| package  | stats |
-| ------------- | ------------- |
-| **SimBAxTF**      | |
-|| |
-| | |
-
 | | | |
 |-|-|-|
 |**SimBAxTF**|[![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf/month)  |
 | **SimBA w/o TF**|[![Downloads](https://pepy.tech/badge/simba-uw-no-tf/month)](https://pepy.tech/project/simba-uw-no-tf/month)  |
 |**SimBAxTF-development wheel**|[![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev/month)   |
-
-
-**SimBAxTF**    [![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf/month)
-
-**SimBA w/o TF** [![Downloads](https://pepy.tech/badge/simba-uw-no-tf/month)](https://pepy.tech/project/simba-uw-no-tf/month)
-
-**SimBAxTF-development wheel** [![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev/month)
 
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
