@@ -23,7 +23,7 @@
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/data_tab.JPG "Data Tab")
 ![](https://github.com/sgoldenlab/simba/blob/master/images/graphsettings_tab.JPG "Graph Settings Tab")
-![](https://github.com/sgoldenlab/simba/blob/master/images/downloadsettings_tab.JPG "Download Settings Tab")
+![](https://github.com/sgoldenlab/simba/blob/master/images/updated_downloadsettings.JPG "Download Settings Tab")
 
 ## Part 1: Data
 
@@ -85,6 +85,14 @@
 
 `RESET AXES`
 
+### Bar Graph Properties
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/bar_properties.JPG "Bar Graph Properties Selection")
+
+* ```Error Type:```
+
+`Above` `Below` `Both` 
+
 ### Additional Properties
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/additional_properties.JPG "Additional Properties Selection")
@@ -103,7 +111,16 @@
 
 ## Part 3: Download Settings
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/download_image.JPG "Image Download Settings")
+### CSV Export 
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/csv_export.JPG "CSV Export Settings")
+
+* ```Enter csv file name:
+
+`MEANS.CSV` `GROUP.CSV`
+
+### Image Export
+![](https://github.com/sgoldenlab/simba/blob/master/images/image_export.JPG "Image Export Settings")
 
 * ```Image Height:```
 
