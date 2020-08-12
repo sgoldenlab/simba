@@ -476,32 +476,19 @@ Generates distance line plots between two body parts for all of the videos in th
 #### Heatmap
 Generates heatmap of behavior that happened in the video.
 
-1. Fill in the `Bin size(px)`, `# Scale increments`, and `Scale increment (s)`. Then from the dropdown box, select `Color Palette`, and `Target`.
+To generate heatmaps, SimBA needs several user-defined variables:
 
-- `Bin size(px)` : 
+- `Bin size(mm)` : Pose-estimation coupled with supervised machine learning in SimBA gives information on the location of an event at the single pixel resolution, which is too-high of a resolution to be useful in heatmap generation. In this entry box, insert an integer value (e.g., 100) that dictates, in pixels, how big a location is. For example, if the user inserts *100*, and the video is filmed using 1000x1000 pixels, then SimBA will generate a heatmap based on 10x10 locations (each being 100x100 pixels large).   
 
-- `# Scale increments` :
+- `max` (integer, or auto): How many color increments on the heatmap that should be generated. For example, if the user inputs *11*, then a 11-point scale will be created (as in the gifs above). If the user inserts auto in this entry box, then SimBA will calculate the ideal number of increments automatically for each video. 
 
-- `Scale increment (s)` :
+- `Color Palette` : Which color pallette to use to plot the heatmap. See the gifs above for different output examples. 
 
-- `Color Palette` :
+- `Target`: Which target behavior to plot in the heatmap. As the number of behavioral target events increment in a specific location, the color representing that region changes. 
 
-<p align="center">
-  <img width="400" height="137" src="https://github.com/sgoldenlab/simba/blob/master/images/SimBA_pallettes.PNG">
-</p>
+- `Bodypart`: To determine the location of the event in the video, SimBA uses a single body-part coordinate. Specify which body-part to use here. 
 
-
-
-magma             |  gnuplot2
-:-------------------------:|:-------------------------:
-![](https://github.com/sgoldenlab/simba/blob/master/images/magma_heatmap.gif)  |  ![](https://github.com/sgoldenlab/simba/blob/master/images/gnuplot_heatmap.gif)
-jet|viridis
-![](https://github.com/sgoldenlab/simba/blob/master/images/jet_heatmap.gif)  |  ![](https://github.com/sgoldenlab/simba/blob/master/images/viridis_heatmap.gif)
-inferno|plasma
-![](https://github.com/sgoldenlab/simba/blob/master/images/inferno_heatmap.gif)  |  ![](https://github.com/sgoldenlab/simba/blob/master/images/plasma_heatmap.gif)
-
-
-- `Target` :
+- `Save last image only`: Users can either choose to generate a "heatmap video" for every video in your project. These videos contain one frame for every frame in your video. Alternative, users may want to generate a **single image** representing the final heatmap and all of the events in each video - with one png for every video in your project. If you'd like to generate single images, tick this box. If you do not tick this box, then videos will be generated (which is significantly more time-consuming).  
 
 2. Click `Generate heatmap` to generate heatmap of the target behavior.
 
