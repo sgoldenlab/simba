@@ -29,35 +29,51 @@
 
 ### Select Behavior to Plot
 
+In the following dropdown menus, we can select which type of behavior to visualize for our experiment along with the category of data
+and the specific features of the data sets
+
 ![](https://github.com/sgoldenlab/simba/blob/master/images/plot_behavior.JPG "Plot Behavior Selection")
 
-* ```Behaviors:```
+* ```Behaviors:``` In this dropdown menu, we can select between `Attack` and `Sniffing` behaviors
 
-* ```Category:```
+* ```Category:``` In this dropdown menu, we can select between `VideoData` which plots probability of behavior vs. frames,
+`SklearnData` which plots different results of the features analyzed by Sklearn, and `TimeBins` which plots prevalence of the features
+for each time bin
 
-* ```Feature:```
+* ```Feature:``` In this dropdown menu, we can select the features or statistics to plot for each respective category. VideoData 
+plots probability in the form of a line graph. Sklearn plots seven statistics for each behavior with the mean and standard error represented
+in a bar graph. Here we can select from # bout events, total events duration (s), mean bout duration (s), first occurrence (s), mean interval
+(s), and median interval (s). TimeBins plots the mean of the prevalence of these respective features for each time bin selected.
 
 ### Plotting Group Means
 
+With this feature, we can select different combinations of groups of videos to plot and compare the data of each to one another in the Group Means plot
+
 ![](https://github.com/sgoldenlab/simba/blob/master/images/group_means.JPG "Group Selection")
 
-* ```Select Group(s):```
+* ```Select Group(s):``` In this dropdown menu, we can select the different groups to add to our plot, and to remove a group
+from the selection we can click the `X` next to the group name
 
-`Show Total Mean`
+For the VideoData continuous probability data, we can check the `Show Total Mean` box to add a trace to represent the total mean of the group data
 
 ### Plotting Individual Groups
 
+With this feature, we can select a single group of videos to compare the data of each video in the group to one another in the plot
+
 ![](https://github.com/sgoldenlab/simba/blob/master/images/individual_groups.JPG "Individual Group Selection")
 
-* ```Select Single Group to Plot:```
+* ```Select Single Group to Plot:``` In this dropdown menu, we can select a single group from out list of groups to plot
 
-* ```Select Video(s):```
+* ```Select Video(s):``` In this dropdown menu, we can select which videos we would like to see represented and compared to one another
 
-`Show Group Mean`
+For the VideoData continuous probability data, we can check the `Show Group Mean` box to add a trace to represent the mean of the included videos
+in the group data 
 
 ## Part 2: Graph Settings
 
 ### Group Color Properties
+
+Here we can choose the 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/group_colors.png "Group Color Selection")
 
