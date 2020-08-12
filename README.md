@@ -7,6 +7,13 @@
 [![DOI](https://zenodo.org/badge/206670333.svg)](https://zenodo.org/badge/latestdoi/206670333)
 
 
+| First Header  | Second Header |
+| ------------- | ------------- |
+| **SimBAxTF**  | [![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf/month  |
+| Content Cell  | Content Cell  |
+
+
+
 **SimBAxTF**    [![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf/month)
 
 **SimBA w/o TF** [![Downloads](https://pepy.tech/badge/simba-uw-no-tf/month)](https://pepy.tech/project/simba-uw-no-tf/month)
