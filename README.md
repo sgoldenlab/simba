@@ -150,4 +150,5 @@ This project is licensed under the GNU Lesser General Public License v3.0. Note 
 - [Simon Nilsson](https://github.com/sronilsson)
 - [Jia Jie Choong](https://github.com/inoejj)
 - [Sophia Hwang](https://github.com/sophihwang26)
+- [Aasiya Islam](https://github.com/aasiya-islam)
 - [Xiaoyu Tong](https://github.com/Xiaoyu-Tong)
