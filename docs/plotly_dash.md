@@ -30,31 +30,31 @@
 ### Select Behavior to Plot
 
 In the following dropdown menus, we can select which type of behavior to visualize for our experiment along with the category of data
-and the specific features of the data sets
+and the specific features of the data sets with our given scenario:
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/plot_behavior.JPG "Plot Behavior Selection")
 
-* ```Behaviors:``` In this dropdown menu, we can select between `Attack` and `Sniffing` behaviors
+* ```Behaviors:``` In this dropdown menu, we can select between `Attack` and `Sniffing` behaviors.
 
-* ```Category:``` In this dropdown menu, we can select between `VideoData` which plots probability of behavior vs. frames,
-`SklearnData` which plots different results of the features analyzed by Sklearn, and `TimeBins` which plots prevalence of the features
-for each time bin
+* ```Category:``` In this dropdown menu, we can select between `VideoData` which plots the probability of the behavior vs. frames,
+`SklearnData`, which plots different results of the features analyzed by Sklearn, and `TimeBins`, which plots the prevalence of the features
+for each time bin.
 
 * ```Feature:``` In this dropdown menu, we can select the features or statistics to plot for each respective category. VideoData 
 plots probability in the form of a line graph. Sklearn plots seven statistics for each behavior with the mean and standard error represented
-in a bar graph. Here we can select from # bout events, total events duration (s), mean bout duration (s), first occurrence (s), mean interval
-(s), and median interval (s). TimeBins plots the mean of the prevalence of these respective features for each time bin selected.
+in a bar graph. Here we can select from ` bout events`, `total events duration (s)`, `mean bout duration (s)`, `first occurrence (s)`, `mean interval (s)`,
+and `median interval (s)`. TimeBins plots the mean of the prevalence of these respective features for each time bin selected. 
 
 ### Plotting Group Means
 
-With this feature, we can select different combinations of groups of videos to plot and compare the data of each to one another in the Group Means plot
+With this feature, we can select different combinations of groups of videos to plot and compare the data of each to one another in the Group Means plot.
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/group_means.JPG "Group Selection")
 
 * ```Select Group(s):``` In this dropdown menu, we can select the different groups to add to our plot, and to remove a group
-from the selection we can click the `X` next to the group name
+from the selection we can click the `X` next to the group name.
 
-For the VideoData continuous probability data, we can check the `Show Total Mean` box to add a trace to represent the total mean of the group data
+For the VideoData continuous probability data, we can check the `Show Total Mean` box to add a trace to represent the total mean of the group data.
 
 ### Plotting Individual Groups
 
@@ -62,56 +62,61 @@ With this feature, we can select a single group of videos to compare the data of
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/individual_groups.JPG "Individual Group Selection")
 
-* ```Select Single Group to Plot:``` In this dropdown menu, we can select a single group from out list of groups to plot
+* ```Select Single Group to Plot:``` In this dropdown menu, we can select a single group from out list of groups to plot.
 
-* ```Select Video(s):``` In this dropdown menu, we can select which videos we would like to see represented and compared to one another
+* ```Select Video(s):``` In this dropdown menu, we can select which videos we would like to see represented and compared to one another.
 
 For the VideoData continuous probability data, we can check the `Show Group Mean` box to add a trace to represent the mean of the included videos
-in the group data 
+in the group data.
 
 ## Part 2: Graph Settings
 
-### Group Color Properties
+### Color Properties
 
-Here we can choose the 
+Here we can choose the color properties for both our groups and individual videos for the graphs. 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/group_colors.png "Group Color Selection")
 
-* ```Colorscale Gradient for Individual Group```
+For the group color selection, simply click on he colored circle underneath the name of the group which opens a color picker in which you can choose 
+a specific color and shade for each group to be represented with. Once all the colors have been selected for the groups, you can click the `UPDATE COLORS`
+button to set the selection.
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/colorscales.png "Colorscale Selection")
 
-`UPDATE COLORS`
+* ```Colorscale Gradient for Individual Videos```: For the individual video color selection, you have the option of choosing from different pre-set or custom
+colorscales which can be found in the dropdown menu by clicking on the sample colorscale. Here you can choose the type of colorscale depending on what best
+suits your data visualization needs, as well as setting the number of swatches needed to potentially correspond to the number of videos being visualized.
+The colors will automatically update upon the selection of the colorscale gradient, and to return to the page, you can click the colorscale already displayed
+on the page, and to update the colors with a new combination of colors from the colorscale gradient, you can click on `UPDATE COLORS` to change them.
+
 
 ### Probability Graph Properties
 
+Here we can select the properties for our different probability graphs, both the multi-group and individual group video graphs. Depending on whether you would
+like the graph visualized with video frames or seconds as the x-axis, as set here, we can custom set the axes below.
+
 ![](https://github.com/sgoldenlab/simba/blob/master/images/probability_propertiesJPG.JPGg "Probability Graph Properties Selection")
 
-* ```Set Multi Group Frames:```
-`SUBMIT`
+For visualizing the multi-group graphs in frames, you can set the minumum and maximum number of frames you would like visualized, respectively, and similarly 
+if you're viewing your graph in seconds, you can set the numbers below. Once set, click `SUBMIT` to view the changes. To reset the axes, click `RESET AXES` 
+to view the default minima and maxima values. The same steps can be applied for the individual group and video viewing frames/seconds below.
 
-* ```Multi Group (Seconds)```
-
-`RESET AXES`
-
-* ```Set Individual Group Frames:```
-`SUBMIT`
-
-* ```Individual Group (Seconds):```
-
-`RESET AXES`
 
 ### Bar Graph Properties
 
+For the bar graphs, as represented by the Sklearn and TimeBins data with our given scenario, we can specify what type of error bars we would like visualized,
+being either traditional error bars or just one way around the mean value. The standard error values can also be seen along with the mean if you hover over the
+bar itself on the graph.
+
 ![](https://github.com/sgoldenlab/simba/blob/master/images/bar_properties.JPG "Bar Graph Properties Selection")
 
-* ```Error Type:```
+* ```Error Type:```: The default will display traditional error bars as `Both` but to display them only one way, select either the `Above` or `Below` options to
+view the bars either above or below the bar, respectively. 
 
-`Above` `Below` `Both` 
 
 ### Additional Properties
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/additionalproperties_2.JPG "Additional Properties Selection")
+![](https://github.com/sgoldenlab/simba/blob/master/images/additionalproperties_3.JPG "Additional Properties Selection")
 
 * ```Graph X Axis in Seconds```
 
@@ -131,7 +136,7 @@ Here we can choose the
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/csv_export.JPG "CSV Export Settings")
 
-* ```Enter csv file name:
+* ```Enter csv file name:```
 
 `MEANS.CSV` `GROUP.CSV`
 
