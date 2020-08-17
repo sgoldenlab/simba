@@ -93,7 +93,7 @@ on the page, and to update the colors with a new combination of colors from the 
 ### Probability Graph Properties
 
 Here we can select the properties for our different probability graphs, both the multi-group and individual group video graphs. Depending on whether you would
-like the graph visualized with video frames or seconds as the x-axis, as set here, we can custom set the axes below.
+like the graph visualized with video frames or seconds as the x-axis, as set [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#additional-properties), we can custom set the axes below.
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/probability_propertiesJPG.JPGg "Probability Graph Properties Selection")
 
