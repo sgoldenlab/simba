@@ -95,7 +95,7 @@ on the page, and to update the colors with a new combination of colors from the 
 Here we can select the properties for our different probability graphs, both the multi-group and individual group video graphs. Depending on whether you would
 like the graph visualized with video frames or seconds as the x-axis, as set [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#additional-properties), we can custom set the axes below.
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/probability_propertiesJPG.JPGg "Probability Graph Properties Selection")
+![](https://github.com/sgoldenlab/simba/blob/master/images/probability_propertiesJPG.JPG "Probability Graph Properties Selection")
 
 For visualizing the multi-group graphs in frames, you can set the minumum and maximum number of frames you would like visualized, respectively, and similarly 
 if you're viewing your graph in seconds, you can set the numbers below. Once set, click `SUBMIT` to view the changes. To reset the axes, click `RESET AXES` 
@@ -116,6 +116,8 @@ view the bars either above or below the bar, respectively.
 
 ### Additional Properties
 
+Here we can change different graph properties such as the background display, font, and axes if plotting probability data, custom setting the graph titles.
+
 ![](https://github.com/sgoldenlab/simba/blob/master/images/additionalproperties_3.JPG "Additional Properties Selection")
 
 * ```Graph X Axis in Seconds```
@@ -124,11 +126,12 @@ view the bars either above or below the bar, respectively.
 
 * ```Show Background```
 
+* ``` Group Means Title``` & ```Individual Videos Title```: 
+
 * ```Choose Font:```
 
 * ```Font Size```
 
-`DOWNLOAD INDIVIDUAL GROUP CSV`
 
 ## Part 3: Download Settings
 
@@ -138,16 +141,14 @@ view the bars either above or below the bar, respectively.
 
 * ```Enter csv file name:```
 
-`MEANS.CSV` `GROUP.CSV`
+`MEANS.CSV` `VIDEOS.CSV`
 
 ### Image Export
 ![](https://github.com/sgoldenlab/simba/blob/master/images/imageexport_2.JPG "Image Export Settings")
 
-* ```Image Height:```
+* ``` Enter image dimensions (px):```
 
-* ```Image Width:```
-
-* ```Enter file name:```
+* ```Enter image name:```
 
 * ``` File Extension:```
 
