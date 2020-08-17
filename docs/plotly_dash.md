@@ -23,7 +23,7 @@
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/data_tab.JPG "Data Tab")
 ![](https://github.com/sgoldenlab/simba/blob/master/images/graphsettings_tab.JPG "Graph Settings Tab")
-![](https://github.com/sgoldenlab/simba/blob/master/images/updated_downloadsettings.JPG "Download Settings Tab")
+![](https://github.com/sgoldenlab/simba/blob/master/images/downloadsettings_2.JPG "Download Settings Tab")
 
 ## Part 1: Data
 
@@ -111,7 +111,7 @@ Here we can choose the
 
 ### Additional Properties
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/additional_properties.JPG "Additional Properties Selection")
+![](https://github.com/sgoldenlab/simba/blob/master/images/additionalproperties_2.JPG "Additional Properties Selection")
 
 * ```Graph X Axis in Seconds```
 
@@ -136,7 +136,7 @@ Here we can choose the
 `MEANS.CSV` `GROUP.CSV`
 
 ### Image Export
-![](https://github.com/sgoldenlab/simba/blob/master/images/image_export.JPG "Image Export Settings")
+![](https://github.com/sgoldenlab/simba/blob/master/images/imageexport_2.JPG "Image Export Settings")
 
 * ```Image Height:```
 
