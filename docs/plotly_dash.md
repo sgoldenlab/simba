@@ -178,7 +178,7 @@ You can download the data for each of the respective Group Means and Individual 
 
 
 * ```Enter csv file name```: To designate a CSV file name, type your desired file name into the box and click either the `MEANS.CSV` or the `VIDEOS.CSV` buttons to select
-which data you would like to download as a CSV. Once downloaded, it should display a message saying that you have "Downloaded csv as file_name.csv", as seen below. It will download into the same file from which you are running the page from.
+which data you would like to download as a CSV. Once downloaded, it should display a message saying that you have "Downloaded csv as file_name.csv", as seen below. It will download into the same folder from which the _____.
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/csv_download.JPG "CSV Downloaded Message")
 
