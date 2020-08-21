@@ -192,15 +192,17 @@ For the Group Means data, the CSV will display the probability group data for ea
 ### Image Export
 
 
-You can also download the images for each of the plots
+You can also download the images for each of the plots and customize dimensions, name, and file extension. 
+
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/imageexport_2.JPG "Image Export Settings")
 
 
-* ``` Enter image dimensions (px):```
+* ``` Enter image dimensions (px)```: The default image dimensions in pixels are 500 X 700, but you can change the height and width respectively by typing in a new value or by
+clicking the up and down arrows to increase or decrease the dimensions.
 
-* ```Enter image name:```
+* ```Enter image name```: You can type your desired image download name by typing it in the box here.
 
-* ``` File Extension:```
+* ``` File Extension```: The default file download extension is .SVG but you can also choose the file extension by selecting from the dropdown menu here and save the image as an .SVG, .PNG, or as a .JPEG.
 
-`SET DOWNLOAD SETTINGS`
+Once you've fixed the download settings, click the `SET DOWNLOAD SETTINGS` button at the bottom, and to actually download the image, [go to the plot](insert future link here) and click "camera" button as `Download plot` which should download the image to the folder of your choice on your computer.
