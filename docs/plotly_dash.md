@@ -27,6 +27,30 @@
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/probability_features.png "Plotly Graph Features")
 
+* ```Download Plot```:
+
+* ```Zoom```:
+
+* ```Pan```:
+
+* ```Box Select```:
+
+* ```Lasso Select```:
+
+* ```Zoom In```:
+
+* ```Zoom Out```:
+
+* ```Autoscale```:
+
+* ```Reset Axes```:
+
+* ```Toggle Spike Lines```:
+
+* ```Show closest data on hover```:
+
+* ```Compare data on hover```:
+
 
 # PART 2: Plot Dashboard
 
@@ -205,4 +229,4 @@ clicking the up and down arrows to increase or decrease the dimensions.
 
 * ``` File Extension```: The default file download extension is .SVG but you can also choose the file extension by selecting from the dropdown menu here and save the image as an .SVG, .PNG, or as a .JPEG.
 
-Once you've fixed the download settings, click the `SET DOWNLOAD SETTINGS` button at the bottom, and to actually download the image, [go to the plot](insert future link here) and click "camera" button as `Download plot` which should download the image to the folder of your choice on your computer.
+Once you've fixed the download settings, click the `SET DOWNLOAD SETTINGS` button at the bottom, and to actually download the image, [go to the plot](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#part-3-plot-settings) and click "camera" button as `Download plot` which should download the image to the folder of your choice on your computer.
