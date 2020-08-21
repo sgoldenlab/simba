@@ -1,7 +1,7 @@
 # SimBa Data Visualization: Plotly Dash Tutorial
 
 
-# PART 1: Graphs and Plot Overview
+# PART 1: Plot Overview
 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/cover%20photo.PNG "SimBA Plotly Overview")
@@ -12,22 +12,34 @@
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/overall_bar.JPG "Graph Interface Overview")
 
+Here we feature the plots visualizing data for both a group mean comparison with groups selected on the Data dashboard to the side, as well as an individual video 
+comparison amongst a single group, also selected from the side. In the given scenario...
+
 
 ### Part 2: Graph Types and Features
 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/probability2.JPG "Probability Graph Example")
 
+* Probability Graphs: These graphs plot the probability of the behavior as a continuous line graph per video frames as default. The x-axis can be changed [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#additional-properties) to visualize the probability vs. time in seconds for each video instead. 
+By hovering over each of the line graphs, we can see the individual data points for each trace as a coordinate of (frames/seconds, probability) as shown below. You can 
+also change this [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#part-3-plot-settings) to compare data points betwen traces while hovering. 
+
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/bargraph.JPG "Bar Graph Example")
+
+* Categorical Bar Graphs: These graphs plot specific features of the behavior as designated [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#select-behavior-to-plot), with the means of the feature and standard error of mean displayed for each group in the Group Means comparison, and the feature for each video in the Individual Groups comparison. The means and feature count can be displayed on the top of each of the bars respectively, and also displayed upon hovering over it with the group/video name and feature count, and for the group mean comparison, the standard error will be displayed as +/- after the mean value feature count, as shown below. The standard error bars can be configured to be displayed traditionally as both above and below the mean, or just one way in either direction [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#bar-graph-properties). 
+
+* Legends: 
 
 
 ### Part 3: Plot Settings
 
+With each of the plots, Plotly features many settings to better visualize the graphs and compare data as well as download the plots as images to your own computer.
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/probability_features.png "Plotly Graph Features")
 
-* ```Download Plot```:
+* ```Download Plot```: 
 
 * ```Zoom```:
 
@@ -229,4 +241,4 @@ clicking the up and down arrows to increase or decrease the dimensions.
 
 * ``` File Extension```: The default file download extension is .SVG but you can also choose the file extension by selecting from the dropdown menu here and save the image as an .SVG, .PNG, or as a .JPEG.
 
-Once you've fixed the download settings, click the `SET DOWNLOAD SETTINGS` button at the bottom, and to actually download the image, [go to the plot](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#part-3-plot-settings) and click "camera" button as `Download plot` which should download the image to the folder of your choice on your computer.
+Once you've fixed the download settings, click the `SET DOWNLOAD SETTINGS` button at the bottom, and to actually download the image, [go to the plot settings](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#part-3-plot-settings) and click "camera" button as `Download plot` which should download the image to the folder of your choice on your computer.
