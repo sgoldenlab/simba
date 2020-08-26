@@ -1,4 +1,6 @@
-/* Table of contents
+/*
+Modified from https://codepen.io/chriddyp/pen/bWLwgP
+Table of contents
 ––––––––––––––––––––––––––––––––––––––––––––––––––
 - Plotly.js
 - Grid
@@ -15,22 +17,6 @@
 - Clearing
 - Media Queries
 */
-
-/* PLotly.js 
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-/* plotly.js's modebar's z-index is 1001 by default
- * https://github.com/plotly/plotly.js/blob/7e4d8ab164258f6bd48be56589dacd9bdd7fded2/src/css/_modebar.scss#L5
- * In case a dropdown is above the graph, the dropdown's options
- * will be rendered below the modebar
- * Increase the select option's z-index
- */
-
-/* This was actually not quite right -
-   dropdowns were overlapping each other (edited October 26)
-
-.Select {
-    z-index: 1002;
-}*/
 
 
 /* Grid
@@ -145,6 +131,24 @@
     margin-bottom: 2.0rem;
     text-align: left;
   }
+   .footer {
+     position: fixed;
+     left:0;
+     bottom:0;
+     width:100%;
+     background:#3f3957;
+     color: white;
+     text-align: left;
+     padding-top: 0.2rem;
+     padding-left: 1.0rem;
+   }
+   .sidebar {
+     width: 20%;
+     background: blue;
+     color: white;
+     overflow-y: scroll;
+   }
+
   /* Typography
   –––––––––––––––––––––––––––––––––––––––––––––––––– */
   h1, h2, h3, h4, h5, h6, label {
@@ -160,7 +164,8 @@
   label {font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; margin-bottom: 0.75rem; margin-top: 0.75rem;}
   
   p {
-    margin-top: 0; }
+    margin-top: 0;
+    display: inline}
   
   
   /* Blockquotes
@@ -407,9 +412,10 @@
   }
   #plot_data, #graph_settings, #download-settings {
     padding: 2.0rem;
+    overflow-y:scroll;
+    height: 75.0rem;
   }
   #graphs > *{
-    display: inline;
     padding: 10 10 10 10;
     margin: 1.0rem;
   }
