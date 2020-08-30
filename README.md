@@ -111,7 +111,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [SimBA generic tutorial](docs/tutorial.md) 📘
 - [SimBA behavioral annotation interface](docs/labelling_aggression_tutorial.md) 🏷️
 - [Using user-defined ROIs in SimBA](/docs/ROI_tutorial.md) 🗺️
-- [Using multi-animal pose (maDLC/SLEAP) in SimBA](/docs/Multi_animal_pose.md) ❌
+- [Using multi-animal pose (maDLC/SLEAP) in SimBA](/docs/Multi_animal_pose.md) 🐭🐭
 - [Recommended hardware](https://github.com/sgoldenlab/simba/blob/master/misc/system_requirements.md) 🖥️
 - [Downloading compressed data from the SimBA OSF repository](https://github.com/sgoldenlab/simba/blob/master/docs/using_OSF.md)💾
 
