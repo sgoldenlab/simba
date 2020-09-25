@@ -1,4 +1,4 @@
-# SimBa Data Visualization: Plotly Dash Tutorial
+# SimBA Data Visualization: Plotly Dash Tutorial
 
 
 # PART 1: Plot Overview
