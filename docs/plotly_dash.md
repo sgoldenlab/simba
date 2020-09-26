@@ -1,3 +1,100 @@
+# Interactive Data Visualization in SimBA
+
+## Overview
+
+Once analyses have been performed in SimBA, users may have the need to visualize the results of the classifiers and easy, interactive, paths towards exporting the parts of the datasets of interest into third-party statistical and graphing applications and scripts. For this SimBA has a built-in interactive graphical dashboard written in [Plotly](https://plotly.com/) and [Dash](https://github.com/plotly/dash) that allows users to inspect **huge** (or not so huge) data-sets, and create their own new data-sets (through drag-and-drop, mouse-clicks, zoom-functions and more) without havin to write any costum code.  In this tutrial, we outline and explain the different functions within the SimBA Plotly Dashboard, and how we can utilize the dashboard for analyzing larger data-sets (a data set containing classifications of 5 different behaviors, in 433 five-minute long videos) to third-party applications.  The SimBA dashboard was written by [Sophia Hwang](https://github.com/sophihwang26) and [Aasiya Islam](https://github.com/aasiya-islam).
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_logo.png" />
+</p>
+
+
+### PART 1: Generating a SimBA Dashboard file and opening the Dashboard
+
+1. To open the SimBA Dashboard, we first need to create a single *collated* dashboard dataset file in SimBA. This single dashboard file is ahighly compressed [HDF dataframe container](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) that contains all your data that we want to be able to play around with within our Plotly dashboard. 
+
+>Note: This dataframe container also provides an efficient way of sharing data, and can be opened in SimBA at any location without any other project files being required.
+
+2. To generate this file, begin by loading your project in SimBA. In the main SimBA console window, click on `File` and `Load project`. In the **[Load Project]** window, click on `Browse File` and select the `project_config.ini` that belongs to your project, and then click `Load Project`. 
+ 
+3. Navigate to the `Visualizations` tab, and you should see the following menu on the right hand side, titled `Plotly / Dash`. 
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Dash_1.JPG "Plotly Graph Features")
+
+4. The first part of this menu contains 5 tick-box menus. We will use these tick-box menus to specify *what* data we want to have contained within our dashboard file (e.g., what data we want to be able to be able to handle interactively). In this tutorial we will go ahead and tick `Sklearn results`, `Time bin analyses`, `Probabilities`.
+
+* ```Sklearn results```: 
+
+* ```Time bin analyses```:
+
+* ```Probabilities```:
+
+* ```Severity analyses```:
+
+* ```Entire Machine Classification dataframes```:
+
+Once we have ticked the tick-boxes for the data we want to include, go ahead and click on `Save SimBA/Plotly dataset`. This will generate a single, highly-compressed, `H5` dataframe container, which will be located in the `project_folder/logs` directory. The filename, of this file, will be date-time stamped, and be named something like this: `SimBA_dash_file_20200829090616.h5`.
+
+>Note: This is a highly compressed file. In this example tutorial, the 438  have been compressed into a very-much sharable 32MB that contain all the data indicated by the tick boxes selected in the SimBA GUI 'Plotly /Dash` submenu:
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Dash_2.JPG "Plotly Graph Features")
+
+Depending on the number of videos that the user has within the project, this step may take some time. You can follwo the progress in the Main SimBA terminal window. 
+
+### PART 2: Opening the SimBA Dashboard file
+
+1. To open and inspect a `SimBA/Plotly dataset` h5 file, we will use the two menus circled in blue below:
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Dash_4.JPG "Plotly Graph Features")
+
+* ```SimBA Dashboard file (H5)```: In this menu, click on 'Browse File` and select the dataframe H5 dataframe container you wish to use within the Dashboard interface. 
+>**Important**: The selected `SimBA Dashboard file` .H5 file does not have to have been generated within the currently opened project. The selected `SimBA Dashboard file` .H5 can have been generated within the SimBA interface on any anywhere, within any project (regardless of pose-estimation tool, tracked body-parts, and the number and specific classifier used). 
+
+* ```SimBA Groups file (CSV)```: **(OPTIONAL)** If we want to plot and compare group-level metrics, then we need to tell SimBA and [Plotly](https://plotly.com/) which videos belong to which group. The most straightforward way of doing this is to create our own CSV file, where each column represents each group, and each row represents each video belonging to that group, and feed the information in this CSV file into the Dashboard. For the current tutorial example, with 438 videos, I have created a CSV file example that can be downloaded [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/SimBA_Dash_tutorial_Group_information.csv). This file contains **two columns** representing the two groups (males v. females), with one row for each video in each group. For this example, we have 337 videos in the **male** group, and 101 videos in the **female** group. 
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Dash_5.JPG "Plotly Graph Features")
+
+Once you have selected your files `SimBA Dashboard file` (.. and the optional SimBA Groups file), go ahead and click on the `Open SimBA / Plotly dataset` button. A little time will pass for the application to load, but eventually a window looking similar to this (on the left in the image below) should pop open. Alternatively, if you feel like this interface is finicky to work with, you can also navigate to the the IP `127.0.0.1:8050` adress in your webbrowser (tested with Google Chrome webbrower) and you should see the native Dash interface (on the right in the image below; **click on the images below to enlarge**): 
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_6.JPG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_7.JPG" width="425"/>
+
+### PART 3: Dashboard overview
+
+The left hand side of the Dashboard interface (showed in the image just below) displays the **Dashboard menues**. These dashboard menus allow users to specify what data is displayed on the graphs shown the right hand side of the interface, how the data is plotted, how to save the graphs, and export subsets of data into self-contained CSV and / or [parquet](https://towardsdatascience.com/the-best-format-to-save-pandas-data-414dca023e0d) files for further processing. In this part of the tutorial, we will go through all of the settings and their functions in the SimBA Dashboard:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_8.JPG" />
+</p>
+
+##### The `DATA` tab
+
+The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`. The first of these tabs (`Data`) the users can specify which classifier to plot, what type of data from that classifier, and what type. The `DATA` tab contains several sub-menus, 
+
+* **The `Select Behavior to Plot` submenu**. This sub-menu contains three drop-down menus: `Behaviors`, `Category`, and `Feature`. 
+
+If we click on the on the `Behaviors` submenu, we see a drop down menu where we can choose any of the classified behaviors in the project (in this case `Attack`, `Mounting`, `Escape`, `Pursuit`, and `Defensive`). Selecting a classifier, will update the graphs displayed on the right-hand side with the selected classifier.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_gif_02.gif" />
+</p>
+
+If we click on the on the `Category` submenu, we see a drop down menu where we can choose what type of data to display for the selected classifier. Selecting a data category, will update the graphs displayed on the right-hand side with the selected data category.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_gif_03.gif" />
+</p>
+
+If we click on the on the `Feature` submenu, we see a drop down menu where we can choose what type of sub-type of the data is displayed. For example, this can be schaning from the number of bout events, to the total durations in seconds.
+
+##### The `GRAPH SETTINGS` tab
+
+The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`. The first of these tabs (`Data`) the users can specify which classifier to plot, what type of data from that classifier, and what type
+
+#### The `DOWNLOAD SETTINGS` tab
+
+The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`. The first of these tabs (`Data`) the users can specify which classifier to plot, what type of data from that classifier, and what type... 
+
+
 # SimBA Data Visualization: Plotly Dash Tutorial
 
 
@@ -35,9 +132,13 @@ also change this [here](https://github.com/sgoldenlab/simba/blob/master/docs/plo
 
 ### Part 3: Plot Settings
 
-With each of the plots, Plotly features many settings to better visualize the graphs and compare data as well as download the plots as images to your own computer.
+With each displayed plots, Plotly has many features and settings that allow users to better visualize the graphs and compare data as well as download the plots as images to your own computer. These settings can be accessed by hovering your mouse at the top right of any of the displayed graphs, like this:
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/probability_features.png "Plotly Graph Features")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_gif_01.gif" />
+</p>
+
+These settings are described in detailed in the [Plotly documentation], but are descibed in brief here below:
 
 * ```Download Plot```: 
 
