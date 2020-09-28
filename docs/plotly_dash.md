@@ -119,10 +119,6 @@ These settings are described in detailed in the [Plotly documentation], but are 
 ### PART 4: Plot Dashboard Overview
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/data_tab.JPG "Data Tab")
-
-** replace pic
-
 The left-hand side of the Dashboard interface displays the Dashboard menus. These menus allow users to specify what data is displayed on the graphs shown on the right-hand side of the interface, how the data is plotted, how to save graphs, and export subsets of data into self-contained CSVs and/or [parquet](https://towardsdatascience.com/the-best-format-to-save-pandas-data-414dca023e0d) files for further processing. In this part of the tutorial, we will walk through all of the settings and their functions in the SimBA Dashboard.  
 
 The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`.
@@ -135,6 +131,8 @@ The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download S
 
 
 With the first of these tabs being `Data`, users can select the classifier and types of data to plot, as well as select the types of groups to compare and which videos correspond to each respective group. 
+
+PUT PIC/GIF
 
 ### Select Behavior to Plot
 
