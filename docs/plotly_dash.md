@@ -2,7 +2,7 @@
 
 ## Overview
 
-Once analyses have been performed in SimBA, users may need to visualize the results of the classifiers and have easy, interactive paths towards exporting the parts of the datasets of interest into third-party statistical and graphing applications and scripts. For this, SimBA has a built-in interactive graphical dashboard written in [Plotly](https://plotly.com/) and [Dash](https://github.com/plotly/dash) that allows users to inspect **huge** (or not so huge) data-sets, and create their own new datasets (through drag-and-drop, mouse-clicks, zoom-functions and more) without having to write any custom code.  In this tutorial, we outline and explain the different functions within the SimBA Plotly Dashboard, and how we can utilize the dashboard for analyzing larger datasets (a data set containing classifications of 5 different behaviors, in 433 five-minute long videos) to third-party applications.  The SimBA dashboard was written by [Sophia Hwang](https://github.com/sophihwang26) and [Aasiya Islam](https://github.com/aasiya-islam).
+Once analyses have been performed in SimBA, users may need to visualize the results of the classifiers and have easy, interactive paths towards exporting the parts of the datasets of interest into third-party statistical and graphing applications and scripts. For this, SimBA has a built-in interactive graphical dashboard written in [Plotly](https://plotly.com/) and [Dash](https://github.com/plotly/dash) that allows users to inspect **huge** (or not so huge) data-sets, and create their own new datasets (through drag-and-drop, mouse-clicks, zoom-functions and more) without having to write any custom code.  In this tutorial, we outline and explain the different functions within the SimBA Plotly Dashboard, and how we can utilize the dashboard for analyzing larger datasets (a data set containing classifications of 5 different behaviors, in 433 five-minute long videos) to third-party applications.  The SimBA dashboard was created by [Sophia Hwang](https://github.com/sophihwang26) and [Aasiya Islam](https://github.com/aasiya-islam).
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_logo.png" />
@@ -180,9 +180,9 @@ With this feature, we can select a single group of videos to compare the data of
 ![](https://github.com/sgoldenlab/simba/blob/master/images/individual_groups.JPG "Individual Group Selection")
 
 
-* ```Select Single Group to Plot:``` In this dropdown menu, we can select a single group from out list of groups to plot.
+* ```Select Single Group to Plot:``` In this dropdown menu, we can select a single group from ort list of groups to plot.
 
-* ```Select Video(s):``` In this dropdown menu, we can select which videos we would like to see represented and compared to one another.
+* ```Select Video(s):``` In this dropdown menu, we can select which videos we would like to see represented and compared to one another. We can unselect videos to include in our individual video comparison by clicking the `X` next to the video name.
 
 For the VideoData continuous probability data, we can check the `Show Group Mean` box to add a trace to represent the mean of the included videos
 in the group data.
@@ -193,7 +193,9 @@ in the group data.
 
 With the second tab being `Graph Settings`, users can specify the different graph properties they would like to set such as the color scale, axes, background graph features, and miscellaneous properties. 
 
+
 ![](https://github.com/sgoldenlab/simba/blob/master/images/graphsettings_tab.JPG "Graph Settings Tab")
+
 
 ### Color Properties
 
@@ -252,7 +254,7 @@ Here we can change different graph properties such as the background display, fo
 
 * ``` Group Means Title``` & ```Individual Videos Title```: For the Group Means graph, the plot title will be the Feature + "Group Means" by default (e.g. "Probability_Attack Group Means"), and for the Individual Videos graph, the plot title will be the Feature + Group by default (e.g. Probability_Attack Group_1_test). To set your own plot titles, type in your new titles into the respective boxes and click `SET` to change them.
 
-* ```Choose Font```: The default font displayed for the page is Verdana, but this can be changed using the dropdown menu as you can select from the following fonts: Verdana, Helvetica, Calibri, Arial, Arial Narrow, Candara, Geneva, Courier New, and Times New Roman.
+* ```Choose Font```: The default font displayed for the page is Verdana, but this can be changed using the dropdown menu as you can select from the following fonts: Verdana, Helvetica, Calibri, Arial, Arial Narrow, Candara, Geneva, Courier New, and Times New Roman. *Note that if you want to the new plot title to be updated with this font change, then you must click `SET` next to the title name once again to update both font and title name.
 
 * ```Font Size```: The default font size displayed for the page is 12 pt, but this can also be increased or decreased by either clicking on the up or down arrows, respectively, or by highlighting and typing in a new font size in the display box. 
 
