@@ -61,59 +61,16 @@ Once you have selected your files `SimBA Dashboard file` (.. and the optional Si
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_6.JPG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_7.JPG" width="425"/>
 
-### PART 3: Dashboard overview
+### PART 3: Graph overview
 
-The left hand side of the Dashboard interface (showed in the image just below) displays the **Dashboard menues**. These dashboard menus allow users to specify what data is displayed on the graphs shown the right hand side of the interface, how the data is plotted, how to save the graphs, and export subsets of data into self-contained CSV and / or [parquet](https://towardsdatascience.com/the-best-format-to-save-pandas-data-414dca023e0d) files for further processing. In this part of the tutorial, we will go through all of the settings and their functions in the SimBA Dashboard:
+Here we feature the plots visualizing data for both a group mean comparison with groups selected on the `Data` menu on the Dashboard to the right-hand side, as well as an individual video comparison amongst a single group, also selected from the Dashboard.
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_8.JPG" />
-</p>
-
-##### The `DATA` tab
-
-The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`. The first of these tabs (`Data`) the users can specify which classifier to plot, what type of data from that classifier, and what type. The `DATA` tab contains several sub-menus, 
-
-* **The `Select Behavior to Plot` submenu**. This sub-menu contains three drop-down menus: `Behaviors`, `Category`, and `Feature`. 
-
-If we click on the on the `Behaviors` submenu, we see a drop down menu where we can choose any of the classified behaviors in the project (in this case `Attack`, `Mounting`, `Escape`, `Pursuit`, and `Defensive`). Selecting a classifier, will update the graphs displayed on the right-hand side with the selected classifier.
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_gif_02.gif" />
-</p>
-
-If we click on the on the `Category` submenu, we see a drop down menu where we can choose what type of data to display for the selected classifier. Selecting a data category, will update the graphs displayed on the right-hand side with the selected data category.
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_gif_03.gif" />
-</p>
-
-If we click on the on the `Feature` submenu, we see a drop down menu where we can choose what type of sub-type of the data is displayed. For example, this can be schaning from the number of bout events, to the total durations in seconds.
-
-##### The `GRAPH SETTINGS` tab
-
-The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`. The first of these tabs (`Data`) the users can specify which classifier to plot, what type of data from that classifier, and what type
-
-#### The `DOWNLOAD SETTINGS` tab
-
-The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`. The first of these tabs (`Data`) the users can specify which classifier to plot, what type of data from that classifier, and what type... 
-
-
-### Part 1: Graph Overview
-
-
-![](https://github.com/sgoldenlab/simba/blob/master/images/overall_bar.JPG "Graph Interface Overview")
-
-Here we feature the plots visualizing data for both a group mean comparison with groups selected on the Data dashboard to the side, as well as an individual video 
-comparison amongst a single group, also selected from the side. In the given scenario...
-
-
-### Part 2: Graph Types and Features
+### Part 1: Graph Types and Features
 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/probability2.JPG "Probability Graph Example")
 
-* Probability Graphs: These graphs plot the probability of the behavior as a continuous line graph per video frames as default. The x-axis can be changed [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#additional-properties) to visualize the probability vs. time in seconds for each video instead. 
-By hovering over each of the line graphs, we can see the individual data points for each trace as a coordinate of (frames/seconds, probability) as shown below. You can 
+* Probability Graphs: These graphs plot the probability of the behavior as a continuous line graph per video frames as default. The x-axis can be changed [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#additional-properties) to visualize the probability vs. time in seconds for each video instead. By hovering over each of the line graphs, we can see the individual data points for each trace as a coordinate of (frames/seconds, probability) as shown below. You can 
 also change this [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#part-3-plot-settings) to compare data points betwen traces while hovering. 
 
 
@@ -121,10 +78,10 @@ also change this [here](https://github.com/sgoldenlab/simba/blob/master/docs/plo
 
 * Categorical Bar Graphs: These graphs plot specific features of the behavior as designated [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#select-behavior-to-plot), with the means of the feature and standard error of mean displayed for each group in the Group Means comparison, and the feature for each video in the Individual Groups comparison. The means and feature count can be displayed on the top of each of the bars respectively, and also displayed upon hovering over it with the group/video name and feature count, and for the group mean comparison, the standard error will be displayed as +/- after the mean value feature count, as shown below. The standard error bars can be configured to be displayed traditionally as both above and below the mean, or just one way in either direction [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#bar-graph-properties). 
 
-* Legends: 
+* Legends: The legend primarily displays the color classification for each of the groups or individual videos displayed, which can be altered [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#color-properties)
 
 
-### Part 3: Plot Settings
+### Part 2: Plot Settings
 
 With each displayed plots, Plotly has many features and settings that allow users to better visualize the graphs and compare data as well as download the plots as images to your own computer. These settings can be accessed by hovering your mouse at the top right of any of the displayed graphs, like this:
 
@@ -159,33 +116,49 @@ These settings are described in detailed in the [Plotly documentation], but are 
 * ```Compare data on hover```:
 
 
-# PART 2: Plot Dashboard
+### PART 4: Plot Dashboard Overview
 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/data_tab.JPG "Data Tab")
-![](https://github.com/sgoldenlab/simba/blob/master/images/graphsettings_tab.JPG "Graph Settings Tab")
-![](https://github.com/sgoldenlab/simba/blob/master/images/downloadsettings_2.JPG "Download Settings Tab")
 
+** replace pic
+
+The left-hand side of the Dashboard interface displays the Dashboard menus. These menus allow users to specify what data is displayed on the graphs shown on the right-hand side of the interface, how the data is plotted, how to save graphs, and export subsets of data into self-contained CSVs and/or [parquet](https://towardsdatascience.com/the-best-format-to-save-pandas-data-414dca023e0d) files for further processing. In this part of the tutorial, we will walk through all of the settings and their functions in the SimBA Dashboard.  
+
+The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_8.JPG" />
+</p>
 
 ## Part 1: Data
 
+
+With the first of these tabs being `Data`, users can select the classifier and types of data to plot, as well as select the types of groups to compare and which videos correspond to each respective group. 
+
 ### Select Behavior to Plot
 
-In the following dropdown menus, we can select which type of behavior to visualize for our experiment along with the category of data
-and the specific features of the data sets with our given scenario:
+In the following dropdown menus from the Data tab, the users can specify which classifier to plot, what category or type of data from that classifier, and the specific features of the data sets with our given scenario. 
+
+REPLACE PIC/GIF
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/plot_behavior.JPG "Plot Behavior Selection")
 
-* ```Behaviors:``` In this dropdown menu, we can select between `Attack` and `Sniffing` behaviors.
+* ```Behaviors:``` In this dropdown menu, we can select between any of the classified behaviors in the project, which in this case are `Attack`, `Mounting`, `Escape`, `Pursuit`, and `Defensive`. Selecting the classifier will update the graphs displayed to the right. 
 
-* ```Category:``` In this dropdown menu, we can select between `VideoData` which plots the probability of the behavior vs. frames,
-`SklearnData`, which plots different results of the features analyzed by Sklearn, and `TimeBins`, which plots the prevalence of the features
-for each time bin.
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_gif_02.gif" />
+</p>
 
-* ```Feature:``` In this dropdown menu, we can select the features or statistics to plot for each respective category. VideoData 
-plots probability in the form of a line graph. Sklearn plots seven statistics for each behavior with the mean and standard error represented
-in a bar graph. Here we can select from ` bout events`, `total events duration (s)`, `mean bout duration (s)`, `first occurrence (s)`, `mean interval (s)`,
-and `median interval (s)`. TimeBins plots the mean of the prevalence of these respective features for each time bin selected. 
+* ```Category:``` In this dropdown menu, we can choose what type of data to display for the selected classifier, which will update the graphs to the right. Here we can select between `VideoData` which plots the probability of the behavior vs. frames, `SklearnData`, which plots different results of the features analyzed by Sklearn, and `TimeBins`, which plots the prevalence of the features for each time bin.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_gif_03.gif" />
+</p>
+
+* ```Feature:``` In this dropdown menu, we can select the sub-type of data, aka the features or statistics, to plot for each respective category. VideoData plots probability in the form of a line graph. Sklearn plots seven statistics for each behavior with the mean and standard error represented in a bar graph. Here we can select from ` bout events`, `total events duration (s)`, `mean bout duration (s)`, `first occurrence (s)`, `mean interval (s)`, and `median interval (s)`. TimeBins plots the mean of the prevalence of these respective features for each time bin selected. 
+
+PUT GIF
 
 ### Plotting Group Means
 
@@ -220,6 +193,10 @@ in the group data.
 ## Part 2: Graph Settings
 
 
+With the second tab being `Graph Settings`, users can specify the different graph properties they would like to set such as the color scale, axes, background graph features, and miscellaneous properties. 
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/graphsettings_tab.JPG "Graph Settings Tab")
+
 ### Color Properties
 
 
@@ -235,11 +212,7 @@ For the group color selection, simply click on the colored circle underneath the
 ![](https://github.com/sgoldenlab/simba/blob/master/images/colorscales.png "Colorscale Selection")
 
 
-* ```Colorscale Gradient for Individual Videos```: For the individual video color selection, you have the option of choosing from different pre-set or custom
-colorscales which can be found in the dropdown menu by clicking on the sample colorscale. Here you can choose the type of colorscale depending on what best
-suits your data visualization needs, as well as setting the number of swatches needed to potentially correspond to the number of videos being visualized.
-The colors will automatically update upon the selection of the colorscale gradient, and to return to the page, you can click the colorscale already displayed
-on the page, and to update the colors with a new combination of colors from the colorscale gradient, you can click on `UPDATE COLORS` to change them.
+* ```Colorscale Gradient for Individual Videos```: For the individual video color selection, you have the option of choosing from different pre-set or custom colorscales which can be found in the dropdown menu by clicking on the sample colorscale. Here you can choose the type of colorscale depending on what best suits your data visualization needs, as well as setting the number of swatches needed to potentially correspond to the number of videos being visualized. The colors will automatically update upon the selection of the colorscale gradient, and to return to the page, you can click the colorscale already displayed on the page, and to update the colors with a new combination of colors from the colorscale gradient, you can click on `UPDATE COLORS` to change them.
 
 
 ### Probability Graph Properties
@@ -288,6 +261,10 @@ Here we can change different graph properties such as the background display, fo
 
 ## Part 3: Download Settings
 
+
+With the last tab being `Download Settings`, users can specify how they would like to download their datasets as CSVs and plots as images.
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/downloadsettings_2.JPG "Download Settings Tab")
 
 ### CSV Export 
 
