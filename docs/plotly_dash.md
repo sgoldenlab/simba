@@ -48,9 +48,7 @@ Depending on the number of videos that the user has within the project, this ste
 
 1. To open and inspect a `SimBA/Plotly dataset` h5 file, we will use the two menus circled in blue below:
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_4.JPG" />
-</p>
+![](https://github.com/sgoldenlab/simba/blob/master/images/Dash_4.JPG "SimBA Dashboard")
 
 * ```SimBA Dashboard file (H5)```: In this menu, click on 'Browse File` and select the dataframe H5 dataframe container you wish to use within the Dashboard interface. 
 >**Important**: The selected `SimBA Dashboard file.H5` file did not have to be generated within the currently opened project. The selected `SimBA Dashboard file.H5` could have been generated within the SimBA interface anywhere, within any project (regardless of pose-estimation tool, tracked body-parts, and the number of/specific classifier used). 
