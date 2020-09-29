@@ -48,7 +48,9 @@ Depending on the number of videos that the user has within the project, this ste
 
 1. To open and inspect a `SimBA/Plotly dataset` h5 file, we will use the two menus circled in blue below:
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Dash_4.JPG "Plotly Graph Features")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_4.JPG" />
+</p>
 
 * ```SimBA Dashboard file (H5)```: In this menu, click on 'Browse File` and select the dataframe H5 dataframe container you wish to use within the Dashboard interface. 
 >**Important**: The selected `SimBA Dashboard file.H5` file did not have to be generated within the currently opened project. The selected `SimBA Dashboard file.H5` could have been generated within the SimBA interface anywhere, within any project (regardless of pose-estimation tool, tracked body-parts, and the number of/specific classifier used). 
@@ -67,13 +69,17 @@ Here we feature the plots visualizing data for both a group mean comparison with
 ### Part 1: Graph Types and Features
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/probability2.JPG "Probability Graph Example")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/probability_new.JPG" />
+</p>
 
 * Probability Graphs: These graphs plot the probability of the behavior as a continuous line graph per video frames as default. The x-axis can be changed [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#additional-properties) to visualize the probability vs. time in seconds for each video instead. By hovering over each of the line graphs, we can see the individual data points for each trace as a coordinate of (frames/seconds, probability) as shown below. You can 
 also change this [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#part-3-plot-settings) to compare data points betwen traces while hovering. 
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/bargraph.JPG "Bar Graph Example")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bar_new.JPG" />
+</p>
 
 * Categorical Bar Graphs: These graphs plot specific features of the behavior as designated [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#select-behavior-to-plot), with the means of the feature and standard error of mean displayed for each group in the Group Means comparison, and the feature for each video in the Individual Groups comparison. The means and feature count can be displayed on the top of each of the bars respectively, and also displayed upon hovering over it with the group/video name and feature count, and for the group mean comparison, the standard error will be displayed as +/- after the mean value feature count, as shown below. The standard error bars can be configured to be displayed traditionally as both above and below the mean, or just one way in either direction [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#bar-graph-properties). 
 
@@ -181,15 +187,18 @@ The Dashboard menus display three tabs: `Data`, `Graph Settings`, and `Download 
 With the first of these tabs being `Data`, users can select the classifier and types of data to plot, as well as select the types of groups to compare and which videos correspond to each respective group. 
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/data_tab.PNG "Plot Behavior Selection")
-
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/data_tab.PNG" />
+</p>
 
 ### Select Behavior to Plot
 
 In the following dropdown menus from the Data tab, the users can specify which classifier to plot, what category or type of data from that classifier, and the specific features of the data sets with our given scenario. 
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/plot_behavior.JPG "Plot Behavior Selection")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/plot_behavior.JPG" />
+</p>
 
 
 * ```Behaviors:``` In this dropdown menu, we can select between any of the classified behaviors in the project, which in this case are `Attack`, `Mounting`, `Escape`, `Pursuit`, and `Defensive`. Selecting the classifier will update the graphs displayed to the right. 
@@ -249,7 +258,9 @@ in the group data.
 With the second tab being `Graph Settings`, users can specify the different graph properties they would like to set such as the color scale, axes, background graph features, and miscellaneous properties. 
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/graphsettings_tab.JPG "Graph Settings Tab")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/graphsettings_new.JPG" />
+</p>
 
 
 ### Color Properties
@@ -342,12 +353,18 @@ You files end up `Your_PROJECT_NAME_\project_folder\logs` directory
 
 You can download the data for each of the respective Group Means and Individual Videos plots as CSV files and save to your computer. 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/csv_export.JPG "CSV Export Settings")
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/csv_export.JPG" />
+</p>
 
 
 * ```Enter csv file name```: To designate a CSV file name, type your desired file name into the box and click either the `MEANS.CSV` or the `VIDEOS.CSV` buttons to select which data you would like to download as a CSV. Once downloaded, it should display a message saying that you have "Downloaded csv as file_name.csv", as seen below. It will download into the same folder from which the _____.
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/csv_download.JPG "CSV Downloaded Message")
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/csv_download.JPG" />
+</p>
 
 For the Group Means data, the CSV will display the probability group data for each frame and the mean for the groups, or the feature means for each group with standard errors for the categorical data. For Individual Videos data, the CSV  will display the data in the same format with the data represented for each video instead of for each group. Examples can be seen below: 
 
