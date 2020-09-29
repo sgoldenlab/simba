@@ -39,7 +39,6 @@ Once we have selected the tick-boxes for the data we want to include, click on `
 
 >Note: This is a highly compressed file. In this example tutorial, the 438  have been compressed into a very-much sharable 32MB that contain all the data indicated by the tick-boxes selected in the SimBA GUI 'Plotly/Dash' submenu:
 
-
 ![](https://github.com/sgoldenlab/simba/blob/master/images/Dash_2.JPG "Plotly Graph Features")
 
 
@@ -89,27 +88,76 @@ With each displayed plots, Plotly has many features and settings that allow user
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_gif_01.gif" />
 </p>
 
-These settings are described in detailed in the [Plotly documentation], but are descibed in brief here below:
+These settings are described in detailed in the [Plotly documentation], but are described in brief here below:
 
-* ```Download Plot```: 
 
-* ```Zoom```:
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/image_download.gif" />
+</p>
 
-* ```Pan```:
+
+* ```Download Plot```: By clicking here, we can download each of our plots as images saved to our computers in our desired locations, and you can change the pixel dimensions as well as the file extension type of the image [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#image-export). The default will save as a 500 X 700 PNG. 
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/zoom.gif" />
+</p>
+
+
+* ```Zoom```: By clicking here, we can zoom into a portion of our graphed data by clicking and dragging over the data, creating a box that highlights the data we would like to look at more closely. We can also do this by clicking and dragging the box over the data without clicking on the `Zoom` button, as this is the default feature of the cursor's click-and-drag with our graphs.
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/pan.gif" />
+</p>
+
+
+* ```Pan```: By clicking here, we can pan over a zoomed-in portion of the data and view more of the continuous frames, again by clicking and dragging the cursor over the graph either to the left or right of the data to view the surrounding data to the zoomed-in portion. If the data is not zoomed-in, the default graph will display all frames of the data together and you will not be able to pan the data to other relevant frames.
+
 
 * ```Box Select```:
 
 * ```Lasso Select```:
 
-* ```Zoom In```:
 
-* ```Zoom Out```:
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/zoom2.gif" />
+</p>
 
-* ```Autoscale```:
+
+* ```Zoom In```: By clicking here, we can zoom into a default portion of the data which will be the middle of the graph, and we can click multiple times to keep zooming in and looking closer at the default middle portion of the data. You can also zoom into a specified portion of the data by clicking and dragging over an area, as described above.
+
+* ```Zoom Out```: Similar to above, by clicking here we can zoom out of the zoomed-in portion of the data, and it centers around the middle part of the graph, and continue to zoom out multiple times as needed.
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/autoscale.gif" />
+</p>
+
+
+* ```Autoscale```: After zooming in or out of a portion of data, the axes should automatically autoscale to give the user the best view of the graphed data, but if it doesn't autoscale automatically, we can click here. Note that it may take extra time to autoscale if you are analyzing data from large datasets inclusive of several videos which slows down the program. 
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/reset_axes.gif" />
+</p>
+
 
 * ```Reset Axes```:
 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/toggle_spikes.giff" />
+</p>
+
+
 * ```Toggle Spike Lines```:
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/hover.gif" />
+</p>
+
 
 * ```Show closest data on hover```:
 
@@ -121,7 +169,7 @@ These settings are described in detailed in the [Plotly documentation], but are 
 
 The left-hand side of the Dashboard interface displays the Dashboard menus. These menus allow users to specify what data is displayed on the graphs shown on the right-hand side of the interface, how the data is plotted, how to save graphs, and export subsets of data into self-contained CSVs and/or [parquet](https://towardsdatascience.com/the-best-format-to-save-pandas-data-414dca023e0d) files for further processing. In this part of the tutorial, we will walk through all of the settings and their functions in the SimBA Dashboard.  
 
-The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download Settings`.
+The Dashboard menus display three tabs: `Data`, `Graph Settings`, and `Download Settings`.
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Dash_8.JPG" />
@@ -132,15 +180,17 @@ The Dashboard menus display three tabs: `Data`, `Graph Settings` and `Download S
 
 With the first of these tabs being `Data`, users can select the classifier and types of data to plot, as well as select the types of groups to compare and which videos correspond to each respective group. 
 
-PUT PIC/GIF
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/data_tab.PNG "Plot Behavior Selection")
+
 
 ### Select Behavior to Plot
 
 In the following dropdown menus from the Data tab, the users can specify which classifier to plot, what category or type of data from that classifier, and the specific features of the data sets with our given scenario. 
 
-REPLACE PIC/GIF
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/plot_behavior.JPG "Plot Behavior Selection")
+
 
 * ```Behaviors:``` In this dropdown menu, we can select between any of the classified behaviors in the project, which in this case are `Attack`, `Mounting`, `Escape`, `Pursuit`, and `Defensive`. Selecting the classifier will update the graphs displayed to the right. 
 
@@ -156,14 +206,17 @@ REPLACE PIC/GIF
 
 * ```Feature:``` In this dropdown menu, we can select the sub-type of data, aka the features or statistics, to plot for each respective category. VideoData plots probability in the form of a line graph. Sklearn plots seven statistics for each behavior with the mean and standard error represented in a bar graph. Here we can select from ` bout events`, `total events duration (s)`, `mean bout duration (s)`, `first occurrence (s)`, `mean interval (s)`, and `median interval (s)`. TimeBins plots the mean of the prevalence of these respective features for each time bin selected. 
 
-PUT GIF
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/behavior_feature.gif" />
+</p>
 
 ### Plotting Group Means
 
 With this feature, we can select different combinations of groups of videos to plot and compare the data of each to one another in the Group Means plot.
 
-
-![](https://github.com/sgoldenlab/simba/blob/master/images/group_means.JPG "Group Selection")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/group_means.gif" />
+</p>
 
 
 * ```Select Group(s):``` In this dropdown menu, we can select the different groups to add to our plot, and to remove a group
@@ -177,7 +230,9 @@ For the VideoData continuous probability data, we can check the `Show Total Mean
 With this feature, we can select a single group of videos to compare the data of each video in the group to one another in the plot.
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/individual_groups.JPG "Individual Group Selection")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/individual_videos.gif" />
+</p>
 
 
 * ```Select Single Group to Plot:``` In this dropdown menu, we can select a single group from ort list of groups to plot.
@@ -203,13 +258,17 @@ With the second tab being `Graph Settings`, users can specify the different grap
 Here we can choose the color properties for both our groups and individual videos for the graphs. 
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/group_colors.png "Group Color Selection")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/group_colors.gif" />
+</p>
 
 
 For the group color selection, simply click on the colored circle underneath the name of the group which opens a color picker in which you can choose a specific color and shade for each group to be represented with. Once all the colors have been selected for the groups, you can click the `UPDATE COLORS` button to set the selection.
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/colorscales.png "Colorscale Selection")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/colorscale.gif" />
+</p>
 
 
 * ```Colorscale Gradient for Individual Videos```: For the individual video color selection, you have the option of choosing from different pre-set or custom colorscales which can be found in the dropdown menu by clicking on the sample colorscale. Here you can choose the type of colorscale depending on what best suits your data visualization needs, as well as setting the number of swatches needed to potentially correspond to the number of videos being visualized. The colors will automatically update upon the selection of the colorscale gradient, and to return to the page, you can click the colorscale already displayed on the page, and to update the colors with a new combination of colors from the colorscale gradient, you can click on `UPDATE COLORS` to change them.
@@ -220,7 +279,9 @@ For the group color selection, simply click on the colored circle underneath the
 Here we can select the properties for our different probability graphs, both the multi-group and individual group video graphs. Depending on whether you would like the graph visualized with video frames or seconds as the x-axis, as set [here](https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md#additional-properties), we can custom set the axes below.
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/probability_propertiesJPG.JPG "Probability Graph Properties Selection")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/group_frames.gif" />
+</p>
 
 
 For visualizing the multi-group graphs in frames, you can set the minumum and maximum number of frames you would like visualized, respectively, and similarly if you're viewing your graph in seconds, you can set the numbers below. Once set, click `SUBMIT` to view the changes. To reset the axes, click `RESET AXES` to view the default minima and maxima values. The same steps can be applied for the individual group and video viewing frames/seconds below.
@@ -231,7 +292,9 @@ For visualizing the multi-group graphs in frames, you can set the minumum and ma
 For the bar graphs, as represented by the Sklearn and TimeBins data with our given scenario, we can specify what type of error bars we would like visualized, being either traditional error bars or just one way around the mean value. The standard error values can also be seen along with the mean if you hover over the bar itself on the graph.
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/bar_properties.JPG "Bar Graph Properties Selection")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/error_bars.gif" />
+</p>
 
 
 * ```Error Type:```: The default will display traditional error bars as `Both` but to display them only one way, select either the `Above` or `Below` options to
@@ -252,6 +315,12 @@ Here we can change different graph properties such as the background display, fo
 
 * ```Show Background```: A light blue background will displayed behind the graph by default, but to remove this to display a white background you can check this box
 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/graph_titles.gif" />
+</p>
+
+
 * ``` Group Means Title``` & ```Individual Videos Title```: For the Group Means graph, the plot title will be the Feature + "Group Means" by default (e.g. "Probability_Attack Group Means"), and for the Individual Videos graph, the plot title will be the Feature + Group by default (e.g. Probability_Attack Group_1_test). To set your own plot titles, type in your new titles into the respective boxes and click `SET` to change them.
 
 * ```Choose Font```: The default font displayed for the page is Verdana, but this can be changed using the dropdown menu as you can select from the following fonts: Verdana, Helvetica, Calibri, Arial, Arial Narrow, Candara, Geneva, Courier New, and Times New Roman. *Note that if you want to the new plot title to be updated with this font change, then you must click `SET` next to the title name once again to update both font and title name.
@@ -267,6 +336,8 @@ With the last tab being `Download Settings`, users can specify how they would li
 ![](https://github.com/sgoldenlab/simba/blob/master/images/downloadsettings_2.JPG "Download Settings Tab")
 
 ### CSV Export 
+
+You files end up `Your_PROJECT_NAME_\project_folder\logs` directory
 
 
 You can download the data for each of the respective Group Means and Individual Videos plots as CSV files and save to your computer. 
@@ -291,7 +362,9 @@ For the Group Means data, the CSV will display the probability group data for ea
 You can also download the images for each of the plots and customize dimensions, name, and file extension. 
 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/imageexport_2.JPG "Image Export Settings")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/image_download.gif" />
+</p>
 
 
 * ``` Enter image dimensions (px)```: The default image dimensions in pixels are 500 X 700, but you can change the height and width respectively by typing in a new value or by clicking the up and down arrows to increase or decrease the dimensions.
