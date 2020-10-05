@@ -109,6 +109,7 @@ These settings are described in detailed in the [Plotly documentation], but are 
 
 
 * ```Zoom```: By clicking here, we can zoom into a portion of our graphed data by clicking and dragging over the data, creating a box that highlights the data we would like to look at more closely. We can also do this by clicking and dragging the box over the data without clicking on the `Zoom` button, as this is the default feature of the cursor's click-and-drag with our graphs.
+>Note: When plotting bar graphs, Zooming in using the click-and-drag method produces an error in which the graph immediately zooms back out. We are currently working on resolving the error.
 
 
 <p align="center">
