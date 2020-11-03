@@ -82,6 +82,23 @@ python SimBA.py
 
 >*Note:* For this launch to work you need to [add python to the environmental path](https://datatofish.com/add-python-to-windows-path/). 
 
+# Anaconda installation
+
+1. Open up terminal of your environment
+
+2. In the terminal type 
+
+`pip install simba-uw-no-tf`
+
+3. It will face a known shapely error. To fix it, first uninstall shapely.
+
+`pip uninstall shapely`
+
+4. Then, install shapely with conda command:
+
+`conda install -c conda-forge shapely`
+
+
 # python dependencies
 
 | package  | ver. |
