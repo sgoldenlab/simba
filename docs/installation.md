@@ -90,7 +90,7 @@ python SimBA.py
 
 `pip install simba-uw-no-tf`
 
-3. It will face a known shapely error. To fix it, first uninstall shapely.
+3. It will error out when running simba. To fix it, first uninstall shapely.
 
 `pip uninstall shapely`
 
