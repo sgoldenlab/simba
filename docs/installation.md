@@ -102,12 +102,12 @@ python SimBA.py
 
 This is not recommended but it is possible.
 
-###Requirements
+### Requirements
 - XCode installed
 - Python 3.6
 - Anaconda
 
-##Installation process
+## Installation process
 
 1. Create an environment for simba using anaconda terminal.
 
