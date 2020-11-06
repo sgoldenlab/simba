@@ -104,6 +104,8 @@ This is not recommended but it is possible.
 
 ### Requirements
 - XCode installed
+- Homebrew
+- ffmpeg
 - Python 3.6
 - Anaconda
 
