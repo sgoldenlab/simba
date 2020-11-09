@@ -98,6 +98,14 @@ python SimBA.py
 
 `conda install -c conda-forge shapely`
 
+5. Then, install shape,
+
+`pip install shap`
+
+6. Lastly, install h5py,
+
+`pip install h5py`
+
 # Installing on MacOS
 
 This is not recommended but it is possible.
