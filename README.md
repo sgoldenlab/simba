@@ -103,6 +103,8 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 - [Install SimBA](docs/installation.md)
 
+-[Install SimBA using Anaconda](docs/anaconda_installation.md)
+
 ## Tutorial 📚
 - [Process video using SimBA tools](docs/Tutorial_tools.md) 🔨
 - [Batch pre-process video using SimBA](docs/tutorial_process_videos.md) 🏭
