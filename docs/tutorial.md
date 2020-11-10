@@ -421,7 +421,14 @@ These steps generate visualizations of features and machine learning classificat
 
 ![](/images/visualization_11_20.PNG)
 
-1. Under the **Sklearn visualization** heading, click on `Visualize classification results`.
+1. Under the **Sklearn visualization** heading, check on the box and click on `Visualize classification results`.
+
+`Generate video`: This generates a video of the classification result
+
+`Generate frame`: This generates frames(images) of the classification result
+
+**Note: Generate frames are required if you want to merge frames into videos in the future.**
+
 This step grabs the frames of the videos in the project, and draws circles at the location of the tracked body parts, the convex hull of the animal, and prints the behavioral predictions on top of the frame. For an example, click [here](https://www.youtube.com/watch?v=7AVUWz71rG4&t=519s).
 
 ### Step 11: Visualizations
