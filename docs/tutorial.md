@@ -500,27 +500,18 @@ To generate heatmaps, SimBA needs several user-defined variables:
 2. Click `Generate heatmap` to generate heatmap of the target behavior. For more information on heatmaps based on behavioral events in SimBA - check the [tutorial for scenario 2 - visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions)
 
 ### Step 12: Merge Frames
-Merge all the generated plots from the previous step into single frames.
+Merge all the generated plots from the previous step into a single frame and generate a video as an output.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes.PNG" width="121" height="62" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes_new.PNG" width="216" height="217" />
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
 
-1. Under **Merge Frames**, click `Merge Frames` and frames with all the generated plots will be combined and saved in the `project_folder/frames/output/merged` folder.
+**Note: All the frames must be generated in the previous step for this to work. This step combines all the frames(images) that are generated and merge them together and make a video.**
 
-### Step 13: Create Videos
-This step is to generate a video from the merged frames.
+1. Check on the plot that you wish to merge together and output as a single video.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/createvideoini.PNG" width="200" height="100" />
+2. Under **Merge Frames**, click `Merge Frames` and frames with all the generated plots will be combined and saved in the `project_folder/frames/output/merged` folder in a video format.
 
-1. Enter the `Bitrate` and the `File format`  
 
-- `Bitrate`: [Bitrate](https://en.wikipedia.org/wiki/Bit_rate) is the number of bits per second. The symbol is bit/s. It generally determines the size and quality of video and audio files: the higher the bitrate, the better the quality and the larger the file size. If unsure, try setting bitrate to 2400.
-
-- `File format`: The format of the output video, it can be mp4, mov, flv, avi, etc...
-
-> **Note**: Please enter the file format without the ".".
-
-2. Click on `Create Video`. 
 
 
