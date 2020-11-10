@@ -502,7 +502,7 @@ To generate heatmaps, SimBA needs several user-defined variables:
 ### Step 12: Merge Frames
 Merge all the generated plots from the previous step into a single frame and generate a **video** as an **output**.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes_new.PNG" width="216" height="217" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes_new.PNG" width="126" height="217" />
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
 
