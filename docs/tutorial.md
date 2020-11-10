@@ -512,6 +512,9 @@ Merge all the generated plots from the previous step into a single frame and gen
 
 2. Under **Merge Frames**, click `Merge Frames` and frames with all the generated plots will be combined and saved in the `project_folder/frames/output/merged` folder in a video format.
 
+### Plotly
+
+Please click [here](/docs/plotly_dash.md#interactive-data-visualization-in-simba) to learn how to use plotly.
 
 
 
