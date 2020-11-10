@@ -500,7 +500,7 @@ To generate heatmaps, SimBA needs several user-defined variables:
 2. Click `Generate heatmap` to generate heatmap of the target behavior. For more information on heatmaps based on behavioral events in SimBA - check the [tutorial for scenario 2 - visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions)
 
 ### Step 12: Merge Frames
-Merge all the generated plots from the previous step into a single frame and generate a video as an output.
+Merge all the generated plots from the previous step into a single frame and generate a **video** as an **output**.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes_new.PNG" width="216" height="217" />
 
