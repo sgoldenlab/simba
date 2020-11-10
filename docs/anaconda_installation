@@ -1,0 +1,25 @@
+# Step by step SimBA Installation in Anaconda environment
+
+1. Download [Anaconda](https://www.anaconda.com/products/individual) and install the software into your machine.
+
+2. Run Anaconda Navigator. The application looks like this:
+
+3. Click on **Environments**, then click **Create** to create a new environment.
+
+4. Give it a name for your environment and choose Python 3.6. Then click **Create**
+
+5. Click on the environment that you just made. In this case, my new environment is *simba-test*. Then select `Open Terminal`
+
+6. In the terminal, type 
+
+`pip install simba-uw-no-tf`
+
+7. Once it is installed, uninstall shapely,
+
+`pip uninstall shapely`
+
+8. Then reinstall using the following command,
+
+`conda install -c conda-forge shapely`
+
+9. Type `simba` in the terminal to check if it works.
