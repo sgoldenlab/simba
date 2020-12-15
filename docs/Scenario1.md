@@ -282,7 +282,7 @@ This step is used for training new machine models for behavioral classifications
 
 #### Train predictive classifier(s): settings
 
-1. Click on `Settings` and the following window will pop up. 
+1. Click on `Settings` and the following, slightly indimidating (but I promise: easy to use!) window will pop up. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Settings1.png" />
