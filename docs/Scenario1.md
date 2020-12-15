@@ -284,7 +284,9 @@ This step is used for training new machine models for behavioral classifications
 
 1. Click on `Settings` and the following window will pop up. 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Machine_model_settings_SimBA.PNG "machine model settings")
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Settings1.png" />
+</p>
 
 >*Note I:* If you have a CSV file containing hyperparameter metadata, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the Hyperparameter entry boxes and model evaluation settings. For the Scenario 1, we [provide](https://github.com/sgoldenlab/simba/blob/master/misc/BtWGaNP_meta.csv) a Metadata file that will populate the Hyperparameter entry boxes and evaluation settings with some default values. Please save this file to disk and load it. If you downloaded SimBA through our github page, the Metadata file should be in the *simba/misc* directory. 
 
