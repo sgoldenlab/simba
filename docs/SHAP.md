@@ -46,6 +46,13 @@ Next, navigate to the `Train machine model` tab and click on `Settings`. In the 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP2.png" />
 </p>
 
+If this box is ticked, and the entry boxes are filled in, SiMBA will also calculate SHAP values while generating your behavioral classifier. SimBA will use your annotations when doing so. SHAP calculations are an computationally expensive process, so we most likely can't use **all** of your annotations to calculate them. The time it takes to calculate SHAP scores for a single frame will depend on how many features you have the the specs of the computer you are using, but in all likelihood it will take **several seconds, and possibly tens of seconds**, for a single frame. We therefore have to select a sub-set of frames that we will calculate SHAP scores for. 
+
+  - In the `# target present` entry box, enter the number of frames (integer - e.g., `100`) with the behavioral target **present** to calculate SHAP values for. 
+  - In the `# target absent` entry box, enter the number of frames (integer - e.g., `100`) with the behavioral target **absent** to calculate SHAP values for.
+
+
+
 
 
 
