@@ -359,7 +359,6 @@ Here is a brief description of the different Model evaluation settings available
    - `# target absent`: The number of frames (integer - e.g., `100`) with the behavioral target **absent** (with the behavioral target being the behavior selected in the **Model** drop-down menu in Step 3 above) to calculate SHAP values for.
 
  
-
 #### Train predictive classifier(s): start the machine training
 
 Once all the entry boxes have been filled in with the desired Hyperparameters and Model Evaluation Settings, the user can either click on `Save settings into global environment` or `Save settings for specific model`. If you click on `Save settings into global environment`, the settings will be saved in to your *project_config.ini* file located in your `project_folder`. These settings can subsequently be retreived and executed to generate a predictive classifier (**Mode 1**). 
