@@ -111,6 +111,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Using DeepPoseKit in SimBA](docs/DeepPoseKit_in_SimBA.md) 📙
 - [Using DeepLabCut through SimBA](docs/Tutorial_DLC.md) 📗
 - [SimBA generic tutorial](docs/tutorial.md) 📘
+- [SimBA friendly asked questions (FAQ)](docs/FAQ.md) 📕
 - [SimBA behavioral annotation interface](docs/labelling_aggression_tutorial.md) 🏷️
 - [Using user-defined ROIs in SimBA](/docs/ROI_tutorial.md) 🗺️
 - [Using multi-animal pose (maDLC/SLEAP) in SimBA](/docs/Multi_animal_pose.md) 🐭🐭
