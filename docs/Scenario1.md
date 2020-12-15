@@ -352,9 +352,9 @@ Here is a brief description of the different Model evaluation settings available
 
 - `Calculate SHAP scores`: Creates a CSV file listing the contribution of each individual feature to the classification probability of each frame. For more information, see the [SimBA SHAP tutorial](https://github.com/sgoldenlab/simba/edit/master/docs/SHAP.md) and the [SHAP GitHub repository](https://github.com/slundberg/shap). SHAP calculations are an computationally expensive process, so we most likely need to take a smeller random subset of our video frames, and calculate SHAP scores for this random subset:
 
-  - `# target present`: The number of frames with the behavioral target **present** (with the behavioral target being the behavior selected in the **Model** drop-down menu in Step 3 above) to calculate SHAP values for. 
+  - `# target present`: The number of frames (integer - e.g., `100`) with the behavioral target **present** (with the behavioral target being the behavior selected in the **Model** drop-down menu in Step 3 above) to calculate SHAP values for. 
  
-   - `# target absent`: The number of frames with the behavioral target **absent** (with the behavioral target being the behavior selected in the **Model** drop-down menu in Step 3 above) to calculate SHAP values for.
+   - `# target absent`: The number of frames (integer - e.g., `100`) with the behavioral target **absent** (with the behavioral target being the behavior selected in the **Model** drop-down menu in Step 3 above) to calculate SHAP values for.
 
  
 
