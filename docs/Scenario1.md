@@ -350,6 +350,14 @@ Here is a brief description of the different Model evaluation settings available
 
 - `Generate Precision Recall Curves`: Creates a CSV file listing precision at different recall values. This is useful for titration of the false positive vs. false negative classifications of the models by manipulating the `Discrimination threshold` (see below). For an example CSV file of of a precision-recall curve generated through SimBA, click [here](https://github.com/sgoldenlab/simba/blob/master/images/BtWGaNP_prediction_precision_recall.csv). This may be informative if your aiming to titrate your classifier to (i) predict all occurances of behavior BtWGaNP, and can live with a few false-positive classifications, or (ii) conversely, you want all predictions of behavior BtWGaNP to be accurate, and can live with a few false-negative classifications, or (iii) you are aiming for a balance between false-negative and false-positive classifications. 
 
+- `Calculate SHAP scores`: Creates a CSV file listing the contribution of each individual feature to the classification probability of each frame. For more information, see the [SimBA SHAP tutorial](https://github.com/sgoldenlab/simba/edit/master/docs/SHAP.md) and the [SHAP GitHub repository](https://github.com/slundberg/shap). SHAP calculations are an computationally expensive process, so we most likely need to take a smeller random subset of our video frames, and calculate SHAP scores for this random subset:
+
+  - `# target present`: The number of frames with the behavioral target **present** (with the behavioral target being the behavior selected in the **Model** drop-down menu in Step 3 above) to calculate SHAP values for. 
+ 
+   - `# target absent`: The number of frames with the behavioral target **absent** (with the behavioral target being the behavior selected in the **Model** drop-down menu in Step 3 above) to calculate SHAP values for.
+
+ 
+
 #### Train predictive classifier(s): start the machine training
 
 Once all the entry boxes have been filled in with the desired Hyperparameters and Model Evaluation Settings, the user can either click on `Save settings into global environment` or `Save settings for specific model`. If you click on `Save settings into global environment`, the settings will be saved in to your *project_config.ini* file located in your `project_folder`. These settings can subsequently be retreived and executed to generate a predictive classifier (**Mode 1**). 
