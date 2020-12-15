@@ -50,6 +50,10 @@ If this box is ticked, and the entry boxes are filled in, SiMBA will also calcul
 
   - In the `# target present` entry box, enter the number of frames (integer - e.g., `100`) with the behavioral target **present** to calculate SHAP values for. 
   - In the `# target absent` entry box, enter the number of frames (integer - e.g., `100`) with the behavioral target **absent** to calculate SHAP values for.
+  
+Once you have filled in the SHAP entry boxes, click on either `save settings into global environment` or `save settings for specific model`, depening on wether you are generating one model, or several models at once. For more information on generating one vs several models, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-start-the-machine-training). 
+
+
 
 
 
