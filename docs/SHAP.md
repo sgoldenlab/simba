@@ -21,15 +21,15 @@ Explainability metrics can be very important, as it is possible that the classif
 
 Here we will look at how we can use [SHAP (SHapley Additive exPlanations)](https://github.com/slundberg/shap) within SimBA to calculate how much each feature contributes to the final behavioral classification score for each annotated video frame. Through this method we will get an verbalizable explanation for the classification probability score for each frame, such as: 
 
-*Frame N in Video X was was classified as containing my behavior of interest, mainly because of the small distance between animal A and B, but also because the movements of animal A was large. In frame N, the large movements of the animals increased the behavior classification probability with 20%, and the distance between the animals increased the classification probability with a further 70%*. 
+*Frame N in Video X was classified as containing my behavior of interest, mainly because of the distance between animal A and B, but also because the movements of animal A. In frame N, the larger movements of the animals increased the behavior classification probability with 20%, and the distance between the animals increased the classification probability with a further 70%*. 
  
-In brief, when using SHAP, each feature is evaluated independently, and the final classification probability is distributed among the individual features according to their contribution to it as evaluated after permutations within the order of feature-introductions into the classification scenario:
+In brief, when using SHAP, each feature is evaluated independently, and the final classification probability is distributed among the individual features according to their contribution to it. This value is calculated after exhaustive permutations within the order of feature-introductions into the classification scenario:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP1.png" />
 </p>
 
-Where the *base probability* in the figure above, is the probability of picking a frame that contains your behavior by pure chance (e.g., if half of your video frames contain you behavior of interest , then the base probability will be 50%; more info below!). To read more about SHAP values, also see the [SHAP GitHub repository](https://github.com/slundberg/shap) which SimBA wraps, or read the excellent [SHAP paper in Nature Machine Learning Intelligence](https://www.nature.com/articles/s42256-019-0138-9). 
+The *base probability* in the figure above is the probability of picking a frame that contains your behavior by pure chance (e.g., if half of your video frames contain you behavior of interest , then the base probability will be 50%; more info below!). To read more about SHAP values, also see the [SHAP GitHub repository](https://github.com/slundberg/shap) which SimBA wraps, or read the excellent [SHAP paper in Nature Machine Learning Intelligence](https://www.nature.com/articles/s42256-019-0138-9). 
 
 ## Part 1: Generate a dataset
 
@@ -79,7 +79,7 @@ The two SHAP value output files have an equal number of rows, where every row re
 
 To help understand this, I've placed the two CSV files next to each other in the image above, with the `RAW feature values` file shown on the left, and the `SHAP values` file on the right. The red rectangle in the RAW values, on the left, shows that raw feature distance between the nose and the tail of animal number 1 (the feature name is in the header) was 70.23404 millimeters in frame number 1. Conversely, the SHAP values, shown on the right, shows that the distance between the nose and the tail of animal number 1 **increased** the copulation probability in frame number 1 with 0.317% in frame number 1.
 
-Furthermore, the last four columns of your `SHAP_values_copulation_prediction.csv` file contain some information that might be helpful for interpretating the data and give sanity check that the calculations were done properly:
+The last four columns of the `SHAP_values_copulation_prediction.csv` file contain some information that might be helpful for interpretating the data and give sanity check that the calculations were done properly:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP6.png" />
