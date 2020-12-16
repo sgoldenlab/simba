@@ -30,7 +30,7 @@ In brief, when using SHAP, each feature is evaluated independently, and the fina
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP1.png" />
 </p>
 
-Where the *base probability* in the figure above, is the probability if picking a frame that contains your behavior by chance (e.g., if half of your video frames contain attack events, then the base probability will be 50%). To read more about SHAP values, see the [SHAP GitHub repository](https://github.com/slundberg/shap) which SimBA wraps, or read the excellent [SHAP paper in Nature Machine Learning Intelligence](https://www.nature.com/articles/s42256-019-0138-9). 
+Where the *base probability* in the figure above, is the probability of picking a frame that contains your behavior by chance (e.g., if half of your video frames contain attack events, then the base probability will be 50%; more info below!). To read more about SHAP values, see the [SHAP GitHub repository](https://github.com/slundberg/shap) which SimBA wraps, or read the excellent [SHAP paper in Nature Machine Learning Intelligence](https://www.nature.com/articles/s42256-019-0138-9). 
 
 ## Part 1: Generate a dataset
 
@@ -89,11 +89,3 @@ Moreover, the last four columns of your `SHAP_values_copulation_prediction.csv` 
 The first columns (`Expected_value`), contains the baseline probability value. That is - in this toy example - if you tried to pick a frame at random and guess if it contained the behaviour `copulation` or not, there is a 0.7693.. % chance that the frame contains copulation. 
 
 The second column (`Sum`) contains the sum of all of the SHAP values for each individual frame. The third column (`Prediction_probability`) is the classifiers probability for the presence of the behavior in each individual frame. **These two columns are generated as a sanity check, because the final prediction probability in the `Prediction_probability` column should equal the sum of all the SHAP values in the `Sum` column**. If the values in these two columns are **not** identical, then something has gone astray. Check in with us on the [Gitter chat channel](https://gitter.im/SimBA-Resource/community) or raise a an issue and we may be able to help. The fourth column (`copulation_prediction`) will read either 0 or 1, and tell you if this particular frame was annotated as containiing the behavior (`1`) or not containing the behavior (`0`). 
-
-
-
-
-
-
-
-
