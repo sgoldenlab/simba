@@ -73,8 +73,11 @@ Once complete, you will see the following message `All SHAP data saved in projec
 
 The two SHAP value output files have an equal number of rows, where every row represent a frame. If you choose to generate SHAP values for 200 frames, for example, each of the two files will contain 200 rows, where row *N* within both files represent the data for the **same frame**. The first file (`SHAP_values_copulation_prediction.csv`) contains the actual SHAP values. The second file (`RAW_SHAP_feature_values_copulation_prediction.csv`) contain the **raw** feature values for the same frames. The reason for generating two files is that it is sometimes necessery to match the SHAP values (represented in the `SHAP_values_copulation_prediction.csv`) with an actual feature value (represented in the `RAW_SHAP_feature_values_copulation_prediction.csv`).  
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP4.png" />
+</p>
 
-
+To help understand this, I've libed the two CSV files next to each other in this image, with the `SHAP values` shown on the left, and the `RAW feature values` on the right.
 
 
 
