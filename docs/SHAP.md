@@ -13,7 +13,7 @@ An understanding of how machine learning models reach their  decisions is import
 
 * Why does my tracking model think the location of the nose of the animal is located in this particlar part of the image?
 
-* Which, of several classifiers, classify events by using the same behavioural features human observers would use to classify the same events?
+* Which, of several classifiers, classify the target events by using the same behavioural features that a human observers would use to classify events?
 
 * Are there any potential differences in the features that annotator X and annotator Y look at when annotating videos for the presence or absence of the same target behavior? 
  
