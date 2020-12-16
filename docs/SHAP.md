@@ -39,6 +39,7 @@ SimBA calculates SHAP values for the classifier at the same time as the model is
 
 ## Part 2: Compute SHAP scores
 
+### Step 1: Define SHAP settings
 Next, navigate to the `Train machine model` tab and click on `Settings`. In the pop-up window, fill out your model `hyperparameter` settings as described [HERE]
 (https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model. At the bottom of the `Settings` pop up window, you will see these entry boxes. Tick the `Calculate SHAP values` entry box to enable them:
 
@@ -52,6 +53,17 @@ If this box is ticked, and the entry boxes are filled in, SiMBA will also calcul
   - In the `# target absent` entry box, enter the number of frames (integer - e.g., `100`) with the behavioral target **absent** to calculate SHAP values for.
   
 Once you have filled in the SHAP entry boxes, click on either `save settings into global environment` or `save settings for specific model`, depening on wether you are generating one model, or several models at once. For more information on generating one vs several models, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-start-the-machine-training). 
+
+Click to close the `Settings` pop-up window. 
+
+### Step 1: Train machine model and and generate your SHAP values.
+
+To start training by clicking on `Train single model from global environment` or `Train multiple models, one for each saved settings`. You will be able to follow the progress in the Terminal window. 
+
+>**Note**: As noted above, calculating SHAP scores is computationally expensive and depending on the number of frames you entered in the `# target present` and `# target absent`, this could take a while. If you are calculating SHAP scores on a lot of frames, it's best to make it a night job. 
+
+
+
 
 
 
