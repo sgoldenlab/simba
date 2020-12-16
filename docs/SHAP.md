@@ -29,7 +29,7 @@ In brief, when using SHAP, each feature is evaluated independently, and the fina
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP1.png" />
 </p>
 
-The *base probability* in the figure above is the probability of picking a frame that contains your behavior by pure chance (e.g., if half of your video frames contain you behavior of interest , then the base probability will be 50%; more info below!). To read more about SHAP values, also see the [SHAP GitHub repository](https://github.com/slundberg/shap) which SimBA wraps, or read the excellent [SHAP paper in Nature Machine Learning Intelligence](https://www.nature.com/articles/s42256-019-0138-9). 
+The *base probability* in the figure above is the probability of picking a frame that contains your behavior by pure chance (e.g., if half of your video frames contain you behavior of interest , then the base probability will be 50%; more info below!). The values associated with each feature describe the features effect on the classification probability. To read more about SHAP values, also see the [SHAP GitHub repository](https://github.com/slundberg/shap) which SimBA wraps, or read the excellent [SHAP paper in Nature Machine Learning Intelligence](https://www.nature.com/articles/s42256-019-0138-9). 
 
 ## Part 1: Generate a dataset
 
