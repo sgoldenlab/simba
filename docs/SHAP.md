@@ -17,7 +17,7 @@ An understanding of how machine learning models reach their  decisions is import
 
 * Are there any potential differences in the features that annotator X and annotator Y look at when annotating videos for the presence or absence of the same target behavior? 
  
-Explainability metrics can be very important, as it is possible that the classifiers you are using *appear* to look for the same behavioral target behaviours and features as a human observer would, while the classifier in fact looks as something very different from the human observer. Such weaknesses are typically revealed when analyzing new videos in new recording environments, that were not included in the data used to train the classifier. 
+Explainability metrics can be very important, as it is possible that the classifiers you are using *appear* to look for the same behavioral target behaviours and features as a human observer would, while the classifier in fact looks as something very different from the human observer. Such weaknesses are typically revealed when analyzing new videos in new recording environments, that were not included in the data used to train the classifier, and explainability metrics can help you avoid those pitfalls. 
 
 Here we will look at how we can use [SHAP (SHapley Additive exPlanations)](https://github.com/slundberg/shap) within SimBA to calculate how much each feature contributes to the final behavioral classification score for each annotated video frame. Through this method we will get an verbalizable explanation for the classification probability score for each frame, such as: 
 
