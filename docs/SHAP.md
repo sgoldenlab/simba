@@ -15,7 +15,7 @@ An understanding, and ability to explain and communicate, how machine learning m
 
 * Which, of several classifiers, classify events the way I, as a human observer, would classify the same events?
 
-* Which different latent behavioural features do annotator X and annotator Y look look at when annotating videos for the presence or absence of a behavior? 
+* Are there any potential differences in the features that annotator X and annotator Y look at when annotating videos for the presence or absence of a behavior? 
  
 Explainability metrics are **extremely** important, as it is possible that the classifiers you are using *appear* to look for the same behavioral target behaviours and features as a human observer would (have strong *face validity*) while the classifier in fact looks as something very different from the human observer (weak *construct validity*). These weaknesses are typically revealed in new videos and recording environments that were not present in the training data set. 
 
