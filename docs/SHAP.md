@@ -21,7 +21,7 @@ Explainability metrics are **extremely** important, as it is possible that the c
 
 In this tutorial we will look at how we can use [SHAP (SHapley Additive exPlanations)](https://github.com/slundberg/shap) within SimBA to calculate how much each feature contributes to the final behavioral classification score for each frame. Through this method we will get an verbalizable explanation for the classification score for each frame, such as: 
 
-*Frame N on Video X was was classified as containing my behavior of interest mainly because of the small distance between animal A and B, but also because the movements of animal A was large. The movement of the animals increased the classification probability with 70%, and the distance between increased the classification probability with a further 20%*. 
+*Frame N in Video X was was classified as containing my behavior of interest mainly because of the small distance between animal A and B, but also because the movements of animal A was large. In frame N, the movement of the animals increased the behavior classification probability with 20%, and the distance between the animals increased the classification probability with a further 70%*. 
  
  
 In brief, when using SHAP, each feature is evaluated independently, and the final classification probability is distributed among the individual features according to their contribution, as evaluated after permutations within the order of feature-introductions into the classification scenario:
