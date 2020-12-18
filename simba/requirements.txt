@@ -269,7 +269,7 @@ sklearn == 0.0
 tabulate == 0.8.3
 
 # dpk_script\train_model.py: 16
-tensorflow_gpu == 1.14.0
+tensorflow_gpu == 2.4.0
 
 # dpk_script\create_annotation_set.py: 7
 # extract_seqframes.py: 97
