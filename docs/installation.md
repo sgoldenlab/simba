@@ -173,5 +173,17 @@ This is not recommended but it is possible.
 | [xgboost](https://github.com/dmlc/xgboost)| 0.9 |
 | [tabulate](https://bitbucket.org/astanin/python-tabulate/src/master/)| 0.8.3 |
 | [tables](https://www.pytables.org/)| ≥ 3.5.1 |
+| [dash](https://github.com/plotly/dash/)| 1.14.0 |
+| [dash color picker](https://github.com/vivekvs1/dash-color-picker/)| 0.0.1 |
+| [dash daqs](https://dash.plotly.com/dash-daq)| 0.5.0 |
+| [h5py](https://github.com/h5py/h5py)| 2.9.0 |
+| [numba](https://github.com/numba/numba)| 0.48.0 |
+| [numexpr](https://github.com/pydata/numexpr)| 2.6.9 |
+| [plotly](https://github.com/plotly)| 4.9.0 |
+| [statsmodels](https://github.com/statsmodels/statsmodels)| 0.9.0 |
+| [cefpython3](https://github.com/cztomczak/cefpython)| 66.0 |
+| [pyarrow](https://github.com/apache/arrow/tree/master/python/pyarrow)| 0.17.1 |
+| [shap](https://github.com/slundberg/shap)| 0.35.0 |
+
 
 
