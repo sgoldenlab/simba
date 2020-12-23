@@ -5,7 +5,7 @@
 </p>
 
 
-An understanding of how machine learning models reach their  decisions is important not only for the scientific method but can also help you gain insight into how classifiers reach their decision. Machine learning explainability metrics, such as SHAP, can help you answer questions like:
+An understanding of how machine learning models reach their  decisions is important not only for the scientific method but can also help you gain insight into how your classifier works and what makes it different or similar to other classifiers. Machine learning explainability metrics, such as SHAP, can help you answer questions like:
 
 * Why does my classifier think some specific frames contain my behavior of interest, while other frames do not?
  
