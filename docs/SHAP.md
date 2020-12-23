@@ -33,14 +33,14 @@ The *base probability* in the figure above is the probability of picking a frame
 
 ## Part 1: Generate a dataset
 
-SimBA calculates SHAP values for the classifier at the same time as the model is being trained. Thus, before analysing SHAP scores, we need a dataset that contains behavioral annotations. You will need complete the steps detailed in the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) **Part 1 Step 1** up **Part 2 Step 6**. That is, you will need to complete everything from [Creating a project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1) up to, and including [labelling behavioral events](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-6-label-behavior-ie-create-annotations-for-predictive-classifiers). 
+SimBA calculates SHAP values for the classifier at the same time as the model is being trained. Thus, before analysing SHAP scores, we need a dataset that contains behavioral annotations. You will need complete the steps detailed in the [Scenario 1 tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) **Part 1 Step 1** up to **Part 2 Step 6**. That is, you will need to complete everything from [Creating a project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1) up to, and including [labelling behavioral events](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-6-label-behavior-ie-create-annotations-for-predictive-classifiers). 
 
->Note: If you already have annotations generated elsewhere (e.g., downloaded from the [SimBA OSF repository](https://osf.io/d69jt/), you may not have to go through **Part 1 Step 1** to **Part 2 Step 6** as detailed above. When calculating the SHAP values, SiMBA will loook inside your `project_folder/csv/targets_inserted` subdirectory for annotated files (just as SimBA does when generating the classifier). To calculate SHAp values, SimBA needs this folder to be populated with files containing behavioral annotations. 
+>Note: If you already have annotations generated elsewhere (e.g., downloaded from the [SimBA OSF repository](https://osf.io/d69jt/), you may not have to go through **Part 1 Step 1** to **Part 2 Step 6** as detailed above. When calculating the SHAP values, SimBA will loook inside your `project_folder/csv/targets_inserted` subdirectory for files containing the annotations (just as SimBA does when generating the classifier). So to calculate SHAP values, SimBA needs this folder to be populated with files containing behavioral annotations. 
 
 ## Part 2: Compute SHAP scores
 
 ### Step 1: Define SHAP settings
-Next, navigate to the `Train machine model` tab and click on `Settings`. In the pop-up window, fill out your model `hyperparameter` settings as described [HERE]
+Navigate to the `Train machine model` tab and click on `Settings`. In the pop-up window, fill out your model `hyperparameter` settings as described [HERE]
 (https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model. At the bottom of the `Settings` pop-up window, you will see these entry boxes. Begin by ticking the `Calculate SHAP values` entry box.
 
 <p align="center">
