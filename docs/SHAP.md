@@ -77,7 +77,7 @@ The two SHAP value output files have an equal number of rows, where every row re
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP5.png" />
 </p>
 
-To help understand this, I've placed the two CSV files next to each other in the image above, with the `RAW feature values` file shown on the left, and the `SHAP values` file on the right. The red rectangle in the RAW values, on the left, shows that raw feature distance between the nose and the tail of animal number 1 (the feature name is in the header) was 70.23404 millimeters in frame number 1. Conversely, the SHAP values, shown on the right, shows that the distance between the nose and the tail of animal number 1 **increased** the copulation probability in frame number 1 with 0.317% in frame number 1.
+To help understand this, I've placed the two CSV files next to each other in the image above, with the `RAW feature values` file shown on the left, and the `SHAP values` file on the right. The red rectangle in the RAW values, on the left, shows that raw feature distance between the nose and the tail of animal number 1 (the feature name is in the header) was 70.23404 millimeters in frame number 1. Conversely, the SHAP values, shown on the right, shows that the distance between the nose and the tail of animal number 1 **increased** the copulation probability in frame number 1 with 0.317%.
 
 The last four columns of the `SHAP_values_copulation_prediction.csv` file contain some information that might be helpful for interpretating the data, and give a sanity check that the calculations were done as expected:
 
