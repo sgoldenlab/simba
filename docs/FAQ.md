@@ -8,7 +8,7 @@
 
 ### I get a `QHull` (e..g., QH6154 or 6013) error when extracting the features
 
->This error typically happens when a video tracked with DLC/DPK does not contain an animal (or one animal is missing from the video when you are tracking two animals). Because no animal is present in the video, DeepLabCut places all body-parts at the same co-ordinate with a low probability. SimBA tries to use these co-ordinates to calculate metrics from teh hull of the animal, but bacause the coordinates are in 1D rather than 2D, it produces the`QHull` error. To fix it, use the video pre-processing tools in SimBA to trim the videos and discard the portions where no animals are present:
+>This error typically happens when a video tracked with DLC/DPK does not contain an animal (or one animal is missing from the video when you are tracking two animals). Because no animal is present in the video, DeepLabCut places all body-parts at the same co-ordinate with a low probability (no-where, or frequently at coordinate (0,0), which is the upper-left most pixel in the image). SimBA tries to use these co-ordinates to calculate metrics from the hull of the animal, but bacause the coordinates are in 1D rather than 2D, it produces the `QHull` error. To fix it, use the video pre-processing tools in SimBA to trim the videos and discard the portions where no animals are present:
 
 [Tutorial: Batch pre-process videos in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md)
 
