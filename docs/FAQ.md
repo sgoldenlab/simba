@@ -85,5 +85,3 @@ When you execute your process (e.g., Feature extraction), SimBA looks in the fol
 These are warnings, and are not fatal. You should be able to ignore them - go ahead with launching SimBA by typing `simba` in the console. 
 
 
-
-
