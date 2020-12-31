@@ -85,3 +85,19 @@ When you execute your process (e.g., Feature extraction), SimBA looks in the fol
 These are warnings, and are not fatal. You should be able to ignore them - go ahead with launching SimBA by typing `simba` in the console. 
 
 
+### When I install or update SimBA, I see a bunch or messages in the console, telling there has been some `dependency conflicts`. The messages may look a little like this:
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/Dependencies.png)
+
+These errors are related to an update in the pypi package manager version 20.3.3, [where they introduced stricter control on version controls](https://pip.pypa.io/en/stable/news/). I suggest trying either:
+
+* If you are installing SimBA via git - try typing `pip3 install -r simba/SimBA/requirements.txt --no-dependencies` rather than `pip3 install -r simba/SimBA/requirements.txt`
+
+* Try downgrading pip before installing SimBA:
+  - Run `pip install pip==20.1.1`
+  - Next, run `pip install simba-uw-tf`, `pip install simba-uw-no-tf` or `pip install simba-uw-tf-dev`, depending [on which version of SimBA you want to run](https://github.com/sgoldenlab/simba/blob/master/docs/installation.md#installing-simba-option-1-recommended).  
+
+* Install SimBA using pip and the `--no-dependencies` argument:
+  - Type `pip install simba-uw-tf --no-dependencies`, `pip install simba-uw-no-tf--no-dependencies` or `pip install simba-uw-tf-dev --no-dependencies`, depending [on which version of SimBA you want to run](https://github.com/sgoldenlab/simba/blob/master/docs/installation.md#installing-simba-option-1-recommended).
+
+
