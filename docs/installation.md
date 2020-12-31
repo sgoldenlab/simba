@@ -37,6 +37,10 @@ Open bash or command prompt and run the following commands on current working di
 pip install simba-uw-tf-dev
 ```
 
+>Note: If you are seeing error messages related to some dependency conflicts, then you need to either downgrade your pypi package or intstruct SimBA to ignore these dependency conflicts - either works. To find more information on how to do this, click [HERE]. 
+
+
+
 # How to launch SimBA ( installed using pip install simba-uw-tf)
 
 1. Open up command prompt anywhere.
