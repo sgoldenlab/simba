@@ -89,7 +89,7 @@ These are warnings, and are not fatal. You should be able to ignore them - go ah
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/Dependencies.png)
 
-These errors are related to an update in the pypi package manager version 20.3.3, [where they introduced stricter control on version controls](https://pip.pypa.io/en/stable/news/). I suggest trying either:
+These errors are related to an update in the pypi package manager version 20.3.3, [where they introduced stricter version control](https://pip.pypa.io/en/stable/news/). I suggest trying either:
 
 * If you are installing SimBA via git - try typing `pip3 install -r simba/SimBA/requirements.txt --no-dependencies` rather than `pip3 install -r simba/SimBA/requirements.txt`
 
