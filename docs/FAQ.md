@@ -85,7 +85,7 @@ When you execute your process (e.g., Feature extraction), SimBA looks in the fol
 These are warnings, and are not fatal. You should be able to ignore them - go ahead with launching SimBA by typing `simba` in the console. 
 
 
-### When I install or update SimBA, I see a bunch or messages in the console, telling there has been some `dependency conflicts`. The messages may look a little like this:
+### When I install or update SimBA, I see a bunch or messages in the console, telling there me about some `dependency conflicts`. The messages may look a little like this:
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/Dependencies.png)
 
