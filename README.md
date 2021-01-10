@@ -116,6 +116,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Using user-defined ROIs in SimBA](/docs/ROI_tutorial.md) 🗺️
 - [Using multi-animal pose (maDLC/SLEAP) in SimBA](/docs/Multi_animal_pose.md) 🐭🐭
 - [Using the SimBA data analysis and export dashboard](docs/plotly_dash.md) 📊
+- [Explainable machine classifications in SimBA (SHAP)](docs/SHAP.md) 🧮
 - [Recommended hardware](https://github.com/sgoldenlab/simba/blob/master/misc/system_requirements.md) 🖥️
 - [Downloading compressed data from the SimBA OSF repository](https://github.com/sgoldenlab/simba/blob/master/docs/using_OSF.md)💾
 
