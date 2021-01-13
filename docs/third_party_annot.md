@@ -4,7 +4,7 @@
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/third_party_annot.png" />
 </p>
 
-##How to import annotations into SimBA project
+## How to import annotations into SimBA project
 
 1. Once you have created a project, click on `File` --> `Load project` to load your project.
 
