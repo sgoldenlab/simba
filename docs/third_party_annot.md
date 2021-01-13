@@ -21,3 +21,9 @@ SimBA has an [in-built behavior interface](https://github.com/sgoldenlab/simba/b
 
 4. Under **Import Third-Party behavior labels**, click on the button and select the folder that contains **ONLY** the annotation files. It will then generate annotion .csvs in the project_folder/csv/targets_inserted folder.
 
+
+#### NOTE: Keep in mind that the behaviors/classifiers has to be defined  (with the same name as the annotated behaviors) in the SimBA project folder. You can add or remove classifier in `Further imports(data/video/frames)` --> `Add classifier` or `Remove existing classifier`
+
+<p align="center">
+<img src=/images/addorremoveC.PNG />
+</p>
