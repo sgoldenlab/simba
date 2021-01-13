@@ -9,9 +9,9 @@ SimBA has an [in-built behavior interface](https://github.com/sgoldenlab/simba/b
 
 ## How to import annotations into SimBA project
 
-1. Once you have created a project, click on `File` --> `Load project` to load your project.
+1. Once you have created a project, click on `File` --> `Load project` to load your project. For more information on creating a project, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1)
 
-2. Make sure you have extracted the features from your tracking data and there are *.csv* files in the project_folder/csv/features_extracted
+2. Make sure you have extracted the features from your tracking data and there are files, one file representing each video in your project, inside the `project_folder/csv/features_extracted` directory of your project. 
 
 3. Click on `Label behavior`, and you should see the following.
 
