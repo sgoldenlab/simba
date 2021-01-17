@@ -4,6 +4,8 @@
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/reversering_1.PNG" />
 </p>
 
+### BACKGROUND
+
 In this scenario, the user has already created a classifier in SimBA within a two-animal protocol. The classifier the user created has a "direction". This means that the created classifer takes into account which **specific** animal is doing the classified behavior, or alternative, the specific relationship between the two animals within a classified social interaction. Now the user wants a straighforward way of creating a second classifier with the reversed "direction", for example: 
 
 * The original classifier detects when **animal 1** rears, but not when **animal 2** rears. The user wants a second classifier that detects when **animal 2** rears, but not **animal 1** rears. The user will then run the classifiers in tandem to get metrics for when either animals rears seperately. 
