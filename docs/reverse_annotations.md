@@ -51,13 +51,13 @@ After clicking the button, it will reverse the tracking identity of the two mice
 
 ### Step 3
 
-Then, create a new classifier for this in the `[Train machine model]` tab. If you have a previous classifier with this name in the project_folder, please save it somewhere else or rename it.
+Then, create a new classifier for this in the `[Train machine model]` tab. If you have a previous classifier with the same name in the project_folder, please save the classifier somewhere else or rename it.
 
 ### Step 4
 
 Lastly, you can then run the new classifier in the `[Run machine model]` tab.
 
-Once the classifier is created, you can 
+
 
 
 
