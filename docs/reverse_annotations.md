@@ -38,11 +38,26 @@ The files in the `project_folder/csv/targets_inserted` directory should have bee
 
 ### Step 2
 
-[Load your SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config) and navigate to the tab 
+[Load your SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config) and navigate to the tab below. Click on `Reverse ID`
 <p align="left">
 <img src=/images/reverseid.PNG />
 </p>
 
+After clicking the button, it will reverse the tracking identity of the two mice and generate new features (csv). Hence, in the *project_folder/csv*, the original .csv will be stored in a new folder with the time stamp.
+
+<p align="left">
+<img src=/images/reversebackend.PNG />
+</p>
+
+### Step 3
+
+Then, create a new classifier for this in the `[Train machine model]` tab. If you have a previous classifier with this name in the project_folder, please save it somewhere else or rename it.
+
+### Step 4
+
+Lastly, you can then run the new classifier in the `[Run machine model]` tab.
+
+Once the classifier is created, you can 
 
 
 
