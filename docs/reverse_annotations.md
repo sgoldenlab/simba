@@ -39,6 +39,9 @@ The files in the `project_folder/csv/targets_inserted` directory should have bee
 ### Step 2
 
 [Load your SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config) and navigate to the tab 
+<p align="left">
+<img src=/images/reverseid.PNG />
+</p>
 
 
 
