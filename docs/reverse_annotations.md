@@ -55,7 +55,7 @@ Clicking the button will cayse the identy of the animals to become reversed, and
 
 ### Step 3
 
-Navigate to the the `[Train machine model]` tab and train your new machine model, as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model), using your newly created reversed data. If you have a previous classifier with the same name in the project_folder, we recommend renaming the classifier `.sav` file and saving it somewhere else so not to become confused with which classifier has which directionality. 
+Navigate to the the `[Train machine model]` tab and train your new machine model, as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model). SimBA will use your newly created reversed data by default. If you have a previous classifier with the same name in the project_folder, we recommend renaming the classifier `.sav` file and saving it somewhere else so not to become confused with which classifier has which directionality. 
 
 After training your reversed classifier, you can go ahead and use it on new data as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data)
 
