@@ -172,6 +172,14 @@ Once this information is entered, click `Run`. Generated heatmap videos/frames a
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/Heatmap_parameters.PNG)
 
+## 'Directionality' between animals
+
+To analyze and visualize how animals are directing towards each other, rather than user-defined ROIs, head to [THIS TUTORIAL](https://github.com/sgoldenlab/simba/edit/master/docs/directionality_between_animals.md)
+
+<p align="center">
+  <img src="https://github.com/sgoldenlab/simba/blob/master/images/Testing_Video_3_short.gif" width="425"/>
+</p>
+
 
 
 
