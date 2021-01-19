@@ -38,12 +38,16 @@ The files in the `project_folder/csv/targets_inserted` directory should have bee
 
 ### Step 2
 
-[Load your SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config) and navigate to the tab below. Click on `Reverse ID`
+[Load your SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config) and navigate to the tab `Further imports (data/video/frames)` tab. Locate the `Reverse tracking identity button`, similar to the one shown below. 
+
+below. Click on `Reverse ID`
 <p align="left">
 <img src=/images/reverseid.PNG />
 </p>
 
-After clicking the button, it will reverse the tracking identity of the two mice and generate new features (csv). Hence, in the *project_folder/csv*, the original .csv will be stored in a new folder with the time stamp.
+Before clicking the button, it may be a good idea to back up your project - reversing tracking data, especially when reversed and reversed back, can quickly cause confusing when you don't remember which data has been reversed and which hasn't. 
+
+Clicking the button will cayse the identy of the animals to become reversed, and new files will be generated in your `project_folder/csv/outlier_corrected_movement_location`, `project_folder/csv/features_extracted`, and `project_folder/csv/targets_inserted` directories. The original, non-reversed files, will be but into a back-up subfolder in each of these directories named `Non_reversed` followed by a timestamp - just in case you decided not to back-up and this gives you a chance to access them later - as shown in this image below. 
 
 <p align="center">
 <img src=/images/reversebackend.PNG />
@@ -51,11 +55,9 @@ After clicking the button, it will reverse the tracking identity of the two mice
 
 ### Step 3
 
-Then, create a new classifier for this in the `[Train machine model]` tab. If you have a previous classifier with the same name in the project_folder, please save the classifier somewhere else or rename it.
+Navigate to the the `[Train machine model]` tab and train your new machine model, as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model), using your newly created reversed data. If you have a previous classifier with the same name in the project_folder, we recommend renaming the classifier `.sav` file and saving it somewhere else so not to become confused with which classifier has which directionality. 
 
-### Step 4
-
-Lastly, you can then run the new classifier in the `[Run machine model]` tab.
+After training your reversed classifier, you can go ahead and use it on new data as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data)
 
 
 
