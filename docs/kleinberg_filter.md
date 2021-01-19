@@ -16,8 +16,8 @@ Through the SimBA menues the user can access three hyperparameters. For more inf
 
 In short,
 
-*(i) Sigma* - Higher values and the discrepancy between no-behavior events and behavior events has to be larger for the event to be recognised. **Higher sigma values and fewer behavioural bursts will be recognised** 
+*(i) Sigma* - Higher values and the discrepancy between no-behavior events and behavior events has to be larger for the event to be recognised. **Higher sigma values and fewer behavioural bursts will be recognised (Default: 1)** 
 
-*(ii) Gamma* - Higher gamma values and behaviors needs to be sustained for a longer time for them to be recognised as burts. **Higher gamma values and fewer behavioural bursts will be recognised**
+*(ii) Gamma* - Higher gamma values and behaviors needs to be sustained for a longer time for them to be recognised as burts. **Higher gamma values and fewer behavioural bursts will be recognised (Default: 0.3)**
 
-*(ii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values values and fewer behavioural bursts will be recognised**.
+*(ii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values values and fewer behavioural bursts will be recognised (Default: 2)**
