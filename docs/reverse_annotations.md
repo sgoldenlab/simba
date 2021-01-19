@@ -45,7 +45,7 @@ The files in the `project_folder/csv/targets_inserted` directory should have bee
 
 After clicking the button, it will reverse the tracking identity of the two mice and generate new features (csv). Hence, in the *project_folder/csv*, the original .csv will be stored in a new folder with the time stamp.
 
-<p align="left">
+<p align="center">
 <img src=/images/reversebackend.PNG />
 </p>
 
