@@ -8,6 +8,16 @@ Classifiers generated in SimBA provide a classification for the presence vs. abs
 
 However, a more sophisticated (albeit less interpretable) approach is to use infinite hidden Markov models through the [Kleinberg burst detection method](https://link.springer.com/article/10.1023/A:1024940629314) to unify perdiods when the behavior is more and less likely. The Kleinberg burst detection method for smoothing behavioral data was championed by the Curley lab in the excellent [Lee et al. 2019](https://journals.plos.org/plosone/article/comments?id=10.1371/journal.pone.0220596) paper. SimBA performs Kleinberg burst smoothing by using a modified version of the no-longer maintained [pyburst](https://pypi.org/project/pybursts/) package. 
 
+ ## How to use Kleinberg Filter in SimBA
+ 
+1. After running the machine model (i.e., after clicking on `Run RF Model` as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model)), go aheas and click on the `Kleinberg Smoothing` button.
+ 
+ ![](/images/kleinberg1.PNG)
+ 
+ 
+2. You should see the below `settings menu` pop up. Check on the classifier(s) that you wished to apply Kleinberg Smoother/Filter and click on the `Apply Kleinberg Smoother` button to apply the filter.
+
+![](/images/kleinberg2.PNG)
 
 
 ### Hyperparameters
@@ -21,14 +31,3 @@ In short,
 *(ii) Gamma* - Higher gamma values and behaviors needs to be sustained for a longer time for them to be recognised as burts. **Higher gamma values and fewer behavioural bursts will be recognised (Default: 0.3)**
 
  *(ii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values values and fewer behavioural bursts are likely tobe recognised (Default: 2)**
- 
- ## How to use Kleinberg Filter in SimBA
- 
- 1. After running the machine model ( `Run RF Model`), click on `Kleinberg Smoothing`.
- 
- ![](/images/kleinberg1.PNG)
- 
- 
-2. Then, the settings menu will pop up. Check on the classifier(s) that you wished to apply Kleinberg Smoother/Filter and click on the `Apply Kleinberg Smoother` button to apply the filter.
-
-![](/images/kleinberg2.PNG)
