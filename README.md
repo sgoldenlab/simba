@@ -119,9 +119,9 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Explainable machine classifications in SimBA (SHAP)](docs/SHAP.md) 🧮
 - [Kleinberg markov chain classification smoothing in SimBA](docs/kleinberg_filter.md) 🔗
 - [Reversing the directionality of classifiers in SimBA](docs/reverse_annotations.md) ⏪
-- [Analysing animal directions in SimBA](docs/directionality_between_animals.md)🧭
+- [Analysing animal directions in SimBA](docs/directionality_between_animals.md) 🧭
 - [Recommended hardware](https://github.com/sgoldenlab/simba/blob/master/misc/system_requirements.md) 🖥️
-- [Downloading compressed data from the SimBA OSF repository](https://github.com/sgoldenlab/simba/blob/master/docs/using_OSF.md)💾
+- [Downloading compressed data from the SimBA OSF repository](https://github.com/sgoldenlab/simba/blob/master/docs/using_OSF.md) 💾
 
 ## Resource 💾
 
