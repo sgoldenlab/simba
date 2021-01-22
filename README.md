@@ -117,6 +117,8 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Using multi-animal pose (maDLC/SLEAP) in SimBA](/docs/Multi_animal_pose.md) 🐭🐭
 - [Using the SimBA data analysis and export dashboard](docs/plotly_dash.md) 📊
 - [Explainable machine classifications in SimBA (SHAP)](docs/SHAP.md) 🧮
+- [Kleinberg markov chain classification smoothing in SimBA](docs/kleinberg_filter.md) 🔗
+- [Reversing the directionality of classifiers in SimBA](docs/reverse_annotations.md) ⏪
 - [Analysing animal directions in SimBA](docs/directionality_between_animals.md)🧭
 - [Recommended hardware](https://github.com/sgoldenlab/simba/blob/master/misc/system_requirements.md) 🖥️
 - [Downloading compressed data from the SimBA OSF repository](https://github.com/sgoldenlab/simba/blob/master/docs/using_OSF.md)💾
@@ -144,7 +146,9 @@ Below is a link to download trained  behavior classification models to apply it 
 
 
 ## License 📃
-This project is licensed under the GNU Lesser General Public License v3.0. Note that the software is provided "as is", without warranty of any kind, express or implied. If you use the code or data, please cite us :)
+This project is licensed under the GNU Lesser General Public License v3.0. Note that the software is provided 'as is', without warranty of any kind, express or implied. 
+
+If you use any part of the code or data, please cite us! :)
 
     @article {Nilsson2020.04.19.049452,
       author = {Nilsson, Simon RO and Goodwin, Nastacia L. and Choong, Jia Jie and Hwang, Sophia and Wright, Hayden R and Norville, Zane C and Tong, Xiaoyu and Lin, Dayu and Bentzley, Brandon S. and Eshel, Neir and McLaughlin, Ryan J and Golden, Sam A.},
@@ -157,8 +161,6 @@ This project is licensed under the GNU Lesser General Public License v3.0. Note 
 	URL = {https://www.biorxiv.org/content/early/2020/04/21/2020.04.19.049452},
 	eprint = {https://www.biorxiv.org/content/early/2020/04/21/2020.04.19.049452.full.pdf},
 	journal = {bioRxiv}
-}
-
 
 
 ## References 📜
