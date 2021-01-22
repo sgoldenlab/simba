@@ -20,7 +20,7 @@ However, a more sophisticated (albeit less interpretable) approach is to use inf
 
 3. The files in the `project_folder/csv/machine_results` will be overwritten with new files, with the same file names as the original files, but now containing the kleinberg smoothened classifications for the selected classifiers. To compare the results, either (i) back-up the original files and open it up alongside the newly generated file and compare the `0` and `1` in the relevant classification columns in the right-most part of the file. Or, alternative, generate new classifier visualizations as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) and compare the classifications pre- and post smoothing. 
 
-If satisfied with the results, go ahead and compute new descriptive stastistics as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results)
+If satisfied with the results, go ahead and compute new descriptive stastistics as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results).
 
 
 ### Hyperparameters
