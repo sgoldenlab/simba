@@ -10,19 +10,20 @@ However, a more sophisticated (albeit less interpretable) approach is to use inf
 
  ## How to use Kleinberg Filter in SimBA
  
-1. After running the machine model (i.e., after clicking on `Run RF Model` as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model)), go aheas and click on the `Kleinberg Smoothing` button.
+1. After running the machine model (i.e., after clicking on `Run RF Model` as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model)), go ahead and click on the `Kleinberg Smoothing` button.
  
  ![](/images/kleinberg1.PNG)
  
- 
-2. You should see the below `settings menu` pop up. Check on the classifier(s) that you wished to apply Kleinberg Smoother/Filter and click on the `Apply Kleinberg Smoother` button to apply the filter.
+2. You should see the below `settings menu` pop up. Check the classifier(s) that you wished to apply the Kleinberg smoothing for and set the "hyperparameters". See the section below for more information about the hyperparameters and the default settings. Click on the `Apply Kleinberg Smoother` button to apply the filter.
 
 ![](/images/kleinberg2.PNG)
+
+3. The files in the `project_folder/csv/machine_results` will be overwritten with new files, with the same file names as the original files, but now containing the kleinberg smoothened classifications for the selected classifiers. To compare the results, either (i) back-up the original files and open it up alongside the newly generated file and compare the `0` and `1` in the relevant classification columns in the right-most part of the file. Or, alternative, generate new classifier visualizations as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions). 
 
 
 ### Hyperparameters
 
-Through the SimBA menues the user can access three hyperparameters. For more information of what the hyperparameters mean, check out the [R 'bursts' package documentation](https://cran.r-project.org/web/packages/bursts/bursts.pdf) and [Lee et al. 2019](https://journals.plos.org/plosone/article/comments?id=10.1371/journal.pone.0220596). 
+Through the SimBA menues the user can access three hyperparameters. For more information of what the hyperparameters mean, check out the [R 'bursts' package documentation](https://cran.r-project.org/web/packages/bursts/bursts.pdf) the [Lee et al. 2019](https://journals.plos.org/plosone/article/comments?id=10.1371/journal.pone.0220596) paper, or the [original paper](https://link.springer.com/article/10.1023/A:1024940629314). 
 
 In short,
 
