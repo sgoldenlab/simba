@@ -10,7 +10,7 @@ However, a more sophisticated (albeit less interpretable) approach is to use inf
 
 
 <p align="center">
-  <img src="https://github.com/sgoldenlab/simba/blob/master/images/klenberg.gif" width="425"/>
+  <img src="https://github.com/sgoldenlab/simba/blob/master/images/klenberg.gif" width="850"/>
 </p>
 
 
