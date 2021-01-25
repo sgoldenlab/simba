@@ -6,7 +6,6 @@
 
 >This error comes up when SimBA can't find the resolution and/or pixels per millimeter of your video. This data is stored in the `project_folder/logs/video_info.csv` file. If you open this CSV file, make sure that the left-most column named `Video` contains the names of your video files, do not contain any duplicate rows (where video names appear in more than one row), and that the resolution columns and pixels/mm column contains values. 
 
-
 ## When I click on a video to set its parameters (i.e., "pixel per millimeter"), or try to open a video to dray ROI regions I get an OpenCV, I get an error report with something like "cv2.Error. The function is not implemented. Rebuild the library with Windows..."
 
 To fix this, make sure your python environment has the correct version of OpenCV installed. Within your environment, try to type:
@@ -18,9 +17,6 @@ or
 `conda install opencv-python==3.4.5.20`
 
 Then launch SimBA by typing `SimBA`, and see if that fixes the issue. 
-
-
-
 
 ## I get a `QHull` (e..g., QH6154 or 6013) error when extracting the features
 
