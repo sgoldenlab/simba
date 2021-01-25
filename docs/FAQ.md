@@ -10,11 +10,21 @@
 
 To fix this, make sure your python environment has the correct version of OpenCV installed. Within your environment, try to type:
 
-`pip install opencv-python==3.4.5.20`
+(1) `pip install opencv-python==3.4.5.20`
 
 or
 
-`conda install opencv-python==3.4.5.20`
+`conda install opencv-python==3.4.5.20`.
+
+Then launch SimBA by typing `SimBA`, and see if that fixes the issue. 
+
+(2) Alternatively, if this does not fix it, try:
+
+`pip uninstall opencv-python`
+
+followed by:
+
+`pip install opencv-contrib-python` or `conda install opencv-contrib-python`
 
 Then launch SimBA by typing `SimBA`, and see if that fixes the issue. 
 
