@@ -167,7 +167,7 @@ If you use **any** part of the code or data, please cite us! :)
 
 
 
-[![Foo](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)](https://osf.io/d69jt/) [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/twitter.png)](https://twitter.com/GoldenNeuron?s=20)
+[![Foo](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)](https://osf.io/d69jt/) [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/twitter_2.png)](https://twitter.com/GoldenNeuron?s=20)
 
 ## Contributors 🤼
 - [Simon Nilsson](https://github.com/sronilsson)
