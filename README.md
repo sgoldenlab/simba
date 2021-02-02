@@ -16,6 +16,19 @@
 
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
+## Feb-03-2021: SimBA version 1.3 release
+### New Features
+- ROI Visualization update - [Documentation](/docs/ROI_tutorial.md)
+- User define features extraction - Allow user to run self customized feature extraction script
+- Quick line plot - Allow user to make line plots with selected bodypart and tracking data.(located under **Tools**)
+- Easy install of SimBA via `pip` - [Documentation](/docs/installation.md)
+- Install simba using anaconda - [Documentation](/docs/anaconda_installation.md)
+- Labelling behaviors with more third-party apps - [Documentation](/docs/third_party_annot.md)
+- Plotly - [Documentation](/docs/plotly_dash.md)
+- Kleinberg Filter - [Documentation](/docs/kleinberg_filter.md)
+- Many, many, many, many bug-fixes
+
+
 ## June-12-2020: SimBA version 1.2 release
 ### New Features
 - Multi-animal DLC support - [Documentation](/docs/Multi_animal_pose.md)
