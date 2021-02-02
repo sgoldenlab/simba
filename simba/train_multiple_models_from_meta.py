@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings('ignore',category=FutureWarning)
 warnings.filterwarnings('ignore',category=DeprecationWarning)
-from configparser import ConfigParser, MissingSectionHeaderError
+from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError
 import os, glob
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -21,7 +21,9 @@ from eli5.sklearn import PermutationImportance
 import numpy as np
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
-from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
+from simba.drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
+from simba.rw_dfs import *
+import shap
 
 def train_multimodel(configini):
     pd.options.mode.chained_assignment = None
@@ -43,6 +45,10 @@ def train_multimodel(configini):
         os.makedirs(modelPath)
     model_nos = config.getint('SML settings', 'No_targets')
     data_folder = config.get('create ensemble settings', 'data_folder')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     features = pd.DataFrame()
 
     def generateClassificationReport(clf, class_names, classifierName, saveFileNo):
@@ -53,6 +59,41 @@ def train_multimodel(configini):
             visualizer.poof(outpath=visualizerPath, clear_figure=True)
         except KeyError:
             print(('Warning, not enough data for classification report: ') + str(classifierName))
+            
+    def generateShapLog(trainingSet, target_train, feature_list, classifierName, shap_target_present_no, shap_target_absent_no, saveFileNo):
+        print('Calculating SHAP scores for ' + str(len(trainingSet)) +' observations...')
+        trainingSet[classifierName] = target_train
+        targetTrainSet = trainingSet.loc[trainingSet[classifierName] == 1]
+        nonTargetTrain = trainingSet.loc[trainingSet[classifierName] == 0]
+        targetsForShap = targetTrainSet.sample(shap_target_present_no, replace=False)
+        nontargetsForShap = nonTargetTrain.sample(shap_target_absent_no, replace=False)
+        shapTrainingSet = pd.concat([targetsForShap, nontargetsForShap])
+        targetValFrame = shapTrainingSet.pop(classifierName).values
+        explainer = shap.TreeExplainer(clf, data=None, model_output='raw', feature_perturbation='tree_path_dependent')
+        expected_value = explainer.expected_value[1]
+        outputDfRaw = pd.DataFrame(columns=feature_list)
+        shapHeaders = feature_list.copy()
+        shapHeaders.extend(('Expected_value', 'Sum', 'Prediction_probability', str(classifierName)))
+        outputDfShap = pd.DataFrame(columns=shapHeaders)
+        counter = 0
+        for row in range(len(shapTrainingSet)):
+            currInstance = shapTrainingSet.iloc[[row]]
+            shap_values = explainer.shap_values(currInstance, check_additivity=False)
+            shapList = list(shap_values[0][0])
+            shapList = [x * -1 for x in shapList]
+            shapList.append(expected_value)
+            shapList.append(sum(shapList))
+            probability = clf.predict_proba(currInstance)
+            shapList.append(probability[0][1])
+            shapList.append(targetValFrame[row])
+            currRaw = list(shapTrainingSet.iloc[row])
+            outputDfRaw.loc[len(outputDfRaw)] = currRaw
+            outputDfShap.loc[len(outputDfShap)] = shapList
+            counter += 1
+            print('SHAP calculated: ' + str(counter) + '/' + str(len(shapTrainingSet)))
+        outputDfShap.to_csv(os.path.join(tree_evaluations_out, 'SHAP_values_' + str(classifierName) + '_' + str(saveFileNo) + '.csv'))
+        outputDfRaw.to_csv(os.path.join(tree_evaluations_out, 'RAW_SHAP_feature_values_' + str(classifierName) + '_' + str(saveFileNo) + '.csv'))
+        print('All SHAP data saved in project_folder/models/evaluations directory')
 
     def generateFeatureImportanceLog(importances, classifierName, saveFileNo):
         feature_importances = [(feature, round(importance, 2)) for feature, importance in zip(feature_list, importances)]
@@ -66,6 +107,19 @@ def train_multimodel(configini):
         logPath = os.path.join(ensemble_evaluations_out, str(classifierName) + '_' + str(saveFileNo) + '_feature_importance_log.csv')
         log_df.to_csv(logPath)
         return log_df
+
+    def perf_RFCVE(projectPath, RFCVE_CVs, RFCVE_step_size, clf, data_train, target_train, feature_list, saveFileNo):
+        selector = RFECV(estimator=clf, step=RFCVE_step_size, cv=RFCVE_CVs, scoring='f1', verbose=1)
+        selector = selector.fit(data_train, target_train)
+        selectorSupport = selector.support_.tolist()
+        trueIndex = np.where(selectorSupport)
+        trueIndex = list(trueIndex[0])
+        selectedFeatures = [feature_list[i] for i in trueIndex]
+        selectedFeaturesDf = pd.DataFrame(selectedFeatures, columns=['Selected_features'])
+        savePath = os.path.join(tree_evaluations_out, 'RFECV_selected_features_' + str(classifierName) + '_' + str(saveFileNo) + '.csv')
+        selectedFeaturesDf.to_csv(savePath)
+        print('Recursive feature elimination results stored in ' + str(savePath))
+
 
     def generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars, classifierName, saveFileNo):
         log_df['Feature_importance'] = log_df['Feature_importance'].apply(pd.to_numeric)
@@ -100,7 +154,7 @@ def train_multimodel(configini):
             out_writer.writerow(metaDataHeaders)
             out_writer.writerow(metaDataList)
 
-    def computePermutationImportance(data_test, target_test, clf):
+    def computePermutationImportance(data_test, target_test, clf,savefile_no):
         perm = PermutationImportance(clf, random_state=1).fit(data_test, target_test)
         permString = (eli5.format_as_text(eli5.explain_weights(perm, feature_names=data_test.columns.tolist())))
         permString = permString.split('\n', 9)[-1]
@@ -111,10 +165,10 @@ def train_multimodel(configini):
         errot = [row[2] for row in all_cols]
         name = [row[4] for row in all_cols]
         dfvals = pd.DataFrame(list(zip(fimp, errot, name)), columns=['A', 'B', 'C'])
-        fname = os.path.join(ensemble_evaluations_out, str(classifierName) + '_permutations_importances.csv')
+        fname = os.path.join(ensemble_evaluations_out, str(classifierName) + '_' + str(savefile_no) +'_permutations_importances.csv')
         dfvals.to_csv(fname, index=False)
 
-    def LearningCurve(features, targetFrame, shuffle_splits, dataset_splits):
+    def LearningCurve(features, targetFrame, shuffle_splits, dataset_splits,savefile_no):
         cv = ShuffleSplit(n_splits=shuffle_splits, test_size=train_test_size, random_state=0)
         model = RandomForestClassifier(n_estimators=RF_n_estimators, max_features=RF_max_features, n_jobs=-1, criterion=RF_criterion, min_samples_leaf=RF_min_sample_leaf, bootstrap=True, verbose=1)
         train_sizes, train_scores, test_scores = learning_curve(model, features, targetFrame, cv=cv, scoring='f1',shuffle=True, n_jobs=-1, train_sizes=np.linspace(0.01, 1.0, dataset_splits))
@@ -129,7 +183,7 @@ def train_multimodel(configini):
         learningCurve_df['Test_mean_f1'] = test_mean
         learningCurve_df['Train_std_f1'] = train_std
         learningCurve_df['Test_std_f1'] = test_std
-        fname = os.path.join(ensemble_evaluations_out, str(classifierName) + '_learning_curve.csv')
+        fname = os.path.join(ensemble_evaluations_out, str(classifierName) + '_' + str(savefile_no) + '_learning_curve.csv')
         learningCurve_df.to_csv(fname, index=False)
 
     #READ IN THE META FILES
@@ -144,20 +198,17 @@ def train_multimodel(configini):
 
     # READ IN DATA FOLDER AND REMOVE ALL NON-FEATURE VARIABLES (POP DLC COORDINATE DATA AND TARGET DATA)
     features = pd.DataFrame()
-    print('Reading in ' + str(len(glob.glob(data_folder + '/*.csv'))) + ' annotated files...')
-
-    for p in os.listdir(data_folder):
-        if (".csv") in p:
-            currentFn = os.path.join(data_folder, p)
-            df = pd.read_csv(currentFn, index_col=0)
-            features = features.append(df, ignore_index=True)
+    print('Reading in ' + str(len(glob.glob(data_folder + '/*.' + wfileType))) + ' annotated files...')
+    filesFound = glob.glob(data_folder + '/*.' + wfileType)
+    for file in filesFound:
+        df = read_df(file, wfileType)
+        features = features.append(df, ignore_index=True)
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     baseFeatureFrame = features.drop(["scorer"], axis=1, errors='ignore')
     try:
         baseFeatureFrame = baseFeatureFrame.drop(['video_no', 'frames'], axis=1)
     except KeyError:
         pass
-
 
     for i in metaFilesList:
         loopy+=1
@@ -171,11 +222,10 @@ def train_multimodel(configini):
         except KeyError:
             print('Error: the dataframe does not contain any target annotations. Please check the csv files in the project_folder/csv/target_inserted folder')
             break
-        features = features.fillna(0)
         features = drop_bp_cords(features, configini)
+        features = features.fillna(0)
         target_names = []
         loop=1
-
         for bb in range(model_nos):
             currentModelNames = 'target_name_' + str(loop)
             currentModelNames = config.get('SML settings', currentModelNames)
@@ -225,6 +275,7 @@ def train_multimodel(configini):
                 data_train = trainDf
             except ValueError:
                 print('Undersampling failed: the undersampling ratio for the specific model is likely too high - there are not enough non-events too sample. Fix this by decreasing the undersampling ratio.')
+                continue
         if under_sample_setting != 'Random undersample':
             target_train = trainDf.pop(classifierName).values
             under_sample_ratio = 'NaN'
@@ -286,7 +337,7 @@ def train_multimodel(configini):
             compute_permutation_importance = currMetaFile['compute_feature_permutation_importance'].iloc[0]
             if compute_permutation_importance == 'yes':
                 print('Calculating permutation importances...')
-                computePermutationImportance(data_test, target_test, clf)
+                computePermutationImportance(data_test, target_test, clf,saveFileNo)
 
             generate_precision_recall_curve = currMetaFile['generate_precision_recall_curves'].iloc[0]
             if generate_precision_recall_curve == 'yes':
@@ -299,7 +350,7 @@ def train_multimodel(configini):
                 thresholds = list(thresholds)
                 thresholds.insert(0, 0.00)
                 precisionRecallDf['thresholds'] = thresholds
-                PRCpath = os.path.join(ensemble_evaluations_out, str(classifierName) + '_precision_recall.csv')
+                PRCpath = os.path.join(ensemble_evaluations_out, str(classifierName) + '_' + str(saveFileNo) + '_precision_recall.csv')
                 precisionRecallDf.to_csv(PRCpath)
 
             generate_learning_curve = currMetaFile['generate_sklearn_learning_curves'].iloc[0]
@@ -307,7 +358,23 @@ def train_multimodel(configini):
             dataset_splits = currMetaFile['learning_curve_data_splits'].iloc[0]
             if generate_learning_curve == 'yes':
                 print('Calculating learning curves...')
-                LearningCurve(features, targetFrame, shuffle_splits, dataset_splits)
+                LearningCurve(features, targetFrame, shuffle_splits, dataset_splits,saveFileNo)
+
+            try:
+                shap_scores_input = config.get('create ensemble settings', 'generate_shap_scores')
+            except NoOptionError:
+                shap_scores_input = 'no'
+            if shap_scores_input == 'yes':
+                shap_target_present_no = config.getint('create ensemble settings', 'shap_target_present_no')
+                shap_target_absent_no = config.getint('create ensemble settings', 'shap_target_absent_no')
+                generateShapLog(data_train, target_train, feature_list, classifierName, shap_target_present_no, shap_target_absent_no, saveFileNo)
+
+            try:
+                RFECV_setting = config.get('create ensemble settings', 'perform_RFECV')
+            except NoOptionError:
+                RFECV_setting = 'no'
+            if RFECV_setting == 'yes':
+                perf_RFCVE(projectPath, 3, 5, clf, data_train, target_train, feature_list, saveFileNo)
 
             # SAVE MODEL META DATA
             RF_meta_data = currMetaFile['generate_rf_model_meta_data_file'].iloc[0]
@@ -322,7 +389,6 @@ def train_multimodel(configini):
                                 N_feature_importance_bars, over_sample_ratio, over_sample_setting, train_test_size,
                                 under_sample_ratio, under_sample_setting]
                 generateMetaData(metaDataList, classifierName, saveFileNo)
-
 
         #SAVE MODEL
         modelfn = str(classifierName) + '_' + str(saveFileNo) + '.sav'

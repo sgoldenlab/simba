@@ -1,8 +1,8 @@
 import warnings
 warnings.filterwarnings('ignore',category=FutureWarning)
 warnings.filterwarnings('ignore',category=DeprecationWarning)
-from configparser import ConfigParser, MissingSectionHeaderError
-import os
+from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError,NoOptionError
+import os, glob
 import pandas as pd
 from dtreeviz.trees import *
 from sklearn.ensemble import RandomForestClassifier
@@ -14,6 +14,7 @@ from imblearn.combine import SMOTEENN
 from imblearn.over_sampling import SMOTE
 from sklearn.tree import export_graphviz
 from subprocess import call
+import shap
 import pickle
 import csv
 import warnings
@@ -28,13 +29,16 @@ import graphviz
 import graphviz.backend
 from dtreeviz.shadow import *
 from sklearn import tree
-from drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
+from simba.drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
 from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import cross_val_score, cross_validate
+from simba.rw_dfs import *
+from sklearn.feature_selection import RFECV
+import time
 # import timeit
 
+
 def trainmodel2(inifile):
-    # startTime = timeit.default_timer()
     configFile = str(inifile)
     config = ConfigParser()
     try:
@@ -43,6 +47,12 @@ def trainmodel2(inifile):
         print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     modelDir = config.get('SML settings', 'model_dir')
     modelDir_out = os.path.join(modelDir, 'generated_models')
+    projectPath = config.get('General settings', 'project_path')
+    csv_dir_in, csv_dir_out = os.path.join(projectPath, 'csv', 'targets_inserted'), os.path.join(projectPath,'csv', 'machine_results')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     if not os.path.exists(modelDir_out):
         os.makedirs(modelDir_out)
     tree_evaluations_out = os.path.join(modelDir_out, 'model_evaluations')
@@ -54,12 +64,8 @@ def trainmodel2(inifile):
         model_to_run = config.get('create ensemble settings', 'model_to_run')
         classifierName = config.get('create ensemble settings', 'classifier')
         train_test_size = config.getfloat('create ensemble settings', 'train_test_size')
-        pose_estimation_body_parts = config.get('create ensemble settings', 'pose_estimation_body_parts')
     except ValueError:
         print('ERROR: Project_config.ini contains errors in the [create ensemble settings] or [SML settings] sections. Please check the project_config.ini file.')
-    log_path = config.get('General settings', 'project_path')
-
-    log_path = os.path.join(log_path, 'logs')
     features = pd.DataFrame()
 
     def generateClassificationReport(clf, class_names):
@@ -84,6 +90,53 @@ def trainmodel2(inifile):
         savePath = os.path.join(tree_evaluations_out, str(classifierName) + '_feature_importance_log.csv')
         log_df.to_csv(savePath)
         return log_df
+
+    def generateShapLog(trainingSet, target_train, feature_list, classifierName, shap_target_present_no,shap_target_absent_no):
+        print('Calculating SHAP scores for ' + str(len(trainingSet)) +' observations...')
+        trainingSet[classifierName] = target_train
+        targetTrainSet = trainingSet.loc[trainingSet[classifierName] == 1]
+        nonTargetTrain = trainingSet.loc[trainingSet[classifierName] == 0]
+        targetsForShap = targetTrainSet.sample(shap_target_present_no, replace=False)
+        nontargetsForShap = nonTargetTrain.sample(shap_target_absent_no, replace=False)
+        shapTrainingSet = pd.concat([targetsForShap, nontargetsForShap])
+        targetValFrame = shapTrainingSet.pop(classifierName).values
+        explainer = shap.TreeExplainer(clf, data=None, model_output='raw', feature_perturbation='tree_path_dependent')
+        expected_value = explainer.expected_value[1]
+        outputDfRaw = pd.DataFrame(columns=feature_list)
+        shapHeaders = feature_list.copy()
+        shapHeaders.extend(('Expected_value', 'Sum', 'Prediction_probability', str(classifierName)))
+        outputDfShap = pd.DataFrame(columns=shapHeaders)
+        counter = 0
+        for frame in range(len(shapTrainingSet)):
+            currInstance = shapTrainingSet.iloc[[frame]]
+            shap_values = explainer.shap_values(currInstance, check_additivity=False)
+            shapList = list(shap_values[0][0])
+            shapList = [x * -1 for x in shapList]
+            shapList.append(expected_value)
+            shapList.append(sum(shapList))
+            probability = clf.predict_proba(currInstance)
+            shapList.append(probability[0][1])
+            shapList.append(targetValFrame[frame])
+            currRaw = list(shapTrainingSet.iloc[frame])
+            outputDfRaw.loc[len(outputDfRaw)] = currRaw
+            outputDfShap.loc[len(outputDfShap)] = shapList
+            counter += 1
+            print('SHAP calculated: ' + str(counter) + '/' + str(len(shapTrainingSet)))
+        outputDfShap.to_csv(os.path.join(tree_evaluations_out, 'SHAP_values_' + str(classifierName) + '.csv'))
+        outputDfRaw.to_csv(os.path.join(tree_evaluations_out, 'RAW_SHAP_feature_values_' + str(classifierName) + '.csv'))
+        print('All SHAP data saved in project_folder/models/evaluations directory')
+
+    def perf_RFCVE(projectPath, RFCVE_CVs, RFCVE_step_size, clf, data_train, target_train, feature_list):
+        selector = RFECV(estimator=clf, step=RFCVE_step_size, cv=RFCVE_CVs, scoring='f1', verbose=1)
+        selector = selector.fit(data_train, target_train)
+        selectorSupport = selector.support_.tolist()
+        trueIndex = np.where(selectorSupport)
+        trueIndex = list(trueIndex[0])
+        selectedFeatures = [feature_list[i] for i in trueIndex]
+        selectedFeaturesDf = pd.DataFrame(selectedFeatures, columns=['Selected_features'])
+        savePath = os.path.join(tree_evaluations_out, 'RFECV_selected_features_' + str(classifierName) + '.csv')
+        selectedFeaturesDf.to_csv(savePath)
+        print('Recursive feature elimination results stored in ' + str(savePath))
 
     def generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars):
         log_df['Feature_importance'] = log_df['Feature_importance'].apply(pd.to_numeric)
@@ -156,24 +209,27 @@ def trainmodel2(inifile):
         fname = os.path.join(tree_evaluations_out, str(classifierName) + 'fancy_decision_tree_example.svg')
         svg_tree.save(fname)
 
-
     # READ IN DATA FOLDER AND REMOVE ALL NON-FEATURE VARIABLES (POP DLC COORDINATE DATA AND TARGET DATA)
-    print('Reading in ' + str(len(os.listdir(data_folder))) + ' annotated files...')
-    for i in os.listdir(data_folder):
-        if i.__contains__(".csv"):
-            currentFn = os.path.join(data_folder, i)
-            df = pd.read_csv(currentFn, index_col=0)
-            features = features.append(df, ignore_index=True)
-            print(features)
+    print('Reading in ' + str(len(glob.glob(data_folder + '/*.' + wfileType))) + ' annotated files...')
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
+    for file in filesFound:
+        df = read_df(file, wfileType)
+        features = features.append(df, ignore_index=True)
+    try:
+        features = features.set_index('scorer')
+    except KeyError:
+        pass
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
-    features = features.drop(["scorer"], axis=1, errors='ignore')
     totalTargetframes = features[classifierName].sum()
     try:
         targetFrame = features.pop(classifierName).values
     except KeyError:
         print('Error: the dataframe does not contain any target annotations. Please check the csv files in the project_folder/csv/target_inserted folder')
     features = features.fillna(0)
-    features = drop_bp_cords(features, inifile)
+    try:
+        features = drop_bp_cords(features, inifile)
+    except KeyError:
+        print('Could not drop bodypart coordinates, bodypart coordinates missing in dataframe')
     target_names = []
     loop = 1
     for i in range(model_nos):
@@ -199,6 +255,7 @@ def trainmodel2(inifile):
     trainDf[classifierName] = target_train
     targetFrameRows = trainDf.loc[trainDf[classifierName] == 1]
     print('# of ' + str(classifierName) + ' frames in dataset: ' + str(totalTargetframes))
+
     if under_sample_setting == 'Random undersample':
         try:
             print('Performing undersampling...')
@@ -239,20 +296,10 @@ def trainmodel2(inifile):
                                      criterion=RF_criterion, min_samples_leaf=RF_min_sample_leaf, bootstrap=True,
                                      verbose=1)
         try:
-           clf.fit(data_train, target_train)
+            clf.fit(data_train, target_train)
         except ValueError:
-           print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
+            print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
 
-        # scoring = ['precision', 'recall', 'f1']
-        # newDataTargets = np.concatenate((target_train, target_test), axis=0)
-        # #newDataTargets = np.where((newDataTargets == 0) | (newDataTargets == 1), newDataTargets ** 1, newDataTargets)
-        # newDataFeatures = np.concatenate((data_train, data_test), axis=0)
-        # #newDataFeatures = np.where((newDataFeatures == 0) | (newDataFeatures == 1), newDataFeatures ** 1, newDataFeatures)
-        # cv = ShuffleSplit(n_splits=5, test_size=train_test_size)
-        # results = cross_validate(clf, newDataFeatures, newDataTargets, cv=cv, scoring=scoring)
-        # results = pd.DataFrame.from_dict(results)
-        # crossValresultsFname = os.path.join(tree_evaluations_out, str(classifierName) + '_cross_val_100.csv')
-        # results.to_csv(crossValresultsFname)
 
         # #RUN RANDOM FOREST EVALUATIONS
         compute_permutation_importance = config.get('create ensemble settings', 'compute_permutation_importance')
@@ -304,18 +351,36 @@ def trainmodel2(inifile):
             importances = list(clf.feature_importances_)
             log_df = generateFeatureImportanceLog(importances)
             generate_features_importance_log = 'yes'
-            N_feature_importance_bars = config.getint('create ensemble settings', 'N_feature_importance_bars')
+            try:
+                N_feature_importance_bars = config.getint('create ensemble settings', 'N_feature_importance_bars')
+            except ValueError:
+                print('SimBA could not find how many feature importance bars you want to generate. Double check that you entered an integer in the "Genereate Feature Importance Bar Graph" entry box"')
             print('Generating feature importance bar graph...')
             generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars)
         if generate_features_importance_bar_graph != 'yes':
             N_feature_importance_bars = 'NaN'
             generate_features_importance_log = 'no'
 
-
         generate_example_decision_tree_fancy = config.get('create ensemble settings','generate_example_decision_tree_fancy')
         if generate_example_decision_tree_fancy == 'yes':
             print('Generating fancy decision tree example...')
             dviz_classification_visualization(data_train, target_train, classifierName)
+
+        try:
+            shap_scores_input = config.get('create ensemble settings', 'generate_shap_scores')
+        except NoOptionError:
+            shap_scores_input = 'no'
+        if shap_scores_input == 'yes':
+            shap_target_present_no = config.getint('create ensemble settings', 'shap_target_present_no')
+            shap_target_absent_no = config.getint('create ensemble settings', 'shap_target_absent_no')
+            generateShapLog(data_train, target_train, feature_list, classifierName, shap_target_present_no,shap_target_absent_no)
+
+        try:
+            RFECV_setting = config.get('create ensemble settings', 'perform_RFECV')
+        except NoOptionError:
+            RFECV_setting = 'no'
+        if RFECV_setting == 'yes':
+            perf_RFCVE(projectPath, 3, 5, clf, data_train, target_train, feature_list)
 
         # SAVE MODEL META DATA
         RF_meta_data = config.get('create ensemble settings', 'RF_meta_data')
@@ -329,51 +394,7 @@ def trainmodel2(inifile):
                             under_sample_ratio, under_sample_ratio]
             generateMetaData(metaDataList)
 
-    # run gradient boost model
-    if model_to_run == 'GBC':
-        GBC_n_estimators = config.getint('create ensemble settings', 'GBC_n_estimators')
-        GBC_max_features = config.get('create ensemble settings', 'GBC_max_features')
-        GBC_max_depth = config.getint('create ensemble settings', 'GBC_max_depth')
-        GBC_learning_rate = config.getfloat('create ensemble settings', 'GBC_learning_rate')
-        GBC_min_sample_split = config.getint('create ensemble settings', 'GBC_min_sample_split')
-        clf = GradientBoostingClassifier(max_depth=GBC_max_depth, n_estimators=GBC_n_estimators,
-                                         learning_rate=GBC_learning_rate, max_features=GBC_max_features,
-                                         min_samples_split=GBC_min_sample_split, verbose=1)
-        clf.fit(data_train, target_train)
-        clf_pred = clf.predict(data_test)
-        print(str(classifierName) + str(" Accuracy train: ") + str(clf.score(data_train, target_train)))
 
-        generate_example_decision_tree = config.get('create ensemble settings', 'generate_example_decision_tree')
-        if generate_example_decision_tree == 'yes':
-            estimator = clf.estimators_[3, 0]
-            generateExampleDecisionTree(estimator)
-
-        generate_classification_report = config.get('create ensemble settings', 'generate_classification_report')
-        if generate_classification_report == 'yes':
-            generateClassificationReport(clf, class_names)
-
-        generate_features_importance_log = config.get('create ensemble settings', 'generate_features_importance_log')
-        if generate_features_importance_log == 'yes':
-            importances = list(clf.feature_importances_)
-            log_df = generateFeatureImportanceLog(importances)
-
-        generate_features_importance_bar_graph = config.get('create ensemble settings',
-                                                            'generate_features_importance_bar_graph')
-        N_feature_importance_bars = config.getint('create ensemble settings', 'N_feature_importance_bars')
-        if generate_features_importance_bar_graph == 'yes':
-            generateFeatureImportanceBarGraph(log_df, N_feature_importance_bars)
-
-    # run XGboost
-    if model_to_run == 'XGB':
-        XGB_n_estimators = config.getint('create ensemble settings', 'XGB_n_estimators')
-        XGB_max_depth = config.getint('create ensemble settings', 'GBC_max_depth')
-        XGB_learning_rate = config.getfloat('create ensemble settings', 'XGB_learning_rate')
-        clf = XGBClassifier(max_depth=XGB_max_depth, min_child_weight=1, learning_rate=XGB_learning_rate,
-                            n_estimators=XGB_n_estimators,
-                            silent=0, objective='binary:logistic', max_delta_step=0, subsample=1, colsample_bytree=1,
-                            colsample_bylevel=1, reg_alpha=0, reg_lambda=0, scale_pos_weight=1, seed=1, missing=None,
-                            verbosity=3)
-        clf.fit(data_train, target_train, verbose=True)
 
     # SAVE MODEL
     modelfn = str(classifierName) + '.sav'
@@ -384,5 +405,3 @@ def trainmodel2(inifile):
     # stop = timeit.default_timer()
     # execution_time = stop - startTime
     # print(execution_time)
-
-

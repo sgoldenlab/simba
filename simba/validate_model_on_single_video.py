@@ -2,48 +2,57 @@ import warnings
 warnings.filterwarnings('ignore',category=FutureWarning)
 warnings.filterwarnings('ignore',category=DeprecationWarning)
 import pickle
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError, NoSectionError
 import os
 import pandas as pd
 import cv2
 from scipy import ndimage
 import warnings
 import random
-from drop_bp_cords import drop_bp_cords
+from simba.drop_bp_cords import *
 import matplotlib.pyplot as plt
 import numpy as np
 import io
 import PIL
+from simba.rw_dfs import *
+from pylab import cm
 
 plt.interactive(True)
 plt.ioff()
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
+
+# inifile = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Zebrafish\Zebrafish\project_folder\project_config.ini"
+# featuresPath = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Zebrafish\Zebrafish\project_folder\csv\features_extracted\20200730_AB_7dpf_850nm_0002.csv"
+# modelPath = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Zebrafish\Zebrafish\models\generated_models\Rheotaxis.sav"
+# savfile = ''
+# dt = 0.4
+# sb = 67
+# generategantt = 0
+
+def validate_model_one_vid(inifile,featuresPath,modelPath,dt,sb,generategantt):
     configFile = str(inifile)
     config = ConfigParser()
     config.read(configFile)
-    sample_feature_file = str(csvfile)
+    sample_feature_file = str(featuresPath)
     sample_feature_file_Name = os.path.basename(sample_feature_file)
     sample_feature_file_Name = sample_feature_file_Name.split('.', 1)[0]
     discrimination_threshold = float(dt)
-    classifier_path = savfile
-    classifier_name = os.path.basename(classifier_path).replace('.sav','')
-    inputFile = pd.read_csv(sample_feature_file)
+    classifier_name = os.path.basename(modelPath).replace('.sav','')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
+    inputFile = read_df(sample_feature_file, wfileType)
     inputFile = inputFile.loc[:, ~inputFile.columns.str.contains('^Unnamed')]
-    outputDf = inputFile
+    try:
+        inputFile = inputFile.set_index('scorer')
+    except KeyError:
+        pass
+    outputDf = inputFile.copy()
     inputFileOrganised = drop_bp_cords(inputFile, inifile)
-    if (classifier_name == 'attack_prediction') or (classifier_name == 'anogenital_prediction') or (classifier_name == 'pursuit_prediction'):
-        try:
-            inputFileOrganised = inputFileOrganised.drop(
-                ['Mouse_1_Nose_to_lateral_left', 'Mouse_2_Nose_to_lateral_left', 'Mouse_1_Nose_to_lateral_right',
-                 'Mouse_2_Nose_to_lateral_right', 'Mouse_1_Centroid_to_lateral_left',
-                 'Mouse_2_Centroid_to_lateral_left', 'Mouse_1_Centroid_to_lateral_right',
-                 'Mouse_2_Centroid_to_lateral_right'], axis=1)
-        except KeyError:
-            pass
     print('Running model...')
-    clf = pickle.load(open(classifier_path, 'rb'))
+    clf = pickle.load(open(modelPath, 'rb'))
     ProbabilityColName = 'Probability_' + classifier_name
     predictions = clf.predict_proba(inputFileOrganised)
     outputDf[ProbabilityColName] = predictions[:, 1]
@@ -51,15 +60,15 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
 
     # CREATE LIST OF GAPS BASED ON SHORTEST BOUT
     shortest_bout = int(sb)
-    vidInfPath = config.get('General settings', 'project_path')
-    videoInputFolder = os.path.join(vidInfPath, 'videos')
-    outputPath = os.path.join(vidInfPath, 'frames', 'output', 'validation')
+    projectFolder = config.get('General settings', 'project_path')
+    videoInputFolder = os.path.join(projectFolder, 'videos')
+    outputPath = os.path.join(projectFolder, 'frames', 'output', 'validation')
     if not os.path.exists(outputPath):
         os.makedirs(outputPath)
-    outputFileName = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.csv', '_' + classifier_name + '.avi')))
-    vidInfPath = os.path.join(vidInfPath, 'logs', 'video_info.csv')
+    outputFileName = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.' + wfileType, '_' + classifier_name + '.avi')))
+    vidInfPath = os.path.join(projectFolder, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-    fps = vidinfDf.loc[vidinfDf['Video'] == str(sample_feature_file_Name.replace('.csv', ''))]
+    fps = vidinfDf.loc[vidinfDf['Video'] == str(sample_feature_file_Name.replace('.' + wfileType, ''))]
     try:
         fps = int(fps['fps'])
     except TypeError:
@@ -92,35 +101,49 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
         else:
             outputDf.loc[outputDf['rolling_match'] == True, classifier_name] = 1
         outputDf = outputDf.drop(['rolling_match'], axis=1)
-    outFname = sample_feature_file_Name + '.csv'
+    outFname = sample_feature_file_Name + '.' + wfileType
     csv_dir_out_validation = config.get('General settings', 'csv_path')
     csv_dir_out_validation = os.path.join(csv_dir_out_validation,'validation')
+
     if not os.path.exists(csv_dir_out_validation):
         os.makedirs(csv_dir_out_validation)
     outFname = os.path.join(csv_dir_out_validation, outFname)
-    outputDf.to_csv(outFname)
-    print('Predictions generated...')
-
+    save_df(outputDf, wfileType, outFname)
+    print('Predictions generated.')
 
     #generate the video based on the just generated classification
     target_counter = 0
-    currentDf = pd.read_csv(outFname)
-    currentDf = currentDf.fillna(0)
+    inputFile = read_df(outFname, wfileType)
+    currentDf = inputFile.fillna(0)
     currentDf = currentDf.astype(int)
-    Xlocs, Ylocs = (currentDf.filter(like='_x', axis=1), currentDf.filter(like='_y', axis=1))
-    Xlocs = Xlocs.rename(columns=lambda x: x.strip('_x'))
-    Ylocs = Ylocs.rename(columns=lambda x: x.strip('_y'))
-    bodypartColNames = list(Xlocs.columns)
+    noAnimals = config.getint('General settings', 'animal_no')
+
+    try:
+        animalIDlist = config.get('Multi animal IDs', 'id_list')
+        animalIDlist = animalIDlist.split(",")
+        if animalIDlist[0] != '':
+            multiAnimalStatus = True
+            print('Applying settings for multi-animal tracking...')
+        else:
+            multiAnimalStatus = False
+            print('Applying settings for classical tracking...')
+    except NoSectionError:
+        animalIDlist = []
+        for animal in range(noAnimals):
+            animalIDlist.append('Animal' + str(animal + 1))
+        multiAnimalStatus = False
+        print('Applying settings for classical tracking...')
+
+    x_cols, y_cols, p_cols = getBpNames(inifile)
     targetColumn = classifier_name
-    if os.path.exists(os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.mp4')))):
-        currVideoFile = os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.mp4')))
-    if os.path.exists(os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.avi')))):
-        currVideoFile = os.path.join(videoInputFolder, os.path.basename(outFname.replace('.csv', '.avi')))
+    if os.path.exists(os.path.join(videoInputFolder, os.path.basename(outFname.replace('.' + wfileType, '.mp4')))):
+        currVideoFile = os.path.join(videoInputFolder, os.path.basename(outFname.replace('.' + wfileType, '.mp4')))
+    if os.path.exists(os.path.join(videoInputFolder, os.path.basename(outFname.replace('.' +wfileType, '.avi')))):
+        currVideoFile = os.path.join(videoInputFolder, os.path.basename(outFname.replace('.' + wfileType, '.avi')))
     cap = cv2.VideoCapture(currVideoFile)
+
     ## find vid size and fps
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps, width, height  = cap.get(cv2.CAP_PROP_FPS), int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     if height < width:
@@ -134,21 +157,41 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
     fontScale = float(myFontScale / (myResolution / maxResDimension))
     spacingScale = int(mySpaceScale / (myResolution / maxResDimension))
     currRow = 0
-    colorList = []
-    for color in range(len(bodypartColNames)):
-        r, g, b = (random.randint(0,255), random.randint(0,255), random.randint(0,255))
-        colorTuple = (r, g, b)
-        colorList.append(colorTuple)
+    colorListofList = []
+    cmaps = ['spring', 'summer', 'autumn', 'cool', 'Wistia', 'Pastel1', 'Set1', 'winter']
+    cMapSize = int(len(x_cols)/noAnimals) + 1
+    for colormap in range(noAnimals):
+        currColorMap = cm.get_cmap(cmaps[colormap], cMapSize)
+        currColorList = []
+        for i in range(currColorMap.N):
+            rgb = list((currColorMap(i)[:3]))
+            rgb = [i * 255 for i in rgb]
+            rgb.reverse()
+            currColorList.append(rgb)
+        colorListofList.append(currColorList)
+    animalBpDict = create_body_part_dictionary(multiAnimalStatus, animalIDlist, noAnimals, x_cols, y_cols, p_cols, colorListofList)
 
     while (cap.isOpened()):
         ret, frame = cap.read()
         if ret == True:
-            loop = 0
-            for bodyParts in bodypartColNames:
-                currXval = Xlocs.loc[Xlocs.index[currRow], bodyParts]
-                currYval = Ylocs.loc[Ylocs.index[currRow], bodyParts]
-                cv2.circle(frame, (int(currXval), int(currYval)), circleScale, colorList[loop], -1, lineType=cv2.LINE_AA)
-                loop+=1
+            IDlabelLoc = []
+            for currAnimal in range(noAnimals):
+                currentDictID = list(animalBpDict.keys())[currAnimal]
+                currentDict = animalBpDict[currentDictID]
+                currNoBps = len(currentDict['X_bps'])
+                IDappendFlag = False
+                animalArray = np.empty((currNoBps, 2), dtype=int)
+                for bp in range(currNoBps):
+                    hullColor = currentDict['colors'][bp]
+                    currXheader, currYheader, currColor = currentDict['X_bps'][bp], currentDict['Y_bps'][bp], currentDict['colors'][bp]
+                    currAnimal = currentDf.loc[currentDf.index[currRow], [currXheader, currYheader]]
+                    cv2.circle(frame, (currAnimal[0], currAnimal[1]), 0, hullColor, circleScale)
+                    animalArray[bp] = [currAnimal[0], currAnimal[1]]
+                    if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
+                        IDlabelLoc.append([currAnimal[0], currAnimal[1]])
+                        IDappendFlag = True
+                if IDappendFlag == False:
+                    IDlabelLoc.append([currAnimal[0], currAnimal[1]])
             target_timer = (1/fps) * target_counter
             target_timer = round(target_timer, 2)
             if height < width:
@@ -165,7 +208,7 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
                 addSpacer += 1
             writer.write(frame)
             currRow += 1
-            print('Frame: ' + str(currRow) + '/' + str(frames) + '.')
+            print('Frame created: ' + str(currRow) + '/' + str(frames) + '.')
         if frame is None:
             print('Video ' + str(currVideoFile) + ' saved.')
             cap.release()
@@ -173,36 +216,31 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
             break
 
     if int(generategantt) == 1:
-        #generate gantt
-        outputFileNameGantt = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.csv', '_' + classifier_name + '_gantt.avi')))
+        outputFileNameGantt = os.path.join(outputPath, os.path.basename(sample_feature_file.replace('.' +wfileType, '_' + classifier_name + '_gantt.avi')))
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         writer2 = cv2.VideoWriter(outputFileNameGantt, fourcc, int(fps), (640, 480))
-        boutEnd = 0
-        boutEnd_list = [0]
-        boutStart_list = []
-        boutsDf = pd.DataFrame(columns=['Event', 'Start_frame', 'End_frame'])
-        rowCount = currentDf.shape[0]
-        for indexes, rows in currentDf[currentDf['Unnamed: 0'] >= boutEnd].iterrows():
-            if rows[classifier_name] == 1:
-                boutStart = rows['Unnamed: 0']
-                for index, row in currentDf[currentDf['Unnamed: 0'] >= boutStart].iterrows():
-                    if row[classifier_name] == 0:
-                        boutEnd = row['Unnamed: 0']
-                        if boutEnd_list[-1] != boutEnd:
-                            boutStart_list.append(boutStart)
-                            boutEnd_list.append(boutEnd)
-                            values = [classifier_name, boutStart, boutEnd]
-                            boutsDf.loc[(len(boutsDf))] = values
-                            break
-                        break
-                boutStart_list = [0]
-                boutEnd_list = [0]
-        boutsDf['Start_time'] = boutsDf['Start_frame'] / fps
-        boutsDf['End_time'] = boutsDf['End_frame'] / fps
-        boutsDf['Bout_time'] = boutsDf['End_time'] - boutsDf['Start_time']
-        loop = 0
+        boutsList, nameList, startTimeList, endTimeList, endFrameList = [], [], [], [], []
+        groupDf = pd.DataFrame()
+        v = (currentDf[classifier_name] != currentDf[classifier_name].shift()).cumsum()
+        u = currentDf.groupby(v)[classifier_name].agg(['all', 'count'])
+        m = u['all'] & u['count'].ge(1)
+        groupDf['groups'] = currentDf.groupby(v).apply(lambda x: (x.index[0], x.index[-1]))[m]
+        for indexes, rows in groupDf.iterrows():
+            currBout = list(rows['groups'])
+            boutTime = ((currBout[-1] - currBout[0]) + 1) / fps
+            startTime = (currBout[0] + 1) / fps
+            endTime = (currBout[1]) / fps
+            endFrame = (currBout[1])
+            endTimeList.append(endTime)
+            startTimeList.append(startTime)
+            boutsList.append(boutTime)
+            nameList.append(classifier_name)
+            endFrameList.append(endFrame)
+        boutsDf = pd.DataFrame(list(zip(nameList, startTimeList, endTimeList, endFrameList, boutsList)), columns=['Event', 'Start_time', 'End Time', 'End_frame', 'Bout_time'])
 
-        for k in range(rowCount):
+
+
+        for k in range(len(inputFile)):
             fig, ax = plt.subplots()
             currentDf = currentDf.iloc[:k]
             relRows = boutsDf.loc[boutsDf['End_frame'] <= k]
@@ -233,7 +271,7 @@ def validate_model_one_vid(inifile,csvfile,savfile,dt,sb,generategantt):
             buffer_.close()
             writer2.write(open_cv_image)
             plt.close('all')
-            print('Gantt: ' + str(k) + '/' + str(rowCount) + '.')
+            print('Gantt: ' + str(k) + '/' + str(len(inputFile)) + '.')
         cv2.destroyAllWindows()
         writer2.release()
         print('Gantt ' + str(os.path.basename(outputFileNameGantt)) + ' saved.')
