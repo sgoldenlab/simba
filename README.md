@@ -17,6 +17,11 @@
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
 ## Feb-03-2021: SimBA version 1.3 release
+
+Please update it using `pip install simba-uw-tf==1.3.2`, this version has the deeplabcut and deepposekit disabled. Hence, no tensorflow is needed. If you want to use deeplabcut and deepposekit using SimBA, please let us know in the [![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community) and we will figure it out.
+
+The current simba-uw-no-tf is still under maintenance, we will keep you posted!
+
 ### New Features
 - ROI Visualization update - [Documentation](/docs/ROI_tutorial.md)
 - User define features extraction - Allow user to run self customized feature extraction script
