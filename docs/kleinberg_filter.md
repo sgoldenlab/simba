@@ -42,4 +42,4 @@ In short,
 
 *(ii) Gamma* - Higher gamma values and behaviors needs to be sustained for a longer time for them to be recognised as burts. **Higher gamma values and fewer behavioural bursts will be recognised (Default: 0.3)**
 
- *(ii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values values and fewer behavioural bursts are likely to be recognised (Default: 2)**
+ *(ii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values values and fewer behavioural bursts are likely to be recognised (Default: 1)**
