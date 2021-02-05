@@ -15,12 +15,12 @@ After applying the Kleinberg smoother, you can expect the output to look like be
   <img src="https://github.com/sgoldenlab/simba/blob/master/images/klenberg.gif" width="850"/>
 </p>
 
-
+>Note: If you are smoothing your data using the Kleinberg smoother, I recommend refraining from setting [heuristic rules in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data) when we run the classifiers (i.e., a behavioural bout cannot be shorter than N milliseconds) and instead let the Kleinberg algorithm take care of **all** of the smoothing. Thus, when you first run the classifier, set the **min bout duration** for the classifiers you want to smooth (as descibed [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data)) to `0`. 
 
  ## How to use Kleinberg Filter in SimBA
  
 1. After running the machine model (i.e., after clicking on `Run RF Model` as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model)), go ahead and click on the `Kleinberg Smoothing` button.
- 
+
  ![](/images/kleinberg1.PNG)
  
 2. You should see the below `settings menu` pop up. Check the classifier(s) that you wished to apply the Kleinberg smoothing for and set the "hyperparameters". See the section below for more information about the hyperparameters and the default settings. Click on the `Apply Kleinberg Smoother` button to apply the filter.
