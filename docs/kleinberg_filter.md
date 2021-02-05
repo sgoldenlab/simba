@@ -35,7 +35,7 @@ After applying the Kleinberg smoother, you can expect the output to look like be
 
 Here, every row is a classified behavioral bout. The *Hierarchy* columns denotes which level in the hierarchy the bout belongs to. The *Start* columns denotes the frame when the behavioral bout started within this part of the hierarchy. The *End* columns denotes the frame when the behavioral bout ended within this part of the hierarchy. If you look carefully you see that the lower hierarchies encompass the same boural events further up the hierarchy.  
 
-If you are unhappy with the results, I suggest you tinker with the hierarchy value based on the result in this logfile - have a look with the majority of your classifies bouts are located and suggest your hierarchy accordingly. 
+If you are unhappy with the results, I suggest you tinker with the hierarchy value based on the result in this logfile - have a look with the majority of your classifies bouts are located and set your hierarchy hyperparameter accordingly. 
 
 If satisfied with the results, go ahead and compute new descriptive stastistics as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results).
 
