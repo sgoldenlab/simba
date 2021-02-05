@@ -27,7 +27,15 @@ After applying the Kleinberg smoother, you can expect the output to look like be
 
 ![](/images/kleinberg2.PNG)
 
-3. The files in the `project_folder/csv/machine_results` will be overwritten with new files, with the same file names as the original files, but now containing the kleinberg smoothened classifications for the selected classifiers. To compare the results, either (i) back-up the original files and open it up alongside the newly generated file and compare the `0` and `1` in the relevant classification columns in the right-most part of the file. Or, alternative, generate new classifier visualizations as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) and compare the classifications pre- and post smoothing. 
+3. The files in the `project_folder/csv/machine_results` will be overwritten with new files, with the same file names as the original files, but now containing the kleinberg smoothened classifications for the selected classifiers. To compare the results, either (i) back-up the original files and open it up alongside the newly generated file and compare the `0` and `1` in the relevant classification columns in the right-most part of the file. Or, alternative, generate new classifier visualizations as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) and compare the classifications pre- and post smoothing.
+
+4. For troubleshooting purposes - for each classifier you smooth - SimBA will save a log file in the `project_folder/csv/logs` directory that is named after the classifier name and the current date and time, for example *Kleinberg_log_Attack_20210204202223.csv*. This file contains information on **all** the classified bouts found by the Kleinberg smoother, their hierarchy, and start and end frame. It may look like this:
+
+![](/images/Kleinberg_10.png)
+
+Here, every row is a classified behavioral bout. The *Hierarchy* columns denotes which level in the hierarchy the bout belongs to. The *Start* columns denotes the frame when the behavioral bout started within this part of the hierarchy. The *End* columns denotes the frame when the behavioral bout ended within this part of the hierarchy. If you look carefully you see that the lower hierarchies encompass the same boural events further up the hierarchy.  
+
+If you are unhappy with the results, I suggest you tinker with the hierarchy value based on the result in this logfile - have a look with the majority of your classifies bouts are located and suggest your hierarchy accordingly. 
 
 If satisfied with the results, go ahead and compute new descriptive stastistics as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-9-analyze-machine-results).
 
