@@ -10,7 +10,7 @@ from simba.rw_dfs import *
 from pylab import *
 
 
-def plotsklearnresult(iniFile,videoSetting, frameSetting):
+def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
     config = ConfigParser()
     configFile = str(iniFile)
     try:
@@ -52,8 +52,12 @@ def plotsklearnresult(iniFile,videoSetting, frameSetting):
     cMapSize = int(len(Xcols) + 1)
     colorListofList = createColorListofList(animalsNo, cMapSize)
 
-    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
-    print('Processing ' + str(len(filesFound)) + ' videos ...')
+    csvfile = videofile.split('.')[0]+'.csv'
+
+    filesFound = []
+    filesFound.append((os.path.join(csv_dir_in,csvfile)))
+    print(filesFound,type(filesFound))
+    print('Processing ' + str(len(filesFound)) + ' video ...')
 
     ########### GET MODEL NAMES ###########
     for i in range(counters_no):

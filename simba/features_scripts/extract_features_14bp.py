@@ -18,6 +18,8 @@ def extract_features_wotarget_14(inifile):
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    #change videos name to str
+    vidinfDf.Video = vidinfDf.Video.astype('str')
 
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
@@ -61,7 +63,11 @@ def extract_features_wotarget_14(inifile):
             currPixPerMM = float(currVideoSettings['pixels/mm'])
         except TypeError:
             print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
-        fps = float(currVideoSettings['fps'])
+        try:
+            fps = float(currVideoSettings['fps'])
+        except TypeError:
+            print('No file found.')
+            continue
         print('Processing ' + '"' + str(currVidName) + '".' + ' Fps: ' + str(fps) + ". mm/ppx: " + str(currPixPerMM))
 
         for i in range(len(roll_windows_values)):
@@ -269,14 +275,11 @@ def extract_features_wotarget_14(inifile):
             M2_hull_small_euclidean_list.append(M2_hull_small_euclidean)
             M2_hull_mean_euclidean_list.append(M2_hull_mean_euclidean)
             M2_hull_sum_euclidean_list.append(M2_hull_sum_euclidean)
-        csv_df['M1_largest_euclidean_distance_hull'] = list(
-            map(lambda x: x / currPixPerMM, M1_hull_large_euclidean_list))
-        csv_df['M1_smallest_euclidean_distance_hull'] = list(
-            map(lambda x: x / currPixPerMM, M1_hull_small_euclidean_list))
+        csv_df['M1_largest_euclidean_distance_hull'] = list(map(lambda x: x / currPixPerMM, M1_hull_large_euclidean_list))
+        csv_df['M1_smallest_euclidean_distance_hull'] = list(map(lambda x: x / currPixPerMM, M1_hull_small_euclidean_list))
         csv_df['M1_mean_euclidean_distance_hull'] = list(map(lambda x: x / currPixPerMM, M1_hull_mean_euclidean_list))
         csv_df['M1_sum_euclidean_distance_hull'] = list(map(lambda x: x / currPixPerMM, M1_hull_sum_euclidean_list))
-        csv_df['M2_largest_euclidean_distance_hull'] = list(
-            map(lambda x: x / currPixPerMM, M2_hull_large_euclidean_list))
+        csv_df['M2_largest_euclidean_distance_hull'] = list(map(lambda x: x / currPixPerMM, M2_hull_large_euclidean_list))
         csv_df['M2_smallest_euclidean_distance_hull'] = list(
             map(lambda x: x / currPixPerMM, M2_hull_small_euclidean_list))
         csv_df['M2_mean_euclidean_distance_hull'] = list(map(lambda x: x / currPixPerMM, M2_hull_mean_euclidean_list))

@@ -18,6 +18,8 @@ def extract_features_wotarget_8(inifile):
     vidInfPath = os.path.join(vidInfPath,'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    #change videos name to str
+    vidinfDf.Video = vidinfDf.Video.astype('str')
 
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
@@ -396,6 +398,9 @@ def extract_features_wotarget_8(inifile):
         fileName = fileName.split('.')
         fileOut = str(fileName[0]) + str('.csv')
         saveFN = os.path.join(csv_dir_out, fileOut)
+
+
+
         csv_df.to_csv(saveFN)
         print('Feature extraction complete for ' + '"' + str(currVidName) + '".')
     print('All feature extraction complete.')

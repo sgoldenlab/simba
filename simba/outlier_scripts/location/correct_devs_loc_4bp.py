@@ -119,6 +119,7 @@ def dev_loc_4(projectini):
         fnamePrint = fname.replace('.csv', '')
         csvOutPath = os.path.join(csv_dir_out, fname)
         csv_out.to_csv(csvOutPath, index=False)
+
         frames_processed = len(csv_out)
         frames_processed_list.append(frames_processed)
         fixedPositions_M1_list.append(fixedPositions_M1)

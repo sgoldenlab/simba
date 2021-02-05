@@ -92,12 +92,12 @@ def dev_loc_user_defined(projectini):
             print('Analyzing animal ' + str(animalCounter + 1) + '...')
             currentFixedList, currCols, fixedPositions_M1 = [], [], 0
             counts_total_M1 = [0] * len(animalBpDict[animal]['X_bps'])
-            outputArray = np.array([0] * (3*len(animalBpDict[animal]['X_bps'])))
+            outputArray = np.array([0] * (2*len(animalBpDict[animal]['X_bps'])))
             meanSize = statistics.mean(np.sqrt((csv_df[bodyPartNameArrayForMeans[animalCounter][1]] - csv_df[bodyPartNameArrayForMeans[animalCounter][3]]) ** 2 + (csv_df[bodyPartNameArrayForMeans[animalCounter][2]] - csv_df[bodyPartNameArrayForMeans[animalCounter][4]]) ** 2))
             currentCriterion = meanSize * criterion
             currXcols, currYcols, currPcols = animalBpDict[animalIDlist[animalCounter]]['X_bps'], animalBpDict[animalIDlist[animalCounter]]['Y_bps'], animalBpDict[animalIDlist[animalCounter]]['P_bps']
-            for Xcol, Ycol,Pcol  in zip(currXcols, currYcols, currPcols):
-                currCols.extend((Xcol, Ycol,Pcol))
+            for Xcol, Ycol  in zip(currXcols, currYcols):
+                currCols.extend((Xcol, Ycol))
             currAnimaldf = csv_df[currCols]
             for index, row in currAnimaldf.iterrows():
                 currentArray = row.to_numpy()

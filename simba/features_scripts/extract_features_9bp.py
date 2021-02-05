@@ -19,6 +19,8 @@ def extract_features_wotarget_9(inifile):
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    #change videos name to str
+    vidinfDf.Video = vidinfDf.Video.astype('str')
 
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)

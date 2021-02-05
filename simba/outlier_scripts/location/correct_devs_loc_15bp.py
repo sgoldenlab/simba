@@ -11,7 +11,7 @@ def dev_loc_14(projectini):
     config = ConfigParser()
     config.read(configFile)
     csv_dir = config.get('General settings', 'csv_path')
-    csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement')
+    csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement', 'Batch_3')
     csv_dir_out = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
@@ -164,7 +164,6 @@ def dev_loc_14(projectini):
                            "Nose_2_p", "Center_2_x", "Center_2_y", "Center_2_p", "Lat_left_2_x", "Lat_left_2_y",
                            "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x",
                            "Tail_base_2_y", "Tail_base_2_p"]]
-
         df_headers = pd.read_csv(currentFile, nrows=0)
         csv_out.columns = df_headers.columns
         csv_out = pd.concat([df_headers, csv_out])

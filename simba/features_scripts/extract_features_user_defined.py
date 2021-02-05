@@ -1,9 +1,12 @@
 from __future__ import division
 import os
-import pandas as pd
 import numpy as np
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError, NoSectionError
 import glob
+from simba.rw_dfs import *
+from simba.drop_bp_cords import *
+from numba import jit
+
 
 def extract_features_wotarget_user_defined(inifile):
     config = ConfigParser()
@@ -12,31 +15,63 @@ def extract_features_wotarget_user_defined(inifile):
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     csv_dir_out = os.path.join(csv_dir, 'features_extracted')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     vidInfPath = config.get('General settings', 'project_path')
+    noAnimals = config.getint('General settings', 'animal_no')
     logsPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(logsPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-    poseConfigPath = os.path.join(logsPath, 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
-    poseConfigDf = pd.read_csv(poseConfigPath, header=None)
-    poseConfigDf = list(poseConfigDf[0])
+    #change videos name to str
+    vidinfDf.Video = vidinfDf.Video.astype('str')
+
+    Xcols, Ycols, Pcols = getBpNames(inifile)
+    columnHeaders = getBpHeaders(inifile)
+    columnHeadersShifted = [bp + '_shifted' for bp in columnHeaders]
+
+    try:
+        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
+        multiAnimalIDList = multiAnimalIDList.split(",")
+        if multiAnimalIDList[0] != '':
+            multiAnimalStatus = True
+            print('Applying settings for multi-animal tracking...')
+        else:
+            multiAnimalStatus = False
+            for animal in range(noAnimals):
+                multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
+            print('Applying settings for classical tracking...')
+
+    except NoSectionError:
+        multiAnimalIDList = []
+        for animal in range(noAnimals):
+            multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
+        multiAnimalStatus = False
+        print('Applying settings for classical tracking...')
+    animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, noAnimals, Xcols, Ycols, Pcols, [])
 
     if not os.path.exists(csv_dir_out):
         os.makedirs(csv_dir_out)
-
-    def count_values_in_range(series, values_in_range_min, values_in_range_max):
-        return series.between(left=values_in_range_min, right=values_in_range_max).sum()
-
     roll_windows = []
     roll_windows_values = [2, 5, 6, 7.5, 15]
     loopy = 0
 
-    filesFound = glob.glob(csv_dir_in + '/*.csv')
+
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     print('Extracting features from ' + str(len(filesFound)) + ' files...')
 
+    def count_values_in_range(series, values_in_range_min, values_in_range_max):
+        return series.between(left=values_in_range_min, right=values_in_range_max).sum()
+
+    @jit(nopython=True, cache=True)
+    def EuclidianDistCalc(bp1xVals, bp1yVals, bp2xVals, bp2yVals, currPixPerMM):
+        series = (np.sqrt((csv_df[bp1xVals] - csv_df[bp2xVals]) ** 2 + (csv_df[bp1yVals] - csv_df[bp2yVals]) ** 2)) / currPixPerMM
+        return series
+
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
-    for i in filesFound:
-        currentFile = i
-        currVidName = os.path.basename(currentFile.replace('.csv', ''))
+    for currentFile in filesFound:
+        currVidName = os.path.basename(currentFile.replace('.' + wfileType, ''))
         currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
         try:
             currPixPerMM = float(currVideoSettings['pixels/mm'])
@@ -47,22 +82,14 @@ def extract_features_wotarget_user_defined(inifile):
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))
         loopy += 1
-        bodypartNames = list(poseConfigDf)
-        columnHeaders = []
-        columnHeadersShifted = []
-        p_cols = []
-        for bodypart in bodypartNames:
-            colHead1, colHead2, colHead3 = (bodypart + '_x', bodypart + '_y', bodypart + '_p')
-            colHead4, colHead5, colHead6 = (bodypart + '_x_shifted', bodypart + '_y_shifted', bodypart + '_p_shifted')
-            columnHeaders.extend((colHead1, colHead2, colHead3))
-            columnHeadersShifted.extend((colHead4, colHead5, colHead6))
-            p_cols.append(colHead3)
-
-        csv_df = pd.read_csv(currentFile, names=columnHeaders, low_memory=False)
+        csv_df = read_df(currentFile, wfileType)
+        try:
+            csv_df = csv_df.set_index('scorer')
+        except KeyError:
+            pass
+        csv_df.columns = columnHeaders
         csv_df = csv_df.fillna(0)
-        csv_df = csv_df.drop(csv_df.index[[0]])
         csv_df = csv_df.apply(pd.to_numeric)
-        csv_df = csv_df.reset_index(drop=True)
 
         ########### CREATE SHIFTED DATAFRAME FOR DISTANCE CALCULATIONS ###########################################
         csv_df_shifted = csv_df.shift(periods=1)
@@ -70,73 +97,63 @@ def extract_features_wotarget_user_defined(inifile):
         csv_df_combined = pd.concat([csv_df, csv_df_shifted], axis=1, join='inner')
         csv_df_combined = csv_df_combined.fillna(0)
         csv_df_combined = csv_df_combined.reset_index(drop=True)
-        print('Calculating euclidean distances...')
 
+        print('Calculating euclidean distances...')
         ########### EUCLIDEAN DISTANCES BETWEEN BODY PARTS###########################################
         distanceColNames = []
-        for idx in range(len(bodypartNames)-1):
-            for idy in range(idx+1, len(bodypartNames)):
-                colName = 'distance_' + str(bodypartNames[idx]) + '_to_' + str(bodypartNames[idy])
-                distanceColNames.append(colName)
-                firstBpX , firstBpY = (bodypartNames[idx] + '_x', bodypartNames[idx] + '_y')
-                secondBpX, secondBpY = (bodypartNames[idy] + '_x', bodypartNames[idy] + '_y')
-                csv_df[colName] = (np.sqrt((csv_df[firstBpX] - csv_df[secondBpX]) ** 2 + (csv_df[firstBpY]- csv_df[secondBpY]) ** 2)) / currPixPerMM
+        for currAnimal in animalBpDict:
+            currentAnimalX, currentAnimalY = animalBpDict[currAnimal]['X_bps'], animalBpDict[currAnimal]['Y_bps']
+            otherAnimals = {i: animalBpDict[i] for i in animalBpDict if i != currAnimal}
+            for currBpX, currBpY in zip(currentAnimalX, currentAnimalY):
+                for otherAnimal in otherAnimals:
+                    otherAnimalBpX, otherAnimalBpY = animalBpDict[otherAnimal]['X_bps'], animalBpDict[otherAnimal]['Y_bps']
+                    for otherBpX, otherBpY in zip(otherAnimalBpX, otherAnimalBpY):
+                        bpName1, bpName2 =  currBpX.strip('_x'), otherBpX.strip('_x')
+                        colName = 'Euclidean_distance_' + bpName1 + '_' + bpName2
+                        reverseColName = 'Euclidean_distance_' + bpName2 + '_' + bpName1
+                        if not reverseColName in csv_df.columns:
+                            csv_df[colName] = (np.sqrt((csv_df[currBpX] - csv_df[otherBpX]) ** 2 + (csv_df[currBpY] - csv_df[otherBpY]) ** 2)) / currPixPerMM
+                            distanceColNames.append(colName)
 
-        ########### MOVEMENTS OF ALL BODY PARTS ###########################################
-        movementColNames = []
-        for selectBp in bodypartNames:
-            colName = 'movement_' + selectBp
-            movementColNames.append(colName)
-            selectBpX_1, selectBpY_1 = (selectBp + '_x', selectBp + '_y')
-            selectBpX_2, selectBpY_2 = (selectBp + '_x_shifted', selectBp + '_y_shifted')
-            csv_df[colName] = (np.sqrt((csv_df_combined[selectBpX_1] - csv_df_combined[selectBpX_2]) ** 2 + (csv_df_combined[selectBpY_1] - csv_df_combined[selectBpY_2]) ** 2)) / currPixPerMM
-        movementDf = csv_df.filter(movementColNames, axis=1)
-        descriptiveColNames = ['collapsed_sum_of_all_movements', 'collapsed_mean_of_all_movements', 'collapsed_median_of_all_movements', 'collapsed_min_of_all_movements', 'collapsed_max_of_all_movements']
-        csv_df['collapsed_sum_of_all_movements'] = movementDf[movementColNames].sum(axis=1)
-        csv_df['collapsed_mean_of_all_movements'] = movementDf[movementColNames].mean(axis=1)
-        csv_df['collapsed_median_of_all_movements'] = movementDf[movementColNames].median(axis=1)
-        csv_df['collapsed_min_of_all_movements'] = movementDf[movementColNames].min(axis=1)
-        csv_df['collapsed_max_of_all_movements'] = movementDf[movementColNames].max(axis=1)
+        print('Calculating movements of all bodyparts...')
+        collapsedColNamesMean, collapsedColNamesSum = [], []
+        for currAnimal in animalBpDict:
+            animalCols = []
+            currentAnimalX, currentAnimalY = animalBpDict[currAnimal]['X_bps'], animalBpDict[currAnimal]['Y_bps']
+            for currBpX, currBpY in zip(currentAnimalX, currentAnimalY):
+                shiftedBpX, shiftedBpY = currBpX + '_shifted', currBpY + '_shifted'
+                colName = 'Movement_' + currBpX.strip('_x')
+                csv_df[colName] = (np.sqrt((csv_df_combined[currBpX] - csv_df_combined[shiftedBpX]) ** 2 + (csv_df_combined[currBpY] - csv_df_combined[shiftedBpY]) ** 2)) / currPixPerMM
+                animalCols.append(colName)
+            sumColName, meanColName = 'All_bp_movements_' + currAnimal + '_sum', 'All_bp_movements_' + currAnimal + '_mean'
+            csv_df[sumColName] = csv_df[animalCols].sum(axis=1)
+            csv_df[meanColName] = csv_df[animalCols].mean(axis=1)
+            csv_df['All_bp_movements_' + currAnimal + '_min'] = csv_df[animalCols].min(axis=1)
+            csv_df['All_bp_movements_' + currAnimal + '_max'] = csv_df[animalCols].max(axis=1)
+            collapsedColNamesMean.append(meanColName)
+            collapsedColNamesSum.append(sumColName)
 
-        print('Calculating rolling windows data...')
 
-        ########### CALC MEAN, MEDIAN, AND SUM DISTANCES BETWEEN BODY PARTS IN ROLLING WINDOWS ###########################################
-        combinedLists_1 = distanceColNames + movementColNames + descriptiveColNames
+        print('Calculating rolling windows data: distances between body-parts')
+        ########### CALC MEAN & SUM DISTANCES BETWEEN BODY PARTS IN ROLLING WINDOWS ###########################################
         for i in range(len(roll_windows_values)):
-            for selectedCol in combinedLists_1:
-                colName = 'Mean_' + str(selectedCol) + '_' + str(roll_windows_values[i])
-                csv_df[colName] = csv_df[selectedCol].rolling(roll_windows[i], min_periods=1).mean()
-                colName = 'Sum_' + str(selectedCol) + '_' + str(roll_windows_values[i])
-                csv_df[colName] = csv_df[selectedCol].rolling(roll_windows[i], min_periods=1).sum()
+            for currDistanceCol in distanceColNames:
+                colName = 'Mean_' + str(currDistanceCol) + '_' + str(roll_windows_values[i])
+                csv_df[colName] = csv_df[currDistanceCol].rolling(roll_windows[i], min_periods=1).mean()
+                colName = 'Sum_' + str(currDistanceCol) + '_' + str(roll_windows_values[i])
+                csv_df[colName] = csv_df[currDistanceCol].rolling(roll_windows[i], min_periods=1).sum()
 
-        print('Calculating body part movements...')
-        ########### BODY PART MOVEMENTS RELATIVE TO EACH OTHER ###########################################
-        movementDiffcols = []
-        for idx in range(len(movementColNames)-1):
-            for idy in range(idx+1, len(movementColNames)):
-                colName = 'Movement_difference_' + movementColNames[idx] + '_' + movementColNames[idy]
-                movementDiffcols.append(colName)
-                csv_df[colName] = abs(csv_df[movementColNames[idx]]-csv_df[movementColNames[idy]])
-                movementDiffcols.append(colName)
-                csv_df[colName] = abs(csv_df[movementColNames[idx]]-csv_df[movementColNames[idy]])
-
-        print('Calculating deviations and rank...')
-
-        ########### DEVIATIONS FROM MEAN ###########################################
-        combinedLists_2 = combinedLists_1 + movementDiffcols
-        for column in combinedLists_2:
-            colName = str('Deviation_from_median_') + column
-            csv_df[colName] = csv_df[column].mean() - csv_df[column]
-
-        ########### PERCENTILE RANK ###########################################
-        combinedLists_2 = combinedLists_1 + movementDiffcols
-        for column in combinedLists_2:
-            colName = 'Rank_' + column
-            csv_df[colName] = csv_df[column].rank(pct=True)
+        print('Calculating rolling windows data: animal movements')
+        for i in range(len(roll_windows_values)):
+            for animal in collapsedColNamesMean:
+                colName = 'Mean_' + str(animal) + '_' + str(roll_windows_values[i])
+                csv_df[colName] = csv_df[animal].rolling(roll_windows[i], min_periods=1).mean()
+                colName = 'Sum_' + str(animal) + '_' + str(roll_windows_values[i])
+                csv_df[colName] = csv_df[animal].rolling(roll_windows[i], min_periods=1).sum()
 
         ########### CALC THE NUMBER OF LOW PROBABILITY DETECTIONS & TOTAL PROBABILITY VALUE FOR ROW###########################################
         print('Calculating pose probability scores...')
-        probabilityDf = csv_df.filter(p_cols, axis=1)
+        probabilityDf = csv_df.filter(Pcols, axis=1)
         csv_df['Sum_probabilities'] = probabilityDf.sum()
         csv_df['Mean_probabilities'] = probabilityDf.mean()
         values_in_range_min, values_in_range_max = 0.0, 0.1
@@ -147,13 +164,12 @@ def extract_features_wotarget_user_defined(inifile):
         csv_df["Low_prob_detections_0.75"] = probabilityDf.apply(func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
 
         ########### SAVE DF ###########################################
-        #csv_df = csv_df.loc[:, ~csv_df.T.duplicated(keep='first')]
         csv_df = csv_df.reset_index(drop=True)
         csv_df = csv_df.fillna(0)
-        #csv_df = csv_df.drop(columns=['index'])
         fileOutName = os.path.basename(currentFile)
         savePath = os.path.join(csv_dir_out, fileOutName)
-        csv_df.to_csv(savePath)
+        print('Saving features...')
+        save_df(csv_df, wfileType, savePath)
         print('Feature extraction complete for ' + '"' + str(currVidName) + '".')
 
     print('All feature extraction complete.')

@@ -19,6 +19,8 @@ def extract_features_wotarget_16(inifile):
     csv_dir_in, csv_dir_out = os.path.join(projectPath, 'csv', 'outlier_corrected_movement_location'), os.path.join(projectPath,'csv', 'features_extracted')
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    #change videos name to str
+    vidinfDf.Video = vidinfDf.Video.astype('str')
 
     def count_values_in_range(series, values_in_range_min, values_in_range_max):
         return series.between(left=values_in_range_min, right=values_in_range_max).sum()
