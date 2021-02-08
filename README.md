@@ -9,8 +9,9 @@
 | | |
 |-|-|
 |**SimBAxTF**|[![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf)|
-| **SimBA w/o TF**|[![Downloads](https://pepy.tech/badge/simba-uw-no-tf/month)](https://pepy.tech/project/simba-uw-no-tf)|
 |**SimBAxTF-development wheel**|[![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev)|
+
+SimBA no longer requires tensorflow. SimBAxTF is the stable branch and SimBAxTF-development wheel is the most up-to-date, but potentially buggy, release.
 
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
