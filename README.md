@@ -16,21 +16,24 @@ SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development 
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
-## Feb-03-2021: SimBA version 1.3 release
+## Feb-08-2021: SimBA version 1.3 release
 
-Please update it using `pip install simba-uw-tf==1.3.5`, [this version](https://pypi.org/project/Simba-UW-tf/) has the deeplabcut and deepposekit disabled. Hence, no tensorflow is needed. If you want to use deeplabcut and deepposekit using SimBA, please let us know in the [![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community) and we will figure it out.
+It has been nearly a year since the first public iteration of SimBA was released! We would like to thank the open-source community who have supported us and provided invaluable feedback and motivation to continue developing and supporting SimBA to where it is now. We have recently passed well over 150,000 downloads via pip install across all branches, and average between ~5000 to 10,000 weekly downloads alongside a gitter community of >100 users. We have just passed 15 citations for the SimBA preprint, which was released ~8 months ago. This would not be possible without your support. Thank you.
 
-The current simba-uw-no-tf is still under maintenance, we will keep you posted!
+The newest release of SimBA, v1.3, provides a significant jump in features, quality of life improvements, and bug fixes. Several are highlighted below.
 
-### New Features
-- ROI Visualization update - [Documentation](/docs/ROI_tutorial.md)
-- User define features extraction - Allow user to run self customized feature extraction script
-- Quick line plot - Allow user to make line plots with selected bodypart and tracking data.(located under **Tools**)
+Please update using `pip install simba-uw-tf==1.3.5`, [this version](https://pypi.org/project/Simba-UW-tf/) has native deeplabcut and deepposekit GUI support disabled. Hence, tensorflow is not needed. Pose-estimation developers have created excellent GUIs for their pipelines, and we do a disservice to you by not supporting the most updated versions. SimBA now supports pose-estimation dataframe imports from Deeplabcut, DeepPoseKit, SLEAP, MARS and others. If you are developing a new pose-estimation method and would like it directly supported in SimBA, please let us know! 
+
+### Selected New Features
 - Easy install of SimBA via `pip` - [Documentation](/docs/installation.md)
 - Install simba using anaconda - [Documentation](/docs/anaconda_installation.md)
-- Labelling behaviors with more third-party apps - [Documentation](/docs/third_party_annot.md)
-- Plotly - [Documentation](/docs/plotly_dash.md)
-- Kleinberg Filter - [Documentation](/docs/kleinberg_filter.md)
+- Introduction of SHAP for behavioral neuroscience classifier explainability and standarization- [Documentation](/docs/SHAP.md)
+- Plotly integration for immediate data visualization - [Documentation](/docs/plotly_dash.md)
+- Labelling/annotating behaviors with many third-party apps - [Documentation](/docs/third_party_annot.md)
+- Kleinberg Filter for smoothing - [Documentation](/docs/kleinberg_filter.md)
+- ROI Visualization update - [Documentation](/docs/ROI_tutorial.md)
+- User define features extraction - Allow user to run self customized feature extraction script
+- Quick line plot - Allow user to make line plots with selected bodypart and tracking data (located under **Tools**)
 - Many, many, many, many bug-fixes
 
 
