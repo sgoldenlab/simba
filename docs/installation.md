@@ -40,6 +40,7 @@ simba
 
 
 # Anaconda installation
+Click [here](/docs/anaconda_installation.md) for a step by step guide on how to install using anaconda.
 
 1. Open up terminal of your environment
 
@@ -55,13 +56,6 @@ simba
 
 `conda install -c conda-forge shapely`
 
-5. Then, install shape,
-
-`pip install shap`
-
-6. Lastly, install h5py,
-
-`pip install h5py`
 
 # Installing on MacOS
 
