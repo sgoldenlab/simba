@@ -24,11 +24,11 @@
 
 ![](/images/anastep4.PNG)
 
-7. Once it is installed, uninstall shapely,
+7. Once it is installed, uninstall shapely, it will then prompt `Proceed([y]/[n])?`, type `y`.
 
 `pip uninstall shapely`
 
-8. Then reinstall using the following command,
+8. Then reinstall using the following command, it will then prompt `Proceed([y]/[n])?`, type `y`.
 
 `conda install -c conda-forge shapely`
 
