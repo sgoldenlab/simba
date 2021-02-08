@@ -20,7 +20,7 @@
 
 ![](/images/anastep3.png)
 
-6. In the terminal, type  `pip install simba-uw-no-tf`
+6. In the terminal, type  `pip install simba-uw-tf`
 
 ![](/images/anastep4.PNG)
 
