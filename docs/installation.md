@@ -1,4 +1,4 @@
-# SimBA
+# SimBA Installation
 
 # Requirements
 1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- VALIDATED WITH 3.6.0**
