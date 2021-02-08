@@ -1,12 +1,4 @@
-# SimBAxTF or SimBA?
-**!!! IMPORTANT !!!**
-You can choose to install SimBA as a standalone package or install SimBA with [TensorFlow](https://github.com/tensorflow/tensorflow) integration.  
-
-1) If you would like to be able to call [DeepLabCut](https://github.com/AlexEMG/DeepLabCut) or [DeepPoseKit](https://github.com/jgraving/DeepPoseKit) commands via the SimBA interface (whuch requires a local GPU), please install SimBAxTF from the **master** branch. Please see the SimBA tutorials on [DeepLabCut](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md) or [DeepPoseKit](https://github.com/sgoldenlab/simba/blob/master/docs/DeepPoseKit_in_SimBA.md) for information on what it means to run DeepLabCut and DeepPoseKit within the SimBA GUI. **See full installation instructions below.**
-
-2) If you do **not** want to use TensorFlow through SimBA on your local machine, and instead have DeepLabCut/DeepPoseKit/SLEAP installed elsewhere, please install SimBA from the **SimBA_no_TF** branch. This does not require a GPU, or local installations of DeepLabCut, DeepPoseKit, or SLEAP. Please see full instructions below. This non-TF version of SimBA includes **all functionalities** of SimBAxTF, except for the ability to generate pose-estimation models through the SimBA GUI. **Pose-estmation model results can still be imported and analysed**.
-
-3) If you are on a Linux machine (or Mac or Windows PC), or you just want to work with a far speedier (and buggier!!) version of SimBA then run the  **SimBAxTF-dev** version. This version is the same as the SimBAxTF, but contains the latest and the greatest tools (most undocumented, as yet) for explainable and interpretable supervised models for behavioral neuroscience.  
+# SimBA
 
 # Requirements
 1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- VALIDATED WITH 3.6.0**
@@ -16,18 +8,11 @@ You can choose to install SimBA as a standalone package or install SimBA with [T
 
 # Installing SimBA Option 1 (RECOMMENDED!)
 
-### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut, DeepPoseKit, or SLEAP locally using a GPU)
+### Install SimBAxTF 
 Open bash or command prompt and run the following commands on current working directory
 
 ```
 pip install simba-uw-tf
-```
-
-### Install SimBA standalone package (without TensorFlow or integrated DeepLabCut/DeepPoseKit support)
-Open bash or command prompt and run the following commands on current working directory
-
-```
-pip install simba-uw-no-tf
 ```
 
 ### Install SimBAxTF-development version
@@ -53,38 +38,6 @@ simba
 
 >*Note:* If you installed SimBA on a virtual environment (anaconda), after installation, you may have to run run `conda install shapely` for SimBA to work.
 
-
-# Installing SimBA Option 2
-
-### Install SimBAxTF with integrated TensorFlow (use this installation method when running DeepLabCut or DeepPoseKit locally using a GPU)
-Open bash or command prompt and run the following commands on current working directory
-
-```
-git clone -b master https://github.com/sgoldenlab/simba.git
-
-pip3 install -r simba/simba/requirements.txt
-```
-
-### Install SimBA standalone package (without TensorFlow or integrated DeepLabCut/DeepPoseKit support)
-Open bash or command prompt and run the following commands on current working directory
-
-```
-git clone -b SimBA_no_TF https://github.com/sgoldenlab/simba.git
-
-pip3 install -r simba/SimBA/requirements.txt
-```
-
-# How to launch SimBA (installing by cloning)
-
-1. Open up command prompt in the SimBA folder
-
-2. In the command prompt type
-```
-python SimBA.py
-```
-3. Hit `Enter`.
-
->*Note:* For this launch to work you need to [add python to the environmental path](https://datatofish.com/add-python-to-windows-path/). 
 
 # Anaconda installation
 
