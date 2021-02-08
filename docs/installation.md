@@ -40,7 +40,7 @@ simba
 
 
 # Anaconda installation
-Click [here](/docs/anaconda_installation.md) for a step by step guide on how to install using anaconda.
+Click [here](/docs/anaconda_installation.md) for a detail step by step guide on how to install using anaconda.
 
 1. Open up terminal of your environment
 
