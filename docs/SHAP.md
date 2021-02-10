@@ -85,6 +85,7 @@ The last four columns of the `SHAP_values_copulation_prediction.csv` file contai
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP6.png" />
 </p>
 
-The first of these 4  columns (`Expected_value`), contains the baseline probability value. That is - in this toy example - if you picked a frame at random, there is a 0.7693% chance that the frame contains the target behavior `copulation`. 
+The first of these 4  columns (`Expected_value`), contains the baseline probability value. That is - in this toy example - if you picked a frame at random, there is a 7.
+693% chance that the frame contains the target behavior `copulation`. 
 
 The second column (`Sum`) contains the sum of all of the SHAP values for each individual frame. The third column (`Prediction_probability`) is the classifiers probability for the presence of the behavior in each individual frame. **These two columns are generated as a sanity check, because the final prediction probability seen in the `Prediction_probability` column should equal the sum of all the SHAP values seen in the `Sum` column**. If the values in these two columns are **not** identical, then something has gone astray. Check in with us on the [Gitter chat channel](https://gitter.im/SimBA-Resource/community) or raise a an issue and we may be able to help. The fourth column (`copulation_prediction`) will read either 0 or 1, and tell you if this particular frame was annotated as containing the behavior of interest (`1`), or **not** containing the behavior of interest (`0`). 
