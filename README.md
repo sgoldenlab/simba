@@ -22,7 +22,7 @@ It has been nearly a year since the first public iteration of SimBA was released
 
 The newest release of SimBA, v1.3, provides a significant jump in features, quality of life improvements, and bug fixes. Several are highlighted below.
 
-Please update using `pip install simba-uw-tf==1.3.5`, [this version](https://pypi.org/project/Simba-UW-tf/) has native deeplabcut and deepposekit GUI support disabled. Hence, tensorflow is not needed. Pose-estimation developers have created excellent GUIs for their pipelines, and we do a disservice to you by not supporting the most updated versions. SimBA now supports pose-estimation dataframe imports from Deeplabcut, DeepPoseKit, SLEAP, MARS and others. If you are developing a new pose-estimation method and would like it directly supported in SimBA, please let us know! 
+Please update using `pip install simba-uw-tf==1.3.7`, [this version](https://pypi.org/project/Simba-UW-tf/) has native deeplabcut and deepposekit GUI support disabled. Hence, tensorflow is not needed. Pose-estimation developers have created excellent GUIs for their pipelines, and we do a disservice to you by not supporting the most updated versions. SimBA now supports pose-estimation dataframe imports from Deeplabcut, DeepPoseKit, SLEAP, MARS and others. If you are developing a new pose-estimation method and would like it directly supported in SimBA, please let us know! 
 
 ### Selected New Features
 - Easy install of SimBA via `pip` - [Documentation](/docs/installation.md)
