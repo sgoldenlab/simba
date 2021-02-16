@@ -45,7 +45,7 @@ Click [here](/docs/anaconda_installation.md) for a detail step by step guide on 
 
 2. In the terminal type 
 
-`pip install simba-uw-no-tf`
+`pip install simba-uw-tf`
 
 3. It will error out when running simba. To fix it, first uninstall shapely.
 
