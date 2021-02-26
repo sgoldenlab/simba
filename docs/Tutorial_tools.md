@@ -6,6 +6,7 @@ We have developed video and image processing tools and incorporated them into th
 ![alt-text-1](/images/toolsmenu.png)
 
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
+- [Clip video into multiple videos]()
 - [Crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
 - [Fixed Crop Videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#fixed-crop-videos)
 - [Multi-crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos)
@@ -55,6 +56,25 @@ Let's say we have a 2 minute long video and we want to get rid of the first 20 s
 ![alt-text-1](/images/shortenvideos3.PNG "shortenvideos3")
 
 2. Click `Cut Video` to trim video and a new shorten video will be generated, the new video will have a name of *Name of original video* + *_shorten* and will be located in the same folder as the original video.
+
+## Clip video into multiple videos
+This tool can help users to cut the videos into multiple clips/section.
+
+1. Click on the `Clip video into multiple videos` from the `Tools` section.
+
+![](/images/clipmulti1.png)
+
+2. Select the video that you want to split/clip by clicking `Browse File`
+
+![](/images/clipmulti2.png)
+
+3. Put in the number of output clips/sections that you want in `# of clips`, and click `Confirm`. Please note that if you put in the wrong number the first time, you can re-enter the number and click `Confirm` to change the table.
+
+![](/images/clipmulti3.png)
+
+4. Then enter the `Start Time` and `Stop Time` in the following format HH:MM:SS. For example, for a minute and 20 seconds it will be 00:01:20.
+
+5. Once the table has been filled, click `Clip video` and the video will be output on the same folder path/ directory of your original video.
 
 ## Crop Video
 This is a tool to crop videos.
