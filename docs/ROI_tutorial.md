@@ -105,6 +105,14 @@ Once complete, a statement will be printed in the main SimBA terminal window not
 * One file will be named `ROI_entry_data` and contain the number of entries into the different ROIs. It also contains the percent of entries into each ROI over all of the ROI entries. For an expected output ROI entry CSV file, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_entry_data_example.csv).
 * A second file, named `ROI_time_data`, contain the time spent in in seconds the different ROIs. It also contains the percent of the session time spent in each of the ROIs. For an expected output ROI time CSV file, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_data_example.csv).
 
+*Note*: As of Feb-26 2021, the SimBA ROI analysis also generates a sub-folder within the `Project_folder/logs` directory named **`Detailed_ROI_analysis`**. This folder contains additional information, with exact time-stamps of when animals enter and exits user-drawn ROIs. For each analysed video, SimBA will generate one date-time stamped CSV file located in the `project_folder/logs/Detailed_ROI_analysis` directory. These CSV files files will contain 4 columns: `Animal_name`, `Shape_name`, `Entry_frame`, and `Exit_frame`, and look something like this:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_022021_2.png" />
+</p>
+
+Consult these files if you want to know the exact frame numbers when animals entered and exited your drawn ROIs. If you want to convert the frame numbers to time-stamps, then divide these numbers with the fps of the video. 
+
 # Part 3. Generating features from ROI data. 
 
 1. With the ROI information, we can generate several further features that might be useful for predicting behaviors, or be handy within other third-party applications. For each frame of the video, the following features can be added to a previously calculated battery of features:
