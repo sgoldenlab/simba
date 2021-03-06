@@ -17,12 +17,15 @@ The FSTTC may be helpful to answer questions such as:
 
 Note that SimBA will calculate the FSTTC for all the behaviors selected by the user, and SimBA does **not** require there to be two or more tracked animals.  
 
->Note: Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces statistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f) techniques but we don't have time to get into that. 
+>Note: Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces stastistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f) techniques but.. yeah.. we don't have time to get into that :)
 
 
 ## Part 1: Generate a dataset.
 
 First, SimBA needs classified data to calculate the FSTTC. SimBA will look in the `project_folder/csv/machine_results` directory for files, and calculate the FSTTC scores for all the files in this folder. Thus, before calculating the FSTTC, make sure that you have run your classifiers on your data as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model). In other words, make sure you have processed your data as documented in the [Scenario 1 Tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md), up to and including [Step 8](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model).
+
+
+
 
 
 
