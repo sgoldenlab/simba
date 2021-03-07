@@ -27,7 +27,7 @@ For the connoisseurs, the FSTCC is calculated as:
 
 Where  Δt parameter is a time-window (e.g 2000ms - Lee et al. 2019). P is the proportion of behavior B onsets that fall inside Δt following the onset of behavior A. TA is the proportion of the total session time that falls inside Δt following behavior A onset. TB is the proportion of the total session time that falls inside Δt following behavior B onset.
 
->Note: Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces stastistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f) techniques but.. yeah.. we don't have time to get into that :)
+>Note: Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces stastistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f) techniques but.. yeah.. this works and RL is complicated :)
 
 
 ## Part 1: Generate a dataset.
@@ -35,9 +35,45 @@ Where  Δt parameter is a time-window (e.g 2000ms - Lee et al. 2019). P is the p
 First, SimBA needs classified data to calculate the FSTTC. SimBA will look in the `project_folder/csv/machine_results` directory for files, and calculate the FSTTC scores for all the files in this folder. Thus, before calculating the FSTTC, make sure that you have run your classifiers on your data as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model). In other words, make sure you have processed your data as documented in the [Scenario 1 Tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md), up to and including [Step 8](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model).
 
 
+## Part 2: Perform FSTTC analysis.
+
+[Load you SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config), and click on the `[Run machine model]` tab. *Run Machine Model* submenu, you should see a button named `FSTTC`. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_11.png" />
+</p>
+
+Go ahead and click on it, and you should see the following menu pop up:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_12.png" />
+</p>
+
+
+In this menu, we need to insert some settings for telling SimBA how to perform the FSTTC:
+
+* `Create graph`: If you tick this box, SimBA will create and save a violin plot of the FSTTC representating all the videos in you project. This can be helpful to get a quick overview of the data. The graph will be saved as a time-stamped `.png` file in the `project_folder/logs` directory, and be named something like `FSTTC_20210307071243.png`. It will look something like this, with the FSTTC is on the y-axis, and the dyadic pairwise behaviors on the x-axis. On the x-axis, the first behavior name is behavior A, and the second behavior name is behavior B. Thus, in the image below, the first violin represents the FSTTC for **Lateral threat** behavior followed by **Attack** behavior. 
+
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/FSCTT_3.png" />
 </p>
+
+* Time Delta: The FSTTC needs a single hyperparameter - time delta - which should be expressed in milliseconds. This is a time-window following behavior A onset. If the expression of behavior B happens within time-delta, then we consider behavior B as produced by behavior A. If unsure, start with a time-delta of 2000ms [Lee et al, 2019](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596). 
+
+* Behaviors: Go ahead and tick the behaviors in your project that you want to calculate FSTTC's for. SimBA will calculate FSTTC's for all possible pairwise combinations of the behaviors you tick. 
+
+Once done, go ahead and click on `Caluclate FSTTC`. You can follow the progress in the main SimBA terminal window. 
+
+## Part 3: Interpreting the FCSST output results.
+
+
+
+
+
+
+
+
+
 
 
 
