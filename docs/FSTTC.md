@@ -82,7 +82,7 @@ This file contains one row for every video in your project, and one column for e
 
 * If the video contained no expression of behavior A, and no expression of behavior B, then the FSTTC cell value will read `No events`.
 
->Note: If you ticked the box for `Create graph` in **Step 2** above, you will also have a violin plot in `project_folder/logs` directory. In this violin plot, videos that neither expression of behavior A nor expression of behavior B have been omitted fron the calculation. 
+>Note: If you ticked the box for `Create graph` in **Step 2** above, you will also have a violin plot in `project_folder/logs` directory. In this violin plot, videos that has neither expression of behavior A nor expression of behavior B have been omitted fron the calculation. 
 
 
 
