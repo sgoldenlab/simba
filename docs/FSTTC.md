@@ -30,12 +30,12 @@ Where  Δt parameter is a time-window (e.g 2000ms - Lee et al. 2019). P is the p
 >Note: Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces stastistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f) techniques but.. yeah.. this works and RL is complicated :)
 
 
-## Part 1: Generate a dataset.
+## Step 1: Generate a dataset.
 
 First, SimBA needs classified data to calculate the FSTTC. SimBA will look in the `project_folder/csv/machine_results` directory for files, and calculate the FSTTC scores for all the files in this folder. Thus, before calculating the FSTTC, make sure that you have run your classifiers on your data as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model). In other words, make sure you have processed your data as documented in the [Scenario 1 Tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md), up to and including [Step 8](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model).
 
 
-## Part 2: Perform FSTTC analysis.
+## Step 2: Perform FSTTC analysis.
 
 [Load you SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config), and click on the `[Run machine model]` tab. *Run Machine Model* submenu, you should see a button named `FSTTC`. 
 
@@ -64,7 +64,22 @@ In this menu, we need to insert some settings for telling SimBA how to perform t
 
 Once done, go ahead and click on `Caluclate FSTTC`. You can follow the progress in the main SimBA terminal window. 
 
-## Part 3: Interpreting the FCSST output results.
+## Step 3: Interpreting the FCSST results output.
+
+Inside your `project_folder/logs` directory, you will have a time-stamped CSV file - which is named something like `FSTTC_20210307071243.csv` - and contains the results for each of the video in your project. If you open it up, it will look like this (click on the image to enlarge):
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_13.png" />
+</p>
+
+This file contains one row for every video in your project, and one column for every pairwise behavior combination of the behaviors you selected in **Step 2** above. So, for example, if you want the FSTTC for video `CSDS01110` and `Lateral threat -> Attack`, look in cell C2. 
+
+* If the video contained no expression of behavior B, but expression of behavior A, then the FSTTC cell value will read `0`. 
+
+* If the video contained no expression of behavior A, and no expression of behavior B, then the FSTTC cell value will read `No events`.
+
+Next, if you ticked the box for `Create graph` in **Step 2** above, you will also have a violin plot in `project_folder/logs` directory. 
+
 
 
 
