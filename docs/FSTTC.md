@@ -68,7 +68,7 @@ In this menu, we need to insert some settings for telling SimBA how to perform t
 
 Once done, go ahead and click on `Caluclate FSTTC`. You can follow the progress in the main SimBA terminal window. 
 
-## Step 3: Interpreting the FCSST results output.
+## Step 3: Interpreting the FSTTC results output.
 
 Inside your `project_folder/logs` directory, you will have a time-stamped CSV file - which is named something like `FSTTC_20210307071243.csv` - and contains the results for each of the video in your project. If you open it up, it will look like this (click on the image to enlarge):
 
