@@ -21,7 +21,7 @@ In short, FSTTC may be helpful to answer questions such as:
 
 ... etc etc.
 
-Note that SimBA will calculate the FSTTC for all the behaviors selected by the user, and SimBA does **not** require there to be two or more tracked animals.
+Note that SimBA will calculate the FSTTC for all the behaviors selected by the user, and SimBA does **not** require there to be two, or more, tracked animals.
 
 The FSTCC is calculated as:
 
@@ -29,9 +29,9 @@ The FSTCC is calculated as:
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_2.png" />
 </p>
 
-Where the Δt hyper-parameter is a time-window (e.g 2000ms - Lee et al. 2019). P is the proportion of behavior B onsets that fall inside Δt following the onset of behavior A. TA is the proportion of the total session time that falls inside Δt following behavior A onset. TB is the proportion of the total session time that falls inside Δt following behavior B onset.
+Where the Δt hyper-parameter is a time-window (e.g 2000ms - Lee et al. 2019). P is the proportion of behavior B onsets that fall inside Δt following the onset of behavior A. T<sub>A</sub> is the proportion of the total session time that falls inside Δt following behavior A onset. T<sub>B</sub>  is the proportion of the total session time that falls inside Δt following behavior B onset.
 
->Note: Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces stastistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f) techniques but.. yeah.. this works and RL is complicated :)
+>Note: Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces statistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f) techniques but.. yeah.. this works and RL have to wait.. :)
 
 
 ## Step 1: Generate a dataset.
@@ -41,7 +41,7 @@ First, SimBA needs classified data to calculate the FSTTC. SimBA will look in th
 
 ## Step 2: Perform FSTTC analysis.
 
-[Load you SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config), and click on the `[Run machine model]` tab. *Run Machine Model* submenu, you should see a button named `FSTTC`. 
+[Load you SimBA project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config), and click on the `[Run machine model]` tab. In the *Run Machine Model* submenu, you should see a button named `FSTTC`. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_11.png" />
@@ -54,15 +54,15 @@ Go ahead and click on it, and you should see the following menu pop up:
 </p>
 
 
-In this menu, we need to insert some settings for telling SimBA how to perform the FSTTC:
+In this menu, we need to insert some settings telling SimBA how to perform the FSTTC:
 
-* `Create graph`: If you tick this box, SimBA will create and save a violin plot of the FSTTC representating all the videos in you project. This can be helpful to get a quick overview of the data. The graph will be saved as a time-stamped `.png` file in the `project_folder/logs` directory, and be named something like `FSTTC_20210307071243.png`. It will look something like this, with the FSTTC is on the y-axis, and the dyadic pairwise behaviors on the x-axis. On the x-axis, the first behavior name is behavior A, and the second behavior name is behavior B. Thus, in the image below, the first violin represents the FSTTC for **Lateral threat** behavior followed by **Attack** behavior. 
+* `Create graph`: If you tick this box, SimBA will create and save a violin plot of the FSTTC representating all the videos in you project. This can be helpful to get a quick overview of the data. The graph will be saved as a time-stamped `.png` file in the `project_folder/logs` directory, and be named something like `FSTTC_20210307071243.png`. It will look something like this image below (click on the image to enlarge), with the FSTTC is on the y-axis, and the dyadic pairwise behaviors on the x-axis. On the x-axis, the first behavior name is behavior A, and the second behavior name is behavior B. Thus, in the image below, the first violin represents the FSTTC for **Lateral threat** behavior followed by **Attack** behavior. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_violin.png" />
 </p>
 
-* Time Delta: The FSTTC needs a single hyperparameter - time delta - which should be expressed in milliseconds. This is a time-window following behavior A onset. If the expression of behavior B happens within time-delta, then we consider behavior B as produced by behavior A. If unsure, start with a time-delta of 2000ms [Lee et al, 2019](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596). 
+* Time Delta: The FSTTC needs a single hyperparameter - time delta - which should be expressed in milliseconds. This represents the length of the time-window following behavior A onset. If the expression of behavior B happens within time-delta, then we will consider behavior B as produced by behavior A. If unsure, start with a time-delta of 2000ms [Lee et al, 2019](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596). 
 
 * Behaviors: Go ahead and tick the behaviors in your project that you want to calculate FSTTC's for. SimBA will calculate FSTTC's for all possible pairwise combinations of the behaviors you tick. 
 
@@ -70,7 +70,7 @@ Once done, go ahead and click on `Caluclate FSTTC`. You can follow the progress 
 
 ## Step 3: Interpreting the FSTTC results output.
 
-Inside your `project_folder/logs` directory, you will have a time-stamped CSV file - which is named something like `FSTTC_20210307071243.csv` - and contains the results for each of the video in your project. If you open it up, it will look like this (click on the image to enlarge):
+Once done, inside your `project_folder/logs` directory, you will have a time-stamped CSV file - which is named something like `FSTTC_20210307071243.csv` - and contains the results for each of the videos in your project. If you open it up, it will look like this (click on the image to enlarge):
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_13.png" />
@@ -82,7 +82,7 @@ This file contains one row for every video in your project, and one column for e
 
 * If the video contained no expression of behavior A, and no expression of behavior B, then the FSTTC cell value will read `No events`.
 
->Note: If you ticked the box for `Create graph` in **Step 2** above, you will also have a violin plot in `project_folder/logs` directory. In this violin plot, videos that has neither expression of behavior A nor expression of behavior B have been omitted fron the calculation. 
+>Note: If you ticked the box for `Create graph` in **Step 2** above, you will also have a violin plot in `project_folder/logs` directory. In this violin plot, videos that has neither expression of behavior A nor expression of behavior B have been omitted from the graph calculation. 
 
 
 
