@@ -5,7 +5,7 @@
 </p>
 
 
-When classifying mutiple behaviors in SimBA, we may be interested in causal sequences. For example, does behaviour A cause the expression of behaviour B, or does behavior B cause the expression of behavior A (... and so one for all the different pairwise behavior combinations of interest).
+When classifying mutiple behaviors in SimBA, we may be interested in causal sequences. For example, does behavior A cause the expression of behavior B, or does behavior B cause the expression of behavior A (... and so one for all the different pairwise behavior combinations of interest).
 
 Several statistical solutions to get to such answers have been presented (e.g., [Haccou et al. 1988](https://www.tandfonline.com/doi/abs/10.1080/00949658808811102)), and [Lee et al. (2019)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596) proposed the Forward Spike Time Tiling Coefficient (FSTTC), an adaptation of the Spike Time Tiling Coefficient ([Cutts and Eglen, 2014](https://www.jneurosci.org/content/34/43/14288.short)), to detect how behaviors initiated by one animal can trigger behavioral responses of a second animal during dyadic encounters. We urge users interested in these metrics to check out the excellent [Lee et al. (2019)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596). 
 
