@@ -55,7 +55,7 @@ In this menu, we need to insert some settings for telling SimBA how to perform t
 * `Create graph`: If you tick this box, SimBA will create and save a violin plot of the FSTTC representating all the videos in you project. This can be helpful to get a quick overview of the data. The graph will be saved as a time-stamped `.png` file in the `project_folder/logs` directory, and be named something like `FSTTC_20210307071243.png`. It will look something like this, with the FSTTC is on the y-axis, and the dyadic pairwise behaviors on the x-axis. On the x-axis, the first behavior name is behavior A, and the second behavior name is behavior B. Thus, in the image below, the first violin represents the FSTTC for **Lateral threat** behavior followed by **Attack** behavior. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSCTT_3.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_violin.png" />
 </p>
 
 * Time Delta: The FSTTC needs a single hyperparameter - time delta - which should be expressed in milliseconds. This is a time-window following behavior A onset. If the expression of behavior B happens within time-delta, then we consider behavior B as produced by behavior A. If unsure, start with a time-delta of 2000ms [Lee et al, 2019](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596). 
@@ -78,7 +78,10 @@ This file contains one row for every video in your project, and one column for e
 
 * If the video contained no expression of behavior A, and no expression of behavior B, then the FSTTC cell value will read `No events`.
 
-Next, if you ticked the box for `Create graph` in **Step 2** above, you will also have a violin plot in `project_folder/logs` directory. 
+>Note: If you ticked the box for `Create graph` in **Step 2** above, you will also have a violin plot in `project_folder/logs` directory. In this violin plot, videos that neither expression of behavior A nor expression of behavior B have been omitted fron the calculation. 
+
+
+
 
 
 
