@@ -1,5 +1,5 @@
 SimBA (Simple Behavioral Analysis)
-=====
+######
 
 
 SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development is the most up-to-date - but potentially buggy - release.
@@ -9,7 +9,8 @@ SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development 
 
 .. image:: /images/SimBA_logo_4.jpg
 
-## Feb-08-2021: SimBA version 1.3 release
+Feb-08-2021: SimBA version 1.3 release
+======
 
 It has been nearly a year since the first public iteration of SimBA was released! We would like to thank the open-source community who have supported us and provided invaluable feedback and motivation to continue developing and supporting SimBA to where it is now. We have recently passed well over 150,000 downloads via pip install across all branches, and average between ~5000 to 10,000 weekly downloads alongside a gitter community of >100 users. We have just passed 15 citations for the SimBA preprint, which was released ~8 months ago. This would not be possible without your support. Thank you.
 
@@ -17,7 +18,8 @@ The newest release of SimBA, v1.3, provides a significant jump in features, qual
 
 Please update using `pip install simba-uw-tf==1.3.7`, [this version](https://pypi.org/project/Simba-UW-tf/) has native deeplabcut and deepposekit GUI support disabled. Hence, tensorflow is not needed. Pose-estimation developers have created excellent GUIs for their pipelines, and we do a disservice to you by not supporting the most updated versions. SimBA now supports pose-estimation dataframe imports from Deeplabcut, DeepPoseKit, SLEAP, MARS and others. If you are developing a new pose-estimation method and would like it directly supported in SimBA, please let us know! 
 
-### Selected New Features
+Selected New Features
+*********
 - Easy install of SimBA via `pip` - [Documentation](/docs/installation.md)
 - Install simba using anaconda - [Documentation](/docs/anaconda_installation.md)
 - Introduction of SHAP for behavioral neuroscience classifier explainability and standarization- [Documentation](/docs/SHAP.md)
@@ -30,8 +32,10 @@ Please update using `pip install simba-uw-tf==1.3.7`, [this version](https://pyp
 - Many, many, many, many bug-fixes
 
 
-## June-12-2020: SimBA version 1.2 release
-### New Features
+June-12-2020: SimBA version 1.2 release
+===========
+New Features
+************
 - Multi-animal DLC support - [Documentation](/docs/Multi_animal_pose.md)
 - Multi-animal SLEAP support - [Documentation](/docs/Multi_animal_pose.md)
 - SimBA 'pseudo-labelling' module - [Documentation](/docs/pseudoLabel.md)
@@ -45,8 +49,10 @@ Please join our [Gitter chat](https://gitter.im/SimBA-Resource/community) if you
 
 A pre-print SimBA manuscript on bioRxiv! The manuscript details the use of SimBA for generation of social predictive classifiers in rat and mouse resident-intruder protocols - please check it out using the link above. All data, pose-estimation models, and the final classifiers generated in the manuscript, can be accessed through our [OSF repository](https://osf.io/tmu6y/) and through the [Resource](https://github.com/sgoldenlab/simba#resource-) menu further down this page.
 
-## March-05-2020: SimBA version 1.1 release
-### New Features
+March-05-2020: SimBA version 1.1 release
+===========
+New Features
+**********
 - Region of Interest support (ROI Module) - [Documentation](/docs/ROI_tutorial.md)
 - DeepPoseKit support (DPK Module) - [Documentation](/docs/DeepPoseKit_in_SimBA.md)
 - SimBA accepts user-defined pose-configurations (Flexible Annotation Module) - [Documentation](/docs/Pose_config.md)
@@ -57,7 +63,8 @@ A pre-print SimBA manuscript on bioRxiv! The manuscript details the use of SimBA
 - Post-classification validation method for false-positives - [Documentation](/docs/classifier_validation.md#classifier-validation)
 - Many, many, many bug-fixes
 
-## What is SimBA?
+What is SimBA?
+##############
 Several excellent computational frameworks exist that enable high-throughput and consistent tracking of freely moving unmarked animals. Here we introduce and distribute a plug-and play pipeline that enabled users to use these pose-estimation approaches in combination with behavioral annotation and generation of supervised machine-learning behavioral predictive classifiers. We have developed this pipeline for the analysis of complex social behaviors, but have included the flexibility for users to generate predictive classifiers across other behavioral modalities with minimal effort and no specialized computational background.  
 
 SimBA does not require computer science and programing experience, and SimBA is optimized for wide-ranging video acquisition parameters and quality. SimBA is written for Microsoft Windows. We may be able to provide support and advice for specific use instances, especially if it benefits multiple users and advances the scope of SimBA. Feel free to post issues and bugs here or contact us directly and we'll work on squashing them as they appear. We hope that users will contribute to the community!
