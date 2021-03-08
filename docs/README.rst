@@ -1,20 +1,13 @@
-# SimBA (Simple Behavioral Analysis)
+SimBA (Simple Behavioral Analysis)
+=====
 
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-pink.svg)](https://www.gnu.org/licenses/lgpl-3.0)
-[![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community)
-[![Download: Weights](https://img.shields.io/badge/Download-Weights-orange.svg)](https://osf.io/5t4y9/)
-[![SimBA: listserv](https://img.shields.io/static/v1?label=SimBA&message=listserv&color=blue)](https://docs.google.com/forms/d/e/1FAIpQLSfjbjae0XqNcl7GYOxmqvRsCveG-cmf4p4hBNNJ8gu5vPLHng/viewform)
-[![DOI](https://zenodo.org/badge/206670333.svg)](https://zenodo.org/badge/latestdoi/206670333)
-
-| | | |
-|-|-|-|
-|**SimBAxTF**|[![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf)|[![Downloads](https://pepy.tech/badge/simba-uw-tf)](https://pepy.tech/project/simba-uw-tf)|
-|**SimBAxTF-development wheel**|[![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev)|[![Downloads](https://pepy.tech/badge/simba-uw-tf-dev)](https://pepy.tech/project/simba-uw-tf-dev)|
 
 SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development is the most up-to-date - but potentially buggy - release.
 
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
-![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
+
+
+.. image:: /images/SimBA_logo_4.jpg
 
 ## Feb-08-2021: SimBA version 1.3 release
 
