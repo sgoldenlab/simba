@@ -57,7 +57,7 @@ Mouse
 
 Rat
 ----------
-![](https://github.com/sgoldenlab/simba/blob/master/images/rat_videos.gif)
+.. image:: https://github.com/sgoldenlab/simba/blob/master/images/rat_videos.gif
 
 #### SimBA GUI workflow
 ![](https://github.com/sgoldenlab/simba/blob/master/images/SimBA_tkinter_3.png)
