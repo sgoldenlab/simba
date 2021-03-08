@@ -1,5 +1,5 @@
 SimBA (Simple Behavioral Analysis)
-######
+#################
 
 
 SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development is the most up-to-date - but potentially buggy - release.
@@ -10,7 +10,7 @@ SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development 
 .. image:: /images/SimBA_logo_4.jpg
 
 Feb-08-2021: SimBA version 1.3 release
-======
+=================
 
 It has been nearly a year since the first public iteration of SimBA was released! We would like to thank the open-source community who have supported us and provided invaluable feedback and motivation to continue developing and supporting SimBA to where it is now. We have recently passed well over 150,000 downloads via pip install across all branches, and average between ~5000 to 10,000 weekly downloads alongside a gitter community of >100 users. We have just passed 15 citations for the SimBA preprint, which was released ~8 months ago. This would not be possible without your support. Thank you.
 
