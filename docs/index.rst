@@ -53,20 +53,27 @@ SimBA does not require computer science and programing experience, and SimBA is 
 
 Mouse
 ---------
+
 .. image:: https://github.com/sgoldenlab/simba/blob/master/images/mouse_videos.gif
 
 Rat
 ----------
+
 .. image:: https://github.com/sgoldenlab/simba/blob/master/images/rat_videos.gif
 
-#### SimBA GUI workflow
-![](https://github.com/sgoldenlab/simba/blob/master/images/SimBA_tkinter_3.png)
+SimBA GUI workflow
+----------
+
+.. image:: https://github.com/sgoldenlab/simba/blob/master/images/SimBA_tkinter_3.png
 
 
-## Pipeline 👷
-![](https://github.com/sgoldenlab/simba/blob/master/images/overallflow.PNG)
+Pipeline 👷
+---------
 
-## Documentation: General methods
+.. image:: https://github.com/sgoldenlab/simba/blob/master/images/overallflow.PNG
+
+Documentation: General methods
+-------------
 
 ### Step 1: [Pre-process videos](docs/tutorial_process_videos.md) 
 
