@@ -20,7 +20,6 @@ Please update using `pip install simba-uw-tf==1.3.7`, [this version](https://pyp
 
 Selected New Features
 *********
- `Documentation </docs/installation.md/>`_
 
 - Easy install of SimBA via `pip` -  `Documentation </docs/installation.md/>`_
 - Install simba using anaconda - [Documentation](/docs/anaconda_installation.md)
