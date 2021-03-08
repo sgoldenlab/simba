@@ -1,3 +1,4 @@
+#################
 SimBA (Simple Behavioral Analysis)
 #################
 
@@ -8,7 +9,7 @@ SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development 
 
 
 .. image:: /images/SimBA_logo_4.jpg
-
+================
 Feb-08-2021: SimBA version 1.3 release
 =================
 
