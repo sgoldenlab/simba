@@ -168,7 +168,7 @@ Below is a link to download trained  behavior classification models to apply it 
 
 
 ## License 📃
-This project is licensed under the GNU Lesser General Public License v3.0. Note that the software is provided 'as is', without warranty of any kind, express or implied. 
+This project is licensed under the MIT License. Note that the software is provided 'as is', without warranty of any kind, express or implied. 
 
 If you use **any** part of the code or data, please cite us! :)
 
