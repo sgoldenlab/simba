@@ -125,3 +125,12 @@ These errors are related to an update in the pypi package manager version 20.3.3
 This means there is something odd going on with this classifier, and the classifier most likely was not  created properly. Your classifier is expected to return **two** values: the probability for absence of behaviour, and probability for presence of the behaviour. In this case your classifier only returns one value. 
 
 This could happen if you did not provide the classifier with examples for **both** the presence of the behavior, and absence of the behavior, during the [behavioral annotation step](https://github.com/sgoldenlab/simba/blob/master/docs/labelling_aggression_tutorial.md). It could also happen if you only [imported annotations](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md) for the presence *or* absence of the behavior, not both. This means SimBA can't generate probability scores for the presence/absence of the behavior, as you have not provided the classifier examples of both behavioral states. [Go back and re-create your classifier](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-6-label-behavior) using annotations for both the presence AND absence of the behaviour. 
+
+## 10. When I try to correct outliers, I get an error about the wrong number of columns, for example: `Value error: Length mismatch: Expected axis has 16 elements, new values have 24`. 
+
+One possibility here is that you are importing the wrong files from SLEAP / DLC / DeepPoseKit into SimBA. For example, if you are seeing the error message as exactly stated above, you are tracking 8 body-parts, each which should have 3 columns in your CSV file (8 * 3 = 24) but SimBA can only find 16 (8 * 2 = 16) and thus one column per body-part is missing. This could happen if you are importing your hand-annotated, human, body-part annotation files (which only has 2 columns per body-part - there is no 'probability' associated with your human hand labels) rather than the actual tracking files. 
+
+If the files you are importing has a name akin to `CollectedData_MyName.csv` you are importing the **wrong** files and go back to your pose-estimation tools to generate actual machine predictions for your videos. If you are importing files with names akin to `MyVideoName_DeepCut_resnet50_Project1Nov11shuffle1_500000.csv` you are importing the right pose-estimation tracking files. 
+
+
+
