@@ -131,6 +131,3 @@ This could happen if you did not provide the classifier with examples for **both
 One possibility here is that you are importing the wrong files from SLEAP / DLC / DeepPoseKit into SimBA. For example, if you are seeing the error message as exactly stated above, you are tracking 8 body-parts, each which should have 3 columns in your CSV file (8 * 3 = 24) but SimBA can only find 16 (8 * 2 = 16) and thus one column per body-part is missing. This could happen if you are importing your hand-annotated, human, body-part annotation files (which only has 2 columns per body-part - there is no 'probability' associated with your human hand labels) rather than the actual tracking files. 
 
 If the files you are importing has a name akin to `CollectedData_MyName.csv` you are importing the **wrong** files and go back to your pose-estimation tools to generate actual machine predictions for your videos. If you are importing files with names akin to `MyVideoName_DeepCut_resnet50_Project1Nov11shuffle1_500000.csv` you are importing the right pose-estimation tracking files. 
-
-
-
