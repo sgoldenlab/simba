@@ -92,11 +92,22 @@ Likewise, if you'd like to delete all the shapes you have drawn for all of the v
 
 Here, begin by selecting the number of animals (or body-parts) you wish to produce the ROI descriptive statistics for, and then click confirm. A second sub-menu will appear below named `Choose bodyparts`. This menu will contain as many dropdown menus as the number of animals (or body-parts) selected in the  `Select number of animals` menu. Each of these drop-down menus will contain the body-parts used to track the animals in pose-estimation. Select the body-parts you wish to use when calculating the ROI entry and time data.
 
-At the bottom of this window, you'll see an entry box named `Bp probability threshold`:
+At the bottom of this window, you'll see an entry box named `Bp probability threshold` (the first arrow in the image below) and a tick box option named `calculate distance moved within ROI` (the second arrow in the image below) :
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Bp_thresh_ROI_1.png)
+![](https://github.com/sgoldenlab/simba/blob/master/images/ROI_0320_1.png)
 
-If you can, we **strongly** recommend to pre-process all videos, and remove any segments of the videos where animals are not present in the video as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md) prior to perfroming pose-estimation and importing videos into SimBA. However, if this is not possible, we can filter out out frames where probability for the pose-estimation accuracy is low, and not use these frames when we calculate the location of the animal in relation to the ROI (i.e., useful if you have an animal leaving the frame and the pose-estimation predictions are jumping all over the place). To filter out these frames, increase the probability threshold (DEFAULT = 0.0. I.e., all frames will be treated as the animal is present). 
+Regarding the **first option** in the menu above (`Bp probability threshold`): If you can, we **strongly** recommend to pre-process all videos, and remove any segments of the videos where animals are not present in the video as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md) prior to perfroming pose-estimation and importing videos into SimBA. However, if this is not possible, we can filter out out frames where probability for the pose-estimation accuracy is low, and not use these frames when we calculate the location of the animal in relation to the ROI (i.e., useful if you have an animal leaving the frame and the pose-estimation predictions are jumping all over the place). To filter out these frames, increase the probability threshold (DEFAULT = 0.0. - i.e., all frames will be treated as the animal is present). 
+
+Regarding the **second option** in the above menu above (`calculate distance moved within ROI`): This tick-box option allows you to calculate the distance (in millimeters) that each animal has moved within each of your ROIs. If you run the analysis with this box ticked, SimBA will generate a time-stamped CSV file inside your project log folder named something akin to this: `Movement_within_ROIs_20210320143608.csv`. This file contains one row for each analyzed video, and one column for each ROI and analyzed body-part. If you open this CSV up after analysis, you can excpect it to look something like this (click to enlarge):
+
+![](https://github.com/sgoldenlab/simba/blob/master/images/ROI_0320_2.png)
+
+This CSV file tells me - for example - that in `Video10`, the animal named `Animal_1` moved 1104 millimeters within the ROI shape named `rec_1` (looking in cell B2). 
+
+>Note: 
+
+
+
 
 Click `Run` to perform the ROI analysis. 
 
