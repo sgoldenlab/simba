@@ -3694,7 +3694,12 @@ class loadprojectini:
         #single video
         label_skv_single = LabelFrame(label_plotsklearnr, text='Apply to single video', font=("Helvetica", 12, 'bold'),pady=5, padx=5, fg='black')
         videodir_ = os.path.join(os.path.dirname(self.projectconfigini), 'videos')
-        vid_list_ = os.listdir(videodir_)
+        vid_list_ =[]
+        for i in os.listdir(videodir_):
+            if i.endswith(('.avi','.mp4','.mov','flv','m4v')):
+                vid_list_.append(i)
+        if not vid_list_:
+            vid_list_.append('No videos found')
         self.video_entry = DropDownMenu(label_skv_single, 'Select video', vid_list_, '15')
         self.video_entry.setChoices(vid_list_[0])
         self.videovar2 = IntVar()
@@ -5004,11 +5009,11 @@ class loadprojectini:
         elif groupPath.endswith('.csv'):
             print('Reading in',os.path.basename(groupPath))
 
-        self.p = subprocess.Popen([sys.executable, r'simba\SimBA_dash_app.py', filePath, groupPath])
+        self.p = subprocess.Popen([sys.executable, os.path.join(os.path.dirname(__file__),'SimBA_dash_app.py'), filePath, groupPath])
         # csvPath = os.path.join(os.path.dirname(self.projectconfigini),'csv')
         # p = subprocess.Popen([sys.executable, r'simba\SimBA_dash_app.py', filePath, groupPath, csvPath])
         wait_for_internet_connection(url)
-        self.p2 = subprocess.Popen([sys.executable, r'simba\run_dash_tkinter.py', url])
+        self.p2 = subprocess.Popen([sys.executable, os.path.join(os.path.dirname(__file__),'run_dash_tkinter.py'), url])
         subprocess_children = [self.p, self.p2]
         atexit.register(terminate_children, subprocess_children)
 
