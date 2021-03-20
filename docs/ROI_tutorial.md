@@ -104,10 +104,7 @@ Regarding the **second option** in the above menu above (`calculate distance mov
 
 This CSV file tells me - for example - that in `Video10`, the animal named `Animal_1` moved 1104 millimeters within the ROI shape named `rec_1` (looking in cell B2). 
 
->Note: 
-
-
-
+>A short note on how simba calculates *movements within ROIs*: Pose-estimation tracking data can contain significant jitter. That means that even if the animal is standing still, the tracked body-part location can "jump around" a few pixels between sequential frames. Thus, if we calculate the movements of the body-parts between each sequential frame and add it up, it appears that the animal is moving a lot more than it actually is. To solve this, we bin the data into seconds, and calculate the movement of the body-part at the beginning of the second till the end of that second, and sum those values to get the *movement distance of the animal*. 
 
 Click `Run` to perform the ROI analysis. 
 
