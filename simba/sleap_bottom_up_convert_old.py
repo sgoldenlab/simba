@@ -7,8 +7,7 @@ from pylab import *
 import numpy as np
 import operator
 from functools import reduce
-from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError
-from simba.rw_dfs import *
+from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError
 
 def importSLEAPbottomUP(inifile, dataFolder, currIDList):
     def func(name, obj):
@@ -27,17 +26,15 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
     except MissingSectionHeaderError:
         print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     projectPath = config.get('General settings', 'project_path')
-    animalIDs = config.get('Multi animal IDs', 'id_list')
-    currIDList = animalIDs.split(",")
-
     filesFound = glob.glob(dataFolder + '/*.slp')
     videoFolder = os.path.join(projectPath, 'videos')
     outputDfFolder = os.path.join(projectPath, 'csv', 'input_csv')
     try:
         wfileType = config.get('General settings', 'workflow_file_type')
-    except NoOptionError:
+    except NoSectionError:
         wfileType = 'csv'
     animalsNo = len(currIDList)
+    print(animalsNo)
     bpNamesCSVPath = os.path.join(projectPath, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
     poseEstimationSetting = config.get('create ensemble settings', 'pose_estimation_body_parts')
     print('Converting .slp into csv dataframes...')
@@ -48,13 +45,7 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
         f = h5py.File(filename, 'r')
         bpNames, orderVarList, OrderedBpList, MultiIndexCol, dfHeader, csvFilesFound, colorList, xy_heads, bp_cord_names, bpNameList, projBpNameList = [], [], [], [], [], [], [], [], [], [], []
         final_dictionary = f.visititems(func)
-        try:
-            videoName = os.path.basename(final_dictionary['provenance']['video.path']).replace('.mp4', '')
-        except KeyError:
-            videoName = filename.replace('.slp', '')
-            print('Warning: The video name could not be found in the .SLP meta-data table')
-            print('SimBA therefore gives the imported CSV the same name as the SLP file.')
-            print('To be sure that SimBAs slp import function works, make sure the .SLP file and the associated video file has the same file name - e.g., "Video1.slp" and "Video1.slp" borefore importing the videos and SLP files to SimBA.')
+        videoName = os.path.basename(final_dictionary['provenance']['video.path']).replace('.mp4', '')
         savePath = os.path.join(outputDfFolder, videoName + '.csv')
         for bpName in final_dictionary['nodes']: bpNames.append((bpName['name']))
         skeletonOrder = final_dictionary['skeletons'][0]['nodes']
@@ -64,12 +55,10 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
         with h5py.File(filename, 'r') as f:
             frames = f['frames'][:]
             instances = f['instances'][:]
-
             predicted_points = f['pred_points'][:]
             predicted_points = np.reshape(predicted_points, (predicted_points.size, 1))
 
         ### CREATE COLUMN IN DATAFRAME
-
         for animal in range(len(currIDList)):
             for bp in OrderedBpList:
                 colName1, colName2, colName3 = str('Annimal' + str(animal) + '_' + bp + '_x'), ('Annimal' + str(animal) + '_' + bp + '_y'), ('Annimal' + str(animal) + '_' + bp + '_p')
@@ -85,11 +74,9 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
             f.close
 
         bpNameListGrouped = [xy_heads[x:x + len(OrderedBpList) * 2] for x in range(0, len(xy_heads) - 2, len(OrderedBpList) * 2)]
-
-
         dataDf = pd.DataFrame(columns=dfHeader)
 
-        ### COUNT ANIMALS IN EACH FRAME
+        ### COUNT ANIMALS IN EAH FRAME
         animalsinEachFrame = []
         framesList = [l.tolist() for l in frames]
         for row in framesList:
@@ -123,8 +110,6 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
             ### check if all animals exist
             splitOutRow = np.array_split(outRow, animalsinCurrFrame)
             splitOutRow = [l.tolist() for l in splitOutRow]
-            for newValue in range(len(splitOutRow)):
-                splitOutRow[newValue][-1] = newValue
             animalsExist = []
             for animalList in splitOutRow:
                 animalsExist.append(animalList[-1])
@@ -141,13 +126,14 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
             frameCounter+=1
 
         dataDf.fillna(0, inplace=True)
-        save_df(dataDf, wfileType, savePath)
+        dataDf.to_csv(savePath, index=False)
         csvPaths.append(savePath)
         print('Saved file ' + savePath)
 
     ###### ASSIGN IDENTITIES
 
     global currIDcounter
+
     def define_ID(event, x, y, flags, param):
         global currIDcounter
         if (event == cv2.EVENT_LBUTTONDBLCLK):
@@ -167,7 +153,7 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
         indBpCordList, frameNumber, addSpacer, EuclidDistanceList, changeList = [], 0, 2, [], []
         ID_user_cords, currIDcounter = [], 0
         assigningIDs, completePromt, chooseFrame, assignBpCords = False, False, True, True
-        currDf = read_df(csvFile, wfileType)
+        currDf = pd.read_csv(csvFile)
         vidFname = os.path.join(videoFolder, os.path.basename(csvFile).replace('.csv', '.mp4'))
         vidBasename = os.path.basename(vidFname)
         cap = cv2.VideoCapture(vidFname)
@@ -293,13 +279,14 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList):
                 f.write(i + '\n')
             f.close
         MultiIndexCol = []
-
-        print('@@@@@@@@@@@@@@@@@@@',len(outDf.columns))
         for column in range(len(outDf.columns)):
             MultiIndexCol.append(tuple(('SLEAP_multi', 'SLEAP_multi', outDf.columns[column])))
         outDf.columns = pd.MultiIndex.from_tuples(MultiIndexCol, names=['scorer', 'bodypart', 'coords'])
-        outputCSVname = os.path.basename(vidFname).replace('.mp4', '.csv')
-        outDf.to_csv(os.path.join(outputDfFolder, outputCSVname))
+        outputCSVname = os.path.basename(vidFname).replace('.mp4', '.' + wfileType)
+        if wfileType == 'csv':
+            outDf.to_csv(os.path.join(outputDfFolder, outputCSVname))
+        if wfileType == 'parquet':
+            outDf.to_parquet(os.path.join(outputDfFolder, outputCSVname))
         print('Imported ', outputCSVname, 'to project.')
     print('All multi-animal SLEAP .slp tracking files ordered and imported into SimBA project in CSV file format')
 

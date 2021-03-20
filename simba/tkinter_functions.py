@@ -11,6 +11,9 @@ import pathlib
 import csv
 import shutil
 from datetime import datetime
+import glob
+import pandas as pd
+from simba.extract_frames_fast import *
 
 def archive_all_csvs(inifile,archivename):
     csv_dir = os.path.join(os.path.dirname(inifile),'csv')
@@ -40,10 +43,29 @@ def archive_all_csvs(inifile,archivename):
             shutil.move(i,dest1)
             print(i,'archived')
 
+    logPath = os.path.join(os.path.dirname(inifile), 'logs')
+    VidInfoPath = os.path.join(logPath, 'video_info.csv')
+    logArchivePath = os.path.join(logPath, archivename)
+    if not os.path.exists(logArchivePath):
+        os.mkdir(logArchivePath)
+    try:
+        shutil.move(VidInfoPath, logArchivePath)
+        print('Video_info.csv file archived in project_folder/logs/ ' + str(archivename))
+    except FileNotFoundError:
+        pass
+
+
+    videoPath = os.path.join(os.path.dirname(inifile), 'videos')
+    videoPathList = [f for f in listdir(videoPath) if isfile(join(videoPath, f))]
+    videoPathList = [videoPath + '/' + s for s in videoPathList]
+    videoArchivePath = os.path.join(videoPath, archivename)
+    if not os.path.exists(videoArchivePath):
+        os.mkdir(videoArchivePath)
+    for video in videoPathList:
+        shutil.move(video, videoArchivePath)
+    print('Video files archived in project_folder/videos/' + str(archivename))
+
     print('Archive completed.')
-
-
-
 
 
 def batch_convert_videoformat(directory,format1,format2):
@@ -63,7 +85,7 @@ def batch_convert_videoformat(directory,format1,format2):
         outFile = str(outFile)
         output = os.path.basename(outFile)
         print('Converting video...')
-        command = (str('ffmpeg -y -i ') +'"' + str(directory)+ '\\' + str(currentFile)+'"' + ' -c:v libx264 -crf 5 -preset medium -c:a libmp3lame -b:a 320k '+'"' + str(directory) + '\\' + outFile+'"')
+        command = (str('ffmpeg -y -i ') + '"' + str(os.path.join(directory, currentFile) + '"' + ' -c:v libx264 -crf 5 -preset medium -c:a libmp3lame -b:a 320k '+'"' + str(os.path.join(directory, outFile) +'"')))
 
         execute(command)
         print('Video converted! ',output, ' created.')
@@ -330,66 +352,37 @@ def convertpowerpoint(filename):
 
 def extract_allframescommand(filename):
     if filename:
-
         pathDir = str(filename[:-4])
         if not os.path.exists(pathDir):
             os.makedirs(pathDir)
-
-        picFname = '%d.png'
-
-        saveDirFilenames = os.path.join(pathDir, picFname)
-        print(saveDirFilenames)
-
-        fname = str(filename)
-        cap = cv2.VideoCapture(fname)
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        amount_of_frames = cap.get(7)
-        print('The number of frames in this video = ',amount_of_frames)
-        print('Extracting frames... (Might take awhile)')
-        command = str('ffmpeg -i ' +'"'+ str(fname)+'"' + ' ' + '-q:v 1' + ' ' + '-start_number 0' + ' '+'"'+ str(saveDirFilenames)+'"')
-        print(command)
-        subprocess.call(command, shell=True)
+        video_to_frames(filename, pathDir, overwrite=True, every=1, chunk_size=1000)
+        print('Frame extraction for ' + os.path.basename(filename) + ' complete')
         print('All frames are extracted!')
     else:
         print('Please select a video to convert')
 
 def batch_extract_allframes(dir):
     curdir = os.listdir(dir)
-    vid=[]
+    vid, vidEnding = [], []
     for i in curdir:
-        if i.endswith(('.avi','.mp4','.mov','flv')):
+        if i.endswith(('.avi','.mp4')):
             vid.append(i)
-
+            if i.endswith('.mp4'):
+                vidEnding.append('mp4')
+            if i.endswith('.avi'):
+                vidEnding.append('avi')
     for index,i in enumerate(vid):
         vid[index]=os.path.join(dir,i)
-
-    for i in vid:
-        filename= i
-        pathDir = str(filename[:-4])
-        if not os.path.exists(pathDir):
-            os.makedirs(pathDir)
-
-        picFname = '%d.png'
-
-        saveDirFilenames = os.path.join(pathDir, picFname)
-        print(saveDirFilenames)
-
-        fname = str(filename)
-        cap = cv2.VideoCapture(fname)
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        amount_of_frames = cap.get(7)
-        print('The number of frames in this video = ', amount_of_frames)
-        print('Extracting frames... (Might take awhile)')
-        command = str(
-            'ffmpeg -i '+'"' + str(fname)+'"' + ' ' + '-q:v 1' + ' ' + '-start_number 0' + ' ' +'"'+ str(saveDirFilenames)+'"')
-        print(command)
-        subprocess.call(command, shell=True)
-        print('All frames are extracted!')
+    for videoName, videoFiletype in zip(vid, vidEnding):
+        frames_dir = os.path.join(dir, os.path.basename(videoName).replace(videoFiletype, ''))
+        if not os.path.exists(frames_dir):
+            os.makedirs(frames_dir)
+        video_to_frames(videoName, frames_dir, overwrite=True, every=1, chunk_size=1000)
+        print('Frame extraction for ' + os.path.basename(videoName) + ' complete')
+    print('All frames are extracted!')
 
 def mergemovieffmpeg(directory,framespersec,vidformat,bit,imgformat):
-
     currDir = directory
-
     fps = str(framespersec)
     fileformat = str('.'+vidformat)
     bitrate = str(bit)
@@ -473,7 +466,7 @@ def extractspecificframe(filename,startframe1,endframe1):
 
     cap = cv2.VideoCapture(filename)
     amount_of_frames = cap.get(7)
-    pathDir = str(filename[:-4]+'\\frames')
+    pathDir = os.path.join(filename[:-4], 'frames')
     if not os.path.exists(pathDir):
         os.makedirs(pathDir)
 
@@ -608,7 +601,9 @@ def youOnlyCropOnce(inputdir,outputdir):
     for i in filesFound:
         #crop video with ffmpeg
         fileOut, fileType = i.split(".", 2)
-        fileOutName = outputdir + '\\'+ os.path.basename(str(fileOut)) + str('_cropped.')+ str(fileType)
+        fileOutName = os.path.join(outputdir, os.path.basename(str(fileOut)) + str('_cropped.') + str(fileType))
+
+
         command = str('ffmpeg -i ') +'"'+ str(i) +'"'+ str(' -vf ') + str('"crop=') + str(width) + ':' + str(
             height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -crf 21 -c:a copy ') +'"'+ str(
             fileOutName)+'"'
@@ -689,3 +684,31 @@ def changeimageformat(directory,filetypein,filetypeout):
         os.remove(filename)
 
     return filetype2
+
+def convert_parquet_to_csv(directory):
+    filesFound = glob.glob(directory + '/*.parquet')
+    for file in filesFound:
+        print('Reading in ' + str( os.path.basename(file)) + '...')
+        currDf = pd.read_parquet(file)
+        newFileName = os.path.basename(file).replace('.parquet', '.csv')
+        newFilePath = os.path.join(directory, newFileName)
+        try:
+            currDf = currDf.set_index('scorer')
+        except KeyError:
+            pass
+        currDf.to_csv(newFilePath)
+        print('Saved ' + str(newFileName))
+    print('All files in ' + str(directory) + ' converted to .CSV')
+
+def convert_csv_to_parquet(directory):
+    filesFound = glob.glob(directory + '/*.csv')
+    print('Converting ' + str(len(filesFound)) + ' files...')
+    for file in filesFound:
+        print('Reading in ' + str( os.path.basename(file)) + '...')
+        currDf = pd.read_csv(file)
+        newFileName = os.path.basename(file).replace('.csv', '.parquet')
+        newFilePath = os.path.join(directory, newFileName)
+        currDf.to_parquet(newFilePath)
+        print('Saved ' + str(newFileName))
+    print('All files in ' + str(directory) + ' converted to .parquet')
+
