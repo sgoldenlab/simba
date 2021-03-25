@@ -13,7 +13,7 @@ Pillow == 5.4.1
 
 # dlc_change_yamlfile.py: 1
 # tkinter_functions.py: 7
-PyYAML == 5.3.1
+PyYAML == 5.4
 
 # ROI_analysis_2.py: 6,7
 # ROI_freehand_draw_3.py: 6
