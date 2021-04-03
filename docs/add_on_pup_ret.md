@@ -26,7 +26,10 @@
 
 `Smooth function` - function to smooth the animal movement trajectories. DEFULT: gaussian. 
 
-`Smooth factor` - function to smooth the animal movement trajectories. DEFULT: gaussian. 
-`Carry classifier name`
-`Approach classifier name`
-`Dig classifier name`
+`Smooth factor` - the standard deviation of the gaussian smoothing function. DEFULT: 5.
+
+`Carry classifier name` - The name of the *carry* classifier as defined in the [SimBA project creation menu](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1).
+
+`Approach classifier name` - The name of the *approach* classifier as defined in the [SimBA project creation menu](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1).
+
+`Dig classifier name` - The name of the *dig* classifier as defined in the [SimBA project creation menu](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1).
