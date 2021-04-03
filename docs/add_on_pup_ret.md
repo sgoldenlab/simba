@@ -18,7 +18,7 @@
 
 `Core-nest name` - the name of the core-nest as defined in the [SimBA ROI definitions table](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-1-defining-rois-in-simba)
 
-`Nest-name` - the name of the core-nest as defined in the [SimBA ROI definitions table](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-1-defining-rois-in-simba 
+`Nest-name` - the name of the core-nest as defined in the [SimBA ROI definitions table](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-1-defining-rois-in-simba)
 
 `Dam name` - the name of the dam (mother) as set in the [SimBA project definitions table](https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md#step-4-import-your-tracking-data) *Note*: The animal names can also be accessed in the *project_folder/project_config.ini* under the [Multi animal IDs] heading. 
 
