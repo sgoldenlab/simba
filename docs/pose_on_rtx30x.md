@@ -1,3 +1,4 @@
+### Pose estimation on newer GPUs
 
 With the newer GPUs (e.g., NVIDEA Rtx3080 ) you can no longer use Tensorflow (TF) version 1.x, which is what earlier versions of DeepLabCut depend on. Instead, you have to use TF version 2.x, and this requires a different set of package versions than previously. Here is our protocol for getting TF and DLC to work on our **Microsoft Windows** NVIDEA Rtx3080 supported machines. 
 
