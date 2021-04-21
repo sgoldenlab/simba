@@ -13,12 +13,17 @@ With the newer GPUs (e.g., NVIDEA Rtx3080 ) you can no longer use Tensorflow (TF
 
 ##### 5.	Create a new conda environment – python 3.6 should work. In your conda environment, install the following python packages:
 
-*tensorflow-gpu==2.4
-*keras==2.3.1
-*scipy==1.2
-*protobuf==3.6.0
-*tf_slim==1.1.0 
-*tf-nightly==2.5.0.dev20210128
+* tensorflow-gpu==2.4
+
+* keras==2.3.1
+
+* scipy==1.2
+
+* protobuf==3.6.0
+
+* tf_slim==1.1.0 
+
+* tf-nightly==2.5.0.dev20210128
 
 Alternatively copy past this in the terminal: 
 
