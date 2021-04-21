@@ -42,7 +42,7 @@ If satisfied with the results, go ahead and compute new descriptive stastistics 
 
 ### Hyperparameters
 
-Through the SimBA menues the user can access three hyperparameters. For more information of what the hyperparameters mean, check out the [R 'bursts' package documentation](https://cran.r-project.org/web/packages/bursts/bursts.pdf) the [Lee et al. 2019](https://journals.plos.org/plosone/article/comments?id=10.1371/journal.pone.0220596) paper, or the [original paper](https://link.springer.com/article/10.1023/A:1024940629314). 
+Through the SimBA menues the user can access three hyperparameters. For more information of what the hyperparameters mean, check out the [R 'bursts' package documentation](https://cran.r-project.org/web/packages/bursts/bursts.pdf), the [Lee et al. 2019](https://journals.plos.org/plosone/article/comments?id=10.1371/journal.pone.0220596) paper, the [original paper](https://link.springer.com/article/10.1023/A:1024940629314), or [THIS](https://nikkimarinsek.com/blog/kleinberg-burst-detection-algorithm) excellent blog post walk-through. 
 
 In short,
 
@@ -51,5 +51,3 @@ In short,
 *(ii) Gamma* - Higher gamma values and behaviors needs to be sustained for a longer time for them to be recognised as burts. I.e., gamma represents the cost associated with entering a time-period of behevior expression. **Higher gamma values and fewer behavioural bursts will be recognised. Lower gamma values and a greate number of behavioural bursts will be recognised (Default: 0.3)**
 
  *(ii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values and fewer behavioural bursts will to be recognised (Default: 1)**
- 
- For more information on the hyperparameters [HERE](https://nikkimarinsek.com/blog/kleinberg-burst-detection-algorithm) is an excellent blog post walk-through.
