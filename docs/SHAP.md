@@ -4,7 +4,6 @@
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP0.png" />
 </p>
 
-
 An understanding of how machine learning models reach their  decisions is important not only for the scientific method but can also help you gain insight into how your classifier works and what makes it different or similar to other classifiers. Machine learning explainability metrics, such as SHAP, can help you answer questions like:
 
 * Why does my classifier think some specific frames contain my behavior of interest, while other frames do not?
@@ -17,9 +16,9 @@ An understanding of how machine learning models reach their  decisions is import
 
 * Are there any potential differences in the features that annotator X and annotator Y look at when annotating videos for the presence or absence of the same target behavior? 
  
-Explainability metrics can be very important, as it is possible that the classifiers you are using *appear* to look for the same behavioral target behaviours and features as a human observer would, while the classifier in fact looks as something very different from the human observer. Such weaknesses are typically revealed when analyzing new videos in new recording environments, that were not included in the data used to train the classifier, and explainability metrics can help you avoid those pitfalls. 
+Explainability metrics can be very important, as it is possible that the classifiers you are using *appear* to look for the same behavioral target behaviours and features as a human observer would, while the classifier in fact looks as something very different from the human observer. Such weaknesses are typically revealed when analyzing new videos in new recording environments, that were not included in the data used to train the classifier, and explainability metrics can help you avoid sucj pitfalls. 
 
-Here we will look at how we can use [SHAP (SHapley Additive exPlanations)](https://github.com/slundberg/shap) within SimBA to calculate how much each feature contributes to the final behavioral classification score for each annotated video frame. Through this method we will get an verbalizable explanation for the classification probability score for each frame, such as: 
+Here we  look at how we can use [SHAP (SHapley Additive exPlanations)](https://github.com/slundberg/shap) within SimBA to calculate how much each feature contributes to the final behavioral classification score for each annotated video frame. Through this method we will get an verbalizable explanation for the classification probability score for each frame, such as: 
 
 *Frame N in Video X was classified as containing my behavior of interest, mainly because of the distance between animal A and B, but also because the movements of animal A. In frame N, the larger movements of the animals increased the behavior classification probability with 20%, and the distance between the animals increased the classification probability with a further 70%*. 
  
@@ -31,7 +30,11 @@ In brief, when using SHAP, each feature is evaluated independently, and the fina
 
 The *base probability* in the figure above is the probability of picking a frame that contains your behavior by pure chance (e.g., if half of your video frames contain you behavior of interest, then the base probability will be 50%; more info below!). The values associated with each feature describe the features effect on the classification probability. To read more about SHAP values, also see the [SHAP GitHub repository](https://github.com/slundberg/shap) which SimBA wraps, or read [SHAP paper in Nature Machine Learning Intelligence](https://www.nature.com/articles/s42256-019-0138-9). 
 
-The goal if this analysis may be to produce data and visualisations similar to the image below, which compares classifiers for the same target behavior (attack behaviour, in this example) but built using annotations from different recording environment, annotators and institutes. With this type of data at hand, we would be able to conclude that most attack classifiers primarily relied on features of intruder movement, animal distances, and resident and intruder movements, for discriminating attack events from non-attack events (with some notable exceptions). 
+The goal if this analysis may be to produce data and visualisations similar to the image below, which compares classifiers for the same target behavior (attack behaviour, in this example) but built using annotations from different recording environment, annotators and institutes. With this type of data at hand, we would be able to conclude that most attack classifiers primarily depend on features of intruder movement, animal distances, and resident and intruder movements, for discriminating attack events from non-attack events (with some notable exceptions!). 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/SHAP_05_10.png" />
+</p>
 
 ## Part 1: Generate a dataset
 
