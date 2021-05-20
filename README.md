@@ -16,7 +16,8 @@ SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development 
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
-## SimBA's new documentation page
+## SimBA's new documentation page (still in the works)
+Please feel free to create a pull request or provide feedback. If you need help, please post on gitter and I will try to respond to them asap -JJ
 
 https://simba-docs.readthedocs.io/en/latest/index.html
 
