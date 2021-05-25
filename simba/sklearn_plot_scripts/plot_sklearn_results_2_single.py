@@ -26,23 +26,34 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
         wfileType = config.get('General settings', 'workflow_file_type')
     except NoOptionError:
         wfileType = 'csv'
+    try:
+        pose_threshold = config.getfloat('threshold_settings', 'bp_threshold_sklearn')
+    except NoOptionError:
+        pose_threshold = 0.00
+
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
     counters_no, vidInfPath = config.getint('SML settings', 'No_targets'), os.path.join(projectPath, 'logs', 'video_info.csv')
 
-    multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
+    try:
+        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
+        multiAnimalIDList = multiAnimalIDList.split(",")
+        if multiAnimalIDList[0] != '':
+            multiAnimalStatus = True
+            print('Applying settings for multi-animal tracking...')
+        else:
+            multiAnimalStatus = False
+            multiAnimalIDList = []
+            for animal in range(animalsNo):
+                multiAnimalIDList.append('Animal_' + str(animal+1) + '_')
+            print('Applying settings for classical tracking...')
 
-    if not multiAnimalIDList:
+    except NoSectionError:
         multiAnimalIDList = []
         for animal in range(animalsNo):
-            multiAnimalIDList.append('Animal_' + str(animal + 1))
+            multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
         multiAnimalStatus = False
         print('Applying settings for classical tracking...')
-
-    else:
-        multiAnimalIDList = multiAnimalIDList.split(",")
-        multiAnimalStatus = True
-        print('Applying settings for multi-animal tracking...')
 
 
     vidinfDf = pd.read_csv(vidInfPath)
@@ -52,7 +63,7 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
     cMapSize = int(len(Xcols) + 1)
     colorListofList = createColorListofList(animalsNo, cMapSize)
 
-    csvfile = videofile.split('.')[0]+'.csv'
+    csvfile = os.path.join(os.path.dirname(iniFile),'csv','machine_results',os.path.basename(videofile).split('.')[0]+'.csv')
 
     filesFound = []
     filesFound.append((os.path.join(csv_dir_in,csvfile)))
@@ -75,6 +86,7 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
 
     #### CREATE DICT TO HOLD ANIMAL BPS AND NAMES
     animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, animalsNo, Xcols, Ycols, [], colorListofList)
+    print(animalBpDict)
 
     ########### FIND PREDICTION COLUMNS ###########
     for currentVideo in filesFound:
@@ -96,7 +108,7 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
         except KeyError:
             pass
         currentDf = currentDf.fillna(0)
-        currentDf = currentDf.astype(int)
+        currentDf = currentDf.astype(float)
         currentDf = currentDf.loc[:, ~currentDf.columns.str.contains('^Unnamed')]
         if os.path.exists(os.path.join(projectPath,'videos', CurrentVideoName.replace('.' + wfileType, '.mp4'))):
             videoPathName = os.path.join(projectPath,'videos', CurrentVideoName.replace('.' + wfileType, '.mp4'))
@@ -134,12 +146,14 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
                     for bp in range(currNoBps):
                         hullColor = currentDict['colors'][bp]
                         currXheader, currYheader, currColor = currentDict['X_bps'][bp], currentDict['Y_bps'][bp], currentDict['colors'][bp]
-                        currAnimal = currentDf.loc[currentDf.index[currRow], [currXheader, currYheader]]
-                        cv2.circle(frame, (currAnimal[0], currAnimal[1]), 0, hullColor, circleScale)
-                        animalArray[bp] = [currAnimal[0], currAnimal[1]]
-                        if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
-                            IDlabelLoc.append([currAnimal[0], currAnimal[1]])
-                            IDappendFlag = True
+                        curr_bp_p_header = currXheader[:-2] + '_p'
+                        currAnimal = currentDf.loc[currentDf.index[currRow], [currXheader, currYheader, curr_bp_p_header]]
+                        if currAnimal[2] > pose_threshold:
+                            cv2.circle(frame, (int(currAnimal[0]), int(currAnimal[1])), 0, hullColor, circleScale)
+                            animalArray[bp] = [currAnimal[0], currAnimal[1]]
+                            if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
+                                IDlabelLoc.append([currAnimal[0], currAnimal[1]])
+                                IDappendFlag = True
                     if IDappendFlag == False:
                         IDlabelLoc.append([currAnimal[0], currAnimal[1]])
                 if height < width:
@@ -148,7 +162,7 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
                 if rotationFlag == False:
                     for currAnimal in range(animalsNo):
                         currentDictID = list(animalBpDict.keys())[currAnimal]
-                        cv2.putText(frame, str(multiAnimalIDList[currAnimal]), (IDlabelLoc[currAnimal][0], IDlabelLoc[currAnimal][1]), cv2.FONT_HERSHEY_COMPLEX, fontScale, animalBpDict[currentDictID]['colors'][0], 2)
+                        cv2.putText(frame, str(multiAnimalIDList[currAnimal]), (int(IDlabelLoc[currAnimal][0]), int(IDlabelLoc[currAnimal][1])), cv2.FONT_HERSHEY_COMPLEX, fontScale, animalBpDict[currentDictID]['colors'][0], 2)
                 if rotationFlag == True:
                     for currAnimal in range(animalsNo):
                         currentDictID = list(animalBpDict.keys())[currAnimal]
