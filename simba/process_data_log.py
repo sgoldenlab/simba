@@ -1,9 +1,10 @@
 import pandas as pd
 import os
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 from datetime import datetime
 import numpy as np
 import glob
+from simba.rw_dfs import *
 
 
 def analyze_process_data_log(configini,chosenlist):
@@ -15,10 +16,14 @@ def analyze_process_data_log(configini,chosenlist):
     csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
     no_targets = config.getint('SML settings', 'No_targets')
     filesFound, target_names = [], []
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     vidinfDf = pd.read_csv(os.path.join(projectPath, 'logs', 'video_info.csv'))
     loop, videoCounter = 0, 0
 
-    filesFound = glob.glob(csv_dir_in + '/*.csv')
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
 
     ########### GET TARGET COLUMN NAMES ###########
     for ff in range(no_targets):
@@ -41,14 +46,15 @@ def analyze_process_data_log(configini,chosenlist):
 
     for currentFile in filesFound:
         videoCounter += 1
-        currVidName = os.path.basename(currentFile).replace('.csv', '')
+        currVidName = os.path.basename(currentFile).replace('.' + wfileType, '')
         fps = vidinfDf.loc[vidinfDf['Video'] == currVidName]
         try:
             fps = int(fps['fps'])
         except TypeError:
             print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         print('Analyzing video ' + str(videoCounter) + '/' + str(len(filesFound)) + '...')
-        dataDf = pd.read_csv(currentFile)
+        dataDf = read_df(currentFile, wfileType)
+
         boutsList, nameList, startTimeList, endTimeList = [], [], [], []
         for currTarget in target_names:
             groupDf = pd.DataFrame()

@@ -199,7 +199,6 @@ def cropvid_auto(filenames,outputdir):
     fileOutName = str(fileOut) + str('_cropped.mp4')
 
 
-
     total = width+height+topLeftX +topLeftY
 
     if total != 0:

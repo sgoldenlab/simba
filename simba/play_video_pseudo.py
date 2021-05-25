@@ -6,17 +6,20 @@ import pandas as pd
 
 
 currentVideoPath = sys.stdin.readline()
+currentVideoPath = currentVideoPath.encode().decode()
 mainprojectdir = os.path.dirname(os.path.dirname(currentVideoPath))
 capture = cv2.VideoCapture(currentVideoPath)
 frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
 width = int(capture.get(3))
 height = int(capture.get(4))
 f = open(os.path.join(mainprojectdir,'labelling_info.txt'), 'w')
-video_info_path = os.path.join(mainprojectdir,'logs','video_info.csv')
+video_info_path = os.path.join(mainprojectdir, 'logs','video_info.csv')
 vidinfDf = pd.read_csv(video_info_path)
 videoName = os.path.basename(currentVideoPath)
 videoName = videoName.split('.', 2)[0]
-fps = capture.get(cv2.CAP_PROP_FPS)
+videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(videoName)]
+fps = int(videoSettings['fps'])
+
 timeBetFrames = int(1000/fps)
 
 def printOnFrame(currentFrame):

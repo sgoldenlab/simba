@@ -3,10 +3,12 @@ import cv2
 import pandas as pd
 from collections import deque
 import numpy as np
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 import seaborn as sns
 import imutils
 import glob
+from simba.rw_dfs import *
+
 
 def path_plot_config(configini):
     pd.options.mode.chained_assignment = None
@@ -16,6 +18,10 @@ def path_plot_config(configini):
     noAnimals = config.getint('Path plot settings', 'no_animal_pathplot')
     projectPath = config.get('General settings', 'project_path')
     frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'path_plots')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
 
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
@@ -56,7 +62,7 @@ def path_plot_config(configini):
         r, g, b = color[0], color[1], color[2]
         severityColour.append((b, g, r))
 
-    filesFound = glob.glob(csv_dir_in + "/*.csv")
+    filesFound = glob.glob(csv_dir_in + "/*." + wfileType)
     print('Generating path plots for ' + str(len(filesFound)) + ' video(s)...')
     fileCounter = 0
 
@@ -65,7 +71,7 @@ def path_plot_config(configini):
         loop = 0
         listPaths_mouse1, listPaths_mouse2 = deque(maxlen=maxDequeLines), deque(maxlen=maxDequeLines)
         severityCircles = []
-        csv_df = pd.read_csv(currentFile, index_col=[0])
+        csv_df = read_df(currentFile, wfileType)
         CurrentVideoName = os.path.basename(currentFile)
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
 
@@ -98,7 +104,10 @@ def path_plot_config(configini):
 
         if severityBool == 'yes':
             csv_df_combined[severityTarget] = csv_df[severityTarget].values
-            csv_df_combined['Scaled_movement_M1_M2'] = csv_df['Scaled_movement_M1_M2'].values
+            if noAnimals == 2:
+                csv_df_combined['Scaled_movement_M1_M2'] = csv_df['Scaled_movement_M1_M2'].values
+            else:
+                csv_df_combined['Scaled_movement_M1'] = csv_df['Scaled_movement_M1'].values
             columnNames = list(csv_df_combined)
 
         for index, row in csv_df_combined.iterrows():
@@ -125,9 +134,11 @@ def path_plot_config(configini):
                 attackPrediction = int(row[columnNames[8]])
                 severityScore = float(row[columnNames[9]])
                 if attackPrediction == 1:
-                    midpoints = (
-                        list(zip(np.linspace(m1tuple[0], m2tuple[0], 3), np.linspace(m1tuple[1], m2tuple[1], 3))))
-                    locationEventX, locationEventY = midpoints[1]
+                    if noAnimals == 2:
+                        midpoints = (list(zip(np.linspace(m1tuple[0], m2tuple[0], 3), np.linspace(m1tuple[1], m2tuple[1], 3))))
+                        locationEventX, locationEventY = midpoints[1]
+                    if noAnimals == 1:
+                        locationEventX, locationEventY = m1tuple
                     for i in range(severity_brackets):
                         lowerBound = severityGrades[i]
                         upperBound = severityGrades[i + 1]

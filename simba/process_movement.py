@@ -1,11 +1,13 @@
 import pandas as pd
 import os
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 from datetime import datetime
 import statistics
 import numpy as np
 import glob
 from drop_bp_cords import define_movement_cols
+from simba.rw_dfs import *
+
 
 def analyze_process_movement(configini):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -16,6 +18,10 @@ def analyze_process_movement(configini):
     csv_dir_in = os.path.join(projectPath, 'csv', 'outlier_corrected_movement_location')
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidLogFilePath)
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     noAnimals = config.getint('process movements', 'no_of_animals')
     Animal_1_Bp = config.get('process movements', 'animal_1_bp')
     Animal_2_Bp = config.get('process movements', 'animal_2_bp')
@@ -27,7 +33,7 @@ def analyze_process_movement(configini):
     log_df = pd.DataFrame(columns=columnNames)
 
     ########### FIND CSV FILES ###########
-    filesFound = glob.glob(csv_dir_in + '/*.csv')
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     print('Processing movement data for ' + str(len(filesFound)) + ' files...')
     columnHeaders = [Animal_1_Bp + '_x', Animal_1_Bp + '_y']
     shifted_columnHeaders = ['shifted_' + Animal_1_Bp + '_x', 'shifted_' + Animal_1_Bp + '_y']
@@ -37,14 +43,15 @@ def analyze_process_movement(configini):
 
     for currentFile in filesFound:
         frameCounter = 0
-        currVideoName = os.path.basename(currentFile).replace('.csv', '')
+        currVideoName = os.path.basename(currentFile).replace('.' + wfileType, '')
         videoSettings = vidinfDf.loc[vidinfDf['Video'] == currVideoName]
         try:
             fps = int(videoSettings['fps'])
             currPixPerMM = float(videoSettings['pixels/mm'])
         except TypeError:
             print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
-        csv_df = pd.read_csv(currentFile, usecols=columnHeaders)
+        csv_df = read_df(currentFile, wfileType)
+        csv_df = csv_df[columnHeaders]
         csv_df_shifted = csv_df.shift(-1, axis=0)
         csv_df_shifted.columns = shifted_columnHeaders
         csv_df = pd.concat([csv_df, csv_df_shifted], axis=1)

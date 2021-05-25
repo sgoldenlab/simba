@@ -1,21 +1,25 @@
 import pandas as pd
-import os
+import os, glob
 import numpy as np
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 from datetime import datetime
+from simba.rw_dfs import *
 dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
 
 def analyze_process_severity(configini,severitbrac,targetBehavior):
     print('Processing',targetBehavior, 'severity...')
     config = ConfigParser()
     config.read(configini)
-    filesFound = []
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'machine_results')
     severity_brackets = int(severitbrac)
     vidInfPath = config.get('General settings', 'project_path')
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     vidinfDf = pd.read_csv(vidInfPath)
     severityGrades = list(np.arange(0, 1.0, ((10/severity_brackets)/10)))
     severityGrades.append(10)
@@ -43,27 +47,24 @@ def analyze_process_severity(configini,severitbrac,targetBehavior):
     log_df = pd.DataFrame(columns=headers)
 
     ########### FIND CSV FILES ###########
-    for i in os.listdir(csv_dir_in):
-        if i.__contains__(".csv"):
-            file = os.path.join(csv_dir_in, i)
-            filesFound.append(file)
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     loopy=0
     for i in filesFound:
         currentFile = i
         CurrentVideoName = os.path.basename(currentFile)
-        videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
+        videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.' + wfileType, ''))]
         try:
             fps = int(videoSettings['fps'])
         except TypeError:
             print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
-        csv_df = pd.read_csv(currentFile, index_col=[0])
+        csv_df = read_df(currentFile, wfileType)
         for pp in range(severity_brackets):
             lowerBound = severityGrades[pp]
             upperBound = severityGrades[pp + 1]
             currGrade = len(csv_df[(csv_df[str(targetBehavior)] == 1) & (csv_df['Scaled_movement_M1_M2'] > lowerBound) & (csv_df['Scaled_movement_M1_M2'] <= upperBound)])
             severityLogFrames[pp] = currGrade
         log_list = []
-        log_list.append(str(CurrentVideoName.replace('.csv', '')))
+        log_list.append(str(CurrentVideoName.replace('.' + wfileType, '')))
         for bb in range(len(severityLogFrames)):
             severityLogTime[bb] = round(severityLogFrames[bb] / fps, 4)
         log_list.extend(severityLogFrames)

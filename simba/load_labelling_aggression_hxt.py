@@ -3,8 +3,10 @@ import pandas as pd
 from PIL import Image, ImageTk
 import os
 from tkinter import filedialog
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 from subprocess import *
+from simba.rw_dfs import *
+
 
 current_video = ""
 frames_in = []
@@ -32,10 +34,14 @@ def reset():
 
 # Retrieves behavior names from the config file
 def configure(file_name):
+    global wfileType
     config = ConfigParser()
     config.read(file_name)
     number_of_targets = config.get('SML settings', 'No_targets')
-
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
 
     for i in range(1, int(number_of_targets)+1):
         target = config.get('SML settings', 'target_name_' + str(i))
@@ -178,6 +184,7 @@ class MainInterface:
         if self.rangeOn.get():
             s = int(self.firstFrame.get())
             e = int(self.lastFrame.get())
+            print(s, e)
             save_values(s, e)
             if e < len(frames_in) - 1:
                 load_frame(e + 1, master, self.fbox)
@@ -188,6 +195,8 @@ class MainInterface:
             e = s
             save_values(s, e)
             load_frame(e+1, master, self.fbox)
+
+        print(df)
 
 class MainInterface2:
     def __init__(self):
@@ -271,7 +280,7 @@ def play_video():
     script_directory = os.path.dirname(os.path.realpath(__file__))
     p = Popen('python ' + str(script_directory) + r"/play_video.py", stdin=PIPE, stdout=PIPE, shell=True)
     main_project_dir = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])
-    video_dir = main_project_dir + '\\videos\\'
+    video_dir = os.path.join(main_project_dir, videos)
     video_list = os.listdir(video_dir)
     current_video_name = os.path.basename(os.getcwd())
     current_full_video_name = [i for i in video_list if current_video_name in i]
@@ -302,9 +311,10 @@ def load_folder(project_name):
     global current_video
     img_dir = filedialog.askdirectory()
     os.chdir(img_dir)
+    print("Working directory is %s" % os.getcwd())
     dirpath = os.path.basename(os.getcwd())
     current_video = dirpath
-    print('Loading video ' + current_video + '...')
+    print('Current Video: ' + current_video)
     ## get the frames
     global frames_in
     frames_in = []
@@ -319,9 +329,8 @@ def load_folder(project_name):
     print("Number of Frames: " + str(number_of_frames))
 
     configure(project_name)
-    curr_target_csv= os.path.join(os.path.dirname(project_name),'csv','targets_inserted',os.path.basename(img_dir)+'.csv')
-    df = pd.read_csv(curr_target_csv)
-    df = df.fillna(0)
+    curr_target_csv = os.path.join(os.path.dirname(project_name),'csv','targets_inserted',os.path.basename(img_dir)+'.csv')
+    df = read_df(curr_target_csv, wfileType)
     MainInterface()
     #create_data_frame(number_of_frames)
 
@@ -340,7 +349,7 @@ def choose_folder2(framedir):
     frames_in = sorted(frames_in, key=lambda x: int(x.split('.')[0]))
     # print(frames_in)
     number_of_frames = len(frames_in)
-    print("Number of Frames in current video: " + str(number_of_frames))
+    print("Number of Frames: " + str(number_of_frames))
 
     guiwindow = MainInterface2()
 
@@ -423,37 +432,26 @@ def set_values(dictionary):
 
 
 # Saves the values of each behavior in the DataFrame and prints out the updated data frame
-
 def save_values(start, end):
-    global columns
-    contprintLoop = True
-    print('\n')
     if start == end:
         for i in range(len(behaviors)):
             df.at[current_frame_number, columns[i]] = int(behaviors[i])
-            if behaviors[i] != 0:
-                print('Annotated behavior: ' + columns[i] + '. Frame: ' + str(start) + '.')
-
     if start != end:
         for i in range(start, end+1):
             for b in range(len(behaviors)):
                 df.at[i, columns[b]] = int(behaviors[b])
-                if behaviors[b] != 0 and (contprintLoop == True):
-                    print('Annotated behavior: ' + columns[b] + '. Start frame: ' + str(start) + '. End frame: ' + str(end))
-            contprintLoop = False
+    print(df.ix[current_frame_number])
 
 
 # Appends data to corresponding features_extracted csv and exports as new csv
 def save_video(master):
-    input_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\features_extracted\\" \
-                 + current_video + '.csv'
-    output_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\targets_inserted\\" \
-                  + current_video + '.csv'
-    data = pd.read_csv(input_file)
+    global wfileType
+    input_file = str(os.path.join(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2], 'csv', 'features_extracted', current_video + '.' + wfileType))
+    output_file = str(os.path.join(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2], 'csv', 'targets_inserted', current_video + '.' + wfileType))
+    data = read_df(input_file, wfileType)
     new_data = pd.concat([data, df], axis=1)
     new_data = new_data.fillna(0)
     new_data.rename(columns={'Unnamed: 0': 'scorer'}, inplace=True)
-    new_data.to_csv(output_file, index=FALSE)
-    print(output_file)
+    save_df(new_data, wfileType, output_file)
     print(current_video + 'Annotation file for "' + str(current_video) + '"' + ' created.')
     # master.destroy()

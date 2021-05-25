@@ -1,12 +1,13 @@
 import glob
 import pandas as pd
 from pylab import *
-from configparser import ConfigParser, MissingSectionHeaderError
+from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError, NoOptionError
 import os
 import cv2
 import numpy as np
-from drop_bp_cords import getBpHeaders
+from simba.drop_bp_cords import getBpHeaders
 import math
+from simba.rw_dfs import *
 
 def plotHeatMap(inifile, animalbp1, mmSize, noIncrements, colorPalette, targetBehav, lastImageOnlyBol):
     config = ConfigParser()
@@ -18,6 +19,10 @@ def plotHeatMap(inifile, animalbp1, mmSize, noIncrements, colorPalette, targetBe
     projectPath = config.get('General settings', 'project_path')
     csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     videoLog = pd.read_csv(vidLogFilePath)
     trackedBodyParts = [str(animalbp1)+'_x', str(animalbp1)+ '_y']
     frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'heatmap_behavior')
@@ -27,22 +32,25 @@ def plotHeatMap(inifile, animalbp1, mmSize, noIncrements, colorPalette, targetBe
     vidinfDf = pd.read_csv(vidInfPath)
     colorList, loopCounter = [], 0
 
-    filesFound = glob.glob(csv_dir_in + '/*.csv')
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     for currVid in filesFound:
         calcFlag = False
         loopCounter += 1
         currVidBaseName = os.path.basename(currVid)
         currVidInfo = videoLog.loc[videoLog['Video'] == str(currVidBaseName.replace('.csv', ''))]
         fps, width, height = int(currVidInfo['fps']), int(currVidInfo['Resolution_width']), int(currVidInfo['Resolution_height'])
-        pxPerMM = int(currVidInfo['pixels/mm'])
-        binInput = int(mmSize * pxPerMM)
+        pxPerMM = float(currVidInfo['pixels/mm'])
+        binInput = float(mmSize * pxPerMM)
         outputfilename = os.path.join(frames_dir_out, currVidBaseName.replace('.csv', '.mp4'))
         binWidth, binHeight = (binInput, binInput)
-        NbinsX, NbinsY, NbinsXCheck, NbinsYCheck = (int(width / binWidth), int(height / binHeight), width / binWidth, height / binHeight)
+        try:
+            NbinsX, NbinsY, NbinsXCheck, NbinsYCheck = (int(width / binWidth), int(height / binHeight), width / binWidth, height / binHeight)
+        except ZeroDivisionError:
+            print('Could not find the resolution information for ' + str(currVidBaseName) + '. Make sure the video is represented in your video_info.csv file')
         targetCountArrayFrames = np.zeros((NbinsY, NbinsX))
         im = np.zeros((height, width, 3))
         im.fill(0)
-        currDf = pd.read_csv(currVid)
+        currDf = read_df(currVid, wfileType)
         count_row = currDf.shape[0]
         vidInfo = vidinfDf.loc[vidinfDf['Video'] == str(currVidBaseName.replace('.csv', ''))]
         fps = int(vidInfo['fps'])

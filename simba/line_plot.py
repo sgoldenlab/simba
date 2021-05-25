@@ -2,14 +2,19 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 import glob
+from simba.rw_dfs import *
 
 def line_plot_config(configini):
     configFile = str(configini)
     config = ConfigParser()
     config.read(configFile)
     projectPath = config.get('General settings', 'project_path')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'line_plot')
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
@@ -24,20 +29,21 @@ def line_plot_config(configini):
     columnNames = (str(POI_1) + str('_x'), str(POI_1) + str('_y'), str(POI_2) + str('_x'), str(POI_2) + str('_y'))
 
     ########### FIND CSV FILES ###########
-    filesFound = glob.glob(csv_dir_in + "/*.csv")
+    filesFound = glob.glob(csv_dir_in + "/*." + wfileType)
     print('Generating line plots for ' + str(len(filesFound)) + ' video(s)...')
 
     for currentFile in filesFound:
         loop = 0
         CurrentVideoName = os.path.basename(currentFile)
-        videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.csv', ''))]
+        videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.' + wfileType, ''))]
         try:
             fps = int(videoSettings['fps'])
         except TypeError:
             print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
         loopy += 1
         distanceOI_mm, xTick, xLabel = [], [], []
-        csv_df = pd.read_csv(currentFile, usecols=[columnNames[0], columnNames[1], columnNames[2], columnNames[3]])
+        csv_df = read_df(currentFile, wfileType)
+        csv_df = csv_df[[columnNames[0], columnNames[1], columnNames[2], columnNames[3]]]
         csv_df_shifted = csv_df.shift(periods=1)
         csv_df_shifted = csv_df_shifted.rename(columns={columnNames[0]: str(columnNames[0] + '_shifted'), columnNames[1]: str(columnNames[1] + '_shifted'), columnNames[2]: str(columnNames[2] + '_shifted'), columnNames[3]: str(columnNames[3] + '_shifted')})
         csv_df_combined = pd.concat([csv_df, csv_df_shifted], axis=1, join='inner')

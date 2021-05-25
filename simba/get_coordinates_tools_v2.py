@@ -134,5 +134,5 @@ def get_coordinates_nilsson(filenames,knownmm):
     insertStatus = False
     changeLoop = False
     ppm = euclidPixelDist / mm_dist
-    print('mm per pixel for video ' + '"' + str(videoName) + '" = ' + str(round(ppm,4)))
+    print('pixel per mm for video ' + '"' + str(videoName) + '" = ' + str(round(ppm,4)))
     return ppm

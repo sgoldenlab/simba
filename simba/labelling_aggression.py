@@ -3,10 +3,14 @@ import pandas as pd
 from PIL import Image, ImageTk
 import os
 from tkinter import filedialog
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 from subprocess import *
 import matplotlib.pyplot as plt
-
+from simba.rw_dfs import *
+from simba.drop_bp_cords import *
+from pylab import cm
+import cv2
+import numpy as np
 
 current_video = ""
 frames_in = []
@@ -17,7 +21,6 @@ new_index = []
 columns = []
 df = pd.DataFrame(index=new_index, columns=columns)
 jump_size = 0
-
 
 # Resets variables and dataFrame
 def reset():
@@ -34,10 +37,19 @@ def reset():
 
 # Retrieves behavior names from the config file
 def configure(file_name):
-    global columns
+    global wfileType
+    global animalsNo
+    global animalBpDict
+    global currDf
     config = ConfigParser()
     config.read(file_name)
     number_of_targets = config.get('SML settings', 'No_targets')
+    animalsNo = config.getint('General settings', 'animal_no')
+    poseEstimationBps = config.get('create ensemble settings', 'pose_estimation_body_parts')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
 
     for i in range(1, int(number_of_targets)+1):
         target = config.get('SML settings', 'target_name_' + str(i))
@@ -46,9 +58,34 @@ def configure(file_name):
         df[columns[i-1]] = 0
 
 
+    inputDfpath = str(os.path.join(os.path.dirname(projectini), 'csv', 'features_extracted',current_video + '.' + wfileType))
+    print(inputDfpath,'@@@@@@@@@@@@@')
+    currDf = read_df(inputDfpath, wfileType)
+    print(currDf)
+    try:
+        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
+        multiAnimalIDList = multiAnimalIDList.split(",")
+        if (multiAnimalIDList[0] != '') and (poseEstimationBps == 'user_defined'):
+            multiAnimalStatus = True
+            print('Applying settings for multi-animal tracking...')
+        else:
+            multiAnimalStatus = False
+            print('Applying settings for classical tracking...')
+
+    except NoSectionError:
+        multiAnimalIDList = ['']
+        multiAnimalStatus = False
+        print('Applying settings for classical tracking...')
+
+    Xcols, Ycols, Pcols = getBpNames(file_name)
+    cMapSize = int(len(Xcols)) + 1
+    colorListofList = createColorListofList(animalsNo, cMapSize)
+    animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, animalsNo, Xcols, Ycols, [], colorListofList)
+
 # Initializes all GUI widgets
 class MainInterface:
     def __init__(self):
+        padding = 5
         self.window = Toplevel()
         folder = Frame(self.window)
         folder.grid(row=0, column=1, sticky=N)
@@ -58,16 +95,16 @@ class MainInterface:
         self.button_frame.grid(row=1, column=0)
 
         self.frameNumber = Label(self.button_frame, text="Frame number")
-        self.frameNumber.grid(row=0, column=1)
+        self.frameNumber.grid(row=0, column=1, padx=padding)
         self.forward = Button(self.button_frame, text=">",
                               command=lambda: load_frame(current_frame_number+1, self.window, self.fbox))
-        self.forward.grid(row=1, column=3, sticky=E)
+        self.forward.grid(row=1, column=3, sticky=E, padx=padding)
         self.forward = Button(self.button_frame, text=">>",
                               command=lambda: load_frame(len(frames_in) - 1, self.window, self.fbox))
-        self.forward.grid(row=1, column=4, sticky=E)
+        self.forward.grid(row=1, column=4, sticky=E, padx=padding)
         self.back = Button(self.button_frame, text="<",
                            command=lambda: load_frame(current_frame_number-1, self.window, self.fbox))
-        self.back.grid(row=1, column=1, sticky=W)
+        self.back.grid(row=1, column=1, sticky=W, padx=padding)
         self.back = Button(self.button_frame, text="<<", command=lambda: load_frame(0, self.window, self.fbox))
         self.back.grid(row=1, column=0, sticky=W)
 
@@ -132,11 +169,11 @@ class MainInterface:
         self.lastFrame.grid(row=0, column=3, sticky=E)
 
         # Quit Button
-        self.generate = Button(self.window, text="Generate / Save csv", command=lambda: save_video(self.window))
+        self.generate = Button(self.window, text="Generate / Save annotations", command=lambda: save_video(self.window))
         self.generate.grid(row=2, column=1, sticky=N)
 
         # Loads the first frame
-        load_frame(0, self.window, self.fbox)
+        load_frame(0, self.window, self.fbox, )
 
         # Video Player
         video_player = Frame(self.window, width=100, height=100)
@@ -145,8 +182,8 @@ class MainInterface:
         video.grid(sticky=N, pady = 10)
         video_key = Label(video_player, text='\n\n  Keyboard shortcuts for video navigation: \n p = Pause/Play'
                                              '\n\n After pressing pause:'
-                                             '\n o = +2 frames \n e = +10 frames \n w = +1 second'
-                                             '\n\n t = -2 frames \n s = -10 frames \n x = -1 second'
+                                             '\n r = +2 frames \n e = +10 frames \n w = +1 second'
+                                             '\n\n o = -2 frames \n i = -10 frames \n u = -1 second'
                                              '\n\n q = Close video window \n\n')
         video_key.grid(sticky=W)
         update = Button(video_player, text='Show current video frame',
@@ -180,6 +217,7 @@ class MainInterface:
         if self.rangeOn.get():
             s = int(self.firstFrame.get())
             e = int(self.lastFrame.get())
+            print(s, e)
             save_values(s, e)
             if e < len(frames_in) - 1:
                 load_frame(e + 1, master, self.fbox)
@@ -193,6 +231,7 @@ class MainInterface:
 
 class MainInterface2:
     def __init__(self):
+        padding = 5
         self.window = Toplevel()
         folder = Frame(self.window)
         folder.grid(row=0, column=1, sticky=N)
@@ -202,16 +241,16 @@ class MainInterface2:
         self.button_frame.grid(row=1, column=0)
 
         self.frameNumber = Label(self.button_frame, text="Frame number")
-        self.frameNumber.grid(row=0, column=1)
+        self.frameNumber.grid(row=0, column=1, padx=padding)
         self.forward = Button(self.button_frame, text=">",
                               command=lambda: load_frame(current_frame_number+1, self.window, self.fbox))
-        self.forward.grid(row=1, column=3, sticky=E)
+        self.forward.grid(row=1, column=3, sticky=E, padx=padding)
         self.forward = Button(self.button_frame, text=">>",
                               command=lambda: load_frame(len(frames_in) - 1, self.window, self.fbox))
-        self.forward.grid(row=1, column=4, sticky=E)
+        self.forward.grid(row=1, column=4, sticky=E, padx=padding)
         self.back = Button(self.button_frame, text="<",
                            command=lambda: load_frame(current_frame_number-1, self.window, self.fbox))
-        self.back.grid(row=1, column=1, sticky=W)
+        self.back.grid(row=1, column=1, sticky=W, padx=padding)
         self.back = Button(self.button_frame, text="<<", command=lambda: load_frame(0, self.window, self.fbox))
         self.back.grid(row=1, column=0, sticky=W)
 
@@ -274,27 +313,26 @@ class MainInterface2:
 def play_video():
     script_directory = os.path.dirname(os.path.realpath(__file__))
     p = Popen('python ' + str(script_directory) + r"/play_video.py", stdin=PIPE, stdout=PIPE, shell=True)
-    main_project_dir = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])
-    video_dir = main_project_dir + '\\videos\\'
+    main_project_dir = os.path.dirname(projectini)
+    video_dir = os.path.join(main_project_dir, 'videos')
     video_list = os.listdir(video_dir)
-    print(video_list,video_dir)
     current_full_video_name = [i for i in video_list if current_video in i]
     try:
         current_full_video_name = current_full_video_name[0]
     except IndexError:
         print("Video not found in project_folder/videos, please make sure you have the video in the video folder")
-    print(current_full_video_name)
-    data = bytes(video_dir+str(current_full_video_name), 'utf-8')
+    print(os.path.join(video_dir,current_full_video_name))
+    data = bytes(os.path.join(video_dir, current_full_video_name), 'utf-8')
     p.stdin.write(data)
     p.stdin.close()
-    path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
+    path = os.path.join(main_project_dir,'subprocess.txt')
     with open(path, "w") as text_file:
         text_file.write(str(p.pid))
 
 
 # Updates and loads the frame corresponding to the frame the video is paused on
 def update_frame_from_video(master, entrybox):
-    f = open(str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/labelling_info.txt", 'r+')
+    f = open(os.path.join(os.path.dirname(projectini),'labelling_info.txt'), 'r+')
     os.fsync(f.fileno())
     vid_frame_no = int(f.readline())
     print(vid_frame_no)
@@ -306,48 +344,42 @@ def update_frame_from_video(master, entrybox):
 # loads the config file, creates an empty dataframe and loads the interface,
 # Prints working directory, current video name, and number of frames in folder.
 def choose_folder(project_name):
-    global current_video, projectini
+    global current_video, projectini,video_file_path
     projectini = project_name
-    img_dir = filedialog.askdirectory()
-    os.chdir(img_dir)
-    dirpath = os.path.basename(os.getcwd())
-    current_video = dirpath
-    print('Loading video ' + current_video + '...')
-
+    video_file_path = filedialog.askopenfilename()
+    current_video,_ = os.path.splitext(os.path.basename(video_file_path))
+    cap = cv2.VideoCapture(video_file_path)
+    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    cap.release()
+    del cap
     global frames_in
-    frames_in = []
-    for i in os.listdir(os.curdir):
-        if i.__contains__(".png"):
-            frames_in.append(i)
-        reset()
+    frames_in = list(range(0,length))
 
-    frames_in = sorted(frames_in, key=lambda x: int(x.split('.')[0]))
-    # print(frames_in)
     number_of_frames = len(frames_in)
     print("Number of Frames: " + str(number_of_frames))
 
     configure(project_name)
-
     MainInterface()
-    #create_data_frame(number_of_frames)
 
-def choose_folder2(framedir):
-    global current_video, guiwindow
-    img_dir = framedir
-    os.chdir(img_dir)
+def choose_folder2(videofilepath,inifile):
+    global current_video, guiwindow,video_file_path,current_frame_number,projectini
+    projectini = inifile
 
+    current_video,_ = os.path.splitext(os.path.basename(videofilepath))
+    video_file_path = videofilepath
+
+    cap = cv2.VideoCapture(video_file_path)
+    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    cap.release()
+    print(video_file_path)
+    del cap
     global frames_in
-    frames_in = []
-    for i in os.listdir(os.curdir):
-        if i.__contains__(".png"):
-            frames_in.append(i)
-        reset()
+    frames_in = list(range(0, length))
 
-    frames_in = sorted(frames_in, key=lambda x: int(x.split('.')[0]))
-    # print(frames_in)
     number_of_frames = len(frames_in)
     print("Number of Frames: " + str(number_of_frames))
 
+    configure(projectini)
     guiwindow = MainInterface2()
 
 
@@ -364,33 +396,65 @@ def load_frame(number, master, entry):
     except:
         pass
 
+    if number > max_index_frames_in:
+        print("Reached End of Frames")
+        current_frame_number = max_index_frames_in
+    elif number < 0:
+        current_frame_number = 0
+    else:
+        current_frame_number = number
+
+    entry.delete(0, END)
+    entry.insert(0, current_frame_number)
+
+    video_frame = Label(master, image='')
+    video_frame.grid(row=0, column=0)
+    max_size = 1080, 650
+    IDlabelLoc  = []
+
+
+    cap = cv2.VideoCapture(video_file_path)
+    cap.set(1,current_frame_number)
+    res, imageIn = cap.read()
+    cap.release()
+
+
     try:
-        if number > max_index_frames_in:
-            print("Reached End of Frames")
-            current_frame_number = max_index_frames_in
-        elif number < 0:
-            current_frame_number = 0
-        else:
-            current_frame_number = number
+        try:
+            maxResDimension = max(imageIn.shape[1], imageIn.shape[0])
+        except Exception as e:
+            print(e)
+            print('No images found - make sure you have video ' + str(video_file_path) + ' in your SimBA project.')
+        mySpaceScale, myRadius, myResolution, myFontScale = 60, 12, 1500, 1.5
+        circleScale, fontScale, spacingScale = int(myRadius / (myResolution / maxResDimension)), float(myFontScale / (myResolution / maxResDimension)), int(mySpaceScale / (myResolution / maxResDimension))
+        if animalsNo > 1:
+            for animal in range(animalsNo):
+                currentDictID = list(animalBpDict.keys())[animal]
+                currentDict = animalBpDict[currentDictID]
+                currNoBps = len(currentDict['X_bps']) - 1
+                IDappendFlag = False
+                for bp in range(currNoBps):
+                    currXheader, currYheader, currColor = currentDict['X_bps'][bp], currentDict['Y_bps'][bp], currentDict['colors'][bp]
+                    currAnimal = currDf.loc[currDf.index[current_frame_number], [currXheader, currYheader]]
+                    if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
+                        IDlabelLoc.append([currentDictID, currAnimal[0], currAnimal[1], currentDict['colors'][bp]])
+                        IDappendFlag = True
+                if IDappendFlag == False:
+                    IDlabelLoc.append([currentDictID, currAnimal[0], currAnimal[1], currentDict['colors'][bp]])
 
-        entry.delete(0, END)
-        entry.insert(0, current_frame_number)
+        for currAnimal in IDlabelLoc:
+            cv2.putText(imageIn, str(currAnimal[0]), (int(currAnimal[1]), int(currAnimal[2])), cv2.FONT_HERSHEY_COMPLEX, fontScale, currAnimal[3], 4)
 
-        video_frame = Label(master, image='')
-        video_frame.grid(row=0, column=0)
-
-        max_size = 1080, 650
-        current_image = Image.open(frames_in[current_frame_number])
-        current_image.thumbnail(max_size, Image.ANTIALIAS)
-        current_frame = ImageTk.PhotoImage(master=master, image=current_image)
-
-
-        video_frame.image = current_frame
-        video_frame.config(image=current_frame)
-        current_image.close()
-
-    except IndexError:
+    except NameError:
+        print('No image found')
         pass
+    imageIn = cv2.cvtColor(imageIn, cv2.COLOR_BGR2RGB)
+    current_image = Image.fromarray(imageIn)
+    current_image.thumbnail(max_size, Image.ANTIALIAS)
+    current_frame = ImageTk.PhotoImage(master=master, image=current_image)
+    video_frame.image = current_frame
+    video_frame.config(image=current_frame)
+    current_image.close()
 
 # Loads a new image frame
 def load_frame2(number, master,entry):
@@ -417,7 +481,13 @@ def load_frame2(number, master,entry):
         video_frame.grid(row=0, column=0)
 
         max_size = 1080, 650
-        current_image = Image.open(frames_in[current_frame_number])
+        print(video_file_path)
+        cap = cv2.VideoCapture(video_file_path)
+        cap.set(1, current_frame_number)
+        res, current_image = cap.read()
+        cap.release()
+        current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB)
+        current_image = Image.fromarray(current_image)
         current_image.thumbnail(max_size, Image.ANTIALIAS)
         current_frame = ImageTk.PhotoImage(master=master, image=current_image)
 
@@ -427,11 +497,6 @@ def load_frame2(number, master,entry):
 
     except IndexError:
         pass
-
-
-# Creates a new Pandas DataFrame for current Video
-# def create_data_frame(number):
-#     df.insert(0, 'frames.', list(range(0, number)))
 
 
 # Temporarily updates the value of each variable for each frame to either 0 or 1
@@ -448,36 +513,32 @@ def set_values(dictionary):
 
 # Saves the values of each behavior in the DataFrame and prints out the updated data frame
 def save_values(start, end):
-    global columns
-    contprintLoop = True
-    print('\n')
     if start == end:
         for i in range(len(behaviors)):
             df.at[current_frame_number, columns[i]] = int(behaviors[i])
-            if behaviors[i] != 0:
-                print('Annotated behavior: ' + columns[i] + '. Frame: ' + str(start) + '.')
-
     if start != end:
         for i in range(start, end+1):
             for b in range(len(behaviors)):
                 df.at[i, columns[b]] = int(behaviors[b])
-                if behaviors[b] != 0 and (contprintLoop == True):
-                    print('Annotated behavior: ' + columns[b] + '. Start frame: ' + str(start) + '. End frame: ' + str(end))
-            contprintLoop = False
+    #print(df.ix[current_frame_number])
+
 
 # Appends data to corresponding features_extracted csv and exports as new csv
 def save_video(master):
-    input_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\features_extracted\\" \
-                 + current_video + '.csv'
-    output_file = str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"\csv\targets_inserted\\" \
-                  + current_video + '.csv'
-    data = pd.read_csv(input_file)
+    global wfileType
+    input_file = str(os.path.join(os.path.dirname(projectini), 'csv', 'features_extracted', current_video + '.' + wfileType))
+    output_file = str(os.path.join(os.path.dirname(projectini), 'csv', 'targets_inserted', current_video + '.' + wfileType))
+    data = read_df(input_file, wfileType)
+    print(data,input_file)
+    try:
+        data = data.set_index('scorer')
+    except KeyError:
+        pass
     new_data = pd.concat([data, df], axis=1)
     new_data = new_data.fillna(0)
     new_data.rename(columns={'Unnamed: 0': 'scorer'}, inplace=True)
     try:
-        new_data.to_csv(output_file, index=FALSE)
-        print(output_file)
+        save_df(new_data, wfileType, output_file)
         print('Annotation file for "' + str(current_video) + '"' + ' created.')
         # saved last frame number on
         frameLog = os.path.join(os.path.dirname(projectini),'logs',"lastframe_log.ini")
@@ -492,6 +553,7 @@ def save_video(master):
         # write
         with open(frameLog, 'w') as configfile:
             config.write(configfile)
+
 
     except PermissionError:
         print('You don not have permission to save the annotation file - check that the file is not open in a different application. If you are working of a server make sure the file is not open on a different computer.')

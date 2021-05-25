@@ -1,11 +1,11 @@
-import os, glob
-import cv2
+#### ALL CRED TO Pierre Llorach, Boris Heifets lab @ Stanford!!
 
+import os
+import cv2
 
 def downsamplevideo_auto(width,height,filesFound,outputdir):
 
     downsamplelist = []
-
     ########### DEFINE COMMAND ###########
     for i in filesFound:
         currentFile = i
@@ -13,10 +13,10 @@ def downsamplevideo_auto(width,height,filesFound,outputdir):
         outFile = str(outFile) + '_downsampled.mp4'
         output = os.path.basename(outFile)
 
-        command = (str('ffmpeg -y -i ') + '"' + str(os.path.join(outputdir, os.path.basename(currentFile)))+ '"' + ' -vf scale='+str(width)+':'+ str(height) + ' ' + '"' + str(os.path.join(outputdir, output)) + '"'+ ' -hide_banner' + '\n'
-                   'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + os.path.dirname(outputdir) + '\\' + 'tmp\"' + '\n'
-                   'copy \"' + str(outputdir) + '\\' + output + '\" \"' +os.path.dirname(outputdir) +'\\' +'tmp\"' +'\n'
-                   'rename \"' +os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
+        command = (str('ffmpeg -y -i ') + '"' + str(outputdir) + '/' + os.path.basename(currentFile)+ '"' + ' -vf scale='+str(width)+':'+ str(height) + ' ' + '"'+ str(outputdir) + '/' + output + '"'+ ' -hide_banner' + '\n'
+                   'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + os.path.dirname(outputdir) + '/' + 'tmp/"' + '\n'
+                   'cp \"' + str(outputdir) + '/' + output + '" "' +os.path.dirname(outputdir) +'/' +'tmp/"' +'\n'
+                   'mv \"' +os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
 
         downsamplelist.append(command)
     print('Downsample added into queue')
@@ -29,10 +29,10 @@ def downsamplevideo_queue(width,height,filesFound,outputdir):
     outFile = str(outFile) + '_downsampled.mp4'
     output = os.path.basename(outFile)
 
-    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '\\' + os.path.basename(currentFile) + '"'+ ' -vf scale='+str(width)+':'+ str(height) + ' ' + '"'+ str(outputdir) + '\\' + output+ '"' + ' -hide_banner' + '\n'
-               'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + (outputdir) + '\\' + 'tmp\"' + '\n'
-               'copy \"' + str(outputdir) + '\\' + output + '\" \"' + (outputdir) +'\\' +'tmp\"' +'\n'
-               'rename \"' +os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
+    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '/' + os.path.basename(currentFile) + '"'+ ' -vf scale='+str(width)+':'+ str(height) + ' ' + '"'+ str(outputdir) + '/' + output+ '"' + ' -hide_banner' + '\n'
+               'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
+               'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir) +'/' +'tmp/"' +'\n'
+               'mv \"' +os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
 
     print(filesFound,'added into the downsample queue')
     return command
@@ -46,10 +46,10 @@ def greyscale_auto(outputdir,filesFound):
         outFile = currentFile.replace('.mp4', '')
         outFile = str(outFile) + '_grayscale.mp4'
         output = os.path.basename(outFile)
-        command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '\\' + os.path.basename(currentFile) + '"'+ ' -vf format=gray '+ '"'+ str(outputdir) + '\\' + output + '"'+ '\n'
-                   'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + os.path.dirname(outputdir)+'\\'+'tmp\"' +'\n'                     
-                   'copy \"' + str(outputdir) + '\\' + output + '\" \"' + os.path.dirname(outputdir)+'\\'+'tmp\"' +'\n'
-                   'rename \"' + os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
+        command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '/' + os.path.basename(currentFile) + '"'+ ' -vf format=gray '+ '"'+ str(outputdir) + '/' + output + '"'+ '\n'
+                   'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + os.path.dirname(outputdir)+'/'+'tmp/"' +'\n'                     
+                   'cp \"' + str(outputdir) + '/' + output + '" "' + os.path.dirname(outputdir)+'/'+'tmp/"' +'\n'
+                   'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
         greyscale_list.append(command)
     print('Grayscale added into queue')
     return greyscale_list
@@ -60,10 +60,10 @@ def greyscale_queue(outputdir,filesFound):
     outFile = currentFile.replace('.mp4', '')
     outFile = str(outFile) + '_grayscale.mp4'
     output = os.path.basename(outFile)
-    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '\\' + os.path.basename(currentFile)+ '"' + ' -vf format=gray '+ '"'+ str(outputdir) + '\\' + output + '"'+ '\n'
-               'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + (outputdir)+'\\'+'tmp\"' +'\n'                     
-               'copy \"' + str(outputdir) + '\\' + output + '\" \"' + (outputdir)+'\\'+'tmp\"' +'\n'
-               'rename \"' + os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
+    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '/' + os.path.basename(currentFile)+ '"' + ' -vf format=gray '+ '"'+ str(outputdir) + '/' + output + '"'+ '\n'
+               'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir)+'/'+'tmp/"' +'\n'                     
+               'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir)+'/'+'tmp/"' +'\n'
+               'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
 
     print(filesFound,'added into the grayscale queue')
     return command
@@ -76,10 +76,10 @@ def superimposeframe_auto(outputdir,filesFound):
         outFile = currentFile.replace('.mp4', '')
         outFile = str(outFile) + '_frame_no.mp4'
         output = os.path.basename(outFile)
-        command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'\\' + os.path.basename(currentFile)+ '"' + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy ' + '"'+ str(outputdir) + '\\' + output + '"'+ '\n'
-                   'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + os.path.dirname(outputdir)+'\\'+'tmp\"' +'\n'
-                   'copy \"' + str(outputdir) + '\\' + output + '\" \"' + os.path.dirname(outputdir)+'\\'+'tmp\"' + '\n'
-                   'rename \"' + os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
+        command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'/' + os.path.basename(currentFile)+ '"' + ' -vf "drawtext=fontfile=Arial.ttf: text=/'%{frame_num}/': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy ' + '"'+ str(outputdir) + '/' + output + '"'+ '\n'
+                   'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + os.path.dirname(outputdir)+'/'+'tmp/"' +'\n'
+                   'cp \"' + str(outputdir) + '/' + output + '" "' + os.path.dirname(outputdir)+'/'+'tmp/"' + '\n'
+                   'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
         superimposeframe_list.append(command)
     print('Superimpose frame added into queue.')
     return superimposeframe_list
@@ -90,10 +90,10 @@ def superimposeframe_queue(outputdir,filesFound):
     outFile = currentFile.replace('.mp4', '')
     outFile = str(outFile) + '_frame_no.mp4'
     output = os.path.basename(outFile)
-    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'\\' + os.path.basename(currentFile) + '"'+ ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+ '"'+ str(outputdir) + '\\' + output + '"'+ '\n'
-               'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + (outputdir)+'\\'+'tmp\"' +'\n'
-               'copy \"' + str(outputdir) + '\\' + output + '\" \"' + (outputdir)+'\\'+'tmp\"' + '\n'
-               'rename \"' + os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
+    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'/' + os.path.basename(currentFile) + '"'+ ' -vf "drawtext=fontfile=Arial.ttf: text=/'%{frame_num}/': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+ '"'+ str(outputdir) + '/' + output + '"'+ '\n'
+               'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir)+'/'+'tmp/"' +'\n'
+               'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir)+'/'+'tmp/"' + '\n'
+               'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
 
     print(filesFound,'added into the superimpose frame queue.')
     return command
@@ -107,10 +107,10 @@ def shortenvideos1_auto(outputdir,filesFound,starttime,endtime):
         outFile = currentFile.replace('.mp4', '')
         outFile = str(outFile) + '_shorten.mp4'
         output = os.path.basename(outFile)
-        command = (str('ffmpeg -y -i ')+ '"' + str(outputdir)+'\\' + os.path.basename(currentFile)+ '"' + ' -ss ' + str(starttime) +' -to ' + str(endtime) + ' -async 1 '+ '"'+ str(outputdir)+'\\' + output + '"'+ '\n'
-                        'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + os.path.dirname(outputdir)+'\\'+'tmp\"' +'\n'
-                        'copy \"' + str(outputdir) + '\\' + output + '\" \"' + os.path.dirname(outputdir)+'\\'+'tmp\"' + '\n'
-                        'rename \"' + os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
+        command = (str('ffmpeg -y -i ')+ '"' + str(outputdir)+'/' + os.path.basename(currentFile)+ '"' + ' -ss ' + str(starttime) +' -to ' + str(endtime) + ' -async 1 '+ '"'+ str(outputdir)+'/' + output + '"'+ '\n'
+                        'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + os.path.dirname(outputdir)+'/'+'tmp/"' +'\n'
+                        'cp \"' + str(outputdir) + '/' + output + '" "' + os.path.dirname(outputdir)+'/'+'tmp/"' + '\n'
+                        'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.join(str(outputdir, os.path.basename(currentFile)))+'"')
         shortenvideo_list.append(command)
     print('Shorten video added into queue')
     return shortenvideo_list
@@ -121,10 +121,10 @@ def shortenvideos1_queue(outputdir,filesFound,starttime,endtime):
     outFile = currentFile.replace('.mp4', '')
     outFile = str(outFile) + '_shorten.mp4'
     output = os.path.basename(outFile)
-    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'\\' + os.path.basename(currentFile) + '"'+ ' -ss ' + str(starttime) +' -to ' + str(endtime) + ' -async 1 '+ '"'+ str(outputdir)+'\\' + output + '"'+ '\n'
-                    'move \"' + str(outputdir) + '\\' + os.path.basename(currentFile) + '\" \"' + (outputdir)+'\\'+'tmp\"' +'\n'
-                    'copy \"' + str(outputdir) + '\\' + output + '\" \"' + (outputdir)+'\\'+'tmp\"' + '\n'
-                    'rename \"' + os.path.join(str(outputdir),output) + '\" \"' + os.path.basename(currentFile)+'\"')
+    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'/' + os.path.basename(currentFile) + '"'+ ' -ss ' + str(starttime) +' -to ' + str(endtime) + ' -async 1 '+ '"' + str(outputdir)+ '/' + output + '"'+ '\n'
+                    'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir)+'/'+'tmp/"' +'\n'
+                    'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir)+'/'+'tmp/"' + '\n'
+                    'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
 
     print(filesFound,'added into the shorten video queue')
     return command
@@ -203,10 +203,10 @@ def cropvid_auto(filenames,outputdir):
     total = width+height+topLeftX +topLeftY
 
     if total != 0:
-        command = (str('ffmpeg -y -i ') + str(outputdir) + '\\' + str(videoName) + str(' -vf ') + str('"crop=') + str(width) + ':' + str(height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -c:a copy ') + str(os.path.join(outputdir, fileOutName)) + '\n'
-            'move \"' + str(outputdir) + '\\' + videoName + '\" \"' + (outputdir) + '\\' + 'tmp\"' + '\n'
-             'copy \"' + str(outputdir) + '\\' + os.path.basename(fileOutName) + '\" \"' + (outputdir) + '\\' + 'tmp\"' + '\n'
-            'rename \"' + os.path.join(str(outputdir), os.path.basename(fileOutName)) + '\" \"' + os.path.basename(videoName) + '\"')
+        command = (str('ffmpeg -y -i ') + str(outputdir) + '/' + str(videoName) + str(' -vf ') + str('"crop=') + str(width) + ':' + str(height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -c:a copy ') + str(os.path.join(outputdir, fileOutName)) + '\n'
+            'mv \"' + str(outputdir) + '/' + videoName + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
+             'cp \"' + str(outputdir) + '/' + os.path.basename(fileOutName) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
+            'mv \"' + os.path.join(str(outputdir), os.path.basename(fileOutName)) + '" "' + os.path.basename(videoName) + '"')
         print(videoName,'added into the crop video queue.')
         os.remove(filePath)
     elif total == 0:
@@ -249,10 +249,10 @@ def cropvid_queue(filenames,outputdir):
     total = width+height+topLeftX +topLeftY
 
     if total != 0:
-        command = (str('ffmpeg -y -i ')+ '"' + str(outputdir) + '\\' + str(videoName)+ '"' + str(' -vf ') + str('"crop=') + str(width) + ':' + str(height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -c:a copy ') + '"'+ str(os.path.join(outputdir, fileOutName))+ '"' + '\n'
-            'move \"' + str(outputdir) + '\\' + videoName + '\" \"' + (outputdir) + '\\' + 'tmp\"' + '\n'
-             'copy \"' + str(outputdir) + '\\' + os.path.basename(fileOutName) + '\" \"' + (outputdir) + '\\' + 'tmp\"' + '\n'
-            'rename \"' + os.path.join(str(outputdir), os.path.basename(fileOutName)) + '\" \"' + os.path.basename(videoName) + '\"')
+        command = (str('ffmpeg -y -i ')+ '"' + str(outputdir) + '/' + str(videoName)+ '"' + str(' -vf ') + str('"crop=') + str(width) + ':' + str(height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -c:a copy ') + '"'+ str(os.path.join(outputdir, fileOutName))+ '"' + '\n'
+            'mv \"' + str(outputdir) + '/' + videoName + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
+             'cp \"' + str(outputdir) + '/' + os.path.basename(fileOutName) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
+            'mv \"' + os.path.join(str(outputdir), os.path.basename(fileOutName)) + '" "' + os.path.basename(videoName) + '"')
         print(videoName, 'added into the crop video queue.')
         os.remove(filePath)
         return command

@@ -1,9 +1,15 @@
-import os
+import os, glob
 import shutil
 import cv2
 import subprocess
 import sys
-import glob
+import glob, os
+from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError
+import pandas as pd
+from simba.extract_frames_fast import *
+from os import listdir
+from os.path import isfile, join
+
 
 def splitall(path):
     allparts = []
@@ -20,51 +26,32 @@ def splitall(path):
             allparts.insert(0, parts[1])
     return allparts
 
-def extract_frames_ini(directory):
-    filesFound = []
-
-    def execute(command):
-        print(command)
-        subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-
-    ########### FIND FILES ###########
-    for i in os.listdir(directory):
-        # if i.__contains__(".mp4"):
-        filesFound.append(i)
-
-
-    for i in filesFound:
-        pathDir1 = str(i[:-4])
-        pathDir0 =str(str(os.path.dirname(directory)) +'\\frames\\input' )
-        pathDir = str(str(pathDir0)+'\\' + pathDir1)
-
-        if not os.path.exists(pathDir):
-            os.makedirs(pathDir)
-            picFname = '%d.png'
-
-            saveDirFilenames = os.path.join(pathDir, picFname)
-
-            fname = str(directory)+'\\' + str(i)
-            cap = cv2.VideoCapture(fname)
-            fps = cap.get(cv2.CAP_PROP_FPS)
-            amount_of_frames = cap.get(7)
-            print('The number of frames in this video = ',amount_of_frames)
-            print('Extracting frames... (Might take awhile)')
-            command = str('ffmpeg -i ' + str(fname) + ' ' + '-q:v 1' + ' ' + '-start_number 0' + ' ' + str(saveDirFilenames))
-            print(command)
-            subprocess.call(command, shell=True)
-            print('Frames were extracted for',os.path.basename(pathDir))
-
+def extract_frames_ini(directory, configinifile):
+    filesFound = glob.glob(directory + '/*.avi') + glob.glob(directory + '/*.mp4')
+    configFile = str(configinifile)
+    config = ConfigParser()
+    try:
+        config.read(configFile)
+    except MissingSectionHeaderError:
+        print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
+    projectPath = config.get('General settings', 'project_path')
+    for video in filesFound:
+        fName = os.path.basename(video)
+        fName = fName[:-4]
+        outputPath = os.path.join(projectPath, 'frames', 'input', fName)
+        if not os.path.exists(outputPath):
+            os.makedirs(outputPath)
+            video_to_frames(video, outputPath, overwrite=True, every=1, chunk_size=1000)
+            print('Frames were extracted for',os.path.basename(outputPath))
 
         else:
-            print(os.path.basename(pathDir),'existed, no action taken, frames should be in there')
+            print(os.path.basename(outputPath),'already exist, no action taken.')
 
     print('All frames were extracted.')
 
 def copy_frame_folders(source,inifile):
-    source = str(source) + '\\'
     dest = str(os.path.dirname(inifile))
-    dest1 = str((dest) + '\\frames\\input')
+    dest1 = os.path.join(dest, 'frames', 'input')
     files = []
 
     ########### FIND FILES ###########
@@ -72,13 +59,13 @@ def copy_frame_folders(source,inifile):
         files.append(i)
 
     for f in files:
-        filetocopy = source + f
-        if os.path.exists(dest1 + '\\' + f):
+        filetocopy = os.path.join(source, f)
+        if os.path.exists(os.path.join(dest1, f)):
             print(f, 'already exist in', dest1)
 
-        elif not os.path.exists(dest1 + '\\' + f):
+        elif not os.path.exists(os.path.join(dest1, f)):
             print('Copying frames of',f)
-            shutil.copytree(filetocopy, dest1+'\\'+f)
+            shutil.copytree(filetocopy, os.path.join(dest1,f))
             nametoprint = os.path.join('',*(splitall(dest1)[-4:]))
             print(f, 'copied to', nametoprint)
 
@@ -88,9 +75,9 @@ def copy_singlevideo_DPKini(inifile,source):
     try:
         print('Copying video...')
         dest = str(os.path.dirname(inifile))
-        dest1 = str((dest) + '\\videos\\input')
+        dest1 = str(os.path.join(dest, 'videos', 'input'))
 
-        if os.path.exists(dest1+'\\'+os.path.basename(source)):
+        if os.path.exists(os.path.join(dest1, os.path.basename(source))):
             print(os.path.basename(source), 'already exist in', dest1)
         else:
             shutil.copy(source, dest1)
@@ -105,15 +92,17 @@ def copy_singlevideo_ini(inifile,source):
     try:
         print('Copying video...')
         dest = str(os.path.dirname(inifile))
-        dest1 = os.path.join(dest, 'videos')
-
-        if os.path.exists(dest1+'\\'+os.path.basename(source)):
+        filename, file_extension = os.path.basename(source), os.path.splitext(source)[1]
+        filename = os.path.splitext(filename)[0]
+        file_extension = file_extension.lower()
+        newFileName = os.path.join(filename + file_extension)
+        dest1 = os.path.join(dest, 'videos', newFileName)
+        if os.path.isfile(dest1):
             print(os.path.basename(source), 'already exist in', dest1)
         else:
             shutil.copy(source, dest1)
             nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
             print(os.path.basename(source),'copied to',nametoprint)
-
         print('Finished copying video.')
     except:
         pass
@@ -121,22 +110,21 @@ def copy_singlevideo_ini(inifile,source):
 def copy_multivideo_DPKini(inifile,source,filetype):
     try:
         print('Copying videos...')
-        source = str(source)+'\\'
         dest = str(os.path.dirname(inifile))
-        dest1 = str((dest)+ '\\videos\\input')
+        dest1 = os.path.join(dest, 'videos', 'input')
         files = []
 
         ########### FIND FILES ###########
         for i in os.listdir(source):
-            if i.__contains__(str('.'+filetype)):
+            if i.__contains__(str('.'+ filetype)):
                 files.append(i)
 
         for f in files:
-            filetocopy=source +'\\'+f
-            if os.path.exists(dest1+'\\'+f):
+            filetocopy = os.path.join(source, f)
+            if os.path.exists(os.path.join(dest1,f)):
                 print(f, 'already exist in', dest1)
 
-            elif not os.path.exists(dest1+'\\'+f):
+            elif not os.path.exists(os.path.join(dest1, f)):
                 shutil.copy(filetocopy, dest1)
                 nametoprint = os.path.join('', *(splitall(dest1)[-4:]))
                 print(f, 'copied to', nametoprint)
@@ -147,25 +135,36 @@ def copy_multivideo_DPKini(inifile,source,filetype):
 
 
 def copy_multivideo_ini(inifile,source,filetype):
-
-    if filetype not in ('avi', 'mp4'):
+    if filetype not in ('avi', 'mp4', 'MP4', 'AVI'):
         print('SimBA only works with .avi and .mp4 files. Please convert your videos to .mp4 or .avi to continue. ')
     else:
         print('Copying videos...')
-        dest1 = os.path.join(os.path.dirname(inifile), 'videos')
+        vidFolderPath = os.path.join(os.path.dirname(inifile), 'videos')
         files = glob.glob(source + '/*.' + filetype)
         for file in files:
-            filebasename = os.path.basename(file)
-            if os.path.exists(os.path.join(dest1, filebasename)):
+            filebasename, file_extension = os.path.basename(file), os.path.splitext(file)[1]
+            filebasename = os.path.splitext(filebasename)[0]
+            file_extension = file_extension.lower()
+            newFileName = os.path.join(filebasename + file_extension)
+            dest1 = os.path.join(vidFolderPath, newFileName)
+            if os.path.isfile(dest1):
                 print(filebasename, 'already exist in project')
-            elif not os.path.exists(os.path.join(dest1, filebasename)):
+                print(dest1)
+            elif not os.path.isfile(dest1):
                 shutil.copy(file, dest1)
-                print(filebasename, 'copied to project_folder/videos')
+                print(filebasename, 'copied to project_folder/videos.')
         print('Finished copying videos.')
 
 
 def copy_allcsv_ini(inifile,source):
-    print('Copying csv files...')
+    configFile = str(inifile)
+    config = ConfigParser()
+    try:
+        config.read(configFile)
+    except MissingSectionHeaderError:
+        print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
+    wfileType = config.get('General settings', 'workflow_file_type')
+    print('Copying tracking files to project using ' + str(wfileType) + ' file format.')
     dest = str(os.path.dirname(inifile))
     dest1 = os.path.join(dest, 'csv', 'input_csv', 'original_filename')
     if not os.path.exists(dest1):
@@ -184,10 +183,17 @@ def copy_allcsv_ini(inifile,source):
             print(filebasename, 'copied into SimBA project')
             if (('.csv') and ('DeepCut') in filebasename) or (('.csv') and ('DLC_') in filebasename):
                 if (('.csv') and ('DeepCut') in filebasename):
-                    newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
+                    newFname = str(filebasename.split('DeepCut')[0]) + '.' + wfileType
                 if (('.csv') and ('DLC_') in filebasename):
-                    newFname = str(filebasename.split('DLC_')[0]) + '.csv'
-                newFname = os.path.join(dest2, newFname)
+                    newFname = str(filebasename.split('DLC_')[0]) + '.' + wfileType
+            else:
+                newFname = str(filebasename.split('.')[0]) + '.' + wfileType
+            if wfileType == 'parquet':
+                currDf = pd.read_csv(os.path.join(dest2, filebasename))
+                currDf = currDf.apply(pd.to_numeric, errors='coerce')
+                currDf.to_parquet(os.path.join(dest2,newFname))
+                os.remove(os.path.join(dest2, filebasename))
+            if wfileType == 'csv':
                 try:
                     os.rename(os.path.join(dest2,filebasename),os.path.join(dest2,newFname))
                 except FileExistsError:
@@ -195,9 +201,16 @@ def copy_allcsv_ini(inifile,source):
                     print(filebasename + ' already exist in project')
             else:
                 pass
-    print('Finished importing tracking data.')
+
 
 def copy_singlecsv_ini(inifile,source):
+    configFile = str(inifile)
+    config = ConfigParser()
+    try:
+        config.read(configFile)
+    except MissingSectionHeaderError:
+        print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
+    wfileType = config.get('General settings', 'workflow_file_type')
     print('Copying csv file...')
     dest = str(os.path.dirname(inifile))
     dest1 = os.path.join(dest, 'csv', 'input_csv', 'original_filename')
@@ -212,10 +225,17 @@ def copy_singlecsv_ini(inifile,source):
         shutil.copy(source, dest2)
         if (('.csv') and ('DeepCut') in filebasename) or (('.csv') and ('DLC_') in filebasename):
             if (('.csv') and ('DeepCut') in filebasename):
-                newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
+                newFname = str(filebasename.split('DeepCut')[0]) + '.' + wfileType
             if (('.csv') and ('DLC_') in filebasename):
-                newFname = str(filebasename.split('DLC_')[0]) + '.csv'
-            newFname = os.path.join(dest2, newFname)
+                newFname = str(filebasename.split('DLC_')[0]) + '.' + wfileType
+        else:
+            newFname = str(filebasename.split('.')[0]) + '.' + wfileType
+        if wfileType == 'parquet':
+            currDf = pd.read_csv(os.path.join(dest2, filebasename))
+            currDf = currDf.apply(pd.to_numeric, errors='coerce')
+            currDf.to_parquet(os.path.join(dest2, newFname))
+            os.remove(os.path.join(dest2, filebasename))
+        if wfileType == 'csv':
             try:
                 os.rename(os.path.join(dest2, filebasename), os.path.join(dest2, newFname))
             except FileExistsError:
@@ -223,4 +243,5 @@ def copy_singlecsv_ini(inifile,source):
                 print(filebasename + ' already exist in project')
         else:
             pass
-    print('Finished importing tracking data.')
+
+    print('Csv imported.')

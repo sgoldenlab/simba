@@ -2,12 +2,17 @@ import pandas as pd
 import json
 import numpy as np
 import glob, os
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
+from simba.rw_dfs import *
 
 def json2csv_folder(configini, folderpath):
     print('Converting JSON files...')
     config = ConfigParser()
     config.read(configini)
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     projectPath = config.get('General settings', 'project_path')
     csv_dir_out = os.path.join(projectPath, 'csv', 'input_csv')
     filesFound = glob.glob(folderpath + '/*.json')
@@ -72,7 +77,7 @@ def json2csv_file(configini, filename):
     for column in range(len(keypointsDf.columns)):
         MultiIndexCol.append(tuple(('MARS', 'MARS', keypointsDf.columns[column])))
     keypointsDf.columns = pd.MultiIndex.from_tuples(MultiIndexCol, names=['scorer', 'bodypart', 'coords'])
-    keypointsDf.to_csv(savePath)
+    save_df(keypointsDf, wfileType, savePath)
     print('Json file ' + basename + ' imported')
     print('All MARS Json files imported as CSVs in SimBA')
 

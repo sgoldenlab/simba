@@ -1,32 +1,44 @@
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import cv2
-from labelling_aggression import *
+from simba.labelling_aggression import *
 import threading
+from simba.rw_dfs import *
+
+
 def updateThreshold_graph(inifile,csv,model):
-    ## find the csv for df
     configFile = str(inifile) ## get ini file
     config = ConfigParser()
     config.read(configFile)
     csv_dir = config.get('General settings', 'csv_path')
+    project_path = config.get('General settings', 'project_path')
+    videos_path = os.path.join(project_path, 'videos')
+
     currFile = os.path.join(csv_dir,"validation",(os.path.basename(csv)))
     classifierName = str(os.path.basename(model)).split(".")[0]
-    currDf = pd.read_csv(currFile)
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
+    currDf = read_df(currFile, wfileType)
     probabilityColumnName = 'Probability_' + classifierName
     probs = currDf[[probabilityColumnName]].to_numpy()
 
     # get frame dir
     frames_dir_in = config.get('Frame settings', 'frames_dir_in')
-    currFrameFolder = os.path.basename(currFile).replace('.csv', '')
+    currFrameFolder = os.path.basename(currFile).replace('.' + wfileType, '')
     currFramesDir = os.path.join(frames_dir_in, currFrameFolder) ### get current video frames folder
 
-    master = choose_folder2(currFramesDir) ## open up label gui
+    # get video file
+    currentVideoFileName = os.path.basename(currFile).replace('.' + wfileType, '.mp4')
+    current_video_file_path = os.path.join(videos_path, currentVideoFileName)
+    cap = cv2.VideoCapture(current_video_file_path)
+    master = choose_folder2(current_video_file_path,inifile) ## open up label gui
 
     ### gets mouse click on graph to open up the frames
     def onclick(event):
-
         if event.dblclick:
             if event.button ==1: ##get point 1 on double left click
                 probability = probs[int(event.xdata)].astype(str)
@@ -37,6 +49,8 @@ def updateThreshold_graph(inifile,csv,model):
                 fig.canvas.flush_events()
                 a.remove()
     #plot graphs
+    import matplotlib
+    matplotlib.use('TkAgg')
     fig, ax = plt.subplots()
     ax.plot(probs)
     plt.xlabel('frame #', fontsize=16)

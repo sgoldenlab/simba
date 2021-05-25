@@ -4,22 +4,19 @@ import os
 import signal
 import pandas as pd
 
-currentVideoPath = sys.stdin.readline()
-print(currentVideoPath)
+currentVideoPath = sys.stdin.read()
+projpath = os.path.dirname(os.path.dirname(currentVideoPath))
 capture = cv2.VideoCapture(currentVideoPath)
-frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
-width = int(capture.get(3))
-height = int(capture.get(4))
-f = open(str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + '/labelling_info.txt', 'w')
-video_info_path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2])) + '/logs/video_info.csv'
+frame_count, width, height = int(capture.get(cv2.CAP_PROP_FRAME_COUNT)), int(capture.get(3)), int(capture.get(4))
+f = open(os.path.join(projpath,'labelling_info.txt'), 'w')
+video_info_path = os.path.join((projpath), 'logs', 'video_info.csv')
 print(video_info_path)
 vidinfDf = pd.read_csv(video_info_path)
 videoName = os.path.basename(currentVideoPath)
 videoName = videoName.split('.', 2)[0]
-# currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == videoName]
-# fps = int(currVideoSettings['fps'])
 fps = capture.get(cv2.CAP_PROP_FPS)
 timeBetFrames = int(1000/fps)
+
 
 def printOnFrame(currentFrame):
     currentTime = currentFrame / fps
@@ -34,17 +31,19 @@ while True:
         while True:
             key2 = cv2.waitKey(1) or 0xff
             ### THE VIDEO IS PAUSED
-            currDisplayFrameNo = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+            currDisplayFrameNo = int(capture.get(cv2.CAP_PROP_POS_FRAMES))-1
             f.seek(0)
             f.write(str(currDisplayFrameNo-1))
+
             f.truncate()
             f.flush()
             os.fsync(f.fileno())
             ### BACK UP TWO FRAME
-            if key2 == ord('t'):
+
+            if key2 == ord('o'):
                 capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo - 2))
                 ret, frame = capture.read()
-                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))-2
                 printOnFrame(currentFrame)
                 cv2.imshow('Video', frame)
                 f.seek(0)
@@ -52,11 +51,12 @@ while True:
                 f.truncate()
                 f.flush()
                 os.fsync(f.fileno())
+
             ### BACK UP TEN FRAME
-            if key2 == ord('s'):
-                capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo - 11))
+            if key2 == ord('i'):
+                capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo - 10))
                 ret, frame = capture.read()
-                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))-2
                 printOnFrame(currentFrame)
                 cv2.imshow('Video', frame)
                 f.seek(0)
@@ -65,10 +65,10 @@ while True:
                 f.flush()
                 os.fsync(f.fileno())
             ### BACK UP 1s
-            if key2 == ord('x'):
+            if key2 == ord('u'):
                 capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo-fps))
                 ret, frame = capture.read()
-                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))-2
                 printOnFrame(currentFrame)
                 cv2.imshow('Video', frame)
                 f.seek(0)
@@ -80,7 +80,7 @@ while True:
             if key2 == ord('w'):
                 capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo+fps))
                 ret, frame = capture.read()
-                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))-2
                 printOnFrame(currentFrame)
                 cv2.imshow('Video', frame)
                 f.seek(0)
@@ -89,10 +89,10 @@ while True:
                 f.flush()
                 os.fsync(f.fileno())
             ### FORWARD TWO FRAMES
-            if key2 == ord('o'):
-                capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo + 1))
+            if key2 == ord('r'):
+                capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo + 2))
                 ret, frame = capture.read()
-                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))-2
                 printOnFrame(currentFrame)
                 cv2.imshow('Video', frame)
                 f.seek(0)
@@ -102,9 +102,9 @@ while True:
                 os.fsync(f.fileno())
             ### FORWARD TEN FRAMES
             if key2 == ord('e'):
-                capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo + 9))
+                capture.set(cv2.CAP_PROP_POS_FRAMES, (currDisplayFrameNo + 10))
                 ret, frame = capture.read()
-                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+                currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))-2
                 printOnFrame(currentFrame)
                 cv2.imshow('Video', frame)
                 f.seek(0)
@@ -117,7 +117,7 @@ while True:
             if key2 == ord('q'):
                 capture.release()
                 cv2.destroyAllWindows()
-                path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
+                path = os.path.join(projpath,'subprocess.txt')
                 txtFile = open(path)
                 line = txtFile.readline()
                 os.kill(int(line), signal.SIGTERM)
@@ -125,7 +125,7 @@ while True:
             if cv2.getWindowProperty('Video', 1) == -1:
                 capture.release()
                 cv2.destroyAllWindows()
-                path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
+                path = os.path.join(projpath,'subprocess.txt')
                 txtFile = open(path)
                 line = txtFile.readline()
                 try:
@@ -133,7 +133,7 @@ while True:
                 except OSError:
                     print('OSError: Cannot save/read latest image file CSV. Please try again')
 
-    currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))
+    currentFrame = int(capture.get(cv2.CAP_PROP_POS_FRAMES))-1
     printOnFrame(currentFrame)
     cv2.namedWindow('Video', cv2.WINDOW_NORMAL)
     cv2.imshow('Video', frame)
@@ -145,7 +145,7 @@ while True:
 capture.release()
 f.close()
 cv2.destroyAllWindows()
-path = (str(os.path.split(os.path.dirname(os.path.dirname(os.getcwd())))[-2]) + r"/subprocess.txt")
+path = os.path.join(projpath,'subprocess.txt')
 txtFile = open(path)
 line = txtFile.readline()
 os.kill(int(line), signal.SIGTERM)
