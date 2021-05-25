@@ -42,6 +42,15 @@ def extract_features_wotarget_16(inifile):
     roll_windows, loopy = [], 0
     roll_windows_values = [2, 5, 6, 7.5, 15]
 
+    #REMOVE WINDOWS THAT ARE TOO SMALL
+    minimum_fps = vidinfDf['fps'].min()
+    for win in range(len(roll_windows_values)):
+        if minimum_fps < roll_windows_values[win]:
+            roll_windows_values[win] = minimum_fps
+        else:
+            pass
+    roll_windows_values = list(set(roll_windows_values))
+
     ########### FIND CSV FILES ###########
     print(csv_dir_in)
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
@@ -61,6 +70,10 @@ def extract_features_wotarget_16(inifile):
 
         fps = float(currVideoSettings['fps'])
         print('Processing ' + '"' + str(currVidName) + '".' + ' Fps: ' + str(fps) + ". mm/ppx: " + str(currPixPerMM))
+
+
+
+
 
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))

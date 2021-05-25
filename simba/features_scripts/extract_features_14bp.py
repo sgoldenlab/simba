@@ -36,6 +36,16 @@ def extract_features_wotarget_14(inifile):
     roll_windows_values = [2, 5, 6, 7.5, 15]
     loopy = 0
 
+    #REMOVE WINDOWS THAT ARE TOO SMALL
+    minimum_fps = vidinfDf['fps'].min()
+    for win in range(len(roll_windows_values)):
+        if minimum_fps < roll_windows_values[win]:
+            roll_windows_values[win] = minimum_fps
+        else:
+            pass
+    roll_windows_values = list(set(roll_windows_values))
+
+
     ########### FIND CSV FILES ###########
     for i in os.listdir(csv_dir_in):
         if i.__contains__(".csv"):
