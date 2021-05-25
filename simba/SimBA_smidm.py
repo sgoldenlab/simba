@@ -75,7 +75,7 @@ from simba.features_scripts.extract_features_4bp import extract_features_wotarge
 from simba.features_scripts.extract_features_user_defined import extract_features_wotarget_user_defined
 from simba.sklearn_plot_scripts.plot_sklearn_results_2 import plotsklearnresult
 from simba.sklearn_plot_scripts.plot_sklearn_results_2_single import plotsklearnresultsingle
-from simba.drop_bp_cords import define_bp_drop_down,reverse_dlc_input_files
+from simba.drop_bp_cords import define_bp_drop_down
 from simba.drop_bp_cords import bodypartConfSchematic
 from simba.define_new_pose_config import define_new_pose_configuration
 # from simba.dpk_create_project_ini import write_dpkfile
@@ -101,7 +101,6 @@ from simba.import_solomon import solomonToSimba
 from simba.reverse_tracking_order import reverse_tracking_2_animals
 from simba.Kleinberg_burst_analysis import run_kleinberg
 from simba.FSTCC import FSTCC_perform
-from simba.pup_retrieval_1 import pup_retrieval_1
 
 import urllib.request
 from cefpython3 import cefpython as cef
@@ -803,6 +802,7 @@ class FileSelect(Frame):
     @property
     def file_path(self):
         return self.filePath.get()
+
 
 class Entry_Box(Frame):
     def __init__(self, parent=None, fileDescription="", labelwidth='',status=None, validation=None, **kw):
@@ -3324,7 +3324,7 @@ class project_config:
         try:
             noTarget = int(noTargetStr)
         except ValueError:
-            assert False, 'Invalid number of predictive classifiers'
+            assert False, 'invalid number of predictive classifiers'
 
         self.all_entries = []
         self.lab=[0]*noTarget
@@ -3491,7 +3491,7 @@ class loadprojectini:
             targetlist[(config.get('SML settings','target_name_'+str(i+1)))]=(config.get('SML settings','target_name_'+str(i+1)))
         #starting of gui
         simongui = Toplevel()
-        simongui.minsize(1300, 800)
+        simongui.minsize(1100, 450)
         simongui.wm_title("Load project")
         simongui.columnconfigure(0, weight=1)
         simongui.rowconfigure(0, weight=1)
@@ -3581,12 +3581,11 @@ class loadprojectini:
         archiveentrybox = Entry_Box(label_archivecsv,'Archive folder name', '16')
         button_archivecsv = Button(label_archivecsv,text='Archive',command = lambda: archive_all_csvs(self.projectconfigini,archiveentrybox.entry_get))
 
-        #reverse identity
-        label_reverseID = LabelFrame(label_import,text='Reverse Tracking Identity',font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
-        label_reverse_info = Label(label_reverseID,text='Note: This only works for 2 animals tracking')
-        label_git_reverse = Label(label_reverseID, text='[Click here to learn more about the reverse identity process]', cursor='hand2', fg='blue')
-        label_git_reverse.bind('<Button-1>', lambda e: webbrowser.open_new('https://github.com/sgoldenlab/simba/blob/master/docs/reverse_annotations.md'))
-        reverse_button = Button(label_reverseID,text='Reverse ID',command=self.reverseid)
+        # #reverse identity
+        # label_reverseID = LabelFrame(label_import,text='Reverse Tracking Identity',font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
+        # label_git_reverse = Label(label_reverseID, text='[Click here to learn more about the reverse identity process]', cursor='hand2', fg='blue')
+        # label_git_reverse.bind('<Button-1>', lambda e: webbrowser.open_new('https://github.com/sgoldenlab/simba/blob/master/docs/reverse_annotations.md'))
+        # reverse_button = Button(label_reverseID,text='Reverse ID',command=lambda:reverse_tracking_2_animals(self.projectconfigini))
 
         #get coordinates
         label_setscale = LabelFrame(tab3,text='Video parameters (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
@@ -3646,10 +3645,10 @@ class loadprojectini:
         self.hmlvar.set(1)
         button_hmlocation = Button(processmovementdupLabel,text='Create heat maps',command=lambda:self.run_roiAnalysisSettings(Toplevel(),self.hmlvar,'locationheatmap'))
 
-        button_timebins_M = Button(processmovementdupLabel,text='Time bins: Distance/velocity',command = lambda: self.timebin_ml("Time bins: Distance/Velocity",))
+        button_timebins_M = Button(processmovementdupLabel,text='Time bins: Distance/velocity',command = lambda: self.timebinmove('mov'))
         button_lineplot = Button(processmovementdupLabel, text='Generate path plot', command=self.quicklineplot)
         button_analyzeDirection = Button(processmovementdupLabel,text='Analyze directionality between animals',command =lambda:directing_to_other_animals(self.projectconfigini) )
-        button_visualizeDirection = Button(processmovementdupLabel,text='Visualize directionality between animals',command=lambda:ROI_directionality_other_animals_visualize(self.projectconfigini))
+        button_visualizeDirection = Button(processmovementdupLabel,text='Visualize directionalitybetween animals',command=lambda:ROI_directionality_other_animals_visualize(self.projectconfigini))
 
         #organize
         processmovementdupLabel.grid(row=0,column=4,sticky=N)
@@ -3741,7 +3740,7 @@ class loadprojectini:
         button_run_rfmodelsettings = Button(label_runmachinemodel,text='Model Settings',command=self.modelselection)
         # self.descrimination_threshold = Entry_Box(label_runmachinemodel,'Discrimination threshold','28')
         # self.shortest_bout = Entry_Box(label_runmachinemodel,'Minimum behavior bout length (ms)','28')
-        button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command = self.runrfmodel)
+        button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command = lambda: threading.Thread(target=self.runrfmodel).start())
 
         #kleinberg smoothing
         kleinberg_button = Button(label_runmachinemodel,text='Kleinberg Smoothing',command = self.kleinbergMenu)
@@ -3766,27 +3765,12 @@ class loadprojectini:
 
         #plot sklearn res
         label_plotsklearnr = LabelFrame(tab10,text='Sklearn visualization',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
-
-        #lbl prob threshold
-        lbl_probthreshold = LabelFrame(label_plotsklearnr,text='Body-part probability threshold',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
-        lbl_thresexplain = Label(lbl_probthreshold,text='Bodyparts below the set threshold won\'t be shown in the output.')
-        self.bpthres = Entry_Box(lbl_probthreshold,'Body-part probability threshold','32')
-        bpthresbutton = Button(lbl_probthreshold,text='Save threshold',command= self.savethres)
-
-        #set bp threshold
-        try:
-            thres = config.get('threshold_settings', 'bp_threshold_sklearn')
-            self.bpthres.entry_set(str(thres))
-        except:
-            self.bpthres.entry_set(0.0)
-
         #all videos
         label_skv_all = LabelFrame(label_plotsklearnr,text='Apply to all videos',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         self.videovar = IntVar()
         self.genframevar = IntVar()
         videocheck = Checkbutton(label_skv_all,text='Generate video',variable=self.videovar)
         framecheck = Checkbutton(label_skv_all,text='Generate frame',variable=self.genframevar)
-
         button_plotsklearnr = Button(label_skv_all,text='Visualize classification results',command =self.plotsklearn_result)
         #single video
         label_skv_single = LabelFrame(label_plotsklearnr, text='Apply to single video', font=("Helvetica", 12, 'bold'),pady=5, padx=5, fg='black')
@@ -3921,7 +3905,7 @@ class loadprojectini:
         # button_dlsconfirm = Button(label_deeplabstream,text='Confirm', command = self.DLSsettings)
 
         #addons
-        lbl_addon = LabelFrame(tab12,text='SimBA Expansions',pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
+        lbl_addon = LabelFrame(tab12,text='SimBA Expansion',pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
         button_bel = Button(lbl_addon,text='Pup retrieval - Analysis Protocol 1',command = self.pupMenu)
 
         #organize
@@ -3952,10 +3936,9 @@ class loadprojectini:
         self.frame_folder.grid(row=0,sticky=W)
         button_importframefolder.grid(row=1,sticky=W)
         #
-        label_reverseID.grid(row=2,column=1,sticky=N+W,pady=5,padx=5)
-        label_reverse_info.grid(row=0,sticky=W)
-        label_git_reverse.grid(row=1,sticky=W)
-        reverse_button.grid(row=2,sticky=W,pady=5)
+        # label_reverseID.grid(row=2,column=1,sticky=N+W,pady=5,padx=5)
+        # label_git_reverse.grid(row=0,sticky=W)
+        # reverse_button.grid(row=1,sticky=W)
 
         label_newclassifier.grid(row=0,column=2,sticky=N+W,pady=5,padx=5)
         self.classifierentry.grid(row=0,column=0,sticky=W)
@@ -4037,15 +4020,11 @@ class loadprojectini:
         button_process_severity.grid(row=2,sticky=W,pady=8)
 
         label_plotsklearnr.grid(row=11,column=0,sticky=W+N,padx=5)
-        lbl_probthreshold.grid(row=0,sticky=W,padx=5,pady=10)
-        lbl_thresexplain.grid(row=0,sticky=W)
-        self.bpthres.grid(row=1,sticky=E)
-        bpthresbutton.grid(row=2,padx=5,pady=10)
-        label_skv_all.grid(row=1,sticky=W,padx=5,pady=10)
+        label_skv_all.grid(row=0,sticky=W,padx=5,pady=10)
         videocheck.grid(row=0,sticky=W)
         framecheck.grid(row=1,sticky=W)
         button_plotsklearnr.grid(row=2,sticky=W)
-        label_skv_single.grid(row=2,sticky=W,pady=10,padx=5)
+        label_skv_single.grid(row=1,sticky=W,pady=10,padx=5)
         self.video_entry.grid(row=0,sticky=W)
         videocheck2.grid(row=1,sticky=W)
         framecheck2.grid(row=2,sticky=W)
@@ -4110,97 +4089,50 @@ class loadprojectini:
         # self.label_settingsini.grid(row=0,sticky=W)
         # button_dlsconfirm.grid(row=1,pady=5)
 
-    def reverseid(self):
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        noanimal = int(config.get('General settings','animal_no'))
-
-        if noanimal ==2:
-            reverse_dlc_input_files(self.projectconfigini)
-        else:
-            print('This only works if you have exactly 2 animals in your tracking data and video.')
-
-    def savethres(self):
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        config.set('threshold_settings', 'bp_threshold_sklearn',str(self.bpthres.entry_get))
-        with open(self.projectconfigini, 'w') as configfile:
-            config.write(configfile)
-
-        print('Threshold saved >>', str(self.bpthres.entry_get))
-
-
     def pupMenu(self):
         #top lvl
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        try:
-            multi_animal_IDs = config.get('Multi animal IDs', 'id_list').split(',')
-        except (NoSectionError, NoOptionError):
-            multi_animal_IDs = ['1_mother', ' 2_pup']
-        if len(multi_animal_IDs) != 2:
-            multi_animal_IDs = ['1_mother', ' 2_pup']
-
-
         puptoplvl = Toplevel()
         puptoplvl.minsize(400,320)
         puptoplvl.wm_title('Pup retrieval - Analysis Protocol 1')
 
         #lblframe for input
         lbl_pup = LabelFrame(puptoplvl,text='Pup retrieval - Analysis Protocol 1', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
-        prob_pup = Entry_Box(lbl_pup,'Tracking probability (pup)','20')
-        prob_pup.entry_set(0.025)
-        prob_mom = Entry_Box(lbl_pup,'Tracking probability (dam)','20')
-        prob_mom.entry_set(0.5)
-        dist_start = Entry_Box(lbl_pup, 'Start distance criterion (mm)', '20')
-        dist_start.entry_set(80)
-        carry_frames_seconds = Entry_Box(lbl_pup, 'Carry frames (s)', '20')
-        carry_frames_seconds.entry_set(3)
-        corenest_name = Entry_Box(lbl_pup, 'Core-nest name', '20')
-        corenest_name.entry_set('corenest')
-        nest_name = Entry_Box(lbl_pup, 'Nest name', '20')
-        nest_name.entry_set('nest')
-        dam_name = Entry_Box(lbl_pup, 'Dam name', '20')
-        dam_name.entry_set(multi_animal_IDs[0])
-        pup_name = Entry_Box(lbl_pup, 'Pup name', '20')
-        pup_name.entry_set(multi_animal_IDs[1])
-        smooth_function = Entry_Box(lbl_pup, 'Smooth function', '20')
-        smooth_function.entry_set('gaussian')
-        smooth_factor = Entry_Box(lbl_pup, 'Smooth factor', '20')
-        smooth_factor.entry_set(5)
-        max_time = Entry_Box(lbl_pup, 'Max time (s)', '20')
-        max_time.entry_set(90)
-        carry_classifier_name = Entry_Box(lbl_pup, 'Carry classifier name', '20')
-        carry_classifier_name.entry_set('carry')
-        approach_classifier_name = Entry_Box(lbl_pup, 'Approach classifier name', '20')
-        approach_classifier_name.entry_set('approach')
-        dig_classifier_name = Entry_Box(lbl_pup, 'Dig classifier name', '20')
-        dig_classifier_name.entry_set('doggy')
+        prob_pup = Entry_Box(lbl_pup,'prob_pup','20')
+        prob_mom = Entry_Box(lbl_pup,'prob_mother','20')
+        dist_start = Entry_Box(lbl_pup, 'dist_start_crit', '20')
+        dist_crit = Entry_Box(lbl_pup, 'dist_crit', '20')
+        prob_crit_certain = Entry_Box(lbl_pup, 'prob_crit_certain', '20')
+        mm_deviation = Entry_Box(lbl_pup, 'mm_deviation', '20')
+        carry_frames_seconds = Entry_Box(lbl_pup, 'carry_frames_seconds', '20')
+        smooth_factor = Entry_Box(lbl_pup, 'smooth_factor', '20')
+        corenest_name = Entry_Box(lbl_pup, 'corenest_name', '20')
+        nest_name = Entry_Box(lbl_pup, 'nest_name', '20')
+        dam_name = Entry_Box(lbl_pup, 'dam_name', '20')
+        pup_name = Entry_Box(lbl_pup, 'pup_name', '20')
+        carry_classifier_name = Entry_Box(lbl_pup, 'carry_classifier_name', '20')
+        approach_classifier_name = Entry_Box(lbl_pup, 'approach_classifier_name', '20')
+        smooth_function = Entry_Box(lbl_pup, 'smooth_function', '20')
 
         #button
-        button_run = Button(puptoplvl,text='RUN',font=("Helvetica",12,'bold'),fg='red',command= lambda: pup_retrieval_1(self.projectconfigini, float(prob_pup.entry_get), float(prob_mom.entry_get), float(dist_start.entry_get), float(carry_frames_seconds.entry_get), float(smooth_factor.entry_get), corenest_name.entry_get,  nest_name.entry_get, dam_name.entry_get, pup_name.entry_get, smooth_function.entry_get, int(max_time), carry_classifier_name.entry_get, approach_classifier_name.entry_get, dig_classifier_name.entry_get))
+        button_run = Button(puptoplvl,text='RUN',font=("Helvetica",12,'bold'),fg='red',command=print('run'))
 
         #organize
         lbl_pup.grid(row=0,sticky=W)
         prob_pup.grid(row=0,sticky=W)
         prob_mom.grid(row=1,sticky=W)
         dist_start.grid(row=2,sticky=W)
-        carry_frames_seconds.grid(row=4,sticky=W)
-        corenest_name.grid(row=5,sticky=W)
-        nest_name.grid(row=6,sticky=W)
-        dam_name.grid(row=7,sticky=W)
-        pup_name.grid(row=8,sticky=W)
-        smooth_function.grid(row=9, sticky=W)
-        smooth_factor.grid(row=10, sticky=W)
-        max_time.grid(row=11, sticky=W)
-        carry_classifier_name.grid(row=12,sticky=W)
-        approach_classifier_name.grid(row=13,sticky=W)
-        dig_classifier_name.grid(row=14, sticky=W)
+        dist_crit.grid(row=3,sticky=W)
+        prob_crit_certain.grid(row=4,sticky=W)
+        mm_deviation.grid(row=5,sticky=W)
+        carry_frames_seconds.grid(row=5,sticky=W)
+        smooth_factor.grid(row=6,sticky=W)
+        corenest_name.grid(row=7,sticky=W)
+        nest_name.grid(row=8,sticky=W)
+        dam_name.grid(row=9,sticky=W)
+        pup_name.grid(row=10,sticky=W)
+        carry_classifier_name.grid(row=11,sticky=W)
+        approach_classifier_name.grid(row=12,sticky=W)
+        smooth_function.grid(row=13,sticky=W)
 
         button_run.grid(row=1,padx=10,pady=10)
 
@@ -4323,7 +4255,9 @@ class loadprojectini:
 
         print(classifier_list,'selected')
         run_kleinberg(self.projectconfigini,classifier_list,self.k_sigma.entry_get,self.k_gamma.entry_get,self.k_hierarchy.entry_get)
-        print('Kleinberg filter applied, process completed.')
+
+
+
 
 
     def DLSsettings(self):
@@ -4553,17 +4487,7 @@ class loadprojectini:
 
         #threshold
         self.p_threshold = Entry_Box(vrtoplevel,'Bp probability threshold','20')
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        #set threshdhol if exist
-        try:
-            thres = config.get('ROI settings', 'probability_threshold')
-            self.p_threshold.entry_set(thres)
-        except:
-            self.p_threshold.entry_set(0.0)
-
+        self.p_threshold.entry_set(0.000)
         thresholdlabel = Label(vrtoplevel,text='Note: body-part locations detected with probabilities below this threshold will be filtered out.')
 
 
@@ -4629,18 +4553,7 @@ class loadprojectini:
 
         # threshold
         self.p_threshold_b = Entry_Box(vrfeattoplevel, 'Bp probability threshold', '20')
-
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        # set threshdhol if exist
-        try:
-            thres = config.get('ROI settings', 'probability_threshold')
-            self.p_threshold_b.entry_set(thres)
-        except:
-            self.p_threshold_b.entry_set(0.0)
-
+        self.p_threshold_b.entry_set(0.000)
         thresholdlabel = Label(vrfeattoplevel,
                                text='Note: body-part locations detected with probabilities below this threshold will be filtered out.')
 
@@ -4717,18 +4630,6 @@ class loadprojectini:
 
         self.frame = Frame(self.label_import_csv)
 
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        no_animals_int = config.getint('General settings', 'animal_no')
-
-        try:
-            self.animal_ID_list = config.get('Multi animal IDs', 'id_list').split(',')
-        except MissingSectionHeaderError:
-            self.animal_ID_list = []
-            for animal in range(no_animals_int): animal_ID_list.append('Animal_' + str(animal + 1))
-
         if val == 'CSV (DLC/DeepPoseKit)':
             # multicsv
             label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
@@ -4776,9 +4677,8 @@ class loadprojectini:
         elif val in ('SLP (SLEAP)','H5 (multi-animal DLC)'):
             animalsettings = LabelFrame(self.frame, text='Animal settings', pady=5, padx=5)
             noofanimals = Entry_Box(animalsettings, 'No of animals', '15')
-            noofanimals.entry_set(no_animals_int)
-            animalnamebutton = Button(animalsettings, text='Confirm', command=lambda: self.animalnames(noofanimals.entry_get, animalsettings))
-
+            animalnamebutton = Button(animalsettings, text='Confirm',
+                                      command=lambda: self.animalnames(noofanimals.entry_get, animalsettings))
             if val == 'H5 (multi-animal DLC)':
                 options = ['skeleton', 'box']
                 self.dropdowndlc = DropDownMenu(self.frame, 'Tracking type', options, '15')
@@ -4801,8 +4701,6 @@ class loadprojectini:
             self.frame.grid(row=1, sticky=W)
             animalsettings.grid(row=1, sticky=W)
             noofanimals.grid(row=0, sticky=W)
-
-
             animalnamebutton.grid(row=0, column=1, sticky=W)
 
             #save val into memory for dlc or sleap
@@ -4814,16 +4712,12 @@ class loadprojectini:
 
     def importh5(self):
         idlist = []
-        try:
-            for i in self.animalnamelist:
-                idlist.append(i.entry_get)
-            if self.val =='H5 (multi-animal DLC)':
-                importMultiDLCpose(self.projectconfigini, self.h5path.folder_path, self.dropdowndlc.getChoices(), idlist)
-            else:
-                importSLEAPbottomUP(self.projectconfigini,self.h5path.folder_path,idlist)
-        except Exception as error_str:
-            print(error_str)
-            print('Check that you have confirmed the number of animals and named your animals in the SimBA interface')
+        for i in self.animalnamelist:
+            idlist.append(i.entry_get)
+        if self.val =='H5 (multi-animal DLC)':
+            importMultiDLCpose(self.projectconfigini, self.h5path.folder_path, self.dropdowndlc.getChoices(), idlist)
+        else:
+            importSLEAPbottomUP(self.projectconfigini,self.h5path.folder_path,idlist)
 
     def animalnames(self, noofanimal, master):
         try:
@@ -4840,7 +4734,6 @@ class loadprojectini:
         for i in range(no_animal):
             self.animalnamelist[i] = Entry_Box(self.frame2, 'Animal ' + str(i + 1) + ' name', '15')
             self.animalnamelist[i].grid(row=i, sticky=W)
-            self.animalnamelist[i].entry_set(self.animal_ID_list[i])
 
     def addclassifier(self,newclassifier):
         config = ConfigParser()
@@ -4977,90 +4870,6 @@ class loadprojectini:
         animalMenu.grid(row=0, column=1, sticky=W)
         setAnimalButton.grid(row=0, column=2, sticky=W)
 
-    def timebin_ml(self,title,text='Run'):
-        roisettings = Toplevel()
-        roisettings.minsize(400, 400)
-        roisettings.wm_title(title)
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        projectNoAnimals = config.getint('General settings', 'animal_no')
-
-        #first choice frame
-        firstMenu = LabelFrame(roisettings,text='Select number of animals')
-
-        ## set up drop down for animals
-        noOfAnimalVar = IntVar()
-        animalOptions = set(range(1, projectNoAnimals+1))
-        noOfAnimalVar.set(1)
-
-        animalMenu = OptionMenu(firstMenu,noOfAnimalVar,*animalOptions)
-        animalLabel = Label(firstMenu,text="# of animals")
-
-        setAnimalButton = Button(firstMenu,text="Confirm",command=lambda:self.timebin_ml2(roisettings,noOfAnimalVar,text=text))
-
-        #organize
-        firstMenu.grid(row=0,sticky=W)
-        animalLabel.grid(row=0,column=0,sticky=W)
-        animalMenu.grid(row=0,column=1,sticky=W)
-        setAnimalButton.grid(row=0,column=2,sticky=W)
-
-    def timebin_ml2(self, master, noofanimal, text='Run'):
-        try:
-            self.secondMenu.destroy()
-        except:
-            pass
-
-        self.secondMenu = LabelFrame(master, text="Choose bodyparts")
-
-        # try to see if it exist or not
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-
-        runButton = Button(self.secondMenu, text=text,
-                           command=lambda: self.timebin_ml3(noofanimal.get(),self.animalVarList[animal].get(),self.binlen.entry_get))
-
-        animals2analyze = noofanimal.get()
-        labelFrameList, labelList, self.animalVarList, AnimalStringVarList, optionsVarList, animalBodyMenuList = [], [], [], [], [], []
-        options = define_bp_drop_down(configini)
-        for animal in range(animals2analyze):
-            animalName = str(animal + 1)
-            labelFrameList.append(LabelFrame(self.secondMenu, text='Animal ' + animalName))
-            labelList.append(Label(labelFrameList[animal], text='Bodypart'))
-            self.animalVarList.append(StringVar())
-            self.animalVarList[animal].set(options[animal][0])
-            animalBodyMenuList.append(OptionMenu(labelFrameList[animal], self.animalVarList[animal], *options[animal]))
-
-        #binlen
-        self.binlen = Entry_Box(self.secondMenu,'Set time bin size (s)',"16")
-
-        # organize
-        self.secondMenu.grid(row=1, sticky=W)
-        for animal in range(animals2analyze):
-            labelFrameList[animal].grid(row=animal, column=0, sticky=W)
-            labelList[animal].grid(row=0, column=0, sticky=W)
-            animalBodyMenuList[animal].grid(row=animal, column=0, sticky=W)
-
-        self.binlen.grid(row=animals2analyze+2,sticky=W)
-        runButton.grid(row=animals2analyze + 3, padx=10, pady=10)
-
-    def timebin_ml3(self,noofanimal,animalBp,binlen):
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-
-
-        config.set('process movements', 'no_of_animals', str(noofanimal))
-        bp_vars_dist = self.animalVarList
-        for animal in range(noofanimal):
-            animalBp = str(bp_vars_dist[animal].get())
-            config.set('process movements', 'animal_' + str(animal+1) + '_bp', animalBp)
-        with open(configini, 'w') as configfile:
-            config.write(configfile)
-
-        time_bins_movement(configini,int(binlen))
-
     def roi_settings(self,title,selection,text='Run'):
         roisettings = Toplevel()
         roisettings.minsize(400, 400)
@@ -5097,74 +4906,55 @@ class loadprojectini:
 
         self.secondMenu = LabelFrame(master,text="Choose bodyparts")
         self.p_threshold_a = Entry_Box(self.secondMenu,'Bp probability threshold','20')
-
-        #try to see if it exist or not
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-        try:
-            pthresh = config.get('ROI settings', 'probability_threshold')
-            self.p_threshold_a.entry_set(pthresh)
-        except:
-            self.p_threshold_a.entry_set(0.00)
-
+        self.p_threshold_a.entry_set(0.0)
         self.disvar = IntVar()
         discheckbox = Checkbutton(self.secondMenu,text='Calculate distance moved within ROI',variable=self.disvar)
-        runButton = Button(self.secondMenu,text=text,command =lambda:self.run_analyze_roi(noofanimal.get(), self.animalVarList[animal], appendornot))
+        runButton = Button(self.secondMenu,text=text,command =lambda:self.run_analyze_roi(noofanimal.get(), animalVarList, appendornot))
         animals2analyze = noofanimal.get()
-        labelFrameList, labelList, self.animalVarList, AnimalStringVarList, optionsVarList, animalBodyMenuList = [],[],[],[],[],[]
+        configini = self.projectconfigini
+        labelFrameList, labelList, animalVarList, AnimalStringVarList, optionsVarList, animalBodyMenuList = [],[],[],[],[],[]
         options = define_bp_drop_down(configini)
-        if appendornot != 'locationheatmap':
-            for animal in range(animals2analyze):
-                animalName = str(animal + 1)
-                labelFrameList.append(LabelFrame(self.secondMenu,text='Animal ' + animalName))
-                labelList.append(Label(labelFrameList[animal],text='Bodypart'))
-                self.animalVarList.append(StringVar())
-                self.animalVarList[animal].set(options[animal][0])
-                animalBodyMenuList.append(OptionMenu(labelFrameList[animal], self.animalVarList[animal], *options[animal]))
-        if appendornot == 'locationheatmap':
-            options = [item for sublist in options for item in sublist]
-            labelFrameList.append(LabelFrame(self.secondMenu,text='Animal bodypart'))
-            labelList.append(Label(labelFrameList[0], text='Bodypart'))
-            self.animalVarList.append(StringVar())
-            self.animalVarList[0].set(options[0])
-            animalBodyMenuList.append(OptionMenu(labelFrameList[0], self.animalVarList[0], *options))
+        for animal in range(animals2analyze):
+            animalName = str(animal + 1)
+            labelFrameList.append(LabelFrame(self.secondMenu,text='Animal ' + animalName))
+            labelList.append(Label(labelFrameList[animal],text='Bodypart'))
+            animalVarList.append(StringVar())
+            animalVarList[animal].set(options[animal][0])
+            animalBodyMenuList.append(OptionMenu(labelFrameList[animal], animalVarList[animal], *options[animal]))
+
 
         #organize
         self.secondMenu.grid(row=1, sticky=W)
+        self.p_threshold_a.grid(row=3,sticky=W)
+        discheckbox.grid(row=4,sticky=W)
+        runButton.grid(row=30,padx=10,pady=10)
         for animal in range(animals2analyze):
             labelFrameList[animal].grid(row=animal,column=0, sticky=W)
             labelList[animal].grid(row=0, column=0, sticky=W)
             animalBodyMenuList[animal].grid(row=animal, column=0, sticky=W)
-        if appendornot != 'locationheatmap':
-            self.p_threshold_a.grid(row=animals2analyze+1, sticky=W)
-            discheckbox.grid(row=animals2analyze+2, sticky=W)
-            runButton.grid(row=animals2analyze+3, padx=10, pady=10)
 
         if appendornot == 'locationheatmap':
-            heatmapframe = Frame(self.secondMenu)
-            self.binsizepixels = Entry_Box(heatmapframe,'Bin size (mm)','21')
-            self.scalemaxsec = Entry_Box(heatmapframe,'max','21')
+            self.binsizepixels = Entry_Box(self.secondMenu,'Bin size (mm)','21')
+            self.scalemaxsec = Entry_Box(self.secondMenu,'max','21')
             self.pal_var = StringVar()
             paloptions = ['magma','jet','inferno','plasma','viridis','gnuplot2']
-            palette = OptionMenu(heatmapframe,self.pal_var,*paloptions)
+            palette = OptionMenu(self.secondMenu,self.pal_var,*paloptions)
             self.pal_var.set(paloptions[0])
             self.lastimgvar =IntVar()
-            lastimg = Checkbutton(heatmapframe,text='Save last image only (if unticked heatmap videos are created)',variable=self.lastimgvar)
+            lastimg = Checkbutton(self.secondMenu,text='Save last image only (if unticked heatmap videos are created)',variable=self.lastimgvar)
+            print(options)
             newoptions = [item for sublist in options for item in sublist]
+            print(newoptions)
             self.animalbody1var = StringVar()
-            # self.animalbody1var.set(newoptions[0])
-            animalbodymenu1 = OptionMenu(heatmapframe, self.animalbody1var, *newoptions)
-
+            self.animalbody1var.set(newoptions[0])
+            animalbodymenu1 = OptionMenu(self.secondMenu, self.animalbody1var, *newoptions)
+            animalbodymenu1.grid(row=0, column=0, sticky=W)
 
             #organize
-            heatmapframe.grid(row=5,sticky=W)
-            # animalbodymenu1.grid(row=0, column=0, sticky=W)
             self.binsizepixels.grid(row=1,sticky=W)
             self.scalemaxsec.grid(row=2,sticky=W)
             palette.grid(row=4,sticky=W)
             lastimg.grid(row=5,sticky=W)
-            runButton.grid(row=6, padx=10, pady=10)
 
 
     def run_analyze_roi(self,noofanimal,animalVarList,appendornot):
@@ -5175,15 +4965,14 @@ class loadprojectini:
 
         if appendornot == 'processmovement':
             config.set('process movements', 'no_of_animals', str(noofanimal))
-            bp_vars_dist = self.animalVarList
             for animal in range(noofanimal):
-                animalBp = str(bp_vars_dist[animal].get())
+                animalBp = str(animalVarList[animal].get())
                 config.set('process movements', 'animal_' + str(animal+1) + '_bp', animalBp)
             with open(configini, 'w') as configfile:
                 config.write(configfile)
 
         elif appendornot == 'locationheatmap':
-            animalBp = str(animalVarList.get())
+            animalBp = str(self.animalbody1var.get())
             config.set('Heatmap location', 'body_part', animalBp)
             config.set('Heatmap location', 'Palette', str(self.pal_var.get()))
             config.set('Heatmap location', 'Scale_max_seconds', str(self.scalemaxsec.entry_get))
@@ -5193,10 +4982,9 @@ class loadprojectini:
 
         else:
             config.set('ROI settings', 'no_of_animals', str(noofanimal))
-            bp_vars_ROI = self.animalVarList
             for animal in range(noofanimal):
                 currStr = 'animal_' + str(animal+1) + '_bp'
-                config.set('ROI settings', currStr, str(bp_vars_ROI[animal].get()))
+                config.set('ROI settings', currStr, str(animalVarList[animal].get()))
                 with open(configini, 'w') as configfile:
                     config.write(configfile)
 
@@ -5207,11 +4995,7 @@ class loadprojectini:
                 caldist = True
             else:
                 caldist = False
-            #write into configini
             config.set('ROI settings', 'probability_threshold', str(self.p_threshold_a.entry_get))
-            with open(configini, 'w') as configfile:
-                config.write(configfile)
-
             roiAnalysis(configini,'outlier_corrected_movement_location',caldist)
         elif appendornot == 'processmovement':
             ROI_process_movement(configini)
@@ -6425,3 +6209,7 @@ def main():
     print('Welcome fellow scientists :)' + '\n')
     print('\n')
     app.root.mainloop()
+
+
+if __name__ == '__main__':
+    main()

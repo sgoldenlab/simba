@@ -8,7 +8,6 @@ import glob
 from simba.drop_bp_cords import *
 from simba.rw_dfs import *
 
-
 def ROI_process_movement(configini):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
@@ -106,11 +105,7 @@ def ROI_process_movement(configini):
         currentVidList = []
         currentVidList.append(currVideoName)
         currentVidList.append(frameCounter-fps)
-        out_lists = [totalMovement, meanVelocityList, medianVelocityList]
-        for current_list in out_lists:
-            for value in current_list:
-                currentVidList.append(value)
-        #for movement, mean_velocity, median_velocity in zip(totalMovement, meanVelocityList, medianVelocityList): currentVidList.extend((movement, mean_velocity, median_velocity))
+        currentVidList = currentVidList + totalMovement + meanVelocityList + medianVelocityList
         if noAnimals == 2:
             currentVidList.append(statistics.mean(distanceList) / 10)
             currentVidList.append(statistics.median(distanceList) / 10)

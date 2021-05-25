@@ -5,9 +5,10 @@ import pandas as pd
 import pickle
 import numpy as np
 import statistics
+import os
 from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError, NoSectionError
 from simba.drop_bp_cords import *
-import glob, os
+import glob
 from simba.rw_dfs import *
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -53,25 +54,18 @@ def rfmodel(inifile):
 
     ########### GET MODEL PATHS, NAMES, AND DISCRIMIINATION THRESHOLDS ###########
     for i in range(model_nos):
-        try:
-            currentModelPaths = 'model_path_' + str(i+1)
-            currentModelNames = 'target_name_' + str(i+1)
-            currentDT = 'threshold_' + str(i+1)
-            currMinBoutName = 'min_bout_' + str(i+1)
-            currentModelPaths = config.get('SML settings', currentModelPaths)
-            if currentModelPaths == '':
-                print('Skipping ' + str(currentModelNames) + ' classifications: ' + ' no path set to .sav file.')
-                continue
-            currentModelNames = config.get('SML settings', currentModelNames)
-            currentDT = config.getfloat('threshold_settings', currentDT)
-            currMinBout = config.getfloat('Minimum_bout_lengths', currMinBoutName)
-            DTList.append(currentDT)
-            min_bout_list.append(currMinBout)
-            model_paths.append(currentModelPaths)
-            target_names.append(currentModelNames)
-        except ValueError:
-            print('Skipping ' + str(currentModelNames) + ' classifications: ' + ' no discrimination threshold and/or minimum bout set.')
-            continue
+        currentModelPaths = 'model_path_' + str(i+1)
+        currentModelNames = 'target_name_' + str(i+1)
+        currentDT = 'threshold_' + str(i+1)
+        currMinBoutName = 'min_bout_' + str(i+1)
+        currentModelPaths = config.get('SML settings', currentModelPaths)
+        currentModelNames = config.get('SML settings', currentModelNames)
+        currentDT = config.getfloat('threshold_settings', currentDT)
+        currMinBout = config.getfloat('Minimum_bout_lengths', currMinBoutName)
+        DTList.append(currentDT)
+        min_bout_list.append(currMinBout)
+        model_paths.append(currentModelPaths)
+        target_names.append(currentModelNames)
 
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     print('Running ' + str(len(target_names)) + ' model(s) on ' + str(len(filesFound)) + ' video file(s).')
@@ -99,38 +93,34 @@ def rfmodel(inifile):
             framesToPlug = int(currVidFps * (shortest_bout / 1000))
             framesToPlugList = list(range(1, framesToPlug + 1))
             framesToPlugList.reverse()
-            patternListofLists, negPatternListofList = [], []
+            patternListofLists = []
             for k in framesToPlugList:
-                zerosInList, oneInlist = [0] * k, [1] * k
+                zerosInList = [0] * k
                 currList = [1]
                 currList.extend(zerosInList)
                 currList.extend([1])
-                currListNeg = [0]
-                currListNeg.extend(oneInlist)
-                currListNeg.extend([0])
                 patternListofLists.append(currList)
-                negPatternListofList.append(currListNeg)
-            fillPatterns = np.asarray(patternListofLists)
-            remPatterns = np.asarray(negPatternListofList)
+            # patternListofLists.append([0, 1, 1, 0])
+            # patternListofLists.append([0, 1, 0])
+            patterns = np.asarray(patternListofLists)
             currentModelPath = model_paths[b]
             model = os.path.join(model_dir, currentModelPath)
             currModelName = target_names[b]
             discrimination_threshold = DTList[b]
             currProbName = 'Probability_' + currModelName
             clf = pickle.load(open(model, 'rb'))
+            # predictions = clf.predict_proba(inputFileOrganised)
             try:
                 predictions = clf.predict_proba(inputFileOrganised)
             except ValueError:
                 print('Mismatch in the number of features in input file and what is expected from the model in file ' + str(currentFileName) + ' and model ' + str(currModelName))
 
-            try:
-                outputDf[currProbName] = predictions[:, 1]
-            except IndexError:
-                print('IndexError: Your classifier has not been created properly. See The SimBA GitHub FAQ page for more information and suggested fixes.')
+            outputDf[currProbName] = predictions[:, 1]
             outputDf[currModelName] = np.where(outputDf[currProbName] > discrimination_threshold, 1, 0)
 
-            ########## FILL PATTERNS ###########################################
-            for currPattern in fillPatterns:
+            ########## FIX  'GAPS' ###########################################
+            for l in patterns:
+                currPattern = l
                 n_obs = len(currPattern)
                 outputDf['rolling_match'] = (outputDf[currModelName].rolling(window=n_obs, min_periods=n_obs)
                                              .apply(lambda x: (x == currPattern).all())
@@ -139,20 +129,13 @@ def rfmodel(inifile):
                                              .fillna(0)
                                              .astype(bool)
                                              )
+                # if (currPattern == patterns[-2]) or (currPattern == patterns[-1]):
+                #     outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 0
+                # else:
+                #     outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 1
                 outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 1
+                outputDf.loc[outputDf['rolling_match'] == False, currModelName] = 0
                 outputDf = outputDf.drop(['rolling_match'], axis=1)
-            for currPattern in remPatterns:
-                n_obs = len(currPattern)
-                outputDf['rolling_match'] = (outputDf[currModelName].rolling(window=n_obs, min_periods=n_obs)
-                                             .apply(lambda x: (x == currPattern).all())
-                                             .mask(lambda x: x == 0)
-                                             .bfill(limit=n_obs - 1)
-                                             .fillna(0)
-                                             .astype(bool)
-                                             )
-                outputDf.loc[outputDf['rolling_match'] == True, currModelName] = 0
-                outputDf = outputDf.drop(['rolling_match'], axis=1)
-
         if poseEstimationBps == '4' or poseEstimationBps == '7' or poseEstimationBps == '8' or poseEstimationBps == '7':
             #sketchy fix due to version compatability
             try:

@@ -242,6 +242,36 @@ def shortenvideos1(filename,starttime,endtime):
     else:
         print('Please select a video to trim')
 
+def splitvideos(filename,varlist):
+
+    def execute(command):
+        subprocess.call(command, shell=True, stdout = subprocess.PIPE)
+
+    startlist,stoplist = varlist[0],varlist[1]
+
+    for i in range(len(startlist)):
+        starttime = startlist[i].get()
+        endtime = stoplist[i].get()
+
+        currentFile = filename
+        outFile, fileformat = currentFile.split('.')
+        outFile = str(outFile) + '_clip_' +str(i+1)+ '_' + '.mp4'
+        output = os.path.basename(outFile)
+
+        command = (str('ffmpeg -i ') +'"'+ str(currentFile) +'"'+ ' -ss ' + starttime + ' -to ' + endtime + ' -async 1 '+'"'+ outFile+'"')
+
+        file = pathlib.Path(outFile)
+
+        if file.exists():
+            print(output, 'already exist')
+        else:
+            print('Clipping video....')
+            execute(command)
+            print(output,' generated!')
+
+
+
+
 
 def shortenvideos2(filename,time):
 

@@ -34,6 +34,7 @@ from sklearn.metrics import make_scorer, accuracy_score, precision_score, recall
 from sklearn.model_selection import cross_val_score, cross_validate
 from simba.rw_dfs import *
 from sklearn.feature_selection import RFECV
+from simba.shap_calcs import shap_summary_calculations
 import time
 # import timeit
 
@@ -91,12 +92,16 @@ def trainmodel2(inifile):
         log_df.to_csv(savePath)
         return log_df
 
-    def generateShapLog(trainingSet, target_train, feature_list, classifierName, shap_target_present_no,shap_target_absent_no):
+    def generateShapLog(trainingSet, target_train, feature_list, classifierName, shap_target_present_no,shap_target_absent_no, inifile):
         print('Calculating SHAP scores for ' + str(len(trainingSet)) +' observations...')
         trainingSet[classifierName] = target_train
         targetTrainSet = trainingSet.loc[trainingSet[classifierName] == 1]
         nonTargetTrain = trainingSet.loc[trainingSet[classifierName] == 0]
-        targetsForShap = targetTrainSet.sample(shap_target_present_no, replace=False)
+        try:
+            targetsForShap = targetTrainSet.sample(shap_target_present_no, replace=False)
+        except ValueError:
+            print('Could not find ' + str(shap_target_present_no) + ' in dataset. Taking the maximum instead (' + str(len(targetTrainSet)) + ')')
+            targetsForShap = targetTrainSet.sample(len(targetTrainSet), replace=False)
         nontargetsForShap = nonTargetTrain.sample(shap_target_absent_no, replace=False)
         shapTrainingSet = pd.concat([targetsForShap, nontargetsForShap])
         targetValFrame = shapTrainingSet.pop(classifierName).values
@@ -121,8 +126,10 @@ def trainmodel2(inifile):
             outputDfRaw.loc[len(outputDfRaw)] = currRaw
             outputDfShap.loc[len(outputDfShap)] = shapList
             counter += 1
-            print('SHAP calculated: ' + str(counter) + '/' + str(len(shapTrainingSet)))
+            print('SHAP calculated for: ' + str(counter) + '/' + str(len(shapTrainingSet)) + ' frames')
         outputDfShap.to_csv(os.path.join(tree_evaluations_out, 'SHAP_values_' + str(classifierName) + '.csv'))
+        print('Creating SHAP summary statistics...')
+        shap_summary_calculations(inifile, outputDfShap, classifierName, expected_value, tree_evaluations_out)
         outputDfRaw.to_csv(os.path.join(tree_evaluations_out, 'RAW_SHAP_feature_values_' + str(classifierName) + '.csv'))
         print('All SHAP data saved in project_folder/models/evaluations directory')
 
@@ -214,6 +221,7 @@ def trainmodel2(inifile):
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     for file in filesFound:
         df = read_df(file, wfileType)
+        df = df.dropna(axis=0, how='all')
         features = features.append(df, ignore_index=True)
     try:
         features = features.set_index('scorer')
@@ -297,9 +305,9 @@ def trainmodel2(inifile):
                                      verbose=1)
         try:
             clf.fit(data_train, target_train)
-        except ValueError:
+        except Exception as e:
+            print(e)
             print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
-
 
         # #RUN RANDOM FOREST EVALUATIONS
         compute_permutation_importance = config.get('create ensemble settings', 'compute_permutation_importance')
@@ -373,7 +381,7 @@ def trainmodel2(inifile):
         if shap_scores_input == 'yes':
             shap_target_present_no = config.getint('create ensemble settings', 'shap_target_present_no')
             shap_target_absent_no = config.getint('create ensemble settings', 'shap_target_absent_no')
-            generateShapLog(data_train, target_train, feature_list, classifierName, shap_target_present_no,shap_target_absent_no)
+            generateShapLog(data_train, target_train, feature_list, classifierName, shap_target_present_no,shap_target_absent_no, inifile)
 
         try:
             RFECV_setting = config.get('create ensemble settings', 'perform_RFECV')

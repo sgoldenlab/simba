@@ -8,7 +8,7 @@ from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import pickle
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError
 import os
 import warnings
 from sklearn.tree import export_graphviz

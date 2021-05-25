@@ -7,7 +7,6 @@ import numpy as np
 import glob
 from simba.drop_bp_cords import getBpNames
 
-
 def time_bins_movement(configini,binLength):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()

@@ -24,6 +24,7 @@ from sklearn.model_selection import ShuffleSplit
 from simba.drop_bp_cords import drop_bp_cords, GenerateMetaDataFileHeaders
 from simba.rw_dfs import *
 import shap
+from simba.shap_calcs import shap_summary_calculations
 
 def train_multimodel(configini):
     pd.options.mode.chained_assignment = None
@@ -91,8 +92,10 @@ def train_multimodel(configini):
             outputDfShap.loc[len(outputDfShap)] = shapList
             counter += 1
             print('SHAP calculated: ' + str(counter) + '/' + str(len(shapTrainingSet)))
-        outputDfShap.to_csv(os.path.join(tree_evaluations_out, 'SHAP_values_' + str(classifierName) + '_' + str(saveFileNo) + '.csv'))
-        outputDfRaw.to_csv(os.path.join(tree_evaluations_out, 'RAW_SHAP_feature_values_' + str(classifierName) + '_' + str(saveFileNo) + '.csv'))
+        outputDfShap.to_csv(os.path.join(ensemble_evaluations_out, 'SHAP_values_' + str(classifierName) + '_' + str(saveFileNo) + '.csv'))
+        print('Creating SHAP summary statistics...')
+        shap_summary_calculations(configini, outputDfShap, classifierName, expected_value, ensemble_evaluations_out)
+        outputDfRaw.to_csv(os.path.join(ensemble_evaluations_out, 'RAW_SHAP_feature_values_' + str(classifierName) + '_' + str(saveFileNo) + '.csv'))
         print('All SHAP data saved in project_folder/models/evaluations directory')
 
     def generateFeatureImportanceLog(importances, classifierName, saveFileNo):
@@ -116,7 +119,7 @@ def train_multimodel(configini):
         trueIndex = list(trueIndex[0])
         selectedFeatures = [feature_list[i] for i in trueIndex]
         selectedFeaturesDf = pd.DataFrame(selectedFeatures, columns=['Selected_features'])
-        savePath = os.path.join(tree_evaluations_out, 'RFECV_selected_features_' + str(classifierName) + '_' + str(saveFileNo) + '.csv')
+        savePath = os.path.join(ensemble_evaluations_out, 'RFECV_selected_features_' + str(classifierName) + '_' + str(saveFileNo) + '.csv')
         selectedFeaturesDf.to_csv(savePath)
         print('Recursive feature elimination results stored in ' + str(savePath))
 
@@ -202,6 +205,7 @@ def train_multimodel(configini):
     filesFound = glob.glob(data_folder + '/*.' + wfileType)
     for file in filesFound:
         df = read_df(file, wfileType)
+        df = df.dropna(axis=0, how='all')
         features = features.append(df, ignore_index=True)
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     baseFeatureFrame = features.drop(["scorer"], axis=1, errors='ignore')

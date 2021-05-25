@@ -3,7 +3,8 @@ import os
 import pandas as pd
 
 def ROI_reset(inifile, currVid):
-    CurrVidName = os.path.basename(currVid).replace('.mp4', '')
+    CurrVidName, CurrVidExtention = os.path.basename(currVid), os.path.splitext(currVid)[1]
+    CurrVidName = CurrVidName.replace(CurrVidExtention, '')
     config = ConfigParser()
     configFile = str(inifile)
     config.read(configFile)

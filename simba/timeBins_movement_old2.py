@@ -8,6 +8,8 @@ import glob
 from simba.drop_bp_cords import *
 from simba.rw_dfs import *
 
+
+
 def time_bins_movement(configini,binLength):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
@@ -22,8 +24,7 @@ def time_bins_movement(configini,binLength):
     except NoOptionError:
         wfileType = 'csv'
     noAnimals = config.getint('General settings', 'animal_no')
-    columnHeaders, shifted_columnHeaders, logList = [], [], []
-    logDf = pd.DataFrame(columns=['Videos_omitted_from_time_bin_analysis'])
+    columnHeaders, shifted_columnHeaders = [], []
     for animal in range(noAnimals):
         animalBp = config.get('process movements', 'animal_' + str(animal + 1) + '_bp')
         columnHeaders.append([animalBp + '_x', animalBp + '_y'])
@@ -39,14 +40,13 @@ def time_bins_movement(configini,binLength):
             print('Applying settings for multi-animal tracking...')
         else:
             multiAnimalStatus = False
-            multiAnimalIDList = []
             for animal in range(noAnimals):
-                multiAnimalIDList.append('Animal ' + str(animal + 1) + ' ')
+                multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
             print('Applying settings for classical tracking...')
     except NoSectionError:
         multiAnimalIDList = []
         for animal in range(noAnimals):
-            multiAnimalIDList.append('Animal ' + str(animal + 1) + ' ')
+            multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
         multiAnimalStatus = False
         print('Applying settings for classical tracking...')
 
@@ -81,8 +81,8 @@ def time_bins_movement(configini,binLength):
             csv_df[colName1] = (np.sqrt((csv_df[columnHeaders[animal][0]] - csv_df[shifted_columnHeaders[animal][0]]) ** 2 + (csv_df[columnHeaders[animal][1]] - csv_df[shifted_columnHeaders[animal][1]]) ** 2)) / currPixPerMM
             for animal1 in range(noAnimals):
                 for animal2 in reversed(range(noAnimals)):
-                    colName = 'Distance ' + str(multiAnimalIDList[animal1]) + ' ' + str(multiAnimalIDList[animal2])
-                    colNameReversed = 'Distance ' + str(multiAnimalIDList[animal2]) + ' ' + str(multiAnimalIDList[animal1])
+                    colName = 'Distance_' + str(multiAnimalIDList[animal1]) + '_' + str(multiAnimalIDList[animal2])
+                    colNameReversed = 'Distance_' + str(multiAnimalIDList[animal2]) + '_' + str(multiAnimalIDList[animal1])
                     if not (colNameReversed in csv_df.columns) and not (colName in csv_df.columns) and animal1 != animal2:
                         csv_df[colName] = (np.sqrt((csv_df[columnHeaders[animal1][0]] - csv_df[columnHeaders[animal2][0]]) ** 2 + (csv_df[columnHeaders[animal1][1]] - csv_df[columnHeaders[animal2][1]]) ** 2)) / currPixPerMM
                         distanceCols.append(colName)
@@ -93,56 +93,35 @@ def time_bins_movement(configini,binLength):
                 movementList.append(currentDf['Movement_' + currAnimalID].mean())
             movementListChunks = [movementList[x:x + binLength] for x in range(0, len(movementList), binLength)]
             for L in movementListChunks: finalList.append(sum(L))
-            for i in range(len(movementListChunks)): mov_and_vel_headers.append(currAnimalID + 'total movement bin ' + str(i + 1) + ' (cm)')
+            for i in range(len(movementListChunks)): mov_and_vel_headers.append(currAnimalID + '_total_movement_' + str(i + 1))
         for animal in range(noAnimals):
             velocityList, currAnimalID = [], multiAnimalIDList[animal]
             for currentDf in df_lists:
                 velocityList.append(currentDf['Movement_' + currAnimalID].mean() / 1)
             velocityListChunks = [velocityList[x:x + binLength] for x in range(0, len(velocityList), binLength)]
             for L in velocityListChunks: finalList.append(statistics.mean(L))
-            for i in range(len(velocityListChunks)): mov_and_vel_headers.append(currAnimalID + 'mean velocity ' + str(i + 1) + ' (cm)')
+            for i in range(len(velocityListChunks)): mov_and_vel_headers.append(currAnimalID + '_mean_velocity_' + str(i + 1))
         for distanceCol in distanceCols:
             distanceList = []
             for currdf in df_lists:
                 distanceList.append(currdf[distanceCol].mean())
             distanceListChunks = [distanceList[x:x + binLength] for x in range(0, len(distanceList), binLength)]
-            for L in distanceListChunks: finalList.append(statistics.mean(L) / 10)
+            for L in distanceListChunks: finalList.append(statistics.mean(L))
         for distanceCol in distanceCols:
             for currCol in range(len(distanceListChunks)):
-                distanceHeaders.append(distanceCol + ' bin ' + str(currCol + 1) + (' (cm)'))
+                distanceHeaders.append(distanceCol + '_bin_' + str(currCol + 1))
         headerList = mov_and_vel_headers + distanceHeaders
         headerList.insert(0, 'Video_name')
-        outputList = [round(num, 4) for num in finalList]
-        #outputList = [x / 10 for x in outputList]
-
-        outputList.insert(0, currVideoName)
+        finalList = [round(num, 4) for num in finalList]
+        finalList.insert(0, currVideoName)
         if currentFile == filesFound[0]:
             outputDf = pd.DataFrame(columns=headerList)
-            listLength = len(outputList)
-        try:
-            outputDf.loc[len(outputDf)] = outputList
-        except ValueError:
-            targetVals, currentVals = listLength, len(outputList)
-            difference = currentVals - targetVals
-            if difference > 0:
-                outputList = outputList[:-difference]
-                print(currVideoName + ' does not contain the same number of time bins as your other, previously analysed videos (it contains more). We shaved of these additional data bins to fit the dataframe.')
-            if difference < 0:
-                print(currVideoName + ' does not contain the same number of time bins as your other, previously analysed videos (it contains less). We added a few zeros to this video to fit the dataframe.')
-                addList = [0] * abs(difference)
-                outputList.extend((addList))
-            outputDf.loc[len(outputDf)] = outputList
-            logList.append(currVideoName)
+        outputDf.loc[len(outputDf)] = finalList
         fileCounter += 1
         print('Processed time-bins for file ' + str(fileCounter) + '/' + str(len(filesFound)))
     log_fn = os.path.join(projectPath, 'logs', 'Time_bins_movement_results_' + dateTime + '.csv')
     try:
         outputDf.to_csv(log_fn, index=False)
-        if len(logList) > 0:
-            logDf['Videos_omitted_from_time_bin_analysis'] = logList
-            log_fn = os.path.join(projectPath, 'logs', 'Time_bins_machine_results_omitted_videos_' + dateTime + '.csv')
-            logDf.to_csv(log_fn)
-            print('WARNING: Some of the videos you attempted to analyze contains an unequal number of time-bins and we had to omit / add some zeros to pad it out. To see which videos where had omitted times / added times, check the logfile in project_folder/logs or the SimBA GitHub repository for more information')
-        print('Time-bin analysis for movement results complete.')
     except UnboundLocalError:
         print('Error: Check that files exist. Have you corrected, or indicated you want to skip, the outlier correction step?')
+    print('Time-bin analysis for movement results complete.')
