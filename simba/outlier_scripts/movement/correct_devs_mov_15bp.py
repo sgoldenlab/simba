@@ -3,24 +3,23 @@ import os, glob
 import numpy as np
 import statistics
 import math
-from configparser import ConfigParser, NoOptionError
+from configparser import ConfigParser
 from datetime import datetime
-from numba import jit
-from simba.rw_dfs import *
+from rw_dfs import *
 
 
 def dev_move_16(configini):
-    dfHeaders = ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
+    dfHeaders = ["scorer", "Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
                                     "Ear_right_1_p", "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y",
                                     "Center_1_p", "Lat_left_1_x", "Lat_left_1_y",
                                     "Lat_left_1_p", "Lat_right_1_x", "Lat_right_1_y", "Lat_right_1_p", "Tail_base_1_x",
-                                    "Tail_base_1_y", "Tail_base_1_p", "Tail_end_1_x", "Tail_end_1_y", "Tail_end_1_p",
+                                    "Tail_base_1_y", "Tail_base_1_p",
                                     "Ear_left_2_x",
                                     "Ear_left_2_y", "Ear_left_2_p", "Ear_right_2_x", "Ear_right_2_y", "Ear_right_2_p",
                                     "Nose_2_x", "Nose_2_y", "Nose_2_p", "Center_2_x", "Center_2_y", "Center_2_p",
                                     "Lat_left_2_x", "Lat_left_2_y",
                                     "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x",
-                                    "Tail_base_2_y", "Tail_base_2_p", "Tail_end_2_x", "Tail_end_2_y", "Tail_end_2_p"]
+                                    "Tail_base_2_y", "Tail_base_2_p"]
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     filesFound, loop, loopy = [], 0, 0
     configFile = str(configini)
@@ -28,14 +27,11 @@ def dev_move_16(configini):
     config.read(configFile)
     criterion = config.getfloat('Outlier settings', 'movement_criterion')
     projectPath = config.get('General settings', 'project_path')
-    try:
-        wfileType = config.get('General settings', 'workflow_file_type')
-    except NoOptionError:
-        wfileType = 'csv'
+    wfileType = config.get('General settings', 'workflow_file_type')
     csv_dir_in, csv_dir_out = os.path.join(projectPath, 'csv', 'input_csv'), os.path.join(projectPath, 'csv', 'outlier_corrected_movement')
     headers = ['Video', "frames_processed", 'Animal1_centroid', "Animal1_left_ear", "Animal1_right_ear", "Animal1_lateral_left", "Animal1_lateral_right",
-               "Animal1_nose", "Animal1_tail_base", "Animal1_tail_end", 'Animal2_centroid', "Animal2_left_ear", "Animal2_right_ear", "Animal2_lateral_left",
-               "Animal2_lateral_right", "Animal2_nose", "Animal2_tail_base", "Animal2_tail_end", "Sum"]
+               "Animal1_nose", "Animal1_tail_base", 'Animal2_centroid', "Animal2_left_ear", "Animal2_right_ear", "Animal2_lateral_left",
+               "Animal2_lateral_right", "Animal2_nose", "Animal2_tail_base", "Sum"]
     log_df = pd.DataFrame(columns=headers)
     log_path = os.path.join(projectPath, 'logs', 'Outliers_movement_' + str(dateTime) + '.csv')
 
@@ -131,8 +127,7 @@ def dev_move_16(configini):
                      'Lat_right_1_y': 'Lat_right_1_y_shifted', \
                      'Lat_right_1_p': 'Lat_right_1_p_shifted', 'Tail_base_1_x': 'Tail_base_1_x_shifted',
                      'Tail_base_1_y': 'Tail_base_1_y_shifted', \
-                     'Tail_base_1_p': 'Tail_base_1_p_shifted', 'Tail_end_1_x': 'Tail_end_1_x_shifted',
-                     'Tail_end_1_y': 'Tail_end_1_y_shifted', 'Tail_end_1_p': 'Tail_end_1_p_shifted',
+                     'Tail_base_1_p': 'Tail_base_1_p_shifted',
                      'Ear_left_2_x': 'Ear_left_2_x_shifted', 'Ear_left_2_y': 'Ear_left_2_y_shifted',
                      'Ear_left_2_p': 'Ear_left_2_p_shifted', 'Ear_right_2_x': 'Ear_right_2_x_shifted', \
                      'Ear_right_2_y': 'Ear_right_2_y_shifted', 'Ear_right_2_p': 'Ear_right_2_p_shifted',
@@ -144,8 +139,7 @@ def dev_move_16(configini):
                      'Lat_right_2_y': 'Lat_right_2_y_shifted', \
                      'Lat_right_2_p': 'Lat_right_2_p_shifted', 'Tail_base_2_x': 'Tail_base_2_x_shifted',
                      'Tail_base_2_y': 'Tail_base_2_y_shifted', \
-                     'Tail_base_2_p': 'Tail_base_2_p_shifted', 'Tail_end_2_x': 'Tail_end_2_x_shifted',
-                     'Tail_end_2_y': 'Tail_end_2_y_shifted', 'Tail_end_2_p': 'Tail_end_2_p_shifted',
+                     'Tail_base_2_p': 'Tail_base_2_p_shifted',
                      'Mouse_1_poly_area': 'Mouse_1_poly_area_shifted',
                      'Mouse_2_poly_area': 'Mouse_2_poly_area_shifted'})
 
@@ -165,7 +159,7 @@ def dev_move_16(configini):
         mean1size = (statistics.mean(csv_df_combined['Mouse_1_nose_to_tail']))
         mean2size = (statistics.mean(csv_df_combined['Mouse_2_nose_to_tail']))
 
-        bps = ['Ear', 'Nose', 'Lat', 'Center', 'Tail_base', 'Tail_end']
+        bps = ['Ear', 'Nose', 'Lat', 'Center', 'Tail_base']
         bplist1x = []
         bplist1y = []
         bplist2x = []
@@ -249,18 +243,17 @@ def dev_move_16(configini):
         # csv_df_combined['scorer'] = scorer.values.astype(int)
 
         csv_df_combined = csv_df_combined[
-            ["Corrected_Ear_left_1_x", "Corrected_Ear_left_1_y", "Ear_left_1_p", "Corrected_Ear_right_1_x",
+            ["scorer", "Corrected_Ear_left_1_x", "Corrected_Ear_left_1_y", "Ear_left_1_p", "Corrected_Ear_right_1_x",
              "Corrected_Ear_right_1_y", "Ear_right_1_p", "Corrected_Nose_1_x", "Corrected_Nose_1_y", "Nose_1_p",
              "Corrected_Center_1_x", "Corrected_Center_1_y", "Center_1_p", "Corrected_Lat_left_1_x",
              "Corrected_Lat_left_1_y", "Lat_left_1_p", "Corrected_Lat_right_1_x", "Corrected_Lat_right_1_y",
              "Lat_right_1_p", "Corrected_Tail_base_1_x", "Corrected_Tail_base_1_y", "Tail_base_1_p",
-             "Corrected_Tail_end_1_x", "Corrected_Tail_end_1_y", "Tail_end_1_p", "Corrected_Ear_left_2_x",
+             "Corrected_Ear_left_2_x",
              "Corrected_Ear_left_2_y", "Ear_left_2_p", "Corrected_Ear_right_2_x", "Corrected_Ear_right_2_y",
              "Ear_right_2_p", "Corrected_Nose_2_x", "Corrected_Nose_2_y", "Nose_2_p", "Corrected_Center_2_x",
              "Corrected_Center_2_y", "Center_2_p", "Corrected_Lat_left_2_x", "Corrected_Lat_left_2_y", "Lat_left_2_p",
              "Corrected_Lat_right_2_x", "Corrected_Lat_right_2_y", "Lat_right_2_p", "Corrected_Tail_base_2_x",
-             "Corrected_Tail_base_2_y", "Tail_base_2_p", "Corrected_Tail_end_2_x", "Corrected_Tail_end_2_y",
-             "Tail_end_2_p"]]
+             "Corrected_Tail_base_2_y", "Tail_base_2_p"]]
 
         # csv_df_combined = csv_df_combined.drop(csv_df_combined.index[0:2])
         #df_headers = pd.read_csv(currentFile, nrows=0)
