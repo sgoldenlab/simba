@@ -2,13 +2,15 @@ import os, glob
 import pandas as pd
 import cv2
 import numpy as np
-from configparser import ConfigParser, MissingSectionHeaderError
+from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError, NoOptionError
 from pylab import *
-import json
+from simba.rw_dfs import *
+from simba.drop_bp_cords import *
+import pyarrow.parquet as pq
+import pyarrow as pa
 
 def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
     global currIDcounter
-
     def define_ID(event, x, y, flags, param):
         global currIDcounter
         if (event == cv2.EVENT_LBUTTONDBLCLK):
@@ -25,50 +27,75 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
         print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     projectPath = config.get('General settings', 'project_path')
     if filetype == 'skeleton':
-        filesFound = glob.glob(dataFolder + '/*sk.h5')
+        filesFound = glob.glob(dataFolder + '/*sk.h5') + glob.glob(dataFolder + '/*sk_filtered.h5')
     if filetype == 'box':
-        filesFound = glob.glob(dataFolder + '/*bx.h5')
+        filesFound = glob.glob(dataFolder + '/*bx.h5') + glob.glob(dataFolder + '/*bx_filtered.h5')
     videoFolder = os.path.join(projectPath, 'videos')
     outputDfFolder = os.path.join(projectPath, 'csv', 'input_csv')
     bpNamesCSVPath = os.path.join(projectPath, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
     poseEstimationSetting = config.get('create ensemble settings', 'pose_estimation_body_parts')
+    noAnimals = config.getint('General settings', 'animal_no')
+
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
+
+    try:
+        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
+        multiAnimalIDList = multiAnimalIDList.split(",")
+        if multiAnimalIDList[0] != '':
+            multiAnimalStatus = True
+            print('Applying settings for multi-animal tracking...')
+        else:
+            multiAnimalStatus = False
+            for animal in range(noAnimals):
+                multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
+            print('Applying settings for classical tracking...')
+    except NoSectionError:
+        multiAnimalIDList = []
+        for animal in range(noAnimals):
+            multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
+        multiAnimalStatus = False
+        print('Applying settings for classical tracking...')
+
+    print('Importing ' + str(len(filesFound)) + ' multi-animal DLC h5 files to the current project')
+
+    Xcols, Ycols, Pcols = getBpNames(inifile)
     currIDList = idlist
-    print('Importing ' + str(len(filesFound)) + ' multi-animal DLC h5 files to teh current project')
 
     for file in filesFound:
         bpNameList, x_heads, y_heads, xy_heads, indBpCordList, EuclidDistanceList, colorList, bp_cord_names, changeList, projBpNameList = [], [], [], [], [], [], [], [], [], []
         assigningIDs, completePromt, chooseFrame, assignBpCords = False, False, True, True
         addSpacer, ID_user_cords, currIDcounter, frameNumber = 2, [], 0, 0
-        vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')
-        vidBasename = os.path.basename(vidFname)
+        currVidName = os.path.basename(file)
+        if os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')
+        elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.avi')
+        elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.mp4')
+        elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.avi')
+
+        else:
+            print('Cannot locate video ' + str(currVidName.replace('.' + wfileType, '')) + ' in mp4 or avi format')
+            break
+        vidBasename, VideoExtension = os.path.basename(vidFname), os.path.splitext(vidFname)[1]
         currDf = pd.read_hdf(file)
-        bpNames = [lis[2] for lis in list(currDf.columns)]
-        uniqueBpNames = pd.Series(bpNames).drop_duplicates().tolist()
-        animalIDs = [lis[1] for lis in list(currDf.columns)]
-        UniqueIDs = pd.Series(animalIDs).drop_duplicates().tolist()
-        cmap = cm.get_cmap(str('tab10'), len(UniqueIDs) + 1)
-        for i in range(cmap.N):
-            rgb = list((cmap(i)[:3]))
-            rgb = [i * 255 for i in rgb]
-            rgb.reverse()
-            colorList.append(rgb)
-        for animal in range(len(UniqueIDs)):
-            for bp in uniqueBpNames:
-                x_head, y_head, p_head = str('Animal' + str(animal) + '_' + bp + '_x'),  str('Animal' + str(animal) + '_' + bp + '_y'),  str('Animal' + str(animal) + '_' + bp + '_p')
-                bp_cord_names.append('_' + bp + '_x')
-                bp_cord_names.append('_' + bp + '_y')
-                x_heads.append(x_head)
-                y_heads.append(y_head)
-                xy_heads.extend((x_head, y_head))
-                bpNameList.extend((x_head, y_head, p_head))
+        bpNames, idNames = [lis[2] for lis in list(currDf.columns)] , [lis[1] for lis in list(currDf.columns)]
+        uniqueIds = list(unique(idNames))
+
+        cmaps = ['spring', 'summer', 'autumn', 'cool', 'Wistia', 'Pastel1', 'Set1', 'winter']
+        cMapSize = int(len(Xcols) / noAnimals) + 1
+        colorListofList = createColorListofList(noAnimals, cMapSize)
+        animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, noAnimals, Xcols, Ycols, Pcols, colorListofList)
+        for animal in animalBpDict.keys():
+            for currXcol, currYcol, currPcol in zip(animalBpDict[animal]['X_bps'], animalBpDict[animal]['Y_bps'], animalBpDict[animal]['P_bps']):
+                bpNameList.extend((animal + '_' + currXcol, animal + '_' + currYcol, animal + '_' + currPcol))
         if poseEstimationSetting == 'user_defined':
-            config.set("General settings", "animal_no", str(len(UniqueIDs)))
+            config.set("General settings", "animal_no", str(len(uniqueIds)))
             with open(inifile, "w+") as f:
                 config.write(f)
             f.close
-
-        bpNameListGrouped = [xy_heads[x:x + len(uniqueBpNames)*2] for x in range(0, len(xy_heads) - 2, len(uniqueBpNames)*2)]
         currDf.columns = bpNameList
+        currDf.replace([np.inf, -np.inf], np.nan, inplace=True)
         currDf = currDf.fillna(0)
         cap = cv2.VideoCapture(vidFname)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -89,14 +116,12 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
                 ret, frame = cap.read()
                 overlay = frame.copy()
                 cv2.namedWindow('Define animal IDs', cv2.WINDOW_NORMAL)
-                for animal_bps in range(len(bpNameListGrouped)):
-                    currCols = bpNameListGrouped[animal_bps]
-                    currcolor = tuple(colorList[animal_bps])
-                    for ind_bp_cords in range(0, len(currCols), 2):
-                        y_cord = currDf.loc[currDf.index[frameNumber], currCols[ind_bp_cords + 1]]
-                        x_cord = currDf.loc[currDf.index[frameNumber], currCols[ind_bp_cords]]
-                        indBpCordList.append([x_cord, y_cord, currCols[ind_bp_cords]])
-                        cv2.circle(overlay, (int(x_cord), int(y_cord)), circleScale, currcolor, -1, lineType=cv2.LINE_AA)
+                for animal in animalBpDict.keys():
+                    for currXcol, currYcol, currColor in zip(animalBpDict[animal]['X_bps'], animalBpDict[animal]['Y_bps'], animalBpDict[animal]['colors']):
+                        y_cord = currDf.loc[currDf.index[frameNumber], animal + '_' + currYcol]
+                        x_cord = currDf.loc[currDf.index[frameNumber], animal + '_' + currXcol]
+                        indBpCordList.append([x_cord, y_cord, animal])
+                        cv2.circle(overlay, (int(x_cord), int(y_cord)), circleScale, currColor, -1, lineType=cv2.LINE_AA)
                     loop =0
                     for name in indBpCordList:
                         currstring = name[2]
@@ -134,7 +159,7 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
                 cv2.setMouseCallback('Define animal IDs', define_ID)
                 cv2.imshow('Define animal IDs', imageConcat)
                 cv2.waitKey(10)
-                if currIDcounter >= len(UniqueIDs):
+                if currIDcounter >= len(currIDList):
                     cv2.destroyWindow('Define animal IDs')
                     assigningIDs, completePromt = False, True
 
@@ -179,6 +204,7 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
                     newHeader = header.replace(currPoseName, newName)
                     bpNameList[loop] = newHeader
                 loop += 1
+
         currDf.columns = bpNameList
         outDf = pd.DataFrame()
         for name in currIDList:
@@ -187,19 +213,23 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
             outDf = pd.concat([outDf, sliceDf], axis=1)
         outDfcols = list(outDf.columns)
         toBpCSVlist = []
-        if poseEstimationSetting == 'user_defined':
-            for i in outDfcols:
-                currBpName = i[:-2]
-                toBpCSVlist.append(currBpName) if currBpName not in toBpCSVlist else toBpCSVlist
-            f = open(bpNamesCSVPath, 'w+')
-            for i in toBpCSVlist:
-                f.write(i + '\n')
-            f.close
+        # if poseEstimationSetting == 'user_defined':
+        #     for i in outDfcols:
+        #         currBpName = i[:-2]
+        #         toBpCSVlist.append(currBpName) if currBpName not in toBpCSVlist else toBpCSVlist
+        #     f = open(bpNamesCSVPath, 'w+')
+        #     for i in toBpCSVlist:
+        #         f.write(i + '\n')
+        #     f.close
         MultiIndexCol = []
         for column in range(len(outDf.columns)):
             MultiIndexCol.append(tuple(('DLC_multi', 'DLC_multi', outDf.columns[column])))
         outDf.columns = pd.MultiIndex.from_tuples(MultiIndexCol, names=['scorer', 'bodypart', 'coords'])
-        outputCSVname = os.path.basename(vidFname).replace('.mp4', '.csv')
-        outDf.to_csv(os.path.join(outputDfFolder, outputCSVname))
+        outputCSVname = os.path.basename(vidFname).replace(VideoExtension, '.' + wfileType)
+        if wfileType == 'parquet':
+            table = pa.Table.from_pandas(outDf)
+            pq.write_table(table, os.path.join(outputDfFolder, outputCSVname))
+        if wfileType == 'csv':
+            outDf.to_csv(os.path.join(outputDfFolder, outputCSVname))
         print('Imported ', outputCSVname, 'to current project.')
-    print('All multi-animal DLC .h5 tracking files ordered and imported into SimBA project in CSV file format')
+    print('All multi-animal DLC .h5 tracking files ordered and imported into SimBA project in the chosen workflow file format')

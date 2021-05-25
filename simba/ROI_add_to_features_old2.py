@@ -1,14 +1,12 @@
 from __future__ import division
 import os
+import pandas as pd
 import numpy as np
 from configparser import ConfigParser, NoSectionError, NoOptionError
 import glob
 from simba.rw_dfs import *
-from shapely.geometry import Point, Polygon
-from datetime import datetime
 
 def ROItoFeatures(inifile):
-    dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
     config.read(inifile)
     noAnimals = config.getint('ROI settings', 'no_of_animals')
@@ -40,7 +38,6 @@ def ROItoFeatures(inifile):
         multiAnimalStatus = False
         print('Applying settings for classical tracking...')
 
-    multiAnimalIDList = [x for x in multiAnimalIDList if x]
     trackedBodyParts = []
     for currAnimal in range(1,noAnimals+1):
         trackedBodyParts.append(config.get('ROI settings', 'animal_' + str(currAnimal) + '_bp'))
@@ -49,7 +46,6 @@ def ROItoFeatures(inifile):
     ROIcoordinatesPath = os.path.join(logFolderPath, 'measures', 'ROI_definitions.h5')
     rectanglesInfo = pd.read_hdf(ROIcoordinatesPath, key='rectangles')
     circleInfo = pd.read_hdf(ROIcoordinatesPath, key='circleDf')
-    polygonInfo = pd.read_hdf(ROIcoordinatesPath, key='polygons')
 
     def line_length(p, q, n, M, coord):
         Px, Py = np.abs(p[0] - M[0]), np.abs(p[1] - M[1])
@@ -68,25 +64,17 @@ def ROItoFeatures(inifile):
             return False, coord
 
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
-    if len(filesFound) == 0:
-        print('No feature-files found. Please extract features before appending ROI-features.')
-
     print('Extracting ROI features from ' + str(len(filesFound)) + ' files...')
     print('Please be patient, code is not optimized...')
-    summary_df_list = []
     for currFile in filesFound:
         CurrVidFn = os.path.basename(currFile)
         CurrentVideoName = os.path.basename(currFile).replace('.csv', '')
         print('Analyzing ROI features for ' + CurrentVideoName + '...')
         Rectangles = (rectanglesInfo.loc[rectanglesInfo['Video'] == str(CurrentVideoName)])
         Circles = (circleInfo.loc[circleInfo['Video'] == str(CurrentVideoName)])
-        Polygons = (polygonInfo.loc[polygonInfo['Video'] == str(CurrentVideoName)])
         currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == CurrentVideoName]
-        try:
-            currPixPerMM = float(currVideoSettings['pixels/mm'])
-            fps = float(currVideoSettings['fps'])
-        except TypeError:
-            print('ERROR: Make sure your videos are accurately represented in your project_folder/logs/video_info.csv file.')
+        currPixPerMM = float(currVideoSettings['pixels/mm'])
+        fps = float(currVideoSettings['fps'])
         currDfPath = os.path.join(csv_dir_in, CurrVidFn)
         currDf = read_df(currDfPath, wfileType)
         currDf = currDf.fillna(0)
@@ -96,19 +84,13 @@ def ROItoFeatures(inifile):
         directionalityCordHeaders = []
         EarLeftCoords, EarRightCoords, NoseCords = [], [], []
         for i in range(1, noAnimals + 1):
-            if noAnimals > 1: EarLeftTuple, EarRightTuple, NoseTuple = ('Ear_left_' + str(i) + '_x', 'Ear_left_' + str(i) + '_y'), ('Ear_right_' + str(i) + '_x', 'Ear_right_' + str(i) + '_y'), ('Nose_' + str(i) + '_x', 'Nose_' + str(i) + '_y')
-            else: EarLeftTuple, EarRightTuple, NoseTuple = ('Ear_left_x', 'Ear_left_y'), ('Ear_right_x', 'Ear_right_y'), ('Nose_x', 'Nose_y')
+            EarLeftTuple, EarRightTuple, NoseTuple = ('Ear_left_' + str(i) + '_x', 'Ear_left_' + str(i) + '_y'), ('Ear_right_' + str(i) + '_x', 'Ear_right_' + str(i) + '_y'), ('Nose_' + str(i) + '_x', 'Nose_' + str(i) + '_y')
             EarLeftCoords.append(EarLeftTuple)
             EarRightCoords.append(EarRightTuple)
             NoseCords.append(NoseTuple)
-            if noAnimals > 1:
-                directionalityCordHeaders.extend((['Nose_' + str(i) + '_x', 'Nose_' + str(i) + '_y']))
-                directionalityCordHeaders.extend(('Ear_left_' + str(i) + '_x', 'Ear_left_' + str(i) + '_y'))
-                directionalityCordHeaders.extend(('Ear_right_' + str(i) + '_x', 'Ear_right_' + str(i) + '_y'))
-            else:
-                directionalityCordHeaders.extend((['Nose_x', 'Nose_y']))
-                directionalityCordHeaders.extend(('Ear_left_x', 'Ear_left_y'))
-                directionalityCordHeaders.extend(('Ear_right_x', 'Ear_right_y'))
+            directionalityCordHeaders.extend((['Nose_' + str(i) + '_x', 'Nose_' + str(i) + '_y']))
+            directionalityCordHeaders.extend(('Ear_left_' + str(i) + '_x', 'Ear_left_' + str(i) + '_y'))
+            directionalityCordHeaders.extend(('Ear_right_' + str(i) + '_x', 'Ear_right_' + str(i) + '_y'))
         if set(directionalityCordHeaders).issubset(currDf.columns):
             directionalitySetting = 'yes'
         else:
@@ -117,17 +99,19 @@ def ROItoFeatures(inifile):
 
         #### FEATURES COLUMNS AND NUMPY ARRAYS WITH COORDINATES######
         rectangleFeatures = np.array([0]*5)
-        Rectangle_col_inside_value, Rectangle_col_distance, Rectangle_col_facing = [], [], []
+        Rectangle_col_inside_value = []
+        Rectangle_col_distance = []
+        Rectangle_col_facing = []
         for rectangle in range(len(Rectangles)):
             for bodypart in range(len(trackedBodyParts)):
-                ROI_col_name = str(Rectangles['Name'].iloc[rectangle] + '_' + multiAnimalIDList[bodypart] + 'in_zone')
+                ROI_col_name = str(Rectangles['Name'].iloc[rectangle] + '_' + multiAnimalIDList[bodypart] + '_in_zone')
                 Rectangle_col_inside_value.append(ROI_col_name)
                 currDf[ROI_col_name] = 0
-                ROI_col_name = str(Rectangles['Name'].iloc[rectangle] + '_' + multiAnimalIDList[bodypart] + 'distance')
+                ROI_col_name = str(Rectangles['Name'].iloc[rectangle] + '_' + multiAnimalIDList[bodypart] + '_distance')
                 currDf[ROI_col_name] = 0
                 Rectangle_col_distance.append(ROI_col_name)
                 if directionalitySetting == 'yes':
-                    ROI_col_name = str(Rectangles['Name'].iloc[rectangle] + '_' + multiAnimalIDList[bodypart] + 'facing')
+                    ROI_col_name = str(Rectangles['Name'].iloc[rectangle] + '_' + multiAnimalIDList[bodypart] + '_facing')
                     currDf[ROI_col_name] = 0
                     Rectangle_col_facing.append(ROI_col_name)
             rectangleArray = np.array([Rectangles['Name'].iloc[rectangle], Rectangles['topLeftX'].iloc[rectangle], Rectangles['topLeftY'].iloc[rectangle], Rectangles['topLeftX'].iloc[rectangle] + Rectangles['width'].iloc[rectangle], Rectangles['topLeftY'].iloc[rectangle] + Rectangles['height'].iloc[rectangle]])
@@ -135,33 +119,24 @@ def ROItoFeatures(inifile):
         rectangleFeatures = np.delete(rectangleFeatures, 0, 0)
 
         circleFeatures = np.array([0] * 4)
-        circle_col_inside_value, circle_col_distance, circle_col_facing = [], [], []
+        circle_col_inside_value = []
+        circle_col_distance = []
+        circle_col_facing = []
         for circle in range(len(Circles)):
             for bodypart in range(len(trackedBodyParts)):
-                ROI_col_name = str(Circles['Name'].iloc[circle] + '_' + multiAnimalIDList[bodypart] + 'in_zone')
+                ROI_col_name = str(Circles['Name'].iloc[circle] + '_' + multiAnimalIDList[bodypart] + '_in_zone')
                 circle_col_inside_value.append(ROI_col_name)
                 currDf[ROI_col_name] = 0
-                ROI_col_name = str(Circles['Name'].iloc[circle] + '_' + multiAnimalIDList[bodypart] + 'distance')
+                ROI_col_name = str(Circles['Name'].iloc[circle] + '_' + multiAnimalIDList[bodypart] + '_distance')
                 currDf[ROI_col_name] = 0
                 circle_col_distance.append(ROI_col_name)
                 if directionalitySetting == 'yes':
-                    ROI_col_name = str(Circles['Name'].iloc[circle] + '_' + multiAnimalIDList[bodypart] + 'facing')
+                    ROI_col_name = str(Circles['Name'].iloc[circle] + '_' + multiAnimalIDList[bodypart] + '_facing')
                     currDf[ROI_col_name] = 0
                     circle_col_facing.append(ROI_col_name)
             circleArray = np.array([Circles['Name'].iloc[circle], Circles['centerX'].iloc[circle], Circles['centerY'].iloc[circle], Circles['radius'].iloc[circle]])
             circleFeatures = np.vstack((circleFeatures, circleArray))
         circleFeatures = np.delete(circleFeatures, 0, 0)
-
-        polyFeatures = np.array([0] * 2)
-        poly_col_inside_value = []
-        for polyGon in range(len(Polygons)):
-            for bodypart in range(len(trackedBodyParts)):
-                ROI_col_name = str(Polygons['Name'].iloc[polyGon] + '_' + multiAnimalIDList[bodypart] + 'in_zone')
-                poly_col_inside_value.append(ROI_col_name)
-                currDf[ROI_col_name] = 0
-            polyArray = np.array([Polygons['Name'].iloc[polyGon], Polygons['vertices'].iloc[polyGon]])
-            polyFeatures = np.vstack((polyFeatures, polyArray))
-        polyFeatures = np.delete(polyFeatures, 0, 0)
 
         ### CALUCLATE BOOLEAN, IF ANIMAL IS IN RECTANGLES, CIRCLES, OR POLYGONS
         for index, row in currDf.iterrows():
@@ -192,23 +167,7 @@ def ROItoFeatures(inifile):
                 colName2 = str(column) + '_cumulative_percent'
                 currDf[colName2] = currDf[colName1] / currDf.index
 
-            loop = 0
-            for polyGon in range(len(Polygons)):
-                currPolyGon = Polygon(polyFeatures[0, 1])
-                for bodyparts in range(len(trackedBodyParts)):
-                    currROIColName = poly_col_inside_value[loop]
-                    loop += 1
-                    currBpLoc = Point(row[trackedBodyParts[bodyparts][0]], row[trackedBodyParts[bodyparts][1]])
-                    PolyGonCheck = (currPolyGon.contains(currBpLoc))
-                    if PolyGonCheck == True:
-                        currDf.loc[index, currROIColName] = 1
-            for column in poly_col_inside_value:
-                colName1 = str(column) + '_cumulative_time'
-                currDf[colName1] = currDf[column].cumsum() * float(1 / fps)
-                colName2 = str(column) + '_cumulative_percent'
-                currDf[colName2] = currDf[colName1] / currDf.index
-
-        ### CALUCLATE DISTANCE TO CENTER OF EACH RECTANGLE AND CIRCLES
+        ### CALUCLATE DISTANCE TO CENTER OF EACH RECTANGLE
         for index, row in currDf.iterrows():
             loop = 0
             for rectangle in range(len(Rectangles)):
@@ -258,30 +217,4 @@ def ROItoFeatures(inifile):
         currDf = currDf.replace(np.inf, 0)
         save_df(currDf, wfileType, currFile)
         print('New feature file with ROI data saved: ' + str(r'project_folder\csv\features_extracted') + str(r'\\') + str(CurrVidFn))
-
-        distance_facing_list, header_list = [], ['Video']
-        for distance_col in Rectangle_col_distance:
-            distance_facing_list.append(currDf[distance_col].mean())
-            header_list.append(distance_col + '_mean_mm')
-        for distance_col in circle_col_distance:
-            distance_facing_list.append(currDf[distance_col].mean())
-            header_list.append(distance_col + '_mean_mm')
-        for facing_col in Rectangle_col_facing:
-            distance_facing_list.append(currDf[facing_col].sum() / fps)
-            header_list.append(facing_col + '_sum_(s)')
-        for facing_col in circle_col_facing:
-            distance_facing_list.append(currDf[facing_col].sum() / fps)
-            header_list.append(facing_col + '_sum_(s)')
-        distance_facing_list.insert(0, CurrentVideoName)
-        summary_df_list.append(pd.DataFrame([distance_facing_list], columns=header_list))
-    try:
-        summary_df_out = pd.concat(summary_df_list, axis=0)
-    except FutureWarning:
-        print('WARNING: Not all of your videos have defined ROIs. Please define ROIs for all videos')
-    tmp = summary_df_out.select_dtypes(include=[np.number])
-    summary_df_out.loc[:, tmp.columns] = np.round(tmp, decimals=2)
-
-    summary_file_name = os.path.join(logFolderPath, 'ROI_features_summary_' + str(dateTime) + '.csv')
-    summary_df_out.to_csv(summary_file_name, index=False)
-    print('Summary file containing the mean distances between the animal and ROI centroids in the video, and the total (sum) seconds directing towards each ROI for each animal in each video is saved @' + str(summary_file_name))
     print('COMPLETE: All ROI feature data appended to feature files. The new features can be found as the last columns in the CSV (or parquet) files inside the project-folder/csv/features_extracted directory.')

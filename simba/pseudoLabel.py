@@ -1,30 +1,49 @@
 import pandas as pd
 from tkinter import *
 import pandas as pd
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps
 import os
 from tkinter import filedialog
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 from subprocess import *
 import re
+from simba.rw_dfs import *
+from simba.drop_bp_cords import *
 import numpy as np
+from pylab import cm
+import cv2
+
+
 '''
 parameters: inifile should be a .ini file, framedir should be a directory with a type(str), targets=list  
 '''
 
 def semisuperviseLabel(inifile,framedir,targets,threshold_list):
+    print(targets, threshold_list)
+    frameDirBaseName = os.path.basename(framedir).split('.')[0]
+    print(frameDirBaseName)
     projectpath = os.path.dirname(inifile)
-    csvfile = os.path.join(projectpath,'csv','machine_results',os.path.basename(framedir)+'.csv')
-    nameofvid = os.path.basename(csvfile).split('.csv')[0]
+    config = ConfigParser()
+    configFile = str(inifile)
+    config.read(configFile)
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
+    csvfile = os.path.join(projectpath,'csv','machine_results',(frameDirBaseName)+'.' + wfileType)
+    nameofvid = os.path.basename(csvfile).split('.' + wfileType)[0]
+    animalsNo = config.getint('General settings', 'animal_no')
+    poseEstimationBps = config.get('create ensemble settings', 'pose_estimation_body_parts')
+    currDf = read_df(csvfile, wfileType)
+
     # Retrieves behavior name and preexisting values from the machine generated csv file
     ##read in csv file
-    df = pd.read_csv(csvfile)
+    df = read_df(csvfile, wfileType)
     frames_dir = framedir
     threshold ={}
     for i in range(len(threshold_list)):
         name = threshold_list[i].labelname
         threshold[name]=float(threshold_list[i].entry_get)
-
 
     ## get dataframe of probability target columns
     df_prob_targets = []
@@ -36,9 +55,41 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
         probabilityColumnNames.append(probabilityColumnName)
         df_targets[target] = [1 if x > threshold[target] else 0 for x in df[[probabilityColumnName]].to_numpy()] #change new df according to threshold
 
+    try:
+        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
+        multiAnimalIDList = multiAnimalIDList.split(",")
+        if (multiAnimalIDList[0] != '') and (poseEstimationBps == 'user_defined'):
+            multiAnimalStatus = True
+            print('Applying settings for multi-animal tracking...')
+        else:
+            multiAnimalStatus = False
+            print('Applying settings for classical tracking...')
+
+    except NoSectionError:
+        multiAnimalIDList = ['']
+        multiAnimalStatus = False
+        print('Applying settings for classical tracking...')
+
+    cmaps = ['spring', 'summer', 'autumn', 'cool', 'Wistia', 'Pastel1', 'Set1', 'winter']
+    Xcols, Ycols, Pcols = getBpNames(inifile)
+    cMapSize = int(len(Xcols)/animalsNo) + 1
+    colorListofList = []
+    for colormap in range(animalsNo):
+        currColorMap = cm.get_cmap(cmaps[colormap], cMapSize)
+        currColorList = []
+        for i in range(currColorMap.N):
+            rgb = list((currColorMap(i)[:3]))
+            rgb = [i * 255 for i in rgb]
+            rgb.reverse()
+            currColorList.append(rgb)
+        colorListofList.append(currColorList)
+
+    animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, animalsNo, Xcols, Ycols, [], colorListofList)
+
 
     class MainInterface:
-        def __init__(self,framesfolder,targets,df_targets,video_name,inifile,maindf):
+        def __init__(self,videopath,targets,df_targets,video_name,inifile,maindf):
+            padding = 5
             #instances
             self.targets = targets
             self.df_targets = df_targets
@@ -47,13 +98,16 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
             self.maindf = maindf
             ## defining starting frames x parameters
             self.currentframeNo = 0
-            self.framesin = []
+            self.videopath = videopath
             ## getting all the frames froom the directory
-            for i in os.listdir(framesfolder):
-                self.framesin.append(os.path.join((framesfolder),i))
+            cap = cv2.VideoCapture(videopath)
+            length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            cap.release()
+            del cap
+            self.framesin = list(range(0, length))
 
             #sort the frame
-            self.framesin.sort(key=lambda f: int(re.sub('\D','',f)))
+            # self.framesin.sort(key=lambda f: int(re.sub('\D','',f)))
 
             ## making new top level
             self.window = Toplevel()
@@ -75,7 +129,12 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
 
             ## define first frames
             max_size = 1080, 650
-            current_image = Image.open(self.framesin[self.currentframeNo])
+            cap = cv2.VideoCapture(videopath)
+            cap.set(1, 0)
+            res, imageIn = cap.read()
+            cap.release()
+
+            current_image = Image.fromarray(imageIn)
             current_image.thumbnail(max_size, Image.ANTIALIAS)
             current_frame = ImageTk.PhotoImage(master=self.window, image=current_image)
 
@@ -96,11 +155,11 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
             folder.grid(row=0, column=1, sticky=N)
             self.button_frame.grid(row=1, column=0)
             self.frameNumber.grid(row=0, column=1)
-            self.forward.grid(row=1, column=3, sticky=E)
-            self.back.grid(row=1, column=1, sticky=W)
+            self.forward.grid(row=1, column=3, sticky=E, padx = padding)
+            self.back.grid(row=1, column=1, sticky=W, padx = padding)
             self.fbox.grid(row=1, column=1)
-            self.forwardmax.grid(row=1,column=4,sticky=W)
-            self.backmax.grid(row=1,column=0,sticky=W)
+            self.forwardmax.grid(row=1,column=4,sticky=W, padx = padding)
+            self.backmax.grid(row=1,column=0,sticky=W, padx = padding)
             self.select.grid(row=2, column=1, sticky=N)
             #jump
             self.jump_frame.grid(row=2, column=0)
@@ -189,7 +248,7 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
             script_directory = os.path.dirname(os.path.realpath(__file__))
             p = Popen('python ' + str(script_directory) + r"/play_video_pseudo.py", stdin=PIPE, stdout=PIPE, shell=True)
             main_project_dir = os.path.dirname(self.inifile)
-            video_dir = main_project_dir + '\\videos\\'
+            video_dir = os.path.join(main_project_dir, 'videos')
             video_list = os.listdir(video_dir)
             current_full_video_name = [i for i in video_list if self.video_name in i]
             try:
@@ -197,7 +256,7 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
             except IndexError:
                 print(
                     "Video not found in project_folder/videos, please make sure you have the video in the video folder")
-            data = bytes(video_dir + str(current_full_video_name), 'utf-8')
+            data = bytes(os.path.join(video_dir, str(current_full_video_name)), 'utf-8')
             p.stdin.write(data)
             p.stdin.close()
             path = os.path.join(main_project_dir,'subprocess.txt')
@@ -218,8 +277,16 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
         def save_video(self, dataframe):
             for i in self.targets:
                 dataframe[i] = self.df_targets[i]
+            dataframe = dataframe.drop(['Scaled_movement_M1','Scaled_movement_M2','Scaled_movement_M1_M2'], axis=1, errors='ignore')
+            for i in self.targets:
+                targetColName = 'Probability_' + i
+                dataframe = dataframe.drop([targetColName], axis=1, errors='ignore')
 
-            dataframe.to_csv(os.path.join(projectpath,'csv','targets_inserted',str(self.video_name) + '.csv'), index=FALSE)
+
+            try:
+                save_df(dataframe, wfileType, os.path.join(projectpath,'csv','targets_inserted',str(self.video_name) + '.csv'))
+            except PermissionError:
+                print('You don not have permission to save the annotation file - check that the file is not open in a different application. If you are working of a server make sure the file is not open on a different computer.')
             print('Files saved in',(os.path.join(projectpath,'csv','targets_inserted')))
 
         def saveBehavior(self, frame,targets):
@@ -228,11 +295,14 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
 
             # df_targets[target].loc[frame] = self.checkVar[target].get() ##get the frame numbre from the fbox and set it to equals to row in the df, then get 1 or 0
 
+        def saveBehaviorMulti(self, frame,targets):
+            df_targets[targets].loc[frame] = self.checkVar[targets].get()
+
         def saveRangeOfBehavior(self, start, end):
             if self.rangeOn.get():
                 for i in range(start, end+1):
                     for j in targets:
-                        self.saveBehavior(i,j)
+                        self.saveBehaviorMulti(i,j)
 
         def advance_frame(self,frame):
             ## define max frames ( last frames)
@@ -250,6 +320,7 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
                     self.currentframeNo = 0
                 else:
                     self.currentframeNo = frame
+
                 ## remove entry box (frame number) and refresh
                 self.fbox.delete(0, END)
                 self.fbox.insert(0, self.currentframeNo)
@@ -259,7 +330,43 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
 
                 ## refresh the frames showed in tkinter
                 max_size = 1080, 650
-                current_image = Image.open(self.framesin[self.currentframeNo])
+                IDlabelLoc = []
+
+                cap = cv2.VideoCapture(self.videopath)
+                cap.set(1, self.currentframeNo)
+                res, imageIn = cap.read()
+                cap.release()
+                try:
+                    maxResDimension = max(imageIn.shape[1], imageIn.shape[0])
+                    mySpaceScale, myRadius, myResolution, myFontScale = 60, 12, 1500, 1.5
+                    circleScale, fontScale, spacingScale = int(myRadius / (myResolution / maxResDimension)), float(myFontScale / (myResolution / maxResDimension)), int(mySpaceScale / (myResolution / maxResDimension))
+                    if animalsNo > 1:
+                        for animal in range(animalsNo):
+                            currentDictID = list(animalBpDict.keys())[animal]
+                            currentDict = animalBpDict[currentDictID]
+                            currNoBps = len(currentDict['X_bps'])
+                            IDappendFlag = False
+                            for bp in range(currNoBps):
+                                currXheader, currYheader, currColor = currentDict['X_bps'][bp], currentDict['Y_bps'][bp], currentDict['colors'][bp]
+                                currAnimal = currDf.loc[currDf.index[self.currentframeNo], [currXheader, currYheader]]
+                                if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
+                                        IDlabelLoc.append([currentDictID, currAnimal[0], currAnimal[1], currentDict['colors'][bp]])
+                                        IDappendFlag = True
+                            if IDappendFlag == False:
+                                IDlabelLoc.append([currentDictID, currAnimal[0], currAnimal[1], currentDict['colors'][bp]])
+                        for currAnimal in IDlabelLoc:
+                            cv2.putText(imageIn, str(currAnimal[0]), (int(currAnimal[1]), int(currAnimal[2])), cv2.FONT_HERSHEY_COMPLEX, fontScale, currAnimal[3], 4)
+                except NameError:
+                    pass
+
+                for i in self.targets:
+                    checkStatus = self.checkVar[i].get()
+                    if checkStatus == 1:
+                        imageIn = cv2.copyMakeBorder(imageIn, 10, 10, 10, 10, cv2.BORDER_CONSTANT, value=[0,0,255])
+                    break
+
+                imageIn = cv2.cvtColor(imageIn, cv2.COLOR_BGR2RGB)
+                current_image = Image.fromarray(imageIn)
                 current_image.thumbnail(max_size, Image.ANTIALIAS)
                 current_frame = ImageTk.PhotoImage(master=self.window, image=current_image)
 
