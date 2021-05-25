@@ -1,13 +1,14 @@
 import yaml
 import cv2
-import os
+import os, glob
 import shutil
-import deeplabcut
+#import deeplabcut
+from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError, NoOptionError
 
 def generatetempyaml(yamlfile,videolist):
     try:
         #copy yaml and rename
-        tempyaml = os.path.dirname(yamlfile) +'\\temp.yaml'
+        tempyaml = os.path.join(os.path.dirname(yamlfile), 'temp.yaml')
         shutil.copy(yamlfile,tempyaml)
 
         #adding new videos to tempyaml
@@ -34,7 +35,7 @@ def generatetempyaml(yamlfile,videolist):
 def generatetempyaml_multi(yamlfile,videolist):
 
     #copy yaml and rename
-    tempyaml = os.path.dirname(yamlfile) +'\\temp.yaml'
+    tempyaml = os.path.join(os.path.dirname(yamlfile), 'temp.yaml')
     shutil.copy(yamlfile,tempyaml)
 
 
@@ -77,12 +78,12 @@ def update_init_weight(yamlfile,initweights):
     iteration = read_yaml['iteration']
 
     yamlfiledirectory = os.path.dirname(yamlfile)
-    iterationfolder = yamlfiledirectory +'\\dlc-models\\iteration-' +str(iteration)
+    iterationfolder = os.path.join(yamlfiledirectory, 'dlc-models', 'iteration-' + str(iteration))
     projectfolder = os.listdir(iterationfolder)
     projectfolder = projectfolder[0]
 
 
-    posecfg = iterationfolder + '\\' + projectfolder +'\\train\\' + 'pose_cfg.yaml'
+    posecfg = os.path.join(iterationfolder, projectfolder, 'train' + 'pose_cfg.yaml')
 
     with open(posecfg) as g:
         read_cfg = yaml.load(g, Loader=yaml.FullLoader)
@@ -111,8 +112,9 @@ def add_multi_video_yaml(yamlfile,directory):
 
     ########### FIND FILES ###########
     for i in os.listdir(directory):
-        if ('.avi' in i) or ('.mp4' in i):
+        if i.__contains__(".mp4"):
             a=os.path.join(directory,i)
+            print(a)
             filesFound.append(a)
 
 
@@ -163,17 +165,18 @@ def add_single_video_yaml(yamlfile,videofile):
 
 
 def copycsv(inifile,source):
-    source = str(source)+'\\'
     dest = str(os.path.dirname(inifile))
-    dest1 = str((dest)+ '\\' + 'csv' + '\\' + 'input_csv')
-    files = []
-    print(dest1)
-    print(source)
-    ########### FIND FILES ###########
-    for i in os.listdir(source):
-        if i.__contains__(".csv"):
-            files.append(i)
+    dest1 = os.path.join(dest, 'csv', 'input_csv')
+    config = ConfigParser()
+    configFile = str(inifile)
+    config.read(configFile)
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
 
+    ########### FIND FILES ###########
+    files = glob.glob(source + '/*.' + wfileType)
     for f in files:
         try:
             shutil.copy(source+f,dest1)

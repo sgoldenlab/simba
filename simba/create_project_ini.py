@@ -1,50 +1,51 @@
 import os
 import csv
 import re
+import platform
 
-def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo):
+def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo,csvorparquet):
     simbaDir = os.path.dirname(__file__)
     animalNo = re.sub("[^0-9]", "", animalNo)
+    OSsystem = platform.system()
 
 ############create directories################
     directory = project_path
+
     #generate main directories in project path
-    project_folder = str(directory +'\\' + project_name + '\\project_folder')
-    models_folder = str(directory + '\\' + project_name +'\\models')
+    project_folder = os.path.join(directory, project_name, 'project_folder')
+    models_folder = os.path.join(directory, project_name, 'models')
+
     #generate sub-directories in main directories
-    config_folder = str(project_folder + '\\configs')
-    csv_folder = str(project_folder + '\\csv')
-    frames_folder = str(project_folder + '\\frames')
-    logs_folder = str(project_folder + '\\logs')
+    config_folder = os.path.join(project_folder, 'configs')
+    csv_folder = os.path.join(project_folder, 'csv')
+    frames_folder = os.path.join(project_folder, 'frames')
+    logs_folder = os.path.join(project_folder, 'logs')
     measures_folder = os.path.join(logs_folder, 'measures')
     pose_configs_folder = os.path.join(measures_folder, 'pose_configs')
     bp_names_folder = os.path.join(pose_configs_folder, 'bp_names')
-    videos_folder = str(project_folder + '\\videos')
+    videos_folder = os.path.join(project_folder, 'videos')
+
     #csv folder
-    features_extracted_folder = str(csv_folder + '\\features_extracted')
-    input_csv_folder = str(csv_folder + '\\input_csv')
-    machine_results_folder = str(csv_folder + '\\machine_results')
-    outlier_corrected_movement_folder = str(csv_folder + '\\outlier_corrected_movement')
-    outlier_corrected_location_folder = str(csv_folder + '\\outlier_corrected_movement_location')
-    targets_inserted_folder = str(csv_folder + '\\targets_inserted')
+    features_extracted_folder = os.path.join(csv_folder, 'features_extracted')
+    input_csv_folder = os.path.join(csv_folder, 'input_csv')
+    machine_results_folder = os.path.join(csv_folder, 'machine_results')
+    outlier_corrected_movement_folder = os.path.join(csv_folder, 'outlier_corrected_movement')
+    outlier_corrected_location_folder = os.path.join(csv_folder, 'outlier_corrected_movement_location')
+    targets_inserted_folder = os.path.join(csv_folder, 'targets_inserted')
     #frames
-    input_folder = str(frames_folder + '\\input')
-    output_folder = str(frames_folder + '\\output')
+    input_folder = os.path.join(frames_folder, 'input')
+    output_folder = os.path.join(frames_folder, 'output')
 
     folder_list = [project_folder,models_folder,config_folder,csv_folder,frames_folder,logs_folder,videos_folder,features_extracted_folder,input_csv_folder,machine_results_folder,outlier_corrected_movement_folder,outlier_corrected_location_folder,targets_inserted_folder,input_folder,output_folder, measures_folder, pose_configs_folder, bp_names_folder]
 
     for i in folder_list:
         try:
-            # Create target Directory
             os.makedirs(i)
-            # print("Directory ", os.path.basename(i), " created ")
         except FileExistsError:
             pass
-            # print("Directory ", os.path.basename(i), " already exists")
-
 
 ########create text file ##################
-    f = open(project_folder + "\\project_config.ini","w+")
+    f = open(os.path.join(project_folder, "project_config.ini"), "w+")
 
     #general settings
     f.write('[General settings]\n')
@@ -53,7 +54,9 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     f.write('csv_path = ' + str(csv_folder) +'\n')
     f.write('use_master_config = ' + str(msconfig) +'\n')
     f.write('config_folder = ' + str(config_folder)+ '\n')
+    f.write('workflow_file_type = ' + str(csvorparquet) + '\n')
     f.write('animal_no = ' + str(animalNo) + '\n')
+    f.write('OS_system = ' + str(OSsystem) + '\n')
     f.write('\n')
 
     #sml setings
@@ -61,7 +64,7 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     f.write('model_dir = ' + str(models_folder) +'\n')
     #for loop model path
     for i in range(int(no_targets)):
-        f.write('model_path_' +str(i+1) + ' = ' + str(models_folder) +'\\' + str(target_list[i]) + '.sav' +'\n')
+        f.write('model_path_' + str(i+1) + ' = ' + os.path.join(str(models_folder), str(target_list[i])) + '.sav' +'\n')
 
     f.write('No_targets = ' + str(no_targets) +'\n')
     #for loop for targetname
@@ -152,10 +155,10 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     #ensemble settings
     f.write('[create ensemble settings]\n')
     f.write('pose_estimation_body_parts = ' + str(bp) + '\n')
-    f.write('pose_config_label_path = ' + str(directory +'\\' + project_name + '\\project_folder\\logs\\measures\\pose_configs\\bp_names\\project_bp_names.csv') + '\n')
+    f.write('pose_config_label_path = ' + os.path.join(directory, project_name, 'project_folder', 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv') + '\n')
     f.write('model_to_run = RF\n')
     f.write('load_model =\n')
-    f.write('data_folder = ' + str(csv_folder+'\\targets_inserted') + '\n')
+    f.write('data_folder = ' + os.path.join(csv_folder, 'targets_inserted') + '\n')
     f.write('classifier =\n')
     f.write('train_test_size = 0.20 \n')
     f.write('under_sample_setting = \n')
@@ -184,7 +187,7 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     f.write('XGB_n_estimators = \n')
     f.write('XGB_max_depth = \n')
     f.write('XGB_learning_rate = \n')
-    f.write('meta_files_folder = ' + project_folder + '\\configs\\ \n' )
+    f.write('meta_files_folder = ' + os.path.join(project_folder, 'configs') + '\n')
     f.write('LearningCurve_shuffle_k_splits = 0 \n')
     f.write('LearningCurve_shuffle_data_splits = 0 \n')
     f.write('\n')
@@ -213,7 +216,7 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
     f.write('location_criterion = \n')
     f.close
 
-    configfile = str(project_folder + "\\project_config.ini")
+    configfile = os.path.join(project_folder, 'project_config.ini')
 
 
     ########create project_bp_names ##################
@@ -224,7 +227,6 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
 
     if listindex==9:
         return configfile
-
 
     chosenBodyParts = rows[listindex]
     chosenBodyParts = list(filter(None, chosenBodyParts))

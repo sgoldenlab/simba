@@ -103,4 +103,10 @@ def ganntplot_config(configini):
             print('Gantt plot ' + str(k) + '/' + str(rowCount) + ' for video ' + str(VideoCounter) + '/' + str(len(filesFound)))
             plt.close('all')
         loop += 1
+
+
+
+
+
+
     print('Finished generating gantt plots. Plots are saved @ project_folder/frames/output/gantt')

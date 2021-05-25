@@ -3,8 +3,9 @@ import pandas as pd
 import statistics
 import numpy as np
 import cv2
-from configparser import ConfigParser, MissingSectionHeaderError
+from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError, NoSectionError
 import glob
+from simba.drop_bp_cords import *
 
 def data_plot_config(configini, SelectedBp):
     config = ConfigParser()
@@ -14,12 +15,40 @@ def data_plot_config(configini, SelectedBp):
     projectPath = config.get('General settings', 'project_path')
     poseConfigSetting = config.get('create ensemble settings', 'pose_estimation_body_parts')
     frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'live_data_table')
+    bplist = define_bp_drop_down(configini)
+    print(bplist)
     if not os.path.exists(frames_dir_out):
         os.makedirs(frames_dir_out)
-    csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
+    csv_dir_in = os.path.join(projectPath, 'csv', 'features_extracted')
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     vidinfDf = pd.read_csv(vidInfPath)
     videoCounter = 0
+
+    try:
+        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
+        multiAnimalIDList = multiAnimalIDList.split(",")
+        if multiAnimalIDList[0] != '':
+            multiAnimalStatus = True
+            print('Applying settings for multi-animal tracking...')
+        else:
+            multiAnimalStatus = False
+            multiAnimalIDList = []
+            for animal in range(noAnimals):
+                multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
+            print('Applying settings for classical tracking...')
+    except NoSectionError:
+        multiAnimalIDList = []
+        for animal in range(noAnimals):
+            multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
+        multiAnimalStatus = False
+        print('Applying settings for classical tracking...')
+
+    Xcols, Ycols, Pcols = getBpNames(configini)
+    bpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, noAnimals, Xcols, Ycols, Pcols, [])
 
     ##### FIND RELEVANT COLUMN
     if poseConfigSetting != 'user_defined':
@@ -33,8 +62,9 @@ def data_plot_config(configini, SelectedBp):
         if noAnimals == 2:
             move1ColName = "movement_" + SelectedBp + '_1'
 
+
     ########### FIND CSV FILES ###########
-    filesFound = glob.glob(csv_dir_in + "/*.csv")
+    filesFound = glob.glob(csv_dir_in + "/*." + wfileType)
 
     print('Generating data plots for ' + str(len(filesFound)) + ' video(s)...')
 
@@ -56,7 +86,12 @@ def data_plot_config(configini, SelectedBp):
         df_lists = [csv_df[i:i + fps] for i in range(0, csv_df.shape[0], fps)]
 
         for currentDf in df_lists:
-            mmMove_nose_M1 = currentDf[move1ColName].mean()
+            try:
+                mmMove_nose_M1 = currentDf[move1ColName].mean()
+            except (KeyError, UnboundLocalError):
+                move1ColName = bplist[0][0]
+                move1ColName = 'Movement_' + str(move1ColName)
+                mmMove_nose_M1 = currentDf[move1ColName].mean()
             list_nose_movement_M1.append(mmMove_nose_M1)
             current_velocity_M1_cm_sec = round(mmMove_nose_M1, 2)
             meanVelocity_M1 = statistics.mean(list_nose_movement_M1)
@@ -67,7 +102,7 @@ def data_plot_config(configini, SelectedBp):
                 if poseConfigSetting != 'user_defined':
                     mmMove_nose_M2 = currentDf["Movement_mouse_2_centroid"].mean()
                 if poseConfigSetting == 'user_defined':
-                    mmMove_nose_M2 = currentDf["movement_" + SelectedBp + '_2'].mean()
+                    mmMove_nose_M2 = currentDf["movement_" + SelectedBp].mean()
                 list_nose_movement_M2.append(mmMove_nose_M2)
                 current_velocity_M2_cm_sec = round(mmMove_nose_M2, 2)
                 meanVelocity_M2 = statistics.mean(list_nose_movement_M2)

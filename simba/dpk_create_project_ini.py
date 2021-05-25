@@ -12,10 +12,10 @@ def write_dpkfile(projectdir,projectName):
     project_name = projectName
 
     #generate main directories in project path
-    annotation_folder = str(dpkdir +'\\' + project_name + '\\annotation_sets')
-    models_folder = str(dpkdir + '\\' + project_name +'\\models')
-    predictions_folder = str(dpkdir + '\\' + project_name +'\\predictions')
-    video_folder = str(dpkdir + '\\' + project_name +'\\videos')
+    annotation_folder = os.path.join(dpkdir, project_name, 'annotation_sets')
+    models_folder = os.path.join(dpkdir, project_name, 'models')
+    predictions_folder = os.path.join(dpkdir, project_name, 'predictions')
+    video_folder = os.path.join(dpkdir, project_name, 'videos')
     video_input_folder = os.path.join(video_folder, 'input')
     video_output_folder = os.path.join(video_folder, 'output')
 

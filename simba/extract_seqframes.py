@@ -47,7 +47,7 @@ def extract_seqframescommand(filename):
             f.seek(pos[i]+extra*(i+1), 0)
             imgdata = f.read(frameSize[i])
             img = Image.open(io.BytesIO(imgdata))
-            img.save(pathDir + '\\' + os.path.basename(pathDir) + str(i) + '.png')
+            img.save(os.path.join(pathDir, os.path.basename(pathDir) + str(i) + '.png'))
         print('All frames are extracted!')
     else:
         print('Please select a video to convert')

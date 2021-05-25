@@ -2,24 +2,29 @@ import os
 import pandas as pd
 from operator import itemgetter
 import cv2
-from configparser import ConfigParser
+from configparser import ConfigParser, NoSectionError, NoOptionError
 import glob
 from itertools import groupby, chain
+from simba.rw_dfs import *
+
 
 
 def validate_classifier(configini,seconds,target):
     seconds = int(seconds)
-
     ###get data from ini file
     config = ConfigParser()
     configFile = str(configini)
     config.read(configFile)
     projectPath = config.get('General settings', 'project_path')
     inputcsvfolder = os.path.join(projectPath, 'csv', 'machine_results')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     videoFolder = os.path.join(projectPath, 'videos')
 
     ##get all the csv in the folder
-    csvList = glob.glob(inputcsvfolder + '/*.csv')
+    csvList = glob.glob(inputcsvfolder + '/*.' + wfileType)
 
     ## get fps from videoinfo csv
     videoinfocsv = os.path.join(projectPath, 'logs', 'video_info.csv')
@@ -28,8 +33,8 @@ def validate_classifier(configini,seconds,target):
 
     #main loop
     for i in csvList:
-        print('Processing file: ' + os.path.basename(csvList) + ' File ' + fileCounter + ' / ' + str(len(csvList)))
-        df = pd.read_csv(i)
+        print('Processing file: ' + str(i) + ' File ' + str(fileCounter) + ' / ' + str(len(csvList)))
+        df = read_df(i, wfileType)
         csvname = os.path.basename(i).split('.')[0]
         fps = int(fpsdf['fps'].loc[(fpsdf['Video'] == csvname)])
         targetcolumn = df[target]
@@ -83,7 +88,7 @@ def validate_classifier(configini,seconds,target):
         #make folder if not exist
         if not os.path.exists(currFrameFolderOut):
             os.makedirs(currFrameFolderOut)
-        writer = cv2.VideoWriter(currFrameFolderOut+'\\'+(csvname + '_'+str(target) + '_' + str(no_bouts) + '.mp4'), fourcc, fps, (frame_width, frame_height))
+        writer = cv2.VideoWriter(os.path.join(currFrameFolderOut, (csvname + '_'+ str(target) + '_' + str(no_bouts) + '.mp4')), fourcc, fps, (frame_width, frame_height))
         framecounter= 1
         # create video
         for i in range(no_bouts):
