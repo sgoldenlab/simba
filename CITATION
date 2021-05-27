@@ -1,0 +1,14 @@
+@software{sgoldenlab_2021_4521178,
+  author       = {sgoldenlab and
+                  Jia Jie Choong and
+                  Simon Nilsson and
+                  Aasiya Islam and
+                  sophihwang26},
+  title        = {sgoldenlab/simba: SimBA: release v1.3},
+  month        = feb,
+  year         = 2021,
+  publisher    = {Zenodo},
+  version      = {v1.3},
+  doi          = {10.5281/zenodo.4521178},
+  url          = {https://doi.org/10.5281/zenodo.4521178}
+}
