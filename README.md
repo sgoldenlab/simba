@@ -177,18 +177,17 @@ This project is licensed under the MIT License. Note that the software is provid
 
 If you use **any** part of the code or data, please cite us! :)
 
-    @article {Nilsson2020.04.19.049452,
+    @article{Nilsson2020.04.19.049452,
       author = {Nilsson, Simon RO and Goodwin, Nastacia L. and Choong, Jia Jie and Hwang, Sophia and Wright, Hayden R and Norville, Zane C and Tong, Xiaoyu and Lin, Dayu and Bentzley, Brandon S. and Eshel, Neir and McLaughlin, Ryan J and Golden, Sam A.},
       title = {Simple Behavioral Analysis (SimBA) {\textendash} an open source toolkit for computer classification of complex social behaviors in experimental animals},
       elocation-id = {2020.04.19.049452},
       year = {2020},
       doi = {10.1101/2020.04.19.049452},
       publisher = {Cold Spring Harbor Laboratory},
-
-	URL = {https://www.biorxiv.org/content/early/2020/04/21/2020.04.19.049452},
-	eprint = {https://www.biorxiv.org/content/early/2020/04/21/2020.04.19.049452.full.pdf},
-	journal = {bioRxiv}
-
+      URL = {https://www.biorxiv.org/content/early/2020/04/21/2020.04.19.049452},
+      eprint = {https://www.biorxiv.org/content/early/2020/04/21/2020.04.19.049452.full.pdf},
+      journal = {bioRxiv}
+    }
 
 ## References 📜
 
