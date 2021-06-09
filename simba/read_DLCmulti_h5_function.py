@@ -71,7 +71,7 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
         currVidName = os.path.basename(file)
         if os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')
         elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.avi')
-        elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.mp4')
+        elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.mp4')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.mp4')
         elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.avi')
 
         else:
