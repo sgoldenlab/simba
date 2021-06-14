@@ -30,6 +30,9 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
         filesFound = glob.glob(dataFolder + '/*sk.h5') + glob.glob(dataFolder + '/*sk_filtered.h5')
     if filetype == 'box':
         filesFound = glob.glob(dataFolder + '/*bx.h5') + glob.glob(dataFolder + '/*bx_filtered.h5')
+    if filetype == 'ellipse':
+        filesFound = glob.glob(dataFolder + '/*el.h5') + glob.glob(dataFolder + '/*el_filtered.h5')
+
     videoFolder = os.path.join(projectPath, 'videos')
     outputDfFolder = os.path.join(projectPath, 'csv', 'input_csv')
     bpNamesCSVPath = os.path.join(projectPath, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
@@ -69,6 +72,7 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
         assigningIDs, completePromt, chooseFrame, assignBpCords = False, False, True, True
         addSpacer, ID_user_cords, currIDcounter, frameNumber = 2, [], 0, 0
         currVidName = os.path.basename(file)
+
         if os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')
         elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.avi')
         elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.mp4')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.mp4')

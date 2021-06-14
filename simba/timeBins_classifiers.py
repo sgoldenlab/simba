@@ -56,7 +56,7 @@ def time_bins_classifier(inifile,binLength):
                     currHead2 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_total_event_duration'
                     currHead3 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_mean_event_duration'
                     currHead4 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_median_event_duration'
-                    currHead5 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_time_first_occurance'
+                    currHead5 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_time_first_occurrence'
                     currHead6 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_mean_interval_duration'
                     currHead7 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_median_interval_duration'
                     outputDfHeaders.extend((currHead1,currHead2,currHead3,currHead4,currHead5,currHead6,currHead7))

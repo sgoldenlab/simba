@@ -112,7 +112,7 @@ import atexit
 
 simBA_version = 1.2
 currentPlatform = platform.system()
-if currentPlatform == 'Linux':
+if currentPlatform == 'Linux'or (currentPlatform == 'Darwin'):
     from simba.process_videos_automation_linux import *
 if currentPlatform == 'Windows':
     from simba.process_videos_automation_win import *
@@ -510,7 +510,7 @@ class processvid_menu:
         for i in self.filesFound:
             if currentPlatform == 'Windows':
                 command = 'copy \"' + str(self.videofolder) + '\\' + str(os.path.basename(i)) + '\" \"' + self.outputdir + '\"'
-            if currentPlatform == 'Linux':
+            if currentPlatform == 'Linux'or (currentPlatform == 'Darwin'):
                 command = 'cp "' + str(self.videofolder) + '/' + str(os.path.basename(i)) + '" "' + self.outputdir + '/"'
             copyvideos.append(command)
 
@@ -1103,7 +1103,7 @@ class video_info_table:
         # add path to videos for get coord
         if currentPlatform == 'Windows':
             self.data_lists[1] = [str(self.config_videofolders)+'\\'+s for s in self.data_lists[1]]
-        if currentPlatform == 'Linux':
+        if currentPlatform == 'Linux'or (currentPlatform == 'Darwin'):
             self.data_lists[1] = [str(self.config_videofolders)+'/'+s for s in self.data_lists[1]]
 
 
@@ -2902,7 +2902,7 @@ class project_config:
 
         #extract videos in projects
         label_extractframes = LabelFrame(tab4,text='Extract Frames into project folder',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
-        label_note = Label(label_extractframes,text='Video frames are used for visualizations')
+        label_note = Label(label_extractframes,text='Note: This is no longer needed for labelling videos. Instead, extract video frames are used for visualizations')
         label_caution = Label(label_extractframes,text='Caution: This extract all frames from all videos in project,')
         label_caution2 = Label(label_extractframes,text='and is computationally expensive if there is a lot of videos at high frame rates/resolution.')
         button_extractframes = Button(label_extractframes,text='Extract frames',command=self.extract_frames,fg='navy')
@@ -3066,7 +3066,7 @@ class project_config:
             animalnamebutton = Button(animalsettings,text='Confirm',command=lambda:self.animalnames(noofanimals.entry_get,animalsettings))
 
             if self.filetype.getChoices() == 'H5 (multi-animal DLC)':
-                options =['skeleton','box']
+                options =['skeleton','box','ellipse']
                 self.dropdowndlc = DropDownMenu(self.frame,'Tracking type',options,'15')
                 self.dropdowndlc.setChoices(options[1])
 
@@ -3103,7 +3103,7 @@ class project_config:
         id_ini = str(id_ini)
         if currentPlatform == 'Windows':
             id_ini = id_ini.replace('\'','')
-        if currentPlatform == 'Linux':
+        if currentPlatform == 'Linux'or (currentPlatform == 'Darwin'):
             id_ini = id_ini.replace('/', '')
         id_ini = id_ini.replace('[', '')
         id_ini = id_ini.replace(']', '')
@@ -3211,7 +3211,7 @@ class project_config:
         if currentPlatform == 'Windows':
             frame = LabelFrame(master,text='Bodyparts\' name')
 
-        if currentPlatform == 'Linux':
+        if currentPlatform == 'Linux'or (currentPlatform == 'Darwin'):
             frame = LabelFrame(master,text='Bodyparts/' 'name')
 
         frame.grid(row=5,sticky=W)
@@ -3607,7 +3607,7 @@ class loadprojectini:
         showname = Button(self.roi_define, text="Show Shape Definitions Table", command= lambda:self.table(self.roi_define,self.rec_entry.entry_get,self.cir_entry.entry_get,self.pol_entry.entry_get))
 
         # organize
-        self.roi_define.grid(row=0, sticky=W)
+        self.roi_define.grid(row=0, sticky=N)
         self.rec_entry.grid(row=1, sticky=W)
         self.cir_entry.grid(row=2, sticky=W)
         self.pol_entry.grid(row=3, sticky=W)
@@ -4780,7 +4780,7 @@ class loadprojectini:
             animalnamebutton = Button(animalsettings, text='Confirm', command=lambda: self.animalnames(noofanimals.entry_get, animalsettings))
 
             if val == 'H5 (multi-animal DLC)':
-                options = ['skeleton', 'box']
+                options = ['skeleton', 'box','ellipse']
                 self.dropdowndlc = DropDownMenu(self.frame, 'Tracking type', options, '15')
                 self.dropdowndlc.setChoices(options[1])
 
@@ -6022,7 +6022,7 @@ class trainmachinemodel_settings:
             output_path = os.path.dirname(self.configini) + "\\configs\\" + \
                         str(self.varmodel.get())+ '_meta_' + str(meta_number) + '.csv'
 
-        if currentPlatform == 'Linux':
+        if currentPlatform == 'Linux'or (currentPlatform == 'Darwin'):
             output_path = os.path.dirname(self.configini) + "/configs/" + \
                         str(self.varmodel.get())+ '_meta_' + str(meta_number) + '.csv'
 

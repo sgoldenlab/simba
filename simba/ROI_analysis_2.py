@@ -220,9 +220,13 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
         collapsedListEntry = list(itertools.chain.from_iterable(itertools.repeat(x, 1) if isinstance(x, str) else x for x in collapsedListEntry))
         EntrieInEntryList = collapsedListEntry[1:]
         sumEntries = sum(EntrieInEntryList)
-        EntrieInEntryList = [x / sumEntries for x in EntrieInEntryList]
-        EntrieInEntryList = ['%.3f' % elem for elem in EntrieInEntryList]
-        collapsedListEntry.extend(EntrieInEntryList)
+        entry_props = []
+        for entry_count in EntrieInEntryList:
+            if entry_count > 0:
+                entry_props.append(round((entry_count / sumEntries), 3))
+            else:
+                entry_props.append(0)
+        collapsedListEntry.extend(entry_props)
         outputDfTime = outputDfTime.append(pd.Series(dict(zip(outputDfTime.columns, collapsedListTime))),ignore_index=True)
         outputDfEntries = outputDfEntries.append(pd.Series(dict(zip(outputDfEntries.columns, collapsedListEntry))),ignore_index=True)
 

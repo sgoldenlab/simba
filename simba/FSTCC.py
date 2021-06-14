@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 class FSTCC_perform(object):
     def __init__(self, config_path, time_window, behavior_list, create_graphs):
-        self.time_delta, self.behavior_list, self.graph_status = time_window, behavior_list, create_graphs
+        self.time_delta, self.behavior_list, self.graph_status = int(time_window), behavior_list, create_graphs
         config = ConfigParser()
         config.read(config_path)
         project_path = config.get('General settings', 'project_path')
