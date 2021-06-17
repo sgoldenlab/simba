@@ -144,3 +144,12 @@ For example, when you created the model, SimBA grabbed the files inside your `pr
 * You created a standard classifier without [adding ROI features](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data). For the new files you are trying to analyze however, you **did** [calculate ROI features](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data). This will produce a mismatch in the number of columns between your model and your current files. 
 
 * Before creating your model, you [calculated ROI features](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data). These features where added to your files inside your `project_folder/features_extracted` directory. For the new files you are trying to analyze however, you **did not** [calculate ROI features](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data). This would also produce a mismatch in the number of columns between your model and your current files. 
+
+
+## 15. After a Microsoft Windows 10 update, I get a GPU CUDA/cudnn error - it was working before the update and now it is complaining about about `.cv2 DLL`
+
+Try an go to Settings > Apps > Manage Optional Features > Add a Feature. And then check the boxes for both Windows Media Player and for the Media Feature Pack. Restart the computer and try launching SimBA again. 
+
+
+
+
