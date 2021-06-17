@@ -148,7 +148,7 @@ For example, when you created the model, SimBA grabbed the files inside your `pr
 
 ## 15. After a Microsoft Windows 10 update, I get a GPU CUDA/cudnn error - it was working before the update and now it is complaining about about `.cv2 DLL`
 
-Try an go to Settings > Apps > Manage Optional Features > Add a Feature. And then check the boxes for both Windows Media Player and for the Media Feature Pack. Restart the computer and try launching SimBA again. 
+In Windows, try an go to Settings > Apps > Manage Optional Features > Add a Feature. And then check the boxes for both Windows Media Player and for the Media Feature Pack. Restart the computer, and try launching SimBA again. 
 
 
 
