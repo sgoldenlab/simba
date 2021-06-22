@@ -1,1 +1,44 @@
+# SimBA Unsupervised Classification
 
+## Overview
+
+[highlight features of unsupervised vs. supervised]. The SimBA Unsupervised Classification pipline and GUI were created by [Simon Nilsson](https://github.com/sronilsson) and [Aasiya Islam](https://github.com/aasiya-islam).
+
+## Pipeline
+
+### Step 1: Save Project Folder 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/create_folder.PNG" />
+</p>
+
+
+### Step 2: Create Dataset
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/create_dataset.PNG" />
+</p>
+
+### Step 3: Perform Dimensionality Reduction
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/perform_DR.PNG" />
+</p>
+
+### Step 4: Perform Clustering
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/perform_clustering.PNG" />
+</p>
+
+### Step 5: Train Model
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/train_model.PNG" />
+</p>
+
+### Step 6: Visualize Clusters 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/visualize_clusters.PNG" />
+</p>
