@@ -46,7 +46,7 @@ To begin, first import a folder of the machine results saved as CSV datasets by 
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/dataset_folder.PNG" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/dataset_folder2.PNG" />
 </p>
 
 <p align="center">
@@ -83,9 +83,9 @@ Once everything has been processed, you will observe that a new folder labeled '
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/perform_DR.PNG" />
 </p>
 
-The third tab will walk you through selecting a dimensionality reduction algorithm and inputting hyperparameters for the respective algorithm. Dimensionality reduction is used in unsupervised learning to transform the data from high-dimension to low-dimension by reducing the number of variables/features while still maintaining data integrity and retaining meaningful properties of the intrinsic dimension. Here, it is useful for our visualization of the data and gives us our first glimpse of data relationships prior to clustering in the next step. 
+The third tab will walk you through selecting a dimensionality reduction algorithm and inputting hyperparameters for the respective algorithm. Dimensionality reduction is used in unsupervised learning to transform the data from high-dimension to low-dimension by reducing the number of variables/features while still maintaining data integrity and retaining meaningful properties of the intrinsic dimension. Here, it is useful for our visualization of the data as pre-processed and generated in the previous step and gives us our first glimpse of data relationships prior to clustering in the next step. 
 
-We have provided three options for dimensionality reduction algorithms to choose from and use in your analysis, being [UMAP](https://umap-learn.readthedocs.io/en/latest/), [t-SNE](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html), and [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html). Each has their own set of hyperparameters to perform the dimensionality reduction with, as outlined below, but can be inputted in the same manner. 
+We have provided 3 options for dimensionality reduction algorithms to choose from and use in your analysis, being [UMAP](https://umap-learn.readthedocs.io/en/latest/), [t-SNE](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html), and [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html). Each has their own set of hyperparameters to perform the dimensionality reduction with, as outlined below, but can be inputted in the same manner. 
 
 >**Note:** To read more about the supporting documentation for each of the hyperparameters, please click on the algorithm name and follow the hyperlink. 
 
@@ -93,14 +93,14 @@ First, import the pre-processed feature dataset as was saved as a .pkl file from
 
 Next, specify the target group you would like to focus on for the analysis in the ```Target group``` entry box, such as "RI Male". [more info on target group].
 
-Then, you can select between your dimensionality reduction algorithms via the dropdown menu on the right of the `Select dimensionality reduction algorithm` label, and by clicking the small box inside of the box that says `UMAP` (which is the default algorithm), the other options should be available. As each algorithm is selected, a new set of hyperparameter entry boxes will appear respective to the algorithm. 
+Then, you can select between your dimensionality reduction algorithms via the dropdown menu on the right of the `Select dimensionality reduction algorithm` label, and by clicking the small box inside of the box that says `UMAP` (which is the default algorithm), the other options should be available. As each algorithm is selected, a new set of hyperparameter entry boxes will appear respective to the algorithm. For each entry box of hyperparameters, you can list several options for each hyperparameter that you would like to test in a pseudo grid search approach. A grid search is a method for hyperparameter optimization where test several hyperparameters at once as a grid of values then evaluate every position on the grid as a different combination of hyperparameters. Our approach goes through each hyperparameter value and assesses the combinations individually. You may then evaluate each combination of hyperparameters once the dimensionality reduction visualization saves in the folder and assess the effectiveness of each hyperparameter and test out other combinations to fine-tune your approach. 
 
 <p>
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/UMAP.PNG" />
 </p>
 
 
-- UMAP: 
+- UMAP: For UMAP, there are 4 hyperparameters to input, and 
 
 <p>
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/tsne.PNG" />
