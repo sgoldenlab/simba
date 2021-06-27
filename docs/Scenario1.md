@@ -100,9 +100,13 @@ In this step, you will import your pose-estimation tracking data from DeepLabCut
 
 1. Navigate to the `[ Import tracking data ]` tab. The first dropdown menu specify your file-type. In this tutorial we are importing CSV files from DLC and we will leave this at the default (**CSV (DLC/DeepPoseKit)**). If you have pose-estimation data in alternative file-formats, for example from multi-animal DLC or SLEAP, then please see the seperate SimBA  multi-animal tutorial for how to import this data. 
 
-Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the CSV files that you wish to import into your project.
+2. Under the `Interpolate missing pose-estimation data` heading, select how SimBA should handle missing data in your pose-estimation input files. For best classifier performance, it is important that the animals are present in all the videos throughout the recording. We recommend that you use the [SimBA video clipping tools](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos) to remove time-segments of the video where the animals are absent from the recorded arena. However - if clipping the videos is not an option - then we can tell SimBA to interpolate the missing values. SimBA offers three methods of interpolation - linear, nearest, and quadratic. Figures showing the differences between interpolation methods can be found [HERE](https://github.com/sgoldenlab/simba/blob/master/images/Interpolation_comparison.png) or [HERE](https://gist.github.com/gyassine/b47b90e8de935cc06ef856401f7582b0).
 
-2. Click on `Import csv to project folder`. 
+>*Note*: We recommend that you make sure that the animals are not absent from the video recording and that you pre-process the videos by removing video segments where the animals are not present, before performing pose-estimation and importing the data into SimBA. Interpolations will result in feeding inaccurate data into SimBA and should be avoided where possible.
+
+3. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the CSV files that you wish to import into your project. Click on `Import csv to project folder`. 
+
+
 
 >*Note*: SimBA also provides the ability to import single videos and their corressponding CSV files. For more information, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1). This method is not used in Scenario 1.
 
