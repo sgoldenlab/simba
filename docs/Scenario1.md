@@ -94,7 +94,7 @@ In this step, you will import your pose-estimation tracking data from DeepLabCut
 
 >*Note*: DLC outputs CSV files with exceptionally long file names. We have included a function that will automatically copy the DLC CSV files, remove the excess DLC notations from the filename, and paste the new CSV files within the SimBA project. The new CSV will now have the same name as the corresponding video. The original DLC output CSV will still be present in its original folder.
 
-![](/images/Create_project_2.PNG "importcsv")
+![](/images/Create_project_2_new.PNG "importcsv")
 
 #### To import multiple DLC csv files
 
