@@ -23,7 +23,7 @@ In short, FSTTC may be helpful to answer questions such as:
 
 Note that SimBA will calculate the FSTTC for all the behaviors selected by the user, and SimBA does **not** require there to be two, or more, tracked animals.
 
-The FSTCC is calculated as:
+The FSTTC is calculated as:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_2.png" />
