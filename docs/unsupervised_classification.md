@@ -83,7 +83,7 @@ Once everything has been processed, you will observe that a new folder labeled '
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/perform_DR.PNG" />
 </p>
 
-The third tab will walk you through selecting a dimensionality reduction algorithm and inputting hyperparameters for the respective algorithm. Dimensionality reduction is used in unsupervised learning to transform the data from high-dimension to low-dimension by reducing the number of variables/features while still maintaining data integrity and retaining meaningful properties of the intrinsic dimension. Here, it is useful for our visualization of the data as pre-processed and generated in the previous step and gives us our first glimpse of data relationships prior to clustering in the next step. 
+The third tab will walk you through selecting a dimensionality reduction algorithm and inputting hyperparameters for the respective algorithm. Dimensionality reduction is used in unsupervised learning to transform the data from high-dimension to low-dimension, simplifying a data point to a single x,y coordinate. It is especially useful as it reduces the number of variables/features while still maintains data integrity and retains meaningful properties of the intrinsic dimension. Here, it is valuable for our visualization of the data as pre-processed and generated in the previous step and gives us our first glimpse of data relationships prior to clustering in the next step. 
 
 We have provided 3 options for dimensionality reduction algorithms to choose from and use in your analysis, being [UMAP](https://umap-learn.readthedocs.io/en/latest/), [t-SNE](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html), and [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html). Each has their own set of hyperparameters to perform the dimensionality reduction with, as outlined below, but can be inputted in the same manner. 
 
@@ -97,12 +97,16 @@ Then, you can select between your dimensionality reduction algorithms via the dr
 
 For each entry box of hyperparameters, you can list several options for each hyperparameter that you would like to test in a pseudo grid search approach. A grid search is a method for hyperparameter optimization where test several hyperparameters at once as a grid of values then evaluate every position on the grid as a different combination of hyperparameters. Our approach goes through each hyperparameter value and assesses the combinations individually. You may then evaluate each combination of hyperparameters once the dimensionality reduction visualization saves in the folder and assess the effectiveness of each hyperparameter and test out other combinations to fine-tune your approach. 
 
+Below, you will find an explanation of each algorithm and their associated hyperparameters as well as suggested entry values with further documentation. Essentially this step will require a trial-and-error approach with finding the combination of hyperparameters where the resulting visualization best fits the data according to your understanding. 
+
+[explain what the hyperparameters do, provide range of values, and link documentation]
+
 <p>
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/UMAP.PNG" />
 </p>
 
 
-- UMAP: For UMAP, there are 4 hyperparameters to input, and 
+- UMAP: For UMAP, there are 4 hyperparameters to input, being `Distance`, `Neighbors`, `Spread`, and `Dimensions`. 
 
 <p>
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/tsne.PNG" />
@@ -119,11 +123,29 @@ For each entry box of hyperparameters, you can list several options for each hyp
 - PCA:
 
 
+>**Note:** If you are inputting multiple values for the hyperparameter entry box, you must do so without commas. For example, you can list '10, 20, 30' as `10 20 30` instead of `10, 20, 30`.
+
+Once you have entered the values for each hyperparamter box, you can save the resulting .npy array by clicking the `Save dimensionality reduction .npy `, which will automatically save in a new folder within the project folder labeled 'dimensionality_reduction'. After selecting the hyperparameter combination based on visualizations that you would like to cluster, this .npy array can then be used as the input for the following clustering step.
+
+To save the visualizations associated with each algorithm, click the `Save visualizations` button, and each resulting combination of the hyperparameters will save as its own scatter plot visualization in the same folder. Note that the combination can be distinguished given the file name that will read [insert file name template]. For example, a visualization that features the hyperparameters of [insert hyperparameter combo] will be named `visualization name`.
+
+Below, you will find examples of different dimensionality reduction visualizations and their corresponding algorithm. Note that visually, the plots look similar, with respect to the differences found between hyperparameters.
+
+>**Note:** Something about not being able to guarantee results or what it will look like with pseudo grid search approach, no metrics to assess performance of one hyperparameter combination over another. 
+
 ## Step 4: Perform Clustering
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/perform_clustering.PNG" />
 </p>
+
+The fourth tab will guide you through performing clustering using HDBSCAN with the previous dimensionality reduction results. Clustering in unsupervised analysis is greatly useful in grouping data in clusters based on behavioral similarities and gives insight into underlying patterns that distinguish clustered groups. 
+
+Our primary algorithm of choice is HDBSCAN [link documentation], which is a hierarchical clustering algorithm that assesses the proximity of the clusters relative to one another based on the degree of differences found between them. It will automatically cluster the data without needing to provide a set number of clusters beforehand, and filters out noise and inconsequential data points with a set minimum cluster size. 
+
+HDBSCAN is also useful as it provides us with different types of visualizations to assess how the data was clustered. The first way is through a standard scatter plot visualization, similar to the one represented earlier via the dimensionality reduction visualization. Here, it color codes the data points based on the cluster assignment, as shown below. To save the HDBSCAN scatter plot visualization, click the `Visualize/save HDBSCAN scatter plot` button, and the visualization will save to a folder named 'clustering' [double check] within the project folder.
+
+The second form of visualization is via a hierarchical tree plot, which 
 
 ## Step 5: Train Model
 
