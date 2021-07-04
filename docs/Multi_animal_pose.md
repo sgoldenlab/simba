@@ -2,7 +2,7 @@
 
 New developments in pose-estimation packages such as [maDeepLabCut (version >=2.2b5)](https://github.com/DeepLabCut/DeepLabCut/releases/tag/v2.2b5) and [SLEAP](https://sleap.ai/) allow users to track similar looking animals, for example multiple littermates of the same coat-color. In prior versions of these pose-estimation tools, tracking several similar looking animals could be difficult as a single body-part (i.e., the "Snout" or the "Tail-base") was intermittently attributed to either animal. 
 
-In this tutorial we will import multi-animal tracking data from DeepLabCut into SimBA from videos of two black-coated C57BL/6J mice. SimBA is capable of working with more than two subjects, but has been optimized for two-subject pairings.
+In this tutorial we will import multi-animal tracking data from DeepLabCut into SimBA from videos of two black-coated C57BL/6J mice. SimBA is capable of working with more than two subjects, but has been optimized for two-subject pairings. Multiple animals can also be tracked with [*Animal Part Tracker* (APT)](http://kristinbranson.github.io/APT/index.html) and such data (.trk files) can also be imported into SimBA. 
 
 **IMPORTANT NOTE:** Both maDLC and SLEAP present significant advances in pose-estimation. However, behaviors that contain elements where experimental subjects are fully occluded, by either environmental factors (such as enrichment igloos) or by other experimental subjects (such as during aggression or mating behaviors), may present tracking difficulties. The accuracy of predictive classifiers depends on tracking, so it is critical to troubleshoot any similar multiple animal pose-estimation issues prior to importing tracking data into SimBA.
 
