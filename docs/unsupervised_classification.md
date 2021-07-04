@@ -113,7 +113,7 @@ Below, you will find an explanation of each algorithm and their associated hyper
 </p>
 
 
-- t-SNE:
+- t-SNE: For t-SNE, there are 3 hyperparameters of `Perplexity`, `Iterations`, and `Dimensions`. 
 
 <p>
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/PCA.PNG" />
@@ -143,9 +143,24 @@ The fourth tab will guide you through performing clustering using HDBSCAN with t
 
 Our primary algorithm of choice is HDBSCAN [link documentation], which is a hierarchical clustering algorithm that assesses the proximity of the clusters relative to one another based on the degree of differences found between them. It will automatically cluster the data without needing to provide a set number of clusters beforehand, and filters out noise and inconsequential data points with a set minimum cluster size. 
 
-HDBSCAN is also useful as it provides us with different types of visualizations to assess how the data was clustered. The first way is through a standard scatter plot visualization, similar to the one represented earlier via the dimensionality reduction visualization. Here, it color codes the data points based on the cluster assignment, as shown below. To save the HDBSCAN scatter plot visualization, click the `Visualize/save HDBSCAN scatter plot` button, and the visualization will save to a folder named 'clustering' [double check] within the project folder.
+HDBSCAN is also useful as it provides us with different types of visualizations to assess how the data was clustered. The first way is through a standard scatter plot visualization, similar to the one represented earlier via the dimensionality reduction visualization. Here, it color codes the data points based on the cluster assignment, as shown below. [x and y axis labels]. 
 
-The second form of visualization is via a hierarchical tree plot, which 
+[insert scatter plot]
+
+First, import the dimensionality reduction results from the previous step, by clicking the `Browse File` button and selecting the .npy array that was saved in the 'dimensionality reduction folder' and represents the best-fitting combination of hyperparameters. 
+To save the HDBSCAN scatter plot visualization, click the `Visualize/save HDBSCAN scatter plot` button, and the visualization will save to a folder named 'clustering' [double check] within the project folder.
+
+The second form of visualization is via a hierarchical tree plot, which represents the cluster tree as a dendrogram. At each of the nodes the data is split off into their respective clusters, and the width of each branch represents the number of data points in the cluster at that level. The clusters are also color-coded with a circle around the cluster branch. The y-axis is labeled by the lambda value, otherwise known as 1/distance of the data points [double check], and the legend designates a color gradient representing the number of data points being split per node. An example of the tree plot can be shown below. 
+
+[insert tree plot graphic]
+
+To save the HDBSCAN tree plot visualization, click the `Visualize/save HDBSCAN tree plot` button, and the visualization will also save in the 'clustering' folder.
+
+Finally, we can save the resulting dataset that assigns clusters to each behavioral bout as was represented by the original dataset we created. As shown below, the CSV file saves [insert what it contains]. This file is saved as both a CSV and .pkl file, where the CSV file can be opened to evaluate the cluster assignment, and the .pkl file can be used to train the model in the following step.
+
+[insert clusters CSV and file saving both CSV and .pkl]
+
+To save the clusters CSV and .pkl, click the `Save clusters CSV` button [update later] and the files will save to the same 'clustering' folder. 
 
 ## Step 5: Train Model
 
@@ -158,3 +173,6 @@ The second form of visualization is via a hierarchical tree plot, which
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/visualize_clusters.PNG" />
 </p>
+
+
+The final step allows you to visualize the cluster assignments for each behavioral bout in t
