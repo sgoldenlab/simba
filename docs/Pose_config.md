@@ -4,7 +4,7 @@ SimBA comes pre-packaged with the ability to import tracking data based on [8 di
 
 However, SimBA can handle *any* combination of tracked body-parts, as long as users create their own pose configuration setting in SimBA. In this tutorial we describe how users define their own body part configurations in SimBA. 
 
- **CAUTION**: When users create projects with user-defined body part configurations, SimBA calculates fewer and less precise features for the machine models and this may negatively affect the prediction performance. Thus - *if users have the option* - we strongly encourage  that the [16-body-part, 2 animal, pose-configuration setting](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) is used. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/features_user_defined_pose_config.csv) for a rough list of the features that SimBA calculates based on user-defined pose configurations. For comparison, click [HERE] for the list of features that SimBA calculates based on the [16-body-part, 2 animal, pose-configuration setting](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv). 
+ **CAUTION**: When users create projects with user-defined body part configurations, SimBA calculates fewer and less precise features for the machine models and this may negatively affect the prediction performance. Thus - *if users have the option* - we strongly encourage  that the [16-body-part, 2 animal, pose-configuration setting](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) is used. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/features_user_defined_pose_config.csv) for a rough list of the features that SimBA calculates based on user-defined pose configurations. For comparison, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) for the list of features that SimBA calculates based on the 16-body-part, 2 animal, pose-configuration setting.
 
 # Create a new user-defined pose-configuration
 
@@ -18,17 +18,18 @@ Click on `Create pose config` to begin to define a new user-defined pose configu
 
 ![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Pose_config_2.PNG "Pose config menu 2")
 
-In the *first* entry box, give your pose-configuration a name. In this tutorial we will call our user-defined pose configuration *BtWGaNP_pose*. Please avoid spaces in the pose config name. In the *second* entry box, enter the number of animals you wish to track. This could be 1 or 2. In the *third* entry box, enter the number of body-parts your tracking data will contain. For example, if the dataset contains 8 tracked body-parts on two different animals, I will enter the integer **16**. 
+In the *first* entry box, give your pose-configuration a name. In this tutorial we will call our user-defined pose configuration *BtWGaNP_pose*. Please avoid spaces in the pose config name. In the *second* entry box, enter the number of animals you wish to track. This could be 1 or 2 or mote. In the *third* entry box, enter the number of body-parts your tracking data will contain. For example, if the dataset contains 8 tracked body-parts on two different animals, I will enter the integer **16**. 
 
 Next, select an image that is representative of your tracking environment and contains a clear view of all the tracked bodyparts by clicking on `Browse File`. This image will be used to create a reference image of your pose configuration settings. After you have selected an image, click on `Confirm`.
 
-3. After clicking confirm the following table should pop open:
+3. After clicking confirm a table should pop open. The table contains one row for each body-part specified in the `# of Bodyparts` entry box. If the user has entered `1` in the `# of Animals` entry box, this table will contain a single columns (as in the left image below). If the user has entered a number greater than 1 in the `# of Animals` entry box, then this table will contain two columns (as in the right image below). 
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Pose_config_image_3.PNG "Pose config menu 3")
 
-The table contains one row for each body-part specified in the `# of Bodyparts` entry box. Please name the bodyparts by filling in their names. **Do not use spaces in the bodypart names**.
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/UD_1.png" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/UD_2.png" width="425"/>
 
-**IMPORTANT** If you have two animals, you might want to track two body-parts with the same name for each of the two animals. For example, you may want to track the *Nose* of the two animals. If this is the case, then name the two noses *Nose_1* for animal 1, and *Nose_2* for animal 2.  When done, click on `Save Pose Configs` to proceed. 
+Please name the bodyparts in the left-most column (titled *Bodyparts' name*) by filling in their names. **Do not use spaces in the bodypart names**.
+
+If you have two or more animals, you will need to fill in the second column (titled *Animal ID number*) with an integer which tells SimBA which animal each of the individual body-part belong too. In this example image above, we are creating a body-part pose-configuration with 7 bodyparts for 2 different animals, and I have entered `1` and `2` in the *Animal ID number* column to specify which animal the different body-parts belong too. When done, click on `Save Pose Configs` to proceed. 
 
 3. After clicking on `Save Pose Configs`, a window named `Define pose` pops open that shows the frame that was chosen in the `Image Path` entry box. This image also displays some instructions at the top - like the image here below to the left. Follow the instructions at the top of the window to label all of your defined body parts, like the gif below on the right: 
 
