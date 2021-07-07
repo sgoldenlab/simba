@@ -175,4 +175,11 @@ To save the clusters CSV and .pkl, click the `Save clusters CSV` button [update 
 </p>
 
 
-The final step allows you to visualize the cluster assignments for each behavioral bout in t
+The final step allows you to visualize the cluster assignments for each behavioral bout in the video of your choice and make sense of the type of behavior associated with each cluster. There are two forms of visualizations, being the original video clip of the animal behavioral bout saved with the cluster assignment, as well as a dynamic "skeleton" showing the animal movement and associated cluster behavior type. 
+
+
+To visualize the clusters, we must begin by importing the clusters CSV file as was saved in the previous step that associates each bout with a cluster. Select this file from the respective folder by clicking `Browse File` next to the `Import clusters .csv file`. Then, choose a particular video from the collection of videos in which the data analysis was performed on that you would like to see clips from specifically, and input the exact video name in the `Video name` entry box. An example would be: [insert video name example]. 
+
+Next, import both the folders of videos and initial datasets (those which were used in "Step 2: Create Dataset") by clicking the `Browse Folder` button. Finally, import the CSV file that names the headers for the animal body parts, as can be found and saved from [detail folder/SimBA step where its saved]. 
+
+To save the 
