@@ -41,7 +41,7 @@ Note that the folder name will save as "unsupervised_projectname" with "projectn
 The second tab will walk you through pre-processing and cleaning the data from prior machine results, and saving the data relevant for unsupervised analysis into a single dataset. 
 This step serves to extract behavioral bouts of interest as designated by the classifier and find mean feature values while dropping all features that are not relevant.
 
-To begin, first import a folder of the machine results saved as CSV datasets by clicking the ```Browse Folder``` button and selecting the folder of datasets. An example of the machine results folder and CSV format and can be shown below, and is generated as directed by this documentation (hyperlink relevant documentation, discuss kleinberg or link documentation]
+To begin, first import a folder of the machine results saved as .csv datasets by clicking the ```Browse Folder``` button and selecting the folder of datasets. An example of the machine results folder and .csv format and can be shown below, and is generated as directed by this documentation (hyperlink relevant documentation, discuss kleinberg or link documentation]
 
 
 
@@ -69,9 +69,9 @@ Once everything has been imported, you can begin the pre-processing by clicking 
 
 >**Note:** This step may take a few minutes to process all of the machine results depending on the length and number of datasets in the folder. Once everything has been processed you will see the .pkl file 
 
-Once everything has been processed, you will observe that a new folder labeled 'create_dataset' has been saved in your project folder, and inside the 'create_dataset' folder, there will be a single .pkl file saved under the name of the classifier you inputted, such as "Attack.pkl". The .pkl file is a serialized object file that can be read in and deserialized in future steps to use in our classification, and is mainly used for storage efficiency. It cannot be opened on its own like you would a CSV file. 
+Once everything has been processed, you will observe that a new folder labeled 'create_dataset' has been saved in your project folder, and inside the 'create_dataset' folder, there will be a single .pkl file saved under the name of the classifier you inputted, such as "Attack.pkl". The .pkl file is a serialized object file that can be read in and deserialized in future steps to use in our classification, and is mainly used for storage efficiency. It cannot be opened on its own like you would a .csv file. 
 
-[insert pic of pkl file saved]
+[insert pic of pkl file saved w final tutorial]
 
 
 [GIF of saving dataset then showing pkl file saved]
@@ -125,13 +125,13 @@ Below, you will find an explanation of each algorithm and their associated hyper
 
 >**Note:** If you are inputting multiple values for the hyperparameter entry box, you must do so without commas. For example, you can list '10, 20, 30' as `10 20 30` instead of `10, 20, 30`.
 
-Once you have entered the values for each hyperparamter box, you can save the resulting .npy array by clicking the `Save dimensionality reduction .npy `, which will automatically save in a new folder within the project folder labeled 'dimensionality_reduction'. After selecting the hyperparameter combination based on visualizations that you would like to cluster, this .npy array can then be used as the input for the following clustering step.
+Once you have entered the values for each hyperparameter box, you can save the resulting .npy array by clicking the `Save dimensionality reduction .npy `, which will automatically save in a new folder within the project folder labeled 'dimensionality_reduction'. After selecting the hyperparameter combination based on visualizations that you would like to cluster, this .npy array can then be used as the input for the following clustering step.
 
-To save the visualizations associated with each algorithm, click the `Save visualizations` button, and each resulting combination of the hyperparameters will save as its own scatter plot visualization in the same folder. Note that the combination can be distinguished given the file name that will read [insert file name template]. For example, a visualization that features the hyperparameters of [insert hyperparameter combo] will be named `visualization name`.
+To save the visualizations associated with each algorithm, click the `Save visualizations` button, and each resulting combination of the hyperparameters will save as its own scatter plot visualization in the same folder. Note that the combination can be distinguished given the file name that will read `algorithm_reduced_features_hyperparameter_value_.npy`. For example, a UMAP visualization/.npy that features the hyperparameters of spread = 1.0, neighbors = 3, distance = 0.0, and dimensions = 2 will be named `UMAP_reduced_features_spread_1.0_neighbors_3_dist_0.0_dimensions_2`.
 
 Below, you will find examples of different dimensionality reduction visualizations and their corresponding algorithm. Note that visually, the plots look similar, with respect to the differences found between hyperparameters.
 
->**Note:** Something about not being able to guarantee results or what it will look like with pseudo grid search approach, no metrics to assess performance of one hyperparameter combination over another. 
+>**Note:** Something about not being able to guarantee results or what it will look like with pseudo grid search approach, no metrics to assess performance of one hyperparameter combination over another. UMAP_reduced_features_after_normalized_spread_1.0_neighbors_3_dist_0.0_dimensions_2.npy"
 
 ## Step 4: Perform Clustering
 
@@ -141,14 +141,14 @@ Below, you will find examples of different dimensionality reduction visualizatio
 
 The fourth tab will guide you through performing clustering using HDBSCAN with the previous dimensionality reduction results. Clustering in unsupervised analysis is greatly useful in grouping data in clusters based on behavioral similarities and gives insight into underlying patterns that distinguish clustered groups. 
 
-Our primary algorithm of choice is HDBSCAN [link documentation], which is a hierarchical clustering algorithm that assesses the proximity of the clusters relative to one another based on the degree of differences found between them. It will automatically cluster the data without needing to provide a set number of clusters beforehand, and filters out noise and inconsequential data points with a set minimum cluster size. 
+Our primary algorithm of choice is [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html), which is a hierarchical clustering algorithm that assesses the proximity of the clusters relative to one another based on the degree of differences found between them. It will automatically cluster the data without needing to provide a set number of clusters beforehand, and filters out noise and inconsequential data points with a set minimum cluster size. 
 
 HDBSCAN is also useful as it provides us with different types of visualizations to assess how the data was clustered. The first way is through a standard scatter plot visualization, similar to the one represented earlier via the dimensionality reduction visualization. Here, it color codes the data points based on the cluster assignment, as shown below. [x and y axis labels]. 
 
 [insert scatter plot]
 
 First, import the dimensionality reduction results from the previous step, by clicking the `Browse File` button and selecting the .npy array that was saved in the 'dimensionality reduction folder' and represents the best-fitting combination of hyperparameters. 
-To save the HDBSCAN scatter plot visualization, click the `Visualize/save HDBSCAN scatter plot` button, and the visualization will save to a folder named 'clustering' [double check] within the project folder.
+To save the HDBSCAN scatter plot visualization, click the `Visualize/save HDBSCAN scatter plot` button, and the visualization will save to a folder named 'clustering' within the project folder.
 
 The second form of visualization is via a hierarchical tree plot, which represents the cluster tree as a dendrogram. At each of the nodes the data is split off into their respective clusters, and the width of each branch represents the number of data points in the cluster at that level. The clusters are also color-coded with a circle around the cluster branch. The y-axis is labeled by the lambda value, otherwise known as 1/distance of the data points [double check], and the legend designates a color gradient representing the number of data points being split per node. An example of the tree plot can be shown below. 
 
@@ -156,16 +156,25 @@ The second form of visualization is via a hierarchical tree plot, which represen
 
 To save the HDBSCAN tree plot visualization, click the `Visualize/save HDBSCAN tree plot` button, and the visualization will also save in the 'clustering' folder.
 
-Finally, we can save the resulting dataset that assigns clusters to each behavioral bout as was represented by the original dataset we created. As shown below, the CSV file saves [insert what it contains]. This file is saved as both a CSV and .pkl file, where the CSV file can be opened to evaluate the cluster assignment, and the .pkl file can be used to train the model in the following step.
+Finally, we can save the resulting dataset that assigns clusters to each behavioral bout as was represented by the original dataset we created. As shown below, the .csv file saves a dataset with 6 columns: the x and y-dimensions of the behavioral bout data point (based on the dimensionality reduction results), the video from which the bout was taken from, the bout frame start and end, and the cluster the bout was assigned to. Note that values of -1 result in the bout not being assigned to a cluster, as it was filtered out as noise or insignificant. A cluster number of 0 still represents a considerable cluster. An example of what the clusters .csv may look like can be found below.
 
-[insert clusters CSV and file saving both CSV and .pkl]
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clusters_csv.PNG" />
+</p>
 
-To save the clusters CSV and .pkl, click the `Save clusters CSV` button [update later] and the files will save to the same 'clustering' folder. 
+This file is saved as both a .csv and .pkl file, where the .csv file can be opened to evaluate the cluster assignment, and the .pkl file can be used to train the model in the following step. To save the clusters CSV and .pkl, click the `Save clusters .csv & .pkl` button and the files will save to the same 'clustering' folder. 
+
+[insert clusters CSV and file saving both .csv and .pkl]
+
 
 ## Step 5: Train Model
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/train_model.PNG" />
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_correlation.PNG" />
 </p>
 
 ## Step 6: Visualize Clusters 
@@ -178,8 +187,18 @@ To save the clusters CSV and .pkl, click the `Save clusters CSV` button [update 
 The final step allows you to visualize the cluster assignments for each behavioral bout in the video of your choice and make sense of the type of behavior associated with each cluster. There are two forms of visualizations, being the original video clip of the animal behavioral bout saved with the cluster assignment, as well as a dynamic "skeleton" showing the animal movement and associated cluster behavior type. 
 
 
-To visualize the clusters, we must begin by importing the clusters CSV file as was saved in the previous step that associates each bout with a cluster. Select this file from the respective folder by clicking `Browse File` next to the `Import clusters .csv file`. Then, choose a particular video from the collection of videos in which the data analysis was performed on that you would like to see clips from specifically, and input the exact video name in the `Video name` entry box. An example would be: [insert video name example]. 
+To visualize the clusters, we must begin by importing the clusters CSV file as was saved in the previous step that associates each bout with a cluster. Select this file from the respective folder by clicking `Browse File` next to the `Import clusters .csv file`. Then, choose a particular video from the collection of videos in which the data analysis was performed on that you would like to see clips from specifically, and input the exact video name in the `Video name` entry box. An example would be: `Box2-20201003T151955-152154_shorten_frame_no`. 
 
 Next, import both the folders of videos and initial datasets (those which were used in "Step 2: Create Dataset") by clicking the `Browse Folder` button. Finally, import the CSV file that names the headers for the animal body parts, as can be found and saved from [detail folder/SimBA step where its saved]. 
 
-To save the 
+To save the original video clips of the animal behavior, click the `Save original video clips` button. Similarly, you can click the `Save skeleton clips` button to save the skeletal movement representation of the behavioral bout. In a new folder within the project folder labeled 'visualize_clusters', you will find each bout saved with the cluster assignment, the type of video clip, the clip number depicting the bout number within a single video, and the video name. An example would be `Cluster_2_OriginalClip_#4_Box2-20201003T151955-152154_shorten_frame_no.avi"` [change to .mp4 later]. 
+
+Below we have demonstrated examples of what each of the clip types look like. Notice how the skeleton movements mimic those of the original video clip, only that it is annotated to show when a cluster behavior is coming up and when it is happening in real time. Each clip will represent a specific bout but there can be many clips associated with a single cluster, labeled by the associated video name and clip within that video. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/original_clip0.PNG" />
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/skeleton0.PNG" />
+</p>
