@@ -131,7 +131,7 @@ To save the visualizations associated with each algorithm, click the `Save visua
 
 Below, you will find examples of different dimensionality reduction visualizations and their corresponding algorithm. Note that visually, the plots look similar, with respect to the differences found between hyperparameters.
 
->**Note:** Something about not being able to guarantee results or what it will look like with pseudo grid search approach, no metrics to assess performance of one hyperparameter combination over another. UMAP_reduced_features_after_normalized_spread_1.0_neighbors_3_dist_0.0_dimensions_2.npy"
+>**Note:** Something about not being able to guarantee results or what it will look like with pseudo grid search approach, no metrics to assess performance of one hyperparameter combination over another.
 
 ## Step 4: Perform Clustering
 
@@ -173,6 +173,11 @@ This file is saved as both a .csv and .pkl file, where the .csv file can be open
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/train_model.PNG" />
 </p>
 
+The next step involves training our model based on the input data and the cluster groups generated in the previous step. We can then find patterns within the data mainly focusing on feature correlation and how well each feature correlates to or predicts the clusters amongst the data. Note that here lies the main difference between supervised and unsupervised learning: unlike supervised learning, we do not have any outputs or target variables such as metrics in which we can use to assess to assess the performance of the model. Rather, we must interpret the classification results ourselves and make sense of what is generated in relation to the starting data. Our model utilizes random forest classifiers [discuss more].
+
+To start, import the condensed dataset .pkl we generated in the second step by browsing for the file in the 'create_dataset' folder, then import the cluster .pkl file generated in the previous step under the 'clustering' folder. 
+
+
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_correlation.PNG" />
 </p>
@@ -187,7 +192,7 @@ This file is saved as both a .csv and .pkl file, where the .csv file can be open
 The final step allows you to visualize the cluster assignments for each behavioral bout in the video of your choice and make sense of the type of behavior associated with each cluster. There are two forms of visualizations, being the original video clip of the animal behavioral bout saved with the cluster assignment, as well as a dynamic "skeleton" showing the animal movement and associated cluster behavior type. 
 
 
-To visualize the clusters, we must begin by importing the clusters CSV file as was saved in the previous step that associates each bout with a cluster. Select this file from the respective folder by clicking `Browse File` next to the `Import clusters .csv file`. Then, choose a particular video from the collection of videos in which the data analysis was performed on that you would like to see clips from specifically, and input the exact video name in the `Video name` entry box. An example would be: `Box2-20201003T151955-152154_shorten_frame_no`. 
+To visualize the clusters, we must begin by importing the clusters CSV file as was saved in a previous step that associates each bout with a cluster. Select this file from the respective folder by clicking `Browse File` next to the `Import clusters .csv file`. Then, choose a particular video from the collection of videos in which the data analysis was performed on that you would like to see clips from specifically, and input the exact video name in the `Video name` entry box. An example would be: `Box2-20201003T151955-152154_shorten_frame_no`. 
 
 Next, import both the folders of videos and initial datasets (those which were used in "Step 2: Create Dataset") by clicking the `Browse Folder` button. Finally, import the CSV file that names the headers for the animal body parts, as can be found and saved from [detail folder/SimBA step where its saved]. 
 
