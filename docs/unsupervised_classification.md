@@ -106,29 +106,28 @@ Below, you will find an explanation of each algorithm and their associated hyper
 
 >**Note:** For each hyperparameter, pay attention to the type of number required for input as designated in bold, being either integer (whole number) or float (decimal value)
 
-- [UMAP](https://umap-learn.readthedocs.io/en/latest/api.html): UMAP, or Uniform Manifold Approximation & Projection, is a manifold learning and dimensionality reduction algorithm that is designed to be compatible with scikit-learn. It is founded with three assumptions about the data: the data is uniformly distributed on Riemannain manifold, the Riemannian metric is locally constant, and the manifold is locally connected. Its design works at high speeds, scales well with dataset and dimension size, and better preserves the data's global structure as compared to other dimensionality reduction algorithms. For our UMAP pipeline, there are 4 hyperparameter values to input, being `Distance`, `Neighbors`, `Spread`, and `Dimensions`.     
-`Distance` or min_dist controls how tightly the points are packed together by referring to the minimum distance apart that the points can be represented in the low-dimensional space. The typical range of Distance values are [insert range] with a default of 0.1 **(float)**.      
-`Neighbors` or 'n_neighbors' controls the balance between local and global data structure, where low values will concentrate more on the data's local structure and high values will concentrate on the larger neighborhoods of each data point while losing finer detail structure **(integer)**.        
-`Spread` refers to the effecctive scale of the embedded data points, and combined with min_distance, it determines how clustered the embedded points are to one another. A typical range would be [insert range] and the default value is 1.0 **(float)**.       
-`Dimensions` **(integer)**
+[UMAP](https://umap-learn.readthedocs.io/en/latest/api.html): UMAP, or Uniform Manifold Approximation & Projection, is a manifold learning and dimensionality reduction algorithm that is designed to be compatible with scikit-learn. It is founded with three assumptions about the data: the data is uniformly distributed on Riemannain manifold, the Riemannian metric is locally constant, and the manifold is locally connected. Its design works at high speeds, scales well with dataset and dimension size, and better preserves the data's global structure as compared to other dimensionality reduction algorithms. For our UMAP pipeline, there are 4 hyperparameter values to input, being `Distance`, `Neighbors`, `Spread`, and `Dimensions`.     
+- `Distance` or min_dist controls how tightly the points are packed together by referring to the minimum distance apart that the points can be represented in the low-dimensional space. The typical range of Distance values are [insert range] with a default of 0.1 **(float)**.      
+- `Neighbors` or 'n_neighbors' controls the balance between local and global data structure, where low values will concentrate more on the data's local structure and high values will concentrate on the larger neighborhoods of each data point while losing finer detail structure **(integer)**.        
+- `Spread` refers to the effecctive scale of the embedded data points, and combined with min_distance, it determines how clustered the embedded points are to one another. A typical range would be [insert range] and the default value is 1.0 **(float)**.       
+- `Dimensions` **(integer)**
 
 <p>
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/tsne.PNG" />
 </p>
 
 
-- [t-SNE](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html): t-SNE or t-distributed Stochastic Neighbor Embedding works to convert similarities between data points to joint probabilities while minimizing the Kullback-Leibler divergence between high and low dimensional data joint probabilities.  For our t-SNE pipeline, there are 3 hyperparameters of `Perplexity`, `Iterations`, and `Dimensions`.      
-`Perplexity` is similar to UMAP's nearest "n_neighbors" as it again balances local and global data structure. The suggested range of values is between 5 and 50, with a default of 30 **(float)**.       
-`Iterations` or n_iter looks at the maximum number of iterations for the optimization. The suggested minimum value is 250, and the default is 300 **(integer)**.      
-`Dimensions` **(integer)**
+[t-SNE](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html): t-SNE or t-distributed Stochastic Neighbor Embedding works to convert similarities between data points to joint probabilities while minimizing the Kullback-Leibler divergence between high and low dimensional data joint probabilities.  For our t-SNE pipeline, there are 3 hyperparameters of `Perplexity`, `Iterations`, and `Dimensions`.      
+- `Perplexity` is similar to UMAP's nearest "n_neighbors" as it again balances local and global data structure. The suggested range of values is between 5 and 50, with a default of 30 **(float)**.       
+- `Iterations` or n_iter looks at the maximum number of iterations for the optimization. The suggested minimum value is 250, and the default is 300 **(integer)**.     - `Dimensions` **(integer)**
 
 <p>
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/PCA.PNG" />
 </p>
 
 
-- [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html): PCA or Principal Component Analysis, is a linear dimensionality reduction technique that uses Singular Value Decomposition (SVD) of data to reduce it to a lower dimensional space. The input data is not scaled but centered per feature before SVD is applied. For the PCA pipeline, there is one main hyperparameter: `n-components`. 
-`n-components` [come back]
+[PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html): PCA or Principal Component Analysis, is a linear dimensionality reduction technique that uses Singular Value Decomposition (SVD) of data to reduce it to a lower dimensional space. The input data is not scaled but centered per feature before SVD is applied. For the PCA pipeline, there is one main hyperparameter: `n-components`. 
+- `n-components` [come back]
 
 
 >**Note:** If you are inputting multiple values for the hyperparameter entry box, you must do so without commas. For example, you can list '10, 20, 30' as `10 20 30` instead of `10, 20, 30`.
@@ -155,14 +154,18 @@ Our primary algorithm of choice is [HDBSCAN](https://hdbscan.readthedocs.io/en/l
 
 HDBSCAN is also useful as it provides us with different types of visualizations to assess how the data was clustered. The first way is through a standard scatter plot visualization, similar to the one represented earlier via the dimensionality reduction visualization. Here, it color codes the data points based on the cluster assignment, as shown below. [x and y axis labels]. 
 
-[insert scatter plot]
-
 First, import the dimensionality reduction results from the previous step, by clicking the `Browse File` button and selecting the .npy array that was saved in the 'dimensionality reduction folder' and represents the best-fitting combination of hyperparameters. 
-To save the HDBSCAN scatter plot visualization, click the `Visualize/save HDBSCAN scatter plot` button, and the visualization will save to a folder named 'clustering' within the project folder.
+To save the HDBSCAN scatter plot visualization, click the `Visualize/save HDBSCAN scatter plot` button, and the visualization will save to a folder named 'clustering' within the project folder. An example of this clustered scatter plot can be shown below.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/HDBSCAN_scatter.PNG" />
+</p>
 
 The second form of visualization is via a hierarchical tree plot, which represents the cluster tree as a dendrogram. At each of the nodes the data is split off into their respective clusters, and the width of each branch represents the number of data points in the cluster at that level. The clusters are also color-coded with a circle around the cluster branch. The y-axis is labeled by the lambda value, otherwise known as 1/distance of the data points [double check], and the legend designates a color gradient representing the number of data points being split per node. An example of the tree plot can be shown below. 
 
-[insert tree plot graphic]
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/HDBSCAN_tree.PNG" />
+</p>
 
 To save the HDBSCAN tree plot visualization, click the `Visualize/save HDBSCAN tree plot` button, and the visualization will also save in the 'clustering' folder.
 
