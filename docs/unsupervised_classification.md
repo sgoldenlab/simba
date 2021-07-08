@@ -4,6 +4,10 @@
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SimBA_logo_4.jpg" />
 </p>
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/logo1.PNG" />
+</p>
+
 ## Overview
 
 - include image from paper and simba logo, with unsupervised you wanna see new behavior, different forms, dividing up behavior that yove already successfully classified and cluster the behavior that you can newly find, the unlabeled behaviors. to find new behaviors, can't rely on targets, use dimensionality reduction for new targets. when machine results are created in the other step in tutorial, located within this folder (scenario 1 up until step 8, needed to complete unsupervised learning, project files should be contained within machine results folder, if you don't have it then complete that first, project config file 
