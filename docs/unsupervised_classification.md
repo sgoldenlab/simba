@@ -2,20 +2,23 @@
 
 ## Overview
 
+- include image from paper and simba logo, with unsupervised you wanna see new behavior, different forms, dividing up behavior that yove already successfully classified and cluster the behavior that you can newly find, the unlabeled behaviors. to find new behaviors, can't rely on targets, use dimensionality reduction for new targets. when machine results are created in the other step in tutorial, located within this folder (scenario 1 up until step 8, needed to complete unsupervised learning, project files should be contained within machine results folder, if you don't have it then complete that first, project config file 
 [highlight features of unsupervised vs. supervised, explain tutorial scenario and how this continues from prior analysis and Kleinberg, how to navigate from existing GUI]. The SimBA Unsupervised Classification pipeline and GUI were created by [Simon Nilsson](https://github.com/sronilsson) and [Aasiya Islam](https://github.com/aasiya-islam).
 
 ## Pipeline
 
-Training an unsupervised classifier involves the creation of an algorithm that clusters animal activity based on behavioral similarities, typically with three main steps: data pre-processing, dimensionality reduction, and cluster assignment. 
+Training an unsupervised classifier involves the creation of an algorithm that clusters animal activity based on behavioral similarities, typically with three main steps: data pre-processing, dimensionality reduction, and cluster assignment. (talk about what's necessary to complete the steps)
 The SimBA Unsupervised Classification pipeline consists of six main steps: 
 
-**1) Save Project Folder**- allows user to create an unsupervised project folder and saves outputs to future steps in encompassed folder     
+**1) Save Project Folder**- allows user to create an unsupervised project folder and saves outputs to future steps in encompassed folder    (creates folder structure, saves folders for each following step with their respective outputs) 
 **2) Create Dataset**- cleans and pre-processes the machine results and localizes relevant data into a single dataset      
 **3) Perform Dimensionality Reduction**- allows user to select a dimensionality reduction algorithm to apply and visualize data with     
 **4) Perform Clustering**- assigns and visualizes clusters with HDBSCAN from the dimensionality reduction results       
-**5) Train Model**- trains model on the clusters generated previously and saves permutational importance and feature correlation metrics     
+**5) Train Model**- trains supervised classifier on the clusters generated previously and saves permutational importance and feature correlation metrics      
 **6) Visualize Clusters**- visualize behavioral bouts corresponding to clusters as original video clips or simulated skeleton movements
 
+
+- step 5 and 6 are both optional, training model is like supervised learning on top of unsupervised learning, no longer unsupervised, more for explainability
 The outputs generated from each step can be saved into their respective folders encompassed within the main unsupervised project folder and taken as inputs for subsequent steps throughout the pipeline.
 
 ## Step 1: Save Project Folder 
@@ -41,7 +44,7 @@ Note that the folder name will save as "unsupervised_projectname" with "projectn
 The second tab will walk you through pre-processing and cleaning the data from prior machine results, and saving the data relevant for unsupervised analysis into a single dataset. 
 This step serves to extract behavioral bouts of interest as designated by the classifier and find mean feature values while dropping all features that are not relevant.
 
-To begin, first import a folder of the machine results saved as .csv datasets by clicking the ```Browse Folder``` button and selecting the folder of datasets. An example of the machine results folder and .csv format and can be shown below, and is generated as directed by this documentation (hyperlink relevant documentation, discuss kleinberg or link documentation]
+To begin, first import a folder of the machine results saved as .csv datasets by clicking the ```Browse Folder``` button and selecting the folder of datasets being the machine results. An example of the machine results folder and .csv format and can be shown below, and is generated as directed by this documentation (hyperlink relevant documentation, discuss kleinberg or link documentation] - take the csv file
 
 
 
@@ -55,8 +58,8 @@ To begin, first import a folder of the machine results saved as .csv datasets by
 
 
 Next, import the file that lists the features that you would like to remove or disregard in the classification. 
-The purpose of this is to perform the classification without the irrelevant features (double check this) and drop them before saving our condensed dataset for future analysis. 
-You can similarly select the ```Browse File``` button to search for and select this file, and the file should be formatted similar to as shown below.
+The purpose of this is to perform the classification without the irrelevant features (double check this) that we don't want to use in the clusters, and drop them before saving our condensed dataset for future analysis. (body part coordinates are unlikely to be relevant to the behavior clustering, therefore want to remove them (x, y, p)
+You can similarly select the ```Browse File``` button to search for and select this file, and the file should be formatted similar to as shown below. (update image to include body part coordinates to make it clear, and there might be others. (remove all features in animals, remove all features custom, based on supervised 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/features2remove.PNG" />
@@ -184,7 +187,7 @@ This file is saved as both a .csv and .pkl file, where the .csv file can be open
 ## Step 5: Train Model
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/train_model.PNG" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/train_classifier.PNG" />
 </p>
 
 The next step involves training our model based on the input data and the cluster groups generated in the previous step. We can then find patterns within the data mainly focusing on feature correlation and how well each feature correlates to or predicts the clusters amongst the data. Note that here lies the main difference between supervised and unsupervised learning: unlike supervised learning, we do not have any outputs or target variables such as metrics in which we can use to assess to assess the performance of the model. Rather, we must interpret the classification results ourselves and make sense of what is generated in relation to the starting data. Our model utilizes random forest classifiers [discuss more].
@@ -203,7 +206,7 @@ To start, import the condensed dataset .pkl we generated in the second step by b
 ## Step 6: Visualize Clusters 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/visualize_clusters.PNG" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/visualize_clusters2.PNG" />
 </p>
 
 
