@@ -19,7 +19,7 @@ SimBA does not require tensorflow. SimBAxTF is stable, and SimBAxTF-development 
 ## SimBA's new documentation page (still in the works)
 Please feel free to create a pull request or provide feedback. If you need help, please post on [gitter](https://gitter.im/SimBA-Resource/community) and I will try to respond to them asap -JJ
 
-https://simba-docs.readthedocs.io/en/latest/index.html
+[Click here to go to the new documentation page.](https://simba-docs.readthedocs.io/en/latest/index.html)
 
 ## Feb-08-2021: SimBA version 1.3 release
 
