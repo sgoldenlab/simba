@@ -10,12 +10,13 @@
 
 ## Overview
 
-- include image from paper and simba logo, with unsupervised you wanna see new behavior, different forms, dividing up behavior that yove already successfully classified and cluster the behavior that you can newly find, the unlabeled behaviors. to find new behaviors, can't rely on targets, use dimensionality reduction for new targets. when machine results are created in the other step in tutorial, located within this folder (scenario 1 up until step 8, needed to complete unsupervised learning, project files should be contained within machine results folder, if you don't have it then complete that first, project config file 
-[highlight features of unsupervised vs. supervised, explain tutorial scenario and how this continues from prior analysis and Kleinberg, how to navigate from existing GUI]. The SimBA Unsupervised Classification pipeline and GUI were created by [Simon Nilsson](https://github.com/sronilsson) and [Aasiya Islam](https://github.com/aasiya-islam).
+The SimBA Unsupervised Classification module allows users to classify their animal behavior data without pre-defining behavioral standards and insteads clusters the data based on behavioral similarities. Our pipeline is designed to build off our supervised machine learning pipeline, where the clusters can help uncover new behavior present in different forms by dividing up behavior that has already been successfully classified and clustering the new, unlabeled behaviors. To find these new behaviors, we cannot rely on performance targets, but instead use dimensionality reduction and fine-tuning the hyperparameters through a [pseudo-grid search approach](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#step-3-perform-dimensionality-reduction) to find the best clusters. 
+
+In order to perform the unsupervised classification analysis, we must start with our folder of machine results as was generated in the supervised pipeline and located within your project folder as described in [this scenario](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model).  Overall, unsupervised classification provides the potential for increased accuracy and explainability while reducing human variability errors by eliminating the need for frame by frame annotation. The SimBA Unsupervised Classification pipeline and GUI were created by [Simon Nilsson](https://github.com/sronilsson) and [Aasiya Islam](https://github.com/aasiya-islam).
 
 ## Pipeline
 
-Training an unsupervised classifier involves the creation of an algorithm that clusters animal activity based on behavioral similarities, typically with three main steps: data pre-processing, dimensionality reduction, and cluster assignment. (talk about what's necessary to complete the steps)
+Training an unsupervised classifier involves the creation of an algorithm that clusters animal activity based on behavioral similarities, typically with three main steps: data pre-processing, dimensionality reduction, and cluster assignment.
 The SimBA Unsupervised Classification pipeline consists of six main steps: 
 
 **1) Save Project Folder**- allows user to create an unsupervised project folder and saves outputs to future steps in encompassed folder    (creates folder structure, saves folders for each following step with their respective outputs) 
@@ -25,8 +26,16 @@ The SimBA Unsupervised Classification pipeline consists of six main steps:
 **5) Train Model**- trains supervised classifier on the clusters generated previously and saves permutational importance and feature correlation metrics      
 **6) Visualize Clusters**- visualize behavioral bouts corresponding to clusters as original video clips or simulated skeleton movements
 
+In addition to the folder of supervised machine results, to complete this analysis we must also have on hand the following files and folders:
 
-- step 5 and 6 are both optional, training model is like supervised learning on top of unsupervised learning, no longer unsupervised, more for explainability
+- a features to remove file to disregard in classification [(step 2)](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#step-2-create-dataset)
+- the folder of animal behavior videos from which the analysis was performed on [(step 6)](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#step-6-visualize-clusters)
+- the animal headers file to list body parts [(step 6)](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#step-6-visualize-clusters)
+
+If you do not have these files, please complete the steps in the prior tutorial as described before moving on to the unsupervised learning module.
+
+Please note that Steps 5 and 6, the model training and cluster visualization, are optional and more for explainability of the clusters. Training the model builds supervised learning methods with the use of random forest classifiers on top of the unsupervised classification with the generation of behavioral clusters, so this step is no longer part of the actual unsupervised pipeline. 
+
 The outputs generated from each step can be saved into their respective folders encompassed within the main unsupervised project folder and taken as inputs for subsequent steps throughout the pipeline.
 
 ## Step 1: Save Project Folder 
@@ -36,7 +45,7 @@ The outputs generated from each step can be saved into their respective folders 
 </p>
 
 The first step allows the user to create and save a project folder for their unsupervised analysis results. 
-For each subsequent step in the pipeline, the individual outputs will save into that step's respective folder that is automatically created upon the use of each step. 
+It creates a file folder structure that creates a new folder within the project folder for each step. For each subsequent step in the pipeline, the individual outputs will save into that step's respective folder that is automatically created upon the use of each step. 
 
 To save a project folder, specify the folder path where you would like the project folder to be saved into by clicking the ```Browse Folder``` button and selecting a folder, as the folder path will replace the ```No folder selected``` box, and designate a name for the project folder with the ```Project Name``` entry box. 
 Note that the folder name will save as "unsupervised_projectname" with "projectname" being the name you filled out the entry box with. After you have specified the folder path and designated a project name, click the ```Create folder``` button to save the folder.
@@ -52,7 +61,7 @@ Note that the folder name will save as "unsupervised_projectname" with "projectn
 The second tab will walk you through pre-processing and cleaning the data from prior machine results, and saving the data relevant for unsupervised analysis into a single dataset. 
 This step serves to extract behavioral bouts of interest as designated by the classifier and find mean feature values while dropping all features that are not relevant.
 
-To begin, first import a folder of the machine results saved as .csv datasets by clicking the ```Browse Folder``` button and selecting the folder of datasets being the machine results. An example of the machine results folder and .csv format and can be shown below, and is generated as directed by this documentation (hyperlink relevant documentation, discuss kleinberg or link documentation] - take the csv file
+To begin, first import a folder of the machine results saved as .csv datasets by clicking the ```Browse Folder``` button and selecting the folder of datasets being the machine results. An example of the machine results folder and .csv format and can be shown below, and is generated as directed by this documentation (hyperlink relevant documentation, discuss kleinberg or link documentation]
 
 
 
@@ -102,7 +111,6 @@ We have provided 3 options for dimensionality reduction algorithms to choose fro
 
 First, import the pre-processed feature dataset as was saved as a .pkl file from the previous step by clicking the ```Browse File``` button and navigating to the 'create_dataset' folder. 
 
-Next, specify the target group you would like to focus on for the analysis in the ```Target group``` entry box, such as "RI Male". [more info on target group].
 
 Then, you can select between your dimensionality reduction algorithms via the dropdown menu on the right of the `Select dimensionality reduction algorithm` label, and by clicking the small box inside of the box that says `UMAP` (which is the default algorithm), the other options should be available. As each algorithm is selected, a new set of hyperparameter entry boxes will appear respective to the algorithm. 
 
