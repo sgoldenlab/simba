@@ -19,7 +19,7 @@ In order to perform the unsupervised classification analysis, we must start with
 Training an unsupervised classifier involves the creation of an algorithm that clusters animal activity based on behavioral similarities, typically with three main steps: data pre-processing, dimensionality reduction, and cluster assignment.
 The SimBA Unsupervised Classification pipeline consists of six main steps: 
 
-**1) Save Project Folder**- allows user to create an unsupervised project folder and saves outputs to future steps in encompassed folder    (creates folder structure, saves folders for each following step with their respective outputs) 
+**1) Save Project Folder**- allows user to create an unsupervised project folder and saves outputs to future steps in encompassed folder        
 **2) Create Dataset**- cleans and pre-processes the machine results and localizes relevant data into a single dataset      
 **3) Perform Dimensionality Reduction**- allows user to select a dimensionality reduction algorithm to apply and visualize data with     
 **4) Perform Clustering**- assigns and visualizes clusters with HDBSCAN from the dimensionality reduction results       
