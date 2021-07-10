@@ -1,11 +1,7 @@
 # SimBA Unsupervised Classification
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/SimBA_logo_4.jpg" />
-</p>
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/logo1.PNG" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/dim_1.png" />
 </p>
 
 ## Overview
