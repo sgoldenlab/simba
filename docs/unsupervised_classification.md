@@ -10,10 +10,35 @@ SimBA primarily focus on *supervised* machine learning methods. In supervised ma
 
 Such supervised approaches come with a major drawback. As we are training the computer to recognize behavioral events from **from human-supplied labels or annotations**, the models will at best recognize the same behavioural events as the human annotator. In *unsupervised* machine learning, however, we are agnostic to the behaviors present in the video recording and we are instead creating the algorithm which best clusters (discriminates) the different behaviors present in the videos for us. This means that  *unsupervised* machine learning, but not *supervised machine learning*, can detect novel behaviors that are not immediately observable by the human annotator.
 
-There are several popular and proven python packages focused on unsupervised machine learning from pose-estimation and we list these excellent packages at the [bottom of this page](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data). The SimBA unsupervised machine learning tool works differently from these tools, and we explain the process step-by-step below. If the SimBA unsupervised machine learning tools do not work for your specific use case, we suggest that you either reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community), or try the [alternative unsupervised packages](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data).
+There are several popular and proven python packages focused on unsupervised machine learning from pose-estimation and we list these excellent packages at the [bottom of this page](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data). The SimBA unsupervised machine learning tool works differently from these tools, and we explain the process step-by-step below. If the SimBA unsupervised machine learning tools do not work for your specific use case, we suggest that you either reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community), or try the [alternative unsupervised packages](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data). The SimBA Unsupervised Classification pipeline and GUI were created by [Aasiya Islam](https://github.com/aasiya-islam) with support of [Simon Nilsson](https://github.com/sronilsson) and [Jia-Jie Choong](https://github.com/inoejj). 
 
 
 ## TUTORIAL OVERVIEW
+
+[Alternative frameworks](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data) for unsupervised learning typically accepts raw pose-estimation data as input. SimBA - however - performs unsupervised learning using behavioral bouts initially detected using supervised learning, as the input. For example - if you have successfully classified *attack* behavior using SimBA - you can proceed and do unsupervised learning on those classified events to uncover the different forms of attack events. Thus, some important things to think about before performing unsupervised learning in SimBA:
+
+* Unsupervised learning in SimBA require supervised classification data as input. If you do not have supervised SimBA classification data, check out [other tutorials](https://github.com/sgoldenlab/simba#scenario-tutorials) that document how to generate such classifications before proceeding with the current tutorial. 
+
+* Unsupervised models generated in SimBA will detect different sub-categories of the behavior for which the initial supervised classifier was trained on. For example, the unsupervised models generated in this tutorial will detect different forms of *attack* behaviors. Conversely, the unsupervised models generated in this tutorial *will not* detect other novel behaviors that are unrelated to what the original supervised classifier was trained to detect.  
+
+In brief, the SimBA pipeline for detecting interpretable behavioral clusters consists of four steps:
+
+(1) Perform dimensionality reduction on the classified behavioral events through a user defined algorithm (i.e., PCA, UMAP, t-SNE, KNN).
+
+(2) Perform clustering of the events in the dimentionality reduced space using HDBSCAN.
+
+(3) Generate a supervised classifier on the clusters detected in Step 2 and parse the features discriminating the different clusters. 
+
+(4) Visualize the behaviors in the different clusters and the important features that discriminate them for interpretability. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/dim_2.png" />
+</p>
+
+In this tutorial, we will go through step-by-step for how to use UMAP and HDBSCAN in the SimBA GUI to parse different attack behaviors in male resident-intruder mice. 
+
+
+
 
 The SimBA Unsupervised Classification module allows users to classify their animal behavior data without pre-defining behavioral standards and insteads clusters the data based on behavioral similarities. Our pipeline is designed to build off our supervised machine learning pipeline, where the clusters can help uncover new behavior present in different forms by dividing up behavior that has already been successfully classified and clustering the new, unlabeled behaviors. To find these new behaviors, we cannot rely on performance targets, but instead use dimensionality reduction and fine-tuning the hyperparameters through a [pseudo-grid search approach](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#step-3-perform-dimensionality-reduction) to find the best clusters. 
 
