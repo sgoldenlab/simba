@@ -1,8 +1,19 @@
-# SimBA Unsupervised Classification
+# Unsupervised Machine Learning in SimBA
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/dim_1.png" />
 </p>
+
+## BACKGROUND
+
+SimBA primarily focus on *supervised* machine learning methods. In supervised machine learning (such as [SimBA-generated classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model), or [DeepLabCut](https://github.com/DeepLabCut/DeepLabCut)/[SLEAP](https://github.com/murthylab/sleap)-generated convolutional neural networks), we train computer models to recognize behavioral events or body-parts **from human-supplied labels or annotations**. Thus, in supervised machine learning, the goal is to create a model that recognizes the same stuff as the human observer.
+
+Such supervised approaches come with a major drawback. As we are training the computer to recognize behavioral events from **from human-supplied labels or annotations**, the models will at best recognize the same behavioural events as the human annotator. In *unsupervised* machine learning, however, we are agnostic to the behaviors present in the video recording and we are instead creating the algorithm which best clusters (discriminates) the different behaviors present in the videos for us. This means that  *unsupervised* machine learning, but not *supervised machine learning*, can detect novel behaviors that are not immediately observable by the human annotator.
+
+There are several popular and proven python packages focused on unsupervised machine learning from pose-estimation and we list these excellent packages at the [bottom of this page]. The SimBA unsupervised machine learning tool works differently from these tools, and we explain the process step-by-step below. If the SimBA unsupervised machine learning tools do not work for your specific use case, we suggest that you either reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community), or try the alternative unsupervised packages.
+
+
+
 
 ## Overview
 
@@ -240,5 +251,19 @@ Below we have demonstrated examples of what each of the clip types look like. No
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/skeleton0.PNG" />
 </p>
+
+## OTHER UNSUPERVISED MACHINE LEARNING PACKAGES FOR POSE-ESTIMATION DATA
+
+VAME - [GitHub](https://github.com/LINCellularNeuroscience/VAME) - [Paper](https://www.biorxiv.org/content/10.1101/2020.05.14.095430v1.full.pdf)
+
+B-SOID - [GitHub](https://github.com/YttriLab/B-SOID) - [Paper](https://www.biorxiv.org/content/10.1101/770271v2)
+
+PS-VAE - [Paper](https://www.biorxiv.org/content/10.1101/2021.02.22.432309v1.full)
+
+VAE-SNE - [GitHub](https://github.com/jgraving/vaesne/issues) - [Paper](https://www.biorxiv.org/content/10.1101/2020.07.17.207993v1)
+
+
+
+
 
 [insert gif]
