@@ -13,9 +13,7 @@ Such supervised approaches come with a major drawback. As we are training the co
 There are several popular and proven python packages focused on unsupervised machine learning from pose-estimation and we list these excellent packages at the [bottom of this page](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data). The SimBA unsupervised machine learning tool works differently from these tools, and we explain the process step-by-step below. If the SimBA unsupervised machine learning tools do not work for your specific use case, we suggest that you either reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community), or try the [alternative unsupervised packages](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data).
 
 
-
-
-## Overview
+## TUTORIAL OVERVIEW
 
 The SimBA Unsupervised Classification module allows users to classify their animal behavior data without pre-defining behavioral standards and insteads clusters the data based on behavioral similarities. Our pipeline is designed to build off our supervised machine learning pipeline, where the clusters can help uncover new behavior present in different forms by dividing up behavior that has already been successfully classified and clustering the new, unlabeled behaviors. To find these new behaviors, we cannot rely on performance targets, but instead use dimensionality reduction and fine-tuning the hyperparameters through a [pseudo-grid search approach](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#step-3-perform-dimensionality-reduction) to find the best clusters. 
 
