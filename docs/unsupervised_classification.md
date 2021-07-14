@@ -13,7 +13,7 @@ Such supervised approaches come with a major drawback. As we are training the co
 There are several popular and proven python packages focused on unsupervised machine learning from pose-estimation and we list these excellent packages at the [bottom of this page](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data). The SimBA unsupervised machine learning tool works differently from these tools, and we explain the process step-by-step below. If the SimBA unsupervised machine learning tools do not work for your specific use case, we suggest that you either reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community), or try the [alternative unsupervised packages](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data). The SimBA Unsupervised Classification pipeline and GUI were created by [Aasiya Islam](https://github.com/aasiya-islam) with support of [Simon Nilsson](https://github.com/sronilsson) and [Jia-Jie Choong](https://github.com/inoejj). 
 
 
-## TUTORIAL OVERVIEW
+## TUTORIAL OVERVIEW AND PREREQUISITES
 
 [Alternative frameworks](https://github.com/sgoldenlab/simba/blob/master/docs/unsupervised_classification.md#other-unsupervised-machine-learning-packages-for-pose-estimation-data) for unsupervised learning typically accepts raw pose-estimation data as input. SimBA - however - performs unsupervised learning using behavioral bouts initially detected using supervised learning, as the input. For example - if you have successfully classified *attack* behavior using SimBA - you can proceed and do unsupervised learning on those classified events to uncover the different forms of attack events. Thus, some important things to think about before performing unsupervised learning in SimBA:
 
@@ -23,13 +23,15 @@ There are several popular and proven python packages focused on unsupervised mac
 
 In brief, the SimBA pipeline for detecting interpretable behavioral clusters consists of four steps:
 
-(1) Perform dimensionality reduction on the classified behavioral events through a user defined algorithm (i.e., PCA, UMAP, t-SNE, KNN).
+(1) Perform dimensionality reduction on the classified behavioral events through a user-defined algorithm (i.e., PCA, UMAP, t-SNE, KNN).
 
 (2) Perform clustering of the events in the dimentionality reduced space using HDBSCAN.
 
 (3) Generate a supervised classifier on the clusters detected in Step 2 and parse the features discriminating the different clusters. 
 
 (4) Visualize the behaviors in the different clusters and the important features that discriminate them for interpretability. 
+
+>Note: The results of any unsupervised method is heavily dependent on user-defined dimentionality reduction and clusuering hyperparameters. Therefore, 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/dim_2.png" />
