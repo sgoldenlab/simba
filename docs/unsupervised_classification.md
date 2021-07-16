@@ -111,7 +111,7 @@ The purpose of this is to perform the classification without the irrelevant feat
 You can similarly select the ```Browse File``` button to search for and select this file, and the file should be formatted similar to as shown below. (update image to include body part coordinates to make it clear, and there might be others. (remove all features in animals, remove all features custom, based on supervised 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/features2remove.PNG" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/features2remove-2.PNG" />
 </p>
 
 
@@ -119,7 +119,7 @@ Finally, input the name of the classifier you would like to focus your analysis 
 
 Once everything has been imported, you can begin the pre-processing by clicking the ```Generate/save dataset``` button. 
 
->**Note:** This step may take a few minutes to process all of the machine results depending on the length and number of datasets in the folder. Once everything has been processed you will see the .pkl file 
+>**Note:** This step may take up to several minutes to process all of the machine results depending on the length and number of datasets in the folder. Once everything has been processed you will see the .pkl file 
 
 Once everything has been processed, you will observe that a new folder labeled 'create_dataset' has been saved in your project folder, and inside the 'create_dataset' folder, there will be a single .pkl file saved under the name of the classifier you inputted, such as "Attack.pkl". The .pkl file is a serialized object file that can be read in and deserialized in future steps to use in our classification, and is mainly used for storage efficiency. It cannot be opened on its own like you would a .csv file. 
 
