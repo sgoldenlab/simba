@@ -124,6 +124,8 @@ These errors are related to an update in the pypi package manager version 20.3.3
 
 * Install SimBA using pip and the `--no-dependencies` argument:
   - Type `pip install simba-uw-tf --no-dependencies`, `pip install simba-uw-no-tf--no-dependencies` or `pip install simba-uw-tf-dev --no-dependencies`, depending [on which version of SimBA you want to run](https://github.com/sgoldenlab/simba/blob/master/docs/installation.md#installing-simba-option-1-recommended).
+  - Next, install any missing package dependencies manually. A list of dependencies can be found H
+here: https://github.com/sgoldenlab/simba/blob/master/docs/installation.md#python-dependencies
 
 ## 12. When run my [classifier on new videos](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data), or trying to to [validate my classifier on a single video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#optional-step-before-running-machine-model-on-new-data) my predictions seem to be generated, but then I get either an IndexError: `Index 1 is out of bounds for axis 1 of size 1`, or an error msg telling me that my classifier hasn't been generated properly:
 
