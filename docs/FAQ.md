@@ -154,6 +154,12 @@ For example, when you created the model, SimBA grabbed the files inside your `pr
 
 In Windows, try an go to Settings > Apps > Manage Optional Features > Add a Feature. And then check the boxes for both Windows Media Player and for the Media Feature Pack. Restart the computer, and try launching SimBA again. 
 
+## 16. I get en error message, complaining that something like `Could not find a version that satisfies the requirement tensorflow-gpu==1.14.0. No Matching distribution found for tensorflow==1.14.0.`
+
+You may be running the wrong version of python. You want to be running Python 64-bit, but may have installed Python 32-bit. 
+
+
+
 
 
 
