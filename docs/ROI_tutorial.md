@@ -121,6 +121,17 @@ Once complete, a statement will be printed in the main SimBA terminal window not
 
 Consult these files if you want to know the exact frame numbers when animals entered and exited your drawn ROIs. If you want to convert the frame numbers to time-stamps, then divide these numbers with the fps of the video. 
 
+3. If you want to further calculate time-spent and the number of entries made into the user-defined ROIs within **user-specified time-bins**, go ahead and click on **Time bins: Analyze ROIs** located in the *Analyze ROI* sub-menu. Clicking on this button brings up this menu:
+
+
+
+Select (i) how many animals you want to calculate time-bin ROI data for, (ii) which body-parts you want to use to infer the location of the animals, (iii) and the size of each time bin in seconds. Once the information is filled in click on `Analyze`. You can follow the analyis progress in the SimBA main terminal window. 
+
+
+
+
+
+
 # Part 3. Generating features from ROI data. 
 
 1. With the ROI information, we can generate several further features that might be useful for predicting behaviors, or be handy within other third-party applications. For each frame of the video, the following features can be added to a previously calculated battery of features:
