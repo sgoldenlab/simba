@@ -243,12 +243,18 @@ The next step involves training our model based on the input data and the cluste
 
 To start, import the condensed dataset .pkl we generated in the second step by browsing for the file in the 'create_dataset' folder, then import the cluster .pkl file generated in the previous step under the 'clustering' folder. 
 
+This step generates two main outputs: a feature importance log and a feature correlation heatmap. The feature importance log creates the supervised classifier and ranks all the features based on their relative importance for discriminating the clustered behavior according to the classifier. The feature correlation heatmap visually represents this by plotting the comparison of each feature correlation to one another and determining which is best by the relative contrast of the heatmap. The features should all be most correlated along the diagonal running across the plot given that each feature should be fully correlated with itself. With a black and white heatmap, the darker the color, the better correlated the features are to one another. 
+
+To generate the feature importance log, click the `Save permutational importances` button and the .csv file should save to a folder labeled 'train_model' within the project folder. An example of this feature imprtance log can be shown below, where the features that were actually signficant were ranked on top with their relative importance contribution labeled. 
+
+To save the feature correlation heatmap, click the `Save feature correlations` button and the image will also save in the 'train_model' folder. 
+
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_correlation.PNG" />
 </p>
 
-
+[insert feature importance log]
 [insert gif]
 
 
@@ -278,6 +284,10 @@ Below we have demonstrated examples of what each of the clip types look like. No
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/skeleton0.PNG" />
 </p>
 
+
+
+[insert gif]
+
 ## OTHER UNSUPERVISED MACHINE LEARNING PACKAGES FOR POSE-ESTIMATION DATA
 
 VAME - [GitHub](https://github.com/LINCellularNeuroscience/VAME) - [Paper](https://www.biorxiv.org/content/10.1101/2020.05.14.095430v1.full.pdf)
@@ -292,4 +302,3 @@ VAE-SNE - [GitHub](https://github.com/jgraving/vaesne/issues) - [Paper](https://
 
 
 
-[insert gif]
