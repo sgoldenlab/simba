@@ -71,7 +71,7 @@ It creates a file folder structure that creates a new folder within the project 
 To save a project folder, specify the folder path where you would like the project folder to be saved into by clicking the ```Browse Folder``` button and selecting a folder, as the folder path will replace the ```No folder selected``` box, and designate a name for the project folder with the ```Project Name``` entry box. 
 Note that the folder name will save as "unsupervised_projectname" with "projectname" being the name you filled out the entry box with. After you have specified the folder path and designated a project name, click the ```Create folder``` button to save the folder.
 
-
+**TUTORIAL**
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial1.gif" />
 </p>
@@ -120,8 +120,8 @@ Once everything has been processed, you will observe that a new folder labeled '
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/create_dataset_folder.PNG" />
 </p>
 
+**TUTORIAL:**
 
-[GIF of saving dataset then showing pkl file saved]
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial2.gif" />
 </p>
@@ -201,7 +201,7 @@ Below, you will find examples of different dimensionality reduction visualizatio
 
 [This documentation](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) provides an excellent overview on how to fine-tune UMAP hyperparameters such as min_dist and spread to create more distinguishable clusters. 
 
-[insert gif]
+**TUTORIAL**
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial4.gif" />
 </p>
@@ -258,6 +258,7 @@ This file is saved as both a .csv and .pkl file, where the .csv file can be open
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/clustering_folder.PNG" />
 </p>
 
+**TUTORIAL**
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial6.gif" />
@@ -289,6 +290,7 @@ To save the feature correlation heatmap, click the `Save feature correlations` b
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_importance_log.PNG" />
 </p>
 
+**TUTORIAL**
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial7.gif" />
