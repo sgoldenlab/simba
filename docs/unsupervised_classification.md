@@ -190,11 +190,15 @@ Once you have entered the values for each hyperparameter box, you can save the r
 
 To save the visualizations associated with each algorithm, click the `Save visualizations` button, and each resulting combination of the hyperparameters will save as its own scatter plot visualization in the same folder. Note that the combination can be distinguished given the file name that will read `algorithm_reduced_features_hyperparameter_value_.npy`. For example, a UMAP visualization/.npy that features the hyperparameters of spread = 1.0, neighbors = 3, distance = 0.0, and dimensions = 2 will be named `UMAP_reduced_features_spread_1.0_neighbors_3_dist_0.0_dimensions_2`.
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/DR_folder.PNG" />
+</p>
+
 Below, you will find examples of different dimensionality reduction visualizations and their corresponding algorithm. Note that visually, the plots look similar, with respect to the differences found between hyperparameters.
 
 >**Note:** As noted above, please remember that with an unsupervised classification and pseudo grid-search approach, we cannot guarantee what the clustering results may look like, especially because it is heavily dependent on the user's choice of hyperparameters used to distinguish clusters. Furthermore, there are no performance metrics to compare one set of hyperparameter combinations over another, so it is up to you to find the ideal combination for your data. 
 
-**UMAP:**
+**UMAP example:**
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/umap_0218.PNG" />
 </p>
