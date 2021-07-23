@@ -71,7 +71,10 @@ It creates a file folder structure that creates a new folder within the project 
 To save a project folder, specify the folder path where you would like the project folder to be saved into by clicking the ```Browse Folder``` button and selecting a folder, as the folder path will replace the ```No folder selected``` box, and designate a name for the project folder with the ```Project Name``` entry box. 
 Note that the folder name will save as "unsupervised_projectname" with "projectname" being the name you filled out the entry box with. After you have specified the folder path and designated a project name, click the ```Create folder``` button to save the folder.
 
-[insert GIF tutorial]
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial1.gif" />
+</p>
 
 ## Step 2: Create Dataset
 
@@ -119,6 +122,13 @@ Once everything has been processed, you will observe that a new folder labeled '
 
 
 [GIF of saving dataset then showing pkl file saved]
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial2.gif" />
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial3.gif" />
+</p>
 
 
 ## Step 3: Perform Dimensionality Reduction
@@ -192,6 +202,13 @@ Below, you will find examples of different dimensionality reduction visualizatio
 [This documentation](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) provides an excellent overview on how to fine-tune UMAP hyperparameters such as min_dist and spread to create more distinguishable clusters. 
 
 [insert gif]
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial4.gif" />
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial5.gif" />
+</p>
 
 
 ## Step 4: Perform Clustering
@@ -242,6 +259,9 @@ This file is saved as both a .csv and .pkl file, where the .csv file can be open
 </p>
 
 [insert gif]
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/dim_1.png" />
+</p>
 
 ## Step 5: Train Model
 
@@ -264,9 +284,16 @@ To save the feature correlation heatmap, click the `Save feature correlations` b
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_correlation.PNG" />
 </p>
 
-[insert feature importance log]
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_importance_log.PNG" />
+</p>
+
 [insert gif]
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_importance_log.PNG" />
+</p>
 
 ## Step 6: Visualize Clusters 
 
