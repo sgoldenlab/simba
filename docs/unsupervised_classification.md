@@ -113,7 +113,9 @@ Once everything has been imported, you can begin the pre-processing by clicking 
 
 Once everything has been processed, you will observe that a new folder labeled 'create_dataset' has been saved in your project folder, and inside the 'create_dataset' folder, there will be a single .pkl file saved under the name of the classifier you inputted, such as "Attack.pkl". The .pkl file is a serialized object file that can be read in and deserialized in future steps to use in our classification, and is mainly used for storage efficiency. It cannot be opened on its own like you would a .csv file. 
 
-[insert pic of pkl file saved w final tutorial]
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/create_dataset_folder.PNG" />
+</p>
 
 
 [GIF of saving dataset then showing pkl file saved]
@@ -169,7 +171,7 @@ Below, you will find an explanation of each algorithm and their associated hyper
 
 
 [PCA](https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html): PCA or Principal Component Analysis, is a linear dimensionality reduction technique that uses Singular Value Decomposition (SVD) of data to reduce it to a lower dimensional space. The input data is not scaled but centered per feature before SVD is applied. For the PCA pipeline, there is one main hyperparameter: `n-components`. 
-- `n-components` [come back]
+- `n-components` refers to the number of components you would like to keep, and if not set the default value is the minimum value between the number of samples and number of features. 
 
 
 >**Note:** If you are inputting multiple values for the hyperparameter entry box, you must do so without commas. For example, you can list '10, 20, 30' as `10 20 30` instead of `10, 20, 30`.
@@ -182,9 +184,15 @@ Below, you will find examples of different dimensionality reduction visualizatio
 
 >**Note:** As noted above, please remember that with an unsupervised classification and pseudo grid-search approach, we cannot guarantee what the clustering results may look like, especially because it is heavily dependent on the user's choice of hyperparameters used to distinguish clusters. Furthermore, there are no performance metrics to compare one set of hyperparameter combinations over another, so it is up to you to find the ideal combination for your data. 
 
+**UMAP:**
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/umap_0218.PNG" />
+</p>
+
+[This documentation](https://hdbscan.readthedocs.io/en/latest/how_hdbscan_works.html) provides an excellent overview on how to fine-tune UMAP hyperparameters such as min_dist and spread to create more distinguishable clusters. 
+
 [insert gif]
 
-[insert pics of example dimesionality reduction outputs]
 
 ## Step 4: Perform Clustering
 
@@ -229,7 +237,9 @@ Finally, we can save the resulting dataset that assigns clusters to each behavio
 
 This file is saved as both a .csv and .pkl file, where the .csv file can be opened to evaluate the cluster assignment, and the .pkl file can be used to train the model in the following step. To save the clusters CSV and .pkl, click the `Save clusters .csv & .pkl` button and the files will save to the same 'clustering' folder. 
 
-[insert clusters CSV and file saving both .csv and .pkl]
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clustering_folder.PNG" />
+</p>
 
 [insert gif]
 
