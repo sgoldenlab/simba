@@ -127,7 +127,7 @@ Once everything has been processed, you will observe that a new folder labeled '
 </p>
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial3.gif" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial3-2.gif" />
 </p>
 
 
@@ -258,9 +258,9 @@ This file is saved as both a .csv and .pkl file, where the .csv file can be open
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/clustering_folder.PNG" />
 </p>
 
-[insert gif]
+
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/dim_1.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial6.gif" />
 </p>
 
 ## Step 5: Train Model
@@ -289,10 +289,9 @@ To save the feature correlation heatmap, click the `Save feature correlations` b
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_importance_log.PNG" />
 </p>
 
-[insert gif]
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_importance_log.PNG" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/tutorial7.gif" />
 </p>
 
 ## Step 6: Visualize Clusters 
