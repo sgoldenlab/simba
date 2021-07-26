@@ -347,9 +347,9 @@ Use this tool to re-order the pose-estimation tracking data of multiple files in
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/reorg_1.png" />
 </p>
 
-6. The `Current Order` sub-menu on the right represents the column order of the input files. The `New Order` sub-menu on the right represents the order which the body-parts should be re-ordered to. Use the drop-down menus to select the new order of the body-parts and click on `Run re-organization`. 
+6. The `Current Order` sub-menu on represents the column order of the input files. The `New Order` sub-menu on represents the order which the body-parts should be re-ordered to. Use the drop-down menus to select the new order of the body-parts, then click on `Run re-organization`. 
 
-7. Your new, re-organized files will be saved in a dat-time stamped folder inside the `Data Folder` selected in Step 2. The new folder will be named something like `Reorganized_bp_20210726111127`. 
+7. Your new, re-organized files will be saved in a date-time stamped folder inside the `Data Folder` selected in Step 2. The new folder will be named something like `Reorganized_bp_20210726111127`. 
 
 
 
