@@ -340,10 +340,15 @@ Use this tool to re-order the pose-estimation tracking data of multiple files in
 2. In the entry box `Data Folder`, select the directory containing your pose-estimation tracking files. 
 3. Select your pose-estimation tool in the `Tracking Tool` drop-down menu. 
 4. Select the file-format of your tracking data in the `File Type` drop-down menu. 
-5. Click `Confirm` and the following menu below will pop open. If you have one animal in your tracking data, the menu on the left will show. If you have multiple animals in your tracking data, the menu on the right will show. 
+5. Click `Confirm` and the following menu below will pop open. If you have one animal in your tracking data, the menu on the left will show. If you have multiple animals in your tracking data, the menu on the right will show. The image on the right contains an extra column compared to the image on the left, representing the Animal name. 
+
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/reorg_1.png" />
 </p>
+
+6. The `Current Order` sub-menu on the right represents the column order of the input files. The `New Order` sub-menu on the right represents the order which the body-parts should be re-ordered to. Use the drop-down menus to select the new order of the body-parts and click on `Run re-organization`. 
+
+7. Your new, re-organized files will be saved in a dat-time stamped folder inside the `Data Folder` selected in Step 2. The new folder will be named something like `Reorganized_bp_20210726111127`. 
 
 
 
