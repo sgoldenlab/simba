@@ -330,5 +330,22 @@ Use this tool to convert .seq files to .mp4 files.
 
 2. A window will pop up and you can then navigate and select the video folder that contains the mp4's. 
 
-3. The conversion progress can be followed through the progress bar printed in the terminal window. 
+3. The conversion progress can be followed through the progress bar printed in the terminal window.
+
+
+### Re-organize tracking data
+Use this tool to re-order the pose-estimation tracking data of multiple files in a folder. For example, you may have some pose-estimation body-part tracking files where the `Animal_1_nose` is body-part number 1, and some other pose-estimation body-part tracking files where `Animal_1_tail_base` is body-part number 1. Now you want to re-order the  data so that all files contains the same order of tracked body-parts.
+
+1. Click on `Tools`, then `Re-organize Tracking Data`. 
+2. In the entry box `Data Folder`, select the directory containing your pose-estimation tracking files. 
+3. Select your pose-estimation tool in the `Tracking Tool` drop-down menu. 
+4. Select the file-format of your tracking data in the `File Type` drop-down menu. 
+5. Click `Confirm` and the following menu below will pop open. If you have one animal in your tracking data, the menu on the left will show. If you have multiple animals in your tracking data, the menu on the right will show. 
+
+
+
+
+
+
+
 
