@@ -341,7 +341,9 @@ Use this tool to re-order the pose-estimation tracking data of multiple files in
 3. Select your pose-estimation tool in the `Tracking Tool` drop-down menu. 
 4. Select the file-format of your tracking data in the `File Type` drop-down menu. 
 5. Click `Confirm` and the following menu below will pop open. If you have one animal in your tracking data, the menu on the left will show. If you have multiple animals in your tracking data, the menu on the right will show. 
-
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/reorg_1.png" />
+</p>
 
 
 
