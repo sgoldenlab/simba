@@ -21,6 +21,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Extract frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames)
 - [Convert .seq to .mp4](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_tools.md#convert--seq-files-to-mp4-files)
 - [Re-order pose-estimation tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
+- [Remove body-parts from tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 
 ## Shorten Videos
 This is a tool used to trim video lengths. The tool contains two different methods: 
@@ -352,8 +353,19 @@ Use this tool to re-order the pose-estimation tracking data of multiple files in
 7. Your new, re-organized files will be saved in a date-time stamped folder inside the `Data Folder` selected in Step 2. The new folder will be named something like `Reorganized_bp_20210726111127`. 
 
 
+### Remove body-parts from tracking data
+Use this tool to delete user-specified body-parts from pose-estimation tracking data for all files in a folder. For example, you may have pose-estimation body-part tracking files for 16 body-parts, but now you want to get rid of the data for 2 body-parts and keep the other 14. 
+
+1. Click on `Tools`, then `Remove body-parts from tracking data`.
+2. In the entry box `Data Folder`, select the directory containing your pose-estimation tracking files. 
+3. Select your pose-estimation tool in the `Tracking Tool` drop-down menu. 
+4. Select the file-format of your tracking data in the `File Type` drop-down menu. 
+5. Select how many body-parts you like to remove from the pose-estimation tracking data files.
+6. Click `Confirm` and the following menu below will pop open (Note: if you have multiple animals in your pose-estimation files, you will also see a dropdown menu named `Animal`.) Select the body-parts you would like to remove, and click `Run Removal`. 
 
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/remove_bps.png" />
+</p>
 
-
-
+7. Your new files (with the removed body-parts) will be saved in a date-time stamped folder inside the `Data Folder` selected in Step 2. The new folder will be named something like `Reorganized_bp_20210726111127`. 
