@@ -403,17 +403,33 @@ This step runs behavioral classifiers on new data.
 6. Click on `Set model(s)` and then click on `Run RF Model` to run the machine model on the new data. 
 
 ### Step 9: Analyze Machine Results
-Access this menu through the `Load project` menu and the `Run machine model` tab. This step performs summary analyses and presents descriptive statistics in .csv file format. There are three forms of summary analyses: `Analyze`, `Analyze distance/velocity`, and `Analyze severity`.
 
-![](/images/analyzemachineresult.PNG)
+Access this menu through the `Load project` menu and the `Run machine model` tab. This step performs summary analyses and presents descriptive statistics in .csv file format. There are currently (08/02/21) five forms of summary analyses in this menu: `Analyze machine predictions`, `Analyze distance/velocity`, `Time bins machine predictions`, `Time bins: Distance velocity`, and `Classifications by ROI`.
 
-- `Analyze`: This button generates descriptive statistics for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. 
+![](/images/MR_1.png)
 
-- `Analyze distance/velocity`: This button generates descriptive statistics for mean and median movements and distances between animals. The date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. 
+- `Analyze machine predictions`: This button generates descriptive statistics for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. A date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. Clicking this button brings up a menu with tick boxes for the different output metrics (see image below). Select the metrics you would like to calculate and click `Analyze`.
+
+![](/images/MR_2.png)
+
+- `Analyze distance/velocity`: This button generates descriptive statistics for mean and median movements of the animals, and distances between animals (if you have more than 1 animal). The date-time stamped output csv file with the data is saved in the `/project_folder/log` folder. Clicking this button brings up a menu (see image below) where you select the number of animals you want distance/velocity data for, and the body-parts you would like to use when calculating the data. You can also omit calculations for body-parts below a user-defined probability threshold. Define your settings and click `Run`.
+
+![](/images/MR_3.png)
+
+
+- `Time bins: Machine predictions`: This button generates descriptive statistics for each predictive classifier in the project within user-defined time-bins. The metrics calculated for every time bin are `Number of events`, `Total event duration`, `Mean event duration`, `Median event duration`, `Time of first occurrence`, `Mean interval duration` (time between events in time-bin), and `Median interval duration`. A date-time stamped output CSV file with the data is saved in the `/project_folder/log` folder. Clicking this button bring up a menu (see below) where the user inserts the length of each time-bin:
+
+![](/images/MR_4.png)
+
+
+- `Time bins: Distance / Velocity`: This button generates descriptive statistics for mean and median movements of the animals, and distances between animals (if you have more than 1 animal) in user defined time-bins. Clicking this button brings up a menu where the user defines the size of the time-bins. 
+
+- `Classifications by ROI`: This button generates summary statistics for each classifier within each user-defined region-of-interest (ROI). If you have not defined ROIs, then first head to the [ROI] tab before proceeding with this analysis. You can read more about defining ROIs on SimBA [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md). Clicking this button brings up a menu where the user defines the ROIs and classifiers they would like to calculate summary statistics for (see below). The user is also asked to define the body-part determining the current location of the animal(s). Once complete, click on `Run classifications in each ROI`. A date-time stamped output CSV file with the data is saved in the `/project_folder/log` folder named something like `Classification_time_by_ROI_20210801173201.csv`. For an example output data file (with 5 videos, 3 ROIs, and 3 behaviors analyzed) click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Classification_time_by_ROI_20210801173201.csv). 
+
+![](/images/MR_5.png)
+
 
 - `Analyze severity`: Calculates the ‘severity’ of each frame classified as containing attack behavior based on a user-defined scale. **Example:** the user sets a 10-point scale. One frame is predicted to contain an attack, and the total body-part movements of both animals in that frame is in the top 10% percentile of movements in the entire video. In this frame, the attack will be scored as a 10 on the 10-point scale. A date-time stamped output .csv file containing the 'severity' data is saved in the `/project_folder/log` folder.
-
-- `Severity scale 0 -`:
 
 
 ### Step 10: Sklearn Visualization
