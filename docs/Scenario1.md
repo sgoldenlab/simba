@@ -388,11 +388,11 @@ In this validation step the user specifies the path to a previously created mode
 
 This process allows you to rapidly access the results of the Hyperparameters you have selected on a "gold-standard" behavioral video. If the predictions are not good, you can go back to tweak the appropriate parameters without first running through numerous other videos or adding and/or refining your annotations.
 
-For more details, please [click here](/docs/validation_tutorial.md#validate-model-on-single-video)
+For more details, please [click here](/docs/validation_tutorial.md#validate-model-on-single-video).
 
-![](/images/validatemodel_graph1.PNG)
+![](/images/Validate_0821.png)
 
-**Note: If you check the 'Generate Gantt plot' box, the final validation will include two seperate videos - 1 of the behavior and 1 of the gantt plot. However, this takes longer and we suggest leaving it unchecked unless you really want the gantt plot. This may or may not be combined to a single video in the future!**
+**Note: If you select  `Gantt chart: video` or `Gantt chart: final frame only (slightly faster)` in the `Create Gantt plot` drop-down menu, SimBA will create a validation video with an appended Gantt chart plot (see the final gif image in this tutorial below for an example). Creating Gantt charts take longer, and we suggest selecting `None` in the `Create Gantt plot` drop-down menu unless you really want the gantt plot.
 
 1. Under the **Run machine model tab** and *Validate Model on Single Video* heading, click on `Browse File` next to `Select features file`. In this current Scenario 1, select the CSV file you have stored [in a safe place outside of the project folder](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features). 
 
