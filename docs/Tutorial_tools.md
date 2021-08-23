@@ -368,4 +368,4 @@ Use this tool to delete user-specified body-parts from pose-estimation tracking 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/remove_bps.png" />
 </p>
 
-7. Your new files (with the removed body-parts) will be saved in a date-time stamped folder inside the `Data Folder` selected in Step 2. The new folder will be named something like `Reorganized_bp_20210726111127`. 
+7. Your new files (with the removed body-parts) will be saved in a date-time stamped folder inside the `Data Folder` selected in Step 2. The new folder will be named something like `Reorganized_bp_20210726111127`. You can now go ahead and import the files into your SimBA project. 
