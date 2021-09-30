@@ -67,13 +67,13 @@ The left window will display the first frame of the video that you indicated you
 The right-most window will contain buttons and entry-boxes for creating and manpulating your ROIs, and we will go through the function of each part below.  
 
 
-## The "Region of Interest Settings" menu
+# The "Region of Interest Settings" menu
 
-### Video Information
+## Video Information
 
 The first part of the "Region of Interest Settings" menu is titled *Video Information* and is useful for general troubleshooting. This menu displays the current video being processed, the format of this video, its frame rate, and the frame number and the timestamp of the frame that is being displayed in the left window. 
 
-### Change image
+## Change image
 
 The second part of the "Region of Interest Settings" menu is titled *Change image*. Occationally, the first frame of the video isn't suitable for defining your regions of interest and you'd like to use a different frame. In the *Change image* menu, you can:
 
@@ -85,13 +85,13 @@ The second part of the "Region of Interest Settings" menu is titled *Change imag
 <GIF>
 
 
-### New shape
+## New shape
 The next sub-menu - titled *New shape* - contains three sub-menus (`Shape type`, `Shape attributes`, and `Shape name`) and you will use these to create new ROI shapes.
 
-#### Shape type
+### Shape type
 To begin creating a new ROI, start by selecting its type. SimBA supports three shape types - rectangles, circles, and polygons. Select the shape type you wish to draw by clicking the appropriate button. 
 
-#### Shape attributes 
+### Shape attributes 
 Next, once you have selected the `Shape type`, you can pick a few of its attributes (or go ahead with the default values). Users drawing ROIs in SimBA are often working in very different resolutions and are sometimes drawing relatively complex geometries involving many shapes. The options in this menu can help keep shapes visible, distinguable and aligned while drawing regardless of the resolution of your video. SimBA allowes the user to set three different *shape attributes* (if you want to change these attributes later, after drawing your shape, you can - more info below!):
 
 * **Shape thickness**: This dropdown menu controls the thickness of the lines in the ROIs (see the top of the image below). If you select a higher number in the dropdown, then the lines of your ROI will be thicker. 
@@ -104,23 +104,84 @@ Next, once you have selected the `Shape type`, you can pick a few of its attribu
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_2.png" />
 </p>
 
-#### Shape name
+### Shape name
 Each shape in SimBA has a name. In this menu, enter the name of your shape (e.g., 'bottom_left_corner', or 'center'). 
   
 
-### Draw shape
+## Draw shape
 Once you have defined your shape, it is time to draw it. The methods for drawing the three different shape types (`Rectangle`, `Circle` and `Polygon`) is slightly different from each other and detailed below. However, regardless of the shape type you are currently drawing, begin by clicking on `Draw`.
   
-#### Rectangle
+### Rectangle
 Click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESC` button**  to save your rectangle. 
   
-#### Circle
+### Circle
 Begin by left mouse clicking on the image where you would like the center of the circle to be. You should see a small filled circle appear where you clicked, marking the center location of your circle. Next, left click on the image where you would like the outer bound of the circle to be. You should now see your entire circle ROI.
  
-#### Polygon
-Left mouse click on at least three different locations in the image that defines the outer bounds of your polygon. You should see a small filled circle appear where you clicked, marking the locations of the polygons outer bounds. When you are happy with your polygons outer bounds, **press the keyboard `ESC` button**  to save your polygon. After you press keyboard `ESC` button
+### Polygon
+Left mouse click on at least three different locations in the image that defines the outer bounds of your polygon. You should see a small filled circle appear where you clicked, marking the locations of the polygons outer bounds. When you are happy with your polygons outer bounds, **press the keyboard `ESC` button**  to save your polygon. After you press keyboard `ESC` button, the filled polygon should appear. 
   
+## Shape manipulations
 
+SimBA allows several forms of shape manipulations that are described below, this includes:
+
+* Deleting ROIs - this allows you to delete all ROIs or a single user-defined ROI (and re-draw it if necessery). 
+* Duplicating ROIs - this allows you to duplicate an already-drawn ROI. 
+* Changing ROI location - this allows you to move an entire ROI to a different location. 
+* Changing the *shape of the ROI* - this allows you to change the width and/or hight of a rectangle, radius of a circle, or the locations of the outer bounds of a polygon.
+* Aligning ROIs - this allows you to move ROIs and ensure that they aligned with other ROIs in the image.  
+  
+### Deleting ROIs
+
+* To delete all drawn ROIs, click on `Delete ALL` in the `Draw` sub-menu. 
+  
+* To delete a specific ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to delete. Next, click on the `Delete ROI` button.
+  
+### Duplicating ROIs
+
+1. To duplicate an already-draw ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to delete. Next, click on the `Duplicate ROI` button. A new ROI, with the same dimensions as the ROI selected in the `Select ROI` dropdown menu, should appear in the frame. 
+
+2. The first duplicated ROI will inherit the name of the original ROI with `_copy_1` appended. Thus, if you look in the `Select ROI` dropdown menu, you should see a new name 
+
+  
+### Changing ROI locations
+  
+1. To change the location of an ROI, begin by clicking the `Move shape` button in the `Interaction` sub-menu. Once clicked, the `ear tags` of each shape will be displayed in the frame window. Rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a **center** ear tag). 
+  
+2. Next, left mouse click on the **center** ear tag of the ROI you wish to move. 
+  
+3. Next, left mouse click at the new location the where you want your ROI to be. Once complete, you should see your ROI being displayed in the new location. 
+  
+### Changing the shape of the ROI
+  
+1. To change the shape of an ROI, begin by clicking the `Move shape` button in the `Interaction` sub-menu. Once clicked, the `ear tags` of each shape will be displayed in the frame window. Rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a **center** ear tag).
+  
+2. Next, left mouse-click on the ear-tag you wish to use to manipulate the ROI. Once you left click on the ear-tag, the part of the shape you are manipulating should change its color to *grey*. For example:
+  
+    Rectangles:
+    - Clicking on the left middle ear-tag of a rectangle allows you to control the location of the left border or the rectangle (the left border turns grey).
+  
+    - Clicking on the top-left corner ear-tag of a rectangle allows you to control the top and left border of the rectangle (the left and top border turns grey).   
+  
+    - Clicking on the bottom middle ear-tag of a rectangle allows you to control the bottom border or the rectangle  (the bottom border turns grey). 
+  
+   Circles:
+    - Clicking on the left border ear-tag of a circle allows you to control the radius of the circle (the circle border turns grey). 
+  
+   Polygon:
+    - Clicking on any of the outer bounds of the polygon allows you to control the location of the outer bound in the polygon (the two lines connected to the clicked-on ear-tag turns grey).
+  
+3. Next, after selecting an ear-tag, left mouse-click at the location you want the parts you are manipulating to be located. Once you have clicked on the new location, the new ROI shape should be displayed in the left window.  
+  
+### Aligning ROIs
+  
+1. To align two ROIs, begin by clicking the `Move shape` button in the `Interaction` sub-menu. Once clicked, the `ear tags` of each shape will be displayed in the frame window. Rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a **center** ear tag).
+  
+2. Next, left mouse-click on the ear-tag you wish to move and make in-alignment with another ROIs ear-tag. Once you left-click on the ear-tag, a successful selection will be highlighted by the ear-tag and its connected lines turning grey.  
+
+3. Next, left mouse-click on the ear-tag of a second ROI representing the line with which you want to align your ROI selected in `Step 2` above. 
+  
+>Note: If you are aligning a **Rectangle or Circle** with a second ROI, then the entire shape will move and the coordinates of the ear-tag selected in `Step 2` will inherit the same coordinates as the ear-tag selected in `Step 3`. If you are aligning a **Polygon** with a second ROI, then only the the ear-tag selected in `Step 2` will move and inherit the same coordinates as the ear-tag selected in `Step 3`. If you want to align several edges a polygon with edges in a second ROI, proceed to repeat `Step 2` and `Step 3` for those edges.
+  
 
 
 
