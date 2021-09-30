@@ -1,5 +1,9 @@
 # Regions of Interest (ROIs) in SimBA
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_1.png" />
+</p>
+
 The SimBA region of interest (ROI) interface allows users to define and 
 draw ROIs on videos. ROI data can be used to calculate basic descriptive 
 statistics based on animals movements and locations such as:
