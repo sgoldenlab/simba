@@ -1,4 +1,4 @@
-# Regions of Interest (ROIs) in SimBA
+# <p align="center"> Regions of Interest (ROIs) in SimBA </p>
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_1.png" />
@@ -10,15 +10,12 @@ statistics based on animals movements and locations such as:
 
 * How much time the animals have spent in different ROIs.
 * How many times the animals have entered different ROIs.
-* The distance animals have moved in the different ROIs
-* How many behavior bouts and / or how much time the animals have engaged in 
-different classified behaviors in each ROI.
+* The distance animals have moved in the different ROIs.
+* How the animals have engaged in different classified behaviors in each ROI.
 
-Furthermore, the ROI data can  be used to build potentially valuable,
-additional, features for random forest predictive classifiers. 
-Such features can be used to generate a machine model that classify behaviors that depend on the 
-spatial location of body parts in relation to the ROIs. **CAUTION**: If spatial locations are irrelevant for the 
-behaviour being classified, then such features should *not* be included in the machine model generation as they just 
+etc....
+
+Furthermore, the ROI data can  be used to build potentially valuable, additional, features for random forest predictive classifiers. Such features can be used to generate a machine model that classify behaviors that depend on the spatial location of body parts in relation to the ROIs. **CAUTION**: If spatial locations are irrelevant for the behaviour being classified, then such features should *not* be included in the machine model generation as they just 
 only introduce noise.
 
 # Before analyzing ROIs in SimBA
@@ -74,30 +71,55 @@ The right-most window will contain buttons and entry-boxes for creating and manp
 
 ### Video Information
 
-The first part of the "Region of Interest Settings" menu is titled *Video Information* and is useful for general troubleshooting. This menu displays the current video being processed, 
-the format of this video, its frame rate, and the frame number and the time of the frame that is being displayed in the left window. 
+The first part of the "Region of Interest Settings" menu is titled *Video Information* and is useful for general troubleshooting. This menu displays the current video being processed, the format of this video, its frame rate, and the frame number and the timestamp of the frame that is being displayed in the left window. 
 
 ### Change image
 
-The second part of the "Region of Interest Settings" menu is titled *Change image*. Use this menu if you want to use a different frame of the video when defining your ROIs. Clicking on `+1s` will display a frame one second later in the video than the frame currently displayed.
-Clicking on `-1s` will display a frame one second earlier in the video than the frame currently displayed. To move a custom distance forward in the video, enter the number of seconds you wish to move in the `Seconds forward` entry box and click on the `Move` button. 
+The second part of the "Region of Interest Settings" menu is titled *Change image*. Occationally, the first frame of the video isn't suitable for defining your regions of interest and you'd like to use a different frame. In the *Change image* menu, you can:
+
+* Click on `+1s` will display a frame one second later in the video than the frame currently displayed (see gif below).
+* Conversely, clicking on `-1s` will display a frame one second earlier in the video than the frame currently displayed. 
+* If you need move a custom distance forward in the video, then enter the number of seconds you wish to move forward in the `Seconds forward` entry box and then click on the `Move` button. 
+* Lastly, if you want to go back, and display the first frame in the video, click on `Reset first frame`. 
+
+<GIF>
+
 
 ### New shape
-The second part of the "Region of Interest Settings" menu is titled *New shape* and contains three sub-menus (`Shape type`, `Shape attributes`, and `Shape name`) that are used for creating new ROI shapes.
+The next sub-menu - titled *New shape* - contains three sub-menus (`Shape type`, `Shape attributes`, and `Shape name`) and you will use these to create new ROI shapes.
 
 #### Shape type
-To create a new ROI, begin by selecting its type. SimBA supports three shape types - rectangles, circles, and polygons. Select the shape type you wish to draw by clicking the appropriate button. 
+To begin creating a new ROI, start by selecting its type. SimBA supports three shape types - rectangles, circles, and polygons. Select the shape type you wish to draw by clicking the appropriate button. 
 
 #### Shape attributes 
-Users drawing ROIs in SimBA are often working in very different resolutions and are sometimes drawing relatively complex geometries involving many shapes. It is therefore important to keep shapes visible, distinguable and aligned while drawing regardless of the resolution of your video.
-To facilitate this, SimBA allowes the user to set three different *shape attributes* (if you want to change these later, after drawing your shape, you can - more info below):
+Next, once you have selected the `Shape type`, you can pick a few of its attributes (or go ahead with the default values). Users drawing ROIs in SimBA are often working in very different resolutions and are sometimes drawing relatively complex geometries involving many shapes. The options in this menu can help keep shapes visible, distinguable and aligned while drawing regardless of the resolution of your video. SimBA allowes the user to set three different *shape attributes* (if you want to change these attributes later, after drawing your shape, you can - more info below!):
 
-* **Shape thickness**: this dropdown controls the thickness of the lines in the ROIs. If you select a higher number the lines of the ROI will be thicker. 
-* **Ear tag size**: Each shape that you draw will have *ear tags*. These tags can be clicked on to move shapes, align shapes, or manipulate the dimensions of the shapes (see beloe for more information). In this dropdown menu, select the size that the ear-tags of your ROI should have. If you select a higher number the ear-tags of the ROI will be bigger.  
+* **Shape thickness**: This dropdown menu controls the thickness of the lines in the ROIs (see the top of the image below). If you select a higher number in the dropdown, then the lines of your ROI will be thicker. 
+  
+* **Ear tag size**: Each shape that you draw will have *ear tags* (more info on ear tags below). These tags can be clicked on to move shapes, align shapes, or manipulate the dimensions of the shapes. In this dropdown menu, select the size that the ear-tags of your ROI should have (see the bottom of the image below). If you select a higher number in the dropdown, then the ear-tags of the ROI will be bigger. 
+  
 * **Shape color**: Each shape that you draw will have a color. From the dropdown, select the color that your ROI should have. 
+  
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_2.png" />
+</p>
 
 #### Shape name
-Each shape in SimBA has a nam
+Each shape in SimBA has a name. In this menu, enter the name of your shape (e.g., 'bottom_left_corner', or 'center'). 
+  
+
+### Draw shape
+Once you have defined your shape, it is time to draw it. The methods for drawing the three different shape types (`Rectangle`, `Circle` and `Polygon`) is slightly different from each other and detailed below. However, regardless of the shape type you are currently drawing, begin by clicking on `Draw`.
+  
+#### Rectangle
+Click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESC` button**  to save your rectangle. 
+  
+#### Circle
+Begin by left mouse clicking on the image where you would like the center of the circle to be. You should see a small filled circle appear where you clicked, marking the center location of your circle. Next, left click on the image where you would like the outer bound of the circle to be. You should now see your entire circle ROI.
+ 
+#### Polygon
+Left mouse click on at least three different locations in the image that defines the outer bounds of your polygon. You should see a small filled circle appear where you clicked, marking the locations of the polygons outer bounds. When you are happy with your polygons outer bounds, **press the keyboard `ESC` button**  to save your polygon. After you press keyboard `ESC` button
+  
 
 
 
