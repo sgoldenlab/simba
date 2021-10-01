@@ -82,8 +82,9 @@ The second part of the "Region of Interest Settings" menu is titled *Change imag
 * If you need move a custom distance forward in the video, then enter the number of seconds you wish to move forward in the `Seconds forward` entry box and then click on the `Move` button. 
 * Lastly, if you want to go back, and display the first frame in the video, click on `Reset first frame`. 
 
-<GIF>
-
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Change_frame.gif" />
+</p>
 
 ## New shape
 The next sub-menu - titled *New shape* - contains three sub-menus (`Shape type`, `Shape attributes`, and `Shape name`) and you will use these to create new ROI shapes.
@@ -107,15 +108,26 @@ Next, once you have selected the `Shape type`, you can pick a few of its attribu
 ### Shape name
 Each shape in SimBA has a name. In this menu, enter the name of your shape (e.g., 'bottom_left_corner', or 'center'). 
   
-
 ## Draw shape
 Once you have defined your shape, it is time to draw it. The methods for drawing the three different shape types (`Rectangle`, `Circle` and `Polygon`) is slightly different from each other and detailed below. However, regardless of the shape type you are currently drawing, begin by clicking on `Draw`.
   
 ### Rectangle
-Click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESC` button**  to save your rectangle. 
+Click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESC` button**  to save your rectangle.
+
+>Note: The rectangle will remain blue *while* you drawing it. After you hit `ESC`, the rectangle will take the color you picked in the *shape color attribute* dropdown menu above
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Draw_rectangle.gif" />
+</p>
+
   
 ### Circle
 Begin by left mouse clicking on the image where you would like the center of the circle to be. You should see a small filled circle appear where you clicked, marking the center location of your circle. Next, left click on the image where you would like the outer bound of the circle to be. You should now see your entire circle ROI.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Draw_circle.gif" />
+</p>
+
  
 ### Polygon
 Left mouse click on at least three different locations in the image that defines the outer bounds of your polygon. You should see a small filled circle appear where you clicked, marking the locations of the polygons outer bounds. When you are happy with your polygons outer bounds, **press the keyboard `ESC` button**  to save your polygon. After you press keyboard `ESC` button, the filled polygon should appear. 
