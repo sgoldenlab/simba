@@ -189,6 +189,7 @@ SimBA allows several forms of shape manipulations that are described in detail b
 2. To change the ROI name, enter a new name in the `Shape name` entry box. To change the shape thickness, ear-tag size, or shape color, use the associated dropdown menus. Once done, click on `Save`. Your ROI with new attributes should show in the left frame. 
   
 ## Apply shapes from another video
+Sometimes we have created ROIs 
 
 
 
