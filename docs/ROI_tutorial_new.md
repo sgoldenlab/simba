@@ -128,20 +128,28 @@ Begin by left mouse clicking on the image where you would like the center of the
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Draw_circle.gif" />
 </p>
 
- 
 ### Polygon
 Left mouse click on at least three different locations in the image that defines the outer bounds of your polygon. You should see a small filled circle appear where you clicked, marking the locations of the polygons outer bounds. When you are happy with your polygons outer bounds, **press the keyboard `ESC` button**  to save your polygon. After you press keyboard `ESC` button, the filled polygon should appear. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Draw_polygon.gif" />
+</p>
   
 ## Shape manipulations
 
 SimBA allows several forms of shape manipulations that are described in detail below, this includes:
 
-* Deleting ROIs - allows you to delete all ROIs or a single user-defined ROI (and re-draw it if necessery). 
-* Duplicating ROIs - allows you to duplicate an already-drawn ROI. 
-* Change ROI location - allows you to move an entire ROI to a different location. 
-* Change the *shape of the ROI* - allows you to change the width and/or hight of a rectangle, radius of a circle, or the locations of the outer bounds of a polygon.
-* Aligning ROIs - this allows you to move ROIs and ensure that they aligned with other ROIs in the image. 
-* Change ROI attributes - allows you to change the name, color or other attributes of an already created ROI.
+* [Deleting ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#deleting-rois) - allows you to delete all ROIs, or single user-defined ROIs (and re-draw it if necessery). 
+
+* [Duplicating ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#duplicating-rois) - allows you to duplicate already-drawn ROIs.
+
+* [Change ROI location](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#changing-roi-locations) - allows you to move an ROIs to different locations. 
+
+* [Change the shape of ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#changing-the-shape-of-the-roi) - allows you to change the width and/or hight of a rectangle, radius of a circle, or the locations of the outer bounds of a polygon.
+
+* [Aligning ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#aligning-rois) - allows you to move ROIs while ensuring that they are completely aligned with other ROIs in the image. 
+
+* [Change ROI attributes](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes) - allows you to change the name, color or other attributes of an already created ROI.
   
 ### Deleting ROIs
 
