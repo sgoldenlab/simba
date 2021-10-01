@@ -154,14 +154,30 @@ SimBA allows several forms of shape manipulations that are described in detail b
 ### Deleting ROIs
 
 * To delete all drawn ROIs, click on `Delete ALL` in the `Draw` sub-menu. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Delete_all_shapes.gif" />
+</p>
   
 * To delete a specific ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to delete. Next, click on the `Delete ROI` button.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Delete_specific_shape.gif" />
+</p>
   
 ### Duplicating ROIs
 
-1. To duplicate an already-draw ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to delete. Next, click on the `Duplicate ROI` button. A new ROI, with the same dimensions and attributes as the ROI selected in the `Select ROI` dropdown menu, should appear in the frame. 
+1. To duplicate an already-draw ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to delete. Next, click on the `Duplicate ROI` button. A new ROI, with the same dimensions and attributes as the ROI selected in the `Select ROI` dropdown menu, should appear in the frame near the original ROI.
 
-2. The first duplicated ROI will inherit the name of the original ROI with `_copy_1` appended. Thus, if you look in the `Select ROI` dropdown menu, you should see a new name in this format: `My selected shape: MyShapeName_copy_1`. To change the name and/or other attributes of this shape, see Change ROI attributes section below. 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Duplicate_ROI.gif" />
+</p>
+
+2. The first duplicated ROI will inherit the name of the original ROI with `_copy_1` appended. Thus, if you look in the `Select ROI` dropdown menu, you should see a new ROI with a name in this format: `My selected shape: MyShapeName_copy_1`. To change this name, and/or other attributes of belonging to this ROI, see the Change ROI attributes section below. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Duplicate_dropdown.png" />
+</p>
 
 ### Changing ROI locations
   
@@ -169,7 +185,12 @@ SimBA allows several forms of shape manipulations that are described in detail b
   
 2. Next, left mouse click on the **center** ear tag of the ROI you wish to move. 
   
-3. Next, left mouse click at the new location the where you want your ROI to be. Once complete, you should see your ROI being displayed in the new location. 
+3. Next, left mouse click at the new location the where you want your ROI to be. Once complete, you should see your ROI being displayed in the new location. If you want to move a second shape, go ahead and click on `Move shape` again before clicking on the center tag of the second shape. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Move_shapes.gif" />
+</p>
+
   
 ### Changing the shape of the ROI
   
@@ -190,7 +211,11 @@ SimBA allows several forms of shape manipulations that are described in detail b
    Polygon:
     - Clicking on any of the outer bounds of the polygon allows you to control the location of the outer bound in the polygon (the two lines connected to the clicked-on ear-tag turns grey).
   
-3. Next, after selecting an ear-tag, left mouse-click at the location you want the parts you are manipulating to be located. Once you have clicked on the new location, the new ROI shape should be displayed in the left window.  
+3. Next, after selecting an ear-tag, left mouse-click at the location you want the parts you are manipulating to be located. Once you have clicked on the new location, the new ROI shape should be displayed in the left window. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Change_ROI_shapes.gif" />
+</p>
   
 ### Aligning ROIs
   
@@ -201,6 +226,12 @@ SimBA allows several forms of shape manipulations that are described in detail b
 3. Next, left mouse-click on the ear-tag of a second ROI representing the line with which you want to align your ROI selected in `Step 2` above. 
   
 >Note: If you are aligning a **Rectangle or Circle** with a second ROI, then the entire shape will move and the coordinates of the ear-tag selected in `Step 2` will inherit the same coordinates as the ear-tag selected in `Step 3`. If you are aligning a **Polygon** with a second ROI, then only the the ear-tag selected in `Step 2` will move and inherit the same coordinates as the ear-tag selected in `Step 3`. If you want to align several edges a polygon with edges in a second ROI, proceed to repeat `Step 2` and `Step 3` for those edges.
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Align_shapes.gif" />
+</p>
+
   
 ### Change ROI attributes
 
