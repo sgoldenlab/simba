@@ -238,7 +238,12 @@ SimBA allows several forms of shape manipulations that are described in detail b
 1. To change the attributes of an already-created ROI, begin by selecting the ROI which attributes you want to change in the `Select ROI` drop-down menu. Next, click on `Change ROI` and a new menu window should pop open. 
 
 2. To change the ROI name, enter a new name in the `Shape name` entry box. To change the shape thickness, ear-tag size, or shape color, use the associated dropdown menus. Once done, click on `Save`. Your ROI with new attributes should show in the left frame. 
-  
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Change_shape_attr.gif" />
+</p>
+
+
 ## Apply shapes from another video
 Sometimes we have created ROIs 
 
