@@ -122,13 +122,14 @@ Left mouse click on at least three different locations in the image that defines
   
 ## Shape manipulations
 
-SimBA allows several forms of shape manipulations that are described below, this includes:
+SimBA allows several forms of shape manipulations that are described in detail below, this includes:
 
-* Deleting ROIs - this allows you to delete all ROIs or a single user-defined ROI (and re-draw it if necessery). 
-* Duplicating ROIs - this allows you to duplicate an already-drawn ROI. 
-* Changing ROI location - this allows you to move an entire ROI to a different location. 
-* Changing the *shape of the ROI* - this allows you to change the width and/or hight of a rectangle, radius of a circle, or the locations of the outer bounds of a polygon.
-* Aligning ROIs - this allows you to move ROIs and ensure that they aligned with other ROIs in the image.  
+* Deleting ROIs - allows you to delete all ROIs or a single user-defined ROI (and re-draw it if necessery). 
+* Duplicating ROIs - allows you to duplicate an already-drawn ROI. 
+* Change ROI location - allows you to move an entire ROI to a different location. 
+* Change the *shape of the ROI* - allows you to change the width and/or hight of a rectangle, radius of a circle, or the locations of the outer bounds of a polygon.
+* Aligning ROIs - this allows you to move ROIs and ensure that they aligned with other ROIs in the image. 
+* Change ROI attributes - allows you to change the name, color or other attributes of an already created ROI.
   
 ### Deleting ROIs
 
@@ -138,11 +139,10 @@ SimBA allows several forms of shape manipulations that are described below, this
   
 ### Duplicating ROIs
 
-1. To duplicate an already-draw ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to delete. Next, click on the `Duplicate ROI` button. A new ROI, with the same dimensions as the ROI selected in the `Select ROI` dropdown menu, should appear in the frame. 
+1. To duplicate an already-draw ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to delete. Next, click on the `Duplicate ROI` button. A new ROI, with the same dimensions and attributes as the ROI selected in the `Select ROI` dropdown menu, should appear in the frame. 
 
-2. The first duplicated ROI will inherit the name of the original ROI with `_copy_1` appended. Thus, if you look in the `Select ROI` dropdown menu, you should see a new name 
+2. The first duplicated ROI will inherit the name of the original ROI with `_copy_1` appended. Thus, if you look in the `Select ROI` dropdown menu, you should see a new name in this format: `My selected shape: MyShapeName_copy_1`. To change the name and/or other attributes of this shape, see Change ROI attributes section below. 
 
-  
 ### Changing ROI locations
   
 1. To change the location of an ROI, begin by clicking the `Move shape` button in the `Interaction` sub-menu. Once clicked, the `ear tags` of each shape will be displayed in the frame window. Rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a **center** ear tag). 
@@ -182,6 +182,14 @@ SimBA allows several forms of shape manipulations that are described below, this
   
 >Note: If you are aligning a **Rectangle or Circle** with a second ROI, then the entire shape will move and the coordinates of the ear-tag selected in `Step 2` will inherit the same coordinates as the ear-tag selected in `Step 3`. If you are aligning a **Polygon** with a second ROI, then only the the ear-tag selected in `Step 2` will move and inherit the same coordinates as the ear-tag selected in `Step 3`. If you want to align several edges a polygon with edges in a second ROI, proceed to repeat `Step 2` and `Step 3` for those edges.
   
+### Change ROI attributes
+
+1. To change the attributes of an already-created ROI, begin by selecting the ROI which attributes you want to change in the `Select ROI` drop-down menu. Next, click on `Change ROI` and a new menu window should pop open. 
+
+2. To change the ROI name, enter a new name in the `Shape name` entry box. To change the shape thickness, ear-tag size, or shape color, use the associated dropdown menus. Once done, click on `Save`. Your ROI with new attributes should show in the left frame. 
+  
+## Apply shapes from another video
+
 
 
 
