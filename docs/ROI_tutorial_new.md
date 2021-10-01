@@ -15,7 +15,7 @@ statistics based on animals movements and locations such as:
 
 etc....
 
-Furthermore, the ROI data can  be used to build potentially valuable, additional, features for random forest predictive classifiers. Such features can be used to generate a machine model that classify behaviors that depend on the spatial location of body parts in relation to the ROIs (more info below). **CAUTION**: If spatial locations are irrelevant for the behaviour being classified, then such features should *not* be included in the machine model generation as they just 
+Furthermore, the ROI data can  be used to build potentially valuable, additional, features for random forest predictive classifiers. Such features can be used to generate a machine model that classify behaviors that depend on the spatial location of body parts in relation to the ROIs. **CAUTION**: If spatial locations are irrelevant for the behaviour being classified, then such features should *not* be included in the machine model generation as they just 
 only introduce noise.
 
 # Before analyzing ROIs in SimBA
@@ -245,9 +245,16 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 
 ## Apply shapes from another video
-Sometimes we have created ROIs 
 
+Sometimes we have created ROIs in one video, saved them, and opened up a second video to start drawing ROIs on this second video. Now you may want to replicate the ROIs on the first video on the second video, and you can do this with the `Apply shapes from another video` sub-menu. 
 
+1. To apply shapes already defined in a different video, navigate to the `Select video` dropdown menu in the `Apply shapes from another video` menu. This dropdown menu will show the videos in your SimBA project that has defined ROIs. 
+
+2. In this dropdown menu, select the video which has the ROIs you wish to replicate. Once selected, click `Apply`. The ROIs from the video in the `Select video` dropdown menu will appear on the frame.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Apply_shapes_other_video.gif" />
+</p>
 
 
 
