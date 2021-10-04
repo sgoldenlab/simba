@@ -51,14 +51,13 @@ and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/mast
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_1.png" />
 </p>
 
-
 3. Next, click on the `Define ROIs` button, and the following table will pop open.
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_table.png" />
 </p>
 
-> Note: If you have ROIs on some or all the videos in your project, and want to delete your work and start from scratch, use the `Delete all ROIs` button. More info at the bottom of this tutorial.  
+> Note: If you have ROIs on some or all the videos in your project, and want to delete your work and start from scratch, use the `Delete all ROIs` button. More info at [the end](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#delete-all-roi-definitions-in-your-simba-project) of this tutorial.  
 
 This table contain one row for each of the videos in the project. Each video in the project has three buttons associated with it: **Draw, Reset,** and **Apply to all**. The functions associated with each button is described in detail below. In brief:
 
@@ -274,5 +273,14 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 
 ## Delete all ROI definitions in your SimBA project
 
-Somtimes we may want to delete all ROi definitions in a SimBA project and start from scratch. 
+Somtimes we may want to delete all ROI definitions in a SimBA project and start from scratch.
+
+1. To delete all the ROI definitions in the SimBA projects, click on the `Delete all ROI definitions` under the [ROI] tab in the load project menu, and the following menu should pop open:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_delete.png" />
+</p>
+
+2. Click `Yes` to delete all ROI definitions in a SimBA project. 
+
 
