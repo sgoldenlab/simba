@@ -284,3 +284,14 @@ Somtimes we may want to delete all ROI definitions in a SimBA project and start 
 2. Click `Yes` to delete all ROI definitions in a SimBA project. 
 
 
+## Next steps
+Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
+
+* If you want to analyze descriptive statistics of movements in relation to your defined ROIs, use the `Analyze ROI data` button as detailed in `Step 2` in [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data).
+
+* If you want to create machine learning features using your ROI definitions, use the `Append ROI data to features` in the `Extract features` tab as detailed in [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data)
+
+If you have any questions, bug reports or feature requests, please let us know by opening a new [github issue](https://github.com/sgoldenlab/simba/issues) or contact us through [gitter](https://gitter.im/SimBA-Resource/community)! 
+
+
+
