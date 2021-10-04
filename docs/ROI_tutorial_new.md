@@ -58,6 +58,8 @@ and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/mast
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_table.png" />
 </p>
 
+> Note: If you have ROIs on some or all the videos in your project, and want to delete your work and start from scratch, use the `Delete all ROIs` button. More info at the bottom of this tutorial.  
+
 This table contain one row for each of the videos in the project. Each video in the project has three buttons associated with it: **Draw, Reset,** and **Apply to all**. The functions associated with each button is described in detail below. In brief:
 
 * The **Draw** button allows you to start to draw ROI shapes on the specific video. If drawings already exist for the specific video, then the **Draw** buttons opens an interface where you can move, re-define, or add ROI shapes on the video.  
@@ -270,5 +272,7 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Apply_shapes_other_video.gif" />
 </p>
 
+## Delete all ROI definitions in your SimBA project
 
+Somtimes we may want to delete all ROi definitions in a SimBA project and start from scratch. 
 
