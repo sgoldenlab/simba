@@ -13,8 +13,12 @@
 We are are no longer supporting the legacy SimBAxTF branch, which required TensorFlow. To receive support, you must download the most up-to-date SimBA version (`pip install simba-uw-tf-dev`). If you are using the legacy SimBAxTF branch, please transition to the currently supported branch. If you require access to download the legacy branch, please contact us on Gitter for access.
 
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
-![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
 
+<p align = "center">
+<img src="/images/SimBA_logo_4.jpg" alt=""
+	title="SimBA" width="540" height="488" />
+<p/>
+    
 ## SimBA's new documentation page (still in the works)
 Please feel free to create a pull request or provide feedback. If you need help, please post on [gitter](https://gitter.im/SimBA-Resource/community) and I will try to respond to them asap -JJ
 
