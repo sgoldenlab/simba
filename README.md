@@ -16,7 +16,7 @@ We are are no longer supporting the legacy SimBAxTF branch, which required Tenso
 
 <p align = "center">
 <img src="/images/SimBA_logo_4.jpg" alt=""
-	title="SimBA" width="540" height="488" />
+	title="SimBA" width="540px" height="488px" />
 <p/>
     
 ## SimBA's new documentation page (still in the works)
