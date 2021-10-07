@@ -8,12 +8,9 @@
 
 | | | |
 |-|-|-|
-|**SimBAxTF**|[![Downloads](https://pepy.tech/badge/simba-uw-tf/month)](https://pepy.tech/project/simba-uw-tf)|[![Downloads](https://pepy.tech/badge/simba-uw-tf)](https://pepy.tech/project/simba-uw-tf)|
-|**SimBAxTF-development wheel**|[![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev)|[![Downloads](https://pepy.tech/badge/simba-uw-tf-dev)](https://pepy.tech/project/simba-uw-tf-dev)|
+|**SimBA**|[![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev)|[![Downloads](https://pepy.tech/badge/simba-uw-tf-dev)](https://pepy.tech/project/simba-uw-tf-dev)|
 
-We recommend downloading the most up-to-date SimBAxTF-development version (`pip install simba-uw-tf-dev`) which does not require TensorFlow. 
-
-For SimBA with TensorFlow and in-built pose-estimation graphical tools (not recommended), please download the SimBAxTF version (`pip install simba-uw-tf`)
+We are are no longer supporting the legacy SimBAxTF branch, which required TensorFlow. To receive support, you must download the most up-to-date SimBA version (`pip install simba-uw-tf-dev`). If you are using the legacy SimBAxTF branch, please transition to the currently supported branch. If you require access to download the legacy branch, please contact us on Gitter for access.
 
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 ![alt-text-1](/images/SimBA_logo_4.jpg "simba logo")
