@@ -20,6 +20,30 @@ Please feel free to create a pull request or provide feedback. If you need help,
 
 [Click here to go to the new documentation page.](https://simba-docs.readthedocs.io/en/latest/index.html)
 
+## Oct-07-2021: SimBA version 1.31 release
+
+We have released a signifcantly improved GUI for region-of-interest segmentation and analysis.
+[Click here to go to the new ROI documentation page.](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md)
+
+### <p align="center"> Regions of Interest (ROIs) in SimBA </p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_1.png" />
+</p>
+
+The SimBA region of interest (ROI) interface allows users to define and 
+draw ROIs on videos. ROI data can be used to calculate basic descriptive 
+statistics based on animals movements and locations such as:
+
+* How much time the animals have spent in different ROIs.
+* How many times the animals have entered different ROIs.
+* The distance animals have moved in the different ROIs.
+* Calculate how animals have engaged in different classified behaviors in each ROI.
+etc....
+
+Furthermore, the ROI data can  be used to build potentially valuable, additional, features for random forest predictive classifiers. Such features can be used to generate a machine model that classify behaviors that depend on the spatial location of body parts in relation to the ROIs. **CAUTION**: If spatial locations are irrelevant for the behaviour being classified, then such features should *not* be included in the machine model generation as they just 
+only introduce noise.
+
 ## Feb-08-2021: SimBA version 1.3 release
 
 It has been nearly a year since the first public iteration of SimBA was released! We would like to thank the open-source community who have supported us and provided invaluable feedback and motivation to continue developing and supporting SimBA to where it is now. We have recently passed well over 150,000 downloads via pip install across all branches, and average between ~5000 to 10,000 weekly downloads alongside a gitter community of >100 users. We have just passed 15 citations for the SimBA preprint, which was released ~8 months ago. This would not be possible without your support. Thank you.
