@@ -158,6 +158,25 @@ In Windows, try an go to Settings > Apps > Manage Optional Features > Add a Feat
 
 You may be running the wrong version of python. You want to be running Python 64-bit, but may have installed Python 32-bit. 
 
+## 17. I get an error when I try to import multi-animal data (H5 files) from DeepLabCut into SimBA - the error says that SimBA cannot locate my video files. 
+
+This error may read (depending on what version of SimBA you are using):
+
+* `Cannot locate video MyVideo in mp4 or avi format`, or
+* `ERROR: SimBA searched your project_folder/videos directory for a video file representing the MyVideo and could not find a match. Above is a list of possible video filenames that SimBA searched for within your projects video directory without success.`
+
+Here, you have provided SimBA with a directory containing DeepLabCut tracking data, and now we need to open the video so that we can indicate which animal is which to keep downstream processing consistant across videos. For SimBA to find the video, SimBA makes three assumptions behind the hood:
+
+1. The video file is located inside the `project_folder/videos` directory. 
+2. The video file is in `.mp4` or `.avi` format. 
+3. If we split the DeepLabCut H5 filename into 2 parts at a given place, then the first part of the H5 filename will contain the video file-name. Specifically, DeepLabCut output files can be very long and contain a lot of information, examples could be (with the video filename highlighted in bold:
+
+* **My_video_007**DLC_dlcrnetms5_main_projectJul1shuffle1_100000_el.h5, or
+* **White_mice_together_no_tail_ends**DLC_resnet50_two_white_mice_052820May28shuffle1_200000_bx.h5
+
+To find the correct video name, SimBA tries to split each filename into two at a bunch of hard-coded split-points (e.g., 'DLC_resnet50', 'DLC_resnet_50', 'DLC_dlcrnetms5') and keeps the only the text prior to these split-points. It then appends the potential file extension ('.mp4', '.MP4', '.avi', '.AVI') and checks if those files are present in your `project_folder/videos` directory, one by one. If it can't find a match for any possible combination and permutation, you get this error. 
+
+
 
 
 
