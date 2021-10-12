@@ -260,7 +260,7 @@ numpy == 1.18.1
 # sleap_bottom_up_convert.py: 4
 # tkinter_functions.py: 4
 # validate_model_on_single_video.py: 8
-opencv_python == 3.4.5.20
+opencv_python == 3.4.7.28
 
 # ROI_add_to_features.py: 3
 # ROI_analysis_2.py: 3
