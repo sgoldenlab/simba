@@ -26,7 +26,7 @@ Please feel free to create a pull request or provide feedback. If you need help,
 
 ## Oct-07-2021: SimBA version 1.31 release
 
-We have released a signifcantly improved GUI for region-of-interest segmentation and analysis.
+We have released a significantly improved GUI for region-of-interest segmentation and analysis.
 [Click here to go to the new ROI documentation page.](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md)
 
 ### <p align="center"> Regions of Interest (ROIs) in SimBA </p>
