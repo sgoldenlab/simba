@@ -2,12 +2,13 @@ import numpy as np
 import cv2
 import os
 import pandas as pd
-from scipy import ndimage
+from PIL import Image
 from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError, NoOptionError
 import glob
 from simba.drop_bp_cords import *
 from simba.rw_dfs import *
 from pylab import *
+from simba.features_scripts.unit_tests import *
 
 
 def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
@@ -21,7 +22,6 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
     csv_dir_in = os.path.join(projectPath, 'csv', "machine_results")
     animalsNo = config.getint('General settings', 'animal_no')
     frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'sklearn_results')
-    poseEstimationBps = config.get('create ensemble settings', 'pose_estimation_body_parts')
     try:
         wfileType = config.get('General settings', 'workflow_file_type')
     except NoOptionError:
@@ -57,6 +57,7 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
 
 
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     target_names, loopy = [], 0
 
     Xcols, Ycols, Pcols = getBpNames(iniFile)
@@ -97,11 +98,7 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
             videoFrameDir = os.path.join(frames_dir_out, CurrentVideoName.replace('.' + wfileType, ''))
             if not os.path.exists(videoFrameDir):
                 os.makedirs(videoFrameDir)
-        CurrentVideoRow = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.' + wfileType, ''))]
-        try:
-            fps = int(CurrentVideoRow['fps'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
+        CurrentVideoRow, _, fps = read_video_info(vidinfDf, str(CurrentVideoName.replace('.' + wfileType, '')))
         currentDf = read_df(currentVideo, wfileType)
         try:
             currentDf = currentDf.set_index('index')
@@ -157,7 +154,7 @@ def plotsklearnresultsingle(iniFile,videoSetting, frameSetting,videofile):
                     if IDappendFlag == False:
                         IDlabelLoc.append([currAnimal[0], currAnimal[1]])
                 if height < width:
-                    frame = ndimage.rotate(frame, 90)
+                    frame = np.array(Image.fromarray(frame).rotate(90,Image.BICUBIC, expand=True))
                     rotationFlag = True
                 if rotationFlag == False:
                     for currAnimal in range(animalsNo):
