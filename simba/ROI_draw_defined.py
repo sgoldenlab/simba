@@ -6,6 +6,7 @@ import pandas as pd
 import warnings
 import glob
 
+
 def roiByDefinition(inifile):
     global ix, iy
     global topLeftStatus
@@ -28,6 +29,7 @@ def roiByDefinition(inifile):
     logFolderPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(logFolderPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     rectangularDf = pd.DataFrame(columns=['Video', "Shape_type", "Name", "width", "height", "topLeftX", "topLeftY"])
     circleDf = pd.DataFrame(columns=['Video', "Shape_type", "Name", "centerX", "centerY", "radius"])
     fscale = 0.02

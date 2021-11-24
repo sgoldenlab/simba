@@ -222,6 +222,7 @@ def trainmodel2(inifile):
     for file in filesFound:
         df = read_df(file, wfileType)
         df = df.dropna(axis=0, how='all')
+        df = df.dropna() # jj inserted this, delete if needed
         features = features.append(df, ignore_index=True)
     try:
         features = features.set_index('scorer')
@@ -333,6 +334,7 @@ def trainmodel2(inifile):
             precision, recall, thresholds = precision_recall_curve(target_test, probabilities, pos_label=1)
             precisionRecallDf['precision'] = precision
             precisionRecallDf['recall'] = recall
+            precisionRecallDf['f1'] = 2 * precisionRecallDf['recall'] * precisionRecallDf['precision'] / (precisionRecallDf['recall'] + precisionRecallDf['precision'])
             thresholds = list(thresholds)
             thresholds.insert(0, 0.00)
             precisionRecallDf['thresholds'] = thresholds

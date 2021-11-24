@@ -1,10 +1,10 @@
 from configparser import ConfigParser
 import os
 import pandas as pd
+from simba.drop_bp_cords import get_fn_ext
 
 def ROI_reset(inifile, currVid):
-    CurrVidName, CurrVidExtention = os.path.basename(currVid), os.path.splitext(currVid)[1]
-    CurrVidName = CurrVidName.replace(CurrVidExtention, '')
+    _, CurrVidName, CurrVidExtention = get_fn_ext(currVid)
     config = ConfigParser()
     configFile = str(inifile)
     config.read(configFile)

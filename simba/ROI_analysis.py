@@ -52,6 +52,7 @@ def roiAnalysis(inifile, inputcsv):
     logFolderPath = os.path.join(projectPath, 'logs')
     vidInfPath = os.path.join(logFolderPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     csv_dir_in = os.path.join(projectPath, 'csv', inputcsv)
     ROIcoordinatesPath = os.path.join(logFolderPath, 'measures', 'ROI_definitions.h5')
     rectanglesInfo = pd.read_hdf(ROIcoordinatesPath, key='rectangles')
@@ -104,6 +105,8 @@ def roiAnalysis(inifile, inputcsv):
         currDf = csv_df[columns2grab]
         totalSecInSession = currDf.shape[0] / currFps
 
+        print(animalBodypartList)
+
         for index, row in currDf.iterrows():
             currentPoints = np.empty((noAnimals, 2), dtype=int)
             for animal in range(noAnimals):
@@ -112,7 +115,7 @@ def roiAnalysis(inifile, inputcsv):
                 topLeftX, topLeftY = (Rectangles['topLeftX'].iloc[rectangle], Rectangles['topLeftY'].iloc[rectangle])
                 bottomRightX, bottomRightY = (topLeftX + Rectangles['width'].iloc[rectangle], topLeftY + Rectangles['height'].iloc[rectangle])
                 for bodyparts in range(len(currentPoints)):
-                    if (((topLeftX-10) <= currentPoints[bodyparts][0] <= (bottomRightX+10)) and ((topLeftY-10) <= currentPoints[bodyparts][1] <= (bottomRightY+10))):
+                    if (((topLeftX) <= currentPoints[bodyparts][0] <= (bottomRightX)) and ((topLeftY) <= currentPoints[bodyparts][1] <= (bottomRightY+10))):
                         rectangleTimes[rectangle][bodyparts] = round((rectangleTimes[rectangle][bodyparts] + (1 / currFps)), 2)
                         if rectangleEntryCheck[rectangle][bodyparts] == True:
                             rectangleEntries[rectangle][bodyparts] += 1

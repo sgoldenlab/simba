@@ -2,9 +2,10 @@ import glob
 import pandas as pd
 from configparser import ConfigParser
 import os
+from simba.drop_bp_cords import *
 
 def multiplyFreeHand(inifile, currVid):
-    CurrVidName = os.path.splitext(os.path.basename(currVid))[0]
+    _, CurrVidName, ext = get_fn_ext(currVid)
     config = ConfigParser()
     configFile = str(inifile)
     config.read(configFile)
@@ -30,8 +31,8 @@ def multiplyFreeHand(inifile, currVid):
             videofilesFound = glob.glob(videoPath + '/*.mp4') + glob.glob(videoPath + '/*.avi')
             duplicatedRec, duplicatedCirc, duplicatedPoly = (rectangularDf.copy(), circleDf.copy(), polygonDf.copy())
             for vids in videofilesFound:
-                currVidName = os.path.splitext(os.path.basename(vids))[0]
-                duplicatedRec['Video'], duplicatedCirc['Video'], duplicatedPoly['Video'] = (currVidName, currVidName, currVidName)
+                _, CurrVidName, ext = get_fn_ext(vids)
+                duplicatedRec['Video'], duplicatedCirc['Video'], duplicatedPoly['Video'] = (CurrVidName, CurrVidName, CurrVidName)
                 rectangularDf = rectangularDf.append(duplicatedRec, ignore_index=True)
                 circleDf = circleDf.append(duplicatedCirc, ignore_index=True)
                 polygonDf = polygonDf.append(duplicatedPoly, ignore_index=True)

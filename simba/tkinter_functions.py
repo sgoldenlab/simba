@@ -14,6 +14,7 @@ from datetime import datetime
 import glob
 import pandas as pd
 from simba.extract_frames_fast import *
+from simba.drop_bp_cords import get_fn_ext
 
 def archive_all_csvs(inifile,archivename):
     csv_dir = os.path.join(os.path.dirname(inifile),'csv')
@@ -254,8 +255,8 @@ def splitvideos(filename,varlist):
         endtime = stoplist[i].get()
 
         currentFile = filename
-        outFile, fileformat = currentFile.split('.')
-        outFile = str(outFile) + '_clip_' +str(i+1)+ '_' + '.mp4'
+        dir, outFile, fileformat = get_fn_ext(currentFile)
+        outFile = os.path.join(dir,(str(outFile) + '_clip_' +str(i+1)+ '_' + '.mp4'))
         output = os.path.basename(outFile)
 
         command = (str('ffmpeg -i ') +'"'+ str(currentFile) +'"'+ ' -ss ' + starttime + ' -to ' + endtime + ' -async 1 '+'"'+ outFile+'"')

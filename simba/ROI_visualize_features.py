@@ -9,6 +9,7 @@ from pylab import *
 from shapely.geometry import Point
 from shapely import geometry
 from simba.rw_dfs import *
+from simba.drop_bp_cords import get_fn_ext
 
 
 def ROItoFeaturesViz(inifile, videoFileName):
@@ -24,7 +25,7 @@ def ROItoFeaturesViz(inifile, videoFileName):
     logFolderPath = os.path.join(projectPath, 'logs')
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
 
     if noAnimals == 2:
         arrayIndex = 2
@@ -63,7 +64,7 @@ def ROItoFeaturesViz(inifile, videoFileName):
             return False, coord
 
     videoFilePath = os.path.join(projectPath, 'videos', videoFileName)
-    videoBaseName, videoFileType = os.path.splitext(videoFileName)[0],  os.path.splitext(videoFileName)[1]
+    _, videoBaseName, videoFileType = get_fn_ext(videoFilePath)
     print('Analyzing ROI features for ' + videoBaseName + '...')
     Rectangles = (rectanglesInfo.loc[rectanglesInfo['Video'] == str(videoBaseName)])
     Circles = (circleInfo.loc[circleInfo['Video'] == str(videoBaseName)])

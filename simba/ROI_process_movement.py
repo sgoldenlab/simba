@@ -22,6 +22,9 @@ def ROI_process_movement(configini):
     csv_dir_in = os.path.join(projectPath, 'csv', 'outlier_corrected_movement_location')
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidLogFilePath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
+
+
     noAnimals = config.getint('process movements', 'no_of_animals')
     animalBps = []
     for bp in range(noAnimals):
@@ -81,6 +84,7 @@ def ROI_process_movement(configini):
         csv_df = csv_df.iloc[:, : len(colHeads)]
         csv_df.columns = colHeads
         csv_df = csv_df[columns2grab]
+
         csv_df_shifted = csv_df.shift(periods=1)
         csv_df_shifted.columns = shiftedColNames
         csv_df = pd.concat([csv_df, csv_df_shifted], axis=1)
@@ -107,10 +111,12 @@ def ROI_process_movement(configini):
         currentVidList.append(currVideoName)
         currentVidList.append(frameCounter-fps)
         out_lists = [totalMovement, meanVelocityList, medianVelocityList]
-        for current_list in out_lists:
-            for value in current_list:
-                currentVidList.append(value)
-        #for movement, mean_velocity, median_velocity in zip(totalMovement, meanVelocityList, medianVelocityList): currentVidList.extend((movement, mean_velocity, median_velocity))
+        # for current_list in out_lists:
+        #     for value in current_list:
+        #         currentVidList.append(value)
+        for movement, mean_velocity, median_velocity in zip(totalMovement, meanVelocityList, medianVelocityList):
+            currentVidList.extend((movement, mean_velocity, median_velocity))
+        print(currentVidList)
         if noAnimals == 2:
             currentVidList.append(statistics.mean(distanceList) / 10)
             currentVidList.append(statistics.median(distanceList) / 10)

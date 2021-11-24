@@ -19,6 +19,7 @@ def time_bins_classifier(inifile,binLength):
     except NoOptionError:
         wfileType = 'csv'
     vidinfDf = pd.read_csv(os.path.join(projectPath, 'logs', 'video_info.csv'))
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     filesFound = glob.glob(machineResultsFolder + '/*.' + wfileType)
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     logList = []

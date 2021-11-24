@@ -9,6 +9,7 @@ import cv2
 from pylab import cm
 from simba.rw_dfs import *
 from simba.drop_bp_cords import *
+from simba.drop_bp_cords import get_fn_ext
 
 
 def ROI_directionality_other_animals_visualize(inifile):
@@ -25,6 +26,7 @@ def ROI_directionality_other_animals_visualize(inifile):
     # if not os.path.exists(frames_dir_out): os.makedirs(frames_dir_out)
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
 
     animalIDlist = config.get('Multi animal IDs', 'id_list')
 
@@ -68,8 +70,7 @@ def ROI_directionality_other_animals_visualize(inifile):
     animalBpDict = create_body_part_dictionary(multiAnimalStatus, animalIDlist, noAnimals, x_cols, y_cols, p_cols, [])
 
     for filePath in filesFound:
-        fileBaseName = os.path.basename(filePath)
-        filename, fileType = os.path.splitext(fileBaseName)[0],  os.path.splitext(fileBaseName)[1]
+        _, filename, fileType = get_fn_ext(filePath)
         print('Analyzing ROI features for ' + filename + '...')
         currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == filename]
         fps = float(currVideoSettings['fps'])

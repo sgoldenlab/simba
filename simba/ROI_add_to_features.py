@@ -22,6 +22,7 @@ def ROItoFeatures(inifile):
     logFolderPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(logFolderPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     try:
         multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
         multiAnimalIDList = multiAnimalIDList.split(",")

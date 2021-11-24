@@ -53,6 +53,7 @@ def roiPlot(inifile):
     logFolderPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(logFolderPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     frames_dir_out = config.get('Frame settings', 'frames_dir_out')

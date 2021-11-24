@@ -9,6 +9,7 @@ import cv2
 from pylab import cm
 from simba.rw_dfs import *
 from simba.drop_bp_cords import *
+from simba.drop_bp_cords import get_fn_ext
 
 def directing_to_other_animals(inifile):
     dateTimes = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -25,6 +26,7 @@ def directing_to_other_animals(inifile):
     if not os.path.exists(csv_dir_out): os.makedirs(csv_dir_out)
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
 
     animalIDlist = config.get('Multi animal IDs', 'id_list')
 
@@ -69,8 +71,7 @@ def directing_to_other_animals(inifile):
     videoCounter = 1
 
     for filePath in filesFound:
-        fileBaseName = os.path.basename(filePath)
-        filename, fileType = os.path.splitext(fileBaseName)[0],  os.path.splitext(fileBaseName)[1]
+        _, filename, fileType = get_fn_ext(filePath)
         print('Analyzing ROI features for ' + filename + '...')
         currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == filename]
         fps = float(currVideoSettings['fps'])

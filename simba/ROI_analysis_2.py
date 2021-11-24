@@ -10,6 +10,7 @@ from shapely import geometry
 from shapely.geometry import Point
 from simba.drop_bp_cords import getBpHeaders
 from simba.rw_dfs import *
+from simba.features_scripts.unit_tests import *
 
 def roiAnalysis(inifile, inputcsv, calculate_dist):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -32,7 +33,6 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
         animalBpName = config.get('ROI settings', animalName)
         animalBpNameX, animalBpNameY, animalBpNameP = animalBpName + '_x', animalBpName + '_y', animalBpName + '_p'
         animalBodypartList.append([animalBpNameX, animalBpNameY, animalBpNameP])
-    print(animalBodypartList)
     columns2grab = [item[0:3] for item in animalBodypartList]
     columns2grab = [item for sublist in columns2grab for item in sublist]
 
@@ -64,36 +64,36 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
 
     vidInfPath = os.path.join(logFolderPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     csv_dir_in = os.path.join(projectPath, 'csv', inputcsv)
     ROIcoordinatesPath = os.path.join(logFolderPath, 'measures', 'ROI_definitions.h5')
     rectanglesInfo = pd.read_hdf(ROIcoordinatesPath, key='rectangles')
     circleInfo = pd.read_hdf(ROIcoordinatesPath, key='circleDf')
     polygonInfo = pd.read_hdf(ROIcoordinatesPath, key='polygons')
-    outputDfTime = pd.DataFrame(columns=['Video'])
+    outputDfTime, outputDfEntries = pd.DataFrame(columns=['Video']), pd.DataFrame(columns=['Video'])
+    print(rectanglesInfo.columns)
+    print(circleInfo.columns)
+
     rectangleNames, circleNames, polygonNames = (list(rectanglesInfo['Name'].unique()), list(circleInfo['Name'].unique()), list(polygonInfo['Name'].unique()))
     shapeList = list(itertools.chain(rectangleNames, circleNames, polygonNames))
     for newcol in range(len(shapeList)):
         for bp in multiAnimalIDList:
-            colName = str(bp) + ' ' + shapeList[newcol] + ' (s)'
-            outputDfTime[colName] = 0
+            colName_1 = str(bp) + ' ' + shapeList[newcol] + ' (s)'
+            colName_2 = str(bp) + ' ' + shapeList[newcol] + ' (entries)'
+            outputDfTime[colName_1] = 0
+            outputDfEntries[colName_2] = 0
     for newcol in range(len(shapeList)):
         for bp in multiAnimalIDList:
             colName = str(bp) + ' ' + shapeList[newcol] + ' (% of session)'
             outputDfTime[colName] = 0
-    outputDfEntries = outputDfTime.copy()
+            outputDfEntries[colName] = 0
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
-    movement_in_ROIs_dict = {}
 
     for i in filesFound:
         CurrVidFn = os.path.basename(i)
         CurrentVideoName = CurrVidFn.replace('.' + wfileType, '')
         print('Analysing ' + str(CurrentVideoName) + '...')
-        videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName)]
-        try:
-            currFps = int(videoSettings['fps'])
-            pix_per_mm = float(videoSettings['pixels/mm'])
-        except TypeError:
-            print('The FPS / pixels per millimeter for ' + CurrentVideoName + ' could not be found in the project/logs/video_info.csv file, or multiple entries for ' + CurrentVideoName + ' exist in your  project/logs/video_info.csv file. Make sure each video in your project is represented once in your project/logs/video_info.csv file')
+        videoSettings, pix_per_mm, currFps = read_video_info(vidinfDf, CurrentVideoName)
         noRectangles = len(rectanglesInfo.loc[rectanglesInfo['Video'] == str(CurrentVideoName)])
         noCircles = len(circleInfo.loc[circleInfo['Video'] == str(CurrentVideoName)])
         noPolygons = len(polygonInfo.loc[polygonInfo['Video'] == str(CurrentVideoName)])
@@ -143,8 +143,8 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
                 bottomRightX, bottomRightY = (topLeftX + Rectangles['width'].iloc[rectangle], topLeftY + Rectangles['height'].iloc[rectangle])
                 rectName = Rectangles['Name'].iloc[rectangle]
                 for bodyparts in range(len(currentPoints)):
-                    if ((((topLeftX-10) <= currentPoints[bodyparts][0] <= (bottomRightX+10)) and ((topLeftY-10) <= currentPoints[bodyparts][1] <= (bottomRightY+10)))) and (current_probability_list[bodyparts] > probability_threshold):
-                        rectangleTimes[rectangle][bodyparts] = round((rectangleTimes[rectangle][bodyparts] + (1 / currFps)), 2)
+                    if ((((topLeftX) <= currentPoints[bodyparts][0] <= (bottomRightX)) and ((topLeftY) <= currentPoints[bodyparts][1] <= (bottomRightY)))) and (current_probability_list[bodyparts] > probability_threshold):
+                        rectangleTimes[rectangle][bodyparts] = rectangleTimes[rectangle][bodyparts] + (1 / currFps)
                         if rectangleEntryCheck[rectangle][bodyparts] == True:
                             rect_ee_dict[multiAnimalIDList[bodyparts]][rectName]['Entry_times'].append(index)
                             rectangleEntries[rectangle][bodyparts] += 1
@@ -159,7 +159,7 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
                 for bodyparts in range(len(currentPoints)):
                     euclidPxDistance = int(np.sqrt((currentPoints[bodyparts][0] - centerX) ** 2 + (currentPoints[bodyparts][1] - centerY) ** 2))
                     if (euclidPxDistance <= radius) and (current_probability_list[bodyparts] > probability_threshold):
-                        circleTimes[circle][bodyparts] = round((circleTimes[circle][bodyparts] + (1 / currFps)),2)
+                        circleTimes[circle][bodyparts] = circleTimes[circle][bodyparts] + (1 / currFps)
                         if circleEntryCheck[circle][bodyparts] == True:
                             circle_ee_dict[multiAnimalIDList[bodyparts]][circleName]['Entry_times'].append(index)
                             circleEntries[circle][bodyparts] += 1
@@ -181,7 +181,7 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
                     CurrPoint = Point(int(currentPoints[bodyparts][0]), int(currentPoints[bodyparts][1]))
                     polyGonStatus = (polyGon.contains(CurrPoint))
                     if (polyGonStatus == True) and (current_probability_list[bodyparts] > probability_threshold):
-                        polygonTime[polygon][bodyparts] = round((polygonTime[polygon][bodyparts] + (1 / currFps)), 2)
+                        polygonTime[polygon][bodyparts] = polygonTime[polygon][bodyparts] + (1 / currFps)
                         if polygonEntryCheck[polygon][bodyparts] == True:
                             polygon_ee_dict[multiAnimalIDList[bodyparts]][PolygonName]['Entry_times'].append(index)
                             polyGonEntries[polygon][bodyparts] += 1
@@ -256,7 +256,7 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
                                 #entry_and_exit.at[1, 'Movement'] = 0
                                 all_df_movements_list.append(entry_and_exit)
                             all_movements = pd.concat(all_df_movements_list, axis=0).reset_index(drop=True)
-                            inside_shape_df_list = [all_movements[i:i + currFps] for i in range(0, all_movements.shape[0], currFps)]
+                            inside_shape_df_list = [all_movements[i:i + int(currFps)] for i in range(0, all_movements.shape[0], int(currFps))]
                             for s_inside_shape in inside_shape_df_list:
                                 movement_list_in_shape.append(s_inside_shape['Movement'].mean())
                             total_movement_of_animal_in_shape = sum(movement_list_in_shape)

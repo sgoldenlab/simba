@@ -17,6 +17,7 @@ def time_bins_movement(configini,binLength):
     csv_dir_in = os.path.join(projectPath, 'csv', 'outlier_corrected_movement_location')
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidLogFilePath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     try:
         wfileType = config.get('General settings', 'workflow_file_type')
     except NoOptionError:
@@ -93,14 +94,14 @@ def time_bins_movement(configini,binLength):
                 movementList.append(currentDf['Movement_' + currAnimalID].mean())
             movementListChunks = [movementList[x:x + binLength] for x in range(0, len(movementList), binLength)]
             for L in movementListChunks: finalList.append(sum(L))
-            for i in range(len(movementListChunks)): mov_and_vel_headers.append(currAnimalID + 'total movement bin ' + str(i + 1) + ' (cm)')
+            for i in range(len(movementListChunks)): mov_and_vel_headers.append(currAnimalID + ' total movement bin ' + str(i + 1) + ' (cm)')
         for animal in range(noAnimals):
             velocityList, currAnimalID = [], multiAnimalIDList[animal]
             for currentDf in df_lists:
                 velocityList.append(currentDf['Movement_' + currAnimalID].mean() / 1)
             velocityListChunks = [velocityList[x:x + binLength] for x in range(0, len(velocityList), binLength)]
             for L in velocityListChunks: finalList.append(statistics.mean(L))
-            for i in range(len(velocityListChunks)): mov_and_vel_headers.append(currAnimalID + 'mean velocity ' + str(i + 1) + ' (cm)')
+            for i in range(len(velocityListChunks)): mov_and_vel_headers.append(currAnimalID + ' mean velocity ' + str(i + 1) + ' (cm)')
         for distanceCol in distanceCols:
             distanceList = []
             for currdf in df_lists:

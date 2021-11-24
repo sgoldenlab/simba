@@ -16,7 +16,6 @@ def save_df(currDf, wfileType, path):
             currDf = currDf.drop('scorer', axis=1, errors='ignore')
             currDf.to_csv(path, index=True)
         if wfileType == 'parquet':
-            print(currDf)
             currDf.to_parquet(path)
     except FileNotFoundError:
         print('The PARQUET file could not be located at the following path: ' + str(path) + ' . It may be that you missed a step in the analysis. Please generate the file before proceeding.')

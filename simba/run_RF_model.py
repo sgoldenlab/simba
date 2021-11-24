@@ -30,6 +30,7 @@ def rfmodel(inifile):
         wfileType = 'csv'
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
 
     try:
         multiAnimalIDList = config.get('Multi animal IDs', 'id_list')

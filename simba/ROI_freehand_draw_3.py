@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from shapely.geometry import Polygon
 import warnings
+from simba.drop_bp_cords import get_fn_ext
 
 def roiFreehand(inifile, currVid):
     global centroids
@@ -130,10 +131,7 @@ def roiFreehand(inifile, currVid):
     cv2.imwrite(filePath,frame)
     img = cv2.imread(filePath)
     DrawScale = int(max(img.shape[0], img.shape[1]) / 120)
-    print(DrawScale)
-    textScale = min(img.shape[0], img.shape[1]) / 1500
-    print(textScale)
-    CurrVidName = os.path.splitext(os.path.basename(currVid))[0]
+    _, CurrVidName, ext = get_fn_ext(currVid)
     instructionHeight, instructionWidth = (400, 1000)
     ROIcoordinatesPath = os.path.join(logFolderPath, 'measures', 'ROI_definitions.h5')
 
@@ -430,7 +428,7 @@ def roiFreehand(inifile, currVid):
         cv2.imwrite(filePath, frame)
         img = cv2.imread(filePath)
         overlay = img.copy()
-        CurrVidName = os.path.splitext(os.path.basename(currVid))[0]
+        _, CurrVidName, ext = get_fn_ext(currVid)
         centroids = pd.DataFrame(columns=['Video', "Shape", "Name", "CenterX", "CenterY"])
         toRemoveShapeName = ''
         removeStatus = True
