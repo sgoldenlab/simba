@@ -8,8 +8,7 @@ import scipy
 from configparser import ConfigParser, NoOptionError, NoSectionError
 from numba import jit
 from simba.rw_dfs import *
-import re
-
+from simba.features_scripts.unit_tests import *
 
 def extract_features_wotarget_16(inifile):
     config = ConfigParser()
@@ -23,6 +22,7 @@ def extract_features_wotarget_16(inifile):
     except NoOptionError:
         wfileType = 'csv'
     vidinfDf = pd.read_csv(vidInfPath)
+
     #change videos name to str
     vidinfDf.Video = vidinfDf.Video.astype('str')
 
@@ -43,16 +43,8 @@ def extract_features_wotarget_16(inifile):
     roll_windows_values = [2, 5, 6, 7.5, 15]
 
     #REMOVE WINDOWS THAT ARE TOO SMALL
-    minimum_fps = vidinfDf['fps'].min()
-    for win in range(len(roll_windows_values)):
-        if minimum_fps < roll_windows_values[win]:
-            roll_windows_values[win] = minimum_fps
-        else:
-            pass
-    roll_windows_values = list(set(roll_windows_values))
-
+    roll_windows_values = check_minimum_roll_windows(roll_windows_values, vidinfDf['fps'].min())
     ########### FIND CSV FILES ###########
-    print(csv_dir_in)
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     print('Extracting features from ' + str(len(filesFound)) + ' files...')
 
@@ -60,20 +52,9 @@ def extract_features_wotarget_16(inifile):
     for currentFile in filesFound:
         M1_hull_large_euclidean_list, M1_hull_small_euclidean_list, M1_hull_mean_euclidean_list, M1_hull_sum_euclidean_list, M2_hull_large_euclidean_list, M2_hull_small_euclidean_list, M2_hull_mean_euclidean_list, M2_hull_sum_euclidean_list = [], [], [], [], [], [], [], []
         currVidName = os.path.basename(currentFile).replace('.'  +wfileType, '')
+        currVideoSettings, currPixPerMM, fps = read_video_info(vidinfDf, currVidName)
 
-        # get current pixels/mm
-        currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
-        try:
-            currPixPerMM = float(currVideoSettings['pixels/mm'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
-
-        fps = float(currVideoSettings['fps'])
         print('Processing ' + '"' + str(currVidName) + '".' + ' Fps: ' + str(fps) + ". mm/ppx: " + str(currPixPerMM))
-
-
-
-
 
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))

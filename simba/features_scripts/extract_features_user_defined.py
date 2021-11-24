@@ -6,7 +6,7 @@ import glob
 from simba.rw_dfs import *
 from simba.drop_bp_cords import *
 from numba import jit
-
+from simba.features_scripts.unit_tests import *
 
 def extract_features_wotarget_user_defined(inifile):
     config = ConfigParser()
@@ -58,15 +58,7 @@ def extract_features_wotarget_user_defined(inifile):
     loopy = 0
 
     #REMOVE WINDOWS THAT ARE TOO SMALL
-    minimum_fps = vidinfDf['fps'].min()
-    for win in range(len(roll_windows_values)):
-        if minimum_fps < roll_windows_values[win]:
-            roll_windows_values[win] = minimum_fps
-        else:
-            pass
-    roll_windows_values = list(set(roll_windows_values))
-
-
+    roll_windows_values = check_minimum_roll_windows(roll_windows_values, vidinfDf['fps'].min())
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     print('Extracting features from ' + str(len(filesFound)) + ' files...')
 
@@ -81,15 +73,13 @@ def extract_features_wotarget_user_defined(inifile):
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
     for currentFile in filesFound:
         currVidName = os.path.basename(currentFile.replace('.' + wfileType, ''))
-        currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
-        try:
-            currPixPerMM = float(currVideoSettings['pixels/mm'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
-        fps = float(currVideoSettings['fps'])
+        currVideoSettings, currPixPerMM, fps = read_video_info(vidinfDf, currVidName)
+
         print('Processing ' + '"' + str(currVidName) + '".' + ' Fps: ' + str(fps) + ". mm/ppx: " + str(currPixPerMM))
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))
+
+
         loopy += 1
         csv_df = read_df(currentFile, wfileType)
         try:
@@ -163,8 +153,8 @@ def extract_features_wotarget_user_defined(inifile):
         ########### CALC THE NUMBER OF LOW PROBABILITY DETECTIONS & TOTAL PROBABILITY VALUE FOR ROW###########################################
         print('Calculating pose probability scores...')
         probabilityDf = csv_df.filter(Pcols, axis=1)
-        csv_df['Sum_probabilities'] = probabilityDf.sum()
-        csv_df['Mean_probabilities'] = probabilityDf.mean()
+        csv_df['Sum_probabilities'] = probabilityDf.sum(axis=1)
+        csv_df['Mean_probabilities'] = probabilityDf.mean(axis=1)
         values_in_range_min, values_in_range_max = 0.0, 0.1
         csv_df["Low_prob_detections_0.1"] = probabilityDf.apply(func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
         values_in_range_min, values_in_range_max = 0.000000000, 0.5

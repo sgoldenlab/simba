@@ -18,6 +18,7 @@ def extract_features_wotarget_4(inifile):
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+
     #change videos name to str
     vidinfDf.Video = vidinfDf.Video.astype('str')
 
