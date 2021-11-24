@@ -6,6 +6,7 @@ import math
 from configparser import ConfigParser
 from datetime import datetime
 from simba.rw_dfs import *
+from simba.drop_bp_cords import *
 
 def dev_loc_16(projectini):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')

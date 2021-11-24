@@ -4,6 +4,7 @@ import statistics
 import numpy as np
 from configparser import ConfigParser
 from datetime import datetime
+from simba.drop_bp_cords import *
 
 def dev_loc_14(projectini):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
