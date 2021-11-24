@@ -21,6 +21,7 @@ projectPath = config.get('General settings', 'project_path')
 csv_dir_in = os.path.join(projectPath, 'csv', 'outlier_corrected_movement_location')
 vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
 vidinfDf = pd.read_csv(vidLogFilePath)
+vidinfDf["Video"] = vidinfDf["Video"].astype(str)
 try:
     wfileType = config.get('General settings', 'workflow_file_type')
 except NoOptionError:

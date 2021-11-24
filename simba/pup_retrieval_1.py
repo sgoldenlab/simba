@@ -58,6 +58,7 @@ def pup_retrieval_1(cofigini, prob_pup, prob_mother, dist_start_crit, carry_fram
     features_files = glob.glob(features_extracted_path + '/*.csv')
 
     video_info_df = pd.read_csv(os.path.join(logs_dir_path, 'video_info.csv'))
+    video_info_df["Video"] = video_info_df["Video"].astype(str)
     date_time_string = datetime.now().strftime('%Y%m%d%H%M%S')
 
     Xcols, Ycols, Pcols = getBpNames(cofigini)

@@ -12,6 +12,7 @@ from simba.drop_bp_cords import *
 import numpy as np
 from pylab import cm
 import cv2
+from simba.drop_bp_cords import get_fn_ext
 
 
 '''
@@ -30,8 +31,8 @@ def semisuperviseLabel(inifile,framedir,targets,threshold_list):
         wfileType = config.get('General settings', 'workflow_file_type')
     except NoOptionError:
         wfileType = 'csv'
-    csvfile = os.path.join(projectpath,'csv','machine_results',(frameDirBaseName)+'.' + wfileType)
-    nameofvid = os.path.basename(csvfile).split('.' + wfileType)[0]
+    csvfile = os.path.join(projectpath,'csv','machine_results',frameDirBaseName +'.' + wfileType)
+    _, nameofvid, ext = get_fn_ext(csvfile)
     animalsNo = config.getint('General settings', 'animal_no')
     poseEstimationBps = config.get('create ensemble settings', 'pose_estimation_body_parts')
     currDf = read_df(csvfile, wfileType)

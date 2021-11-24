@@ -5,7 +5,7 @@ from datetime import datetime
 import statistics
 import numpy as np
 import glob
-from drop_bp_cords import define_movement_cols
+from simba.drop_bp_cords import define_movement_cols
 from simba.rw_dfs import *
 
 
@@ -18,6 +18,7 @@ def analyze_process_movement(configini):
     csv_dir_in = os.path.join(projectPath, 'csv', 'outlier_corrected_movement_location')
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidLogFilePath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     try:
         wfileType = config.get('General settings', 'workflow_file_type')
     except NoOptionError:

@@ -37,6 +37,21 @@ def downsamplevideo_queue(width,height,filesFound,outputdir):
     print(filesFound,'added into the downsample queue')
     return command
 
+def changefps_queue(fps,filesFound,outputdir):
+
+    currentFile = filesFound
+    outFile = currentFile.replace('.mp4', '')
+    outFile = str(outFile) + '_fpsChanged.mp4'
+    output = os.path.basename(outFile)
+
+    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '/' + os.path.basename(currentFile) + '"'+ ' -filter:v fps='+ str(fps) + ' ' + '"'+ str(outputdir) + '/' + output+ '"' + ' -hide_banner' + '\n'
+               'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
+               'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir) +'/' +'tmp/"' +'\n'
+               'mv \"' +os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+
+    print(filesFound,'added into the fps queue')
+    return command
+
 def greyscale_auto(outputdir,filesFound):
     greyscale_list=[]
 

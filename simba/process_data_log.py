@@ -21,6 +21,7 @@ def analyze_process_data_log(configini,chosenlist):
     except NoOptionError:
         wfileType = 'csv'
     vidinfDf = pd.read_csv(os.path.join(projectPath, 'logs', 'video_info.csv'))
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     loop, videoCounter = 0, 0
 
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)

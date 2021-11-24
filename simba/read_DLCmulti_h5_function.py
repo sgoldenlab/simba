@@ -8,8 +8,10 @@ from simba.rw_dfs import *
 from simba.drop_bp_cords import *
 import pyarrow.parquet as pq
 import pyarrow as pa
+from simba.interpolate_pose import *
+import itertools
 
-def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
+def importMultiDLCpose(inifile, dataFolder, filetype, idlist, interpolation_method):
     global currIDcounter
     def define_ID(event, x, y, flags, param):
         global currIDcounter
@@ -26,16 +28,31 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
     except MissingSectionHeaderError:
         print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     projectPath = config.get('General settings', 'project_path')
+
     if filetype == 'skeleton':
-        filesFound = glob.glob(dataFolder + '/*sk.h5') + glob.glob(dataFolder + '/*sk_filtered.h5')
-    if filetype == 'box':
-        filesFound = glob.glob(dataFolder + '/*bx.h5') + glob.glob(dataFolder + '/*bx_filtered.h5')
-    if filetype == 'ellipse':
-        filesFound = glob.glob(dataFolder + '/*el.h5') + glob.glob(dataFolder + '/*el_filtered.h5')
+        dlc_file_ending, dlc_filtered_file_ending = 'sk.h5', 'sk_filtered.h5'
+    elif filetype == 'box':
+        dlc_file_ending, dlc_filtered_file_ending = 'bx.h5', 'bx_filtered.h5'
+    elif filetype == 'ellipse':
+        dlc_file_ending, dlc_filtered_file_ending = 'el.h5', 'el_filtered.h5'
+    print('Searching ' + str(dataFolder) + ' for file-endings: ' + '"' + dlc_file_ending + '"' + ' and ' + '"' +dlc_filtered_file_ending + '"')
+
+    filesFound = glob.glob(dataFolder + '/*' + dlc_file_ending) + glob.glob(dataFolder + '/*' + dlc_filtered_file_ending)
+    all_files_in_folder = glob.glob(dataFolder + '/*')
+
+    if len(filesFound) == 0:
+        print('Found 0 files in ' + str(dataFolder) + ' for ' + filetype + ' tracking method.')
+        if len(all_files_in_folder) == 0:
+            print(str(dataFolder) + ' contains 0 files.')
+        else:
+            print('SimBA found other, non-' + filetype + ' files in ' + dataFolder + ' which are listed below.')
+            print(all_files_in_folder)
+        raise FileNotFoundError()
+
+
 
     videoFolder = os.path.join(projectPath, 'videos')
     outputDfFolder = os.path.join(projectPath, 'csv', 'input_csv')
-    bpNamesCSVPath = os.path.join(projectPath, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
     poseEstimationSetting = config.get('create ensemble settings', 'pose_estimation_body_parts')
     noAnimals = config.getint('General settings', 'animal_no')
 
@@ -67,26 +84,34 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
     Xcols, Ycols, Pcols = getBpNames(inifile)
     currIDList = idlist
 
+    split_p_and_file_exts = [['DLC_resnet50', 'DLC_resnet_50', 'DLC_dlcrnetms5'], ['.mp4', '.MP4', '.avi', '.AVI']]
+    split_p_and_file_exts = list(itertools.product(*split_p_and_file_exts))
+
     for file in filesFound:
         bpNameList, x_heads, y_heads, xy_heads, indBpCordList, EuclidDistanceList, colorList, bp_cord_names, changeList, projBpNameList = [], [], [], [], [], [], [], [], [], []
         assigningIDs, completePromt, chooseFrame, assignBpCords = False, False, True, True
         addSpacer, ID_user_cords, currIDcounter, frameNumber = 2, [], 0, 0
         currVidName = os.path.basename(file)
 
-        if os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.mp4')
-        elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet50')[0] + '.avi')
-        elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.mp4')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.mp4')
-        elif os.path.exists(os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.avi')): vidFname = os.path.join(videoFolder, os.path.basename(file).split('DLC_resnet_50')[0] + '.avi')
+        vidFname = 'None'
+        searched_for_list = []
+        for c in split_p_and_file_exts:
+            possible_vid_name = os.path.basename(file).split(c[0])[0] + c[1]
+            if os.path.exists(os.path.join(videoFolder, possible_vid_name)):
+                vidFname = os.path.join(videoFolder, possible_vid_name)
+            else:
+                searched_for_list.append(possible_vid_name)
 
-        else:
-            print('Cannot locate video ' + str(currVidName.replace('.' + wfileType, '')) + ' in mp4 or avi format')
-            break
+        if vidFname == 'None':
+            print(searched_for_list)
+            print('ERROR: SimBA searched your project_folder/videos directory for a video file representing the ' + str(currVidName) + ' and could not find a match. Above is a list of possible video filenames that SimBA searched for within your projects video directory without success.')
+            raise AttributeError
+
         vidBasename, VideoExtension = os.path.basename(vidFname), os.path.splitext(vidFname)[1]
         currDf = pd.read_hdf(file)
         bpNames, idNames = [lis[2] for lis in list(currDf.columns)] , [lis[1] for lis in list(currDf.columns)]
         uniqueIds = list(unique(idNames))
 
-        cmaps = ['spring', 'summer', 'autumn', 'cool', 'Wistia', 'Pastel1', 'Set1', 'winter']
         cMapSize = int(len(Xcols) / noAnimals) + 1
         colorListofList = createColorListofList(noAnimals, cMapSize)
         animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, noAnimals, Xcols, Ycols, Pcols, colorListofList)
@@ -98,7 +123,11 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
             with open(inifile, "w+") as f:
                 config.write(f)
             f.close
-        currDf.columns = bpNameList
+        try:
+            currDf.columns = bpNameList
+        except ValueError as err:
+            print(err)
+            print('The number of body-parts in the input files do not match the number of body-parts in your SimBA project. Make sure you have specified the correct number of animals and body-parts in your project.')
         currDf.replace([np.inf, -np.inf], np.nan, inplace=True)
         currDf = currDf.fillna(0)
         cap = cv2.VideoCapture(vidFname)
@@ -125,7 +154,12 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
                         y_cord = currDf.loc[currDf.index[frameNumber], animal + '_' + currYcol]
                         x_cord = currDf.loc[currDf.index[frameNumber], animal + '_' + currXcol]
                         indBpCordList.append([x_cord, y_cord, animal])
-                        cv2.circle(overlay, (int(x_cord), int(y_cord)), circleScale, currColor, -1, lineType=cv2.LINE_AA)
+                        try:
+                            cv2.circle(overlay, (int(x_cord), int(y_cord)), circleScale, currColor, -1, lineType=cv2.LINE_AA)
+                        except Exception as err:
+                            if type(err) == OverflowError:
+                                print('ERROR: SimBA encountered a pose-estimated body-part located at pixel position ' + str(x_cord) + ' ' + str(y_cord) + '. This value is too large to be converted to an integer. Please check your pose-estimation to make sure that it is accurate.')
+                                print(err.args)
                     loop =0
                     for name in indBpCordList:
                         currstring = name[2]
@@ -215,25 +249,28 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist):
             currCols = [col for col in currDf.columns if name in col]
             sliceDf = currDf[currCols]
             outDf = pd.concat([outDf, sliceDf], axis=1)
-        outDfcols = list(outDf.columns)
-        toBpCSVlist = []
-        # if poseEstimationSetting == 'user_defined':
-        #     for i in outDfcols:
-        #         currBpName = i[:-2]
-        #         toBpCSVlist.append(currBpName) if currBpName not in toBpCSVlist else toBpCSVlist
-        #     f = open(bpNamesCSVPath, 'w+')
-        #     for i in toBpCSVlist:
-        #         f.write(i + '\n')
-        #     f.close
         MultiIndexCol = []
         for column in range(len(outDf.columns)):
             MultiIndexCol.append(tuple(('DLC_multi', 'DLC_multi', outDf.columns[column])))
-        outDf.columns = pd.MultiIndex.from_tuples(MultiIndexCol, names=['scorer', 'bodypart', 'coords'])
+        outDf.columns = pd.MultiIndex.from_tuples(MultiIndexCol, names=('scorer', 'bodypart', 'coords'))
         outputCSVname = os.path.basename(vidFname).replace(VideoExtension, '.' + wfileType)
         if wfileType == 'parquet':
             table = pa.Table.from_pandas(outDf)
             pq.write_table(table, os.path.join(outputDfFolder, outputCSVname))
         if wfileType == 'csv':
             outDf.to_csv(os.path.join(outputDfFolder, outputCSVname))
+        if interpolation_method != 'None':
+            print('Interpolating missing values (Method: ' + str(interpolation_method) + ') ...')
+            if wfileType == 'parquet': csv_df = pd.read_parquet(os.path.join(outputDfFolder, outputCSVname))
+            if wfileType == 'csv': csv_df = pd.read_csv(os.path.join(outputDfFolder, outputCSVname), index_col=0)
+            interpolate_body_parts = Interpolate(inifile, csv_df)
+            interpolate_body_parts.detect_headers()
+            interpolate_body_parts.fix_missing_values(interpolation_method)
+            interpolate_body_parts.reorganize_headers()
+            if wfileType == 'parquet':
+                table = pa.Table.from_pandas(interpolate_body_parts.new_df)
+                pq.write_table(table, os.path.join(outputDfFolder, outputCSVname))
+            if wfileType == 'csv':
+                interpolate_body_parts.new_df.to_csv(os.path.join(outputDfFolder, outputCSVname))
         print('Imported ', outputCSVname, 'to current project.')
     print('All multi-animal DLC .h5 tracking files ordered and imported into SimBA project in the chosen workflow file format')
