@@ -26,6 +26,7 @@ def plotHeatMapLocation(inifile, animalbp1, mmSize, noIncrements, colorPalette, 
         os.makedirs(frames_dir_out)
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     colorList, loopCounter = [], 0
     try:
         wfileType = config.get('General settings', 'workflow_file_type')

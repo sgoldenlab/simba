@@ -17,6 +17,7 @@ def plot_threshold(configini, behavior):
     fileFolder = os.path.join(projectPath, 'csv', 'machine_results')
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
     videoLog = pd.read_csv(vidLogFilePath)
+    videoLog["Video"] = videoLog["Video"].astype(str)
     filesFound = glob.glob(fileFolder +"/*." + wfileType)
 
     fileCounter = 0

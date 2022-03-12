@@ -15,6 +15,7 @@ height = int(capture.get(4))
 f = open(os.path.join(mainprojectdir,'labelling_info.txt'), 'w')
 video_info_path = os.path.join(mainprojectdir, 'logs','video_info.csv')
 vidinfDf = pd.read_csv(video_info_path)
+vidinfDf["Video"] = vidinfDf["Video"].astype(str)
 videoName = os.path.basename(currentVideoPath)
 videoName = videoName.split('.', 2)[0]
 videoSettings = vidinfDf.loc[vidinfDf['Video'] == str(videoName)]

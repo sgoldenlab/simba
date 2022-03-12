@@ -12,6 +12,7 @@ f = open(os.path.join(projpath,'labelling_info.txt'), 'w')
 video_info_path = os.path.join((projpath), 'logs', 'video_info.csv')
 print(video_info_path)
 vidinfDf = pd.read_csv(video_info_path)
+vidinfDf["Video"] = vidinfDf["Video"].astype(str)
 videoName = os.path.basename(currentVideoPath)
 videoName = videoName.split('.', 2)[0]
 fps = capture.get(cv2.CAP_PROP_FPS)

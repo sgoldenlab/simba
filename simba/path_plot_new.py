@@ -69,6 +69,7 @@ def path_plot_config(configini):
 
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     severityGrades = list(np.arange(0, 1.0, ((10 / severity_brackets) / 10)))
     severityGrades.append(1)
 

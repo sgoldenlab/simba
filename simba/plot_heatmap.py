@@ -24,6 +24,7 @@ def plotHeatMap(inifile, animalbp1, mmSize, noIncrements, colorPalette, targetBe
     except NoOptionError:
         wfileType = 'csv'
     videoLog = pd.read_csv(vidLogFilePath)
+    videoLog["Video"] = videoLog["Video"].astype(str)
     trackedBodyParts = [str(animalbp1)+'_x', str(animalbp1)+ '_y']
     frames_dir_out = os.path.join(projectPath, 'frames', 'output', 'heatmap_behavior')
     if not os.path.exists(frames_dir_out):
