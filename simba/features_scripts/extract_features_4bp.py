@@ -1,11 +1,11 @@
 from __future__ import division
-import os
+import os, glob
 import pandas as pd
 import math
 import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError, NoSectionError
 
 def extract_features_wotarget_4(inifile):
     configFile = str(inifile)
@@ -46,12 +46,12 @@ def extract_features_wotarget_4(inifile):
             pass
     roll_windows_values = list(set(roll_windows_values))
 
-    ########### FIND CSV FILES ###########
-    for i in os.listdir(csv_dir_in):
-        if i.__contains__(".csv"):
-            fname = os.path.join(csv_dir_in, i)
-            filesFound.append(fname)
-    print('Extracting features from ' + str(len(filesFound)) + ' files...')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
+
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
 
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
     for i in filesFound:

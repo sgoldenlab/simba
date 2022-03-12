@@ -1,11 +1,13 @@
 from __future__ import division
-import os
+import os, glob
 import pandas as pd
 import math
 import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError, NoSectionError
+from simba.features_scripts.unit_tests import read_video_info
+from simba.rw_dfs import read_df, save_df
 
 def extract_features_wotarget_14(inifile):
     configFile = str(inifile)
@@ -45,16 +47,17 @@ def extract_features_wotarget_14(inifile):
             pass
     roll_windows_values = list(set(roll_windows_values))
 
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
 
-    ########### FIND CSV FILES ###########
-    for i in os.listdir(csv_dir_in):
-        if i.__contains__(".csv"):
-            fname = os.path.join(csv_dir_in, i)
-            filesFound.append(fname)
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
+
     print('Extracting features from ' + str(len(filesFound)) + ' files...')
 
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
-    for i in filesFound:
+    for currentFile in filesFound:
         M1_hull_large_euclidean_list = []
         M1_hull_small_euclidean_list = []
         M1_hull_mean_euclidean_list = []
@@ -63,21 +66,11 @@ def extract_features_wotarget_14(inifile):
         M2_hull_small_euclidean_list = []
         M2_hull_mean_euclidean_list = []
         M2_hull_sum_euclidean_list = []
-        currentFile = i
         currVidName = os.path.basename(currentFile)
-        currVidName = currVidName.replace('.csv', '')
+        currVidName = currVidName.replace('.' + wfileType, '')
 
-        # get current pixels/mm
-        currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
-        try:
-            currPixPerMM = float(currVideoSettings['pixels/mm'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
-        try:
-            fps = float(currVideoSettings['fps'])
-        except TypeError:
-            print('No file found.')
-            continue
+        currVideoSettings, currPixPerMM, fps = read_video_info(vidinfDf, currVidName)
+
         print('Processing ' + '"' + str(currVidName) + '".' + ' Fps: ' + str(fps) + ". mm/ppx: " + str(currPixPerMM))
 
         for i in range(len(roll_windows_values)):
@@ -94,12 +87,14 @@ def extract_features_wotarget_14(inifile):
                          "Lat_left_2_y",
                          "Lat_left_2_p", "Lat_right_2_x", "Lat_right_2_y", "Lat_right_2_p", "Tail_base_2_x",
                          "Tail_base_2_y", "Tail_base_2_p"]
-        csv_df = pd.read_csv(currentFile, names=columnHeaders, low_memory=False)
+
+        csv_df = read_df(currentFile, wfileType)
+        csv_df.columns = columnHeaders
+
+        #csv_df = pd.read_csv(currentFile, names=columnHeaders, low_memory=False)
         csv_df = csv_df.fillna(0)
         csv_df = csv_df.drop(csv_df.index[[0]])
-        csv_df = csv_df.apply(pd.to_numeric)
-        csv_df = csv_df.reset_index()
-        csv_df = csv_df.reset_index(drop=True)
+        csv_df = csv_df.apply(pd.to_numeric).reset_index(drop=True)
 
         print('Evaluating convex hulls...')
         ########### MOUSE AREAS ###########################################
@@ -672,8 +667,6 @@ def extract_features_wotarget_14(inifile):
             csv_df[currentColName1] = tortuosity_M1
             #csv_df[currentColName2] = tortuosity_M2
 
-        print(csv_df)
-
         ########### CALC THE NUMBER OF LOW PROBABILITY DETECTIONS & TOTAL PROBABILITY VALUE FOR ROW###########################################
         print('Calculating pose probability scores...')
         csv_df['Sum_probabilities'] = (
@@ -701,11 +694,17 @@ def extract_features_wotarget_14(inifile):
         ########### DROP COORDINATE COLUMNS ###########################################
         csv_df = csv_df.reset_index(drop=True)
         csv_df = csv_df.fillna(0)
-        csv_df = csv_df.drop(columns=['index'])
+        try:
+            csv_df = csv_df.drop(columns=['index'])
+        except KeyError:
+            pass
         fileName = os.path.basename(currentFile)
         fileName = fileName.split('.')
-        fileOut = str(fileName[0]) + str('.csv')
+        fileOut = str(fileName[0]) + str('.' + wfileType)
         saveFN = os.path.join(csv_dir_out, fileOut)
-        csv_df.to_csv(saveFN)
+        save_df(csv_df, wfileType, saveFN)
         print('Feature extraction complete for ' + '"' + str(currVidName) + '".')
     print('All feature extraction complete.')
+
+
+# extract_features_wotarget_14(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Parquet_test\project_folder\project_config.ini")

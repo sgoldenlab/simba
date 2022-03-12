@@ -5,7 +5,7 @@ import math
 import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError, NoSectionError
 import numexpr as ne
 from numba import jit
 from numba import vectorize, int64

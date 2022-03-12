@@ -1,5 +1,5 @@
 from __future__ import division
-import os
+import os, glob
 import numpy as np
 from configparser import ConfigParser, NoOptionError, NoSectionError
 import glob
@@ -24,6 +24,7 @@ def extract_features_wotarget_user_defined(inifile):
     logsPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(logsPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+
     #change videos name to str
     vidinfDf.Video = vidinfDf.Video.astype('str')
 
@@ -172,3 +173,5 @@ def extract_features_wotarget_user_defined(inifile):
         print('Feature extraction complete for ' + '"' + str(currVidName) + '".')
 
     print('All feature extraction complete.')
+
+# extract_features_wotarget_user_defined(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Parquet_test\project_folder\project_config.ini")

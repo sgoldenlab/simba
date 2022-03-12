@@ -1,11 +1,11 @@
 from __future__ import division
-import os
+import os, glob
 import pandas as pd
 import math
 import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError, NoSectionError
 
 def extract_features_wotarget_14_from_16(inifile):
     config = ConfigParser()
