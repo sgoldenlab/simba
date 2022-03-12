@@ -69,7 +69,6 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
         with h5py.File(filename, 'r') as f:
             frames = f['frames'][:]
             instances = f['instances'][:]
-
             predicted_points = f['pred_points'][:]
             predicted_points = np.reshape(predicted_points, (predicted_points.size, 1))
 
@@ -77,9 +76,7 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
 
         for animal in range(len(currIDList)):
             for bp in OrderedBpList:
-                colName1, colName2, colName3 = str('Animal_' + str(animal + 1) + '_' + bp + '_x'), (
-                            'Animal_' + str(animal + 1) + '_' + bp + '_y'), (
-                                                           'Animal_' + str(animal + 1) + '_' + bp + '_p')
+                colName1, colName2, colName3 = str('Animal_' + str(animal + 1) + '_' + bp + '_x'), ('Animal_' + str(animal + 1) + '_' + bp + '_y'), ('Animal_' + str(animal + 1) + '_' + bp + '_p')
                 xy_heads.extend((colName1, colName2))
                 bp_cord_names.append('_' + bp + '_x')
                 bp_cord_names.append('_' + bp + '_y')
@@ -91,9 +88,9 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
                 config.write(f)
             f.close()
 
-        bpNameListGrouped = [xy_heads[x:x + len(OrderedBpList) * 2] for x in
-                             range(0, len(xy_heads) - 2, len(OrderedBpList) * 2)]
+        bpNameListGrouped = [xy_heads[x:x + len(OrderedBpList) * 2] for x in range(0, len(xy_heads) - 2, len(OrderedBpList) * 2)]
         dataDf = pd.DataFrame(columns=dfHeader)
+
 
         ### COUNT ANIMALS IN EACH FRAME
         animalsinEachFrame = []
@@ -292,8 +289,7 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
                     ID_user_cords, currIDcounter = [], 0
                     assigningIDs, completePromt = True, False
 
-        print('Re-organizing pose data-frame based on user-assigned identities: ' + str(
-            os.path.basename(vidFname)) + '....')
+        print('Re-organizing pose data-frame based on user-assigned identities: ' + str(os.path.basename(vidFname)) + '....')
 
         for values in ID_user_cords:
             currClickedX, currClickedY, currClickedID = values[0], values[1], values[2]
@@ -309,12 +305,11 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
             changeList.append([animalPoseID, i])
         for animal in changeList:
             currPoseName, newName = animal[0], animal[1]
-            loop = 0
-            for header in bpNameList:
+            for loop, header in enumerate(bpNameList):
                 if header.startswith(currPoseName):
                     newHeader = header.replace(currPoseName, newName)
                     bpNameList[loop] = newHeader
-                loop += 1
+
         currDf.columns = bpNameList
         outDf = pd.DataFrame()
         for name in currIDList:
@@ -360,4 +355,4 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
             if wfileType == 'csv':
                 interpolate_body_parts.new_df.to_csv(os.path.join(outputDfFolder, outputCSVname))
         print('Imported ', outputCSVname, 'to project.')
-    print('All multi-animal SLEAP .slp tracking files ordered and imported into SimBA project in CSV file format')
+    print('All multi-animal SLEAP .slp tracking files ordered and imported into SimBA project in chosen workflow file format')

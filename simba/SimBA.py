@@ -3039,8 +3039,8 @@ class project_config:
             label_dropdownmice = Label(self.frame2, text='# config')
             self.option_mice, optionsBasePhotosList = bodypartConfSchematic()
             # del multi animal
-            del self.option_mice[9:12]
-            del optionsBasePhotosList[9:12]
+            del self.option_mice[9:13]
+            del optionsBasePhotosList[9:13]
 
             self.var = StringVar()
             self.var.set(self.option_mice[6])
@@ -3069,9 +3069,9 @@ class project_config:
                 self.option_mice, optionsBasePhotosList = bodypartConfSchematic()
                 # del single animal
                 del self.option_mice[0:9]
-                del self.option_mice[-1]
+                self.option_mice.remove('3D')
                 del optionsBasePhotosList[0:9]
-                del optionsBasePhotosList[-1]
+                optionsBasePhotosList = [x for x in optionsBasePhotosList if "Picture13.png" not in x]
 
                 self.var = StringVar()
                 self.var.set(self.option_mice[2])
@@ -3367,11 +3367,10 @@ class project_config:
         except:
             pass
 
-        print(self.noOfBp.entry_get)
         self.noAnimals = int(self.noOfAnimals.entry_get)
         noofbp = int(self.noOfBp.entry_get)
-        self.bpnamelist = [0]*noofbp
-        self.bp_animal_list = [0]*noofbp
+        self.bpnamelist = [0]*noofbp*self.noAnimals
+        self.bp_animal_list = [0]*noofbp*self.noAnimals
 
         if currentPlatform == 'Windows':
             if self.noAnimals > 1:
@@ -3388,7 +3387,7 @@ class project_config:
         self.table_frame.grid(row=5, sticky=W, column=0)
         scroll_table = hxtScrollbar(self.table_frame)
 
-        for i in range(noofbp):
+        for i in range(noofbp * self.noAnimals):
             self.bpnamelist[i] = Entry_Box(scroll_table,str(i+1),'2')
             self.bpnamelist[i].grid(row=i, column=0)
             if self.noAnimals > 1:
@@ -3570,6 +3569,7 @@ class project_config:
 
         ### animal settings
         listindex = self.option_mice.index(str(self.var.get()))
+        print(listindex)
 
         if self.singleORmulti.getChoices()=='Classic tracking':
             if listindex == 0:
@@ -3608,9 +3608,9 @@ class project_config:
 
 
         if (self.singleORmulti.getChoices() =='Classic tracking') and (bp=='user_defined') and (listindex >8):
-            listindex = listindex + 3
-        elif (self.singleORmulti.getChoices()=='Multi tracking') and (bp=='user_defined') and (listindex >2):
-            pass
+            listindex = listindex + 4
+        elif (self.singleORmulti.getChoices()=='Multi tracking') and (bp=='user_defined') and (listindex > 2):
+            listindex = listindex + 1
 
         noAnimalsPath = os.path.join(os.path.dirname(__file__), 'pose_configurations', 'no_animals', 'no_animals.csv')
         with open(noAnimalsPath, "r", encoding='utf8') as f:
@@ -3619,6 +3619,9 @@ class project_config:
 
         if (self.singleORmulti.getChoices()=='Multi tracking'):
             listindex += 9
+
+        if (self.singleORmulti.getChoices()=='3D tracking'):
+            listindex += 12
 
         animalNo = str(rows[listindex])
         self.configinifile = write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo, self.csvORparquet.getChoices())
@@ -5195,7 +5198,11 @@ class loadprojectini:
         for i in range(no_animal):
             self.animalnamelist[i] = Entry_Box(self.frame2, 'Animal ' + str(i + 1) + ' name', '15')
             self.animalnamelist[i].grid(row=i, sticky=W)
-            self.animalnamelist[i].entry_set(self.animal_ID_list[i])
+            try:
+                self.animalnamelist[i].entry_set(self.animal_ID_list[i])
+            except IndexError:
+                pass
+
 
     def addclassifier(self,newclassifier):
         config = ConfigParser()
@@ -5542,7 +5549,6 @@ class loadprojectini:
 
 
     def run_analyze_roi(self,noofanimal,animalVarList,appendornot):
-        print(animalVarList)
         configini = self.projectconfigini
         config = ConfigParser()
         config.read(configini)
@@ -5587,6 +5593,7 @@ class loadprojectini:
                 config.write(configfile)
 
             roiAnalysis(configini,'outlier_corrected_movement_location',caldist)
+
         elif appendornot == 'processmovement':
             ROI_process_movement(configini)
         elif appendornot == 'locationheatmap':

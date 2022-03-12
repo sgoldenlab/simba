@@ -278,7 +278,7 @@ def train_multimodel(configini):
                 target_train = trainDf.pop(classifierName).values
                 data_train = trainDf
             except ValueError:
-                print('Undersampling failed: the undersampling ratio for the specific model is likely too high - there are not enough non-events too sample. Fix this by decreasing the undersampling ratio.')
+                print('Undersampling failed: the undersampling ratio for the specific model is likely too high - there are not enough non-events to sample. Fix this by decreasing the undersampling ratio.')
                 continue
         if under_sample_setting != 'Random undersample':
             target_train = trainDf.pop(classifierName).values
@@ -302,9 +302,12 @@ def train_multimodel(configini):
             print('Training model ' + str(loopy) + '...')
             try:
                 clf.fit(data_train, target_train)
-            except ValueError:
+            except ValueError as e:
+                print(e.args)
+                print(classifierName)
                 print('ERROR: The model contains an incompatible array. This may happen when trying to train a model with 0 examples of the behavior of interest')
-            except ModuleNotFoundError:
+            except ModuleNotFoundError as e:
+                print(e.args)
                 print('ERROR: ModuleNotFoundError. This can happen with incompatible versions of NumPy.')
 
             #RUN RANDOM FOREST EVALUATIONS

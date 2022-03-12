@@ -41,8 +41,9 @@ def validate_model_one_vid(inifile,featuresPath,modelPath,dt,sb,generategantt):
         for i, event in enumerate(relRows.groupby("Event")):
             data_event = event[1][["Start_time", "Bout_time"]]
             ax.broken_barh(data_event.values, (4, 4), facecolors='red')
-        xLength = (round(k / fps)) + 1
-        if xLength < 10: xLength = 10
+        xLength = (round(image_index / fps)) + 1
+        if xLength < 10:
+            xLength = 10
         ax.set_xlim(0, xLength)
         ax.set_ylim([0, 12])
         plt.ylabel(classifier_name, fontsize=12)

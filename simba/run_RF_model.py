@@ -9,6 +9,7 @@ from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError,
 from simba.drop_bp_cords import *
 import glob, os
 from simba.rw_dfs import *
+from simba.features_scripts.unit_tests import *
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -79,6 +80,7 @@ def rfmodel(inifile):
 
     for currFile in filesFound:
         currentFileName = os.path.basename(currFile)
+        dir_name, file_name, ext = get_fn_ext(currentFileName)
         fileCounter+=1
         print('Analyzing video ' + str(fileCounter) + '/' + str(len(filesFound)) + '...')
         inputFile = read_df(currFile, wfileType)
@@ -88,11 +90,8 @@ def rfmodel(inifile):
             pass
         inputFile = inputFile.loc[:, ~inputFile.columns.str.contains('^Unnamed')]
         inputFileOrganised = drop_bp_cords(inputFile, inifile)
-        currVidInfoDf = vidinfDf.loc[vidinfDf['Video'] == str(currentFileName.replace('.' + wfileType, ''))]
-        try:
-            currVidFps = int(currVidInfoDf['fps'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
+
+        currVidInfoDf, currPixPerMM, currVidFps = read_video_info(vidinfDf, str(file_name))
         outputDf = inputFile.copy(deep=True)
 
         for b in range(model_nos):

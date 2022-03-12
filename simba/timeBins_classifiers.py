@@ -4,9 +4,11 @@ from configparser import ConfigParser, NoOptionError
 from datetime import datetime
 from simba.rw_dfs import *
 from datetime import datetime
+from simba.features_scripts.unit_tests import read_video_info
+from simba.drop_bp_cords import get_fn_ext
 
 
-def time_bins_classifier(inifile,binLength):
+def time_bins_classifier(inifile, binLength):
     config = ConfigParser()
     configFile = str(inifile)
     config.read(configFile)
@@ -32,42 +34,32 @@ def time_bins_classifier(inifile,binLength):
         target_names.append(currentModelNames)
     print('Analyzing ' + str(len(target_names)) + ' classifier result(s) in ' + str(len(filesFound)) + ' video file(s).')
 
-    for i in filesFound:
+    out_header_list = [' number of events (count)', ' total event duration (s)', ' mean event duration (s)', ' median event duration (s)', ' time first occurrence (s)', ' mean interval duration (s)',  ' median interval duration (s)']
+    for file_path in filesFound:
         outputList = []
-        currDf = read_df(i, wfileType)
+        currDf = read_df(file_path, wfileType)
         currDf = currDf.drop(['scorer'], axis=1, errors='ignore')
-        CurrentVideoName = os.path.basename(i)
-        CurrentVideoRow = vidinfDf.loc[vidinfDf['Video'] == str(CurrentVideoName.replace('.' +wfileType, ''))]
-        try:
-            fps = int(CurrentVideoRow['fps'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
+        CurrentVideoName = os.path.basename(file_path)
+        dir_name, file_name, extension = get_fn_ext(file_path)
+        currVideoSettings, currPixPerMM, fps = read_video_info(vidinfDf, file_name)
         binFrameLength = int(binLength * fps)
         currListDf = [currDf[i:i + binFrameLength] for i in range(0, currDf.shape[0], binFrameLength)]
         if fileCounter == 0:
-            outputDfHeaders, outputDfHeadersDfTimeHeaders = ['Video'], []
+            outputDfHeaders = []
+            outputDfHeaders.append('Video')
             setBins = len(currListDf)
-
-            for i in range(setBins):
-                outputDfHeadersDfTimeHeaders.append('Bin_length_' + str(i + 1) + '_s')
-            for target in range(len(target_names)):
-                currTarget = target_names[target]
-                for bin in range(setBins):
-                    currHead1 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_number_of_events'
-                    currHead2 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_total_event_duration'
-                    currHead3 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_mean_event_duration'
-                    currHead4 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_median_event_duration'
-                    currHead5 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_time_first_occurrence'
-                    currHead6 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_mean_interval_duration'
-                    currHead7 = str(currTarget) + '_bin_no_' + str(bin + 1) + '_median_interval_duration'
-                    outputDfHeaders.extend((currHead1,currHead2,currHead3,currHead4,currHead5,currHead6,currHead7))
-                dfHeaders = outputDfHeaders
-                outputDf = pd.DataFrame(columns=dfHeaders)
+            for bin_number in range(setBins):
+                bin_name = ' time bin ' + str(bin_number + 1)
+                for measure in out_header_list:
+                    for classifier in target_names:
+                        col_header = classifier + measure + bin_name
+                        outputDfHeaders.append(col_header)
+            dfHeaders = outputDfHeaders
+            outputDf = pd.DataFrame(columns=dfHeaders)
 
         timebin = 0
         for currDf in currListDf[:setBins]:
             boutsList, nameList, startTimeList, endTimeList, timeBinList = [], [], [], [], []
-            timebin +=1
             for currTarget in target_names:
                 groupDf = pd.DataFrame()
                 v = (currDf[currTarget] != currDf[currTarget].shift()).cumsum()
@@ -134,7 +126,9 @@ def time_bins_classifier(inifile,binLength):
                 print(CurrentVideoName + ' does not contain the same number of time bins as your other, previously analysed videos (it contains less). We added a few zeros to this video to fit the dataframe.')
                 addList = [0] * abs(difference)
                 outputList.extend((addList))
+            print(outputList)
             outputDf.loc[len(outputDf)] = outputList
+
             logList.append(CurrentVideoName)
         fileCounter += 1
         print('Processed time-bins for file ' + str(fileCounter) + '/' + str(len(filesFound)))

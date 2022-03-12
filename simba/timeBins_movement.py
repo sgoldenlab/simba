@@ -73,7 +73,11 @@ def time_bins_movement(configini,binLength):
             pass
         colHeaders = getBpHeaders(configini)
         csv_df.columns = colHeaders
+        print(columnHeaders_flat)
         csv_df = csv_df[columnHeaders_flat]
+
+
+
         csv_df_shifted = csv_df.shift(-1, axis=0)
         csv_df_shifted.columns = shifetcolheaders_flat
         csv_df = pd.concat([csv_df, csv_df_shifted], axis=1)
