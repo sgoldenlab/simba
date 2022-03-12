@@ -4,8 +4,11 @@ import numpy as np
 import glob, os
 from configparser import ConfigParser, NoSectionError, NoOptionError
 from simba.rw_dfs import *
+import pyarrow.parquet as pq
+import pyarrow as pa
+from simba.interpolate_pose import *
 
-def json2csv_folder(configini, folderpath):
+def json2csv_folder(configini, folderpath, interpolation_method):
     print('Converting JSON files...')
     config = ConfigParser()
     config.read(configini)
@@ -18,7 +21,7 @@ def json2csv_folder(configini, folderpath):
     filesFound = glob.glob(folderpath + '/*.json')
     for file in filesFound:
         jsonfile = json.load(open(file))
-        basename = os.path.basename(file).replace('.json', '.csv')
+        basename = os.path.basename(file).replace('.json', '.' + str(wfileType))
         savePath = os.path.join(csv_dir_out, basename)
         keypoints, scores = jsonfile['keypoints'], jsonfile['scores']
         keypoints, scores = np.array(keypoints), np.array(scores)
@@ -40,14 +43,24 @@ def json2csv_folder(configini, folderpath):
         for column in range(len(keypointsDf.columns)):
             MultiIndexCol.append(tuple(('MARS', 'MARS', keypointsDf.columns[column])))
         keypointsDf.columns = pd.MultiIndex.from_tuples(MultiIndexCol, names=['scorer', 'bodypart', 'coords'])
-        keypointsDf.to_csv(savePath)
-        print('Json file ' + basename + ' imported')
-    print('All MARS Json files imported as CSVs in SimBA')
+        if wfileType == 'parquet':
+            table = pa.Table.from_pandas(keypointsDf)
+            pq.write_table(table, savePath)
+        if wfileType == 'csv':
+            keypointsDf.to_csv(savePath)
+        if interpolation_method != 'None':
+            perform_interpolation(savePath, wfileType, configini, interpolation_method)
+        print('JSON file ' + basename + ' imported')
+    print('All MARS Json files imported in SimBA')
 
-def json2csv_file(configini, filename):
+def json2csv_file(configini, filename, interpolation_method):
     config = ConfigParser()
     config.read(configini)
     projectPath = config.get('General settings', 'project_path')
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+    except NoOptionError:
+        wfileType = 'csv'
     csv_dir_out = os.path.join(projectPath, 'csv', 'input_csv')
     jsonfile = json.load(open(filename))
     basename = os.path.basename(filename).replace('.json', '.csv')
@@ -78,8 +91,23 @@ def json2csv_file(configini, filename):
         MultiIndexCol.append(tuple(('MARS', 'MARS', keypointsDf.columns[column])))
     keypointsDf.columns = pd.MultiIndex.from_tuples(MultiIndexCol, names=['scorer', 'bodypart', 'coords'])
     save_df(keypointsDf, wfileType, savePath)
-    print('Json file ' + basename + ' imported')
-    print('All MARS Json files imported as CSVs in SimBA')
+    if interpolation_method != 'None':
+        prit
+        perform_interpolation(savePath, wfileType, configini, interpolation_method)
+    print('JSON file ' + basename + ' imported')
+    print('All MARS Json files imported in SimBA')
 
+def perform_interpolation(file_path, wfileType, configini, interpolation_method):
+    if wfileType == 'parquet': csv_df = pd.read_parquet(file_path)
+    if wfileType == 'csv': csv_df = pd.read_csv(file_path, index_col=0)
+    interpolate_body_parts = Interpolate(configini, csv_df)
+    interpolate_body_parts.detect_headers()
+    interpolate_body_parts.fix_missing_values(interpolation_method)
+    interpolate_body_parts.reorganize_headers()
+    if wfileType == 'parquet':
+        table = pa.Table.from_pandas(interpolate_body_parts.new_df)
+        pq.write_table(table, file_path)
+    if wfileType == 'csv':
+        interpolate_body_parts.new_df.to_csv(file_path)
 
 

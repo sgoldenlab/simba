@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 from configparser import ConfigParser
 import glob
+from simba.drop_bp_cords import get_fn_ext
 
 def solomonToSimba(configinifile,solomonfolder):
     print('Importing...')
@@ -23,6 +24,7 @@ def solomonToSimba(configinifile,solomonfolder):
     featurefolder = os.path.join(os.path.dirname(configinifile),'csv','features_extracted')
     solomonfiles = glob.glob(solomonfolder+'/*.csv')
     fpscsv = pd.read_csv(os.path.join(os.path.dirname(configinifile),'logs','video_info.csv'))
+    fpscsv["Video"] = fpscsv["Video"].astype(str)
 
     #make target inserted folder if it doesnt exits
     targetfolder = os.path.join(os.path.dirname(configinifile),'csv','targets_inserted')
@@ -30,6 +32,7 @@ def solomonToSimba(configinifile,solomonfolder):
         os.mkdir(targetfolder)
 
     for i in solomonfiles:
+        dir_name, file_name, ext = get_fn_ext(i)
         videoname = os.path.basename(i)
 
         if videoname in os.listdir(featurefolder):
@@ -40,7 +43,7 @@ def solomonToSimba(configinifile,solomonfolder):
             finaldf = pd.read_csv(os.path.join(featurefolder,videoname))
 
             #get fps
-            fps = int(fpscsv.fps[fpscsv['Video'] == videoname.split('.')[0]][0])
+            fps = int(fpscsv.fps[fpscsv['Video'] == file_name][0])
 
             for j in target_list:
                 col_w_behavior = df.columns[df.isin([j]).any()] #find the column with the target

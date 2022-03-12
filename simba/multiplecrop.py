@@ -7,7 +7,7 @@ import glob
 
 def multicrop(vtype,inputf,outputf,noOfCrop):
     outputFileEnding = '.' + vtype
-    videoFtype = "." + '/*.' + vtype
+    videoFtype = '/*.' + vtype
     videoFolder = str(inputf)
     addSpacer = 2
     croppingDf = pd.DataFrame(columns=['Video', "height", "width", "topLeftX", "topLeftY"])

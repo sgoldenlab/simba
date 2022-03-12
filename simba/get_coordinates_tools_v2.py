@@ -49,14 +49,17 @@ def get_coordinates_nilsson(filenames,knownmm):
     currentDir = str(os.path.dirname(filenames))
     videoName = str(os.path.basename(filenames))
     os.chdir(currentDir)
-    cap = cv2.VideoCapture(videoName)
-    cap.set(1, 0)
-    ret, frame = cap.read()
-    fileName = str(0) + str('.bmp')
-    filePath = os.path.join(currentDir, fileName)
-    cv2.imwrite(filePath, frame)
-    img = cv2.imread(filePath)
-    (imageHeight, imageWidth) = img.shape[:2]
+    try:
+        cap = cv2.VideoCapture(videoName)
+        cap.set(1, 0)
+        ret, frame = cap.read()
+        fileName = str(0) + str('.bmp')
+        filePath = os.path.join(currentDir, fileName)
+        cv2.imwrite(filePath, frame)
+        img = cv2.imread(filePath)
+        (imageHeight, imageWidth) = img.shape[:2]
+    except AttributeError:
+        print('ERROR: Make sure the video file ' + str(videoName) + ' is located in your project_folder/videos directory')
     maxResDimension = max(imageWidth, imageHeight)
     mySpaceScale, myRadius, myResolution, myFontScale = 80, 20, 1500, 1.5
     circleScale = int(myRadius / (myResolution / maxResDimension))

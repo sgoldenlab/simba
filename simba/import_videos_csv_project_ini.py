@@ -9,6 +9,7 @@ import pandas as pd
 from simba.extract_frames_fast import *
 from os import listdir
 from os.path import isfile, join
+from simba.drop_bp_cords import get_fn_ext
 
 
 def splitall(path):
@@ -92,9 +93,7 @@ def copy_singlevideo_ini(inifile,source):
     try:
         print('Copying video...')
         dest = str(os.path.dirname(inifile))
-        filename, file_extension = os.path.basename(source), os.path.splitext(source)[1]
-        filename = os.path.splitext(filename)[0]
-        file_extension = file_extension.lower()
+        dir_name, filename, file_extension = get_fn_ext(source)
         newFileName = os.path.join(filename + file_extension)
         dest1 = os.path.join(dest, 'videos', newFileName)
         if os.path.isfile(dest1):
@@ -136,14 +135,20 @@ def copy_multivideo_DPKini(inifile,source,filetype):
 
 def copy_multivideo_ini(inifile,source,filetype):
     if filetype not in ('avi', 'mp4', 'MP4', 'AVI'):
-        print('SimBA only works with .avi and .mp4 files. Please convert your videos to .mp4 or .avi to continue. ')
+        print('SimBA only works with .avi and .mp4 files (Please enter mp4 or avi in entrybox). Or please convert your videos to mp4 or avi to continue. ')
     else:
         print('Copying videos...')
         vidFolderPath = os.path.join(os.path.dirname(inifile), 'videos')
-        files = glob.glob(source + '/*.' + filetype)
+        files_in_folder = glob.glob(source + '/*')
+        files = []
+        for f in files_in_folder:
+            file_lower = f.lower()
+            print(file_lower)
+            if file_lower.endswith(filetype.lower()):
+                files.append(f)
+
         for file in files:
-            filebasename, file_extension = os.path.basename(file), os.path.splitext(file)[1]
-            filebasename = os.path.splitext(filebasename)[0]
+            dir_name, filebasename, file_extension = get_fn_ext(file)
             file_extension = file_extension.lower()
             newFileName = os.path.join(filebasename + file_extension)
             dest1 = os.path.join(vidFolderPath, newFileName)

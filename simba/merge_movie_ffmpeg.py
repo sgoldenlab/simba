@@ -16,6 +16,7 @@ def generatevideo_config_ffmpeg(configini):
     vidInfPath = os.path.join(vidInfPath, 'logs')
     vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     print('Creating ' + str(len(allDirs)) + ' video(s)...')
 
     for dir in allDirs:

@@ -1,6 +1,6 @@
 import cv2
 import pandas as pd
-from scipy import ndimage
+from PIL import Image
 import os
 import numpy as np
 from configparser import ConfigParser
@@ -18,6 +18,7 @@ def mergeframesPlot(configini,inputList):
     framesDir = os.path.join(projectPath, 'frames', 'output', 'merged')
     vidLogsPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidLogsDf = pd.read_csv(vidLogsPath)
+    vidLogsDf["Video"] = vidLogsDf["Video"].astype(str)
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
     def define_writer(outputImage, fps, fourcc, mergedFilePath, largePanelFlag):
@@ -153,13 +154,13 @@ def mergeframesPlot(configini,inputList):
                     largePanelHeight, largePanelWidth = img.shape[0], img.shape[1]
                     if imgHeight < imgWidth:
                         rotationFlag = True
-                        img = ndimage.rotate(img, 90)
+                        img = np.array(Image.fromarray(img).rotate(90,Image.BICUBIC, expand=True))
                     outputImage[y_offset:y_offset + img.shape[0], x_offset:x_offset + img.shape[1]] = img
                     largePanelFlag = True
                 else:
                     if largePanelFlag == True:
                         if (rotationFlag == True) and (panelDirectory == 'path_plots'):
-                            img = ndimage.rotate(img, 90)
+                            img = np.array(Image.fromarray(img).rotate(90,Image.BICUBIC, expand=True))
                         try:
                             img = cv2.resize(img, (int(largePanelWidth), int(largePanelHeight / 2)))
                         except cv2.error as e:

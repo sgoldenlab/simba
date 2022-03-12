@@ -21,6 +21,7 @@ def ganntplot_config(configini):
     except NoOptionError:
         wfileType = 'csv'
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     boutStart_list, target_names, VideoCounter = [], [], 0
     colours = ['red', 'green', 'pink', 'orange', 'blue', 'purple', 'lavender', 'grey', 'sienna', 'tomato', 'azure',
                'crimson', 'aqua', 'plum', 'teal', 'maroon', 'lime', 'coral']

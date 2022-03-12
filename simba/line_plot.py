@@ -20,6 +20,7 @@ def line_plot_config(configini):
         os.makedirs(frames_dir_out)
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
     loopy = 0
 

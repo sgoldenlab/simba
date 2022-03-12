@@ -61,7 +61,6 @@ def configure(file_name):
     inputDfpath = str(os.path.join(os.path.dirname(projectini), 'csv', 'features_extracted',current_video + '.' + wfileType))
     print(inputDfpath,'@@@@@@@@@@@@@')
     currDf = read_df(inputDfpath, wfileType)
-    print(currDf)
     try:
         multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
         multiAnimalIDList = multiAnimalIDList.split(",")
@@ -410,7 +409,7 @@ def load_frame(number, master, entry):
     video_frame = Label(master, image='')
     video_frame.grid(row=0, column=0)
     max_size = 1080, 650
-    IDlabelLoc  = []
+    IDlabelLoc = []
 
 
     cap = cv2.VideoCapture(video_file_path)
@@ -418,36 +417,33 @@ def load_frame(number, master, entry):
     res, imageIn = cap.read()
     cap.release()
 
-
     try:
-        try:
-            maxResDimension = max(imageIn.shape[1], imageIn.shape[0])
-        except Exception as e:
-            print(e)
-            print('No images found - make sure you have video ' + str(video_file_path) + ' in your SimBA project.')
-        mySpaceScale, myRadius, myResolution, myFontScale = 60, 12, 1500, 1.5
-        circleScale, fontScale, spacingScale = int(myRadius / (myResolution / maxResDimension)), float(myFontScale / (myResolution / maxResDimension)), int(mySpaceScale / (myResolution / maxResDimension))
-        if animalsNo > 1:
-            for animal in range(animalsNo):
-                currentDictID = list(animalBpDict.keys())[animal]
-                currentDict = animalBpDict[currentDictID]
-                currNoBps = len(currentDict['X_bps']) - 1
-                IDappendFlag = False
-                for bp in range(currNoBps):
-                    currXheader, currYheader, currColor = currentDict['X_bps'][bp], currentDict['Y_bps'][bp], currentDict['colors'][bp]
-                    currAnimal = currDf.loc[currDf.index[current_frame_number], [currXheader, currYheader]]
-                    if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
-                        IDlabelLoc.append([currentDictID, currAnimal[0], currAnimal[1], currentDict['colors'][bp]])
-                        IDappendFlag = True
-                if IDappendFlag == False:
+        maxResDimension = max(imageIn.shape[1], imageIn.shape[0])
+    except Exception as e:
+        print(e)
+        print('No images found - make sure you have video ' + str(video_file_path) + ' in your SimBA project.')
+    mySpaceScale, myRadius, myResolution, myFontScale = 60, 12, 1500, 1.5
+    circleScale, fontScale, spacingScale = int(myRadius / (myResolution / maxResDimension)), float(myFontScale / (myResolution / maxResDimension)), int(mySpaceScale / (myResolution / maxResDimension))
+
+    if animalsNo > 1:
+        for animal in range(animalsNo):
+            currentDictID = list(animalBpDict.keys())[animal]
+            currentDict = animalBpDict[currentDictID]
+            currNoBps = len(currentDict['X_bps']) - 1
+            IDappendFlag = False
+            for bp in range(currNoBps):
+                currXheader, currYheader, currColor = currentDict['X_bps'][bp], currentDict['Y_bps'][bp], currentDict['colors'][bp]
+                currAnimal = currDf.loc[currDf.index[current_frame_number], [currXheader, currYheader]]
+                if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
                     IDlabelLoc.append([currentDictID, currAnimal[0], currAnimal[1], currentDict['colors'][bp]])
+                    IDappendFlag = True
 
-        for currAnimal in IDlabelLoc:
-            cv2.putText(imageIn, str(currAnimal[0]), (int(currAnimal[1]), int(currAnimal[2])), cv2.FONT_HERSHEY_COMPLEX, fontScale, currAnimal[3], 4)
+            if IDappendFlag == False:
+                IDlabelLoc.append([currentDictID, currAnimal[0], currAnimal[1], currentDict['colors'][bp]])
 
-    except NameError:
-        print('No image found')
-        pass
+    for currAnimal in IDlabelLoc:
+        cv2.putText(imageIn, str(currAnimal[0]), (int(currAnimal[1]), int(currAnimal[2])), cv2.FONT_HERSHEY_COMPLEX, fontScale, currAnimal[3], 4)
+
     imageIn = cv2.cvtColor(imageIn, cv2.COLOR_BGR2RGB)
     current_image = Image.fromarray(imageIn)
     current_image.thumbnail(max_size, Image.ANTIALIAS)
