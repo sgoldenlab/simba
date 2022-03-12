@@ -8,6 +8,7 @@ from datetime import datetime
 from simba.drop_bp_cords import *
 import glob
 from simba.rw_dfs import *
+from simba.drop_bp_cords import *
 
 
 def dev_move_user_defined(configini):
@@ -41,8 +42,6 @@ def dev_move_user_defined(configini):
         multiAnimalStatus = True
         print('Applying settings for multi-animal tracking...')
 
-
-
     bodyPartNameArrayForMeans = np.empty((animal_no, 5), dtype=object)
     for animal in range(animal_no):
         bodyPart_1_Name, bodyPart_2_Name = 'movement_bodypart1_' + str(animalIDlist[animal]), 'movement_bodypart2_' + str(animalIDlist[animal])
@@ -58,8 +57,6 @@ def dev_move_user_defined(configini):
 
     #### CREATE DICT TO HOLD ANIMAL BPS AND NAMES
     animalBpDict = create_body_part_dictionary(multiAnimalStatus, animalIDlist, animal_no, x_cols, y_cols, p_cols, [])
-
-
     csv_dir_in, csv_dir_out, log_fn = os.path.join(projectPath, 'csv', 'input_csv'), os.path.join(projectPath, 'csv', 'outlier_corrected_movement'), os.path.join(projectPath, 'logs', 'Outliers_movement_' + str(dateTime) + '.csv')
 
     def add_correction_prefix(col, bpcorrected_list):

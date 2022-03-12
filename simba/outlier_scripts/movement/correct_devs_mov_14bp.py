@@ -5,6 +5,7 @@ import statistics
 import math
 from configparser import ConfigParser
 from datetime import datetime
+from simba.drop_bp_cords import *
 
 def dev_move_14(configini):
 
@@ -327,8 +328,7 @@ def dev_move_14(configini):
         except ValueError:
             print('Error: Too many or too few bodyparts. Check that the number of trackined bodyparts matched the input in SimBA')
         csv_df_combined = pd.concat([df_headers, csv_df_combined])
-        fileName = os.path.basename(currentFile)
-        fileName, fileEnding = fileName.split('.')
+        _, fileName, fileEnding = get_fn_ext(currentFile)
         fileOut = str(fileName) + str('.csv')
         pathOut = os.path.join(csv_dir_out, fileOut)
         csv_df_combined.to_csv(pathOut, index=False)

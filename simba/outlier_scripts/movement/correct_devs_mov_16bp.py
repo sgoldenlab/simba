@@ -7,6 +7,7 @@ from configparser import ConfigParser, NoOptionError
 from datetime import datetime
 from numba import jit
 from simba.rw_dfs import *
+from simba.drop_bp_cords import *
 
 
 def dev_move_16(configini):
@@ -268,8 +269,7 @@ def dev_move_16(configini):
         # csv_df_combined = csv_df_combined.drop(['frames'], axis=1)
         # csv_df_combined.columns = df_headers.columns
         # csv_df_combined = pd.concat([df_headers, csv_df_combined])
-        fileName = os.path.basename(currentFile)
-        fileName, fileEnding = fileName.split('.')
+        _, fileName, fileEnding = get_fn_ext(currentFile)
         fileOut = str(fileName) + '.' + wfileType
         pathOut = os.path.join(csv_dir_out, fileOut)
         csv_df_combined = csv_df_combined.loc[:, ~csv_df_combined.columns.duplicated()]
