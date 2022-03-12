@@ -24,6 +24,7 @@ def append_Boris_annot(configini, BorisPath):
         wfileType = 'csv'
     featFilesfound = glob.glob(featureFilePath + '/*.' + wfileType)
     borisFilesFound = glob.glob(BorisPath + '/*.csv')
+    if len(borisFilesFound) == 0: print('No CSV files found in ' + str(featureFilePath))
     model_nos = config.getint('SML settings', 'No_targets')
     behaviors = []
     for bb in range(model_nos):
@@ -34,16 +35,19 @@ def append_Boris_annot(configini, BorisPath):
 
     for file in borisFilesFound:
         currDf = pd.read_csv(file)
-        index = (currDf[currDf['Observation id'] == "Time"].index.values)
-        currDf = pd.read_csv(file, skiprows=range(0, int(index + 1)))
-        currDf = currDf.loc[:, ~currDf.columns.str.contains('^Unnamed')]
-        currDf.dropna()
-        currDf.drop(['Behavioral category', 'Comment', 'Subject'], axis=1, inplace=True)
-        for index, row in currDf.iterrows():
-            currPath = row['Media file path']
-            currBase = os.path.basename(currPath)
-            currDf.at[index, 'Media file path'] = os.path.splitext(currBase)[0]
-        combinedDf = pd.concat([combinedDf, currDf])
+        try:
+            index = (currDf[currDf['Observation id'] == "Time"].index.values)
+            currDf = pd.read_csv(file, skiprows=range(0, int(index + 1)))
+            currDf = currDf.loc[:, ~currDf.columns.str.contains('^Unnamed')]
+            currDf.dropna()
+            currDf.drop(['Behavioral category', 'Comment', 'Subject'], axis=1, inplace=True)
+            for index, row in currDf.iterrows():
+                currPath = row['Media file path']
+                currBase = os.path.basename(currPath)
+                currDf.at[index, 'Media file path'] = os.path.splitext(currBase)[0]
+            combinedDf = pd.concat([combinedDf, currDf])
+        except:
+            print(str(file) + ' is not a BORIS annotation CSV file.')
 
     found_boris_behaviours =list(combinedDf['Behavior'].unique())
     print('Detected BORIS annotations:')

@@ -29,6 +29,7 @@ def validate_classifier(configini,seconds,target):
     ## get fps from videoinfo csv
     videoinfocsv = os.path.join(projectPath, 'logs', 'video_info.csv')
     fpsdf = pd.read_csv(videoinfocsv)
+    fpsdf["Video"] = fpsdf["Video"].astype(str)
     fileCounter = 0
 
     #main loop
@@ -75,6 +76,10 @@ def validate_classifier(configini,seconds,target):
             currVideo = os.path.join(videoFolder, str(csvname) + '.mp4')
         elif os.path.exists(os.path.join(videoFolder, str(csvname) + '.avi')):
             currVideo = os.path.join(videoFolder, str(csvname) + '.avi')
+        elif os.path.exists(os.path.join(videoFolder, str(csvname) + '.AVI')):
+            currVideo = os.path.join(videoFolder, str(csvname) + '.AVI')
+        elif os.path.exists(os.path.join(videoFolder, str(csvname) + '.MP4')):
+            currVideo = os.path.join(videoFolder, str(csvname) + '.MP4')
         else:
             print('Cannot locate video ' + str(csvname.replace('.csv', '')) + 'in mp4 or avi format')
             break
@@ -94,7 +99,7 @@ def validate_classifier(configini,seconds,target):
         for i in range(no_bouts):
 
             rowCounter = finalbout_list[i][0] ## get the first bout frames from the list
-            cap = cv2.VideoCapture(os.path.join(os.path.dirname(configini), 'videos', currVideo)) #
+            cap = cv2.VideoCapture(os.path.join(os.path.dirname(configini), 'videos', currVideo))
             cap.set(1,rowCounter) #set starting point at first about
 
             while(cap.isOpened()):

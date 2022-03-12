@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError, NoOptionError
 from simba.rw_dfs import *
+from simba.drop_bp_cords import get_fn_ext
 
 def draw_line_plot(configini,video,bodypart):
     configFile = str(configini)
@@ -17,7 +18,8 @@ def draw_line_plot(configini,video,bodypart):
         wfileType = config.get('General settings', 'workflow_file_type')
     except NoOptionError:
         wfileType = 'csv'
-    csvname = video.split('.')[0] + '.' + wfileType
+    dir_path, vid_name, ext = get_fn_ext(video)
+    csvname = vid_name + '.' + wfileType
     tracking_csv = os.path.join(configdir, 'csv', 'outlier_corrected_movement_location', csvname)
     inputDf = read_df(tracking_csv, wfileType)
     videopath = os.path.join(configdir,'videos',video)

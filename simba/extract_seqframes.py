@@ -9,6 +9,7 @@ import io
 import os
 import numpy as np
 import struct
+from simba.drop_bp_cords import get_fn_ext
 
 class seqInfo:
     def __init__(self):
@@ -28,7 +29,7 @@ class seqInfo:
 def extract_seqframescommand(filename):
 
     if filename:
-        pathDir, filetype = filename.split('.')
+        pathDir, _, filetype = get_fn_ext(filename)
         if not os.path.exists(pathDir):
             os.makedirs(pathDir)
         print(pathDir)

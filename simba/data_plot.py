@@ -26,6 +26,7 @@ def data_plot_config(configini, SelectedBp):
     except NoOptionError:
         wfileType = 'csv'
     vidinfDf = pd.read_csv(vidInfPath)
+    vidinfDf["Video"] = vidinfDf["Video"].astype(str)
     videoCounter = 0
 
     try:

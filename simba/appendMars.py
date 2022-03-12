@@ -20,6 +20,9 @@ def append_dot_ANNOTT(inifile, annotationsFolder):
     targetFolder = os.path.join(projectPath, 'csv', 'targets_inserted')
     videoLogPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     videoLogDf = pd.read_csv(videoLogPath)
+    videoLogDf["Video"] = videoLogDf["Video"].astype(str)
+
+
     featureFiles = glob.glob(featureFilesFolder + '/*.' + wfileType)
     noTargets = config.getint('SML settings', 'no_targets')
     targetList = []

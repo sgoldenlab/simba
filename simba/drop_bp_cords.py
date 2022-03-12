@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from pathlib import Path
 from configparser import ConfigParser, NoOptionError, NoSectionError
 import glob
 import re
@@ -8,6 +9,7 @@ from pylab import cm
 import shutil
 from datetime import datetime
 from simba.rw_dfs import *
+
 
 def drop_bp_cords(dataFrame, inifile):
     config = ConfigParser()
@@ -123,7 +125,7 @@ def getBpNames(inifile):
     configFile = str(inifile)
     config.read(configFile)
     project_path = config.get('General settings', 'project_path')
-    bodyparthListPath = os.path.join(project_path, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
+    bodyparthListPath = str(os.path.join(project_path, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv'))
     poseConfigDf = pd.read_csv(bodyparthListPath, header=None)
     poseConfigList = list(poseConfigDf[0])
     for bodypart in poseConfigList:
@@ -167,14 +169,16 @@ def create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, animalsNo,
         if animalsNo > 1:
             for animal in range(animalsNo):
                 currAnimalName = 'Animal_' + str(animal + 1)
-                search_string = '_' + str(animal+1)
+                search_string_x = '_' + str(animal + 1) + '_x'
+                search_string_y = '_' + str(animal + 1) + '_y'
+                search_string_p = '_' + str(animal + 1) + '_p'
                 animalBpDict[currAnimalName] = {}
-                animalBpDict[currAnimalName]['X_bps'] = [i for i in Xcols if search_string in i]
-                animalBpDict[currAnimalName]['Y_bps'] = [i for i in Ycols if search_string in i]
+                animalBpDict[currAnimalName]['X_bps'] = [i for i in Xcols if i.endswith(search_string_x)]
+                animalBpDict[currAnimalName]['Y_bps'] = [i for i in Ycols if i.endswith(search_string_y)]
                 if colorListofList:
                     animalBpDict[currAnimalName]['colors'] = colorListofList[animal]
                 if Pcols:
-                    animalBpDict[currAnimalName]['P_bps'] = [i for i in Pcols if search_string in i]
+                    animalBpDict[currAnimalName]['P_bps'] = [i for i in Pcols if i.endswith(search_string_p)]
             if multiAnimalIDList[0] != '':
                 for animal in range(len(multiAnimalIDList)):
                     currAnimalName = 'Animal_' + str(animal + 1)
@@ -276,6 +280,10 @@ def reverse_dlc_input_files(configini):
         save_df(reversed_df, wfileType, file)
     print('All reversals complete.')
 
-
+def get_fn_ext(filepath):
+    ext = Path(filepath).suffix
+    file_name = os.path.basename(filepath.rsplit(ext, 1)[0])
+    dir_name = os.path.dirname(filepath)
+    return dir_name, file_name, ext
 
 

@@ -3,6 +3,30 @@ import csv
 import re
 import platform
 
+def write_unsupervisedini(projectpath):
+
+    f = open(os.path.join(projectpath, "unsupervised_config.ini"), "w+")
+
+    #umap settings
+    f.write('[UMAP settings]\n')
+    f.write('neighbors = ' + str([2,30,60,80])+'\n')
+    f.write('min_distances = ' + str([0.0,0.1,0.2,0.3]) +'\n')
+    f.write('components = ' + str([2,3]) +'\n')
+    f.write('\n')
+
+    #hdbscan settings
+    f.write('[HDBSCAN settings]\n')
+    f.write('min_cluster = ' + str([40])+'\n')
+    f.write('min_samples = ' + str([2]) +'\n')
+    f.write('epsilon = ' + str([0.2,0.6,0.8]) +'\n')
+    f.write('visualize = ' + str(2) +'\n')
+    f.write('metric = ' + 'euclidean' +'\n')
+    f.write('soft_clustering = ' + 'True' +'\n')
+    f.write('\n')
+
+    f.close
+
+
 def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, listindex, animalNo,csvorparquet):
     simbaDir = os.path.dirname(__file__)
     animalNo = re.sub("[^0-9]", "", animalNo)
@@ -225,8 +249,8 @@ def write_inifile(msconfig,project_path,project_name,no_targets,target_list,bp, 
         cr = csv.reader(f, delimiter=",")  # , is default
         rows = list(cr)  # create a list of rows for instance
 
-    if listindex==9:
-        return configfile
+    # if listindex==10:
+    #     return configfile
 
     chosenBodyParts = rows[listindex]
     chosenBodyParts = list(filter(None, chosenBodyParts))

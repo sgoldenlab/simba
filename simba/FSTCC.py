@@ -23,6 +23,7 @@ class FSTCC_perform(object):
         except NoOptionError:
             self.wfileType = 'csv'
         self.video_info_df = pd.read_csv(video_info_path)
+        self.video_info_df["Video"] = self.video_info_df["Video"].astype(str)
         self.data_file_list = glob.glob(data_folder + "/*." + self.wfileType)
         self.processed_video_list = []
         self.session_length_list = []

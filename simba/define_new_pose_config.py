@@ -1,11 +1,12 @@
 import os
 import glob
 import numpy as np
+import pandas as pd
 import cv2
 import random
 import imutils
 
-def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNameList, animalNumber):
+def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNameList, animalNumber, animal_id_number_list):
     global ix, iy
     global centerCordStatus
 
@@ -28,6 +29,11 @@ def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNam
     cv2.namedWindow('Define pose', cv2.WINDOW_NORMAL)
     overlay = im.copy()
     colorList = []
+    if int(noAnimals) > 1:
+        for value, bp_name_animal_number in enumerate(zip(BpNameList, animal_id_number_list)):
+            BpNameList[value] = bp_name_animal_number[0] + '_' + str(bp_name_animal_number[1])
+
+
     for color in range(len(BpNameList)):
         r, g, b = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         colorTuple = (r, g, b)
@@ -58,14 +64,18 @@ def define_new_pose_configuration(configName, noAnimals, noBps, Imagepath, BpNam
     imageNos = len(glob.glob(imagePath + '/*.png'))
     newImageName = 'Picture' + str(imageNos+1) + '.png'
     imageOutPath = os.path.join(imagePath, newImageName)
-    BpNameList = ','.join(BpNameList)
+    print(imageOutPath)
+    BpNameList = ",".join(BpNameList)
+
+    # body_part_df = pd.DataFrame(BpNameList)
+    # body_part_df.to_csv(bpPath, index=False, header=False)
 
     with open(namePath, 'a') as fd:
         fd.write(configName + '\n')
     with open(bpPath, 'a') as fd:
         fd.write(BpNameList + '\n')
     with open(noAnimalsPath, 'a') as fd:
-        fd.write(animalNumber + '\n')
+        fd.write(str(animalNumber) + '\n')
     cv2.imwrite(imageOutPath, overlay)
 
 
