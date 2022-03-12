@@ -1,6 +1,7 @@
 import os
 from configparser import ConfigParser
 from tkinter import *
+import platform
 from simba.roi_tools.ROI_define import ROI_definitions
 from simba.roi_tools.ROI_reset import reset_video_ROIs
 from simba.roi_tools.ROI_multiply import multiply_ROIs
@@ -28,7 +29,9 @@ class ROI_menu:
         self.roimenu.minsize(500, 400)
         self.roimenu.wm_title("ROI Table")
 
-        tableframe = LabelFrame(self.roimenu, text='Video Name', labelanchor=NW)
+        self.scroll_window = hxtScrollbar(self.roimenu)
+
+        tableframe = LabelFrame(self.scroll_window, text='Video Name', labelanchor=NW)
 
         for i in range(len(self.filesFound)):
             self.row.append(roitableRow(tableframe, self.video_dir, str(self.filesFound[i]), str(len(maxname)), str(i + 1) + '.', projectini=self.config_path))
@@ -61,3 +64,55 @@ class roitableRow(Frame):
 
     def applyall(self):
         multiply_ROIs(self.projectini, self.filename)
+
+
+
+
+def onMousewheel(event, canvas):
+    try:
+        scrollSpeed = event.delta
+        if platform.system() == 'Darwin':
+            scrollSpeed = event.delta
+        elif platform.system() == 'Windows':
+            scrollSpeed = int(event.delta / 120)
+        canvas.yview_scroll(-1 * (scrollSpeed), "units")
+    except:
+        pass
+
+def bindToMousewheel(event, canvas):
+    canvas.bind_all("<MouseWheel>", lambda event: onMousewheel(event, canvas))
+
+def unbindToMousewheel(event, canvas):
+    canvas.unbind_all("<MouseWheel>")
+
+def onFrameConfigure(canvas):
+    '''Reset the scroll region to encompass the inner frame'''
+    canvas.configure(scrollregion=canvas.bbox("all"))
+
+def hxtScrollbar(master):
+    '''
+    Create canvas.
+    Create a frame and put it in the canvas.
+    Create two scrollbar and insert command of canvas x and y view
+    Use canvas to create a window, where window = frame
+    Bind the frame to the canvas
+    '''
+
+    bg = master.cget("background")
+    acanvas = Canvas(master, borderwidth=0, background=bg)
+    frame = Frame(acanvas, background=bg)
+    vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
+    vsb2 = Scrollbar(master, orient='horizontal', command=acanvas.xview)
+    acanvas.configure(yscrollcommand=vsb.set)
+    acanvas.configure(xscrollcommand=vsb2.set)
+    vsb.pack(side="right", fill="y")
+    vsb2.pack(side="bottom", fill="x")
+    acanvas.pack(side="left", fill="both", expand=True)
+
+    acanvas.create_window((10, 10), window=frame, anchor="nw")
+
+    # bind the frame to the canvas
+    acanvas.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
+    acanvas.bind('<Enter>', lambda event: bindToMousewheel(event, acanvas))
+    acanvas.bind('<Leave>', lambda event: unbindToMousewheel(event,acanvas))
+    return frame

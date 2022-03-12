@@ -12,13 +12,13 @@ from simba.drop_bp_cords import get_fn_ext
 
 
 class ROI_image_class():
-    def __init__(self, config_path, video_path, img_no, colors_dict, master_top_left_x, duplicate_jump_size, line_type, click_sens):
+    def __init__(self, config_path, video_path, img_no, colors_dict, master_top_left_x, duplicate_jump_size, line_type, click_sens, text_size, text_thickness, master_win_h, master_win_w):
         config = ConfigParser()
         configFile = str(config_path)
         config.read(configFile)
         self.project_path = config.get('General settings', 'project_path')
         _, self.curr_vid_name, ext = get_fn_ext(video_path)
-        self.duplicate_jump_size, self.line_type, self.click_sens = duplicate_jump_size, line_type, click_sens,
+        self.duplicate_jump_size, self.line_type, self.click_sens, self.text_size, self.text_thickness = duplicate_jump_size, line_type, click_sens, text_size, text_thickness
         self.cap = cv2.VideoCapture(video_path)
         self.video_frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.cap.set(1, img_no)
@@ -33,7 +33,6 @@ class ROI_image_class():
         self.current_zoom = 100
         self.working_frame = deepcopy(self.orig_frame)
         cv2.namedWindow('Define shape', cv2.WINDOW_NORMAL)
-        #cv2.moveWindow('Define shape', self.frame_default_loc[0], 0)
         cv2.imshow('Define shape', self.working_frame)
         self.out_rectangles = []
         self.out_circles = []
@@ -42,7 +41,6 @@ class ROI_image_class():
 
     def check_if_ROIs_exist(self):
         roi_measurement_path = os.path.join(self.project_path, 'logs', 'measures', 'ROI_definitions.h5')
-        print(roi_measurement_path)
 
         if os.path.isfile(roi_measurement_path):
             rectangles_found = pd.read_hdf(roi_measurement_path, key='rectangles')
@@ -71,11 +69,19 @@ class ROI_image_class():
         self.insert_all_ROIs_into_image(change_frame_no=True)
 
     def draw_rectangle(self, rectangle_info):
+
+        def rectangle_integrity_check(top_left_x, top_left_y, bottom_right_x, bottom_right_y):
+            print(top_left_x, bottom_right_x)
+            print(top_left_y, bottom_right_y)
+
+
         ROI = cv2.selectROI('Define shape', self.working_frame)
         top_left_x,top_left_y = ROI[0], ROI[1]
         width = (abs(ROI[0] - (ROI[2] + ROI[0])))
         height = (abs(ROI[2] - (ROI[3] + ROI[2])))
         bottom_right_x, bottom_right_y = top_left_x + width,  top_left_y + height
+        rectangle_integrity_check(top_left_x, top_left_y, bottom_right_x, bottom_right_y)
+
         center_tag_loc = (int(top_left_x + width/2), int(top_left_y + height/2))
         br_tag = (int(top_left_x + width), int(top_left_y + height))
         tr_tag = (int(top_left_x + width), int(top_left_y))
@@ -313,9 +319,12 @@ class ROI_image_class():
         if roi_to_delete.startswith('Circle'):
             circle_name = roi_to_delete.split('Circle: ')[1]
             self.out_circles[:] = [d for d in self.out_circles if d.get('Name') != circle_name]
+        if roi_to_delete.startswith('Polygon'):
+            polygon_name = roi_to_delete.split('Polygon: ')[1]
+            self.out_polygon[:] = [d for d in self.out_polygon if d.get('Name') != polygon_name]
         self.insert_all_ROIs_into_image()
 
-    def insert_all_ROIs_into_image(self, ROI_ear_tags = False, change_frame_no = False, show_zoomed_img = False):
+    def insert_all_ROIs_into_image(self, ROI_ear_tags = False, change_frame_no = False, show_zoomed_img = False, show_size_info=False):
         cv2.destroyAllWindows()
         self.no_shapes = 0
         if (change_frame_no is False) and (show_zoomed_img is False):
@@ -323,10 +332,20 @@ class ROI_image_class():
 
         for e in self.out_rectangles:
             self.no_shapes += 1
-            cv2.rectangle(self.working_frame, (e['topLeftX'], e['topLeftY']), (e['topLeftX'] + e['width'], e['topLeftY'] + e['height']), self.colors[e['Color name']], int(e['Thickness']), lineType=self.line_type)
+            if int(e['Thickness']) == 1:
+                cv2.rectangle(self.working_frame, (e['topLeftX'], e['topLeftY']),(e['topLeftX'] + e['width'], e['topLeftY'] + e['height']), self.colors[e['Color name']], int(e['Thickness']), lineType=4)
+            else:
+                cv2.rectangle(self.working_frame, (e['topLeftX'], e['topLeftY']), (e['topLeftX'] + e['width'], e['topLeftY'] + e['height']), self.colors[e['Color name']], int(e['Thickness']), lineType=self.line_type)
             if ROI_ear_tags is True:
                 for t in e['Tags']:
                     cv2.circle(self.working_frame, e['Tags'][t], e['Ear_tag_size'], self.colors[e['Color name']], -1)
+            if show_size_info is True:
+                area_cm = self.rectangle_size_dict['Rectangles'][e['Name']]['area_cm']
+                width_cm = self.rectangle_size_dict['Rectangles'][e['Name']]['width_cm']
+                height_cm = self.rectangle_size_dict['Rectangles'][e['Name']]['height_cm']
+                cv2.putText(self.working_frame, str(height_cm), (int(e['Tags']['Left tag'][0] + e['Thickness']), e['Tags']['Left tag'][1]), cv2.FONT_HERSHEY_SIMPLEX, self.text_size / 10, self.colors[e['Color name']], self.text_thickness, lineType=self.line_type)
+                cv2.putText(self.working_frame, str(width_cm), (e['Tags']['Bottom tag'][0], int(e['Tags']['Bottom tag'][1] - e['Thickness'])),cv2.FONT_HERSHEY_SIMPLEX, self.text_size / 10, self.colors[e['Color name']], self.text_thickness, lineType=self.line_type)
+                cv2.putText(self.working_frame, str(area_cm), (e['Tags']['Center tag'][0], e['Tags']['Center tag'][1]), cv2.FONT_HERSHEY_SIMPLEX, self.text_size / 10, self.colors[e['Color name']], self.text_thickness, lineType=self.line_type)
 
         for c in self.out_circles:
             self.no_shapes += 1
@@ -334,6 +353,9 @@ class ROI_image_class():
             if ROI_ear_tags is True:
                 for t in c['Tags']:
                     cv2.circle(self.working_frame, c['Tags'][t], c['Ear_tag_size'], self.colors[c['Color name']], -1)
+            if show_size_info is True:
+                area_cm = self.circle_size_dict['Circles'][c['Name']]['area_cm']
+                cv2.putText(self.working_frame, str(area_cm), (c['Tags']['Center tag'][0], c['Tags']['Center tag'][1]),cv2.FONT_HERSHEY_SIMPLEX, self.text_size / 10, self.colors[c['Color name']], self.text_thickness, lineType=self.line_type)
 
         for pg in self.out_polygon:
             self.no_shapes += 1
@@ -342,6 +364,9 @@ class ROI_image_class():
             if ROI_ear_tags is True:
                 for p in pg['Tags']:
                     cv2.circle(self.working_frame, pg['Tags'][p], pg['Ear_tag_size'], self.colors[pg['Color name']], -1)
+            if show_size_info is True:
+                area_cm = self.polygon_size_dict['Polygons'][pg['Shape_name']]['area_cm']
+                cv2.putText(self.working_frame, str(area_cm), (pg['Center_X'], pg['Center_Y']), cv2.FONT_HERSHEY_SIMPLEX, self.text_size / 10, self.colors[pg['Color name']], self.text_thickness, lineType=self.line_type)
 
         cv2.namedWindow('Define shape', cv2.WINDOW_NORMAL)
         #cv2.moveWindow('Define shape', self.frame_default_loc[0], 0)

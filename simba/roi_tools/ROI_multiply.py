@@ -6,13 +6,13 @@ from simba.drop_bp_cords import *
 
 
 def create_emty_df(shape_type):
-    if shape_type == 'rectangle':
+    if shape_type == 'rectangles':
         col_list = ['Video', 'Shape_type', 'Name', 'Color name', 'Color BGR', 'Thickness', 'topLeftX',
          'topLeftY', 'Bottom_right_X', 'Bottom_right_Y', 'width', 'height', 'Tags', 'Ear_tag_size']
-    if shape_type == 'circle':
+    if shape_type == 'circleDf':
         col_list = ['Video', 'Shape_type', 'Name', 'Color name', 'Color BGR', 'Thickness', 'centerX', 'centerY',
          'radius', 'Tags', 'Ear_tag_size']
-    if shape_type == 'polygon':
+    if shape_type == 'polygons':
         col_list = ['Video', 'Shape_type', 'Name', 'Color name', 'Color BGR', 'Thickness', 'Center_X'
                     'Center_Y', 'vertices', 'Tags', 'Ear_tag_size']
     return pd.DataFrame(columns=col_list)

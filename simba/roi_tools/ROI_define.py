@@ -8,8 +8,10 @@ import pandas as pd
 from pathlib import Path
 from simba.roi_tools.ROI_move_shape import update_all_tags, move_edge
 from simba.roi_tools.ROI_multiply import create_emty_df
+from simba.roi_tools.ROI_size_calculations import rectangle_size_calc, circle_size_calc, polygon_size_calc
 from simba.features_scripts.unit_tests import read_video_info
 from simba.drop_bp_cords import get_fn_ext
+
 
 
 class ROI_definitions:
@@ -33,12 +35,8 @@ class ROI_definitions:
             self.other_video_file_names.append(os.path.basename(video))
         self.master_win_h, self.master_win_w = 800, 750
         self.video_info_df = pd.read_csv(self.video_info_path)
-        # currVideoSettings, currPixPerMM, fps = read_video_info(self.video_info_df, currVidName)
-
-
-        self.video_info = self.video_info_df[self.video_info_df['Video'] == os.path.basename(video_path).split('.')[0]]
-        self.curr_fps = self.video_info['fps'].values[0]
-        self.master = Toplevel()
+        self.video_info, self.curr_px_mm, self.curr_fps = read_video_info(self.video_info_df, self.file_name)
+        self.master = Tk()
         self.master.minsize(self.master_win_w, self.master_win_h)
         self.screen_width = self.master.winfo_screenwidth()
         self.screen_height = self.master.winfo_screenheight()
@@ -56,6 +54,8 @@ class ROI_definitions:
         self.img_no = 1
         self.duplicate_jump_size = 20
         self.click_sens = 10
+        self.text_size = 5
+        self.text_thickness = 3
         self.line_type = -1
         self.named_shape_colors = {'White': (255, 255, 255),
                                    'Grey': (220, 200, 200),
@@ -68,7 +68,8 @@ class ROI_definitions:
                                    'Chocolate': (30, 105, 210),
                                    'Yellow': (0, 255, 255),
                                    'Green': (0, 128, 0),
-                                   'Black': (0, 0, 0),
+                                   'Dark-grey': (105, 105, 105),
+                                   'Light-grey': (192, 192, 192),
                                    'Pink': (178, 102, 255),
                                    'Lime': (204, 255, 229),
                                    'Purple': (255, 51, 153),
@@ -83,8 +84,15 @@ class ROI_definitions:
         self.interact_menus()
         self.draw_menu()
         self.save_menu()
-        self.image_data = ROI_image_class(self.config_path, self.video_path, self.img_no, self.named_shape_colors, self.default_top_left_x, self.duplicate_jump_size, self.line_type, self.click_sens)
+        self.image_data = ROI_image_class(self.config_path, self.video_path, self.img_no,
+                                          self.named_shape_colors, self.default_top_left_x,
+                                          self.duplicate_jump_size, self.line_type, self.click_sens, self.text_size, self.text_thickness,
+                                          self.master_win_h, self.master_win_w)
         self.video_frame_count = int(self.image_data.video_frame_count)
+        self.get_all_ROI_names()
+        if len(self.video_ROIs) > 0:
+            self.update_delete_ROI_menu()
+
         mainloop()
 
     def show_video_info(self):
@@ -190,7 +198,9 @@ class ROI_definitions:
                 for shape_type in ['rectangles', 'circleDf', 'polygons']:
                     c_df = pd.read_hdf(self.store_fn, key=shape_type)
                     if len(c_df) > 0:
-                        c_df = c_df[c_df['Video'] == target_video].reset_index(drop=True).to_dict('records')
+                        c_df = c_df[c_df['Video'] == target_video].reset_index(drop=True)
+                        c_df['Video'] = self.file_name
+                        c_df = c_df.to_dict('records')
                         if shape_type == 'rectangles':
                             for r in c_df:
                                 self.image_data.out_rectangles.append(r)
@@ -274,7 +284,8 @@ class ROI_definitions:
         self.zoom_pct_label = Label(self.interact_frame, text="Zoom %: ").grid(row=1, column=5, padx=(10,0))
         self.zoom_pct = Entry(self.interact_frame, width=4, state=DISABLED)
         self.zoom_pct.insert(0, 10)
-        self.pan = Button(self.interact_frame, text='Pan', fg=self.non_select_color, state=DISABLED, command=lambda: self.set_interact_state('pan'))
+        self.pan = Button(self.interact_frame, text='Pan', fg=self.non_select_color, state=DISABLED,command=lambda: self.set_interact_state('pan'))
+        self.shape_info_btn = Button(self.interact_frame, text='Show shape info.', fg=self.non_select_color, command=lambda: self.show_shape_information())
 
         self.interact_frame.grid(row=6, sticky=W)
         self.move_shape_button.grid(row=1, column=0, sticky=W, pady=10, padx=10)
@@ -283,8 +294,10 @@ class ROI_definitions:
         self.zoom_out_button.grid(row=1, column=3, sticky=W, pady=10, padx=10)
         self.zoom_home.grid(row=1, column=4, sticky=W, pady=10, padx=10)
         self.zoom_pct.grid(row=1, column=6, sticky=W, pady=10)
+        self.shape_info_btn.grid(row=1, column=7, sticky=W, pady=10)
 
     def call_remove_ROI(self):
+        self.shape_info_btn.configure(text='Show shape info.')
         self.apply_delete_button.configure(fg=self.select_color)
         self.image_data.remove_ROI(self.selected_video.get())
         self.video_ROIs.remove(self.selected_video.get())
@@ -314,6 +327,40 @@ class ROI_definitions:
         self.duplicate_ROI_btn.grid(row=1, column=6, sticky=W, pady=2, padx=10)
         self.chg_attr_btn.grid(row=1, column=7, sticky=W, pady=2, padx=10)
 
+    def show_shape_information(self):
+        if (len(self.image_data.out_rectangles) + len(self.image_data.out_circles) + len(
+                self.image_data.out_polygon) == 0):
+            print('No shapes to print info for.')
+
+        elif self.shape_info_btn.cget('text') == 'Show shape info.':
+            if len(self.image_data.out_rectangles) > 0:
+                self.rectangle_size_dict = {}
+                self.rectangle_size_dict['Rectangles'] = {}
+                for rectangle in self.image_data.out_rectangles:
+                    self.rectangle_size_dict['Rectangles'][rectangle['Name']] = rectangle_size_calc(rectangle, self.curr_px_mm)
+                self.image_data.rectangle_size_dict = self.rectangle_size_dict
+
+            if len(self.image_data.out_circles) > 0:
+                self.circle_size_dict = {}
+                self.circle_size_dict['Circles'] = {}
+                for circle in self.image_data.out_circles:
+                    self.circle_size_dict['Circles'][circle['Name']] = circle_size_calc(circle, self.curr_px_mm)
+                self.image_data.circle_size_dict = self.circle_size_dict
+
+            if len(self.image_data.out_polygon) > 0:
+                self.polygon_size_dict = {}
+                self.polygon_size_dict['Polygons'] = {}
+                for polygon in self.image_data.out_polygon:
+                    self.polygon_size_dict['Polygons'][polygon['Name']] = polygon_size_calc(polygon, self.curr_px_mm)
+                self.image_data.polygon_size_dict = self.polygon_size_dict
+
+            self.image_data.insert_all_ROIs_into_image(show_size_info=True)
+            self.shape_info_btn.configure(text='Hide shape info.')
+
+        elif self.shape_info_btn.cget('text') == 'Hide shape info.':
+            self.shape_info_btn.configure(text='Show shape info.')
+            self.image_data.insert_all_ROIs_into_image()
+
     def save_menu(self):
         self.save_frame = LabelFrame(self.master, text='Save', font=("Arial", 16, "bold"), padx=5, pady=5)
         self.save_button = Button(self.save_frame, text='Save ROI data', fg=self.non_select_color, command=lambda: self.save_data())
@@ -322,6 +369,7 @@ class ROI_definitions:
 
     def set_current_shape(self, c_shape):
         self.c_shape = c_shape
+        self.shape_info_btn.configure(text='Show shape info.')
         if self.c_shape == self.stored_shape:
             self.rectangle_button.configure(fg=self.non_select_color)
             self.circle_button.configure(fg=self.non_select_color)
@@ -354,6 +402,7 @@ class ROI_definitions:
             self.stored_interact = None
 
     def set_interact_state(self, c_interact):
+        self.shape_info_btn.configure(text = 'Show shape info.')
         if c_interact == self.stored_interact:
             self.move_shape_button.configure(fg=self.non_select_color)
             self.zoom_in_button.configure(fg=self.non_select_color)
@@ -407,7 +456,9 @@ class ROI_definitions:
         self.reset_selected_buttons('interact')
 
     def call_delete_all_rois(self):
-        if len(self.image_data.out_rectangles) + len(self.image_data.out_circles) + len(self.image_data.out_polygon) == 0:
+        self.shape_info_btn.configure(text='Show shape info.')
+        if len(self.image_data.out_rectangles) + len(self.image_data.out_circles) + len(
+                self.image_data.out_polygon) == 0:
             print('SimBA finds no ROIs to delete.')
         else:
             self.image_data.out_rectangles = []
@@ -453,6 +504,7 @@ class ROI_definitions:
 
     def call_duplicate_ROI(self):
         shape_name = self.selected_video.get().split(': ')
+        self.shape_info_btn.configure(text='Show shape info.')
         if shape_name[0] != 'None':
             all_roi_list = self.image_data.out_rectangles + self.image_data.out_circles + self.image_data.out_polygon
             self.shape_type, shape_name = shape_name[0], shape_name[1]
@@ -488,6 +540,7 @@ class ROI_definitions:
             print('No ROI selected.')
 
     def create_draw(self):
+        self.shape_info_btn.configure(text='Show shape info.')
         if self.stored_shape is None:
             raise TypeError('No shape type selected.')
         if not self.name_box.get():
@@ -512,18 +565,82 @@ class ROI_definitions:
         self.roi_dropdown.grid(row=1, column=4, sticky=W, pady=10)
 
     def save_data(self):
+        if os.path.isfile(self.store_fn):
+            rectangles_found = pd.read_hdf(self.store_fn, key='rectangles')
+            circles_found = pd.read_hdf(self.store_fn, key='circleDf')
+            polygons_found = pd.read_hdf(self.store_fn, key='polygons')
+            other_vid_rectangles = rectangles_found[rectangles_found['Video'] != self.file_name]
+            other_vid_circles = circles_found[circles_found['Video'] != self.file_name]
+            other_vid_polygons = polygons_found[polygons_found['Video'] != self.file_name]
+
+            new_rectangles = pd.DataFrame.from_dict(self.image_data.out_rectangles)
+            new_circles = pd.DataFrame.from_dict(self.image_data.out_circles)
+            new_polygons = pd.DataFrame.from_dict(self.image_data.out_polygon)
+
+            if len(new_rectangles) > 0:
+                out_rectangles = pd.concat([other_vid_rectangles, new_rectangles], axis=0).sort_values(by=['Video']).reset_index(drop=True)
+            else:
+                out_rectangles = other_vid_rectangles.sort_values(by=['Video']).reset_index(drop=True)
+
+            if len(new_circles) > 0:
+                out_circles = pd.concat([other_vid_circles, new_circles], axis=0).sort_values(by=['Video']).reset_index(drop=True)
+            else:
+                out_circles = other_vid_circles.sort_values(by=['Video']).reset_index(drop=True)
+
+            if len(new_polygons) > 0:
+                out_polygons = pd.concat([other_vid_polygons, new_polygons], axis=0).sort_values(by=['Video']).reset_index(drop=True)
+            else:
+                out_polygons = other_vid_polygons.sort_values(by=['Video']).reset_index(drop=True)
+
+        else:
+            out_rectangles = pd.DataFrame.from_dict(self.image_data.out_rectangles)
+            out_circles = pd.DataFrame.from_dict(self.image_data.out_circles)
+            out_polygons = pd.DataFrame.from_dict(self.image_data.out_polygon)
+
+            if len(out_rectangles) == 0:
+                out_rectangles = create_emty_df('rectangles')
+            if len(out_circles) == 0:
+                out_circles = create_emty_df('circleDf')
+            if len(out_polygons) == 0:
+                out_polygons = create_emty_df('polygons')
+
+
+
         store = pd.HDFStore(self.store_fn, mode='w')
-        new_rec_df = pd.DataFrame.from_dict(self.image_data.out_rectangles)
-        new_circ_df = pd.DataFrame.from_dict(self.image_data.out_circles)
-        new_poly_df = pd.DataFrame.from_dict(self.image_data.out_polygon)
-        if len(new_rec_df) < 1: new_rec_df = create_emty_df('rectangle')
-        if len(new_circ_df) < 1: new_circ_df = create_emty_df('circle')
-        if len(new_poly_df) < 1: new_poly_df = create_emty_df('polygon')
-        store['rectangles'] = new_rec_df
-        store['circleDf'] = new_circ_df
-        store['polygons'] = new_poly_df
+        store['rectangles'] = out_rectangles
+        store['circleDf'] = out_circles
+        store['polygons'] = out_polygons
         store.close()
         print('ROI definitions saved for video: ' + str(self.file_name))
+
+
+
+        #
+        #
+        #
+        #
+        #
+        # for shape_type in ['rectangles', 'circleDf', 'polygons']:
+        #     try:
+        #         c_df = pd.read_hdf(self.store_fn, key=shape_type, mode='a')
+        #         print(c_df)
+        #     except KeyError:
+        #         c_df = create_emty_df(shape_type)
+        #     c_df = c_df[c_df['Video'] != self.file_name].reset_index(drop=True)
+        #     print(c_df)
+        #     if shape_type == 'rectangles':
+        #         new_shapes = pd.DataFrame.from_dict(self.image_data.out_rectangles)
+        #     elif shape_type == 'circleDf':
+        #         new_shapes = pd.DataFrame.from_dict(self.image_data.out_circles)
+        #     elif shape_type == 'polygons':
+        #         new_shapes = pd.DataFrame.from_dict(self.image_data.out_circles)
+        #     if len(new_shapes) < 1:
+        #         new_shapes = create_emty_df(shape_type)
+        #     c_df = pd.concat([c_df, new_shapes], axis=0).sort_values(by='Video').reset_index(drop=True)
+        #     store[shape_type] = c_df
+        #     print(store[shape_type])
+        # store.close()
+        # print('ROI definitions saved for video: ' + str(self.file_name))
 
     class ChangeAttrMenu:
         def __init__(self, shape_data, image_data):
@@ -606,7 +723,6 @@ class ROI_definitions:
         cv2.destroyAllWindows()
         self.image_data.destroy_windows()
         self.master.destroy()
-        print('asasd')
 
 class PreferenceMenu:
     def __init__(self, image_data):
@@ -615,14 +731,23 @@ class PreferenceMenu:
         pref_win.wm_title("Preference Settings")
         pref_lbl_frame = LabelFrame(pref_win, text='Preferences', font=("Arial", 16, 'bold'), pady=5, padx=5, fg='black')
         line_type_label = Label(pref_lbl_frame, text="Shape line type: ")
+        text_size_label = Label(pref_lbl_frame, text="Text size: ")
+        text_thickness_label = Label(pref_lbl_frame, text="Text thickness: ")
         line_type_list = [4, 8, 16, -1]
+        text_size_list = list(range(1, 20))
+        text_thickness_list = list(range(1, 15))
         click_sensitivity_lbl = Label(pref_lbl_frame, text="Mouse click sensitivity: ")
         click_sensitivity_list = list(range(1, 50, 5))
         self.click_sens = IntVar()
         self.line_type = IntVar()
+        self.text_size = IntVar()
+        self.text_thickness = IntVar()
         self.line_type.set(line_type_list[-1])
+        self.text_size.set(text_size_list[0])
         self.click_sens.set(click_sensitivity_list[0])
         line_type_dropdown = OptionMenu(pref_lbl_frame, self.line_type, *line_type_list)
+        text_thickness_dropdown = OptionMenu(pref_lbl_frame, self.text_thickness, *text_thickness_list)
+        text_size_dropdown = OptionMenu(pref_lbl_frame, self.text_size, *text_size_list)
         click_sens_dropdown = OptionMenu(pref_lbl_frame, self.click_sens, *click_sensitivity_list)
         duplicate_jump_size_lbl = Label(pref_lbl_frame, text="Duplicate shape jump: ")
         duplicate_jump_size_list = list(range(1, 100, 5))
@@ -638,13 +763,16 @@ class PreferenceMenu:
         click_sens_dropdown.grid(row=2, column=1, sticky=W, pady=10)
         duplicate_jump_size_lbl.grid(row=3, column=0, sticky=W, pady=10)
         duplicate_jump_size_dropdown.grid(row=3, column=1, sticky=W, pady=10)
-        pref_save_btn.grid(row=4, column=2, sticky=W, pady=10)
+        text_size_label.grid(row=4, column=0, sticky=W, pady=10)
+        text_size_dropdown.grid(row=4, column=1, sticky=W, pady=10)
+        text_thickness_label.grid(row=5, column=0, sticky=W, pady=10)
+        text_thickness_dropdown.grid(row=5, column=1, sticky=W, pady=10)
+        pref_save_btn.grid(row=5, column=2, sticky=W, pady=10)
 
     def save_prefs(self, image_data):
-        ROI_definitions.click_sens = self.click_sens.get()
-        ROI_definitions.line_type = self.line_type.get()
-        ROI_definitions.duplicate_jump_size = self.duplicate_jump_size.get()
-        image_data.duplicate_jump_size = ROI_definitions.duplicate_jump_size
-        image_data.click_sens = ROI_definitions.click_sens
-        image_data.duplicate_jump_size = ROI_definitions.duplicate_jump_size
+        image_data.click_sens = self.click_sens.get()
+        image_data.text_size = self.text_size.get()
+        image_data.text_thickness = self.text_thickness.get()
+        image_data.line_type = self.line_type.get()
+        image_data.duplicate_jump_size = self.duplicate_jump_size.get()
         print('Saved preference settings.')

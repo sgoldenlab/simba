@@ -2,7 +2,9 @@ import numpy as np
 import re
 
 def update_all_tags(closest_roi):
+
     if closest_roi['Shape_type'] == 'Rectangle':
+
         closest_roi['Tags']['Center tag'] = (int(closest_roi['topLeftX'] + closest_roi['width'] / 2), int(closest_roi['topLeftY'] + closest_roi['height'] / 2))
         closest_roi['Tags']['Top left tag'] = (int(closest_roi['topLeftX']), int(closest_roi['topLeftY']))
         closest_roi['Tags']['Bottom right tag'] = (int(closest_roi['topLeftX'] + closest_roi['width']), int(closest_roi['topLeftY'] + closest_roi['height']))
@@ -23,6 +25,23 @@ def update_all_tags(closest_roi):
     return closest_roi
 
 def move_edge(closest_roi, closest_tag, new_click_loc):
+
+    def rectangle_integrity_check(closest_roi):
+        if closest_roi['topLeftX'] > closest_roi['Bottom_right_X']:
+            top_left_x, bottom_right_x = closest_roi['topLeftX'], closest_roi['Bottom_right_X']
+            closest_roi['topLeftX'] = bottom_right_x
+            closest_roi['Bottom_right_X'] = top_left_x
+            closest_roi['width'] = closest_roi['Bottom_right_X'] - closest_roi['topLeftX']
+            closest_roi['height'] = closest_roi['Bottom_right_Y'] - closest_roi['topLeftY']
+
+        if closest_roi['topLeftY'] > closest_roi['Bottom_right_Y']:
+            top_left_y, bottom_right_y = closest_roi['topLeftY'], closest_roi['Bottom_right_Y']
+            closest_roi['topLeftY'] = bottom_right_y
+            closest_roi['Bottom_right_Y'] = top_left_y
+            closest_roi['width'] = closest_roi['Bottom_right_X'] - closest_roi['topLeftX']
+            closest_roi['height'] = closest_roi['Bottom_right_Y'] - closest_roi['topLeftY']
+
+        return closest_roi
 
     if closest_roi['Shape_type'] == 'Polygon':
         if closest_tag == 'Center_tag':
@@ -50,6 +69,7 @@ def move_edge(closest_roi, closest_tag, new_click_loc):
 
 
     elif closest_roi['Shape_type'] == 'Rectangle':
+
         if closest_tag == "Right tag":
             closest_roi['Bottom_right_X'] = new_click_loc[0]
             closest_roi['width'] = closest_roi['Bottom_right_X'] - closest_roi['topLeftX']
@@ -82,6 +102,11 @@ def move_edge(closest_roi, closest_tag, new_click_loc):
             delta_x, delta_y = closest_roi['Tags']['Center tag'][0] - new_click_loc[0], closest_roi['Tags']['Center tag'][1] - new_click_loc[1]
             closest_roi['topLeftX'] = closest_roi['topLeftX'] - delta_x
             closest_roi['topLeftY'] = closest_roi['topLeftY'] - delta_y
+            closest_roi['Bottom_right_X'] = closest_roi['topLeftX'] + closest_roi['width']
+            closest_roi['Bottom_right_Y'] = closest_roi['topLeftY'] + closest_roi['height']
+
+        closest_roi = rectangle_integrity_check(closest_roi)
+
         update_all_tags(closest_roi)
 
     elif closest_roi['Shape_type'] == 'Circle':

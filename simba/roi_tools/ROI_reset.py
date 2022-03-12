@@ -29,7 +29,7 @@ def reset_video_ROIs(config_path, filename):
     store['rectangles'] = rectanglesInfo
 
     try:
-        circleInfo = rectanglesInfo[rectanglesInfo['Video'] != file_name_wo_ext]
+        circleInfo = circleInfo[circleInfo['Video'] != file_name_wo_ext]
     except KeyError:
         pass
     store['circleDf'] = circleInfo
