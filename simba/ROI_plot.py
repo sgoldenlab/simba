@@ -11,6 +11,10 @@ from simba.rw_dfs import *
 from simba.drop_bp_cords import *
 from simba.drop_bp_cords import get_fn_ext
 from simba.features_scripts.unit_tests import *
+from simba.misc_tools import check_multi_animal_status
+
+# inifile = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\ROI_2_animals\project_folder\project_config.ini"
+# CurrentVideo = "Video10.mp4"
 
 def roiPlot(inifile, CurrentVideo):
     config = ConfigParser()
@@ -27,12 +31,10 @@ def roiPlot(inifile, CurrentVideo):
         wfileType = config.get('General settings', 'workflow_file_type')
     except NoOptionError:
         wfileType = 'csv'
-
     try:
         probability_threshold = config.getfloat('ROI settings', 'probability_threshold')
     except NoOptionError:
         probability_threshold = 0.000
-
 
     animalBodypartList = []
     for bp in range(noAnimals):
@@ -43,25 +45,7 @@ def roiPlot(inifile, CurrentVideo):
     columns2grab = [item[0:3] for item in animalBodypartList]
     columns2grab = [item for sublist in columns2grab for item in sublist]
 
-    try:
-        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
-        multiAnimalIDList = multiAnimalIDList.split(",")
-        if multiAnimalIDList[0] != '':
-            multiAnimalStatus = True
-            print('Applying settings for multi-animal tracking...')
-        else:
-            multiAnimalStatus = False
-            multiAnimalIDList = []
-            for animal in range(noAnimals):
-                multiAnimalIDList.append('Animal ' + str(animal+1) + ' ')
-            print('Applying settings for classical tracking...')
-
-    except NoSectionError:
-        multiAnimalIDList = []
-        for animal in range(noAnimals):
-            multiAnimalIDList.append('Animal ' + str(animal + 1) + ' ')
-        multiAnimalStatus = False
-        print('Applying settings for classical tracking...')
+    multiAnimalStatus, multiAnimalIDList = check_multi_animal_status(config, noAnimals)
 
     logFolderPath = os.path.join(projectPath, 'logs')
     vidInfPath = os.path.join(logFolderPath, 'video_info.csv')
@@ -74,15 +58,14 @@ def roiPlot(inifile, CurrentVideo):
     ROIcoordinatesPath = os.path.join(logFolderPath, 'measures', 'ROI_definitions.h5')
     try:
         rectanglesInfo = pd.read_hdf(ROIcoordinatesPath, key='rectangles')
+        circleInfo = pd.read_hdf(ROIcoordinatesPath, key='circleDf')
+        polygonInfo = pd.read_hdf(ROIcoordinatesPath, key='polygons')
     except FileNotFoundError:
-        print('No ROIs found: please define ROIs using the left-most menu in teh SIMBA ROI tab.')
-    circleInfo = pd.read_hdf(ROIcoordinatesPath, key='circleDf')
-    polygonInfo = pd.read_hdf(ROIcoordinatesPath, key='polygons')
+        print('No ROIs found: please define ROIs using the left-most menu in the SIMBA ROI tab.')
 
     CurrentVideoPath = os.path.join(projectPath, 'videos', CurrentVideo)
     cap = cv2.VideoCapture(CurrentVideoPath)
     _, CurrentVideoName, videoFileType = get_fn_ext(CurrentVideoPath)
-    fps = cap.get(cv2.CAP_PROP_FPS)
     width, height, frames = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     mySpaceScale, myRadius, myResolution, myFontScale = 25, 10, 1500, 0.8
     maxResDimension = max(width, height)
@@ -116,10 +99,6 @@ def roiPlot(inifile, CurrentVideo):
     except KeyError:
         print('ERROR: Make sure you have analyzed the videos before visualizing them. Click on the "Analyze ROI data" buttom first')
     writer = cv2.VideoWriter(currFrameFolderOut, fourcc, currFps, (width*2, height))
-    RectangleColors = [(255, 191, 0), (255, 248, 240), (255,144,30), (230,224,176), (160, 158, 95), (208,224,63), (240, 207,137), (245,147,245), (204,142,0), (229,223,176), (208,216,129)]
-    CircleColors = [(122, 160, 255), (0, 69, 255), (34,34,178), (0,0,255), (128, 128, 240), (2, 56, 121), (21, 113, 239), (5, 150, 235), (2, 106, 253), (0, 191, 255), (98, 152, 247)]
-    polygonColor = [(0, 255, 0), (87, 139, 46), (152,241,152), (127,255,0), (47, 107, 85), (91, 154, 91), (70, 234, 199), (20, 255, 57), (135, 171, 41), (192, 240, 208), (131,193, 157)]
-
     animalColors = []
     cmap = cm.get_cmap('Set1', noAnimals)
     for i in range(cmap.N):
@@ -129,6 +108,7 @@ def roiPlot(inifile, CurrentVideo):
         animalColors.append(rgb)
     currRow = 0
     currentPoints = np.empty((noAnimals, 2), dtype=int)
+
     while (cap.isOpened()):
         try:
             ret, img = cap.read()
@@ -150,9 +130,9 @@ def roiPlot(inifile, CurrentVideo):
                     topLeftX, topLeftY = (Rectangles['topLeftX'].iloc[rectangle], Rectangles['topLeftY'].iloc[rectangle])
                     bottomRightX, bottomRightY = (topLeftX + Rectangles['width'].iloc[rectangle], topLeftY + Rectangles['height'].iloc[rectangle])
                     rectangleName = Rectangles['Name'].iloc[rectangle]
-                    cv2.rectangle(borderImage, (topLeftX, topLeftY), (bottomRightX, bottomRightY), RectangleColors[rectangle], DrawScale)
+                    cv2.rectangle(borderImage, (topLeftX, topLeftY), (bottomRightX, bottomRightY), Rectangles['Color BGR'].iloc[rectangle], Rectangles['Thickness'].iloc[rectangle])
                     for animal in range(len(currentPoints)):
-                        cv2.putText(borderImage, str(rectangleName) + ' ' + str(multiAnimalIDList[animal]) + ' timer:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 1)
+                        cv2.putText(borderImage, str(rectangleName) + ' ' + str(multiAnimalIDList[animal]) + ' timer:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Rectangles['Color BGR'].iloc[rectangle], 1)
                         if ((((topLeftX) <= currentPoints[animal][0] <= (bottomRightX)) and ((topLeftY) <= currentPoints[animal][1] <= (bottomRightY)))) and (current_probability_list[animal] > probability_threshold):
                             rectangleTimes[rectangle][animal] = rectangleTimes[rectangle][animal] + (1 / currFps)
                             if rectangleEntryCheck[rectangle][animal] == True:
@@ -161,17 +141,17 @@ def roiPlot(inifile, CurrentVideo):
                         else:
                             rectangleEntryCheck[rectangle][animal] = True
                         rounded_rec_time = round(rectangleTimes[rectangle][animal], 2)
-                        cv2.putText(borderImage, str(rounded_rec_time), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 1)
+                        cv2.putText(borderImage, str(rounded_rec_time), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Rectangles['Color BGR'].iloc[rectangle], 1)
                         addSpacer += 1
-                        cv2.putText(borderImage, str(rectangleName) + ' ' + str(multiAnimalIDList[animal]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 1)
-                        cv2.putText(borderImage, str(rectangleEntries[rectangle][animal]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, RectangleColors[rectangle], 1)
+                        cv2.putText(borderImage, str(rectangleName) + ' ' + str(multiAnimalIDList[animal]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Rectangles['Color BGR'].iloc[rectangle], 1)
+                        cv2.putText(borderImage, str(rectangleEntries[rectangle][animal]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Rectangles['Color BGR'].iloc[rectangle], 1)
                         addSpacer += 1
 
                 for circle in range(noCircles):
                     circleName, centerX, centerY, radius = (Circles['Name'].iloc[circle], Circles['centerX'].iloc[circle], Circles['centerY'].iloc[circle], Circles['radius'].iloc[circle])
-                    cv2.circle(borderImage, (centerX, centerY), radius,  CircleColors[circle], DrawScale)
+                    cv2.circle(borderImage, (centerX, centerY), radius,  Circles['Color BGR'].iloc[circle], Circles['Thickness'].iloc[circle])
                     for animal in range(len(currentPoints)):
-                        cv2.putText(borderImage, str(circleName) + ' ' + str(multiAnimalIDList[animal]) + ' timer:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale,  CircleColors[circle], 1)
+                        cv2.putText(borderImage, str(circleName) + ' ' + str(multiAnimalIDList[animal]) + ' timer:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale,  Circles['Color BGR'].iloc[circle], 1)
                         euclidPxDistance = int(np.sqrt((currentPoints[animal][0] - centerX) ** 2 + (currentPoints[animal][1] - centerY) ** 2))
                         if (euclidPxDistance <= radius) and (current_probability_list[animal] > probability_threshold):
                             circleTimes[circle][animal] = circleTimes[circle][animal] + (1 / currFps)
@@ -181,19 +161,19 @@ def roiPlot(inifile, CurrentVideo):
                         else:
                             circleEntryCheck[circle][animal] = True
                         rounded_circ_time = round(circleTimes[circle][animal], 2)
-                        cv2.putText(borderImage, str(rounded_circ_time), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 1)
+                        cv2.putText(borderImage, str(rounded_circ_time), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Circles['Color BGR'].iloc[circle], 1)
                         addSpacer += 1
-                        cv2.putText(borderImage, str(circleName) + ' ' + str(multiAnimalIDList[animal]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 1)
-                        cv2.putText(borderImage, str(circleEntries[circle][animal]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, CircleColors[circle], 1)
+                        cv2.putText(borderImage, str(circleName) + ' ' + str(multiAnimalIDList[animal]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Circles['Color BGR'].iloc[circle], 1)
+                        cv2.putText(borderImage, str(circleEntries[circle][animal]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Circles['Color BGR'].iloc[circle], 1)
                         addSpacer += 1
 
                 for polygon in range(noPolygons):
                     PolygonName, vertices = (Polygons['Name'].iloc[polygon], Polygons['vertices'].iloc[polygon])
                     vertices = np.array(vertices, np.int32)
-                    cv2.polylines(borderImage, [vertices], True, polygonColor[polygon], thickness=DrawScale)
+                    cv2.polylines(borderImage, [vertices], True, Polygons['Color BGR'].iloc[polygon], thickness=Polygons['Thickness'].iloc[polygon])
                     for animal in range(len(currentPoints)):
                         pointList = []
-                        cv2.putText(borderImage, str(PolygonName) + ' ' + str(multiAnimalIDList[animal]) + ' timer:', ((width + 5), (height - (height + 10) + spacingScale * addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 1)
+                        cv2.putText(borderImage, str(PolygonName) + ' ' + str(multiAnimalIDList[animal]) + ' timer:', ((width + 5), (height - (height + 10) + spacingScale * addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Polygons['Color BGR'].iloc[polygon], 1)
                         for i in vertices:
                             point = geometry.Point(i)
                             pointList.append(point)
@@ -208,10 +188,10 @@ def roiPlot(inifile, CurrentVideo):
                         else:
                             polygonEntryCheck[polygon][animal] = True
                         rounded_poly_time = round(polygonTime[polygon][animal], 2)
-                        cv2.putText(borderImage, str(rounded_poly_time), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale * addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 1)
+                        cv2.putText(borderImage, str(rounded_poly_time), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale * addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Polygons['Color BGR'].iloc[polygon], 1)
                         addSpacer += 1
-                        cv2.putText(borderImage, str(PolygonName) + ' ' + str(multiAnimalIDList[animal]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 1)
-                        cv2.putText(borderImage, str(polyGonEntries[polygon][animal]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, polygonColor[polygon], 1)
+                        cv2.putText(borderImage, str(PolygonName) + ' ' + str(multiAnimalIDList[animal]) + ' entries:', ((width + 5), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Polygons['Color BGR'].iloc[polygon], 1)
+                        cv2.putText(borderImage, str(polyGonEntries[polygon][animal]), ((int(borderImageWidth-(borderImageWidth/8))), (height - (height + 10) + spacingScale*addSpacer)), cv2.FONT_HERSHEY_TRIPLEX, textScale, Polygons['Color BGR'].iloc[polygon], 1)
                         addSpacer += 1
                 borderImage = np.uint8(borderImage)
                 writer.write(borderImage)

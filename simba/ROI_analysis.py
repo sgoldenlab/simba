@@ -10,6 +10,9 @@ from shapely.geometry import Point
 from simba.drop_bp_cords import getBpHeaders
 from simba.rw_dfs import *
 
+
+
+
 def roiAnalysis(inifile, inputcsv):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
@@ -104,8 +107,6 @@ def roiAnalysis(inifile, inputcsv):
         csv_df.columns = bpHeaders
         currDf = csv_df[columns2grab]
         totalSecInSession = currDf.shape[0] / currFps
-
-        print(animalBodypartList)
 
         for index, row in currDf.iterrows():
             currentPoints = np.empty((noAnimals, 2), dtype=int)

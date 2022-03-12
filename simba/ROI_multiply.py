@@ -43,6 +43,7 @@ def multiplyFreeHand(inifile, currVid):
             store['rectangles'] = rectangularDf
             store['circleDf'] = circleDf
             store['polygons'] = polygonDf
+            print(store['rectangles'])
             store.close()
             print('ROI(s) for ' + CurrVidName + ' applied to all videos')
             print('Next, click on "draw" to modify ROI location(s) or click on "reset" to remove ROI drawing(s)')

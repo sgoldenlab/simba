@@ -137,15 +137,16 @@ def roiFreehand(inifile, currVid):
 
     ### CHECK IF ROI DEFINITIONS EXIST
     try:
-        rectanglesInfo = pd.read_hdf(ROIcoordinatesPath, key='rectangles')
-        circleInfo = pd.read_hdf(ROIcoordinatesPath, key='circleDf')
-        polygonInfo = pd.read_hdf(ROIcoordinatesPath, key='polygons')
+        rectanglesInfo = pd.read_hdf(ROIcoordinatesPath, key='rectangles', mode='a')
+        circleInfo = pd.read_hdf(ROIcoordinatesPath, key='circleDf', mode='a')
+        polygonInfo = pd.read_hdf(ROIcoordinatesPath, key='polygons', mode='a')
         rectangularDf = rectanglesInfo.loc[rectanglesInfo['Video'] == str(CurrVidName)]
         circleDf = circleInfo.loc[circleInfo['Video'] == str(CurrVidName)]
         polygonDf = polygonInfo.loc[polygonInfo['Video'] == str(CurrVidName)]
         inputRect, inputCirc, inputPoly = (rectanglesInfo.copy(), circleInfo.copy(), polygonInfo.copy())
         inputRect, inputCirc, inputPoly = (inputRect[inputRect["Video"] != CurrVidName], inputCirc[inputCirc["Video"] != CurrVidName], inputPoly[inputPoly["Video"] != CurrVidName])
         ROIdefExist = True
+
     except FileNotFoundError:
         ROIdefExist = False
         vidROIDefs = False
