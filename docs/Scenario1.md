@@ -94,11 +94,11 @@ In this step, you will import your pose-estimation tracking data from DeepLabCut
 
 >*Note*: DLC outputs CSV files with exceptionally long file names. We have included a function that will automatically copy the DLC CSV files, remove the excess DLC notations from the filename, and paste the new CSV files within the SimBA project. The new CSV will now have the same name as the corresponding video. The original DLC output CSV will still be present in its original folder.
 
-![](/images/Create_project_2_new.PNG "importcsv")
+![](/images/Import_data_create_project_new_1.png "importcsv")
 
 #### To import multiple DLC csv files
 
-1. Navigate to the `[ Import tracking data ]` tab. The first dropdown menu specify your file-type. In this tutorial we are importing CSV files from DLC and we will leave this at the default (**CSV (DLC/DeepPoseKit)**). If you have pose-estimation data in alternative file-formats, for example from multi-animal DLC or SLEAP, then please see the seperate SimBA  multi-animal tutorial for how to import this data. 
+1. Navigate to the `[ Import tracking data ]` tab. The first dropdown menu specify your file-type. In this tutorial we are importing CSV files from DLC and we will leave this at the default (**CSV (DLC/DeepPoseKit)**). If you have pose-estimation data in alternative file-formats, for example from multi-animal DLC or SLEAP, then please see the seperate [SimBA  multi-animal tutorial](https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md) for how to import this data. 
 
 2. Under the `Interpolate missing pose-estimation data` heading, select how SimBA should handle missing animals in your pose-estimation input files. For best classifier performance, it is important that the animals are present in all the videos throughout the recording. We recommend that you use the [SimBA video clipping tools](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos) to remove time-segments of the video where the animals are absent from the recorded arena. However - if clipping the videos is not an option - then we can tell SimBA to interpolate the missing values. 
 
@@ -106,12 +106,15 @@ You can tell SimBA to *only* interpolate frames where entire animals are missing
 
 ![](/images/Interpolation_0821_3.png "importcsv")
 
-
 >*Note*: We recommend that you make sure that the animals are not absent from the video recording and that you pre-process the videos by removing video segments where the animals are not present, before performing pose-estimation and importing the data into SimBA. Interpolations will result in feeding inaccurate data into SimBA and should be avoided where possible.
 
-3. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the CSV files that you wish to import into your project. Click on `Import csv to project folder`. 
+3. Occasionally, the data coming out of pose-estimation packages is “jittery”, and body-part predictions show small, but unrealistic, “jumps” between sequential frames. “Smoothing” is an optional pre-processing step where the pose-estimation predictions, in any given frame, are averaged with the predictions in the preceding and proceeding frames. This pre-processing step can serve to generate more realistic and truthful tracking predictions. For a *before-and-after* video example of expected output of “smoothing”, check out [THIS VIDEO](https://youtu.be/d9-Bi4_HyfQ).
 
+SimBA allows the option to smooth the post-estimation data using a [Gaussian kernel](https://towardsdatascience.com/gaussian-smoothing-in-time-series-data-c6801f8a4dc) when importing the data. To perform Gaussian smoothing, select `Gaussian` in the “Smoothing data” dropdown menu. Once selected in the dropdown, an entry box titled `Time window (ms)` will be displayed next to the drop-down menu, like in the image below. In this entry box, we specify a time window in milliseconds (e.g., 200). This time window will be used by SimBA in the background to identify the preceding and proceeding frames, the pose-estimation predictions in those frames, and how much influence those predictions should have when correcting the current prediction. If you are unsure what value to use, I recommend to begin with a value somewhere between `100-300`. In this tutorial we will skip smoothing of your pose-estimation data, and select `None` in the `Smoothing` drop-down menu. 
 
+![](/images/Import_data_create_project_new_2.png "importcsv")
+
+4. Under the `Import multiple csv files` heading, click on `Browse Folder` to select the folder that contains the CSV files that you wish to import into your project. Click on `Import csv to project folder`. 
 
 >*Note*: SimBA also provides the ability to import single videos and their corressponding CSV files. For more information, click [here](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1). This method is not used in Scenario 1.
 
