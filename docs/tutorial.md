@@ -81,16 +81,18 @@ In this step, you can choose to import either one or multiple videos. The import
 ### Step 3: Import Tracking Data
 In this step, you will import your pose-estimation tracking data.
 
-![](/images/importcsv.PNG "importcsv")
+![](/images/Import_data_create_project_new_4.png "importcsv")
 
 #### To import csv/json files
 1. Navigate to the `[ Import tracking data ]` tab. Under the `Import tracking data` click on the `File type` drop down menu.
 
-2. From the drop down menu, .csv files = `CSV (DLC/DeepPoseKit)`, and .json files = `JSON (BENTO)`.
+2. From the drop down menu, select the type of data you are importing into SimBA
 
 3. To import multiple files, choose the folder that contains the files by clicking `Browse Folder`, then click `Import csv to project folder`.
 
 4. To import a single file, choose the file by clicking `Browse File`, then click `Import single csv to project folder`.
+
+> Note: Below the `File type` drop-down menu, there are two option menus that can help correct and improve the incoming pose-estimation data (*interpolation*, and *smoothing*). Both of these menus default to `None`, meaning no corrections will be performed on the incoming data. If you are intrested in removing missing values (interpolation), and/or correcting "jitter" (smoothing), please see sections `2` and `3` in [TUTORIAL SCENARIO 1: IMPORT TRACKING DATA](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files) which details these functions, and including video examples of expected results.
 
 #### To import h5 files (multi-animal DLC)
 Please note that you can only import the h5 tracking data after you have imported the videos into the project folder.
