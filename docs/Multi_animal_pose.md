@@ -53,7 +53,7 @@ In this current scenario we will import the tracking data for 8 body-parts on ea
 
 1. After importing your video files, click on the `[Import tracking data]` tab in the `Project configuration` window. In the `Import tracking data` sub-menu, click on the `File type` drop-down menu to select your pose-estimation tracking data file type. 
 
-![](/images/Multi_animal3.jpg "createproject")
+![](/images/Import_data_create_project_new_4.png "createproject")
 
 In this tutorial we have multi-animal tracking data in .H5 file format from DeepLabCut, and we select the `H5 (multi-animal DLC)` option. For more information on the generating .H5 multi-animal tracking files in DeepLabCut, consult the [DeepLabCut tutorials on YouTube](https://www.youtube.com/channel/UC2HEbWpC_1v6i9RnDMy-dfA), the [DeepLabCut GitHub documentation](https://github.com/DeepLabCut/DeepLabCut/releases/tag/v2.2b5), or the [DeepLabCut Gitter channel](https://gitter.im/DeepLabCut/community). SimBA will convert these files during the processes descibed below into organised and more readable CSV files that can be opened with, for example, Microsoft Excel or OpenOffice Calc. 
 
@@ -63,13 +63,15 @@ In this tutorial we have multi-animal tracking data in .H5 file format from Deep
 
 >*Note III*: SimBA focus on use of CSV file formats due to its greater accessability, and SimBA converts alterative pose-estimation tracking formats (e.g., H5, JSON, SLP) behind-the-hood to CSV to enable a greater number of researchers to take advantage of SimBA. If you are tracking a large number of body-parts (e.g., more than 8 body-parts), on a larger number of animals (e.g., more than 3 animals), in longer videos (e.g., more than 20min / 30 fps) then CSV files may be non-optimal to work with due to their relatively slow read/write speed and less-than-ideal compression form (they can become gigabytes after calculating [feature sets](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features)). Although working with CSV files is fine, we are currently working on a tick-box option in SimBA that would allow users to save their data in file formats with better compression ratio and read-write speed. This may be preferred for more advanced users.
 
-2. After selecting the File type, enter the number of animals you are tracking in the `No of animals` entry box. In the current scenario we are tracking two animals and enter the number `2`. After entering the number 2, two further rows will appear asking you to name your two animals. In this tutorial, we will name Animal 1 *Resident* and Animal 2 *Intruder*. 
+2. Below the `File type` drop-down menu, there are two option menus that can help correct and improve the incoming pose-estimation data (*interpolation*, and *smoothing*). Both of these menus default to `None`, meaning no corrections will be performed on the incoming data. If you are intrested in removing missing values (interpolation), and/or correcting "jitter" (smoothing), please sections sections `2` and `3` in [TUTORIAL SCENARIO 1: IMPORT TRACKING DATA](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files) which details these functions, and include video examples of expected results.
+
+3. After selecting the File type, enter the number of animals you are tracking in the `No of animals` entry box. In the current scenario we are tracking two animals and enter the number `2`. After entering the number 2, two further rows will appear asking you to name your two animals. In this tutorial, we will name Animal 1 *Resident* and Animal 2 *Intruder*. 
 
 ![](/images/Multi_animal4.jpg "createproject")
 
 >*Note*: Avoid spaces and commas `,` in your animal names. If you had planned to use spaces in your animal names, we recommend replacing them with underscore `_`. 
 
-3. Multi animal DLC (DLC verson >=2.2b5) offers two tracking methods (skeleton vs. box). In the `Tracking type` dropdown, select the option you used to generate your tracking pose-estimation (this drop-down menu is only relevant for importing deepLabCut H5 files, and ths drop-down is not shown if importing SLEAP SLP data). 
+4. Multi animal DLC (DLC verson >=2.2b5) offers two tracking methods (skeleton vs. box). In the `Tracking type` dropdown, select the option you used to generate your tracking pose-estimation (this drop-down menu is only relevant for importing deepLabCut H5 files, and ths drop-down is not shown if importing SLEAP SLP data). 
 
 5. Next to `Path to h5 files`, click on `Browse` to select the folder that contain you H5 files. The selected folder should contain one H5 file for all the videos imported into the project during [Step 3 of the current tutorial](https://github.com/sgoldenlab/simba/blob/SimBA_no_TF/docs/Multi_animal_pose.md#step-3-import-your-videos). Once you have selected a folder containing your H5 files, click on `Import h5`.
 
