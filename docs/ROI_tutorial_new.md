@@ -271,6 +271,28 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Apply_shapes_other_video.gif" />
 </p>
 
+## Show shape size information. 
+
+Sometimes we need some metrics representing the sizes of the ROIs we have drawn. We can display this by clicking on the `Show shape info.` button located to the right in the `Shape interaction` submenu. 
+
+1. By clicking the `Show shape info.` button, some numbers are displayed inside our ROIs:
+
+  (i). Three numbers are displayed inside each of your drawn **rectangles, representing the length, width and area of the rectangle**
+  
+  (ii) One number is displayed inside each of your drawn **circles, representing the area of your circle.**
+  
+  (iii) One number is displayed inside each of your drawn **polygons, representing the area of your polygon.**
+  
+2. When you have clicked the ``Show shape info.` button, the text of the button toggles to `Hide shape info.` Click the button again to hide the shape information. 
+
+3. The font in which the ROI size information is printed on the image might be grainy, too big, or too small, depending on your video resolution. If that is the case, navigate to the `Preference menu` and correct the `Font size` and `Font thickness` to make the font larger or smaller, as in the last half of the gif below. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/test_9.gif" />
+</p>
+
+
+
 ## Delete all ROI definitions in your SimBA project
 
 Somtimes we may want to delete all ROI definitions in a SimBA project and start from scratch.
