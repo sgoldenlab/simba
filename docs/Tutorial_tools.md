@@ -3,7 +3,10 @@
 
 We have developed video and image processing tools and incorporated them into the overall SimBA pipeline. However, many of the tools are useful on their own or in "one-off" situations. To make these easily accessible, the tools have been incorporated into their own space within the GUI, and are described below.
 
-![alt-text-1](/images/toolsmenu.png)
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/new_tools_img.png" />
+</p>
 
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
 - [Clip video into multiple videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-video-into-multiple-videos)
