@@ -22,6 +22,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Convert .seq to .mp4](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_tools.md#convert--seq-files-to-mp4-files)
 - [Re-order pose-estimation tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 - [Remove body-parts from tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
+- [Visualize pose estimation in folder]()
 
 ## Shorten Videos
 This is a tool used to trim video lengths. The tool contains two different methods: 
@@ -369,3 +370,16 @@ Use this tool to delete user-specified body-parts from pose-estimation tracking 
 </p>
 
 7. Your new files (with the removed body-parts) will be saved in a date-time stamped folder inside the `Data Folder` selected in Step 2. The new folder will be named something like `Reorganized_bp_20210726111127`. You can now go ahead and import the files into your SimBA project. 
+
+### Visualize pose estimation in folder
+Use this tool to visualize the pose-estimation of all the files inside a SimBA project directory. This tool can be useful when you have [interpolated  and/or smoothened](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data) your pose-estimation data at import, and now you want to visualize the results of that interpolation and smoothing. 
+
+1. Click on `Tools`, then `Visualize pose-estimation in folder...`.
+2. In the `Input directory (with csv/parquet files)` menu, click bowse and select a folder that contain CSV or parquet files (e.g., the `project_folder/csv/input_csv` directory) 
+3. In the `Output directory (where your videos will be saved)` menu, click bowse and select a folder where your videos should be saved (I recommend to choose an empty folder or create a new folder).
+4. In the `Circle size` entry box, choose the size of the circles denoting the location of your body-parts (e.g., `5`)
+5. Click on the `Visualize pose`. You can follow the progress in the main SimBA terminal window. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/viz_pose_folder.png" />
+</p>
