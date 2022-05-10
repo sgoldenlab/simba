@@ -8,10 +8,10 @@ SimBA has an [in-built behavior annotation interface](https://github.com/sgolden
 
 SimBA currently supports the import of annotations created in:
 
-* [SOLOMON CODER] - https://solomon.andraspeter.com/
-* [BORIS] - https://www.boris.unito.it/
-* [BENTO] - https://github.com/neuroethology/bentoMAT
-* [ETHOVISION] - https://www.noldus.com/ethovision-xt
+* [SOLOMON CODER](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-bento-and-solomon-annotations) - https://solomon.andraspeter.com/
+* [BORIS](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-boris-annotations) - https://www.boris.unito.it/
+* [BENTO](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-bento-and-solomon-annotations) - https://github.com/neuroethology/bentoMAT
+* [ETHOVISION](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-ethovision-annotations) - https://www.noldus.com/ethovision-xt
 
 ## BEFORE IMPORTING THIRD-PARTY ANNOTATIONS (BEHAVIOR LABELS) INTO YOUR SIMBA PROJECT
 
