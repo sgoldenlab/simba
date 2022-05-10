@@ -1,0 +1,27 @@
+Observation id,testobs,,,,,,,
+,,,,,,,,
+Media file(s),,,,,,,,
+,,,,,,,,
+Player #1,D:/simbatest/test/project_folder/videos/00_000_000_split2.avi,,,,,,,
+Player #2,C:/Users/Steven/Videos/vlc-record-2020-10-14-17h04m36s-m3v1mp4DLC_resnet50_Test2Oct5shuffle1_10000_bx_bp_labeled.avi-.avi,,,,,,,
+,,,,,,,,
+Observation date,4/13/2021 12:55,,,,,,,
+,,,,,,,,
+Description,,,,,,,,
+,,,,,,,,
+Time offset (s),0,,,,,,,
+,,,,,,,,
+independent variables,,,,,,,,
+variable,value,,,,,,,
+,,,,,,,,
+Time,Media file path,Total length,FPS,Subject,Behavior,Behavioral category,Comment,Status
+1.876,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,attack,,,START
+2.701,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,attack,,,STOP
+11.576,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,attack,,,START
+13.375,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,attack,,,STOP
+245.655,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,sniffing,,,START
+248.481,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,sniffing,,,STOP
+476.374,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,attack,,,START
+478.924,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,attack,,,STOP
+886.727,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,sniffing,,,START
+889.778,Z:/Golden_Lab_Users/Goodwin_Nastacia/10_2019_CSDS/CSDS/Processed/rgb/30_frame_no/Video10.mp4,1247.74,15,,sniffing,,,STOP
