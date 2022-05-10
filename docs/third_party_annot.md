@@ -10,7 +10,7 @@ SimBA currently supports the import of annotations created in:
 
 * [SOLOMON CODER] - https://solomon.andraspeter.com/
 * [BORIS] - https://www.boris.unito.it/
-* [MARS / BENTO] - https://github.com/neuroethology/bentoMAT
+* [BENTO] - https://github.com/neuroethology/bentoMAT
 * [ETHOVISION] - https://www.noldus.com/ethovision-xt
 
 ## BEFORE IMPORTING THIRD-PARTY ANNOTATIONS (BEHAVIOR LABELS) INTO YOUR SIMBA PROJECT
@@ -38,7 +38,7 @@ In brief, before we can import the third-party annotations, we need to (i) creat
 
 4. If the appending of your annotations where completed successfully, you should see files representing each of your videos inside the `project_folder/csv/targets_inserted` directory of your SimBA project. If you open these files, you should see one column (towards the very and of the file) representing each of your classifiers. These columns will be populated with `0` and `1`, representing the absence (`0`) and presence (`1`) of the behavior according to your annotations in the BENTO/SOLOMON annotation tools. 
 
-> Note 1: For SimBA to know which third-party annotation files should be appended to which video data file, the files within SimBA and the Solomon/MARS annotation files need to have the same name. Thus, if you are processing two videos in SimBA named `Video_1` and `Video_2`, then the Solomon/MARS annotation files located in the folder defined in Step 5 above should be named `Video_1` and `Video_2` (excluding the file-endings). 
+> Note 1: For SimBA to know which third-party annotation files should be appended to which video data file, the files within SimBA and the Solomon/BENTO annotation files need to have the same name. Thus, if you are processing two videos in SimBA named `Video_1` and `Video_2`, then the Solomon/BENTO annotation files located in the folder defined in Step 5 above should be named `Video_1` and `Video_2` (excluding the file-endings). 
 
 > Note 2: Keep in mind that the behaviors/classifiers has to be defined (with the same names as they appear in the third-party annotation files) in the SimBA project folder. For example, SimBA **will not** recognize a behaviour in the third-party annotation files called `sniffing` if the behavior in the SimBA project is defined as `Sniff` or `Sniffing`. To add / remove classifier(s), use the `Further imports(data/video/frames)` --> `Add classifier` or `Remove existing classifier` menus.
 
