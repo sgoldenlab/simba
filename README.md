@@ -166,7 +166,8 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [SimBA generic tutorial](docs/tutorial.md) 📘
 - [SimBA friendly asked questions (FAQ)](docs/FAQ.md) 📕
 - [SimBA behavioral annotation interface](docs/labelling_aggression_tutorial.md) 🏷️
-- [Using user-defined ROIs in SimBA](/docs/ROI_tutorial.md) 🗺️
+- [Using third-part annotation tools in SimBA](docs/third_party_annot.md) 🏷️
+- [Using user-defined ROIs in SimBA](/docs/ROI_tutorial_new.md) 🗺️
 - [Using multi-animal pose (maDLC/SLEAP/APT) in SimBA](/docs/Multi_animal_pose.md) 🐭🐭
 - [Using the SimBA data analysis and export dashboard](docs/plotly_dash.md) 📊
 - [Explainable machine classifications in SimBA (SHAP)](docs/SHAP.md) 🧮
