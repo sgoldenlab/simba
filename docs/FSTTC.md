@@ -31,7 +31,9 @@ The FSTTC is calculated as:
 
 Where the Δt hyper-parameter is a time-window (e.g 2000ms - Lee et al. 2019). P is the proportion of behavior B onsets that fall inside Δt following the onset of behavior A. T<sub>A</sub> is the proportion of the total session time that falls inside Δt following behavior A onset. T<sub>B</sub>  is the proportion of the total session time that falls inside Δt following behavior B onset.
 
+<!---
 >Note: Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces statistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f) techniques but.. yeah.. this works and RL have to wait.. :)
+-->
 
 
 ## Step 1: Generate a dataset.
