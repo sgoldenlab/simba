@@ -5,20 +5,22 @@ import math
 import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
+from simba.features_scripts.unit_tests import check_minimum_roll_windows
 from configparser import ConfigParser, NoOptionError, NoSectionError
+from simba.features_scripts.unit_tests import read_video_info
+from simba.drop_bp_cords import get_workflow_file_format
+from simba.drop_bp_cords import get_fn_ext
+from simba.rw_dfs import read_df, save_df
 
 def extract_features_wotarget_9(inifile):
-    configFile = str(inifile)
     config = ConfigParser()
-    config.read(configFile)
+    config.read(str(inifile))
     csv_dir = config.get('General settings', 'csv_path')
     csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     csv_dir_out = os.path.join(csv_dir, 'features_extracted')
-    vidInfPath = config.get('General settings', 'project_path')
-    vidInfPath = os.path.join(vidInfPath, 'logs')
-    vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
+    project_path = config.get('General settings', 'project_path')
+    vidInfPath = os.path.join(project_path, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-    #change videos name to str
     vidinfDf.Video = vidinfDf.Video.astype('str')
 
     if not os.path.exists(csv_dir_out):
@@ -31,45 +33,31 @@ def extract_features_wotarget_9(inifile):
             math.atan2(cy - by, cx - bx) - math.atan2(ay - by, ax - bx))
         return ang + 360 if ang < 0 else ang
 
-    roll_windows = []
     roll_windows_values = [2, 5, 6, 7.5, 15]
-    loopy = 0
+    roll_windows_values = check_minimum_roll_windows(roll_windows_values, vidinfDf['fps'].min())
 
-    #REMOVE WINDOWS THAT ARE TOO SMALL
-    minimum_fps = vidinfDf['fps'].min()
-    for win in range(len(roll_windows_values)):
-        if minimum_fps < roll_windows_values[win]:
-            roll_windows_values[win] = minimum_fps
-        else:
-            pass
-    roll_windows_values = list(set(roll_windows_values))
+    wfileType = get_workflow_file_format(config)
 
-    filesFound = glob.glob(csv_dir_in + '/*.csv')
-    print('Extracting features from ' + str(len(filesFound)) + ' files...')
+    filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     print('Extracting features from ' + str(len(filesFound)) + ' file(s)...')
 
     ########### CREATE PD FOR RAW DATA AND PD FOR MOVEMENT BETWEEN FRAMES ###########
-    for i in filesFound:
+    for file_path in filesFound:
         M1_hull_large_euclidean_list = []
         M1_hull_small_euclidean_list = []
         M1_hull_mean_euclidean_list = []
         M1_hull_sum_euclidean_list = []
-        currentFile = i
-        currVidName = os.path.basename(currentFile)
-        currVidName = currVidName.replace('.csv', '')
 
-        # get current pixels/mm
-        currVideoSettings = vidinfDf.loc[vidinfDf['Video'] == currVidName]
-        try:
-            currPixPerMM = float(currVideoSettings['pixels/mm'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
-        fps = float(currVideoSettings['fps'])
+        _, currVidName, _ = get_fn_ext(file_path)
+
+        currVideoSettings, currPixPerMM, fps = read_video_info(vidinfDf,currVidName)
         print('Processing ' + '"' + str(currVidName) + '".' + ' Fps: ' + str(fps) + ". mm/ppx: " + str(currPixPerMM))
 
+        roll_windows = []
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))
-        loopy += 1
+
+
         columnHeaders = ["Mouse1_left_ear_x", "Mouse1_left_ear_y", "Mouse1_left_ear_p", \
                          "Mouse1_right_ear_x", "Mouse1_right_ear_y", "Mouse1_right_ear_p", \
                          "Mouse1_left_hand_x", "Mouse1_left_hand_y", "Mouse1_left_hand_p", \
@@ -79,12 +67,10 @@ def extract_features_wotarget_9(inifile):
                          "Mouse1_nose_x", "Mouse1_nose_y", "Mouse1_nose_p", \
                          "Mouse1_tail_x", "Mouse1_tail_y", "Mouse1_tail_p", \
                          "Mouse1_back_x", "Mouse1_back_y", "Mouse1_back_p"]
-        csv_df = pd.read_csv(currentFile, names=columnHeaders, low_memory=False)
-        csv_df = csv_df.fillna(0)
-        csv_df = csv_df.drop(csv_df.index[[0]])
-        csv_df = csv_df.apply(pd.to_numeric)
-        csv_df = csv_df.reset_index()
-        csv_df = csv_df.reset_index(drop=True)
+
+        csv_df = read_df(file_path, wfileType).fillna(0)
+        csv_df = csv_df.apply(pd.to_numeric).reset_index(drop=True)
+        csv_df.columns = columnHeaders
 
         print('Evaluating convex hulls...')
         ########### MOUSE AREAS ###########################################
@@ -469,13 +455,10 @@ def extract_features_wotarget_9(inifile):
             func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
 
         ########### DROP COORDINATE COLUMNS ###########################################
-        csv_df = csv_df.reset_index(drop=True)
-        csv_df = csv_df.fillna(0)
-        csv_df = csv_df.drop(columns=['index'])
-        fileName = os.path.basename(currentFile)
-        fileName = fileName.split('.')
-        fileOut = str(fileName[0]) + str('.csv')
-        saveFN = os.path.join(csv_dir_out, fileOut)
-        csv_df.to_csv(saveFN)
+        csv_df = csv_df.reset_index(drop=True).fillna(0)
+        save_path = os.path.join(csv_dir_out, currVidName + '.' + wfileType)
+        save_df(csv_df, wfileType, save_path)
         print('Feature extraction complete for ' + '"' + str(currVidName) + '".')
     print('All feature extraction complete.')
+
+#extract_features_wotarget_9(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\9bpagain\project_folder\project_config.ini")

@@ -6,6 +6,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
 from configparser import ConfigParser, NoOptionError, NoSectionError
+from simba.features_scripts.unit_tests import check_minimum_roll_windows, read_video_info
 
 def extract_features_wotarget_4(inifile):
     configFile = str(inifile)
@@ -35,16 +36,11 @@ def extract_features_wotarget_4(inifile):
     filesFound = []
     roll_windows = []
     roll_windows_values = [2, 5, 6, 7.5, 15]
-    loopy = 0
+
 
     #REMOVE WINDOWS THAT ARE TOO SMALL
     minimum_fps = vidinfDf['fps'].min()
-    for win in range(len(roll_windows_values)):
-        if minimum_fps < roll_windows_values[win]:
-            roll_windows_values[win] = minimum_fps
-        else:
-            pass
-    roll_windows_values = list(set(roll_windows_values))
+    roll_windows_values = check_minimum_roll_windows(roll_windows_values, minimum_fps)
 
     try:
         wfileType = config.get('General settings', 'workflow_file_type')
@@ -74,15 +70,14 @@ def extract_features_wotarget_4(inifile):
 
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))
-        loopy += 1
+
         columnHeaders = ["Ear_left_x", "Ear_left_y", "Ear_left_p", "Ear_right_x", "Ear_right_y",
                          "Ear_right_p", "Nose_x", "Nose_y", "Nose_p", "Tail_base_x",
                          "Tail_base_y", "Tail_base_p"]
         csv_df = pd.read_csv(currentFile, names=columnHeaders, low_memory=False)
         csv_df = csv_df.fillna(0)
-        csv_df = csv_df.drop(csv_df.index[[0]])
+        #csv_df = csv_df.drop(csv_df.index[[0]])
         csv_df = csv_df.apply(pd.to_numeric)
-        csv_df = csv_df.reset_index()
         csv_df = csv_df.reset_index(drop=True)
 
         print('Evaluating convex hulls...')

@@ -6,7 +6,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 import scipy
 from configparser import ConfigParser, NoOptionError, NoSectionError
-from simba.features_scripts.unit_tests import read_video_info
+from simba.features_scripts.unit_tests import read_video_info, check_minimum_roll_windows
 from simba.rw_dfs import read_df, save_df
 
 def extract_features_wotarget_14(inifile):
@@ -17,10 +17,8 @@ def extract_features_wotarget_14(inifile):
     csv_dir_in = os.path.join(csv_dir, 'outlier_corrected_movement_location')
     csv_dir_out = os.path.join(csv_dir, 'features_extracted')
     vidInfPath = config.get('General settings', 'project_path')
-    vidInfPath = os.path.join(vidInfPath, 'logs')
-    vidInfPath = os.path.join(vidInfPath, 'video_info.csv')
+    vidInfPath = os.path.join(vidInfPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
-    #change videos name to str
     vidinfDf.Video = vidinfDf.Video.astype('str')
 
     if not os.path.exists(csv_dir_out):
@@ -33,19 +31,13 @@ def extract_features_wotarget_14(inifile):
             math.atan2(cy - by, cx - bx) - math.atan2(ay - by, ax - bx))
         return ang + 360 if ang < 0 else ang
 
-    filesFound = []
+
     roll_windows = []
     roll_windows_values = [2, 5, 6, 7.5, 15]
-    loopy = 0
 
     #REMOVE WINDOWS THAT ARE TOO SMALL
     minimum_fps = vidinfDf['fps'].min()
-    for win in range(len(roll_windows_values)):
-        if minimum_fps < roll_windows_values[win]:
-            roll_windows_values[win] = minimum_fps
-        else:
-            pass
-    roll_windows_values = list(set(roll_windows_values))
+    roll_windows_values = check_minimum_roll_windows(roll_windows_values, minimum_fps)
 
     try:
         wfileType = config.get('General settings', 'workflow_file_type')
@@ -75,7 +67,6 @@ def extract_features_wotarget_14(inifile):
 
         for i in range(len(roll_windows_values)):
             roll_windows.append(int(fps / roll_windows_values[i]))
-        loopy += 1
         columnHeaders = ["Ear_left_1_x", "Ear_left_1_y", "Ear_left_1_p", "Ear_right_1_x", "Ear_right_1_y",
                          "Ear_right_1_p", "Nose_1_x", "Nose_1_y", "Nose_1_p", "Center_1_x", "Center_1_y", "Center_1_p",
                          "Lat_left_1_x", "Lat_left_1_y",
@@ -92,9 +83,9 @@ def extract_features_wotarget_14(inifile):
         csv_df.columns = columnHeaders
 
         #csv_df = pd.read_csv(currentFile, names=columnHeaders, low_memory=False)
-        csv_df = csv_df.fillna(0)
-        csv_df = csv_df.drop(csv_df.index[[0]])
-        csv_df = csv_df.apply(pd.to_numeric).reset_index(drop=True)
+        csv_df = csv_df.fillna(0).apply(pd.to_numeric).reset_index(drop=True)
+        #csv_df = csv_df.drop(csv_df.index[[0]])
+        #csv_df = csv_df.apply(pd.to_numeric).reset_index(drop=True)
 
         print('Evaluating convex hulls...')
         ########### MOUSE AREAS ###########################################
@@ -707,4 +698,4 @@ def extract_features_wotarget_14(inifile):
     print('All feature extraction complete.')
 
 
-# extract_features_wotarget_14(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Parquet_test\project_folder\project_config.ini")
+#extract_features_wotarget_14(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Multi_animal_2_animals\project_folder\project_config.ini")

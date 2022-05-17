@@ -160,7 +160,7 @@ def extract_features_wotarget_user_defined(inifile):
         csv_df["Low_prob_detections_0.1"] = probabilityDf.apply(func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
         values_in_range_min, values_in_range_max = 0.000000000, 0.5
         csv_df["Low_prob_detections_0.5"] = probabilityDf.apply(func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
-        values_in_range_min, values_in_range_max = 0.000000000, 0.75
+        values_in_range_mcreate_body_part_dictionaryin, values_in_range_max = 0.000000000, 0.75
         csv_df["Low_prob_detections_0.75"] = probabilityDf.apply(func=lambda row: count_values_in_range(row, values_in_range_min, values_in_range_max), axis=1)
 
         ########### SAVE DF ###########################################
