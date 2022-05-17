@@ -28,7 +28,7 @@ def splitall(path):
     return allparts
 
 def extract_frames_ini(directory, configinifile):
-    filesFound = glob.glob(directory + '/*.avi') + glob.glob(directory + '/*.mp4')
+    filesFound = glob.glob(directory + '/*.avi') + glob.glob(directory + '/*.mp4') + glob.glob(directory + '/*.AVI') + glob.glob(directory + '/*.MP4')
     configFile = str(configinifile)
     config = ConfigParser()
     try:
@@ -36,13 +36,12 @@ def extract_frames_ini(directory, configinifile):
     except MissingSectionHeaderError:
         print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
     projectPath = config.get('General settings', 'project_path')
-    for video in filesFound:
-        fName = os.path.basename(video)
-        fName = fName[:-4]
+    for video_path in filesFound:
+        dir_name, fName, ext = get_fn_ext(video_path)
         outputPath = os.path.join(projectPath, 'frames', 'input', fName)
         if not os.path.exists(outputPath):
             os.makedirs(outputPath)
-            video_to_frames(video, outputPath, overwrite=True, every=1, chunk_size=1000)
+            video_to_frames(video_path, outputPath, overwrite=True, every=1, chunk_size=1000)
             print('Frames were extracted for',os.path.basename(outputPath))
 
         else:

@@ -3,7 +3,6 @@ from configparser import ConfigParser, NoOptionError, NoSectionError
 from simba.drop_bp_cords import *
 import numpy as np
 
-
 class Interpolate(object):
     def __init__(self, config_file_path, in_file):
         self.in_df = in_file

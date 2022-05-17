@@ -8,7 +8,7 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 from simba.interpolate_pose import *
 
-def json2csv_folder(configini, folderpath, interpolation_method):
+def json2csv_folder(configini, folderpath, interpolation_method, smoothing_method):
     print('Converting JSON files...')
     config = ConfigParser()
     config.read(configini)
@@ -53,7 +53,7 @@ def json2csv_folder(configini, folderpath, interpolation_method):
         print('JSON file ' + basename + ' imported')
     print('All MARS Json files imported in SimBA')
 
-def json2csv_file(configini, filename, interpolation_method):
+def json2csv_file(configini, filename, interpolation_method, smoothing_method):
     config = ConfigParser()
     config.read(configini)
     projectPath = config.get('General settings', 'project_path')
@@ -92,7 +92,7 @@ def json2csv_file(configini, filename, interpolation_method):
     keypointsDf.columns = pd.MultiIndex.from_tuples(MultiIndexCol, names=['scorer', 'bodypart', 'coords'])
     save_df(keypointsDf, wfileType, savePath)
     if interpolation_method != 'None':
-        prit
+        print('performing interpolation...')
         perform_interpolation(savePath, wfileType, configini, interpolation_method)
     print('JSON file ' + basename + ' imported')
     print('All MARS Json files imported in SimBA')

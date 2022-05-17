@@ -9,11 +9,13 @@ import cv2
 import pyarrow.parquet as pq
 import pyarrow as pa
 from simba.interpolate_pose import *
-from simba.drop_bp_cords import get_fn_ext
+from simba.drop_bp_cords import get_fn_ext, get_workflow_file_format
+from simba.misc_tools import check_multi_animal_status, smooth_data_gaussian
 import tables
 from pathlib import Path
 
-def import_trk(inifile, dataFolder, idlist, interpolation_method):
+
+def import_trk(inifile, dataFolder, idlist, interpolation_method, smooth_settings_dict):
     global currIDcounter
 
     def define_ID(event, x, y, flags, param):
@@ -42,43 +44,19 @@ def import_trk(inifile, dataFolder, idlist, interpolation_method):
     videoFolder = os.path.join(project_path, 'videos')
     outputDfFolder = os.path.join(project_path, 'csv', 'input_csv')
 
-    try:
-        wfileType = config.get('General settings', 'workflow_file_type')
-    except NoOptionError:
-        wfileType = 'csv'
+    wfileType = get_workflow_file_format(config)
 
     # ADD CORRECTION IF ONLY ONE ANIMAL
-    print(noAnimals)
     if noAnimals < 2:
         idlist = ['Animal_1']
-    print(idlist)
 
-    try:
-        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
-        multiAnimalIDList = multiAnimalIDList.split(",")
-        if multiAnimalIDList[0] != '':
-            multiAnimalStatus = True
-            print('Applying settings for multi-animal tracking...')
-        else:
-            multiAnimalStatus = False
-            for animal in range(noAnimals):
-                multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
-            print('Applying settings for classical tracking...')
-    except NoSectionError:
-        multiAnimalIDList = []
-        for animal in range(noAnimals):
-            multiAnimalIDList.append('Animal_' + str(animal + 1) + '_')
-        multiAnimalStatus = False
-        print('Applying settings for classical tracking...')
-
-    print(multiAnimalStatus, multiAnimalIDList)
-
+    multiAnimalStatus, multiAnimalIDList = check_multi_animal_status(config, noAnimals)
     Xcols, Ycols, Pcols = getBpNames(inifile)
     currIDList = idlist
-
     cMapSize = int(len(Xcols) / noAnimals) + 1
     colorListofList = createColorListofList(noAnimals, cMapSize)
     animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, noAnimals, Xcols, Ycols, Pcols, colorListofList)
+
 
     for filename in filesFound:
         bpNameList, x_heads, y_heads, xy_heads, indBpCordList, EuclidDistanceList, colorList, bp_cord_names, changeList, projBpNameList = [], [], [], [], [], [], [], [], [], []
@@ -101,6 +79,9 @@ def import_trk(inifile, dataFolder, idlist, interpolation_method):
         try:
             trk_dict = sio.loadmat(filename)
             trk_coordinates = trk_dict['pTrk']
+            animals_tracked = trk_coordinates.shape[3]
+            animals_tracked_list = [trk_coordinates[..., i] for i in range(animals_tracked)]
+
 
         except NotImplementedError:
             with h5py.File(filename, 'r') as trk_dict:
@@ -114,7 +95,8 @@ def import_trk(inifile, dataFolder, idlist, interpolation_method):
                 else:
                     trk_coordinates = np.swapaxes(t_second, 0, 2)
                     animals_tracked = 1
-        print('Number of animals detected in TRK: ' + str(animals_tracked))
+            print('Number of animals detected in TRK: ' + str(animals_tracked))
+
         animal_dfs = []
         if animals_tracked != 1:
             for animal in animals_tracked_list:
@@ -131,11 +113,11 @@ def import_trk(inifile, dataFolder, idlist, interpolation_method):
         currDf = pd.concat([animal_dfs, p_cols], axis=1).sort_index(axis=1)
         animal_dfs.columns = np.arange(len(animal_dfs.columns))
         new_headers = []
-        print(animalBpDict)
+
         for animal in animalBpDict.keys():
             for currXcol, currYcol, currPcol in zip(animalBpDict[animal]['X_bps'], animalBpDict[animal]['Y_bps'], animalBpDict[animal]['P_bps']):
                 new_headers.extend((animal + '_' + currXcol, animal + '_' + currYcol, animal + '_' + currPcol))
-        print(new_headers)
+
         currDf.columns = new_headers
 
         cap = cv2.VideoCapture(video_file)
@@ -267,7 +249,7 @@ def import_trk(inifile, dataFolder, idlist, interpolation_method):
                 loop += 1
         currDf.columns = new_headers
         outDf = pd.DataFrame()
-        print(currDf)
+
         for name in currIDList:
             currCols = [col for col in currDf.columns if name in col]
             sliceDf = currDf[currCols]
@@ -283,6 +265,7 @@ def import_trk(inifile, dataFolder, idlist, interpolation_method):
             pq.write_table(table, os.path.join(outputDfFolder, outputCSVname))
         if wfileType == 'csv':
             outDf.to_csv(os.path.join(outputDfFolder, outputCSVname))
+
         if interpolation_method != 'None':
             print('Interpolating missing values (Method: ' + str(interpolation_method) + ') ...')
             if wfileType == 'parquet': csv_df = pd.read_parquet(os.path.join(outputDfFolder, outputCSVname))
@@ -296,6 +279,19 @@ def import_trk(inifile, dataFolder, idlist, interpolation_method):
                 pq.write_table(table, os.path.join(outputDfFolder, outputCSVname))
             if wfileType == 'csv':
                 interpolate_body_parts.new_df.to_csv(os.path.join(outputDfFolder, outputCSVname))
+
+        if smooth_settings_dict['Method'] == 'Gaussian':
+            time_window = smooth_settings_dict['Parameters']['Time_window']
+            smooth_data_gaussian(config=config, file_path=os.path.join(outputDfFolder, outputCSVname), time_window_parameter=time_window)
+
         print('Imported', outputCSVname, 'to current project.')
     print(
         'All APT TRK tracking files ordered and imported into SimBA project in the chosen workflow file format')
+
+
+# import_trk(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\TRK_test\project_folder\project_config.ini",
+#                    r"Z:\DeepLabCut\DLC_extract\Troubleshooting\TRK_test\import\data",
+#                    ['Bob', 'Ben', 'Bill'],
+#                    'None',
+#                    {'Method': 'Gaussian', 'Parameters': {'Time_window': '200'}})
+

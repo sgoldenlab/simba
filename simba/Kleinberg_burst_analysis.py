@@ -31,6 +31,7 @@ def kleinberg(offsets, s=2, gamma=1):
 
     T = np.sum(gaps)
     n = np.size(gaps)
+
     g_hat = T / n
 
     k = int(math.ceil(float(1 + math.log(T, s) + math.log(1 / np.amin(gaps), s))))
@@ -87,7 +88,6 @@ def kleinberg(offsets, s=2, gamma=1):
         prev_q = q[t]
 
     bursts = np.array([np.repeat(np.nan, N), np.repeat(offsets[0], N), np.repeat(offsets[0], N)], ndmin=2, dtype=object).transpose()
-
     burst_counter = -1
     prev_q = 0
     stack = np.repeat(np.nan, N)
@@ -115,9 +115,9 @@ def kleinberg(offsets, s=2, gamma=1):
     return bursts
 
 def run_kleinberg(config_ini_path, classifier_names, sigma=2, gamma=0.3, hierarchy=1):
+    print('Hyperparameters - Sigma: {}, Gamma: {}, Hierarchy: {}'.format(sigma, gamma, hierarchy))
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
-    sigma= float(sigma)
-    gamma = float(gamma)
+    sigma, gamma= float(sigma), float(gamma)
     hierarchy = float(hierarchy)
     config = ConfigParser()
     config.read(config_ini_path)
@@ -132,40 +132,38 @@ def run_kleinberg(config_ini_path, classifier_names, sigma=2, gamma=0.3, hierarc
     files_found = glob.glob(machine_results_path + '/*.' + wfileType)
     for file in files_found:
         missingClassifications = []
-        inputDf = read_df(file, wfileType)
+        inputDf = read_df(file, wfileType).reset_index(drop=True)
+        print('Processing {}'.format(os.path.basename(file)))
         for classifierName in classifier_names:
             baseName = os.path.basename(file)
             currDf = inputDf[inputDf[classifierName] == 1]
             offsets = list(currDf.index.values)
             try:
-                print(sigma,gamma,hierarchy)
-                print(type(sigma),type(gamma),type(hierarchy))
                 kleinbergBouts = kleinberg(offsets, s=sigma, gamma=gamma)
                 kleinbergDf = pd.DataFrame(kleinbergBouts, columns = ['Hierarchy', 'Start', 'Stop'])
                 kleinbergDf['Stop'] += 1
                 file_name = 'Kleinberg_log_' + classifierName + '_' + str(dateTime) + '.csv'
                 logs_file_name = os.path.join(logs_path, file_name)
                 kleinbergDf.to_csv(logs_file_name)
-                kleinbergDf_2 = kleinbergDf[kleinbergDf['Hierarchy'] == hierarchy]
-                kleinbergDf_2 = kleinbergDf_2.reset_index(drop=True)
+                kleinbergDf_2 = kleinbergDf[kleinbergDf['Hierarchy'] == hierarchy].reset_index(drop=True)
                 inputDf[classifierName] = 0
                 for index, row in kleinbergDf_2.iterrows():
                     rangeList = list(range(row['Start'], row['Stop']))
-                    print(rangeList)
                     for frame in rangeList:
                         inputDf.at[frame, classifierName] = 1
-                print(inputDf[classifierName])
-                print(classifierName)
             except ValueError:
                 inputDf[classifierName] = 0
                 missingClassifications.append(classifierName)
-        save_df(inputDf, wfileType, file)
+        #save_df(inputDf, wfileType, file)
         if not missingClassifications:
             print('Saved ' + 'Kleinberg bout corrected data for: ' + baseName)
         else:
             print('Saved ' + baseName + '. Note: No behavioural bouts found in file for the following classifiers: ' + str(missingClassifications))
 
+        return inputDf
 
+
+#ata = run_kleinberg(r'Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini', ['int'], sigma=2, gamma=0.3, hierarchy=1)
 
 
 

@@ -367,7 +367,6 @@ def load_folder(project_name):
     #get the target inserted csv
     configure(project_name)
     curr_target_csv= os.path.join(os.path.dirname(project_name),'csv','targets_inserted',os.path.basename(current_video)+ '.' + wfileType)
-    print(curr_target_csv)
     df = read_df(curr_target_csv, wfileType)
     df = df.fillna(0)
 
