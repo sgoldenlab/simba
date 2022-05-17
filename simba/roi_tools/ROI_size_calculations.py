@@ -16,8 +16,8 @@ def circle_size_calc(circle_dict, px_mm):
     return circle_dict
 
 def polygon_size_calc(polygon_dict, px_mm):
-    y_vals = polygon_dict['Polygon np.array'][:,0]
-    x_vals = polygon_dict['Polygon np.array'][:,1]
+    y_vals = polygon_dict['vertices'][:,0]
+    x_vals = polygon_dict['vertices'][:,1]
     poly_area_px = 0.5 * np.abs(np.dot(x_vals, np.roll(y_vals, 1)) - np.dot(y_vals, np.roll(x_vals, 1)))
     polygon_dict['area_cm'] = round((poly_area_px / px_mm) / 500, 2)
 

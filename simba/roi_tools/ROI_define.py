@@ -34,7 +34,11 @@ class ROI_definitions:
         for video in self.other_video_paths:
             self.other_video_file_names.append(os.path.basename(video))
         self.master_win_h, self.master_win_w = 800, 750
-        self.video_info_df = pd.read_csv(self.video_info_path)
+        try:
+            self.video_info_df = pd.read_csv(self.video_info_path)
+        except Exception as e:
+            print(e.args)
+            print('Could not find the video parameters file. Make sure you have defined the video parameters in the [Video parameters] tab')
         self.video_info, self.curr_px_mm, self.curr_fps = read_video_info(self.video_info_df, self.file_name)
         self.master = Tk()
         self.master.minsize(self.master_win_w, self.master_win_h)

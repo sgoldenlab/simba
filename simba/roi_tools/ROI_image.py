@@ -365,11 +365,10 @@ class ROI_image_class():
                 for p in pg['Tags']:
                     cv2.circle(self.working_frame, pg['Tags'][p], pg['Ear_tag_size'], self.colors[pg['Color name']], -1)
             if show_size_info is True:
-                area_cm = self.polygon_size_dict['Polygons'][pg['Shape_name']]['area_cm']
+                area_cm = self.polygon_size_dict['Polygons'][pg['Name']]['area_cm']
                 cv2.putText(self.working_frame, str(area_cm), (pg['Center_X'], pg['Center_Y']), cv2.FONT_HERSHEY_SIMPLEX, self.text_size / 10, self.colors[pg['Color name']], self.text_thickness, lineType=self.line_type)
 
         cv2.namedWindow('Define shape', cv2.WINDOW_NORMAL)
-        #cv2.moveWindow('Define shape', self.frame_default_loc[0], 0)
         cv2.imshow('Define shape', self.working_frame)
 
     def destroy_windows(self):
