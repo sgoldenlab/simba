@@ -3,10 +3,8 @@ import pandas as pd
 import glob
 import itertools
 from configparser import ConfigParser, NoSectionError, NoOptionError
-import copy
 from datetime import datetime
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 class FSTCC_perform(object):
     def __init__(self, config_path, time_window, behavior_list, create_graphs):

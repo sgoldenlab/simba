@@ -287,3 +287,10 @@ def get_fn_ext(filepath):
     return dir_name, file_name, ext
 
 
+def get_workflow_file_format(config):
+    try:
+        wfileType = config.get('General settings', 'workflow_file_type')
+        return wfileType
+    except NoOptionError:
+        return 'csv'
+
