@@ -238,54 +238,61 @@ def validate_model_one_vid(inifile,featuresPath,modelPath,dt,sb,generategantt):
 
     while (cap.isOpened()):
         ret, frame = cap.read()
-        if ret == True:
-            IDlabelLoc = []
-            for currAnimal in range(noAnimals):
-                currentDictID = list(animalBpDict.keys())[currAnimal]
-                currentDict = animalBpDict[currentDictID]
-                currNoBps = len(currentDict['X_bps'])
-                IDappendFlag = False
-                animalArray = np.empty((currNoBps, 2), dtype=int)
+        try:
+            if ret == True:
+                IDlabelLoc = []
+                for currAnimal in range(noAnimals):
+                    currentDictID = list(animalBpDict.keys())[currAnimal]
+                    currentDict = animalBpDict[currentDictID]
+                    currNoBps = len(currentDict['X_bps'])
+                    IDappendFlag = False
+                    animalArray = np.empty((currNoBps, 2), dtype=int)
 
-                for bp in range(currNoBps):
-                    hullColor = currentDict['colors'][bp]
-                    currXheader, currYheader, currColor = currentDict['X_bps'][bp], currentDict['Y_bps'][bp], currentDict['colors'][bp]
-                    currAnimal = currentDf.loc[currentDf.index[currRow], [currXheader, currYheader]]
-                    cv2.circle(frame, (currAnimal[0], currAnimal[1]), 0, hullColor, circleScale)
-                    animalArray[bp] = [currAnimal[0], currAnimal[1]]
-                    if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
+                    for bp in range(currNoBps):
+                        hullColor = currentDict['colors'][bp]
+                        currXheader, currYheader, currColor = currentDict['X_bps'][bp], currentDict['Y_bps'][bp], currentDict['colors'][bp]
+                        currAnimal = currentDf.loc[currentDf.index[currRow], [currXheader, currYheader]]
+                        cv2.circle(frame, (currAnimal[0], currAnimal[1]), 0, hullColor, circleScale)
+                        animalArray[bp] = [currAnimal[0], currAnimal[1]]
+                        if ('Centroid' in currXheader) or ('Center' in currXheader) or ('centroid' in currXheader) or ('center' in currXheader):
+                            IDlabelLoc.append([currAnimal[0], currAnimal[1]])
+                            IDappendFlag = True
+                    if IDappendFlag == False:
                         IDlabelLoc.append([currAnimal[0], currAnimal[1]])
-                        IDappendFlag = True
-                if IDappendFlag == False:
-                    IDlabelLoc.append([currAnimal[0], currAnimal[1]])
-            target_timer = (1/fps) * target_counter
-            target_timer = round(target_timer, 2)
-            if height < width:
-                frame = np.array(Image.fromarray(frame).rotate(90,Image.BICUBIC, expand=True))
+                target_timer = (1/fps) * target_counter
+                target_timer = round(target_timer, 2)
+                if height < width:
+                    frame = np.array(Image.fromarray(frame).rotate(90,Image.BICUBIC, expand=True))
 
-            cv2.putText(frame, str('Timer'), (10, ((height-height)+spacingScale)), cv2.FONT_HERSHEY_COMPLEX, fontScale, (0, 255, 0), 2)
-            addSpacer = 2
-            cv2.putText(frame, (str(classifier_name) + ' ' + str(target_timer) + str('s')), (10, (height-height)+spacingScale*addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 0, 255), 2)
-            addSpacer+=1
-            cv2.putText(frame, str('ensemble prediction'), (10, (height-height)+spacingScale*addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 255, 0), 2)
-            addSpacer += 2
-            if currentDf.loc[currentDf.index[currRow], targetColumn] == 1:
-                cv2.putText(frame, str(classifier_name), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_TRIPLEX, fontScale, (2, 166, 249), 2)
-                target_counter += 1
-                addSpacer += 1
-            if generategantt == 'Gantt chart: final frame only (slightly faster)':
-                frame = np.concatenate((frame, gantt_img), axis=1)
-            if generategantt == 'Gantt chart: video':
-                gantt_img = create_gantt_img(boutsDf, currRow, fps, 'Behavior gantt chart')
-                gantt_img = resize_gantt(gantt_img, videoHeight)
-                frame = np.concatenate((frame, gantt_img), axis=1)
-            if generategantt != 'None':
-                frame = cv2.resize(frame, (int(videoWidth + gantt_img.shape[1]), int(videoHeight)))
-            writer.write(frame)
-            currRow += 1
-            print('Frame created: ' + str(currRow) + '/' + str(frames) + '.')
-        if frame is None:
+                cv2.putText(frame, str('Timer'), (10, ((height-height)+spacingScale)), cv2.FONT_HERSHEY_COMPLEX, fontScale, (0, 255, 0), 2)
+                addSpacer = 2
+                cv2.putText(frame, (str(classifier_name) + ' ' + str(target_timer) + str('s')), (10, (height-height)+spacingScale*addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 0, 255), 2)
+                addSpacer+=1
+                cv2.putText(frame, str('ensemble prediction'), (10, (height-height)+spacingScale*addSpacer), cv2.FONT_HERSHEY_SIMPLEX, fontScale, (0, 255, 0), 2)
+                addSpacer += 2
+                if currentDf.loc[currentDf.index[currRow], targetColumn] == 1:
+                    cv2.putText(frame, str(classifier_name), (10, (height - height) + spacingScale * addSpacer), cv2.FONT_HERSHEY_TRIPLEX, fontScale, (2, 166, 249), 2)
+                    target_counter += 1
+                    addSpacer += 1
+                if generategantt == 'Gantt chart: final frame only (slightly faster)':
+                    frame = np.concatenate((frame, gantt_img), axis=1)
+                if generategantt == 'Gantt chart: video':
+                    gantt_img = create_gantt_img(boutsDf, currRow, fps, 'Behavior gantt chart')
+                    gantt_img = resize_gantt(gantt_img, videoHeight)
+                    frame = np.concatenate((frame, gantt_img), axis=1)
+                if generategantt != 'None':
+                    frame = cv2.resize(frame, (int(videoWidth + gantt_img.shape[1]), int(videoHeight)))
+                writer.write(frame)
+                currRow += 1
+                print('Frame created: ' + str(currRow) + '/' + str(frames) + '.')
+            if frame is None:
+                print('Validation video saved @ ' + outputFileName)
+                cap.release()
+                writer.release()
+                break
+        except Exception as e:
             print('Validation video saved @ ' + outputFileName)
+            print(e)
             cap.release()
             writer.release()
             break

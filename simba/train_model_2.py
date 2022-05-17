@@ -224,10 +224,12 @@ def trainmodel2(inifile):
         df = df.dropna(axis=0, how='all')
         df = df.dropna() # jj inserted this, delete if needed
         features = features.append(df, ignore_index=True)
+        print(len(features.columns), file)
     try:
         features = features.set_index('scorer')
     except KeyError:
         pass
+
     features = features.loc[:, ~features.columns.str.contains('^Unnamed')]
     totalTargetframes = features[classifierName].sum()
     try:
@@ -251,6 +253,7 @@ def trainmodel2(inifile):
 
     for i in range(len(target_names)):
         currentModelName = target_names[i]
+        print(currentModelName)
         features.pop(currentModelName).values
     class_names = class_names = ['Not_' + classifierName, classifierName]
     feature_list = list(features)
@@ -415,3 +418,5 @@ def trainmodel2(inifile):
     # stop = timeit.default_timer()
     # execution_time = stop - startTime
     # print(execution_time)
+
+#trainmodel2(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\NickB\project_folder\project_config.ini")
