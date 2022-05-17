@@ -8,6 +8,8 @@ import seaborn as sns
 import imutils
 import glob
 from simba.rw_dfs import *
+from simba.misc_tools import check_multi_animal_status
+from simba.drop_bp_cords import getBpNames, create_body_part_dictionary, createColorListofList
 
 
 def path_plot_config(configini):
@@ -34,8 +36,19 @@ def path_plot_config(configini):
     csv_dir_in = os.path.join(projectPath, 'csv', 'machine_results')
     severityBool = config.get('Path plot settings', 'plot_severity')
     severityTarget = config.get('Path plot settings','severity_target')
-    trackedBodyPart1 = config.get('Path plot settings', 'animal_1_bp')
-    trackedBodyPart2 = config.get('Path plot settings', 'animal_2_bp')
+
+    Xcols, Ycols, _ = getBpNames(configini)
+    colorListofList = createColorListofList(noAnimals, cMapSize=int(len(Xcols) + 1))
+    multiAnimalStatus, multiAnimalIDList = check_multi_animal_status(config, noAnimals)
+    animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, noAnimals, Xcols, Ycols, [], colorListofList)
+
+    try:
+        trackedBodyPart1 = config.get('Path plot settings', 'animal_1_bp')
+        trackedBodyPart2 = config.get('Path plot settings', 'animal_2_bp')
+    except:
+        trackedBodyPart1 = animalBpDict[multiAnimalIDList[0]]['X_bps'][0][:-2]
+        trackedBodyPart2 = animalBpDict[multiAnimalIDList[1]]['X_bps'][0][:-2]
+
 
     try:
         severity_brackets = config.getint('Path plot settings', 'severity_brackets')
@@ -148,8 +161,6 @@ def path_plot_config(configini):
                 for y in range(len(severityCircles)):
                     currEventX, currEventY, colour = severityCircles[y]
                     cv2.circle(overlay, (int(currEventX), int(currEventY)), 20, colour, -1)
-            print(len(severityCircles))
-
 
             image_new = cv2.addWeighted(overlay, 0.2, img, 1 - 0.2, 0)
             m1tuple = (int(row[columnNames[0]]), int(row[columnNames[1]]))
@@ -165,3 +176,7 @@ def path_plot_config(configini):
             loop += 1
             print('Path plot ' + str(loop) + '/' + str(len(csv_df_combined)) + ' for video ' + str(fileCounter) + '/' + str(len(filesFound)))
     print('Finished generating path plots. Plots are saved @ project_folder/frames/output/path_plots')
+
+
+
+#path_plot_config(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini")

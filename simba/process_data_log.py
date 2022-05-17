@@ -5,7 +5,8 @@ from datetime import datetime
 import numpy as np
 import glob
 from simba.rw_dfs import *
-
+from simba.features_scripts.unit_tests import read_video_info
+from simba.drop_bp_cords import get_fn_ext
 
 def analyze_process_data_log(configini,chosenlist):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -45,14 +46,10 @@ def analyze_process_data_log(configini,chosenlist):
             headers.extend([currHead])
     log_df = pd.DataFrame(columns=headers)
 
-    for currentFile in filesFound:
-        videoCounter += 1
-        currVidName = os.path.basename(currentFile).replace('.' + wfileType, '')
-        fps = vidinfDf.loc[vidinfDf['Video'] == currVidName]
-        try:
-            fps = int(fps['fps'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
+    for videoCounter, currentFile in enumerate(filesFound):
+        dir_name, currVidName, ext = get_fn_ext(currentFile)
+        _, _, fps = read_video_info(vidinfDf, currVidName)
+
         print('Analyzing video ' + str(videoCounter) + '/' + str(len(filesFound)) + '...')
         dataDf = read_df(currentFile, wfileType)
 
@@ -114,8 +111,6 @@ def analyze_process_data_log(configini,chosenlist):
     for target in target_names:
         for col2drop in chosenlist:
             currCol = target + ' ' + col2drop
-            print(currCol)
             log_df = log_df.drop(currCol, 1)
-    print(log_df.columns)
     log_df.to_csv(log_fn, index=False)
     print('All files processed for machine predictions: data file saved @' + str(log_fn))

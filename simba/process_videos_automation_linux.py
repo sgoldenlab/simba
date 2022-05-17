@@ -1,4 +1,4 @@
-#### ALL CRED TO Pierre Llorach, Boris Heifets lab @ Stanford!!
+#### All cred to Pierre Llorach, and Florian Duclot!!
 
 import os
 import cv2
@@ -32,7 +32,10 @@ def downsamplevideo_queue(width,height,filesFound,outputdir):
     command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '/' + os.path.basename(currentFile) + '"'+ ' -vf scale='+str(width)+':'+ str(height) + ' ' + '"'+ str(outputdir) + '/' + output+ '"' + ' -hide_banner' + '\n'
                'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
                'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir) +'/' +'tmp/"' +'\n'
-               'mv \"' +os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+               #'mv \"' +os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+               'mv \"' + os.path.join(str(outputdir), output) + '" "' + os.path.join(str(outputdir), os.path.basename(currentFile)) + '"')
+
+
 
     print(filesFound,'added into the downsample queue')
     return command
@@ -47,7 +50,8 @@ def changefps_queue(fps,filesFound,outputdir):
     command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '/' + os.path.basename(currentFile) + '"'+ ' -filter:v fps='+ str(fps) + ' ' + '"'+ str(outputdir) + '/' + output+ '"' + ' -hide_banner' + '\n'
                'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
                'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir) +'/' +'tmp/"' +'\n'
-               'mv \"' +os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+               #'mv \"' +os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+               'mv \"' + os.path.join(str(outputdir), output) + '" "' + os.path.join(str(outputdir), os.path.basename( currentFile)) + '"')
 
     print(filesFound,'added into the fps queue')
     return command
@@ -78,7 +82,8 @@ def greyscale_queue(outputdir,filesFound):
     command = (str('ffmpeg -y -i ') + '"'+ str(outputdir) + '/' + os.path.basename(currentFile)+ '"' + ' -vf format=gray '+ '"'+ str(outputdir) + '/' + output + '"'+ '\n'
                'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir)+'/'+'tmp/"' +'\n'                     
                'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir)+'/'+'tmp/"' +'\n'
-               'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+               #'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+               'mv \"' + os.path.join(str(outputdir), output) + '" "' + os.path.join(str(outputdir), os.path.basename(currentFile)) + '"')
 
     print(filesFound,'added into the grayscale queue')
     return command
@@ -105,10 +110,11 @@ def superimposeframe_queue(outputdir,filesFound):
     outFile = currentFile.replace('.mp4', '')
     outFile = str(outFile) + '_frame_no.mp4'
     output = os.path.basename(outFile)
-    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'/' + os.path.basename(currentFile) + '"'+ ' -vf "drawtext=fontfile=Arial.ttf: text=/'%{frame_num}/': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+ '"'+ str(outputdir) + '/' + output + '"'+ '\n'
+    command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'/' + os.path.basename(currentFile) + '"'+ ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy '+ '"'+ str(outputdir) + '/' + output + '"'+ '\n'
                'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir)+'/'+'tmp/"' +'\n'
                'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir)+'/'+'tmp/"' + '\n'
-               'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+               #'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+               'mv \"' + os.path.join(str(outputdir), output) + '" "' + os.path.join(str(outputdir), os.path.basename(currentFile)) + '"')
 
     print(filesFound,'added into the superimpose frame queue.')
     return command
@@ -139,7 +145,10 @@ def shortenvideos1_queue(outputdir,filesFound,starttime,endtime):
     command = (str('ffmpeg -y -i ') + '"'+ str(outputdir)+'/' + os.path.basename(currentFile) + '"'+ ' -ss ' + str(starttime) +' -to ' + str(endtime) + ' -async 1 '+ '"' + str(outputdir)+ '/' + output + '"'+ '\n'
                     'mv \"' + str(outputdir) + '/' + os.path.basename(currentFile) + '" "' + (outputdir)+'/'+'tmp/"' +'\n'
                     'cp \"' + str(outputdir) + '/' + output + '" "' + (outputdir)+'/'+'tmp/"' + '\n'
-                    'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.basename(currentFile)+'"')
+                    #'mv \"' + os.path.join(str(outputdir), output) + '" "' + os.path.basename(currentFile)+'"')
+                    'mv \"' + os.path.join(str(outputdir), output) + '" "' + os.path.join(str(outputdir), os.path.basename(currentFile)) + '"')
+
+    #'mv \"' + os.path.join(str(outputdir),output) + '" "' + os.path.join(str(outputdir),os.path.basename(currentFile)+'"')
 
     print(filesFound,'added into the shorten video queue')
     return command
@@ -266,8 +275,11 @@ def cropvid_queue(filenames,outputdir):
     if total != 0:
         command = (str('ffmpeg -y -i ')+ '"' + str(outputdir) + '/' + str(videoName)+ '"' + str(' -vf ') + str('"crop=') + str(width) + ':' + str(height) + ':' + str(topLeftX) + ':' + str(topLeftY) + '" ' + str('-c:v libx264 -c:a copy ') + '"'+ str(os.path.join(outputdir, fileOutName))+ '"' + '\n'
             'mv \"' + str(outputdir) + '/' + videoName + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
-             'cp \"' + str(outputdir) + '/' + os.path.basename(fileOutName) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
-            'mv \"' + os.path.join(str(outputdir), os.path.basename(fileOutName)) + '" "' + os.path.basename(videoName) + '"')
+            #'cp \"' + str(outputdir) + '/' + os.path.basename(fileOutName) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
+            #'mv \"' + os.path.join(str(outputdir), os.path.basename(fileOutName)) + '" "' + os.path.basename(videoName) + '"')
+            'cp \"' + str(outputdir) + '/' + os.path.basename(fileOutName) + '" "' + (outputdir) + '/' + 'tmp/"' + '\n'
+            'mv \"' + os.path.join(str(outputdir), os.path.basename(fileOutName)) + '" "' + os.path.join(str(outputdir), os.path.basename(videoName)) + '"')
+
         print(videoName, 'added into the crop video queue.')
         os.remove(filePath)
         return command

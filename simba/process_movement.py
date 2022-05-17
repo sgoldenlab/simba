@@ -5,11 +5,26 @@ from datetime import datetime
 import statistics
 import numpy as np
 import glob
-from simba.drop_bp_cords import define_movement_cols
+from simba.drop_bp_cords import define_movement_cols, get_fn_ext
+from simba.drop_bp_cords import get_workflow_file_format
 from simba.rw_dfs import *
-
+from simba.features_scripts.unit_tests import read_video_info
+import itertools
+from collections import defaultdict
+from simba.misc_tools import check_multi_animal_status
+from collections.abc import Iterable
 
 def analyze_process_movement(configini):
+
+
+
+    def flatten(l):
+        for el in l:
+            if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
+                yield from flatten(el)
+            else:
+                yield el
+
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
     configFile = str(configini)
@@ -19,77 +34,91 @@ def analyze_process_movement(configini):
     vidLogFilePath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidLogFilePath)
     vidinfDf["Video"] = vidinfDf["Video"].astype(str)
-    try:
-        wfileType = config.get('General settings', 'workflow_file_type')
-    except NoOptionError:
-        wfileType = 'csv'
+    wfileType = get_workflow_file_format(config)
+
     noAnimals = config.getint('process movements', 'no_of_animals')
-    Animal_1_Bp = config.get('process movements', 'animal_1_bp')
-    Animal_2_Bp = config.get('process movements', 'animal_2_bp')
-    VideoNo_list, columnNames1, fileCounter = [], [], 0
+    animal_bp_dict = {}
+    for i in range(noAnimals):
+        animal_bp_dict[i] = {}
+        bp_name = config.get('process movements', 'animal_{}_bp'.format(str(i+1)))
+        animal_bp_dict[i]['X'] = bp_name + '_x'
+        animal_bp_dict[i]['Y'] = bp_name + '_y'
+        animal_bp_dict[i]['x_shifted'] = bp_name + '_x_shifted'
+        animal_bp_dict[i]['y_shifted'] = bp_name + '_y_shifted'
+
+
+    log_fn = os.path.join(projectPath, 'logs', 'Movement_log_' + dateTime + '.csv')
+    multiAnimalStatus, multiAnimalIDList = check_multi_animal_status(config, noAnimals)
 
     ########### logfile path ###########
-    log_fn = os.path.join(projectPath, 'logs', 'Movement_log_' + dateTime + '.csv')
-    columnNames = define_movement_cols(noAnimals)
+
+    columnNames = define_movement_cols(multiAnimalIDList)
     log_df = pd.DataFrame(columns=columnNames)
 
     ########### FIND CSV FILES ###########
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
     print('Processing movement data for ' + str(len(filesFound)) + ' files...')
-    columnHeaders = [Animal_1_Bp + '_x', Animal_1_Bp + '_y']
-    shifted_columnHeaders = ['shifted_' + Animal_1_Bp + '_x', 'shifted_' + Animal_1_Bp + '_y']
-    if noAnimals == 2:
-        columnHeaders.extend([Animal_2_Bp + '_x', Animal_2_Bp + '_y'])
-        shifted_columnHeaders.extend(['shifted_' + Animal_2_Bp + '_x', 'shifted_' + Animal_2_Bp + '_y'])
 
-    for currentFile in filesFound:
-        frameCounter = 0
-        currVideoName = os.path.basename(currentFile).replace('.' + wfileType, '')
-        videoSettings = vidinfDf.loc[vidinfDf['Video'] == currVideoName]
-        try:
-            fps = int(videoSettings['fps'])
-            currPixPerMM = float(videoSettings['pixels/mm'])
-        except TypeError:
-            print('Error: make sure all the videos that are going to be analyzed are represented in the project_folder/logs/video_info.csv file')
+    animal_combs = list(itertools.combinations(animal_bp_dict, 2))
+
+    for file_counter, currentFile in enumerate(filesFound):
+        dir_name, currVideoName, ext = get_fn_ext(currentFile)
+        currVideoSettings, currPixPerMM, fps = read_video_info(vidinfDf, currVideoName)
+        fps = int(fps)
         csv_df = read_df(currentFile, wfileType)
-        csv_df = csv_df[columnHeaders]
         csv_df_shifted = csv_df.shift(-1, axis=0)
-        csv_df_shifted.columns = shifted_columnHeaders
+        csv_df_shifted = csv_df_shifted.add_suffix('_shifted')
         csv_df = pd.concat([csv_df, csv_df_shifted], axis=1)
-        csv_df['Movement_animal_1'] = (np.sqrt((csv_df[columnHeaders[0]] - csv_df[shifted_columnHeaders[0]]) ** 2 + (csv_df[columnHeaders[1]] - csv_df[shifted_columnHeaders[1]]) ** 2)) / currPixPerMM
-        if noAnimals == 2:
-            csv_df['Movement_animal_2'] = (np.sqrt((csv_df[columnHeaders[2]] - csv_df[shifted_columnHeaders[2]]) ** 2 + (csv_df[columnHeaders[3]] - csv_df[shifted_columnHeaders[3]]) ** 2)) / currPixPerMM
-            csv_df['Animal_distance'] = (np.sqrt((csv_df[columnHeaders[0]] - csv_df[columnHeaders[2]]) ** 2 + (csv_df[columnHeaders[1]] - csv_df[columnHeaders[3]]) ** 2)) / currPixPerMM
+
+        for a in animal_bp_dict.keys():
+            csv_df['Movement_animal_{}'.format(str(a+1))] = (np.sqrt((csv_df[animal_bp_dict[a]['X']] - csv_df[animal_bp_dict[a]['x_shifted']]) ** 2 + (csv_df[animal_bp_dict[a]['Y']] - csv_df[animal_bp_dict[a]['y_shifted']]) ** 2)) / currPixPerMM
+
+        if noAnimals > 1:
+            for c in animal_combs:
+                csv_df['Animal_distance_{}_{}'.format(str(c[0]), str(c[1]))] = (np.sqrt((csv_df[animal_bp_dict[c[0]]['X']] - csv_df[animal_bp_dict[c[1]]['x_shifted']]) ** 2 + (csv_df[animal_bp_dict[c[0]]['Y']] - csv_df[animal_bp_dict[c[1]]['y_shifted']]) ** 2)) / currPixPerMM
 
         df_lists = [csv_df[i:i + fps] for i in range(0, csv_df.shape[0], fps)]
-        movementListAnimal1, movementListAnimal2, distanceList, velocityAnimal1List, velocityAnimal2List, currentVidList = [], [], [], [], [], []
-        for currentDf in df_lists:
-            if noAnimals == 1:
-                movementListAnimal1.append(currentDf['Movement_animal_1'].mean())
-                velocityAnimal1List.append(currentDf['Movement_animal_1'].mean() / 1)
-            if noAnimals == 2:
-                movementListAnimal1.append(currentDf['Movement_animal_1'].mean())
-                movementListAnimal2.append(currentDf['Movement_animal_2'].mean())
-                velocityAnimal1List.append(currentDf['Movement_animal_1'].mean() / 1)
-                velocityAnimal2List.append(currentDf['Movement_animal_2'].mean() / 1)
-                distanceList.append(currentDf['Animal_distance'].mean())
-                print(currentDf['Animal_distance'].mean())
+        agg_dict = {}
+        distance_dict = defaultdict(list)
+        frameCounter = 0
+        for animal in range(noAnimals):
+            agg_dict[animal] = defaultdict(list)
+        for cnt, currentDf in enumerate(df_lists):
+            for animal in range(noAnimals):
+                agg_dict[animal]['Movement'].append(currentDf['Movement_animal_{}'.format(str(animal + 1))].mean())
+                agg_dict[animal]['Velocity'].append(currentDf['Movement_animal_{}'.format(str(animal + 1))].mean() / 1)
+
+            if noAnimals > 1:
+                for c in animal_combs:
+                    col_name = 'Animal_distance_{}_{}'.format(str(c[0]), str(c[1]))
+                    distance_dict[col_name].append(currentDf[col_name].mean() / 1)
+
             frameCounter += fps
 
-        totalMovement_animal1 = sum(movementListAnimal1)
-        meanVelocity_animal_1 = statistics.mean(velocityAnimal1List)
-        medianVelocity_animal_1 = statistics.median(velocityAnimal1List)
-        currentVidList = [currVideoName, frameCounter, totalMovement_animal1, meanVelocity_animal_1, medianVelocity_animal_1]
-        if noAnimals == 2:
-            totalMovement_animal2 = sum(movementListAnimal2)
-            meanVelocity_animal_2 = statistics.mean(velocityAnimal2List)
-            medianVelocity_animal_2 = statistics.median(velocityAnimal2List)
-            meanDistance = statistics.mean(distanceList) / 10
-            medianDistance = statistics.median(distanceList) / 10
-            currentVidList = [currVideoName, frameCounter, totalMovement_animal1, meanVelocity_animal_1, medianVelocity_animal_1, totalMovement_animal2, meanVelocity_animal_2, medianVelocity_animal_2, meanDistance, medianDistance]
-        log_df.loc[fileCounter] = currentVidList
-        fileCounter += 1
-        print('Files # processed for movement data: ' + str(fileCounter) + '/' + str(len(filesFound)) + '...')
+        move_list = []
+        vel_list_mean = []
+        vel_list_median = []
+        for animal in range(noAnimals):
+            move_list.append(sum(agg_dict[animal]['Movement']))
+            vel_list_mean.append(statistics.mean(agg_dict[animal]['Velocity']))
+            vel_list_median.append(statistics.median(agg_dict[animal]['Velocity']))
+        if noAnimals > 1:
+            mean_dist_lst, median_dist_lst = [], []
+            for c in animal_combs:
+                col_name = 'Animal_distance_{}_{}'.format(str(c[0]), str(c[1]))
+                mean_dist_lst.append(statistics.mean(distance_dict[col_name]) / 10)
+                median_dist_lst.append(statistics.median(distance_dict[col_name]) / 10)
+
+        currentVidList = [currVideoName, frameCounter, move_list, vel_list_mean, vel_list_median]
+        if noAnimals > 1:
+            currentVidList = currentVidList + mean_dist_lst + median_dist_lst
+
+        currentVidList = list(flatten(currentVidList))
+        log_df.loc[file_counter] = currentVidList
+        print('Files # processed for movement data: ' + str(file_counter + 1) + '/' + str(len(filesFound)) + '...')
     log_df = np.round(log_df,decimals=4)
     log_df.to_csv(log_fn, index=False)
     print('All files processed for movement data. ' + 'Data saved @ project_folder\logs')
+
+
+
