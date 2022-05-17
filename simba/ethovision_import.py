@@ -69,4 +69,4 @@ class ImportEthovision(object):
         save_df(self.features_df, self.workflow_file_format, save_file_name)
         print('Added Ethovision annotations for video {} ... '.format(self.video_name))
 
-test = ImportEthovision(config_path= r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini", folder_path=r'Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\ethovision_import')
+#test = ImportEthovision(config_path= r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini", folder_path=r'Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\ethovision_import')
