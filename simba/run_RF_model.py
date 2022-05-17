@@ -7,9 +7,11 @@ import numpy as np
 import statistics
 from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError, NoSectionError
 from simba.drop_bp_cords import *
+from simba.drop_bp_cords import get_workflow_file_format
 import glob, os
 from simba.rw_dfs import *
-from simba.features_scripts.unit_tests import *
+from simba.features_scripts.unit_tests import read_video_info
+from simba.misc_tools import check_multi_animal_status
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -25,64 +27,38 @@ def rfmodel(inifile):
     model_dir = config.get('SML settings', 'model_dir')
     model_nos = config.getint('SML settings', 'No_targets')
     poseEstimationBps = config.get('create ensemble settings', 'pose_estimation_body_parts')
-    try:
-        wfileType = config.get('General settings', 'workflow_file_type')
-    except NoOptionError:
-        wfileType = 'csv'
+
+    wfileType = get_workflow_file_format(config)
     vidInfPath = os.path.join(projectPath, 'logs', 'video_info.csv')
     vidinfDf = pd.read_csv(vidInfPath)
     vidinfDf["Video"] = vidinfDf["Video"].astype(str)
 
-    try:
-        multiAnimalIDList = config.get('Multi animal IDs', 'id_list')
-        multiAnimalIDList = multiAnimalIDList.split(",")
-        if (multiAnimalIDList[0] != '') and (poseEstimationBps == 'user_defined'):
-            multiAnimalStatus = True
-            print('Applying settings for multi-animal tracking...')
-        else:
-            multiAnimalStatus = False
-            print('Applying settings for classical tracking...')
-
-    except NoSectionError:
-        multiAnimalIDList = ['']
-        multiAnimalStatus = False
-        print('Applying settings for classical tracking...')
-
-    bpHeaders = getBpHeaders(inifile)
-    model_paths, target_names, DTList, min_bout_list = ([], [], [], [])
-    target_names = []
-    fileCounter = 0
+    noAnimals = config.getint('General settings', 'animal_no')
+    multiAnimalStatus, multiAnimalIDList = check_multi_animal_status(config, noAnimals)
 
     ########### GET MODEL PATHS, NAMES, AND DISCRIMIINATION THRESHOLDS ###########
+    model_dict = {}
     for i in range(model_nos):
         try:
-            currentModelPaths = 'model_path_' + str(i+1)
-            currentModelNames = 'target_name_' + str(i+1)
-            currentDT = 'threshold_' + str(i+1)
-            currMinBoutName = 'min_bout_' + str(i+1)
-            currentModelPaths = config.get('SML settings', currentModelPaths)
-            if currentModelPaths == '':
-                print('Skipping ' + str(currentModelNames) + ' classifications: ' + ' no path set to .sav file.')
+            model_dict[i] = {}
+            if config.get('SML settings', 'model_path_' + str(i+1)) == '':
+                print('Skipping ' + str(config.get('SML settings', 'target_name_' + str(i+1))) + ' classifications: ' + ' no path set to model file.')
                 continue
-            currentModelNames = config.get('SML settings', currentModelNames)
-            currentDT = config.getfloat('threshold_settings', currentDT)
-            currMinBout = config.getfloat('Minimum_bout_lengths', currMinBoutName)
-            DTList.append(currentDT)
-            min_bout_list.append(currMinBout)
-            model_paths.append(currentModelPaths)
-            target_names.append(currentModelNames)
+            model_dict[i]['model_path'] = config.get('SML settings', 'model_path_' + str(i+1))
+            model_dict[i]['model_name'] = config.get('SML settings', 'target_name_' + str(i+1))
+            model_dict[i]['threshold'] = config.getfloat('threshold_settings', 'threshold_' + str(i+1))
+            model_dict[i]['minimum_bout_length'] = config.getfloat('Minimum_bout_lengths', 'min_bout_' + str(i+1))
         except ValueError:
-            print('Skipping ' + str(currentModelNames) + ' classifications: ' + ' no discrimination threshold and/or minimum bout set.')
+            print('Skipping ' + str(config.get('SML settings', 'target_name_' + str(i+1))) + ' classifications: ' + ' no discrimination threshold and/or minimum bout set.')
             continue
 
     filesFound = glob.glob(csv_dir_in + '/*.' + wfileType)
-    print('Running ' + str(len(target_names)) + ' model(s) on ' + str(len(filesFound)) + ' video file(s).')
+    print('Running ' + str(len(model_dict.keys())) + ' model(s) on ' + str(len(filesFound)) + ' video file(s).')
 
-    for currFile in filesFound:
-        currentFileName = os.path.basename(currFile)
-        dir_name, file_name, ext = get_fn_ext(currentFileName)
-        fileCounter+=1
-        print('Analyzing video ' + str(fileCounter) + '/' + str(len(filesFound)) + '...')
+    for file_cnt, currFile in enumerate(filesFound):
+        print('Analyzing video ' + str(file_cnt + 1) + '/' + str(len(filesFound)) + '...')
+        file_cnt+=1
+        dir_name, file_name, ext = get_fn_ext(currFile)
         inputFile = read_df(currFile, wfileType)
         try:
             inputFile = inputFile.set_index('scorer')
@@ -94,10 +70,9 @@ def rfmodel(inifile):
         currVidInfoDf, currPixPerMM, currVidFps = read_video_info(vidinfDf, str(file_name))
         outputDf = inputFile.copy(deep=True)
 
-        for b in range(model_nos):
-            shortest_bout = min_bout_list[b]
-            framesToPlug = int(currVidFps * (shortest_bout / 1000))
-            framesToPlugList = list(range(1, framesToPlug + 1))
+        for model in model_dict:
+            shortest_bout = model_dict[model]['minimum_bout_length']
+            framesToPlugList = list(range(1, int(currVidFps * (shortest_bout / 1000)) + 1))
             framesToPlugList.reverse()
             patternListofLists, negPatternListofList = [], []
             for k in framesToPlugList:
@@ -112,21 +87,25 @@ def rfmodel(inifile):
                 negPatternListofList.append(currListNeg)
             fillPatterns = np.asarray(patternListofLists)
             remPatterns = np.asarray(negPatternListofList)
-            currentModelPath = model_paths[b]
-            model = os.path.join(model_dir, currentModelPath)
-            currModelName = target_names[b]
-            discrimination_threshold = DTList[b]
+
+            currentModelPath = model_dict[model]['model_path']
+            currModelName = model_dict[model]['model_name']
+            discrimination_threshold = model_dict[model]['threshold']
             currProbName = 'Probability_' + currModelName
-            clf = pickle.load(open(model, 'rb'))
+            clf = pickle.load(open(currentModelPath, 'rb'))
+
             try:
                 predictions = clf.predict_proba(inputFileOrganised)
-            except ValueError:
-                print('Mismatch in the number of features in input file and what is expected from the model in file ' + str(currentFileName) + ' and model ' + str(currModelName))
+            except ValueError as e:
+                print(e.args)
+                print('Mismatch in the number of features in input file and what is expected from the model in file ' + str(file_name) + ' and model ' + str(currModelName))
 
             try:
                 outputDf[currProbName] = predictions[:, 1]
-            except IndexError:
+            except IndexError as e:
+                print(e.args)
                 print('IndexError: Your classifier has not been created properly. See The SimBA GitHub FAQ page for more information and suggested fixes.')
+
             outputDf[currModelName] = np.where(outputDf[currProbName] > discrimination_threshold, 1, 0)
 
             ########## FILL PATTERNS ###########################################
@@ -179,3 +158,6 @@ def rfmodel(inifile):
         save_df(outputDf, wfileType, outFname)
         print('Predictions generated for ' + str(fileBaseName) + '...')
     print('Predictions complete. Saved @ project_folder/csv/machine_results')
+
+
+#rfmodel(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_2_black_060320\project_folder\project_config.ini")

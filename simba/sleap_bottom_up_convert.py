@@ -13,8 +13,10 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 import simba.rw_dfs
 from simba.interpolate_pose import *
+from simba.misc_tools import smooth_data_gaussian
+from simba.drop_bp_cords import get_workflow_file_format
 
-def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
+def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method, smooth_settings_dict):
 
     def func(name, obj):
         attr = list(obj.attrs.items())
@@ -37,10 +39,7 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
     if len(filesFound) == 0: print('No SLP files found in ' + str(dataFolder))
     videoFolder = os.path.join(projectPath, 'videos')
     outputDfFolder = os.path.join(projectPath, 'csv', 'input_csv')
-    try:
-        wfileType = config.get('General settings', 'workflow_file_type')
-    except NoOptionError:
-        wfileType = 'csv'
+    wfileType = get_workflow_file_format(config)
     animalsNo = len(currIDList)
     bpNamesCSVPath = os.path.join(projectPath, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
     poseEstimationSetting = config.get('create ensemble settings', 'pose_estimation_body_parts')
@@ -312,17 +311,26 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
 
         currDf.columns = bpNameList
         outDf = pd.DataFrame()
-        for name in currIDList:
-            currCols = [col for col in currDf.columns if name in col]
+        column_names_lst = currDf.columns
+
+
+        for animal_name in currIDList:
+            currCols = []
+            for col_name in column_names_lst:
+                col_name_split = col_name.split('_')[0]
+                if animal_name.lower() == col_name_split.lower():
+                    currCols.append(col_name)
             sliceDf = currDf[currCols]
             outDf = pd.concat([outDf, sliceDf], axis=1)
         outDfcols = list(outDf.columns)
         toBpCSVlist = []
+
         if poseEstimationSetting == 'user_defined':
             for i in outDfcols:
                 currBpName = i[:-2]
+                bp_name_parts = currBpName.split('_')
                 for identityNo in range(len(currIDList)):
-                    if str(currIDList[identityNo]) in currBpName:
+                    if str(currIDList[identityNo]) == bp_name_parts[0]:
                         currBpName = currBpName + '_' + str(identityNo + 1)
                 toBpCSVlist.append(currBpName) if currBpName not in toBpCSVlist else toBpCSVlist
             newCSVlist_df = pd.DataFrame(toBpCSVlist)
@@ -354,5 +362,21 @@ def importSLEAPbottomUP(inifile, dataFolder, currIDList, interpolation_method):
                 pq.write_table(table, os.path.join(outputDfFolder, outputCSVname))
             if wfileType == 'csv':
                 interpolate_body_parts.new_df.to_csv(os.path.join(outputDfFolder, outputCSVname))
+
+        if smooth_settings_dict['Method'] == 'Gaussian':
+            time_window = smooth_settings_dict['Parameters']['Time_window']
+            smooth_data_gaussian(config=config, file_path=os.path.join(outputDfFolder, outputCSVname), time_window_parameter=time_window)
+
+
         print('Imported ', outputCSVname, 'to project.')
     print('All multi-animal SLEAP .slp tracking files ordered and imported into SimBA project in chosen workflow file format')
+
+
+
+
+# importSLEAPbottomUP(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Parquet_test2\project_folder\project_config.ini",
+#                     r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Parquet_test2\import_2",
+#                     ["female", "male"],
+#                     "Animals(s): Nearest",
+#                     {'Method': 'None', 'Parameters': {'Time_window': '200'}})
+

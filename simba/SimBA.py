@@ -115,6 +115,12 @@ from simba.import_trk import *
 from simba.drop_bps import *
 from simba.classifications_per_ROI import *
 from simba.read_DANNCE_mat import import_DANNCE_file, import_DANNCE_folder
+from simba.drop_bp_cords import get_fn_ext
+from simba.misc_tools import smooth_data_gaussian, smooth_data_savitzky_golay
+from simba.ethovision_import import ImportEthovision
+from simba.plot_pose_in_dir import create_video_from_dir
+
+
 import urllib.request
 from cefpython3 import cefpython as cef
 import threading
@@ -2828,6 +2834,46 @@ class new_window:
 def createWindow(scriptname):
     new_window(scriptname)
 
+
+class visualize_pose:
+    def __init__(self):
+        viz_pose = Toplevel()
+        viz_pose.minsize(350, 200)
+        viz_pose.wm_title('Visualize pose-estimation')
+
+        settings_frame = LabelFrame(viz_pose, text='File Settings', font=('Helvetica', 10, 'bold'), pady=5, padx=5)
+
+        self.input_folder = FolderSelect(settings_frame, 'Input directory (with csv/parquet files)', title='Select input folder')
+        self.output_folder = FolderSelect(settings_frame, 'Output directory (where your videos will be saved)', title='Select output folder')
+        self.circle_size = Entry_Box(settings_frame, 'Circle size', '0')
+
+        button_run_visualization = Button(settings_frame, text='Visualize pose', command=self.run_visualization)
+        settings_frame.grid(row=0, sticky=W)
+        self.input_folder.grid(row=0, column=0, pady=10, sticky=W)
+        self.output_folder.grid(row=1, column=0, pady=10, sticky=W)
+        self.circle_size.grid(row=2, column=0, pady=10, sticky=W)
+        button_run_visualization.grid(row=3, column=0, pady=10)
+
+    def run_visualization(self):
+        circle_size_int = self.circle_size.entry_get
+        input_folder = self.input_folder.folder_path
+        output_folder = self.output_folder.folder_path
+        print(input_folder, output_folder)
+        if circle_size_int == '':
+            print('Please enter a circle size to continue')
+
+        if not circle_size_int.isdigit():
+            print('Circle size must be a integer')
+
+        elif (input_folder == '') or (input_folder == 'No folder selected'):
+            print('Please select an input folder to continue')
+
+        elif (output_folder == '') or (output_folder == 'No folder selected'):
+            print('Please select an output folder to continue')
+
+        else:
+            create_video_from_dir(in_directory=input_folder, out_directory=output_folder, circle_size=int(circle_size_int))
+
 class get_coordinates_from_video:
 
     def __init__(self):
@@ -2969,6 +3015,12 @@ class project_config:
         self.interpolation = DropDownMenu(self.labelmethod,'Interpolation',['None','Animal(s): Nearest', 'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear', 'Body-parts: Quadratic'],'12')
         self.interpolation.setChoices('None')
 
+        # smoothing
+        self.smooth_pose_win_lbl = LabelFrame(self.frame, text='Smooth pose-estimation data', pady=5, padx=5)
+        self.smooth_dropdown = DropDownMenu(self.smooth_pose_win_lbl, 'Smoothing', ['None', 'Gaussian', 'Savitzky Golay'], '12', com=self.smoothing_selected)
+        self.smooth_dropdown.setChoices('None')
+        self.smoothing_time_label = Entry_Box(self.smooth_pose_win_lbl, 'Period (ms):', labelwidth='12', width=10)
+
         #multicsv
         label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport,'Folder Select:',title='Select Folder with .csv(s)')
@@ -3015,10 +3067,13 @@ class project_config:
         self.frame.grid(row=1,sticky=W)
         self.labelmethod.grid(row=0,sticky=W)
         self.interpolation.grid(row=0,sticky=W)
-        label_multicsvimport.grid(row=1, sticky=W)
+        self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+        self.smooth_dropdown.grid(row=1,sticky=W)
+
+        label_multicsvimport.grid(row=2, sticky=W)
         self.folder_csv.grid(row=0,sticky=W)
         button_import_csv.grid(row=1,sticky=W)
-        label_singlecsvimport.grid(row=2,sticky=W)
+        label_singlecsvimport.grid(row=3,sticky=W)
         self.file_csv.grid(row=0,sticky=W)
         button_importsinglecsv.grid(row=1,sticky=W)
 
@@ -3027,6 +3082,12 @@ class project_config:
         label_caution.grid(row=1,sticky=W)
         label_caution2.grid(row=2,sticky=W)
         button_extractframes.grid(row=3,sticky=W)
+
+    def smoothing_selected(self, choice):
+        if choice == 'None':
+            self.smoothing_time_label.grid_forget()
+        if (choice == 'Gaussian') or (choice == 'Savitzky Golay'):
+            self.smoothing_time_label.grid(row=1, column=1, sticky=E)
 
     def trackingselect(self,val):
         try:
@@ -3136,6 +3197,13 @@ class project_config:
         self.interpolation.setChoices('None')
         self.interpolation.grid(row=0, sticky=W)
 
+        self.smooth_pose_win_lbl = LabelFrame(self.frame, text='Smooth pose-estimation data', pady=5, padx=5)
+        self.smooth_dropdown = DropDownMenu(self.smooth_pose_win_lbl, 'Smoothing', ['None', 'Gaussian', 'Savitzky Golay'], '12', com=self.smoothing_selected)
+        self.smooth_dropdown.setChoices('None')
+        self.smooth_dropdown.grid(row=1, sticky=E)
+        self.smoothing_time_label = Entry_Box(self.smooth_pose_win_lbl, 'Period (ms):', labelwidth='12', width=10)
+
+
         if self.filetype.getChoices()=='CSV (DLC/DeepPoseKit)':
             # multicsv
             label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
@@ -3149,10 +3217,11 @@ class project_config:
                                             command=self.import_singlecsv, fg='navy')
             self.frame.grid(row=1,sticky=W)
             self.labelmethod.grid(row=0,sticky=W)
-            label_multicsvimport.grid(row=1, sticky=W)
+            self.smooth_pose_win_lbl.grid(row=1,sticky=W)
+            label_multicsvimport.grid(row=2, sticky=W)
             self.folder_csv.grid(row=0, sticky=W)
             button_import_csv.grid(row=1, sticky=W)
-            label_singlecsvimport.grid(row=2, sticky=W)
+            label_singlecsvimport.grid(row=3, sticky=W)
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglecsv.grid(row=1, sticky=W)
 
@@ -3170,10 +3239,11 @@ class project_config:
 
             # method
             self.labelmethod.grid(row=0, sticky=W)
-            label_multicsvimport.grid(row=1, sticky=W)
+            self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+            label_multicsvimport.grid(row=2, sticky=W)
             self.folder_csv.grid(row=0, sticky=W)
             button_import_csv.grid(row=1, sticky=W)
-            label_singlecsvimport.grid(row=2, sticky=W)
+            label_singlecsvimport.grid(row=3, sticky=W)
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglecsv.grid(row=1, sticky=W)
 
@@ -3183,20 +3253,20 @@ class project_config:
             label_multijsonimport = LabelFrame(self.frame, text='Import multiple json files', pady=5, padx=5)
             self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:',
                                             title='Select Folder with .json(s)')
-            button_import_json = Button(label_multijsonimport, text='Import json to project folder', command=lambda: json2csv_folder(self.configinifile, self.folder_json.folder_path, self.interpolation.getChoices()), fg='navy')
+            button_import_json = Button(label_multijsonimport, text='Import json to project folder', command=lambda: json2csv_folder(self.configinifile, self.folder_json.folder_path, self.interpolation.getChoices(), self.smooth_dropdown.getChoices()), fg='navy')
 
             # singlecsv
             label_singlejsonimport = LabelFrame(self.frame, text='Import single json file', pady=5, padx=5)
             self.file_json = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
-            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', command=lambda: json2csv_file(self.configinifile, self.file_json.file_path, self.interpolation.getChoices()),
-                                             fg='navy')
+            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', command=lambda: json2csv_file(self.configinifile, self.file_json.file_path, self.interpolation.getChoices(), self.smooth_dropdown.getChoices()), fg='navy')
             # import json into projectfolder
             self.frame.grid(row=1, sticky=W)
             self.labelmethod.grid(row=0, sticky=W)
-            label_multijsonimport.grid(row=1, sticky=W)
+            self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+            label_multijsonimport.grid(row=2, sticky=W)
             self.folder_json.grid(row=0, sticky=W)
             button_import_json.grid(row=1, sticky=W)
-            label_singlejsonimport.grid(row=2, sticky=W)
+            label_singlejsonimport.grid(row=3, sticky=W)
             self.file_json.grid(row=0, sticky=W)
             button_importsinglejson.grid(row=1, sticky=W)
 
@@ -3213,7 +3283,7 @@ class project_config:
                 labelinstruction = Label(self.frame,text='Please import videos before importing the multi animal DLC tracking data')
                 runsettings = Button(self.frame,text='Import h5',command=self.importh5)
                 #organize
-                self.dropdowndlc.grid(row=2, sticky=W)
+                self.dropdowndlc.grid(row=3, sticky=W)
 
             elif self.filetype.getChoices() == 'SLP (SLEAP)':
                 self.h5path = FolderSelect(self.frame, 'Path to .slp files', lblwidth=15)
@@ -3228,14 +3298,14 @@ class project_config:
             #organize
             self.frame.grid(row=1,sticky=W)
             self.labelmethod.grid(row=0, sticky=W)
-            self.labelmethod.grid(row=0, sticky=W)
-            animalsettings.grid(row=1,sticky=W)
+            self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+            animalsettings.grid(row=2,sticky=W)
             noofanimals.grid(row=0,sticky=W)
             animalnamebutton.grid(row=0,column=1,sticky=W)
 
-            self.h5path.grid(row=3,sticky=W)
-            labelinstruction.grid(row=4,pady=10,sticky=W)
-            runsettings.grid(row=5,pady=10)
+            self.h5path.grid(row=4,sticky=W)
+            labelinstruction.grid(row=5,pady=10,sticky=W)
+            runsettings.grid(row=6,pady=10)
 
     def importh5(self):
         idlist = []
@@ -3257,23 +3327,40 @@ class project_config:
         config = ConfigParser()
         configFile = str(self.configinifile)
         config.read(configFile)
+
         # write the new values into ini file
         config.set('Multi animal IDs', 'ID_list',id_ini)
 
         with open(self.configinifile, 'w') as configfile:
             config.write(configfile)
 
+        smooth_settings_dict = {}
+        if self.smooth_dropdown.getChoices() == 'Gaussian':
+            smooth_settings_dict['Method'] = 'Gaussian'
+            smooth_settings_dict['Parameters'] = {}
+            smooth_settings_dict['Parameters']['Time_window'] = self.smoothing_time_label.entry_get
+
+        if self.smooth_dropdown.getChoices() == 'Savitzky Golay':
+            smooth_settings_dict['Method'] = 'Savitzky Golay'
+            smooth_settings_dict['Parameters'] = {}
+            smooth_settings_dict['Parameters']['Time_window'] = self.smoothing_time_label.entry_get
+
+
+        if self.smooth_dropdown.getChoices() == 'None':
+            smooth_settings_dict['Method'] = 'None'
 
         if self.filetype.getChoices() == 'H5 (multi-animal DLC)':
-            importMultiDLCpose(self.configinifile,self.h5path.folder_path,self.dropdowndlc.getChoices(),idlist, self.interpolation.getChoices())
+            importMultiDLCpose(self.configinifile,self.h5path.folder_path,self.dropdowndlc.getChoices(),idlist, self.interpolation.getChoices(), smooth_settings_dict)
+
         if self.filetype.getChoices() == 'SLP (SLEAP)':
             try:
-                importSLEAPbottomUP(self.configinifile,self.h5path.folder_path,idlist, self.interpolation.getChoices())
+                importSLEAPbottomUP(self.configinifile,self.h5path.folder_path,idlist, self.interpolation.getChoices(), smooth_settings_dict)
             except Exception as e:
                 messagebox.showerror("Error", str(e))
+
         if self.filetype.getChoices() == 'TRK (multi-animal APT)':
             try:
-                import_trk(self.configinifile,self.h5path.folder_path,idlist, self.interpolation.getChoices())
+                import_trk(self.configinifile,self.h5path.folder_path,idlist, self.interpolation.getChoices(), smooth_settings_dict)
             except Exception as e:
                 messagebox.showerror("Error", str(e))
 
@@ -3406,24 +3493,24 @@ class project_config:
     def import_singlecsv(self):
 
         copy_singlecsv_ini(self.configinifile, self.file_csv.file_path)
+
         # read in configini
-        configFile = str(self.configinifile)
         config = ConfigParser()
-        config.read(configFile)
+        config.read(str(self.configinifile))
         animalIDlist = config.get('Multi animal IDs', 'id_list')
 
         #name filtering
-        filebasename = os.path.basename(self.file_csv.file_path)
-        if (('.csv') and ('DeepCut') in filebasename) or (('.csv') and ('DLC_') in filebasename):
-            if (('.csv') and ('DeepCut') in filebasename):
-                newFname = str(filebasename.split('DeepCut')[0]) + '.csv'
-            if (('.csv') and ('DLC_') in filebasename):
-                newFname = str(filebasename.split('DLC_')[0]) + '.csv'
-        else:
-            newFname = str(filebasename.split('.')[0]) + '.csv'
+        dir_name, filename, extension = get_fn_ext(self.file_csv.file_path)
 
-        csvfile = os.path.join(os.path.dirname(self.configinifile), 'csv', 'input_csv',
-                               newFname)
+
+        if ((('DeepCut') in filename) and (extension == '.csv')):
+            newFname = filename.split('DeepCut')[0] + extension
+        elif ((('DLC_') in filename) and (extension == '.csv')):
+            newFname = filename.split('DLC_')[0] + extension
+        else:
+            newFname = filename + extension
+
+        csvfile = os.path.join(os.path.dirname(self.configinifile), 'csv', 'input_csv', newFname)
 
         if not animalIDlist:
             df = pd.read_csv(csvfile)
@@ -3453,13 +3540,20 @@ class project_config:
             interpolate_body_parts.reorganize_headers()
             interpolate_body_parts.new_df.to_csv(csvfile)
 
+        if self.smooth_dropdown.getChoices() == 'Gaussian':
+            time_window = self.smoothing_time_label.entry_get
+            smooth_data_gaussian(config=config, file_path=csvfile, time_window_parameter=time_window)
+
+        if self.smooth_dropdown.getChoices() == 'Savitzky Golay':
+            time_window = self.smoothing_time_label.entry_get
+            smooth_data_savitzky_golay(config=config, file_path=csvfile, time_window_parameter=time_window)
+
     def import_multicsv(self):
         try:
             copy_allcsv_ini(self.configinifile, self.folder_csv.folder_path)
             #read in configini
-            configFile = str(self.configinifile)
             config = ConfigParser()
-            config.read(configFile)
+            config.read(str(self.configinifile))
             animalIDlist = config.get('Multi animal IDs', 'id_list')
 
             if not animalIDlist:
@@ -3492,19 +3586,30 @@ class project_config:
                         pass
 
             csvfilepath = os.path.join(os.path.dirname(self.configinifile),'csv','input_csv')
-            csvfile = os.listdir(csvfilepath)
-            csvfile = [i for i in csvfile if i.endswith('.csv')]
-            csvfile = [os.path.join(csvfilepath,i) for i in csvfile]
-            print('Interpolating missing values (Method: ' + str(self.interpolation.getChoices()) + ') ...')
-            for file in csvfile:
-                print(str(os.path.basename(file).replace('.csv', '')) + '...')
-                csv_df = pd.read_csv(file, index_col=0)
-                if self.interpolation.getChoices() != 'None':
+            csvfile = glob.glob(csvfilepath + '/*.csv')
+
+            if self.interpolation.getChoices() != 'None':
+                print('Interpolating missing values (Method: ' + str(self.interpolation.getChoices()) + ') ...')
+                for file in csvfile:
+                    print(str(os.path.basename(file).replace('.csv', '')) + '...')
+                    csv_df = pd.read_csv(file, index_col=0)
                     interpolate_body_parts = Interpolate(self.configinifile, csv_df)
                     interpolate_body_parts.detect_headers()
                     interpolate_body_parts.fix_missing_values(self.interpolation.getChoices())
                     interpolate_body_parts.reorganize_headers()
                     interpolate_body_parts.new_df.to_csv(file)
+
+            if self.smooth_dropdown.getChoices() == 'Gaussian':
+                time_window = self.smoothing_time_label.entry_get
+                print('Smoothing pose-estimation data using Gaussian smoothing (Time window: ' + str(time_window))
+                for file in csvfile:
+                    smooth_data_gaussian(config=config, file_path=file, time_window_parameter=time_window)
+
+            if self.smooth_dropdown.getChoices() == 'Savitzky Golay':
+                time_window = self.smoothing_time_label.entry_get
+                print('Smoothing pose-estimation data using Savitzky Golay smoothing (Time window: ' + str(time_window))
+                for file in csvfile:
+                    smooth_data_savitzky_golay(config=config, file_path=file, time_window_parameter=time_window)
 
             print('Finished importing tracking data')
 
@@ -3635,7 +3740,8 @@ class project_config:
             videopath = os.path.join(os.path.dirname(self.configinifile), 'videos')
             print(videopath)
             extract_frames_ini(videopath, self.configinifile)
-        except:
+        except Exception as e:
+            print(e.args)
             print('Please make sure videos are imported and located in /project_folder/videos')
 
 
@@ -3753,14 +3859,24 @@ class loadprojectini:
         filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)','SLP (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'15',com=self.fileselected)
         filetype.setChoices('CSV (DLC/DeepPoseKit)')
         self.frame = Frame(self.label_import_csv)
+
         #method
         self.labelmethod = LabelFrame(self.frame,text='Method',pady=5, padx=5)
         self.interpolation = DropDownMenu(self.labelmethod,'Interpolation',['None','Animal(s): Nearest', 'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear', 'Body-parts: Quadratic'],'12')
         self.interpolation.setChoices('None')
+
+        # smoothing inside project
+        self.smooth_pose_win_lbl = LabelFrame(self.frame, text='Smooth pose-estimation data', pady=5, padx=5)
+        self.smooth_dropdown = DropDownMenu(self.smooth_pose_win_lbl, 'Smoothing', ['None', 'Gaussian', 'Savitzky Golay'], '12', com=self.smoothing_selected)
+        self.smooth_dropdown.setChoices('None')
+        self.smoothing_time_label = Entry_Box(self.smooth_pose_win_lbl, 'Period (ms):', labelwidth='12', width=10)
+
+
         # multicsv
         label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
         self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:',title='Select Folder with .csv(s)')
         button_import_csv = Button(label_multicsvimport, text='Import csv to project folder',command= self.importdlctracking_multi,fg='navy')
+
         # singlecsv
         label_singlecsvimport = LabelFrame(self.frame, text='Import single csv files', pady=5, padx=5)
         self.file_csv = FileSelect(label_singlecsvimport, 'File selected',title='Select a .csv file')
@@ -3934,6 +4050,7 @@ class loadprojectini:
         button_importmars = Button(label_thirdpartyann,text='Import MARS Annotation (select folder with .annot files)',command=self.importMARS)
         button_importboris = Button(label_thirdpartyann,text='Import Boris Annotation (select folder with .csv files)',command = self.importBoris)
         button_importsolomon = Button(label_thirdpartyann,text='Import Solomon Annotation (select folder with .csv files',command = self.importSolomon)
+        button_importethovision = Button(label_thirdpartyann, text='Import Ethovision Annotation (select folder with .xls/xlsx files)', command=self.import_ethovision)
 
         #pseudolabel
         label_pseudo = LabelFrame(tab7,text='Pseudo Labelling',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
@@ -4181,13 +4298,16 @@ class loadprojectini:
         self.label_import_csv.grid(row=2, sticky=N + W, pady=5)
         filetype.grid(row=0,sticky=W)
         self.frame.grid(row=3,sticky=W)
+
         #method
         self.labelmethod.grid(row=0,sticky=W)
         self.interpolation.grid(row=0,sticky=W)
-        label_multicsvimport.grid(row=1, sticky=W)
+        self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+        self.smooth_dropdown.grid(row=0, sticky=W)
+        label_multicsvimport.grid(row=2, sticky=W)
         self.folder_csv.grid(row=0, sticky=W)
         button_import_csv.grid(row=1, sticky=W)
-        label_singlecsvimport.grid(row=2, sticky=W)
+        label_singlecsvimport.grid(row=3, sticky=W)
         self.file_csv.grid(row=0, sticky=W)
         button_importsinglecsv.grid(row=1, sticky=W)
 
@@ -4253,7 +4373,8 @@ class loadprojectini:
         label_thirdpartyann.grid(row=7, sticky=W)
         button_importmars.grid(row=0, sticky=W)
         button_importboris.grid(row=1,sticky=W,pady=10)
-        button_importsolomon.grid(row=2,sticky=W,pady=2)
+        button_importsolomon.grid(row=2,sticky=W,pady=10)
+        button_importethovision.grid(row=3,sticky=W,pady=10)
 
         label_adv_label.grid(row=8,sticky=W)
         label_adv_note.grid(row=0,pady=10,sticky=W)
@@ -4369,6 +4490,12 @@ class loadprojectini:
         lbl_addon.grid(row=15,sticky=W)
         button_bel.grid(row=0,sticky=W)
         button_unsupervised.grid(row=1,sticky=W,pady=10)
+
+    def smoothing_selected(self, choice):
+        if choice == 'None':
+            self.smoothing_time_label.grid_forget()
+        if (choice == 'Gaussian') or (choice == 'Savitzky Golay'):
+            self.smoothing_time_label.grid(row=0, column=1, sticky=E)
 
     def reverseid(self):
         config = ConfigParser()
@@ -4843,9 +4970,13 @@ class loadprojectini:
         configFile = str(self.projectconfigini)
         config.read(configFile)
         # write the new values into ini file
-        config.set('ROI settings', 'probability_threshold', str(self.p_threshold.entry_get))
-        with open(self.projectconfigini, 'w') as configfile:
-            config.write(configfile)
+
+        try:
+            config.set('ROI settings', 'probability_threshold', str(self.p_threshold.entry_get))
+            with open(self.projectconfigini, 'w') as configfile:
+                config.write(configfile)
+        except:
+            pass
 
         roiPlot(self.projectconfigini,video)
 
@@ -4854,11 +4985,15 @@ class loadprojectini:
         config = ConfigParser()
         configFile = str(self.projectconfigini)
         config.read(configFile)
+
         # write the new values into ini file
         config.set('ROI settings', 'probability_threshold',str(self.p_threshold.entry_get))
-        with open(self.projectconfigini, 'w') as configfile:
-            config.write(configfile)
 
+        try:
+            with open(self.projectconfigini, 'w') as configfile:
+                config.write(configfile)
+        except:
+            pass
 
         videolist = os.listdir(os.path.join(os.path.dirname(self.projectconfigini),'videos'))
 
@@ -5020,6 +5155,10 @@ class loadprojectini:
         ann_folder = askdirectory()
         solomonToSimba(self.projectconfigini,ann_folder)
 
+    def import_ethovision(self):
+        ann_folder = askdirectory()
+        ImportEthovision(config_path=self.projectconfigini, folder_path=ann_folder)
+
     def importMARS(self):
         ann_folder = askdirectory()
         append_dot_ANNOTT(self.projectconfigini, ann_folder)
@@ -5050,6 +5189,13 @@ class loadprojectini:
         self.interpolation.setChoices('None')
         self.interpolation.grid(row=0, sticky=W)
 
+        # smoothing
+        self.smooth_pose_win_lbl = LabelFrame(self.frame, text='Smooth pose-estimation data', pady=5, padx=5)
+        self.smooth_dropdown = DropDownMenu(self.smooth_pose_win_lbl, 'Smoothing', ['None', 'Gaussian', 'Savitzky Golay'], '12', com=self.smoothing_selected)
+        self.smooth_dropdown.setChoices('None')
+        self.smoothing_time_label = Entry_Box(self.smooth_pose_win_lbl, 'Period (ms):', labelwidth='12', width=10)
+        self.smooth_dropdown.grid(row=0, sticky=W)
+
         if val == 'CSV (DLC/DeepPoseKit)':
 
             # multicsv
@@ -5065,10 +5211,11 @@ class loadprojectini:
 
             # method
             self.labelmethod.grid(row=0, sticky=W)
-            label_multicsvimport.grid(row=1, sticky=W)
+            self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+            label_multicsvimport.grid(row=2, sticky=W)
             self.folder_csv.grid(row=0, sticky=W)
             button_import_csv.grid(row=1, sticky=W)
-            label_singlecsvimport.grid(row=2, sticky=W)
+            label_singlecsvimport.grid(row=3, sticky=W)
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglecsv.grid(row=1, sticky=W)
 
@@ -5086,35 +5233,33 @@ class loadprojectini:
 
             # method
             self.labelmethod.grid(row=0, sticky=W)
-            label_multicsvimport.grid(row=1, sticky=W)
+            self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+            label_multicsvimport.grid(row=2, sticky=W)
             self.folder_csv.grid(row=0, sticky=W)
             button_import_csv.grid(row=1, sticky=W)
-            label_singlecsvimport.grid(row=2, sticky=W)
+            label_singlecsvimport.grid(row=3, sticky=W)
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglecsv.grid(row=1, sticky=W)
 
-
         elif val =='JSON (BENTO)':
             # import json into projectfolder
-            # multijson
-            label_multijsonimport = LabelFrame(self.frame, text='Import multiple json files', pady=5,
-                                               padx=5)
-            self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:',
-                                            title='Select Folder with .json(s)')
-            button_import_json = Button(label_multijsonimport, text='Import json to project folder', command=lambda: json2csv_folder(self.projectconfigini,self.folder_json.folder_path), fg='navy')
+            label_multijsonimport = LabelFrame(self.frame, text='Import multiple json files', pady=5, padx=5)
+            self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:', title='Select Folder with .json(s)')
+            button_import_json = Button(label_multijsonimport, text='Import json to project folder', command=lambda: json2csv_folder(self.projectconfigini,self.folder_json.folder_path, self.interpolation.getChoices(), self.smooth_dropdown.getChoices()), fg='navy')
 
             # singlejson
             label_singlejsonimport = LabelFrame(self.frame, text='Import single json file', pady=5, padx=5)
             self.file_csv = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
-            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', command=lambda: json2csv_file(self.projectconfigini, self.file_csv.file_path), fg='navy')
+            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', command=lambda: json2csv_file(self.projectconfigini, self.file_csv.file_path, self.interpolation.getChoices(), self.smooth_dropdown.getChoices()), fg='navy')
 
             # import json into projectfolder
             self.frame.grid(row=1, sticky=W)
             self.labelmethod.grid(row=0, sticky=W)
-            label_multijsonimport.grid(row=1, sticky=W)
+            self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+            label_multijsonimport.grid(row=2, sticky=W)
             self.folder_json.grid(row=0, sticky=W)
             button_import_json.grid(row=1, sticky=W)
-            label_singlejsonimport.grid(row=2, sticky=W)
+            label_singlejsonimport.grid(row=3, sticky=W)
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglejson.grid(row=1, sticky=W)
 
@@ -5135,7 +5280,7 @@ class loadprojectini:
                                               ' multi animal DLC tracking data')
                 runsettings = Button(self.frame, text='Import h5', command=self.importh5)
                 #organize
-                self.dropdowndlc.grid(row=2, sticky=W)
+                self.dropdowndlc.grid(row=3, sticky=W)
 
             elif val == 'SLP (SLEAP)':
                 self.h5path = FolderSelect(self.frame, 'Path to .slp files', lblwidth=15)
@@ -5152,7 +5297,8 @@ class loadprojectini:
             # organize
             self.frame.grid(row=1, sticky=W)
             self.labelmethod.grid(row=0, sticky=W)
-            animalsettings.grid(row=1, sticky=W)
+            self.smooth_pose_win_lbl.grid(row=1, sticky=W)
+            animalsettings.grid(row=2, sticky=W)
             noofanimals.grid(row=0, sticky=W)
 
 
@@ -5161,21 +5307,36 @@ class loadprojectini:
             #save val into memory for dlc or sleap
             self.val = val
 
-            self.h5path.grid(row=3, sticky=W)
-            labelinstruction.grid(row=4, pady=10, sticky=W)
-            runsettings.grid(row=5, pady=10)
+            self.h5path.grid(row=4, sticky=W)
+            labelinstruction.grid(row=5, pady=10, sticky=W)
+            runsettings.grid(row=6, pady=10)
 
     def importh5(self):
         idlist = []
+
+        smooth_settings_dict = {}
+        if self.smooth_dropdown.getChoices() == 'Gaussian':
+            smooth_settings_dict['Method'] = 'Gaussian'
+            smooth_settings_dict['Parameters'] = {}
+            smooth_settings_dict['Parameters']['Time_window'] = self.smoothing_time_label.entry_get
+
+        if self.smooth_dropdown.getChoices() == 'Savitzky Golay':
+            smooth_settings_dict['Method'] = 'Savitzky Golay'
+            smooth_settings_dict['Parameters'] = {}
+            smooth_settings_dict['Parameters']['Time_window'] = self.smoothing_time_label.entry_get
+
+        if self.smooth_dropdown.getChoices() == 'None':
+            smooth_settings_dict['Method'] = 'None'
+
         try:
             for i in self.animalnamelist:
                 idlist.append(i.entry_get)
             if self.val =='H5 (multi-animal DLC)':
-                importMultiDLCpose(self.projectconfigini, self.h5path.folder_path, self.dropdowndlc.getChoices(), idlist, self.interpolation.getChoices())
+                importMultiDLCpose(self.projectconfigini, self.h5path.folder_path, self.dropdowndlc.getChoices(), idlist, self.interpolation.getChoices(), smooth_settings_dict)
             if self.val == 'SLP (SLEAP)':
-                importSLEAPbottomUP(self.projectconfigini,self.h5path.folder_path,idlist, self.interpolation.getChoices())
+                importSLEAPbottomUP(self.projectconfigini,self.h5path.folder_path,idlist, self.interpolation.getChoices(), smooth_settings_dict)
             if self.val == 'TRK (multi-animal APT)':
-                import_trk(self.projectconfigini,self.h5path.folder_path, idlist, self.interpolation.getChoices())
+                import_trk(self.projectconfigini,self.h5path.folder_path, idlist, self.interpolation.getChoices(), smooth_settings_dict)
 
         except Exception as error_str:
             print(error_str)
@@ -6003,6 +6164,15 @@ class loadprojectini:
                 interpolate_body_parts.fix_missing_values(self.interpolation.getChoices())
                 interpolate_body_parts.reorganize_headers()
                 interpolate_body_parts.new_df.to_csv(csvfile)
+
+            if self.smooth_dropdown.getChoices() == 'Gaussian':
+                time_window = self.smoothing_time_label.entry_get
+                smooth_data_gaussian(config=config, file_path=csvfile, time_window_parameter=time_window)
+
+            if self.smooth_dropdown.getChoices() == 'Savitzky Golay':
+                time_window = self.smoothing_time_label.entry_get
+                smooth_data_savitzky_golay(config=config, file_path=csvfile, time_window_parameter=time_window)
+
             print('Finished importing tracking data.')
 
         else:
@@ -6048,18 +6218,30 @@ class loadprojectini:
                         pass
 
             csvfilepath = os.path.join(os.path.dirname(self.projectconfigini), 'csv', 'input_csv')
-            csvfile = os.listdir(csvfilepath)
-            csvfile = [i for i in csvfile if i.endswith('.csv')]
-            csvfile = [os.path.join(csvfilepath, i) for i in csvfile]
+            csvfile = glob.glob(csvfilepath + '/*.csv')
 
-            for file in csvfile:
-                csv_df = pd.read_csv(file, index_col=0)
-                if self.interpolation.getChoices() != 'None':
+            if self.interpolation.getChoices() != 'None':
+                print('Interpolating missing values (Method: ' + str(self.interpolation.getChoices()) + ') ...')
+                for file in csvfile:
+                    csv_df = read_df(file, 'csv')
                     interpolate_body_parts = Interpolate(self.projectconfigini, csv_df)
                     interpolate_body_parts.detect_headers()
                     interpolate_body_parts.fix_missing_values(self.interpolation.getChoices())
                     interpolate_body_parts.reorganize_headers()
                     interpolate_body_parts.new_df.to_csv(file)
+
+            if self.smooth_dropdown.getChoices() == 'Gaussian':
+                time_window = self.smoothing_time_label.entry_get
+                print('Smoothing data using Gaussian method and {} ms time window ...'.format(str(time_window)))
+                for file in csvfile:
+                    smooth_data_gaussian(config=config, file_path=file, time_window_parameter=time_window)
+
+            if self.smooth_dropdown.getChoices() == 'Savitzky Golay':
+                time_window = self.smoothing_time_label.entry_get
+                print('Smoothing data using Savitzky Golay method and {} ms time window ...'.format(str(time_window)))
+                for file in csvfile:
+                    smooth_data_savitzky_golay(config=config, file_path=file, time_window_parameter=time_window)
+
             print('Finished importing tracking data.')
 
 
@@ -6120,8 +6302,12 @@ class loadprojectini:
         config.set('Path plot settings', 'no_animal_pathplot', self.noofAnimal.getChoices())
         config.set('Path plot settings', 'deque_points', self.Deque_points.entry_get)
         config.set('Path plot settings', 'severity_brackets', self.severity_brackets.entry_get)
-        config.set('Path plot settings', 'animal_1_bp', self.Bodyparts1.getChoices())
-        config.set('Path plot settings', 'animal_2_bp', self.Bodyparts2.getChoices())
+        try:
+            config.set('Path plot settings', 'animal_1_bp', self.Bodyparts1.getChoices())
+            config.set('Path plot settings', 'animal_2_bp', self.Bodyparts2.getChoices())
+        except:
+            pass
+
         config.set('Path plot settings','severity_target',self.severityTargetpp.getChoices())
 
         if self.plotsvvar.get()==1:
@@ -7664,13 +7850,14 @@ def form_validator_is_numeric(inStr, acttyp):
 class aboutgui:
     def __init__(self):
         about = Toplevel()
-        about.minsize(657, 398)
+        about.minsize(896, 507)
         about.wm_title("About")
 
-        canvas = Canvas(about,width=657,height=398,bg='black')
+        canvas = Canvas(about,width=896,height=507,bg='black')
         canvas.pack()
         scriptdir = os.path.dirname(__file__)
-        img = PhotoImage(file=os.path.join(scriptdir,'TheGoldenLab_aboutme.png'))
+        img = PhotoImage(file=os.path.join(scriptdir,'About_me_050122_1.png'))
+
         canvas.create_image(0,0,image=img,anchor='nw')
         canvas.image = img
 
@@ -7744,6 +7931,7 @@ class App(object):
         fifthMenu.add_command(label='Get mm/ppx',command = get_coordinates_from_video)
         fifthMenu.add_command(label='Make line plot', command=makelineplot)
         fifthMenu.add_cascade(label='Change fps...',menu =fpsMenu)
+        fifthMenu.add_cascade(label='Visualize pose-estimation in folder...', command=visualize_pose)
         fifthMenu.add_cascade(label='Reorganize Tracking Data', command= reorganizeData)
         fifthMenu.add_cascade(label='Drop body-parts from tracking data', command=droptrackingdata)
 
@@ -7818,9 +8006,9 @@ class SplashScreen:
     def Splash(self):
         scriptdir = os.path.dirname(__file__)
         if currentPlatform == 'Windows':
-            self.image = PIL.Image.open(os.path.join(scriptdir,"TheGoldenLab.png"))
+            self.image = PIL.Image.open(os.path.join(scriptdir,"splash_050122.png"))
         if (currentPlatform == 'Linux') or (currentPlatform == 'Darwin'):
-            self.image = PIL.Image.open(os.path.join(scriptdir, "TheGoldenLab.PNG"))
+            self.image = PIL.Image.open(os.path.join(scriptdir, "splash_050122.PNG"))
         self.imgSplash = ImageTk.PhotoImage(self.image)
 
 
@@ -7850,7 +8038,7 @@ def main():
     # default_font.configure(size=6)
     # root.option_add("*Font", default_font)
     app = SplashScreen(root)
-    root.after(2000, root.destroy)
+    root.after(2500, root.destroy)
     root.mainloop()
 
     app = App()
