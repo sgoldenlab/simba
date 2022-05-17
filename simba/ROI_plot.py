@@ -208,8 +208,9 @@ def roiPlot(inifile, CurrentVideo):
                 cap.release()
                 break
 
-        except (IndexError, KeyError):
+        except Exception as e:
             writer.release()
+            print(e.args)
             print('NOTE: index error / keyerror. Some frames of the video may be missing. Make sure you are running latest version of SimBA with pip install simba-uw-tf-dev')
             break
 

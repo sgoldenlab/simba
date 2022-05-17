@@ -13,9 +13,6 @@ from simba.drop_bp_cords import getBpNames, create_body_part_dictionary, createC
 from shapely.geometry import Point
 from shapely import geometry
 
-inifile = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini"
-# videoFileName = "Together_1.avi"
-
 def ROItoFeatures(inifile):
     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
     config = ConfigParser()
@@ -303,9 +300,7 @@ def ROItoFeatures(inifile):
     print('Summary file containing the mean distances between the animal and ROI centroids in the video, and the total (sum) seconds directing towards each ROI for each animal in each video is saved @' + str(summary_file_name))
     print('COMPLETE: All ROI feature data appended to feature files. The new features can be found as the last columns in the CSV (or parquet) files inside the project-folder/csv/features_extracted directory.')
 
-# inifile = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Open_field_4\project_folder\project_config.ini"
-#
-#
-# ROItoFeatures(inifile)
+#inifile =
+#ROItoFeatures(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Open_field_4\project_folder\project_config.ini")
 
 

@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from shapely import geometry
 from shapely.geometry import Point
-from simba.drop_bp_cords import getBpHeaders
+from simba.drop_bp_cords import getBpHeaders, get_fn_ext
 from simba.rw_dfs import *
 from simba.features_scripts.unit_tests import *
 from simba.misc_tools import check_multi_animal_status
@@ -30,8 +30,9 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
         wfileType = 'csv'
     try:
         probability_threshold = config.getfloat('ROI settings', 'probability_threshold')
-    except NoOptionError:
+    except (ValueError, NoOptionError):
         probability_threshold = 0.000
+
     animalBodypartList = []
     for bp in range(noAnimals):
         animalName = 'animal_' + str(bp + 1) + '_bp'
@@ -67,7 +68,7 @@ def roiAnalysis(inifile, inputcsv, calculate_dist):
 
     for v in filesFound:
         CurrVidFn = os.path.basename(v)
-        CurrentVideoName = CurrVidFn.replace('.' + wfileType, '')
+        _, CurrentVideoName, _ = get_fn_ext(v)
         print('Analysing ' + str(CurrentVideoName) + '...')
         noRectangles = len(rectanglesInfo.loc[rectanglesInfo['Video'] == str(CurrentVideoName)])
         noCircles = len(circleInfo.loc[circleInfo['Video'] == str(CurrentVideoName)])

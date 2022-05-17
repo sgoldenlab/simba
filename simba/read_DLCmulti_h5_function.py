@@ -10,8 +10,11 @@ import pyarrow.parquet as pq
 import pyarrow as pa
 from simba.interpolate_pose import *
 import itertools
+from simba.drop_bp_cords import get_fn_ext
+from simba.misc_tools import smooth_data_gaussian
 
-def importMultiDLCpose(inifile, dataFolder, filetype, idlist, interpolation_method):
+def importMultiDLCpose(inifile, dataFolder, filetype, idlist, interpolation_method, smooth_settings_dict):
+
     global currIDcounter
     def define_ID(event, x, y, flags, param):
         global currIDcounter
@@ -84,7 +87,7 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist, interpolation_meth
     Xcols, Ycols, Pcols = getBpNames(inifile)
     currIDList = idlist
 
-    split_p_and_file_exts = [['DLC_resnet50', 'DLC_resnet_50', 'DLC_dlcrnetms5'], ['.mp4', '.MP4', '.avi', '.AVI']]
+    split_p_and_file_exts = [['DLC_resnet50', 'DLC_resnet_50', 'DLC_dlcrnetms5', 'DLC_effnet_b0'], ['.mp4', '.MP4', '.avi', '.AVI']]
     split_p_and_file_exts = list(itertools.product(*split_p_and_file_exts))
 
     for file in filesFound:
@@ -96,7 +99,8 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist, interpolation_meth
         vidFname = 'None'
         searched_for_list = []
         for c in split_p_and_file_exts:
-            possible_vid_name = os.path.basename(file).split(c[0])[0] + c[1]
+            _, file_base_wo_ext, _ = get_fn_ext(file)
+            possible_vid_name = file_base_wo_ext.split(c[0])[0] + c[1]
             if os.path.exists(os.path.join(videoFolder, possible_vid_name)):
                 vidFname = os.path.join(videoFolder, possible_vid_name)
             else:
@@ -259,6 +263,7 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist, interpolation_meth
             pq.write_table(table, os.path.join(outputDfFolder, outputCSVname))
         if wfileType == 'csv':
             outDf.to_csv(os.path.join(outputDfFolder, outputCSVname))
+
         if interpolation_method != 'None':
             print('Interpolating missing values (Method: ' + str(interpolation_method) + ') ...')
             if wfileType == 'parquet': csv_df = pd.read_parquet(os.path.join(outputDfFolder, outputCSVname))
@@ -272,5 +277,19 @@ def importMultiDLCpose(inifile, dataFolder, filetype, idlist, interpolation_meth
                 pq.write_table(table, os.path.join(outputDfFolder, outputCSVname))
             if wfileType == 'csv':
                 interpolate_body_parts.new_df.to_csv(os.path.join(outputDfFolder, outputCSVname))
+
+        if smooth_settings_dict['Method'] == 'Gaussian':
+            time_window = smooth_settings_dict['Parameters']['Time_window']
+            smooth_data_gaussian(config=config, file_path=os.path.join(outputDfFolder, outputCSVname), time_window_parameter=time_window)
+
+
         print('Imported ', outputCSVname, 'to current project.')
     print('All multi-animal DLC .h5 tracking files ordered and imported into SimBA project in the chosen workflow file format')
+
+
+# importMultiDLCpose(r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini",
+#                    r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\import\test_2",
+#                    'ellipse',
+#                    ['mouse1', 'mouse2'],
+#                    'None',
+#                    {'Method': 'Gaussian', 'Parameters': {'Time_window': '200'}})
