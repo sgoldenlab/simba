@@ -279,8 +279,52 @@ This error is caused by running the wrong version of Python. You want to make su
   
 </details>
 
+### 19. I have installed SimBA on MacOS. When I try to launch SimBA by typing `simba`, I get an error saying:  ```ImportError: Python is not installed as a framework. The Mac OS X backend will not be able to function correctly if Python is not installed as a framework. See the Python documentation for more information on installing Python as a framework on Mac OS X. Please either reinstall Python as a framework, or try one of the other backends. If you are using (Ana)Conda please install python.app and replace the use of 'python' with 'pythonw'. See 'Working with Matplotlib on OSX' in the Matplotlib FAQ for more information.```
 
 
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/>
 
+In your conda environment: 
+
+(i) uninstall `matplotlib` by typing `pip uninstall matplotlib`
+  
+(ii) install `matplotlib` using conda, by typing `conda install matplotlib`
+  
+(iii) try to start simba by typing `simba`
+  
+</details>
+
+
+### 20. I have installed SimBA on MacOS. When I try to launch SimBA by typing `simba`, I get a long error message, which ends with: ```libc++abi.dylib: terminating with uncaught exception of type NSException Abort trap: 6```
+
+
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/>
+
+We have seen this error before on slightly older MacOS versions (i.e version 10.13.6) although we can't reproduce the error on newer MacOS versions (i.e version 12.3.1). The error seems to be produced by the specific SimBA python/tkinter version requirements, which does not seem to agree with some MacOS versions - please see https://stackoverflow.com/questions/30031063/nsexception-with-tkinter-on-mac for more info. 
+
+(i) update your MacOS. 
+
+(ii) If that is not possible, see if you can get SimBA running using python 3.7 or 3.8 in conda instead of the suggested python 3.6. This ensures that you have a different version of tkinter installed, which might avoid the clash.
+
+
+</details>
+
+### 21. I am trying to install SimBA on a machine with Linux, and I get an error ```OSError: Could not find library geos_c or load any of its variants ['libgeos_c.so.1', 'libgeos_c.so’]```. I may also get an additional error complaining about `opencv-python` 
+
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/>
+
+This error is produced when SimBA is trying to install the packages `shapeley` and `opencv` on your machine. Try to install SimBA with
+
+(i)Install SimBA with `pip install simba-uw-tf-dev --no-deps`
+
+(ii) install the requirements manually, and then install wxpython seperately using the suggestions e.g. here: wxWidgets/Phoenix#465
+
+</details>
 
 
