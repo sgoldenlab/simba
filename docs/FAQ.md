@@ -309,7 +309,8 @@ We have seen this error before on slightly older MacOS versions (i.e version 10.
 (i) update your MacOS. 
 
 (ii) If that is not possible, see if you can get SimBA running using python 3.7 or 3.8 in conda instead of the suggested python 3.6. This ensures that you have a different version of tkinter installed, which might avoid the clash.
-
+  
+For more information, see this [GitHub issue](https://github.com/sgoldenlab/simba/issues/179)
 
 </details>
 
