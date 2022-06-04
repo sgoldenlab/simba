@@ -328,4 +328,18 @@ This error is produced when SimBA is trying to install the packages `shapeley` a
 
 </details>
 
+### 22. I am trying to launch SimBA by typing `simba`, and I get a long error message that ends with `ImportError: cannot import name 'available_if'`
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/>
+
+This error is produced when SimBA is installed with the wrong version of `pip`. To fix the error:
+
+(i) Upgrade `pip` by typing `pip install pip==21.2.2`
+
+(ii) Install SimBA by typing `pip install simba-uw-tf-dev`
+  
+(iii) Launch SimBA by typing `simba`. `
+  
+</details>
 
