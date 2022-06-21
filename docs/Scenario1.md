@@ -56,9 +56,10 @@ In this step you create your main project folder, which will then auto-populate 
 3. `Project Name` is the name of your project. 
 *Keep in mind that the project name cannot contain spaces. We suggest to instead use underscore "_"* 
 
-4. In the `SML Settings` sub-menu, put in the number of predictive classifiers that you wish to create. For an example, in Scenario 1 we would like to create a single classifier. We will enter the number 1. Note that in the real world you would probably want to create multiple classifiers concurrently as this would decrease the number of times a video would need to be manually annotated. For simplicity, we will here create a single classifier.
+4. In the `SML Settings` sub-menu, put in the number of predictive classifiers that you wish to create. For an example, in Scenario 1 we would like to create a single classifier. We will enter the number 1. Note that in the real world you would probably want to create multiple classifiers concurrently as this would decrease the number of times a video would need to be manually annotated. For simplicity, we will here create a single classifier. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter `1` in this entry box.*
 
-5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> a single time, and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior (BtWGaNP) that you want to classify. If you click too many times, as long as you leave the extra boxes empty, all is well.
+5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> a single time, and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior (BtWGaNP) that you want to classify. If you click too many times, as long as you leave the extra boxes empty, all is well. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter any name in the the single entry box.*
+
 
 <p align="center">
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
