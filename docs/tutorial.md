@@ -49,9 +49,9 @@ In this step you create your main project folder with all the required sub-direc
 
 3. `Project Name` is the name of your project. *Keep in mind that the project name cannot contain spaces. Instead use underscore "_"* 
 
-4. Under `SML Settings`, put in the number of predictive classifiers that you wish to create. For an example, if you had three behaviors in your video, put 3 in the entry box.
+4. Under `SML Settings`, put in the number of predictive classifiers that you wish to create. For an example, if you had three behaviors in your video, put 3 in the entry box. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter `1` in this entry box*
 
-5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior that you want to classify. 
+5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior that you want to classify. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter any name in the the single entry box*. 
 
 <p align="center">
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
