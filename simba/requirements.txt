@@ -220,7 +220,7 @@ numexpr == 2.6.9
 # train_multiple_models_from_meta.py: 21
 # train_multiple_models_from_meta_scramble.py: 21
 # validate_model_on_single_video.py: 14
-numpy == 1.18.1
+numpy == 1.22.0
 
 # ROI_draw_defined.py: 3
 # ROI_freehand_draw_3.py: 3
