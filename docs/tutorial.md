@@ -1,11 +1,10 @@
 # Generic SimBA Tutorial
-This is a generic step by step tutorial to start using SimBA to create behavioral classifiers. For more detailed, up-to-date, information about the menus and options and their use cases, see the [SimBA Scenario tutorials](https://github.com/sgoldenlab/simba#scenario-tutorials)
 
-![alt-text-1](/images/simba.png "simba")
+This is a generic step by step tutorial to start using SimBA to create behavioral classifiers. For more detailed, up-to-date, information about the menus and options and their use cases, see the [SimBA Scenario tutorials](https://github.com/sgoldenlab/simba#scenario-tutorials)
 
 ### Pipeline breakdown
 
-The analysis pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
+The analysis pipeline is split into sections. These sections are indexed below along with their corresponding functions:
 
 ![alt-text-1](/images/Vis_build_2.JPG "simbaworkflow")
 
@@ -31,27 +30,27 @@ The analysis pipeline is split into a few sections. These sections are listed be
 - [Create Video](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-13-create-video)
 
 ## Part 1: Create a new project
-This section describes how to create a new project for your tracking analysis.
+This section describes how to create a new project in SimBA.
 
 ![](/images/createproject2.PNG "createproject2")
 
 ### Step 1: Generate Project Config
 
-In this step you create your main project folder with all the required sub-directories.
+In this step we will create a main project folder with all the required sub-directories.
 
-1. In the main SimBA window, click on `File` and and `Create a new project`. The following windows will pop up.
+1. In the main SimBA window, click on `File` and the then `Create a new project`. The following windows will pop up.
 
 <p align="center">
 <img src="/images/createproject.PNG" width="60%">
 </p>
 
-2. Navigate to the `[ Generate project config ]` tab. Under **General Settings**, specify a `Project Path` which is the directory that will contain your main project folder.
+2. Navigate to the `[ Generate project config ]` tab. Under **General Settings**, specify a `Project Path` which is the directory which will contain your main project folder.
 
-3. `Project Name` is the name of your project. *Keep in mind that the project name cannot contain spaces. Instead use underscore "_"* 
+3. Specify a `Project Name`. This is the name of your project. *Keep recommond not to use spaces in your project name. Instead use underscore "_"* 
 
-4. Under `SML Settings`, put in the number of predictive classifiers that you wish to create. For an example, if you had three behaviors in your video, put 3 in the entry box. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter `1` in this entry box*
+4. Under `SML Settings`, specify the number of classifiers that you wish to create. For an example, if you have three behaviors that you are intrested in, put `3` in the entry box. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter `1` in this entry box*
 
-5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior that you want to classify. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter any name in the the single entry box*. 
+5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> and it creates a row as shown in the below image. In each entry box, fill in the name of the behavior that you want to classify. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter any name in the the single entry box*. 
 
 <p align="center">
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
@@ -59,12 +58,12 @@ In this step you create your main project folder with all the required sub-direc
 
 6. `Type of Tracking` allows the user to choose multi-animal tracking or the classic tracking.
 
-7. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. Select your pose-estimation body-part configuration from the appropriate drop-down menu. If you can't see your species and/or body-part configuration, please create your own *User defined body-part* configuration*. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md) for documentation for how to do so. 
+7. Use the `Animal Settings` dropdown to specify the number of animals and body parts that that the pose estimation tracking data contains. Select your pose-estimation body-part configuration from the appropriate drop-down menu. If you can't see your species and/or body-part configuration, please create your own *User defined body-part* configuration*. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md) for documentation on how to create user-defined body-part configurations. 
 
-8. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. 
+8. Click on `Generate Project Config` to create your project. The project folder will be located in the specified `Project Path`. 
 
 ### Step 2: Import videos into project folder
-In this step, you can choose to import either one or multiple videos. The imported videos are used for visualizing predictions and standardizing distances across videos by calculating metric distances from pixel distances. 
+Next, you can choose to import either one or multiple videos. The imported videos are used for visualizing predictions and standardizing distances across videos by calculating metric distances from pixel distances. 
 
 ![](/images/Import_videos.PNG "Import_videos")
 
@@ -74,12 +73,13 @@ In this step, you can choose to import either one or multiple videos. The import
 3. Enter the file type of your videos. (e.g., *mp4*, *avi*, *mov*, etc) in the `Video type` entry box.
 4. Click on `Import multiple videos`. 
 >**Note**: If you have a lot of videos, it might take a few minutes before all the videos are imported.
+
 #### To import a single video
 1. Under the `Import single video` heading, click on `Browse File` to select your video.
-2. Click on `Import a video`.
+2. Click on `Import a video` to select the path of your video.
 
 ### Step 3: Import Tracking Data
-In this step, you will import your pose-estimation tracking data.
+Next, we will import your pose-estimation tracking data.
 
 ![](/images/Import_data_create_project_new_4.png "importcsv")
 
@@ -87,7 +87,7 @@ In this step, you will import your pose-estimation tracking data.
 
 1. Navigate to the `[ Import tracking data ]` tab. Under the `Import tracking data` click on the `File type` drop down menu.
 
-2. From the drop down menu, select the type of data you are importing into SimBA
+2. From the drop down menu, select the type of pose-estimation data you are importing into SimBA.
 
 3. To import multiple files, choose the folder that contains the files by clicking `Browse Folder`, then click `Import csv to project folder`.
 
@@ -126,8 +126,11 @@ Please note that you can only import the h5 tracking data after you have importe
 5. Click on `Import .slp`.
 
 
-DONE! You have now successfully created your SimBA project and imported your data. Now its time to load the project, create and/or use some classifiers and analyze some data. 
+You have now successfully created your SimBA project and imported your data. You should see you videos inside the `project_folder/videos` directory, and your pose estimation data (one file for each of the videos in the project) inside the `project_folder/csv/input_csv` directory. 
 
+>Note: An earlier version of this documentation suggested that users had to extract frames from each of the imported videos. **Extracting frames is not necessery**.  
+
+Now its time to load the project, create and/or use some classifiers, and analyze some data. 
 
 ## Part 2: Load project
 This section describes how to load and work with created projects.
@@ -135,13 +138,14 @@ This section describes how to load and work with created projects.
 ### Step 1: Load Project Config
 In this step you will load the *project_config.ini* file that was created.
 > **Note:** A project_config.ini should always be loaded before any other process.
+
 1. In the main SimBA window, click on `File` and `Load project`. The following windows will pop up.
 
 <p align="center">
   <img width="302" height="232" src="https://github.com/sgoldenlab/simba/blob/master/images/loadprojectini.PNG">
 </p>
 
-2. Click on `Browse File`. Then, go to the directory that you created your project in and click on your *project folder*. Locate the *project_config.ini* file and select it. Once this step is completed, it should look like the following, and you should no longer see the text *No file selected*.
+2. Click on the `Browse File` button. Then navigate to the directory that you created your project in and click on your *project folder*. Locate the *project_config.ini* file and select it. Once this step is completed, it should look like the following, and you should no longer see the text *No file selected*.
 
 <p align="center">
   <img width="500" height="60" src="https://github.com/sgoldenlab/simba/blob/master/images/loadedprojectini.PNG">
@@ -149,58 +153,58 @@ In this step you will load the *project_config.ini* file that was created.
 
 In this image, you can see the `Desktop` is my selected working directory, `tutorial` is my project name, and the last two sections of the folder path is always going to be `project_folder/project_config.ini`.
 
-3. Click on `Load Project`.
+3. Click on the `Load Project` button.
 
-### Step 2 (Optional) : Import more DLC Tracking Data or videos
-In this step, you can choose to import more pose estimation data in csv file format and/or more videos. If this isn't relevant then you can skip this step.
+### Step 2 (Optional) : Import further pose-estimation tracking data and videos videos
+
+Once we have loaded our project, we can choose to import more pose estimation data in and/or more videos. If this isn't relevant then you can skip this Step 2.
 
 ![](/images/importdlc.PNG "importdlc")
 
-1. Click on the `[ Further imports (data/video/frames) ]` tab. From here you can import more data or videos into the project folder. The imported .csv files will be placed in the `project_folder/csv/input` directory, and the imported videos will be placed in the `project_folder/videos` directory. 
-
-2. Once the videos are imported, you can extract frames from the additional videos by clicking on `Extract frames` under the **Extract further frames into project folder** heading. 
-
-3. If you already have existing frames of the videos in the project folder, you can import the folder that contains the frames into the project. Under the **Import frame folders** heading, click on `Browse Folder` to choose the folder thar contains the frames, and click on `Import frames`. The frames will be imported into the `project_folder/frames/input` folder. 
+1. Click on the `[ Further imports (data/video/frames) ]` tab. From here (at the bottom left of the window) you can import more data or videos into the project folder. The imported filesfiles will be placed in the `project_folder/csv/input_csv` directory, and the imported videos will be placed in the `project_folder/videos` directory. 
 
 ### Step 3: Set video parameters
-In this step, you can customize the meta parameters for each of your videos (fps, resolution, metric distances) and provide additional custom video information (Animal ID, group etc). You also set the **pixels per millimeter** for your videos. You will be using a tool that requires the known distance between two points (e.g., the cage width or the cage height) in order to calculate **pixels per millimeter**. The real life distance between the two points is called `Distance in mm`.
+
+In this step, we will specify the meta parameters for each of your videos (fps, resolution, metric distances). We will also set the **pixels per millimeter** for your videos. You will be using a tool that requires the known distance between two points (e.g., the cage width or the size of an object in the image) in order to calculate **pixels per millimeter**. The real life distance between the two points is called `Distance in mm`. This is important for standardizing meassurments across different videos where the camera might have moved in-between recordings. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/setvidparameter.PNG" width="391" height="96" />
 
-1. Under **Set video parameters(distances,resolution,etc.)**, the entry box named `Distance in mm` is the known distance between two points in the videos in millimeter. If the known distance is the same in all the videos in the project, then enter the value *(e.g,: 245)* and click on `Auto populate Distance in mm in tables`. and it will auto-populate the table in the next step (see below). If you leave the `Distance in mm` entry box empty, the known distance will default to zero and you will fill in the value for each video individually. 
+1. Under **Set video parameters(distances,resolution,etc.)**, the entry box named `Distance in mm` is the known distance between two points in the videos in millimeter. If the known distance is the same in all the videos in the project, then enter the value *(e.g,: 245)* and click on `Auto populate Distance in mm in tables`. and it will auto-populate the table in the next step (see below). If you leave the `Distance in mm` entry box empty, the known distance will default to zero and we will be forced to specify the the value for each video, individually. 
 
 2. Click on `Set Video Parameters` and the following windows will pop up.
 <p align="center">
   <img width="1037" height="259" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table.PNG">
 </p>
 
-3. In the above example I imported four videos and their names are listed the leftmost `Video` column. I auto-populated the known distance to 10 millimeter in the previous step, and this is now displayed in the `Distance in mm` column. 
+3. In the above example we imported four videos, and their names are listed the left-most `Video` column. We auto-populated the known distance to `10` millimeter in the previous step, and this value is now displayed in the `Distance in mm` column. 
 
-4. I can click on the values in the entry boxes and change them until I am satisfied. Then, I click on `Update distance_in_mm` and this will update the whole table.
+4. We can click on the values in the entry boxes and change them manually until satisfied. Then, we click on `Update distance_in_mm` and this will update the whole table.
 
-5. Next, to get the `Pixels/mm` for the first video, click on `Video1` and the following window will pop up. The window that pops up displays the first frame of `Video1`.
+5. Next, to get the `Pixels/mm` for the first video, click on `Video1`, and the following window will pop up. The window that pops up displays the first frame of the `Video1` video.
 
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord1.PNG">
 </p>
 
-6. Now, double **left** click to select two points that defines the known distance in real life. In this case, I know that the two **pink connected dots** represent a distance of 10 millimeter in real life.
+6. Now, **double left mouse click** to select two points in the image that defines the known distance in real life. In this case, I know that the two **pink connected dots** represent a distance of 10 millimeter in real life.
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord2.PNG">
 </p>
 
-7. If you misplaced one or both of the dots, you can double click on either of the dots to place them somewhere else in the image. Once you are done, hit `Esc`.
+7. If you misplaced one, or both of the dots, you can double click on either of the dots to place them somewhere else in the image. Once you are done, hit `Esc` key on your keyboard.
 
 <p align="center">
   <img width="400" height="500" src="https://github.com/sgoldenlab/simba/blob/master/images/getcoord.gif">
 </p>
 
-8. If every step is done correctly, the `Pixels/mm` column in the table should populate with the number of pixels that represent one millimeter, 
+8. If every step is done correctly, the `Pixels/mm` column in the table should populate with the number of pixels that represent one millimeter in your video. 
 <p align="center">
   <img width="700" height="350" src="https://github.com/sgoldenlab/simba/blob/master/images/videoinfo_table2.PNG">
 </p>
 
-9. Repeat the steps for every video in the table, and once it is done, click on `Save Data`. This will generate a csv file named **video_info.csv** in `/project_folder/log` folder that contains a table with your video meta data. 
+9. Repeat the steps for every video in the table, and once it is done, click the `Save Data` button. This will generate a csv file named **video_info.csv** in `project_folder/log` directory that contains a table with your video meta data. 
+
+>Note: If you know the ...
 
 10. You can also chose to add further columns to the meta data file (e.g., AnimalID or experimental group) by clicking on the `Add Column` button. This information will be saved in additional columns to your **video_info.csv** file.
 
