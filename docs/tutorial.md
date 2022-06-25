@@ -1,11 +1,11 @@
 # Generic SimBA Tutorial
-This is a generic step by step tutorial to start using SimBA to create behavioral classifiers. For more information about the menus and options and their use cases, see the [SimBA Scenario tutorials](https://github.com/sgoldenlab/simba#scenario-tutorials)
+This is a generic step by step tutorial to start using SimBA to create behavioral classifiers. For more detailed, up-to-date, information about the menus and options and their use cases, see the [SimBA Scenario tutorials](https://github.com/sgoldenlab/simba#scenario-tutorials)
 
 ![alt-text-1](/images/simba.png "simba")
 
 ### Pipeline breakdown
 
-For processing datasets, the pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
+The analysis pipeline is split into a few sections. These sections are listed below along with their corresponding functions:
 
 ![alt-text-1](/images/Vis_build_2.JPG "simbaworkflow")
 
@@ -59,7 +59,7 @@ In this step you create your main project folder with all the required sub-direc
 
 6. `Type of Tracking` allows the user to choose multi-animal tracking or the classic tracking.
 
-7. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts ( `2 animals, 16bp`). There are a few other - ** yet not validaded** - options, accessible in the dropdown menu.
+7. `Animal Settings` is the number of animals and body parts that that the pose estimation tracking data contains. Select your pose-estimation body-part configuration from the appropriate drop-down menu. If you can't see your species and/or body-part configuration, please create your own *User defined body-part* configuration*. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md) for documentation for how to do so. 
 
 8. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. 
 
@@ -83,7 +83,8 @@ In this step, you will import your pose-estimation tracking data.
 
 ![](/images/Import_data_create_project_new_4.png "importcsv")
 
-#### To import csv/json files
+#### To import csv/json/h5/trk/deepposekit pose-estimation tracking files
+
 1. Navigate to the `[ Import tracking data ]` tab. Under the `Import tracking data` click on the `File type` drop down menu.
 
 2. From the drop down menu, select the type of data you are importing into SimBA
@@ -94,7 +95,10 @@ In this step, you will import your pose-estimation tracking data.
 
 > Note: Below the `File type` drop-down menu, there are two option menus that can help correct and improve the incoming pose-estimation data (*interpolation*, and *smoothing*). Both of these menus default to `None`, meaning no corrections will be performed on the incoming data. If you are intrested in removing missing values (interpolation), and/or correcting "jitter" (smoothing), please see sections `2` and `3` in [TUTORIAL SCENARIO 1: IMPORT TRACKING DATA](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files) which details these functions, and including video examples of expected results.
 
-#### To import h5 files (multi-animal DLC)
+Below follows short examples for how to import pose-estimation from two of the more popular poset-estimation packages (multi-animal DLC and SLEAP).
+
+###### To import h5 files (multi-animal DLC)
+
 Please note that you can only import the h5 tracking data after you have imported the videos into the project folder.
 
 1. From the `File type` drop down menu, select `H5 (multi-animal DLC)`.
@@ -109,7 +113,7 @@ Please note that you can only import the h5 tracking data after you have importe
 
 6. Click `Import h5` to start importing.
 
-#### To import slp files (SLEAP)
+##### To import SLP files (SLEAP)
 
 1. From the `File type` drop down menu, select `SLP (SLEAP)`.
 
@@ -121,11 +125,9 @@ Please note that you can only import the h5 tracking data after you have importe
 
 5. Click on `Import .slp`.
 
-### Step 4: Extract frames into project folder
-This step will extract all the frames from every video that are imported into the project following **Step 2**. The frames are used for behavioral labeling when creating classifiers, and for visualizing the classification results. Once the step is completed, close the `Project Configuration` window.
->**Note**: Splitting videos up into frames can take time if you have a lot of high resolution videos at high frame rates. The frames can also take up a lot of hard drive space. 
 
-![](/images/extractframeintop.PNG "extractframeintop")
+DONE! You have now successfully created your SimBA project and imported your data. Now its time to load the project, create and/or use some classifiers and analyze some data. 
+
 
 ## Part 2: Load project
 This section describes how to load and work with created projects.
