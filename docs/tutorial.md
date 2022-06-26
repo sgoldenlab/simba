@@ -86,11 +86,8 @@ Next, we will import your pose-estimation tracking data.
 #### To import csv/json/h5/trk/deepposekit pose-estimation tracking files
 
 1. Navigate to the `[ Import tracking data ]` tab. Under the `Import tracking data` click on the `File type` drop down menu.
-
 2. From the drop down menu, select the type of pose-estimation data you are importing into SimBA.
-
 3. To import multiple files, choose the folder that contains the files by clicking `Browse Folder`, then click `Import csv to project folder`.
-
 4. To import a single file, choose the file by clicking `Browse File`, then click `Import single csv to project folder`.
 
 > Note: Below the `File type` drop-down menu, there are two option menus that can help correct and improve the incoming pose-estimation data (*interpolation*, and *smoothing*). Both of these menus default to `None`, meaning no corrections will be performed on the incoming data. If you are intrested in removing missing values (interpolation), and/or correcting "jitter" (smoothing), please see sections `2` and `3` in [TUTORIAL SCENARIO 1: IMPORT TRACKING DATA](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files) which details these functions, and including video examples of expected results.
@@ -102,29 +99,19 @@ Below follows short examples for how to import pose-estimation from two of the m
 Please note that you can only import the h5 tracking data after you have imported the videos into the project folder.
 
 1. From the `File type` drop down menu, select `H5 (multi-animal DLC)`.
-
 2. Under ` Animal settings`, enter the number of animals in the videos in the `No of animals` entry box, and click `Confirm`.
-
 3. Enter the names for each of the animal in the video.
-
 4. `Tracking type` is the type of tracking from DeepLabCut multi animal tracking.
-
 5. Select the folder that contains all the h5 files by clicking `Browse Folder`.
-
-6. Click `Import h5` to start importing.
+6. Click `Import h5` to start importing your pose-estimation data.
 
 ##### To import SLP files (SLEAP)
 
 1. From the `File type` drop down menu, select `SLP (SLEAP)`.
-
 2. Under ` Animal settings`, enter the number of animals in the videos in the `No of animals` entry box, and click `Confirm`.
-
 3. Enter the names for each of the animal in the video.
-
 4. Select the folder that contains all the slp files by clicking `Browse Folder`.
-
-5. Click on `Import .slp`.
-
+5. Click on `Import .slp` to start importing your pose-estimation data.
 
 You have now successfully created your SimBA project and imported your data. You should see you videos inside the `project_folder/videos` directory, and your pose estimation data (one file for each of the videos in the project) inside the `project_folder/csv/input_csv` directory. 
 
@@ -210,11 +197,13 @@ In this step, we will specify the meta parameters for each of your videos (fps, 
 
 ### Step 4: Outlier Correction
 
-Outlier correction is used to correct gross tracking inaccuracies by detecting outliers based on movements and locations of body parts in relation to the animal body length. For more details, please click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf)
+Outlier correction is used to correct gross tracking inaccuracies by detecting outliers based on movements and locations of body parts in relation to the animal body length. For more details, please click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf).
+
+To skip Outlier Correction, click the `Skip outlier correction` button in red font in the [Outlier correction] tab. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection.PNG" width="156" height="109" />
 
-1. Click on `Settings` and the following window will pop up. The Outlier Settings window varies with the number of animals in the project. The images below shows settings for two animals.
+1. Click on `Settings` and the following window will pop up. The Outlier Settings window varies with the number of animals in the project. The images below shows settings for a project contaning two animals.
 
 <p align="center">
   <img width="300" height="400" src="https://github.com/sgoldenlab/simba/blob/master/images/outliercorrection2.PNG">
@@ -235,26 +224,27 @@ Body parts flagged as movement or location outliers will be re-placed in their l
 5. Click to run the outlier correction. You can follow the progress in the main SimBA window. Once complete, two new csv log files will appear in the `/project_folder/log` folder. These two files contain the number of body parts corrected following the two outlier correction methods for each video in the project.  
 
 ### Step 5: Extract Features
-Based on the coordinates of body parts in each frame - and the frame rate and the pixels per millimeter values - the feature extraction step calculates a larger set of features used for behavioral classification. Features are values such as metric distances between body parts, angles, areas, movement, paths, and their deviations and rank in individual frames and across rolling windows. This set of features will depend on the body-parts tracked during pose-estimation (which is defined when creating the project). Click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) for an example list of features when tracking 2 mice and 16 body parts. 
 
-1. Click on `Extract Features`.
+Based on the coordinates of body parts in each frame (as well as the frame rate and the pixels per millimeter values) the feature extraction step calculates a larger set of features used for behavioral classification. Features are values such as metric distances between body parts, angles, areas, movement, paths, and their deviations and rank in individual frames and across rolling windows. This set of features will depend on the body-parts tracked during pose-estimation (which is defined when creating the project). Click [here](https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv) for an example list of features when tracking 2 mice and 16 body parts. Click [here]([https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv](https://github.com/sgoldenlab/simba/blob/master/misc/features_user_defined_pose_config.csv) for an example list of feature categories when tracking user-defined body-parts in SimBA. 
+
+1. Click on `Extract Features` under the [Extract features] tab.
 
 ### Step 6: Label Behavior
-This step is used for label the behaviors in each frames of a video. This data will be concatenated with the features and used for creating behavioral classifiers. 
+This step is used to label (a.k.a annotate) behaviors in each frames of a video. This data will be concatenated with the features and used for creating behavioral classifiers. If you have annotations from third-party tools you want to append, and skip labelling behavior in SimBA, [check out the third-party annotation page](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md).
 
-There are two options, one is to start a **new video annotation** and one is to **continue on where you last left off**. Both are essentially the same, except the latter will start with the frame where you last saved. For example, one day, you started a new video by clicking `Select folder with frames (create new video annotation` and you feel tired and sick of annotating the videos. You can now click `Generate/Save` button to save your work for your coworker to continue. Your coworker can continue by clicking ` Select folder with frames(continue existing video annotation)` and select the the video folder that you have annotated half way and take it from there!
+There are two options: **(i) start anew video annotation (ii)continue on where you last left off**. Both are essentially the same, except the latter will start with the frame where you last saved. For example, one day, you started a new video by clicking `Select video (create new video annotation` and you feel tired of annotating the videos. You can now click `Generate/Save` button to save your work, for your co-worker to continue. Your co-worker can continue by clicking ` Select video (continue existing video annotation)` and select the the video that you have annotated half-way and take it from there!
 
-![](/images/label_behaviornew.PNG)
+![](/images/label_0622.png)
 
-1. Click on `Select folder with frames`. In your project folder navigate to the `/project_folder/frames/input/` folder, and you should see folders that are named after your videos. These folders contain the extracted video frames. Select one of the folder and the following window should pop up.
+1. Click on `Select video (create new video annotation`. In your project folder, navigate to the `/project_folder/videos/` directory and select the video file you wish to annotate. The following window should pop up.
 
 <p align="center">
   <img width="720" height="720" src="https://github.com/sgoldenlab/simba/blob/master/images/labelbe.PNG">
 </p>
 
-2. Please click [here](/docs/labelling_aggression_tutorial.md) to learn how to use the behavior annotation interface.
+Please click [here](/docs/labelling_aggression_tutorial.md) for more detailed information on how to use the behavior annotation interface in SimBA.
 
-3. Once finished, click on `Generate/Save` and it will generate a new *.csv* file in */csv/targets_inserted* folder.
+3. Once finished, click the `Generate/Save` button and a new file will be created in the *project_folder/csv/targets_inserted* directory representing your video.
 
 ### Step 7: Train Machine Model
 This step is used for training new machine models for behavioral classifications. 
@@ -269,7 +259,7 @@ This step is used for training new machine models for behavioral classifications
   <img width="378" height="712" src="https://github.com/sgoldenlab/simba/blob/master/images/machinemodelsettings.PNG">
 </p>
 
->**Note:** If you have a .csv file containing hyper-parameter meta data, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the hyper-parameter entry boxes and model evaluation settings. 
+>**Note:** If you have a .csv file containing hyper-parameter meta data, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the hyper-parameter entry boxes and model evaluation settings. You can find an example hyper-parameter meta data file [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/BtWGaNP_meta.csv). 
 
 2. Under **Machine Model**, choose a machine model from the drop down menu: `RF` ,`GBC`,`Xboost`.
 
@@ -301,6 +291,7 @@ This step is used for training new machine models for behavioral classifications
 
 - `Over sample ratio`: The desired ratio of the number of samples in the minority class over the number of samples in the majority class after over sampling.
 
+To learn more about machine learning hyperparameters, click [HERE] to go to the `Scenario 1 tutorial` (https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model) or see the [SimBA pre-print](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)
 
 5. Under **Model Evaluation Settings**.
 
@@ -334,6 +325,8 @@ This step is used for training new machine models for behavioral classifications
 
 #### To train multiple models
 
+It is often necessery to train multiple models, in order to explore several different hyperparameters, or get classifiers for multiple different behaviors. To train multiple models at once, 
+
 1. Click on `Settings`.
 
 2. Under **Machine Model**, choose the machine model from the drop down menu,`RF` ,`GBC`,`Xboost`.
@@ -349,7 +342,7 @@ This step is used for training new machine models for behavioral classifications
 7. Click on the green `Train Multiple Models, one for each saved settings` button.
 
 ### Optional step before running machine model on new data
-The user can validate each model *( saved in .sav format)* file. In this validation step the user specifies the path to a previously created model in .sav file format, and a .csv file containing the features extracted from a video. This process will (i) run the classifications on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click[here](https://youtu.be/UOLSj7DGKRo) for an example validation video.
+The user can validate each model *( saved in .sav format)*. In this validation step the user specifies the path to a previously created model in .sav file format, and a .csv file containing the features extracted from a video. This process will (i) run the classifications on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click[here](https://youtu.be/UOLSj7DGKRo) for an example validation video.
 
 1. Click `Browse File` and select the *project_config.ini* file and click `Load Project`.
 
@@ -441,7 +434,7 @@ Access this menu through the `Load project` menu and the `Run machine model` tab
 
 
 ### Step 10: Sklearn Visualization
-These steps generate visualizations of features and machine learning classification results. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots and data plots. In this step the different frames can also be merged into video mp4 format. 
+These steps generate visualizations of features and machine learning classification results. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots and data plots etc. In this step the different videos can also be merged into video mp4 format. 
 
 ![](/images/visualization_11_20.PNG)
 
