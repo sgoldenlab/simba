@@ -79,6 +79,8 @@ In this tutorial we have multi-animal tracking data in .H5 file format from Deep
 
 When SLEAP and multi-animal DLC predicts the location of body-parts for multiple animals, the animals are assigned *tracks* or *tracklets* (for more information, see the SLEAP and maDLC documentation), with one track for each animal. In the current scenario, this means that DeepLabCut may have assigned *track 1* to be the Resident, and *track 2* to be the Intruder. It could also be the reverse, and *track 1* is the Intruder and *track 2* is the Resident. Further - if you have multiple videos, then the identity of the animal representing *track 1* and *track 2* will most likely shift across the different videos in your project. We need to organise the pose-estimation data such as *track 1* is Animal 1 (Resident) and *track 2*  is Animal 2 (Intruder) **in all of our tracking files** and SimBA does this through an interactive interface. 
 
+>Note: If you used SLEAP to track only **one** animal, then SimBA will automatically skip over over this step.  
+
 1. When you click on `Import h5`, you will see the following window pop open.
 
 ![](/images/Multi_animal5.jpg "createproject")
