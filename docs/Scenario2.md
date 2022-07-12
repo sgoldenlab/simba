@@ -90,11 +90,22 @@ Clicking the `Run` buttons calculates the descriptive statistics on all the CSV 
 
 ![alt-text-1](/images/movement_log.JPG "movement_log")
 
-4. `Time bins: machine predictions`: This button generates descriptive statistics in **user-defined time-bins** for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. Clicking on `Time bins: machine predictions` brings up a pop-up menu where the user selects the size of each time bin in seconds. The pop up should look like this:
+3. `Time bins: machine predictions`: This button creates descriptive statistics of classification results within **user-defined time-bins**. SimBA will create a CSV file that contains data, **split into time bins**, for the following variables: 
+* Total total number of classified ‘bouts’ (count)
+* Total time in seconds of classified behavior 
+* Time (within the time bin) of first behavior occurance
+* Mean bout duration in seconds.
+* Median bout duration in seconds.
+* Mean interval between behavior bouts (within the time bin) in seconds
+* Median interval between behavior bouts (within the time bin) in seconds
+
+Clicking on `Time bins: machine predictions` brings up a pop-up menu where the user selects the size of each time bin in seconds. The pop up should look like this:
 
 ![alt-text-1](/images/Analyze_4.PNG "data_log")
 
-The data is saved in a timestaped CSV file in the in the `/project_folder/log` folder. 
+Fill in the time bins in seconds. The data is saved in a timestaped CSV file in the in the `/project_folder/log` folder. For an example of the output, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/Time_bins_ML_results_20220711185633.csv) file which includes the analysis of 2 videos and 2 classifiers. 
+
+>Note: (i) If no behavior was expressed in a certain time bin, then the fields representing that time bin is missing. (i) If there was 1 behavior event within a time bin, then the `Mean event interval (s)` and `Median event interval (s)` fields are missing for that time-bin. 
 
 5. `Time bins: Distance / velocity`: This button generates descriptive statistics for mean and median movements and distances between animals in **user-defined time-bins**. Clicking this button brings up a pop-up menu where the user selects the size of each time bin in seconds. The data is saved in a timestaped CSV file in the in the `/project_folder/log` folder.
 
