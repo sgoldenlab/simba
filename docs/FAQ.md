@@ -304,13 +304,17 @@ In your conda environment:
   <summary>Show solutions!</summary>
 <br/><br/>
 
-We have seen this error before on slightly older MacOS versions (i.e version 10.13.6) although we can't reproduce the error on newer MacOS versions (i.e version 12.3.1). The error seems to be produced by the specific SimBA python/tkinter version requirements, which does not seem to agree with some MacOS versions - please see https://stackoverflow.com/questions/30031063/nsexception-with-tkinter-on-mac for more info. 
+(i) use anaconda to import this conda environment file [environment.yml.zip](https://github.com/sgoldenlab/simba/files/9097623/environment.yml.zip)
 
-(i) update your MacOS. 
+(ii) There is a directory in your root called ~/.matplotlib. Create a file ~/.matplotlib/matplotlibrc there and add the following code: backend: TkAgg
+https://stackoverflow.com/questions/21784641/installation-issue-with-matplotlib-python
 
-(ii) If that is not possible, see if you can get SimBA running using python 3.7 or 3.8 in conda instead of the suggested python 3.6. This ensures that you have a different version of tkinter installed, which might avoid the clash.
+(iii) Do "conda install shapely" in this new anaconda environment
+
+Type simba to check if it works!
   
-For more information, see this [GitHub issue](https://github.com/sgoldenlab/simba/issues/179)
+For more information, see this [GitHub issue](https://github.com/sgoldenlab/simba/issues/196)
+
 
 </details>
 
