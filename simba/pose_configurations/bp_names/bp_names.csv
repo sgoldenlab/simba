@@ -1,0 +1,13 @@
+Ear_left,Ear_right,Nose,Tail_base,,,,,,,,,,,,
+Ear_left,Ear_right,Nose,Center,Lat_left,Lat_right,Tail_base,,,,,,,,,
+Ear_left,Ear_right,Nose,Center,Lat_left,Lat_right,Tail_base,Tail_end,,,,,,,,
+Mouse1_left_ear,Mouse1_right_ear,Mouse1_left_hand,Mouse1_right_hand,Mouse1_left_foot,Mouse1_right_foot,Mouse1_nose,Mouse1_tail,Mouse1_back,,,,,,,
+Ear_left_1,Ear_right_1,Nose_1,Tail_base_1,Ear_left_2,Right_ear_2,Nose_2,Tail_base_2,,,,,,,,
+Ear_left_1,Ear_right_1,Nose_1,Center_1,Lat_left_1,Lat_right_1,Tail_base_1,Ear_left_2,Ear_right_2,Nose_2,Center_2,Lat_left_2,Lat_right_2,Tail_base_2,,
+Ear_left_1,Ear_right_1,Nose_1,Center_1,Lat_left_1,Lat_right_1,Tail_base_1,Tail_end_1,Ear_left_2,Ear_right_2,Nose_2,Center_2,Lat_left_2,Lat_right_2,Tail_base_2,Tail_end_2
+Ear_left_1,Ear_right_1,Nose_1,Center_1,Lat_left_1,Lat_right_1,Tail_base_1,Ear_left_2,Ear_right_2,Nose_2,Center_2,Lat_left_2,Lat_right_2,Tail_base_2,,
+Nose_1,Ear_left_1,Ear_right_1,Neck_1,Hip_left_1,Hip_right_1,Tail_1,Nose_2,Ear_left_2,Ear_right_2,Neck_2,Hip_left_2,Hip_right_2,Tail_2,,
+Ear_left_1,Ear_right_1,Nose_1,Tail_base_1,Ear_left_2,Right_ear_2,Nose_2,Tail_base_2,,,,,,,,
+Ear_left_1,Ear_right_1,Nose_1,Center_1,Lat_left_1,Lat_right_1,Tail_base_1,Ear_left_2,Ear_right_2,Nose_2,Center_2,Lat_left_2,Lat_right_2,Tail_base_2,,
+Ear_left_1,Ear_right_1,Nose_1,Center_1,Lat_left_1,Lat_right_1,Tail_base_1,Tail_end_1,Ear_left_2,Ear_right_2,Nose_2,Center_2,Lat_left_2,Lat_right_2,Tail_base_2,Tail_end_2
+3D,,,,,,,,,,,,,,,
