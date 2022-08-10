@@ -4,7 +4,6 @@ Annotating frames can be the most time-consuming aspect of supervised machine le
 
 These workflows are built upon feeding computer-generated predictions, initially with human oversight, back into the model as training examples and thus improving its predictions through more data, all while spending significantly less time annotating images. This is approach is **not** restricted to animal tracking / pose-estimation, but can also use for improving the performance of behavior classifiers in SimBA.
 
->*Note*: If you want to label behaviors, including the use of pseudo-labelling methods in SimBA, you **must** extract the frames for the videos you wish to label. The frame extraction ensures that the frame number, the behavioral label, and the displayed frame during the annotation-work are all align. For more information on how to extract frames in SimBA, see the [Scenario 1 Part 2 - Import more tracking data into project](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-2-optional--import-more-dlc-tracking-data-or-videos), or the generic [Tools menu tutorials](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames).
 
 ## Step 1: Generating initial machine predictions in SimBA
 
