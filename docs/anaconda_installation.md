@@ -20,9 +20,7 @@
 
 ![](/images/anastep3.png)
 
-6. In the terminal, type  `pip install simba-uw-tf`
-
-![](/images/anastep4.PNG)
+6. In the terminal, type  `pip install simba-uw-tf-dev`
 
 7. Once it is installed, uninstall shapely, it will then prompt `Proceed([y]/[n])?`, type `y`.
 
