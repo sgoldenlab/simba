@@ -8,13 +8,6 @@
 
 # Installing SimBA Option 1 
 
-### Install SimBAxTF 
-Open bash or command prompt and run the following commands on current working directory
-
-```
-pip install simba-uw-tf
-```
-
 ### Install SimBAxTF-development version
 Open bash or command prompt and run the following commands on current working directory
 
@@ -25,7 +18,7 @@ pip install simba-uw-tf-dev
 >Note: If you are seeing error messages related to some dependency conflicts, then you need to either downgrade your pypi package or instruct SimBA to ignore these dependency conflicts - either works. To find more information on how to do this, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/FAQ.md#when-i-install-or-update-simba-i-see-a-bunch-or-messages-in-the-console-telling-there-has-been-some-dependency-conflicts-the-messages-may-look-a-little-like-this)
 
 
-# How to launch SimBA ( installed using pip install simba-uw-tf)
+# How to launch SimBA ( installed using pip install simba-uw-tf-dev)
 
 1. Open up command prompt anywhere.
 
@@ -45,7 +38,7 @@ Click [here](/docs/anaconda_installation.md) for a detail step by step guide on 
 
 2. In the terminal type 
 
-`pip install simba-uw-tf`
+`pip install simba-uw-tf-dev`
 
 3. It will error out when running simba. To fix it, first uninstall shapely.
 
@@ -56,9 +49,7 @@ Click [here](/docs/anaconda_installation.md) for a detail step by step guide on 
 `conda install -c conda-forge shapely`
 
 
-# Installing on MacOS
-
-This is not recommended but it is possible.
+# Installing on MacOS 
 
 ### Requirements
 - XCode installed
@@ -72,7 +63,7 @@ This is not recommended but it is possible.
 1. Create an environment for simba using anaconda terminal.
 
 2. In the terminal type,
-`pip install simba-uw-no-tf`
+`pip install simba-uw-tf-dev`
 
 3. Then,
 `conda install -c anaconda python.app`
