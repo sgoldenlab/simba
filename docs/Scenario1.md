@@ -274,14 +274,16 @@ If you already have annotation videos created with these alternative tools, or a
 
 1. Click on the `Label Behavior` tab in the `Load Project` window and you should see the following menu:
 
-![](/images/Create_project_11.jpg "project11_dup.PNG")
+<p align="center">
+  <img width="720" height="720" src="https://github.com/sgoldenlab/simba/blob/master/images/Label_behavior.png">
+</p>
 
 Use the first button (i) in the image above if you are starting to create behavior labels for a video from scratch. Use the second button (ii) to continue annotating a video that you have made behavior labels for previously in the current project. In the third menu (iii) we have button-click access to functions that append behavior labels generated in third-party apps to your SimBA dataset. To read more about how to append annotations created in third-party applications, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md)   
 
 1. In the current scenario, we want to click on the first button - `Select video (create new video annotation)`. In your project folder, navigate to the `/project_folder/videos` folder and select the video file (e.g., mp4 or avi file) representing the video you wish to annotate. 
 
 <p align="center">
-  <img width="720" height="720" src="https://github.com/sgoldenlab/simba/blob/master/images/Label_behavior.png">
+  <img width="800" height="720" src="https://github.com/sgoldenlab/simba/blob/master/images/labelbe.PNG">
 </p>
 
 2. Please click [here](/docs/labelling_aggression_tutorial.md) to learn how to use the behavior annotation interface.
