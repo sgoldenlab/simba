@@ -22,7 +22,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Merge frames to video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video)
 - [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs)
 - [Extract frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames)
-- [Print model info]()
+- [Print model info](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#print-mode-info)
 - [Convert .seq to .mp4](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_tools.md#convert--seq-files-to-mp4-files)
 - [Re-order pose-estimation tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 - [Remove body-parts from tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
