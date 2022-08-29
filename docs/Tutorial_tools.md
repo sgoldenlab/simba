@@ -22,6 +22,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Merge frames to video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video)
 - [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs)
 - [Extract frames](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames)
+- [Print model info]()
 - [Convert .seq to .mp4](https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_tools.md#convert--seq-files-to-mp4-files)
 - [Re-order pose-estimation tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 - [Remove body-parts from tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
@@ -386,3 +387,22 @@ Use this tool to visualize the pose-estimation of all the files inside a SimBA p
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/viz_pose_folder.png" />
 </p>
+
+
+### Print mode info
+Use this tool to get the model information (e.g., number of features, number of trees used to create a model) from a model `.sav` file in SimBA. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/model_info_1.png" />
+</p>
+
+1. Next to the `Model path` entry box, click `Browse` and navigate to a model classifier that you have created in SimBA (e.g., select the `MyClassifier.sav` file. 
+
+2. Next, click `PRINT MODEL INFO` and you should see the following information printed in the main SimBA terminal. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/model_info_2.png" />
+</p>
+
+This information tells you how many trees the classifier uses, how many features the classifier expects, further model hyperparameter settings, and when the file was created etc. 
+
