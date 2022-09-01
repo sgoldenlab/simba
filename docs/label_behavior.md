@@ -12,7 +12,7 @@ If you already have annotation videos created with these alternative tools, or a
 ## Step 1. Loading project_config file 
 In the main SimBA menu, click on `File > Load Project > Load Project.ini > Browse File` and select the config file (project_config.ini) representing your SimBA project. This step **must** be done before proceeding to the next step.
 
-## Step 2. Opening labelling behavior window
+## Step 2. Opening the labelling behavior interface
 
 Once your project is loaded, click on the [Label Behavior] tab and you should see the below four sub-menus (Note: I'm writing this document on a Mac, if you're running SimBA on a PC or Linux, the aestetics might be slightly different): 
 <p align="center">
@@ -26,8 +26,30 @@ These four different sub-menus represent four different ways of annotating your 
 * (3) **ADVANCED LABEL BEHAVIOR**. When selecting a new video to annotate, SimBA **has no default annotatation for any frame**. In other words, the user is required annotate each frame as either behavior-absent or behavior-present. Only annotated frames will be used when creating the machine learning model(s). 
 * (4) **IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS**. Use these menus to import annotations created in other tools (without performing annotations in SimBA. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md) to learn more about how to import annotations from third-party software. 
 
+Regardless of which method you choose to use, by clicking on `Select video...` (or `Correct labels) you will access the same user interface. The only difference between the methods is how non user-annoated videos are going to be treated. 
 
-Regardless of which method you choose to use, clicking on `Select video...` (or `Correct labels) will take you to the same user interface. The only difference between the methods is how 
+In this tutorial, we will click on `Select video (create new video annotation)`. This will bring up a file selection dialog menu. We navigate to the `project_folder/videos` directory and select a video we wich to annotate. In this tutorial, I am selecting `BtWGANP.mp4` and click Open:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/docs/annotator_2.png" />
+</p>
+
+## Step 3. Using the labelling behavior interface
+
+Once I've selected my video file, the annotation interface will pop open, looking something like this:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_3.png" />
+</p>
+
+In this image I have marked out 8 different parts of the window, which will we can use to accurately label the frames of the video as containing (or not containing) your behavior(s) of interest. We go over the 
+
+(1) This is the title header of the window. It tells you which 
+
+
+
+
+
 
 
 
