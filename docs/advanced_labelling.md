@@ -35,7 +35,19 @@ Once I've selected my video file, the annotation interface will pop open, lookin
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_adv_1.png" />
 </p>
 
-In this tutorial I am annotating a video within a SimBA project with two classifiers, 
+In this tutorial I am annotating a video within a SimBA project that has two classifiers. We can see this in the `Check behavior` submenu, which is populated with two rows for the two classifiers (`Attack` and `Sniffing`) and two columns for annotating if the behavior happening or not happening in the frame (`PRESENT` and `ABSENT`). 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_adv_2.png" />
+</p>
+
+In the below example gif, I am viewing frame number `28` of a video called `Together_1` (Note: you can see the name of the video currently beeing annotated by looking in the GUI annotator title window). In frame number `28`, I annotate `Sniffing` as beeing present, while `Attack` is absent. My annotations are saved into SimBA working memory when I click to advance to the next frame. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/advanced_annotator_6_fast.gif" />
+</p>
+
+
 
 
 
