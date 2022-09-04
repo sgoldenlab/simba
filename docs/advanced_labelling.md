@@ -7,8 +7,7 @@ The SimBA behavioural annotator GUI is used to label (annotate) frames in videos
 * (2) **PSEUDO-LABELLING**: When selecting a new video to annotate, SimBA uses machine classifications the default annotation. Thus, any frame with a classification probability above the user-specified threshold will have **behavior present** as the default value.  
 * (3) **ADVANCED LABEL BEHAVIOR**. When selecting a new video to annotate, SimBA **has no default annotatation for any frame**. In other words, the user is required annotate each frame as either behavior-absent or behavior-present. Only annotated frames will be used when creating the machine learning model(s). 
 
-
-This tutoral details how to use the `ADVANCED LABEL BEHAVIOR` annotator in SimBA. For information on how to use the standard `LABEL BEHAVIOR` annotator or `PSEUDO-LABELLING`, click [HERE](https://github.com/sgoldenlab/simba/edit/master/docs/label_behavior.md). For information on how to append annotations created in alternative third-party software outside of SimBA, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md)
+This tutoral details how to use the `ADVANCED LABEL BEHAVIOR` annotator in SimBA. To use advanced labelling in SimBA, I recommend first reading the tutorial on how to use the [standard `LABEL BEHAVIOR` / `PSUDO-LABELLING`]((https://github.com/sgoldenlab/simba/edit/master/docs/label_behavior.md). that tutoral documents the functions of the buttons in the SimBA annotator GUI, most which are identical when using advanced labelling in SimBA. For information on how to append annotations created in alternative third-party software outside of SimBA, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md)
 
 ## Step 1. Loading project_config file 
 In the main SimBA menu, click on `File > Load Project > Load Project.ini > Browse File` and select the config file (project_config.ini) representing your SimBA project. This step **must** be done before proceeding to the next step.
@@ -17,13 +16,13 @@ In the main SimBA menu, click on `File > Load Project > Load Project.ini > Brows
 
 Once your project is loaded, click on the [Label Behavior] tab and you should see the below four sub-menus (Note: I'm writing this document on a Mac, if you're running SimBA on a PC or Linux, the aestetics might be slightly different): 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_1.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_0.png" />
 </p>
 
-These four different sub-menus represent four different ways of annotating your videos. In this tutorial, we will use the buttons in sub-menu number `3`. We will click on `Select video (create new video annotation)` in the `ADVANCED BEHAVIOR LABEL` submenu. This will bring up a file selection dialog menu. We navigate to the `project_folder/videos` directory and select a video we wich to annotate. In this tutorial, I am selecting `BtWGANP.mp4` and click Open:
+These four different sub-menus represent four different ways of getting human annotations appended to your video data. In this tutorial, we will use the buttons in sub-menu number `3`. We will click on `Select video (create new video annotation)` in the `ADVANCED BEHAVIOR LABEL` submenu. This will bring up a file selection dialog menu. We navigate to the `project_folder/videos` directory and select a video we wich to annotate. In this tutorial, I am selecting `Together_1.mp4` and click `Open`:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/docs/annotator_2.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_10.png" />
 </p>
 
 
@@ -35,7 +34,7 @@ Once I've selected my video file, the annotation interface will pop open, lookin
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_adv_1.png" />
 </p>
 
-In this tutorial I am annotating a video within a SimBA project that has two classifiers. We can see this in the `Check behavior` submenu, which is populated with two rows for the two classifiers (`Attack` and `Sniffing`) and two columns for annotating if the behavior happening or not happening in the frame (`PRESENT` and `ABSENT`). 
+In this tutorial I am annotating a video within a SimBA project that has two classifiers. We can see this in the `Check behavior` submenu, which is populated with two rows for the two classifiers (`Attack` and `Sniffing`) and two columns for annotating if the behavior happening, or not happening, in the frame (`PRESENT` and `ABSENT`). 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_adv_2.png" />
@@ -47,7 +46,7 @@ In the below gif, I am viewing frame number `28` of a video called `Together_1` 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/advanced_annotator_6_fast.gif" />
 </p>
 
-As opposed to [`PSEDO-LABELLING` or standard `LABELING BEHAVIOR`](https://github.com/sgoldenlab/simba/edit/master/docs/label_behavior.md), within advanced labelling, it is possible to **omit** a frame from beeing annotated. This means that we score the behavior(s) as neither `PRESENT` or `ABSENT` in the frame or a range of frames. For example, if we **do not** tick any behaviors as absent of present (leave all classifier checkboxes unticked) for a frame (or range of frames), that means that the specific frame (or range of frames) will be omitted as annotated examples within any downstream processes involving  machine learning predictive classifiers. In the gif below, I use the label `frame range` tool in the annotator to label frames `50-100` as containing no good examples of `Sniffing` and `Attack` being present or absent. 
+As opposed to [`PSEDO-LABELLING` or standard `LABELING BEHAVIOR`](https://github.com/sgoldenlab/simba/edit/master/docs/label_behavior.md), within advanced labelling, it is possible to **omit** a frame from being annotated. This means that we score the behavior(s) as neither `PRESENT` or `ABSENT` in the frame (or a range of frames). For example, if we **do not** tick any behaviors as absent of present (leave all classifier checkboxes unticked) for a frame (or range of frames), that means that the specific frame (or range of frames) will be omitted as an annotated example for any downstream processes involving  machine learning predictive classifiers. In the gif below, I use the label `frame range` tool in the annotator to label frames `50-100` as containing no good examples of `Sniffing` and `Attack` being present or absent. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/advanced_annotator_7_fast.gif" />
