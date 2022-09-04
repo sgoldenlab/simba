@@ -1,14 +1,14 @@
 # <p align="center"> SimBA behavioral Annotator GUI (ADVANCED LABELLING) </p>
 
 
-The SimBA behavioural annotator GUI is used to label (annotate) frames in videos that contain behaviors of interest. SimBA allows four different ways of annotating behaviors as present or absent in individual frames. The  difference between the methods is how **non** user-annoated frames are going to be treated. 
+The SimBA behavioural annotator GUI is used to label (annotate) frames in videos that contain behaviors of interest. SimBA allows three different ways of annotating behaviors as present or absent in individual frames. The  difference between these methods is how **non** user-annoated frames are treated
 
 * (1) **LABEL BEHAVIOR**: When selecting a new video to annotate, SimBA assumes that the behavior is absent in any given frame unless indicated by the user. In other words, the default annotation is that the behavior(s) are **not** present. 
 * (2) **PSEUDO-LABELLING**: When selecting a new video to annotate, SimBA uses machine classifications the default annotation. Thus, any frame with a classification probability above the user-specified threshold will have **behavior present** as the default value.  
 * (3) **ADVANCED LABEL BEHAVIOR**. When selecting a new video to annotate, SimBA **has no default annotatation for any frame**. In other words, the user is required annotate each frame as either behavior-absent or behavior-present. Only annotated frames will be used when creating the machine learning model(s). 
-* (4) **IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS**. Use these menus to import annotations created in other tools (without performing annotations in SimBA. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md) to learn more about how to import annotations from third-party software. 
 
-This tutoral details how to use the `ADVANCED LABEL BEHAVIOR` annotator in SimBA. For information on how to use the standard `LABEL BEHAVIOR` annotator or `PSEUDO-LABELLING`, click [HERE](https://github.com/sgoldenlab/simba/edit/master/docs/label_behavior.md). For information on how to append annotations created in alternative third-party software, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md)
+
+This tutoral details how to use the `ADVANCED LABEL BEHAVIOR` annotator in SimBA. For information on how to use the standard `LABEL BEHAVIOR` annotator or `PSEUDO-LABELLING`, click [HERE](https://github.com/sgoldenlab/simba/edit/master/docs/label_behavior.md). For information on how to append annotations created in alternative third-party software outside of SimBA, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md)
 
 ## Step 1. Loading project_config file 
 In the main SimBA menu, click on `File > Load Project > Load Project.ini > Browse File` and select the config file (project_config.ini) representing your SimBA project. This step **must** be done before proceeding to the next step.
@@ -41,11 +41,44 @@ In this tutorial I am annotating a video within a SimBA project that has two cla
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_adv_2.png" />
 </p>
 
-In the below example gif, I am viewing frame number `28` of a video called `Together_1` (Note: you can see the name of the video currently beeing annotated by looking in the GUI annotator title window). In frame number `28`, I annotate `Sniffing` as beeing present, while `Attack` is absent. My annotations are saved into SimBA working memory when I click to advance to the next frame. 
+In the below gif, I am viewing frame number `28` of a video called `Together_1` (Note: you can see the name of the video currently beeing annotated by looking in the GUI annotator title window). In frame number `28`, I annotate `Sniffing` as beeing present, while `Attack` is absent. My annotations are saved into SimBA working memory when I click to advance to the next frame. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/advanced_annotator_6_fast.gif" />
 </p>
+
+As opposed to [`PSEDO-LABELLING` or standard `LABELING BEHAVIOR`](https://github.com/sgoldenlab/simba/edit/master/docs/label_behavior.md), within advanced labelling, it is possible to **omit** a frame from beeing annotated. This means that we score the behavior(s) as neither `PRESENT` or `ABSENT` in the frame or a range of frames. For example, if we **do not** tick any behaviors as absent of present (leave all classifier checkboxes unticked) for a frame (or range of frames), that means that the specific frame (or range of frames) will be omitted as annotated examples within any downstream processes involving  machine learning predictive classifiers. In the gif below, I use the label `frame range` tool in the annotator to label frames `50-100` as containing no good examples of `Sniffing` and `Attack` being present or absent. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/advanced_annotator_7_fast.gif" />
+</p>
+
+
+> IMPORTANT NOTE: If you are working on annotating a video for multiple classifiers (just as in the current tutorial, where we are annotating both `Attack` and `Sniffing`), then we cannot annotate some behaviors as `PRESENT` or `ABSENT`, while we annotate other behaviors as *neither* `PRESENT` or `ABSENT`. For example,  in the below gif I annotate `Sniffing` as present in frame number `35` and I tick `Attack` as neither `PRESENT` or `ABSENT`. In this scenario I will be presented with an error message, and either (i) annotate all behaviors as neither `PRESENT` or `ABSENT` (remove all ticks from all tick-boxes), or (ii) provide ticks in tick-boxes for all behaviors. In this below gif example, I go for the latter solution and tick `Attack` as absent. 
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/advanced_annotator_8_fast.gif" />
+</p>
+
+Once you have completed your annotations, we need to save all your annotations into your SimBA project. We do this with the `Save Annotations`, and this is a very important button. This buttons saves your annotations into your SimBA project, which you are required to do in order to use the annotations for creating machine learning models. Clicking this buttons saves a data file inside your project_folder/csv/targets_inserted directory. This file will contain all of the body-part coordinates and features in seperate columns, plus a few additional columns at the end (one for each behavior that you are annotating) with the headers that represent the behavior names. Hence, clicking this button, in this tutoral, will generate a file inside the project_folder/csv/targets_inserted directory called `Together_1` (which is the name of the video I am annotating). The last two columns in this file will be named `Attack` and `Sniffing`. These two column will be filed with 1s and 0s - a 1 for every frame where I noted the behavior to be present, and a 0 for every frame where I note the behavior to be absent. This file will contain as many rows as the number of frames where I annotated the behaviors as `PRESENT or `ABSENT`. 
+
+## CONTINOUING PREVIOUSLY STARTED ANNOTATIONS
+
+After clicking `Save Annotations` and closing the SimBA annotation GUI, you may want to come back and continue annotating the same video. To do this, click the `Select video (continue existing video annotation)` button in the **ADVANCED LABEL BEHAVIOR** sub-menu:
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
