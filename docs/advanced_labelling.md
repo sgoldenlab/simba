@@ -65,7 +65,13 @@ Once you have completed your annotations, we need to save all your annotations i
 
 ## CONTINOUING PREVIOUSLY STARTED ANNOTATIONS
 
-After clicking `Save Annotations` and closing the SimBA annotation GUI, you may want to come back and continue annotating the same video. To do this, click the `Select video (continue existing video annotation)` button in the **ADVANCED LABEL BEHAVIOR** sub-menu:
+After clicking `Save Annotations` and closing the SimBA annotation GUI, you may want to come back and continue annotating the same video using the advanced SimBA annotation GUI. To do this, click the `Select video (continue existing video annotation)` button in the **ADVANCED LABEL BEHAVIOR** sub-menu:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/advanced_annotator_9.png" />
+</p>
+
+SimBA will then look for the file representing your video inside the `project_folder/csv/targets_inserted` directory. SimBA will also look for the file representing your video inside the `project_folder/csv/features_extracted` directory in order to de-code how many frames you have provided neither `PRESENT` or `ABSENT` annotations for. It will next bring up the SimBA advanced annotation GUI at the frame number where you last clicked `Save Annotations`. 
 
 
 
