@@ -5,7 +5,7 @@ The SimBA behavioural annotator GUI is used to label (annotate) frames in behavi
 
 Note that SimBA performs similar functions such as the open-source [JWatcher](http://www.jwatcher.ucla.edu/) or commercial [Noldus Observer](https://www.noldus.com/human-behavior-research/products/the-observer-xt) systems, with the exception that SimBA automates the backend integration of behavioral annotation with creating predictive classifiers. If you already have such annotations stored in alterantive file formats, like [JWatcher](http://www.jwatcher.ucla.edu/) or [Noldus Observer](https://www.noldus.com/human-behavior-research/products/the-observer-xt), they can be appended directly to the tracking data and no behavioral annotations needs to be done in SimBA. To append annotations created in alternative third-party software, check out [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md). The [Crim13 dataset](http://www.vision.caltech.edu/Video_Datasets/CRIM13/CRIM13/Main.html) was annotated using [Piotr’s Matlab Toolbox](https://github.com/pdollar/toolbox) and we appended the annotations to the tracking data using a version of [this script](https://github.com/sgoldenlab/simba/blob/master/misc/Caltech_2_DLC.py). 
 
-If you already have annotation videos created with these alternative tools, or any other behavioral annotator, and would like to use them to create predictive classifiers, please let us know as we would like to write scripts that could process these data for SimBA. If you have created such scripts yourself, please consider contributing them to the community! If you have any issues using the SimBA annotation interface, please open a [GitHub issue](https://github.com/sgoldenlab/simba/issues) or reach out to us on our [Gitter](https://gitter.im/SimBA-Resource/community) support channel. **We will provide support in either scenario**.
+If you already have annotated videos created with these alternative tools, or any other behavioral annotator, and would like to use them to create predictive classifiers, please let us know as we would like to write scripts that could process these data for SimBA. If you have created such scripts yourself, please consider contributing them to the community! If you have any issues using the SimBA annotation interface, please open a [GitHub issue](https://github.com/sgoldenlab/simba/issues) or reach out to us on our [Gitter](https://gitter.im/SimBA-Resource/community) support channel. **We will provide support in either scenario**.
 
 ## Step 1. Loading project_config file 
 In the main SimBA menu, click on `File > Load Project > Load Project.ini > Browse File` and select the config file (project_config.ini) representing your SimBA project. This step **must** be done before proceeding to the next step.
@@ -42,23 +42,24 @@ Once I've selected my video file, the annotation interface will pop open, lookin
 
 In this image I have marked out 9 different parts of the window, which will we can use to accurately label the frames of the video as containing (or not containing) your behavior(s) of interest. We go over the 
 
-(1) In the title header of the window, it will say which type (of the ones listed above) of annotations you are doing. I opened the annotation interface through the **LABEL BEHAVIOR** setting, hence it reads **ANNOTATING FROM SCRATCH**. If you are using **PSEUDO-LABELLING**, it will read **PSEUDO-LABELLING**, and if you opened **ADVANCED LABEL BEHAVIOR**, it will read **ADVANCED ANNOTATION**
+(1) In the title header of the window, it will say which type (of the ones listed above) of annotations you are doing. I opened the annotation interface through the **LABEL BEHAVIOR** setting, hence it reads **ANNOTATING FROM SCRATCH**. If you are using **PSEUDO-LABELLING**, it will read **PSEUDO-LABELLING**, and if you opened **ADVANCED LABEL BEHAVIOR**, it will read **ADVANCED ANNOTATION**.
 
-**(2)** In box 2, there are buttons to navigate between the frames of your video. The middle entry box is telling you the `frame number` within the video that is currently beeing displayed. The inner buttons `>` and `<` will show you the proceeding and preceding frame, respectively. The outer buttons `>>` and `<<` will show tou the last and first frame of the video, respectively. 
+**(2)** In box 2, there are buttons to navigate between the frames of your video. The middle entry box is telling you the `frame number` within the video that is currently beeing displayed. The inner buttons `>` and `<` will show you the proceeding and preceding frame, respectively. The outer buttons `>>` and `<<` will show tou the last and first frame of the video, respectively. Navigating to a different frame (i.e., a preceding or a proceeding frame) will save your annotation selections for the previously-viewed frame into SimBA memory (more information below). 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_1.gif" />
 </p>
 
-To navigate to a specific frame, change the value in the frame number entry box and click on `Jump to selected frame`. To jump a user-specified number of frames forwards or backwards in the video, drag the `Jump Size` bar to set the number of frames you wish to jump forwards or backwards. Then use the `<<` and `>>` buttons next to the `Jump size` bar to jump the selected number of frames in the video:
+To navigate to a specific frame, change the value in the frame number entry box and click on `Jump to selected frame`. To jump a user-specified number of frames forwards, or backwards, drag the `Jump Size` bar to set the number of frames you wish to jump forwards or backwards. Then use the `<<` and `>>` buttons next to the `Jump size` bar to jump the selected number of frames in the video:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_2.gif" />
 </p>
 
 
-**(3)** This part of the window contains one check box for each classifier in your SimBA project. In my project, I only have one behavior - `Attack`. This is the first time I view this frame in the SimBA annotator GUI - and because I started the annotator GUI through the **LABEL BEHAVIOR** button - it's by default unchecked (behavior is not present). If the behavior of interest (Attack) is occuring in the frame I am viewing, then I go ahead and check the `Attack` checkbox. If You then navigate back or forwards several frames, and back to the frame where I checked the `Attack` checkbox, you can see that it remains checked for that particular frame. My choice have been recorded, and is being held in SimBA memory. 
+**(3)** If you are using standard *LABEL BEHAVIOR*, or *PSEUDO-LABELLING*, this part of the window contains one check box for each classifier in your SimBA project. In my project, I only have one behavior - `Attack`. This is the first time I view this frame in the SimBA annotator GUI - and because I started the annotator GUI through the *LABEL BEHAVIOR* button - it's by default unchecked (behavior is not present). If the behavior of interest (Attack) is occuring in the frame I am viewing, then I go ahead and check the `Attack` checkbox. If you then navigate back or forwards several frames, and back to the frame where I checked the `Attack` checkbox, you can see that it remains checked for that particular frame. My choice have been recorded, and is being held in SimBA memory.
 
+>Note: If you are using **ADVANCED LABEL BEHAVIOR** in SimBA, every classifier in your SimBA project will have **two** check-boxes in the SimBA annotator GUI - one checkbox to indicate that the behavior is present, and one check-box to indicate that the behavior is absent. For a further tutorial doceumenting how to use the advanced behavior annotator in SimBA, click [HERE](). 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_3.gif" />
@@ -84,7 +85,7 @@ To navigate to a specific frame, change the value in the frame number entry box 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_4.png" />
 </p>
 
-**(7)** When you're viewing the video, you may see a frame that you want to view in the main SimBA annotator and view, label, or change labels for that partuclar frame or range of frames. To do this. First highlight the video and press the `p` button on your keyboard for pause. Next, click the `Show current video frame` button. This will diplay whatever frame is shown in the video player in the main SimBA annotator GUI. 
+**(7)** When you're viewing the video, you may see a frame that you want to view in the main SimBA annotator and view, label, or change labels for that partuclar frame or range of frames. To do this. First highlight the video (by clicking on the frame) and press the `p` button on your keyboard for pause. Next, click the `Show current video frame` button. This will diplay whatever frame is shown in the video player in the main SimBA annotator GUI frame-viewer. 
 
 
 <p align="center">
@@ -92,13 +93,15 @@ To navigate to a specific frame, change the value in the frame number entry box 
 </p>
 
 
-**(8)** There are also several keyboard-shortcuts that will allow you to navigate the frame displayed in the main SimBA annotator GUI. These keyboard shortcuts allows you to perfrom some of the same functions as performed with the buttons in part **1**. They also allow you to save your annotations onto the computer disc and into your SimBA project (see below) which you are required to do in order to use your annotations for creating mchine learning models. 
+**(8)** There are also several keyboard-shortcuts that will allow you to navigate the frame displayed in the main SimBA annotator GUI. These keyboard shortcuts allows you to perfrom some of the same functions as performed with the buttons documented in part **1**. They also allow you to save your annotations onto the computer disc and into your SimBA project (see below), which you are required to do in order to use your annotations for creating machine learning models. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_5.png" />
 </p>
 
-**(8)** The last button in the SimBA annotator interface is labelled `Save Annotations` and it is **very important**. This buttons saves your annotations into your SimBA project  which you are required to do in order to use the annotation for creating mchine learning models. Clicking this buttons saves a data file inside your `project_folder/csv/targets_inserted` directory. This file will contain all of the body-part coordinates and features in seperate columns, plus a few columns at the end (one for each bahevior that you are annotating) with the headers that represent the behaviors. Hence, clicking this button in this tutoral, will generate a file inside the `project_folder/csv/targets_inserted` directory called `BtWGANP` where the last column is named `Attack`. This column will be filed with `1`s and `0`s: a `1` for every frame where I noted the behavior to be present, and a `0` for every frame where I note the behavior to be absent. 
+**(8)** The last button in the SimBA annotator interface is labelled `Save Annotations` and it is a **very important** button. This buttons saves your annotations into your SimBA project which you are required to do in order to use the annotation for creating mchine learning models. Clicking this buttons saves a data file inside your `project_folder/csv/targets_inserted` directory. This file will contain all of the body-part coordinates and features in seperate columns, plus a few additional columns at the end (one for each behavior that you are annotating) with the headers that represent the behavior names. Hence, clicking this button in this tutoral, will generate a file inside the `project_folder/csv/targets_inserted` directory called `BtWGANP` where the last column is named `Attack`. This column will be filed with `1`s and `0`s - a `1` for every frame where I noted the behavior to be present, and a `0` for every frame where I note the behavior to be absent. 
+
+>Note: I used the standard *LABEL BEHAVIOR* method in SimBA in this tutorial. This means that any frame that I did **not** view in the SimBA annotator GUI frame viewer will be saved as **behavior absent**. Thus, if I open the BtWGANP file inside the `project_folder/csv/targets_inserted` directory, there will be a `0` for every frame that I did not view in the SimBA annotator GUI frame viewer. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_6.png" />
@@ -106,31 +109,34 @@ To navigate to a specific frame, change the value in the frame number entry box 
 
 ## CONTINOUING PREVIOUSLY STARTED ANNOTATIONS
 
-After clicking `Save Annotations` and closing the SimBA annotation GUI, you may want to come back and continoue annotating the same video. To do this, click the `Select video (continue existing video annotation)` button:
+After clicking `Save Annotations` and closing the SimBA annotation GUI, you may want to come back and continue annotating the same video. To do this, click the `Select video (continue existing video annotation)` button:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_7.png" />
 </p>
 
-When clicked, this bring up a file selection dialog menu. We navigate to the `project_folder/videos` directory and select a video we wich to continue annotating. SimBA will read the file name for the video you select e.g., (BtWGANP.mp4), and scan the `project_folder/csv/targets_inserted` directory within your SimBA project to find the file that represents your previous annotations. 
+When clicked, this bring up a file selection dialog menu. We navigate to the `project_folder/videos` directory and select a video we wich to continue annotating. SimBA will read the file name for the video you select e.g., (BtWGANP.mp4), and scan the `project_folder/csv/targets_inserted` directory within your SimBA project to find the file that represents your previously stored annotations. You can then preceed to annotate video frames as documented above. When continuing to annotate a previously started video, SimBA should open the GUI annotator interface at the frame number of the latest saved frame. 
 
 ## NOTES ON THE DIFFERENT FORMS OF BEHAVIOR LABELLING (ADVANCED vs. PSUDO vs. 'STANDARD' LABELLING)
 
 
 ### 'STANDARD' LABELLING
 
-If you use standard labelling (as in the tutorial above) all frames are by default labelled as behavior absent. Thus, if I open a video of 3k frames, and immidiatly click `Save Annotations`, a file will be saved inside the `project_folder/csv/targets_inserted` directory with 3k rows, where the final columns representing my annotations all are filled with `0s`. Using the 'STANDARD' labelling method, it is not *required* to view all frames, it is only necessery to label all the frames where you know that the behavior is present. 
+If you use standard labelling (as in the tutorial above) all frames are by default labelled as **behavior absent**. Thus, if I open a video of 3k frames, and **immediately** click `Save Annotations`, a file will be saved inside the `project_folder/csv/targets_inserted` directory with 3k rows, where the final columns representing my annotations all are filled with `0s`. Using the 'STANDARD' labelling method, it is not *required* to view all frames, it is only necessery to label all the frames where you know that the behavior is present. 
 
-However, it is very important to not feed your classifier errorous information. An assumption that behavior is absent in unviewed frames, and the behavior is actually present, can lead to terrible classifiers. If you are working with  infrequent behaviors, and have a good understanding of when they are occuring, then this option can nevertheless save you a lot of time. 
+However, it is very important to not feed your classifier errorous information. An assumption that behavior is absent in unviewed frames, where the behavior is actually present, can lead to classifiers that perform terribly. If you are working with infrequent behaviors, and have a good understanding of when they are occuring, then this option can nevertheless save you a lot of time. 
 
 
 ### 'PSUDO' LABELLING
 
-If you use pseudo labelling (as in the tutorial above) all frames are, by default, labelled according to what your latest machine learning inference on that video (and your input threshold) said was occuring in that frame. Therefore, in order to perform psudo-labelling, the video has to have been scored with a classifier. That means that the video has to have been analyzed through the [Run machine model] header, and a file representing the video has to be present within the `project_folder/csv/machine_results` directory. To read more about the benefits and motives behind pseudo-labelling, check out [THIS TUTORIAL](https://github.com/sgoldenlab/simba/edit/master/docs/pseudoLabel.md). 
-
+If you use pseudo labelling all frames are, by default, labelled according to what your latest machine learning inference on that video (and your input threshold) said was occuring in that frame. Therefore, in order to perform psudo-labelling, the video has to have been scored with a classifier prior to starting the annotation of that video. That means that the video has to have been analyzed through the [Run machine model] header, and a file representing the video has to be present within the `project_folder/csv/machine_results` directory. To read more about the benefits and motives behind pseudo-labelling, and how to use it, check out [THIS TUTORIAL](https://github.com/sgoldenlab/simba/edit/master/docs/pseudoLabel.md). 
 
 ### 'ADVANCED' LABELLING
 
-If you use ADVANCED labelling, all frames are, by default, labelled as `None`. That means that if you have not looked at a frame in the SimBA annotation GUI, and indicated what the frame contains (behavior or no behavior), then the information for that frame won't be saved when clicking the `Save Annotations`,  and the frame won't be used in any downstream machine learning classificatier creation tasks. For example, if you (i) open a video containing 3k frames, (ii) look at, and annotate, the first N frames, (iii) and click `Save Annotations`, and navigate to the `project_folder/csv/machine_results` directory and open the file representing the video you just annotated. If you open this file, you should see that it containing N rows. 
+If you use ADVANCED labelling, all frames are, by default, labelled as `None`. That means that if you have not looked at a frame in the SimBA annotation GUI, and indicated what the frame contains (i.e., if the behvaior is present or absent), then the information for that specific frame **will not** be saved when clicking the `Save Annotations`,  and that frame won't be used in any downstream machine learning classificatier creation tasks. For example, if you (i) open a video containing 3k frames, (ii) look at, and annotate, the first N frames, (iii)  click `Save Annotations`, and navigate to the `project_folder/csv/machine_results` directory and open the file representing the video you just annotated. When you open this file, you should see that it only contains N rows representing the N rows you labelled in the SimBA annotator GUI.
+
+This method (`ADVANCED LABELLING`) allows you the greatest control over the data that is used by the machine learning models to build predictive classifiers. This is the only method that allows you to control which frames of the specific video that goes into training and testing the classifiers. While 'PSUDO' and standard labelling use all of the frames of a specific video, `ADVANCED LABELLING` allows you to pick a specific subset of frames from a aspecific video for creating machine learning models. To read more about how to use the `ADVANCED LABELLING` method in SimBA, click [HERE]().
+
+
 
 
