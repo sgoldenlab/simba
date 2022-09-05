@@ -1,4 +1,4 @@
-# <p align="center"> SimBA behavioral Annotator GUI </p>
+# <p align="center"> SimBA Behavioral Annotator GUI </p>
 
 
 The SimBA behavioural annotator GUI is used to label (annotate) frames in videos that contain behaviors of interest. SimBA appends the behavioral annotations directly to the pose-estimation tracking data to build supervised machine learning predictive classifiers of behaviors of interest. Specifically, this GUI integrates two additional consoles with the main SimBA console: (1) a video player and (2) a frame viewer. The video player and frame viewer are synced, such that pausing or starting the video will advance the frame viewer to the identical frame that the video was paused or started at. The frame viewer is then used to annotate when behaviors of interest are present or absent within the given frame. Such annotations can be flexibily annotated from single to numerous frames using the annotation interface. Please see below for details for how to best use the annotator in your specific use case. 
