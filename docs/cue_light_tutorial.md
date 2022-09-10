@@ -53,7 +53,7 @@ To begin analysing
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_4.png" />
 </p>
 
-Once clicked, a window will pop open looking something like the below gif. Using this interface, we will tell SimBA with of our ROIs are cue lights, and analyse animal movements and classifications around cue lights onsets and offsets. We will also visualize the cue light data to validatation and peace of mind that the onsets and offsets of the cue light(s) are accurately captures by SimBA. 
+Once clicked, a window will pop open looking something like the below gif. Using this interface, we will tell SimBA with of our ROIs are cue lights, and analyse animal movements and classifications around cue lights onsets and offsets. We will also visualize the cue light data to validatation and sanity check that the onsets and offsets of the cue light(s) are accurately captured by SimBA. 
 
 To begin, we use the `Define cue lights` menu and select `1` in the `# Cue lights` drop-down to indicate that we have one cue light in our video(s). Once done, a single dropdown menu will appear asking us for the name of the single cue light. I use this dropdown menu to say that the cue light is names `Cue light`. 
 
@@ -61,9 +61,12 @@ To begin, we use the `Define cue lights` menu and select `1` in the `# Cue light
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_1.gif" />
 </p>
 
-Next, I go ahead and click the `Analyze cue light data` button, which will start the analysis and extract when the cue light(s) are on and off in all frames of all videos in the project. Once complete, a new file is creates inside the `project_folder/csv/cue_lights` directory of your SimBA project. If you open up one of these files, you will see columns named after your cue lights right towards the end of the file, filled with ones and zeros. Each row represents a frame of your data, a `1` in the 
+Next, I go ahead and click the `Analyze cue light data` button, which will start the analysis and extract when the cue light(s) are on and off in all frames of all videos in the project. You can follow the progress in the SimBA main terminal window. Once complete, a new file is creates inside the `project_folder/csv/cue_lights` directory within your SimBA project. If you open up one of these files, you will see columns named after your cue lights right towards the end of the file, filled with ones and zeros. Each row represents a frame of your data, a `1` in the 
 
-> Note : 
+> Note: To analyze the cue-light states on standard computers at acceptable runtimes, SimBA uses [kmeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html) and python [multi-processing](https://docs.python.org/3/library/multiprocessing.html). Should you happen to see any `MemoryErrors`, or analysis that are *not* completed in an acceptable time, please reach out to us by opening a [GitHib issue](https://github.com/sgoldenlab/simba/issues) or chat to us on [Gitter](https://gitter.im/SimBA-Resource/community). 
+
+# Part 3. Analyzing cue light(s) states.
+
 
 
 
