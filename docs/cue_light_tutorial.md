@@ -65,7 +65,29 @@ Next, I go ahead and click the `Analyze cue light data` button, which will start
 
 > Note: To analyze the cue-light states on standard computers at acceptable runtimes, SimBA uses [kmeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html) and python [multi-processing](https://docs.python.org/3/library/multiprocessing.html). Should you happen to see any `MemoryErrors`, or analysis that are *not* completed in an acceptable time, please reach out to us by opening a [GitHib issue](https://github.com/sgoldenlab/simba/issues) or chat to us on [Gitter](https://gitter.im/SimBA-Resource/community). 
 
-# Part 3. Analyzing cue light(s) states.
+# Part 3. Visualizing cue light states.
+
+As a further sanity check before analysing larger video batches, we'd want to visualize the results of the preceding step to confirm that SimBA has accurately captured the onsets and offsets of the cue lights. We have to option to generate compressed video files or individual images. I choose to generate a compressed video, and click `Visualize cue light data`. Once clicked, you can follow the progress in the main SimBA terminal.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_5.png" />
+</p>
+
+> Note: Reading and writing images and videos to disc is computationally costly on standard computers. I recommend generating video confirmations on a sub-set of videos to gauge accuracy and troubleshooting. 
+
+Once complete, one video file for each of your input data files will be saved inside the `project_folder/frames/output/cue_lighs` directory of your SimBA project. In the videos, the numbers to the right of the video will tell you (i) the current status of each hoselight (ON vs OFF), (ii) the onset count, (iii) the total ON time in seconds, and the total OFF time in seconds, as in the gif example below:
+
+
+# Part 4. Visualizing movement at cue light states. 
+
+Next, we want to analyze movements (distances moved, velocities, and time spend in different parts of the environment) in and around the times the cue light(s) are on. To do this will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) with 7 
+
+
+
+
+
+
+
 
 
 
