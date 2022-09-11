@@ -1,7 +1,7 @@
 # <p align="center"> Cue Light Analysis in SimBA </p>
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_lights.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_lights_0.png" />
 </p>
 
 # <p align="center">  </p>
