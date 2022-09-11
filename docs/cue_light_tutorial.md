@@ -118,6 +118,7 @@ As we ticked the checkbox during step **(6)**, SimBA will also generate a second
 
 Next, we want to analyze behavioral classifications in and around the times the cue light(s) are on. To do this we click on `Analyze cue light classifications`. Which will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) accepting different user-defined settings: 
 
+>Note: To analyze classifications at cue light states, we need to have analyzed our videos using the classifiers of interest. That means that **before** we analyze classifications at cue light states, we need a file representing each video of interest in the `project_folder/csv/machine_results` directory. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model) for documentation on how to analyze videos using previously created classifiers. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_10.png" />
