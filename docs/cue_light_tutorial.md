@@ -80,7 +80,34 @@ Once complete, one video file for each of your input data files will be saved in
 
 # Part 4. Visualizing movement at cue light states. 
 
-Next, we want to analyze movements (distances moved, velocities, and time spend in different parts of the environment) in and around the times the cue light(s) are on. To do this will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) with 7 
+Next, we want to analyze movements (distances moved, velocities, and time spend in different parts of the environment) in and around the times the cue light(s) are on. To do this will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) accepting 7 user-defined settings: 
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_6.png" />
+</p>
+
+**(1)** Begin by selecting how many animals you want to compute movements for in the `# Animals` dropdown menu. In my SimBA project I only have one animal, so I use the drop-down to select `1` (which is the only option available). 
+
+**(2)** Select which body-part you want to use to determine the location of each animal in the `Animal 1 bp` dropdown menu. If you have more than one animal, there will be a dropdown shown for each animal chosen in step (1) above. 
+
+**(3)** Select a pre-cue window size (in milliseconds) in the `Pre-cue window (ms)` entry box. This is the time period **before** the onset of each each cue light which we want to compute movement statistics for. In the screengrab above, I have typed `15000`, and SimBA will therefore calculate movement statistics in the 15s preceeding each cue light onset. 
+
+**(4)** Select a post-cue window size (in milliseconds) in the `Post-cue window (ms)` entry box. This is the time period **after** the onset of each each cue light which we want to compute movement statistics for. In the screengrab above, I have typed `15000`, and SimBA will therefore calculate movement statistics in the 15s proceding each cue light onset. 
+
+**(5)** Select a body-part threshold value in the `Threshold (0.00 - 1.00)` entry box. This is the minimum pose-estimation confidence probability value for the present of the body-part SimBA should use. For example, if you want SimBA to calculate movements when the confidence is high, set this value to close to `1.00`. If you want SimBA to use all pose-estimation body-part locations to calculate movement statistics, set this value to `0.00`. 
+
+**(6)** If you have additional ROIs defined in SimBA (i.e., more ROIs than there are cue lights), we may want to calculate how much time the animal(s) are spending in these ROIs when the cue light is on, as well as the `pre-cue` and `post-cue` periods. If we want to perform these calculations, we go ahead and tick the `Analyze ROI data` checkbox. 
+
+**(7)** Once all the fields have been filled in, we click the `Analyze movement data` button. You can follow the progress in the main SimBA terminal window. Once complete, navigate to the `project_folder/logs` directory in your SimBA project. You should see a datetimed CSV file named something like this: `Cue_lights_movement_statistics_20220909103957.csv`. Opening this you should see something like this:
+
+
+
+
+
+
+
+
 
 
 
