@@ -77,10 +77,13 @@ As a further sanity check before analysing larger video batches, we'd want to vi
 
 Once complete, one video file for each of your input data files will be saved inside the `project_folder/frames/output/cue_lighs` directory of your SimBA project. In the videos, the numbers to the right of the video will tell you (i) the current status of each hoselight (ON vs OFF), (ii) the onset count, (iii) the total ON time in seconds, and the total OFF time in seconds, as in the gif example below:
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/example_cue_light.gif" />
+</p>
 
-# Part 4. Visualizing movement at cue light states. 
+# Part 4. Analyzing movement at cue light states. 
 
-Next, we want to analyze movements (distances moved, velocities, and time spend in different parts of the environment) in and around the times the cue light(s) are on. To do this will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) accepting 7 user-defined settings: 
+Next, we want to analyze movements (distances moved, velocities, and time spend in different parts of the environment) in and around the times the cue light(s) are on. To do this we click on `Analyze cue light movements` which will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) accepting different user-defined settings: 
 
 
 <p align="center">
@@ -99,7 +102,38 @@ Next, we want to analyze movements (distances moved, velocities, and time spend 
 
 **(6)** If you have additional ROIs defined in SimBA (i.e., more ROIs than there are cue lights), we may want to calculate how much time the animal(s) are spending in these ROIs when the cue light is on, as well as the `pre-cue` and `post-cue` periods. If we want to perform these calculations, we go ahead and tick the `Analyze ROI data` checkbox. 
 
-**(7)** Once all the fields have been filled in, we click the `Analyze movement data` button. You can follow the progress in the main SimBA terminal window. Once complete, navigate to the `project_folder/logs` directory in your SimBA project. You should see a datetimed CSV file named something like this: `Cue_lights_movement_statistics_20220909103957.csv`. Opening this you should see something like this:
+**(7)** Once all the fields have been filled in, we click the `Analyze movement data` button. You can follow the progress in the main SimBA terminal window. Once complete, navigate to the `project_folder/logs` directory in your SimBA project. You should see a datetimed CSV file named something like this: `Cue_lights_movement_statistics_20220909103957.csv`. Opening this file you should see the different movement statistics for the different animals within the different cue lights periods, e.g., somthing akin to this:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_7.png" />
+</p>
+
+As we ticked the checkbox during step **(6)**, SimBA will also generate a second output file inside the `project_folder/logs` directory named something like `Cue_lights_roi_statistics_20220911112453.csv`. This file contains statistics on where in relation to the non-cue light ROIs the animals spent time during the different cue lights period:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_8.png" />
+</p>
+
+# Part 5. Analyzing classifications at cue light states. 
+
+Next, we want to analyze behavioral classifications in and around the times the cue light(s) are on. To do this we click on `Analyze cue light classifications`. Which will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) accepting different user-defined settings: 
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_10.png" />
+</p>
+
+**(1)** Begin by selecting shich behavior you want statistics for in relation to the onsets and offsets of the cue lights(s). In this example, I only have one classifier named `Freezing`. I go ahead and tick the checkbox next to `Freezing`. 
+
+**(2)** Select a pre-cue window size (in milliseconds) in the `Pre-cue window (ms)` entry box. This is the time period **before** the onset of each each cue light which we want to compute behavior statistics for. In the screengrab above, I have typed `1500`, and SimBA will therefore calculate movement statistics in the 1.5s preceding each cue light onset.
+
+**(3)** Select a post-cue window size (in milliseconds) in the `Post-cue window (ms)` entry box. This is the time period **after** the onset of each each cue light which we want to compute behavior statistics for. In the screengrab above, I have typed `1500`, and SimBA will therefore calculate movement statistics in the 1.5s proceding each cue light onset.
+
+**(7)** Once all the fields have been filled in, we click the `Analyze classifier data` button. You can follow the progress in the main SimBA terminal window. Once complete, navigate to the `project_folder/logs` directory in your SimBA project. You should see a datetimed CSV file named something like this: `Cue_lights_clf_statistics_20220911120047.csv`. Opening this file you should see the different statistics for the different classifications within the different cue lights periods, e.g., something like the screengrab below. The last row for each classifier will tell you how much the animals engaged in the classified behavior outside the cue light time periods. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_12.png" />
+</p>
 
 
 
