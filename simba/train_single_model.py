@@ -24,17 +24,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
 class TrainSingleModel(object):
+   '''
+   Class for training a single random forest models from hyperparameter setting and sampling methods
+   stored within the SimBA project config file
+
+   Parameters
+   ----------
+   config_path: str
+      path to SimBA project config file in Configparser format
+   '''
+  
+  
+  
     def __init__(self,
                  config_path: str):
-        '''
-        Class for training a single random forest models from hyperparameter setting and sampling methods
-        stored within the SimBA project config file
-
-        Parameters
-        ----------
-        config_path: str
-            path to SimBA project config file in Configparser format
-        '''
 
         self.config = read_config_file(config_path)
         self.ini_path = config_path
