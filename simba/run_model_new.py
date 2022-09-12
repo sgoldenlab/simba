@@ -1,6 +1,6 @@
 from configparser import ConfigParser, MissingSectionHeaderError
 from simba.features_scripts.unit_tests import read_video_info_csv, read_video_info
-from simba.read_config_unit_tests import (check_int, check_str, check_float, read_config_entry)
+from simba.read_config_unit_tests import (check_int, check_str, check_float, read_config_entry, read_config_file)
 from simba.train_model_functions import get_model_info
 from simba.misc_tools import get_fn_ext, plug_holes_shortest_bout
 from simba.drop_bp_cords import drop_bp_cords
@@ -11,14 +11,26 @@ import pickle
 import numpy as np
 
 class RunModel(object):
-    def __init__(self, config_path=None):
-        self.config_path = config_path
-        self.config = ConfigParser()
-        try:
-            self.config.read(config_path)
-        except MissingSectionHeaderError:
-            print('ERROR:  Not a valid project_config file. Please check the project_config.ini path.')
 
+    '''
+    Class for running classifier inference. Results are stored in the `project_folder/csv/machine_results`
+    directory of the SimBA project.
+
+    Parameters
+    ----------
+    config_path: str
+        path to SimBA project config file in Configparser format
+
+    '''
+
+
+
+
+    def __init__(self,
+                 config_path: str):
+
+        self.config = read_config_file(config_path)
+        self.config_path = config_path
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='str')
         self.model_cnt = read_config_entry(self.config, 'SML settings', 'No_targets', data_type='int')
         self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
@@ -50,7 +62,7 @@ class RunModel(object):
                     out_df[probability_column] = p[:, 1]
                 except IndexError as e:
                     print(e.args)
-                    raise IndexError('SIMBA INDEXERROR: Your classifier has not been created properly. See The SimBA GitHub FAQ page for more information and suggested fixes.')
+                    raise IndexError('SIMBA INDEX ERROR: Your classifier has not been created properly. See The SimBA GitHub FAQ page for more information and suggested fixes.')
                 out_df[m_hyp['model_name']] = np.where(out_df[probability_column] > m_hyp['threshold'], 1, 0)
                 out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=m_hyp['model_name'], fps=fps, shortest_bout=m_hyp['minimum_bout_length'])
             save_df(out_df, self.file_type, file_save_path)
