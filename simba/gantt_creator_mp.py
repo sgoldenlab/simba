@@ -157,7 +157,7 @@ class GanttCreator(object):
                         for img_cnt, img in enumerate(result):
                             file_save_path = os.path.join(save_path, str(img_cnt + 1 + len(os.listdir(self.save_frame_folder_dir))) + '.png')
                             cv2.imwrite(file_save_path, img)
-                    print('Image {}/{}, Video {}/{}...'.format(str(int(('Image {}/{}, Video {}/{}...'.format(str(int(imgs_peer_loop*cnt)), str(len(self.data_df)), str(file_cnt+1), str(len(self.files_found)))))), str(len(self.data_df)), str(file_cnt+1), str(len(self.files_found))))
+                    print('Image {}/{}, Video {}/{}...'.format(str(int(imgs_peer_loop*cnt)), str(len(self.data_df)), str(file_cnt+1), str(len(self.files_found)))))), str(len(self.data_df)), str(file_cnt+1), str(len(self.files_found))))
                 pool.terminate()
                 pool.join()
 
