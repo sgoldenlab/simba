@@ -14,6 +14,38 @@ from copy import deepcopy
 from simba.pybursts import kleinberg_burst_detection
 
 class KleinbergCalculator(object):
+    '''
+    Class for smoothing classification results using the Kleinberg burst
+    detection algorithm.
+
+    Parameters
+    ----------
+    config_path: str
+        path to SimBA project config file in Configparser format
+    classifier_names: list
+        List of classifier names to smooth.
+    sigma: list
+        Burst detection sigma value. Higher sigma values and fewer, longer, behavioural bursts will be recognised.
+    gamma: bool
+        Burst detection gamma value. Higher gamma values and fewer behavioural bursts will be recognised
+    hierarchy: bool
+        Burst detection hierarchy level. Higher hierarchy values and fewer behavioural bursts will to be recognised.
+
+    Notes
+    -----
+    `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md>`__.
+
+    References
+    ----------
+
+    .. [1] Kleinberg, Bursty and Hierarchical Structure in Streams, `Data Mining and Knowledge Discovery`,
+           vol. 7, pp. 373–397, 2003.
+    .. [2] Lee et al., Temporal microstructure of dyadic social behavior during relationship formation in mice, `PLOS One`,
+           2019.
+    .. [3] Bordes et al., Automatically annotated motion tracking identifies a distinct social behavioral profile
+           following chronic social defeat stress, `bioRxiv`, 2022.
+    '''
+
     def __init__(self,
                  config_path: str,
                  classifier_names: list,
@@ -21,25 +53,6 @@ class KleinbergCalculator(object):
                  gamma=0.3,
                  hierarchy=1
                  ):
-
-        '''
-        Class for smoothing classification results using the Kleinberg burst
-        detection alogorithm: https://link.springer.com/article/10.1023/A:1024940629314
-
-        Parameters
-        ----------
-        config_path: str
-            path to SimBA project config file in Configparser format
-        classifier_names: list
-            List of classifier names to smooth.
-        sigma: list
-            Burst detection sigma value. Higher sigma values and fewer, longer, behavioural bursts will be recognised.
-        gamma: bool
-            Burst detection gamma value. Higher gamma values and fewer behavioural bursts will be recognised
-        hierarchy: bool
-            Burst detection hierarchy level. Higher hierarchy values and fewer behavioural bursts will to be recognised.
-
-        '''
 
         self.config = read_config_file(config_path)
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
@@ -58,6 +71,16 @@ class KleinbergCalculator(object):
         print('Processing Kleinberg burst detection for {} file(s)...'.format(str(len(self.files_found))))
 
     def perform_kleinberg(self):
+        '''
+        Method to perform Kleinberg smoothing. Results are stored in the `project_folder/csv/targets_inserted` directory.
+        Detailed log is saved in the `project_folder/logs/` directory.
+
+        Returns
+        ----------
+        None
+
+        '''
+
         detailed_df_lst = []
         for file_cnt, file_path in enumerate(self.files_found):
             _, video_name, _ = get_fn_ext(file_path)
