@@ -66,7 +66,19 @@ class KleinbergCalculator(object):
         check_float(value=gamma, name='gamma', min_value=0)
         check_int(value=hierarchy, name='hierarchy')
         self.sigma, self.gamma, self.hierarchy = float(sigma), float(gamma), float(hierarchy)
+        
         self.files_found = glob.glob(self.in_path + '/*.' + self.file_type)
+        if len(self.files_found) == 0: 
+          print('SIMBA ERROR: No files found in machine learning reults folder. Please make sure that you ran your machine model!')
+          raise ValueError
+          
+        original_results = os.path.join(project_path, 'csv', 'machine_results', '_pre_Kleinberg_' + self.datetime)
+        if not os.path.exists(original_results):
+          os.makedirs(original_results)
+        
+        for i in self.files_found:
+          shutil.copyfile(i, original_results)
+        
         self.clfs = classifier_names
         print('Processing Kleinberg burst detection for {} file(s)...'.format(str(len(self.files_found))))
 
