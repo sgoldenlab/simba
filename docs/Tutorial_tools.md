@@ -406,3 +406,6 @@ Use this tool to get the model information (e.g., number of features, number of 
 
 This information tells you how many trees the classifier uses, how many features the classifier expects, further model hyperparameter settings, and when the file was created etc. 
 
+
+##
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
