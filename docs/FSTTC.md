@@ -88,6 +88,9 @@ This file contains one row for every video in your project, and one column for e
 
 If you bump into any issues using the FSTTC, let on know by opening an [issue](https://github.com/sgoldenlab/simba/issues) or reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community).
 
+##
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
+
 
 
 
