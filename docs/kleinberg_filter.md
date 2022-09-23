@@ -51,3 +51,8 @@ In short,
 *(ii) Gamma* - Higher gamma values and behaviors needs to be sustained for a longer time for them to be recognised as burts. I.e., gamma represents the cost associated with entering a time-period of behevior expression. **Higher gamma values and fewer behavioural bursts will be recognised. Lower gamma values and a greate number of behavioural bursts will be recognised (Default: 0.3)**
 
  *(ii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values and fewer behavioural bursts will to be recognised (Default: 1)**
+ 
+ 
+ 
+#
+Author [Simon N](https://github.com/sronilsson)
