@@ -17,3 +17,5 @@ Post-classification validation generates a video for each .CSV in the project th
 3. Click `Validate` button and the videos will be generated in `/project_folder/frames/output/classifier_validation`. The name of the video will be formated in the following manner: **videoname** + **target behavior** + **number of bouts** + .mp4
 
 ![](/images/classifiervalidation.gif)
+
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
