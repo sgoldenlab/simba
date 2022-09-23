@@ -142,7 +142,7 @@ Next, we want to analyze behavioral classifications in and around the times the 
 Cue light analyses involve  new and un-tested functions in SimBA. Should you encounter errors that are difficult to interpret, please reach out to us by opening a [GitHub issue](https://github.com/sgoldenlab/simba/issues) or write to us on [Gitter](https://gitter.im/SimBA-Resource/community). 
 
 
-
+Author [Simon N](https://github.com/sronilsson)
 
 
 
