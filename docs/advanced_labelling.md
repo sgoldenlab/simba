@@ -76,6 +76,8 @@ SimBA will then look for the file representing your video inside the `project_fo
 
 
 
+##
+Author [Simon N](https://github.com/sronilsson)
 
 
 
