@@ -17,3 +17,6 @@ User can now add or remove classifier in the project.
 2. Under ` [ Further imports (data/video/frames) ]` --> **Remove exisiting classifier(s)**, click on `Choose a classifier to remove` button.
 
 3. From the `Classifier` drop down menu, choose the classifier to remove and click on `Remove classifier`.
+
+
+Author [JJ Choong](https://github.com/inoejj)
