@@ -41,3 +41,8 @@
 - `Create Gantt plot`: Determins if a Gantt chart displaying the detected behavioral bouts should be appended to the validation video. Select `None` and no Gantt chart will be created (fastest option). Select `Gantt chart: video` and [a temporally aligned Gantt chart video](https://www.youtube.com/watch?v=UOLSj7DGKRo) will be appended to your output video (slowest option). Select `Gantt chart: final frame only (slightly faster)` and a single Gantt image representing all detected behavior bouts in the video will be appended to the output video. 
 
 10. Click `Validate` to validate your model. You can follow the progress in the main SimBA terminal window. The validation video will be saved in the `project_folder/frames/output/validation` directory. 
+
+
+
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
