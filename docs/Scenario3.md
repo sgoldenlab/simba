@@ -83,3 +83,5 @@ Once you have completed **Part 5** of the current Scenario 3, you may want to pr
 **Congratulations! You now have a new classifier of your behavior that is better than the original, or that has been updated from another lab's behavioral setup to work with your own! If you are following the Scenarios, you also now are ready to add the next two days of Experimental data to your project. Please see [Scenario 4](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md) for instructions.**
 
 
+##
+Author [Simon N](https://github.com/sronilsson)
