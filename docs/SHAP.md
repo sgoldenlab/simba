@@ -123,3 +123,7 @@ The final file (`SHAP_summary_line_graph_copulation_20210507160801.png`) is an i
 
 
 Check in with us on the [Gitter chat channel](https://gitter.im/SimBA-Resource/community) or raise a an issue and we may be able to help. The fourth column (`copulation_prediction`) will read either 0 or 1, and tell you if this particular frame was annotated as containing the behavior of interest (`1`), or **not** containing the behavior of interest (`0`). 
+
+
+##
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
