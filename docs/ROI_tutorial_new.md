@@ -315,5 +315,6 @@ Once your ROI definitions are all defined, close the `ROI table`, `Regions of In
 
 If you have any questions, bug reports or feature requests, please let us know by opening a new [github issue](https://github.com/sgoldenlab/simba/issues) or contact us through [gitter](https://gitter.im/SimBA-Resource/community)! 
 
-
+##
+Author [Simon N](https://github.com/sronilsson)
 
