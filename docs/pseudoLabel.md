@@ -44,4 +44,6 @@ Congrats! You have now successfully generated more machince model training data 
 For details tutorial on how to generate machine classifiers based on the pseudo-labelled data, and all other CSV data files in your `project_folder/csv/targets_inserted` directory,  see the [Train Machine Model](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model) tutorial. 
 
 
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
 
