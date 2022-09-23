@@ -128,3 +128,5 @@ Click [here](/docs/anaconda_installation.md) for a detail step by step guide on 
 
 
 
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
