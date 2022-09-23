@@ -1,4 +1,4 @@
-# Using DeepPoseKit in SimBa
+# Using DeepPoseKit in SimBA
 
 DeepPoseKit projects can be created and managed in SimBa, and DeepPosekit tracking data can be imported into SimBA to [generate machine learning behavioral classifiers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md).
 
@@ -123,3 +123,7 @@ You can now go ahead and import these files into SimBA to [generate behavioral p
 ## Step 6 Visualize tracking using DeepPoseKit in SimBA
 
 To generate a visualization of analyzed videos, navigate to the `[Visualiza video]` tab.
+
+
+##
+Author [Simon N](https://github.com/sronilsson)
