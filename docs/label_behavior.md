@@ -141,3 +141,8 @@ When closing the SimBA annotation GUI after annotating a video using the psedu-a
 If you use ADVANCED labelling, all frames are, by default, labelled as `None`. That means that if you have not looked at a frame in the SimBA annotation GUI, and indicated what behaviors the frame contains (i.e., if the behvaior is present or absent), then the information for that specific frame **will not** be saved when clicking the `Save Annotations`. That means that the specific frame won't be used in any downstream machine learning classifier creation tasks. For example, if you (i) open a video containing 3k frames, (ii) look at, and annotate, the first N frames, (iii)  click `Save Annotations`, and navigate to the `project_folder/csv/machine_results` directory and open the file representing the video you just annotated. When you open this file, you should see that it only contains N rows representing the N rows you labelled in the SimBA annotator GUI.
 
 This method (`ADVANCED LABELLING`) allows you the greatest control over the data that is used by the machine learning models to build predictive classifiers. This is the only method that allows you to control which frames of the specific video that goes into training and testing the classifiers. While 'PSUDO' and standard labelling use all of the frames of a specific video, `ADVANCED LABELLING` allows you to pick a specific subset of frames from a a specific video for creating machine learning models. To read more about how to use the `ADVANCED LABELLING` method in SimBA, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md).
+
+
+
+#
+Author [Simon N](https://github.com/sronilsson)
