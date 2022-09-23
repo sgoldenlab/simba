@@ -440,3 +440,5 @@ Clicking on the graph on the line displays the corresponding frame in the video 
 Congrats! You have now generated RF models that can be run on new, experimental data, and we hope those models are doing a good job at recognizing the behaviors of intrest. Proceed to [Scenario 2](https://github.com/sgoldenlab/simba/edit/master/docs/Scenario2.md) to use the BtWGaNP classifier to evaluate new experimental data. If you already have further data that has been processed (outliers are corrected, and the featureshave been calculated), and you now want to run the classifier on this data, proceed to [Scenario 2 - Part 3: Run the classifier on new data](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data).
 
 
+##
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
