@@ -60,3 +60,6 @@ if __name__ == "__main__":
     print('Video analysis complete')
 
 `````
+
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
