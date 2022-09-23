@@ -59,4 +59,6 @@ Keyboard shortcut information is displayed on the right side of the window for e
 > *Note*: Video name must be the same as the folder name. The video must also be paused by pressing `p` before any other keyboard command (such as moving forward or backwards a set number of frames). 
 
 
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
 
