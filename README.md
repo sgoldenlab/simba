@@ -199,7 +199,7 @@ Below is a link to download trained  behavior classification models to apply it 
 ## License 📃
 This project is licensed under the MIT License. Note that the software is provided 'as is', without warranty of any kind, express or implied. 
 
-If you use **any** part of the code or data, please cite us! :)
+If you use **any** part of the code or data, please cite us! Thank you 🙏!
 
     @article{Nilsson2020.04.19.049452,
       author = {Nilsson, Simon RO and Goodwin, Nastacia L. and Choong, Jia Jie and Hwang, Sophia and Wright, Hayden R and Norville, Zane C and Tong, Xiaoyu and Lin, Dayu and Bentzley, Brandon S. and Eshel, Neir and McLaughlin, Ryan J and Golden, Sam A.},
