@@ -302,3 +302,5 @@ This step automates the **Extract Frames** process to only extract frames from s
 
 
 
+##
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
