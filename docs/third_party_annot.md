@@ -79,3 +79,6 @@ In brief, before we can import the third-party annotations, we need to (i) creat
 4. If the appending of your annotations where completed successfully, you should see files representing each of your videos inside the `project_folder/csv/targets_inserted` directory of your SimBA project. If you open these files, you should see one column (towards the very and of the file) representing each of your classifiers. These columns will be populated with `0` and `1`, representing the absence (`0`) and presence (`1`) of the behavior according to your annotations in the ETHOVISON annotation tool. 
 
 
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
+
