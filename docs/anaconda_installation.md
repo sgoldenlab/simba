@@ -31,3 +31,6 @@
 `conda install -c conda-forge shapely`
 
 9. Type `simba` in the terminal to check if it works.
+
+
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
