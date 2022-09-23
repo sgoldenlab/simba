@@ -347,3 +347,5 @@ This error is produced when SimBA is installed with the wrong version of `pip`. 
   
 </details>
 
+##
+Author [Simon N](https://github.com/sronilsson)
