@@ -80,3 +80,8 @@ The video parameters that you specify will be processed in the following sequenc
 5. The **Output Directory** will contain all the final processed videos.
 
 ### NEXT STEP: [Create tracking model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md) 
+
+
+
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
