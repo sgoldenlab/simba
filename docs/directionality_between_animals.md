@@ -78,7 +78,7 @@ Once complete, you can find your final rendered videos in your `project_folder\f
 ![](https://github.com/sgoldenlab/simba/blob/master/images/Together_2.gif)
 
 
-
+Author [Simon N](https://github.com/sronilsson)
 
 
 
