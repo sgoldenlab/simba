@@ -219,7 +219,8 @@ To analyze and visualize how animals are directing towards each other, rather th
 </p>
 
 
-
+##
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
 
 
 
