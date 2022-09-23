@@ -34,3 +34,6 @@ Once done, export your annotations as **Tabular events**:
 
 
 Now you have your data in the SimBA-required format - head to the  tutorial on [Appending third-party annotations in SimBA](https://github.com/sgoldenlab/simba/edit/master/docs/third_party_annot.md) to learn how to append it to your feature and pose data. 
+
+Author [Simon N](https://github.com/sronilsson)
+
