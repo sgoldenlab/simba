@@ -72,6 +72,8 @@ Once clicked on, first navigate to your SimBA project. Your SimBA body-part conf
 When you click on `Create project` in the  DeepLabCut `Create Project` menu, your DeepLabCut project and DeepLabCut project *yaml* file will now be based on your SimBA-configured body-parts.  
 
 
+##
+Author [Simon N](https://github.com/sronilsson)
 
 
 
