@@ -224,3 +224,6 @@ If you use **any** part of the code or data, please cite us! Thank you 🙏!
 - [Jia Jie Choong](https://github.com/inoejj)
 - [Sophia Hwang](https://github.com/sophihwang26)
 - [Aasiya Islam](https://github.com/aasiya-islam)
+
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
