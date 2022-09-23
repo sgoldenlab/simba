@@ -61,6 +61,8 @@ After training your reversed classifier, you can go ahead and use it on new data
 
 
 
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
 
 
 
