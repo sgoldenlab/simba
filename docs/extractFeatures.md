@@ -36,4 +36,5 @@ In some scenarios, however, employing SimBAs' built-in feature-extraction script
 
 4. After selecting the feature extraction script you would like to use in you project, click on `Extract Features` in the `Extract Features` sub-menu. 
 
-
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
