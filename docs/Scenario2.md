@@ -253,3 +253,7 @@ This menu contains several tick-box options, representing the different frame ca
 Go to [Scenario 3](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md) to read about how to update a classifier with further annotated data.
 
 Go to [Scenario 4](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md) to read about how to analyze new experimental data with a previously started project.
+
+
+##
+Author [Simon N](https://github.com/sronilsson)
