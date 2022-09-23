@@ -19,3 +19,8 @@ The data-sets we share on OSF are typically very large (many GBs) so they have b
 
 
 4. That's it! The first compressed file is linked to all the other files in the compressed library, and all of the video files should appear in mp4 format.
+
+
+
+#
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
