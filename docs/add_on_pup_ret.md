@@ -33,3 +33,8 @@
 `Approach classifier name` - The name of the *approach* classifier as defined in the [SimBA project creation menu](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1).
 
 `Dig classifier name` - The name of the *dig* classifier as defined in the [SimBA project creation menu](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1).
+
+
+
+##
+Author [Simon N](https://github.com/sronilsson)
