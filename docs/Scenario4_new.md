@@ -103,3 +103,8 @@ Now, when you likely have generated a large number of predictions, you may want 
 ![](/images/classifiervalidation.gif)
 
 **PLEASE HELP BY REPORTING BUGS VIA GITHUB, OR JOIN THE SIMBA [GITTER](https://gitter.im/SimBA-Resource/community) FOR DISCUSSION**
+
+
+
+##
+Author [Simon N](https://github.com/sronilsson)
