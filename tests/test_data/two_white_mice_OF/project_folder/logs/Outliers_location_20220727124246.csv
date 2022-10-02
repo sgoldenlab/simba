@@ -1,0 +1,4 @@
+Video,Frames_processed,Animal1_centroid,Animal1_left_ear,Animal1_right_ear,Animal1_lateral_left,Animal1_lateral_right,Animal1_nose,Animal1_tail_base,Animal2_centroid,Animal2_left_ear,Animal2_right_ear,Animal2_lateral_left,Animal2_lateral_right,Animal2_nose,Animal2_tail_base,Sum,% body parts corrected
+CD1-B1-Ph1-T1-MS_US-20MIN0_TO_10,27000,370,403,407,384,392,787,570,258,269,257,270,266,1203,418,6254,0.016544973544973546
+CD1-B1-Ph1-T1-MS_US-20MIN10_TO_20,26986,192,195,197,198,197,475,208,85,101,88,82,106,327,126,2577,0.006820997130787393
+CD1-B1-Ph1-T2-MS_US10min,27000,54,54,54,56,54,7460,98,606,607,671,605,631,1641,717,13308,0.035206349206349206
