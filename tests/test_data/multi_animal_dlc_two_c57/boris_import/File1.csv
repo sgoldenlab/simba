@@ -1,0 +1,350 @@
+Observation id,Video 2,,,,,,,
+,,,,,,,,
+Media file(s),,,,,,,,
+,,,,,,,,
+Player #1,test3.mp4,,,,,,,
+,,,,,,,,
+Observation date,6/15/22 11:30,,,,,,,
+,,,,,,,,
+Description,,,,,,,,
+,,,,,,,,
+Time offset (s),0,,,,,,,
+,,,,,,,,
+independent variables,,,,,,,,
+variable,value,,,,,,,
+,,,,,,,,
+Time,Media file path,Total length,FPS,Subject,Behavior,Behavioral category,Comment,Status
+0,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+123.024,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+123.025,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+184.524,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+184.525,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+211.026,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+211.027,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+227.527,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+227.528,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+315.678,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+315.679,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,START
+331.679,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,STOP
+331.68,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+336.428,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+336.429,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,START
+464.738,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,STOP
+464.739,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+474.987,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+474.988,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,START
+511.487,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,STOP
+511.488,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+520.987,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+520.988,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,START
+537.012,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,STOP
+537.013,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+542.262,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+542.263,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,START
+561.511,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,nesting,,,STOP
+561.512,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+562.761,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+562.762,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+565.262,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+577.633,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+586.633,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+586.634,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+588.133,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+588.134,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+588.632,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+635.485,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+637.735,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+731.406,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+807.657,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+818.567,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+839.817,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+1064.19,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+1072.19,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+1085.691,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1087.689,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1132.68,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+1156.081,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+1156.082,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+1158.58,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+1161.831,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1165.33,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1165.331,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+1199.58,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+1199.581,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1206.329,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1210.831,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1212.58,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1212.581,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+1229.561,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+1229.562,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1251.812,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1251.813,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+1256.811,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+1256.812,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1263.062,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1322.376,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1328.874,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1368.125,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+1379.623,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+1394.124,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1396.04,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1396.041,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+1406.039,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+1406.04,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1408.789,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1426.29,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1428.039,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1478.04,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1481.04,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1485.289,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1497.788,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1564.414,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+1571.662,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+1571.663,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+1578.913,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+1578.914,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1580.913,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1580.914,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+1582.914,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+1582.915,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1584.663,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1705.951,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,START
+1725.201,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,STOP
+1725.202,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1727.201,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1727.202,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,START
+1734.2,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,STOP
+1734.201,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1736.699,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1736.7,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,START
+1740.95,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,STOP
+1740.951,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1747.949,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1791.201,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1798.45,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1823.451,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,START
+1825.736,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,STOP
+1825.737,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+1826.485,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+1826.486,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1826.951,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,START
+1826.952,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1828.736,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,STOP
+1828.737,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+1829.985,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+1829.986,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1831.986,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1834.237,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+1836.486,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+1851.737,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1870.91,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1870.911,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+1912.911,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+1962.663,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1978.41,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1996.412,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+1998.66,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+1998.661,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,START
+2005.357,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,STOP
+2005.358,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,START
+2051.541,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,STOP
+2051.542,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+2061.541,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+2061.542,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2067.792,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2067.793,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,START
+2070.542,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,STOP
+2070.543,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+2095.792,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+2095.793,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2099.292,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2099.293,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,START
+2106.042,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,STOP
+2106.043,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+2109.542,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+2109.543,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,START
+2115.042,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,STOP
+2115.043,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+2116.542,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+2116.543,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,START
+2121.041,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,STOP
+2121.042,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2123.542,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2123.543,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,START
+2131.791,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,digging,,,STOP
+2131.792,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2134.701,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2134.702,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+2161.2,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+2161.201,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+2166.95,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+2166.951,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+2170.951,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+2170.952,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,START
+2173.951,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,STOP
+2173.952,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2182.45,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2240.269,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2246.02,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2463.873,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2465.372,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2465.373,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+2479.873,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+2483.624,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2484.872,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2484.873,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,START
+2489.623,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,drinking,,,STOP
+2489.624,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2499.623,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2586.347,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2588.095,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2588.096,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+2593.347,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+2593.348,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+2595.846,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+2619.047,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+2631.045,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+2691.822,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+2960.321,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+3402.762,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+3413.261,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+3413.262,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+3417.761,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+3417.762,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+3419.512,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+3419.513,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+3437.511,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+3437.512,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+3443.762,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+3443.763,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+3446.011,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+3446.012,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+3452.26,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+3452.261,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+3454.012,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+3454.013,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+3457.26,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+3457.261,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+3462.012,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+3462.013,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+3467.261,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+3467.262,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+3481.011,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+3491.264,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+3506.513,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+3730.008,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+3737.258,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+3740.073,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+3750.571,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+3750.572,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+3753.32,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+3786.323,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+3791.072,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+3802.822,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+3870.571,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+3916.823,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+4109.899,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+4114.65,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+4126.652,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+4193.703,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+4199.703,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+4322.816,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+4427.052,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+4427.053,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+4492.052,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+4492.053,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+4501.302,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+4501.303,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+5362.809,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+5362.81,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+5370.81,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+5370.811,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+5658.943,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+5658.944,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+5660.942,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+5660.943,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+5879.731,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+5879.732,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+5887.483,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+5887.484,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+6336.661,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+6336.662,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+6360.661,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+6360.662,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+7000.237,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+7000.237,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+7005.486,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+7005.487,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+7316.873,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+7316.873,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+7421.386,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+7421.387,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+7437.168,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+8179.961,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+8186.961,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+8186.962,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+8420.604,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+8484.645,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+8502.393,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+8502.394,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+9417.168,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+9417.168,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+9432.916,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+9432.917,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+10163.162,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
+10163.163,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+10204.626,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+10204.627,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+10217.875,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+10217.876,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+10224.625,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+10224.626,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+10227.126,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+10227.127,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+10232.625,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+10232.626,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+10244.376,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+10253.377,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+10259.125,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+10259.126,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+10271.125,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+10275.627,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+10281.131,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+10281.132,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+10287.631,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+10287.632,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+10291.132,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+10291.133,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+10293.13,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+10293.131,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+10343.507,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+10343.508,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+10370.257,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+10370.258,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+10390.007,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+10390.008,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+10415.757,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+10415.758,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+10430.58,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+10430.581,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+10471.83,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+10471.831,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+10479.831,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+10485.276,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,START
+10928.5,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,grooming,,,STOP
+10928.506,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+10934.673,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+10934.674,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,START
+11063.4,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still outside nest,,,STOP
+11063.401,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+11079.651,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+11092.581,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+11105.081,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+11105.082,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,START
+11108.83,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,walking,,,STOP
+11126.081,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,START
+11135.33,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,undetermined,,,STOP
+11135.331,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,START
+11341.049,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,still inside nest,,,STOP
+11341.05,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,START
+11427.314,/Users/simon/Desktop/train_model_project/boris_import/Together_1.mp4,11427.314,12.7,Mouse 1,Attack,,,STOP
