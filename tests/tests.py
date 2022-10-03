@@ -1,3 +1,5 @@
+__author__ = "Simon Nilsson", "JJ Choong"
+
 from simba.BORIS_appender import BorisAppender
 from simba.solomon_importer import SolomonImporter
 from simba.clf_validator import ClassifierValidationClips
@@ -15,6 +17,7 @@ from simba.heat_mapper_clf import HeatMapperClf
 from simba.probability_plot_creator_mp import TresholdPlotCreator
 import pytest
 from simba.rw_dfs import read_df
+import pandas as pd
 from simba.project_config_creator import ProjectConfigCreator
 from simba.read_config_unit_tests import (check_int,
                                           check_str,
@@ -26,6 +29,19 @@ from simba.read_config_unit_tests import (check_int,
                                           read_config_file,
                                           insert_default_headers_for_feature_extraction,
                                           check_that_column_exist)
+from simba.misc_tools import (get_video_meta_data,
+                              check_multi_animal_status)
+from simba.ROI_analyzer import ROIAnalyzer
+from simba.ROI_directing_analyzer import DirectingROIAnalyzer
+from simba.ROI_feature_analyzer import ROIFeatureCreator
+from simba.ROI_feature_visualizer import ROIfeatureVisualizer
+from simba.ROI_movement_analyzer import ROIMovementAnalyzer
+from simba.ROI_plot_new import ROIPlot
+from simba.run_model_new import RunModel
+
+
+
+
 
 #from simba.dlc_multi_animal_importer import MADLC_Importer
 
@@ -123,6 +139,115 @@ def test_project_config_create_use_case(project_path, project_name, target_list,
     _ = ProjectConfigCreator(project_path=project_path, project_name=project_name, target_list=target_list, pose_estimation_bp_cnt=pose_estimation_bp_cnt, body_part_config_idx=body_part_config_idx, animal_cnt=animal_cnt, file_type=file_type)
 
 @pytest.mark.parametrize("name, value, max_value, min_value", [('test_1', 1, 2, 0),
-                                                               ('test_2', 2.0, 5.0, 1.0)])
+                                                               ('test_2', 2.0, 5.0, 1.0),
+                                                               ('test_2', 2.0, None, None)])
 def test_check_int_use_case(name, value, max_value, min_value):
     _ = check_int(name=value, value=value, max_value=max_value, min_value=min_value)
+
+@pytest.mark.parametrize("name, value, options, allow_blank", [('test_1', 'test_str', ('test_str', 'test_2'), True),
+                                                               ('test_1', 'test_str', (), True)])
+def test_check_str_use_case(name, value, options, allow_blank):
+    _ = check_str(name=name, value=value, options=options, allow_blank=allow_blank)
+
+@pytest.mark.parametrize("name, value, max_value, min_value", [('test_1', 1, 2, 0),
+                                                               ('test_2', 2.0, 5.0, 1.0),
+                                                               ])
+def test_check_float_use_case(name, value, max_value, min_value):
+    _ = check_float(name=name, value=value, max_value=max_value, min_value=min_value)
+
+@pytest.mark.parametrize("config, section, option, data_type, default_value, options", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini', 'General settings', 'animal_no', 'int', 2, None)])
+def test_read_config_entry_use_case(config, section, option, data_type, default_value, options):
+    config = read_config_file(config)
+    _ = read_config_entry(config=config, section=section, option=option, data_type=data_type, default_value=default_value)
+
+@pytest.mark.parametrize("folder_path", [('test_data/multi_animal_dlc_two_c57/project_folder/configs')])
+def test_read_simba_meta_files(folder_path):
+    meta_file_lst = read_simba_meta_files(folder_path=folder_path)
+    assert isinstance(meta_file_lst, list)
+    for i in meta_file_lst:
+        assert isinstance(i, str)
+        d = read_meta_file(i)
+        assert isinstance(d, dict)
+        assert len(d.keys()) > 0
+        check_file_exist_and_readable(file_path=i)
+
+@pytest.mark.parametrize("df_path", [('test_data/multi_animal_dlc_two_c57/project_folder/csv/outlier_corrected_movement_location/Together_1.csv')])
+def test_insert_default_headers_for_feature_extraction(df_path):
+    df = read_df(df_path, 'csv')
+    header_lst = [str(x) for x in range(0, 48)]
+    df = insert_default_headers_for_feature_extraction(df=df, headers=header_lst, pose_config='16 body-parts', filename='test')
+    assert isinstance(df, pd.DataFrame)
+
+@pytest.mark.parametrize("df_path, column_name, file_name", [('test_data/multi_animal_dlc_two_c57/project_folder/csv/outlier_corrected_movement_location/Together_1.csv', 'Ear_left_1_x', 'Test')])
+def test_check_that_column_exist(df_path, column_name, file_name):
+    df = read_df(df_path, 'csv')
+    _ = check_that_column_exist(df, column_name, file_name)
+
+@pytest.mark.parametrize("ini_path, data_path, calculate_distances", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini', 'outlier_corrected_movement_location', True)])
+def test_ROIAnalyzer(ini_path, data_path, calculate_distances):
+    roi_analyzer = ROIAnalyzer(ini_path=ini_path, data_path=data_path, calculate_distances=calculate_distances)
+    roi_analyzer.read_roi_dfs()
+    roi_analyzer.analyze_ROIs()
+    roi_analyzer.save_data()
+
+@pytest.mark.parametrize("ini_path, data_path, calculate_distances", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini', 'outlier_corrected_movement_location', True)])
+def test_ROIAnalyzer(ini_path, data_path, calculate_distances):
+    roi_analyzer = ROIAnalyzer(ini_path=ini_path, data_path=data_path, calculate_distances=calculate_distances)
+    roi_analyzer.read_roi_dfs()
+    roi_analyzer.analyze_ROIs()
+    roi_analyzer.save_data()
+
+@pytest.mark.parametrize("config_path ", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini')])
+def test_DirectingROIAnalyzer(config_path):
+    roi_directing_calculator = DirectingROIAnalyzer(config_path=config_path)
+    roi_directing_calculator.calc_directing_to_ROIs()
+
+@pytest.mark.parametrize("config_path ", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini')])
+def test_ROIFeatureCreator(config_path):
+    roi_featurizer = ROIFeatureCreator(config_path=config_path)
+    roi_featurizer.analyze_ROI_data()
+    roi_featurizer.save_new_features_files()
+
+@pytest.mark.parametrize("config_path, video_name", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini', 'Together_1.avi')])
+def test_ROIfeatureVisualizer(config_path, video_name):
+    roi_feature_visualizer = ROIfeatureVisualizer(config_path=config_path, video_name=video_name)
+    roi_feature_visualizer.create_visualization()
+
+@pytest.mark.parametrize("config_path", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini')])
+def test_ROIMovementAnalyzer(config_path):
+     _ = ROIMovementAnalyzer(config_path=config_path)
+
+@pytest.mark.parametrize("config_path, video_name", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini', 'Together_1.avi')])
+def test_ROIPlot(config_path, video_name):
+    roi_visualizer = ROIPlot(ini_path=config_path, video_path=video_name)
+    roi_visualizer.insert_data()
+    roi_visualizer.visualize_ROI_data()
+
+@pytest.mark.parametrize("config_path", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini')])
+def test_RunModel(config_path):
+    inferencer = RunModel(config_path=config_path)
+    inferencer.run_models()
+
+@pytest.mark.parametrize("video_path", [('test_data/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4'),
+                                        ('test_data/multi_animal_dlc_two_c57/project_folder/videos/Together_1.avi')])
+def test_get_video_meta_data(video_path):
+    video_data = get_video_meta_data(video_path=video_path)
+
+@pytest.mark.parametrize("config_path, no_animals", [('test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini', 2),
+                                                     ('test_data/mouse_open_field/project_folder/project_config.ini', 1),
+                                                     ('tests/test_data/two_white_mice_OF/project_folder/project_config.ini', 2)])
+def test_check_multi_animal_status(config_path, no_animals):
+    config = read_config_file(config_path)
+    status, id_lst = check_multi_animal_status(config, no_animals)
+    assert isinstance(status, bool)
+    assert isinstance(id_lst, list)
+    assert len(id_lst) > 0
+    assert 'None' not in id_lst
+
+
+
+
+
+
+
+
