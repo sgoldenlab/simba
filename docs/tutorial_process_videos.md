@@ -37,15 +37,53 @@ The video parameters that you specify will be processed in the following sequenc
 
 4. Click to `Confirm` the two selected directories.
 
->**Note**: Please make sure there is no spaces in your folder names or video names, use underscores if needed.
+>**Note**: Please make sure there is no spaces in your folder names or video names. Instead use underscores if needed.
 
 ![](/images/processvideo2.PNG)
 
-## Step 2: Select parameters
+## Step 2: The batch processing interface.
 
-1. Once you select `Confirm`, a table listing the videos in the `Video directory` folder will auto-generate and display. This sequence of videos will now be processed with the parameters you selected, started with the cropping fucntion.
+1. Once you select `Confirm`, an interface will be displayed which will allow us to manipulate the attributes of each video, or batch change attributes of all videos in the directory. Below is a screengrab of this interface, which I have labelled into three different parts: **(1) QUICK SETTINGS, (2) VIDEOS, and (3) EXECUTE**. We will go through the functions of each one in turn. 
 
-![](/images/batchprocessvideo.PNG)
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/batch_preprocess_2.png" />
+</p>
+
+### QUICK SETTINGS
+
+The quick setting menu allows us to batch specify new resolutions, new frames rates, or clipping times for all videos. In my toy example I have 10 videos, each which is 10s long (Note: you can see that they are 10s long in the middle **VIDEOS** table, by looking in the *End Time* column, shich SimBa has populated with the video meta-information data). 
+
+Let's say I want to remove the first 5s from each of the videos, and to do this I can use the `Clip Videos Settings` sub-menu in QUICK SETTINGS. To do this, I set the `Start Time` to 00:00:05, and the `End Time` to 00:00:10 and click `Apply`, as in the gif below. Note that the `Start Time` of all videos listed in the VIDEOS table are updated:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/quick_clip.gif" />
+</p>
+
+
+Similarly, let say I want to downsample all my videos to a 1200x800 resolution. I then update the `Width` and `Height` values in the `Downsample Videos` sub-menu, and click `Apply`:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/quick_downsample.gif" />
+</p>
+
+### VIDEOS TABLE
+The middle videos list all the video files found inside your input directory defined in Step 1, with one video per row. Each video has a `Crop` button, and several entry boxes and radio buttons that allows us to specify which pre-processing functions we should apply to each video. In the header of the VIDEOS table, there are radio buttons that allows us to tick all of the videos in the table. For example, if I want to apply the 00:00:05 to 00:00:10 trimming to all videos, I go ahead and click the `Clip all videos` radio button. If I want downsample all videos, I go ahead and click the `Downsample All Videos` radiobutton. If I want to `Clip all videos` *except* few videos. I go ahead and de-select the videos I want to omit from downsampling. The same applies for the FPS, greyscale, CLAHE and Frame count radio buttons:
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/header_radiobtn.gif" />
+</p>
+
+
+
+
+
+
+
+
+
+
+
 
 2. If you wish to crop your videos, click on the `Crop` button. A frame from the video will pop up. Left click on the frame and drag the rectangular bounding box to mark the region of the video you wish to keep. Once the rectangle is marked, double tap "Enter" on your keyboard. *(The relevant crop button will turn red once you have selected to crop a video)*
 
