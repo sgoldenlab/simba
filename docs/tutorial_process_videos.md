@@ -77,7 +77,7 @@ Next, it might be that you want to crop some of the videos listes in the VIDEOS 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/crop_fast.gif" />
 </p>
 
-Chose with types of manipulation you which to perform on each video. Once done, head to the **EXECUTE** section. 
+Chose with types of manipulation you which to perform on each video. Once done, head to the **EXECUTE** section. To learn more about each individual manipulation, check out their descriptions in the [SimBA TOOLS Guide](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md).
 
 ### EXECUTE
 
@@ -91,58 +91,10 @@ The Ecexute section contains three buttons: (i) RESET ALL, (ii) RESET CROP, and 
 
 **RESET CROP**: The RESET CROP button removes all crop settings only (once clicking the `RESET CROP` button, you should see any red `Crop` button associated the videos go bck to their original color). 
 
-**EXECUTE**: The `EXECUTE` button initates your chosen manipulations on each video according t
+**EXECUTE**: The `EXECUTE` button initates your chosen manipulations on each video according the settings in the VIDEO TABLE. The results are stored in the `Output Directory` defined during Step 1 above. Together with the output files, there is a `.json` file that is also saved in the output directory. This `.json` file contains the information on the manipulations performed on the videos in the VIDEO TABLE. For an exampple of this .json file, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/batch_process_log.json). 
 
+> Note: If you have a lot of videos (>100s), and are performing a lot of manipulations, then batch pre-processing videos may take some time, and it might be best to make it an over-nighter. 
 
+If you have any questions, bug reports or feature requests, please let us know by opening a new github issue or contact us through gitter and, we will fix it together!
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-2. If you wish to crop your videos, click on the `Crop` button. A frame from the video will pop up. Left click on the frame and drag the rectangular bounding box to mark the region of the video you wish to keep. Once the rectangle is marked, double tap "Enter" on your keyboard. *(The relevant crop button will turn red once you have selected to crop a video)*
-
-![](/images/cropvideoroi.gif)
-
-3. If you wish to trim a specific video, check the `Shorten` box and enter the **Start Time** and  **End Time** in the HH:MM:SS format.
-
-4. If you wish to downsample a specific video, check the `Downsample` box and enter the **Width** and **Height** in pixels.
-
-5. If you wish to change a specific video to grayscale, check the `Grayscale` box.
-
-6. If you wish to superimpose the specific frame numbers onto the frames of the video, check on the `Add Frame #` box. For an example output video with frame numbers overlaid, click [here](https://youtu.be/TMQmNr8Ssyg). 
-
-7. If you wish to apply CLAHE, check on the `CLAHE` box. For more information on CLAHE, click [here](https://docs.opencv.org/master/d5/daf/tutorial_py_histogram_equalization.html)
-
-8. In the first row of the table, there are `Select All` checkboxes. Use these checkboxes to apply a manipulation to all of the videos in the folder. 
-
-> **Note:** We know that the `Select All` checkbox might be slightly off position in the table. We are working on a fix. 
-
-## Step 3: Execute
-
-1. Once all the parameters are set, click on `Execute`. 
-
-2. The final output videos will be saved in the `Output Directory` that you selected in *Step 1*.
-
-![alt-text-1](/images/processvideo4.PNG "processvideo4.PNG")
-
-3. A subfolder in the `Output Directory` called **tmp** will contain the step-by-step processsed videos.
-
-4. The **process_archieve** folder contains a **.txt** file that lists the processes that were run. 
-
-5. The **Output Directory** will contain all the final processed videos.
-
-### NEXT STEP: [Create tracking model](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md) 
-
-
-
-#
-Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
+Author [Simon N](https://github.com/sronilsson)
