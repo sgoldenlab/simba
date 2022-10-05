@@ -1,5 +1,3 @@
-
-
 # Tutorial for processing videos in batch
 
 It is often helpful, and sometimes necessary, to pre-process experimental videos prior to analysis. This is generally accomplished through the use of open-source approaches like **FFmpeg** or commercial software, but can be a time consuming and cumbersome when applying to numerous similar videos. To streamline this process, SimBA incorporates **FFmpeg** into a a batch-process GUI. 
@@ -59,7 +57,6 @@ Let's say I want to remove the first 5s from each of the videos, and to do this 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/quick_clip.gif" />
 </p>
 
-
 Similarly, let say I want to downsample all my videos to a 1200x800 resolution. I then update the `Width` and `Height` values in the `Downsample Videos` sub-menu, and click `Apply`:
 
 <p align="center">
@@ -67,14 +64,18 @@ Similarly, let say I want to downsample all my videos to a 1200x800 resolution. 
 </p>
 
 ### VIDEOS TABLE
-The middle videos list all the video files found inside your input directory defined in Step 1, with one video per row. Each video has a `Crop` button, and several entry boxes and radio buttons that allows us to specify which pre-processing functions we should apply to each video. In the header of the VIDEOS table, there are radio buttons that allows us to tick all of the videos in the table. For example, if I want to apply the 00:00:05 to 00:00:10 trimming to all videos, I go ahead and click the `Clip all videos` radio button. If I want downsample all videos, I go ahead and click the `Downsample All Videos` radiobutton. If I want to `Clip all videos` *except* few videos. I go ahead and de-select the videos I want to omit from downsampling. The same applies for the FPS, greyscale, CLAHE and Frame count radio buttons:
 
+The middle VIDEOS table list all the video files found inside your input directory defined in Step 1, with one video per row. Each video has a `Crop` button, and several entry boxes and radio buttons that allows us to specify which pre-processing functions we should apply to each video. In the header of the VIDEOS table, there are also radio buttons that allows us to tick all of the videos in the table. For example, if I want to apply the 00:00:05 to 00:00:10 clip trimming to all videos, I go ahead and click the `Clip all videos` radio button. If I want downsample all videos, I go ahead and click the `Downsample All Videos` radiobutton. If I want to `Clip all videos` *except* few videos. I go ahead and de-select the videos I want to omit from downsampling. The same applies for the FPS, greyscale, CLAHE and Frame count radio buttons:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/header_radiobtn.gif" />
 </p>
 
+Next, it might be that you want to crop some of the videos listes in the VIDEOS table. To do this, click on the `Crop` button associated with the video. In this scenario I want to crop Video 1, and click the `Crop` button. Once clicked, the first frame of `Video 1` pops open. To draw the region of the video to keep, click and hold the left mouse button at the top left corner of your rectangular region and drag the mouse to the bottom right corner of the rectanglar region. If you're unhappy with your rectangle, start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your region, press the keyboard SPACE or ESC button to save your rectangle. Notice that the `Crop` button associated with Video 1 turns red after I've defined the cropped region.
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/crop_fast.gif" />
+</p>
 
 
 
