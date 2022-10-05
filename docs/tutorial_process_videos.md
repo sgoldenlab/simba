@@ -77,6 +77,28 @@ Next, it might be that you want to crop some of the videos listes in the VIDEOS 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/crop_fast.gif" />
 </p>
 
+Chose with types of manipulation you which to perform on each video. Once done, head to the **EXECUTE** section. 
+
+### EXECUTE
+
+The Ecexute section contains three buttons: (i) RESET ALL, (ii) RESET CROP, and (iii) EXECUTE. 
+
+**RESET ALL**: The RESET ALL button puts all the choices back to how they were when opening the batch processing interface:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/reset_settings.gif" />
+</p>
+
+**RESET CROP**: The RESET CROP button removes all crop settings only (once clicking the `RESET CROP` button, you should see any red `Crop` button associated the videos go bck to their original color). 
+
+**EXECUTE**: The `EXECUTE` button initates your chosen manipulations on each video according t
+
+
+
+
+
+
+
 
 
 
