@@ -98,7 +98,16 @@ If you want to navigate to a specific frame number, change the value in the fram
 **(8)** There are keyboard-shortcuts that will allow you to navigate the frame displayed in the main SimBA annotator GUI. These keyboard shortcuts allows you to perform some of the same functions as performed with the buttons documented in part **(1)** in this document. They also allow you to save your annotations into your SimBA project (see below), which you are **required to do** in order to use your annotations for creating machine learning models. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_5.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/annotator_shortcuts.png" />
+</p>
+
+Two of these shortcuts needs further description:
+
+> Control-a: Hold down the `ctrl` keyboard button and press `a` to move to the next frame as well as keeping the classifier checkboxes the same as however they where checked in the prior frame. Good for quickly labelling successive frames with the same annotations. 
+> Control-p: Hold down the `ctrl` keyboard button and press `p` to print a table telling you how many frames you have annotated so far and how you have anntated them, as in the image below.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/label_table.png" />
 </p>
 
 **(8)** The last button in the SimBA annotator interface is labelled `Save Annotations` and it is a **very important** button. This buttons saves your annotations into your SimBA project which you are required to do in order to use the annotation for creating mchine learning models. Clicking this buttons saves a data file inside your `project_folder/csv/targets_inserted` directory. This file will contain all of the body-part coordinates and features in seperate columns, plus a few additional columns at the end of the file (one for each behavior that you are annotating) with the headers that represent the behavior names. Hence, clicking this button in this tutoral, will generate a file inside the `project_folder/csv/targets_inserted` directory called `BtWGANP` where the last column is named `Attack`. This column will be filled with `1`s and `0`s - a `1` for every frame where I noted the behavior to be present, and a `0` for every frame where I note the behavior to be absent. 
