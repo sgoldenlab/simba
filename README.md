@@ -168,6 +168,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Using the SimBA data analysis and export dashboard](docs/plotly_dash.md) 📊
 - [Explainable machine classifications in SimBA (SHAP)](docs/SHAP.md) 🧮
 - [Kleinberg markov chain classification smoothing in SimBA](docs/kleinberg_filter.md) 🔗
+- [Cue-light analyses in SimBA](docs/cue_light_tutorial.md)💡💡
 - [Reversing the directionality of classifiers in SimBA](docs/reverse_annotations.md) ⏪
 - [Spike-time correlation coefficients in SimBA](docs/FSTTC.md) 📔
 - [Analysing animal directions in SimBA](docs/directionality_between_animals.md) 🧭
