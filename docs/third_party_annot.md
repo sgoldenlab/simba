@@ -12,7 +12,7 @@ SimBA currently supports the import of annotations created in:
 * [BORIS](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-boris-annotations) - https://www.boris.unito.it/
 * [BENTO](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-bento-and-solomon-annotations) - https://github.com/neuroethology/bentoMAT
 * [ETHOVISION](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-ethovision-annotations) - https://www.noldus.com/ethovision-xt
-* [DeepEthogram](https://github.com/jbohnslav/deepethogram) - https://github.com/jbohnslav/deepethogram
+* [DeepEthogram]([https://github.com/jbohnslav/deepethogram)](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-deepethogram-annotations) - https://github.com/jbohnslav/deepethogram
 
 If you have annotation created in any other propriatory or open-source tool and would like to append them to your data in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or [GitHub](https://github.com/sgoldenlab/simba) and we can work together to make the option available in the SimBA GUI.
 
