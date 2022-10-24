@@ -12,6 +12,7 @@ SimBA currently supports the import of annotations created in:
 * [BORIS](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-boris-annotations) - https://www.boris.unito.it/
 * [BENTO](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-bento-and-solomon-annotations) - https://github.com/neuroethology/bentoMAT
 * [ETHOVISION](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-ethovision-annotations) - https://www.noldus.com/ethovision-xt
+* [DeepEthogram](https://github.com/jbohnslav/deepethogram) - https://github.com/jbohnslav/deepethogram
 
 If you have annotation created in any other propriatory or open-source tool and would like to append them to your data in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or [GitHub](https://github.com/sgoldenlab/simba) and we can work together to make the option available in the SimBA GUI.
 
@@ -72,11 +73,23 @@ In brief, before we can import the third-party annotations, we need to (i) creat
 
 ## IMPORTING ETHOVISION ANNOTATIONS
 
-1. To import Ethovison annotations, begin by clicking the appropriate button. A file browser window will pop open, asking you to choose the folder that contains your annotation files. If you are importing **ETHOVISON** annotations, SimBA expects a folder containing files with the file-endings `.xlxs` and `.xls`. For an example layout of **ETHOVISON** annotations that SimBA expects, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx). If your files look (i) different from these files, and (ii) you are having trouble appending BORIS annotations in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or open a [GitHub issue](https://github.com/sgoldenlab/simba) report. 
+1. To import Ethovison annotations, begin by clicking the appropriate button. A file browser window will pop open, asking you to choose the folder that contains your annotation files. If you are importing **ETHOVISON** annotations, SimBA expects a folder containing files with the file-endings `.xlxs` and `.xls`. For an example layout of **ETHOVISON** annotations that SimBA expects, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx). If your files look (i) different from these files, and (ii) you are having trouble appending ETHOVISON annotations in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or open a [GitHub issue](https://github.com/sgoldenlab/simba) report. 
 
 2. Click `Select` for the folder that contains your annotation. You can follow the progress in the main SimBA terminal window. 
 
-4. If the appending of your annotations where completed successfully, you should see files representing each of your videos inside the `project_folder/csv/targets_inserted` directory of your SimBA project. If you open these files, you should see one column (towards the very and of the file) representing each of your classifiers. These columns will be populated with `0` and `1`, representing the absence (`0`) and presence (`1`) of the behavior according to your annotations in the ETHOVISON annotation tool. 
+3. If the appending of your annotations where completed successfully, you should see files representing each of your videos inside the `project_folder/csv/targets_inserted` directory of your SimBA project. If you open these files, you should see one column (towards the very and of the file) representing each of your classifiers. These columns will be populated with `0` and `1`, representing the absence (`0`) and presence (`1`) of the behavior according to your annotations in the ETHOVISON annotation tool. 
+
+## IMPORTING DEEPETHOGRAM ANNOTATIONS
+
+1. To import DeepEthogram annotations, begin by clicking the appropriate button. A file browser window will pop open, asking you to choose the folder that contains your annotation files. If you are importing **DeepEthogram** annotations, SimBA expects a folder containing files with the file-endings `.csv`. For an example layout of **DeepEthogram** annotations that SimBA expects, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/deep_ethogram_labels.csv). If your files look (i) different from these files, and (ii) you are having trouble appending DeepEthogram annotations in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or open a [GitHub issue](https://github.com/sgoldenlab/simba) report. 
+
+2. Click `Select` for the folder that contains your annotation. You can follow the progress in the main SimBA terminal window. 
+
+3. If the appending of your annotations where completed successfully, you should see files representing each of your videos inside the `project_folder/csv/targets_inserted` directory of your SimBA project. If you open these files, you should see one column (towards the very and of the file) representing each of your classifiers. These columns will be populated with `0` and `1`, representing the absence (`0`) and presence (`1`) of the behavior according to your annotations in the ETHOVISON annotation tool. 
+
+> Note 1: Keep in mind that the behaviors/classifiers has to be defined (with the same names as they appear in the third-party annotation files) in the SimBA project folder. For example, SimBA **will not** recognize a behaviour in the DeepEthogram annotation files called `sniffing` if the behavior in the SimBA project is defined as `Sniff` or `Sniffing`. To add / remove classifier(s), use the `Further imports(data/video/frames)` --> `Add classifier` or `Remove existing classifier` menus.
+
+> Note 2: If the DeepEthogram annotation file contains annotations for 2k frames for a specific video, but the imported pose-estimation data for the same video is 1.5k frames long, then SimBA will **discard the DeepEthogram annotations for the last 500 frames**. SimBA will print a warning in the main terminal window if this happens. 
 
 
 #
