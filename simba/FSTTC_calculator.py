@@ -53,7 +53,6 @@ class FSTTCPerformer(object):
     """
 
 
-
     def __init__(self,
                  config_path: str,
                  time_window: int,

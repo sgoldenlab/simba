@@ -26,7 +26,7 @@ import tkinter.ttk as ttk
 import webbrowser
 import cv2
 from simba.plotly_create_h5 import *
-from simba.tkinter_functions import *
+from simba.tkinter_functions import hxtScrollbar, DropDownMenu, Entry_Box, FileSelect, form_validator_is_numeric
 from simba.project_config_creator import ProjectConfigCreator
 from simba.json2csv import json2csv_file, json2csv_folder
 from simba.probability_graph_interactive import InteractiveProbabilityGrapher
@@ -138,7 +138,11 @@ from simba.video_processing import (change_img_format,
                                     crop_multiple_videos,
                                     frames_to_movie)
 from simba.setting_menu import SettingsMenu
-from simba.pop_up_classes import HeatmapLocationPopup, QuickLineplotPopup
+from simba.pop_up_classes import (HeatmapLocationPopup,
+                                  QuickLineplotPopup,
+                                  ClfByROI,
+                                  FSTTCPopUp,
+                                  KleinbergPopUp)
 from simba.labelling_interface import select_labelling_video
 from simba.labelling_advanced_interface import select_labelling_video_advanced
 from simba.deepethogram_importer import DeepEthogramImporter
@@ -319,76 +323,6 @@ class FolderSelect(Frame):
     def folder_path(self):
         return self.folderPath.get()
 
-class DropDownMenu(Frame):
-    def __init__(self,parent=None,dropdownLabel='',choice_dict=None,labelwidth='',com=None,**kw):
-        Frame.__init__(self,master=parent,**kw)
-        self.dropdownvar = StringVar()
-        self.lblName = Label(self,text=dropdownLabel,width=labelwidth,anchor=W)
-        self.lblName.grid(row=0,column=0)
-        self.choices = choice_dict
-        self.popupMenu = OptionMenu(self,self.dropdownvar,*self.choices,command=com)
-        self.popupMenu.grid(row=0,column=1)
-    def getChoices(self):
-        return self.dropdownvar.get()
-    def setChoices(self,choice):
-        self.dropdownvar.set(choice)
-
-class FileSelect(Frame):
-    def __init__(self,parent=None,fileDescription="",color=None,title=None,lblwidth=None,**kw):
-        self.title=title
-        self.color = color if color is not None else 'black'
-        self.lblwidth = lblwidth if lblwidth is not None else 0
-        self.parent=parent
-        Frame.__init__(self,master=parent,**kw)
-        self.filePath = StringVar()
-        self.lblName = Label(self, text=fileDescription,fg=str(self.color),width=str(self.lblwidth),anchor=W)
-        self.lblName.grid(row=0,column=0,sticky=W)
-        self.entPath = Label(self, textvariable=self.filePath,relief=SUNKEN)
-        self.entPath.grid(row=0,column=1)
-        self.btnFind = Button(self, text="Browse File",command=self.setFilePath)
-        self.btnFind.grid(row=0,column=2)
-        self.filePath.set('No file selected')
-    def setFilePath(self):
-        file_selected = askopenfilename(title=self.title,parent=self.parent)
-        if file_selected:
-            self.filePath.set(file_selected)
-        else:
-            self.filePath.set('No file selected')
-    @property
-    def file_path(self):
-        return self.filePath.get()
-
-class Entry_Box(Frame):
-    def __init__(self, parent=None, fileDescription="", labelwidth='',status=None, validation=None, **kw):
-        super(Entry_Box, self).__init__(master=parent)
-        self.validation_methods = {
-            'numeric': (self.register(form_validator_is_numeric), '%P', '%d'),
-        }
-        self.status = status if status is not None else NORMAL
-        self.labelname = fileDescription
-        Frame.__init__(self,master=parent,**kw)
-        self.filePath = StringVar()
-        self.lblName = Label(self, text=fileDescription,width=labelwidth,anchor=W)
-        self.lblName.grid(row=0,column=0)
-        self.entPath = Entry(self, textvariable=self.filePath, state=self.status,
-                             validate='key',
-                             validatecommand=self.validation_methods.get(validation, None))
-        self.entPath.grid(row=0,column=1)
-
-    @property
-    def entry_get(self):
-        self.entPath.get()
-        return self.entPath.get()
-
-    def entry_set(self, val):
-        self.filePath.set(val)
-
-    def set_state(self,setstatus):
-        self.entPath.config(state=setstatus)
-
-    def destroy(self):
-        self.lblName.destroy()
-        self.entPath.destroy()
 
 class newcolumn(Frame):
     def __init__(self,parent=None,lengthoflist=[],width='',**kw):
@@ -455,55 +389,6 @@ class Button_getcoord(Frame):
 
 def Exit():
     app.root.destroy()
-
-
-def onMousewheel(event, canvas):
-    try:
-        scrollSpeed = event.delta
-        if platform.system() == 'Darwin':
-            scrollSpeed = event.delta
-        elif platform.system() == 'Windows':
-            scrollSpeed = int(event.delta / 120)
-        canvas.yview_scroll(-1 * (scrollSpeed), "units")
-    except:
-        pass
-
-def bindToMousewheel(event, canvas):
-    canvas.bind_all("<MouseWheel>", lambda event: onMousewheel(event, canvas))
-
-def unbindToMousewheel(event, canvas):
-    canvas.unbind_all("<MouseWheel>")
-
-def onFrameConfigure(canvas):
-    '''Reset the scroll region to encompass the inner frame'''
-    canvas.configure(scrollregion=canvas.bbox("all"))
-
-def hxtScrollbar(master):
-        '''
-        Create canvas.
-        Create a frame and put it in the canvas.
-        Create two scrollbar and insert command of canvas x and y view
-        Use canvas to create a window, where window = frame
-        Bind the frame to the canvas
-        '''
-        bg = master.cget("background")
-        acanvas = Canvas(master, borderwidth=0, background=bg)
-        frame = Frame(acanvas, background=bg)
-        vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
-        vsb2 = Scrollbar(master, orient='horizontal', command=acanvas.xview)
-        acanvas.configure(yscrollcommand=vsb.set)
-        acanvas.configure(xscrollcommand=vsb2.set)
-        vsb.pack(side="right", fill="y")
-        vsb2.pack(side="bottom", fill="x")
-        acanvas.pack(side="left", fill="both", expand=True)
-
-        acanvas.create_window((10, 10), window=frame, anchor="nw")
-
-        # bind the frame to the canvas
-        acanvas.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
-        acanvas.bind('<Enter>', lambda event: bindToMousewheel(event, acanvas))
-        acanvas.bind('<Leave>', lambda event: unbindToMousewheel(event,acanvas))
-        return frame
 
 class video_downsample:
 
@@ -2533,14 +2418,14 @@ class loadprojectini:
         button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command = self.runrfmodel)
 
         #kleinberg smoothing
-        kleinberg_button = Button(label_runmachinemodel,text='Kleinberg Smoothing',command = self.kleinbergMenu)
-        fsttc_button = Button(label_runmachinemodel,text='FSTTC',command=self.fsttcmenu)
+        kleinberg_button = Button(label_runmachinemodel,text='Kleinberg Smoothing',command=lambda: KleinbergPopUp(config_path=self.projectconfigini))
+        fsttc_button = Button(label_runmachinemodel,text='FSTTC',command=lambda:FSTTCPopUp(config_path=self.projectconfigini))
         label_machineresults = LabelFrame(tab9,text='ANALYZE MACHINE RESULTS',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
         button_process_movement = Button(label_machineresults, text='Analyze distances/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ANALYZE MOVEMENT'))
         button_movebins = Button(label_machineresults, text='Time bins: Distance/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='TIME BINS: DISTANCE/VELOCITY'))
         button_classifierbins = Button(label_machineresults,text='Time bins: Machine predictions',command=lambda:self.timebinmove('classifier'))
-        button_classifier_ROI = Button(label_machineresults, text='Classifications by ROI', command=lambda: self.ROI_classifier())
+        button_classifier_ROI = Button(label_machineresults, text='Classifications by ROI', command=lambda: ClfByROI(config_path=self.projectconfigini))
 
         label_severity = LabelFrame(tab9,text='ANALYZE SEVERITY',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         self.severityscale = Entry_Box(label_severity,'Severity scale 0 -',15)
@@ -3121,157 +3006,6 @@ class loadprojectini:
 
         button_run.grid(row=1,padx=10,pady=10)
 
-    def fsttcmenu(self):
-        #get data
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        # get current no of target
-        notarget = config.getint('SML settings', 'no_targets')
-        targetlist = [0] * notarget
-        varlist = [0] * notarget
-        for i in range(notarget):
-            varlist[i] = IntVar()
-            targetlist[i] = (config.get('SML settings', 'target_name_' + str(i + 1)))
-
-        #toplvl
-        fstoplvl = Toplevel()
-        fstoplvl.minsize(400,320)
-        fstoplvl.wm_title('Calculate forward-spike time tiling coefficents')
-
-        #git
-        lbl_git_fsttc = Label(fstoplvl, text='[Click here to learn about FSTTC]',cursor='hand2', fg='blue')
-        lbl_git_fsttc.bind('<Button-1>', lambda e: webbrowser.open_new('https://github.com/sgoldenlab/simba/blob/master/docs/FSTTC.md'))
-
-        #fsttc settings
-        lbl_fsttc_settings = LabelFrame(fstoplvl,text='FSTTC Settings', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
-        cvar = IntVar()
-        cr8_graph = Checkbutton(lbl_fsttc_settings,text='Create graph',variable=cvar)
-        time_delta = Entry_Box(lbl_fsttc_settings,'Time Delta','10')
-        lbl_behavior = LabelFrame(lbl_fsttc_settings,text="Behaviors")
-        #behaviors
-        behaviorlist = [0]*notarget
-        for i in range(len(targetlist)):
-            behaviorlist[i] = Checkbutton(lbl_behavior,text=str(targetlist[i]),variable=varlist[i])
-            behaviorlist[i].grid(row=str(i),sticky=W)
-
-        ftsccbutton = Button(fstoplvl,text='Calculate FSTTC',command=lambda:self.runfsttc(time_delta.entry_get,cvar.get(),targetlist,varlist))
-
-        #organize
-        lbl_git_fsttc.grid(row=0,sticky=W,pady=5)
-        lbl_fsttc_settings.grid(row=1,sticky=W)
-        cr8_graph.grid(row=0,sticky=W)
-        time_delta.grid(row=1,sticky=W,pady=5)
-        lbl_behavior.grid(row=2,sticky=W,pady=5)
-
-        ftsccbutton.grid(row=3,pady=10)
-
-    def runfsttc(self,timedelta,creategraph,targetlist,varlist):
-        if creategraph == 1:
-            creategraph = True
-        else:
-            creategraph = False
-
-        target = []
-
-        for i in range(len(varlist)):
-            if varlist[i].get()==1:
-                target.append(targetlist[i])
-
-        # FSTCC_performer = FSTCC_perform(self.projectconfigini, timedelta, target, creategraph)
-        # FSTCC_performer.calculate_sequence_data()
-        # FSTCC_performer.calculate_FSTCC()
-        # FSTCC_performer.save_results()
-        # FSTCC_performer.plot_results()
-
-
-        FSTCC_performer = FSTTCPerformer(config_path=self.projectconfigini,
-                                         time_window=timedelta,
-                                         behavior_lst=target,
-                                         create_graphs=creategraph)
-        FSTCC_performer.find_sequences()
-        FSTCC_performer.calculate_FSTTC()
-        FSTCC_performer.save_FSTTC()
-        FSTCC_performer.plot_FSTTC()
-
-
-    def kleinbergMenu(self):
-        kleintoplvl = Toplevel()
-        kleintoplvl.minsize(400,320)
-        kleintoplvl.wm_title('Apply Kleinberg behavior classification smoothing')
-
-        #git
-        label_git_kleinberg = Label(kleintoplvl, text='[Click here to learn about Kleinberg Smoother]',cursor='hand2', fg='blue')
-        label_git_kleinberg.bind('<Button-1>', lambda e: webbrowser.open_new('https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md'))
-
-        #kleinberg settings
-        lbl_kleinberg_settings = LabelFrame(kleintoplvl,text='Kleinberg Settings', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
-        self.k_sigma = Entry_Box(lbl_kleinberg_settings,'Sigma','10')
-        self.k_sigma.entry_set('2')
-        self.k_gamma = Entry_Box(lbl_kleinberg_settings,'Gamma','10')
-        self.k_gamma.entry_set('0.3')
-        self.k_hierarchy = Entry_Box(lbl_kleinberg_settings,'Hierarchy','10')
-        self.k_hierarchy.entry_set('1')
-        self.h_search_lbl = Label(lbl_kleinberg_settings, text="Hierarchical search: ")
-        self.h_search_lbl_val = BooleanVar()
-        self.h_search_lbl_val.set(False)
-        self.h_search_lbl_val_cb = Checkbutton(lbl_kleinberg_settings, variable=self.h_search_lbl_val, command=None)
-
-
-
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        # get current no of target
-        notarget = config.getint('SML settings', 'no_targets')
-        targetlist = [0] * notarget
-        varlist = [0] * notarget
-        for i in range(notarget):
-            varlist[i] = IntVar()
-            targetlist[i] = (config.get('SML settings', 'target_name_' + str(i + 1)))
-
-        # make table for classifier to apply filter
-        tablelabel = LabelFrame(kleintoplvl, text='Choose classifier(s) to apply Kleinberg smoothing')
-        for i in range(notarget):
-            Checkbutton(tablelabel, text=str(targetlist[i]), variable=varlist[i]).grid(row=i, sticky=W)
-
-        run_kleinberg_button = Button(kleintoplvl, text='Apply Kleinberg Smoother', command=lambda: self.runkleinberg(targetlist, varlist, self.h_search_lbl_val.get()))
-
-        #organize
-        label_git_kleinberg.grid(row=0,sticky=W)
-        lbl_kleinberg_settings.grid(row=1,sticky=W,padx=10)
-        self.k_sigma.grid(row=0,sticky=W)
-        self.k_gamma.grid(row=1,sticky=W)
-        self.k_hierarchy.grid(row=2,sticky=W)
-        self.h_search_lbl.grid(row=3, column=0, sticky=W)
-        self.h_search_lbl_val_cb.grid(row=3, column=1, sticky=W)
-
-
-
-        tablelabel.grid(row=2,pady=10,padx=10)
-
-        run_kleinberg_button.grid(row=3)
-
-    def runkleinberg(self, targetlist, varlist, search_bool):
-        classifier_list =[]
-        for i in range(len(varlist)):
-            if varlist[i].get() == 1:
-                classifier_list.append(targetlist[i])
-
-        try:
-            print('Kleinberg hyperparameters, Sigma: {}, Gamma: {}, Hierarchy: {}'.format(str(self.k_sigma.entry_get), str(self.k_gamma.entry_get), str(self.k_hierarchy.entry_get)))
-        except:
-            print('Please insert accurate values for all hyperparameters.')
-
-        kleinberg_analyzer = KleinbergCalculator(config_path=self.projectconfigini,
-                                                 classifier_names=classifier_list,
-                                                 sigma=self.k_sigma.entry_get,
-                                                 gamma=self.k_gamma.entry_get,
-                                                 hierarchy=self.k_hierarchy.entry_get,
-                                                 hierarchical_search=search_bool)
-        kleinberg_analyzer.perform_kleinberg()
-
-
     def DLSsettings(self):
 
         config = ConfigParser()
@@ -3656,57 +3390,6 @@ class loadprojectini:
         time_bins_clf_analyzer = TimeBinsClf(config_path=self.projectconfigini, bin_length=time_bin, measurements=var_list)
         time_bins_clf_multiprocessor = multiprocessing.Process(target=time_bins_clf_analyzer.analyze_timebins_clf())
         time_bins_clf_multiprocessor.start()
-
-    def ROI_classifier(self):
-        ROI_clf_toplevel = Toplevel()
-        ROI_clf_toplevel.minsize(400, 100)
-        ROI_clf_toplevel.wm_title("Classifications by ROI settings")
-        ROI_menu = LabelFrame(ROI_clf_toplevel, text='Select_ROI(s)', padx=5, pady=5)
-        classifier_menu = LabelFrame(ROI_clf_toplevel, text='Select classifier(s)', padx=5, pady=5)
-        body_part_menu = LabelFrame(ROI_clf_toplevel, text='Select body part', padx=5, pady=5)
-        self.menu_items = clf_within_ROI(self.projectconfigini)
-        self.ROI_check_boxes_status_dict = {}
-        self.clf_check_boxes_status_dict = {}
-
-        for row_number, ROI in enumerate(self.menu_items.ROI_str_name_list):
-            self.ROI_check_boxes_status_dict[ROI] = IntVar()
-            ROI_check_button = Checkbutton(ROI_menu, text=ROI, variable=self.ROI_check_boxes_status_dict[ROI])
-            ROI_check_button.grid(row=row_number, sticky=W)
-
-        for row_number, clf_name in enumerate(self.menu_items.behavior_names):
-            self.clf_check_boxes_status_dict[clf_name] = IntVar()
-            clf_check_button = Checkbutton(classifier_menu, text=clf_name, variable=self.clf_check_boxes_status_dict[clf_name])
-            clf_check_button.grid(row=row_number, sticky=W)
-
-        self.choose_bp = DropDownMenu(body_part_menu, 'Body part', self.menu_items.body_part_list, '12')
-        self.choose_bp.setChoices(self.menu_items.body_part_list[0])
-        self.choose_bp.grid(row=0, sticky=W)
-        run_analysis_button = Button(ROI_clf_toplevel, text='Analyze classifications in each ROI', command=lambda: self.run_clf_by_ROI_analysis())
-        body_part_menu.grid(row=0, sticky=W, padx=10, pady=10)
-        ROI_menu.grid(row=1, sticky=W, padx=10, pady=10)
-        classifier_menu.grid(row=2, sticky=W, padx=10, pady=10)
-        run_analysis_button.grid(row=3, sticky=W, padx=10, pady=10)
-
-    def run_clf_by_ROI_analysis(self):
-        body_part_list = [self.choose_bp.getChoices()]
-        ROI_dict_lists, behavior_list = defaultdict(list), []
-        for loop_val, ROI_entry in enumerate(self.ROI_check_boxes_status_dict):
-            check_val = self.ROI_check_boxes_status_dict[ROI_entry]
-            if check_val.get() == 1:
-                shape_type = self.menu_items.ROI_str_name_list[loop_val].split(':')[0].replace(':', '')
-                shape_name = self.menu_items.ROI_str_name_list[loop_val].split(':')[1].replace(' ', '')
-                ROI_dict_lists[shape_type].append(shape_name)
-
-        for loop_val, clf_entry in enumerate(self.clf_check_boxes_status_dict):
-            check_val = self.clf_check_boxes_status_dict[clf_entry]
-            if check_val.get() == 1:
-                behavior_list.append(self.menu_items.behavior_names[loop_val])
-        if len(ROI_dict_lists) == 0: print('No ROIs selected.')
-        if len(behavior_list) == 0: print('No classifiers selected.')
-
-        else:
-            clf_within_ROI.perform_ROI_clf_analysis(self.menu_items, ROI_dict_lists, behavior_list, body_part_list)
-
 
     def importBoris(self):
         ann_folder = askdirectory()
@@ -4342,20 +4025,6 @@ class loadprojectini:
             movement_processor = MovementProcessor(config_path=configini)
             movement_processor.process_movement()
             movement_processor.save_results()
-        elif appendornot == 'locationheatmap':
-
-            check_int(name='Max scale', value=self.scalemaxsec.entry_get)
-            check_int(name='Bin size', value=self.binsizepixels.entry_get)
-            heatmapper_location_plotter = HeatmapperLocation(config_path=configini,
-                                                             bodypart=animalBp,
-                                                             bin_size=int(self.binsizepixels.entry_get),
-                                                             palette=self.pal_var.get(),
-                                                             max_scale=self.scalemaxsec.entry_get,
-                                                             final_img_setting=self.lastimgvar.get(),
-                                                             video_setting=self.videos_var.get(),
-                                                             frame_setting=self.frames_var.get())
-            heatmapper_location_plotter.create_heatmaps()
-            #plotHeatMapLocation(configini,animalBp,int(self.binsizepixels.entry_get),str(self.scalemaxsec.entry_get),self.pal_var.get(),self.lastimgvar.get())
 
         elif appendornot == 'direction':
             print('ROI settings saved.')
@@ -4781,9 +4450,9 @@ class loadprojectini:
         with open(configini, 'w') as configfile:
             config.write(configfile)
 
+        if self.MaxScale.entry_get != 'auto':
+            check_int(name='Max scale (s) (int or auto)', value=self.MaxScale.entry_get, min_value=1)
         check_int(name='Bin size (mm)', value=self.BinSize.entry_get)
-        check_int(name='Max scale (s)', value=self.MaxScale.entry_get)
-
         heat_mapper = HeatMapperClf(config_path=configini,
                       video_setting=self.heatmap_clf_videos_var.get(),
                       frame_setting=self.heatmap_clf_frames_var.get(),
@@ -6318,12 +5987,6 @@ def CreateToolTip(widget, text):
         toolTip.hidetip()
     widget.bind('<Enter>', enter)
     widget.bind('<Leave>', leave)
-
-def form_validator_is_numeric(inStr, acttyp):
-    if acttyp == '1':  #insert
-        if not inStr.isdigit():
-            return False
-    return True
 
 class aboutgui:
     def __init__(self):

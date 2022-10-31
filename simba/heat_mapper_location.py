@@ -28,7 +28,7 @@ class HeatmapperLocation(object):
         into 5 centimeter rectangular spatial bins.
     palette: str
         Heatmap pallette. Eg. 'jet', 'magma', 'inferno','plasma', 'viridis', 'gnuplot2'
-    max_scale: int
+    max_scale: int or 'auto'
         The max value in the heatmap in seconds. E.g., with a value of `10`, if the classified behavior has occured
         >= 10 within a rectangular bins, it will be filled with the same color.
     final_img_setting: bool
@@ -97,7 +97,6 @@ class HeatmapperLocation(object):
                     final_img[row, col] += loc_array[frm, row, col]
         return final_img
 
-
     def __create_img(self):
         fig = plt.figure()
         im_ratio = self.color_array.shape[0] / self.color_array.shape[1]
@@ -164,9 +163,12 @@ class HeatmapperLocation(object):
                 for h_bin_name, v_dict in self.bin_dict.items():
                     for v_bin_name, c in v_dict.items():
                         if (frame[1] < c['bottom_right_x'] and frame[1] > c['top_left_x']):
-                            if (frame[2] < c['bottom_right_y'] and frame[2] < c['top_left_y']):
+                            if (frame[2] < c['bottom_right_y'] and frame[2] > c['top_left_y']):
                                 self.loc_array[int(frame[0])][v_bin_name][h_bin_name] = 1
             cum_array = np.zeros((self.loc_array.shape[1], self.loc_array.shape[2]))
+            if self.max_scale == 'auto':
+                self.max_scale = int(np.max(np.sum(self.loc_array,axis=0)) / self.fps)
+                if self.max_scale == 0: self.max_scale = 1
 
             if self.final_img_setting:
                 cum_array = self.__calculate_cum_array_final_img(loc_array=self.loc_array)
@@ -206,17 +208,18 @@ class HeatmapperLocation(object):
             if self.video_setting:
                 self.writer.release()
             print('Heatmap plot for video {} saved...'.format(self.video_name))
+        print('SIMBA COMPLETE: Created heatmaps for {} videos'.format(str(len(self.files_found))))
 
-
-
+#
+#
 # test = HeatmapperLocation(config_path='/Users/simon/Desktop/troubleshooting/Open_field_5/project_folder/project_config.ini',
 #                           bodypart='Nose',
-#                           bin_size=10,
+#                           bin_size=50,
 #                           palette='jet',
-#                           max_scale=3,
-#                           final_img_setting=False,
+#                           max_scale=1,
+#                           final_img_setting=True,
 #                           video_setting=False,
-#                           frame_setting=True)
+#                           frame_setting=False)
 # test.create_heatmaps()
 
 
@@ -224,8 +227,8 @@ class HeatmapperLocation(object):
 #                           bodypart='Nose_1',
 #                           bin_size=50,
 #                           palette='jet',
-#                           max_scale=3,
+#                           max_scale='auto',
 #                           final_img_setting=True,
-#                           video_setting=True,
+#                           video_setting=False,
 #                           frame_setting=False)
 # test.create_heatmaps()

@@ -1,15 +1,15 @@
 __author__ = "Simon Nilsson", "JJ Choong"
 
 import glob, os
-import pandas as pd
-from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError, NoOptionError
-from simba.rw_dfs import *
-from pathlib import Path
+from simba.rw_dfs import read_df
 import numpy as np
 from shapely import geometry
 from shapely.geometry import Point
 from simba.features_scripts.unit_tests import *
 from datetime import datetime
+from simba.read_config_unit_tests import read_config_file, read_config_entry
+from simba.features_scripts.unit_tests import read_video_info_csv, read_video_info
+
 
 class clf_within_ROI(object):
     """
@@ -33,20 +33,18 @@ class clf_within_ROI(object):
     def __init__(self,
                  config_ini: str):
 
-        self.config = ConfigParser()
-        self.config.read(config_ini)
-        self.projectPath = self.config.get('General settings', 'project_path')
-        model_nos = self.config.getint('SML settings', 'No_targets')
+        self.config = read_config_file(ini_path=config_ini)
+        self.projectPath = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        model_nos = read_config_entry(config=self.config, section='SML settings', option='No_targets', data_type='int')
         self.logFolderPath = os.path.join(self.projectPath, 'logs')
-        video_info_path = os.path.join(self.logFolderPath, 'video_info.csv')
-        self.video_info_df = pd.read_csv(video_info_path)
-        self.video_info_df["Video"] = self.video_info_df["Video"].astype(str)
+        self.video_info_df = read_video_info_csv(os.path.join(self.logFolderPath, 'video_info.csv'))
         self.body_parts_path = os.path.join(os.path.join(self.logFolderPath, 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv'))
         body_parts_df = pd.read_csv(self.body_parts_path, names=['bodyparts'])
         self.body_part_list = list(body_parts_df['bodyparts'])
         self.ROIcoordinatesPath = os.path.join(self.logFolderPath, 'measures', 'ROI_definitions.h5')
         if not os.path.isfile(self.ROIcoordinatesPath):
             print('No ROI coordinates found. Please use the [ROI] tab to define ROIs')
+            raise FileNotFoundError()
         self.rectanglesInfo = pd.read_hdf(self.ROIcoordinatesPath, key='rectangles')
         self.circleInfo = pd.read_hdf(self.ROIcoordinatesPath, key='circleDf')
         self.polygonInfo = pd.read_hdf(self.ROIcoordinatesPath, key='polygons')
@@ -78,11 +76,11 @@ class clf_within_ROI(object):
         """
 
         machine_results_path = os.path.join(self.projectPath, 'csv', 'machine_results')
-        try:
-            wfileType = self.config.get('General settings', 'workflow_file_type')
-        except NoOptionError:
-            wfileType = 'csv'
+        wfileType = read_config_entry(config=self.config, section='General settings', option='workflow_file_type', data_type='str')
         files_found = glob.glob(machine_results_path + '/*.' + wfileType)
+        if len(files_found) == 0:
+            print('SIMBA ERROR: No machine learning results found in the project_folder/csv/machine_results directory. Create machine classifications before analyzing classifications by ROI')
+            raise ValueError()
         print('Analyzing ' + str(len(files_found)) + ' files...')
         body_part_col_names = []
         body_part_col_names_x, body_part_col_names_y = [], []

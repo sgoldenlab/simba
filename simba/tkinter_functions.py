@@ -1,23 +1,158 @@
 __author__ = "Simon Nilsson", "JJ Choong"
 
 import subprocess
-import numpy as np
-import os
-import cv2
 from os import listdir
 from os.path import isfile, join
-import yaml
-from PIL import Image
-import glob
 import pathlib
-import csv
-import shutil
-from datetime import datetime
-import glob
-import pandas as pd
 from simba.extract_frames_fast import *
-from simba.drop_bp_cords import get_fn_ext
-from simba.features_scripts.unit_tests import read_video_info_csv
+from tkinter import *
+import platform
+from tkinter.filedialog import askopenfilename,askdirectory
+
+def onMousewheel(event, canvas):
+    try:
+        scrollSpeed = event.delta
+        if platform.system() == 'Darwin':
+            scrollSpeed = event.delta
+        elif platform.system() == 'Windows':
+            scrollSpeed = int(event.delta / 120)
+        canvas.yview_scroll(-1 * (scrollSpeed), "units")
+    except:
+        pass
+
+def bindToMousewheel(event, canvas):
+    canvas.bind_all("<MouseWheel>", lambda event: onMousewheel(event, canvas))
+
+def unbindToMousewheel(event, canvas):
+    canvas.unbind_all("<MouseWheel>")
+
+def onFrameConfigure(canvas):
+    '''Reset the scroll region to encompass the inner frame'''
+    canvas.configure(scrollregion=canvas.bbox("all"))
+
+def hxtScrollbar(master):
+        '''
+        Create canvas.
+        Create a frame and put it in the canvas.
+        Create two scrollbar and insert command of canvas x and y view
+        Use canvas to create a window, where window = frame
+        Bind the frame to the canvas
+        '''
+        bg = master.cget("background")
+        acanvas = Canvas(master, borderwidth=0, background=bg)
+        frame = Frame(acanvas, background=bg)
+        vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
+        vsb2 = Scrollbar(master, orient='horizontal', command=acanvas.xview)
+        acanvas.configure(yscrollcommand=vsb.set)
+        acanvas.configure(xscrollcommand=vsb2.set)
+        vsb.pack(side="right", fill="y")
+        vsb2.pack(side="bottom", fill="x")
+        acanvas.pack(side="left", fill="both", expand=True)
+
+        acanvas.create_window((10, 10), window=frame, anchor="nw")
+
+        # bind the frame to the canvas
+        acanvas.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
+        acanvas.bind('<Enter>', lambda event: bindToMousewheel(event, acanvas))
+        acanvas.bind('<Leave>', lambda event: unbindToMousewheel(event,acanvas))
+        return frame
+
+
+def form_validator_is_numeric(inStr, acttyp):
+    if acttyp == '1':  #insert
+        if not inStr.isdigit():
+            return False
+    return True
+
+class DropDownMenu(Frame):
+    def __init__(self,parent=None,dropdownLabel='',choice_dict=None,labelwidth='',com=None,**kw):
+        Frame.__init__(self,master=parent,**kw)
+        self.dropdownvar = StringVar()
+        self.lblName = Label(self,text=dropdownLabel,width=labelwidth,anchor=W)
+        self.lblName.grid(row=0,column=0)
+        self.choices = choice_dict
+        self.popupMenu = OptionMenu(self,self.dropdownvar,*self.choices,command=com)
+        self.popupMenu.grid(row=0,column=1)
+    def getChoices(self):
+        return self.dropdownvar.get()
+    def setChoices(self,choice):
+        self.dropdownvar.set(choice)
+
+class FileSelect(Frame):
+    def __init__(self,parent=None,fileDescription="",color=None,title=None,lblwidth=None,**kw):
+        self.title=title
+        self.color = color if color is not None else 'black'
+        self.lblwidth = lblwidth if lblwidth is not None else 0
+        self.parent=parent
+        Frame.__init__(self,master=parent,**kw)
+        self.filePath = StringVar()
+        self.lblName = Label(self, text=fileDescription,fg=str(self.color),width=str(self.lblwidth),anchor=W)
+        self.lblName.grid(row=0,column=0,sticky=W)
+        self.entPath = Label(self, textvariable=self.filePath,relief=SUNKEN)
+        self.entPath.grid(row=0,column=1)
+        self.btnFind = Button(self, text="Browse File",command=self.setFilePath)
+        self.btnFind.grid(row=0,column=2)
+        self.filePath.set('No file selected')
+    def setFilePath(self):
+        file_selected = askopenfilename(title=self.title,parent=self.parent)
+        if file_selected:
+            self.filePath.set(file_selected)
+        else:
+            self.filePath.set('No file selected')
+    @property
+    def file_path(self):
+        return self.filePath.get()
+
+class Entry_Box(Frame):
+    def __init__(self, parent=None, fileDescription="", labelwidth='',status=None, validation=None, **kw):
+        super(Entry_Box, self).__init__(master=parent)
+        self.validation_methods = {
+            'numeric': (self.register(form_validator_is_numeric), '%P', '%d'),
+        }
+        self.status = status if status is not None else NORMAL
+        self.labelname = fileDescription
+        Frame.__init__(self,master=parent,**kw)
+        self.filePath = StringVar()
+        self.lblName = Label(self, text=fileDescription,width=labelwidth,anchor=W)
+        self.lblName.grid(row=0,column=0)
+        self.entPath = Entry(self, textvariable=self.filePath, state=self.status,
+                             validate='key',
+                             validatecommand=self.validation_methods.get(validation, None))
+        self.entPath.grid(row=0,column=1)
+
+    @property
+    def entry_get(self):
+        self.entPath.get()
+        return self.entPath.get()
+
+    def entry_set(self, val):
+        self.filePath.set(val)
+
+    def set_state(self,setstatus):
+        self.entPath.config(state=setstatus)
+
+    def destroy(self):
+        self.lblName.destroy()
+        self.entPath.destroy()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # def colorized(filename):
 #

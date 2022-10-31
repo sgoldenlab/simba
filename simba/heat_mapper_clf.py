@@ -36,7 +36,7 @@ class HeatMapperClf(object):
         The name of the body-part used to infer the location of the classified behavior
     clf_name: str
         The name of the classified behavior
-    max_scale: int
+    max_scale: int or 'auto'
         The max value in the heatmap in seconds. E.g., with a value of `10`, if the classified behavior has occured
         >= 10 within a rectangular bins, it will be filled with the same color.
 
@@ -130,10 +130,14 @@ class HeatMapperClf(object):
             for clf_frame in self.clf_idx:
                 for h_bin_name, v_dict in self.bin_dict.items():
                     for v_bin_name, c in v_dict.items():
-                        if (clf_frame[1] < c['bottom_right_x'] and clf_frame[1] > c['top_left_x']):
-                            if (clf_frame[2] < c['bottom_right_y'] and clf_frame[2] < c['top_left_y']):
+                        if (clf_frame[1] <= c['bottom_right_x'] and clf_frame[1] >= c['top_left_x']):
+                            if (clf_frame[2] <= c['bottom_right_y'] and clf_frame[2] >= c['top_left_y']):
                                 self.clf_array[int(clf_frame[0])][v_bin_name][h_bin_name] = 1
             cum_array = np.zeros((self.clf_array.shape[1], self.clf_array.shape[2]))
+            if self.max_scale == 'auto':
+                self.max_scale = int(np.max(np.sum(self.clf_array,axis=0)) / self.fps)
+                if self.max_scale == 0: self.max_scale = 0
+
             if (self.frame_setting) or (self.video_setting):
                 for frm_cnt, cumulative_frm in enumerate(range(self.clf_array.shape[0])):
                     current_frm = self.clf_array[cumulative_frm,:,:]
@@ -141,8 +145,6 @@ class HeatMapperClf(object):
                     cum_array_s = cum_array / self.fps
                     cum_df = pd.DataFrame(cum_array_s).reset_index()
                     cum_df = cum_df.melt(id_vars='index', value_vars=None, var_name=None, value_name='seconds', col_level=None).rename(columns={'index':'vertical_idx', 'variable': 'horizontal_idx'})
-
-
                     cum_df['color'] = (cum_df['seconds'].astype(float) / float(self.max_scale)).round(2).clip(upper=100)
                     color_array = np.zeros((len(cum_df['vertical_idx'].unique()), len(cum_df['horizontal_idx'].unique())))
                     for i in range(color_array.shape[0]):
@@ -190,10 +192,10 @@ class HeatMapperClf(object):
 #                  final_img_setting=False,
 #                  video_setting=True,
 #                  frame_setting=False,
-#                  bin_size=50,
+#                  bin_size=100,
 #                  palette='jet',
 #                  bodypart='Nose_1',
 #                  clf_name='Attack',
-#                  max_scale=2)
+#                  max_scale='auto')
 # test.create_heatmaps()
 

@@ -15,13 +15,13 @@ from simba.features_scripts.extract_features_9bp import extract_features_wotarge
 from simba.features_scripts.feature_extractor_8bp import ExtractFeaturesFrom8bps
 from simba.features_scripts.feature_extractor_7bp import ExtractFeaturesFrom7bps
 from simba.features_scripts.feature_extractor_4bp import ExtractFeaturesFrom4bps
-from simba.features_scripts.extract_features_user_defined_new import UserDefinedFeatureExtractor
+from simba.features_scripts.feature_extractor_user_defined import UserDefinedFeatureExtractor
 from simba.train_model_functions import get_all_clf_names
 from _legacy.test import check_that_two_dfs_are_equal_len
 
 class Reverse2AnimalTracking(object):
     def __init__(self,
-                 config_path: str=None):
+                 config_path: str):
 
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
         self.config, self.config_path = read_config_file(config_path), config_path
@@ -40,7 +40,7 @@ class Reverse2AnimalTracking(object):
         self.animal_cnt = read_config_entry(self.config, 'General settings', 'animal_no', 'int')
         self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.animal_cnt)
         self.x_cols, self.y_cols, self.p_cols = getBpNames(config_path)
-        self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, self.multi_animal_id_lst, self.animal_cnt, self.x_cols, self.y_cols, [], [])
+        self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, list(self.multi_animal_id_lst), self.animal_cnt, list(self.x_cols), list(self.y_cols), [], [])
         self.pose_estimation_setting = read_config_entry(self.config, 'create ensemble settings', 'pose_estimation_body_parts', 'str')
 
         self.files_found = glob.glob(self.in_dir + '/*.' + self.file_type)
@@ -95,24 +95,6 @@ class Reverse2AnimalTracking(object):
                 check_that_two_dfs_are_equal_len(df_1=data_df[clf_name], df_2=target_df[clf_name], file_path_1=file_path, file_path_2=target_df_path, col_name=clf_name)
                 data_df[clf_name] = target_df[clf_name]
             shutil.move(file_path, os.path.join(self.store_path_targets, os.path.basename(file_path)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 test = Reverse2AnimalTracking(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini')
 test.reverse_tracking()
