@@ -61,14 +61,25 @@ class TrainSingleModel(object):
         self.model_cnt = read_config_entry(self.config, 'SML settings', 'No_targets', data_type='int')
         self.algo = read_config_entry(self.config, 'create ensemble settings', 'model_to_run', data_type='str')
         self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.under_sample_setting = read_config_entry(self.config, 'create ensemble settings', 'under_sample_setting', data_type='str')
-        self.over_sample_setting = read_config_entry(self.config, 'create ensemble settings', 'over_sample_setting', data_type='str')
+        self.under_sample_setting = read_config_entry(self.config, 'create ensemble settings', 'under_sample_setting', data_type='str').lower().strip()
+        self.over_sample_setting = read_config_entry(self.config, 'create ensemble settings', 'over_sample_setting', data_type='str').lower().strip()
+        if self.under_sample_setting == 'random undersample':
+            self.under_sample_ratio = read_config_entry(self.config, 'create ensemble settings', 'under_sample_ratio', data_type='float', default_value='NaN')
+            check_float(name='under_sample_ratio', value=self.under_sample_ratio)
+        else:
+            self.under_sample_ratio = 'NaN'
+        if (self.over_sample_setting == 'smoteenn') or (self.over_sample_setting == 'smote'):
+            self.over_sample_ratio = read_config_entry(self.config, 'create ensemble settings', 'over_sample_ratio', data_type='float', default_value='NaN')
+            check_float(name='over_sample_ratio', value=self.over_sample_ratio)
+        else:
+            self.over_sample_ratio = 'NaN'
+
         self.annotation_file_paths = glob.glob(self.data_in_path + '/*.' + self.file_type)
         print('Reading in {} annotated files...'.format(str(len(self.annotation_file_paths))))
         self.data_df = read_all_files_in_folder(self.annotation_file_paths, self.file_type, [self.clf_name])
         self.data_df_wo_cords = drop_bp_cords(self.data_df, config_path)
         annotation_cols_to_remove = read_in_all_model_names_to_remove(self.config, self.model_cnt, self.clf_name)
-        self.x_y_df = delete_other_annotation_columns(self.data_df_wo_cords, annotation_cols_to_remove)
+        self.x_y_df = delete_other_annotation_columns(self.data_df_wo_cords, list(annotation_cols_to_remove))
         self.class_names = ['Not_' + self.clf_name, self.clf_name]
         self.x_df, self.y_df = split_df_to_x_y(self.x_y_df, self.clf_name)
         self.feature_names = self.x_df.columns
@@ -93,12 +104,13 @@ class TrainSingleModel(object):
         """
 
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_df, self.y_df,test_size=self.tt_size)
+        print(self.over_sample_setting)
         if self.under_sample_setting.lower() == 'random undersample':
-            self.x_train, self.y_train = random_undersampler(self.x_train, self.y_train, self.under_sample_ratio)
-        if self.over_sample_setting == 'SMOTEENN':
-            self.x_train, self.y_train = smoteen_oversampler(self.x_train, self.y_train, self.over_sample_ratio)
-        elif self.over_sample_setting == 'SMOTE':
-            self.x_train, self.y_train = smote_oversampler(self.x_train, self.y_train, self.over_sample_ratio)
+            self.x_train, self.y_train = random_undersampler(self.x_train, self.y_train, float(self.under_sample_ratio))
+        if self.over_sample_setting == 'smoteenn':
+            self.x_train, self.y_train = smoteen_oversampler(self.x_train, self.y_train, float(self.over_sample_ratio))
+        elif self.over_sample_setting == 'smote':
+            self.x_train, self.y_train = smote_oversampler(self.x_train, self.y_train, float(self.over_sample_ratio))
 
     def train_model(self):
         """
@@ -145,18 +157,6 @@ class TrainSingleModel(object):
                 shap_target_absent_cnt = read_config_entry(self.config, 'create ensemble settings', 'shap_target_absent_no', data_type='int', default_value=0)
                 check_int(name='shap_target_present_cnt', value=shap_target_present_cnt)
                 check_int(name='shap_target_absent_cnt', value=shap_target_absent_cnt)
-
-            if self.under_sample_setting.lower() == 'random undersample':
-                self.under_sample_ratio = read_config_entry(self.config, 'create ensemble settings', 'under_sample_ratio', data_type='float', default_value='NaN')
-                check_float(name='under_sample_ratio', value=self.under_sample_ratio)
-            else:
-                self.under_sample_ratio = 'NaN'
-            if (self.over_sample_setting.lower() == 'smoteenn') or (self.over_sample_setting.lower() == 'smote'):
-                self.over_sample_ratio = read_config_entry(self.config, 'create ensemble settings', 'over_sample_ratio',data_type='str', default_value='NaN')
-                check_float(name='over_sample_ratio', value=self.over_sample_ratio)
-            else:
-                self.over_sample_ratio = 'NaN'
-
 
             self.rf_clf = RandomForestClassifier(n_estimators=n_estimators, max_features=max_features, n_jobs=-1, criterion=criterion, min_samples_leaf=min_sample_leaf, bootstrap=True, verbose=1)
             try:
@@ -207,7 +207,7 @@ class TrainSingleModel(object):
         print('Classifier ' + self.clf_name + ' saved @ ' + str('models/generated_models ') + 'folder')
         print('Evaluation files are in models/generated_models/model_evaluations folders')
 
-# test = TrainSingleModel(config_path='/Users/simon/Desktop/train_model_project/project_folder/project_config.ini')
+# test = TrainSingleModel(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini')
 # test.perform_sampling()
 # test.train_model()
 # test.save_model()
