@@ -78,7 +78,7 @@ class FFMPEGCommandCreator(object):
             print('Down-sampling {}...'.format(video))
             in_path, out_path = video_data['path'], os.path.join(self.process_dir, os.path.basename(video_data['path']))
             width, height = str(video_data['settings']['width']), str(video_data['settings']['height'])
-            command = 'ffmpeg -i {} -vf scale={}:{} {} -hide_banner -loglevel error'.format(in_path, width, height, out_path)
+            command = 'ffmpeg -i "{}" -vf scale={}:{} "{}" -hide_banner -loglevel error'.format(in_path, width, height, out_path)
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print('Downsampling complete...')
@@ -92,7 +92,7 @@ class FFMPEGCommandCreator(object):
             start_time, end_time = str(video_data['settings']['start']).replace(' ', ''), str(video_data['settings']['stop']).replace(' ', '')
             start_time_shift, end_time = datetime.datetime.strptime(start_time, self.time_format), datetime.datetime.strptime(end_time, self.time_format)
             time_difference = str(end_time - start_time_shift)
-            command = 'ffmpeg -i {} -ss {} -t {} -async 1 -qscale 0 -c:a copy {} -hide_banner -loglevel error'.format(in_path, start_time, time_difference, out_path)
+            command = 'ffmpeg -i "{}" -ss {} -t {} -async 1 -qscale 0 -c:a copy "{}" -hide_banner -loglevel error'.format(in_path, start_time, time_difference, out_path)
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print('Clipping complete...')
@@ -104,7 +104,7 @@ class FFMPEGCommandCreator(object):
             print('Changing FPS {}...'.format(video))
             in_path, out_path = video_data['path'], os.path.join(self.process_dir, os.path.basename(video_data['path']))
             fps = str(video_data['settings']['fps'])
-            command = 'ffmpeg -i {} -filter:v fps=fps={} {} -hide_banner -loglevel error'.format(in_path, fps, out_path)
+            command = 'ffmpeg -i "{}" -filter:v fps=fps={} "{}" -hide_banner -loglevel error'.format(in_path, fps, out_path)
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print('FPS conversion complete...')
@@ -116,7 +116,7 @@ class FFMPEGCommandCreator(object):
         for video, video_data in self.videos_to_greyscale.items():
             print('Applying grayscale {}...'.format(video))
             in_path, out_path = video_data['path'], os.path.join(self.process_dir, os.path.basename(video_data['path']))
-            command = 'ffmpeg -i {} -vf hue=s=0 {} -hide_banner -loglevel error'.format(in_path, out_path)
+            command = 'ffmpeg -i "{}" -vf hue=s=0 "{}" -hide_banner -loglevel error'.format(in_path, out_path)
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print('Grayscale complete...')
@@ -124,15 +124,18 @@ class FFMPEGCommandCreator(object):
     def apply_frame_count(self):
         self.videos_to_frm_cnt = self.find_relevant_videos(variable='frame_cnt')
         self.create_process_dir()
-        simba_cw = os.path.dirname(simba.__file__)
-        #simba_font_path = os.path.join(simba_cw, 'assets', 'UbuntuMono-Regular.ttf')
-        simba_font_path = pathlib.Path(simba_cw, 'assets', 'UbuntuMono-Regular.ttf')
         for video, video_data in self.videos_to_frm_cnt.items():
             print('Applying frame count print {}...'.format(video))
             in_path, out_path = video_data['path'], os.path.join(self.process_dir, os.path.basename(video_data['path']))
-            #command = 'ffmpeg -i ' + in_path + ' -vf "drawtext=: ' + "text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" + '" ' + "-c:a copy " + out_path + ' -hide_banner -loglevel error'
-            command = 'ffmpeg -i ' + in_path + ' -vf "drawtext=fontfile={}:'.format(simba_font_path) + "text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" + '" ' + "-c:a copy " + out_path + ' -hide_banner -loglevel error'
-            subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+            try:
+                command = 'ffmpeg -i ' + '"' + in_path + '"' + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy ' + '"' + out_path + '"'
+                subprocess.check_output(command, shell=True)
+                subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+            except:
+                simba_cw = os.path.dirname(simba.__file__)
+                simba_font_path = pathlib.Path(simba_cw, 'assets', 'UbuntuMono-Regular.ttf')
+                command = 'ffmpeg -i "' + in_path + '" -vf "drawtext=fontfile={}:'.format(simba_font_path) + "text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" + '" ' + '-c:a copy "' + out_path + '" -hide_banner -loglevel error'
+                subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print('Applying frame count complete...')
 
@@ -169,7 +172,7 @@ class FFMPEGCommandCreator(object):
             crop_settings = self.video_dict['video_data'][video]['crop_settings']
             width, height = str(crop_settings['width']), str(crop_settings['height'])
             top_left_x, top_left_y = str(crop_settings['top_left_x']), str(crop_settings['top_left_y'])
-            command = 'ffmpeg -i {} -vf "crop={}:{}:{}:{}" -c:v libx264 -crf 0 -c:a copy {} -hide_banner -loglevel error'.format(in_path, width, height, top_left_x, top_left_y, out_path)
+            command = 'ffmpeg -i "{}" -vf "crop={}:{}:{}:{}" -c:v libx264 -crf 0 -c:a copy "{}" -hide_banner -loglevel error'.format(in_path, width, height, top_left_x, top_left_y, out_path)
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print('Applying crop complete...')
