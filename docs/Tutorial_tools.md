@@ -389,6 +389,20 @@ Use this tool to visualize the pose-estimation of all the files inside a SimBA p
 </p>
 
 
+### Concatenate videos
+Use this tool to concatenate two videos into a single video. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/concat_1.png" />
+</p>
+
+1. In the `First video path`, click on `Browse` and select the first video. 
+2. In the `Second video path`, click on `Browse` and select the second video. 
+3. In the `Resolution` drop-down menu, select the resolution of the output video.
+> Note 1: Select `Video 1` in the `Resolution` drop-down menu to use the resolution of Video 1 as the resolution of the output video.
+> Note 2: Select `Video 2` in the `Resolution` drop-down menu to use the resolution of Video 2 as the resolution of the output video.
+4. To vertically concatenate the videos, click the `Vertical concatenation` radio-button. To horizontally concatenate the videos, click the `Horizontal concatenation` radio-button. The resolution choosen in Step 3 refers to the height or width depending on which type of concatenation (vertical vs horizontal). 
+
 ### Print mode info
 Use this tool to get the model information (e.g., number of features, number of trees used to create a model) from a model `.sav` file in SimBA. 
 
