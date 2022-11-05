@@ -27,6 +27,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Re-order pose-estimation tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 - [Remove body-parts from tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 - [Visualize pose estimation in folder](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#visualize-pose-estimation-in-folder)
+- [Concatenate videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#concatenate-videos)
 
 ## Shorten Videos
 This is a tool used to trim video lengths. The tool contains two different methods: 
@@ -401,7 +402,8 @@ Use this tool to concatenate two videos into a single video.
 3. In the `Resolution` drop-down menu, select the resolution of the output video.
 > Note 1: Select `Video 1` in the `Resolution` drop-down menu to use the resolution of Video 1 as the resolution of the output video.
 > Note 2: Select `Video 2` in the `Resolution` drop-down menu to use the resolution of Video 2 as the resolution of the output video.
-4. To vertically concatenate the videos, click the `Vertical concatenation` radio-button. To horizontally concatenate the videos, click the `Horizontal concatenation` radio-button. The resolution choosen in Step 3 refers to the height or width depending on which type of concatenation (vertical vs horizontal). 
+4. To vertically concatenate the videos, click the `Vertical concatenation` radio-button. To horizontally concatenate the videos, click the `Horizontal concatenation` radio-button. The resolution choosen in Step 3 refers to the height or width depending on which type of concatenation (vertical vs horizontal).
+5. Click `Run` to perform the concatenation. The file-path of the output video will be printed in the main SimBA terminal window (the file will be located in the same directory as the `First video path` with the `_concat.mp4` suffix. 
 
 ### Print mode info
 Use this tool to get the model information (e.g., number of features, number of trees used to create a model) from a model `.sav` file in SimBA. 
