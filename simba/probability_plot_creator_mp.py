@@ -187,7 +187,7 @@ class TresholdPlotCreator(object):
                     for file in files:
                         f.write("file '" + str(pathlib.Path(file)) + "'\n")
                 if os.path.exists(self.save_video_path): os.remove(self.save_video_path)
-                returned = os.system('ffmpeg -f concat -safe 0 -i {} {} -hide_banner -loglevel error'.format(temp_txt_path, self.save_video_path))
+                returned = os.system('ffmpeg -f concat -safe 0 -i "{}" "{}" -hide_banner -loglevel error'.format(temp_txt_path, self.save_video_path))
                 while True:
                     if returned != 0:
                         pass

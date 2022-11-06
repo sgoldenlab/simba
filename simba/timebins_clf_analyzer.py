@@ -27,6 +27,8 @@ class TimeBinsClf(object):
         Aggregate statistic measures to calculate for each time bin. OPTIONS: ['First occurance (s)', 'Event count',
         Total event duration (s)', 'Mean event duration (s)', 'Median event duration (s)', 'Mean event interval (s)',
         'Median event interval (s)']
+    classifiers: list
+        Names of classifiers to calculate aggregate statistics in time-bins for. EXAMPLE: ['Attack', 'Sniffing']
 
     Example
     ----------
@@ -39,14 +41,15 @@ class TimeBinsClf(object):
     def __init__(self,
                  config_path: str,
                  bin_length: int,
-                 measurements: list):
+                 measurements: list,
+                 classifiers: list):
 
         if len(measurements) == 0:
             print('SIMBA ERROR: Please select at least ONE aggregate statistic measurement.')
             raise ValueError('SIMBA ERROR: Please select at least ONE aggregate statistic measurement.')
         check_int(name='Bin length', value=bin_length)
         self.bin_length, self.measurements = int(bin_length), measurements
-        self.config = read_config_file(config_path)
+        self.classifiers, self.config = classifiers, read_config_file(config_path)
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
         self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
         self.data_in_dir = os.path.join(self.project_path, 'csv', 'machine_results')
@@ -80,7 +83,7 @@ class TimeBinsClf(object):
             video_dict[file_name] = {}
             for bin_cnt, df in enumerate(data_df_lst):
                 video_dict[file_name][bin_cnt] = {}
-                bouts_df = detect_bouts(data_df=df, target_lst=self.clf_names, fps=fps)
+                bouts_df = detect_bouts(data_df=df, target_lst=list(self.clf_names), fps=fps)
                 bouts_df['Shifted start'] = bouts_df['Start_time'].shift(-1)
                 bouts_df['Interval duration'] = bouts_df['Shifted start'] - bouts_df['End Time']
                 for clf in self.clf_names:
@@ -114,6 +117,7 @@ class TimeBinsClf(object):
                 self.out_df_lst.append(data_df)
         out_df = pd.concat(self.out_df_lst, axis=0).sort_values(by=['Video', 'Time bin #']).set_index('Video')
         out_df = out_df[out_df['Measurement'].isin(self.measurements)]
+        out_df = out_df[out_df['Classifier'].isin(self.classifiers)]
         save_path = os.path.join(self.project_path, 'logs', 'Time_bins_ML_results_' + self.datetime + '.csv')
         out_df.to_csv(save_path)
         print('SIMBA COMPLETE: Classification time-bins results saved at project_folder/logs/output/{}'.format(str('Time_bins_ML_results_' + self.datetime + '.csv')))

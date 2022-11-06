@@ -3,28 +3,16 @@ __author__ = "Simon Nilsson", "JJ Choong"
 import warnings
 warnings.filterwarnings('ignore',category=FutureWarning)
 warnings.filterwarnings('ignore',category=DeprecationWarning)
-from collections import defaultdict
 import seaborn as sns
-import os
-import time
 from simba.merge_videos import FrameMergerer
-import subprocess
-import itertools
 import csv
-import sys
 from tkinter import *
 from tkinter.filedialog import askopenfilename,askdirectory
 from tkinter import tix, messagebox
-import subprocess
-import platform
-import shutil
-from tabulate import tabulate
-from configparser import ConfigParser, NoSectionError, NoOptionError, MissingSectionHeaderError
 from PIL import ImageTk
 import PIL.Image
 import tkinter.ttk as ttk
 import webbrowser
-import cv2
 from simba.plotly_create_h5 import *
 from simba.tkinter_functions import hxtScrollbar, DropDownMenu, Entry_Box, FileSelect, form_validator_is_numeric
 from simba.project_config_creator import ProjectConfigCreator
@@ -33,23 +21,18 @@ from simba.probability_graph_interactive import InteractiveProbabilityGrapher
 from simba.Validate_model_one_video_run_clf import ValidateModelRunClf
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
 from simba.path_plotter import PathPlotter
-#from simba.gannt_creator import GanntCreator
 from simba.gantt_creator_mp import GanttCreator
 from simba.data_plotter import DataPlotter
 from simba.distance_plotter import DistancePlotter
 from simba.import_videos_csv_project_ini import *
 from simba.get_coordinates_tools_v2 import get_coordinates_nilsson
-from simba.create_clf_log import ClfLogCreator
 from simba.process_severity import analyze_process_severity
-from simba.extract_seqframes import *
 from simba.clf_validator import ClassifierValidationClips
-from simba.multi_cropper import MultiCropper
 from simba.validate_model_on_single_video import ValidateModelOneVideo
 from simba.ROI_reset import *
 from simba.ROI_feature_analyzer import ROIFeatureCreator
 from simba.ROI_movement_analyzer import ROIMovementAnalyzer
 from simba.ROI_feature_visualizer import ROIfeatureVisualizer
-from simba.movement_processor import MovementProcessor
 from simba.heat_mapper_clf import HeatMapperClf
 from simba.outlier_scripts.outlier_corrector_movement import OutlierCorrecterMovement
 from simba.outlier_scripts.outlier_corrector_location import OutlierCorrecterLocation
@@ -68,20 +51,13 @@ from simba.user_pose_config_creator import PoseConfigCreator
 from simba.pose_reset import PoseResetter
 #from simba.probability_plot_creator import TresholdPlotCreator
 from simba.probability_plot_creator_mp import TresholdPlotCreator
-from simba.heat_mapper_location import HeatmapperLocation
 from simba.appendMars import append_dot_ANNOTT
 from simba.dlc_multi_animal_importer import MADLC_Importer
-from simba.timebins_movement_analyzer import TimeBinsMovementAnalyzer
-from simba.timebins_clf_analyzer import TimeBinsClf
-from simba.ez_lineplot import draw_line_plot,draw_line_plot_tools
 from simba.BORIS_appender import BorisAppender
 from simba.Directing_animals_analyzer import DirectingOtherAnimalsAnalyzer
 from simba.Directing_animals_visualizer import DirectingOtherAnimalsVisualizer
-from simba.reorganize_keypoint_in_pose import KeypointReorganizer
 from simba.solomon_importer import SolomonImporter
 from simba.reverse_tracking_order import reverse_tracking_2_animals
-from simba.Kleinberg_calculator import KleinbergCalculator
-from simba.FSTTC_calculator import FSTTCPerformer
 from simba.pup_retrieval_1 import pup_retrieval_1
 from simba.interpolate_pose import Interpolate
 from simba.import_trk import *
@@ -91,7 +67,6 @@ from simba.read_DANNCE_mat import import_DANNCE_file, import_DANNCE_folder
 from simba.ethovision_import import ImportEthovision
 from simba.plot_pose_in_dir import create_video_from_dir
 from simba.sleap_import_new import ImportSLEAP
-from simba.ROI_analyzer import ROIAnalyzer
 from simba.ROI_plot_new import ROIPlot
 from simba.train_single_model import TrainSingleModel
 from simba.train_mutiple_models_from_meta_new import TrainMultipleModelsFromMeta
@@ -110,39 +85,43 @@ from simba.roi_tools.ROI_zoom import *
 from simba.roi_tools.ROI_define import *
 from simba.roi_tools.ROI_menus import *
 from simba.roi_tools.ROI_reset import *
-from simba.misc_tools import (tabulate_clf_info,
-                              convert_parquet_to_csv,
-                              convert_csv_to_parquet,
-                              check_multi_animal_status,
+from simba.misc_tools import (check_multi_animal_status,
                               smooth_data_gaussian,
                               smooth_data_savitzky_golay,
                               archive_processed_files)
-from simba.video_processing import (change_img_format,
-                                    clahe_enhance_video,
-                                    extract_frame_range,
-                                    change_single_video_fps,
-                                    change_fps_of_multiple_videos,
-                                    convert_video_powerpoint_compatible_format,
-                                    convert_to_mp4,
-                                    video_to_greyscale,
-                                    superimpose_frame_count,
-                                    remove_beginning_of_video,
-                                    clip_video_in_range,
-                                    downsample_video,
-                                    gif_creator,
-                                    batch_convert_video_format,
-                                    batch_create_frames,
-                                    extract_frames_single_video,
-                                    multi_split_video,
-                                    crop_single_video,
-                                    crop_multiple_videos,
-                                    frames_to_movie)
+from simba.video_processing import (video_to_greyscale,
+                                    superimpose_frame_count)
 from simba.setting_menu import SettingsMenu
 from simba.pop_up_classes import (HeatmapLocationPopup,
                                   QuickLineplotPopup,
                                   ClfByROI,
                                   FSTTCPopUp,
-                                  KleinbergPopUp)
+                                  KleinbergPopUp,
+                                  TimeBinsClfPopUp,
+                                  ClfDescriptiveStatsPopUp,
+                                  DownsampleVideoPopUp,
+                                  CLAHEPopUp,
+                                  CropVideoPopUp,
+                                  ClipVideoPopUp,
+                                  MultiShortenPopUp,
+                                  ChangeImageFormatPopUp,
+                                  ConertVideoPopUp,
+                                  ExtractSpecificFramesPopUp,
+                                  ExtractAllFramesPopUp,
+                                  Csv2ParquetPopUp,
+                                  Parquet2CsvPopUp,
+                                  MultiCropPopUp,
+                                  ChangeFpsSingleVideoPopUp,
+                                  ChangeFpsMultipleVideosPopUp,
+                                  ExtractSEQFramesPopUp,
+                                  MergeFrames2VideoPopUp,
+                                  PrintModelInfoPopUp,
+                                  CreateGIFPopUP,
+                                  CalculatePixelsPerMMInVideoPopUp,
+                                  PoseReorganizerPopUp,
+                                  MakePathPlotPopUp,
+                                  AboutSimBAPopUp,
+                                  ConcatenatingVideosPopUp)
 from simba.labelling_interface import select_labelling_video
 from simba.labelling_advanced_interface import select_labelling_video_advanced
 from simba.deepethogram_importer import DeepEthogramImporter
@@ -390,144 +369,6 @@ class Button_getcoord(Frame):
 def Exit():
     app.root.destroy()
 
-class video_downsample:
-
-    def __init__(self):
-        # Popup window
-        videosdownsample = Toplevel()
-        videosdownsample.minsize(200, 200)
-        videosdownsample.wm_title("Downsample Video Resolution")
-
-
-        # Video Path
-        self.videopath1selected = FileSelect(videosdownsample, "Video path",title='Select a video file')
-        label_choiceq = Label(videosdownsample, text='Choose only one of the following method to downsample videos (Custom/Default)')
-
-        #custom reso
-        label_downsamplevidcustom = LabelFrame(videosdownsample,text='Custom resolution',font='bold',padx=5,pady=5)
-        # width
-        self.label_width = Entry_Box(label_downsamplevidcustom,'Width','10')
-        # height
-        self.label_height = Entry_Box(label_downsamplevidcustom,'Height','10')
-        # confirm custom resolution
-        self.button_downsamplevideo1 = Button(label_downsamplevidcustom, text='Downsample to custom resolution',command=self.downsample_customreso)
-        #Default reso
-        # Checkbox
-        label_downsampleviddefault = LabelFrame(videosdownsample,text='Default resolution',font ='bold',padx=5,pady=5)
-        self.var1 = IntVar()
-        self.checkbox1 = Radiobutton(label_downsampleviddefault, text="1980 x 1080", variable=self.var1,value=1)
-        self.checkbox2 = Radiobutton(label_downsampleviddefault, text="1280 x 720", variable=self.var1,value=2)
-        self.checkbox3 = Radiobutton(label_downsampleviddefault, text="720 x 480", variable=self.var1, value=3)
-        self.checkbox4 = Radiobutton(label_downsampleviddefault, text="640 x 480", variable=self.var1, value=4)
-        self.checkbox5 = Radiobutton(label_downsampleviddefault, text="320 x 240", variable=self.var1, value=5)
-        # Downsample video
-        self.button_downsamplevideo2 = Button(label_downsampleviddefault, text='Downsample to default resolution',command=self.downsample_defaultreso)
-
-        # Organize the window
-        self.videopath1selected.grid(row=0,sticky=W)
-        label_choiceq.grid(row=1, sticky=W,pady=10)
-
-        label_downsamplevidcustom.grid(row=2,sticky=W,pady=10)
-        self.label_width.grid(row=0, column=0,sticky=W)
-        self.label_height.grid(row=1, column=0,sticky=W)
-        self.button_downsamplevideo1.grid(row=3)
-
-        label_downsampleviddefault.grid(row=3,sticky=W,pady=10)
-        self.checkbox1.grid(row=0,stick=W)
-        self.checkbox2.grid(row=1,sticky=W)
-        self.checkbox3.grid(row=2, sticky=W)
-        self.checkbox4.grid(row=3, sticky=W)
-        self.checkbox5.grid(row=4, sticky=W)
-        self.button_downsamplevideo2.grid(row=5)
-
-    def downsample_customreso(self):
-        self.width1 = self.label_width.entry_get
-        self.height1 = self.label_height.entry_get
-
-        downsample_video(file_path=self.videopath1selected.file_path,
-                         video_width=self.width1, video_height=self.height1)
-
-    def downsample_defaultreso(self):
-
-        if self.var1.get()==1:
-            self.width2, self.height2 = 1980, 1080
-
-        elif self.var1.get()==2:
-            self.width2, self.height2 = 1280, 720
-
-        elif self.var1.get()==3:
-            self.width2, self.height2 = 720, 480
-
-        elif self.var1.get()==4:
-            self.width2, self.height2 = 640, 480
-
-        elif self.var1.get()==5:
-            self.width2, self.height2 = 320, 240
-
-        print('The width selected is {}, and the height is {}...'.format(str(self.width2), str(self.height2)))
-
-        downsample_video(file_path=self.videopath1selected.file_path,
-                         video_width=self.width2, video_height=self.height2)
-
-class Red_light_Convertion:
-
-    def __init__(self):
-        # Popup window
-        redlightconversion = Toplevel()
-        redlightconversion.minsize(200, 200)
-        redlightconversion.wm_title("CLAHE")
-
-
-        #CLAHE
-        label_clahe = LabelFrame(redlightconversion,text='Contrast Limited Adaptive Histogram Equalization',font='bold',padx=5,pady=5)
-        # Video Path
-        self.videopath1selected = FileSelect(label_clahe, "Video path ",title='Select a video file')
-
-        button_clahe = Button(label_clahe, text='Apply CLAHE', command=lambda: clahe_enhance_video(file_path=self.videopath1selected.file_path))
-
-        #button_clahe = Button(label_clahe,text='Apply CLAHE',command=lambda:clahe(self.videopath1selected.file_path))
-
-        #organize the window
-        label_clahe.grid(row=0,sticky=W)
-        self.videopath1selected.grid(row=0,sticky=W)
-        button_clahe.grid(row=1,pady=5)
-
-class crop_video:
-
-    def __init__(self):
-        # Popup window
-        cropvideo = Toplevel()
-        cropvideo.minsize(300, 300)
-        cropvideo.wm_title("Crop Single Video")
-
-        # Normal crop
-        label_cropvideo = LabelFrame(cropvideo,text='Crop Video',font='bold',padx=5,pady=5)
-        self.videopath1selected = FileSelect(label_cropvideo,"Video path",title='Select a video file')
-        # CropVideo
-        button_cropvid = Button(label_cropvideo, text='Crop Video', command=lambda:crop_single_video(file_path=self.videopath1selected.file_path))
-
-        # fixed crop
-        label_videoselection = LabelFrame(cropvideo, text='Fixed coordinates crop for multiple videos', font='bold', padx=5, pady=5)
-        self.folder1Select = FolderSelect(label_videoselection, 'Video directory:', title='Select Folder with videos')
-        # output video
-        self.outputfolder = FolderSelect(label_videoselection, 'Output directory:',
-                                         title='Select a folder for your output videos')
-
-        # create list of all videos in the videos folder
-        button_cL = Button(label_videoselection, text='Confirm', command=lambda: crop_multiple_videos(directory_path=self.folder1Select.folder_path,
-                                                                                                      output_path=self.outputfolder.folder_path))
-
-
-        #organize
-        label_cropvideo.grid(row=0,sticky=W)
-        self.videopath1selected.grid(row=0,sticky=W)
-        button_cropvid.grid(row=1,sticky=W,pady=10)
-        #fixedcrop
-        label_videoselection.grid(row=1,sticky=W,pady=10,padx=5)
-        self.folder1Select.grid(row=0,sticky=W,pady=5)
-        self.outputfolder.grid(row=1,sticky=W,pady=5)
-        button_cL.grid(row=2,sticky=W,pady=5)
-
 class create_project_DLC:
 
     def __init__(self):
@@ -638,480 +479,6 @@ class create_project_DLC:
         if bodyPartConfigFile != 'No file selected':
             changedlc_config(config_path, bodyPartConfigFile)
 
-class shorten_video:
-
-    def __init__(self):
-        # Popup window
-        shortenvid = Toplevel()
-        shortenvid.minsize(200, 200)
-        shortenvid.wm_title("Clip video")
-
-        # videopath
-        self.videopath1selected = FileSelect(shortenvid, "Video path",title='Select a video file')
-
-        #timeframe for start and end cut
-        label_cutvideomethod1 = LabelFrame(shortenvid,text='Method 1',font='bold',padx=5,pady=5)
-        label_timeframe = Label(label_cutvideomethod1, text='Please enter the time frame in hh:mm:ss format')
-        self.label_starttime = Entry_Box(label_cutvideomethod1,'Start at:','8')
-        self.label_endtime = Entry_Box(label_cutvideomethod1, 'End at:', '8')
-        CreateToolTip(label_cutvideomethod1,
-                      'Method 1 will retrieve the specified time input.(eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)')
-
-        #express time frame
-        label_cutvideomethod2 = LabelFrame(shortenvid,text='Method 2',font='bold',padx=5,pady=5)
-        label_method2 = Label(label_cutvideomethod2,text='Method 2 will retrieve from the end of the video (e.g.,: an input of 3 seconds will get rid of the first 3 seconds of the video).')
-        # self.var_express = IntVar()
-        # checkbox_express = Checkbutton(label_cutvideomethod2, text='Check this box to use Method 2', variable=self.var_express)
-        self.label_time = Entry_Box(label_cutvideomethod2,'Seconds:','8')
-        CreateToolTip(label_cutvideomethod2,'Method 2 will retrieve from the end of the video.(eg: an input of 3 seconds will get rid of the first 3 seconds of the video)')
-
-        #button to cut video
-        button_cutvideo1 = Button(label_cutvideomethod1, text='Cut Video', command=lambda:clip_video_in_range(file_path=self.videopath1selected.file_path,
-                                                                                                              start_time=self.label_starttime.entry_get,
-                                                                                                              end_time=self.label_endtime.entry_get))
-        button_cutvideo2 = Button(label_cutvideomethod2,text='Cut Video',command =lambda:remove_beginning_of_video(file_path=self.videopath1selected.file_path,
-                                                                                                                   time=self.label_time.entry_get))
-        #organize
-        self.videopath1selected.grid(row=0,sticky=W)
-
-        label_cutvideomethod1.grid(row=1,sticky=W,pady=5)
-        label_timeframe.grid(row=0,sticky=W)
-        self.label_starttime.grid(row=1,sticky=W)
-        self.label_endtime.grid(row=2,sticky=W)
-        button_cutvideo1.grid(row=3)
-
-
-        label_cutvideomethod2.grid(row=2,sticky=W,pady=5)
-        label_method2.grid(row=0,sticky=W)
-        # checkbox_express.grid(row=1,sticky=W)
-        self.label_time.grid(row=2,sticky=W)
-        button_cutvideo2.grid(row=3)
-
-class multi_shorten_video:
-    def __init__(self):
-        # Popup window
-        self.multishort = Toplevel()
-        self.multishort.minsize(200, 200)
-        self.multishort.wm_title("Clip video into multiple videos")
-        self.lblmultishort = LabelFrame(self.multishort, text='Split videos into different parts', font='bold', padx=5, pady=5)
-        self.videopath1selected = FileSelect(self.lblmultishort, "Video path", title='Select a video file')
-        self.noclips = Entry_Box(self.lblmultishort,'# of clips','8')
-        confirmclip = Button(self.lblmultishort,text='Confirm',command=lambda:self.expand(self.noclips.entry_get))
-        runbutton = Button(self.multishort,text='Clip video', command= lambda: self.run_clipping(),fg='navy',font=("Helvetica",12,'bold'))
-        self.lblmultishort.grid(row=0,sticky=W)
-        self.videopath1selected.grid(row=1,sticky=W,columnspan=2)
-        self.noclips.grid(row=2,sticky=W)
-        confirmclip.grid(row=2,column=1,sticky=W)
-
-        runbutton.grid(row=5)
-
-    def expand(self,noclips):
-
-        try:
-            self.table.destroy()
-        except:
-            pass
-
-        noclips = int(noclips)
-
-        self.table = LabelFrame(self.multishort)
-
-        lbl_clip = Label(self.table,text='Clip #')
-        lbl_start = Label(self.table,text='Start Time')
-        lbl_stop = Label(self.table,text='Stop Time')
-
-        #organize table
-        self.table.grid(row=2,sticky=W)
-        lbl_clip.grid(row=0,column=0,sticky=W)
-        lbl_start.grid(row=0,column=1)
-        lbl_stop.grid(row=0,column=2)
-
-        #list
-        self.ent1 = [0] * noclips
-        self.ent2 = [0] * noclips
-        self.ent3 = [0] * noclips
-
-        for i in range(noclips):
-            self.ent1[i] = Label(self.table,text='Clip '+str(i+1))
-            self.ent1[i].grid(row=i+2,sticky=W)
-            self.ent2[i] = Entry(self.table)
-            self.ent2[i].grid(row=i+2,column=1,sticky=W)
-            self.ent3[i] = Entry(self.table)
-            self.ent3[i].grid(row=i+2,column=2,sticky=W)
-
-        self.allentries = [self.ent2,self.ent3]
-
-    def run_clipping(self):
-        self.start_times, self.end_times = [], []
-        for start_time, end_time in zip(self.ent2, self.ent3):
-            self.start_times.append(start_time.get())
-            self.end_times.append(end_time.get())
-
-        multi_split_video(file_path=self.videopath1selected.file_path, start_times=self.start_times, end_times=self.end_times)
-
-
-class change_imageformat:
-
-    def __init__(self):
-
-        # Popup window
-        chgimgformat = Toplevel()
-        chgimgformat.minsize(200, 200)
-        chgimgformat.wm_title("Change image format")
-
-        #select directory
-        self.folderpath1selected = FolderSelect(chgimgformat,"Image directory",title='Select folder with images')
-
-        #change image format
-        label_filetypein = LabelFrame(chgimgformat,text= 'Original image format',font=("Helvetica",12,'bold'),padx=15,pady=5)
-        # Checkbox input
-        self.varfiletypein = IntVar()
-        checkbox_c1 = Radiobutton(label_filetypein, text=".png", variable=self.varfiletypein, value=1)
-        checkbox_c2 = Radiobutton(label_filetypein, text=".jpeg", variable=self.varfiletypein, value=2)
-        checkbox_c3 = Radiobutton(label_filetypein, text=".bmp", variable=self.varfiletypein, value=3)
-
-        #ouput image format
-        label_filetypeout = LabelFrame(chgimgformat,text='Output image format',font=("Helvetica",12,'bold'),padx=15,pady=5)
-        #checkbox output
-        self.varfiletypeout = IntVar()
-        checkbox_co1 = Radiobutton(label_filetypeout, text=".png", variable=self.varfiletypeout, value=1)
-        checkbox_co2 = Radiobutton(label_filetypeout, text=".jpeg", variable=self.varfiletypeout, value=2)
-        checkbox_co3 = Radiobutton(label_filetypeout, text=".bmp", variable=self.varfiletypeout, value=3)
-
-        #button
-        button_changeimgformat = Button(chgimgformat, text='Convert image file format', command=self.changeimgformatcommand)
-
-        #organized
-        self.folderpath1selected.grid(row=0,column=0)
-        label_filetypein.grid(row=1,column=0,pady=5)
-        checkbox_c1.grid(row=2,column=0)
-        checkbox_c2.grid(row=3,column=0)
-        checkbox_c3.grid(row=4,column=0)
-        label_filetypeout.grid(row=5,column=0,pady=5)
-        checkbox_co1.grid(row=6,column=0)
-        checkbox_co2.grid(row=7,column=0)
-        checkbox_co3.grid(row=8, column=0)
-        button_changeimgformat.grid(row=9,pady=5)
-
-    def changeimgformatcommand(self):
-
-        if self.varfiletypein.get()==1:
-            filetypein = 'png'
-        elif self.varfiletypein.get()==2:
-            filetypein = 'jpeg'
-        elif self.varfiletypein.get()==3:
-            filetypein = 'bmp'
-
-        if self.varfiletypeout.get()==1:
-            filetypeout = 'png'
-        elif self.varfiletypeout.get()==2:
-            filetypeout = 'jpeg'
-        elif self.varfiletypeout.get() == 3:
-            filetypeout = 'bmp'
-
-        change_img_format(directory=self.folderpath1selected.folder_path,
-                          file_type_in=filetypein,
-                          file_type_out=filetypeout)
-class convert_video:
-
-    def __init__(self):
-        # Popup window
-        convertvid = Toplevel()
-        convertvid.minsize(400, 400)
-        convertvid.wm_title("Convert video format")
-
-        #multi video
-        label_multivideo = LabelFrame(convertvid, text='Convert multiple videos',font=("Helvetica",12,'bold'),padx=5,pady=5)
-        vid_dir = FolderSelect(label_multivideo,'Video directory',title='Select folder with videos')
-        ori_format = Entry_Box(label_multivideo,'Input format','12')
-        final_format = Entry_Box(label_multivideo,'Output format','12')
-        button_convertmultivid = Button(label_multivideo,text='Convert multiple videos',command = lambda: batch_convert_video_format(directory=vid_dir.folder_path,
-                                                                                                                                    input_format=ori_format.entry_get,
-                                                                                                                                    output_format=final_format.entry_get))
-
-        #single video
-        label_convert = LabelFrame(convertvid,text='Convert single video',font=("Helvetica",12,'bold'),padx=5,pady=5)
-        self.videopath1selected = FileSelect(label_convert, "Video path",title='Select a video file')
-        self.vvformat = IntVar()
-        checkbox_v1 = Radiobutton(label_convert, text="Convert to .mp4", variable=self.vvformat, value=1)
-        checkbox_v2 = Radiobutton(label_convert, text="Convert mp4 into PowerPoint supported format", variable=self.vvformat, value=2)
-
-        #button
-        button_convertvid= Button(label_convert, text='Convert video format', command=self.convertavitomp)
-
-        #organize
-        label_multivideo.grid(row=0,sticky=W)
-        vid_dir.grid(row=0,sticky=W)
-        ori_format.grid(row=1,sticky=W)
-        final_format.grid(row=2,sticky=W)
-        button_convertmultivid.grid(row=3,pady=10)
-
-        label_convert.grid(row=1,sticky=W)
-        self.videopath1selected.grid(row=0,sticky=W)
-        checkbox_v1.grid(row=1,column=0,sticky=W)
-        checkbox_v2.grid(row=2,column=0,sticky=W)
-        button_convertvid.grid(row=3,column=0,pady=10)
-
-    def convertavitomp(self):
-
-        if self.vvformat.get()== 1:
-            convert_to_mp4(file_path=self.videopath1selected.file_path)
-
-
-            cavi = convertavitomp4(self.videopath1selected.file_path)
-            print('Video converted to ' + cavi)
-        elif self.vvformat.get()== 2:
-            convert_video_powerpoint_compatible_format(file_path=self.videopath1selected.file_path)
-
-class extract_specificframes:
-
-    def __init__(self):
-        # Popup window
-        extractsf = Toplevel()
-        extractsf.minsize(200, 200)
-        extractsf.wm_title("Extract defined Frames")
-
-        # videopath
-        self.videopath1selected = FileSelect(extractsf, "Video path",title='Select a video file')
-
-        #entry boxes for frames to extract
-        label_frametitle = LabelFrame(extractsf, text='Frames to be extracted',padx=5,pady=5)
-        self.label_startframe1 = Entry_Box(label_frametitle,'Start Frame:','10')
-
-        self.label_endframe1 = Entry_Box(label_frametitle, 'End Frame:','10')
-
-
-        #button
-        button_extractsf = Button(label_frametitle, text='Extract Frames', command=self.extractsfcommand)
-
-        #organize
-        self.videopath1selected.grid(row=0,column=0,sticky=W,pady=10)
-        label_frametitle.grid(row=1,column=0,sticky=W)
-        self.label_startframe1.grid(row=2,column=0,sticky=W)
-
-        self.label_endframe1.grid(row=3,column=0,sticky=W)
-
-        button_extractsf.grid(row=4,pady=5)
-
-    def extractsfcommand(self):
-
-        start_frame = self.label_startframe1.entry_get
-        end_frame = self.label_endframe1.entry_get
-
-        extract_frame_range(file_path=self.videopath1selected.file_path,
-                            start_frame=start_frame,
-                            end_frame=end_frame)
-
-def extract_allframes():
-
-    # Popup window
-    extractaf = Toplevel()
-    extractaf.minsize(300, 300)
-    extractaf.wm_title("Extract all frames")
-
-    #single video
-    singlelabel = LabelFrame(extractaf,text='Single video',padx=5,pady=5,font='bold')
-
-    # videopath
-    videopath = FileSelect(singlelabel, "Video path",title='Select a video file')
-
-    #button
-    button_extractaf = Button(singlelabel, text='Extract Frames (Single video)', command= lambda:extract_frames_single_video(file_path=videopath.file_path))
-
-    #multivideo
-    multilabel = LabelFrame(extractaf,text='Multiple videos',padx=5,pady=5,font='bold')
-    folderpath = FolderSelect(multilabel,'Folder path',title=' Select video folder')
-    button_extractmulti = Button(multilabel,text='Extract Frames (Multiple videos)',command=lambda:batch_create_frames(directory=folderpath.folder_path))
-
-    #organize
-    singlelabel.grid(row=0,sticky=W,pady=10)
-    videopath.grid(row=0,sticky=W)
-    button_extractaf.grid(row=1,sticky=W,pady=10)
-
-    multilabel.grid(row=1,sticky=W,pady=10)
-    folderpath.grid(row=0,sticky=W)
-    button_extractmulti.grid(row=1,sticky=W,pady=10)
-
-def CSV2parquet():
-    csv2parq = Toplevel()
-    csv2parq.minsize(300, 300)
-    csv2parq.wm_title("Convert CSV directory to parquet")
-    multilabel = LabelFrame(csv2parq, text='Select CSV directory', padx=5, pady=5, font='bold')
-    folderpath = FolderSelect(multilabel, 'CSV folder path', title=' Select CSV folder')
-    button_extractmulti = Button(multilabel, text='Convert CSV to parquet', command=lambda: convert_csv_to_parquet(directory=folderpath.folder_path))
-    multilabel.grid(row=1, sticky=W, pady=10)
-    folderpath.grid(row=0, sticky=W)
-    button_extractmulti.grid(row=1, sticky=W, pady=10)
-
-def parquet2CSV():
-    parq2csv = Toplevel()
-    parq2csv.minsize(300, 300)
-    parq2csv.wm_title("Convert parquet directory to CSV")
-    multilabel = LabelFrame(parq2csv, text='Select parquet directory', padx=5, pady=5, font='bold')
-    folderpath = FolderSelect(multilabel, 'Parquet folder path', title=' Select parquet folder')
-    button_extractmulti = Button(multilabel, text='Convert parquet to CSV', command=lambda: convert_parquet_to_csv(directory=folderpath.folder_path))
-    multilabel.grid(row=1, sticky=W, pady=10)
-    folderpath.grid(row=0, sticky=W)
-    button_extractmulti.grid(row=1, sticky=W, pady=10)
-
-class multicropmenu:
-    def __init__(self):
-        multimenu = Toplevel()
-        multimenu.minsize(300, 300)
-        multimenu.wm_title("Multi Crop")
-
-        self.inputfolder = FolderSelect(multimenu,"Video Folder  ")
-        self.outputfolder = FolderSelect(multimenu,"Output Folder")
-
-        self.videotype = Entry_Box(multimenu," Video type (e.g. mp4)", "15")
-        self.croptimes = Entry_Box(multimenu,"# of crops","15")
-
-
-
-        button_multicrop = Button(multimenu,text='Crop',command=lambda:MultiCropper(file_type=self.videotype.entry_get,
-                                                                                    input_folder=self.inputfolder.folder_path,
-                                                                                    output_folder=self.outputfolder.folder_path,
-                                                                                    crop_cnt=self.croptimes.entry_get))
-        #organize
-        self.inputfolder.grid(row=0,sticky=W,pady=2)
-        self.outputfolder.grid(row=1,sticky=W,pady=2)
-        self.videotype.grid(row=2,sticky=W,pady=2)
-        self.croptimes.grid(row=3,sticky=W,pady=2)
-        button_multicrop.grid(row=4,pady=10)
-
-class changefps:
-    def __init__(self):
-        fpsmenu = Toplevel()
-        fpsmenu.minsize(200, 200)
-        fpsmenu.wm_title("Change frame rate of video")
-
-        # videopath
-        videopath = FileSelect(fpsmenu, "Video path",title='Select a video file')
-
-        #fps
-        label_fps= Entry_Box(fpsmenu,'Output fps','10')
-
-        #button
-        button_fps = Button(fpsmenu, text='Convert', command=lambda: change_single_video_fps(file_path=videopath.file_path,
-                                                                                             fps=label_fps.entry_get))
-
-        #organize
-        videopath.grid(row=0,sticky=W)
-        label_fps.grid(row=1,sticky=W)
-        button_fps.grid(row=2)
-
-class changefpsmulti:
-    def __init__(self):
-        multifpsmenu = Toplevel()
-        multifpsmenu.minsize(400, 200)
-        multifpsmenu.wm_title("Change frame rate of videos in a folder")
-        videopath = FolderSelect(multifpsmenu, "Folder path", title='Select folder with videos')
-        label_fps = Entry_Box(multifpsmenu, 'Output fps', '10')
-        button_fps = Button(multifpsmenu, text='Convert', command=lambda: change_fps_of_multiple_videos(directory=videopath.folder_path, fps=label_fps.entry_get))
-
-        # organize
-        videopath.grid(row=0, sticky=W)
-        label_fps.grid(row=1, sticky=W)
-        button_fps.grid(row=2)
-
-
-class extract_seqframe:
-
-    def __init__(self):
-        extractseqtoplevel = Toplevel()
-        extractseqtoplevel.minsize(200, 200)
-        extractseqtoplevel.wm_title("Extract All Frames from Seq files")
-
-        # videopath
-        videopath = FileSelect(extractseqtoplevel, "Video Path",title='Select a video file')
-
-        # button
-        button_extractseqframe = Button(extractseqtoplevel, text='Extract All Frames', command=lambda: extract_seqframescommand(videopath.file_path))
-
-        #organize
-        videopath.grid(row=0)
-        button_extractseqframe.grid(row=1)
-
-class mergeframeffmpeg:
-
-    def __init__(self):
-        # Popup window
-        mergeffmpeg = Toplevel()
-        mergeffmpeg.minsize(250, 250)
-        mergeffmpeg.wm_title("Merge images to video")
-
-        # select directory
-        self.folderpath1selected = FolderSelect(mergeffmpeg,"Working Directory",title='Select folder with frames')
-
-        # settings
-        label_settings = LabelFrame(mergeffmpeg,text='Settings',padx=5,pady=5)
-        self.label_imgformat = Entry_Box(label_settings, 'Image format','10')
-        self.label_bitrate = Entry_Box(label_settings,'Bitrate','10', validation='numeric')
-        self.label_fps = Entry_Box(label_settings,'fps','10')
-
-        #button
-        button_mergeimg = Button(label_settings, text='Merge Images', command=self.mergeframeffmpegcommand)
-
-        #organize
-        label_settings.grid(row=1,pady=10)
-        self.folderpath1selected.grid(row=0,column=0,pady=10)
-        self.label_imgformat.grid(row=1,column=0,sticky=W)
-
-        self.label_fps.grid(row=2,column=0,sticky=W,pady=5)
-        self.label_bitrate.grid(row=3,column=0,sticky=W,pady=5)
-        button_mergeimg.grid(row=4,column=1,sticky=E,pady=10)
-
-
-    def mergeframeffmpegcommand(self):
-
-        imgformat = self.label_imgformat.entry_get
-        bitrate = self.label_bitrate.entry_get
-        fps = self.label_fps.entry_get
-
-        _ = frames_to_movie(directory=self.folderpath1selected.folder_path, fps=fps, bitrate=bitrate, img_format=imgformat)
-
-class print_model_info(object):
-    def __init__(self):
-        model_info_win = Toplevel()
-        model_info_win.minsize(250, 250)
-        model_info_win.wm_title("PRINT MACHINE MODEL INFO")
-
-        model_info_frame = LabelFrame(model_info_win, text='PRINT MODEL INFORMATION', padx=5, pady=5, font='bold')
-        model_path_selector = FileSelect(model_info_frame, 'Model path', title='Select a video file')
-        btn_print_info = Button(model_info_frame,text='PRINT MODEL INFO',command=lambda:tabulate_clf_info(clf_path=model_path_selector.file_path))
-
-        model_info_frame.grid(row=0, sticky=W)
-        model_path_selector.grid(row=0, sticky=W, pady=5)
-        btn_print_info.grid(row=1, sticky=W)
-
-
-class creategif:
-    def __init__(self):
-        create_gif = Toplevel()
-        create_gif.minsize(250, 250)
-        create_gif.wm_title("Generate Gif from video")
-
-        label_creategif = LabelFrame(create_gif,text='Video to Gif',padx=5,pady=5,font='bold')
-        videoselected = FileSelect(label_creategif, 'Video path',title='Select a video file')
-        label_starttime = Entry_Box(label_creategif,'Start time(s)','12')
-        label_duration = Entry_Box(label_creategif,'Duration(s)','12')
-        label_size = Entry_Box(label_creategif,'Width','12')
-        size_description = Label(label_creategif,text='example Width: 240,360,480,720,1080',font=("Times", 10, "italic"))
-        size_description_1 = Label(label_creategif, text='Aspect ratio is kept (i.e., height is automatically computed)', font=("Times", 10, "italic"))
-
-        button_creategif = Button(label_creategif,text='Generate Gif',command=lambda :gif_creator(file_path=videoselected.file_path,
-                                                                                                  start_time=label_starttime.entry_get,
-                                                                                                  duration=label_duration.entry_get,
-                                                                                                  width=label_size.entry_get))
-        label_creategif.grid(row=0,sticky=W)
-        videoselected.grid(row=0,sticky=W,pady=5)
-        label_starttime.grid(row=1,sticky=W)
-        label_duration.grid(row=2,sticky=W)
-        label_size.grid(row=3,sticky=W)
-        size_description.grid(row=4,sticky=W)
-        size_description_1.grid(row=5, sticky=W)
-        button_creategif.grid(row=6,sticky=E,pady=10)
-
 class new_window:
 
     def open_Folder(self):
@@ -1175,42 +542,6 @@ class visualize_pose:
 
         else:
             create_video_from_dir(in_directory=input_folder, out_directory=output_folder, circle_size=int(circle_size_int))
-
-class get_coordinates_from_video:
-
-    def __init__(self):
-        # Popup window
-        getcoord = Toplevel()
-        getcoord.minsize(200, 200)
-        getcoord.wm_title('Get Coordinates in Video')
-
-        # settings files selected
-        self.videopath1selected = FileSelect(getcoord, "Video selected",title='Select a video file')
-
-        # label for known mm
-        self.label_knownmm = Entry_Box(getcoord,'Known length in real life(mm)','0')
-
-        #button
-        button_getcoord = Button(getcoord, text='Get Distance', command=self.getcoord)
-
-        #organize
-        self.videopath1selected.grid(row=0,column=0,pady=10,sticky=W)
-        self.label_knownmm.grid(row=1,column=0,pady=10,sticky=W)
-        button_getcoord.grid(row=2,column=0,pady=10)
-
-    def getcoord(self):
-        filename= self.videopath1selected.file_path
-        knownmm_value = self.label_knownmm.entry_get
-        if knownmm_value == '':
-            print('Please enter the known millimeters to continue')
-
-        elif filename != '' and filename != 'No file selected':
-
-            getco = get_coordinates_nilsson(self.videopath1selected.file_path,knownmm_value)
-            print('The distance between the two set points is ', str(getco))
-
-        else:
-            print('Please select a video')
 
 class project_config:
 
@@ -2421,10 +1752,10 @@ class loadprojectini:
         kleinberg_button = Button(label_runmachinemodel,text='Kleinberg Smoothing',command=lambda: KleinbergPopUp(config_path=self.projectconfigini))
         fsttc_button = Button(label_runmachinemodel,text='FSTTC',command=lambda:FSTTCPopUp(config_path=self.projectconfigini))
         label_machineresults = LabelFrame(tab9,text='ANALYZE MACHINE RESULTS',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
-        button_process_datalog = Button(label_machineresults,text='Analyze machine predictions',command =self.analyzedatalog)
+        button_process_datalog = Button(label_machineresults, text='Analyze machine predictions',command=lambda: ClfDescriptiveStatsPopUp(config_path=self.projectconfigini))
         button_process_movement = Button(label_machineresults, text='Analyze distances/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ANALYZE MOVEMENT'))
         button_movebins = Button(label_machineresults, text='Time bins: Distance/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='TIME BINS: DISTANCE/VELOCITY'))
-        button_classifierbins = Button(label_machineresults,text='Time bins: Machine predictions',command=lambda:self.timebinmove('classifier'))
+        button_classifierbins = Button(label_machineresults,text='Time bins: Machine predictions',command=lambda: TimeBinsClfPopUp(config_path=self.projectconfigini))
         button_classifier_ROI = Button(label_machineresults, text='Classifications by ROI', command=lambda: ClfByROI(config_path=self.projectconfigini))
 
         label_severity = LabelFrame(tab9,text='ANALYZE SEVERITY',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
@@ -3351,46 +2682,6 @@ class loadprojectini:
             roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.projectconfigini, video_name=video_name)
             roi_feature_visualizer.create_visualization()
 
-    def timebinmove(self,var):
-        timebintoplevel = Toplevel()
-        timebintoplevel.minsize(200, 80)
-        timebintoplevel.wm_title("Time bins settings")
-        tb_labelframe = LabelFrame(timebintoplevel)
-        cnt = 0
-        tb_entry = Entry_Box(tb_labelframe,'Set time bin size (s)','15')
-        if var == 'mov':
-            tb_button = Button(tb_labelframe,text='Run',command=lambda: self.run_time_bins_movement(time_bin=int(tb_entry.entry_get)))
-
-        else:
-            measures_frm = LabelFrame(tb_labelframe, text='MEASUREMENTS', font=("Helvetica", 12, 'bold'), fg='black')
-            cbox_titles = ['First occurance (s)', 'Event count', 'Total event duration (s)',
-                           'Mean event duration (s)', 'Median event duration (s)',
-                           'Mean event interval (s)', 'Median event interval (s)']
-            self.cbox_var_dict = {}
-            for cnt, title in enumerate(cbox_titles):
-                self.cbox_var_dict[title] = BooleanVar()
-                cbox = Checkbutton(measures_frm, text=title, variable=self.cbox_var_dict[title])
-                cbox.grid(row=cnt, sticky=W)
-            tb_button = Button(tb_labelframe, text='Run', command=lambda: self.run_time_bins_clf(time_bin=tb_entry.entry_get))
-            measures_frm.grid(row=1,sticky=NW)
-
-        ##organize
-        tb_labelframe.grid(row=0,sticky=W)
-        tb_entry.grid(row=cnt+1,sticky=W)
-        tb_button.grid(row=cnt+2,pady=10)
-
-    def run_time_bins_movement(self, time_bin=None):
-        time_bins_movement_analyzer = TimeBinsMovementAnalyzer(config_path=self.projectconfigini, bin_length=time_bin)
-        time_bins_movement_analyzer.analyze_movement()
-
-    def run_time_bins_clf(self, time_bin=None):
-        var_list = []
-        for var_name, var_val in self.cbox_var_dict.items():
-            if var_val.get() == True: var_list.append(var_name)
-        time_bins_clf_analyzer = TimeBinsClf(config_path=self.projectconfigini, bin_length=time_bin, measurements=var_list)
-        time_bins_clf_multiprocessor = multiprocessing.Process(target=time_bins_clf_analyzer.analyze_timebins_clf())
-        time_bins_clf_multiprocessor.start()
-
     def importBoris(self):
         ann_folder = askdirectory()
         boris_appender = BorisAppender(config_path=self.projectconfigini, boris_folder=ann_folder)
@@ -3728,313 +3019,6 @@ class loadprojectini:
             self.bp_dict[animal_cnt].grid(row=start_row, sticky=W)
             start_row += 1
 
-    def appendroisettings(self):
-        apdroisettings = Toplevel()
-        apdroisettings.minsize(400, 400)
-        apdroisettings.wm_title("Append Roi Settings")
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        projectNoAnimals = config.getint('General settings', 'animal_no')
-
-        # first choice frame
-        firstMenu = LabelFrame(apdroisettings, text='Select number of animals')
-
-        ## set up drop down for animals
-        noOfAnimalVar = IntVar()
-        animalOptions = set(range(1, projectNoAnimals + 1))
-        noOfAnimalVar.set(1)
-
-        animalMenu = OptionMenu(firstMenu, noOfAnimalVar, *animalOptions)
-        animalLabel = Label(firstMenu, text="# of animals")
-        setAnimalButton = Button(firstMenu, text="Confirm",
-                                 command=lambda: self.run_roiAnalysisSettings(apdroisettings, noOfAnimalVar,'append'))
-
-        # organize
-        firstMenu.grid(row=0, sticky=W)
-        animalLabel.grid(row=0, column=0, sticky=W)
-        animalMenu.grid(row=0, column=1, sticky=W)
-        setAnimalButton.grid(row=0, column=2, sticky=W)
-
-    def timebin_ml(self,title,text='Run'):
-        roisettings = Toplevel()
-        roisettings.minsize(400, 400)
-        roisettings.wm_title(title)
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        projectNoAnimals = config.getint('General settings', 'animal_no')
-
-        #first choice frame
-        firstMenu = LabelFrame(roisettings,text='Select number of animals')
-
-        ## set up drop down for animals
-        noOfAnimalVar = IntVar()
-        animalOptions = set(range(1, projectNoAnimals+1))
-        noOfAnimalVar.set(1)
-
-        animalMenu = OptionMenu(firstMenu,noOfAnimalVar,*animalOptions)
-        animalLabel = Label(firstMenu,text="# of animals")
-
-        setAnimalButton = Button(firstMenu,text="Confirm",command=lambda:self.timebin_ml2(master=roisettings,noofanimal= noOfAnimalVar, text=text, title=title))
-
-        #organize
-        firstMenu.grid(row=0,sticky=W)
-        animalLabel.grid(row=0,column=0,sticky=W)
-        animalMenu.grid(row=0,column=1,sticky=W)
-        setAnimalButton.grid(row=0,column=2,sticky=W)
-
-    def timebin_ml2(self, master, noofanimal, text='Run',title =None ):
-        try:
-            self.secondMenu.destroy()
-        except:
-            pass
-
-        self.secondMenu = LabelFrame(master, text="Choose bodyparts")
-
-        # try to see if it exist or not
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-
-        if title != "Time bins: Distance/Velocity":
-            runButton = Button(self.secondMenu, text=text,
-                           command=lambda: self.timebin_ml3(noofanimal.get(),self.animalVarList[animal].get(),self.binlen.entry_get,'analyze'))
-        else:
-            runButton = Button(self.secondMenu, text=text,
-                               command=lambda: self.timebin_ml3(noofanimal.get(), self.animalVarList[animal].get(),
-                                                                self.binlen.entry_get, 'Notanalyze'))
-
-        animals2analyze = noofanimal.get()
-        labelFrameList, labelList, self.animalVarList, AnimalStringVarList, optionsVarList, animalBodyMenuList = [], [], [], [], [], []
-        options = define_bp_drop_down(configini)
-        for animal in range(animals2analyze):
-            animalName = str(animal + 1)
-            labelFrameList.append(LabelFrame(self.secondMenu, text='Animal ' + animalName))
-            labelList.append(Label(labelFrameList[animal], text='Bodypart'))
-            self.animalVarList.append(StringVar())
-            self.animalVarList[animal].set(options[animal][0])
-            animalBodyMenuList.append(OptionMenu(labelFrameList[animal], self.animalVarList[animal], *options[animal]))
-
-        #binlen
-        self.binlen = Entry_Box(self.secondMenu,'Set time bin size (s)',"16")
-
-        # organize
-        self.secondMenu.grid(row=1, sticky=W)
-        for animal in range(animals2analyze):
-            labelFrameList[animal].grid(row=animal, column=0, sticky=W)
-            labelList[animal].grid(row=0, column=0, sticky=W)
-            animalBodyMenuList[animal].grid(row=animal, column=0, sticky=W)
-
-        self.binlen.grid(row=animals2analyze+2,sticky=W)
-        runButton.grid(row=animals2analyze + 3, padx=10, pady=10)
-
-    def timebin_ml3(self,noofanimal,animalBp,binlen,text='Notanalyze'):
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-
-        if text == 'Notanalyze':
-            config.set('process movements', 'no_of_animals', str(noofanimal))
-            bp_vars_dist = self.animalVarList
-
-            for animal in range(noofanimal):
-                animalBp = str(bp_vars_dist[animal].get())
-                config.set('process movements', 'animal_' + str(animal + 1) + '_bp', animalBp)
-
-            with open(configini, 'w') as configfile:
-                config.write(configfile)
-
-
-            time_bin_movement_analyzer = TimeBinsMovementAnalyzer(config_path=configini, bin_length=int(binlen))
-            time_bin_movement_analyzer.analyze_movement()
-
-
-    def roi_settings(self, title, seldection, text='Run'):
-        roisettings = Toplevel()
-        roisettings.minsize(400, 400)
-        roisettings.wm_title(title)
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        projectNoAnimals = config.getint('General settings', 'animal_no')
-
-        #first choice frame
-        firstMenu = LabelFrame(roisettings,text='Select number of animals')
-
-        ## set up drop down for animals
-        noOfAnimalVar = IntVar()
-        animalOptions = set(range(1, projectNoAnimals+1))
-        noOfAnimalVar.set(1)
-
-        animalMenu = OptionMenu(firstMenu,noOfAnimalVar,*animalOptions)
-        animalLabel = Label(firstMenu,text="# of animals")
-
-        setAnimalButton = Button(firstMenu,text="Confirm",command=lambda:self.run_roiAnalysisSettings(roisettings,noOfAnimalVar, seldection, text=text))
-
-        #organize
-        firstMenu.grid(row=0,sticky=W)
-        animalLabel.grid(row=0,column=0,sticky=W)
-        animalMenu.grid(row=0,column=1,sticky=W)
-        setAnimalButton.grid(row=0,column=2,sticky=W)
-
-    def run_roiAnalysisSettings(self,master,noofanimal,appendornot,text='Run'):
-        try:
-            self.secondMenu.destroy()
-        except:
-            pass
-
-        self.secondMenu = LabelFrame(master,text="Choose bodyparts")
-        self.p_threshold_a = Entry_Box(self.secondMenu,'Bp probability threshold','20')
-
-        #try to see if it exist or not
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-        try:
-            pthresh = config.get('ROI settings', 'probability_threshold')
-            self.p_threshold_a.entry_set(pthresh)
-        except:
-            self.p_threshold_a.entry_set(0.00)
-
-        self.disvar = IntVar()
-        discheckbox = Checkbutton(self.secondMenu,text='Calculate distance moved within ROI',variable=self.disvar)
-        runButton = Button(self.secondMenu,text=text,command =lambda:self.run_analyze_roi(noofanimal.get(), self.animalVarList[animal], appendornot))
-        animals2analyze = noofanimal.get()
-        labelFrameList, labelList, self.animalVarList, AnimalStringVarList, optionsVarList, animalBodyMenuList = [],[],[],[],[],[]
-        options = define_bp_drop_down(configini)
-        if appendornot != 'locationheatmap':
-            for animal in range(animals2analyze):
-                animalName = str(animal + 1)
-                labelFrameList.append(LabelFrame(self.secondMenu,text='Animal ' + animalName))
-                labelList.append(Label(labelFrameList[animal],text='Bodypart'))
-                self.animalVarList.append(StringVar())
-                self.animalVarList[animal].set(options[animal][0])
-                animalBodyMenuList.append(OptionMenu(labelFrameList[animal], self.animalVarList[animal], *options[animal]))
-        if appendornot == 'locationheatmap':
-            options = [item for sublist in options for item in sublist]
-            labelFrameList.append(LabelFrame(self.secondMenu,text='Animal bodypart'))
-            labelList.append(Label(labelFrameList[0], text='Bodypart'))
-            self.animalVarList.append(StringVar())
-            self.animalVarList[0].set(options[0])
-            animalBodyMenuList.append(OptionMenu(labelFrameList[0], self.animalVarList[0], *options))
-
-        #organize
-        self.secondMenu.grid(row=1, sticky=W)
-        for animal in range(animals2analyze):
-            labelFrameList[animal].grid(row=animal,column=0, sticky=W)
-            labelList[animal].grid(row=0, column=0, sticky=W)
-            animalBodyMenuList[animal].grid(row=animal, column=0, sticky=W)
-        if appendornot != 'locationheatmap':
-            self.p_threshold_a.grid(row=animals2analyze+1, sticky=W)
-            discheckbox.grid(row=animals2analyze+2, sticky=W)
-            runButton.grid(row=animals2analyze+3, padx=10, pady=10)
-
-        if appendornot == 'locationheatmap':
-            heatmapframe = Frame(self.secondMenu)
-            self.binsizepixels = Entry_Box(heatmapframe,'Bin size (mm)','21')
-            self.scalemaxsec = Entry_Box(heatmapframe,'max','21')
-            self.pal_var = StringVar()
-            paloptions = ['magma','jet','inferno','plasma','viridis','gnuplot2']
-            palette = OptionMenu(heatmapframe,self.pal_var,*paloptions)
-            self.pal_var.set(paloptions[0])
-            self.lastimgvar = BooleanVar()
-            lastimg = Checkbutton(heatmapframe,text='Create last image',variable=self.lastimgvar)
-            self.frames_var = BooleanVar()
-            create_frames = Checkbutton(heatmapframe,text='Create frames ',variable=self.frames_var)
-            self.videos_var = BooleanVar()
-            create_videos = Checkbutton(heatmapframe, text='Create videos ', variable=self.videos_var)
-            newoptions = [item for sublist in options for item in sublist]
-            self.animalbody1var = StringVar()
-            # self.animalbody1var.set(newoptions[0])
-            animalbodymenu1 = OptionMenu(heatmapframe, self.animalbody1var, *newoptions)
-
-
-            #organize
-            heatmapframe.grid(row=5,sticky=W)
-            # animalbodymenu1.grid(row=0, column=0, sticky=W)
-            self.binsizepixels.grid(row=1,sticky=W)
-            self.scalemaxsec.grid(row=2,sticky=W)
-            palette.grid(row=4,sticky=W)
-            lastimg.grid(row=5,sticky=W)
-            create_frames.grid(row=6, sticky=W)
-            create_videos.grid(row=7, sticky=W)
-            runButton.grid(row=8, padx=10, pady=10)
-
-
-    def run_analyze_roi(self,noofanimal,animalVarList,appendornot):
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-
-        if (appendornot == 'processmovement') or (appendornot == 'processmovement_machine_results'):
-            config.set('process movements', 'no_of_animals', str(noofanimal))
-            bp_vars_dist = self.animalVarList
-            for animal in range(noofanimal):
-                animalBp = str(bp_vars_dist[animal].get())
-                config.set('process movements', 'animal_' + str(animal+1) + '_bp', animalBp)
-
-            with open(configini, 'w') as configfile:
-                config.write(configfile)
-
-        elif appendornot == 'locationheatmap':
-            animalBp = str(animalVarList.get())
-            config.set('Heatmap location', 'body_part', animalBp)
-            config.set('Heatmap location', 'Palette', str(self.pal_var.get()))
-            config.set('Heatmap location', 'Scale_max_seconds', str(self.scalemaxsec.entry_get))
-            config.set('Heatmap location', 'bin_size_pixels', str(self.binsizepixels.entry_get))
-            with open(configini, 'w') as configfile:
-                config.write(configfile)
-
-        else:
-            config.set('ROI settings', 'no_of_animals', str(noofanimal))
-            bp_vars_ROI = self.animalVarList
-            for animal in range(noofanimal):
-                currStr = 'animal_' + str(animal+1) + '_bp'
-                config.set('ROI settings', currStr, str(bp_vars_ROI[animal].get()))
-                with open(configini, 'w') as configfile:
-                    config.write(configfile)
-
-        if appendornot == 'append':
-            roi_feature_creator = ROIFeatureCreator(config_path=configini)
-            roi_feature_creator.analyze_ROI_data()
-            roi_feature_creator.save_new_features_files()
-
-        elif appendornot == 'not append':
-            if self.disvar.get()==1:
-                caldist = True
-            else:
-                caldist = False
-            #write into configini
-            config.set('ROI settings', 'probability_threshold', str(self.p_threshold_a.entry_get))
-            with open(configini, 'w') as configfile:
-                config.write(configfile)
-
-            roi_analyzer = ROIAnalyzer(ini_path=configini, data_path='outlier_corrected_movement_location', calculate_distances=caldist)
-            roi_analyzer.read_roi_dfs()
-            roi_analyzer.analyze_ROIs()
-            roi_analyzer.save_data()
-
-            #roiAnalysis(configini,'outlier_corrected_movement_location',caldist)
-
-        elif appendornot == 'processmovement':
-            _ = ROIMovementAnalyzer(config_path=configini)
-        elif appendornot == 'processmovement_machine_results':
-            config.set('process movements', 'probability_threshold', str(self.p_threshold_a.entry_get))
-            with open(configini, 'w') as configfile: config.write(configfile)
-            movement_processor = MovementProcessor(config_path=configini)
-            movement_processor.process_movement()
-            movement_processor.save_results()
-
-        elif appendornot == 'direction':
-            print('ROI settings saved.')
-        else:
-            roi_analyzer = ROIAnalyzer(ini_path=configini, data_path='features_extracted', calculate_distances=False)
-            roi_analyzer.read_roi_dfs()
-            roi_analyzer.analyze_ROIs()
-            roi_analyzer.save_data()
-            #roiAnalysis(configini,'features_extracted')
-
     def updateThreshold(self):
         interactive_grapher = InteractiveProbabilityGrapher(config_path=self.projectconfigini,
                                                             file_path=self.csvfile.file_path,
@@ -4122,44 +3106,6 @@ class loadprojectini:
 
     def analyzseverity(self):
         analyze_process_severity(self.projectconfigini,self.severityscale.entry_get,self.severityTarget.getChoices())
-
-    def analyzedatalog(self):
-        # Popup window
-        datalogmenu = Toplevel()
-        datalogmenu.minsize(400, 400)
-        datalogmenu.wm_title("Analyze Classification descriptive statistics")
-
-        dlmlabel = LabelFrame(datalogmenu)
-
-        #use for loop to create intvar
-        var=[]
-        for i in range(7):
-            var.append(IntVar())
-
-        #use loop to create checkbox?
-        checkbox = [0]*7
-        titlebox =['Bout count', 'Total event duration (s)', 'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)', 'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']
-        for i in range(7):
-            checkbox[i] = Checkbutton(dlmlabel,text=titlebox[i],variable=var[i])
-            checkbox[i].grid(row=i,sticky=W)
-
-        #organize
-        dlmlabel.grid(row=0)
-        button1 = Button(dlmlabel,text='Analyze',command=lambda:self.findDatalogList(titlebox,var))
-        button1.grid(row=10)
-
-    def findDatalogList(self,titleBox,Var):
-        finallist = []
-        for index,i in enumerate(Var):
-            if i.get()==1:
-                finallist.append(titleBox[index])
-
-        #run analyze
-        #analyze_process_data_log(self.projectconfigini,finallist)
-        data_log_analyzer = ClfLogCreator(config_path=self.projectconfigini, data_measures=finallist)
-        data_log_analyzer.analyze_data()
-        data_log_analyzer.save_results()
-
 
     def runrfmodel(self):
         rf_model_runner = RunModel(config_path=self.projectconfigini)
@@ -4466,845 +3412,8 @@ class loadprojectini:
         heat_mapper_multiprocess = multiprocessing.Process(target=heat_mapper.create_heatmaps())
         heat_mapper_multiprocess.start()
 
-
-
     def callback(self,url):
         webbrowser.open_new(url)
-
-class unsupervisedInterface:
-    def __init__(self,inifile):
-        self.unsupervisedfolderpath = os.path.join(os.path.dirname(inifile), 'unsupervised')
-        #get data from yaml
-        self.configini = str(inifile)
-        config = ConfigParser()
-        configFile = str(self.configini)
-        config.read(configFile)
-
-        classifierlist= []
-
-        for i in range(config.getint('SML settings','no_targets')):
-            classifierlist.append(config.get('SML settings','target_name_'+str(i+1)))
-
-
-        window = Toplevel()
-        window.wm_title("SimBA Unsupervised GUI")
-        window.minsize(800, 400)
-        window.columnconfigure(0, weight=1)
-        window.rowconfigure(0, weight=1)
-        tabControl = ttk.Notebook(window)
-
-        tab1 = ttk.Frame(tabControl)
-        tab2 = ttk.Frame(tabControl)
-        tab3 = ttk.Frame(tabControl)
-        tab4 = ttk.Frame(tabControl)
-        tab5 = ttk.Frame(tabControl)
-        tab6 = ttk.Frame(tabControl)
-
-        tabControl.add(tab1, text=' [Create Project] ')
-        tabControl.add(tab3, text=' [Perform Dimensionality Reduction] ')
-        tabControl.add(tab4, text=' [Perform Clustering] ')
-        tabControl.add(tab5, text=' [Train Model] ')
-        tabControl.add(tab6, text=' [Visualize Clusters] ')
-
-        tabControl.grid(row=0,sticky=NW)
-        tabControl.enable_traversal()
-
-        # save project folder frame
-        saveProjectFolder = LabelFrame(tab1, text="1.Create Project Folder", font=("Helvetica", 12, 'bold'), padx=5, pady=5, fg='black')
-        btnCreateFolder = Button(saveProjectFolder, text="Create folder", command= self.unsupervisedCreate)
-
-        # create dataset
-        createDataset = LabelFrame(tab1, text="2.Create Dataset", font=("Helvetica", 12, 'bold'), padx=5, pady=5, fg='black')
-        self.classifier = DropDownMenu(createDataset, 'Classifier name', classifierlist, '12')
-        self.classifier.setChoices(classifierlist[0])
-        btnGenerateDataset = Button(createDataset, text="Generate/save dataset", command=self.generate_dataset)
-
-        # perform dimensionality reduction
-        # managing dropdown menus
-        drOptions = ['UMAP', 't-SNE', 'PCA']
-        self.performDR = LabelFrame(tab3, text="3.Perform Dimensionality Reduction", font=("Helvetica", 12, 'bold'), padx=10,
-                               pady=10, fg='black')
-        self.importFeatureDataset = FileSelect(self.performDR, "Import feature dataset .pkl")
-        self.algorithm = DropDownMenu(self.performDR,'Dimensionality Algorithm',drOptions,'15',com=self.selectAlgo)
-        self.algorithm.setChoices(drOptions[0])
-
-        self.frame = Frame(self.performDR)
-
-        self.UMAPhyperparameters = LabelFrame(self.frame, text="UMAP Hyperparameters", padx=5, pady=5)
-        self.distance1 = Entry_Box(self.UMAPhyperparameters, "Distance", '10')
-        self.neighbors1 = Entry_Box(self.UMAPhyperparameters, "Neighbors", '10')
-        self.spread1 = Entry_Box(self.UMAPhyperparameters, "Spread", '10')
-        self.dimensionsUMAP = Entry_Box(self.UMAPhyperparameters, "Dimensions", '10')
-
-        btnSaveDR = Button(self.performDR, text="Save dimensionality reduction .npy", command=self.perform_DR)
-
-        # perform clustering
-        performHDBSCAN = LabelFrame(tab4, text="4.Perform Clustering", font=("Helvetica", 12, 'bold'), padx=5, pady=10,fg='black')
-        self.importDR = FileSelect(performHDBSCAN, "Select dimensionality reduction .npy")
-        btnVisualizeScatter = Button(performHDBSCAN, text="Visualize/save HDBSCAN scatter plot",command=self.visualize_scatter)
-        btnVisualizeTree = Button(performHDBSCAN, text="Visualize/save HDBSCAN tree plot", command=self.visualize_tree)
-        btnSaveClusters = Button(performHDBSCAN, text="Save clusters .csv & .pkl", command=self.save_clusters)
-
-        # train model
-        trainModel = LabelFrame(tab5, text="5.Train Model", font=("Helvetica", 12, 'bold'), padx=10, pady=10, fg='black')
-        self.importFeatureFile = FileSelect(trainModel, 'Import condensed dataset')
-        self.importClusterFile = FileSelect(trainModel, 'Import cluster .pkl file')
-        btnSavePermutation = Button(trainModel, text="Save permutational importances", command=self.save_permimportances)  # command setFolderPath
-        btnSaveFeatures = Button(trainModel, text="Save feature correlations", command=self.save_featcorrelations)  # command setFolderPath
-
-        # visualize clusters
-        visualizeClusters = LabelFrame(tab6, text='6.Visualize Clusters', font=("Helvetica", 12, 'bold'), padx=10, pady=10, fg='black')
-        self.importDataFile = FileSelect(visualizeClusters, 'Import clusters .csv file')
-        self.importVideoName = Entry_Box(visualizeClusters, "Video name", '10')
-        self.importVideoFolder = FolderSelect(visualizeClusters, "Import videos")
-        self.importDatasetFolder = FolderSelect(visualizeClusters, "Import initial datasets")
-        self.importAnimalHeaders = FileSelect(visualizeClusters, "Import animal headers .csv")
-        btnSaveSkeletons = Button(visualizeClusters, text='Save skeleton clips', command=lambda: self.visualize_skeletons_videos('skeleton'))
-        btnSaveVideoClips = Button(visualizeClusters, text='Save original video clips', command=lambda: self.visualize_skeletons_videos(video_type='original'))
-
-
-        #organize
-        saveProjectFolder.grid(row=0,sticky=W)
-        btnCreateFolder.grid(row=0)
-
-        createDataset.grid(row=1,pady=5,sticky=W)
-        self.classifier.grid(row=1,sticky=W)
-        btnGenerateDataset.grid(row=2,sticky=W)
-
-        self.performDR.grid(row=0,sticky=W,pady=10)
-        self.importFeatureDataset.grid(row=0,sticky=W)
-        self.algorithm.grid(row=1,sticky=W)
-        self.frame.grid(row=2,sticky=W)
-        self.UMAPhyperparameters.grid(row=0,sticky=W)
-        self.distance1.grid(row=1,sticky=W)
-        self.neighbors1.grid(row=2,sticky=W)
-        self.spread1.grid(row=3,sticky=W)
-        self.dimensionsUMAP.grid(row=4,sticky=W)
-        btnSaveDR.grid(row=3,pady=10)
-
-        performHDBSCAN.grid(row=0,sticky=W)
-        self.importDR.grid(row=0,sticky=W)
-        btnVisualizeScatter.grid(row=1,pady=5,sticky=W)
-        btnVisualizeTree.grid(row=2,pady=5,sticky=W)
-        btnSaveClusters.grid(row=3,pady=5,sticky=W)
-
-        trainModel.grid(row=0,sticky=W)
-        self.importFeatureFile.grid(row=0,sticky=W)
-        self.importClusterFile.grid(row=1,sticky=W)
-        btnSavePermutation.grid(row=2,sticky=W)
-        btnSaveFeatures.grid(row=3,sticky=W)
-
-        visualizeClusters.grid(row=0,sticky=W)
-        self.importDataFile.grid(row=0,sticky=W)
-        self.importVideoName.grid(row=1,sticky=W)
-        self.importVideoFolder.grid(row=2,sticky=W)
-        self.importDatasetFolder.grid(row=3,sticky=W)
-        self.importAnimalHeaders.grid(row=4,sticky=W)
-        btnSaveSkeletons.grid(row=5,sticky=W)
-        btnSaveVideoClips.grid(row=6,sticky=W)
-
-    def selectAlgo(self,val):
-        try:
-            self.frame.destroy()
-        except:
-            pass
-
-        if val == 'UMAP':
-            self.frame = Frame(self.performDR)
-            self.UMAPhyperparameters = LabelFrame(self.frame, text="UMAP Hyperparameters", padx=5, pady=5)
-            self.distance1 = Entry_Box(self.UMAPhyperparameters, "Distance", '10')
-            self.neighbors1 = Entry_Box(self.UMAPhyperparameters, "Neighbors", '10')
-            self.spread1 = Entry_Box(self.UMAPhyperparameters, "Spread", '10')
-            self.dimensionsUMAP = Entry_Box(self.UMAPhyperparameters, "Dimensions", '10')
-            #organize
-            self.frame.grid(row=2, sticky=W)
-            self.UMAPhyperparameters.grid(row=0, sticky=W)
-            self.distance1.grid(row=1, sticky=W)
-            self.neighbors1.grid(row=2, sticky=W)
-            self.spread1.grid(row=3, sticky=W)
-            self.dimensionsUMAP.grid(row=4, sticky=W)
-
-        elif val == 't-SNE':
-            self.frame = Frame(self.performDR)
-            self.tSNEhyperparameters = LabelFrame(self.frame, text="t-SNE Hyperparameters", padx=5, pady=5)
-            self.perplexity1 = Entry_Box(self.tSNEhyperparameters, "Perplexity", '10')
-            self.iterations1 = Entry_Box(self.tSNEhyperparameters, "Iterations", '10')
-            self.dimensionstSNE = Entry_Box(self.tSNEhyperparameters, "Dimensions", '10')
-            # organize
-            self.frame.grid(row=2, sticky=W)
-            self.tSNEhyperparameters.grid(row=0, sticky=W)
-            self.perplexity1.grid(row=1, sticky=W)
-            self.iterations1.grid(row=2, sticky=W)
-            self.dimensionstSNE.grid(row=3, sticky=W)
-
-        elif val == 'PCA':
-            self.frame = Frame(self.performDR)
-            self.PCAhyperparameters = LabelFrame(self.frame, text=" PCA Hyperparameters", padx=5, pady=5)
-            self.nComponents1 = Entry_Box(self.PCAhyperparameters, 'n-components', '12')
-            #organize
-            self.frame.grid(row=2, sticky=W)
-            self.PCAhyperparameters.grid(row=0, sticky=W)
-            self.nComponents1.grid(row=1, sticky=W)
-
-    def unsupervisedCreate(self):
-        folder_list = ['dimensionality_reduction','dataset','clustering','train_model','visualize_clusters']
-
-        if not os.path.exists(self.unsupervisedfolderpath):
-            for i in folder_list:
-                try:
-                    os.makedirs(os.path.join(self.unsupervisedfolderpath,i))
-                except FileExistsError:
-                    pass
-            write_unsupervisedini(self.unsupervisedfolderpath)
-            print('Unsupervised project folder created.')
-        else:
-            print('Old unsupervised project detected, delete to create new project.')
-
-    def generate_dataset(self):
-        filesFolder = os.path.join(os.path.dirname(self.configini),'csv','machine_results')
-        features2removeFile = askopenfilename(title="Select csv file that includes feature to remove",filetypes=(("csv files","*.csv"),("all files","*.*")))
-        classifierName = self.classifier.getChoices()
-        outputPath = os.path.join(self.unsupervisedfolderpath, 'dataset')
-
-        filesFound = glob.glob(filesFolder + '/*.csv')
-        counter = 0
-        concatDf = pd.DataFrame()
-        features2remove = pd.read_csv(features2removeFile)
-        features2removeList = list(features2remove['Column_name'])
-
-        # loops over all of the input files
-        for file in filesFound:
-            # extracts the file name
-            currDf = pd.read_csv(file, index_col=0)
-            groupDf = pd.DataFrame()
-            # finds all of the bouts of attack where you have multiple 1s in a row, continuous behavior
-            v = (currDf[classifierName] != currDf[classifierName].shift()).cumsum()
-            u = currDf.groupby(v)[classifierName].agg(['all', 'count'])
-            m = u['all'] & u['count'].ge(1)
-            groupDf['groups'] = currDf.groupby(v).apply(lambda x: (x.index[0], x.index[-1]))[m]
-            differenceList = []
-            # extracting beginning and end of behavior sequence
-            for row in groupDf.itertuples():
-                difference = row[1][1] - row[1][0]
-                differenceList.append(difference)
-            groupDf['boutLength'] = differenceList
-            frameWindowListStart, frameWindowListEnd = [], []
-            for row in groupDf.itertuples():
-                frameWindowListStart.append(int(row[1][0]))
-                frameWindowListEnd.append(int(row[1][1]))
-            currDf = currDf.drop(features2removeList, axis=1) # why did we comment out?
-            for startFrame, endFrame in zip(frameWindowListStart, frameWindowListEnd):
-                relRows = currDf.loc[startFrame:endFrame]
-                meanVals = relRows.mean(axis=0)
-                meanVals = pd.DataFrame(meanVals).transpose()
-                meanVals['frame_no_start'] = startFrame
-                meanVals['frame_no_end'] = endFrame
-                meanVals['video'] = os.path.basename(file).replace('.csv', '')
-                concatDf = pd.concat([concatDf, meanVals], axis=0)
-                concatDf.reset_index(drop=True, inplace=True)
-                counter += 1
-                print('Processed ' + str(os.path.basename(file)) + ' ' + str(counter))
-        # saving everything at pkl file (condensed csv)
-
-        concatDf = concatDf.drop([classifierName], axis=1, errors='ignore')
-        concatDf[classifierName] = classifierName
-        concatDf.to_pickle(os.path.join(outputPath, classifierName + '.pkl'))
-        print('Annotations for dimensionality reduction saved.')
-
-    def perform_DR(self):
-
-        file = self.importFeatureDataset.file_path
-        s_behavior = os.path.basename(file).split('.pkl')[0]
-        outputDirectory = os.path.join(self.unsupervisedfolderpath,'dimensionality_reduction')
-
-        print("Reading pickled file...")
-        concatDf = pd.read_pickle(file)
-
-        concatDf = concatDf.loc[:, ~concatDf.columns.str.contains('^Unnamed')]
-        # drop more columns here related to probability features to cluster, user should specify beforehand
-        concatDf = concatDf.drop(
-            ['Scaled_movement_M1', 'Scaled_movement_M2', 'Scaled_movement_M1_M2', 'Probability', 'Low_prob_detections_0.1',
-             'Low_prob_detections_0.5', 'Low_prob_detections_0.75', 'Sum_probabilities', 'Sum_probabilities_deviation',
-             'Sum_probabilities_deviation_percentile_rank', 'Sum_probabilities_deviation_rank',
-             'Sum_probabilities_percentile_rank'], axis=1, errors='ignore')
-
-        videoArray = concatDf.pop('video').values
-        frameNoStart = concatDf.pop('frame_no_start').values
-        frameNoEnd = concatDf.pop('frame_no_end').values
-        behaviour = concatDf.pop(s_behavior).values
-
-        featureArray = (concatDf - concatDf.min()) / (concatDf.max() - concatDf.min())
-
-        print('Performing dimensionality reduction...')
-        #print('UMAP distances =', distances)
-        if (self.algorithm.getChoices() == 'UMAP'):
-            # UMAP
-            dist_string = self.distance1.entry_get
-            distances = dist_string.split()
-
-            neigh_string = self.neighbors1.entry_get
-            neighbors = neigh_string.split()
-
-            spread_string = self.spread1.entry_get
-            spread = spread_string.split()
-
-            UMAP_dim_string = self.dimensionsUMAP.entry_get
-            UMAP_dimensions = UMAP_dim_string.split()
-
-            for dist in distances:
-                for neigh in neighbors:
-                    for spr in spread:
-                        for index, comps in enumerate(UMAP_dimensions):
-                            print('Spread: ' + str(spr) + ' Distance: ' + str(dist) + ' Neighbours: ' + str(
-                                neigh) + ' Dimensions: ' + str(comps))
-                            umap_reducer = umap.UMAP(n_components=int(comps), n_neighbors=int(neigh), spread=float(spr), min_dist=float(dist),
-                                                     metric='euclidean', verbose=True)
-                            umap_embedding = umap_reducer.fit_transform(featureArray)
-                            ############### SAVE DATA #####################
-                            outputNp = np.c_[
-                                umap_embedding, videoArray, frameNoStart, frameNoEnd, behaviour]  # took out group and sex
-                            npyName = os.path.join(outputDirectory, 'UMAP_reduced_features_spread_' + s_behavior + '_'+ str(
-                                spr) + '_neighbors_' + str(neigh) + '_dist_' + str(dist) + '_dimensions_' + str(
-                                comps) + '.npy')
-                            np.save(npyName, outputNp)
-                            print('Saved ' + str(npyName))
-                            print('All UMAPs saved.')
-                            currDf = pd.DataFrame(data=outputNp, columns=['X', 'Y', 'Video', 'Frame_Start', 'Frame_End',
-                                                                          'Behavior'])  # took out Sex and Group
-                            ax = sns.scatterplot(x="X", y="Y", data=currDf, s=10, palette='Set1')
-                            ax.set_title('Spread: ' + str(spr) + ' Distance: ' + str(dist) + ' Neighbours: ' + str(
-                                neigh) + ' Dimensions: ' + str(comps), fontsize=10)
-                            # umap.plot.points(reducer) # UMAPs default visualization, doesn't detail
-                            #plt.show()
-                            pngName = os.path.join(outputDirectory, 'UMAP_reduced_features_spread_' +s_behavior + '_'+ str(
-                                spr) + '_neighbors_' + str(neigh) + '_dist_' + str(dist) + '_dimensions_' + str(
-                                comps) + '.png')
-                            plt.savefig(pngName)
-
-        elif (self.algorithm.getChoices() == 't-SNE'):
-            # tSNE
-            perp_string = self.perplexity1.entry_get
-            perplexity = perp_string.split()
-            iter_string = self.iterations1.entry_get
-            iterations = iter_string.split()
-
-            TSNE_dim_string = self.dimensionstSNE.entry_get
-            TSNE_dimensions = TSNE_dim_string.split()
-            for perp in perplexity:
-                for iter in iterations:
-                    for index, comps in enumerate(TSNE_dimensions):
-                        print('Perplexity: ' + str(perp) + ' Iterations: ' + str(iter) + ' Dimensions: ' + str(comps))
-                        tsne_reducer = TSNE(n_components=int(comps), perplexity=int(perp), n_iter=int(iter))
-                        tsne_embedding = tsne_reducer.fit_transform(featureArray)
-                        outputNp = np.c_[
-                            tsne_embedding, videoArray, frameNoStart, frameNoEnd, behaviour]  # took out group and sex
-                        npyName = os.path.join(outputDirectory, 't-SNE_reduced_features_perplexity_' + s_behavior + '_'+str(
-                            perp) + '_iterations_' + str(iter) + '_dimensions_' + str(comps) + '.npy')
-                        np.save(npyName, outputNp)
-                        print('Saved ' + str(npyName))
-                        print('All t-SNEs saved.')
-                        currDf = pd.DataFrame(data=outputNp, columns=['X', 'Y', 'Video', 'Frame_Start', 'Frame_End',
-                                                                      'Behavior'])  # took out Sex and Group
-                        plt.figure(figsize=(16, 10))
-                        ax = sns.scatterplot(x="X", y="Y", palette=sns.color_palette("Set2"), data=currDf, legend="full",
-                                             alpha=0.3)
-                        ax.set_title(
-                            'Perplexity: ' + str(perp) + ' Iterations: ' + str(iter) + ' Dimensions: ' + str(comps))
-                        pngName = os.path.join(outputDirectory, 't-SNE_reduced_features_perplexity_' +s_behavior + '_'+ str(
-                            perp) + '_iterations_' + str(iter) + '_dimensions_' + str(comps) + '.png')
-                        plt.savefig(pngName)
-
-        elif (self.algorithm.getChoices()  == 'PCA'):
-            pca_reducer = PCA(n_components=int(self.nComponents1.entry_get))
-            pca_embedding = pca_reducer.fit_transform(featureArray)
-            outputNp = np.c_[pca_embedding, videoArray, frameNoStart, frameNoEnd, behaviour]  # took out group and sex
-            npyName = os.path.join(outputDirectory, 'PCA_reduced_features' + s_behavior + '_' + '.npy')
-            np.save(npyName, outputNp)
-            print('Saved ' + str(npyName))
-            print('All PCAs saved.')
-            currDf = pd.DataFrame(data=outputNp, columns=['X', 'Y', 'Video', 'Frame_Start', 'Frame_End', 'Behavior'])
-            plt.figure(figsize=(16, 10))
-            ax = sns.scatterplot(x="X", y="Y", palette=sns.color_palette("hls", 10), data=currDf, legend="full", alpha=0.3)
-            ax.set_title('PCA_reduced_features_after_normalization')
-            #plt.show()
-            pngName = os.path.join(outputDirectory, 'PCA_reduced_features' + '.png')
-            plt.savefig(pngName)
-
-    def visualize_scatter(self):
-        fileName = self.importDR.file_path
-        outputFolder = os.path.join(self.unsupervisedfolderpath, 'clustering')
-
-        dataNp = np.load(fileName, allow_pickle=True)
-
-        drFeatures = np.delete(dataNp, np.s_[-1], axis=1)
-        drFeatures = np.delete(drFeatures, np.s_[2], axis=1)
-
-        # videoArray = np.delete(dataNp, [0,1,3,4,5,6], axis=1)
-        # frameArray = np.delete(dataNp, [0,1,2,4,5,6], axis=1).astype('float32')
-        # sexArray = np.delete(dataNp, [0,1,2,3,5,6], axis=1).astype('str')
-        # groupArray = np.delete(dataNp, [0,1,2,3,4,6], axis=1).astype('str')
-        # behavior = np.delete(dataNp, [0,1,2,3,4,5], axis=1).astype('float32')
-
-        min_cluster_size = int(0.10 * len(drFeatures))  # set it as percentage of entire dataset, 10% length
-
-        HDBSCAN_clusterer = hdbscan.HDBSCAN(algorithm='best', alpha=1.0, approx_min_span_tree=True,
-                                            gen_min_span_tree=True,
-                                            leaf_size=10, metric='euclidean', min_cluster_size=min_cluster_size,
-                                            min_samples=2,
-                                            p=None)
-        HDBscanResults = HDBSCAN_clusterer.fit_predict(drFeatures)
-        np.unique(HDBscanResults)
-        np.count_nonzero(HDBscanResults == -1)
-
-        ###PLOT 2DHDBSCAN SCATTER
-
-        # for every attack bout you have x,y location
-        color_palette = sns.color_palette('Paired', len(np.unique(HDBscanResults)))
-        cluster_colors = [color_palette[x] if x >= 0
-                          else (0.5, 0.5, 0.5)
-                          for x in HDBSCAN_clusterer.labels_]
-        cluster_member_colors = [sns.desaturate(x, p) for x, p in
-                                 zip(cluster_colors, HDBSCAN_clusterer.probabilities_)]
-        X_dim = drFeatures[:, [0]].astype('float32')
-        Y_dim = drFeatures[:, [1]].astype('float32')
-        plt.title('Spread_1_Neigh_8_dist_0.1')  # take in combo name, currently hard-coded
-        plt.scatter(X_dim, Y_dim, s=10, linewidth=0, c=cluster_member_colors, alpha=1)
-        #plt.show()
-        pngName = os.path.join(outputFolder, 'HDBSCAN_scatter.png')
-        plt.savefig(pngName)
-        # saves another column in the dataset
-        print(np.unique(HDBscanResults))
-
-    def visualize_tree(self):
-        fileName = self.importDR.file_path
-        outputFolder = os.path.join(self.unsupervisedfolderpath, 'clustering')
-
-        dataNp = np.load(fileName, allow_pickle=True)
-
-        drFeatures = np.delete(dataNp, np.s_[-1], axis=1)
-        drFeatures = np.delete(drFeatures, np.s_[2], axis=1)
-
-        # videoArray = np.delete(dataNp, [0,1,3,4,5,6], axis=1)
-        # frameArray = np.delete(dataNp, [0,1,2,4,5,6], axis=1).astype('float32')
-        # sexArray = np.delete(dataNp, [0,1,2,3,5,6], axis=1).astype('str')
-        # groupArray = np.delete(dataNp, [0,1,2,3,4,6], axis=1).astype('str')
-        # behavior = np.delete(dataNp, [0,1,2,3,4,5], axis=1).astype('float32')
-
-        min_cluster_size = int(0.10 * len(drFeatures))  # set it as percentage of entire dataset, 10% length
-
-        HDBSCAN_clusterer = hdbscan.HDBSCAN(algorithm='best', alpha=1.0, approx_min_span_tree=True,
-                                            gen_min_span_tree=True,
-                                            leaf_size=10, metric='euclidean', min_cluster_size=min_cluster_size,
-                                            min_samples=2,
-                                            p=None)
-        HDBscanResults = HDBSCAN_clusterer.fit_predict(drFeatures)
-        np.unique(HDBscanResults)
-        np.count_nonzero(HDBscanResults == -1)
-
-        ###PLOT TREE HDBSCAN
-        HDBSCAN_clusterer.condensed_tree_.plot(select_clusters=True, selection_palette=sns.color_palette())
-        #plt.show()
-        pngName = os.path.join(outputFolder, 'HDBSCAN_tree.png')
-        plt.savefig(pngName)
-
-        # #
-        # ###HDBSCAN TO PANDAS
-        # clusturerDf = clusterer.condensed_tree_.to_pandas()
-        # clusturerDf.to_csv('test.csv')
-
-    def save_clusters(self):
-        fileName = self.importDR.file_path
-        outputFolder = os.path.join(self.unsupervisedfolderpath, 'clustering')
-
-        dataNp = np.load(fileName, allow_pickle=True)
-
-        drFeatures = np.delete(dataNp, np.s_[-1], axis=1)
-        drFeatures = np.delete(drFeatures, np.s_[2], axis=1)
-
-        # videoArray = np.delete(dataNp, [0,1,3,4,5,6], axis=1)
-        # frameArray = np.delete(dataNp, [0,1,2,4,5,6], axis=1).astype('float32')
-        # sexArray = np.delete(dataNp, [0,1,2,3,5,6], axis=1).astype('str')
-        # groupArray = np.delete(dataNp, [0,1,2,3,4,6], axis=1).astype('str')
-        # behavior = np.delete(dataNp, [0,1,2,3,4,5], axis=1).astype('float32')
-
-        min_cluster_size = int(0.10 * len(drFeatures))  # set it as percentage of entire dataset, 10% length
-
-        HDBSCAN_clusterer = hdbscan.HDBSCAN(algorithm='best', alpha=1.0, approx_min_span_tree=True,
-                                            gen_min_span_tree=True,
-                                            leaf_size=10, metric='euclidean', min_cluster_size=min_cluster_size,
-                                            min_samples=2,
-                                            p=None)
-        HDBscanResults = HDBSCAN_clusterer.fit_predict(drFeatures)
-        np.unique(HDBscanResults)
-        np.count_nonzero(HDBscanResults == -1)
-
-        # saves output as a pkl
-        ###HDBSCAN TO PICKLE
-        outputNp = np.c_[dataNp, HDBscanResults]
-        outputDf = pd.DataFrame(
-            {'X_dim': outputNp[:, 0], 'Y_dim': outputNp[:, 1], 'Video': outputNp[:, 2], 'Frame_start': outputNp[:, 3],
-             'Frame_end': outputNp[:, 4], 'Behavior': outputNp[:, 5], 'Cluster': outputNp[:, 6]})
-        outputDf[["X_dim", "Y_dim"]] = outputDf[["X_dim", "Y_dim"]].apply(pd.to_numeric)
-        outputPath1 = os.path.join(outputFolder, 'HDBscan_bouts.pkl')
-        outputPath2 = os.path.join(outputFolder, 'HDBscan_bouts.csv')
-        outputDf.to_pickle(outputPath1)
-        outputDf.to_csv(outputPath2)
-
-    def save_permimportances(self):
-        featureFile = self.importFeatureFile.file_path
-        clusterFile = self.importClusterFile.file_path
-        outputPath = os.path.join(self.unsupervisedfolderpath, 'train_model')
-
-        clusterFile = np.load(clusterFile, allow_pickle=True)
-        featureFile = pd.read_pickle(featureFile)
-        # clusterFile = pd.read_pickle(clusterFile)
-        clusterFile_2 = clusterFile[clusterFile['Cluster'] == 0]
-
-        # figure out why the algorithm clustered it like this, difference between feature values
-        clusterCol = clusterFile['Cluster']
-        # featureFile = featureFile[featureFile['group'] == 'Female']
-        featureFile = featureFile.reset_index(drop=True)
-        X_dim = clusterFile_2.pop('X_dim').values
-        Y_dim = clusterFile_2.pop('Y_dim').values
-        FrameStart = clusterFile.pop('Frame_start').values
-        FrameEnd = clusterFile.pop('Frame_end').values
-        video = clusterFile_2.pop('Video').values
-
-        featureFile = featureFile.drop(
-            ['Attack', 'frame_no_start', 'frame_no_end', 'video', 'group', 'sex', 'Scaled_movement_M1',
-             'Scaled_movement_M2', 'Scaled_movement_M1_M2', 'Probability_Attack', 'Low_prob_detections_0.1',
-             'Low_prob_detections_0.5', 'Low_prob_detections_0.75', 'Sum_probabilities', 'Sum_probabilities_deviation',
-             'Sum_probabilities_deviation_percentile_rank', 'Sum_probabilities_deviation_rank',
-             'Sum_probabilities_percentile_rank'], axis=1, errors='ignore')
-        featureFile['Cluster'] = clusterCol
-
-        featureFile = featureFile[featureFile['Cluster'] != -1]
-
-        clustersList = list(featureFile.Cluster.unique())
-
-        def pearson_filter(featuresDf, del_corr_threshold, del_corr_plot_status):
-            print('Reducing features. Correlation threshold: ' + str(del_corr_threshold))
-            col_corr = set()
-            corr_matrix = featuresDf.corr()
-            for i in range(len(corr_matrix.columns)):
-                for j in range(i):
-                    if (corr_matrix.iloc[i, j] >= del_corr_threshold) and (corr_matrix.columns[j] not in col_corr):
-                        colname = corr_matrix.columns[i]
-                        col_corr.add(colname)
-                        if colname in featuresDf.columns:
-                            del featuresDf[colname]
-                            print(colname)
-            # if del_corr_plot_status == 'yes':
-            #     print('Creating feature correlation heatmap...')
-            #     dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
-            #     plt.matshow(featuresDf.corr())
-            #     plt.tight_layout()
-            #     plt.savefig(os.path.join(outputPath, 'Feature_correlations_' + dateTime + '.png'), dpi=300)
-            #     plt.close('all')
-            #     print('Feature correlation heatmap .png saved in project_folder/logs directory')
-
-            return featuresDf
-
-
-        for cluster in range(len(clustersList)):
-            currentTargetDf = featureFile[featureFile['Cluster'] == clustersList[cluster]]
-            currentTargetDf['Cluster'] = 1
-            currentTargetDf = currentTargetDf.reset_index(drop=True)
-            # currentNonTargetDf = featureFile[featureFile['Cluster'] == clustervalue2[cluster]]
-            currentNonTargetDf = featureFile.loc[featureFile['Cluster'].isin(clustersList)]
-            currentNonTargetDf = currentNonTargetDf.drop(['Cluster'], axis=1, errors='ignore')
-            currentNonTargetDf['Cluster'] = 0
-            currentNonTargetDf = currentNonTargetDf.reset_index(drop=True)
-            features = pd.concat([currentTargetDf, currentNonTargetDf])
-            targetFrameRows = features.loc[features['Cluster'] == 1]
-            targetFrame = features.pop('Cluster').values
-
-            # for cluster in clustersList:
-            # currentTargetDf = featureFile[featureFile['Cluster'] == clustersList[cluster]]
-
-            features = pearson_filter(features, 0.70, 'yes')
-
-            # somehow, random forest models generate tables that calculate permutational importances for each feature
-
-            # features = (features-features.min())/(features.max()-features.min())
-            feature_list = list(features)
-            data_train, data_test, target_train, target_test = train_test_split(features, targetFrame, test_size=0.20)
-
-            clf = RandomForestClassifier(n_estimators=2000, max_features='sqrt', n_jobs=-1, criterion='entropy',
-                                         min_samples_leaf=1, bootstrap=True, verbose=1)
-            clf.fit(data_train, target_train)
-
-
-        # PERFORM GINI IMPORTANCES
-        importances = list(clf.feature_importances_)
-        feature_importances = [(feature, round(importance, 2)) for feature, importance in zip(feature_list, importances)]
-        feature_importances = sorted(feature_importances, key=lambda x: x[1], reverse=True)
-        feature_importance_list = [('Variable: {:20} Importance: {}'.format(*pair)) for pair in feature_importances]
-        feature_importance_list_varNm = [i.split(':' " ", 3)[1] for i in feature_importance_list]
-        feature_importance_list_importance = [i.split(':' " ", 3)[2] for i in feature_importance_list]
-        log_df = pd.DataFrame()
-        log_df['Feature_name'] = feature_importance_list_varNm
-        log_df['Feature_importance'] = feature_importance_list_importance
-        savePath = os.path.join(outputPath, 'feature_importance_log_2.csv')
-        log_df.to_csv(savePath)
-
-    def save_featcorrelations(self):
-
-        featureFile = self.importFeatureFile.file_path
-        clusterFile = self.importClusterFile.file_path
-        outputPath = os.path.join(self.unsupervisedfolderpath, 'train_model')
-
-        clusterFile = np.load(clusterFile, allow_pickle=True)
-        featureFile = pd.read_pickle(featureFile)
-        # clusterFile = pd.read_pickle(clusterFile)
-        clusterFile_2 = clusterFile[clusterFile['Cluster'] == 0]
-
-        # figure out why the algorithm clustered it like this, difference between feature values
-        clusterCol = clusterFile['Cluster']
-        # featureFile = featureFile[featureFile['group'] == 'Female']
-        featureFile = featureFile.reset_index(drop=True)
-        X_dim = clusterFile_2.pop('X_dim').values
-        Y_dim = clusterFile_2.pop('Y_dim').values
-        FrameStart = clusterFile.pop('Frame_start').values
-        FrameEnd = clusterFile.pop('Frame_end').values
-        video = clusterFile_2.pop('Video').values
-
-        featureFile = featureFile.drop(
-            ['Attack', 'frame_no_start', 'frame_no_end', 'video', 'group', 'sex', 'Scaled_movement_M1',
-             'Scaled_movement_M2', 'Scaled_movement_M1_M2', 'Probability_Attack', 'Low_prob_detections_0.1',
-             'Low_prob_detections_0.5', 'Low_prob_detections_0.75', 'Sum_probabilities', 'Sum_probabilities_deviation',
-             'Sum_probabilities_deviation_percentile_rank', 'Sum_probabilities_deviation_rank',
-             'Sum_probabilities_percentile_rank'], axis=1, errors='ignore')
-        featureFile['Cluster'] = clusterCol
-
-        featureFile = featureFile[featureFile['Cluster'] != -1]
-
-        clustersList = list(featureFile.Cluster.unique())
-
-        def pearson_filter(featuresDf, del_corr_threshold, del_corr_plot_status):
-            print('Reducing features. Correlation threshold: ' + str(del_corr_threshold))
-            col_corr = set()
-            corr_matrix = featuresDf.corr()
-            for i in range(len(corr_matrix.columns)):
-                for j in range(i):
-                    if (corr_matrix.iloc[i, j] >= del_corr_threshold) and (corr_matrix.columns[j] not in col_corr):
-                        colname = corr_matrix.columns[i]
-                        col_corr.add(colname)
-                        if colname in featuresDf.columns:
-                            del featuresDf[colname]
-                            print(colname)
-            if del_corr_plot_status == 'yes':
-                print('Creating feature correlation heatmap...')
-                dateTime = datetime.now().strftime('%Y%m%d%H%M%S')
-                plt.matshow(featuresDf.corr())
-                plt.tight_layout()
-                plt.savefig(os.path.join(outputPath, 'Feature_correlations_' + dateTime + '.png'), dpi=300)
-                plt.close('all')
-                print('Feature correlation heatmap .png saved in project_folder/logs directory')
-
-            return featuresDf
-
-
-        for cluster in range(len(clustersList)):
-            currentTargetDf = featureFile[featureFile['Cluster'] == clustersList[cluster]]
-            currentTargetDf['Cluster'] = 1
-            currentTargetDf = currentTargetDf.reset_index(drop=True)
-            # currentNonTargetDf = featureFile[featureFile['Cluster'] == clustervalue2[cluster]]
-            currentNonTargetDf = featureFile.loc[featureFile['Cluster'].isin(clustersList)]
-            currentNonTargetDf = currentNonTargetDf.drop(['Cluster'], axis=1, errors='ignore')
-            currentNonTargetDf['Cluster'] = 0
-            currentNonTargetDf = currentNonTargetDf.reset_index(drop=True)
-            features = pd.concat([currentTargetDf, currentNonTargetDf])
-            targetFrameRows = features.loc[features['Cluster'] == 1]
-            targetFrame = features.pop('Cluster').values
-
-            # for cluster in clustersList:
-            # currentTargetDf = featureFile[featureFile['Cluster'] == clustersList[cluster]]
-
-            features = pearson_filter(features, 0.70, 'yes')
-
-            # somehow, random forest models generate tables that calculate permutational importances for each feature
-
-            # features = (features-features.min())/(features.max()-features.min())
-            feature_list = list(features)
-            data_train, data_test, target_train, target_test = train_test_split(features, targetFrame, test_size=0.20)
-
-            clf = RandomForestClassifier(n_estimators=2000, max_features='sqrt', n_jobs=-1, criterion='entropy',
-                                         min_samples_leaf=1, bootstrap=True, verbose=1)
-            clf.fit(data_train, target_train)
-
-    def visualize_skeletons_videos(self,video_type):
-        plot_skeleton = 'yes'
-        save_frames = 'yes'
-        videoFn = self.importVideoName.entry_get  # main example of all 3 clusters
-        video = video_type
-
-        # can't we just import the video file?
-        dataFilePath = self.importDataFile.file_path
-        videoFile = os.path.join(self.importVideoFolder.folder_path, videoFn + '.mp4')
-        outputFolder = os.path.join(self.unsupervisedfolderpath, 'visualize_clusters')
-        # skeletonDfpath = r"Z:\DeepLabCut\misc\UMAP\2_UMAP_091020\1_pkl_data_files\Bouts_attack_no_size_more_SA.pkl"
-        animalHeaders = self.importAnimalHeaders.file_path
-        animal1HeadersDf = pd.read_csv(animalHeaders)
-        animal1Headers = list(animal1HeadersDf['Animal_1'])
-        animal2Headers = list(animal1HeadersDf['Animal_2'])
-
-        dataFile = pd.read_csv(dataFilePath, index_col=0)
-        dataFile = dataFile[dataFile['Video'] == os.path.basename(videoFile).replace('.mp4', '')]
-        cap = cv2.VideoCapture(videoFile)
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        width, height, noFrames = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), int(
-            cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        clusterVals = list(dataFile['Cluster'].unique())
-        if plot_skeleton == 'yes':
-            skeletonDf = pd.read_csv(os.path.join(self.importDatasetFolder.folder_path, videoFn + '.csv'), index_col=0)
-
-        if save_frames == 'yes':
-            dirPath = os.path.join(outputFolder, videoFn)
-            if not os.path.exists(dirPath):
-                os.makedirs(dirPath)
-
-        for currCluster in clusterVals:
-            if save_frames == 'yes':
-                dirPathCluster = os.path.join(outputFolder, videoFn, 'Cluster_' + str(currCluster))
-                if not os.path.exists(dirPathCluster):
-                    os.makedirs(dirPathCluster)
-
-            cap = cv2.VideoCapture(videoFile)
-            vidBasename = os.path.basename(videoFile).replace('.mp4', '.avi')
-            outputDf = pd.DataFrame(columns=['Cluster'])
-            outputDf['Cluster'] = [0] * noFrames
-            currDf = dataFile[dataFile['Cluster'] == currCluster]
-            currDf = currDf[['Frame_start', 'Frame_end']]
-            for index, row in currDf.iterrows():
-                frameList = list(range(row['Frame_start'], row['Frame_end']))
-                for frame in frameList:
-                    outputDf['Cluster'][frame] = 1
-
-            outDf = pd.DataFrame(columns=['Start', 'End'])
-            groupDf = pd.DataFrame()
-            v = (outputDf['Cluster'] != outputDf['Cluster'].shift()).cumsum()
-            u = outputDf.groupby(v)['Cluster'].agg(['all', 'count'])
-            m = u['all'] & u['count'].ge(1)
-            groupDf['groups'] = outputDf.groupby(v).apply(lambda x: (x.index[0], x.index[-1]))[m]
-            for row in groupDf.itertuples():
-                start, end = row[1][0] - 30, row[1][1] + 30
-                if start < 0: start = 0
-                if end > len(outputDf): end = len(outputDf)
-                appendList = [start, end]
-                outDf.loc[len(outDf)] = appendList
-
-            clusterCounter = 0
-            for index, row in outDf.iterrows():
-                clusterCounter += 1
-                if save_frames == 'yes':
-                    dirPathClusterExample = os.path.join(dirPathCluster, 'Example_' + str(clusterCounter))
-                    if not os.path.exists(dirPathClusterExample):
-                        os.makedirs(dirPathClusterExample)
-                frames = list(range(row['Start'], row['End'] + 1))
-                behaviorStart, behaviorEnd = frames[0] + 30, frames[-1] - 30
-                frameCounter = 0
-                if video == 'original':
-                    outputPath1 = os.path.join(outputFolder,
-                                               'Cluster_' + str(currCluster) + '_OriginalClip_#' + str(
-                                                   index) + '_' + vidBasename)
-                    writer1 = cv2.VideoWriter(outputPath1, fourcc, 30, (width, height))
-                    cap = cv2.VideoCapture(videoFile)
-                    for frameNo in frames:
-                        cap.set(cv2.CAP_PROP_POS_FRAMES, frameNo)
-                        ret, frame = cap.read()
-                        cv2.imshow('frame', frame)  # need to fix so width and height are 0
-                        cv2.waitKey(33)
-                        writer1.write(frame)
-                    cv2.destroyAllWindows()
-                    writer1.release()
-                    print('Video ' + str(outputPath1) + ' created.')
-
-                else:
-                    for frameNo in frames:
-                        outputPath2 = os.path.join(outputFolder,
-                                                   'Cluster_' + str(currCluster) + '_Skeletons_' + vidBasename)
-                        writer2 = cv2.VideoWriter(outputPath2, fourcc, 30, (width, height))
-                        frameCounter += 1
-                        currAnimal1 = list(skeletonDf.loc[skeletonDf.index[frameNo], animal1Headers])
-                        currAnimal1 = np.array([currAnimal1[i:i + 2] for i in range(0, len(currAnimal1), 2)]).astype(int)
-                        currAnimal2 = list(skeletonDf.loc[skeletonDf.index[frameNo], animal2Headers])
-                        currAnimal2 = np.array([currAnimal2[i:i + 2] for i in range(0, len(currAnimal2), 2)]).astype(int)
-                        currFrame = np.zeros((height, width, 3), dtype="uint8")
-                        currAnimal1_hull = cv2.convexHull((currAnimal1.astype(int)))
-                        currAnimal2_hull = cv2.convexHull((currAnimal2.astype(int)))
-
-                        cv2.drawContours(currFrame, [currAnimal1_hull.astype(int)], 0, (255, 255, 255), 1)
-                        cv2.drawContours(currFrame, [currAnimal2_hull.astype(int)], 0, (0, 255, 0), 1)
-                        for anim1, anim2 in zip(currAnimal1, currAnimal2):
-                            cv2.circle(currFrame, (int(anim1[0]), int(anim1[1])), 4, (147, 20, 255), thickness=-1,
-                                       lineType=8, shift=0)
-                            cv2.circle(currFrame, (int(anim2[0]), int(anim2[1])), 4, (0, 255, 255), thickness=-1,
-                                       lineType=8, shift=0)
-
-                        cv2.line(currFrame, (currAnimal1[0][0], currAnimal1[0][1]), (currAnimal1[1][0], currAnimal1[1][1]),
-                                 (0, 0, 255), 2)
-                        cv2.line(currFrame, (currAnimal2[0][0], currAnimal2[0][1]), (currAnimal2[1][0], currAnimal2[1][1]),
-                                 (0, 0, 255), 2)
-                        cv2.line(currFrame, (currAnimal1[4][0], currAnimal1[4][1]), (currAnimal1[5][0], currAnimal1[5][1]),
-                                 (0, 0, 255), 2)
-                        cv2.line(currFrame, (currAnimal2[4][0], currAnimal2[4][1]), (currAnimal2[5][0], currAnimal2[5][1]),
-                                 (0, 0, 255), 2)
-                        cv2.line(currFrame, (currAnimal1[2][0], currAnimal1[2][1]), (currAnimal1[6][0], currAnimal1[6][1]),
-                                 (0, 0, 255), 2)
-                        cv2.line(currFrame, (currAnimal2[2][0], currAnimal2[2][1]), (currAnimal2[6][0], currAnimal2[6][1]),
-                                 (0, 0, 255), 2)
-
-                        if (frameNo < behaviorStart):
-                            cv2.putText(currFrame, str('Cluster ' + str(currCluster)) + ' coming up...', (30, 30),
-                                        cv2.FONT_HERSHEY_DUPLEX, 0.7, (0, 0, 255), 1)
-                        elif (frameNo > behaviorEnd):
-                            cv2.putText(currFrame, str('Cluster ' + str(currCluster)) + ' happened.', (30, 30),
-                                        cv2.FONT_HERSHEY_DUPLEX, 0.7, (0, 255, 255), 1)
-                        else:
-                            cv2.putText(currFrame, str(currCluster) + '!!', (30, 30), cv2.FONT_HERSHEY_DUPLEX, 1.5,
-                                        (0, 255, 0), 1)
-
-                        cv2.imshow('frame', currFrame)
-                        cv2.waitKey(3)  # pauses for 3 seconds before fetching next image
-
-                        if save_frames == 'yes':
-                            filename = os.path.join(dirPathClusterExample, str(frameCounter) + '.png')
-                            cv2.imwrite(filename, currFrame)
-
-                        writer2.write(currFrame)
-
-                    for i in range(30):
-                        blueFrame = np.zeros((currFrame.shape[0], currFrame.shape[1], 3))
-                        blueFrame[:] = (255, 0, 0)
-                        blueFrame = blueFrame.astype(np.uint8)
-                        writer2.write(blueFrame)
-
-            print('saved')
-            cap.release()
-
-        currRow = 0
-        while (cap.isOpened()):
-            ret, frame = cap.read()
-            if ret == True:
-                currVals = clusterFramesDf.loc[clusterFramesDf['Frame'] == currRow]
-                if currVals.empty:
-                    cv2.putText(frame, str('Cluster: None'), (30, 30), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 255, 255), 2)
-                else:
-                    clustervalue = list(currVals['Cluster'])
-                    cv2.putText(frame, str(clustervalue[0]), (30, 30), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 255, 255), 2)
-
-                frame = np.uint8(frame)
-                cv2.imshow('image', frame)
-                cv2.waitKey(30)
-                # cv2.destroyAllWindows()
-                writer.write(frame)
-            if frame is None:
-                print('Video saved.')
-                cap.release()
-                break
-            currRow += 1
-            print(currRow)
 
 class trainmachinemodel_settings:
     def __init__(self,inifile):
@@ -5655,26 +3764,6 @@ class trainmachinemodel_settings:
 
         print('Settings exported to project_config.ini')
 
-class makelineplot:
-    def __init__(self):
-        # Popup window
-        lpToplevel = Toplevel()
-        lpToplevel.minsize(200, 200)
-        lpToplevel.wm_title("Make line plot")
-
-        lpLabelframe = LabelFrame(lpToplevel)
-        lpvideo = FileSelect(lpLabelframe,'Video',lblwidth='10')
-        lpcsv = FileSelect(lpLabelframe,'csv file',lblwidth='10')
-        bpentry = Entry_Box(lpLabelframe,'Bodypart','10')
-
-        lpbutton = Button(lpLabelframe,text='Generate plot',command =lambda: draw_line_plot_tools(lpvideo.file_path,lpcsv.file_path,bpentry.entry_get))
-        #organize
-        lpLabelframe.grid(row=0,sticky=W)
-        lpvideo.grid(row=0,sticky=W)
-        lpcsv.grid(row=1,sticky=W)
-        bpentry.grid(row=2,sticky=W)
-        lpbutton.grid(row=3,pady=10)
-
 class droptrackingdata:
     def __init__(self):
         self.dtToplevel = Toplevel()
@@ -5755,120 +3844,6 @@ class droptrackingdata:
 
 
         #run_bp_removal(self.poseTool.getChoices(), self.animal_names, bp_to_remove_list, self.fFolder.folder_path, self.fileFormat.getChoices())
-
-
-class reorganizeData:
-    def __init__(self):
-        self.roToplevel = Toplevel()
-        self.roToplevel.minsize(500,800)
-        self.roToplevel.wm_title('Reorganize Tracking Data')
-
-        self.scroll = hxtScrollbar(self.roToplevel)
-
-        roLabelframe = LabelFrame(self.scroll,text='File Settings',font=('Helvetica',10,'bold'),pady=5,padx=5)
-        self.fFolder = FolderSelect(roLabelframe,'Data Folder',lblwidth='10')
-        self.poseTool = DropDownMenu(roLabelframe,'Tracking tool',['DLC', 'maDLC'],'10')
-        self.poseTool.setChoices('DLC')
-        self.fileFormat = DropDownMenu(roLabelframe,'File Type',['csv','h5'],'10')
-        self.fileFormat.setChoices('csv')
-
-        btnConfirm = Button(roLabelframe,text='Confirm',command= lambda: self.confirm(self.fFolder.folder_path,self.poseTool.getChoices(),self.fileFormat.getChoices()))
-        # btnreorganize = Button(self.roToplevel,text='Reorganize Data',command = )
-
-        #organize
-        roLabelframe.grid(row=0,sticky=W)
-        self.fFolder.grid(row=0,sticky=W,columnspan=3)
-        self.poseTool.grid(row=1,sticky=W)
-        self.fileFormat.grid(row=2,sticky=W)
-        btnConfirm.grid(row=2,column=1,sticky=W)
-
-    def confirm(self,folder,posetool,fileformat):
-        try:
-            self.frame.destroy()
-        except:
-            pass
-
-        self.keypoint_reorganizer = KeypointReorganizer(data_folder=folder, pose_tool=posetool, file_format=fileformat)
-        #animallist, bplist, self.headerlist = display_original_bp_list(folder,posetool,fileformat)
-        self.frame = Frame(self.scroll)
-        self.table1 = LabelFrame(self.frame,text='Current Order:')
-        self.table2 = LabelFrame(self.frame,text='New Order')
-
-        #organize
-        self.frame.grid(row=1,sticky=W,pady=10)
-        self.table1.grid(row=0,sticky=N, pady=5)
-        self.table2.grid(row=0,column=1,sticky=N,padx=5,pady=5)
-
-        idx1, idx2, oldanimallist, oldbplist, self.newanimallist, self.newbplist = ([0]*len(self.keypoint_reorganizer.bp_list) for i in range(6)) #create lists
-
-        if self.keypoint_reorganizer.animal_list:
-            animal_list_reduced = list(set(self.keypoint_reorganizer.animal_list))
-            self.pose_tool = 'maDLC'
-            #if ma dlc or h5
-            for i in range(len(self.keypoint_reorganizer.bp_list)):
-
-                #current order
-                idx1[i] = Label(self.table1,text=str(i+1) + '.')
-                oldanimallist[i] = Label(self.table1,text=str(self.keypoint_reorganizer.animal_list[i]))
-                oldbplist[i] = Label(self.table1,text=str(self.keypoint_reorganizer.bp_list[i]))
-
-                idx1[i].grid(row=i,column=0,sticky=W)
-                oldanimallist[i].grid(row=i,column=1,sticky=W, ipady=5)
-                oldbplist[i].grid(row=i,column=2,sticky=W, ipady=5)
-
-                #new order
-                idx2[i] = Label(self.table2,text=str(i+1) + '.')
-                self.newanimallist[i] = DropDownMenu(self.table2, ' ', animal_list_reduced, '10')
-                self.newbplist[i] = DropDownMenu(self.table2,' ', self.keypoint_reorganizer.bp_list,'10')
-                self.newanimallist[i].setChoices(self.keypoint_reorganizer.animal_list[i])
-                self.newbplist[i].setChoices(self.keypoint_reorganizer.bp_list[i])
-
-                idx2[i].grid(row=i,column=0,sticky=W)
-                self.newanimallist[i].grid(row=i, column=1, sticky=W)
-                self.newbplist[i].grid(row=i,column=2,sticky=W)
-
-        else:
-            self.pose_tool = 'DLC'
-            for i in range(len(self.keypoint_reorganizer.bp_list)):
-                # current order
-                idx1[i] = Label(self.table1, text=str(i + 1) + '.')
-                oldbplist[i] = Label(self.table1, text=str(self.keypoint_reorganizer.bp_list[i]))
-
-                idx1[i].grid(row=i, column=0, sticky=W, ipady=5)
-                oldbplist[i].grid(row=i, column=2, sticky=W, ipady=5)
-
-                # new order
-                idx2[i] = Label(self.table2, text=str(i + 1) + '.')
-                self.newbplist[i] = StringVar()
-                oldanimallist[i] = OptionMenu(self.table2, self.newbplist[i], *self.keypoint_reorganizer.bp_list)
-                self.newbplist[i].set(self.keypoint_reorganizer.bp_list[i])
-
-                idx2[i].grid(row=i, column=0, sticky=W)
-                oldanimallist[i].grid(row=i, column=1, sticky=W)
-
-        button_run = Button(self.frame, text='Run re-organization', command= lambda: self.run_reorganization())
-        button_run.grid(row=2, column=1, sticky=W)
-
-    def run_reorganization(self):
-
-        if self.pose_tool == 'DLC':
-            new_bp_list = []
-            for curr_choice in self.newbplist:
-                new_bp_list.append(curr_choice.get())
-
-            self.keypoint_reorganizer.perform_reorganization(animal_list=None, bp_lst=new_bp_list)
-
-            #reorganize_bp_order(self.fFolder.folder_path, self.poseTool.getChoices(), self.fileFormat.getChoices(), self.headerlist, [], new_bp_list, self.pose_tool)
-
-        if self.pose_tool == 'maDLC':
-            new_bp_list, new_animal_list = [], []
-            for curr_animal, curr_bp in zip(self.newanimallist, self.newbplist):
-                new_bp_list.append(curr_bp.getChoices())
-                new_animal_list.append(curr_animal.getChoices())
-            self.keypoint_reorganizer.perform_reorganization(animal_list=new_animal_list, bp_lst=new_bp_list)
-
-            #reorganize_bp_order(self.fFolder.folder_path, self.poseTool.getChoices(), self.fileFormat.getChoices(), self.headerlist, new_animal_list, new_bp_list, self.pose_tool)
-
 
 class runmachinemodelsettings:
     def __init__(self,inifile):
@@ -5988,20 +3963,6 @@ def CreateToolTip(widget, text):
     widget.bind('<Enter>', enter)
     widget.bind('<Leave>', leave)
 
-class aboutgui:
-    def __init__(self):
-        about = Toplevel()
-        about.minsize(896, 507)
-        about.wm_title("About")
-
-        canvas = Canvas(about,width=896,height=507,bg='black')
-        canvas.pack()
-        scriptdir = os.path.dirname(__file__)
-        img = PhotoImage(file=os.path.join(scriptdir,'About_me_050122_1.png'))
-
-        canvas.create_image(0,0,image=img,anchor='nw')
-        canvas.image = img
-
 class App(object):
     def __init__(self):
         scriptdir = os.path.dirname(os.path.realpath(__file__))
@@ -6050,47 +4011,47 @@ class App(object):
 
         #fifth menu
         fifthMenu = Menu(menu)
-        #changefpsmenu
         fpsMenu = Menu(fifthMenu)
-        fpsMenu.add_command(label='Change fps for single video', command=changefps)
-        fpsMenu.add_command(label='Change fps for multiple videos',command=changefpsmulti)
+        fpsMenu.add_command(label='Change fps for single video', command=ChangeFpsSingleVideoPopUp)
+        fpsMenu.add_command(label='Change fps for multiple videos',command=ChangeFpsMultipleVideosPopUp)
         menu.add_cascade(label='Tools',menu=fifthMenu)
-        fifthMenu.add_command(label='Clip videos',command=shorten_video)
-        fifthMenu.add_command(label='Clip video into multiple videos', command=multi_shorten_video)
-        fifthMenu.add_command(label='Crop videos',command=crop_video)
-        fifthMenu.add_command(label='Multi-crop',command=multicropmenu)
-        fifthMenu.add_command(label='Downsample videos',command=video_downsample)
-        fifthMenu.add_command(label='Get mm/ppx',command = get_coordinates_from_video)
-        fifthMenu.add_command(label='Make line plot', command=makelineplot)
+        fifthMenu.add_command(label='Clip videos',command=ClipVideoPopUp)
+        fifthMenu.add_command(label='Clip video into multiple videos', command=MultiShortenPopUp)
+        fifthMenu.add_command(label='Crop videos',command=CropVideoPopUp)
+        fifthMenu.add_command(label='Multi-crop',command=MultiCropPopUp)
+        fifthMenu.add_command(label='Downsample videos',command=DownsampleVideoPopUp)
+        fifthMenu.add_command(label='Get mm/ppx',command = CalculatePixelsPerMMInVideoPopUp)
+        fifthMenu.add_command(label='Create path plot', command=MakePathPlotPopUp)
         fifthMenu.add_cascade(label='Change fps...',menu =fpsMenu)
+        fifthMenu.add_cascade(label='Concatenate videos', command=ConcatenatingVideosPopUp)
         fifthMenu.add_cascade(label='Visualize pose-estimation in folder...', command=visualize_pose)
-        fifthMenu.add_cascade(label='Reorganize Tracking Data', command= reorganizeData)
+        fifthMenu.add_cascade(label='Reorganize Tracking Data', command= PoseReorganizerPopUp)
         fifthMenu.add_cascade(label='Drop body-parts from tracking data', command=droptrackingdata)
 
         #changefpsmenu organize
 
         changeformatMenu = Menu(fifthMenu)
-        changeformatMenu.add_command(label='Change image file formats',command=change_imageformat)
-        changeformatMenu.add_command(label='Change video file formats',command=convert_video)
+        changeformatMenu.add_command(label='Change image file formats',command=ChangeImageFormatPopUp)
+        changeformatMenu.add_command(label='Change video file formats',command=ConertVideoPopUp)
         changeformatMenu.add_command(label='Change .seq to .mp4', command=lambda:convertseqVideo(askdirectory(title='Please select video folder to convert')))
         fifthMenu.add_cascade(label='Change formats...',menu=changeformatMenu)
 
-        fifthMenu.add_command(label='CLAHE enhance video',command=Red_light_Convertion)
+        fifthMenu.add_command(label='CLAHE enhance video',command=CLAHEPopUp)
         fifthMenu.add_command(label='Superimpose frame numbers on video',command=lambda:superimpose_frame_count(file_path=askopenfilename()))
         fifthMenu.add_command(label='Convert to grayscale',command=lambda:video_to_greyscale(file_path=askopenfilename()))
-        fifthMenu.add_command(label='Merge frames to video',command=mergeframeffmpeg)
-        fifthMenu.add_command(label='Generate gifs', command=creategif)
-        fifthMenu.add_command(label='Print model info...', command=print_model_info)
+        fifthMenu.add_command(label='Merge frames to video',command=MergeFrames2VideoPopUp)
+        fifthMenu.add_command(label='Generate gifs', command=CreateGIFPopUP)
+        fifthMenu.add_command(label='Print classifier info...', command=PrintModelInfoPopUp)
 
         extractframesMenu = Menu(fifthMenu)
-        extractframesMenu.add_command(label='Extract defined frames',command=extract_specificframes)
-        extractframesMenu.add_command(label='Extract frames',command=extract_allframes)
-        extractframesMenu.add_command(label='Extract frames from seq files', command=extract_seqframe)
+        extractframesMenu.add_command(label='Extract defined frames',command=ExtractSpecificFramesPopUp)
+        extractframesMenu.add_command(label='Extract frames',command=ExtractAllFramesPopUp)
+        extractframesMenu.add_command(label='Extract frames from seq files', command=ExtractSEQFramesPopUp)
         fifthMenu.add_cascade(label='Extract frames...',menu=extractframesMenu)
 
         convertWftypeMenu = Menu(fifthMenu)
-        convertWftypeMenu.add_command(label='Convert CSV to parquet', command=CSV2parquet)
-        convertWftypeMenu.add_command(label='Convert parquet o CSV', command=parquet2CSV)
+        convertWftypeMenu.add_command(label='Convert CSV to parquet', command=Csv2ParquetPopUp)
+        convertWftypeMenu.add_command(label='Convert parquet o CSV', command=Parquet2CsvPopUp)
         fifthMenu.add_cascade(label='Convert working file type...', menu=convertWftypeMenu)
 
 
@@ -6107,7 +4068,7 @@ class App(object):
         links.add_command(label='Install FFmpeg',command =lambda: webbrowser.open_new(str(r'https://m.wikihow.com/Install-FFmpeg-on-Windows')))
         links.add_command(label='Install graphviz', command=lambda: webbrowser.open_new(str(r'https://bobswift.atlassian.net/wiki/spaces/GVIZ/pages/20971549/How+to+install+Graphviz+software')))
         sixthMenu.add_cascade(label="Links",menu=links)
-        sixthMenu.add_command(label='About', command= aboutgui)
+        sixthMenu.add_command(label='About', command= AboutSimBAPopUp)
 
         #Status bar at the bottom
         self.frame = Frame(background, bd=2, relief=SUNKEN, width=300, height=300)

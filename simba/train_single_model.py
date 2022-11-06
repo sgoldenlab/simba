@@ -105,7 +105,7 @@ class TrainSingleModel(object):
 
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_df, self.y_df,test_size=self.tt_size)
         print(self.over_sample_setting)
-        if self.under_sample_setting.lower() == 'random undersample':
+        if self.under_sample_setting == 'random undersample':
             self.x_train, self.y_train = random_undersampler(self.x_train, self.y_train, float(self.under_sample_ratio))
         if self.over_sample_setting == 'smoteenn':
             self.x_train, self.y_train = smoteen_oversampler(self.x_train, self.y_train, float(self.over_sample_ratio))
@@ -121,8 +121,6 @@ class TrainSingleModel(object):
         Attribute: object
             rf_clf
         """
-
-
 
         if self.algo == 'RF':
             n_estimators = read_config_entry(self.config, 'create ensemble settings', 'RF_n_estimators', data_type='int')

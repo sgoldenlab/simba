@@ -34,7 +34,6 @@ def change_img_format(directory: str,
     Example
     ----------
     >>> _ = change_img_format(directory='MyDirectoryWImages', file_type_in='bmp', file_type_out='png')
-    >>> inferencer.run_models()
 
     """
     if not os.path.isdir(directory):
@@ -191,6 +190,7 @@ def change_fps_of_multiple_videos(directory: str,
         raise ValueError()
     for file_cnt, file_path in enumerate(video_paths):
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
+        print('Converting FPS for {}...'.format(file_name))
         save_path = os.path.join(dir_name, file_name + '_fps_{}{}'.format(str(fps), str(ext)))
         command = str('ffmpeg -i ') + str(file_path) + ' -filter:v fps=fps=' + str(fps) + ' ' + '"' + save_path + '"'
         subprocess.call(command, shell=True)
@@ -404,8 +404,6 @@ def gif_creator(file_path: str,
         The width of the gif in pixels. The aspect ratio of the gif will be the same as in the video, i.e.,
         height is automatically computed.
     """
-
-
 
     check_file_exist_and_readable(file_path=file_path)
     check_int(name='Start time', value=start_time)
@@ -695,6 +693,43 @@ def frames_to_movie(directory: str,
     ffmpeg_fn = os.path.join(directory, '%d.{}'.format(img_format))
     save_path = os.path.join(os.path.dirname(directory), os.path.basename(directory) + '.mp4')
     command = str('ffmpeg -y -r ' + str(fps) + ' -f image2 -s ' + str(img_h) + 'x' + str(img_w) + ' -i ' + '"' + ffmpeg_fn + '"' + ' -vcodec libx264 -b ' + str(bitrate) + 'k ' + '"' + str(save_path) + '"')
-    print('Creating {}...'.format(os.path.basename(save_path)))
+    print('Creating {} from {} images...'.format(os.path.basename(save_path), str(len(img_paths_in_folder))))
     subprocess.call(command, shell=True)
     print('SIMBA COMPLETE: Video created at {}'.format(save_path))
+
+
+def video_concatenator(video_one_path: str,
+                       video_two_path: str,
+                       resolution: int or str,
+                       horizontal: bool):
+    for file_path in [video_one_path, video_two_path]:
+        check_file_exist_and_readable(file_path=file_path)
+        _ = get_video_meta_data(file_path)
+    if type(resolution) is int:
+        video_meta_data = {}
+        if horizontal:
+            video_meta_data['height'] = resolution
+        else:
+            video_meta_data['width'] = resolution
+    elif resolution is 'Video 1':
+        video_meta_data = get_video_meta_data(video_one_path)
+    else:
+        video_meta_data = get_video_meta_data(video_one_path)
+    dir, file_name_1, _ = get_fn_ext(video_one_path)
+    _, file_name_2, _ = get_fn_ext(video_two_path)
+    print('Concatenating videos...')
+    save_path = os.path.join(dir, file_name_1 + file_name_2 + '_concat.mp4')
+    if horizontal:
+        command = 'ffmpeg -y -i "{}" -i "{}" -filter_complex "[0:v]scale=-1:{}[v0];[v0][1:v]hstack=inputs=2" "{}"'.format(video_one_path, video_two_path, video_meta_data['height'], save_path)
+    else:
+        command = 'ffmpeg -y -i "{}" -i "{}" -filter_complex "[0:v]scale={}:-1[v0];[v0][1:v]vstack=inputs=2" "{}"'.format(video_one_path, video_two_path, video_meta_data['width'], save_path)
+    subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+    print('SIMBA COMPLETE! Videos concatenated and saved at {}.'.format(save_path))
+
+# video_concatenator(video_one_path='/Users/simon/Desktop/troubleshooting/Open_field_5/project_folder/frames/output/gantt_plots/SI_DAY3_308_CD1_PRESENT_2.mp4',
+#                    video_two_path= '/Users/simon/Desktop/troubleshooting/Open_field_5/project_folder/frames/output/gantt_plots/SI_DAY3_308_CD1_PRESENT.mp4',
+#                    resolution='Video 1',
+#                    horizontal=False)
+
+
+

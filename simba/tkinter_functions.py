@@ -222,3 +222,72 @@ def mergemovebatch(dir,framespersec,vidformat,bit,imgformat):
             ffmpegFileName) +'"'+ ' -vcodec libx264 -b ' + str(bitrate) + 'k ' +'"'+ str(fileOut)+'"')
         print(command)
         subprocess.call(command, shell=True)
+
+
+class FolderSelect(Frame):
+    def __init__(self,parent=None,folderDescription="",color=None,title=None,lblwidth =None,**kw):
+        self.title=title
+        self.color = color if color is not None else 'black'
+        self.lblwidth = lblwidth if lblwidth is not None else 0
+        self.parent = parent
+        Frame.__init__(self,master=parent,**kw)
+        self.folderPath = StringVar()
+        self.lblName = Label(self, text=folderDescription,fg=str(self.color),width=str(self.lblwidth),anchor=W)
+        self.lblName.grid(row=0,column=0,sticky=W)
+        self.entPath = Label(self, textvariable=self.folderPath,relief=SUNKEN)
+        self.entPath.grid(row=0,column=1)
+        self.btnFind = Button(self, text="Browse Folder",command=self.setFolderPath)
+        self.btnFind.grid(row=0,column=2)
+        self.folderPath.set('No folder selected')
+    def setFolderPath(self):
+        folder_selected = askdirectory(title=str(self.title),parent=self.parent)
+        if folder_selected:
+            self.folderPath.set(folder_selected)
+        else:
+            self.folderPath.set('No folder selected')
+
+    @property
+    def folder_path(self):
+        return self.folderPath.get()
+
+class ToolTip(object):
+
+    def __init__(self, widget):
+        self.widget = widget
+        self.tipwindow = None
+        self.id = None
+        self.x = self.y = 0
+
+    def showtip(self, text):
+        "Display text in tooltip window"
+        self.text = text
+        if self.tipwindow or not self.text:
+            return
+        x, y, cx, cy = self.widget.bbox("insert")
+        x = x + self.widget.winfo_rootx() + 57
+        y = y + cy + self.widget.winfo_rooty() +27
+        self.tipwindow = tw = Toplevel(self.widget)
+        tw.wm_overrideredirect(1)
+        tw.wm_geometry("+%d+%d" % (x, y))
+        label = Label(tw, text=self.text, justify=LEFT,
+                      background="#ffffe0", relief=SOLID, borderwidth=1,
+                      font=("tahoma", "8", "normal"))
+        label.pack(ipadx=1)
+
+    def hidetip(self):
+        tw = self.tipwindow
+        self.tipwindow = None
+        if tw:
+            tw.destroy()
+
+
+
+def CreateToolTip(widget, text):
+    toolTip = ToolTip(widget)
+    def enter(event):
+        toolTip.showtip(text)
+    def leave(event):
+        toolTip.hidetip()
+    widget.bind('<Enter>', enter)
+    widget.bind('<Leave>', leave)
+

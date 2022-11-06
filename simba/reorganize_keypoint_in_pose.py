@@ -26,7 +26,6 @@ class KeypointReorganizer(object):
     ----------
     >>> keypoint_reorganizer = KeypointReorganizer(data_folder="test_data/misc_test_files", pose_tool='maDLC', file_format='h5')
     >>> keypoint_reorganizer.perform_reorganization(animal_list=['UM', 'LM', 'LM', 'UM', 'LM', 'UM', 'LM', 'LM', 'UM', 'LM', 'UM', 'UM', 'UM', 'UM', 'LM', 'LM'], bp_lst=['Lateral_left', 'Nose', 'Tail_base', 'Lateral_right', 'Ear_right', 'Center', 'Nose', 'Ear_left', 'Ear_right', 'Center', 'Tail_end', 'Ear_left', 'Tail_base', 'Lateral_left', 'Tail_end', 'Lateral_right'])
-
     >>> keypoint_reorganizer = KeypointReorganizer(data_folder="test_data/misc_test_files", pose_tool='DLC', file_format='csv')
     >>> keypoint_reorganizer.perform_reorganization(bp_lst=['Ear_left_1', 'Ear_right_1', 'Nose_1', 'Center_1', 'Lateral_left_1', 'Lateral_right_1', 'Tail_base_1', 'Ear_left_2', 'Ear_right_2', 'Nose_2', 'Center_2', 'Lateral_left_2', 'Lateral_right_2', 'Tail_base_2'], animal_list=None)
     """
@@ -93,8 +92,8 @@ class KeypointReorganizer(object):
                 self.header_list = list(zip(scorer, bodyparts, coords))
 
     def perform_reorganization(self,
-                               animal_list: list,
-                               bp_lst: list):
+                               bp_lst: list,
+                               animal_list: list = None):
         save_directory = os.path.join(self.data_folder, 'Reorganized_bp_{}'.format(self.datetime))
         if not os.path.exists(save_directory): os.makedirs(save_directory)
         print('Saving {} new pose-estimation files in {} directory...'.format(str(len(self.files_found)), save_directory))

@@ -90,9 +90,6 @@ class DataPlotter(object):
         None
         """
 
-
-
-
         def multiprocess_img_creation(video_data_slice=None, location_dict=None, animal_ids=None, video_data=None, color_lst=None):
             img = np.zeros((480, 640, 3))
             cv2.putText(img, 'Animal', location_dict['Animal'], cv2.FONT_HERSHEY_TRIPLEX, 0.5, (255, 255, 255), 1)

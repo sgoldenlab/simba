@@ -23,24 +23,27 @@ class ClfLogCreator(object):
         Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration',
         'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence',
         'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']
+    classifiers: list
+        Classifiers to calculate aggregate statistics for. E.g.,: ['Attack', 'Sniffing']
 
     Notes
     -----
 
     Examples
     -----
-    >>> clf_log_creator = ClfLogCreator(config_path="MyConfigPath", data_measures=['Bout count', 'Total event duration'])
+    >>> clf_log_creator = ClfLogCreator(config_path="MyConfigPath", data_measures=['Bout count', 'Total event duration'], classifiers=['Attack', 'Sniffing'])
     >>> clf_log_creator.analyze_data()
     >>> clf_log_creator.save_results()
     """
 
     def __init__(self,
                  config_path: str,
-                 data_measures: list):
+                 data_measures: list,
+                 classifiers: list):
 
         self.chosen_measures = data_measures
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
-        self.config = read_config_file(config_path)
+        self.config, self.classifiers = read_config_file(config_path), classifiers
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
         self.files_in_dir = os.path.join(self.project_path, 'csv', 'machine_results')
         self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
@@ -115,6 +118,7 @@ class ClfLogCreator(object):
         """
 
         results_df = self.results_df[self.results_df['Measure'].isin(self.chosen_measures)].sort_values(by=['Video', 'Classifier', 'Measure']).reset_index(drop=True)
+        results_df = results_df[results_df['Classifier'].isin(self.classifiers)].set_index('Video')
         results_df.to_csv(self.file_save_name)
         print('SIMBA COMPLETE: Data log saved at {}'.format(self.file_save_name))
 

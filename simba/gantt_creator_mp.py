@@ -135,7 +135,7 @@ class GanttCreator(object):
             self.data_df = read_df(file_path, self.file_type).reset_index(drop=True)
             print('Processing video {}, Frame count: {} (Video {}/{})...'.format(self.video_name, str(len(self.data_df)), str(file_cnt+1), str(len(self.files_found))))
             self.video_info_settings, _, self.fps = read_video_info(self.vid_info_df, self.video_name)
-            self.bouts_df = detect_bouts(data_df=self.data_df, target_lst=self.clf_names, fps=self.fps)
+            self.bouts_df = detect_bouts(data_df=self.data_df, target_lst=list(self.clf_names), fps=int(self.fps))
             if self.frame_setting:
                 self.save_frame_folder_dir = os.path.join(self.out_parent_dir, self.video_name)
                 if os.path.exists(self.save_frame_folder_dir): shutil.rmtree(self.save_frame_folder_dir)
@@ -191,7 +191,7 @@ class GanttCreator(object):
                     for file in files:
                         f.write("file '" + str(pathlib.Path(file)) + "'\n")
                 if os.path.exists(self.save_video_path): os.remove(self.save_video_path)
-                returned = os.system('ffmpeg -f concat -safe 0 -i {} {} -hide_banner -loglevel error'.format(temp_txt_path, self.save_video_path))
+                returned = os.system('ffmpeg -f concat -safe 0 -i "{}" "{}" -hide_banner -loglevel error'.format(temp_txt_path, self.save_video_path))
                 while True:
                     if returned != 0:
                         pass

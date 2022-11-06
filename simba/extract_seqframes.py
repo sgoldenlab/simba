@@ -26,7 +26,7 @@ class seqInfo:
         self.fps=0.0
         self.codec=''
 
-def extract_seqframescommand(filename):
+def extract_seq_frames(filename):
 
     if filename:
         pathDir, _, filetype = get_fn_ext(filename)

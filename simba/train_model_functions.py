@@ -171,7 +171,10 @@ def random_undersampler(x_train: np.array,
     present_df, absent_df = data_df[data_df[y_train.name] == 1], data_df[data_df[y_train.name] == 0]
     ratio_n = int(len(present_df) * sample_ratio)
     if len(absent_df) < ratio_n:
-        raise ValueError('UNDER SAMPLING ERROR: The under-sample ratio of {} in classifier {} demands {} '
+        print('SIMBA UNDER SAMPLING ERROR: The under-sample ratio of {} in classifier {} demands {} '
+                         'behavior-absent annotations. This is more than the number of behavior-absent annotations in '
+                         'the entire dataset ({}). Please annotate more images or decrease the under-sample ratio.'.format(str(sample_ratio), y_train.name, str(ratio_n), str(len(absent_df))))
+        raise ValueError('SIMBA UNDER SAMPLING ERROR: The under-sample ratio of {} in classifier {} demands {} '
                          'behavior-absent annotations. This is more than the number of behavior-absent annotations in '
                          'the entire dataset ({}). Please annotate more images or decrease the under-sample ratio.'.format(str(sample_ratio), y_train.name, str(ratio_n), str(len(absent_df))))
 

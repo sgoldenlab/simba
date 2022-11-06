@@ -46,7 +46,6 @@ class FrameMergerer(object):
                  frame_setting: bool,
                  output_height: int):
 
-
         if (frame_setting is False) & (video_setting is False):
             print('SIMBA ERROR: Please select frames and/or video output')
             raise ValueError('SIMBA ERROR: Please select frames and/or video output')
@@ -229,10 +228,13 @@ class FrameMergerer(object):
 
 
 # test = FrameMergerer(config_path=r'/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini',
-#                      frame_types=['Classifications', 'Gantt', 'Path', 'Heatmaps', 'Probability', 'Data table'],
+#                      frame_types=['Gantt','Data table'],
 #                      frame_setting=False,
 #                      video_setting=True,
 #                      output_height=1280)
+
+
+#frame_types=['Classifications', 'Gantt', 'Path', 'Heatmaps', 'Probability', 'Data table'],
 
 
 
