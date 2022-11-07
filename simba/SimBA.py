@@ -16,7 +16,7 @@ import webbrowser
 from simba.plotly_create_h5 import *
 from simba.tkinter_functions import hxtScrollbar, DropDownMenu, Entry_Box, FileSelect, form_validator_is_numeric
 from simba.project_config_creator import ProjectConfigCreator
-from simba.json2csv import json2csv_file, json2csv_folder
+from simba.import_mars import MarsImporter
 from simba.probability_graph_interactive import InteractiveProbabilityGrapher
 from simba.Validate_model_one_video_run_clf import ValidateModelRunClf
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
@@ -886,12 +886,20 @@ class project_config:
             label_multijsonimport = LabelFrame(self.frame, text='Import multiple json files', pady=5, padx=5)
             self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:',
                                             title='Select Folder with .json(s)')
-            button_import_json = Button(label_multijsonimport, text='Import json to project folder', command=lambda: json2csv_folder(self.configinifile, self.folder_json.folder_path, self.interpolation.getChoices(), self.smooth_dropdown.getChoices()), fg='navy')
+            button_import_json = Button(label_multijsonimport, text='Import json to project folder', fg='navy', command=lambda: MarsImporter(config_path=self.configinifile,
+                                                                                                                                              data_path=self.folder_json.folder_path,
+                                                                                                                                              interpolation_method=self.interpolation.getChoices(),
+                                                                                                                                              smoothing_method=self.smooth_dropdown.getChoices()))
+
+
 
             # singlecsv
             label_singlejsonimport = LabelFrame(self.frame, text='Import single json file', pady=5, padx=5)
             self.file_json = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
-            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', command=lambda: json2csv_file(self.configinifile, self.file_json.file_path, self.interpolation.getChoices(), self.smooth_dropdown.getChoices()), fg='navy')
+            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', fg='navy', command=lambda: MarsImporter(config_path=self.configinifile,
+                                                                                                                                                            data_path=self.folder_json.folder_path,
+                                                                                                                                                            interpolation_method=self.interpolation.getChoices(),
+                                                                                                                                                            smoothing_method=self.smooth_dropdown.getChoices()))
             # import json into projectfolder
             self.frame.grid(row=1, sticky=W)
             self.labelmethod.grid(row=0, sticky=W)
@@ -1946,9 +1954,12 @@ class loadprojectini:
 
         ## classifier validation
         label_classifier_validation = LabelFrame(tab11, text='Classifier Validation', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
-        self.seconds = Entry_Box(label_classifier_validation,'Seconds','8')
+        self.seconds = Entry_Box(label_classifier_validation,'Seconds','8', validation='numeric')
         self.cvTarget = DropDownMenu(label_classifier_validation,'Target',targetlist,'15')
         self.cvTarget.setChoices(targetlist[(config.get('SML settings', 'target_name_' + str(1)))])
+        self.one_vid_per_bout_var, self.one_vid_per_video_var = BooleanVar(value=False), BooleanVar(value=False)
+        individual_bout_clips_cb = Checkbutton(label_classifier_validation, text='One clip per bout', variable=self.one_vid_per_bout_var)
+        individual_clip_per_video_cb = Checkbutton(label_classifier_validation, text='One clip per video', variable=self.one_vid_per_video_var)
         button_validate_classifier = Button(label_classifier_validation,text='Validate',command =self.classifiervalidation)
 
         #addons
@@ -2169,7 +2180,10 @@ class loadprojectini:
         label_classifier_validation.grid(row=14,sticky=W)
         self.seconds.grid(row=0,sticky=W)
         self.cvTarget.grid(row=1,sticky=W)
-        button_validate_classifier.grid(row=2,sticky=W)
+        individual_bout_clips_cb.grid(row=2, column=0, sticky=NW)
+        individual_clip_per_video_cb.grid(row=3, column=0, sticky=NW)
+        button_validate_classifier.grid(row=4,sticky=NW)
+
 
         lbl_addon.grid(row=15,sticky=W)
         button_bel.grid(row=0,sticky=W)
@@ -2789,12 +2803,18 @@ class loadprojectini:
             # import json into projectfolder
             label_multijsonimport = LabelFrame(self.frame, text='Import multiple json files', pady=5, padx=5)
             self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:', title='Select Folder with .json(s)')
-            button_import_json = Button(label_multijsonimport, text='Import json to project folder', command=lambda: json2csv_folder(self.projectconfigini,self.folder_json.folder_path, self.interpolation.getChoices(), self.smooth_dropdown.getChoices()), fg='navy')
+            button_import_json = Button(label_multijsonimport, text='Import json to project folder', fg='navy', command=lambda: MarsImporter(config_path=self.projectconfigini,
+                                                                                                                                              data_path=self.folder_json.folder_path,
+                                                                                                                                              interpolation_method=self.interpolation.getChoices(),
+                                                                                                                                              smoothing_method=self.smooth_dropdown.getChoices()))
 
             # singlejson
             label_singlejsonimport = LabelFrame(self.frame, text='Import single json file', pady=5, padx=5)
             self.file_csv = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
-            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', command=lambda: json2csv_file(self.projectconfigini, self.file_csv.file_path, self.interpolation.getChoices(), self.smooth_dropdown.getChoices()), fg='navy')
+            button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', fg='navy', command=lambda: MarsImporter(config_path=self.projectconfigini,
+                                                                                                                                                 data_path=self.folder_json.folder_path,
+                                                                                                                                                 interpolation_method=self.interpolation.getChoices(),
+                                                                                                                                                 smoothing_method=self.smooth_dropdown.getChoices()))
 
             # import json into projectfolder
             self.frame.grid(row=1, sticky=W)
@@ -3029,7 +3049,9 @@ class loadprojectini:
         print('Generating videos...')
         clf_validator = ClassifierValidationClips(config_path=self.projectconfigini,
                                                   window=self.seconds.entry_get,
-                                                  clf_name=self.cvTarget.getChoices())
+                                                  clf_name=self.cvTarget.getChoices(),
+                                                  clips=self.one_vid_per_bout_var.get(),
+                                                  concat_video=self.one_vid_per_video_var.get())
         clf_validator.create_clips()
         print('Videos generated')
 
