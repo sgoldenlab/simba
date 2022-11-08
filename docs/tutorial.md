@@ -418,7 +418,7 @@ Access this menu through the `Load project` menu and the `Run machine model` tab
 ![](/images/MR_3.png)
 
 
-- `Time bins: Machine predictions`: This button generates descriptive statistics for each predictive classifier in the project within user-defined time-bins. The metrics available for every time bin are `Number of events`, `Total event duration`, `Mean event duration`, `Median event duration`, `Time of first occurrence`, `Mean interval duration` (time between event in each time-bin), and `Median interval duration`. A date-time stamped output CSV file with the data is saved in the `/project_folder/log` folder. Clicking this button bring up a menu (see below) where the user inserts the length of each time-bin and the metrics required:
+- `Time bins: Machine predictions`: This button generates descriptive statistics for selected predictive classifier in the project within user-defined time-bins. The metrics available for every time bin are `Number of events`, `Total event duration`, `Mean event duration`, `Median event duration`, `Time of first occurrence`, `Mean interval duration` (time between event in each time-bin), and `Median interval duration`. A date-time stamped output CSV file with the data is saved in the `/project_folder/log` folder. Clicking this button bring up a menu (see below) where the user inserts the length of each time-bin and the metrics required. For example, if your videos are 10 minutes long, and you specify `60` in the `Time bin (s)` entry box, then SimBA will divide each video into 10 sequential bins and provide the choosen data for each of the sequential time bins.  
 
 ![](/images/timebins_clf_20220921.png)
 
