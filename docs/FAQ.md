@@ -347,5 +347,18 @@ This error is produced when SimBA is installed with the wrong version of `pip`. 
   
 </details>
 
+
+### 23. When installing shapely with "conda install -c conda-forge shapely" I see the error msg "CondaSSLError: OpenSSL appears to be unavailable on this machine. OpenSSL is required to download and install packages." 
+
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/>
+
+Try to install `shapely` with "pip install shapely` or `conda install shapely` rather than "conda install -c conda-forge shapely". Then try to re-launch SimBA with `simba`.
+  
+</details>
+
+
+
 ##
 Author [Simon N](https://github.com/sronilsson)
