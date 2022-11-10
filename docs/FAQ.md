@@ -354,7 +354,7 @@ This error is produced when SimBA is installed with the wrong version of `pip`. 
   <summary>Show solutions!</summary>
 <br/><br/>
 
-Try to install `shapely` with "pip install shapely` or `conda install shapely` rather than "conda install -c conda-forge shapely". Then try to re-launch SimBA with `simba`.
+Try to install `shapely` with "pip install shapely` or `conda install shapely` rather than "conda install -c conda-forge shapely". Then try to re-launch SimBA with `simba`. Also see [THIS GITHUB ISSUE](https://github.com/sgoldenlab/simba/issues/214)
   
 </details>
 
