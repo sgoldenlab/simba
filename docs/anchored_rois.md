@@ -31,7 +31,16 @@ This brings up a further pop-up window named `FIND ANIMAL BOUNDARIES` with a sin
 
 If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown the settings menu on the **left** in the screen-grab below will be show up. If choosing **Single body-part circle** or **Single body-part square**  in the `SELECT SHAPE TYPE` dropdown the settings menu on the **right** in the screen-grab below will be show up. We will first go through the settings for **Entire animal** based bounding boxes, followed by body-part anchored bounding boxes. 
 
-### ENTIRE ANIMAL BASED BOUNDING BOXES
+### SHAPE TYPES - ENTIRE ANIMAL BASED BOUNDING BOXES
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_2.png" />
+</p>  
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png" />
+</p>  
+
 
 Entire animal-based bounding boxes has two user-defined parameters:
 
