@@ -60,7 +60,9 @@ Single body-part based bounding also has two user-defined parameters:
 
 Once you have filled in your parameters above, click the `RUN` button. You should be able to follow the progress in the mian SimBa terminal window and the OS terminal. 
 
-Once complete, SimBA saves all information of all the anchored ROIs for all the animals in all frames and videos in a *pickled dictionary with shapely shapes* in the `project_folder/log` directory. I know - a *pickled dictionary with shapely shapes* will be nonsense to many of 
+Once complete, SimBA saves all information of all the anchored ROIs for all the animals in all frames and videos in a *pickled dictionary with shapely shapes* in the `project_folder/log` directory. I know - a *pickled dictionary with shapely shapes* will be nonsense to many and difficult to work with. However, this file containes all the information we need to compute all the statistics we need. We save it in this format as we need to **compress** it as much as we possibly can, because it contains a potentially very large about of data (depending on the number of videos, individuals, and frame rate of your videos). 
+
+
 
 
 
