@@ -49,7 +49,9 @@ Single body-part based bounding also has two user-defined parameters:
 
 ### FINDING ANIMAL-ANCHORED ROIs
 
-Once you have filled in your parameters above, click the `RUN` button. 
+Once you have filled in your parameters above, click the `RUN` button. You should be able to follow the progress in the mian SimBa terminal window and the OS terminal. 
+
+Once complete, SimBA saves all information of all the anchored ROIs for all the animals in all frames and videos in a *pickled dictionary with shapely shapes* in the `project_folder/log` directory. I know - a *pickled dictionary with shapely shapes* will be nonsense to many of 
 
 
 
