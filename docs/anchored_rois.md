@@ -31,16 +31,11 @@ This brings up a further pop-up window named `FIND ANIMAL BOUNDARIES` with a sin
 
 If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown the settings menu on the **left** in the screen-grab below will be show up. If choosing **Single body-part circle** or **Single body-part square**  in the `SELECT SHAPE TYPE` dropdown the settings menu on the **right** in the screen-grab below will be show up. We will first go through the settings for **Entire animal** based bounding boxes, followed by body-part anchored bounding boxes. 
 
-### SHAPE TYPES - ENTIRE ANIMAL BASED BOUNDING BOXES
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_2.png" />
-</p>  
+### ANCHORED-ROI SHAPE TYPES - ENTIRE ANIMAL BASED BOUNDING BOXES
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png" />
 </p>  
-
 
 Entire animal-based bounding boxes has two user-defined parameters:
 
@@ -58,9 +53,57 @@ Single body-part based bounding also has two user-defined parameters:
 
 ### FINDING ANIMAL-ANCHORED ROIs
 
-Once you have filled in your parameters above, click the `RUN` button. You should be able to follow the progress in the mian SimBa terminal window and the OS terminal. 
+Once you have filled in your parameters above, click the `RUN` button. You should be able to follow the progress in the mian SimBA main terminal window and the OS terminal. 
 
 Once complete, SimBA saves all information of all the anchored ROIs for all the animals in all frames and videos in a *pickled dictionary with shapely shapes* in the `project_folder/log` directory. I know - a *pickled dictionary with shapely shapes* will be nonsense to many and difficult to work with. However, this file containes all the information we need to compute all the statistics we need. We save it in this format as we need to **compress** it as much as we possibly can, because it contains a potentially very large about of data (depending on the number of videos, individuals, and frame rate of your videos). 
+
+## VISUALIZING ANIMAL-ANCHORED ROIs
+
+Once the animal anchored-ROIs have been computed, we may want to visualize them to confirm they look as expected. To visualize the boundaries, click on the `VISUALIZE BOUNDARIES` button which should bring up the following pop-up window allowing user-defined settings:
+
+* In the `SELECT VIDEO` drop-down menu, select the video you wish to visualize the boundaries for. 
+* Tick the `INCLUDE KEY-POINTS` checkbox if you want to visualize the body-part pose-estimated key-points **in addition** to the animal-anchored ROIs. 
+* Sometimes the animal-anchored ROIs (and key-points) are more easily visable of the rest of the images are in greyscale. To create greyscale images (except the ROIs/key-points), tick the `GREYSCALE` checkbox. 
+
+To create the boundary videos, click the `RUN` button. You can follow the progress in the main SimBA  terminal window and the OS terminal. Once complete, a new file representing your video is created in the `project_folder/frames/output/anchored_rois` directory of your SimBA project, and may look something like these examples:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_entire_animal_termite.gif" />
+</p>
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_head_termite.gif" />
+</p>
+
+## CALCULATING BOUNDARY STATISTICS
+
+Next, we want to calculate statistics based on on each animal-anchored ROI. For example, for each frame and each animal-anchored ROI, we may want to know:
+
+* Which other animal-anchored ROIs it intersects with
+* Which pose-estimated key-points belonging to other animals intersects with the animal-anchored ROIs
+
+Thus, an animal-anchored ROi can intersect with other animal-anchored ROIs or other animal key-points. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/intersecting_examples.png" />
+</p>
+
+To calculate these statistics, click on `CALCULATE BOUNDARY STATISTICS` which brings up the following pop-up settings window:
+
+To calculate ROI-ROI intersection data (as in the left image above), tick the `ROI-ROI INTERSECTIONS` checkbox. To calculate ROI-keypoints intersection data (as in the right image above), tick the `ROI-KEYPOINT INTERSECTIONS` checkbox. 
+
+Next, we want to choose the output file-format on how to store our data. If your data is relatively small (e.g.,  <100k-ish frames per video, <5 animals per video, and you have a good amount of storage space), consider ticking the `.csv` radio-button `OUTPUT FILE TYPE` sub-menu. This is the easiest file-type to work with (you can open and play with it in any spreadsheet-viewer) but comes at the cost of the files being very large and time-consuming to read and write. If you have longer videos and less storage available, then you may be forced to tick either the `.pickle` or `.parquet` radio-buttons. 
+
+Once you've made your selections, click the `RUN` button. You can follow the progress in the main SimBA terminal window. Once complete, a data-file for each of your videos is generated in the `project_folder/csv/anchored_roi_data` directory of your SimBA project. These files are big *truth tables* (containing only 0 and 1s) with rows representing frames and columns representing the different possible interactions/intersections. 
+
+
+
+
+
+
+
+
+
+
 
 
 
