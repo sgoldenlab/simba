@@ -34,8 +34,10 @@ If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown the settings m
 ### ANCHORED-ROI SHAPE TYPES - ENTIRE ANIMAL BASED BOUNDING BOXES
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_2.png" />
 </p>  
+
+CLICK [HERE](https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png) FOR A SIMILAR SHAPE-TYPE REFERENCE TABLE FOR NON-SHAPE SHIFTERS (MICE) 
 
 Entire animal-based bounding boxes has two user-defined parameters:
 
@@ -81,7 +83,7 @@ Next, we want to calculate statistics based on on each animal-anchored ROI. For 
 * Which other animal-anchored ROIs it intersects with
 * Which pose-estimated key-points belonging to other animals intersects with the animal-anchored ROIs
 
-Thus, an animal-anchored ROi can intersect with other animal-anchored ROIs or other animal key-points. 
+Thus, an animal-anchored ROi can intersect with other animal-anchored ROIs, or intersect with other animal key-points. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/intersecting_examples.png" />
@@ -93,7 +95,34 @@ To calculate ROI-ROI intersection data (as in the left image above), tick the `R
 
 Next, we want to choose the output file-format on how to store our data. If your data is relatively small (e.g.,  <100k-ish frames per video, <5 animals per video, and you have a good amount of storage space), consider ticking the `.csv` radio-button `OUTPUT FILE TYPE` sub-menu. This is the easiest file-type to work with (you can open and play with it in any spreadsheet-viewer) but comes at the cost of the files being very large and time-consuming to read and write. If you have longer videos and less storage available, then you may be forced to tick either the `.pickle` or `.parquet` radio-buttons. 
 
-Once you've made your selections, click the `RUN` button. You can follow the progress in the main SimBA terminal window. Once complete, a data-file for each of your videos is generated in the `project_folder/csv/anchored_roi_data` directory of your SimBA project. These files are big *truth tables* (containing only 0 and 1s) with rows representing frames and columns representing the different possible interactions/intersections. 
+Once you've made your selections, click the `RUN` button. You can follow the progress in the main SimBA terminal window. Once complete, a data-file for each of your videos is generated in the `project_folder/csv/anchored_roi_data` directory of your SimBA project. These files can be rather big *truth tables* (containing only 0 and 1s) with rows representing frames, and columns representing the different possible interactions/intersections. 
+
+From these truth tables we can calculate all necessery aggregate statistics of such as latencies and event count. But, to better enable flexibility and user-defined custom metrics, we will go through the structure of the file in detail.
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/data_table_intersection.png" />
+</p>
+
+There are two types of columns in this file, representing (i) ROI-ROI intersections, and (ii) ROI keypoint intersections. The ROI-ROI intersections are represented by the columns to the **left** in the image above. These column headers contain two strings separated by **:** characters. The ROI-keypoint intersections are represented by the columns to the **right** in the image above. These column headers contain three strings separated by **:** characters. 
+
+If you saved the data in CSV file format, and open the file in a spreadsheet viewer, you might see something like this when viewing the first two columns and first 27 frames:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/intersaction_tables.png" />
+</p>
+
+The first column is named `Animal_1:Animal_2`. This column contains data for the intersections of the **Animal 1 anchored ROI** and the **Animal 2 anchored ROI**. The `1` in rows 14-20 indicate that the Animal 1 anchored ROI and Animal 2 anchored ROI **where** overlapping in those frames. 
+The value `0` in the cells representing frames 0-13 and frames 21-27 shows that the Animal 1 anchored ROI and Animal 2 anchored ROI **where not** overlapping in those frames.
+
+As opposed to the **first** column header, the **second** column header contains three `:` characters and is named `Animal 1:Animal 2:Head`. This column contains data for the intersections of the **Animal 1 anchored ROI** and the **Animal 2 head body-part**. The `1` in rows 21-27 indicate that the Animal 1 anchored ROI and Animal 2 head **where** overlapping in those frames. The value `0` in the cells representing frames 0-20 shows that the Animal 1 anchored ROI and Animal 2 head **where not** overlapping in those frames.
+
+## CALCULATING SUMMARY AGGREGATE BOUNDARY STATISTICS
+
+With this information, we can now compute aggregate statistics proxying how much each animal interacted with each other. To compute aggregate statistics, we click the `CALCULATE AGGREGATE BOUNDARY STATISTICS` button which brings up the following pop-up window:
+
+
+The first `Settings` 
 
 
 
