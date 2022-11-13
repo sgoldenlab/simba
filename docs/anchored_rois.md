@@ -1,13 +1,13 @@
-# <p align="center"> Animal-anchored (ROIs) in SimBA </p>
+# <p align="center"> Animal-anchored ROIs (bounding-boxes) in SimBA </p>
 
-The animal-anchored region-of-interest (ROI) interface allows users to define bounding boxes (or circles) around pose-estimated animal key-points. Once defined, we can calulate how often and when the different bounding boxes and key-points intersect which each other, in order to infer when and how animals interact with each other. 
+The animal-anchored region-of-interest (ROI) interface allows users to define bounding boxes (or circles) around pose-estimated animal key-points. Once defined, we can calulate how often and when the different bounding boxes and key-points has intersected which each other to get a proxy measurement for when and how different animals interact with each other. 
 
-# Before analyzing ROIs in SimBA
+# BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA
 
 To analyze anchored-roi data in SimBA (for descriptive statistics, machine learning features, or both descriptive statistics and 
-machine learning features) the tracking data **first** has to be processed the **up-to and including the 
+machine learning features), the tracking data **first** has to be processed the **up-to and including the 
 *Outlier correction* step described in [Part 2 - Step 4 - Correcting outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction)**. 
-Thus, before proceeding to calculate anchored-ROI based measures, you should have one file for each of the videos in your 
+Thus, before proceeding to calculate animal-anchored ROI based metrics, you should have one file for each of the videos in your 
 project located within the `project_folder\csv\outlier_corrected_movement_location` sub-directory of your SimBA project.
 
 Specifically, for working with anchored-ROI in SimBA, begin by 
@@ -21,13 +21,22 @@ and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/mast
 
 ## FINDING THE ANIMAL-ANCHORED ROI'S
 
-Before analyzing animal-anchored ROI data in SimBA, we need to define the shape of, and find, the bounding boxes that define each animal in each frame. To do this, click on the `Find animal boundaries` button in the `SIMBA ANCHORED ROI` pop-up window displayed in the screengrab above. 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_1.png" />
+</p>  
 
-This brings up a further pop-up window named `FIND ANIMAL BOUNDARIES` with a single drop-down menu named `SELECT SHAPE TYPE`. The dropdown menu has **three** options, (i) Entire animal, (ii) Single body-part square, and (iii) Single body-part circle. More information on each option follows below, but in brief: 
+
+Before analyzing animal-anchored ROI data in SimBA, we need to define the shape of - and find - the bounding boxes that define each animal in each frame of your videos. To do this, click on the right-most [Add-ons] tab after loading your SimBA project. Next, click on `Animal-anchored ROI analysis` button to launch a pop-up giving access to the animal-anchored ROI methods. Begin by clickin on the `Find animal boundaries` button in the `SIMBA ANCHORED ROI` pop-up window displayed in the screengrab above. 
+
+This brings up a further pop-up window named `FIND ANIMAL BOUNDARIES` with a single drop-down menu named `SELECT SHAPE TYPE`. The dropdown menu has **three** options, (i) *Entire animal*, (ii) *Single body-part square*, and (iii) *Single body-part circle*. More information on each option follows below, but in brief: 
   
-  * When choosing  *Entire animal*, all of the animal body-parts will be inside the animal-anchored ROI.
+  * When choosing  *Entire animal*, all of the animal body-parts will be placed inside the animal-anchored ROI.
   * When choosing *Single body-part square*, a single user-defined body-part will be inside a square animal-anchored ROI.  
   * When choosing *Single body-part circle*, a single user-defined body-part will be inside a circular animal-anchored ROI. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_2.png" />
+</p>  
 
 If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown the settings menu on the **left** in the screen-grab below will be show up. If choosing **Single body-part circle** or **Single body-part square**  in the `SELECT SHAPE TYPE` dropdown the settings menu on the **right** in the screen-grab below will be show up. We will first go through the settings for **Entire animal** based bounding boxes, followed by body-part anchored bounding boxes. 
 
@@ -37,37 +46,42 @@ If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown the settings m
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_2.png" />
 </p>  
 
-CLICK [HERE](https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png) FOR A SIMILAR SHAPE-TYPE REFERENCE TABLE FOR NON-SHAPE SHIFTERS (MICE) 
+CLICK [HERE](https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png) FOR A SIMILAR SHAPE-TYPE REFERENCE TABLE DESCRIBING EXPECTED BOUNDING BOXES OUTPUT FOR NON-SHAPE SHIFTING ANIMALS (I.E., MICE) 
 
-Entire animal-based bounding boxes has two user-defined parameters:
+If selecting `Entire animal` based bounding boxes, then users have two user-defined parameters:
 
-1. FORCE RECTANGLE: Rather then defining each animals ROI through polygons, we can force the polygon to its minimim bounding rectangle. If you want each ROI to be a rectangle rather than a polygon, then check the `FORCE RECTANGLE` checkbox. If you would want the animals ROi to be defined as a polygon, then un-check the `FORCE RECTANGLE` checkbox. 
+* 1. FORCE RECTANGLE: Rather then defining each animals ROI through polygons, we can force the polygon to its [minimim bounding rectangle](https://github.com/sgoldenlab/simba/blob/f07bc8e2e2c845e7913c05bf6e0cbbc96cc1a19d/simba/bounding_box_tools/find_bounderies.py#L47). If you want your whole animal-anchored ROI to be rectangles, rather than a polygons, then tick the `FORCE RECTANGLE` checkbox. If you want the animals-anchored ROIs to be  polygons, then leave the `FORCE RECTANGLE` checkbox un-checked. 
 
-2. PARALLEL OFFSET: Sometimes we may not want to draw our animal-anchored ROIs exacactly by the outer-bounds of the animal hull key-points. Instead, we may want to introduce a little extra wriggle room that is included in the animals personal space. If you want to introduce a little extra room inside the animals ROI, then enter the size of that space in the `PARALLEL OFFSET` entry box in millimeter. 
+* 2. PARALLEL OFFSET: Sometimes we may **not** want to draw our animal-anchored ROIs exacactly by the outer-bounds of the animal hull body-part key-points. Instead, we may want to introduce a little extra wriggle room that defines the animals personal space. If you want to introduce a little extra room inside the animal-anchored ROIs, then enter the size of that space in the `PARALLEL OFFSET` entry box in millimeter. 
 
 ### SINGLE BODY-PART BASED BOUNDING BOXES.
 
 Single body-part based bounding also has two user-defined parameters:
 
-1. BODY-PARTS: For each animal, we need to define which body-part the ROI should be anchored to. When selecting **Single body-part circle** or **Single body-part square** in the `SELECT SHAPE TYPE` dropdown, you should see a row for each animal in your SimBA project. Each row has a drop-down menu named `BODY-PART`. For each animal, select the body-part you wish to anchor the ROI too.  
+* 1. BODY-PARTS: As opposed to `ENTIRE ANIMAL` based bounding boxes - for single body-part based bounding boxes, we need to define which body-part the ROI should be anchored to. When selecting **Single body-part circle** or **Single body-part square** in the `SELECT SHAPE TYPE` dropdown, you should see a row representing each animal in your SimBA project. Each row has a drop-down menu named `BODY-PART`. For each animal, select the body-part you wish to anchor the animals' ROI to.  
 
-2. PARALLEL OFFSET: Just as *Entire animal* based ROIs, there is a parallel offset entry box when working with single body-part based ROIs. This entry box defines the size of the ROI from the animal body-part (see the example image below). As opposed to when working with *Entire animal* based ROIs, this entry box **cannot be zero or empty** when working with ingle body-part based ROIs. 
+* 2. PARALLEL OFFSET: Just as when working with *Entire animal* based ROIs, there is a parallel offset entry box when working with single body-part based ROIs. This entry box defines the size of the ROI from the animal body-part (see the example reference image above). As opposed to when working with *Entire animal* based ROIs, this entry box **cannot be zero or empty** when working with single body-part based ROIs. 
 
-### FINDING ANIMAL-ANCHORED ROIs
+________________
 
-Once you have filled in your parameters above, click the `RUN` button. You should be able to follow the progress in the mian SimBA main terminal window and the OS terminal. 
+Once you have filled in the parameters for your animal-anchored ROIs, click the `RUN` button. You should be able to follow the progress in the main SimBA main terminal window and the OS terminal. 
 
-Once complete, SimBA saves all information of all the anchored ROIs for all the animals in all frames and videos in a *pickled dictionary with shapely shapes* in the `project_folder/log` directory. I know - a *pickled dictionary with shapely shapes* will be nonsense to many and difficult to work with. However, this file containes all the information we need to compute all the statistics we need. We save it in this format as we need to **compress** it as much as we possibly can, because it contains a potentially very large about of data (depending on the number of videos, individuals, and frame rate of your videos). 
+Once complete, SimBA saves the information of all the anchored ROIs for all the animals in all frames and videos in a *pickled dictionary of shapely shapes values* with the `project_folder/log` directory. You should see a file named `project_folder/logs/anchored_rois.pickle`. I know - a *pickled dictionary with shapely shapes* will be nonsense to many and difficult to work with. However, this file containes all the information we need to compute all the statistics we need. The reason for saving the data in this nonsense format as we need to **compress** it as much as we possibly can, because it contains a potentially very large about of data (depending on the number of videos, individuals, and frame rate of your videos). 
 
 ## VISUALIZING ANIMAL-ANCHORED ROIs
 
-Once the animal anchored-ROIs have been computed, we may want to visualize them to confirm they look as expected. To visualize the boundaries, click on the `VISUALIZE BOUNDARIES` button which should bring up the following pop-up window allowing user-defined settings:
+Next, when the animal anchored-ROIs have been computed and we have the `anchored_rois.pickle` file, we may want to visualize the information in this file to confirm the ROIs look as expected. To visualize the animal-anchored ROI boundaries, click on the `VISUALIZE BOUNDARIES` button which should bring up the following pop-up window allowing a few user-defined video settings:
 
-* In the `SELECT VIDEO` drop-down menu, select the video you wish to visualize the boundaries for. 
-* Tick the `INCLUDE KEY-POINTS` checkbox if you want to visualize the body-part pose-estimated key-points **in addition** to the animal-anchored ROIs. 
-* Sometimes the animal-anchored ROIs (and key-points) are more easily visable of the rest of the images are in greyscale. To create greyscale images (except the ROIs/key-points), tick the `GREYSCALE` checkbox. 
 
-To create the boundary videos, click the `RUN` button. You can follow the progress in the main SimBA  terminal window and the OS terminal. Once complete, a new file representing your video is created in the `project_folder/frames/output/anchored_rois` directory of your SimBA project, and may look something like these examples:
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_3.png" />
+</p>  
+
+* In the `SELECT VIDEO` drop-down menu, select the video for you wish to visualize the animal-anchored boundaries in. 
+* Tick the `INCLUDE KEY-POINTS` checkbox **if** you want to visualize the body-part pose-estimated key-points **in addition** to the animal-anchored ROIs. 
+* Occationally, the animal-anchored ROIs (and key-points) are more visable when rest of the image is in greyscale. To create greyscale images (and colored  ROIs/key-points), then tick the `GREYSCALE` checkbox. 
+
+Next, to create the animal-anchored boundary videos, click the `RUN` button. You can follow the progress in the main SimBA  terminal window and the OS terminal. Once complete, a new file representing the video selected in the `SELECT VIDEO` drop-down is created in the `project_folder/frames/output/anchored_rois` directory of your SimBA project. You should expect the videos to look something like these examples, dependning in your chosen shape-type:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_entire_animal_termite.gif" />
@@ -78,33 +92,37 @@ To create the boundary videos, click the `RUN` button. You can follow the progre
 
 ## CALCULATING BOUNDARY STATISTICS
 
-Next, we want to calculate statistics based on on each animal-anchored ROI. For example, for each frame and each animal-anchored ROI, we may want to know:
+Next, we want to calculate statistics based on on each animal-anchored ROI. For each frame and each animal-anchored ROI, we may want to know:
 
-* Which other animal-anchored ROIs it intersects with
-* Which pose-estimated key-points belonging to other animals intersects with the animal-anchored ROIs
+* Which other animal-anchored ROIs the ROI intersects with, and
+* Which pose-estimated key-points belonging to other animals intersects with the animal-anchored ROI
 
-Thus, an animal-anchored ROi can intersect with other animal-anchored ROIs, or intersect with other animal key-points. 
+Thus, an animal-anchored ROI can intersect with (i) other animal-anchored ROIs, and (ii) other animal body-part key-points, as in the example image below.
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/intersecting_examples.png" />
 </p>
 
-To calculate these statistics, click on `CALCULATE BOUNDARY STATISTICS` which brings up the following pop-up settings window:
+To calculate these data, click on `CALCULATE BOUNDARY STATISTICS` button which brings up the following pop-up settings window:
 
-To calculate ROI-ROI intersection data (as in the left image above), tick the `ROI-ROI INTERSECTIONS` checkbox. To calculate ROI-keypoints intersection data (as in the right image above), tick the `ROI-KEYPOINT INTERSECTIONS` checkbox. 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_4.png" />
+</p>  
 
-Next, we want to choose the output file-format on how to store our data. If your data is relatively small (e.g.,  <100k-ish frames per video, <5 animals per video, and you have a good amount of storage space), consider ticking the `.csv` radio-button `OUTPUT FILE TYPE` sub-menu. This is the easiest file-type to work with (you can open and play with it in any spreadsheet-viewer) but comes at the cost of the files being very large and time-consuming to read and write. If you have longer videos and less storage available, then you may be forced to tick either the `.pickle` or `.parquet` radio-buttons. 
 
-Once you've made your selections, click the `RUN` button. You can follow the progress in the main SimBA terminal window. Once complete, a data-file for each of your videos is generated in the `project_folder/csv/anchored_roi_data` directory of your SimBA project. These files can be rather big *truth tables* (containing only 0 and 1s) with rows representing frames, and columns representing the different possible interactions/intersections. 
+To calculate ROI-ROI intersection data (as in the left termite image above), tick the `ROI-ROI INTERSECTIONS` checkbox. To calculate ROI-keypoints intersection data (as in the right termite image above), then tick the `ROI-KEYPOINT INTERSECTIONS` checkbox. 
 
-From these truth tables we can calculate all necessery aggregate statistics of such as latencies and event count. But, to better enable flexibility and user-defined custom metrics, we will go through the structure of the file in detail.
+Next, we want to choose the output file-format on how to store our data. If your data is relatively small (e.g.,  <100k-ish frames per video, <5 animals per video, <15 ish videos, and you have a good amount of storage space), consider ticking the `.csv` radio-button in the `OUTPUT FILE TYPE` sub-menu. This is the easiest file-type to work with for many of us (You can open and play with these it in any spreadsheet-viewer) but comes at the cost of the files being very large and time-consuming to read and write. If you have longer videos and less storage available, then you may be forced to tick either the `.pickle` or `.parquet` radio-buttons. 
 
+Once you've made your selections, click the `RUN` button. You can follow the progress in the main SimBA terminal window. Once complete, one data-file in your chosen file-format for each of your videos will be created within the `project_folder/csv/anchored_roi_data` directory of your SimBA project. These files are *truth tables* (containing only 0 and 1s) with rows representing frames, and columns representing the different possible interactions/intersections between animal-anchored ROIs and pose-estimated body-part key-points.  
+
+From these truth tables we can calculate all necessery aggregate statistics representing animal interactions (e.g., latencies and event count). But, to  enable flexibility and user-defined custom metrics, we will go through the structure of the file in a little more details.
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/data_table_intersection.png" />
 </p>
 
-There are two types of columns in this file, representing (i) ROI-ROI intersections, and (ii) ROI keypoint intersections. The ROI-ROI intersections are represented by the columns to the **left** in the image above. These column headers contain two strings separated by **:** characters. The ROI-keypoint intersections are represented by the columns to the **right** in the image above. These column headers contain three strings separated by **:** characters. 
+There are two possible types of columns in this file; representing (i) ROI-ROI intersections, and (ii) ROI-keypoint intersections. The ROI-ROI intersections are represented by the column headers to the **left** in the image above. These column headers contain two strings separated by a single **:** character. Further, the ROI-keypoint intersections are represented by the column headers to the **right** in the image above. These column headers contain three different strings separated by **:** characters. 
 
 If you saved the data in CSV file format, and open the file in a spreadsheet viewer, you might see something like this when viewing the first two columns and first 27 frames:
 
@@ -112,17 +130,46 @@ If you saved the data in CSV file format, and open the file in a spreadsheet vie
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/intersaction_tables.png" />
 </p>
 
-The first column is named `Animal_1:Animal_2`. This column contains data for the intersections of the **Animal 1 anchored ROI** and the **Animal 2 anchored ROI**. The `1` in rows 14-20 indicate that the Animal 1 anchored ROI and Animal 2 anchored ROI **where** overlapping in those frames. 
-The value `0` in the cells representing frames 0-13 and frames 21-27 shows that the Animal 1 anchored ROI and Animal 2 anchored ROI **where not** overlapping in those frames.
+The first column is named `Animal_1:Animal_2`. This column contains data reprsenenting intersections of the **Animal 1 anchored ROI** and the **Animal 2 anchored ROI**. The `1` with the rows 14-20 shows that the Animal 1 anchored ROI and the Animal 2 anchored ROI where **overlapping** in those frames. 
+The value `0` in the cells representing frames 0-13 and frames 21-27 shows that the Animal 1 anchored ROI and Animal 2 anchored ROI where **not overlapping** in those frames.
 
-As opposed to the **first** column header, the **second** column header contains three `:` characters and is named `Animal 1:Animal 2:Head`. This column contains data for the intersections of the **Animal 1 anchored ROI** and the **Animal 2 head body-part**. The `1` in rows 21-27 indicate that the Animal 1 anchored ROI and Animal 2 head **where** overlapping in those frames. The value `0` in the cells representing frames 0-20 shows that the Animal 1 anchored ROI and Animal 2 head **where not** overlapping in those frames.
+As opposed to the **first** column header, the **second** column header contains three `:` characters and is named `Animal 1:Animal 2:Head`. This column contains data for the intersections of the **Animal 1 anchored ROI** and the **Animal 2 head body-part**. The `1` in rows 21-27 shows that the Animal 1 anchored ROI and Animal 2 head body-part where **overlapping** in those frames. The value `0` in the cells representing frames 0-20 shows that the Animal 1 anchored ROI and Animal 2 head body-part where **not overlapping** in those frames.
 
 ## CALCULATING SUMMARY AGGREGATE BOUNDARY STATISTICS
 
-With this information, we can now compute aggregate statistics proxying how much each animal interacted with each other. To compute aggregate statistics, we click the `CALCULATE AGGREGATE BOUNDARY STATISTICS` button which brings up the following pop-up window:
+Next, with this information at hand, we can now compute aggregate statistics proxying how much each animal interact with each other in each video. To compute aggregate statistics, we click the `CALCULATE AGGREGATE BOUNDARY STATISTICS` button which brings up the following pop-up window:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_5.png" />
+</p>
+
+The first sub-menu in this pop-up window is titled `SETTINGS`. Here, we define the types of aggregate statistics we want to compute:
+
+* INTERACTION TIME (s): How much time (in seconds) did each ROI intersected with other ROI and/or body-part key-points.  
+
+* INTERACTION BOUT COUNT: The number of interaction events (defined as an uninterrupted sequence of frames with intersections) between each two aniamls in the video.   
+
+* INTERACTION BOUT TIME MEAN (s): The mean length of each interaction event (defined as an uninterrupted sequence of frames with intersections) between each two aniamls in the video.   
+
+* INTERACTION BOUT TIME MEDIAN (s): The median length of each interaction event (defined as an uninterrupted sequence of frames with intersections) between each two aniamls in the video.
+
+* MINIMUM BOUT LENGTH (MS): The shortest allowed length of an interaction bout. You can read more about [minimum bout length here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data). In brief, if you enter 500 in the `MINIMUM BOUT LENGTH` entry-box, then any interaction shorter than 500ms will be **ignored** when computing aggregate statistics. 
+
+Next, click on `CALCULATE AGGREGATE STATISTICS`. You can follow the progress in the main SimBA terminal window. Once complete, a datetime-stamped CSV file containing the user-defined aggregate statistics is saved in the `project_folder/logs` directory of the SimBA project, with a file-name akin to `aggregate_statistics_anchored_rois_20221113153859.csv`. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/aggregate_statistics_anchored_rois_20221113154903.csv) for an example the SimBA output presenting aggregate statistics. When opening this file in a spreadsheet viewer, the top few cells look something like this:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/example_intersection_output.png" />
+</p>
+
+The first column named 'Video' tells you which video the row data comes from (in my cace `termites_test.mp4`). The second column tells you the Animal anchored ROI. Th third column tells you the second Animal anchored ROI. If analyzing ROI-keypoint intersections, then the fourth column tell you which second animal key-point body-part. If analyzing ROI-ROI intersections, then the fourth column will read `None`. The fifth and sixth column gives you the specific measurement and its value. Thus, the first row in the screengrab above tells me `Animal 3` and `Animal 4` have 11 event bout interaction events while the second row tells me they have lasted for a total 10.83s. Moreover, the sixth row tells me `Thorax` body-part of `Animal 5` has intersected with the animal-anchored ROI of `Animal 2` for 5 event bouts. 
 
 
-The first `Settings` 
+
+
+
+
+
+
 
 
 
