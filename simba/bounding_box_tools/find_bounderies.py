@@ -6,21 +6,54 @@ import os, glob
 import itertools
 import numpy as np
 from shapely.geometry import Polygon, Point, LineString
+import shapely.wkt
 from joblib import Parallel, delayed
 import pickle
+import platform
 from scipy.spatial import ConvexHull
-from simba.misc_tools import check_multi_animal_status
+from simba.misc_tools import check_multi_animal_status, find_core_cnt
+
 
 class AnimalBoundaryFinder(object):
+    """
+    Class finding boundaries (animal-anchored) ROIs for animals in each frame. Result is saved as a pickle in the
+    `project_folder/logs` directory of the SimBA project.
+
+    Parameters
+    ----------
+    config_path: str
+        path to SimBA project config file in Configparser format
+    roi_type: str
+        shape type of ROI. OPTIONS: ENTIRE ANIMAL, SINGLE BODY-PART SQUARE, SINGLE BODY-PART CIRCLE
+    force_rectangle: str or None
+        If True, forces roi shape into rectangle.
+    body_parts: dict
+        Body-parts to anchor the ROI to with keys as animal names and values as body-parts. E.g., body_parts={'Animal_1': 'Head_1', 'Animal_2': 'Head_2'}.
+    parallel_offset: int
+        Offset of ROI from the animal outer bounds in millimeter.
+
+    Notes
+    ----------
+    `Bounding boxes tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md__.
+
+    Examples
+    ----------
+    >>> animal_boundary_finder= AnimalBoundaryFinder(config_path='/Users/simon/Desktop/troubleshooting/termites/project_folder/project_config.ini', roi_type='SINGLE BODY-PART CIRCLE',body_parts={'Animal_1': 'Head_1', 'Animal_2': 'Head_2'}, force_rectangle=False, parallel_offset=15)
+    >>> animal_boundary_finder.find_boundaries()
+    """
+
+
     def __init__(self,
                  config_path: str,
-                 roi_type: str,
+                 roi_type: str or None,
                  force_rectangle: bool,
                  body_parts: dict or None,
                  parallel_offset: int or None):
 
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.parallel_offset_mm, self.roi_type, self.force_rectangle = parallel_offset, roi_type.lower(), force_rectangle
+        self.parallel_offset_mm, self.roi_type, self.force_rectangle = parallel_offset, roi_type, force_rectangle
+        if self.parallel_offset_mm == 0:
+            self.parallel_offset_mm += 1
         self.body_parts = body_parts
         self.project_path= read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
         self.input_dir = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
@@ -35,7 +68,8 @@ class AnimalBoundaryFinder(object):
         self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.no_animals)
         self.x_cols, self.y_cols, self.pcols = getBpNames(config_path)
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, list(self.multi_animal_id_lst),  self.no_animals, list(self.x_cols), list(self.y_cols), [], [])
-        if (self.roi_type == 'circle') or (self.roi_type == 'square'):
+        self.cpus, self.cpus_to_use = find_core_cnt()
+        if (self.roi_type == 'SINGLE BODY-PART CIRCLE') or (self.roi_type == 'SINGLE BODY-PART SQUARE'):
             self.center_bp_names = {}
             for animal, body_part in self.body_parts.items():
                 self.center_bp_names[animal] = [body_part + '_x', body_part + '_y']
@@ -43,9 +77,9 @@ class AnimalBoundaryFinder(object):
     def _save_results(self):
         with open(self.save_path, 'wb') as path:
             pickle.dump(self.polygons, path, pickle.HIGHEST_PROTOCOL)
+        print('SIMBA COMPLETE: Animal shapes for {} videos saved at {}'.format(str(len(self.files_found)), self.save_path))
 
     def minimum_bounding_rectangle(self, points):
-
         pi2 = np.pi / 2.
         hull_points = points[ConvexHull(points).vertices]
         edges = hull_points[1:] - hull_points[:-1]
@@ -68,11 +102,11 @@ class AnimalBoundaryFinder(object):
         return rval
 
     def _find_polygons(self, point_array: np.array):
-        if self.roi_type == 'polygon':
+        if self.roi_type == 'ENTIRE ANIMAL':
             animal_shape = LineString(point_array.tolist()).buffer(self.offset_px)
-        elif self.roi_type == 'circle':
+        elif self.roi_type == 'SINGLE BODY-PART CIRCLE':
             animal_shape = Point(point_array).buffer(self.offset_px)
-        elif self.roi_type == 'square':
+        elif self.roi_type == 'SINGLE BODY-PART SQUARE':
             top_left = Point(int(point_array[0] - self.offset_px), int(point_array[1] - self.offset_px))
             top_right = Point(int(point_array[0] + self.offset_px), int(point_array[1] - self.offset_px))
             bottom_left = Point(int(point_array[0] - self.offset_px), int(point_array[1] + self.offset_px))
@@ -80,6 +114,7 @@ class AnimalBoundaryFinder(object):
             animal_shape = Polygon([top_left, top_right, bottom_left, bottom_right])
         if self.force_rectangle:
             animal_shape = Polygon(self.minimum_bounding_rectangle(points=np.array(animal_shape.exterior.coords)))
+        animal_shape = shapely.wkt.loads(shapely.wkt.dumps(animal_shape, rounding_precision=1)).simplify(0)
         return animal_shape
 
     def find_boundaries(self):
@@ -90,19 +125,15 @@ class AnimalBoundaryFinder(object):
             self.offset_px = px_per_mm * self.parallel_offset_mm
             self.polygons[self.video_name] = {}
             self.data_df = read_df(file_path=file_path,file_type=self.file_type).astype(int)
-            for animal in self.animal_bp_dict.keys():
-                if self.roi_type == 'polygon':
+            for animal_cnt, animal in enumerate(self.animal_bp_dict.keys()):
+                print('Analyzing shapes in video {} ({}/{}), animal {} ({}/{})...'.format(self.video_name, str(file_cnt+1), str(len(self.files_found)), animal, str(animal_cnt+1), len(list(self.animal_bp_dict.keys()))))
+                if self.roi_type == 'ENTIRE ANIMAL':
                     animal_x_cols, animal_y_cols = self.animal_bp_dict[animal]['X_bps'], self.animal_bp_dict[animal]['Y_bps']
                     animal_df = self.data_df[[x for x in itertools.chain.from_iterable(itertools.zip_longest(animal_x_cols,animal_y_cols)) if x]]
                     animal_arr = np.reshape(animal_df.values, (-1, len(animal_x_cols), 2))
-                if (self.roi_type == 'circle') or (self.roi_type == 'square'):
+                if (self.roi_type == 'SINGLE BODY-PART SQUARE') or (self.roi_type == 'SINGLE BODY-PART CIRCLE'):
                     animal_arr = self.data_df[self.center_bp_names[animal]].values
-                self.polygons[self.video_name][animal] = Parallel(n_jobs=5, verbose=2, backend="loky")(delayed(self._find_polygons)(x) for x in animal_arr)
+
+                self.polygons[self.video_name][animal] = Parallel(n_jobs=self.cpus_to_use, verbose=1, backend="threading")(delayed(self._find_polygons)(x) for x in animal_arr)
         self._save_results()
 
-test = AnimalBoundaryFinder(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini',
-                            roi_type='polygon',
-                            body_parts={'Animal_1': 'Nose_1', 'Animal_2': 'Nose_2'},
-                            force_rectangle=True,
-                            parallel_offset=30)
-test.find_boundaries()
