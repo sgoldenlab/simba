@@ -65,7 +65,6 @@ from simba.remove_keypoints_in_pose import KeypointRemover
 from simba.classifications_per_ROI import *
 from simba.read_DANNCE_mat import import_DANNCE_file, import_DANNCE_folder
 from simba.ethovision_import import ImportEthovision
-from simba.plot_pose_in_dir import create_video_from_dir
 from simba.sleap_import_new import ImportSLEAP
 from simba.ROI_plot_new import ROIPlot
 from simba.train_single_model import TrainSingleModel
@@ -121,7 +120,9 @@ from simba.pop_up_classes import (HeatmapLocationPopup,
                                   PoseReorganizerPopUp,
                                   MakePathPlotPopUp,
                                   AboutSimBAPopUp,
-                                  ConcatenatingVideosPopUp)
+                                  ConcatenatingVideosPopUp,
+                                  VisualizePoseInFolderPopUp)
+from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.labelling_interface import select_labelling_video
 from simba.labelling_advanced_interface import select_labelling_video_advanced
 from simba.deepethogram_importer import DeepEthogramImporter
@@ -502,46 +503,6 @@ class new_window:
 
 def createWindow(scriptname):
     new_window(scriptname)
-
-
-class visualize_pose:
-    def __init__(self):
-        viz_pose = Toplevel()
-        viz_pose.minsize(350, 200)
-        viz_pose.wm_title('Visualize pose-estimation')
-
-        settings_frame = LabelFrame(viz_pose, text='File Settings', font=('Helvetica', 10, 'bold'), pady=5, padx=5)
-
-        self.input_folder = FolderSelect(settings_frame, 'Input directory (with csv/parquet files)', title='Select input folder')
-        self.output_folder = FolderSelect(settings_frame, 'Output directory (where your videos will be saved)', title='Select output folder')
-        self.circle_size = Entry_Box(settings_frame, 'Circle size', '0')
-
-        button_run_visualization = Button(settings_frame, text='Visualize pose', command=self.run_visualization)
-        settings_frame.grid(row=0, sticky=W)
-        self.input_folder.grid(row=0, column=0, pady=10, sticky=W)
-        self.output_folder.grid(row=1, column=0, pady=10, sticky=W)
-        self.circle_size.grid(row=2, column=0, pady=10, sticky=W)
-        button_run_visualization.grid(row=3, column=0, pady=10)
-
-    def run_visualization(self):
-        circle_size_int = self.circle_size.entry_get
-        input_folder = self.input_folder.folder_path
-        output_folder = self.output_folder.folder_path
-        print(input_folder, output_folder)
-        if circle_size_int == '':
-            print('Please enter a circle size to continue')
-
-        if not circle_size_int.isdigit():
-            print('Circle size must be a integer')
-
-        elif (input_folder == '') or (input_folder == 'No folder selected'):
-            print('Please select an input folder to continue')
-
-        elif (output_folder == '') or (output_folder == 'No folder selected'):
-            print('Please select an output folder to continue')
-
-        else:
-            create_video_from_dir(in_directory=input_folder, out_directory=output_folder, circle_size=int(circle_size_int))
 
 class project_config:
 
@@ -1400,34 +1361,6 @@ class project_config:
             print(e.args)
             print('Please make sure videos are imported and located in /project_folder/videos')
 
-
-class loadprojectMenu:
-    def __init__(self,inputcommand):
-        load_project_menu = Toplevel()
-        load_project_menu.minsize(300, 200)
-        load_project_menu.wm_title("Load SimBA project (project_config.ini file)")
-
-        # load project ini
-        label_loadprojectini = LabelFrame(load_project_menu, text='Load Project .ini', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
-        self.projectconfigini = FileSelect(label_loadprojectini,'File Select:', title='Select project_config.ini file')
-
-        #button
-        launchloadprojectButton = Button(load_project_menu,text='Load Project',command=lambda:self.launch(load_project_menu, inputcommand))
-
-        #organize
-        label_loadprojectini.grid(row=0)
-        self.projectconfigini.grid(row=0,sticky=W)
-        launchloadprojectButton.grid(row=1,pady=10)
-
-    def launch(self,master,command):
-        if (self.projectconfigini.file_path.endswith('.ini')):
-            master.destroy()
-            print('Loading {}...'.format(self.projectconfigini.file_path))
-            command(self.projectconfigini.file_path)
-        else:
-            print('Please select the project_config.ini file')
-
-
 def open_web_link(url):
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
     cef.Initialize()
@@ -1444,8 +1377,29 @@ def wait_for_internet_connection(url):
         except:
             pass
 
+class LoadProjectPopUp(object):
+    def __init__(self):
+        main_frm = Toplevel()
+        main_frm.minsize(300, 200)
+        main_frm.wm_title("Load SimBA project (project_config.ini file)")
+        load_project_frm = LabelFrame(main_frm, text='LOAD SIMBA PROJECT_CONFIG.INI', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
+        self.selected_file = FileSelect(load_project_frm,'Select file: ', title='Select project_config.ini file')
+        load_project_btn = Button(load_project_frm, text='LOAD PROJECT', font=("Helvetica", 12, 'bold'), command=lambda: self.launch_project())
+
+        load_project_frm.grid(row=0)
+        self.selected_file.grid(row=0,sticky=NW)
+        load_project_btn.grid(row=1,pady=10, sticky=NW)
+
+    def launch_project(self):
+        print('Loading {}...'.format(self.selected_file.file_path))
+        check_file_exist_and_readable(file_path=self.selected_file.file_path)
+        _ = loadprojectini(configini=self.selected_file.file_path)
+
+
+
 class loadprojectini:
-    def __init__(self,configini):
+    def __init__(self,
+                 configini=str):
 
         #save project ini as attribute
         self.projectconfigini = configini
@@ -1796,10 +1750,11 @@ class loadprojectini:
         self.videovar = BooleanVar()
         self.genframevar = BooleanVar()
         self.include_timers_var = BooleanVar()
+        self.rotate_image_var = BooleanVar()
         videocheck = Checkbutton(label_skv_all,text='Generate video',variable=self.videovar)
-        framecheck = Checkbutton(label_skv_all,text='Generate frame',variable=self.genframevar)
+        framecheck = Checkbutton(label_skv_all,text='Generate frames',variable=self.genframevar)
         timerscheck = Checkbutton(label_skv_all, text='Include timers overlay', variable=self.include_timers_var)
-
+        rotate_check = Checkbutton(label_skv_all, text='Rotate video 90 degrees', variable=self.rotate_image_var)
         button_plotsklearnr = Button(label_skv_all,text='Visualize classification results',command =self.plotsklearn_result)
 
         #single video
@@ -1816,10 +1771,13 @@ class loadprojectini:
         self.videovar2 = BooleanVar()
         self.genframevar2 = BooleanVar()
         self.include_timers_single_var = BooleanVar()
+        self.rotate_single_var = BooleanVar()
         videocheck2 = Checkbutton(label_skv_single, text='Generate video', variable=self.videovar2)
-        framecheck2 = Checkbutton(label_skv_single, text='Generate frame', variable=self.genframevar2)
+        framecheck2 = Checkbutton(label_skv_single, text='Generate frames', variable=self.genframevar2)
         timers_single_check = Checkbutton(label_skv_single, text='Include timers overlay', variable=self.include_timers_single_var)
+        rotate_single_check = Checkbutton(label_skv_single, text='Rotate video 90 degrees', variable=self.rotate_single_var)
         button_plotsklearnr2 = Button(label_skv_single, text='Visualize classification results',command=lambda: self.plotsklearnresultsingle(project_config_path=self.projectconfigini,
+                                                                                                                                             rotate=self.rotate_single_var.get(),
                                                                                                                                              video_setting=self.videovar2.get(),
                                                                                                                                              frame_setting=self.genframevar2.get(),
                                                                                                                                              video_path=self.video_entry.getChoices(),
@@ -1967,6 +1925,7 @@ class loadprojectini:
         button_bel = Button(lbl_addon,text='Pup retrieval - Analysis Protocol 1',command = self.pupMenu)
         button_unsupervised = Button(lbl_addon,text='Unsupervised',command = lambda :unsupervisedInterface(self.projectconfigini))
         cue_light_analyser_btn = Button(lbl_addon, text='Cue light analysis', command=lambda: CueLightAnalyzerMenu(config_path=self.projectconfigini))
+        anchored_roi_analysis_btn = Button(lbl_addon, text='Animal-anchored ROI analysis', command=lambda: BoundaryMenus(config_path=self.projectconfigini))
 
         #organize
         label_import.grid(row=0,column=0,sticky=W,pady=5)
@@ -2104,13 +2063,15 @@ class loadprojectini:
         videocheck.grid(row=0,sticky=W)
         framecheck.grid(row=1,sticky=W)
         timerscheck.grid(row=2, sticky=W)
-        button_plotsklearnr.grid(row=3,sticky=W)
+        rotate_check.grid(row=3, sticky=W)
+        button_plotsklearnr.grid(row=4,sticky=W)
         label_skv_single.grid(row=2,sticky=W,pady=10,padx=5)
         self.video_entry.grid(row=0,sticky=W)
         videocheck2.grid(row=1,sticky=W)
         framecheck2.grid(row=2,sticky=W)
         timers_single_check.grid(row=3,sticky=W)
-        button_plotsklearnr2.grid(row=4,sticky=W)
+        rotate_single_check.grid(row=4, sticky=W)
+        button_plotsklearnr2.grid(row=5,sticky=W)
 
         label_plotall.grid(row=11,column=1,sticky=W+N,padx=5)
         #gantt
@@ -2187,8 +2148,9 @@ class loadprojectini:
 
         lbl_addon.grid(row=15,sticky=W)
         button_bel.grid(row=0,sticky=W)
-        button_unsupervised.grid(row=1,sticky=W,pady=10)
-        cue_light_analyser_btn.grid(row=2, sticky=W, pady=10)
+        button_unsupervised.grid(row=1,sticky=W)
+        cue_light_analyser_btn.grid(row=2, sticky=W)
+        anchored_roi_analysis_btn.grid(row=3, sticky=W)
 
     def create_video_info_table(self):
         video_info_tabler = VideoInfoTable(config_path=self.projectconfigini)
@@ -2200,11 +2162,12 @@ class loadprojectini:
 
     def plotsklearnresultsingle(self,
                                 project_config_path: str,
+                                rotate: bool,
                                 video_setting: bool,
                                 frame_setting: bool,
                                 video_path: str,
                                 timers: bool):
-        simba_plotter = PlotSklearnResults(config_path=project_config_path, video_setting=video_setting, frame_setting=frame_setting, video_file_path=video_path, print_timers=timers)
+        simba_plotter = PlotSklearnResults(config_path=project_config_path, video_setting=video_setting, rotate=rotate, frame_setting=frame_setting, video_file_path=video_path, print_timers=timers)
         simba_plotter.initialize_visualizations()
 
     def validate_model_first_step(self):
@@ -3123,7 +3086,11 @@ class loadprojectini:
         data_plotter_multiprocessor.start()
 
     def plotsklearn_result(self):
-        simba_plotter = PlotSklearnResults(config_path=self.projectconfigini, video_setting=self.videovar.get(), frame_setting=self.genframevar.get(), print_timers=self.include_timers_var.get())
+        simba_plotter = PlotSklearnResults(config_path=self.projectconfigini,
+                                           rotate=self.rotate_image_var.get(),
+                                           video_setting=self.videovar.get(),
+                                           frame_setting=self.genframevar.get(),
+                                           print_timers=self.include_timers_var.get())
         simba_plotter.initialize_visualizations()
 
     def analyzseverity(self):
@@ -4011,7 +3978,7 @@ class App(object):
         fileMenu = Menu(menu)
         menu.add_cascade(label='File', menu=fileMenu)
         fileMenu.add_command(label='Create a new project',command=project_config)
-        fileMenu.add_command(label='Load project', command=lambda:loadprojectMenu(loadprojectini))
+        fileMenu.add_command(label='Load project', command=lambda: LoadProjectPopUp())
         fileMenu.add_separator()
         fileMenu.add_command(label='Exit', command=self.root.destroy)
 
@@ -4046,7 +4013,7 @@ class App(object):
         fifthMenu.add_command(label='Create path plot', command=MakePathPlotPopUp)
         fifthMenu.add_cascade(label='Change fps...',menu =fpsMenu)
         fifthMenu.add_cascade(label='Concatenate videos', command=ConcatenatingVideosPopUp)
-        fifthMenu.add_cascade(label='Visualize pose-estimation in folder...', command=visualize_pose)
+        fifthMenu.add_cascade(label='Visualize pose-estimation in folder...', command=VisualizePoseInFolderPopUp)
         fifthMenu.add_cascade(label='Reorganize Tracking Data', command= PoseReorganizerPopUp)
         fifthMenu.add_cascade(label='Drop body-parts from tracking data', command=droptrackingdata)
 
