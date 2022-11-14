@@ -1,13 +1,12 @@
 # <p align="center"> Animal-anchored ROIs (bounding-boxes) in SimBA </p>
 
-The animal-anchored region-of-interest (ROI) interface allows users to define bounding boxes (or circles) around pose-estimated animal key-points. Once defined, we can calulate how often and when the different bounding boxes and key-points has intersected which each other to get a proxy measurement for when and how different animals interact with each other. 
+The animal-anchored region-of-interest (ROI) interface allows users to define bounding boxes (or circles) around one or more pose-estimated animal key-points. Once defined, the bounding boxes can be used to calulate how often and when different bounding boxes and key-points intersect which each other to get proxy measurement for how different animals interact with each other. These measurements can also be used as features for any downstream machine learning algorithm.
 
 # BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA
 
 To analyze anchored-roi data in SimBA (for descriptive statistics, machine learning features, or both descriptive statistics and 
-machine learning features), the tracking data **first** has to be processed the **up-to and including the 
-*Outlier correction* step described in [Part 2 - Step 4 - Correcting outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction)**. 
-Thus, before proceeding to calculate animal-anchored ROI based metrics, you should have one file for each of the videos in your 
+machine learning features), the pose-estimated tracking data **first** has to be processed the **up-to and including the 
+*Outlier correction* step described in [Part 2 - Step 4 - Correcting outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction)**. Thus, before proceeding to calculate animal-anchored ROI based metrics, you should have one file for each of the videos in your 
 project located within the `project_folder\csv\outlier_corrected_movement_location` sub-directory of your SimBA project.
 
 Specifically, for working with anchored-ROI in SimBA, begin by 
