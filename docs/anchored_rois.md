@@ -145,23 +145,25 @@ Next, with this information at hand, we can now compute aggregate statistics pro
 
 The first sub-menu in this pop-up window is titled `SETTINGS`. Here, we define the types of aggregate statistics we want to compute:
 
-* INTERACTION TIME (s): How much time (in seconds) did each ROI intersected with other ROI and/or body-part key-points.  
+* INTERACTION TIME (s): How much time (in seconds) each ROI intersect with other ROI and/or body-part key-points.  
 
-* INTERACTION BOUT COUNT: The number of interaction events (defined as an uninterrupted sequence of frames with intersections) between each two aniamls in the video.   
+* INTERACTION BOUT COUNT: The number of interaction events (defined as an uninterrupted sequence of frames where ROI and/or body-part key-points intersect) between each two aniamls in the video.   
 
-* INTERACTION BOUT TIME MEAN (s): The mean length of each interaction event (defined as an uninterrupted sequence of frames with intersections) between each two aniamls in the video.   
+* INTERACTION BOUT TIME MEAN (s): The mean length of each interaction event between each two aniamls in the video.   
 
-* INTERACTION BOUT TIME MEDIAN (s): The median length of each interaction event (defined as an uninterrupted sequence of frames with intersections) between each two aniamls in the video.
+* INTERACTION BOUT TIME MEDIAN (s): The median length of each interaction event between each two aniamls in the video.
 
-* MINIMUM BOUT LENGTH (MS): The shortest allowed length of an interaction bout. You can read more about [minimum bout length here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data). In brief, if you enter 500 in the `MINIMUM BOUT LENGTH` entry-box, then any interaction shorter than 500ms will be **ignored** when computing aggregate statistics. 
+* MINIMUM BOUT LENGTH (MS): The shortest allowed length of an interaction bout. You can read more about [minimum bout length here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data). In brief, if you enter `500` in the `MINIMUM BOUT LENGTH` entry-box, then any interaction shorter than 500ms will be **ignored** when computing aggregate statistics. 
 
-Next, click on `CALCULATE AGGREGATE STATISTICS`. You can follow the progress in the main SimBA terminal window. Once complete, a datetime-stamped CSV file containing the user-defined aggregate statistics is saved in the `project_folder/logs` directory of the SimBA project, with a file-name akin to `aggregate_statistics_anchored_rois_20221113153859.csv`. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/aggregate_statistics_anchored_rois_20221113154903.csv) for an example the SimBA output presenting aggregate statistics. When opening this file in a spreadsheet viewer, the top few cells look something like this:
+Next, click on `CALCULATE AGGREGATE STATISTICS`. You can follow the progress in the main SimBA terminal window. Once complete, a datetime-stamped CSV file containing the user-defined aggregate statistics is saved in the `project_folder/logs` directory of the SimBA project, with a file-name akin to `aggregate_statistics_anchored_rois_20221113153859.csv`. Click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/aggregate_statistics_anchored_rois_20221113154903.csv) for an example the SimBA output with expected aggregate statistics after ticking all available metrics. When opening this file in a spreadsheet viewer, the top few cells look something like this:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/example_intersection_output.png" />
 </p>
 
-The first column named 'Video' tells you which video the row data comes from (in my cace `termites_test.mp4`). The second column tells you the Animal anchored ROI. Th third column tells you the second Animal anchored ROI. If analyzing ROI-keypoint intersections, then the fourth column tell you which second animal key-point body-part. If analyzing ROI-ROI intersections, then the fourth column will read `None`. The fifth and sixth column gives you the specific measurement and its value. Thus, the first row in the screengrab above tells me `Animal 3` and `Animal 4` have 11 event bout interaction events while the second row tells me they have lasted for a total 10.83s. Moreover, the sixth row tells me `Thorax` body-part of `Animal 5` has intersected with the animal-anchored ROI of `Animal 2` for 5 event bouts. 
+Here, the first column named 'Video' tells you which video the data comes from (in my cace `termites_test.mp4`). The second column tells you the Animal anchored ROI. Th third column tells you the second Animal anchored ROI. If analyzing ROI-keypoint intersections, then the fourth column tell you the key-point body-part of the second animal. If analyzing ROI-ROI intersections, then the fourth column will read `None`. The fifth and sixth column gives you the  measurement and its value. Thus, the first row in the screengrab above tells me `Animal 3` and `Animal 4` have 11 event bout interaction events, while the second row tells me they have lasted for a total 10.83s. Moreover, the sixth row tells me `Thorax` body-part of `Animal 5` has intersected with the animal-anchored ROI of `Animal 2` for 5 event bouts.
+
+> Note: if you need to calculate aggregate statistics that is not available in the `CALCULATE AGGREGATE BOUNDARY STATISTICS` menu, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or open an [issue on GitHub](https://github.com/sgoldenlab/simba/issues) and we can work together to make the measurement you need available! 
 
 
 
