@@ -17,9 +17,9 @@ class AggBoundaryStatisticsCalculator(object):
     config_path: str
         Path to SimBA project config file in Configparser format
     measures: list
-        Meassures to compute aggregate statistics for. OPTIONS: 'INTERACTION TIME (s)', 'INTERACTION BOUT COUNT', 'INTERACTION BOUT MEAN (s)', 'INTERACTION BOUT MEDIAN (s)'
+        Aggregate statistics measurements. OPTIONS: 'INTERACTION TIME (s)', 'INTERACTION BOUT COUNT', 'INTERACTION BOUT MEAN (s)', 'INTERACTION BOUT MEDIAN (s)'
     shortest_allowed_interaction: int
-        The shortest allowed animal anchored ROI intersection in millisecond.
+        The shortest allowed animal-anchored ROI intersection in millisecond.
 
     Notes
     ----------

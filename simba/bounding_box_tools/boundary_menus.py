@@ -12,8 +12,8 @@ from simba.bounding_box_tools.agg_boundary_stats import AggBoundaryStatisticsCal
 
 class BoundaryMenus(object):
     """
-    Class creating GUI interface for extrapolating bounding boxes from pose-estimation data and calculating
-    statstics on bounding boxes intersection.
+    Class creating GUI interface for extrapolating bounding boxes from pose-estimation data, and calculating
+    statstics on bounding boxes and pose-estmated key-point intersections.
 
     Parameters
     ----------
@@ -145,22 +145,26 @@ class BoundaryMenus(object):
         self.run_visualize_roi = Button(self.video_settings_frm, text='RUN', command=lambda: self.__run_boundary_visualization())
         self.include_keypoints_var = BooleanVar()
         self.convert_to_grayscale_var = BooleanVar()
+        self.highlight_intersections_var = BooleanVar()
         self.include_keypoints_cb = Checkbutton(self.video_settings_frm, text='INCLUDE KEY-POINTS', variable=self.include_keypoints_var, command=None)
         self.convert_to_grayscale_cb = Checkbutton(self.video_settings_frm, text='GREYSCALE', variable=self.convert_to_grayscale_var, command=None)
+        self.highlight_intersections_cb = Checkbutton(self.video_settings_frm, text='HIGHLIGHT INTERSECTIONS', variable=self.highlight_intersections_var, command=None)
         self.video_settings_frm.grid(row=0, sticky=NW)
         self.select_video_dropdown.grid(row=0, column=0, sticky=NW)
         self.include_keypoints_cb.grid(row=1, column=0, sticky=NW)
         self.convert_to_grayscale_cb.grid(row=2, column=0, sticky=NW)
-        self.run_visualize_roi.grid(row=3, column=0, sticky=NW)
-
+        self.highlight_intersections_cb.grid(row=3, column=0, sticky=NW)
+        self.run_visualize_roi.grid(row=4, column=0, sticky=NW)
 
     def __run_boundary_visualization(self):
         include_keypoints = self.include_keypoints_var.get()
         greyscale = self.convert_to_grayscale_var.get()
+        highlight_intersections = self.highlight_intersections_var.get()
         video_visualizer = BoundaryVisualizer(config_path=self.config_path,
                                               video_name=self.select_video_dropdown.getChoices(),
                                               include_key_points=include_keypoints,
-                                              greyscale=greyscale)
+                                              greyscale=greyscale,
+                                              show_intersections=highlight_intersections)
         video_visualizer.run_visualization()
 
     def __launch_boundary_statistics(self):

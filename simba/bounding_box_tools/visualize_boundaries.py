@@ -22,10 +22,12 @@ def _image_creator(frm_range: list,
                    polygon_data: dict,
                    animal_bp_dict: dict,
                    data_df: pd.DataFrame or None,
+                   intersection_data_df: pd.DataFrame or None,
                    circle_size: int,
                    video_path: str,
                    key_points: bool,
                    greyscale: bool):
+
     cap, current_frame = cv2.VideoCapture(video_path), frm_range[0]
     cap.set(1, frm_range[0])
     img_lst = []
@@ -40,6 +42,10 @@ def _image_creator(frm_range: list,
                 for bp_cnt, (x_col, y_col) in enumerate(zip(animal_data['X_bps'], animal_data['Y_bps'])):
                     cv2.circle(frame, (frm_data[x_col], frm_data[y_col]), 0, animal_data['colors'][bp_cnt], circle_size)
             animal_polygon = np.array(list(polygon_data[animal][current_frame].convex_hull.exterior.coords)).astype(int)
+            if intersection_data_df is not None:
+                intersect = intersection_data_df.loc[current_frame, intersection_data_df.columns.str.startswith(animal)].sum()
+                if intersect > 0:
+                    cv2.polylines(frame, [animal_polygon], 1, (0, 0, 255), 10)
             cv2.polylines(frame, [animal_polygon], 1, animal_data['colors'][animal_cnt], 2)
         img_lst.append(frame)
         current_frame += 1
@@ -60,6 +66,8 @@ class BoundaryVisualizer(object):
         If True, includes pose-estimated body-parts in the visualization.
     greyscale: bool
         If True, converts the video (but not the shapes/keypoints) to greyscale.
+    show_intersections: bool or None
+        If True, then produce highlight boundaries/keypoints to signify present intersections.
 
     Notes
     ----------
@@ -75,7 +83,8 @@ class BoundaryVisualizer(object):
                  config_path: str,
                  video_name: str,
                  include_key_points: bool,
-                 greyscale: bool):
+                 greyscale: bool,
+                 show_intersections: bool or None):
 
         if platform.system() == "Darwin":
             multiprocessing.set_start_method('spawn', force=True)
@@ -84,7 +93,10 @@ class BoundaryVisualizer(object):
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
         self.polygon_path = os.path.join(self.project_path, 'logs', 'anchored_rois.pickle')
         self.video_name, self.include_key_points, self.greyscale = video_name, include_key_points, greyscale
+        self.show_intersections, self.intersection_data_folder = show_intersections, os.path.join(self.project_path, 'csv', 'anchored_roi_data')
         check_file_exist_and_readable(file_path=self.polygon_path)
+        self.intersections_df = None
+        if self.show_intersections: self._find_intersection_data()
         with open(self.polygon_path, 'rb') as fp: self.polygons = pickle.load(fp)
         self.input_dir = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
         self.video_dir = os.path.join(self.project_path, 'videos')
@@ -100,6 +112,23 @@ class BoundaryVisualizer(object):
         self.cpu_cnt, self.cpu_to_use = find_core_cnt()
         self.maxtasksperchild, self.chunksize = 10, 1
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, list(self.multi_animal_id_lst), self.no_animals, list(self.x_cols), list(self.y_cols), [], self.color_lst_of_lst)
+
+    def _find_intersection_data(self):
+        self.intersection_path = None
+        for p in [os.path.join(self.intersection_data_folder, self.video_name + x) for x in ['.pickle', '.csv', '.parquet']]:
+            if os.path.isfile(p):
+                self.intersection_path = p
+        if self.intersection_path is None:
+            print('SIMBA WARNING: No ROI intersection data found for video {} in directory {}. Skipping intersection visualizations'.format(self.video_name, self.intersection_data_folder))
+            self.show_intersections = False
+            self.intersections_df = None
+        else:
+            if self.intersection_path.endswith('pickle'):
+                self.intersections_df = pd.read_pickle(self.intersection_path)
+            elif self.intersection_path.endswith('parquet'):
+                self.intersections_df = pd.read_parquet(self.intersection_path)
+            elif self.intersection_path.endswith('csv'):
+                self.intersections_df = pd.read_csv(self.intersection_path)
 
     def run_visualization(self, chunk_size=50):
         if self.include_key_points:
@@ -132,7 +161,8 @@ class BoundaryVisualizer(object):
                                           animal_bp_dict=self.animal_bp_dict,
                                           video_path=video_path,
                                           key_points=self.include_key_points,
-                                          greyscale=self.greyscale)
+                                          greyscale=self.greyscale,
+                                          intersection_data_df=self.intersections_df)
             for cnt, result in enumerate(p.imap(constants, frame_chunks, chunksize=self.chunksize)):
                 save_path = os.path.join(self.temp_folder, str(cnt) + '.mp4')
                 writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), video_meta_data['fps'], (video_meta_data['width'], video_meta_data['height']))
@@ -159,3 +189,10 @@ class BoundaryVisualizer(object):
                 remove_a_folder(folder_dir=self.temp_folder)
                 break
         print('SIMBA COMPLETE: Anchored ROI video created at {}'.format(self.save_video_path))
+
+# boundary_visualizer = BoundaryVisualizer(config_path='/Users/simon/Desktop/troubleshooting/termites/project_folder/project_config.ini',
+#                                          video_name='termites_test',
+#                                          include_key_points=True,
+#                                          greyscale=True,
+#                                          show_intersections=True)
+# boundary_visualizer.run_visualization()

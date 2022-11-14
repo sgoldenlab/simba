@@ -25,8 +25,8 @@ class AnimalBoundaryFinder(object):
         path to SimBA project config file in Configparser format
     roi_type: str
         shape type of ROI. OPTIONS: ENTIRE ANIMAL, SINGLE BODY-PART SQUARE, SINGLE BODY-PART CIRCLE
-    force_rectangle: str or None
-        If True, forces roi shape into rectangle.
+    force_rectangle: bool or None
+        If True, forces roi shape into rectangles.
     body_parts: dict
         Body-parts to anchor the ROI to with keys as animal names and values as body-parts. E.g., body_parts={'Animal_1': 'Head_1', 'Animal_2': 'Head_2'}.
     parallel_offset: int
