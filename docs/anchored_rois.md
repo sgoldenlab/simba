@@ -1,6 +1,8 @@
 # <p align="center"> Animal-anchored ROIs (bounding-boxes) in SimBA </p>
 
-The animal-anchored region-of-interest (ROI) interface allows users to define bounding boxes (or circles) around one or more pose-estimated animal key-points. Once defined, the bounding boxes can be used to calulate how often and when different bounding boxes and key-points intersect which each other to get proxy measurement for how different animals interact with each other. These measurements can also be used as features for any downstream machine learning algorithm.
+The animal-anchored region-of-interest (ROI) interface allows users to define bounding boxes (or circles) around one or more pose-estimated animal key-points. Once defined, the bounding boxes can be used to calulate how often and when different bounding boxes and key-points intersect which each other to get proxy measurement for how different animals interact with each other. These measurements can also be used as features for any downstream machine learning algorithm. 
+
+The code can be found in [simba.bounding_box_tools](https://github.com/sgoldenlab/simba/tree/master/simba/bounding_box_tools).
 
 # BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA
 
