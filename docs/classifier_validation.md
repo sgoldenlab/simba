@@ -4,7 +4,7 @@ Post-classification validation generates video clips of each detected (classifie
 
 1. Load your SimBA project and click on the [Classifier validation] tab, and you should see the following sub-menu:
 
-![](/images/clf_validation_12.PNG)
+![](/images/clf_validation_12.png)
 
 * The `Seconds` entry-box: Sometimes it can be difficult to understand the context if we only see the classified behavior bout, and we want to introduce a little temporal "padding" pre- and post-behavioral bout to get a better understand of what is going on. In this entry-box, enter the **number of seconds** 
 pre- and post-behavioral bout that should be included in the output video clips. 
