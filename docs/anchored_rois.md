@@ -7,39 +7,39 @@ The code can be found in [simba.bounding_box_tools](https://github.com/sgoldenla
 # BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA
 
 To analyze anchored-roi data in SimBA (for descriptive statistics, machine learning features, or both descriptive statistics and 
-machine learning features), the pose-estimated tracking data **first** has to be processed the **up-to and including the 
+machine learning features), the pose-estimated tracking data **first** has to be processed **up-to and including the 
 *Outlier correction* step described in [Part 2 - Step 4 - Correcting outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction)**. Thus, before proceeding to calculate animal-anchored ROI based metrics, you should have one file for each of the videos in your 
 project located within the `project_folder\csv\outlier_corrected_movement_location` sub-directory of your SimBA project.
 
-Specifically, for working with anchored-ROI in SimBA, begin by 
+Specifically, for working with anchored-ROIs in SimBA, begin by 
 (i) [Importing your videos to your project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-import-videos-into-project-folder), 
-(ii) [Import the tracking data and relevant videos to your project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data), 
-(iii) [Set the video parameters](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters), 
-and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction) (or click to indicate that you want to *Skip outlier correction* as detailed in the Correct outliers tutorial)
+(ii) [Importing the tracking data and relevant videos to your project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data), 
+(iii) [Setting the video parameters](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters), 
+and lastly (iv) [Correctting outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction) (or click to indicate that you want to *Skip outlier correction* as detailed in the Correct outliers tutorial)
 
 
 # ANALYZING ANIMAL-ANCHORED ROIs IN SIMBA
 
-## FINDING THE ANIMAL-ANCHORED ROI'S
+## FINDING THE ANIMAL-ANCHORED ROIs
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_1.png" />
 </p>  
 
 
-Before analyzing animal-anchored ROI data in SimBA, we need to define the shape of - and find - the bounding boxes that define each animal in each frame of your videos. To do this, click on the right-most [Add-ons] tab after loading your SimBA project. Next, click on `Animal-anchored ROI analysis` button to launch a pop-up giving access to the animal-anchored ROI methods. Begin by clickin on the `Find animal boundaries` button in the `SIMBA ANCHORED ROI` pop-up window displayed in the screengrab above. 
+Before analyzing animal-anchored ROI data in SimBA, we need to define the shape of - and find - the bounding boxes that define each animal in each frame of your videos. To do this, click on the right-most [Add-ons] tab after loading your SimBA project. Next, click on the `Animal-anchored ROI analysis` button to launch a pop-up giving access to the animal-anchored ROI methods. Begin by clickin on the `Find animal boundaries` button in the `SIMBA ANCHORED ROI` pop-up window displayed in the screengrab above. 
 
 This brings up a further pop-up window named `FIND ANIMAL BOUNDARIES` with a single drop-down menu named `SELECT SHAPE TYPE`. The dropdown menu has **three** options, (i) *Entire animal*, (ii) *Single body-part square*, and (iii) *Single body-part circle*. More information on each option follows below, but in brief: 
   
   * When choosing  *Entire animal*, all of the animal body-parts will be placed inside the animal-anchored ROI.
-  * When choosing *Single body-part square*, a single user-defined body-part will be inside a square animal-anchored ROI.  
-  * When choosing *Single body-part circle*, a single user-defined body-part will be inside a circular animal-anchored ROI. 
+  * When choosing *Single body-part square*, a single user-defined body-part will be placed inside a square animal-anchored ROI.  
+  * When choosing *Single body-part circle*, a single user-defined body-part will be placed inside a circular animal-anchored ROI. 
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_2.png" />
 </p>  
 
-If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown the settings menu on the **left** in the screen-grab below will be show up. If choosing **Single body-part circle** or **Single body-part square**  in the `SELECT SHAPE TYPE` dropdown the settings menu on the **right** in the screen-grab below will be show up. We will first go through the settings for **Entire animal** based bounding boxes, followed by body-part anchored bounding boxes. 
+If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown, the settings menu on the **left** in the screen-grab below will be show up. If choosing **Single body-part circle** or **Single body-part square**  in the `SELECT SHAPE TYPE` dropdown, the settings menu on the **right** in the screen-grab below will be show up. We will first go through the settings for **Entire animal** based bounding boxes, followed by body-part anchored bounding boxes. 
 
 ### ANCHORED-ROI SHAPE TYPES - ENTIRE ANIMAL BASED BOUNDING BOXES
 
