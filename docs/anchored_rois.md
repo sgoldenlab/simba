@@ -47,7 +47,7 @@ If choosing **Entire animal** in the `SELECT SHAPE TYPE` dropdown, the settings 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_2.png" />
 </p>  
 
-CLICK [HERE](https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png) FOR A SIMILAR SHAPE-TYPE REFERENCE TABLE DESCRIBING EXPECTED BOUNDING BOXES OUTPUT FOR NON-SHAPE SHIFTING ANIMALS (I.E., MICE) 
+CLICK [HERE](https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png) FOR A SIMILAR SHAPE-TYPE REFERENCE TABLE DESCRIBING EXPECTED BOUNDING BOXES OUTPUT FOR SHAPE SHIFTING ANIMALS (I.E., MICE) 
 
 If selecting `Entire animal` based bounding boxes, then users have two user-defined parameters:
 
@@ -78,10 +78,10 @@ Next, when the animal anchored-ROIs have been computed and we have the `anchored
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_66.png" />
 </p>  
 
-* In the `SELECT VIDEO` drop-down menu, select the video for you wish to visualize the animal-anchored boundaries in. 
+* In the `SELECT VIDEO` drop-down menu, select the video you wish to visualize the animal-anchored boundaries in. 
 * Tick the `INCLUDE KEY-POINTS` checkbox **if** you want to visualize the body-part pose-estimated key-points **in addition** to the animal-anchored ROIs. 
 * Occationally, the animal-anchored ROIs (and key-points) are more visable when rest of the image is in greyscale. To create greyscale images (and colored  ROIs/key-points), then tick the `GREYSCALE` checkbox.
-* We may want to make the the intersections that SimBA finds more **salient** (i.e., highlight intersecting animal-anchored ROIs in in bright red) to make sure that the statistics presented are accurate. To do this, tick the `HIGHLIGHT INTERSECTIONS` checkbox. NOTE: In order for this to work, please [calculate boundary statistics](https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md#calculating-boundary-statistics) before visualizing the data. 
+* We may want to make the the intersections that SimBA finds more **salient** (i.e., highlight intersecting animal-anchored ROIs in in bright red) to make sure that the statistics presented are accurate. To do this, tick the `HIGHLIGHT INTERSECTIONS` checkbox. NOTE: In order for this to work, you **must** [calculate boundary statistics](https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md#calculating-boundary-statistics) before visualizing the data. 
 
 Next, to create the animal-anchored boundary videos, click the `RUN` button. You can follow the progress in the main SimBA  terminal window and the OS terminal. Once complete, a new file representing the video selected in the `SELECT VIDEO` drop-down is created in the `project_folder/frames/output/anchored_rois` directory of your SimBA project. You should expect the videos to look something like these examples, dependning in your chosen shape-type:
 
