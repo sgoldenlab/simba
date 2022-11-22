@@ -9,7 +9,7 @@
 # pseudoLabel.py: 4
 # tkinter_functions.py: 8
 # validate_model_on_single_video.py: 16
-Pillow == 5.4.1
+Pillow == 9.3.0
 
 # dlc_change_yamlfile.py: 1
 # tkinter_functions.py: 7
