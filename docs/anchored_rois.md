@@ -75,13 +75,20 @@ Next, when the animal anchored-ROIs have been computed and we have the `anchored
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_66.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_viz_98.png" />
 </p>  
 
 * In the `SELECT VIDEO` drop-down menu, select the video you wish to visualize the animal-anchored boundaries in. 
 * Tick the `INCLUDE KEY-POINTS` checkbox **if** you want to visualize the body-part pose-estimated key-points **in addition** to the animal-anchored ROIs. 
 * Occationally, the animal-anchored ROIs (and key-points) are more visable when rest of the image is in greyscale. To create greyscale images (and colored  ROIs/key-points), then tick the `GREYSCALE` checkbox.
 * We may want to make the the intersections that SimBA finds more **salient** (i.e., highlight intersecting animal-anchored ROIs in in bright red) to make sure that the statistics presented are accurate. To do this, tick the `HIGHLIGHT INTERSECTIONS` checkbox. NOTE: In order for this to work, you **must** [calculate boundary statistics](https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md#calculating-boundary-statistics) before visualizing the data. 
+* We may want to specify the the attributes of each ROI manually rather than SimBA automatically assigning ROI and key-point colors and sizes. To do this, tick the `ENABLE USER-DEFINED ROI ATTRIBUTES` and the the table to assign different ROI attributes for different animals becomes available: 
+
+  - `ROI COLOR`: The color of the animal bounding-box (and key-points).
+  - `ROI THICKNESS`: The thickness of the animal bounding-box. For more information on thickness, see the upper panel of [THIS IMAGE](https://github.com/sgoldenlab/simba/blob/master/images/roi_new_2.png).
+  - `KEY-POINT SIZE`: The size of the circles denoting the location of the pose-estimated body-parts.
+  - `HIGHLIGHT COLOR`: The color of the animal bounding-box **IF** it insersects with another animal bounding box or another animal body-part.
+  - `HIGHLIGHT THICKNESS`: The thickness of the animal bounding-box **IF** it insersects with another animal bounding box or another animal body-part.
 
 Next, to create the animal-anchored boundary videos, click the `RUN` button. You can follow the progress in the main SimBA  terminal window and the OS terminal. Once complete, a new file representing the video selected in the `SELECT VIDEO` drop-down is created in the `project_folder/frames/output/anchored_rois` directory of your SimBA project. You should expect the videos to look something like these examples, dependning in your chosen shape-type:
 
