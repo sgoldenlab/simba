@@ -145,7 +145,7 @@ As opposed to the **first** column header, the **second** column header contains
 Next, with this information at hand, we can now compute aggregate statistics proxying how much each animal interact with each other in each video. To compute aggregate statistics, we click the `CALCULATE AGGREGATE BOUNDARY STATISTICS` button which brings up the following pop-up window:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_5.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_agg_stats.png" />
 </p>
 
 The first sub-menu in this pop-up window is titled `SETTINGS`. Here, we define the types of aggregate statistics we want to compute:
@@ -157,6 +157,8 @@ The first sub-menu in this pop-up window is titled `SETTINGS`. Here, we define t
 * INTERACTION BOUT TIME MEAN (s): The mean length of each interaction event between each two aniamls in the video.   
 
 * INTERACTION BOUT TIME MEDIAN (s): The median length of each interaction event between each two aniamls in the video.
+
+* DETAILED INTERACTIONS TABLE: A table showiing all found interactions and their start and end times. For an example, [CLICK HERE](https://github.com/sgoldenlab/simba/blob/master/misc/detailed_aggregate_statistics_anchored_rois_20221121204633.csv)
 
 * MINIMUM BOUT LENGTH (MS): The shortest allowed length of an interaction bout. You can read more about [minimum bout length here](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data). In brief, if you enter `500` in the `MINIMUM BOUT LENGTH` entry-box, then any interaction shorter than 500ms will be **ignored** when computing aggregate statistics. 
 
