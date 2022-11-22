@@ -75,7 +75,7 @@ Next, when the animal anchored-ROIs have been computed and we have the `anchored
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_viz_98.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_viz_97.png" />
 </p>  
 
 * In the `SELECT VIDEO` drop-down menu, select the video you wish to visualize the animal-anchored boundaries in. 
@@ -128,24 +128,23 @@ Next, we want to choose the output file-format on how to store our data. If your
 
 Once you've made your selections, click the `RUN` button. You can follow the progress in the main SimBA terminal window. Once complete, one data-file in your chosen file-format for each of your videos will be created within the `project_folder/csv/anchored_roi_data` directory of your SimBA project. These files are *truth tables* (containing only 0 and 1s) with rows representing frames, and columns representing the different possible interactions/intersections between animal-anchored ROIs and pose-estimated body-part key-points.  
 
-From these truth tables we can calculate all necessery aggregate statistics representing animal interactions (e.g., latencies and event count). But, to  enable flexibility and user-defined custom metrics, we will go through the structure of the file in a little more details.
+From these truth tables we can calculate all necessery aggregate statistics representing animal interactions (e.g., interaction latencies and interaction event counts). But, to  enable flexibility and user-defined custom metrics, we will go through the structure of the file in a little more details.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/data_table_intersection.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_data_format_1.png" />
 </p>
 
-There are two possible types of columns in this file; representing (i) ROI-ROI intersections, and (ii) ROI-keypoint intersections. The ROI-ROI intersections are represented by the column headers to the **left** in the image above. These column headers contain two strings separated by a single **:** character. Further, the ROI-keypoint intersections are represented by the column headers to the **right** in the image above. These column headers contain three different strings separated by **:** characters. 
+There are two possible types of columns in this file; representing (i) ROI-ROI intersections, and (ii) ROI-keypoint intersections. The ROI-ROI intersections are represented by the column headers to the **left** in the image above. These column headers contain three strings separated by a single **:** character **where the final string reads ROI_ONLY**. Further, the ROI-keypoint intersections are represented by the column headers to the **right** in the image above. These column headers also contain three different strings separated by **:** characters **where the final string reads the name of the 2nd animals body-part key-point**. 
 
-If you saved the data in CSV file format, and open the file in a spreadsheet viewer, you might see something like this when viewing the first two columns and first 27 frames:
+If you saved the data in CSV file format, and open the file in a spreadsheet viewer, you might see something like this when viewing the first two columns and first 30 frames:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/intersaction_tables.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/anchored_roi_data_ex_1.png" />
 </p>
 
-The first column is named `Animal_1:Animal_2`. This column contains data reprsenenting intersections of the **Animal 1 anchored ROI** and the **Animal 2 anchored ROI**. The `1` with the rows 14-20 shows that the Animal 1 anchored ROI and the Animal 2 anchored ROI where **overlapping** in those frames. 
-The value `0` in the cells representing frames 0-13 and frames 21-27 shows that the Animal 1 anchored ROI and Animal 2 anchored ROI where **not overlapping** in those frames.
+The first column (in blue) is named `Animal_1:Animal_2:ROI_ONLY`. This column contains data reprsenenting intersections of the **Animal 1 anchored ROI** and the **Animal 2 anchored ROI**. The `1` with the rows 0-13 shows that the Animal 1 anchored ROI and the Animal 2 anchored ROI where **overlapping** in those frames. The value `0` in the cells representing frames 14-30 shows that the Animal 1 anchored ROI and Animal 2 anchored ROI where **not overlapping** in those frames.
 
-As opposed to the **first** column header, the **second** column header contains three `:` characters and is named `Animal 1:Animal 2:Head`. This column contains data for the intersections of the **Animal 1 anchored ROI** and the **Animal 2 head body-part**. The `1` in rows 21-27 shows that the Animal 1 anchored ROI and Animal 2 head body-part where **overlapping** in those frames. The value `0` in the cells representing frames 0-20 shows that the Animal 1 anchored ROI and Animal 2 head body-part where **not overlapping** in those frames.
+The second column (in yellow) is named `Animal 1:Animal 5:Head`. This column contains data for the intersections of the **Animal 1 anchored ROI** and the **Animal 2 head body-part**. The `1` in rows 14-30 shows that the Animal 1 anchored ROI and Animal 5 head body-part where **overlapping** in those frames. The value `0` in the cells representing frames 0-13 shows that the Animal 1 anchored ROI and Animal 5 head body-part where **not overlapping** in those frames.
 
 ## CALCULATING SUMMARY AGGREGATE BOUNDARY STATISTICS
 
