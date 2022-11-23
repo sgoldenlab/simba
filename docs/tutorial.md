@@ -517,9 +517,25 @@ To generate heatmaps, SimBA needs several user-defined variables:
 2. Click `Generate heatmap` to generate heatmap of the target behavior. For more information on heatmaps based on behavioral events in SimBA - check the [tutorial for scenario 2 - visualizing machine predictions](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions)
 
 ### Step 12: Merge Frames
-Merge all the generated plots from the previous step into a single frame and generate a **video** as an **output**.
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeframes_new.PNG" width="126" height="217" />
+Next, we may want to merge (concatenate) several of the videos we have created in the prior steps into a single video file. To do this, click the `MERGE FRAMES` button in the [VISUALIZATIONS] tab, and you should see this pop up to the left:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/frm_merge.png" />
+</p> 
+
+Begin by selecting how many videos you want to concatenate together in the `VIDEOS #` drop-down menu and click `SELECT`. A table, with one row representing each of the videos, will show up titled `VIDEO PATHS`. Here, click the `BROWSE FILE` button and select the videos that you want to merge into a single video. 
+
+Next, in the `JOIN TYPE` sub-menu, we need to select how to join the videos together, and we have 4 options:
+
+* MOSAIC: Creates two rows with half of your choosen videos in each row. If you have an unequal number of videos you want to concatenate, then the bottom row will get an additional blank space. 
+* VERTICAL: Creates a single column concatenation with the selected videos. 
+* HORIZONTAL: Creates a single row concatenation with the selected videos. 
+* MIXED MOSAIC: First creates two rows with half of your choosen videos in each row. The video selected in the `Video 1` path is concatenated to the left of the two rows. 
+
+Finally, we need to choose the resolution of the videos in the `Resolution width` and the `Resolution height` drop-down videos. **If choosing the MOSAIC, , VERTICAL, or horizontal join type, this is the resolution of each panel video in the output video. If choosing MIXED MOSAIC, then this is the resolution of the smaller videos in the panel (to the right)**. 
+
+After clicking `RUN`, you can follow the progress in the main SimBA terminal and the OS terminal. Once complete, a new output video with a date-time stamp in the filename is saved in the `project_folder/frames/output/merged` directory of your SimBA project.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
 
@@ -527,7 +543,7 @@ Merge all the generated plots from the previous step into a single frame and gen
 
 1. Check on the plot that you wish to merge together and output as a single video.
 
-2. Under **Merge Frames**, click `Merge Frames` and frames with all the generated plots will be combined and saved in the `project_folder/frames/output/merged` folder in a video format.
+2. Under **Merge Frames**, click `Merge Frames` and frames with all the generated plots will be combined and saved in the  folder in a video format.
 
 ### Plotly
 
