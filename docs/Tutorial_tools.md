@@ -28,6 +28,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Remove body-parts from tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 - [Visualize pose estimation in folder](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#visualize-pose-estimation-in-folder)
 - [Concatenate two videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#concatenate-two-videos)
+- [Concatenate multiple videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#concatenate-multiple-videos)
 
 ## Shorten Videos
 This is a tool used to trim video lengths. The tool contains two different methods: 
