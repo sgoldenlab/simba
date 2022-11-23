@@ -27,7 +27,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Re-order pose-estimation tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 - [Remove body-parts from tracking data](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data)
 - [Visualize pose estimation in folder](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#visualize-pose-estimation-in-folder)
-- [Concatenate videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#concatenate-videos)
+- [Concatenate two videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#concatenate-two-videos)
 
 ## Shorten Videos
 This is a tool used to trim video lengths. The tool contains two different methods: 
@@ -390,7 +390,7 @@ Use this tool to visualize the pose-estimation of all the files inside a SimBA p
 </p>
 
 
-### Concatenate videos
+### Concatenate two videos
 Use this tool to concatenate two videos into a single video. 
 
 <p align="center">
@@ -404,6 +404,26 @@ Use this tool to concatenate two videos into a single video.
 > Note 2: Select `Video 2` in the `Resolution` drop-down menu to use the resolution of Video 2 as the resolution of the output video.
 4. To vertically concatenate the videos, click the `Vertical concatenation` radio-button. To horizontally concatenate the videos, click the `Horizontal concatenation` radio-button. The resolution choosen in Step 3 refers to the height or width depending on which type of concatenation (vertical vs horizontal).
 5. Click `Run` to perform the concatenation. The file-path of the output video will be printed in the main SimBA terminal window (the file will be located in the same directory as the `First video path` with the `_concat.mp4` suffix. 
+
+### Concatenate multiple videos
+Use this tool to concatenate a user-defined number of videos into a single video mosaic of videos. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/frm_merge.png" />
+</p> 
+
+Begin by selecting how many videos you want to concatenate together in the `VIDEOS #` drop-down menu and click `SELECT`. A table, with one row representing each of the videos, will show up titled `VIDEO PATHS`. Here, click the `BROWSE FILE` button and select the videos that you want to merge into a single video. 
+
+Next, in the `JOIN TYPE` sub-menu, we need to select how to join the videos together, and we have 4 options:
+
+* MOSAIC: Creates two rows with half of your choosen videos in each row. If you have an unequal number of videos you want to concatenate, then the bottom row will get an additional blank space. 
+* VERTICAL: Creates a single column concatenation with the selected videos. 
+* HORIZONTAL: Creates a single row concatenation with the selected videos. 
+* MIXED MOSAIC: First creates two rows with half of your choosen videos in each row. The video selected in the `Video 1` path is concatenated to the left of the two rows. 
+
+Finally, we need to choose the resolution of the videos in the `Resolution width` and the `Resolution height` drop-down videos. **If choosing the MOSAIC, , VERTICAL, or horizontal join type, this is the resolution of each panel video in the output video. If choosing MIXED MOSAIC, then this is the resolution of the smaller videos in the panel (to the right)**. 
+
+After clicking `RUN`, you can follow the progress in the main SimBA terminal and the OS terminal. Once complete, a new output video with a date-time stamp in the filename is saved in the the same directory as the directory of the video selected as `Video 1`.
 
 ### Print mode info
 Use this tool to get the model information (e.g., number of features, number of trees used to create a model) from a model `.sav` file in SimBA. 
