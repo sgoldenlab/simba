@@ -49,11 +49,11 @@ class OutlierCorrecterMovement(object):
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, self.multi_animal_id_lst, self.no_animals, x_cols, y_cols, p_cols,[])
         if self.no_animals == 1:
             self.animal_id = read_config_entry(self.config, 'Multi animal IDs', 'id_list', 'str')
-            self.animal_bp_dict[self.animal_id] = self.animal_bp_dict.pop('Animal_1')
+            if self.animal_id != 'None':
+                self.animal_bp_dict[self.animal_id] = self.animal_bp_dict.pop('Animal_1')
         self.above_criterion_dict_dict = {}
         self.criterion = read_config_entry(self.config, 'Outlier settings', 'movement_criterion', 'float')
         self.outlier_bp_dict = {}
-        print(self.animal_bp_dict)
         for animal_name in self.animal_bp_dict.keys():
             self.outlier_bp_dict[animal_name] = {}
             self.outlier_bp_dict[animal_name]['bp_1'] = read_config_entry(self.config, 'Outlier settings', 'movement_bodypart1_{}'.format(animal_name.lower()), 'str')
@@ -123,7 +123,7 @@ class OutlierCorrecterMovement(object):
         out_df.to_csv(log_fn)
         print('Log for corrected "movement outliers" saved in project_folder/logs')
 
-# test = OutlierCorrecterMovement(config_path='/Users/simon/Desktop/troubleshooting/Open_field_5/project_folder/project_config.ini')
+# test = OutlierCorrecterMovement(config_path='/Users/simon/Desktop/troubleshooting/User_def_2/project_folder/project_config.ini')
 # test.correct_movement_outliers()
 
 
