@@ -138,7 +138,7 @@ from simba.deepethogram_importer import DeepEthogramImporter
 import multiprocessing
 import sys
 
-#sys.setrecursionlimit(10 ** 6)
+sys.setrecursionlimit(10 ** 6)
 simBA_version = 1.2
 currentPlatform = platform.system()
 
