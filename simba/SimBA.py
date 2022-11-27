@@ -138,7 +138,7 @@ from simba.deepethogram_importer import DeepEthogramImporter
 import multiprocessing
 import sys
 
-sys.setrecursionlimit(10 ** 6)
+#sys.setrecursionlimit(10 ** 6)
 simBA_version = 1.2
 currentPlatform = platform.system()
 
@@ -734,7 +734,6 @@ class project_config:
 
         elif self.filetype.getChoices()=='JSON (BENTO)':
 
-            # multijson
             label_multijsonimport = LabelFrame(self.frame, text='Import multiple json files', pady=5, padx=5)
             self.folder_json = FolderSelect(label_multijsonimport, 'Folder Select:',
                                             title='Select Folder with .json(s)')
@@ -743,9 +742,6 @@ class project_config:
                                                                                                                                               interpolation_method=self.interpolation.getChoices(),
                                                                                                                                               smoothing_method=self.smooth_dropdown.getChoices()))
 
-
-
-            # singlecsv
             label_singlejsonimport = LabelFrame(self.frame, text='Import single json file', pady=5, padx=5)
             self.file_json = FileSelect(label_singlejsonimport, 'File Select', title='Select a .csv file')
             button_importsinglejson = Button(label_singlejsonimport, text='Import single .json to project folder', fg='navy', command=lambda: MarsImporter(config_path=self.configinifile,
@@ -2881,7 +2877,6 @@ class loadprojectini:
         data_plotter_multiprocessor.start()
 
     def plotsklearn_result(self):
-
         if not self.use_default_font_settings_val.get():
             print_settings = {'font_size': self.sklearn_text_size_entry_box.entry_get, 'circle_size': self.sklearn_circle_size_entry_box.entry_get, 'space_size': self.sklearn_text_spacing_entry_box.entry_get, 'text_thickness': self.sklearn_text_thickness_entry_box.entry_get}
         else:

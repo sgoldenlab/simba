@@ -1383,7 +1383,8 @@ class OutlierSettingsPopUp(object):
 
         agg_type_frm = LabelFrame(self.main_frm, text='AGGREGATION METHOD', font=('Times', 12, 'bold'), pady=5, padx=5)
         self.agg_type_dropdown = DropDownMenu(agg_type_frm, 'Aggregation method:', ['mean', 'median'], '15')
-        self.agg_type_dropdown.setChoices('median').grid(row=0, column=0, sticky=NW)
+        self.agg_type_dropdown.setChoices('median')
+        self.agg_type_dropdown.grid(row=0, column=0, sticky=NW)
         agg_type_frm.grid(row=2, column=0, sticky=NW)
 
         run_btn = Button(self.main_frm, text='CONFIRM', font=('Helvetica', 12, 'bold'), fg='red', command=lambda: self.run())

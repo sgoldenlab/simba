@@ -104,7 +104,6 @@ class TrainSingleModel(object):
         """
 
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_df, self.y_df,test_size=self.tt_size)
-        print(self.over_sample_setting)
         if self.under_sample_setting == 'random undersample':
             self.x_train, self.y_train = random_undersampler(self.x_train, self.y_train, float(self.under_sample_ratio))
         if self.over_sample_setting == 'smoteenn':
@@ -160,11 +159,19 @@ class TrainSingleModel(object):
             try:
                 self.rf_clf.fit(self.x_train, self.y_train)
             except Exception as e:
-                raise ValueError(e, 'ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
+                print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
+                raise ValueError(e, 'SIMBA ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
             if compute_permutation_importance == 'yes':
                 calc_permutation_importance(self.x_test, self.y_test, self.rf_clf, self.feature_names, self.clf_name, self.eval_out_path)
             if generate_learning_curve == 'yes':
-                calc_learning_curve(self.x_y_df, self.clf_name, shuffle_splits, dataset_splits, self.tt_size, self.rf_clf, self.eval_out_path)
+                calc_learning_curve(x_y_df=self.x_y_df,
+                                    clf_name=self.clf_name,
+                                    shuffle_splits=shuffle_splits,
+                                    dataset_splits=dataset_splits,
+                                    tt_size=self.tt_size,
+                                    rf_clf=self.rf_clf,
+                                    save_dir=self.eval_out_path)
+
             if generate_precision_recall_curve == 'yes':
                 calc_pr_curve(self.rf_clf, self.x_test, self.y_test, self.clf_name, self.eval_out_path)
             if generate_example_decision_tree == 'yes':

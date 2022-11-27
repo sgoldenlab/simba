@@ -1,9 +1,9 @@
 __author__ = "Simon Nilsson", "JJ Choong"
 
 import os
+from simba.drop_bp_cords import drop_bp_cords
 import numpy as np
 import pandas as pd
-import sklearn.ensemble
 from simba.rw_dfs import read_df
 from simba.misc_tools import get_fn_ext
 from imblearn.combine import SMOTEENN
@@ -13,6 +13,7 @@ from sklearn.model_selection import learning_curve
 from sklearn.model_selection import ShuffleSplit
 from sklearn.metrics import precision_recall_curve
 from sklearn.ensemble import RandomForestClassifier
+import sklearn
 from copy import deepcopy
 from sklearn.tree import export_graphviz
 from subprocess import call
@@ -20,10 +21,12 @@ from yellowbrick.classifier import ClassificationReport
 import shap
 from simba.drop_bp_cords import GenerateMetaDataFileHeaders
 from tabulate import tabulate
-import pickle
 from simba.shap_calcs import shap_summary_calculations
 from simba.read_config_unit_tests import (check_int, check_str, check_float, read_config_entry, check_file_exist_and_readable)
 import configparser
+import platform
+from sklearn.utils import parallel_backend
+import pickle
 from dtreeviz.trees import tree, dtreeviz
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
@@ -313,8 +316,12 @@ def calc_learning_curve(x_y_df: pd.DataFrame,
 
     print('Calculating learning curves...')
     x_df, y_df = split_df_to_x_y(x_y_df, clf_name)
-    cv = ShuffleSplit(n_splits=shuffle_splits, test_size=tt_size, random_state=0)
-    train_sizes, train_scores, test_scores = learning_curve(rf_clf, x_df, y_df, cv=cv, scoring='f1',shuffle=True, n_jobs=-1, verbose=0, train_sizes=np.linspace(0.01, 1.0, dataset_splits))
+    cv = ShuffleSplit(n_splits=shuffle_splits, test_size=tt_size)
+    if platform.system() == "Darwin":
+        with parallel_backend("threading", n_jobs=-2):
+            train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf, X=x_df, y=y_df, cv=cv,scoring='f1', shuffle=False, verbose=0, train_sizes=np.linspace(0.01, 1.0, dataset_splits), error_score='raise')
+    else:
+        train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf, X=x_df, y=y_df, cv=cv, scoring='f1', shuffle=False, n_jobs=-1, verbose=0, train_sizes=np.linspace(0.01, 1.0, dataset_splits), error_score='raise')
     results_df = pd.DataFrame()
     results_df['FRACTION TRAIN SIZE'] = np.linspace(0.01, 1.0, dataset_splits)
     results_df['TRAIN_MEAN_F1'] = np.mean(train_scores, axis=1)
@@ -566,8 +573,6 @@ def dviz_classification_visualization(x_train: np.array,
     -------
     None
     """
-
-
 
     clf = tree.DecisionTreeClassifier(max_depth=5, random_state=666)
     clf.fit(x_train, y_train)
@@ -839,3 +844,54 @@ def insert_column_headers_for_outlier_correction(data_df: pd.DataFrame,
     else:
         data_df.columns = new_headers
         return data_df
+
+
+# df = pd.read_csv('/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/csv/targets_inserted/Together_1.csv', index_col=0)
+# df = df.drop('Sniffing', axis=1)
+# df = drop_bp_cords(df=df, config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini')
+# clf = pickle.load(open('/Users/simon/Desktop/troubleshooting/train_model_project/models/generated_models/Attack.sav', 'rb'))
+# _ = calc_learning_curve(x_y_df=df,
+#                         clf_name='Attack',
+#                         shuffle_splits=3,
+#                         dataset_splits=5,
+#                         rf_clf=clf,
+#                         tt_size=0.2,
+#                         save_dir='/Users/simon/Desktop/troubleshooting/train_model_project/models/generated_models/model_evaluations')
+
+# # #
+# def calc_learning_curve(x_y_df: pd.DataFrame,
+#                   clf_name: str,
+#                   shuffle_splits: int,
+#                   dataset_splits: int,
+#                   tt_size: float,
+#                   rf_clf: RandomForestClassifier,
+#                   save_dir: str,
+#                   save_file_no=None):
+#     """
+#     Helper to compute random forest learning curves with cross-validation.
+#
+#     Parameters
+#     ----------
+#     x_y_df: pd.DataFrame
+#         Pandas dataframe holding features and targets.
+#     clf_name: str,
+#         Name of the classifier
+#     shuffle_splits: int
+#         Number of cross-validation datasets at each data split.
+#     dataset_splits: int
+#         Number of data splits.
+#     tt_size: float
+#         dataset test size.
+#     rf_clf: RandomForestClassifier
+#         sklearn RandomForestClassifier object.
+#     save_dir: str,
+#         Directory where to save output in csv file format.
+#     save_file_no: int or None.
+#         If integer, represents the count of the classifier within a grid search. If none, the classifier is not
+#         part of a grid search.
+#
+#     Returns
+#     -------
+#     None
+#
+#     """
