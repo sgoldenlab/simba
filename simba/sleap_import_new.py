@@ -162,9 +162,14 @@ class ImportSLEAP(object):
 
     def __update_bp_headers_file(self):
         self.new_headers = []
-        for cnt, animal in enumerate(self.animal_bp_dict.keys()):
-            for bp in self.analysis_dict['ordered_bps']:
-                self.new_headers.append('{}_{}_{}'.format(animal, bp, str(cnt + 1)))
+        if len(list(self.animal_bp_dict.keys())) > 1:
+            for cnt, animal in enumerate(self.animal_bp_dict.keys()):
+                for bp in self.analysis_dict['ordered_bps']:
+                    self.new_headers.append('{}_{}_{}'.format(animal, bp, str(cnt + 1)))
+        else:
+            for cnt, animal in enumerate(self.animal_bp_dict.keys()):
+                for bp in self.analysis_dict['ordered_bps']:
+                    self.new_headers.append('{}_{}'.format(bp, str(cnt + 1)))
         new_bp_df = pd.DataFrame(self.new_headers)
         new_bp_df.to_csv(self.bp_names_csv_path, index=False, header=False)
 

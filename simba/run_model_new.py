@@ -57,6 +57,7 @@ class RunModel(object):
     def run_models(self):
         for file_cnt, file_path in enumerate(self.files_found):
             _, file_name, _ = get_fn_ext(file_path)
+            print('Analyzing video {}...'.format(file_name))
             file_save_path = os.path.join(self.files_out_dir, file_name + '.' + self.file_type)
             in_df = read_df(file_path, self.file_type)
             x_df = drop_bp_cords(in_df, self.config_path)
@@ -68,6 +69,7 @@ class RunModel(object):
                 try:
                     p = clf.predict_proba(x_df)
                 except ValueError as e:
+                    print('FEATURE NUMBER ERROR: Mismatch in the number of features in input file and what is expected from the model in file ' + str(file_name) + ' and model ' + str(m))
                     print(e.args)
                     raise ValueError('FEATURE NUMBER ERROR: Mismatch in the number of features in input file and what is expected from the model in file ' + str(file_name) + ' and model ' + str(m))
                 try:

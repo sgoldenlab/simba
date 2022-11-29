@@ -105,7 +105,7 @@ class FrameMergererFFmpeg(object):
         video_path_str = ''
         for video_type in frames_dict.keys():
             video_path_str += ' -i "{}"'.format(os.path.join(self.temp_dir, video_type + '.mp4'))
-        cmd = 'ffmpeg -y{} -filter_complex hstack=inputs={} -vsync 2 {}'.format(video_path_str, str(len(frames_dict.keys())), out_path)
+        cmd = 'ffmpeg -y{} -filter_complex hstack=inputs={} -vsync 2 "{}"'.format(video_path_str, str(len(frames_dict.keys())), out_path)
         print('Concatenating (horizontal) {} videos...'.format(str(len(frames_dict.keys()))))
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if final_img: print('SIMBA COMPLETE: Merged video saved at {}'.format(out_path))
@@ -115,7 +115,7 @@ class FrameMergererFFmpeg(object):
         video_path_str = ''
         for video_type in frames_dict.keys():
             video_path_str += ' -i "{}"'.format(os.path.join(self.temp_dir, video_type + '.mp4'))
-        cmd = 'ffmpeg -y{} -filter_complex vstack=inputs={} -vsync 2 {}'.format(video_path_str, str(len(frames_dict.keys())), out_path)
+        cmd = 'ffmpeg -y{} -filter_complex vstack=inputs={} -vsync 2 "{}"'.format(video_path_str, str(len(frames_dict.keys())), out_path)
         print('Concatenating (vertical) {} videos...'.format(str(len(frames_dict.keys()))))
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if final_img: print('SIMBA COMPLETE: Merged video saved at {}'.format(out_path))

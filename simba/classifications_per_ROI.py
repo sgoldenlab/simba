@@ -50,7 +50,6 @@ class clf_within_ROI(object):
             raise FileNotFoundError()
         self.rectangles_df = pd.read_hdf(self.ROIcoordinatesPath, key='rectangles')
         self.circles_df = pd.read_hdf(self.ROIcoordinatesPath, key='circleDf')
-        print(self.circles_df['Name'])
         self.polygon_df = pd.read_hdf(self.ROIcoordinatesPath, key='polygons')
 
         self.ROI_str_name_list = []
@@ -71,7 +70,6 @@ class clf_within_ROI(object):
             return 0
 
     def __inside_circle(self, bp_x, bp_y, center_x, center_y, radius):
-        radius = 10000
         px_dist = int(np.sqrt((bp_x - center_x) ** 2 + (bp_y - center_y) ** 2))
         if px_dist <= radius:
             return 1
@@ -110,7 +108,7 @@ class clf_within_ROI(object):
         if roi_type.lower() == 'rectangle': names = list(self.rectangles_df['Name'][self.rectangles_df['Video'] == self.video_name])
         elif roi_type.lower() == 'circle': names = list(self.circles_df['Name'][self.circles_df['Video'] == self.video_name])
         elif roi_type.lower() == 'polygon': names = list(self.polygon_df['Name'][self.polygon_df['Video'] == self.video_name])
-        print('NOTE: Video {} has the following {} shape names: {}'.format(self.video_name, roi_type, names))
+        print('SIMBA WARNING NOTE: Video {} has the following {} shape names: {}'.format(self.video_name, roi_type, names))
 
     def perform_ROI_clf_analysis(self,
                                  ROI_dict_lists: dict,
@@ -177,7 +175,7 @@ class clf_within_ROI(object):
                     elif roi_type.lower() == 'polygon':
                         shape_info = self.polygon_df.loc[(self.polygon_df['Video'] == self.video_name) & (self.polygon_df['Shape_type'] == roi_type) & (self.polygon_df['Name'] == roi_name)]
                     if len(shape_info) == 0:
-                        self.print_missing_roi_warning(roi_type=roi_type, roi_name=roi_name, )
+                        self.print_missing_roi_warning(roi_type=roi_type, roi_name=roi_name)
                         continue
                     if roi_type.lower() == 'rectangle':
                         data_df['top_left_x'], data_df['top_left_y'] = shape_info['topLeftX'].values[0], shape_info['topLeftY'].values[0]

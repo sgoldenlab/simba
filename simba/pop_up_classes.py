@@ -52,6 +52,7 @@ from simba.video_processing import (downsample_video,
                                     gif_creator,
                                     video_concatenator)
 from collections import defaultdict
+from PIL import Image, ImageTk
 import os, glob
 
 class HeatmapLocationPopup(object):
@@ -226,7 +227,7 @@ class ClfByROIPopUp(object):
             check_val = self.ROI_check_boxes_status_dict[ROI_entry]
             if check_val.get() == 1:
                 shape_type = self.clf_roi_analyzer.ROI_str_name_list[loop_val].split(':')[0].replace(':', '')
-                shape_name = self.clf_roi_analyzer.ROI_str_name_list[loop_val].split(':')[1].replace(' ', '')
+                shape_name = self.clf_roi_analyzer.ROI_str_name_list[loop_val].split(':')[1][1:]
                 ROI_dict_lists[shape_type].append(shape_name)
 
         for measurement_var, measurement_name in zip([self.total_time_var.get(), self.start_bouts_var.get(), self.end_bouts_var.get()], ['Total time by ROI (s)', 'Started bouts by ROI (count)', 'Ended bouts by ROI (count)']):
@@ -1212,7 +1213,7 @@ class ConcatenatorPopUp(object):
                  config_path: str or None):
         self.config_path = config_path
         self.icons_path = os.path.join(os.path.dirname(simba.__file__), 'assets', 'icons')
-        self.icons_path = '/Users/simon/Desktop/simbapypi_dev/simba/assets/icons'
+        #self.icons_path = '/Users/simon/Desktop/simbapypi_dev/simba/assets/icons'
         self.main_frm = Toplevel()
         self.main_frm.minsize(500, 800)
         self.main_frm.wm_title('MERGE (CONCATENATE) VIDEOS')
@@ -1242,7 +1243,11 @@ class ConcatenatorPopUp(object):
         for file_cnt, file_path in enumerate(glob.glob(self.icons_path + '/*')):
             _, file_name, _ = get_fn_ext(file_path)
             self.icons_dict[file_name] = {}
-            self.icons_dict[file_name]['img'] = PhotoImage(file=file_path)
+            # self.img1 = Image.open("pic1.png")
+            # self.pic1 = ImageTk.PhotoImage(self.img1)
+            #
+            #
+            self.icons_dict[file_name]['img'] = ImageTk.PhotoImage(Image.open(file_path))
             self.icons_dict[file_name]['btn'] = Radiobutton(self.join_type_frm, text=file_name, variable=self.join_type_var, value=file_name)
             self.icons_dict[file_name]['btn'].config(image=self.icons_dict[file_name]['img'])
             self.icons_dict[file_name]['btn'].image = self.icons_dict[file_name]['img']
