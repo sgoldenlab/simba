@@ -44,6 +44,9 @@ class DirectingOtherAnimalsAnalyzer(object):
         self.config = read_config_file(config_path)
         self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
         self.animal_cnt = read_config_entry(self.config, 'General settings', 'animal_no', 'int')
+        if self.animal_cnt < 2:
+            print('SIMBA ERROR: Cannot analyze directionality between animals in a 1 animal project.')
+            raise ValueError('SIMBA ERROR: Cannot analyze directionality between animals in a 1 animal project.')
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
         self.logs_dir = os.path.join(self.project_path, 'logs')
         self.data_in_dir = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
