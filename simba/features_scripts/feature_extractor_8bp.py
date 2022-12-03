@@ -3,7 +3,7 @@ from simba.features_scripts.unit_tests import read_video_info_csv, read_video_in
 from simba.read_config_unit_tests import (read_config_file, read_config_entry, insert_default_headers_for_feature_extraction)
 from simba.drop_bp_cords import get_fn_ext
 from simba.rw_dfs import read_df, save_df
-from numba import jit
+from numba import jit, prange
 import numpy as np
 import pandas as pd
 from copy import deepcopy
@@ -11,6 +11,8 @@ import math
 from scipy.spatial import ConvexHull
 import scipy
 from collections import defaultdict
+from joblib import Parallel, delayed
+import time
 
 
 class ExtractFeaturesFrom8bps(object):
@@ -63,12 +65,42 @@ class ExtractFeaturesFrom8bps(object):
         series = (np.sqrt((bp_1_x_vals - bp_2_x_vals) ** 2 + (bp_1_y_vals - bp_2_y_vals) ** 2)) / px_per_mm
         return series
 
-    def __angle3pt(self, ax, ay, bx, by, cx, cy):
+    @staticmethod
+    @jit(nopython=True, fastmath=True)
+    def __angle3pt(ax, ay, bx, by, cx, cy):
         ang = math.degrees(math.atan2(cy - by, cx - bx) - math.atan2(ay - by, ax - bx))
         return ang + 360 if ang < 0 else ang
 
-    def __count_values_in_range(self, series, values_in_range_min, values_in_range_max):
-        return series.between(left=values_in_range_min, right=values_in_range_max).sum()
+    @staticmethod
+    @jit(nopython=True, fastmath=True)
+    def __angle3pt_serialized(data: np.array):
+        results = np.full((data.shape[0]), 0.0)
+        for i in prange(data.shape[0]):
+            angle = math.degrees(math.atan2(data[i][5] - data[i][3], data[i][4] - data[i][2]) - math.atan2(data[i][1] - data[i][3], data[i][0] - data[i][2]))
+            if angle < 0:
+                angle += 360
+            results[i] = angle
+        return results
+
+    @staticmethod
+    def convex_hull_calculator_mp(arr: np.array, px_per_mm: float) -> float:
+        for i in range(1, arr.shape[0]):
+            if (arr[i] != arr[0]).all():
+                return ConvexHull(arr).area / px_per_mm
+            else:
+                pass
+        return 0
+
+
+    @staticmethod
+    @jit(nopython=True)
+    def __count_values_in_range(data: np.array, ranges: np.array):
+        results = np.full((data.shape[0], ranges.shape[0]), 0)
+        for i in prange(data.shape[0]):
+            for j in prange(ranges.shape[0]):
+                lower_bound, upper_bound = ranges[j][0], ranges[j][1]
+                results[i][j] = data[i][np.logical_and(data[i] >= lower_bound, data[i] <= upper_bound)].shape[0]
+        return results
 
 
     def extract_features(self):
@@ -80,18 +112,18 @@ class ExtractFeaturesFrom8bps(object):
         -------
         None
         """
-
+        session_time = 0
         for file_cnt, file_path in enumerate(self.files_found):
             _, self.video_name, _ = get_fn_ext(file_path)
             video_settings, self.px_per_mm, fps = read_video_info(self.vid_info_df, self.video_name)
-            roll_windows = []
+            roll_windows, file_start_time = [], time.time()
             for window in self.roll_windows_values:
                 roll_windows.append(int(fps / window))
             self.in_data = read_df(file_path, self.file_type).fillna(0).apply(pd.to_numeric).reset_index(drop=True)
             self.in_data = insert_default_headers_for_feature_extraction(df=self.in_data, headers=self.in_headers, pose_config='8 body-parts', filename=file_path)
             self.out_data = deepcopy(self.in_data)
-            self.out_data['Mouse_poly_area'] = self.out_data.apply(lambda x: ConvexHull(np.array([[x['Ear_left_x'], x["Ear_left_y"]], [x['Ear_right_x'], x["Ear_right_y"]], [x['Nose_x'], x["Nose_y"]], [x['Lat_left_x'], x["Lat_left_y"]], [x['Lat_right_x'], x["Lat_right_y"]],[x['Tail_base_x'], x["Tail_base_y"]],[x['Center_x'], x["Center_y"]]])).area, axis=1)
-            self.out_data['Mouse_poly_area'] = self.out_data['Mouse_poly_area'] / self.px_per_mm
+            mouse_1_ar = np.reshape(self.out_data[self.mouse_headers].values, (len(self.out_data / 2), -1, 2))
+            self.out_data['Mouse_poly_area'] = Parallel(n_jobs=-1, verbose=0, backend="threading")(delayed(self.convex_hull_calculator_mp)(x, self.px_per_mm) for x in mouse_1_ar)
             self.in_data_shifted = self.out_data.shift(periods=1).add_suffix('_shifted').fillna(0)
             self.in_data = pd.concat([self.in_data, self.in_data_shifted], axis=1, join='inner').fillna(0).reset_index(drop=True)
             self.out_data['Mouse_nose_to_tail'] = self.__euclidean_distance(self.in_data['Nose_x'].values, self.in_data['Tail_base_x'].values, self.in_data['Nose_y'].values, self.in_data['Tail_base_y'].values, self.px_per_mm)
@@ -211,7 +243,7 @@ class ExtractFeaturesFrom8bps(object):
                 self.out_data[currentColName_M1] = self.out_data[tail_end_col_name] - (self.out_data[tail_base_col_name] + self.out_data[centroid_col_name] + self.out_data[nose_col_name])
 
             print('Calculating angles...')
-            self.out_data['Mouse_angle'] = self.out_data.apply(lambda x: self.__angle3pt(x['Nose_x'], x['Nose_y'], x['Center_x'], x['Center_y'], x['Tail_base_x'], x['Tail_base_y']), axis=1)
+            self.out_data['Mouse_angle'] = self.__angle3pt_serialized(data=self.out_data[['Nose_x', 'Nose_y', 'Center_x', 'Center_y', 'Tail_base_x', 'Tail_base_y']].values)
 
             ########### DEVIATIONS ###########################################
             print('Calculating deviations...')
@@ -294,17 +326,16 @@ class ExtractFeaturesFrom8bps(object):
             self.out_data['Sum_probabilities_deviation'] = (self.out_data['Sum_probabilities'].mean() - self.out_data['Sum_probabilities'])
             self.out_data['Sum_probabilities_deviation_percentile_rank'] = self.out_data['Sum_probabilities_deviation'].rank(pct=True)
             self.out_data['Sum_probabilities_percentile_rank'] = self.out_data['Sum_probabilities_deviation_percentile_rank'].rank(pct=True)
-            p_df = self.out_data.filter(self.mouse_headers)
-            in_range_dict = {'0.1': [0.0, 0.1], '0.5': [0.000000000, 0.5], '0.75': [0.000000000, 0.75]}
-            for k, v in in_range_dict.items():
-                self.out_data["Low_prob_detections_{}".format(k)] = p_df.apply(func=lambda row: self.__count_values_in_range(row, v[0], v[1]), axis=1)
+            results = pd.DataFrame(self.__count_values_in_range(data=self.out_data.filter(self.mouse_p_headers).values, ranges=np.array([[0.0, 0.1], [0.000000000, 0.5], [0.000000000, 0.75]])), columns=['Low_prob_detections_0.1', 'Low_prob_detections_0.5','Low_prob_detections_0.75'])
+            self.out_data = pd.concat([self.out_data, results], axis=1)
 
             self.out_data = self.out_data.reset_index(drop=True).fillna(0)
             save_path = os.path.join(self.save_dir, self.video_name + '.' + self.file_type)
             save_df(self.out_data, self.file_type, save_path)
-            print('Feature extraction complete for {} ({}/{})...'.format(self.video_name, str(file_cnt + 1), str(len(self.files_found))))
+            session_time, file_time = session_time + (time.time() - file_start_time), int(time.time() - file_start_time)
+            print('Feature extraction complete for {} ({}/{} (elapsed time: {}s))...'.format(self.video_name, str(file_cnt + 1), str(len(self.files_found)), str(file_time)))
 
-        print('SIMBA COMPLETE: All features extracted. Results are stored in the project_folder/csv/features_extracted directory')
+        print('SIMBA COMPLETE: All features extracted (elapsed time: {}s). Results stored in project_folder/csv/features_extracted directory'.format(str(int(session_time))))
 
 # test = ExtractFeaturesFrom7bps(config_path='/Users/simon/Desktop/train_model_project/project_folder/project_config.ini')
 # test.extract_features()

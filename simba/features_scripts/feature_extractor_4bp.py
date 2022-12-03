@@ -5,7 +5,7 @@ from simba.drop_bp_cords import get_fn_ext
 from simba.rw_dfs import read_df, save_df
 import pandas as pd
 import numpy as np
-from numba import jit
+from numba import jit, prange
 from copy import deepcopy
 import math
 from collections import defaultdict
@@ -58,12 +58,22 @@ class ExtractFeaturesFrom4bps(object):
         series = (np.sqrt((bp_1_x_vals - bp_2_x_vals) ** 2 + (bp_1_y_vals - bp_2_y_vals) ** 2)) / px_per_mm
         return series
 
-    def __angle3pt(self, ax, ay, bx, by, cx, cy):
+
+    @staticmethod
+    @jit(nopython=True, fastmath=True)
+    def __angle3pt(ax, ay, bx, by, cx, cy):
         ang = math.degrees(math.atan2(cy - by, cx - bx) - math.atan2(ay - by, ax - bx))
         return ang + 360 if ang < 0 else ang
 
-    def __count_values_in_range(self, series, values_in_range_min, values_in_range_max):
-        return series.between(left=values_in_range_min, right=values_in_range_max).sum()
+    @staticmethod
+    @jit(nopython=True)
+    def __count_values_in_range(data: np.array, ranges: np.array):
+        results = np.full((data.shape[0], ranges.shape[0]), 0)
+        for i in prange(data.shape[0]):
+            for j in prange(ranges.shape[0]):
+                lower_bound, upper_bound = ranges[j][0], ranges[j][1]
+                results[i][j] = data[i][np.logical_and(data[i] >= lower_bound, data[i] <= upper_bound)].shape[0]
+        return results
 
     def extract_features(self):
         """
@@ -229,10 +239,8 @@ class ExtractFeaturesFrom4bps(object):
             self.out_data['Sum_probabilities_deviation'] = (self.out_data['Sum_probabilities'].mean() - self.out_data['Sum_probabilities'])
             self.out_data['Sum_probabilities_deviation_percentile_rank'] = self.out_data['Sum_probabilities_deviation'].rank(pct=True)
             self.out_data['Sum_probabilities_percentile_rank'] = self.out_data['Sum_probabilities_deviation_percentile_rank'].rank(pct=True)
-            p_df = self.out_data.filter(self.mouse_headers)
-            in_range_dict = {'0.1': [0.0, 0.1], '0.5': [0.000000000, 0.5], '0.75': [0.000000000, 0.75]}
-            for k, v in in_range_dict.items():
-                self.out_data["Low_prob_detections_{}".format(k)] = p_df.apply(func=lambda row: self.__count_values_in_range(row, v[0], v[1]), axis=1)
+            results = pd.DataFrame(self.__count_values_in_range(data=self.out_data.filter(self.mouse_p_headers).values, ranges=np.array([[0.0, 0.1], [0.000000000, 0.5], [0.000000000, 0.75]])), columns=['Low_prob_detections_0.1', 'Low_prob_detections_0.5','Low_prob_detections_0.75'])
+            self.out_data = pd.concat([self.out_data, results], axis=1)
 
             self.out_data = self.out_data.reset_index(drop=True).fillna(0)
             save_path = os.path.join(self.save_dir, self.video_name + '.' + self.file_type)
