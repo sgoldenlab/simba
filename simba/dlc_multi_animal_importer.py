@@ -99,7 +99,7 @@ class MADLC_Importer(object):
         self.x_cols, self.y_cols, self.pcols = getBpNames(config_path)
         self.clr_lst_of_lst = createColorListofList(self.animal_cnt, int(len(self.x_cols) / self.animal_cnt) + 1)
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, self.multi_animal_ids, self.animal_cnt, self.x_cols, self.y_cols, self.pcols, self.clr_lst_of_lst)
-        self.split_file_exts = list(itertools.product(*[['dlc_resnet50', 'dlc_resnet_50', 'dlc_dlcrnetms5', 'dlc_effnet_b0'], ['.mp4', '.avi']]))
+        self.split_file_exts = list(itertools.product(*[['dlc_resnet50', 'dlc_resnet_50', 'dlc_dlcrnetms5', 'dlc_effnet_b0', 'dlc_resnet101'], ['.mp4', '.avi']]))
         self.space_scaler, self.radius_scaler, self.res_scaler, self.font_scaler = 40, 10, 1500, 1.2
         self.bp_lst = []
         for animal in self.animal_bp_dict.keys():
@@ -141,7 +141,7 @@ class MADLC_Importer(object):
         if self.video_path is None:
             print(assessed_file_paths)
             print('SimBA ERROR: SimBA searched your project_folder/videos directory for a video file representing {}, and could not find a match. Above is a list of possible video filenames that SimBA searched for within your projects video directory without success.'.format(self.file_name))
-            raise AttributeError
+            raise AttributeError()
         else:
              _, self.video_basename, _ = get_fn_ext(self.video_path)
 

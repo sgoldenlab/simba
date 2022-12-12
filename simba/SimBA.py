@@ -17,7 +17,8 @@ from simba.tkinter_functions import (hxtScrollbar,
                                      DropDownMenu,
                                      Entry_Box,
                                      FileSelect,
-                                     FolderSelect)
+                                     FolderSelect,
+                                     CreateToolTip)
 from simba.project_config_creator import ProjectConfigCreator
 from simba.import_mars import MarsImporter
 from simba.probability_graph_interactive import InteractiveProbabilityGrapher
@@ -30,9 +31,11 @@ from simba.data_plotter import DataPlotter
 from simba.distance_plotter import DistancePlotter
 from simba.import_videos_csv_project_ini import *
 from simba.get_coordinates_tools_v2 import get_coordinates_nilsson
+from simba.create_project_select_datatype import TrackingSelectorMenu
 from simba.process_severity import analyze_process_severity
 from simba.clf_validator import ClassifierValidationClips
 from simba.validate_model_on_single_video import ValidateModelOneVideo
+from simba.sleap_csv_importer import SleapCsvImporter
 from simba.ROI_reset import *
 from simba.ROI_feature_analyzer import ROIFeatureCreator
 from simba.ROI_movement_analyzer import ROIMovementAnalyzer
@@ -70,6 +73,7 @@ from simba.classifications_per_ROI import *
 from simba.read_DANNCE_mat import import_DANNCE_file, import_DANNCE_folder
 from simba.ethovision_import import ImportEthovision
 from simba.sleap_import_new import ImportSLEAP
+from simba.sleap_csv_importer import SleapCsvImporter
 from simba.ROI_plot_new import ROIPlot
 from simba.train_single_model import TrainSingleModel
 from simba.train_mutiple_models_from_meta_new import TrainMultipleModelsFromMeta
@@ -130,7 +134,9 @@ from simba.pop_up_classes import (HeatmapLocationPopup,
                                   ConcatenatorPopUp,
                                   SetMachineModelParameters,
                                   OutlierSettingsPopUp,
-                                  RemoveAClassifierPopUp)
+                                  RemoveAClassifierPopUp,
+                                  VisualizeROIFeaturesPopUp,
+                                  VisualizeROITrackingPopUp)
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.labelling_interface import select_labelling_video
 from simba.labelling_advanced_interface import select_labelling_video_advanced
@@ -153,7 +159,6 @@ class BatchPreProcessWindow(object):
         #output video
         self.output_folder = FolderSelect(label_videoselection,'Output directory:',title='Select Folder for Output videos')
 
-        #create list of all videos in the videos folder
         confirm_btn = Button(label_videoselection,text='Confirm',command=lambda: self.confirm_table())
 
         #organize
@@ -177,23 +182,6 @@ class BatchPreProcessWindow(object):
             batch_preprocessor.create_execute_btn()
             batch_preprocessor.batch_process_main_frame.mainloop()
 
-class newcolumn(Frame):
-    def __init__(self,parent=None,lengthoflist=[],width='',**kw):
-        Frame.__init__(self,master=parent,**kw)
-        self.entPath = []
-        self.entPathvars =[]
-        for i in range(len(lengthoflist)):
-            self.entPathvar = IntVar()
-            self.entPathvars.append(self.entPathvar)
-            self.entPath.append(Entry(self, textvariable=self.entPathvars[i],width=width))
-            self.entPath[i].grid(row=i,pady=3)
-
-    def entry_get(self,row):
-        return self.entPath[row].get()
-
-    def setvariable(self,row,vars):
-        return self.entPathvars[row].set(vars)
-
 class LoadProjectPopUp(object):
     def __init__(self):
         main_frm = Toplevel()
@@ -211,52 +199,6 @@ class LoadProjectPopUp(object):
         print('Loading {}...'.format(self.selected_file.file_path))
         check_file_exist_and_readable(file_path=self.selected_file.file_path)
         _ = loadprojectini(configini=self.selected_file.file_path)
-
-class Button_getcoord(Frame):
-
-    def __init__(self,parent=None,filename=[],knownmm=[],ppmlist = None,**kw): #set to list and use range i in list to call each elements in list
-
-        Frame.__init__(self, master=parent, **kw)
-        self.entPath = []
-        self.ppm_list = []
-        self.ppmvar = []
-        self.filename = filename
-        labelgetcoord =Label(self,text='Get coord')
-        labelgetcoord.grid(row=0,pady=6)
-
-        labelppm =Label(self,text='Pixels/mm')
-        labelppm.grid(row=0,column=1)
-
-        for i in range(len(filename)-1):
-            self.entPath.append(Button(self,text='Video'+str(i+1),command =lambda i=i :self.getcoord_forbutton(filename[i+1],knownmm[i+1],i)))
-            self.entPath[i].grid(row=i+1)
-            self.ppmvars=IntVar()
-            self.ppmvar.append(self.ppmvars)
-            self.ppm_list.append(Entry(self,textvariable=self.ppmvar[i]))
-            self.ppm_list[i].grid(row=i+1,column=1)
-        if ppmlist != None:
-            try:
-                for i in range(len(self.ppmvar)):
-                    self.ppmvar[i].set(ppmlist[i])
-            except IndexError:
-                pass
-
-    def getcoord_forbutton(self,filename,knownmm,count):
-
-        ppm = get_coordinates_nilsson(filename,knownmm)
-
-        if ppm == float('inf'):
-            print('Divide by zero error. Please make sure the values in [Distance_in_mm] are updated')
-        else:
-            self.ppmvar[count].set(ppm)
-
-    def getppm(self,count):
-        ppms = self.ppm_list[count].get()
-        return ppms
-
-    def set_allppm(self,value):
-        for i in range(len(self.filename) - 1):
-            self.ppmvar[i].set(value)
 
 def Exit():
     app.root.destroy()
@@ -371,30 +313,6 @@ class create_project_DLC:
         if bodyPartConfigFile != 'No file selected':
             changedlc_config(config_path, bodyPartConfigFile)
 
-class new_window:
-
-    def open_Folder(self):
-        print("Current directory is %s" % os.getcwd())
-        folder = askdirectory(title='Select Frame Folder')
-        os.chdir(folder)
-        print("Working directory is %s" % os.getcwd())
-
-    def __init__(self, script_name):
-        window = Tk()
-
-        folder = Frame(window)
-        folder.grid(row = 0, column = 1, sticky = N)
-
-        choose_folder = Label(folder, text="Choose Folder")
-        choose_folder.grid(row = 0, column = 0, sticky = W)
-        select_folder = Button(folder, text="Choose Folder...", command=self.open_Folder)
-        select_folder.grid(row = 0, column = 0, sticky = W)
-        run_script = Button(folder, text="Run", command=script_name.main)
-        run_script.grid(columnspan = 2, sticky = S)
-
-def createWindow(scriptname):
-    new_window(scriptname)
-
 class project_config:
 
     def __init__(self):
@@ -429,13 +347,13 @@ class project_config:
 
         #SML Settings
         self.label_smlsettings = LabelFrame(self.label_generalsettings, text='SML Settings',padx=5,pady=5)
-        self.label_notarget = Entry_Box(self.label_smlsettings,'Number of predictive classifiers (behaviors):','33',
-                                        validation='numeric')
-        addboxButton = Button(self.label_smlsettings, text='<Add predictive classifier>', fg="navy",
-                              command=lambda:self.addBox(self.label_notarget.entry_get))
+        self.label_notarget = Entry_Box(self.label_smlsettings,'Number of predictive classifiers (behaviors):','33', validation='numeric')
+        addboxButton = Button(self.label_smlsettings, text='<Add predictive classifier>', fg="navy",  command=lambda:self.addBox(self.label_notarget.entry_get))
 
         ##dropdown for # of mice
+        #self.dropdownbox = TrackingSelectorMenu(main_frm=)
         self.dropdownbox = LabelFrame(self.label_generalsettings, text='Animal Settings')
+
 
         ## choose multi animal or not
         self.singleORmulti = DropDownMenu(self.dropdownbox,'Type of Tracking',['Classic tracking','Multi tracking', '3D tracking'],'15', com=self.trackingselect)
@@ -483,6 +401,7 @@ class project_config:
         self.multivideofolderpath = FolderSelect(label_multivideoimport, 'Folder path',title='Select Folder with videos')
         self.video_type = Entry_Box(label_multivideoimport, 'Format (i.e., mp4, avi):', '18')
         button_multivideoimport = Button(label_multivideoimport, text='Import multiple videos',command= self.import_multivid,fg='navy')
+
         # singlevideo
         label_singlevideoimport = LabelFrame(label_importvideo, text='Import single video', pady=5, padx=5)
         self.singlevideopath = FileSelect(label_singlevideoimport, "Video path",title='Select a video file')
@@ -491,7 +410,7 @@ class project_config:
 
         #import all csv file into project folder
         self.label_import_csv = LabelFrame(tab3,text='Import Tracking Data',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
-        self.filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)','SLP (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'12',com=self.fileselected)
+        self.filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)','SLP (SLEAP)', 'CSV (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'12',com=self.fileselected)
         self.filetype.setChoices('CSV (DLC/DeepPoseKit)')
         self.frame = Frame(self.label_import_csv)
 
@@ -688,8 +607,7 @@ class project_config:
         self.smooth_dropdown.grid(row=1, sticky=E)
         self.smoothing_time_label = Entry_Box(self.smooth_pose_win_lbl, 'Period (ms):', labelwidth='12', width=10)
 
-
-        if self.filetype.getChoices()=='CSV (DLC/DeepPoseKit)':
+        if self.filetype.getChoices()== 'CSV (DLC/DeepPoseKit)':
             # multicsv
             label_multicsvimport = LabelFrame(self.frame, text='Import multiple csv files', pady=5, padx=5)
             self.folder_csv = FolderSelect(label_multicsvimport, 'Folder Select:', title='Select Folder with .csv(s)')
@@ -711,18 +629,14 @@ class project_config:
             button_importsinglecsv.grid(row=1, sticky=W)
 
         elif val == 'MAT (DANNCE 3D)':
-            # multicsv
             label_multicsvimport = LabelFrame(self.frame, text='Import multiple DANNCE files', pady=5, padx=5)
             self.folder_csv = FolderSelect(label_multicsvimport, 'Folder selected:', title='Select Folder with MAT files')
             button_import_csv = Button(label_multicsvimport, text='Import DANNCE files to project folder', command = lambda: import_DANNCE_folder(self.configinifile, self.folder_csv.folder_path, self.interpolation.getChoices()), fg='navy')
-
-            # singlecsv
             label_singlecsvimport = LabelFrame(self.frame, text='Import single DANNCE files', pady=5, padx=5)
             self.file_csv = FileSelect(label_singlecsvimport, 'File selected', title='Select a .csv file')
             button_importsinglecsv = Button(label_singlecsvimport, text='Import single DANNCE to project folder', command = lambda: import_DANNCE_file(self.configinifile, self.file_csv.file_path, self.interpolation.getChoices()), fg='navy')
             self.frame.grid(row=1, sticky=W)
 
-            # method
             self.labelmethod.grid(row=0, sticky=W)
             self.smooth_pose_win_lbl.grid(row=1, sticky=W)
             label_multicsvimport.grid(row=2, sticky=W)
@@ -759,7 +673,7 @@ class project_config:
             self.file_json.grid(row=0, sticky=W)
             button_importsinglejson.grid(row=1, sticky=W)
 
-        elif self.filetype.getChoices() in ('H5 (multi-animal DLC)','SLP (SLEAP)', 'TRK (multi-animal APT)'):
+        elif self.filetype.getChoices() in ('H5 (multi-animal DLC)', 'SLP (SLEAP)', 'CSV (SLEAP)', 'TRK (multi-animal APT)'):
             animalsettings = LabelFrame(self.frame,text='Animal settings',pady=5,padx=5)
             noofanimals = Entry_Box(animalsettings,'No of animals','15')
             animalnamebutton = Button(animalsettings,text='Confirm',command=lambda:self.animalnames(noofanimals.entry_get,animalsettings))
@@ -771,7 +685,6 @@ class project_config:
                 self.h5path = FolderSelect(self.frame,'Path to h5 files',lblwidth=15)
                 labelinstruction = Label(self.frame,text='Please import videos before importing the multi animal DLC tracking data')
                 runsettings = Button(self.frame,text='Import h5',command=self.importh5)
-                #organize
                 self.dropdowndlc.grid(row=3, sticky=W)
 
             elif self.filetype.getChoices() == 'SLP (SLEAP)':
@@ -783,6 +696,13 @@ class project_config:
                 self.h5path = FolderSelect(self.frame, 'Path to .trk files', lblwidth=15)
                 labelinstruction = Label(self.frame, text='Please import videos before importing the multi animal trk tracking data')
                 runsettings = Button(self.frame, text='Import .trk', command=self.importh5)
+
+            elif self.filetype.getChoices() == 'CSV (SLEAP)':
+                self.h5path = FolderSelect(self.frame, 'Path to CSV files', lblwidth=15)
+                labelinstruction = Label(self.frame, text='Please import videos before importing the multi animal trk tracking data')
+                runsettings = Button(self.frame, text='Import .csv', command=self.importh5)
+
+
 
             #organize
             self.frame.grid(row=1,sticky=W)
@@ -804,11 +724,7 @@ class project_config:
         except AttributeError:
             print('Please fill in the animal identity names appropriately.')
 
-        config = ConfigParser()
-        configFile = str(self.configinifile)
-        config.read(configFile)
-
-        # write the new values into ini file
+        config = read_config_file(ini_path=self.configinifile)
         config.set('Multi animal IDs', 'ID_list', ",".join(idlist))
         with open(self.configinifile, 'w') as configfile:
             config.write(configfile)
@@ -830,7 +746,6 @@ class project_config:
             smooth_settings_dict['Method'] = 'None'
 
         if self.filetype.getChoices() == 'H5 (multi-animal DLC)':
-            #importMultiDLCpose(self.configinifile,self.h5path.folder_path,self.dropdowndlc.getChoices(),idlist, self.interpolation.getChoices(), smooth_settings_dict)
             dlc_multi_animal_importer = MADLC_Importer(config_path=self.configinifile,
                                                        data_folder=self.h5path.folder_path,
                                                        file_type=self.dropdowndlc.getChoices(),
@@ -855,6 +770,14 @@ class project_config:
             except Exception as e:
                 messagebox.showerror("Error", str(e))
 
+        if self.filetype.getChoices() == 'CSV (SLEAP)':
+            sleap_csv_importer = SleapCsvImporter(config_path=self.configinifile,
+                                                  data_folder=self.h5path.folder_path,
+                                                  actor_IDs=idlist,
+                                                  interpolation_settings=self.interpolation.getChoices(),
+                                                  smoothing_settings=smooth_settings_dict)
+            sleap_csv_importer.initate_import_slp()
+            print('SIMBA COMPLETE: Sleap CSV files imported to project_folder/csv/input_csv directory.')
 
     def animalnames(self,noofanimal,master):
         try:
@@ -1013,8 +936,6 @@ class project_config:
             newFname = filename + extension
 
         csvfile = os.path.join(os.path.dirname(self.configinifile), 'csv', 'input_csv', newFname)
-        shutil.copy()
-
 
         if not animalIDlist:
             df = pd.read_csv(csvfile)
@@ -1160,13 +1081,9 @@ class project_config:
         self.modelPath.set(file_selected)
 
     def make_projectini(self):
-        #get input from user
-        #general settings input
 
         project_path = self.directory1Select.folder_path
         project_name = self.label_project_name.entry_get
-
-        msconfig= str('yes')
 
         #sml settings
         no_targets = self.label_notarget.entry_get
@@ -1243,7 +1160,7 @@ class project_config:
         try:
             videopath = os.path.join(os.path.dirname(self.configinifile), 'videos')
             print(videopath)
-            extract_frames_ini(videopath, self.configinifile)
+            extract_frames_from_all_videos_in_directory(videopath, self.configinifile)
         except Exception as e:
             print(e.args)
             print('Please make sure videos are imported and located in /project_folder/videos')
@@ -1333,7 +1250,7 @@ class loadprojectini:
 
         #import all csv file into project folder
         self.label_import_csv = LabelFrame(label_import, text='IMPORT FURTHER TRACKING DATA', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='black')
-        filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)','SLP (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'15',com=self.fileselected)
+        filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)', 'SLP (SLEAP)', 'CSV (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'15',com=self.fileselected)
         filetype.setChoices('CSV (DLC/DeepPoseKit)')
         self.frame = Frame(self.label_import_csv)
 
@@ -1406,7 +1323,7 @@ class loadprojectini:
 
         #get coordinates
         label_setscale = LabelFrame(tab3,text='VIDEO PARAMETERS (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
-        self.distanceinmm = Entry_Box(label_setscale, 'Known distance (mm)', '18')
+        self.distanceinmm = Entry_Box(label_setscale, 'Known distance (mm)', '18', validation='numeric')
         button_setdistanceinmm = Button(label_setscale, text='Auto-populate known distance in table',command=lambda: self.set_distancemm(self.distanceinmm.entry_get))
 
         button_setscale = Button(label_setscale, text='Set video parameters',command=lambda: self.create_video_info_table())
@@ -1435,13 +1352,13 @@ class loadprojectini:
         self.roi_draw1 = LabelFrame(tab6, text='VISUALIZE ROI', font=("Helvetica",12,'bold'))
 
         # button
-        visualizeROI = Button(self.roi_draw1, text='VISUALIZE ROI', command=self.visualizeRoiTracking)
-        visualizeROIfeature = Button(self.roi_draw1, text='Visualize ROI features', command=self.visualizeROifeatures)
+        visualizeROI = Button(self.roi_draw1, text='VISUALIZE ROI TRACKING', command= lambda: VisualizeROITrackingPopUp(config_path=self.projectconfigini))
+        visualizeROIfeature = Button(self.roi_draw1, text='Visualize ROI features', command= lambda: VisualizeROIFeaturesPopUp(config_path=self.projectconfigini))
+
         ##organize
         self.roi_draw1.grid(row=0, column=2, sticky=N)
         visualizeROI.grid(row=0)
         visualizeROIfeature.grid(row=1,pady=10)
-
 
         processmovementdupLabel = LabelFrame(tab6,text='ANALYZE DISTANCES / VELOCITIES', font=("Helvetica",12,'bold'))
         analyze_distances_velocity_btn = Button(processmovementdupLabel, text='Analyze distances/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ANALYZE MOVEMENT'))
@@ -1709,15 +1626,15 @@ class loadprojectini:
 
         #Heatplot
         label_heatmap = LabelFrame(label_plotall, text='Heatmap', pady=5, padx=5)
-        self.BinSize = Entry_Box(label_heatmap, 'Bin size (mm)', '10', validation='numeric')
-        self.MaxScale = Entry_Box(label_heatmap, 'Max scale (s)', '10', validation='numeric')
+        self.BinSize = Entry_Box(label_heatmap, 'Bin size (mm)', '15', validation='numeric')
+        self.MaxScale = Entry_Box(label_heatmap, 'Max scale (s)', '15')
 
         hmchoices = {'viridis','plasma','inferno','magma','jet','gnuplot2'}
         self.hmMenu = DropDownMenu(label_heatmap,'Color Palette',hmchoices,'15')
         self.hmMenu.setChoices('jet')
 
         #get target called on top
-        self.targetMenu = DropDownMenu(label_heatmap,'Target',targetlist,'15')
+        self.targetMenu = DropDownMenu(label_heatmap,'Classifier', targetlist,'15')
         self.targetMenu.setChoices(targetlist[(config.get('SML settings','target_name_'+str(1)))])
 
         #bodyparts
@@ -2371,169 +2288,6 @@ class loadprojectini:
 
         print('Settings saved in',os.path.basename(configFile))
 
-    def visualizeRoiTracking(self):
-        vrtoplevel = Toplevel()
-        vrtoplevel.minsize(350, 300)
-        vrtoplevel.wm_title('Visualize ROI tracking')
-
-        videodir = os.path.join(os.path.dirname(self.projectconfigini), 'videos')
-        vid_list = os.listdir(videodir)
-
-        vrlabelframe = LabelFrame(vrtoplevel,text='Visualize ROI tracking on single video',pady=10,padx=10,font=("Helvetica",12,'bold'),fg='black')
-        videoSelected = DropDownMenu(vrlabelframe, 'Select video', vid_list, '15')
-        videoSelected.setChoices(vid_list[0])
-
-        vrbutton = Button(vrlabelframe, text='Generate ROI visualization', command=lambda: self.roiPlot_singlevideo(videoSelected.getChoices()))
-
-        #multi
-        multilabelframe = LabelFrame(vrtoplevel,text='Visualize ROI tracking on all videos',pady=10,padx=10,font=("Helvetica",12,'bold'),fg='black')
-        multiButton = Button(multilabelframe,text='Generate ROI visualization on all videos',command = self.roiPlot_allvideos)
-
-        #threshold
-        self.p_threshold = Entry_Box(vrtoplevel,'Bp probability threshold','20')
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        #set threshdhol if exist
-        try:
-            thres = config.get('ROI settings', 'probability_threshold')
-            self.p_threshold.entry_set(thres)
-        except:
-            self.p_threshold.entry_set(0.0)
-
-        thresholdlabel = Label(vrtoplevel,text='Note: body-part locations detected with probabilities below this threshold will be filtered out.')
-
-
-        # organize
-        vrlabelframe.grid(row=0, sticky=W)
-        videoSelected.grid(row=1, sticky=W)
-        vrbutton.grid(row=2, pady=12)
-
-        multilabelframe.grid(row=1,sticky=W,pady=10)
-        multiButton.grid(row=0,sticky=W)
-
-        self.p_threshold.grid(row=2,sticky=W,pady=10)
-        thresholdlabel.grid(row=3,sticky=W,pady=10)
-
-    def roiPlot_singlevideo(self,video):
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        # write the new values into ini file
-
-        try:
-            config.set('ROI settings', 'probability_threshold', str(self.p_threshold.entry_get))
-            with open(self.projectconfigini, 'w') as configfile:
-                config.write(configfile)
-        except:
-            pass
-
-        roi_plotter = ROIPlot(ini_path=self.projectconfigini, video_path=video)
-        roi_plotter.insert_data()
-        roi_plotter_multiprocessor = multiprocessing.Process(target=roi_plotter.visualize_ROI_data())
-        roi_plotter_multiprocessor.start()
-
-    def roiPlot_allvideos(self):
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        # write the new values into ini file
-        config.set('ROI settings', 'probability_threshold',str(self.p_threshold.entry_get))
-
-        try:
-            with open(self.projectconfigini, 'w') as configfile:
-                config.write(configfile)
-        except:
-            pass
-
-        videolist = os.listdir(os.path.join(os.path.dirname(self.projectconfigini),'videos'))
-
-        for i in videolist:
-            roi_plotter = ROIPlot(ini_path=self.projectconfigini, video_path=i)
-            roi_plotter.insert_data()
-            roi_plotter.visualize_ROI_data()
-            #roiPlot(self.projectconfigini,i)
-        print('All ROI videos created in project_folder/frames/output/ROI_analysis.')
-
-    def visualizeROifeatures(self):
-        vrfeattoplevel = Toplevel()
-        vrfeattoplevel.minsize(350, 300)
-        vrfeattoplevel.wm_title('Visualize ROI features')
-
-        videodir = os.path.join(os.path.dirname(self.projectconfigini), 'videos')
-        vid_list = os.listdir(videodir)
-
-        vrlabelframe = LabelFrame(vrfeattoplevel, text='Visualize ROI features on single video', pady=10, padx=10,
-                                     font=("Helvetica", 12, 'bold'), fg='black')
-        videoSelected = DropDownMenu(vrlabelframe, 'Select video', vid_list, '15')
-        videoSelected.setChoices(vid_list[0])
-
-        vrbutton = Button(vrlabelframe, text='Generate ROI visualization', command=lambda: self.roifeatures_singlevid(videoSelected.getChoices()))
-
-        # multi
-        multifealabelframe = LabelFrame(vrfeattoplevel, text='Visualize ROI features on all videos', pady=10, padx=10,
-                                     font=("Helvetica", 12, 'bold'), fg='black')
-
-        multifeaButton = Button(multifealabelframe, text='Generate ROI visualization on all videos',
-                             command=self.roifeatures_allvid)
-
-        # threshold
-        self.p_threshold_b = Entry_Box(vrfeattoplevel, 'Bp probability threshold', '20')
-
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        # set threshdhol if exist
-        try:
-            thres = config.get('ROI settings', 'probability_threshold')
-            self.p_threshold_b.entry_set(thres)
-        except:
-            self.p_threshold_b.entry_set(0.0)
-
-        thresholdlabel = Label(vrfeattoplevel,
-                               text='Note: body-part locations detected with probabilities below this threshold will be filtered out.')
-
-        # organize
-        vrlabelframe.grid(row=0, sticky=W)
-        videoSelected.grid(row=1, sticky=W)
-        vrbutton.grid(row=2, pady=12)
-
-        multifealabelframe.grid(row=1,sticky=W,pady=10)
-        multifeaButton.grid(row=0,sticky=W)
-
-        self.p_threshold_b.grid(row=3,sticky=W,pady=10)
-        thresholdlabel.grid(row=4,sticky=W,pady=10)
-
-    def roifeatures_singlevid(self,video):
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        # write the new values into ini file
-        config.set('ROI settings', 'probability_threshold', str(self.p_threshold_b.entry_get))
-        with open(self.projectconfigini, 'w') as configfile:
-            config.write(configfile)
-
-        roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.projectconfigini, video_name=video)
-        roi_feature_visualizer.create_visualization()
-
-    def roifeatures_allvid(self):
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-        # write the new values into ini file
-        config.set('ROI settings', 'probability_threshold', str(self.p_threshold_b.entry_get))
-        with open(self.projectconfigini, 'w') as configfile:
-            config.write(configfile)
-
-        videolist = os.listdir(os.path.join(os.path.dirname(self.projectconfigini),'videos'))
-
-        for video_name in videolist:
-            roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.projectconfigini, video_name=video_name)
-            roi_feature_visualizer.create_visualization()
-
     def importBoris(self):
         ann_folder = askdirectory()
         boris_appender = BorisAppender(config_path=self.projectconfigini, boris_folder=ann_folder)
@@ -2560,24 +2314,18 @@ class loadprojectini:
         append_dot_ANNOTT(self.projectconfigini, ann_folder)
 
     def fileselected(self,val):
-        try:
+        if hasattr(self, 'frame'):
             self.frame.destroy()
-        except:
-            pass
-
         self.frame = Frame(self.label_import_csv)
 
-        config = ConfigParser()
-        configFile = str(self.projectconfigini)
-        config.read(configFile)
-
-        no_animals_int = config.getint('General settings', 'animal_no')
-
-        try:
+        config = read_config_file(ini_path=self.projectconfigini)
+        animal_cnt = read_config_entry(self.config, 'General settings', 'animal_no', data_type='int')
+        if config.has_option('Multi animal IDs', 'id_list'):
             self.animal_ID_list = config.get('Multi animal IDs', 'id_list').split(',')
-        except MissingSectionHeaderError:
+        else:
             self.animal_ID_list = []
-            for animal in range(no_animals_int): self.animal_ID_list.append('Animal_' + str(animal + 1))
+            for a in range(animal_cnt):
+                self.animal_ID_list.append('Animal_' + str(a + 1))
 
         # method
         self.labelmethod = LabelFrame(self.frame, text='Method', pady=5, padx=5)
@@ -2665,10 +2413,10 @@ class loadprojectini:
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglejson.grid(row=1, sticky=W)
 
-        elif val in ('SLP (SLEAP)','H5 (multi-animal DLC)','TRK (multi-animal APT)'):
+        elif val in ('SLP (SLEAP)','H5 (multi-animal DLC)', 'TRK (multi-animal APT)', 'CSV (SLEAP)'):
             animalsettings = LabelFrame(self.frame, text='Animal settings', pady=5, padx=5)
             noofanimals = Entry_Box(animalsettings, 'No of animals', '15')
-            noofanimals.entry_set(no_animals_int)
+            noofanimals.entry_set(animal_cnt)
             animalnamebutton = Button(animalsettings, text='Confirm', command=lambda: self.animalnames(noofanimals.entry_get, animalsettings))
 
             if val == 'H5 (multi-animal DLC)':
@@ -2681,7 +2429,6 @@ class loadprojectini:
                                          text='Please import videos before importing the \n'
                                               ' multi animal DLC tracking data')
                 runsettings = Button(self.frame, text='Import h5', command=self.importh5)
-                #organize
                 self.dropdowndlc.grid(row=3, sticky=W)
 
             elif val == 'SLP (SLEAP)':
@@ -2695,6 +2442,11 @@ class loadprojectini:
                 self.h5path = FolderSelect(self.frame, 'Path to .trk files', lblwidth=15)
                 labelinstruction = Label(self.frame, text='Please import videos before importing the multi animal trk tracking data')
                 runsettings = Button(self.frame, text='Import .trk', command=self.importh5)
+
+            elif val == 'CSV (SLEAP)':
+                self.h5path = FolderSelect(self.frame, 'Path to CSV files', lblwidth=15)
+                labelinstruction = Label(self.frame, text='Please import videos before importing the sleap csv tracking data')
+                runsettings = Button(self.frame, text='Import .csv', command=self.importh5)
 
             # organize
             self.frame.grid(row=1, sticky=W)
@@ -2761,11 +2513,15 @@ class loadprojectini:
         if self.val == 'TRK (multi-animal APT)':
             import_trk(self.projectconfigini,self.h5path.folder_path, idlist, self.interpolation.getChoices(), smooth_settings_dict)
 
-        # except Exception as error_str:
-        #     print(error_str)
-        #     print('Check that you have: ')
-        #     print('1. Confirmed the number of animals and named your animals in the SimBA interface')
-        #     print('2. Imported the videos for the tracking data to your SimBA project')
+        if self.val == 'CSV (SLEAP)':
+            sleap_csv_importer = SleapCsvImporter(config_path=self.projectconfigini,
+                                                  data_folder=self.h5path.folder_path,
+                                                  actor_IDs=idlist,
+                                                  interpolation_settings=self.interpolation.getChoices(),
+                                                  smoothing_settings=smooth_settings_dict)
+            sleap_csv_importer.initate_import_slp()
+            print('SIMBA COMPLETE: Sleap CSV files imported to project_folder/csv/input_csv directory.')
+
 
     def animalnames(self, noofanimal, master):
         try:
@@ -3110,41 +2866,32 @@ class loadprojectini:
             print('Fail to import csv file, please select folder with the .csv files and load config.ini file')
 
     def set_distancemm(self, distancemm):
-
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-
+        check_int(name='DISTANCE IN MILLIMETER', value=distancemm)
+        config = read_config_file(ini_path=self.projectconfigini)
         config.set('Frame settings', 'distance_mm', distancemm)
-        with open(configini, 'w') as configfile:
+        with open(self.projectconfigini, 'w') as configfile:
             config.write(configfile)
 
     def extract_frames_loadini(self):
         configini = self.projectconfigini
         videopath = os.path.join(os.path.dirname(configini), 'videos')
-        extract_frames_ini(videopath, configini)
+        extract_frames_from_all_videos_in_directory(videopath, configini)
 
     def correct_outlier(self):
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-        outlier_correcter_movement = OutlierCorrecterMovement(config_path=configini)
+        outlier_correcter_movement = OutlierCorrecterMovement(config_path=self.projectconfigini)
         outlier_correcter_movement.correct_movement_outliers()
-        outlier_correcter_location = OutlierCorrecterLocation(config_path=configini)
+        outlier_correcter_location = OutlierCorrecterLocation(config_path=self.projectconfigini)
         outlier_correcter_location.correct_location_outliers()
         print('SIMBA COMPLETE: Outlier correction complete. Outlier corrected files located in "project_folder/csv/outlier_corrected_movement_location" directory')
 
     def distanceplotcommand(self):
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-
+        config = read_config_file(ini_path=self.projectconfigini)
         config.set('Distance plot', 'POI_1', self.poi1.getChoices())
         config.set('Distance plot', 'POI_2', self.poi2.getChoices())
-        with open(configini, 'w') as configfile:
+        with open(self.projectconfigini, 'w') as configfile:
             config.write(configfile)
 
-        distance_plot_creator = DistancePlotter(config_path=configini,
+        distance_plot_creator = DistancePlotter(config_path=self.projectconfigini,
                                                 frame_setting=self.distance_plot_frames_var.get(),
                                                 video_setting=self.distance_plot_videos_var.get())
         distance_plot_creator.create_distance_plot()
@@ -3165,21 +2912,19 @@ class loadprojectini:
         path_plotter.create_path_plots()
 
     def heatmapcommand_clf(self):
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
+        config = read_config_file(ini_path=self.projectconfigini)
         config.set('Heatmap settings', 'bin_size_pixels', self.BinSize.entry_get)
         config.set('Heatmap settings', 'Scale_max_seconds', self.MaxScale.entry_get)
         config.set('Heatmap settings', 'Palette', self.hmMenu.getChoices())
         config.set('Heatmap settings', 'Target', self.targetMenu.getChoices())
         config.set('Heatmap settings', 'body_part', self.bp1.getChoices())
-        with open(configini, 'w') as configfile:
+        with open(self.projectconfigini, 'w') as configfile:
             config.write(configfile)
 
         if self.MaxScale.entry_get != 'auto':
             check_int(name='Max scale (s) (int or auto)', value=self.MaxScale.entry_get, min_value=1)
         check_int(name='Bin size (mm)', value=self.BinSize.entry_get)
-        heat_mapper = HeatMapperClf(config_path=configini,
+        heat_mapper = HeatMapperClf(config_path=self.projectconfigini,
                       video_setting=self.heatmap_clf_videos_var.get(),
                       frame_setting=self.heatmap_clf_frames_var.get(),
                       final_img_setting=self.heatmap_clf_last_img_var.get(),
@@ -3275,8 +3020,7 @@ class trainmachinemodel_settings:
         checkbutton3 = Checkbutton(self.label_settings_box, text='Generate Fancy Example Decision Tree ("dtreeviz")', variable=self.box3)
         checkbutton4 = Checkbutton(self.label_settings_box, text='Generate Classification Report', variable=self.box4)
         # checkbutton5 = Checkbutton(self.label_settings_box, text='Generate Features Importance Log', variable=self.box5)
-        checkbutton6 = Checkbutton(self.label_settings_box, text='Generate Features Importance Bar Graph', variable=self.box6,
-                                   command = lambda:activate(self.box6, self.label_n_feature_importance_bars))
+        checkbutton6 = Checkbutton(self.label_settings_box, text='Generate Features Importance Bar Graph', variable=self.box6, command = lambda:activate(self.box6, self.label_n_feature_importance_bars))
         checkbutton7 = Checkbutton(self.label_settings_box, text='Compute Feature Permutation Importances (Note: CPU intensive)', variable=self.box7)
         checkbutton8 = Checkbutton(self.label_settings_box, text='Generate Sklearn Learning Curves (Note: CPU intensive)', variable=self.box8,
                                    command = lambda:activate(self.box8, self.LC_datasplit, self.LC_ksplit))
@@ -3550,45 +3294,6 @@ def get_frame(self):
     '''
     return self.canvas
 
-class ToolTip(object):
-
-    def __init__(self, widget):
-        self.widget = widget
-        self.tipwindow = None
-        self.id = None
-        self.x = self.y = 0
-
-    def showtip(self, text):
-        "Display text in tooltip window"
-        self.text = text
-        if self.tipwindow or not self.text:
-            return
-        x, y, cx, cy = self.widget.bbox("insert")
-        x = x + self.widget.winfo_rootx() + 57
-        y = y + cy + self.widget.winfo_rooty() +27
-        self.tipwindow = tw = Toplevel(self.widget)
-        tw.wm_overrideredirect(1)
-        tw.wm_geometry("+%d+%d" % (x, y))
-        label = Label(tw, text=self.text, justify=LEFT,
-                      background="#ffffe0", relief=SOLID, borderwidth=1,
-                      font=("tahoma", "8", "normal"))
-        label.pack(ipadx=1)
-
-    def hidetip(self):
-        tw = self.tipwindow
-        self.tipwindow = None
-        if tw:
-            tw.destroy()
-
-def CreateToolTip(widget, text):
-    toolTip = ToolTip(widget)
-    def enter(event):
-        toolTip.showtip(text)
-    def leave(event):
-        toolTip.hidetip()
-    widget.bind('<Enter>', enter)
-    widget.bind('<Leave>', leave)
-
 class App(object):
     def __init__(self):
         scriptdir = os.path.dirname(os.path.realpath(__file__))
@@ -3701,8 +3406,9 @@ class App(object):
         self.frame = Frame(background, bd=2, relief=SUNKEN, width=300, height=300)
         self.frame.pack(expand=True)
         self.txt = Text(self.frame, bg='white')
-        self.txt.config(state=DISABLED)
+        self.txt.config(state=DISABLED, font=("Rockwell", 11))
         self.txt.pack(expand=True, fill='both')
+        #self.txt.configure(font=("Comic Sans MS", 20, "bold"))
         sys.stdout = StdRedirector(self.txt)
 
 # writes text out in GUI

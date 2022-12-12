@@ -64,7 +64,8 @@ class ImportSLEAP(object):
     """
 
 
-    def __init__(self, project_path: str,
+    def __init__(self,
+                 project_path: str,
                  data_folder: str,
                  actor_IDs: list,
                  interpolation_settings: str,
@@ -223,6 +224,7 @@ class ImportSLEAP(object):
             self.analysis_dict['animals_in_each_frame'] = [x[4] - x[3] for x in frames_lst]
             self.__create_tracks()
 
+
     def __check_that_all_animals_exist_in_frame(self):
         existing_animals = list(self.frame_dict.keys())
         missing_animals = [x for x in range(self.animals_no) if x not in existing_animals]
@@ -232,7 +234,6 @@ class ImportSLEAP(object):
     def __create_tracks(self):
         start_frame = 0
         for frame_cnt, frame in enumerate(range(self.analysis_dict['no_frames'])):
-        #for frame_cnt, frame in enumerate(range(0, 500)):
             frame_idx = self.analysis_dict['frames'][frame_cnt][2]
             self.frame_dict = {}
             print('Frame: {}/{}, Video: {} ({}/{})'.format(str(frame_cnt), str(self.analysis_dict['no_frames']), str(self.video_name), str(self.video_counter + 1), str(len(self.files_found))))

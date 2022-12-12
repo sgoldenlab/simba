@@ -957,3 +957,21 @@ def archive_processed_files(config_path: str,
 
     print('SIMBA COMPLETE: Archiving completed.')
 
+def get_color_dict():
+    return {'White': (255, 255, 255),
+            'Grey': (220, 200, 200),
+            'Red': (0, 0, 255),
+            'Dark-red': (0, 0, 139),
+            'Maroon': (0, 0, 128),
+            'Orange': (0, 165, 255),
+            'Dark-orange': (0, 140, 255),
+            'Coral': (80, 127, 255),
+            'Chocolate': (30, 105, 210),
+            'Yellow': (0, 255, 255),
+            'Green': (0, 128, 0),
+            'Dark-grey': (105, 105, 105),
+            'Light-grey': (192, 192, 192),
+            'Pink': (178, 102, 255),
+            'Lime': (204, 255, 229),
+            'Purple': (255, 51, 153),
+            'Cyan': (255, 255, 102)}

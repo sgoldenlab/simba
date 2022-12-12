@@ -838,9 +838,24 @@ def insert_column_headers_for_outlier_correction(data_df: pd.DataFrame,
     """
 
     if len(new_headers) != len(data_df.columns):
-        print('SIMBA ERROR: SimBA expects {} columns of data inside the files within project_folder/csv/input_csv directory. However, '
-                         'within file {} file, SimBA found {} columns.'.format(str(len(new_headers)), filepath, str(len(data_df.columns))))
-        raise ValueError
+        difference = int(len(data_df.columns) - len(new_headers))
+        bp_missing = int(abs(difference) / 3)
+        if difference < 0:
+
+            print('SIMBA ERROR: SimBA expects {} columns of data inside the files within project_folder/csv/input_csv directory. However, '
+                  'within file {} file, SimBA found {} columns. Thus, there is {} missing data columns in the imported data, which may represent {} '
+                  'bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {} less body-part, or '
+                  'include {} more body-part in the imported data'.format(str(len(new_headers)), filepath, str(len(data_df.columns)), str(abs(difference)),
+                                                                      str(int(bp_missing)), str(bp_missing), str(bp_missing)))
+        else:
+            print('SIMBA ERROR: SimBA expects {} columns of data inside the files within project_folder/csv/input_csv directory. However, '
+                'within file {} file, SimBA found {} columns. Thus, there is {} more data columns in the imported data than anticipated, which may represent {} '
+                'bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {} more body-part, or '
+                'include {} less body-part in the imported data'.format(str(len(new_headers)), filepath,
+                                                                        str(len(data_df.columns)), str(abs(difference)),
+                                                                        str(int(bp_missing)), str(bp_missing),
+                                                                        str(bp_missing)))
+        raise ValueError()
     else:
         data_df.columns = new_headers
         return data_df

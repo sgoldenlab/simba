@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Tkinter pop up classes.
+"""
 from simba.read_config_unit_tests import (read_config_file,
                                           read_config_entry,
                                           check_int,
@@ -12,8 +17,10 @@ from simba.misc_tools import (check_multi_animal_status,
                               convert_parquet_to_csv,
                               convert_csv_to_parquet,
                               tabulate_clf_info,
-                              find_video_of_file)
+                              find_video_of_file,
+                              get_color_dict)
 from simba.drop_bp_cords import getBpNames, create_body_part_dictionary, get_fn_ext
+from simba.ROI_feature_visualizer import ROIfeatureVisualizer
 from simba.get_coordinates_tools_v2 import get_coordinates_nilsson
 from simba.heat_mapper_location import HeatmapperLocation
 from simba.classifications_per_ROI import clf_within_ROI
@@ -32,6 +39,7 @@ from simba.remove_keypoints_in_pose import KeypointRemover
 from simba.plot_pose_in_dir import create_video_from_dir
 from simba.extract_seqframes import extract_seq_frames
 from simba.frame_mergerer_ffmpeg import FrameMergererFFmpeg
+from simba.ROI_plot_new import ROIPlot
 from simba.video_processing import (downsample_video,
                                     clahe_enhance_video,
                                     crop_single_video,
@@ -1118,20 +1126,22 @@ class ConcatenatingVideosPopUp(object):
 
 class VisualizePoseInFolderPopUp(object):
     def __init__(self):
-        main_frm = Toplevel()
-        main_frm.minsize(350, 200)
-        main_frm.wm_title('Visualize pose-estimation')
-        settings_frame = LabelFrame(main_frm, text='SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+        self.main_frm = Toplevel()
+        self.main_frm.minsize(350, 200)
+        self.main_frm.wm_title('Visualize pose-estimation')
+        settings_frame = LabelFrame(self.main_frm, text='SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
         self.input_folder = FolderSelect(settings_frame, 'Input directory (with csv/parquet files)', title='Select input folder')
         self.output_folder = FolderSelect(settings_frame, 'Output directory (where your videos will be saved)', title='Select output folder')
         self.circle_size = Entry_Box(settings_frame, 'Circle size', 0, validation='numeric')
-        run_btn = Button(main_frm, text='VISUALIZE POSE', font=('Helvetica', 12, 'bold'), command= lambda: self.run())
-
+        run_btn = Button(self.main_frm, text='VISUALIZE POSE', font=('Helvetica', 12, 'bold'), fg='blue', command= lambda: self.run())
+        self.advanced_settings_btn = Button(self.main_frm, text='OPEN ADVANCED SETTINGS', font=('Helvetica', 12, 'bold'), fg='red', command=lambda: self.launch_adv_settings())
         settings_frame.grid(row=0, sticky=W)
         self.input_folder.grid(row=0, column=0, pady=10, sticky=W)
         self.output_folder.grid(row=1, column=0, pady=10, sticky=W)
         self.circle_size.grid(row=2, column=0, pady=10, sticky=W)
         run_btn.grid(row=3, column=0, pady=10)
+        self.advanced_settings_btn.grid(row=4, column=0, pady=10)
+        self.color_lookup = None
 
 
     def run(self):
@@ -1145,7 +1155,39 @@ class VisualizePoseInFolderPopUp(object):
             print('SimBA ERROR: Please select an output folder to continue')
             raise ValueError('SimBA ERROR: Please select an output folder to continue')
         else:
-            create_video_from_dir(in_directory=input_folder, out_directory=output_folder, circle_size=int(circle_size_int))
+            if self.color_lookup is not None:
+                cleaned_color_lookup = {}
+                for k, v in self.color_lookup.items():
+                    cleaned_color_lookup[k] = v.getChoices()
+                self.color_lookup = cleaned_color_lookup
+            create_video_from_dir(in_directory=input_folder, out_directory=output_folder, circle_size=int(circle_size_int), clr_attr=self.color_lookup)
+
+    def launch_adv_settings(self):
+        if self.advanced_settings_btn['text'] == 'OPEN ADVANCED SETTINGS':
+            self.advanced_settings_btn.configure(text="CLOSE ADVANCED SETTINGS")
+            self.adv_settings_frm = LabelFrame(self.main_frm, text='ADVANCED SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+            self.confirm_btn = Button(self.adv_settings_frm, text='Confirm', command=lambda: self.launch_clr_menu())
+            self.specify_animals_dropdown = DropDownMenu(self.adv_settings_frm, 'ANIMAL COUNT: ', list(range(1, 11)), '20')
+            self.adv_settings_frm.grid(row=5, column=0, pady=10)
+            self.specify_animals_dropdown.grid(row=0, column=0)
+            self.confirm_btn.grid(row=0, column=1)
+        elif self.advanced_settings_btn['text'] == 'CLOSE ADVANCED SETTINGS':
+            if hasattr(self, 'adv_settings_frm'):
+                self.adv_settings_frm.destroy()
+                self.color_lookup = None
+            self.advanced_settings_btn.configure(text="OPEN ADVANCED SETTINGS")
+
+    def launch_clr_menu(self):
+        if hasattr(self, 'color_table_frme'):
+            self.color_table_frme.destroy()
+        clr_dict = get_color_dict()
+        self.color_table_frme = LabelFrame(self.adv_settings_frm, text='SELECT COLORS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+        self.color_lookup = {}
+        for animal_cnt in list(range(int(self.specify_animals_dropdown.getChoices()))):
+            self.color_lookup['Animal_{}'.format(str(animal_cnt+1))] = DropDownMenu(self.color_table_frme, 'Animal {} color:'.format(str(animal_cnt+1)), list(clr_dict.keys()), '20')
+            self.color_lookup['Animal_{}'.format(str(animal_cnt+1))].setChoices(list(clr_dict.keys())[animal_cnt])
+            self.color_lookup['Animal_{}'.format(str(animal_cnt+1))].grid(row=animal_cnt, column=0)
+        self.color_table_frme.grid(row=1, column=0)
 
 
 class DropTrackingDataPopUp(object):
@@ -1449,3 +1491,115 @@ class RemoveAClassifierPopUp(object):
             self.config.write(f)
 
         print('SIMBA COMPLETE: {} classifier removed from SimBA project.'.format(self.clf_dropdown.getChoices()))
+
+
+class VisualizeROIFeaturesPopUp(object):
+    def __init__(self,
+                 config_path: str):
+        self.main_frm = Toplevel()
+        self.main_frm.minsize(350, 300)
+        self.main_frm.wm_title('VISUALIZE ROI FEATURES')
+        self.config, self.config_path = read_config_file(ini_path=config_path), config_path
+        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.videos_dir = os.path.join(self.project_path, 'videos')
+        self.video_list = []
+        for file_path in glob.glob(self.videos_dir + '/*'):
+            _, video_name, ext = get_fn_ext(filepath=file_path)
+            self.video_list.append(video_name + ext)
+
+        if len(self.video_list) == 0:
+            print('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI features.')
+            raise FileNotFoundError('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI features.')
+
+        self.single_video_frm = LabelFrame(self.main_frm, text='Visualize ROI features on SINGLE video', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.single_video_dropdown = DropDownMenu(self.single_video_frm, 'Select video', self.video_list, '15')
+        self.single_video_dropdown.setChoices(self.video_list[0])
+        self.single_video_btn = Button(self.single_video_frm, text='Visualize ROI features for SINGLE video', command=lambda: self.visualize_single_video())
+
+        self.all_videos_frm = LabelFrame(self.main_frm, text='Visualize ROI features on ALL videos', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.all_videos_btn = Button(self.all_videos_frm, text='Generate ROI visualization on ALL videos', command=lambda: self.visualize_all_videos())
+
+        self.threshold_entry_box = Entry_Box(self.main_frm, 'Body-part probability threshold', '30')
+        self.threshold_entry_box.entry_set(0.0)
+
+        threshold_label = Label(self.main_frm, text='Note: body-part locations detected with probabilities below this threshold will be filtered out.', font=("Helvetica", 10, 'italic'))
+        self.single_video_frm.grid(row=0, sticky=W)
+        self.single_video_dropdown.grid(row=0, sticky=W)
+        self.single_video_btn.grid(row=1, pady=12)
+        self.all_videos_frm.grid(row=1,sticky=W,pady=10)
+        self.all_videos_btn.grid(row=0,sticky=W)
+        self.threshold_entry_box.grid(row=3,sticky=W,pady=10)
+        threshold_label.grid(row=4,sticky=W,pady=10)
+
+    def visualize_single_video(self):
+        check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
+        self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
+        with open(self.config_path, 'w') as f: self.config.write(f)
+        roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.config_path, video_name=self.single_video_dropdown.getChoices())
+        roi_feature_visualizer.create_visualization()
+
+    def visualize_all_videos(self):
+        check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
+        self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
+        with open(self.config_path, 'w') as f: self.config.write(f)
+        for video_name in self.video_list:
+            roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.config_path, video_name=video_name)
+            roi_feature_visualizer.create_visualization()
+
+class VisualizeROITrackingPopUp(object):
+    def __init__(self,
+                 config_path: str):
+        self.main_frm = Toplevel()
+        self.main_frm.minsize(350, 300)
+        self.main_frm.wm_title('VISUALIZE ROI TRACKING')
+
+        self.config, self.config_path = read_config_file(ini_path=config_path), config_path
+        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.videos_dir = os.path.join(self.project_path, 'videos')
+        self.video_list = []
+        for file_path in glob.glob(self.videos_dir + '/*'):
+            _, video_name, ext = get_fn_ext(filepath=file_path)
+            self.video_list.append(video_name + ext)
+
+        if len(self.video_list) == 0:
+            print('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI tracking.')
+            raise FileNotFoundError('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI tracking.')
+
+        self.single_video_frm = LabelFrame(self.main_frm, text='Visualize ROI tracking on SINGLE video', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.single_video_dropdown = DropDownMenu(self.single_video_frm, 'Select video', self.video_list, '15')
+        self.single_video_dropdown.setChoices(self.video_list[0])
+        self.single_video_btn = Button(self.single_video_frm, text='Generate ROI visualization on SINGLE video', command=lambda: self.visualize_single_video())
+        self.all_videos_frm = LabelFrame(self.main_frm, text='Visualize ROI tracking on ALL videos', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.all_videos_btn = Button(self.all_videos_frm, text='Generate ROI visualization on ALL videos', command= lambda: self.visualize_all())
+
+        self.threshold_entry_box = Entry_Box(self.main_frm, 'Body-part probability threshold', '30')
+        self.threshold_entry_box.entry_set(0.0)
+
+        threshold_label = Label(self.main_frm, text='Note: body-part locations detected with probabilities below this threshold will be filtered out.', font=("Helvetica", 10, 'italic'))
+        self.single_video_frm.grid(row=0, sticky=W)
+        self.single_video_dropdown.grid(row=0, sticky=W)
+        self.single_video_btn.grid(row=1, pady=12)
+        self.all_videos_frm.grid(row=1,sticky=W,pady=10)
+        self.all_videos_btn.grid(row=0,sticky=W)
+        self.threshold_entry_box.grid(row=3,sticky=W,pady=10)
+        threshold_label.grid(row=4,sticky=W,pady=10)
+
+    def visualize_single_video(self):
+        check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
+        self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
+        with open(self.config_path, 'w') as f: self.config.write(f)
+        roi_plotter = ROIPlot(ini_path=self.config_path, video_path=self.single_video_dropdown.getChoices())
+        roi_plotter.insert_data()
+        roi_plotter_multiprocessor = multiprocessing.Process(target=roi_plotter.visualize_ROI_data())
+        roi_plotter_multiprocessor.start()
+
+
+    def visualize_all(self):
+        check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
+        self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
+        with open(self.config_path, 'w') as f: self.config.write(f)
+        for i in self.video_list:
+            roi_plotter = ROIPlot(ini_path=self.config_path, video_path=i)
+            roi_plotter.insert_data()
+            roi_plotter.visualize_ROI_data()
+        print('All ROI videos created in project_folder/frames/output/ROI_analysis.')

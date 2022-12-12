@@ -142,7 +142,7 @@ class VideoInfoTable(object):
         self.save_data_btn.grid(row=0, column=0, sticky=W)
         self.video_frm = LabelFrame(self.main_frm, text='PROJECT VIDEOS', font=('Helvetica', 15, 'bold'))
         self.column_names = ['INDEX', 'VIDEO', 'FPS', 'RESOLUTION WIDTH', 'RESOLUTION HEIGHT', 'DISTANCE IN MM', 'FIND DISTANCE', 'PIXELS PER MM']
-        self.col_widths = ['5',self.max_char_vid_name,'16','16','16','16', '16', '16']
+        self.col_widths = ['5',self.max_char_vid_name,'18','18','18','18', '18', '18']
         self.video_frm.grid(row=6, column=0)
         for cnt, (col_name, col_width) in enumerate(zip(self.column_names, self.col_widths)):
             col_header_label = Label(self.video_frm, text=col_name, width=col_width, font=('Helvetica', 14, 'bold'))

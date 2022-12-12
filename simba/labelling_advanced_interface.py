@@ -50,7 +50,7 @@ class AdvancedLabellingInterface(object):
         self.frm_no, self.config_path = 0, config_path
         self.config = read_config_file(config_path)
         self.continuing = continuing
-        self.play_video_script_path = os.path.join(os.path.dirname(simba.__file__), 'play_video_pseudo.py')
+        self.play_video_script_path = os.path.join(os.path.dirname(simba.__file__), 'play_annotation_video.py')
         self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
         self.target_cnt = read_config_entry(self.config, 'SML settings', 'no_targets', 'int')
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='str')
