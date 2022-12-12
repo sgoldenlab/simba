@@ -80,5 +80,8 @@ class OutlierCorrectionSkipper(object):
 # test = OutlierCorrectionSkipper(config_path=r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Parquet_test2\project_folder\project_config.ini")
 # test.skip_outlier_correction()
 
+# test = OutlierCorrectionSkipper(config_path='/Users/simon/Desktop/troubleshooting/User_def_2/project_folder/project_config.ini')
+# test.skip_outlier_correction()
+
 # config_ini = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\Parquet_test2\project_folder\project_config.ini"
 # skip_outlier_c(config_ini)
