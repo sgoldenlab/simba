@@ -1,3 +1,4 @@
+import os.path
 import pandas as pd
 
 def read_df(file_path: str,
@@ -22,12 +23,17 @@ def read_df(file_path: str,
     """
     try:
         if file_type == 'csv':
-            df = pd.read_csv(file_path, index_col=idx, low_memory=False)
+            try:
+                df = pd.read_csv(file_path, index_col=idx, low_memory=False)
+            except Exception as e:
+                if type(e).__name__ == 'ParserError':
+                    print('SIMBA ERROR: SimBA tried to read {} as a comma delimited CSV file and failed. Make sure {} is a utf-8 encoded comma delimited CSV file.'.format(file_path, os.path.basename(file_path)))
+                    raise ValueError(e)
         elif file_type == 'parquet':
             df = pd.read_parquet(file_path)
         else:
             print('SIMBA ERROR: The file type ({}) is not recognized. Please set the workflow file type to either csv or parquet'.format(file_type))
-            raise ValueError('SIMBA ERROR: The file type ({}) is not recognized. Please set the workflow file type to either csv or parquet'.format(file_type))
+            raise ValueError('SIMBA ERROR: The file type is not recognized. Please set the workflow file type to either csv or parquet')
         return df
     except FileNotFoundError:
         print('The CSV file could not be located at the following path: ' + str(file_path) + ' . It may be that you missed a step in the analysis. Please generate the file before proceeding.')

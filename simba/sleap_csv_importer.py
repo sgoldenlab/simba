@@ -22,6 +22,39 @@ from simba.interpolate_pose import Interpolate
 
 
 class SleapCsvImporter(object):
+
+    """
+    Class for importing SLEAP pose-estimation data into SimBA project.
+
+    Parameters
+    ----------
+    config_path: str
+        path to SimBA project config file in Configparser format
+    data_folder: str
+        Path to folder containing SLEAP data in `.slp` format.
+    actor_IDs: list
+        List of animal names.
+    interpolation_settings: str
+        String defining the pose-estimation interpolation method. OPTIONS: 'None', 'Animal(s): Nearest',
+        'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear',
+        'Body-parts: Quadratic'.
+    smoothing_settings: dict
+        Dictionary defining the pose estimation smoothing method. EXAMPLE: {'Method': 'Savitzky Golay',
+        'Parameters': {'Time_window': '200'}})
+
+    Notes
+    ----------
+    `Google Colab notebook for converting SLEAP .slp to CSV  <https://colab.research.google.com/drive/1EpyTKFHVMCqcb9Lj9vjMrriyaG9SvrPO?usp=sharing>`__.
+    `Example expected SLEAP csv data file for 5 animals / 4 pose-estimated body-parts  <https://github.com/sgoldenlab/simba/blob/master/misc/sleap_csv_example.csv>`__.
+
+
+    Example
+    ----------
+
+    >>> sleap_csv_importer = SleapCsvImporter(config_path=r'/Users/simon/Desktop/envs/troubleshooting/slp_1_animal_1_bp/project_folder/project_config.ini', data_folder=r'/Users/simon/Desktop/envs/troubleshooting/slp_1_animal_1_bp/import/temp', actor_IDs=['Termite_1', 'Termite_2', 'Termite_3', 'Termite_4', 'Termite_5'], interpolation_settings="Body-parts: Nearest", smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}})
+    >>> sleap_csv_importer.initate_import_slp()
+    """
+
     def __init__(self,
                  config_path: str,
                  data_folder: str,
@@ -51,7 +84,6 @@ class SleapCsvImporter(object):
         if (self.pose_settings is 'user_defined'): self.__update_config_animal_cnt()
         if (self.animal_cnt > 1): self.__update_bp_headers_file()
         self.df_headers = getBpHeaders(inifile=self.config_path)
-        print(self.df_headers)
 
     def __update_config_animal_cnt(self):
         self.config.set("General settings", "animal_no", str(self.animal_cnt))
@@ -314,7 +346,7 @@ class SleapCsvImporter(object):
 
 
 # test = SleapCsvImporter(config_path=r'/Users/simon/Desktop/envs/troubleshooting/slp_1_animal_1_bp/project_folder/project_config.ini',
-#                  data_folder=r'/Users/simon/Desktop/envs/troubleshooting/slp_1_animal_1_bp/import',
+#                  data_folder=r'/Users/simon/Desktop/envs/troubleshooting/slp_1_animal_1_bp/import/temp',
 #                  actor_IDs=['Termite_1', 'Termite_2', 'Termite_3', 'Termite_4', 'Termite_5'],
 #                  interpolation_settings="Body-parts: Nearest",
 #                  smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}})

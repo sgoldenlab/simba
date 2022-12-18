@@ -56,6 +56,9 @@ class MovementProcessor(object):
                 self.bp_dict[animal].append(bp_name + c)
                 self.bp_columns.append(bp_name + c)
         self.files_found = glob.glob(self.in_dir + '/*.' + self.file_type)
+        if len(self.files_found) == 0:
+            print('SIMBA ERROR: ZERO files found in the {} directory.'.format(self.files_found))
+            raise FileNotFoundError()
         print('Processing {} video(s)...'.format(str(len(self.files_found))))
 
     def __euclidean_distance(self, bp_1_x_vals, bp_2_x_vals, bp_1_y_vals, bp_2_y_vals, px_per_mm):

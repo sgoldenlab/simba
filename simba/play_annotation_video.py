@@ -19,8 +19,8 @@ def annotation_video_player():
 
     def print_video_txt(frame_number: int, video_info: dict) -> None:
         current_time = round((frame_number / video_info['fps']), 2)
-        cv2.putText(frame, 'F~ {}'.format(str(frame_number)), (10, int((video_info['height'] - spacing_scale))), cv2.FONT_HERSHEY_SIMPLEX, font_size, colors['Pink'], 3)
-        cv2.putText(frame, 'T~ {}'.format(str(current_time)), (10, int((video_info['height'] - spacing_scale*2))), cv2.FONT_HERSHEY_SIMPLEX, font_size, colors['Pink'], 3)
+        cv2.putText(frame, 'F~ {}'.format(str(frame_number)), (10, int((video_info['height'] - spacing_scale))), cv2.FONT_HERSHEY_SIMPLEX, font_size, colors['Pink'], 2)
+        cv2.putText(frame, 'T~ {}'.format(str(current_time)), (10, int((video_info['height'] - spacing_scale*2))), cv2.FONT_HERSHEY_SIMPLEX, font_size, colors['Pink'], 2)
 
     colors = get_color_dict()
     video_path = sys.stdin.readline().encode().decode()

@@ -53,6 +53,9 @@ class ClfLogCreator(object):
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.model_cnt)
         self.file_save_name = os.path.join(self.project_path, 'logs', 'data_summary_' + str(self.datetime) + '.csv')
         self.files_found = glob.glob(self.files_in_dir + '/*.' + self.file_type)
+        if len(self.files_found) == 0:
+            print('SIMBA ERROR: No data files found in the project_folder/csv/machine_results directory. Run classifiers before analysing results.')
+            raise ValueError('SIMBA ERROR: No data files found in the project_folder/csv/machine_results directory')
         print('Analyzing {} files for {} classifiers...'.format(str(len(self.files_found)), str(len(self.clf_names))))
 
     def analyze_data(self):

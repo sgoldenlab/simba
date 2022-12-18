@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson", "JJ Choong"
+__author__ = "Simon Nilsson"
 
 import itertools
 from configparser import ConfigParser, MissingSectionHeaderError
@@ -38,7 +38,7 @@ class ImportSLEAP(object):
     config_path: str
         path to SimBA project config file in Configparser format
     data_folder: str
-        Path to folder containing maDLC data in `.h5` format.
+        Path to folder containing SLEAP data in `.slp` format.
     actor_IDs: list
         List of animal names.
     interpolation_settings: str
@@ -48,11 +48,6 @@ class ImportSLEAP(object):
     smoothing_settings: dict
         Dictionary defining the pose estimation smoothing method. EXAMPLE: {'Method': 'Savitzky Golay',
         'Parameters': {'Time_window': '200'}})
-
-    Notes
-    -----
-    `Multi-animal import tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md>`__.
-
 
     Example
     ----------
