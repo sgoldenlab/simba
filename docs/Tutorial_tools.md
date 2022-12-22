@@ -381,13 +381,14 @@ Use this tool to delete user-specified body-parts from pose-estimation tracking 
 Use this tool to visualize the pose-estimation of all the files inside a SimBA project directory. This tool can be useful when you have [interpolated  and/or smoothened](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data) your pose-estimation data at import, and now you want to visualize the results of that interpolation and smoothing. 
 
 1. Click on `Tools`, then `Visualize pose-estimation in folder...`.
-2. In the `Input directory (with csv/parquet files)` menu, click bowse and select a folder that contain CSV or parquet files (e.g., the `project_folder/csv/input_csv` directory) 
+2. In the `Input directory (with csv/parquet files)` menu, click bowse and select a folder that contain CSV or parquet files (e.g., the `project_folder/csv/input_csv` directory of your SimBA project) 
 3. In the `Output directory (where your videos will be saved)` menu, click bowse and select a folder where your videos should be saved (I recommend to choose an empty folder or create a new folder).
 4. In the `Circle size` entry box, choose the size of the circles denoting the location of your body-parts (e.g., `5`)
-5. Click on the `Visualize pose`. You can follow the progress in the main SimBA terminal window. 
+5. **OPTIONAL**: If you want to manually set the colors for each of the animals, click on `OPEN ADVANCED SETTINGS` and choose the number of animals in your data file. Then use the dropdown menus to set the color of each animal. If you **do not** set the animal colors using the `ADVANCED SETTINGS` menu, SimBA will automatically assign colors to each of the body-parts. 
+6. Click on the `VISUALIZE`. You can follow the progress in the main SimBA terminal window. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/viz_pose_folder.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/visualize_pose_in_folder.png" />
 </p>
 
 
