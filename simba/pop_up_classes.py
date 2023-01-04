@@ -3,6 +3,8 @@
 """
 Tkinter pop up classes.
 """
+import sys
+sys.setrecursionlimit(10**7)
 from simba.read_config_unit_tests import (read_config_file,
                                           read_config_entry,
                                           check_int,
@@ -839,7 +841,7 @@ class ChangeFpsSingleVideoPopUp(object):
         main_frm.minsize(200, 200)
         main_frm.wm_title("CHANGE FRAME RATE: SINGLE VIDEO")
         video_path = FileSelect(main_frm, "Video path", title='Select a video file')
-        fps_entry_box = Entry_Box(main_frm, 'Output FPS:', '10')
+        fps_entry_box = Entry_Box(main_frm, 'Output FPS:', '10', validation='numeric')
         run_btn = Button(main_frm, text='Convert', command=lambda: change_single_video_fps(file_path=video_path.file_path, fps=fps_entry_box.entry_get))
         video_path.grid(row=0,sticky=W)
         fps_entry_box.grid(row=1,sticky=W)
@@ -851,7 +853,7 @@ class ChangeFpsMultipleVideosPopUp(object):
         main_frm.minsize(400, 200)
         main_frm.wm_title("CHANGE FRAME RATE: MULTIPLE VIDEO")
         folder_path = FolderSelect(main_frm, "Folder path", title='Select folder with videos: ')
-        fps_entry = Entry_Box(main_frm, 'Output FPS: ', '10')
+        fps_entry = Entry_Box(main_frm, 'Output FPS: ', '10', validation='numeric')
         run_btn = Button(main_frm, text='Convert', command=lambda: change_fps_of_multiple_videos(directory=folder_path.folder_path, fps=fps_entry.entry_get))
         folder_path.grid(row=0, sticky=W)
         fps_entry.grid(row=1, sticky=W)
@@ -1608,7 +1610,10 @@ class VisualizeROITrackingPopUp(object):
 
 
 class CreateUserDefinedPoseConfigurationPopUp(object):
-    def __init__(self):
+    def __init__(self,
+                 master=None,
+                 project_config_class=None):
+
         self.main_frm = Toplevel()
         self.main_frm.minsize(400, 400)
         self.main_frm.wm_title("USER-DEFINED POSE CONFIGURATION")
@@ -1618,7 +1623,7 @@ class CreateUserDefinedPoseConfigurationPopUp(object):
         self.animal_cnt_entry_box = Entry_Box(self.main_frm, '# of Animals', '23', validation='numeric')
         self.no_body_parts_entry_box = Entry_Box(self.main_frm, '# of Body-parts (per animal)', '23', validation='numeric')
         self.img_path_file_select = FileSelect(self.main_frm, 'Image path')
-
+        self.master, self.project_config_class = master, project_config_class
         self.confirm_btn = Button(self.main_frm, text='CONFIRM',  fg='blue', command=lambda: self.create_bodypart_table())
         self.save_btn = Button(self.main_frm, text='SAVE USER-DEFINED POSE-CONFIG', fg='blue', command=lambda: self.save_pose_config())
         self.save_btn.config(state='disabled')
@@ -1634,7 +1639,8 @@ class CreateUserDefinedPoseConfigurationPopUp(object):
     def create_bodypart_table(self):
         if hasattr(self, 'bp_table_frm'):
             self.bp_table_frm.destroy()
-
+        check_int(name='ANIMAL NUMBER', value=self.animal_cnt_entry_box.entry_get)
+        check_int(name='BODY-PART NUMBER', value=self.no_body_parts_entry_box.entry_get)
         self.selected_animal_cnt, self.selected_bp_cnt = int(self.animal_cnt_entry_box.entry_get), int(self.no_body_parts_entry_box.entry_get)
         check_int(name='number of animals', value=self.selected_animal_cnt)
         check_int(name='number of body-parts', value=self.selected_bp_cnt)
@@ -1658,6 +1664,7 @@ class CreateUserDefinedPoseConfigurationPopUp(object):
 
 
     def save_pose_config(self):
+
         config_name = self.config_name_entry_box.entry_get
         image_path = self.img_path_file_select.file_path
         check_file_exist_and_readable(image_path)
@@ -1667,14 +1674,17 @@ class CreateUserDefinedPoseConfigurationPopUp(object):
             if int(self.selected_animal_cnt) > 1:
                 check_int(name='Animal ID number', value=entry[1].entry_get)
                 animal_id_lst.append(entry[1].entry_get)
+
         pose_config_creator = PoseConfigCreator(pose_name=config_name,
                                                 no_animals=int(self.selected_animal_cnt),
                                                 img_path=image_path,
                                                 bp_list=bp_lst,
                                                 animal_id_int_list=animal_id_lst)
         pose_config_creator.launch()
-        self.main_frm.destroy()
         print('SIMBA COMPLETE: User-defined pose-configuration "{}" created.'.format(config_name))
+        self.main_frm.winfo_toplevel().destroy()
+        self.master.winfo_toplevel().destroy()
+        self.project_config_class()
 
 class PoseResetterPopUp(object):
     def __init__(self):

@@ -799,7 +799,9 @@ class project_config:
         if (self.var.get() != 'Create pose config...'):
             self.label.config(image=self.photos[self.option_mice.index(str(self.var.get()))])
         else:
-            _ = CreateUserDefinedPoseConfigurationPopUp()
+            _ = CreateUserDefinedPoseConfigurationPopUp(master=self.toplevel, project_config_class=project_config)
+
+
 
     def import_singlecsv(self):
 

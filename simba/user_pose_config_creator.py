@@ -1,5 +1,6 @@
 __author__ = "Simon Nilsson", "JJ Choong"
 
+import tkinter
 import cv2
 import numpy as np
 import imutils
@@ -24,9 +25,9 @@ class PoseConfigCreator(object):
     img_path: str
         Path to image representation of user-defined pose-estimation setting
     bp_list: list
-        List of body-parts in the user-defined pose-estimation setting
+        Body-parts in the user-defined pose-estimation setting
     animal_id_int_list: list
-        List of integers representing the animal ID which the body-parts belong to
+        Integers representing the animal ID which the body-parts belong to
 
     Notes
     ----------
@@ -70,6 +71,7 @@ class PoseConfigCreator(object):
             for cnt, (bp_name, animal_number_id) in enumerate(zip(self.bp_list, self.animal_id_int_list)):
                 self.bp_list[cnt] = '{}_{}'.format(bp_name, animal_number_id)
         self.color_lst = createColorListofList(1, len(self.bp_list))[0]
+
 
     def launch(self):
         def draw_circle(event, x, y, flags, param):
