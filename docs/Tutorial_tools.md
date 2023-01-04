@@ -17,6 +17,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Get mm/ppx](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#get-coordinates)
 - [Change formats](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#change-formats)
 - [Change fps](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#change-fps-frame-rate-of-videos)
+- [Create path plots](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#create-path-plots)
 - [CLAHE enhance video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clahe)
 - [Superimpose frame numbers on video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#add-frame-numbers)
 - [Convert to greyscale](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#convert-to-grayscale)
