@@ -261,6 +261,27 @@ This tool creates a video with the frame numbers printed on top of the video.
 
 3. The new greyscale version of the video will be created and have the name *Name of original video* + *_grayscale*. The new video will be located in the same folder as the original video.
 
+## Change FPS (frame-rate) of videos
+
+### Change FPS of a single video
+
+1. Click on `Tools` -> `Change fps` -> `Change fps for single video` and a new pop up window is displayed. 
+
+2. Click on `Browse File` and select the video you want to change the FPS for. 
+
+3. In the `Output FPS` entry-box, enter the FPS of the new video as a number (e.g., `15`). 
+
+4. Click the `Convert` button. A new video is saved in the directory of the input video with the `fps_15` filename suffix.
+
+### Change FPS of multiple videos
+
+1. Click on `Tools` -> `Change fps` -> `Change fps for multiple videos` and a new pop up window is displayed. 
+
+2. Click on `Browse Folder` and select the directory containing the videos you want to change the FPS for. 
+
+3. In the `Output FPS` entry-box, enter the FPS of the new videos as a number (e.g., `15`). 
+
+4. Click the `Convert` button. New videos are saved in the directory of the input videos with the `fps_15` filename suffix.
 
 ## Merge images to video
 
