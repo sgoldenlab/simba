@@ -12,7 +12,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Clip video into multiple videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-video-into-multiple-videos)
 - [Crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
 - [Fixed Crop Videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#fixed-crop-videos)
-- [Multi-crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos)
+- [Multi-crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos)
 - [Downsample videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video)
 - [Get mm/ppx](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#get-coordinates)
 - [Change formats](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#change-formats)
@@ -220,7 +220,7 @@ This tool allows the user to convert the file format of a single or multiple vid
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/changevideoformat.PNG" width="400" height="400" />
 
-#### Convert multiple videos
+#### Convert multiple video file formats
 
 1. Click on `Browse Folder` to select the directory that contains the videos that you want to convert.
 
@@ -230,7 +230,7 @@ This tool allows the user to convert the file format of a single or multiple vid
 
 4. Click on `Convert multiple videos`.
 
-#### Convert single video
+#### Convert single video file format
 
 1. Click on `Browse File` to select a video to convert.
 
@@ -283,6 +283,35 @@ This tool creates a video with the frame numbers printed on top of the video.
 3. In the `Output FPS` entry-box, enter the FPS of the new videos as a number (e.g., `15`). 
 
 4. Click the `Convert` button. New videos are saved in the directory of the input videos with the `fps_15` filename suffix.
+
+## Create path plots
+
+Use this tool to create a path plot videos from raw pose-estimation data files. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/raw_line_plot.png" />
+</p>
+
+1. Click on `Browse File` next to `VIDEO PATH` and select the video file used to create the pose-estimation data (this is needed get and apply the correct fps and resolution of the output video).
+
+2. Click on `Browse File` next to `DATA PATH` and select the raw output pose-estimation data from the video file (e.g., a DLC-generated H5 or CSV file). 
+
+3. In the `BODY-PART` entry-box, enter the body-part (e.g., Nose) you which to represent the location of the animal in the path plot video. 
+
+4. In the `BACKGROUND COLOR` drop-down, select the color you which to represent the background in the path plot video. 
+
+5. In the `LINE COLOR` drop-down, select the color you which to represent the path of your animal in the path plot video (NOTE: make sure background and line colors are not identical). 
+
+6. In the `LINE THICKNESS` drop-down, select the thickness of the lines you which to represent the path of your animal in the path plot video.
+
+7. In the `CIRCLE SIZE` drop-down, select the size of the circle which represent the current location of the animal in the path plot video. 
+
+8. Click on `CREATE PATH PLOT VIDEO`. A new path plot video is created in the same directory as the input video with the `line_plot` file name suffix.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/ez_line_plot_gif.gif" />
+</p>
+
 
 ## Merge images to video
 
