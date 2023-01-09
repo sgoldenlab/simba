@@ -119,27 +119,61 @@ In this pop-up. Tick the checkboxes for which classified behaviors and ROIs you 
 
 Congrats! You have now used machine models to classify behaviors in new data. To visualize the machine predictions by rendering images and videos with the behavioral predictions overlaid, and plots describing on-going behaviors and bouts, proceed to [*Part 5*](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) of the current tutorial. 
 
-## Part 5:  Visualizing machine predictions
+## Part 5:  VISUALIZING RESULTS
 
-In this part of the tutorial we will create visualizations of features and machine learning classifications that you have generated. This includes images and videos of the animals with prediction overlays, gantt plots, line plots, paths plots, heat maps and data plot. In this step the different frames can also be merged into video mp4 format. Please note that the rendering of images and videos can take up a lot of hardrive space, especially if your videos are recorded at high frame rates, are long duration, or high resolution. One suggestion, if you are short on harddrive space, is to only generate frames for a few select videos (more information below). We are currently working on updating SimBA to give the user the oppurtunity to work with compressed videos rather than frames during the `visualization` steps.   
+In this part of the tutorial we will create visualizations of machine learning classifications and the features which you have generated. This includes images and videos of the animals with *prediction overlays, gantt plots, line plots, paths plots, heat maps and data plot etc.* These visualizations can help us understand the classifier(s), behaviors, and differences between experimental groups. 
 
-1. In the `Load Project` menu, click on the `Visualization` tab and you will see the following menu. 
+To access the visualization functions, click the `[Visualizations]` tab.
 
-![alt-text-1](https://github.com/sgoldenlab/simba/blob/master/images/Visualize_01.PNG "viz")
+### VISUALIZING CLASSIFICATIONS
 
-2. **Visualize predictions**. On the left of the `Visualization` menu, there is a sub-menu with the heading `Visualize classification results`. This button grabs the frames of the videos in the project, and draws circles at the location of the tracked body parts, the convex hull of the animal, and prints the behavioral predictions on top of the frame together with the classified time spent enganging in the behavior. If you would like to generate image frames over the predictions (one image for each frame in the videos), tick the `Generate frame` box. If you would like to generate a MP4 video, tick the `Generate video` box. If you would like to generate both frames and videos, tick both `Generate video` and `Generate frame` boxes
+On the left of the `Visualization` tab menu, there is a sub-menu with the heading `DATA VISUALIZATION` with a button named `VISUALIZE CLASSIFICATIONS`. Use this button to create videos with classification visualization overlays, similar to what is presented [HERE](https://youtu.be/lGzbS7OaVEg). Clicking this button brings up the below pop-up menu allowing customization of the videos and how they are created. We will go through each of the settings in the visualization options in turn:
 
->*Note I*: SimBA uses a "one-click-interface" unless explicitly stated. For example, if you click on `Visualize classification results` twice, the images will be generated twice. 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clf_viz_1.png" height="700"/>
+</p>
 
->*Note II*: The code will run through each CSV file in your `project_folder\csv\machine_results` directory, find a matching folder of frames in your `project_folder\frames\input` directory, and save new frames (or videos) in the `project_folder\frames\output\sklearn_results` directory, contained within a new folder named after the video file. If you would like to generate visualizations for only a select CSV file, remove the files you want to omit from visualizing from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. 
+* **BODY-PART VISUALIZATION THRESHOLD** (0.0-1.0): In this entry-box, enter the **minimum** pose-estimation detection probability threshold required for the body-part to be included in the visualization. For example, enter `0.0` for **all** body-part predictions to be included in teh visualization. Enter `1.0` for only body-parts detected with 100% certainty to be visualized. 
 
->*Note III*: If you do not want to create any further visualizations (e.g., gantt plots, path plots, data plots, or distance plots), you can stop at this point of the tutorial.
+* **STYLE SETTINGS**: By default, SimBA will **auto-compute** suitable visualization (i) font sizes, (ii) spacing between text rows, (iii) font thickness, and (iv) pose-estimation body-part location circles which depend on the resolution of your videos. If you do **not** want SimBA to auto-compute these attributes, go ahead and and **un-tick** the `Auto-compute font/key-point sizes checkbox, and fill in these values manually in each entry box. 
 
-3. **Generate gantt plots**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the first button named `Generate gantt plot` to create a gantt plot (a.k.a, horizontal bar chart or harmonogram) displaying the occurances, length, and frequencies of behavioural bouts of interest. These charts are similar to the ones generated by [popular propriatory software for behavioral analysis](https://www.noldus.com/the-observer-xt/data-analysis), and could look like this when created in SimBA: 
+* **VISUALIZATION SETTINGS**:
+  - **Create video**: Tick the `Create video` checkbox to generate `.mp4` videos with classification result overlays.
+  - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with classification result overlays (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked. 
+  - **Include timers overlay**: Tick the `Include timers overlay` checkbox to insert the cumulative time in seconds each classified behavior has occured in the top left corner of the video. 
+  - **Rotate video 90°**: Tick the `Rotate video 90°` checkbox to rotate the output video 90 degrees clockwise relative to the input video. 
+  - **Multiprocess videos (faster)**: Creating videos can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your visualizations. 
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/gantt_plot.gif" width="300" height="225" />
+* **RUN**:
 
->*Note*: The code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one gantt frame for each frame of the video and save these frames in the `project_folder\frames\output\gantt_plots` directory, contained within a new folder named after the video file. If you would like to generate gantt charts for only a select csv file, remove the files you want to omit from visualizing  gantt charts from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the gantt frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
+  - **SINGLE VIDEO**: To create classification visualizations for a single video, select the video in the `Video` drop-down menu and click the `Create single video` button. You can follow the progress in the main SimBA terminal. The results will be stored in the `project_folder/frames/output/sklearn_results` directory of your SimBA project.
+  - **MULTIPLE VIDEO**: To create classification visualizations for all videos in your project, click the `Create multiple videos` button. You can follow the progress in the main SimBA terminal. The results will be stored in the `project_folder/frames/output/sklearn_results` directory of your SimBA project.
+
+### VISUALIZING GANTT CHARTS 
+
+Clicking the `VUSIALIZE GANTT` button brings up a pop-up menu allowing us to customize gantt charts. Gantt charts are broken horizontal bar charts allowing us to insepct when and for how long each of our classified behaviors occur as in the gif below. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clf_viz_2.png" />
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/gantt_plot.gif" width="600" height="450" />
+</p>
+
+
+* **STYLE SETTINGS**: Use this menu to specify the resultion of the Gantt plot videos and/or frames. Use the `Font size` entry box to specify the size of the y- and x-axis label text sizes. Use the `Font rotation degree` entry-box to specify the rotation of the y-axis classifier names (set to `45` by default which is what is visualized in the gif above). 
+
+* **VISUALIZATION SETTINGS**:
+  - **Create video**: Tick the `Create video` checkbox to generate gantt plots `.mp4` videos.
+  - **Create frames**: Tick the `Create frames` checkbox to generate gantt plots `.png` files (NOTE: this will create one png file for each frame in each 
+  - **Multiprocess videos (faster)**: Creating gantt videos and/or images can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your gantt charts. 
+
+* **RUN**:
+  - **SINGLE VIDEO**: To create gantt chart visualizations for a single video, select the video in the `Video` drop-down menu and click the `Create single video` button. You can follow the progress in the main SimBA terminal. The results will be stored in the `project_folder/frames/output/sklearn_results` directory of your SimBA project.
+  - **MULTIPLE VIDEO**: To create gantt chart visualizations for all videos in your project, click the `Create multiple videos` button. You can follow the progress in the main SimBA terminal. The results will be stored in the `project_folder/frames/output/sklearn_results` directory of your SimBA project.
+
+>*Note*: If you'd like to create a  gif from the gantt frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tool. 
 
 4. **Generate data plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the second button named `Generate data plot` to create a frames that display the velocities, movements, and distances between the animals:
 
