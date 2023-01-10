@@ -207,6 +207,46 @@ On the left of the `Visualization` menu, a button named `VISUALIZE PROBABILITIES
 
 >*Note*: If you'd like to create a gif from the probability_plots frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tool. 
 
+### VISUALIZING PATH PLOTS
+
+SimBA can create path plots depicting the location of the animal(s), their paths, as well the locations of the classified behaviors. In the [Visualizations] tab, click the [VISUALIZE PATHS] button, which brings up the below pop-up menu. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clf_viz_4.png" height="700"/>
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/pathplot.gif" height="500"/>
+</p>
+
+* **STYLE SETTINGS**:
+  - **AUTO-COMPUTE STYLES**: By default, SimBA will **auto-compute** suitable visualization styles which depend on the resolution of your videos. If you do **not** want SimBA to auto-compute these attributes, go ahead and and **un-tick** the `Auto-compute styles` checkbox, and fill in these values manually in each entry box. 
+  - **MAX PRIOR LINES** (int): Number of milliseconds for which the movement path is diplayed. E.g., a value of `2000` will display the movement path for the most recent 2s. 
+  - **LINE WIDTH** (int): The width of the lines representing the movement path. E.g., `6`.
+  - **CIRCLE SIZE** (int): The size of the circle representing the animals current location. E.g., `20`.
+  - **FONT SIZE**: The size of the font text of the animals name. `E.g., 3`.
+  - **FONT THICKNESS**: The thickness (boldness) of the font text of the animals name. `E.g., 2`.
+  - **BACKGROUND COLOR**: The background color of the path plots. E.g., `White`.
+
+* **CHOOSE CLASSIFICATION VISUALIZATION**: Use this menu to specify if and how the location of classified events are printed on the path plots.
+  - **INCLUDE CLASSIFICATION LOCATIONS**: Check this box to include the location of classified events in the path plot.
+  
+  - You should see a row for each classifier, and three drop-down menues for each classifier. In the example screengrab above, I have two classifiers (Classifier 1: *Attack*, Classifier 2: Sniffing). In the second drop-down, select which **color** the circles depicting the location of the classified events should have. In the third dropdown, select the **size** the circles depicting the location of the classified events should have.
+
+  >Note: The classified event location will be inferred to be in the first animals body-part location
+
+* **CHOOSE BODY-PARTS**: Use this menu to specify which body-parts of the animals will represent their location.
+  - **# ANIMALS**: Use this drop-down to specify how many animals you want to visualize paths for.
+  
+  - You should see a row for each animal, and two drop-down menues per. In the example screengrab above, I have two animals. In the first drop-down, select the body-part which you want to represent the path. In the second drop-down, select which **color** the circles and lines depicting the location of the animal should have. 
+
+* **RUN**:
+  - **SINGLE VIDEO**: Use this menu to create a *single* path visualization video. The `Video` drop-down will contain all the videos in your `project_folder/machine_results` directory. Choose which video you want to create a path visualization for. Once choosen, click the `Create single video` button. You can follow the progress in the main SimBA terminal window. Once complete, a new video and/or frames will be saved in the `project_folder/frames/output/path_plots` directory. 
+  - **MULTIPLE VIDEO**: Use this menu to create a path visualization video for every video in your project. After clicking the `Create multiple videos` button. You can follow the progress in the main SimBA terminal window. Once complete, one new video and/or frames folder for every input video will be saved in the `project_folder/frames/output/path_plots` directory.
+
+
+
+
 4. **Generate data plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the second button named `Generate data plot` to create a frames that display the velocities, movements, and distances between the animals:
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/dataplot.gif" width="300" height="200" />
@@ -229,25 +269,6 @@ The data plots currently displays the below metrics if the data contains the tra
 
 >*Note*: The code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one data frame for each frame of the video and save it in the `project_folder\frames\output\live_data_table` directory, contained within a new folder named after the video file. If you would like to generate data plots for only a select csv file, remove the files you want to omitt from visualizing  gantt charts from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the data frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
 
-4. **Generate path plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the third menu named `Path plot` to generate graphs depicting the movement of the animals, the location of the animals, where the behaviors of interest occurs. The 'severity' and location of a behavior can also be visulized with a color-coded heat map. The output may look something like this:
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/pathplot.gif" width="199" height="322" />
-
-The generation of the path plots requires several user-defined parameters:
-
-- `Max Lines`: Integer specifying the max number of lines depicting the path of the animals. For example, if 100, the most recent 100 movements of animal 1 and animal 2 will be plotted as lines.
-
-- `Severity Scale`: Integer specifying the scale on which to classify 'severity'. For example, if set to 10, all frames containing attack behavior will be classified from 1 to 10 (see above). 
-
-- `Bodyparts`: String to specify the body parts tracked in the path plot. For example, if Nose_1 and Centroid_2, the nose of animal 1 and the centroid of animal 2 will be represented as the current location of the animals in the path plot.
-
-If you are using the recommended [16 body-part, 2 mice setting for pose estimation tracking](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) hover your computer mouse over the title of the entry box to see alternatives for `Bodyparts`.
-
-- `plot_severity`: Tick this box to include color-coded circles on the path plot that signify the location and severity of attack interactions.
-
-After specifying these values, click on `Generate Path plot`.
-
->*Note*: After clicking on `Generate Path plot`, the code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one path plot frame for each frame of the video and save it in the `project_folder\frames\output\path_plots` directory, contained within a new folder named after the video file. if you would like to generate path plots for only a select csv file, remove the files you want to omit from visualizing path plots for from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the path frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
 
 5. **Generate distance plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the fourth sub-menu titled `Distance plot` to create frames that display the distances between the animals, like in this example gif:
 
