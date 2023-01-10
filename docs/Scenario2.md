@@ -162,7 +162,7 @@ Clicking the `VUSIALIZE GANTT` button brings up a pop-up menu allowing us to cus
 </p>
 
 
-* **STYLE SETTINGS**: Use this menu to specify the resultion of the Gantt plot videos and/or frames. Use the `Font size` entry box to specify the size of the y- and x-axis label text sizes. Use the `Font rotation degree` entry-box to specify the rotation of the y-axis classifier names (set to `45` by default which is what is visualized in the gif above). 
+* **STYLE SETTINGS**: Use this menu to specify the resultion of the Gantt plot videos and/or frames. Furthermore, use the `Font size` entry box to specify the size of the y- and x-axis label text sizes. Use the `Font rotation degree` entry-box to specify the rotation of the y-axis classifier names (set to `45` by default which is what is visualized in the gif above). 
 
 * **VISUALIZATION SETTINGS**:
   - **Create video**: Tick the `Create video` checkbox to generate gantt plots `.mp4` videos.
@@ -174,6 +174,38 @@ Clicking the `VUSIALIZE GANTT` button brings up a pop-up menu allowing us to cus
   - **MULTIPLE VIDEO**: To create gantt chart visualizations for all videos in your project, click the `Create multiple videos` button. You can follow the progress in the main SimBA terminal. The results will be stored in the `project_folder/frames/output/sklearn_results` directory of your SimBA project.
 
 >*Note*: If you'd like to create a  gif from the gantt frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tool. 
+
+### VISUALIZING CLASSIFICATION PROBABILITIES
+
+SimBA can create line plots depicting the *classification probability* that a specific behavior is occuring in the current frame across the video.
+On the left of the `Visualization` menu, a button named `VISUALIZE PROBABILITIES`. Clicking this button brings up the below sub-menu allowing users to customize the videos and how they are created.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clf_viz_3.png" height="700"/>
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/prob_plot.gif" height="700"/>
+</p>
+
+* **STYLE SETTINGS**: Use this menu to specify the resultion of the probability plot videos and/or frames.
+  - **RESOLUTION**: Use this dropdown to select the resolution (size) of the output video and/or output frames.
+  - **LINE COLOR**: Use this dropdown to specify the color of the line in the charts.
+  - **FONT SIZE**: In this entry-box, enter the font size of the y- and x-axis labels and tick labels. (e.g., `10`)
+  - **LINE WIDTH**: In this entry-box, enter the thickness of the line in the chart (e.g., `6`).
+  - **CIRCLE SIZE**: In this entry-box, enter the size of the circle representing the current frame probability value (e.g., `20`)
+
+* **VISUALIZATION SETTINGS**:
+  - **CLASSIFIER**: Use this drop down menu to select the classifier you which to create the line plot for.
+  - **CREATE FRAMES**: Tick the `Create frames` checkbox to create probability plots `.png` files (NOTE: this will create one png file for each frame in each
+  - **CREATE VIDEOS**: Tick the `Create video` checkbox to create probability plots `.mp4` videos. 
+  - **Multiprocess videos (faster)**: Creating probability videos and/or images can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your probability charts. 
+
+* **RUN**:
+  - **SINGLE VIDEO**: To create probability chart visualizations for a single video, select the video in the `Video` drop-down menu and click the `Create single video` button. You can follow the progress in the main SimBA terminal. The results will be stored in the `project_folder/frames/output/probability_plots` directory of your SimBA project.
+  - **MULTIPLE VIDEO**: To create probability chart visualizations for all videos in your project, click the `Create multiple videos` button. You can follow the progress in the main SimBA terminal. The results will be stored in the `project_folder/frames/output/probability_plots` directory of your SimBA project.
+
+>*Note*: If you'd like to create a gif from the probability_plots frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tool. 
 
 4. **Generate data plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the second button named `Generate data plot` to create a frames that display the velocities, movements, and distances between the animals:
 
@@ -266,13 +298,6 @@ Once filled in, click on `Generate heatmap`:
 
 
 >*Note*: After clicking on `Generate heatmap`, the code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one heatmap frame for each frame of the video and save it in the `project_folder\frames\output\heatmap` directory, contained within a new folder named after the video file. if you would like to generate heatmaps for only a select csv file, remove the files you want to omitt from visualizing heatmap plots for from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the heatmap frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
-
-
-6. **Plot thresholds**. SimBA can generate line plots depicting the *probability* that a specific behavior is occuring in the current frame, that can be merged with the frames of real video. These plots look very similar to the *distance plots* described above, with the difference being that the probability for the presence of the behavior is now plotted on the y-axis, like this:
-
-![](/images/prob_plot.gif "createproject2")
-
->*Note*: After clicking on `Plot threshold`, the code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one probability plot frame for each frame of the video and save it in the `project_folder\frames\output\heatmap` directory, contained within a new folder named after the video file. If you would like to generate probability plots for only a select CSV file, remove the files you want to omitt from visualizing probability plots for from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the probability frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
 
 7. **Merge Frames**. If you have followed through all of **Part 5** of this tutorial, you should have generated several graphs of your machine classifications and extracted data (i.e., gantt plots, line plots, path plots, data plots, sklearn plots). These images are stored in different sub-directories in the `project_folder\frames\output` folder. Now you may want to merge all these frames into single videos video, to more readily observe the behavior of interest and its different expression in experimental groups, like in the following video example:   
 
