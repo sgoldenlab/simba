@@ -167,7 +167,7 @@ Clicking the `VUSIALIZE GANTT` button brings up a pop-up menu allowing us to cus
 * **VISUALIZATION SETTINGS**:
   - **Create video**: Tick the `Create video` checkbox to generate gantt plots `.mp4` videos.
   - **Create frames**: Tick the `Create frames` checkbox to generate gantt plots `.png` files (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
-  - **Create last frame**: Tick the `Create frames` checkbox to generate a gantt plots `.png` file representing the entire video.
+  - **Create last frame**: Tick the `Create last frame` checkbox to generate a gantt plots `.png` file representing the entire video.
   - **Multiprocess videos (faster)**: Creating gantt videos and/or images can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your gantt charts. 
 
 * **RUN**:
