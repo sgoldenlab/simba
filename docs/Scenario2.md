@@ -139,7 +139,7 @@ On the left of the `Visualization` tab menu, there is a sub-menu with the headin
 
 * **VISUALIZATION SETTINGS**:
   - **Create video**: Tick the `Create video` checkbox to generate `.mp4` videos with classification result overlays.
-  - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with classification result overlays (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked. 
+  - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with classification result overlays (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
   - **Include timers overlay**: Tick the `Include timers overlay` checkbox to insert the cumulative time in seconds each classified behavior has occured in the top left corner of the video. 
   - **Rotate video 90°**: Tick the `Rotate video 90°` checkbox to rotate the output video 90 degrees clockwise relative to the input video. 
   - **Multiprocess videos (faster)**: Creating videos can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your visualizations. 
@@ -166,7 +166,8 @@ Clicking the `VUSIALIZE GANTT` button brings up a pop-up menu allowing us to cus
 
 * **VISUALIZATION SETTINGS**:
   - **Create video**: Tick the `Create video` checkbox to generate gantt plots `.mp4` videos.
-  - **Create frames**: Tick the `Create frames` checkbox to generate gantt plots `.png` files (NOTE: this will create one png file for each frame in each 
+  - **Create frames**: Tick the `Create frames` checkbox to generate gantt plots `.png` files (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
+  - **Create last frame**: Tick the `Create frames` checkbox to generate a gantt plots `.png` file representing the entire video.
   - **Multiprocess videos (faster)**: Creating gantt videos and/or images can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your gantt charts. 
 
 * **RUN**:
@@ -197,7 +198,7 @@ On the left of the `Visualization` menu, a button named `VISUALIZE PROBABILITIES
 
 * **VISUALIZATION SETTINGS**:
   - **CLASSIFIER**: Use this drop down menu to select the classifier you which to create the line plot for.
-  - **CREATE FRAMES**: Tick the `Create frames` checkbox to create probability plots `.png` files (NOTE: this will create one png file for each frame in each
+  - **CREATE FRAMES**: Tick the `Create frames` checkbox to create probability plots `.png` files (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
   - **CREATE VIDEOS**: Tick the `Create video` checkbox to create probability plots `.mp4` videos. 
   - **Multiprocess videos (faster)**: Creating probability videos and/or images can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your probability charts. 
 
@@ -244,7 +245,39 @@ SimBA can create path plots depicting the location of the animal(s), their paths
   - **SINGLE VIDEO**: Use this menu to create a *single* path visualization video. The `Video` drop-down will contain all the videos in your `project_folder/machine_results` directory. Choose which video you want to create a path visualization for. Once choosen, click the `Create single video` button. You can follow the progress in the main SimBA terminal window. Once complete, a new video and/or frames will be saved in the `project_folder/frames/output/path_plots` directory. 
   - **MULTIPLE VIDEO**: Use this menu to create a path visualization video for every video in your project. After clicking the `Create multiple videos` button. You can follow the progress in the main SimBA terminal window. Once complete, one new video and/or frames folder for every input video will be saved in the `project_folder/frames/output/path_plots` directory.
 
+### VISUALIZING DISTANCE PLOTS
 
+SimBA can create distance plots depicting the distance between different body-parts and/or animals across the videos. In the [Visualizations] tab, click the [VISUALIZE DISTANCES] button, which brings up the below pop-up menu. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clf_viz_5.png" height="700"/>
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/distance_plot.gif" height="500"/>
+</p>
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/distance_plot_termites.gif" height="500"/>
+</p>
+
+
+* **STYLE SETTINGS**:
+  - **RESOLUTION**: Use the drop-down to set the size of the output video(s) and/or frames.
+  - **FONT SIZE** (int): The size of the text representing the y- and x-axis labels and graph title.
+  - **LINE WIDTH** (int): The width of the lines representing the animal body-part distances.
+
+* **CHOOSE DISTANCES**: 
+  - **# DISTANCES**: Use the drop-down to specify how many distances (lines) you want to display in the distance plot. E.g., the two gifs above 1 and 4 distances, respectively. 
+  - Once you have selected a number of lines, the table show be populated with as many rows as distances chosen, with **three** drop-down menus per row. Use the first two drop-down menus to select the two body-parts which distance in-between you want depicted in the output video and/or frames. Use the third right-most drop-down to select the color of that specific line.
+
+* **VISUALIXATION SETTINGS**: 
+  - **Create video**: Tick the `Create video` checkbox to generate `.mp4` videos with distance plots.
+  - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with distance plots (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
+
+* **RUN**:
+  - **SINGLE VIDEO**: Use this menu to create a *single* distance visualization video. The `Video` drop-down will contain all the videos in your `project_folder/machine_results` directory. Choose which video you want to create a distance visualization for. Once choosen, click the `Create single video` button. You can follow the progress in the main SimBA terminal window. Once complete, a new video and/or frames will be saved in the `project_folder/frames/output/line_plots` directory. 
+  - **MULTIPLE VIDEO**: Use this menu to create a distance visualization video for every video in your project. After clicking the `Create multiple videos` button. You can follow the progress in the main SimBA terminal window. Once complete, one new video and/or frames folder for every input video will be saved in the `project_folder/frames/output/line_plots` directory.
 
 
 4. **Generate data plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the second button named `Generate data plot` to create a frames that display the velocities, movements, and distances between the animals:
@@ -268,23 +301,6 @@ The data plots currently displays the below metrics if the data contains the tra
 
 
 >*Note*: The code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one data frame for each frame of the video and save it in the `project_folder\frames\output\live_data_table` directory, contained within a new folder named after the video file. If you would like to generate data plots for only a select csv file, remove the files you want to omitt from visualizing  gantt charts from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the data frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
-
-
-5. **Generate distance plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the fourth sub-menu titled `Distance plot` to create frames that display the distances between the animals, like in this example gif:
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/distance_plot.gif" width="300" height="225" />
-
-The generation of the distance plots requires two user-defined parameters:
-
-- `Body part 1`: String that specifies the the bodypart of animal 1 (e.g., Nose_1)
-
-- `Body part 2`: String that specifies the the bodypart of animal 1 (e.g., Nose_2)
-
-If you are using the recommended [16 body-part, 2 mice setting for pose estimation tracking](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) hover your computer mouse over the title of the entry box to see alternatives for `Body part 1` and `Body part 2`/.
-
-Click on `Generate Distance plot`, and the distance plot frames will be generated in the `project_folder/frames/output/line_plot` folder.
-
->*Note*: After clicking on `Generate Distance plot`, the code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one distance plot frame for each frame of the video and save it in the `project_folder\frames\output\line_plot` directory, contained within a new folder named after the video file. if you would like to generate path plots for only a select csv file, remove the files you want to omitt from visualizing distance plots for from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the distance frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
 
 
 6. **Generate heatmap**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the fifth sub-menu titled `Heatmap` to create frames displaying a heatmap and spatial information on where the classified behaviors occur according to user-defined scale. SimBA accepts six different palettes for heatmaps:
