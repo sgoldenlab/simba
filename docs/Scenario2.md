@@ -261,6 +261,11 @@ SimBA can create distance plots depicting the distance between different body-pa
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/distance_plot_termites.gif" height="500"/>
 </p>
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clf_viz_8.png" height="500"/>
+</p>
+
+
 
 * **STYLE SETTINGS**:
   - **RESOLUTION**: Use the drop-down to set the size of the output video(s) and/or frames.
@@ -274,6 +279,7 @@ SimBA can create distance plots depicting the distance between different body-pa
 * **VISUALIXATION SETTINGS**: 
   - **Create video**: Tick the `Create video` checkbox to generate `.mp4` videos with distance plots.
   - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with distance plots (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
+  - **Create last frame**: Create a single `.png` image representing the body-part distances at the end of each video (as in the bottom image above).
 
 * **RUN**:
   - **SINGLE VIDEO**: Use this menu to create a *single* distance visualization video. The `Video` drop-down will contain all the videos in your `project_folder/machine_results` directory. Choose which video you want to create a distance visualization for. Once choosen, click the `Create single video` button. You can follow the progress in the main SimBA terminal window. Once complete, a new video and/or frames will be saved in the `project_folder/frames/output/line_plots` directory. 
