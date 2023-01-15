@@ -49,9 +49,6 @@ from simba.features_scripts.feature_extractor_7bp import ExtractFeaturesFrom7bps
 from simba.features_scripts.feature_extractor_4bp import ExtractFeaturesFrom4bps
 from simba.features_scripts.feature_extractor_user_defined import UserDefinedFeatureExtractor
 from simba.drop_bp_cords import define_bp_drop_down, reverse_dlc_input_files, bodypartConfSchematic
-from simba.user_pose_config_creator import PoseConfigCreator
-from simba.probability_plot_creator import TresholdPlotCreatorSingleProcess
-from simba.probability_plot_creator_mp import TresholdPlotCreatorMultiprocess
 from simba.appendMars import append_dot_ANNOTT
 from simba.dlc_multi_animal_importer import MADLC_Importer
 from simba.BORIS_appender import BorisAppender

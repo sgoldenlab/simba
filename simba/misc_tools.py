@@ -773,7 +773,7 @@ def determine_chunksize_for_imap(data_df_len: int=None,
 
 def tabulate_clf_info(clf_path: str):
     """
-    Helper to print the hyperparameters and creation date of a pickled classifier.
+    Helper to print the hyper-parameters and creation date of a pickled classifier.
 
     Parameters
     ----------
@@ -1019,7 +1019,7 @@ class SimbaTimer(object):
 def concatenate_videos_in_folder(in_folder: str,
                                  save_path: str) -> None:
     """
-    Helper to temporally concatenate all video files in a folder into a
+    Helper to  concatenate (temporally) all video files in a folder into a
     single video.
 
     Parameters
@@ -1047,16 +1047,61 @@ def concatenate_videos_in_folder(in_folder: str,
             remove_a_folder(folder_dir=in_folder)
             break
 
-def find_all_videos_in_directory(directory: str):
+def find_all_videos_in_directory(directory: str,
+                                 video_formats: tuple = ('.avi', '.mp4', '.mov', '.flv', '.m4v')):
+    """
+    Helper to return list of all video file paths in a directory
+
+    Parameters
+    ----------
+    directory: str
+        Directory to search.
+    video_formats: tuple
+        Allowed video formats.
+
+    Parameters
+    ----------
+    video_lst: list
+    """
+
+
     video_lst = []
     for i in os.listdir(directory):
-        if i.lower().endswith(('.avi','.mp4','.mov','flv','m4v')):
+        if i.lower().endswith(video_formats):
             video_lst.append(i)
         if not video_lst:
             video_lst.append('No videos found')
             print('SIMBA WARNING: Cannot visualize sklearn classification results, no imported videos found in project_folder/videos directory')
 
     return video_lst
+
+
+def get_file_name_info_in_directory(directory: str,
+                                    file_type: str):
+    """
+    Helper to return dict of all file path with extension as values as basenames as keys.
+    E.g., ['Video_1:, 'C:\project_folder\csv\machine_results\Video_1, ...]
+
+    Parameters
+    ----------
+    directory: str
+        Directory to search.
+    video_formats: tuple
+        Allowed video formats.
+
+    Parameters
+    ----------
+    video_lst: list
+    """
+
+
+    results = {}
+    file_paths = glob.glob(directory + "/*." + file_type)
+    for file_path in file_paths:
+        _, file_name, ext = get_fn_ext(file_path)
+        results[file_name] = file_path
+
+    return results
 
 
 

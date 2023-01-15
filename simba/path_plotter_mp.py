@@ -237,7 +237,7 @@ class PathPlotterMulticore(object):
                 print('Path plot video {} complete (elapsed time: {}s) ...'.format(self.video_name,video_timer.elapsed_time_str))
 
         self.timer.stop_timer()
-        print('SIMBA COMPLETE: Path plot visualizations for {} videos created in project_folder/frames/output/heatmap_classifier locations directory (elapsed time: {}s)'.format(str(len(self.files_found)), self.timer.elapsed_time_str))
+        print('SIMBA COMPLETE: Path plot visualizations for {} videos created in project_folder/frames/output/path_plots directory (elapsed time: {}s)'.format(str(len(self.files_found)), self.timer.elapsed_time_str))
 
     @staticmethod
     @jit(nopython=True)

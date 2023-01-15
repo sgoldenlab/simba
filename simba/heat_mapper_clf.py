@@ -1,10 +1,13 @@
 __author__ = "Simon Nilsson", "JJ Choong"
 
 import pandas as pd
-from simba.read_config_unit_tests import (read_config_entry, read_config_file)
-from simba.features_scripts.unit_tests import read_video_info_csv, read_video_info
+from simba.read_config_unit_tests import (read_config_entry,
+                                          read_config_file)
+from simba.features_scripts.unit_tests import (read_video_info_csv,
+                                               read_video_info)
 from simba.misc_tools import (get_fn_ext,
                               SimbaTimer)
+from simba.misc_visualizations import make_heatmap_plot
 from simba.rw_dfs import read_df
 import numpy as np
 import os
@@ -146,54 +149,6 @@ class HeatMapperClfSingleCore(object):
                               clf_array: np.array):
         return np.round(np.max(np.max(clf_array[-1], axis=0)), 3)
 
-
-    def __single_heatmap_frm(self,
-                             data_arr: np.array,
-                             max_scale: float,
-                             palette: str,
-                             aspect_ratio: float,
-                             file_name: str,
-                             shading: str,
-                             clf_name: str):
-
-        frm_data = data_arr[data_arr.shape[0]-1, :, :]
-        cum_df = pd.DataFrame(frm_data).reset_index()
-        cum_df = cum_df.melt(id_vars='index', value_vars=None, var_name=None, value_name='seconds',
-                             col_level=None).rename(columns={'index': 'vertical_idx', 'variable': 'horizontal_idx'})
-        cum_df['color'] = (cum_df['seconds'].astype(float) / float(max_scale)).round(2).clip(upper=100)
-        color_array = np.zeros((len(cum_df['vertical_idx'].unique()), len(cum_df['horizontal_idx'].unique())))
-        for i in range(color_array.shape[0]):
-            for j in range(color_array.shape[1]):
-                value = cum_df["color"][(cum_df["horizontal_idx"] == j) & (cum_df["vertical_idx"] == i)].values[0]
-                color_array[i, j] = value
-
-        fig = plt.figure()
-        im_ratio = color_array.shape[0] / color_array.shape[1]
-        plt.pcolormesh(color_array, shading=shading, cmap=palette, rasterized=True, alpha=1, vmin=0.0, vmax=float(max_scale))
-        plt.gca().invert_yaxis()
-        plt.xticks([])
-        plt.yticks([])
-        plt.axis('off')
-        plt.tick_params(axis='both', which='both', length=0)
-        cb = plt.colorbar(pad=0.0, fraction=0.023 * im_ratio)
-        cb.ax.tick_params(size=0)
-        cb.outline.set_visible(False)
-        cb.set_label('{} (seconds)'.format(clf_name), rotation=270, labelpad=10)
-        plt.tight_layout()
-        plt.gca().set_aspect(aspect_ratio)
-        canvas = FigureCanvas(fig)
-        canvas.draw()
-        mat = np.array(canvas.renderer._renderer)
-        image = cv2.cvtColor(mat, cv2.COLOR_RGB2BGR)
-        image = cv2.resize(image, (self.width, self.height))
-        image = np.uint8(image)
-        plt.close()
-        cv2.imwrite(file_name, image)
-        print('Final heatmap saved at {}...'.format(file_name))
-
-
-
-
     def create_heatmaps(self):
         '''
         Creates heatmap charts. Results are stored in the `project_folder/frames/heatmaps_classifier_locations`
@@ -232,13 +187,14 @@ class HeatMapperClfSingleCore(object):
                 self.max_scale = self.__calculate_max_scale(clf_array=clf_array)
 
             if self.final_img_setting:
-                self.__single_heatmap_frm(data_arr=clf_array,
-                                          max_scale=self.max_scale,
-                                          palette=self.palette,
-                                          aspect_ratio=aspect_ratio,
-                                          file_name=os.path.join(self.save_dir, self.video_name + '_final_frm.png'),
-                                          shading=self.shading,
-                                          clf_name=self.clf_name)
+                make_heatmap_plot(data_arr=clf_array,
+                                  max_scale=self.max_scale,
+                                  palette=self.palette,
+                                  aspect_ratio=aspect_ratio,
+                                  file_name=os.path.join(self.save_dir, self.video_name + '_final_frm.png'),
+                                  shading=self.shading,
+                                  clf_name=self.clf_name,
+                                  img_size=(self.width, self.height))
 
             if self.video_setting or self.frame_setting:
                 for frm_cnt, cumulative_frm_idx in enumerate(range(clf_array.shape[0])):

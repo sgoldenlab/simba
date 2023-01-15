@@ -4,6 +4,7 @@ import io
 import PIL
 import cv2
 import pandas as pd
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from simba.misc_tools import (get_color_dict,
                               get_named_colors,
@@ -50,7 +51,7 @@ def make_distance_plot(data: np.array,
     for j in range(data.shape[1]):
         color = (colors[line_attr[j][-1]][::-1])
         color = tuple(x / 255 for x in color)
-        plt.plot(data[:, j], color=color, linewidth=style_attr['line width'], alpha=0.5)
+        plt.plot(data[:, j], color=color, linewidth=style_attr['line width'], alpha=style_attr['opacity'])
 
     timer = SimbaTimer()
     timer.start_timer()
@@ -82,7 +83,7 @@ def make_probability_plot(data: pd.Series,
                           fps,
                           save_path: str):
     """
-    Helper to make a single classifier probability plot .png image.
+    Helper to make a single classifier probability plot png image.
 
     Parameters
     ----------
@@ -146,7 +147,7 @@ def make_probability_plot(data: pd.Series,
 
 
 def make_path_plot(data_df: pd.DataFrame,
-                   video_info: dict,
+                   video_info: pd.DataFrame,
                    style_attr: dict,
                    deque_dict: dict,
                    clf_attr: dict,
@@ -238,6 +239,55 @@ def make_gantt_plot(data_df: pd.DataFrame,
         print('SIMBA COMPLETE: Final gantt frame for video {} saved at {} (elapsed time: {}s) ...'.format(video_name, save_path, video_timer.elapsed_time_str))
 
 
+def make_heatmap_plot(data_arr: np.array,
+                      max_scale: float,
+                      palette: str,
+                      aspect_ratio: float,
+                      file_name: str,
+                      shading: str,
+                      clf_name: str,
+                      img_size: tuple):
+
+    timer = SimbaTimer()
+    timer.start_timer()
+    frm_data = data_arr[data_arr.shape[0]-1, :, :]
+    cum_df = pd.DataFrame(frm_data).reset_index()
+    cum_df = cum_df.melt(id_vars='index', value_vars=None, var_name=None, value_name='seconds',
+                         col_level=None).rename(columns={'index': 'vertical_idx', 'variable': 'horizontal_idx'})
+    cum_df['color'] = (cum_df['seconds'].astype(float) / float(max_scale)).round(2).clip(upper=100)
+    color_array = np.zeros((len(cum_df['vertical_idx'].unique()), len(cum_df['horizontal_idx'].unique())))
+    for i in range(color_array.shape[0]):
+        for j in range(color_array.shape[1]):
+            value = cum_df["color"][(cum_df["horizontal_idx"] == j) & (cum_df["vertical_idx"] == i)].values[0]
+            color_array[i, j] = value
+    fig = plt.figure()
+    im_ratio = color_array.shape[0] / color_array.shape[1]
+    plt.pcolormesh(color_array, shading=shading, cmap=palette, rasterized=True, alpha=1, vmin=0.0, vmax=float(max_scale))
+    plt.gca().invert_yaxis()
+    plt.xticks([])
+    plt.yticks([])
+    plt.axis('off')
+    plt.tick_params(axis='both', which='both', length=0)
+    cb = plt.colorbar(pad=0.0, fraction=0.023 * im_ratio)
+    cb.ax.tick_params(size=0)
+    cb.outline.set_visible(False)
+    cb.set_label('{} (seconds)'.format(clf_name), rotation=270, labelpad=10)
+    plt.tight_layout()
+    plt.gca().set_aspect(aspect_ratio)
+    canvas = FigureCanvas(fig)
+    canvas.draw()
+    mat = np.array(canvas.renderer._renderer)
+    image = cv2.cvtColor(mat, cv2.COLOR_RGB2BGR)
+    image = cv2.resize(image, img_size)
+    image = np.uint8(image)
+    plt.close()
+    cv2.imwrite(file_name, image)
+    timer.stop_timer()
+    print('SIMBA COMPLETE: Final heatmap image saved at at {} (elapsed time: {}s)...'.format(file_name, timer.elapsed_time_str))
+
+
+
+
 
 
 
@@ -249,9 +299,9 @@ def make_gantt_plot(data_df: pd.DataFrame,
 #               'circle size': 5,
 #               'bg color': 'White',
 #               'max lines': 100}
-animal_attr = {0: ['Ear_right_1', 'Red']}
-clf_attr = {0: ['Attack', 'Black', 'Size: 30'], 1: ['Sniffing', 'Red', 'Size: 30']}
-
+# animal_attr = {0: ['Ear_right_1', 'Red']}
+# clf_attr = {0: ['Attack', 'Black', 'Size: 30'], 1: ['Sniffing', 'Red', 'Size: 30']}
+#
 
 
 

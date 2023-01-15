@@ -117,7 +117,7 @@ class DistancePlotterSingleCore(object):
                     for j in range(distance_arr.shape[1]):
                         color = (self.colors_dict[self.line_attr[j][-1]][::-1])
                         color = tuple(x / 255 for x in color)
-                        plt.plot(distance_arr[0:i, j], color=color, linewidth=self.style_attr['line width'], alpha=0.5)
+                        plt.plot(distance_arr[0:i, j], color=color, linewidth=self.style_attr['line width'], alpha=self.style_attr['opacity'])
 
                     x_ticks_locs = x_lbls = np.round(np.linspace(0, i, 5))
                     x_lbls = np.round((x_lbls / self.fps), 1)

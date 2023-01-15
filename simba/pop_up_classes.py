@@ -23,11 +23,11 @@ from simba.misc_tools import (check_multi_animal_status,
                               convert_parquet_to_csv,
                               convert_csv_to_parquet,
                               tabulate_clf_info,
-                              find_video_of_file,
                               get_color_dict,
                               find_core_cnt,
                               find_all_videos_in_directory,
-                              get_named_colors)
+                              get_named_colors,
+                              get_file_name_info_in_directory)
 
 from simba.drop_bp_cords import getBpNames, create_body_part_dictionary, get_fn_ext
 from simba.ROI_feature_visualizer import ROIfeatureVisualizer
@@ -80,34 +80,13 @@ from simba.sklearn_plot_scripts.plot_clf_results_mp import PlotSklearnResultsMul
 from simba.path_plotter import PathPlotterSingleCore
 from simba.path_plotter_mp import PathPlotterMulticore
 from simba.distance_plotter import DistancePlotterSingleCore
+from simba.distance_plotter_mp import DistancePlotterMultiCore
 from simba.heat_mapper_clf import HeatMapperClfSingleCore
 from simba.heat_mapper_clf_mp import HeatMapperClfMultiprocess
 
 from collections import defaultdict
 from PIL import Image, ImageTk
 import os, glob
-
-
-def find_all_videos_in_directory(directory: str):
-    video_lst = []
-    for i in os.listdir(directory):
-        if i.lower().endswith(('.avi','.mp4','.mov','flv','m4v')):
-            video_lst.append(i)
-        if not video_lst:
-            video_lst.append('No videos found')
-            print('SIMBA WARNING: Cannot visualize sklearn classification results, no imported videos found in project_folder/videos directory')
-
-    return video_lst
-
-def get_file_name_info_in_directory(directory: str, file_type: str):
-    results = {}
-    file_paths = glob.glob(directory + "/*." + file_type)
-    for file_path in file_paths:
-        _, file_name, ext = get_fn_ext(file_path)
-        results[file_name] = file_path
-
-    return results
-
 
 
 class HeatmapLocationPopup(object):
@@ -1670,7 +1649,8 @@ class CreateUserDefinedPoseConfigurationPopUp(object):
         self.selected_animal_cnt, self.selected_bp_cnt = int(self.animal_cnt_entry_box.entry_get), int(self.no_body_parts_entry_box.entry_get)
         check_int(name='number of animals', value=self.selected_animal_cnt)
         check_int(name='number of body-parts', value=self.selected_bp_cnt)
-        self.bpnamelist = self.bp_animal_list = [0]*self.selected_bp_cnt*self.selected_animal_cnt
+        self.bp_name_list = []
+        self.bp_animal_list = []
 
         if self.selected_animal_cnt > 1:
             self.table_frame = LabelFrame(self.main_frm, text='Bodypart name                       Animal ID number')
@@ -1681,13 +1661,31 @@ class CreateUserDefinedPoseConfigurationPopUp(object):
         scroll_table = hxtScrollbar(self.table_frame)
 
         for i in range(self.selected_bp_cnt * self.selected_animal_cnt):
-            self.bpnamelist[i] = Entry_Box(scroll_table,str(i+1),'2')
-            self.bpnamelist[i].grid(row=i, column=0)
+            bp_name_entry = Entry_Box(scroll_table, str(i+1), '2')
+            bp_name_entry.grid(row=i, column=0)
+            self.bp_name_list.append(bp_name_entry)
             if self.selected_animal_cnt > 1:
-                self.bp_animal_list[i] = Entry_Box(scroll_table, '', '2', validation='numeric')
-                self.bp_animal_list[i].grid(row=i, column=1)
+                animal_id_entry = Entry_Box(scroll_table, '', '2', validation='numeric')
+                animal_id_entry.grid(row=i, column=1)
+                self.bp_animal_list.append(animal_id_entry)
         self.save_btn.config(state='normal')
 
+    def validate_unique_entries(self,
+                                body_part_names: list,
+                                animal_ids: list):
+        if len(animal_ids) > 0:
+            user_entries = []
+            for (bp_name, animal_id) in zip(body_part_names, animal_ids):
+                user_entries.append('{}_{}'.format(bp_name, animal_id))
+        else:
+            user_entries = body_part_names
+        duplicates = list(set([x for x in user_entries if user_entries.count(x) > 1]))
+        if duplicates:
+            print(duplicates)
+            print('SIMBA ERROR: SimBA found duplicate body-part names (see above). Please enter unique body-part (and animal ID) names.')
+            raise ValueError('SIMBA ERROR: SimBA found duplicate body-part names.')
+        else:
+            pass
 
     def save_pose_config(self):
 
@@ -1695,11 +1693,13 @@ class CreateUserDefinedPoseConfigurationPopUp(object):
         image_path = self.img_path_file_select.file_path
         check_file_exist_and_readable(image_path)
         bp_lst, animal_id_lst = [], []
-        for entry in zip(self.bpnamelist, self.bp_animal_list):
-            bp_lst.append(entry[0].entry_get)
-            if int(self.selected_animal_cnt) > 1:
-                check_int(name='Animal ID number', value=entry[1].entry_get)
-                animal_id_lst.append(entry[1].entry_get)
+        for bp_name_entry in self.bp_name_list:
+            bp_lst.append(bp_name_entry.entry_get)
+        for animal_id_entry in  self.bp_animal_list:
+            check_int(name='Animal ID number', value=animal_id_entry.entry_get)
+            animal_id_lst.append(animal_id_entry.entry_get)
+
+        self.validate_unique_entries(body_part_names=bp_lst, animal_ids=animal_id_lst)
 
         pose_config_creator = PoseConfigCreator(pose_name=config_name,
                                                 no_animals=int(self.selected_animal_cnt),
@@ -2412,6 +2412,7 @@ class DistancePlotterPopUp(object):
         self.bp_names_x, _, _ = getBpNames(inifile=self.config_path)
         self.bp_names = [x[:-2] for x in self.bp_names_x]
         self.colors = get_color_dict()
+        self.core_cnt, _ = find_core_cnt()
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
         check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()),
                                         error_msg='SIMBA ERROR: Zero files found in the project_folder/csv/outlier_corrected_movement_location directory. ')
@@ -2423,9 +2424,11 @@ class DistancePlotterPopUp(object):
         self.resolution_dropdown = DropDownMenu(self.style_settings_frm, 'Resolution:', self.resolutions_options, '16')
         self.font_size_entry = Entry_Box(self.style_settings_frm, 'Font size: ', '16', validation='numeric')
         self.line_width = Entry_Box(self.style_settings_frm, 'Line width: ', '16', validation='numeric')
+        self.opacity_dropdown = DropDownMenu(self.style_settings_frm, 'Line opacity:', list(np.round(np.arange(0.0, 1.1, 0.1), 1)), '16')
         self.resolution_dropdown.setChoices(self.resolutions_options[0])
         self.font_size_entry.entry_set(val=8)
         self.line_width.entry_set(val=6)
+        self.opacity_dropdown.setChoices(0.5)
 
         self.distances_frm = LabelFrame(self.main_frm, text='CHOOSE DISTANCES', font=("Helvetica", 14, 'bold'), pady=5, padx=5)
         self.number_of_distances_dropdown = DropDownMenu(self.distances_frm, '# Distances:', self.number_of_distances, '16', com=self.__populate_distances_menu)
@@ -2436,9 +2439,13 @@ class DistancePlotterPopUp(object):
         self.distance_frames_var = BooleanVar()
         self.distance_videos_var = BooleanVar()
         self.distance_final_img_var = BooleanVar()
+        self.multiprocess_var = BooleanVar()
         distance_frames_cb = Checkbutton(self.settings_frm, text='Create frames', variable=self.distance_frames_var)
         distance_videos_cb = Checkbutton(self.settings_frm, text='Create videos', variable=self.distance_videos_var)
         distance_final_img_cb = Checkbutton(self.settings_frm, text='Create last frame', variable=self.distance_final_img_var)
+        self.multiprocess_cb = Checkbutton(self.settings_frm, text='Multiprocess (faster)', variable=self.multiprocess_var)
+        self.multiprocess_dropdown = DropDownMenu(self.settings_frm, 'Cores:', list(range(2, self.core_cnt)), '12')
+        self.multiprocess_dropdown.setChoices(choice=2)
 
 
         self.run_frm = LabelFrame(self.main_frm, text='RUN', font=("Helvetica", 14, 'bold'), pady=5, padx=5, fg='black')
@@ -2454,6 +2461,7 @@ class DistancePlotterPopUp(object):
         self.resolution_dropdown.grid(row=0, sticky=NW)
         self.font_size_entry.grid(row=1, sticky=NW)
         self.line_width.grid(row=2, sticky=NW)
+        self.opacity_dropdown.grid(row=3, sticky=NW)
 
         self.distances_frm.grid(row=1, sticky=NW)
         self.number_of_distances_dropdown.grid(row=0, sticky=NW)
@@ -2462,6 +2470,8 @@ class DistancePlotterPopUp(object):
         distance_frames_cb.grid(row=0, sticky=NW)
         distance_videos_cb.grid(row=1, sticky=NW)
         distance_final_img_cb.grid(row=2, sticky=NW)
+        self.multiprocess_cb.grid(row=3, column=0, sticky=NW)
+        self.multiprocess_dropdown.grid(row=3, column=1, sticky=NW)
 
         self.run_frm.grid(row=3, sticky=NW)
         self.run_single_video_frm.grid(row=0, sticky=NW)
@@ -2505,7 +2515,6 @@ class DistancePlotterPopUp(object):
             for key, value in attr.items():
                 line_attr[key].append(value.getChoices())
 
-
         width = int(self.resolution_dropdown.getChoices().split('×')[0])
         height = int(self.resolution_dropdown.getChoices().split('×')[1])
         check_int(name='DISTANCE FONT SIZE', value=self.font_size_entry.entry_get, min_value=1)
@@ -2513,15 +2522,25 @@ class DistancePlotterPopUp(object):
         style_attr = {'width': width,
                       'height': height,
                       'line width': int(self.line_width.entry_get),
-                      'font size': int(self.font_size_entry.entry_get)}
-
-        distance_plotter = DistancePlotterSingleCore(config_path=self.config_path,
-                                                     frame_setting=self.distance_frames_var.get(),
-                                                     video_setting=self.distance_videos_var.get(),
-                                                     final_img=self.distance_final_img_var.get(),
-                                                     style_attr=style_attr,
-                                                     files_found=data_paths,
-                                                     line_attr=line_attr)
+                      'font size': int(self.font_size_entry.entry_get),
+                      'opacity': float(self.opacity_dropdown.getChoices())}
+        if not self.multiprocess_var.get():
+            distance_plotter = DistancePlotterSingleCore(config_path=self.config_path,
+                                                         frame_setting=self.distance_frames_var.get(),
+                                                         video_setting=self.distance_videos_var.get(),
+                                                         final_img=self.distance_final_img_var.get(),
+                                                         style_attr=style_attr,
+                                                         files_found=data_paths,
+                                                         line_attr=line_attr)
+        else:
+            distance_plotter = DistancePlotterMultiCore(config_path=self.config_path,
+                                                        frame_setting=self.distance_frames_var.get(),
+                                                        video_setting=self.distance_videos_var.get(),
+                                                        final_img=self.distance_final_img_var.get(),
+                                                        style_attr=style_attr,
+                                                        files_found=data_paths,
+                                                        line_attr=line_attr,
+                                                        core_cnt=int(self.multiprocess_dropdown.getChoices()))
 
         distance_plotter.create_distance_plot()
 
@@ -2677,7 +2696,7 @@ class HeatmapClfPopUp(object):
             heatmapper_clf.create_heatmaps()
 
 
-
+#_ = CreateUserDefinedPoseConfigurationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 
 # _ = SklearnVisualizationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # _ = GanttPlotPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
