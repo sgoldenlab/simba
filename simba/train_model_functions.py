@@ -30,6 +30,7 @@ from sklearn.utils import parallel_backend
 import pickle
 from dtreeviz.trees import tree, dtreeviz
 import matplotlib.pyplot as plt
+from matplotlib import cm as cmap
 import time
 plt.switch_backend('agg')
 
@@ -551,6 +552,7 @@ def create_x_importance_bar_chart(rf_clf: RandomForestClassifier,
     else:
         save_file_path = os.path.join(save_dir, clf_name + '_feature_importance_bar_graph.png')
     plt.savefig(save_file_path, dpi=600)
+    print(save_file_path)
     plt.close('all')
 
 def dviz_classification_visualization(x_train: np.array,
@@ -876,57 +878,3 @@ def read_pickle(file_path: str) -> object:
         print('SIMBA ERROR: Can not read {} as a classifier file (pickle).'.format(os.path.basename(file_path)))
         raise pickle.UnpicklingError('SIMBA ERROR: Can not read user-specified classifier file as pickled file.')
     return clf
-
-# df = pd.read_csv('/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/csv/targets_inserted/Together_1.csv', index_col=0)
-# df = df.drop('Sniffing', axis=1)
-# df = drop_bp_cords(df=df, config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini')
-# clf = pickle.load(open('/Users/simon/Desktop/troubleshooting/train_model_project/models/generated_models/Attack.sav', 'rb'))
-# _ = calc_learning_curve(x_y_df=df,
-#                         clf_name='Attack',
-#                         shuffle_splits=3,
-#                         dataset_splits=5,
-#                         rf_clf=clf,
-#                         tt_size=0.2,
-#                         save_dir='/Users/simon/Desktop/troubleshooting/train_model_project/models/generated_models/model_evaluations')
-
-# # #
-# def calc_learning_curve(x_y_df: pd.DataFrame,
-#                   clf_name: str,
-#                   shuffle_splits: int,
-#                   dataset_splits: int,
-#                   tt_size: float,
-#                   rf_clf: RandomForestClassifier,
-#                   save_dir: str,
-#                   save_file_no=None):
-#     """
-#     Helper to compute random forest learning curves with cross-validation.
-#
-#     Parameters
-#     ----------
-#     x_y_df: pd.DataFrame
-#         Pandas dataframe holding features and targets.
-#     clf_name: str,
-#         Name of the classifier
-#     shuffle_splits: int
-#         Number of cross-validation datasets at each data split.
-#     dataset_splits: int
-#         Number of data splits.
-#     tt_size: float
-#         dataset test size.
-#     rf_clf: RandomForestClassifier
-#         sklearn RandomForestClassifier object.
-#     save_dir: str,
-#         Directory where to save output in csv file format.
-#     save_file_no: int or None.
-#         If integer, represents the count of the classifier within a grid search. If none, the classifier is not
-#         part of a grid search.
-#
-#     Returns
-#     -------
-#     None
-#
-#     """
-
-# import glob
-# file_paths = glob.glob('/Users/simon/Desktop/test_clf' + '/*.csv')
-# data = read_all_files_in_folder(file_paths=file_paths, file_type='csv', classifier_names=['Clf'])

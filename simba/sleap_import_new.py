@@ -66,7 +66,6 @@ class ImportSLEAP(object):
                  interpolation_settings: str,
                  smoothing_settings: dict):
 
-
         self.ini_path = project_path
         self.interpolation_settings = interpolation_settings
         self.smoothing_settings = smoothing_settings
@@ -97,8 +96,7 @@ class ImportSLEAP(object):
         multi_animal_status, multi_animal_id_lst = check_multi_animal_status(self.config, self.animals_no)
         Xcols, Ycols, Pcols = getBpNames(self.ini_path)
         color_lst = createColorListofList(self.animals_no, len(self.analysis_dict['ordered_bps']))
-        self.animal_bp_dict = create_body_part_dictionary(multi_animal_status, multi_animal_id_lst, self.animals_no,
-                                                          Xcols, Ycols, [], color_lst)
+        self.animal_bp_dict = create_body_part_dictionary(multi_animal_status, multi_animal_id_lst, self.animals_no, Xcols, Ycols, [], color_lst)
 
         for file_path in self.save_paths_lst:
             self.data_df = read_df(file_path, self.file_format)
@@ -151,7 +149,6 @@ class ImportSLEAP(object):
         self.data_df = pd.concat([self.data_df, missing_df], axis=0)
 
     def __save_multi_index_header_df(self, df=None, filetype=None, savepath=None):
-        self.save_paths_lst = []
         if filetype == 'csv':
             df.to_csv(savepath)
         if filetype == 'parquet':
@@ -183,6 +180,7 @@ class ImportSLEAP(object):
 
         """
         self.analysis_dict = defaultdict(list)
+        self.save_paths_lst = []
         for vdn_cnt, file_path in enumerate(self.files_found):
             print('Analysing {}{}'.format(os.path.basename(file_path), '...'))
             self.file_path = file_path
@@ -234,12 +232,11 @@ class ImportSLEAP(object):
         for frame_cnt, frame in enumerate(range(self.analysis_dict['no_frames'])):
             frame_idx = self.analysis_dict['frames'][frame_cnt][2]
             self.frame_dict = {}
-            print('Frame: {}/{}, Video: {} ({}/{})'.format(str(frame_cnt), str(self.analysis_dict['no_frames']), str(self.video_name), str(self.video_counter + 1), str(len(self.files_found))))
+            print('Restructuring SLEAP frame: {}/{}, Video: {} ({}/{})'.format(str(frame_cnt), str(self.analysis_dict['no_frames']), str(self.video_name), str(self.video_counter + 1), str(len(self.files_found))))
             self.cnt_animals_frm = self.analysis_dict['animals_in_each_frame'][frame]
             if self.cnt_animals_frm == 0:
                 self.frame_dict[0] = [0] * len(self.analysis_dict['xyp_headers'])
                 end_frame = start_frame + (len(self.analysis_dict['ordered_bps']) * self.cnt_animals_frm)
-
 
             else:
                 end_frame = start_frame + (len(self.analysis_dict['ordered_bps']) * self.cnt_animals_frm)
@@ -466,6 +463,18 @@ class ImportSLEAP(object):
 # test.perform_smothing()
 # print('All SLEAP imports complete.')
 #
-#
+
+# test = ImportSLEAP(project_path="/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/project_folder/project_config.ini",
+#                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/data',
+#                    actor_IDs=['Simon', 'Nastacia', 'JJ', 'Sam', 'Liana'],
+#                    interpolation_settings="Body-parts: Nearest",
+#                    smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}}) #Savitzky Golay
+# test.initate_import_slp()
+# if test.animals_no > 1:
+#     test.visualize_sleap()
+# test.save_df()
+# test.perform_interpolation()
+# test.perform_smothing()
+# print('All SLEAP imports complete.')
 
 
