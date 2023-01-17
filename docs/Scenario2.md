@@ -317,27 +317,36 @@ SimBA can create heatmap videos and/or images representing the location of class
   - **MULTIPLE VIDEO**: Use this menu to create a heatmap visualization for every video in your project. After clicking the `Create multiple videos` button. You can follow the progress in the main SimBA terminal window. Once complete, one new video and/or frames folder for every input video will be saved in the `project_folder/frames/output/heatmaps_classifier_locations` directory.
 
 
-4. **Generate data plot**. In the `Visualization` menu, and the sub-menu `Visualizations`, use the second button named `Generate data plot` to create a frames that display the velocities, movements, and distances between the animals:
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/dataplot.gif" width="300" height="200" />
+### VISUALIZING DATA TABLES
 
-The data plots currently displays the below metrics if the data contains the tracking for 2 animals. These metrics can, currently, **not** be defined by the user.
-  * Distance between the noses of the two animals
-  * Distance between the centroids of the two animals
-  * Current velocity of Animal 1
-  * Current velocity of Animal 2
-  * Mean velocity of Animal 1
-  * Mean velocity of Animal 2
-  * Total distance moved for Animal 1
-  * Total distance moved for Animal 2
- 
- If the data contains the tracking of 1 animal, the data plots currently displays the below metrics.
-   * Current velocity of the Animal
-   * Mean velocity of Animal
-   * Total distance moved for the Animal
+In the `Visualization` sub-menu, use the second button named `VISUALIZE DATA PLOTS` to create a frames that display the velocities and movements of animals:
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/data_table_ex1.gif" height="500"/>
+</p>
 
->*Note*: The code will run through each csv file in your `project_folder\csv\machine_results` directory, and generate one data frame for each frame of the video and save it in the `project_folder\frames\output\live_data_table` directory, contained within a new folder named after the video file. If you would like to generate data plots for only a select csv file, remove the files you want to omitt from visualizing  gantt charts from the `project_folder\csv\machine_results` directory. For example, you can manually create a temporary `project_folder\csv\machine_results\temp` directory and place the files you do **not** want to visualize in this temporary folder. If you'd like to create a video or gif from the data frames, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [`Merge images to video`](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video) or [Generate gifs](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs) tools. 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/data_table_ex2.gif" height="500"/>
+</p>
+
+* **STYLE SETTINGS**:
+  - **RESOLUTION**: The size of the output video and/or frames in pixels.
+  - **DECIMAL ACCURACY**: The number of floating points in the values displayed.
+  - **BACKGROUND COLOR**: The background color of the data tables.
+  - **HEADER COLOR**: The colors of the headers in the data table.
+  - **FONT THICKNESS**: The thickness of the font in teh the table.
+
+* **CHOOSE BODY-PARTS**: 
+
+* **VISUALIXATION SETTINGS**: 
+  - **Create video**: Tick the `Create video` checkbox to generate `.mp4` videos data plots.
+  - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with data plots (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
+
+* **RUN**:
+  - **SINGLE VIDEO**: Use this menu to create a *single* data table visualization. The `Video` drop-down will contain all the videos in your `project_folder/machine_results` directory. Choose which video you want to create a distance visualization for. Once choosen, click the `Create single video` button. You can follow the progress in the main SimBA terminal window. Once complete, a new video and/or frames will be saved in the `project_folder/frames/output/live_data_table` directory. 
+  - **MULTIPLE VIDEO**: Use this menu to create a data table visualization for every video in your project. After clicking the `Create multiple videos` button. You can follow the progress in the main SimBA terminal window. Once complete, one new video and/or frames folder for every input video will be saved in the `project_folder/frames/output/live_data_table` directory.
+
 
 7. **Merge Frames**. If you have followed through all of **Part 5** of this tutorial, you should have generated several graphs of your machine classifications and extracted data (i.e., gantt plots, line plots, path plots, data plots, sklearn plots). These images are stored in different sub-directories in the `project_folder\frames\output` folder. Now you may want to merge all these frames into single videos video, to more readily observe the behavior of interest and its different expression in experimental groups, like in the following video example:   
 
