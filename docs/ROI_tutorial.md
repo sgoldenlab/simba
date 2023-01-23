@@ -179,10 +179,12 @@ You can now generate visualizations of the ROI data for each of the videos in yo
 Clicking on this button brings up the below menu: 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_viz_012023.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_viz_012023_2.png" />
 </p>
 
 The first sub-menu is called **SETTINGS**. In the *Body-part probability threshold* entry-box, fill in the minimum pose-estimation confidence required for a body-part to be plotted (a value between 0.0 and 1.0). E.g., set this value to `0.0` to plot all body-parts in all frames. Alternatively, set this value to `1.0` to plot only the body-parts that your pose-estimation tool is most condident about. 
+
+There are two checkboxes that are auto-ticked when opening the menu: (i) `Show pose-estimated location`, and (ii) `Show animal names`. To remove the "circles" representing the location of the body-parts in the video, untick the the `Show pose-estimated location` check-box. To remove the names of the animals in the video, untick the the `Show animal names` check-box. 
 
 Next, there is a `Multi-process (faster)` check-box. If you are on a computer with a high CPU count, you may want to take advantage of several or all of to cores to generate your videos in parallel. This way you could make hefty saves on run-time. To take advantage of many or all cores, check the `Multi-process (faster)` check-box and choose how many cores you want to use in the `CPU cores drop-down` menu. 
 
