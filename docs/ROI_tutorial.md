@@ -172,13 +172,25 @@ To proceed and generate machine learning classifiers that use these features, co
 
 # Part 4. Visualizing ROI data
 
-You can now generate visualizations of the ROI data for each of the videos in your project. To generate the visualizations, click on `Visualize ROI tracking` in the `Visualize ROI` submenu of the **ROI** tab. This will generate visualizations of the ROI and tracking data, like in these gifs:
+You can now generate visualizations of the ROI data for each of the videos in your project. To generate the visualizations, click on `Visualize ROI tracking` in the `Visualize ROI` submenu of the **ROI** tab. You can use this tool to generate visualizations of the ROI and tracking data, like in these gifs:
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_visualization_1.gif" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_OF.gif" width="425"/>
 
-Clicking on `Visualize ROI tracking` will generate visualizations for all of the files located in the `project_folder/csv/features_extracted` folder. The visualization process will use the body-parts specified in `Analyze ROI data` step described in [Part 2 above](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data). 
+Clicking on this button brings up the below menu: 
 
-The visualization process will generate **one** output video for every input video. For example, if you are generating visualizations for Video1, then the output mp4 video will be located in the following path: `project_folder/frames/output/ROI_analysis/Video1.mp4`.
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_viz_012023.png" />
+</p>
+
+The first sub-menu is called **SETTINGS**. In the *Body-part probability threshold* entry-box, fill in the minimum pose-estimation confidence required for a body-part to be plotted (a value between 0.0 and 1.0). E.g., set this value to `0.0` to plot all body-parts in all frames. Alternatively, set this value to `1.0` to plot only the body-parts that your pose-estimation tool is most condident about. 
+
+Next, there is a `Multi-process (faster)` check-box. If you are on a computer with a high CPU count, you may want to take advantage of several or all of to cores to generate your videos in parallel. This way you could make hefty saves on run-time. To take advantage of many or all cores, check the `Multi-process (faster)` check-box and choose how many cores you want to use in the `CPU cores drop-down` menu. 
+
+To create a single ROI visualization video, click the **Create SINGLE ROI Video** button. Select which video you want to create in the *select Video* drop-down menu*. 
+
+To create many ROI visualization videos, click the **Create ALL ROI Videos** button.
+
+You can follow the progress in the main SimBA terminal. The ROI videos are saved in the `project_folder/frames/output/ROI_analysis` directory. 
 
 # Part 5. Miscellaneous ROI tools
 
