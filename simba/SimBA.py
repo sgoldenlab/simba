@@ -86,9 +86,12 @@ from simba.roi_tools.ROI_reset import *
 from simba.misc_tools import (check_multi_animal_status,
                               smooth_data_gaussian,
                               smooth_data_savitzky_golay,
-                              archive_processed_files)
+                              archive_processed_files,
+                              copy_single_video_to_project,
+                              copy_multiple_videos_to_project)
 from simba.video_processing import (video_to_greyscale,
                                     superimpose_frame_count)
+from simba.sleap_importer import SLEAPImporterH5
 from simba.setting_menu import SettingsMenu
 from simba.pop_up_classes import (HeatmapLocationPopup,
                                   QuickLineplotPopup,
@@ -135,7 +138,8 @@ from simba.pop_up_classes import (HeatmapLocationPopup,
                                   VisualizeClassificationProbabilityPopUp,
                                   PathPlotPopUp,
                                   DistancePlotterPopUp,
-                                  HeatmapClfPopUp)
+                                  HeatmapClfPopUp,
+                                  DataPlotterPopUp)
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.labelling_interface import select_labelling_video
 from simba.labelling_advanced_interface import select_labelling_video_advanced
@@ -404,7 +408,7 @@ class project_config:
 
         #import all csv file into project folder
         self.label_import_csv = LabelFrame(tab3,text='Import Tracking Data',fg='black',font=("Helvetica",12,'bold'),pady=5,padx=5)
-        self.filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)','SLP (SLEAP)', 'CSV (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'12',com=self.fileselected)
+        self.filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)','SLP (SLEAP)', 'CSV (SLEAP)', 'H5 (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'12',com=self.fileselected)
         self.filetype.setChoices('CSV (DLC/DeepPoseKit)')
         self.frame = Frame(self.label_import_csv)
 
@@ -667,7 +671,7 @@ class project_config:
             self.file_json.grid(row=0, sticky=W)
             button_importsinglejson.grid(row=1, sticky=W)
 
-        elif self.filetype.getChoices() in ('H5 (multi-animal DLC)', 'SLP (SLEAP)', 'CSV (SLEAP)', 'TRK (multi-animal APT)'):
+        elif self.filetype.getChoices() in ('H5 (multi-animal DLC)', 'SLP (SLEAP)', 'CSV (SLEAP)', 'H5 (SLEAP)', 'TRK (multi-animal APT)'):
             animalsettings = LabelFrame(self.frame,text='Animal settings',pady=5,padx=5)
             noofanimals = Entry_Box(animalsettings,'No of animals','15')
             animalnamebutton = Button(animalsettings,text='Confirm',command=lambda:self.animalnames(noofanimals.entry_get,animalsettings))
@@ -691,12 +695,15 @@ class project_config:
                 labelinstruction = Label(self.frame, text='Please import videos before importing the multi animal trk tracking data')
                 runsettings = Button(self.frame, text='Import .trk', command=self.importh5)
 
+            elif self.filetype.getChoices() == 'H5 (SLEAP)':
+                self.h5path = FolderSelect(self.frame, 'Path to H5 files', lblwidth=15)
+                labelinstruction = Label(self.frame, text='Please import videos before importing the multi animal SLEAP H5 tracking data')
+                runsettings = Button(self.frame, text='Import .H5', command=self.importh5)
+
             elif self.filetype.getChoices() == 'CSV (SLEAP)':
                 self.h5path = FolderSelect(self.frame, 'Path to CSV files', lblwidth=15)
-                labelinstruction = Label(self.frame, text='Please import videos before importing the multi animal trk tracking data')
-                runsettings = Button(self.frame, text='Import .csv', command=self.importh5)
-
-
+                labelinstruction = Label(self.frame, text='Please import videos before importing the multi animal SLEAP CSV tracking data')
+                runsettings = Button(self.frame, text='Import .CSV', command=self.importh5)
 
             #organize
             self.frame.grid(row=1,sticky=W)
@@ -771,7 +778,15 @@ class project_config:
                                                   interpolation_settings=self.interpolation.getChoices(),
                                                   smoothing_settings=smooth_settings_dict)
             sleap_csv_importer.initate_import_slp()
-            print('SIMBA COMPLETE: Sleap CSV files imported to project_folder/csv/input_csv directory.')
+            print('SIMBA COMPLETE: Sleap H5 files imported to project_folder/csv/input_csv directory.')
+
+        if self.filetype.getChoices() == 'H5 (SLEAP)':
+            sleap_csv_importer = SLEAPImporterH5(config_path=self.configinifile,
+                                                  data_folder=self.h5path.folder_path,
+                                                  actor_IDs=idlist,
+                                                  interpolation_settings=self.interpolation.getChoices(),
+                                                  smoothing_settings=smooth_settings_dict)
+            sleap_csv_importer.import_sleap()
 
     def animalnames(self,noofanimal,master):
         try:
@@ -925,13 +940,13 @@ class project_config:
 
     def import_multivid(self):
         try:
-            copy_multivideo_ini(self.configinifile, self.multivideofolderpath.folder_path, self.video_type.entry_get)
+            copy_multiple_videos_to_project(self.configinifile, self.multivideofolderpath.folder_path, self.video_type.entry_get)
         except:
             print('Please select a folder containing the videos and enter the correct video format to proceed')
 
     def import_singlevid(self):
 
-        copy_singlevideo_ini(self.configinifile, self.singlevideopath.file_path)
+        copy_single_video_to_project(self.configinifile, self.singlevideopath.file_path)
 
     def addBox(self, noTargetStr):
         try:
@@ -1130,7 +1145,7 @@ class loadprojectini:
 
         #import all csv file into project folder
         self.label_import_csv = LabelFrame(label_import, text='IMPORT FURTHER TRACKING DATA', font=("Helvetica",12,'bold'), pady=5, padx=5,fg='black')
-        filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)', 'SLP (SLEAP)', 'CSV (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'15',com=self.fileselected)
+        filetype = DropDownMenu(self.label_import_csv,'File type',['CSV (DLC/DeepPoseKit)','JSON (BENTO)','H5 (multi-animal DLC)', 'SLP (SLEAP)', 'CSV (SLEAP)', 'H5 (SLEAP)', 'TRK (multi-animal APT)', 'MAT (DANNCE 3D)'],'15',com=self.fileselected)
         filetype.setChoices('CSV (DLC/DeepPoseKit)')
         self.frame = Frame(self.label_import_csv)
 
@@ -1412,27 +1427,9 @@ class loadprojectini:
         heatmap_clf_visualization_btn = Button(visualization_frm, text='VISUALIZE CLASSIFICATION HEATMAPS', fg='pink', command=lambda: HeatmapClfPopUp(config_path=self.projectconfigini))
         heatmap_clf_visualization_btn.grid(row=5, column=0, sticky=NW)
 
+        data_plot_visualization_btn = Button(visualization_frm, text='VISUALIZE DATA PLOTS', fg='purple',command=lambda: DataPlotterPopUp(config_path=self.projectconfigini))
+        data_plot_visualization_btn.grid(row=6, column=0, sticky=NW)
 
-        label_plotall = LabelFrame(tab10, text='DATA VISUALIZATIONS', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
-        #dataplot
-        label_dataplot = LabelFrame(label_plotall, text='Data plot', pady=5, padx=5)
-        if pose_config_setting == 'user_defined':
-            self.SelectedBp = DropDownMenu(label_dataplot, 'Select body part', bp_set, '15')
-            self.SelectedBp.setChoices((bp_set)[0])
-        button_dataplot = Button(label_dataplot, text='Generate data plot', command=self.plotdataplot)
-
-        #Heatplot
-        label_heatmap = LabelFrame(label_plotall, text='Heatmap', pady=5, padx=5)
-        self.BinSize = Entry_Box(label_heatmap, 'Bin size (mm)', '15', validation='numeric')
-        self.MaxScale = Entry_Box(label_heatmap, 'Max scale (s)', '15')
-
-        hmchoices = {'viridis','plasma','inferno','magma','jet','gnuplot2'}
-        self.hmMenu = DropDownMenu(label_heatmap,'Color Palette',hmchoices,'15')
-        self.hmMenu.setChoices('jet')
-
-        #get target called on top
-        self.targetMenu = DropDownMenu(label_heatmap,'Classifier', targetlist,'15')
-        self.targetMenu.setChoices(targetlist[(config.get('SML settings','target_name_'+str(1)))])
 
         #Merge frames
         merge_frm = LabelFrame(tab10, text='MERGE FRAMES', pady=5, padx=5, font=("Helvetica", 12, 'bold'), fg='black')
@@ -1602,13 +1599,6 @@ class loadprojectini:
 
         #SKLEARN VISUALIZATION
         visualization_frm.grid(row=11,column=0,sticky=W+N,padx=5)
-
-        label_plotall.grid(row=11, column=1, sticky=W + N, padx=5)
-        #data
-        label_dataplot.grid(row=1,sticky=W)
-        if pose_config_setting == 'user_defined':
-            self.SelectedBp.grid(row=1, sticky=W)
-        button_dataplot.grid(row=2, sticky=W)
 
 
         merge_frm.grid(row=11,column=2,sticky=W+N,padx=5)
@@ -2076,7 +2066,7 @@ class loadprojectini:
             self.file_csv.grid(row=0, sticky=W)
             button_importsinglejson.grid(row=1, sticky=W)
 
-        elif val in ('SLP (SLEAP)','H5 (multi-animal DLC)', 'TRK (multi-animal APT)', 'CSV (SLEAP)'):
+        elif val in ('SLP (SLEAP)','H5 (multi-animal DLC)', 'TRK (multi-animal APT)', 'CSV (SLEAP)', 'H5 (SLEAP)'):
             animalsettings = LabelFrame(self.frame, text='Animal settings', pady=5, padx=5)
             noofanimals = Entry_Box(animalsettings, 'No of animals', '15')
             noofanimals.entry_set(animal_cnt)
@@ -2110,6 +2100,11 @@ class loadprojectini:
                 self.h5path = FolderSelect(self.frame, 'Path to CSV files', lblwidth=15)
                 labelinstruction = Label(self.frame, text='Please import videos before importing the sleap csv tracking data')
                 runsettings = Button(self.frame, text='Import .csv', command=self.importh5)
+
+            elif val == 'H5 (SLEAP)':
+                self.h5path = FolderSelect(self.frame, 'Path to H5 files', lblwidth=15)
+                labelinstruction = Label(self.frame, text='Please import videos before importing the sleap h5 tracking data')
+                runsettings = Button(self.frame, text='Import .H5', command=self.importh5)
 
             # organize
             self.frame.grid(row=1, sticky=W)
@@ -2167,12 +2162,14 @@ class loadprojectini:
             sleap_importer = ImportSLEAP(self.projectconfigini, self.h5path.folder_path, idlist,
                                              self.interpolation.getChoices(), smooth_settings_dict)
             sleap_importer.initate_import_slp()
+
             if sleap_importer.animals_no > 1:
                 sleap_importer.visualize_sleap()
             sleap_importer.save_df()
             sleap_importer.perform_interpolation()
             sleap_importer.perform_smothing()
             print('All SLEAP imports complete.')
+
         if self.val == 'TRK (multi-animal APT)':
             import_trk(self.projectconfigini,self.h5path.folder_path, idlist, self.interpolation.getChoices(), smooth_settings_dict)
 
@@ -2184,6 +2181,14 @@ class loadprojectini:
                                                   smoothing_settings=smooth_settings_dict)
             sleap_csv_importer.initate_import_slp()
             print('SIMBA COMPLETE: Sleap CSV files imported to project_folder/csv/input_csv directory.')
+
+        if self.val == 'H5 (SLEAP)':
+            sleap_csv_importer = SLEAPImporterH5(config_path=self.projectconfigini,
+                                                  data_folder=self.h5path.folder_path,
+                                                  actor_IDs=idlist,
+                                                  interpolation_settings=self.interpolation.getChoices(),
+                                                  smoothing_settings=smooth_settings_dict)
+            sleap_csv_importer.import_sleap()
 
 
     def animalnames(self, noofanimal, master):
@@ -2289,11 +2294,6 @@ class loadprojectini:
         atexit.register(terminate_children, subprocess_children)
 
 
-    def plotdataplot(self):
-        data_plotter = DataPlotter(config_path=self.projectconfigini)
-        data_plotter.process_movement()
-        data_plotter_multiprocessor = multiprocessing.Process(data_plotter.create_data_plots())
-        data_plotter_multiprocessor.start()
 
     def analyzseverity(self):
         analyze_process_severity(self.projectconfigini,self.severityscale.entry_get,self.severityTarget.getChoices())
@@ -2369,13 +2369,13 @@ class loadprojectini:
 
     def importvideo_single(self):
         if (self.projectconfigini != 'No file selected') and (self.singlevideopath.file_path != 'No file selected'):
-            copy_singlevideo_ini(self.projectconfigini, self.singlevideopath.file_path)
+            copy_single_video_to_project(self.projectconfigini, self.singlevideopath.file_path)
         else:
             print('Failed to import video, please select a video to import')
 
     def importvideo_multi(self):
         if (self.projectconfigini != 'No file selected') and (self.multivideofolderpath.folder_path != 'No folder selected') and (self.video_type.entry_get != ''):
-            copy_multivideo_ini(self.projectconfigini, self.multivideofolderpath.folder_path,self.video_type.entry_get)
+            copy_multiple_videos_to_project(self.projectconfigini, self.multivideofolderpath.folder_path,self.video_type.entry_get)
         else:
             print('Fail to import videos, please select folder with videos and enter the file format')
 

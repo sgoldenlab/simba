@@ -23,7 +23,8 @@ from simba.shap_agg_stats_visualizer import ShapAggregateStatisticsVisualizer
 from simba.read_config_unit_tests import (check_int, check_str,
                                           check_float,
                                           read_config_entry)
-from simba.misc_tools import SimbaTimer
+from simba.misc_tools import (create_single_color_lst,
+                              SimbaTimer)
 import configparser
 import platform
 from sklearn.utils import parallel_backend
@@ -544,15 +545,16 @@ def create_x_importance_bar_chart(rf_clf: RandomForestClassifier,
     create_x_importance_log(rf_clf, x_names, clf_name, save_dir)
     importances_df = pd.read_csv(os.path.join(save_dir, clf_name + '_feature_importance_log.csv'))
     importances_head = importances_df.head(n_bars)
-    ax = importances_head.plot.bar(x='FEATURE', y='FEATURE_IMPORTANCE', legend=False, rot=90, fontsize=6)
-    plt.ylabel("Feature importances' (mean decrease impurity)")
+    colors = create_single_color_lst(pallete_name='hot',increments=n_bars, as_rgb_ratio=True)
+    colors = [x[::-1] for x in colors]
+    ax = importances_head.plot.bar(x='FEATURE', y='FEATURE_IMPORTANCE', legend=False, rot=90, fontsize=6, color=colors)
+    plt.ylabel("Feature importances' (mean decrease impurity)", fontsize=6)
     plt.tight_layout()
     if save_file_no != None:
         save_file_path = os.path.join(save_dir, clf_name + '_' + str(save_file_no) + '_feature_importance_bar_graph.png')
     else:
         save_file_path = os.path.join(save_dir, clf_name + '_feature_importance_bar_graph.png')
     plt.savefig(save_file_path, dpi=600)
-    print(save_file_path)
     plt.close('all')
 
 def dviz_classification_visualization(x_train: np.array,

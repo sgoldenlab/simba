@@ -37,7 +37,9 @@ class MovementProcessor(object):
     """
 
     def __init__(self,
-                 config_path: str):
+                 config_path: str,
+                 visualization: bool = False,
+                 files: list=None):
 
         self.timer = SimbaTimer()
         self.timer.start_timer()
@@ -58,18 +60,30 @@ class MovementProcessor(object):
         self.multiAnimalStatus, self.multiAnimalIDList = check_multi_animal_status(self.config, self.animal_cnt)
         self.bp_dict = defaultdict(list)
         self.bp_columns = []
-        for cnt, animal in enumerate(self.multiAnimalIDList):
-            bp_name = read_config_entry(self.config, 'process movements', 'animal_{}_bp'.format(cnt+1), 'str')
-            if bp_name == 'None':
-                print('SIMBA ERROR: No body-parts found in config [process movements][animal_N_bp]')
-                raise ValueError
-            for c in ['_x', '_y', '_p']:
-                self.bp_dict[animal].append(bp_name + c)
-                self.bp_columns.append(bp_name + c)
-        self.files_found = glob.glob(self.in_dir + '/*.' + self.file_type)
-        check_if_filepath_list_is_empty(filepaths=self.files_found,
-                                        error_msg='SIMBA ERROR: Cannot process movement. ZERO data files found in the {} directory.'.format(self.files_found))
+        if not visualization:
+            for cnt, animal in enumerate(self.multiAnimalIDList):
+                bp_name = read_config_entry(self.config, 'process movements', 'animal_{}_bp'.format(cnt+1), 'str')
+                if bp_name == 'None':
+                    print('SIMBA ERROR: No body-parts found in config [process movements][animal_N_bp]')
+                    raise ValueError
+                for c in ['_x', '_y', '_p']:
+                    self.bp_dict[animal].append(bp_name + c)
+                    self.bp_columns.append(bp_name + c)
+            self.files_found = glob.glob(self.in_dir + '/*.' + self.file_type)
+            check_if_filepath_list_is_empty(filepaths=self.files_found,
+                                            error_msg='SIMBA ERROR: Cannot process movement. ZERO data files found in the {} directory.'.format(self.files_found))
+        else:
+            for cnt in range(self.animal_cnt):
+                bp_name = read_config_entry(self.config, 'process movements', 'animal_{}_bp'.format(cnt+1), 'str')
+                if bp_name == 'None':
+                    print('SIMBA ERROR: No body-parts found in config [process movements][animal_N_bp]')
+                    raise ValueError
+                for c in ['_x', '_y', '_p']:
+                    self.bp_dict[self.multiAnimalIDList[cnt]].append(bp_name + c)
+                    self.bp_columns.append(bp_name + c)
+            self.files_found = files
         print('Processing {} video(s)...'.format(str(len(self.files_found))))
+
 
     def __euclidean_distance(self, bp_1_x_vals, bp_2_x_vals, bp_1_y_vals, bp_2_y_vals, px_per_mm):
         series = (np.sqrt((bp_1_x_vals - bp_2_x_vals) ** 2 + (bp_1_y_vals - bp_2_y_vals) ** 2)) / px_per_mm

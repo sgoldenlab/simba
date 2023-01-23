@@ -321,7 +321,7 @@ def find_video_of_file(video_dir: str,
             return_path = file_path
 
     if return_path is None:
-        print('SIMBA WARNING: SimBA could not find a video file resenting {} in the project video directory'.format(str(filename)))
+        print('SIMBA WARNING: SimBA could not find a video file representing {} in the project video directory'.format(str(filename)))
     return return_path
 
 
@@ -673,7 +673,8 @@ def read_config_file(ini_path: str):
     return config
 
 def create_single_color_lst(pallete_name: str,
-                            increments: int):
+                            increments: int,
+                            as_rgb_ratio: bool=False):
     """
     Helper to create a color palette of bgr colors in a list.
     Parameters
@@ -693,7 +694,8 @@ def create_single_color_lst(pallete_name: str,
     color_lst = []
     for i in range(cmap.N):
         rgb = list((cmap(i)[:3]))
-        rgb = [i * 255 for i in rgb]
+        if not as_rgb_ratio:
+            rgb = [i * 255 for i in rgb]
         rgb.reverse()
         color_lst.append(rgb)
     return color_lst
@@ -702,14 +704,14 @@ def detect_bouts(data_df: pd.DataFrame,
                  target_lst: list,
                  fps: int):
     """
-    Helper to detect all behavior bouts for a list of classifiers
+    Helper to detect all behavior bouts for a list of classifiers, or e.g., bouts of being within ROIs.
 
     Parameters
     ----------
     data_df: pd.DataFrame
         Pandas Dataframe with classifier prediction data.
     target_lst: list
-        List of classifier names. E.g., ['Attack', 'Sniffing', 'Grooming']
+        Classifier names. E.g., ['Attack', 'Sniffing', 'Grooming'] or ROIs
     fps: int
         The fps of the input video.
 
@@ -1017,7 +1019,8 @@ class SimbaTimer(object):
 
 
 def concatenate_videos_in_folder(in_folder: str,
-                                 save_path: str) -> None:
+                                 save_path: str,
+                                 video_format: str='mp4') -> None:
     """
     Helper to  concatenate (temporally) all video files in a folder into a
     single video.
@@ -1030,7 +1033,7 @@ def concatenate_videos_in_folder(in_folder: str,
         Path to the saved the output file.
     """
 
-    files = glob.glob(in_folder + '/*.mp4')
+    files = glob.glob(in_folder + '/*.{}'.format(video_format))
     check_if_filepath_list_is_empty(filepaths=files,
                                     error_msg='SIMBA ERROR: Cannot join videos in {}. The directory contain ZERO files.'.format(in_folder))
     files.sort(key=lambda f: int(re.sub('\D', '', f)))
@@ -1071,9 +1074,93 @@ def find_all_videos_in_directory(directory: str,
             video_lst.append(i)
         if not video_lst:
             video_lst.append('No videos found')
-            print('SIMBA WARNING: Cannot visualize sklearn classification results, no imported videos found in project_folder/videos directory')
+            print('SIMBA WARNING: No videos found in directory ({})'.format(directory))
 
     return video_lst
+
+
+
+
+
+def copy_single_video_to_project(simba_ini_path: str,
+                                 source_path: str,
+                                 allowed_video_formats: tuple = ('avi', 'mp4')) -> None:
+
+    """ Helper to import single video file to SimBA project
+    Parameters
+    ----------
+    simba_ini_path: str
+        path to SimBA project config file in Configparser format
+    source_path: str
+        Path to video file.
+    allowed_video_formats: tuple
+        Allowed video formats. DEFAULT: avi or mp4
+    """
+
+    timer = SimbaTimer()
+    timer.start_timer()
+    _, file_name, file_ext = get_fn_ext(source_path)
+    print('Copying video {} file...'.format(file_name))
+    if file_ext[1:].lower().strip() not in allowed_video_formats:
+        print('SIMBA ERROR: SimBA works best with avi and mp4 videofiles. Or please convert your videos to mp4 or avi to continue before importing it. ')
+        raise ValueError()
+    new_filename = os.path.join(file_name + file_ext)
+    destination = os.path.join(os.path.dirname(simba_ini_path), 'videos', new_filename)
+    if os.path.isfile(destination):
+        print('SIMBA ERROR: {} already exist in SimBA project. To import, delete this video file before importing the new video file with the same name.'.format(file_name))
+        raise FileExistsError()
+    else:
+        timer.stop_timer()
+        shutil.copy(source_path, destination)
+        print('SIMBA COMPLETE: Video {} imported to SimBA project (project_folder/videos directory, elapsed time: {}s).'.format(file_name, timer.elapsed_time_str))
+
+
+def copy_multiple_videos_to_project(config_path: str,
+                                    source: str,
+                                    file_type: str,
+                                    allowed_video_formats: tuple = ('avi', 'mp4')) -> None:
+    """ Helper to import directory of videos to SimBA project
+
+    Parameters
+    ----------
+    config_path: str
+        path to SimBA project config file in Configparser format
+    source_path: str
+        Path to video file directory
+    file_type: str
+        Video format of imported videos (i.e.,.: mp4 or avi)
+    allowed_video_formats: tuple
+        Allowed video formats. DEFAULT: avi or mp4
+
+    """
+
+    if file_type.lower().strip() not in allowed_video_formats:
+        print('SIMBA ERROR: SimBA only works with avi and mp4 videofiles (Please enter mp4 or avi in entrybox). Or please convert your videos to mp4 or avi to continue. ')
+        raise ValueError()
+    video_path_lst = find_all_videos_in_directory(directory=source, video_formats=(file_type))
+    video_path_lst = [os.path.join(source, x) for x in video_path_lst]
+    if len(video_path_lst) == 0:
+        print('SIMBA ERROR: No videos found in {} directory'.format(source))
+        raise ValueError()
+
+    destination_dir = os.path.join(os.path.dirname(config_path), 'videos')
+    for file_cnt, file_path in enumerate(video_path_lst):
+        timer = SimbaTimer()
+        timer.start_timer()
+        dir_name, filebasename, file_extension = get_fn_ext(file_path)
+        file_extension = file_extension.lower()
+        newFileName = os.path.join(filebasename + file_extension)
+        dest1 = os.path.join(destination_dir, newFileName)
+        if os.path.isfile(dest1):
+            print('SIMBA WARNING: {} already exist in SimBA project. Skipping video...'.format(filebasename))
+        else:
+            shutil.copy(file_path, dest1)
+            timer.stop_timer()
+            print('{} copied to project (Video {}/{}, elapsed timer {}s)...'.format(filebasename, str(file_cnt + 1),
+                                                                                    str(len(video_path_lst)),
+                                                                                    timer.elapsed_time_str))
+    print('SIMBA COMPLETE: {} videos copied to project.'.format(str(len(video_path_lst))))
+
 
 
 def get_file_name_info_in_directory(directory: str,

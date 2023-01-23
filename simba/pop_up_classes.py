@@ -49,6 +49,7 @@ from simba.gantt_creator_mp import GanttCreatorMultiprocess
 from simba.gantt_creator import GanttCreatorSingleProcess
 from simba.probability_plot_creator import TresholdPlotCreatorSingleProcess
 from simba.probability_plot_creator_mp import TresholdPlotCreatorMultiprocess
+from simba.ROI_plotter_mp import ROIPlotMultiprocess
 from simba.remove_keypoints_in_pose import KeypointRemover
 from simba.plot_pose_in_dir import create_video_from_dir
 from simba.extract_seqframes import extract_seq_frames
@@ -83,6 +84,7 @@ from simba.distance_plotter import DistancePlotterSingleCore
 from simba.distance_plotter_mp import DistancePlotterMultiCore
 from simba.heat_mapper_clf import HeatMapperClfSingleCore
 from simba.heat_mapper_clf_mp import HeatMapperClfMultiprocess
+from simba.data_plotter import DataPlotter
 
 from collections import defaultdict
 from PIL import Image, ImageTk
@@ -1114,7 +1116,7 @@ class ConcatenatingVideosPopUp(object):
         settings_frm = LabelFrame(main_frm, text='SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
         video_path_1 = FileSelect(settings_frm, "First video path: ", title='Select a video file')
         video_path_2 = FileSelect(settings_frm, "Second video path: ", title='Select a video file')
-        resolutions =  ['Video 1', 'Video 2', 320, 640, 720, 1280, 1980]
+        resolutions = ['Video 1', 'Video 2', 320, 640, 720, 1280, 1980]
         resolution_dropdown = DropDownMenu(settings_frm, 'Resolution:', resolutions, '15')
         resolution_dropdown.setChoices(resolutions[0])
         horizontal = BooleanVar(value=False)
@@ -1558,6 +1560,7 @@ class VisualizeROIFeaturesPopUp(object):
 class VisualizeROITrackingPopUp(object):
     def __init__(self,
                  config_path: str):
+
         self.main_frm = Toplevel()
         self.main_frm.minsize(350, 300)
         self.main_frm.wm_title('VISUALIZE ROI TRACKING')
@@ -1574,43 +1577,63 @@ class VisualizeROITrackingPopUp(object):
             print('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI tracking.')
             raise FileNotFoundError('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI tracking.')
 
-        self.single_video_frm = LabelFrame(self.main_frm, text='Visualize ROI tracking on SINGLE video', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.cpu_cnt, _ = find_core_cnt()
+        self.multiprocess_var = BooleanVar()
+
+        self.settings_frm = LabelFrame(self.main_frm, text='SETTINGS', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.threshold_entry_box = Entry_Box(self.settings_frm, 'Body-part probability threshold', '30')
+        self.threshold_entry_box.entry_set(0.0)
+        threshold_label = Label(self.settings_frm, text='Note: body-part locations detected with probabilities below this threshold is removed from visualization.', font=("Helvetica", 10, 'italic'))
+        self.probability_multiprocess_cb = Checkbutton(self.settings_frm, text='Multi-process (faster)', variable=self.multiprocess_var, command=lambda: self.enable_core_cnt())
+        self.multiprocess_dropdown = DropDownMenu(self.settings_frm, 'CPU cores:', list(range(2, self.cpu_cnt)), '12')
+        self.multiprocess_dropdown.setChoices(2)
+        self.multiprocess_dropdown.disable()
+
+        self.run_frm = LabelFrame(self.main_frm, text='RUN VISUALIZATION', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+
+        self.single_video_frm = LabelFrame(self.run_frm, text='SINGLE video', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
         self.single_video_dropdown = DropDownMenu(self.single_video_frm, 'Select video', self.video_list, '15')
         self.single_video_dropdown.setChoices(self.video_list[0])
-        self.single_video_btn = Button(self.single_video_frm, text='Generate ROI visualization on SINGLE video', command=lambda: self.visualize_single_video())
-        self.all_videos_frm = LabelFrame(self.main_frm, text='Visualize ROI tracking on ALL videos', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
-        self.all_videos_btn = Button(self.all_videos_frm, text='Generate ROI visualization on ALL videos', command= lambda: self.visualize_all())
+        self.single_video_btn = Button(self.single_video_frm, text='Create SINGLE ROI video', fg='blue', command=lambda: self.run_visualize())
 
-        self.threshold_entry_box = Entry_Box(self.main_frm, 'Body-part probability threshold', '30')
-        self.threshold_entry_box.entry_set(0.0)
+        self.all_videos_frm = LabelFrame(self.run_frm, text='ALL videos', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.all_videos_btn = Button(self.all_videos_frm, text='Create ALL ROI videos ({} videos found)'.format(str(len(self.video_list))), fg='red', command=lambda: self.run_visualize())
 
-        threshold_label = Label(self.main_frm, text='Note: body-part locations detected with probabilities below this threshold will be filtered out.', font=("Helvetica", 10, 'italic'))
-        self.single_video_frm.grid(row=0, sticky=W)
-        self.single_video_dropdown.grid(row=0, sticky=W)
-        self.single_video_btn.grid(row=1, pady=12)
-        self.all_videos_frm.grid(row=1,sticky=W,pady=10)
-        self.all_videos_btn.grid(row=0,sticky=W)
-        self.threshold_entry_box.grid(row=3,sticky=W,pady=10)
-        threshold_label.grid(row=4,sticky=W,pady=10)
+        self.settings_frm.grid(row=0, column=0, sticky=NW)
+        self.threshold_entry_box.grid(row=0, column=0, sticky=NW)
+        threshold_label.grid(row=1, column=0, sticky=NW)
+        self.probability_multiprocess_cb.grid(row=2, column=0, sticky=NW)
+        self.multiprocess_dropdown.grid(row=2, column=1, sticky=NW)
 
-    def visualize_single_video(self):
+        self.run_frm.grid(row=1, column=0, sticky=NW)
+        self.single_video_frm.grid(row=0, column=0, sticky=NW)
+        self.single_video_dropdown.grid(row=0, column=0, sticky=NW)
+        self.single_video_btn.grid(row=1, column=0, sticky=NW)
+        self.all_videos_frm.grid(row=1, column=0, sticky=NW)
+        self.all_videos_btn.grid(row=0, column=0, sticky=NW)
+
+    def enable_core_cnt(self):
+        if self.multiprocess_var.get():
+            self.multiprocess_dropdown.enable()
+        else:
+            self.multiprocess_dropdown.disable()
+
+    def run_visualize(self):
         check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
-        self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
-        with open(self.config_path, 'w') as f: self.config.write(f)
-        roi_plotter = ROIPlot(ini_path=self.config_path, video_path=self.single_video_dropdown.getChoices())
-        roi_plotter.insert_data()
-        roi_plotter_multiprocessor = multiprocessing.Process(target=roi_plotter.visualize_ROI_data())
-        roi_plotter_multiprocessor.start()
-
-
-    def visualize_all(self):
-        check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
-        self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
-        with open(self.config_path, 'w') as f: self.config.write(f)
-        for i in self.video_list:
-            roi_plotter = ROIPlot(ini_path=self.config_path, video_path=i)
+        if not self.multiprocess_var.get():
+            self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
+            with open(self.config_path, 'w') as f: self.config.write(f)
+            roi_plotter = ROIPlot(ini_path=self.config_path, video_path=self.single_video_dropdown.getChoices())
             roi_plotter.insert_data()
-            roi_plotter.visualize_ROI_data()
+            roi_plotter_multiprocessor = multiprocessing.Process(target=roi_plotter.visualize_ROI_data())
+            roi_plotter_multiprocessor.start()
+        else:
+            with open(self.config_path, 'w') as f: self.config.write(f)
+            core_cnt = self.multiprocess_dropdown.getChoices()
+            for i in self.video_list:
+                roi_plotter = ROIPlotMultiprocess(ini_path=self.config_path, video_path=i, core_cnt=int(core_cnt))
+                roi_plotter.insert_data()
+                roi_plotter.visualize_ROI_data()
         print('All ROI videos created in project_folder/frames/output/ROI_analysis.')
 
 
@@ -2551,7 +2574,7 @@ class HeatmapClfPopUp(object):
 
         self.main_frm = Toplevel()
         self.main_frm.minsize(400, 400)
-        self.main_frm.wm_title("CREATE DISTANCE PLOTS")
+        self.main_frm.wm_title("CREATE HEATMAP PLOTS")
         self.main_frm = hxtScrollbar(self.main_frm)
         self.main_frm.pack(expand=True, fill=BOTH)
 
@@ -2696,12 +2719,135 @@ class HeatmapClfPopUp(object):
             heatmapper_clf.create_heatmaps()
 
 
-#_ = CreateUserDefinedPoseConfigurationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+class DataPlotterPopUp(object):
+    def __init__(self,
+                 config_path: str):
 
+        self.main_frm = Toplevel()
+        self.main_frm.minsize(400, 400)
+        self.main_frm.wm_title("CREATE DATA PLOTS")
+        self.main_frm = hxtScrollbar(self.main_frm)
+        self.main_frm.pack(expand=True, fill=BOTH)
+        self.color_lst = list(get_color_dict().keys())
+
+        self.config, self.config_path = read_config_file(ini_path=config_path), config_path
+        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
+        self.data_path = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
+        self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
+        self.bp_names_x, _, _ = getBpNames(inifile=self.config_path)
+        self.bp_names = [x[:-2] for x in self.bp_names_x]
+        self.animal_cnt = read_config_entry(self.config, 'General settings', 'animal_no', data_type='int')
+        self.animal_cnt_options = list(range(1, self.animal_cnt + 1))
+
+        self.style_settings_frm = LabelFrame(self.main_frm, text='STYLE SETTINGS', font=("Helvetica", 14, 'bold'), pady=5, padx=5, fg='black')
+        self.resolutions_options = ['640×480', '800×640', '960×800', '1120×960']
+        self.rounding_decimals_options = list(range(0, 10))
+        self.font_thickness_options = list(range(1, 10))
+        self.resolution_dropdown = DropDownMenu(self.style_settings_frm, 'RESOLUTION:', self.resolutions_options, '18')
+        self.rounding_decimals_dropdown = DropDownMenu(self.style_settings_frm, 'DECIMAL ACCURACY:', self.rounding_decimals_options, '18')
+        self.background_color_dropdown = DropDownMenu(self.style_settings_frm, 'BACKGROUND COLOR: ', self.color_lst, '18')
+        self.font_color_dropdown = DropDownMenu(self.style_settings_frm, 'HEADER COLOR: ', self.color_lst, '18')
+        self.font_thickness_dropdown = DropDownMenu(self.style_settings_frm, 'FONT THICKNESS: ', self.font_thickness_options, '18')
+
+        self.background_color_dropdown.setChoices(choice='White')
+        self.font_color_dropdown.setChoices(choice='Black')
+        self.resolution_dropdown.setChoices(self.resolutions_options[0])
+        self.rounding_decimals_dropdown.setChoices(2)
+        self.font_thickness_dropdown.setChoices(1)
+
+        self.body_parts_frm = LabelFrame(self.main_frm, text='CHOOSE BODY-PARTS', font=("Helvetica", 14, 'bold'), pady=5, padx=5)
+        self.number_of_animals_dropdown = DropDownMenu(self.body_parts_frm, '# Animals:', self.animal_cnt_options, '16', com=self.__populate_body_parts_menu)
+        self.number_of_animals_dropdown.setChoices(self.animal_cnt_options[0])
+        self.__populate_body_parts_menu(self.animal_cnt_options[0])
+
+        self.settings_frm = LabelFrame(self.main_frm, text='VISUALIZATION SETTINGS', font=("Helvetica", 14, 'bold'), pady=5, padx=5)
+        self.data_frames_var = BooleanVar()
+        self.data_videos_var = BooleanVar()
+        data_frames_cb = Checkbutton(self.settings_frm, text='Create frames', variable=self.data_frames_var)
+        data_videos_cb = Checkbutton(self.settings_frm, text='Create videos', variable=self.data_videos_var)
+
+        self.run_frm = LabelFrame(self.main_frm, text='RUN', font=("Helvetica", 14, 'bold'), pady=5, padx=5, fg='black')
+        self.run_single_video_frm = LabelFrame(self.run_frm, text='SINGLE VIDEO', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
+        self.run_single_video_btn = Button(self.run_single_video_frm, text='Create single video', fg='blue', command=lambda: self.__create_data_plots(multiple_videos=False))
+        self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, 'Video:', list(self.files_found_dict.keys()), '12')
+        self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
+        self.run_multiple_videos = LabelFrame(self.run_frm, text='MULTIPLE VIDEO', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
+        self.run_multiple_video_btn = Button(self.run_multiple_videos, text='Create multiple videos ({} video(s) found)'.format(str(len(list(self.files_found_dict.keys())))), fg='blue', command=lambda: self.__create_data_plots(multiple_videos=False))
+
+        self.style_settings_frm.grid(row=0, sticky=NW)
+        self.resolution_dropdown.grid(row=0, sticky=NW)
+        self.rounding_decimals_dropdown.grid(row=1, sticky=NW)
+        self.background_color_dropdown.grid(row=2, sticky=NW)
+        self.font_color_dropdown.grid(row=3, sticky=NW)
+        self.font_thickness_dropdown.grid(row=4, sticky=NW)
+
+        self.body_parts_frm.grid(row=1, sticky=NW)
+        self.number_of_animals_dropdown.grid(row=0, sticky=NW)
+
+        self.settings_frm.grid(row=2, sticky=NW)
+        data_frames_cb.grid(row=0, sticky=NW)
+        data_videos_cb.grid(row=1, sticky=NW)
+
+        self.run_frm.grid(row=3, sticky=NW)
+        self.run_single_video_frm.grid(row=0, sticky=NW)
+        self.run_single_video_btn.grid(row=0, sticky=NW)
+        self.single_video_dropdown.grid(row=0, column=1, sticky=NW)
+        self.run_multiple_videos.grid(row=1, sticky=NW)
+        self.run_multiple_video_btn.grid(row=0, sticky=NW)
+
+        self.main_frm.mainloop()
+
+    def __populate_body_parts_menu(self, choice):
+        if hasattr(self, 'bp_dropdowns'):
+            for (k, v), (k2, v2) in zip(self.bp_dropdowns.items(), self.bp_colors.items()):
+                self.bp_dropdowns[k].destroy()
+                self.bp_colors[k].destroy()
+        self.bp_dropdowns, self.bp_colors = {}, {}
+        for animal_cnt in range(int(self.number_of_animals_dropdown.getChoices())):
+            self.bp_dropdowns[animal_cnt] = DropDownMenu(self.body_parts_frm, 'Body-part {}:'.format(str(animal_cnt + 1)), self.bp_names, '16')
+            self.bp_dropdowns[animal_cnt].setChoices(self.bp_names[animal_cnt])
+            self.bp_dropdowns[animal_cnt].grid(row=animal_cnt + 1, column=0, sticky=NW)
+
+            self.bp_colors[animal_cnt] = DropDownMenu(self.body_parts_frm, '', self.color_lst, '2')
+            self.bp_colors[animal_cnt].setChoices(self.color_lst[animal_cnt])
+            self.bp_colors[animal_cnt].grid(row=animal_cnt + 1, column=1, sticky=NW)
+
+    def __create_data_plots(self,
+                            multiple_videos: bool):
+
+        if multiple_videos:
+            data_paths = list(self.files_found_dict.values())
+        else:
+            data_paths = [self.files_found_dict[self.single_video_dropdown.getChoices()]]
+
+        width = int(self.resolution_dropdown.getChoices().split('×')[0])
+        height = int(self.resolution_dropdown.getChoices().split('×')[1])
+        body_part_attr = []
+        for k, v in self.bp_dropdowns.items():
+            body_part_attr.append([v.getChoices(), self.bp_colors[k].getChoices()])
+
+        style_attr = {'bg_color': self.background_color_dropdown.getChoices(),
+                      'header_color': self.font_color_dropdown.getChoices(),
+                      'font_thickness': int(self.font_thickness_dropdown.getChoices()),
+                      'size': (int(width), int(height)),
+                      'data_accuracy': int(self.rounding_decimals_dropdown.getChoices())}
+
+        data_plotter = DataPlotter(config_path=self.config_path,
+                                   body_part_attr=body_part_attr,
+                                   data_paths=data_paths,
+                                   style_attr=style_attr,
+                                   frame_setting=self.data_frames_var.get(),
+                                   video_setting=self.data_videos_var.get())
+
+        _ = data_plotter.create_data_plots()
+
+
+#_ = CreateUserDefinedPoseConfigurationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # _ = SklearnVisualizationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # _ = GanttPlotPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 #_ = VisualizeClassificationProbabilityPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 #_ = PathPlotPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 #_ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini')
 #_ = HeatmapClfPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
-
+#_ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

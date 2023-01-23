@@ -93,7 +93,9 @@ def copy_singlevideo_DPKini(inifile,source):
     except:
         pass
 
-def copy_singlevideo_ini(simba_ini_path: str, source_path: str) -> None:
+def copy_singlevideo_ini(simba_ini_path: str,
+                         source_path: str) -> None:
+
     """ Helper to import single video file to SimBA project
     Parameters
     ----------
@@ -108,11 +110,11 @@ def copy_singlevideo_ini(simba_ini_path: str, source_path: str) -> None:
     new_filename = os.path.join(filename + file_extension)
     destination = os.path.join(os.path.dirname(simba_ini_path), 'videos', new_filename)
     if os.path.isfile(destination):
-        print('SIMBA ERROR: {} already exist in SimBA project. To import, delete this video file before importing the file.')
+        print('SIMBA ERROR: {} already exist in SimBA project. To import, delete this video file before importing the new video file with the same name.'.format(filename))
         raise FileExistsError()
     else:
         shutil.copy(source_path, destination)
-        print('SIMBA COMPLETE: Video {} imported to SimBA project (project_folder/videos).'.format(filename))
+        print('SIMBA COMPLETE: Video {} imported to SimBA project (project_folder/videos directory).'.format(filename))
 
 def copy_multivideo_DPKini(inifile,source,filetype):
     try:
@@ -141,32 +143,7 @@ def copy_multivideo_DPKini(inifile,source,filetype):
         print('Please select a folder and enter in the file type')
 
 
-def copy_multivideo_ini(inifile,source,filetype):
-    if filetype not in ('avi', 'mp4', 'MP4', 'AVI'):
-        print('SimBA only works with .avi and .mp4 files (Please enter mp4 or avi in entrybox). Or please convert your videos to mp4 or avi to continue. ')
-    else:
-        print('Copying videos...')
-        vidFolderPath = os.path.join(os.path.dirname(inifile), 'videos')
-        files_in_folder = glob.glob(source + '/*')
-        files = []
-        for f in files_in_folder:
-            file_lower = f.lower()
-            print(file_lower)
-            if file_lower.endswith(filetype.lower()):
-                files.append(f)
 
-        for file in files:
-            dir_name, filebasename, file_extension = get_fn_ext(file)
-            file_extension = file_extension.lower()
-            newFileName = os.path.join(filebasename + file_extension)
-            dest1 = os.path.join(vidFolderPath, newFileName)
-            if os.path.isfile(dest1):
-                print(filebasename, 'already exist in project')
-                print(dest1)
-            elif not os.path.isfile(dest1):
-                shutil.copy(file, dest1)
-                print(filebasename, 'copied to project_folder/videos.')
-        print('Finished copying videos.')
 
 
 def copy_allcsv_ini(inifile,source):

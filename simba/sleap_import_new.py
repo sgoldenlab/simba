@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson"
+__author__ = "Simon Nilsson, JJ Choong"
 
 import itertools
 from configparser import ConfigParser, MissingSectionHeaderError
@@ -40,7 +40,7 @@ class ImportSLEAP(object):
     data_folder: str
         Path to folder containing SLEAP data in `.slp` format.
     actor_IDs: list
-        List of animal names.
+        Animal names.
     interpolation_settings: str
         String defining the pose-estimation interpolation method. OPTIONS: 'None', 'Animal(s): Nearest',
         'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear',
@@ -260,6 +260,7 @@ class ImportSLEAP(object):
                 self.data_df.loc[frame_idx] = frame_lst
             except ValueError:
                 break
+
         self.data_df.fillna(0, inplace=True)
         self.__fill_missing_indexes()
         self.data_df.sort_index(inplace=True)
@@ -467,6 +468,20 @@ class ImportSLEAP(object):
 # test = ImportSLEAP(project_path="/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/project_folder/project_config.ini",
 #                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/data',
 #                    actor_IDs=['Simon', 'Nastacia', 'JJ', 'Sam', 'Liana'],
+#                    interpolation_settings="Body-parts: Nearest",
+#                    smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}}) #Savitzky Golay
+# test.initate_import_slp()
+# if test.animals_no > 1:
+#     test.visualize_sleap()
+# test.save_df()
+# test.perform_interpolation()
+# test.perform_smothing()
+# print('All SLEAP imports complete.')
+
+
+# test = ImportSLEAP(project_path="/Users/simon/Desktop/envs/troubleshooting/sleap_cody/project_folder/project_config.ini",
+#                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/sleap_cody/import_data',
+#                    actor_IDs=['Animal_1', 'Animal_2'],
 #                    interpolation_settings="Body-parts: Nearest",
 #                    smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}}) #Savitzky Golay
 # test.initate_import_slp()

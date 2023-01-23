@@ -180,10 +180,7 @@ class ROIPlot(object):
                     self.__insert_texts(self.roi_analyzer.video_polys)
 
                     for _, row in self.roi_analyzer.video_recs.iterrows():
-
                         top_left_x, top_left_y, shape_name = row['topLeftX'], row['topLeftY'], row['Name']
-                        # if shape_name == 'Upper_compartment_bottom_left':
-                        #     print(print(row))
                         bottom_right_x, bottom_right_y = row['Bottom_right_X'], row['Bottom_right_Y']
                         thickness, color = row['Thickness'], row['Color BGR']
                         cv2.rectangle(self.border_img, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), color, thickness)
@@ -237,7 +234,7 @@ class ROIPlot(object):
         writer.release()
 
 
-# test = ROIPlot(ini_path=r'/Users/simon/Desktop/troubleshooting/B1-MS_US/project_folder/project_config.ini', video_path="CD1-B1-Ph1-T2-MS_US10min.mp4")
+# test = ROIPlot(ini_path=r'/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini', video_path="termite_test.mp4")
 # test.insert_data()
 # test.visualize_ROI_data()
 
