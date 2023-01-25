@@ -184,7 +184,12 @@ Clicking on this button brings up the below menu:
 
 The first sub-menu is called **SETTINGS**. In the *Body-part probability threshold* entry-box, fill in the minimum pose-estimation confidence required for a body-part to be plotted (a value between 0.0 and 1.0). E.g., set this value to `0.0` to plot all body-parts in all frames. Alternatively, set this value to `1.0` to plot only the body-parts that your pose-estimation tool is most condident about. 
 
-There are two checkboxes that are auto-ticked when opening the menu: (i) `Show pose-estimated location`, and (ii) `Show animal names`. To remove the "circles" representing the location of the body-parts in the video, untick the the `Show pose-estimated location` check-box. To remove the names of the animals in the video, untick the the `Show animal names` check-box. 
+There are two checkboxes that are auto-ticked when opening the menu: (i) `Show pose-estimated location`, and (ii) `Show animal names`. To remove the "circles" representing the location of the body-parts in the video, untick the the `Show pose-estimated location` check-box. To remove the names of the animals in the video, untick the the `Show animal names` check-box. Four example outputs are shown in the GIF below. (TOP LEFT: `Show pose-estimated location` and `Show animal names` are both **ticked**. TOP RIGHT: `Show pose-estimated location` and `Show animal names` are both **un-ticked**. BOTTOM LEFT: `Show pose-estimated location` is **ticked** and `Show animal names` is **un-ticked**. BOTTOM RIGHT: `Show pose-estimated location` is **un-ticked** and  `Show animal names` is **ticked**.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/merged_video_20230125154753.gif" />
+</p>
+
 
 Next, there is a `Multi-process (faster)` check-box. If you are on a computer with a high CPU count, you may want to take advantage of several or all of to cores to generate your videos in parallel. This way you could make hefty saves on run-time. To take advantage of many or all cores, check the `Multi-process (faster)` check-box and choose how many cores you want to use in the `CPU cores drop-down` menu. 
 
