@@ -3,7 +3,9 @@ from simba.read_config_unit_tests import (read_config_file,
 import os
 import subprocess, shutil
 from simba.misc_tools import (get_video_meta_data,
-                              remove_a_folder)
+                              remove_a_folder,
+                              get_fn_ext,
+                              SimbaTimer)
 from datetime import datetime
 
 
@@ -38,6 +40,8 @@ class FrameMergererFFmpeg(object):
                  video_height: int or None,
                  video_width: int or None):
 
+        self.timer = SimbaTimer()
+        self.timer.start_timer()
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
         if config_path is not None:
             self.config_path, self.config = config_path, read_config_file(ini_path=config_path)
@@ -46,7 +50,8 @@ class FrameMergererFFmpeg(object):
             self.temp_dir = os.path.join(self.project_path, 'frames', 'output', 'merged', 'temp')
             self.output_path = os.path.join(self.project_path, 'frames', 'output', 'merged', 'merged_video_{}.mp4'.format(str(self.datetime)))
         else:
-            self.output_dir = os.path.basename(list(frame_types.items())[0])
+            self.file_path = list(frame_types.values())[0]
+            self.output_dir, ss, df = get_fn_ext(filepath=self.file_path)
             self.temp_dir = os.path.join(self.output_dir, 'temp')
             self.output_path = os.path.join(self.output_dir, 'merged_video_{}.mp4'.format(str(self.datetime)))
 
@@ -97,7 +102,6 @@ class FrameMergererFFmpeg(object):
         """ Helper to change the width and height videos"""
 
         for video_cnt, (video_type, video_path) in enumerate(self.frame_types.items()):
-            print(video_path)
             video_meta_data = get_video_meta_data(video_path=video_path)
             out_path = os.path.join(self.temp_dir, video_type + '.mp4')
             if video_meta_data['height'] != new_width:
@@ -129,7 +133,9 @@ class FrameMergererFFmpeg(object):
         cmd = 'ffmpeg -y{} -filter_complex hstack=inputs={} -vsync 2 "{}"'.format(video_path_str, str(len(frames_dict.keys())), out_path)
         print('Concatenating (horizontal) {} videos...'.format(str(len(frames_dict.keys()))))
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-        if final_img: print('SIMBA COMPLETE: Merged video saved at {}'.format(out_path))
+        if final_img:
+            self.timer.stop_timer()
+            print('SIMBA COMPLETE: Merged video saved at {} (elapsed time: {}s)'.format(out_path, self.timer.elapsed_time_str))
 
     def __vertical_concatenator(self,
                                 frames_dict: dict,
@@ -145,7 +151,9 @@ class FrameMergererFFmpeg(object):
         cmd = 'ffmpeg -y{} -filter_complex vstack=inputs={} -vsync 2 "{}"'.format(video_path_str, str(len(frames_dict.keys())), out_path)
         print('Concatenating (vertical) {} videos...'.format(str(len(frames_dict.keys()))))
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-        if final_img: print('SIMBA COMPLETE: Merged video saved at {}'.format(out_path))
+        if final_img:
+            self.timer.stop_timer()
+            print('SIMBA COMPLETE: Merged video saved at {} (elapsed time: {}s)'.format(out_path, self.timer.elapsed_time_str))
 
     def __mosaic_concatenator(self,
                             frames_dict: dict,

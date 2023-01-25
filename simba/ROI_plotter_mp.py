@@ -17,6 +17,7 @@ from simba.misc_tools import (get_video_meta_data,
                               concatenate_videos_in_folder)
 import numpy as np
 
+pd.options.mode.chained_assignment = None
 def _img_creator(data: pd.DataFrame,
                  loc_dict: dict,
                  scalers: dict,
@@ -27,7 +28,8 @@ def _img_creator(data: pd.DataFrame,
                  input_video_path: str,
                  body_part_dict: dict,
                  roi_analyzer_data: object,
-                 colors: list):
+                 colors: list,
+                 style_attr: dict):
 
     def __insert_texts(shape_df):
         for animal_name in roi_analyzer_data.multiAnimalIDList:
@@ -40,10 +42,8 @@ def _img_creator(data: pd.DataFrame,
 
     font = cv2.FONT_HERSHEY_TRIPLEX
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    #fourcc = cv2.VideoWriter_fourcc(*'XVID')
     group_cnt = int(data['group'].values[0])
     start_frm, current_frm, end_frm = data.index[0], data.index[0], data.index[-1]
-    #save_path = os.path.join(save_temp_directory, '{}.avi'.format(str(group_cnt)))
     save_path = os.path.join(save_temp_directory, '{}.mp4'.format(str(group_cnt)))
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'], (video_meta_data['width'] * 2, video_meta_data['height']))
     cap = cv2.VideoCapture(input_video_path)
@@ -73,10 +73,13 @@ def _img_creator(data: pd.DataFrame,
             cv2.polylines(border_img, [vertices], True, color, thickness=thickness)
 
         for animal_cnt, animal_name in enumerate(roi_analyzer_data.multiAnimalIDList):
-            bp_data = data.loc[current_frm, body_part_dict[animal_name]].values
-            if roi_analyzer_data.p_thresh < bp_data[2]:
-                cv2.circle(border_img, (int(bp_data[0]), int(bp_data[1])), scalers['circle_size'], colors[animal_cnt], -1)
-                cv2.putText(border_img, animal_name, (int(bp_data[0]), int(bp_data[1])), font, scalers['font_size'], colors[animal_cnt], 1)
+            if style_attr['Show_body_part'] or style_attr['Show_animal_name']:
+                bp_data = data.loc[current_frm, body_part_dict[animal_name]].values
+                if roi_analyzer_data.p_thresh < bp_data[2]:
+                    if style_attr['Show_body_part']:
+                        cv2.circle(border_img, (int(bp_data[0]), int(bp_data[1])), scalers['circle_size'], colors[animal_cnt], -1)
+                    if style_attr['Show_animal_name']:
+                        cv2.putText(border_img, animal_name, (int(bp_data[0]), int(bp_data[1])), font, scalers['font_size'], colors[animal_cnt], 1)
 
             for shape_name in video_shape_names:
                 timer = round(data.loc[current_frm, '{}_{}_cum_sum_time'.format(animal_name, shape_name)], 2)
@@ -120,7 +123,8 @@ class ROIPlotMultiprocess(object):
             self,
             ini_path: str,
             video_path: str,
-            core_cnt: int):
+            core_cnt: int,
+            style_attr: dict):
 
 
         if platform.system() == "Darwin":
@@ -138,7 +142,7 @@ class ROIPlotMultiprocess(object):
             raise FileNotFoundError()
         self.roi_analyzer.analyze_ROIs()
         self.roi_entries_df = pd.concat(self.roi_analyzer.entry_exit_df_lst, axis=0)
-        self.data_df = self.roi_analyzer.data_df
+        self.data_df, self.style_attr = self.roi_analyzer.data_df, style_attr
         self.out_parent_dir = os.path.join(self.roi_analyzer.project_path, 'frames', 'output', 'ROI_analysis')
         if not os.path.exists(self.out_parent_dir): os.makedirs(self.out_parent_dir)
         self.video_save_path = os.path.join(self.out_parent_dir, self.video_name + '.mp4')
@@ -278,7 +282,8 @@ class ROIPlotMultiprocess(object):
                                           roi_analyzer_data=self.roi_analyzer,
                                           video_shape_names=self.video_shapes,
                                           colors=color_lst,
-                                          shape_meta_data=self.shape_dicts)
+                                          shape_meta_data=self.shape_dicts,
+                                          style_attr=self.style_attr)
             for cnt, result in enumerate(pool.imap(constants, data_arr, chunksize=self.chunksize)):
                 print('Image {}/{}, Video {}...'.format(str(int(frm_per_core * (result + 1))), str(len(self.data_df)), self.video_name))
             print('Joining {} multiprocessed video...'.format(self.video_name))
@@ -289,7 +294,10 @@ class ROIPlotMultiprocess(object):
             pool.join()
             print('Video {} complete (elapsed time: {}s). Video saved in project_folder/frames/output/ROI_analysis.'.format(self.video_name, video_timer.elapsed_time_str))
 
-# test = ROIPlot(ini_path=r'/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini', video_path="termite_test.mp4", core_cnt=5)
+# test = ROIPlot(ini_path=r'/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini',
+#                video_path="termite_test.mp4",
+#                core_cnt=5,
+#                style_attr={'Show_body_part': True, 'Show_animal_name': True})
 # test.insert_data()
 # test.visualize_ROI_data()
 
