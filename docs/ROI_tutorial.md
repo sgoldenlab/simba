@@ -199,7 +199,28 @@ To create many ROI visualization videos, click the **Create ALL ROI Videos** but
 
 You can follow the progress in the main SimBA terminal. The ROI videos are saved in the `project_folder/frames/output/ROI_analysis` directory. 
 
-# Part 5. Miscellaneous ROI tools
+
+# Part 5. Visualizing ROI features
+
+Rather than visualizing the traditional ROI data (i.e., how many times the animals have entered and how much time that has been spent inside the ROIs etc), we may want to visualize other continous and boolean ROI-features that SimBA caluclates. This includes the distances to the ROIs, if the is directing towards the ROIs, and if the animals are inside the ROIs. 
+
+To visualize these types of data, click the `Visualize ROI features` button in the [ROI] tab, and you should see the following pop-up:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_feature_viz_0123.png" />
+</p>
+
+* The first submenu is titled **SETTINGS** and allows you to specify how the videos are created and how they look, most options are ticked by default.
+  - If you want to show the pose-estimated location of the animals body-parts, tick `Show pose`. 
+  - If you want to mark the center of each ROI with a circle, tick `Show ROI centers`.
+  - If you want to see all the [ear tags](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#shape-attributes) of the ROIs, tick `Show ROI ear tags`. 
+  - If you want to visualize the ["directionality"](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data) between animals and ROIs, tick `Show directionlity`.
+  - Multiprocessing video (faster): Creating videos is computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this in part by using multiprocessing over the multiple cores on your computer. To use multi-processing, tick the Multiprocess videos (faster) checkbox. Once ticked, the CPU cores dropdown becomes enabled. This dropdown contains values between 2 and the number of cores available on your computer with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your visualizations.
+
+SINGLE VIDEO: Use this menu to create a single visualization. The Video drop-down will contain all the videos in your project. Choose which video you want to create a visualization for. Once choosen, click the Create single video button. You can follow the progress in the main SimBA terminal window. Once complete, a new video will be saved in the project_folder/frames/output/ROI_features directory.
+MULTIPLE VIDEO: Use this menu to create a visualization for every video in your project. After clicking the Create multiple videos button. You can follow the progress in the main SimBA terminal window. Once complete, one new video for every input video will be saved in the project_folder/frames/output/ROI_features directory.
+
+# Part 6. Miscellaneous ROI tools
 
 ## Heatmaps
 
