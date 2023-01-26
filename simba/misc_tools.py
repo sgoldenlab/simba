@@ -1191,4 +1191,17 @@ def get_file_name_info_in_directory(directory: str,
     return results
 
 
+def split_and_group_df(df: pd.DataFrame,
+                       splits: int,
+                       include_split_order: bool=True):
+
+    data_arr = np.array_split(df, splits)
+    if include_split_order:
+        for df_cnt in range(len(data_arr)):
+            data_arr[df_cnt]['group'] = df_cnt
+    obs_per_split = len(data_arr[0])
+
+    return data_arr, obs_per_split
+
+
 

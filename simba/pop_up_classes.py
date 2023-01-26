@@ -54,6 +54,7 @@ from simba.remove_keypoints_in_pose import KeypointRemover
 from simba.plot_pose_in_dir import create_video_from_dir
 from simba.extract_seqframes import extract_seq_frames
 from simba.frame_mergerer_ffmpeg import FrameMergererFFmpeg
+from simba.ROI_feature_visualizer_mp import ROIfeatureVisualizerMultiprocess
 from simba.ROI_plot_new import ROIPlot
 from simba.user_pose_config_creator import PoseConfigCreator
 from simba.pose_reset import PoseResetter
@@ -1510,9 +1511,11 @@ class VisualizeROIFeaturesPopUp(object):
         self.main_frm = Toplevel()
         self.main_frm.minsize(350, 300)
         self.main_frm.wm_title('VISUALIZE ROI FEATURES')
+        self.cpu_cnt, _ = find_core_cnt()
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
         self.videos_dir = os.path.join(self.project_path, 'videos')
+        self.colors_dict = get_color_dict()
         self.video_list = []
         for file_path in glob.glob(self.videos_dir + '/*'):
             _, video_name, ext = get_fn_ext(filepath=file_path)
@@ -1522,40 +1525,94 @@ class VisualizeROIFeaturesPopUp(object):
             print('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI features.')
             raise FileNotFoundError('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI features.')
 
+        self.settings_frm = LabelFrame(self.main_frm, text='SETTINGS', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.threshold_entry_box = Entry_Box(self.settings_frm, 'Probability threshold', '15')
+        self.threshold_entry_box.entry_set(0.0)
+        threshold_label = Label(self.settings_frm, text='Note: body-part locations detected with probabilities below this threshold will be filtered out.', font=("Helvetica", 10, 'italic'))
+        self.border_clr_dropdown = DropDownMenu(self.settings_frm, 'Border color:', list(self.colors_dict.keys()), '12')
+        self.border_clr_dropdown.setChoices('Black')
+
+        self.show_pose_var = BooleanVar(value=True)
+        self.show_ROI_centers_var = BooleanVar(value=True)
+        self.show_ROI_tags_var = BooleanVar(value=True)
+        self.show_direction_var = BooleanVar(value=True)
+        self.multiprocess_var = BooleanVar(value=False)
+        show_pose_cb = Checkbutton(self.settings_frm, text='Show pose', variable=self.show_pose_var)
+        show_roi_center_cb = Checkbutton(self.settings_frm, text='Show ROI centers', variable=self.show_ROI_centers_var)
+        show_roi_tags_cb = Checkbutton(self.settings_frm, text='Show ROI ear tags', variable=self.show_ROI_tags_var)
+        show_roi_directionality_cb = Checkbutton(self.settings_frm, text='Show directionality', variable=self.show_direction_var)
+
+        multiprocess_cb = Checkbutton(self.settings_frm, text='Multi-process (faster)', variable=self.multiprocess_var, command=lambda: self.enable_core_cnt())
+        self.multiprocess_dropdown = DropDownMenu(self.settings_frm, 'CPU cores:', list(range(2, self.cpu_cnt)), '12')
+        self.multiprocess_dropdown.setChoices(2)
+        self.multiprocess_dropdown.disable()
+
         self.single_video_frm = LabelFrame(self.main_frm, text='Visualize ROI features on SINGLE video', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
         self.single_video_dropdown = DropDownMenu(self.single_video_frm, 'Select video', self.video_list, '15')
         self.single_video_dropdown.setChoices(self.video_list[0])
-        self.single_video_btn = Button(self.single_video_frm, text='Visualize ROI features for SINGLE video', command=lambda: self.visualize_single_video())
+        self.single_video_btn = Button(self.single_video_frm, text='Visualize ROI features for SINGLE video', command=lambda: self.run(multiple=False))
 
         self.all_videos_frm = LabelFrame(self.main_frm, text='Visualize ROI features on ALL videos', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
-        self.all_videos_btn = Button(self.all_videos_frm, text='Generate ROI visualization on ALL videos', command=lambda: self.visualize_all_videos())
+        self.all_videos_btn = Button(self.all_videos_frm, text='Generate ROI visualization on ALL videos', command=lambda: self.run(multiple=True))
 
-        self.threshold_entry_box = Entry_Box(self.main_frm, 'Body-part probability threshold', '30')
-        self.threshold_entry_box.entry_set(0.0)
-
-        threshold_label = Label(self.main_frm, text='Note: body-part locations detected with probabilities below this threshold will be filtered out.', font=("Helvetica", 10, 'italic'))
-        self.single_video_frm.grid(row=0, sticky=W)
+        self.settings_frm.grid(row=0, column=0, sticky=NW)
+        self.threshold_entry_box.grid(row=0, sticky=NW)
+        threshold_label.grid(row=1, sticky=NW)
+        self.border_clr_dropdown.grid(row=2, sticky=NW)
+        show_pose_cb.grid(row=3, sticky=NW)
+        show_roi_center_cb.grid(row=4, sticky=NW)
+        show_roi_tags_cb.grid(row=5, sticky=NW)
+        show_roi_directionality_cb.grid(row=6, sticky=NW)
+        multiprocess_cb.grid(row=7, column=0, sticky=NW)
+        self.multiprocess_dropdown.grid(row=7, column=1, sticky=NW)
+        self.single_video_frm.grid(row=1, sticky=W)
         self.single_video_dropdown.grid(row=0, sticky=W)
         self.single_video_btn.grid(row=1, pady=12)
-        self.all_videos_frm.grid(row=1,sticky=W,pady=10)
+        self.all_videos_frm.grid(row=2,sticky=W,pady=10)
         self.all_videos_btn.grid(row=0,sticky=W)
-        self.threshold_entry_box.grid(row=3,sticky=W,pady=10)
-        threshold_label.grid(row=4,sticky=W,pady=10)
 
-    def visualize_single_video(self):
-        check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
-        self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
-        with open(self.config_path, 'w') as f: self.config.write(f)
-        roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.config_path, video_name=self.single_video_dropdown.getChoices())
-        roi_feature_visualizer.create_visualization()
+    def enable_core_cnt(self):
+        if self.multiprocess_var.get():
+            self.multiprocess_dropdown.enable()
+        else:
+            self.multiprocess_dropdown.disable()
 
-    def visualize_all_videos(self):
-        check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
+    def run(self,
+            multiple: bool):
+
+        check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0,max_value=1.0)
         self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
-        with open(self.config_path, 'w') as f: self.config.write(f)
-        for video_name in self.video_list:
-            roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.config_path, video_name=video_name)
-            roi_feature_visualizer.create_visualization()
+        with open(self.config_path, 'w') as f:
+            self.config.write(f)
+
+        style_attr = {}
+        style_attr['ROI_centers'] = self.show_ROI_centers_var.get()
+        style_attr['ROI_ear_tags'] = self.show_ROI_tags_var.get()
+        style_attr['Directionality'] = self.show_direction_var.get()
+        style_attr['Border_color'] = self.colors_dict[self.border_clr_dropdown.getChoices()]
+        style_attr['Pose_estimation'] = self.show_pose_var.get()
+
+        if not multiple:
+            if not self.multiprocess_var:
+                roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.config_path, video_name=self.single_video_dropdown.getChoices(), style_attr=style_attr)
+                roi_feature_visualizer.create_visualization()
+            else:
+                roi_feature_visualizer = ROIfeatureVisualizerMultiprocess(config_path=self.config_path, video_name=self.single_video_dropdown.getChoices(), style_attr=style_attr, core_cnt=int(self.multiprocess_dropdown.getChoices()))
+                roi_feature_visualizer_mp = multiprocessing.Process(target=roi_feature_visualizer.create_visualization())
+                roi_feature_visualizer_mp.start()
+        else:
+            if not self.multiprocess_var:
+                for video_name in self.video_list:
+                    roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.config_path, video_name=video_name, style_attr=style_attr)
+                    roi_feature_visualizer.create_visualization()
+            else:
+                for video_name in self.video_list:
+                    roi_feature_visualizer = ROIfeatureVisualizerMultiprocess(config_path=self.config_path, video_name=video_name, style_attr=style_attr, core_cnt=int(self.multiprocess_dropdown.getChoices()))
+                    roi_feature_visualizer_mp = multiprocessing.Process(target=roi_feature_visualizer.create_visualization())
+                    roi_feature_visualizer_mp.start()
+
+
+
 
 class VisualizeROITrackingPopUp(object):
     def __init__(self,
@@ -1579,11 +1636,16 @@ class VisualizeROITrackingPopUp(object):
 
         self.cpu_cnt, _ = find_core_cnt()
         self.multiprocess_var = BooleanVar()
+        self.show_pose_var = BooleanVar(value=True)
+        self.animal_name_var = BooleanVar(value=True)
 
         self.settings_frm = LabelFrame(self.main_frm, text='SETTINGS', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
         self.threshold_entry_box = Entry_Box(self.settings_frm, 'Body-part probability threshold', '30')
         self.threshold_entry_box.entry_set(0.0)
         threshold_label = Label(self.settings_frm, text='Note: body-part locations detected with probabilities below this threshold is removed from visualization.', font=("Helvetica", 10, 'italic'))
+
+        self.show_pose_cb = Checkbutton(self.settings_frm, text='Show pose-estimated location', variable=self.show_pose_var)
+        self.show_animal_name_cb = Checkbutton(self.settings_frm, text='Show animal names', variable=self.animal_name_var)
         self.probability_multiprocess_cb = Checkbutton(self.settings_frm, text='Multi-process (faster)', variable=self.multiprocess_var, command=lambda: self.enable_core_cnt())
         self.multiprocess_dropdown = DropDownMenu(self.settings_frm, 'CPU cores:', list(range(2, self.cpu_cnt)), '12')
         self.multiprocess_dropdown.setChoices(2)
@@ -1602,9 +1664,10 @@ class VisualizeROITrackingPopUp(object):
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_entry_box.grid(row=0, column=0, sticky=NW)
         threshold_label.grid(row=1, column=0, sticky=NW)
-        self.probability_multiprocess_cb.grid(row=2, column=0, sticky=NW)
-        self.multiprocess_dropdown.grid(row=2, column=1, sticky=NW)
-
+        self.show_pose_cb.grid(row=2, column=0, sticky=NW)
+        self.show_animal_name_cb.grid(row=3, column=0, sticky=NW)
+        self.probability_multiprocess_cb.grid(row=4, column=0, sticky=NW)
+        self.multiprocess_dropdown.grid(row=4, column=1, sticky=NW)
         self.run_frm.grid(row=1, column=0, sticky=NW)
         self.single_video_frm.grid(row=0, column=0, sticky=NW)
         self.single_video_dropdown.grid(row=0, column=0, sticky=NW)
@@ -1620,10 +1683,15 @@ class VisualizeROITrackingPopUp(object):
 
     def run_visualize(self):
         check_float(name='Body-part probability threshold', value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
+        style_attr = {}
+        style_attr['Show_body_part'] = False
+        style_attr['Show_animal_name'] = False
+        if self.show_pose_var.get(): style_attr['Show_body_part'] = True
+        if self.animal_name_var.get(): style_attr['Show_animal_name'] = True
         if not self.multiprocess_var.get():
             self.config.set('ROI settings', 'probability_threshold', str(self.threshold_entry_box.entry_get))
             with open(self.config_path, 'w') as f: self.config.write(f)
-            roi_plotter = ROIPlot(ini_path=self.config_path, video_path=self.single_video_dropdown.getChoices())
+            roi_plotter = ROIPlot(ini_path=self.config_path, video_path=self.single_video_dropdown.getChoices(), style_attr=style_attr)
             roi_plotter.insert_data()
             roi_plotter_multiprocessor = multiprocessing.Process(target=roi_plotter.visualize_ROI_data())
             roi_plotter_multiprocessor.start()
@@ -1631,7 +1699,7 @@ class VisualizeROITrackingPopUp(object):
             with open(self.config_path, 'w') as f: self.config.write(f)
             core_cnt = self.multiprocess_dropdown.getChoices()
             for i in self.video_list:
-                roi_plotter = ROIPlotMultiprocess(ini_path=self.config_path, video_path=i, core_cnt=int(core_cnt))
+                roi_plotter = ROIPlotMultiprocess(ini_path=self.config_path, video_path=i, core_cnt=int(core_cnt), style_attr=style_attr)
                 roi_plotter.insert_data()
                 roi_plotter.visualize_ROI_data()
         print('All ROI videos created in project_folder/frames/output/ROI_analysis.')

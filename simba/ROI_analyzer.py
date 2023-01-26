@@ -277,6 +277,10 @@ class ROIAnalyzer(object):
         None
         """
 
+
+
+
+
         for data_name, data in zip(['Detailed_ROI_data', 'ROI_time_data', 'ROI_entry_data'], [self.entry_exit_df_lst, self.time_df_lst, self.entry_df_lst]):
             save_df = pd.concat(data, axis=0).reset_index(drop=True)
             save_path = os.path.join(self.logs_path, data_name + '_' + self.timestamp + '.csv')
@@ -291,7 +295,7 @@ class ROIAnalyzer(object):
         self.timer.stop_timer()
         print('SIMBA COMPLETE: ROI analysis complete (elapsed time: {}s)'.format(self.timer.elapsed_time_str))
 
-# test = ROIAnalyzer(ini_path = r"/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini",
+# test = ROIAnalyzer(ini_path = r"/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini",
 #                    data_path = "outlier_corrected_movement_location", calculate_distances=True)
 # test.read_roi_dfs()
 # test.analyze_ROIs()
