@@ -1593,7 +1593,7 @@ class VisualizeROIFeaturesPopUp(object):
         style_attr['Pose_estimation'] = self.show_pose_var.get()
 
         if not multiple:
-            if not self.multiprocess_var:
+            if not self.multiprocess_var.get():
                 roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.config_path, video_name=self.single_video_dropdown.getChoices(), style_attr=style_attr)
                 roi_feature_visualizer.create_visualization()
             else:
@@ -1601,7 +1601,7 @@ class VisualizeROIFeaturesPopUp(object):
                 roi_feature_visualizer_mp = multiprocessing.Process(target=roi_feature_visualizer.create_visualization())
                 roi_feature_visualizer_mp.start()
         else:
-            if not self.multiprocess_var:
+            if not self.multiprocess_var.get():
                 for video_name in self.video_list:
                     roi_feature_visualizer = ROIfeatureVisualizer(config_path=self.config_path, video_name=video_name, style_attr=style_attr)
                     roi_feature_visualizer.create_visualization()
@@ -1646,7 +1646,7 @@ class VisualizeROITrackingPopUp(object):
 
         self.show_pose_cb = Checkbutton(self.settings_frm, text='Show pose-estimated location', variable=self.show_pose_var)
         self.show_animal_name_cb = Checkbutton(self.settings_frm, text='Show animal names', variable=self.animal_name_var)
-        self.probability_multiprocess_cb = Checkbutton(self.settings_frm, text='Multi-process (faster)', variable=self.multiprocess_var, command=lambda: self.enable_core_cnt())
+        self.multiprocess_cb = Checkbutton(self.settings_frm, text='Multi-process (faster)', variable=self.multiprocess_var, command=lambda: self.enable_core_cnt())
         self.multiprocess_dropdown = DropDownMenu(self.settings_frm, 'CPU cores:', list(range(2, self.cpu_cnt)), '12')
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
@@ -1666,7 +1666,7 @@ class VisualizeROITrackingPopUp(object):
         threshold_label.grid(row=1, column=0, sticky=NW)
         self.show_pose_cb.grid(row=2, column=0, sticky=NW)
         self.show_animal_name_cb.grid(row=3, column=0, sticky=NW)
-        self.probability_multiprocess_cb.grid(row=4, column=0, sticky=NW)
+        self.multiprocess_cb.grid(row=4, column=0, sticky=NW)
         self.multiprocess_dropdown.grid(row=4, column=1, sticky=NW)
         self.run_frm.grid(row=1, column=0, sticky=NW)
         self.single_video_frm.grid(row=0, column=0, sticky=NW)

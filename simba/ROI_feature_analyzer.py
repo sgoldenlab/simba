@@ -88,8 +88,8 @@ class ROIFeatureCreator(object):
             raise ValueError('SIMBA ERROR: No data files found in {}'.format(self.in_dir))
         self.features_files = glob.glob(self.out_dir + '/*.' + self.file_type)
         if len(self.features_files) == 0:
-            print('SIMBA ERROR: No data files found in {}'.format(self.out_dir))
-            raise ValueError('SIMBA ERROR: No data files found in {}'.format(self.out_dir))
+            print('SIMBA WARNING: No data files found in {}'.format(self.out_dir))
+            #raise ValueError('SIMBA ERROR: No data files found in {}'.format(self.out_dir))
         print('Processing {} videos for ROI features...'.format(str(len(self.files_found))))
         self.timer = SimbaTimer()
         self.timer.start_timer()

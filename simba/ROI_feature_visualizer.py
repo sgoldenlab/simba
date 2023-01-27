@@ -75,7 +75,7 @@ class ROIfeatureVisualizer(object):
         self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         self.font = cv2.FONT_HERSHEY_COMPLEX
         self.cap = cv2.VideoCapture(self.video_path)
-        self.space_scale, self.radius_scale, self.res_scale, self.font_scale = 60, 12, 1500, 1.5
+        self.space_scale, self.radius_scale, self.res_scale, self.font_scale = 25, 10, 1500, 0.8
         self.max_dim = max(self.video_meta_data['width'], self.video_meta_data['height'])
         self.circle_scale = int(self.radius_scale / (self.res_scale / self.max_dim))
         self.font_size = float(self.font_scale / (self.res_scale / self.max_dim))
@@ -150,66 +150,69 @@ class ROIfeatureVisualizer(object):
         while (self.cap.isOpened()):
             ret, self.frame = self.cap.read()
             if ret:
-                self.img_w_border = cv2.copyMakeBorder(self.frame, 0, 0, 0, int(self.video_meta_data['width']), borderType=cv2.BORDER_CONSTANT, value=self.style_attr['Border_color'])
-                self.img_w_border_h, self.img_w_border_w = self.img_w_border.shape[0], self.img_w_border.shape[1]
-                if self.frame_cnt == 0:
-                    self.__calc_text_locs()
-                    self.writer = cv2.VideoWriter(self.save_path, self.fourcc, self.video_meta_data['fps'], (self.img_w_border_w, self.img_w_border_h))
-                self.__insert_texts(self.video_recs)
-                self.__insert_texts(self.video_circs)
-                self.__insert_texts(self.video_polys)
+                try:
+                    self.img_w_border = cv2.copyMakeBorder(self.frame, 0, 0, 0, int(self.video_meta_data['width']), borderType=cv2.BORDER_CONSTANT, value=self.style_attr['Border_color'])
+                    self.img_w_border_h, self.img_w_border_w = self.img_w_border.shape[0], self.img_w_border.shape[1]
+                    if self.frame_cnt == 0:
+                        self.__calc_text_locs()
+                        self.writer = cv2.VideoWriter(self.save_path, self.fourcc, self.video_meta_data['fps'], (self.img_w_border_w, self.img_w_border_h))
+                    self.__insert_texts(self.video_recs)
+                    self.__insert_texts(self.video_circs)
+                    self.__insert_texts(self.video_polys)
 
-                if self.style_attr['Pose_estimation']:
-                    for animal, animal_bp_name in self.bp_names.items():
-                        bp_cords = self.data_df.loc[self.frame_cnt, animal_bp_name].values
-                        cv2.circle(self.img_w_border, (int(bp_cords[0]), int(bp_cords[1])), 0, self.animal_bp_dict[animal]['colors'][0], self.circle_scale)
+                    if self.style_attr['Pose_estimation']:
+                        for animal, animal_bp_name in self.bp_names.items():
+                            bp_cords = self.data_df.loc[self.frame_cnt, animal_bp_name].values
+                            cv2.circle(self.img_w_border, (int(bp_cords[0]), int(bp_cords[1])), 0, self.animal_bp_dict[animal]['colors'][0], self.circle_scale)
+                            cv2.putText(self.img_w_border, animal, (int(bp_cords[0]), int(bp_cords[1])), self.font, self.font_size, self.animal_bp_dict[animal]['colors'][0], 1)
 
-                for _, row in self.video_recs.iterrows():
-                    cv2.rectangle(self.img_w_border, (row['topLeftX'], row['topLeftY']), (row['Bottom_right_X'], row['Bottom_right_Y']), row['Color BGR'], row['Thickness'])
-                    if self.style_attr['ROI_centers']:
-                        center_cord = ((int(row['topLeftX'] + (row['width'] / 2))), (int(row['topLeftY'] + (row['height'] / 2))))
-                        cv2.circle(self.img_w_border, center_cord, self.circle_scale, row['Color BGR'], -1)
-                    if self.style_attr['ROI_centers']:
-                        for tag_data in row['Tags'].values():
-                            cv2.circle(self.img_w_border, tuple(tag_data), self.circle_scale, row['Color BGR'], -1)
+                    for _, row in self.video_recs.iterrows():
+                        cv2.rectangle(self.img_w_border, (row['topLeftX'], row['topLeftY']), (row['Bottom_right_X'], row['Bottom_right_Y']), row['Color BGR'], row['Thickness'])
+                        if self.style_attr['ROI_centers']:
+                            center_cord = ((int(row['topLeftX'] + (row['width'] / 2))), (int(row['topLeftY'] + (row['height'] / 2))))
+                            cv2.circle(self.img_w_border, center_cord, self.circle_scale, row['Color BGR'], -1)
+                        if self.style_attr['ROI_centers']:
+                            for tag_data in row['Tags'].values():
+                                cv2.circle(self.img_w_border, tuple(tag_data), self.circle_scale, row['Color BGR'], -1)
 
-                for _, row in self.video_circs.iterrows():
-                    cv2.circle(self.img_w_border, (row['centerX'], row['centerY']), row['radius'], row['Color BGR'], row['Thickness'])
-                    if self.style_attr['ROI_centers']:
-                        cv2.circle(self.img_w_border, (row['centerX'], row['centerY']), self.circle_scale, row['Color BGR'], -1)
-                    if self.style_attr['ROI_centers']:
-                        for tag_data in row['Tags'].values():
-                            cv2.circle(self.img_w_border, tuple(tag_data), self.circle_scale, row['Color BGR'], -1)
+                    for _, row in self.video_circs.iterrows():
+                        cv2.circle(self.img_w_border, (row['centerX'], row['centerY']), row['radius'], row['Color BGR'], row['Thickness'])
+                        if self.style_attr['ROI_centers']:
+                            cv2.circle(self.img_w_border, (row['centerX'], row['centerY']), self.circle_scale, row['Color BGR'], -1)
+                        if self.style_attr['ROI_centers']:
+                            for tag_data in row['Tags'].values():
+                                cv2.circle(self.img_w_border, tuple(tag_data), self.circle_scale, row['Color BGR'], -1)
 
-                for _, row in self.video_polys.iterrows():
-                    cv2.polylines(self.img_w_border, [row['vertices']], True, row['Color BGR'], thickness=row['Thickness'])
-                    if self.style_attr['ROI_centers']:
-                        cv2.circle(self.img_w_border, (row['Center_X'], row['Center_Y']), self.circle_scale, row['Color BGR'], -1)
-                    if style_attr['ROI_ear_tags']:
-                        for tag_data in row['vertices']:
-                            cv2.circle(self.img_w_border, tuple(tag_data), self.circle_scale, row['Color BGR'], -1)
+                    for _, row in self.video_polys.iterrows():
+                        cv2.polylines(self.img_w_border, [row['vertices']], True, row['Color BGR'], thickness=row['Thickness'])
+                        if self.style_attr['ROI_centers']:
+                            cv2.circle(self.img_w_border, (row['Center_X'], row['Center_Y']), self.circle_scale, row['Color BGR'], -1)
+                        if self.style_attr['ROI_ear_tags']:
+                            for tag_data in row['vertices']:
+                                cv2.circle(self.img_w_border, tuple(tag_data), self.circle_scale, row['Color BGR'], -1)
 
 
-                for animal_name, shape_name in itertools.product(self.multi_animal_id_lst, self.video_shapes):
-                    self.animal_name, self.shape_name = animal_name, shape_name
-                    in_zone_col_name = '{} {} {}'.format(shape_name, animal_name, 'in zone')
-                    distance_col_name = '{} {} {}'.format(shape_name, animal_name, 'distance')
-                    in_zone_value = str(bool(self.roi_feature_creator.out_df.loc[self.frame_cnt, in_zone_col_name]))
-                    distance_value = round(self.roi_feature_creator.out_df.loc[self.frame_cnt, distance_col_name], 2)
-                    cv2.putText(self.img_w_border, in_zone_value, self.loc_dict[animal_name][shape_name]['in_zone_data_loc'], self.font, self.font_size, self.shape_dicts[shape_name]['Color BGR'], 1)
-                    cv2.putText(self.img_w_border, str(distance_value), self.loc_dict[animal_name][shape_name]['distance_data_loc'], self.font, self.font_size, self.shape_dicts[shape_name]['Color BGR'], 1)
-                    if self.roi_directing_viable and self.style_attr['Directionality']:
-                        facing_col_name = '{} {} {}'.format(shape_name, animal_name, 'facing')
-                        facing_value = self.roi_feature_creator.out_df.loc[self.frame_cnt, facing_col_name]
-                        cv2.putText(self.img_w_border, str(bool(facing_value)), self.loc_dict[animal_name][shape_name]['directing_data_loc'], self.font, self.font_size, self.shape_dicts[shape_name]['Color BGR'], 1)
-                        if facing_value:
-                            self.__insert_directing_line()
+                    for animal_name, shape_name in itertools.product(self.multi_animal_id_lst, self.video_shapes):
+                        self.animal_name, self.shape_name = animal_name, shape_name
+                        in_zone_col_name = '{} {} {}'.format(shape_name, animal_name, 'in zone')
+                        distance_col_name = '{} {} {}'.format(shape_name, animal_name, 'distance')
+                        in_zone_value = str(bool(self.roi_feature_creator.out_df.loc[self.frame_cnt, in_zone_col_name]))
+                        distance_value = round(self.roi_feature_creator.out_df.loc[self.frame_cnt, distance_col_name], 2)
+                        cv2.putText(self.img_w_border, in_zone_value, self.loc_dict[animal_name][shape_name]['in_zone_data_loc'], self.font, self.font_size, self.shape_dicts[shape_name]['Color BGR'], 1)
+                        cv2.putText(self.img_w_border, str(distance_value), self.loc_dict[animal_name][shape_name]['distance_data_loc'], self.font, self.font_size, self.shape_dicts[shape_name]['Color BGR'], 1)
+                        if self.roi_directing_viable and self.style_attr['Directionality']:
+                            facing_col_name = '{} {} {}'.format(shape_name, animal_name, 'facing')
+                            facing_value = self.roi_feature_creator.out_df.loc[self.frame_cnt, facing_col_name]
+                            cv2.putText(self.img_w_border, str(bool(facing_value)), self.loc_dict[animal_name][shape_name]['directing_data_loc'], self.font, self.font_size, self.shape_dicts[shape_name]['Color BGR'], 1)
+                            if facing_value:
+                                self.__insert_directing_line()
 
-                self.frame_cnt += 1
-                self.writer.write(np.uint8(self.img_w_border))
-                print('Frame: {} / {}. Video: {}'.format(str(self.frame_cnt), str(self.video_meta_data['frame_count']),
-                                                                 self.video_name))
-
+                    self.frame_cnt += 1
+                    self.writer.write(np.uint8(self.img_w_border))
+                    print('Frame: {} / {}. Video: {}'.format(str(self.frame_cnt), str(self.video_meta_data['frame_count']),
+                                                                     self.video_name))
+                except:
+                    break
             else:
                 self.timer.stop_timer()
                 self.cap.release()

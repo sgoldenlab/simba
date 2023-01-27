@@ -112,6 +112,7 @@ def _img_creator(data: pd.DataFrame,
             for animal, animal_bp_name in tracked_bps.items():
                 bp_cords = data.loc[current_frm, animal_bp_name].values
                 cv2.circle(img, (int(bp_cords[0]), int(bp_cords[1])), 0, animal_bps[animal]['colors'][0], scalers['circle_size'])
+                cv2.putText(img, animal, (int(bp_cords[0]), int(bp_cords[1])), font, scalers['font_size'], animal_bps[animal]['colors'][0], 1)
 
         img = __insert_shapes(img=img, shape_info=shape_info)
 
@@ -135,6 +136,7 @@ def _img_creator(data: pd.DataFrame,
                                                   video_name=video_name)
         writer.write(img)
         current_frm += 1
+        print('Multi-processing video frame {} on core {}...'.format(str(current_frm), str(group_cnt)))
     cap.release()
     writer.release()
 
@@ -209,7 +211,7 @@ class ROIfeatureVisualizerMultiprocess(object):
         self.video_meta_data = get_video_meta_data(self.video_path)
         self.scalers = {}
         self.maxtasksperchild, self.chunksize = 10, 1
-        self.space_scale, self.radius_scale, self.res_scale, self.font_scale = 60, 12, 1500, 1.5
+        self.space_scale, self.radius_scale, self.res_scale, self.font_scale = 25, 10, 1500, 0.8
         self.max_dim = max(self.video_meta_data['width'], self.video_meta_data['height'])
         self.scalers['circle_size'] = int(self.radius_scale / (self.res_scale / self.max_dim))
         self.scalers['font_size'] = float(self.font_scale / (self.res_scale / self.max_dim))
@@ -228,6 +230,8 @@ class ROIfeatureVisualizerMultiprocess(object):
         if self.roi_directing_viable:
             self.directing_data = self.roi_feature_creator.directing_analyzer.results_df
             self.directing_data = self.directing_data[self.directing_data['Video'] == self.video_name]
+        else:
+            self.directing_data = None
         self.roi_feature_creator.out_df.fillna(0, inplace=True)
         self.timer = SimbaTimer()
         self.timer.start_timer()
@@ -280,7 +284,7 @@ class ROIfeatureVisualizerMultiprocess(object):
         self.__calc_text_locs()
         data_arr, frm_per_core = split_and_group_df(df=self.roi_feature_creator.out_df, splits=self.core_cnt, include_split_order=True)
 
-        print('Creating probability images, multiprocessing (determined chunksize: {}, cores: {})...'.format(str(self.chunksize), str(self.core_cnt)))
+        print('Creating ROI feature images, multiprocessing (determined chunksize: {}, cores: {})...'.format(str(self.chunksize), str(self.core_cnt)))
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_img_creator,
                                           text_locations=self.loc_dict,

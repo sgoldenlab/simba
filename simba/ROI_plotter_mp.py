@@ -89,6 +89,7 @@ def _img_creator(data: pd.DataFrame,
 
         writer.write(border_img)
         current_frm += 1
+        print('Multi-processing video frame {} on core {}...'.format(str(current_frm), str(group_cnt)))
 
     cap.release()
     writer.release()
@@ -270,7 +271,7 @@ class ROIPlotMultiprocess(object):
             data_arr[df_cnt]['group'] = df_cnt
         frm_per_core = len(data_arr[0])
 
-        print('Creating probability images, multiprocessing (determined chunksize: {}, cores: {})...'.format(str(self.chunksize), str(self.core_cnt)))
+        print('Creating ROI images, multiprocessing (determined chunksize: {}, cores: {})...'.format(str(self.chunksize), str(self.core_cnt)))
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_img_creator,
                                           loc_dict=self.loc_dict,
