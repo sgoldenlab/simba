@@ -44,7 +44,7 @@ def make_distance_plot(data: np.array,
     >>> data = np.random.random((100,2))
     >>> line_attr = {0: ['Blue'], 1: ['Red']}
     >>> save_path = '/_tests/final_frm.png'
-    >>> style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8}
+    >>> style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8, 'y_max': 'auto'}
     >>> make_distance_plot(fps=fps, data=data, line_attr=line_attr, style_attr=style_attr, save_path=save_path)
     """
     colors = get_color_dict()
@@ -55,7 +55,10 @@ def make_distance_plot(data: np.array,
 
     timer = SimbaTimer()
     timer.start_timer()
-    max_y, max_x = np.amax(data), data.shape[0]
+    if style_attr['y_max'] == 'auto':
+        max_y = np.amax(data)
+    else:
+        max_y = float(style_attr['y_max'])
     y_ticks_locs = y_lbls = np.round(np.linspace(0, max_y, 10), 2)
     x_ticks_locs = x_lbls = np.linspace(0, max_x, 5)
     x_lbls = np.round((x_lbls / fps), 1)

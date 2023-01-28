@@ -177,7 +177,10 @@ class TresholdPlotCreatorMultiprocess(object):
 
 
             if self.video_setting or self.frame_setting:
-                highest_p = data_df[self.probability_col].max()
+                if self.style_attr['y_max'] == 'auto':
+                    highest_p = data_df[self.probability_col].max()
+                else:
+                    highest_p = float(self.style_attr['y_max'])
                 data_split = np.array_split(list(data_df.index), self.cores)
                 frm_per_core = len(data_split[0])
                 for group_cnt, rng in enumerate(data_split):

@@ -2,11 +2,12 @@ __author__ = "Simon Nilsson", "JJ Choong"
 
 from datetime import datetime
 from simba.read_config_unit_tests import (read_config_entry,
-                                          check_that_column_exist,
                                           read_config_file,
                                           check_if_filepath_list_is_empty)
 from simba.features_scripts.unit_tests import read_video_info_csv, read_video_info
-from simba.misc_tools import check_multi_animal_status, line_length_numba
+from simba.misc_tools import (check_multi_animal_status,
+                              line_length_numba,
+                              SimbaTimer)
 from simba.drop_bp_cords import (create_body_part_dictionary,
                                  getBpNames,
                                  get_fn_ext,
@@ -64,6 +65,8 @@ class DirectingOtherAnimalsAnalyzer(object):
         self.files_found = glob.glob(self.data_in_dir + '/*.' + self.file_type)
         check_if_filepath_list_is_empty(filepaths=self.files_found,
                                         error_msg='SIMBA ERROR: No data found in the {} directory'.format(self.data_in_dir))
+        self.session_timer = SimbaTimer()
+        self.session_timer.start_timer()
         print('Processing {} video(s)...'.format(str(len(self.files_found))))
 
     def process_directionality(self):
@@ -78,6 +81,8 @@ class DirectingOtherAnimalsAnalyzer(object):
 
         self.results_dict = {}
         for file_cnt, file_path in enumerate(self.files_found):
+            video_timer = SimbaTimer()
+            video_timer.start_timer()
             _, video_name, _ = get_fn_ext(file_path)
             self.results_dict[video_name] = {}
             data_df = read_df(file_path, self.file_type)
@@ -107,7 +112,8 @@ class DirectingOtherAnimalsAnalyzer(object):
                     bp_data.insert(loc=0, column='Animal_2', value=animal_permutation[1])
                     bp_data.insert(loc=0, column='Animal_1', value=animal_permutation[0])
                     self.results_dict[video_name]['{} {} {}'.format(animal_permutation[0], 'directing towards', animal_permutation[1])][x_bp[:-2]] = bp_data
-            print('Direction analysis complete for video {} ({}/{})...'.format(video_name, str(file_cnt + 1), str(len(self.files_found))))
+            video_timer.stop_timer()
+            print('Direction analysis complete for video {} ({}/{}, elapsed time: {}s)...'.format(video_name, str(file_cnt + 1), str(len(self.files_found)), video_timer.elapsed_time_str))
 
     def create_directionality_dfs(self):
         """
@@ -174,8 +180,9 @@ class DirectingOtherAnimalsAnalyzer(object):
                 out_df_lst.append(pd.DataFrame([[video_name, animal_permutation, value]], columns=['Video', 'Animal permutation', 'Value (s)']))
         self.summary_df = pd.concat(out_df_lst, axis=0).sort_values(by=['Video', 'Animal permutation']).set_index('Video')
         self.summary_df.to_csv(os.path.join(self.logs_dir, 'Direction_data_{}{}'.format(str(self.datetime), '.csv')))
+        self.session_timer.stop_timer()
         print('Summary directional statistics saved at ' + os.path.join(self.logs_dir, 'Direction_data_{}{}'.format(str(self.datetime), '.csv')))
-        print('SIMBA COMPLETE: ALL DIRECTIONAL DATA ANALYZED AND SAVED IN PROJECT.')
+        print('SIMBA COMPLETE: All directional data saved in SimBA project (elapsed time: {}s.'.format(self.session_timer.elapsed_time_str))
 
 # test = DirectingOtherAnimalsAnalyzer(config_path='/Users/simon/Desktop/train_model_project/project_folder/project_config.ini')
 # test.process_directionality()

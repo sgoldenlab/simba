@@ -308,4 +308,4 @@ class ROIfeatureVisualizerMultiprocess(object):
             self.timer.stop_timer()
             pool.terminate()
             pool.join()
-            print('Video {} complete (elapsed time: {}s). Video saved in project_folder/frames/output/ROI_analysis.'.format(self.video_name, self.timer.elapsed_time_str))
+            print('Video {} complete (elapsed time: {}s). Video saved in project_folder/frames/output/ROI_features.'.format(self.video_name, self.timer.elapsed_time_str))

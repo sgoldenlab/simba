@@ -97,7 +97,11 @@ class VideoInfoTable(object):
             self.videos[name]['px_mm'].set(0)
             self.videos[name]['px_mm_entry'] = Entry(self.video_frm, width=20, textvariable=self.videos[name]['px_mm'])
             if isinstance(self.vid_info_df, pd.DataFrame):
-                prior_data = read_video_info(self.vid_info_df, video_basename)[0]
+                prior_data = None
+                try:
+                    prior_data = read_video_info(self.vid_info_df, video_basename)[0]
+                except ValueError:
+                    pass
                 if prior_data is not None:
                     for value_name, set_name in zip(['fps', 'Resolution_width', 'Resolution_height', 'Distance_in_mm', 'pixels/mm'], ['fps_var', 'width_var', 'height_var', 'distance', 'px_mm']):
                         float_val = self.__check_that_value_is_numeric(value=prior_data[value_name].values[0], value_name=value_name, video_name=prior_data['Video'].values[0])

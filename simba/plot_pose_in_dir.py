@@ -103,8 +103,8 @@ def create_video_from_dir(in_directory: str,
     timer.stop_timer()
     print('SIMBA COMPLETE: All pose videos complete. Results located in {} directory (elapsed time: {}s)'.format(str(out_directory), timer.elapsed_time_str))
 
-# create_video_from_dir(in_directory=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',
-#                       out_directory=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/test',
+# create_video_from_dir(in_directory=r'/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/project_folder/csv/outlier_corrected_movement_location',
+#                       out_directory=r'/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/test',
 #                       circle_size=5,
-#                       clr_attr={'Animal_1': 'Cyan'})
+#                       clr_attr=None)
 

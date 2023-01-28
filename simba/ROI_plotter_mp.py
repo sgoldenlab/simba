@@ -293,7 +293,7 @@ class ROIPlotMultiprocess(object):
             video_timer.stop_timer()
             pool.terminate()
             pool.join()
-            print('Video {} complete (elapsed time: {}s). Video saved in project_folder/frames/output/ROI_analysis.'.format(self.video_name, video_timer.elapsed_time_str))
+            print('SIMBA COMPLETE: Video {} created. Video saved in project_folder/frames/output/ROI_analysis (elapsed time: {}s).'.format(self.video_name, video_timer.elapsed_time_str))
 
 # test = ROIPlot(ini_path=r'/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini',
 #                video_path="termite_test.mp4",

@@ -105,7 +105,11 @@ class TresholdPlotCreatorSingleProcess(object):
                                       save_path=os.path.join(self.out_parent_dir, self.video_name + '_{}_{}.png'.format(self.orginal_clf_name, 'final_image')))
 
             if self.video_setting or self.frame_setting:
-                max_y, max_x = np.amax(data_df), len(data_df)
+                if self.style_attr['y_max'] == 'auto':
+                    max_y = np.amax(data_df)
+                else:
+                    max_y = float(self.style_attr['y_max'])
+
                 y_ticks_locs = y_lbls = np.round(np.linspace(0, max_y, 10), 2)
                 for i in range(len(data_df)):
                     p_values = list(data_df.loc[0:i])
@@ -144,19 +148,19 @@ class TresholdPlotCreatorSingleProcess(object):
         print('SIMBA COMPLETE: All probability visualizations created in project_folder/frames/output/probability_plots directory (elapsed time: {}s)'.format(self.timer.elapsed_time_str))
 
 
-
+#
 # test = TresholdPlotCreatorSingleProcess(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                                         frame_setting=False,
 #                                         video_setting=True,
 #                                         last_image=True,
 #                                         clf_name='Attack',
 #                                         files_found=['/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'],
-#                                         style_attr={'width': 640, 'height': 480, 'font size': 10, 'line width': 6, 'color': 'blue', 'circle size': 20})
+#                                         style_attr={'width': 640, 'height': 480, 'font size': 10, 'line width': 6, 'color': 'blue', 'circle size': 20, 'y_max': 'auto'})
 # # test = TresholdPlotCreatorSingleProcess(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini', frame_setting=False, video_setting=True, clf_name='Attack')
-# test.create_plots()
-
-
-
+# #test.create_plots()
+#
+#
+#
 
 
 

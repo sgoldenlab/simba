@@ -53,7 +53,6 @@ from simba.appendMars import append_dot_ANNOTT
 from simba.dlc_multi_animal_importer import MADLC_Importer
 from simba.BORIS_appender import BorisAppender
 from simba.Directing_animals_analyzer import DirectingOtherAnimalsAnalyzer
-from simba.Directing_animals_visualizer import DirectingOtherAnimalsVisualizer
 from simba.solomon_importer import SolomonImporter
 from simba.reverse_tracking_order import reverse_tracking_2_animals
 from simba.pup_retrieval_1 import pup_retrieval_1
@@ -139,7 +138,8 @@ from simba.pop_up_classes import (HeatmapLocationPopup,
                                   PathPlotPopUp,
                                   DistancePlotterPopUp,
                                   HeatmapClfPopUp,
-                                  DataPlotterPopUp)
+                                  DataPlotterPopUp,
+                                  DirectingOtherAnimalsVisualizerPopUp)
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.labelling_interface import select_labelling_video
 from simba.labelling_advanced_interface import select_labelling_video_advanced
@@ -1646,8 +1646,7 @@ class loadprojectini:
         directing_animals_analyzer.summary_statistics()
 
     def directing_other_animals_visualizer(self):
-        directing_animals_visualizer = DirectingOtherAnimalsVisualizer(config_path=self.projectconfigini)
-        directing_animals_visualizer.visualize_results()
+        _ = DirectingOtherAnimalsVisualizerPopUp(config_path=self.projectconfigini)
 
     def smoothing_selected(self, choice):
         if choice == 'None':
