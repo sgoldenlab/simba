@@ -207,7 +207,7 @@ Rather than visualizing the traditional ROI data (i.e., how many times the anima
 To visualize these types of data, click the `Visualize ROI features` button in the [ROI] tab, and you should see the following pop-up:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_feature_viz_0123.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_feature_viz_0123_.png" />
 </p>
 
 * The first submenu is titled **SETTINGS** and allows you to specify how the videos are created and how they look, most options are ticked by default.
@@ -215,10 +215,22 @@ To visualize these types of data, click the `Visualize ROI features` button in t
   - If you want to mark the center of each ROI with a circle, tick `Show ROI centers`.
   - If you want to see all the [ear tags](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#shape-attributes) of the ROIs, tick `Show ROI ear tags`. 
   - If you want to visualize the ["directionality"](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data) between animals and ROIs, tick `Show directionlity`.
+  - Direction type: Chhose if you want to view "directionality" as "Funnels" or "Lines. For example, see the gifs below where the top represents ["Funnel"](https://github.com/sgoldenlab/simba/blob/master/images/Funnel_directionality.gif) and the bottom represents ["Lines"](https://github.com/sgoldenlab/simba/blob/master/images/Lines_directionality.gif).
   - Multiprocessing video (faster): Creating videos is computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this in part by using multiprocessing over the multiple cores on your computer. To use multi-processing, tick the Multiprocess videos (faster) checkbox. Once ticked, the CPU cores dropdown becomes enabled. This dropdown contains values between 2 and the number of cores available on your computer with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your visualizations.
 
 SINGLE VIDEO: Use this menu to create a single visualization. The Video drop-down will contain all the videos in your project. Choose which video you want to create a visualization for. Once choosen, click the Create single video button. You can follow the progress in the main SimBA terminal window. Once complete, a new video will be saved in the project_folder/frames/output/ROI_features directory.
 MULTIPLE VIDEO: Use this menu to create a visualization for every video in your project. After clicking the Create multiple videos button. You can follow the progress in the main SimBA terminal window. Once complete, one new video for every input video will be saved in the project_folder/frames/output/ROI_features directory.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Funnel_directionality.gif" />
+</p>
+
+
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Lines_directionality.gif" />
+</p>
+
 
 # Part 6. Miscellaneous ROI tools
 
