@@ -7,7 +7,8 @@ from simba.read_config_unit_tests import (check_int,
                                           check_float,
                                           read_config_entry,
                                           read_config_file)
-import os, glob
+import os
+from numba import jit, prange
 from copy import deepcopy
 from simba.drop_bp_cords import (getBpNames,
                                  create_body_part_dictionary,
@@ -72,7 +73,69 @@ class DirectingROIAnalyzer(object):
         bp_data.insert(loc=0, column='Video', value=self.video_name)
         bp_data = bp_data.reset_index().rename(columns={'index': 'Frame'})
         bp_data = bp_data[bp_data['Directing_BOOL'] == 1].reset_index(drop=True)
-        self.results_lst.append(bp_data)
+        return bp_data
+
+    @staticmethod
+    @jit(nopython=True, fastmath=True)
+    def ccw(roi_lines: np.array, eye_lines: np.array, shape_type: str):
+
+        def calc(A, B, C):
+            return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
+
+        results = np.full((eye_lines.shape[0], 4), -1)
+        for i in prange(eye_lines.shape[0]):
+            eye, roi = eye_lines[i][0:2], eye_lines[i][2:4]
+            min_distance = np.inf
+
+            if shape_type == 'Circle':
+                reversed_roi_lines = roi_lines[::-1]
+                for j in prange(roi_lines.shape[0]):
+                    dist_1 = np.sqrt((eye[0] - roi_lines[j][0]) ** 2 + (eye[1] - roi_lines[j][1]) ** 2)
+                    dist_2 = np.sqrt((eye[0] - roi_lines[j][2]) ** 2 + (eye[1] - roi_lines[j][3]) ** 2)
+                    if (dist_1 < min_distance) or (dist_2 < min_distance):
+                        min_distance = min(dist_1, dist_2)
+                        results[i] = reversed_roi_lines[j]
+
+            else:
+                for j in prange(roi_lines.shape[0]):
+                    line_a, line_b = roi_lines[j][0:2], roi_lines[j][2:4]
+                    center_x, center_y = line_a[0] + line_b[0] // 2, line_a[1] + line_b[1] // 2
+                    if calc(eye, line_a, line_b) != calc(roi, line_a, line_b) or calc(eye, roi, line_a) != calc(eye, roi, line_b):
+                        distance = np.sqrt((eye[0] - center_x) ** 2 + (eye[1] - center_y) ** 2)
+                        if distance < min_distance:
+                            results[i] = roi_lines[j]
+                            min_distance = distance
+
+
+
+
+        return results
+
+    def __find_roi_intersections(self):
+        eye_lines = self.bp_data[['Eye_x', 'Eye_y', 'ROI_x', 'ROI_y']].values.astype(int)
+        if self.shape_info['Shape_type'] == 'Rectangle':
+            top_left_x, top_left_y = self.shape_info['topLeftX'], self.shape_info['topLeftY']
+            bottom_right_x, bottom_right_y = self.shape_info['Bottom_right_X'], self.shape_info['Bottom_right_Y']
+            top_right_x, top_right_y = top_left_x + self.shape_info['width'],  top_left_y
+            bottom_left_x, bottom_left_y = bottom_right_x - self.shape_info['width'], bottom_right_y
+            roi_lines = np.array([[top_left_x, top_left_y, bottom_left_x, bottom_left_y],
+                                  [bottom_left_x, bottom_left_y, bottom_right_x, bottom_right_y],
+                                  [bottom_right_x, bottom_right_y, top_right_x, top_right_y],
+                                  [top_right_x, top_right_y, top_left_x, top_left_y]])
+
+        elif self.shape_info['Shape_type'] == 'Polygon':
+            roi_lines = np.full((self.shape_info['vertices'].shape[0], 4), np.nan)
+            roi_lines[-1] = np.hstack((self.shape_info['vertices'][0], self.shape_info['vertices'][-1]))
+            for i in range(self.shape_info['vertices'].shape[0]-1):
+                roi_lines[i] = np.hstack((self.shape_info['vertices'][i], self.shape_info['vertices'][i+1]))
+
+        elif self.shape_info['Shape_type'] == 'Circle':
+            center = self.shape_info[['centerX' , 'centerY']].values.astype(int)
+            roi_lines = np.full((2, 4), np.nan)
+            roi_lines[0] = np.array([center[0], center[1] - self.shape_info['radius'], center[0], center[1] + self.shape_info['radius']])
+            roi_lines[1] = np.array([center[0] - self.shape_info['radius'], center[1], center[0] + self.shape_info['radius'], center[1]])
+
+        return self.ccw(roi_lines=roi_lines, eye_lines=eye_lines, shape_type=self.shape_info['Shape_type'])
 
     def calc_directing_to_ROIs(self):
         """
@@ -106,7 +169,10 @@ class DirectingROIAnalyzer(object):
                                                                                right_ear_array=self.ear_right_arr,
                                                                                nose_array=self.nose_arr,
                                                                                target_array=self.center_cord)
-                    self.__format_direction_data()
+                    self.bp_data = self.__format_direction_data()
+                    eye_roi_intersections = pd.DataFrame(self.__find_roi_intersections(), columns=['ROI_edge_1_x', 'ROI_edge_1_y', 'ROI_edge_2_x', 'ROI_edge_2_y'])
+                    self.bp_data = pd.concat([self.bp_data, eye_roi_intersections], axis=1)
+                    self.results_lst.append(self.bp_data)
                 for _, row in self.roi_analyzer.video_circs.iterrows():
                     self.shape_info = row
                     self.center_cord = np.asarray((row['centerX'], row['centerY']))
@@ -114,7 +180,10 @@ class DirectingROIAnalyzer(object):
                                                                                right_ear_array=self.ear_right_arr,
                                                                                nose_array=self.nose_arr,
                                                                                target_array=self.center_cord)
-                    self.__format_direction_data()
+                    self.bp_data = self.__format_direction_data()
+                    eye_roi_intersections = pd.DataFrame(self.__find_roi_intersections(), columns=['ROI_edge_1_x', 'ROI_edge_1_y', 'ROI_edge_2_x', 'ROI_edge_2_y'])
+                    self.bp_data = pd.concat([self.bp_data, eye_roi_intersections], axis=1)
+                    self.results_lst.append(self.bp_data)
                 for _, row in self.roi_analyzer.video_polys.iterrows():
                     self.shape_info = row
                     self.center_cord = np.asarray((row['Center_X'], row['Center_Y']))
@@ -122,11 +191,13 @@ class DirectingROIAnalyzer(object):
                                                                                right_ear_array=self.ear_right_arr,
                                                                                nose_array=self.nose_arr,
                                                                                target_array=self.center_cord)
-                    self.__format_direction_data()
-
+                    self.bp_data = self.__format_direction_data()
+                    eye_roi_intersections = pd.DataFrame(self.__find_roi_intersections(), columns=['ROI_edge_1_x', 'ROI_edge_1_y', 'ROI_edge_2_x', 'ROI_edge_2_y'])
+                    self.bp_data = pd.concat([self.bp_data, eye_roi_intersections], axis=1)
+                    self.results_lst.append(self.bp_data)
         self.results_df = pd.concat(self.results_lst, axis=0)
-
-# test = DirectingROIAnalyzer(config_path='/Users/simon/Desktop/train_model_project/project_folder/project_config.ini')
+#
+# test = DirectingROIAnalyzer(config_path='/Users/simon/Desktop/envs/simba_dev/tests/test_data/mouse_open_field/project_folder/project_config.ini')
 # test.calc_directing_to_ROIs()
 
 

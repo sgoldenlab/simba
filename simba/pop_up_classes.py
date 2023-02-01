@@ -1537,17 +1537,23 @@ class VisualizeROIFeaturesPopUp(object):
         self.show_pose_var = BooleanVar(value=True)
         self.show_ROI_centers_var = BooleanVar(value=True)
         self.show_ROI_tags_var = BooleanVar(value=True)
-        self.show_direction_var = BooleanVar(value=True)
+        self.show_direction_var = BooleanVar(value=False)
         self.multiprocess_var = BooleanVar(value=False)
         show_pose_cb = Checkbutton(self.settings_frm, text='Show pose', variable=self.show_pose_var)
         show_roi_center_cb = Checkbutton(self.settings_frm, text='Show ROI centers', variable=self.show_ROI_centers_var)
         show_roi_tags_cb = Checkbutton(self.settings_frm, text='Show ROI ear tags', variable=self.show_ROI_tags_var)
-        show_roi_directionality_cb = Checkbutton(self.settings_frm, text='Show directionality', variable=self.show_direction_var)
+        show_roi_directionality_cb = Checkbutton(self.settings_frm, text='Show directionality', variable=self.show_direction_var, command=lambda: self.enable_choose_direction_type())
+
 
         multiprocess_cb = Checkbutton(self.settings_frm, text='Multi-process (faster)', variable=self.multiprocess_var, command=lambda: self.enable_core_cnt())
         self.multiprocess_dropdown = DropDownMenu(self.settings_frm, 'CPU cores:', list(range(2, self.cpu_cnt)), '12')
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
+
+        self.directionality_type_dropdown = DropDownMenu(self.settings_frm, 'Direction type:', ['Funnel', 'Lines'], '12')
+        self.directionality_type_dropdown.setChoices(choice='Funnel')
+        self.directionality_type_dropdown.disable()
+
 
         self.single_video_frm = LabelFrame(self.main_frm, text='Visualize ROI features on SINGLE video', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
         self.single_video_dropdown = DropDownMenu(self.single_video_frm, 'Select video', self.video_list, '15')
@@ -1565,6 +1571,7 @@ class VisualizeROIFeaturesPopUp(object):
         show_roi_center_cb.grid(row=4, sticky=NW)
         show_roi_tags_cb.grid(row=5, sticky=NW)
         show_roi_directionality_cb.grid(row=6, sticky=NW)
+        self.directionality_type_dropdown.grid(row=6, column=1, sticky=NW)
         multiprocess_cb.grid(row=7, column=0, sticky=NW)
         self.multiprocess_dropdown.grid(row=7, column=1, sticky=NW)
         self.single_video_frm.grid(row=1, sticky=W)
@@ -1578,6 +1585,13 @@ class VisualizeROIFeaturesPopUp(object):
             self.multiprocess_dropdown.enable()
         else:
             self.multiprocess_dropdown.disable()
+
+    def enable_choose_direction_type(self):
+        if self.show_direction_var.get():
+            self.directionality_type_dropdown.enable()
+        else:
+            self.directionality_type_dropdown.disable()
+
 
     def run(self,
             multiple: bool):
@@ -1593,6 +1607,7 @@ class VisualizeROIFeaturesPopUp(object):
         style_attr['Directionality'] = self.show_direction_var.get()
         style_attr['Border_color'] = self.colors_dict[self.border_clr_dropdown.getChoices()]
         style_attr['Pose_estimation'] = self.show_pose_var.get()
+        style_attr['Directionality_style'] = self.directionality_type_dropdown.getChoices()
 
         if not multiple:
             if not self.multiprocess_var.get():
@@ -2514,6 +2529,8 @@ class DistancePlotterPopUp(object):
         self.bp_names = [x[:-2] for x in self.bp_names_x]
         self.colors = get_color_dict()
         self.core_cnt, _ = find_core_cnt()
+        self.max_y_lst = list(range(10, 510, 10))
+        self.max_y_lst.insert(0, 'auto')
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
         check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()),
                                         error_msg='SIMBA ERROR: Zero files found in the project_folder/csv/outlier_corrected_movement_location directory. ')
@@ -2526,11 +2543,12 @@ class DistancePlotterPopUp(object):
         self.font_size_entry = Entry_Box(self.style_settings_frm, 'Font size: ', '16', validation='numeric')
         self.line_width = Entry_Box(self.style_settings_frm, 'Line width: ', '16', validation='numeric')
         self.opacity_dropdown = DropDownMenu(self.style_settings_frm, 'Line opacity:', list(np.round(np.arange(0.0, 1.1, 0.1), 1)), '16')
+        self.max_y_dropdown = DropDownMenu(self.style_settings_frm, 'Max Y-axis:', self.max_y_lst, '16')
         self.resolution_dropdown.setChoices(self.resolutions_options[0])
         self.font_size_entry.entry_set(val=8)
         self.line_width.entry_set(val=6)
         self.opacity_dropdown.setChoices(0.5)
-
+        self.max_y_dropdown.setChoices(choice='auto')
         self.distances_frm = LabelFrame(self.main_frm, text='CHOOSE DISTANCES', font=("Helvetica", 14, 'bold'), pady=5, padx=5)
         self.number_of_distances_dropdown = DropDownMenu(self.distances_frm, '# Distances:', self.number_of_distances, '16', com=self.__populate_distances_menu)
         self.number_of_distances_dropdown.setChoices(self.number_of_distances[0])
@@ -2544,9 +2562,10 @@ class DistancePlotterPopUp(object):
         distance_frames_cb = Checkbutton(self.settings_frm, text='Create frames', variable=self.distance_frames_var)
         distance_videos_cb = Checkbutton(self.settings_frm, text='Create videos', variable=self.distance_videos_var)
         distance_final_img_cb = Checkbutton(self.settings_frm, text='Create last frame', variable=self.distance_final_img_var)
-        self.multiprocess_cb = Checkbutton(self.settings_frm, text='Multiprocess (faster)', variable=self.multiprocess_var)
+        self.multiprocess_cb = Checkbutton(self.settings_frm, text='Multiprocess (faster)', variable=self.multiprocess_var, command=lambda: self.enable_core_cnt())
         self.multiprocess_dropdown = DropDownMenu(self.settings_frm, 'Cores:', list(range(2, self.core_cnt)), '12')
         self.multiprocess_dropdown.setChoices(choice=2)
+        self.multiprocess_dropdown.disable()
 
 
         self.run_frm = LabelFrame(self.main_frm, text='RUN', font=("Helvetica", 14, 'bold'), pady=5, padx=5, fg='black')
@@ -2563,6 +2582,7 @@ class DistancePlotterPopUp(object):
         self.font_size_entry.grid(row=1, sticky=NW)
         self.line_width.grid(row=2, sticky=NW)
         self.opacity_dropdown.grid(row=3, sticky=NW)
+        self.max_y_dropdown.grid(row=4, sticky=NW)
 
         self.distances_frm.grid(row=1, sticky=NW)
         self.number_of_distances_dropdown.grid(row=0, sticky=NW)
@@ -2581,6 +2601,12 @@ class DistancePlotterPopUp(object):
 
         self.run_multiple_videos.grid(row=1, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
+
+    def enable_core_cnt(self):
+        if self.multiprocess_var.get():
+            self.multiprocess_dropdown.enable()
+        else:
+            self.multiprocess_dropdown.disable()
 
     def __populate_distances_menu(self, choice):
         if hasattr(self, 'bp_1'):
@@ -2624,7 +2650,8 @@ class DistancePlotterPopUp(object):
                       'height': height,
                       'line width': int(self.line_width.entry_get),
                       'font size': int(self.font_size_entry.entry_get),
-                      'opacity': float(self.opacity_dropdown.getChoices())}
+                      'opacity': float(self.opacity_dropdown.getChoices()),
+                      'y_max': self.max_y_dropdown.getChoices()}
         if not self.multiprocess_var.get():
             distance_plotter = DistancePlotterSingleCore(config_path=self.config_path,
                                                          frame_setting=self.distance_frames_var.get(),

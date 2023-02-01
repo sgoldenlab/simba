@@ -1247,8 +1247,8 @@ class loadprojectini:
         self.roi_draw1 = LabelFrame(tab6, text='VISUALIZE ROI', font=("Helvetica",12,'bold'))
 
         # button
-        visualizeROI = Button(self.roi_draw1, text='VISUALIZE ROI TRACKING', command= lambda: VisualizeROITrackingPopUp(config_path=self.projectconfigini))
-        visualizeROIfeature = Button(self.roi_draw1, text='Visualize ROI features', command= lambda: VisualizeROIFeaturesPopUp(config_path=self.projectconfigini))
+        visualizeROI = Button(self.roi_draw1, text='VISUALIZE ROI TRACKING', fg='green', command= lambda: VisualizeROITrackingPopUp(config_path=self.projectconfigini))
+        visualizeROIfeature = Button(self.roi_draw1, text='VISUALIZE ROI FEATURES', fg='blue', command= lambda: VisualizeROIFeaturesPopUp(config_path=self.projectconfigini))
 
         ##organize
         self.roi_draw1.grid(row=0, column=2, sticky=N)

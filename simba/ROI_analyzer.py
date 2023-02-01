@@ -108,9 +108,9 @@ class ROIAnalyzer(object):
             raise FileNotFoundError(print('No ROI definitions were found in your SimBA project. Please draw some ROIs before analyzing your ROI data'))
         else:
             self.roi_h5_path = os.path.join(self.logs_path, 'measures', 'ROI_definitions.h5')
-            self.rectangles_df = pd.read_hdf(self.roi_h5_path, key='rectangles')
-            self.circles_df = pd.read_hdf(self.roi_h5_path, key='circleDf')
-            self.polygon_df = pd.read_hdf(self.roi_h5_path, key='polygons')
+            self.rectangles_df = pd.read_hdf(self.roi_h5_path, key='rectangles').dropna(how='any')
+            self.circles_df = pd.read_hdf(self.roi_h5_path, key='circleDf').dropna(how='any')
+            self.polygon_df = pd.read_hdf(self.roi_h5_path, key='polygons').dropna(how='any')
             self.shape_names = list(itertools.chain(self.rectangles_df['Name'].unique(), self.circles_df['Name'].unique(), self.polygon_df['Name'].unique()))
             self.__reset_dicts()
 

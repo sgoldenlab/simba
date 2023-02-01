@@ -53,7 +53,7 @@ def _image_creator(data: np.array,
 
         x_ticks_locs = x_lbls = np.round(np.linspace(0, i, 5))
         x_lbls = np.round((x_lbls / fps), 1)
-
+        plt.ylim(0, style_attr['max_y'])
         plt.xlabel('time (s)')
         plt.ylabel('distance (cm)')
         plt.xticks(x_ticks_locs, x_lbls, rotation='horizontal', fontsize=style_attr['font size'])
@@ -192,7 +192,10 @@ class DistancePlotterMultiCore(object):
                                    save_path=os.path.join(self.save_dir, self.video_name + '_final_img.png'))
 
             if self.video_setting or self.frame_setting:
-                self.style_attr['max_y'] = np.amax(distance_arr)
+                if self.style_attr['y_max'] == 'auto':
+                    self.style_attr['max_y'] = np.amax(distance_arr)
+                else:
+                    self.style_attr['max_y'] = float(self.style_attr['max_y'])
                 self.style_attr['y_ticks_locs'] = np.round(np.linspace(0, self.style_attr['max_y'], 10), 2)
                 self.style_attr['y_ticks_lbls'] = np.round((self.style_attr['y_ticks_locs'] / self.fps), 1)
                 index_column = list(range(0, distance_arr.shape[0]))

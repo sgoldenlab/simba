@@ -50,7 +50,6 @@ def _create_probability_plots(data: list,
         ax.set_ylim([0, highest_p])
         x_ticks_locs = x_lbls = np.linspace(0, current_frm, 5)
         x_lbls = np.round((x_lbls / fps), 1)
-
         ax.xaxis.set_ticks(x_ticks_locs)
         ax.set_xticklabels(x_lbls, fontsize=style_attr['font size'])
         ax.set_xlabel('Time (s)', fontsize=style_attr['font size'])

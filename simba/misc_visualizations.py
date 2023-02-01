@@ -55,6 +55,7 @@ def make_distance_plot(data: np.array,
 
     timer = SimbaTimer()
     timer.start_timer()
+    max_x = len(data)
     if style_attr['y_max'] == 'auto':
         max_y = np.amax(data)
     else:
@@ -67,6 +68,7 @@ def make_distance_plot(data: np.array,
     plt.ylabel('distance (cm)')
     plt.xticks(x_ticks_locs, x_lbls, rotation='horizontal', fontsize=style_attr['font size'])
     plt.yticks(y_ticks_locs, y_lbls, fontsize=style_attr['font size'])
+    plt.ylim(0, max_y)
     plt.suptitle('Animal distances', x=0.5, y=0.92, fontsize=style_attr['font size'] + 4)
     buffer_ = io.BytesIO()
     plt.savefig(buffer_, format="png")
@@ -119,7 +121,10 @@ def make_probability_plot(data: pd.Series,
 
     timer = SimbaTimer()
     timer.start_timer()
-    max_y = float(data.max().round(2))
+    if style_attr['y_max'] == 'auto':
+        max_y = float(data.max().round(2))
+    else:
+        max_y = float(style_attr['y_max'])
     max_x = len(data)
     plt.plot(list(data), color=style_attr['color'], linewidth=style_attr['line width'])
     plt.plot(len(data), list(data)[-1], "o", markersize=style_attr['circle size'], color=style_attr['color'])

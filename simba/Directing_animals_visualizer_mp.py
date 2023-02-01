@@ -112,7 +112,7 @@ def _img_creator(data: pd.DataFrame,
 
 class DirectingOtherAnimalsVisualizerMultiprocess(object):
     """
-    Class for visualizing when animals are directing towards body-parts of other animals.
+    Class for visualizing when animals are directing towards body-parts of other animals using multiprocessing.
 
     > Note: Requires the pose-estimation data for the left ear, right ears and nose of individual animals.
 
@@ -120,6 +120,12 @@ class DirectingOtherAnimalsVisualizerMultiprocess(object):
     ----------
     config_path: str
         path to SimBA project config file in Configparser format
+    video_name: str
+        Video to visualize directionality for (e.g., ``My_video.mp4``)
+    style_attr: dict
+        Video style attribitions.
+    core_cnt: int
+        How many cores to use to create the video.
 
     Notes
     -----
@@ -129,19 +135,18 @@ class DirectingOtherAnimalsVisualizerMultiprocess(object):
     Examples
     -----
     >>> style_attr = {'Show_pose': True, 'Pose_circle_size': 3, "Direction_color": 'Random', 'Direction_thickness': 4, 'Highlight_endpoints': True}
-    >>> directing_visualizer = DirectingOtherAnimalsVisualizerMultiprocess(config_path='/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/project_folder/project_config.ini', video_name='Testing_Video_3.mp4', style_attr=style_attr)
+    >>> directing_visualizer = DirectingOtherAnimalsVisualizerMultiprocess(config_path='project_folder/project_config.ini', video_name='Testing_Video_3.mp4', style_attr=style_attr)
     >>> directing_visualizer.visualize_results()
     """
-
 
     def __init__(self,
                  config_path: str,
                  video_name: str,
                  style_attr: dict,
                  core_cnt: int):
-        #
-        # if platform.system() == "Darwin":
-        #     multiprocessing.set_start_method('spawn', force=True)
+
+        if platform.system() == "Darwin":
+            multiprocessing.set_start_method('spawn', force=True)
 
         self.config = read_config_file(config_path)
         self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')

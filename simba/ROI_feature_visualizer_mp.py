@@ -39,6 +39,7 @@ def _img_creator(data: pd.DataFrame,
                  tracked_bps: dict,
                  animal_bps: dict,
                  directing_data: pd.DataFrame):
+
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     font = cv2.FONT_HERSHEY_COMPLEX
 
@@ -55,7 +56,7 @@ def _img_creator(data: pd.DataFrame,
     def __insert_shapes(img: np.array, shape_info: dict):
         for shape_name, shape_info in shape_info.items():
             if shape_info['Shape_type'] == 'Rectangle':
-                cv2.rectangle(img, (shape_info['topLeftX'], shape_info['topLeftY']), (shape_info['Bottom_right_X'], shape_info['Bottom_right_Y']), shape_info['Color BGR'], shape_info['Thickness'])
+                cv2.rectangle(img, (int(shape_info['topLeftX']), int(shape_info['topLeftY'])), (int(shape_info['Bottom_right_X']), int(shape_info['Bottom_right_Y'])), shape_info['Color BGR'], int(shape_info['Thickness']))
                 if style_attr['ROI_centers']:
                     center_cord = ((int(shape_info['topLeftX'] + (shape_info['width'] / 2))), (int(shape_info['topLeftY'] + (shape_info['height'] / 2))))
                     cv2.circle(img, center_cord, scalers['circle_size'], shape_info['Color BGR'], -1)
@@ -65,15 +66,15 @@ def _img_creator(data: pd.DataFrame,
 
 
             if shape_info['Shape_type'] == 'Circle':
-                cv2.circle(img, (shape_info['centerX'], shape_info['centerY']), shape_info['radius'], shape_info['Color BGR'], shape_info['Thickness'])
+                cv2.circle(img, (int(shape_info['centerX']), int(shape_info['centerY'])), shape_info['radius'], shape_info['Color BGR'], int(shape_info['Thickness']))
                 if style_attr['ROI_centers']:
-                    cv2.circle(img, (shape_info['centerX'], shape_info['centerY']), scalers['circle_size'], shape_info['Color BGR'], -1)
+                    cv2.circle(img, (int(shape_info['centerX']), int(shape_info['centerY'])), scalers['circle_size'], shape_info['Color BGR'], -1)
                 if style_attr['ROI_ear_tags']:
                     for tag_data in shape_info['Tags'].values():
                         cv2.circle(img, tag_data, scalers['circle_size'], shape_info['Color BGR'], -1)
 
             if shape_info['Shape_type'] == 'Polygon':
-                cv2.polylines(img, [shape_info['vertices']], True, shape_info['Color BGR'], thickness=shape_info['Thickness'])
+                cv2.polylines(img, [shape_info['vertices']], True, shape_info['Color BGR'], thickness=int(shape_info['Thickness']))
                 if style_attr['ROI_centers']:
                     cv2.circle(img, shape_info['Tags']['Center_tag'], scalers['circle_size'], shape_info['Color BGR'], -1)
                 if style_attr['ROI_ear_tags']:
@@ -88,12 +89,21 @@ def _img_creator(data: pd.DataFrame,
                                 frame_cnt: int,
                                 shape_info: dict,
                                 img: np.array,
-                                video_name: str):
+                                video_name: str,
+                                style_attr: dict):
 
         r = directing_data.loc[(directing_data['Video'] == video_name) & (directing_data['ROI'] == shape_name) & (directing_data['Animal'] == animal_name) & (directing_data['Frame'] == frame_cnt)]
         clr = shape_info[shape_name]['Color BGR']
         thickness = shape_info[shape_name]['Thickness']
-        cv2.line(img, (int(r['Eye_x']), int(r['Eye_y'])), (int(r['ROI_x']), int(r['ROI_y'])), clr, thickness)
+        if style_attr['Directionality_style'] == 'Funnel':
+            convex_hull_arr = np.array([[r['ROI_edge_1_x'], r['ROI_edge_1_y']],
+                                        [r['ROI_edge_2_x'], r['ROI_edge_2_y']],
+                                        [r['Eye_x'], r['Eye_y']]]).reshape(-1, 2).astype(int)
+            cv2.fillPoly(img, [convex_hull_arr], clr)
+
+        if style_attr['Directionality_style'] == 'Lines':
+            cv2.line(img, (int(r['Eye_x']), int(r['Eye_y'])), (int(r['ROI_x']), int(r['ROI_y'])), clr, int(thickness))
+
         return img
 
     group_cnt = int(data['group'].values[0])
@@ -133,7 +143,8 @@ def _img_creator(data: pd.DataFrame,
                                                   frame_cnt=current_frm,
                                                   shape_info=shape_info,
                                                   img=img,
-                                                  video_name=video_name)
+                                                  video_name=video_name,
+                                                  style_attr=style_attr)
         writer.write(img)
         current_frm += 1
         print('Multi-processing video frame {} on core {}...'.format(str(current_frm), str(group_cnt)))
@@ -165,7 +176,7 @@ class ROIfeatureVisualizerMultiprocess(object):
 
     Examples
     ----------
-    style_attr = {'ROI_centers': True, 'ROI_ear_tags': True, 'Directionality': True, 'Border_color': (0, 128, 0), 'Pose_estimation': True}
+    style_attr = {'ROI_centers': True, 'ROI_ear_tags': True, 'Directionality': True, 'Directionality_style': 'Funnel', 'Border_color': (0, 128, 0), 'Pose_estimation': True}
     roi_feature_visualizer = ROIfeatureVisualizerMultiprocess(config_path='test_/project_folder/project_config.ini', video_name='Together_1.avi', style_attr=style_attr, core_cnt=3)
     roi_feature_visualizer.create_visualization()
     """
@@ -309,3 +320,8 @@ class ROIfeatureVisualizerMultiprocess(object):
             pool.terminate()
             pool.join()
             print('Video {} complete (elapsed time: {}s). Video saved in project_folder/frames/output/ROI_features.'.format(self.video_name, self.timer.elapsed_time_str))
+
+
+# style_attr = {'ROI_centers': True, 'ROI_ear_tags': True, 'Directionality': True, 'Directionality_style': 'Funnel', 'Border_color': (0, 128, 0), 'Pose_estimation': True}
+# roi_feature_visualizer = ROIfeatureVisualizerMultiprocess(config_path='/Users/simon/Desktop/envs/simba_dev/tests/test_data/mouse_open_field/project_folder/project_config.ini', video_name='Video1.mp4', style_attr=style_attr, core_cnt=3)
+# roi_feature_visualizer.create_visualization()

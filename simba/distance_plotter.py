@@ -111,7 +111,10 @@ class DistancePlotterSingleCore(object):
 
 
             if self.video_setting or self.frame_setting:
-                max_y = np.amax(distance_arr)
+                if self.style_attr['y_max'] == 'auto':
+                    max_y = np.amax(distance_arr)
+                else:
+                    max_y = float(self.style_attr['y_max'])
                 y_ticks_locs = y_lbls = np.round(np.linspace(0, max_y, 10), 2)
                 for i in range(distance_arr.shape[0]):
                     for j in range(distance_arr.shape[1]):
@@ -121,7 +124,7 @@ class DistancePlotterSingleCore(object):
 
                     x_ticks_locs = x_lbls = np.round(np.linspace(0, i, 5))
                     x_lbls = np.round((x_lbls / self.fps), 1)
-
+                    plt.ylim(0, max_y)
 
                     plt.xlabel('time (s)')
                     plt.ylabel('distance (cm)')
@@ -154,7 +157,7 @@ class DistancePlotterSingleCore(object):
         print('SIMBA COMPLETE: All distance visualizations created in project_folder/frames/output/line_plot directory (elapsed time: {}s)'.format(self.timer.elapsed_time_str))
 
 
-# style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8}
+#style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8, 'y_max': 'auto'}
 # line_attr = {0: ['Center_1', 'Center_2', 'Green'], 1: ['Ear_left_2', 'Ear_left_1', 'Red']}
 
 # test = DistancePlotterSingleCore(config_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
