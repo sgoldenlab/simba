@@ -197,5 +197,3 @@ class ShapAggregateStatisticsVisualizer(object):
         cv2.imwrite(self.img_save_path, self.img)
         self.visualization_timer.stop_timer()
         print('SIMBA COMPLETE: SHAP summary graph saved at {} (elapsed time: {}s)'.format(self.img_save_path, self.visualization_timer.elapsed_time_str))
-
-

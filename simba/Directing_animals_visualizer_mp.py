@@ -26,6 +26,7 @@ from simba.rw_dfs import read_df
 import platform
 import multiprocessing
 import functools
+from simba.enums import Formats
 
 
 def _img_creator(data: pd.DataFrame,
@@ -37,7 +38,7 @@ def _img_creator(data: pd.DataFrame,
                  video_meta_data: dict,
                  colors: list):
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     group_cnt = int(data.iloc[0]['group'])
     start_frm, current_frm, end_frm = data.index[0], data.index[0], data.index[-1]
     save_path = os.path.join(save_temp_dir, '{}.mp4'.format(str(group_cnt)))

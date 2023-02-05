@@ -27,6 +27,14 @@ def check_int(name, value, max_value=None, min_value=None):
                 'SIMBA VALUE ERROR: {} should be less than, or equal {}. It is set to {}'.format(name, str(max_value),
                                                                                            str(value)))
 
+def check_if_valid_input(name, input, options):
+    if input not in options:
+        error_msg = f'SIMBA VALUE ERROR: {name} is set to {str(input)}, which is an invalid setting. OPTIONS {options}'
+        print(error_msg)
+        raise ValueError(error_msg)
+    else:
+        pass
+
 
 def check_str(name, value, options=(), allow_blank=False):
     try:

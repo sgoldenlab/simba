@@ -10,6 +10,7 @@ from simba.misc_tools import (find_video_of_file,
                               create_single_color_lst,
                               get_color_dict,
                               SimbaTimer)
+from simba.enums import Formats
 from simba.read_config_unit_tests import check_if_filepath_list_is_empty
 from simba.rw_dfs import read_df
 
@@ -76,7 +77,7 @@ def create_video_from_dir(in_directory: str,
             os.makedirs(out_directory)
 
         save_path = os.path.join(out_directory, file_name + '.mp4')
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'], (video_meta_data['width'], video_meta_data['height']))
 
         frm_cnt = 0

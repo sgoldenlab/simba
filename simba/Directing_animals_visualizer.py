@@ -20,6 +20,7 @@ import cv2
 import numpy as np
 import random
 from simba.rw_dfs import read_df
+from simba.enums import ReadConfig, Formats, Paths
 
 
 class DirectingOtherAnimalsVisualizer(object):
@@ -52,14 +53,14 @@ class DirectingOtherAnimalsVisualizer(object):
                  style_attr: dict):
 
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.video_path = os.path.join(self.project_path, 'videos', video_name)
         self.direction_analyzer = DirectingOtherAnimalsAnalyzer(config_path=config_path)
         self.direction_analyzer.process_directionality()
         self.direction_analyzer.create_directionality_dfs()
-        self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         self.x_cols, self.y_cols, self.pcols = getBpNames(config_path)
-        self.no_animals = read_config_entry(self.config, 'General settings', 'animal_no', 'int')
+        self.no_animals = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.ANIMAL_CNT.value, 'int')
         self.style_attr, self.pose_colors = style_attr, []
         self.colors = get_color_dict()
         if self.style_attr['Show_pose']:
@@ -68,12 +69,12 @@ class DirectingOtherAnimalsVisualizer(object):
             self.direction_colors = createColorListofList(1, int(self.no_animals**2))
         else:
             self.direction_colors = [self.colors[self.style_attr['Direction_color']]]
-        self.data_in_dir = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
+        self.data_in_dir = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
         self.data_dict = self.direction_analyzer.directionality_df_dict
         self.video_directory = os.path.join(self.project_path, 'videos')
-        self.save_directory = os.path.join(self.project_path, 'frames', 'output', 'ROI_directionality_visualize')
+        self.save_directory = os.path.join(self.project_path, Paths.DIRECTING_ANIMALS_OUTPUT_PATH.value)
         if not os.path.exists(self.save_directory): os.makedirs(self.save_directory)
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
         self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.no_animals)
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, self.multi_animal_id_lst, self.no_animals, self.x_cols, self.y_cols, [], self.pose_colors)
         self.files_found = glob.glob(self.data_in_dir + '/*.' + self.file_type)

@@ -11,6 +11,7 @@ from simba.read_config_unit_tests import (read_config_entry,
                                           check_if_filepath_list_is_empty)
 from simba.features_scripts.unit_tests import (read_video_info_csv,
                                                read_video_info)
+from simba.enums import ReadConfig, Formats, Paths
 from simba.misc_visualizations import make_gantt_plot
 from simba.train_model_functions import get_all_clf_names
 from simba.drop_bp_cords import get_fn_ext
@@ -45,7 +46,7 @@ def _image_creator(data: np.array,
     start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
 
     if video_setting:
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         video_save_path = os.path.join(video_save_dir, '{}.mp4'.format(str(group)))
         video_writer = cv2.VideoWriter(video_save_path, fourcc, fps, (width, height))
 
@@ -137,21 +138,21 @@ class GanttCreatorMultiprocess(object):
             print('SIMBA ERROR: Please select gantt videos, frames, and/or last frame.')
             raise ValueError('SIMBA ERROR: Please select gantt videos, frames, and/or last frame.')
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.data_in_dir = os.path.join(self.project_path, 'csv', 'machine_results')
-        self.target_cnt = read_config_entry(self.config, 'SML settings', 'No_targets', data_type='int')
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.data_in_dir = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
+        self.target_cnt = read_config_entry(self.config, ReadConfig.SML_SETTINGS.value, ReadConfig.TARGET_CNT.value, data_type='int')
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
         check_if_filepath_list_is_empty(filepaths=self.files_found,
                                         error_msg='SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing gantt charts')
         self.colours = ['red', 'green', 'pink', 'orange', 'blue', 'purple', 'lavender', 'grey', 'sienna', 'tomato', 'azure', 'crimson', 'aqua', 'plum', 'teal', 'maroon', 'lime', 'coral', 'deeppink']
         self.colour_tuple_x = list(np.arange(3.5, 203.5, 5))
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.target_cnt)
-        self.out_parent_dir = os.path.join(self.project_path, 'frames', 'output', 'gantt_plots')
+        self.out_parent_dir = os.path.join(self.project_path, Paths.GANTT_PLOT_DIR.value)
         if not os.path.exists(self.out_parent_dir):
             os.makedirs(self.out_parent_dir)
         self.y_rotation, self.y_fontsize = self.style_attr['font rotation'], self.style_attr['font size']
-        self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         self.out_width, self.out_height = self.style_attr['width'], self.style_attr['height']
         self.maxtasksperchild = 10
         self.chunksize = 1

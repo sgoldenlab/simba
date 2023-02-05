@@ -7,6 +7,7 @@ from simba.misc_tools import (get_video_meta_data,
                               get_fn_ext,
                               SimbaTimer)
 from datetime import datetime
+from simba.enums import Paths, ReadConfig
 
 
 class FrameMergererFFmpeg(object):
@@ -45,10 +46,10 @@ class FrameMergererFFmpeg(object):
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
         if config_path is not None:
             self.config_path, self.config = config_path, read_config_file(ini_path=config_path)
-            self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='str')
-            self.output_dir = os.path.join(self.project_path, 'frames', 'output', 'merged')
-            self.temp_dir = os.path.join(self.project_path, 'frames', 'output', 'merged', 'temp')
-            self.output_path = os.path.join(self.project_path, 'frames', 'output', 'merged', 'merged_video_{}.mp4'.format(str(self.datetime)))
+            self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+            self.output_dir = os.path.join(self.project_path, Paths.CONCAT_VIDEOS_DIR.value)
+            self.temp_dir = os.path.join(self.project_path, Paths.CONCAT_VIDEOS_DIR.value, 'temp')
+            self.output_path = os.path.join(self.project_path, Paths.CONCAT_VIDEOS_DIR.value, 'merged_video_{}.mp4'.format(str(self.datetime)))
         else:
             self.file_path = list(frame_types.values())[0]
             self.output_dir, ss, df = get_fn_ext(filepath=self.file_path)

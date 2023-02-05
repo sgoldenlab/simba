@@ -275,6 +275,8 @@ def calc_permutation_importance(x_test: np.array,
 
     """
     print('Calculating feature permutation importances...')
+    timer = SimbaTimer()
+    timer.start_timer()
     p_importances = permutation_importance(clf, x_test, y_test, n_repeats=10, random_state = 0)
     df = pd.DataFrame(np.column_stack([feature_names, p_importances.importances_mean, p_importances.importances_std]), columns=['FEATURE_NAME', 'FEATURE_IMPORTANCE_MEAN', 'FEATURE_IMPORTANCE_STDEV'])
     df = df.sort_values(by=['FEATURE_IMPORTANCE_MEAN'], ascending=False)
@@ -283,6 +285,8 @@ def calc_permutation_importance(x_test: np.array,
     else:
         save_file_path = os.path.join(save_dir, clf_name + '_permutations_importances.csv')
     df.to_csv(save_file_path, index=False)
+    timer.stop_timer()
+    print('Permutation importance calculation complete (elapsed time: {}s) ...'.format(timer.elapsed_time_str))
 
 def calc_learning_curve(x_y_df: pd.DataFrame,
                   clf_name: str,
@@ -322,6 +326,8 @@ def calc_learning_curve(x_y_df: pd.DataFrame,
     """
 
     print('Calculating learning curves...')
+    timer = SimbaTimer()
+    timer.start_timer()
     x_df, y_df = split_df_to_x_y(x_y_df, clf_name)
     cv = ShuffleSplit(n_splits=shuffle_splits, test_size=tt_size)
     if platform.system() == "Darwin":
@@ -340,6 +346,9 @@ def calc_learning_curve(x_y_df: pd.DataFrame,
     else:
         save_file_path = os.path.join(save_dir, clf_name + '_learning_curve.csv')
     results_df.to_csv(save_file_path, index=False)
+    timer.stop_timer()
+    print('Learning curve calculation complete (elapsed time: {}s) ...'.format(timer.elapsed_time_str))
+
 
 def calc_pr_curve(rf_clf,
                   x_df,
@@ -373,6 +382,8 @@ def calc_pr_curve(rf_clf,
     """
 
     print('Calculating PR curves...')
+    timer = SimbaTimer()
+    timer.start_timer()
     p = rf_clf.predict_proba(x_df)[:, 1]
     precision, recall, thresholds = precision_recall_curve(y_df, p, pos_label=1)
     pr_df = pd.DataFrame()
@@ -387,6 +398,9 @@ def calc_pr_curve(rf_clf,
     else:
         save_file_path = os.path.join(save_dir, clf_name + '_pr_curve.csv')
     pr_df.to_csv(save_file_path, index=False)
+    timer.stop_timer()
+    print('Precision-recall curve calculation complete (elapsed time: {}s) ...'.format(timer.elapsed_time_str))
+
 
 def create_example_dt(rf_clf: RandomForestClassifier,
                       clf_name: str,
@@ -585,9 +599,13 @@ def dviz_classification_visualization(x_train: np.array,
 
     clf = tree.DecisionTreeClassifier(max_depth=5, random_state=666)
     clf.fit(x_train, y_train)
-    svg_tree = dtreeviz(clf, x_train, y_train, target_name=clf_name, feature_names=x_train.columns, orientation="TD", class_names=class_names, fancy=True, histtype='strip', X=None, label_fontsize=12, ticks_fontsize=8, fontname="Arial")
-    save_path = os.path.join(save_dir, clf_name + '_fancy_decision_tree_example.svg')
-    svg_tree.save(save_path)
+    try:
+        svg_tree = dtreeviz(clf, x_train, y_train, target_name=clf_name, feature_names=x_train.columns, orientation="TD", class_names=class_names, fancy=True, histtype='strip', X=None, label_fontsize=12, ticks_fontsize=8, fontname="Arial")
+        save_path = os.path.join(save_dir, clf_name + '_fancy_decision_tree_example.svg')
+        svg_tree.save(save_path)
+    except:
+        print('SIMBA ERROR: Skipping dtreeviz example decision tree visualization. Make sure "graphviz" is installed.')
+
 
 def create_shap_log(ini_file_path: str,
                     rf_clf: RandomForestClassifier,
@@ -633,6 +651,8 @@ def create_shap_log(ini_file_path: str,
     """
 
     print('Calculating SHAP values...')
+    timer = SimbaTimer()
+    timer.start_timer()
     data_df = pd.concat([x_df, y_df], axis=1)
     target_df, nontarget_df = data_df[data_df[y_df.name] == 1], data_df[data_df[y_df.name] == 0]
     if len(target_df) < cnt_present:
@@ -671,6 +691,9 @@ def create_shap_log(ini_file_path: str,
                                           shap_df=out_df_shap,
                                           shap_baseline_value=expected_value,
                                           save_path=save_path)
+    timer.stop_timer()
+    print('SHAP calculations complete (elapsed time: {}s) ...'.format(timer.elapsed_time_str))
+
 
 def print_machine_model_information(model_dict: dict):
     """

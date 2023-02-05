@@ -14,6 +14,7 @@ import os
 import cv2
 from numba import jit, prange
 import matplotlib.pyplot as plt
+from simba.enums import Paths, ReadConfig, Formats
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 class HeatMapperClfSingleCore(object):
@@ -74,12 +75,12 @@ class HeatMapperClfSingleCore(object):
         self.bin_size, self.max_scale, self.palette, self.shading = style_attr['bin_size'], style_attr['max_scale'], style_attr['palette'], style_attr['shading']
         self.clf_name, self.files_found = clf_name, files_found
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.save_dir = os.path.join(self.project_path, 'frames', 'output', 'heatmaps_classifier_locations')
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.save_dir = os.path.join(self.project_path, Paths.HEATMAP_CLF_LOCATION_DIR.value)
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         if not os.path.exists(self.save_dir): os.makedirs(self.save_dir)
-        self.dir_in = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.dir_in = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.bp_lst = [self.bp + '_x', self.bp + '_y']
         self.timer = SimbaTimer()
         self.timer.start_timer()
@@ -166,7 +167,7 @@ class HeatMapperClfSingleCore(object):
             self.video_info, self.px_per_mm, self.fps = read_video_info(vid_info_df=self.vid_info_df, video_name=self.video_name)
             self.width, self.height = int(self.video_info['Resolution_width'].values[0]), int(self.video_info['Resolution_height'].values[0])
             if self.video_setting:
-                self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
                 self.video_save_path = os.path.join(self.save_dir, self.video_name + '.mp4')
                 self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (self.width, self.height))
             if self.frame_setting:

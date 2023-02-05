@@ -4,6 +4,7 @@ import pandas as pd
 from simba.drop_bp_cords import *
 from simba.read_config_unit_tests import read_config_file
 import numpy as np
+from simba.enums import ReadConfig
 from simba.misc_tools import check_multi_animal_status
 
 
@@ -39,7 +40,7 @@ class Interpolate(object):
         config = read_config_file(ini_path=config_file_path)
         Xcols, Ycols, Pcols = getBpNames(config_file_path)
         self.columnHeaders = getBpHeaders(config_file_path)
-        noAnimals = config.getint('General settings', 'animal_no')
+        noAnimals = config.getint(ReadConfig.GENERAL_SETTINGS.value, ReadConfig.ANIMAL_CNT.value)
         _, multiAnimalIDList = check_multi_animal_status(config, noAnimals)
         multiAnimalStatus = True
         self.multiAnimalIDList = [x for x in multiAnimalIDList if x]

@@ -9,6 +9,8 @@ from simba.misc_tools import (find_video_of_file,
                               detect_bouts,
                               get_video_meta_data,
                               SimbaTimer)
+from simba.enums import ReadConfig, Paths, Formats
+
 from simba.rw_dfs import read_df
 import numpy as np
 import os, glob
@@ -57,15 +59,15 @@ class ClassifierValidationClips(object):
             raise ValueError()
         self.p_col = 'Probability_' + self.clf_name
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.data_in_dir = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.data_in_dir = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.video_dir = os.path.join(self.project_path, 'videos')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         self.files_found = glob.glob(self.data_in_dir + '/*.' + self.file_type)
-        self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
-        self.out_folder = os.path.join(self.project_path, 'frames', 'output', 'classifier_validation')
+        self.out_folder = os.path.join(self.project_path, Paths.CLF_VALIDATION_DIR.value)
         if not os.path.exists(self.out_folder): os.makedirs(self.out_folder)
         check_if_filepath_list_is_empty(filepaths=self.files_found,
                                         error_msg='SIMBA ERROR: No data found in the project_folder/csv/machine_results directory')
@@ -157,7 +159,7 @@ class ClassifierValidationClips(object):
         self.timer.stop_timer()
         print('SIMBA COMPLETE: All validation clips complete. Files are saved in the project_folder/frames/output/classifier_validation directory of the SimBA project (elapsed time: {}s)'.format(self.timer.elapsed_time_str))
 
-# test = ClassifierValidationClips(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini', window=1, clf_name='Attack', clips=False, concat_video=True)
+# test = ClassifierValidationClips(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', window=1, clf_name='Attack', clips=False, concat_video=True)
 # test.create_clips()
 
 

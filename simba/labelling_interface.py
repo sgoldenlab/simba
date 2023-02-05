@@ -11,6 +11,7 @@ from simba.read_config_unit_tests import (read_config_entry,
                                           check_int,
                                           check_float)
 from simba.misc_tools import get_video_meta_data, get_fn_ext
+from simba.enums import ReadConfig, Paths
 import simba
 from tkinter import *
 from tkinter import filedialog
@@ -60,14 +61,14 @@ class LabellingInterface(object):
         self.config_path, self.setting = config_path, setting
         self.config = read_config_file(config_path)
         self.play_video_script_path = os.path.join(os.path.dirname(simba.__file__), 'play_annotation_video.py')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.target_cnt = read_config_entry(self.config, 'SML settings', 'no_targets', 'int')
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='str')
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.target_cnt = read_config_entry(self.config, ReadConfig.SML_SETTINGS.value, ReadConfig.TARGET_CNT.value, 'int')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.videos_dir_path = os.path.join(self.project_path, 'videos')
         _, self.video_name, _ = get_fn_ext(filepath=file_path)
-        self.features_extracted_folder = os.path.join(self.project_path, 'csv', 'features_extracted')
-        self.targets_inserted_folder = os.path.join(self.project_path, 'csv', 'targets_inserted')
-        self.machine_results_folder = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.features_extracted_folder = os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value)
+        self.targets_inserted_folder = os.path.join(self.project_path, Paths.TARGETS_INSERTED_DIR.value)
+        self.machine_results_folder = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.features_extracted_file_path = os.path.join(self.features_extracted_folder, self.video_name + '.' + self.file_type)
         self.targets_inserted_file_path = os.path.join(self.targets_inserted_folder, self.video_name + '.' + self.file_type)
         self.machine_results_file_path = os.path.join(self.machine_results_folder, self.video_name + '.' + self.file_type)

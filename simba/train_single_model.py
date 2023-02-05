@@ -1,7 +1,6 @@
 __author__ = "Simon Nilsson", "JJ Choong"
 
-from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError,NoOptionError
-import os, glob
+import os, glob, ast
 from simba.train_model_functions import (read_all_files_in_folder,
                                             read_in_all_model_names_to_remove,
                                             delete_other_annotation_columns,
@@ -21,7 +20,6 @@ from simba.train_model_functions import (read_all_files_in_folder,
                                             create_meta_data_csv_training_one_model,
                                             save_rf_model)
 from simba.read_config_unit_tests import (check_int,
-                                          check_str,
                                           check_float,
                                           read_config_entry,
                                           read_config_file,
@@ -30,6 +28,7 @@ from simba.drop_bp_cords import drop_bp_cords
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from simba.misc_tools import SimbaTimer
+perform_flags = ['yes', True, 'True']
 
 class TrainSingleModel(object):
     """
@@ -81,8 +80,7 @@ class TrainSingleModel(object):
             self.over_sample_ratio = 'NaN'
 
         self.annotation_file_paths = glob.glob(self.data_in_path + '/*.' + self.file_type)
-        check_if_filepath_list_is_empty(filepaths=self.annotation_file_paths,
-                                        error_msg='SIMBA ERROR: Zero annotation files found in project_folder/csv/targets_inserted, cannot create model.')
+        check_if_filepath_list_is_empty(filepaths=self.annotation_file_paths, error_msg='SIMBA ERROR: Zero annotation files found in project_folder/csv/targets_inserted, cannot create model.')
         print('Reading in {} annotated files...'.format(str(len(self.annotation_file_paths))))
         self.data_df = read_all_files_in_folder(self.annotation_file_paths, self.file_type, [self.clf_name])
         self.data_df_wo_cords = drop_bp_cords(self.data_df, config_path)
@@ -135,6 +133,8 @@ class TrainSingleModel(object):
         if self.algo == 'RF':
             n_estimators = read_config_entry(self.config, 'create ensemble settings', 'RF_n_estimators', data_type='int')
             max_features = read_config_entry(self.config, 'create ensemble settings', 'RF_max_features', data_type='str')
+            if max_features == 'None':
+                max_features = None
             criterion = read_config_entry(self.config, 'create ensemble settings', 'RF_criterion', data_type='str', options=['gini', 'entropy'])
             min_sample_leaf = read_config_entry(self.config, 'create ensemble settings', 'RF_min_sample_leaf', data_type='int')
             compute_permutation_importance = read_config_entry(self.config, 'create ensemble settings', 'compute_permutation_importance', data_type='str', default_value='no')
@@ -148,33 +148,52 @@ class TrainSingleModel(object):
             generate_shap_scores = read_config_entry(self.config, 'create ensemble settings', 'generate_shap_scores', data_type='str', default_value='no')
             save_meta_data = read_config_entry(self.config, 'create ensemble settings', 'RF_meta_data' ,data_type='str', default_value='no')
 
-            if generate_learning_curve == 'yes':
+            if self.config.has_option('create ensemble settings', 'class_weights'):
+                class_weights = read_config_entry(self.config, 'create ensemble settings', 'class_weights', data_type='str', default_value='None')
+                if class_weights == 'custom':
+                    class_weights = ast.literal_eval(read_config_entry(self.config, 'create ensemble settings', 'custom_weights', data_type='str'))
+                    for k, v in class_weights.items():
+                        class_weights[k] = int(v)
+                if class_weights == 'None':
+                    class_weights = None
+            else:
+                class_weights = None
+
+            if generate_learning_curve in perform_flags:
                 shuffle_splits = read_config_entry(self.config, 'create ensemble settings', 'LearningCurve_shuffle_k_splits', data_type='int', default_value='NaN')
                 dataset_splits = read_config_entry(self.config, 'create ensemble settings','LearningCurve_shuffle_data_splits', data_type='int', default_value='NaN')
                 check_int(name='shuffle_splits', value=shuffle_splits)
                 check_int(name='dataset_splits', value=dataset_splits)
             else:
                 shuffle_splits, dataset_splits = 'NaN', 'NaN'
-            if generate_features_importance_bar_graph == 'yes':
+            if generate_features_importance_bar_graph in perform_flags:
                 feature_importance_bars = read_config_entry(self.config, 'create ensemble settings', 'N_feature_importance_bars', 'int', 'NaN')
                 check_int(name='n_feature_importance_bars', value=feature_importance_bars)
             else:
                 feature_importance_bars = 'NaN'
-            if generate_shap_scores == 'yes':
+            if generate_shap_scores in perform_flags:
                 shap_target_present_cnt = read_config_entry(self.config, 'create ensemble settings', 'shap_target_present_no', data_type='int', default_value=0)
                 shap_target_absent_cnt = read_config_entry(self.config, 'create ensemble settings', 'shap_target_absent_no', data_type='int', default_value=0)
                 check_int(name='shap_target_present_cnt', value=shap_target_present_cnt)
                 check_int(name='shap_target_absent_cnt', value=shap_target_absent_cnt)
 
-            self.rf_clf = RandomForestClassifier(n_estimators=n_estimators, max_features=max_features, n_jobs=-1, criterion=criterion, min_samples_leaf=min_sample_leaf, bootstrap=True, verbose=1)
+            print(class_weights)
+            self.rf_clf = RandomForestClassifier(n_estimators=n_estimators,
+                                                 max_features=max_features,
+                                                 n_jobs=-1, criterion=criterion,
+                                                 min_samples_leaf=min_sample_leaf,
+                                                 bootstrap=True,
+                                                 verbose=1,
+                                                 class_weight=class_weights)
             try:
                 self.rf_clf.fit(self.x_train, self.y_train)
             except Exception as e:
                 print('ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
                 raise ValueError(e, 'SIMBA ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
-            if compute_permutation_importance == 'yes':
+
+            if compute_permutation_importance in perform_flags:
                 calc_permutation_importance(self.x_test, self.y_test, self.rf_clf, self.feature_names, self.clf_name, self.eval_out_path)
-            if generate_learning_curve == 'yes':
+            if generate_learning_curve in perform_flags:
                 calc_learning_curve(x_y_df=self.x_y_df,
                                     clf_name=self.clf_name,
                                     shuffle_splits=shuffle_splits,
@@ -183,22 +202,22 @@ class TrainSingleModel(object):
                                     rf_clf=self.rf_clf,
                                     save_dir=self.eval_out_path)
 
-            if generate_precision_recall_curve == 'yes':
+            if generate_precision_recall_curve in perform_flags:
                 calc_pr_curve(self.rf_clf, self.x_test, self.y_test, self.clf_name, self.eval_out_path)
-            if generate_example_decision_tree == 'yes':
+            if generate_example_decision_tree in perform_flags:
                 create_example_dt(self.rf_clf, self.clf_name, self.feature_names, self.class_names, self.eval_out_path)
-            if generate_classification_report == 'yes':
+            if generate_classification_report in perform_flags:
                 create_clf_report(self.rf_clf, self.x_test, self.y_test, self.class_names, self.eval_out_path)
-            if generate_features_importance_log == 'yes':
+            if generate_features_importance_log in perform_flags:
                 create_x_importance_log(self.rf_clf, self.feature_names, self.clf_name, self.eval_out_path)
-            if generate_features_importance_bar_graph == 'yes':
+            if generate_features_importance_bar_graph in perform_flags:
                 create_x_importance_bar_chart(self.rf_clf, self.feature_names, self.clf_name, self.eval_out_path, feature_importance_bars)
-            if generate_example_decision_tree_fancy == 'yes':
+            if generate_example_decision_tree_fancy in perform_flags:
                 dviz_classification_visualization(self.x_train, self.y_train, self.clf_name, self.class_names, self.eval_out_path)
-            if generate_shap_scores == 'yes':
+            if generate_shap_scores in perform_flags:
                 create_shap_log(self.ini_path, self.rf_clf, self.x_train, self.y_train, self.feature_names, self.clf_name, shap_target_present_cnt, shap_target_absent_cnt, self.eval_out_path)
 
-            if save_meta_data == 'yes':
+            if save_meta_data in perform_flags:
                 meta_data_lst = [self.clf_name, criterion, max_features, min_sample_leaf,
                                  n_estimators, compute_permutation_importance, generate_classification_report,
                                  generate_example_decision_tree, generate_features_importance_bar_graph,
@@ -223,7 +242,7 @@ class TrainSingleModel(object):
         print('Classifier {} saved in models/generated_models directory (elapsed time: {}s).'.format(self.clf_name, self.timer.elapsed_time_str))
         print('Evaluation files are in models/generated_models/model_evaluations folders')
 
-# test = TrainSingleModel(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini')
+# test = TrainSingleModel(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.perform_sampling()
 # test.train_model()
 # test.save_model()

@@ -7,9 +7,9 @@ from simba.misc_tools import (check_multi_animal_status,
 from datetime import datetime
 from simba.features_scripts.unit_tests import read_video_info_csv, read_video_info
 from simba.read_config_unit_tests import (read_config_entry,
-                                          check_that_column_exist,
                                           read_config_file,
                                           check_if_filepath_list_is_empty)
+from simba.enums import ReadConfig, Paths
 import os, glob
 from collections import defaultdict
 from simba.rw_dfs import read_df
@@ -45,12 +45,12 @@ class MovementProcessor(object):
         self.timer.start_timer()
         self.timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.logs_path = os.path.join(self.project_path, 'logs')
         self.save_path = os.path.join(self.logs_path, 'Movement_log_{}.csv'.format(self.timestamp))
-        self.in_dir = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
+        self.in_dir = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
         self.vid_info_df = read_video_info_csv(os.path.join(self.logs_path, 'video_info.csv'))
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
         try:
             self.animal_cnt = read_config_entry(self.config, 'process movements', 'no_of_animals', 'int')
             self.p_threshold = read_config_entry(self.config, 'process movements', 'probability_threshold', 'float')

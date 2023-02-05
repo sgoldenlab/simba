@@ -4,15 +4,19 @@ import configparser
 import pandas as pd
 import os
 from pathlib import Path
-from configparser import ConfigParser, NoOptionError, NoSectionError
+from configparser import (ConfigParser,
+                          NoOptionError,
+                          NoSectionError)
 import glob
 import re
-import sys
 from pylab import cm
 import shutil
 from datetime import datetime
 from simba.rw_dfs import read_df, save_df
-from simba.read_config_unit_tests import read_config_entry, read_config_file, check_file_exist_and_readable
+from simba.read_config_unit_tests import (read_config_entry,
+                                          read_config_file,
+                                          check_file_exist_and_readable)
+from simba.enums import ReadConfig, Paths
 
 
 def create_body_part_dictionary(multiAnimalStatus: bool,
@@ -111,8 +115,8 @@ def getBpNames(inifile: str):
 
     x_cols, y_cols, p_cols = [], [], []
     config = read_config_file(ini_path=inifile)
-    project_path = read_config_entry(config, 'General settings', 'project_path', data_type='folder_path')
-    body_part_lst_path = str(os.path.join(project_path, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv'))
+    project_path = read_config_entry(config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+    body_part_lst_path = str(os.path.join(project_path, Paths.BP_NAMES.value))
     pose_config_lst = pd.read_csv(body_part_lst_path, header=None).iloc[:, 0].to_list()
     pose_config_lst = [x for x in pose_config_lst if str(x) != 'nan']
     for bodypart in pose_config_lst:
@@ -138,7 +142,7 @@ def define_bp_drop_down(configini: str):
 
     from simba.misc_tools import check_multi_animal_status
     config = read_config_file(ini_path=configini)
-    no_animals = read_config_entry(config=config, section='General settings',option='animal_no',data_type='int')
+    no_animals = read_config_entry(config=config, section=ReadConfig.GENERAL_SETTINGS.value,option=ReadConfig.ANIMAL_CNT.value,data_type='int')
     multi_animal_status, multi_animal_id_lst = check_multi_animal_status(config, no_animals)
     x_cols, y_cols, pcols = getBpNames(configini)
     animal_bp_dict = create_body_part_dictionary(multi_animal_status, multi_animal_id_lst, no_animals, x_cols, y_cols, [], [])
@@ -224,8 +228,8 @@ def drop_bp_cords(df: pd.DataFrame,
     """
 
     config = read_config_file(config_path)
-    project_path = read_config_entry(config, 'General settings', 'project_path', data_type='folder_path')
-    body_part_list_path = os.path.join(project_path, 'logs', 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
+    project_path = read_config_entry(config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type='folder_path')
+    body_part_list_path = os.path.join(project_path, Paths.BP_NAMES.value)
     check_file_exist_and_readable(body_part_list_path)
     pose_df = pd.read_csv(body_part_list_path, header=None)
     pose_lst = list(pose_df[0])
@@ -278,7 +282,7 @@ def bodypartConfSchematic():
     (ii) the paths to the images representing those  body-part schematics in SimBA installation
     """
 
-    optionsBaseListImagesPath = os.path.join(os.path.dirname(__file__), 'pose_configurations', 'schematics')
+    optionsBaseListImagesPath = os.path.join(os.path.dirname(__file__), Paths.SCHEMATICS.value)
     optionsBaseListNamesPath = os.path.join(os.path.dirname(__file__), 'pose_configurations', 'configuration_names', 'pose_config_names.csv')
     optionsBaseNameList = pd.read_csv(optionsBaseListNamesPath, header=None)
     optionsBaseNameList = list(optionsBaseNameList[0])

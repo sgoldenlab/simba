@@ -12,8 +12,10 @@ from simba.drop_bp_cords import (create_body_part_dictionary,
                                  getBpNames,
                                  get_fn_ext,
                                  checkDirectionalityCords)
-import pandas as pd
 from simba.rw_dfs import read_df
+from simba.enums import ReadConfig, Paths
+import pandas as pd
+
 import itertools
 import numpy as np
 import os, glob
@@ -47,17 +49,17 @@ class DirectingOtherAnimalsAnalyzer(object):
 
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
         self.config = read_config_file(config_path)
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.animal_cnt = read_config_entry(self.config, 'General settings', 'animal_no', 'int')
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.animal_cnt = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.ANIMAL_CNT.value, 'int')
         if self.animal_cnt < 2:
             print('SIMBA ERROR: Cannot analyze directionality between animals in a 1 animal project.')
             raise ValueError('SIMBA ERROR: Cannot analyze directionality between animals in a 1 animal project.')
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.logs_dir = os.path.join(self.project_path, 'logs')
-        self.data_in_dir = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
-        self.data_out_dir = os.path.join(self.project_path , 'logs', 'directionality_dataframes')
+        self.data_in_dir = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
+        self.data_out_dir = os.path.join(self.project_path , Paths.DIRECTIONALITY_DF_DIR.value)
         if not os.path.exists(self.data_out_dir): os.makedirs(self.data_out_dir)
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.animal_cnt)
         self.x_cols, self.y_cols, self.p_cols = getBpNames(config_path)
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, self.multi_animal_id_lst, self.animal_cnt, self.x_cols, self.y_cols, [], [])
@@ -184,10 +186,10 @@ class DirectingOtherAnimalsAnalyzer(object):
         print('Summary directional statistics saved at ' + os.path.join(self.logs_dir, 'Direction_data_{}{}'.format(str(self.datetime), '.csv')))
         print('SIMBA COMPLETE: All directional data saved in SimBA project (elapsed time: {}s.'.format(self.session_timer.elapsed_time_str))
 
-# test = DirectingOtherAnimalsAnalyzer(config_path='/Users/simon/Desktop/train_model_project/project_folder/project_config.ini')
+# test = DirectingOtherAnimalsAnalyzer(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.process_directionality()
 # test.create_directionality_dfs()
-# # test.save_directionality_dfs()
-# # test.summary_statistics()
+# test.save_directionality_dfs()
+# test.summary_statistics()
 
 

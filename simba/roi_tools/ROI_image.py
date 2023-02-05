@@ -141,6 +141,7 @@ class ROI_image_class():
                                              'Ear_tag_size': int(circle_info['Shape_ear_tag_size'])})
                     self.insert_all_ROIs_into_image()
                     self.not_done = False
+                    cv2.waitKey(33)
 
         while True:
             cv2.setMouseCallback('Define shape', draw_circle_callback)

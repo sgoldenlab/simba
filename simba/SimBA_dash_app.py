@@ -14,19 +14,18 @@ import json
 import math
 import statistics
 import os
-from flask import request
 import sys
 
 
-filePath = ''
-groupPath = ''
+filePath = '/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/logs/SimBA_dash_storage_20230202105812.h5'
+groupPath = 'None'
 
-if not len(sys.argv) > 1:
-    print("Expecting link argument.")
-else:
-    print("in p1.py link is " + sys.argv[1] + ' ' + sys.argv[2])
-    filePath = sys.argv[1]
-    groupPath = sys.argv[2]
+# if not len(sys.argv) > 1:
+#     print("Expecting link argument.")
+# else:
+#     print("in p1.py link is " + sys.argv[1] + ' ' + sys.argv[2])
+#     filePath = sys.argv[1]
+#     groupPath = sys.argv[2]
 
 
 external_stylesheets = ['dash_simba_base.css', '//use.fontawesome.com/releases/v5.0.7/css/all.css']
@@ -61,6 +60,7 @@ def get_feature_data(videos, behaviors, g_categories, path, h5file):
 
         for category in g_categories:
             if category == 'VideoData':
+                print(videos)
                 video = pd.read_hdf(path, key=category + '/' + videos[0])
                 dict_features[b][category] = \
                     {column: get_probability_data(column, videos, path) for column in video.columns if '_'+b in column}
@@ -104,10 +104,12 @@ def get_categories(h5file):
         if k != 'Classifier_names' and k != 'Video_info':
             if 'VideoData' in k:
                 categories.append(k)
+                print('VideoData categories', k)
             else:
                 hf_category = h5file.get(k)
                 for key in hf_category.keys():
                     categories.append(key)
+                    print('VideoData categories 1', k)
             general_list.append(k)
     return categories, general_list
 
@@ -138,7 +140,7 @@ def get_download_path():
 # # VARIABLES AND DATA
 # # List of all videos in H5File
 video_info = pd.read_hdf(filePath, key='Video_info')
-H5list_videos = list(video_info.index)
+H5list_videos = list(video_info['Video'])
 
 # # List of Behaviors
 classifiers = pd.read_hdf(filePath, key='Classifier_names')
@@ -1146,6 +1148,9 @@ def download(ind_click, multi_click, ind_figure, multi_figure, file_name):
         return ['Saved ' + str_name + '.csv to Downloads']
     else:
         return []
+
+
+
 
 
 if __name__ == '__main__':

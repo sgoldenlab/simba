@@ -10,6 +10,7 @@ from simba.rw_dfs import read_df
 import numpy as np
 from numba import jit
 import pandas as pd
+from simba.enums import ReadConfig, Paths, Formats
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
@@ -68,14 +69,14 @@ class HeatmapperLocation(object):
         self.final_img_setting, self.bp = final_img_setting, bodypart
         self.bin_size, self.max_scale = bin_size, max_scale
         self.config, self.palette= read_config_file(config_path), palette
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.save_dir = os.path.join(self.project_path, 'frames', 'output', 'heatmaps_locations')
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.save_dir = os.path.join(self.project_path, Paths.HEATMAP_LOCATION_DIR.value)
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         if not os.path.exists(self.save_dir): os.makedirs(self.save_dir)
-        self.dir_in = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
+        self.dir_in = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
         self.files_found = glob.glob(self.dir_in + "/*." + self.file_type)
-        self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         self.bp_lst = [self.bp + '_x', self.bp + '_y']
         print('Processing heatmaps for {} video(s)...'.format(str(len(self.files_found))))
 

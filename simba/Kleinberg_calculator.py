@@ -15,6 +15,7 @@ from simba.rw_dfs import read_df, save_df
 from simba.drop_bp_cords import get_fn_ext
 import pandas as pd
 from simba.pybursts import kleinberg_burst_detection
+from simba.enums import ReadConfig, Paths
 import numpy as np
 import shutil
 from copy import deepcopy
@@ -70,14 +71,13 @@ class KleinbergCalculator(object):
         self.timer = SimbaTimer()
         self.timer.start_timer()
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.in_path = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.in_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.logs_folder = os.path.join(self.project_path, 'logs')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.in_path = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
-        self.hierarchical_search, sigma, gamma, hierarchy = hierarchical_search, int(sigma), float(gamma), int(hierarchy)
-        check_int(value=sigma, name='sigma', min_value=1)
+        self.hierarchical_search, sigma, gamma, hierarchy = hierarchical_search, float(sigma), float(gamma), int(hierarchy)
+        check_float(value=sigma, name='sigma', min_value=1.01)
         check_float(value=gamma, name='gamma', min_value=0)
         check_int(value=hierarchy, name='hierarchy')
         self.sigma, self.gamma, self.hierarchy = float(sigma), float(gamma), float(hierarchy)
@@ -85,7 +85,7 @@ class KleinbergCalculator(object):
         check_if_filepath_list_is_empty(filepaths=self.files_found,
                                         error_msg='SIMBA ERROR: No data files found in {}. Cannot perform Kleinberg smooting'.format(self.in_path))
         self.clfs = classifier_names
-        original_data_files_folder = os.path.join(self.project_path, 'csv', 'machine_results', 'Pre_Kleinberg_{}'.format( self.datetime))
+        original_data_files_folder = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value, 'Pre_Kleinberg_{}'.format( self.datetime))
         if not os.path.exists(original_data_files_folder): os.makedirs(original_data_files_folder)
         for file_path in self.files_found:
             _, file_name, ext = get_fn_ext(file_path)
@@ -170,15 +170,12 @@ class KleinbergCalculator(object):
             print('SIMBA WARNING: All behavior bouts removed following kleinberg smoothing (elapsed time: {}s).'.format(self.timer.elapsed_time_str))
 
 
-# test = KleinbergCalculator(config_path='/Users/simon/Desktop/troubleshooting/train_model_project_1/project_folder/project_config.ini',
-#                  classifier_names=['Attack'],
-#                  sigma=2,
-#                  gamma=0.3,
-#                  hierarchy=5,
-#                  hierarchical_search=True)
+# test = KleinbergCalculator(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+#                            classifier_names=['Attack'],
+#                            sigma=1.1,
+#                            gamma=0.3,
+#                            hierarchy=5,
+#                            hierarchical_search=True)
 #
 # test.perform_kleinberg()
-
-
-
 # #data = run_kleinberg(r'Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini', ['int'], sigma=2, gamma=0.3, hierarchy=1)

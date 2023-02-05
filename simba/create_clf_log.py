@@ -12,6 +12,7 @@ from simba.train_model_functions import get_all_clf_names
 from simba.drop_bp_cords import get_fn_ext
 from simba.misc_tools import detect_bouts
 from simba.rw_dfs import read_df
+from simba.enums import ReadConfig, Paths
 
 
 class ClfLogCreator(object):
@@ -49,11 +50,11 @@ class ClfLogCreator(object):
         self.chosen_measures = data_measures
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
         self.config, self.classifiers = read_config_file(config_path), classifiers
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.files_in_dir = os.path.join(self.project_path, 'csv', 'machine_results')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
-        self.model_cnt = read_config_entry(self.config, 'SML settings', 'No_targets', data_type='int')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.files_in_dir = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
+        self.model_cnt = read_config_entry(self.config, ReadConfig.SML_SETTINGS.value, ReadConfig.TARGET_CNT.value, data_type='int')
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.model_cnt)
         self.file_save_name = os.path.join(self.project_path, 'logs', 'data_summary_' + str(self.datetime) + '.csv')
         self.files_found = glob.glob(self.files_in_dir + '/*.' + self.file_type)

@@ -11,6 +11,7 @@ from simba.misc_tools import (get_fn_ext,
 
 from simba.misc_visualizations import make_distance_plot
 
+from simba.enums import ReadConfig, Paths, Formats
 from simba.rw_dfs import read_df
 import numpy as np
 import matplotlib.pyplot as plt
@@ -59,13 +60,13 @@ class DistancePlotterSingleCore(object):
             raise ValueError('SIMBA ERROR: Please choice to create frames and/or video distance plots')
         self.colors_dict = get_color_dict()
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.save_dir = os.path.join(self.project_path, 'frames', 'output', 'line_plot')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.save_dir = os.path.join(self.project_path, Paths.LINE_PLOT_DIR.value)
         if not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.dir_in = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_locaation')
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.dir_in = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
         check_if_filepath_list_is_empty(filepaths=self.files_found,
                                         error_msg='SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing distances.')
         print('Processing {} videos...'.format(str(len(self.files_found))))
@@ -93,7 +94,7 @@ class DistancePlotterSingleCore(object):
             for distance_cnt, data in enumerate(self.line_attr.values()):
                 distance_arr[:, distance_cnt] = (np.sqrt((self.data_df[data[0] + '_x'] - self.data_df[data[1] + '_x']) ** 2 + (self.data_df[data[0] + '_y'] - self.data_df[data[1] + '_y']) ** 2) / self.px_per_mm) / 10
             if self.video_setting:
-                self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
                 video_save_path = os.path.join(self.save_dir, self.video_name + '.mp4')
                 writer = cv2.VideoWriter(video_save_path, self.fourcc, self.fps, (self.style_attr['width'], self.style_attr['height']))
             if self.frame_setting:
@@ -157,9 +158,9 @@ class DistancePlotterSingleCore(object):
         print('SIMBA COMPLETE: All distance visualizations created in project_folder/frames/output/line_plot directory (elapsed time: {}s)'.format(self.timer.elapsed_time_str))
 
 
-#style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8, 'y_max': 'auto'}
+# style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8, 'y_max': 'auto', 'opacity': 0.9}
 # line_attr = {0: ['Center_1', 'Center_2', 'Green'], 1: ['Ear_left_2', 'Ear_left_1', 'Red']}
-
+#
 # test = DistancePlotterSingleCore(config_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                        frame_setting=False,
 #                        video_setting=True,

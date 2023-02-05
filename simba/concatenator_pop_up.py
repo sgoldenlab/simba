@@ -5,20 +5,26 @@ from simba.tkinter_functions import DropDownMenu, FileSelect
 from simba.misc_tools import get_fn_ext, find_video_of_file, get_video_meta_data
 from simba.frame_mergerer_ffmpeg import FrameMergererFFmpeg
 import simba
+from simba.enums import ReadConfig, Paths
 
 class ConcatenatorPopUp(object):
     """
     Creates tkinter GUI pop-up window accepting user-input for how to concatenate videos
     into a single file mosaic of videos.
+
+
+    :EXAMPLE:
+    >>> concatenator = ConcatenatorPopUp(config_path='tests/test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini')
+    >>> concatenator.main_frm.mainloop()
+
     """
 
     def __init__(self,
                  config_path: str):
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.icons_path = os.path.join(os.path.dirname(simba.__file__), 'assets', 'icons')
-        self.icons_path = '/Users/simon/Desktop/simbapypi_dev/simba/assets/icons'
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type='folder_path')
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.icons_path = os.path.join(os.path.dirname(simba.__file__), Paths.ICON_ASSETS.value)
         self.main_frm = Toplevel()
         self.main_frm.minsize(500, 800)
         self.main_frm.wm_title('MERGE (CONCATENATE) VIDEOS')
@@ -77,13 +83,11 @@ class ConcatenatorPopUp(object):
             print('SIMBA ERROR: if using the mixed mosaic join type, please tick check-boxes for at leasr three video types.')
             raise ValueError()
 
-        print(videos_info)
-
         _ = FrameMergererFFmpeg(config_path=self.config_path,
                                 frame_types=videos_info,
                                 video_height=int(self.resolution_height.getChoices()),
                                 video_width=int(self.resolution_width.getChoices()),
                                 concat_type=self.join_type_var.get())
 
-test = ConcatenatorPopUp(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini')
-test.main_frm.mainloop()
+# test = ConcatenatorPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# test.main_frm.mainloop()

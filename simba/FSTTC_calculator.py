@@ -14,6 +14,7 @@ from simba.drop_bp_cords import get_fn_ext
 from simba.rw_dfs import read_df
 from simba.misc_tools import (detect_bouts,
                               SimbaTimer)
+from simba.enums import Paths, ReadConfig
 import itertools
 import seaborn as sns
 
@@ -67,12 +68,12 @@ class FSTTCPerformer(object):
         self.behavior_lst = behavior_lst
         self.graph_status = create_graphs
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.in_path = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.in_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.logs_folder = os.path.join(self.project_path, 'logs')
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.video_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.video_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         self.files_found = glob.glob(self.in_path + "/*." + self.file_type)
         check_if_filepath_list_is_empty(filepaths=self.files_found,
                                         error_msg='SIMBA ERROR: Cannot calculate FSTTC, no data found in {} directory'.format(self.in_path))

@@ -26,6 +26,8 @@ from simba.read_config_unit_tests import (check_file_exist_and_readable,
                                           read_config_entry,
                                           check_int,
                                           check_if_filepath_list_is_empty)
+from simba.enums import ReadConfig
+from simba.features_scripts.unit_tests import read_video_info_csv
 import shutil
 import platform
 import pickle
@@ -211,13 +213,13 @@ def line_length_numba(left_ear_array: np.array,
 
     Parameters
     ----------
-    left_ear_array: np.array
+    left_ear_array: array
         left ear coordinates of observing animal.
-    right_ear_array: np.array
+    right_ear_array: array
         right ear coordinates of observing animal.
-    nose_array: np.array
+    nose_array: array
         nose coordinates of observing animal.
-    target_array: np.array
+    target_array: array
         The location of the target coordinates.
 
     Returns
@@ -350,7 +352,7 @@ def smooth_data_gaussian(config: configparser.ConfigParser,
     except:
         print('Gaussian smoothing failed for video {}. Time window parameter {} can not be interpreted as an integer.'.format(str(os.path.basename(file_path)), str(time_window_parameter)))
     _, filename, _ = get_fn_ext(file_path)
-    project_dir = config.get('General settings', 'project_path')
+    project_dir = config.get(ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value)
     video_dir = os.path.join(project_dir, 'videos')
     video_file_path = find_video_of_file(video_dir, filename)
     file_format = get_workflow_file_format(config)
@@ -407,7 +409,7 @@ def smooth_data_savitzky_golay(config: configparser.ConfigParser,
             'Savitzky-Golay smoothing failed for video {}. The specified time window parameter {} can not be interpreted as an integer.'.format(
                 str(os.path.basename(file_path)), str(time_window_parameter)))
     _, filename, _ = get_fn_ext(file_path)
-    project_dir = config.get('General settings', 'project_path')
+    project_dir = config.get(ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value)
     video_dir = os.path.join(project_dir, 'videos')
     video_file_path = find_video_of_file(video_dir, filename)
     file_format = get_workflow_file_format(config)
@@ -546,7 +548,7 @@ def create_gantt_img(bouts_df: pd.DataFrame,
 def resize_gantt(gantt_img: np.array,
                  img_height: int):
     """
-    Helper to resize a image in np.array format.
+    Helper to resize a image in array format.
     """
 
     return imutils.resize(gantt_img, height=img_height)
@@ -674,7 +676,8 @@ def read_config_file(ini_path: str):
 
 def create_single_color_lst(pallete_name: str,
                             increments: int,
-                            as_rgb_ratio: bool=False):
+                            as_rgb_ratio: bool=False,
+                            as_hex: bool=False):
     """
     Helper to create a color palette of bgr colors in a list.
     Parameters
@@ -689,7 +692,8 @@ def create_single_color_lst(pallete_name: str,
     color_lst: list
 
     """
-
+    if as_hex:
+        as_rgb_ratio = True
     cmap = cm.get_cmap(pallete_name, increments + 1)
     color_lst = []
     for i in range(cmap.N):
@@ -697,6 +701,8 @@ def create_single_color_lst(pallete_name: str,
         if not as_rgb_ratio:
             rgb = [i * 255 for i in rgb]
         rgb.reverse()
+        if as_hex:
+            rgb = matplotlib.colors.to_hex(rgb)
         color_lst.append(rgb)
     return color_lst
 
@@ -917,8 +923,8 @@ def archive_processed_files(config_path: str,
     """
 
     config = read_config_file(config_path)
-    file_type = read_config_entry(config, 'General settings', 'workflow_file_type', 'str', 'csv')
-    project_path = read_config_entry(config, 'General settings', 'project_path', data_type='folder_path')
+    file_type = read_config_entry(config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+    project_path = read_config_entry(config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
     videos_dir = os.path.join(project_path, 'videos')
     csv_dir = os.path.join(os.path.dirname(config_path), 'csv')
     log_path = os.path.join(project_path, 'logs')
@@ -1020,7 +1026,8 @@ class SimbaTimer(object):
 
 def concatenate_videos_in_folder(in_folder: str,
                                  save_path: str,
-                                 video_format: str='mp4') -> None:
+                                 video_format: str='mp4',
+                                 remove_splits: bool=True) -> None:
     """
     Helper to  concatenate (temporally) all video files in a folder into a
     single video.
@@ -1033,6 +1040,8 @@ def concatenate_videos_in_folder(in_folder: str,
         Path to the saved the output file.
     """
 
+    timer = SimbaTimer()
+    timer.start_timer()
     files = glob.glob(in_folder + '/*.{}'.format(video_format))
     check_if_filepath_list_is_empty(filepaths=files,
                                     error_msg='SIMBA ERROR: Cannot join videos in {}. The directory contain ZERO files.'.format(in_folder))
@@ -1042,13 +1051,16 @@ def concatenate_videos_in_folder(in_folder: str,
         for file in files:
             f.write("file '" + str(pathlib.Path(file)) + "'\n")
     if os.path.exists(save_path): os.remove(save_path)
-    returned = os.system('ffmpeg -f concat -safe 0 -i "{}" "{}" -hide_banner -loglevel error'.format(temp_txt_path, save_path))
+    returned = os.system('ffmpeg -f concat -safe 0 -i "{}" "{}" -c copy -hide_banner -loglevel info'.format(temp_txt_path, save_path))
     while True:
         if returned != 0:
             pass
         else:
-            remove_a_folder(folder_dir=in_folder)
+            if remove_splits:
+                remove_a_folder(folder_dir=in_folder)
             break
+    timer.stop_timer()
+    print('Video concatenated (elapsed time: {}s)'.format(timer.elapsed_time_str))
 
 def find_all_videos_in_directory(directory: str,
                                  video_formats: tuple = ('.avi', '.mp4', '.mov', '.flv', '.m4v')):
@@ -1204,4 +1216,36 @@ def split_and_group_df(df: pd.DataFrame,
     return data_arr, obs_per_split
 
 
+def find_files_of_filetypes_in_directory(directory: str,
+                                         extensions: list,
+                                         raise_warning: bool=True):
+    """
+    Helper to find all files in a folder with specified extensions
 
+    Parameters
+    ----------
+    directory: str
+        Directory holding files
+    extensions: list
+        Accepted file extensions
+
+    Returns
+    -------
+    files: list
+
+    """
+    try:
+        all_files_in_folder = [f for f in next(os.walk(directory))[2] if not f[0] == '.']
+    except StopIteration:
+        print('SIMBA WARNING: No files found in the {} directory with accepted extensions {}'.format(directory, str(extensions)))
+        raise FileNotFoundError('SIMBA ERROR: No files found in the directory with accepted extensions')
+    all_files_in_folder = [os.path.join(directory, x) for x in all_files_in_folder]
+    accepted_file_paths = []
+    for file_path in all_files_in_folder:
+        _, file_name, ext = get_fn_ext(file_path)
+        if ext.lower() in extensions:
+            accepted_file_paths.append(file_path)
+    if not accepted_file_paths and raise_warning:
+        print('SIMBA WARNING: SimBA could not find any files with accepted extensions {} in the {} directory'.format(extensions, str(directory)))
+
+    return accepted_file_paths

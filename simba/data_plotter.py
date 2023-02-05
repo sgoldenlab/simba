@@ -14,6 +14,9 @@ from simba.misc_tools import (check_multi_animal_status,
                               get_color_dict)
 import numpy as np
 import cv2
+from simba.enums import (ReadConfig,
+                         Paths,
+                         Formats)
 
 
 class DataPlotter(object):
@@ -54,12 +57,12 @@ class DataPlotter(object):
         self.timer = SimbaTimer()
         self.timer.start_timer()
         self.config, self.config_path = read_config_file(config_path), config_path
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.save_dir = os.path.join(self.project_path, 'frames', 'output', 'live_data_table')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.save_dir = os.path.join(self.project_path, Paths.DATA_TABLE.value)
         if not os.path.exists(self.save_dir):
             os.makedirs(self.save_dir)
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         self.cpu_cnt, self.cpu_to_use = find_core_cnt()
         self.multi_animal_status, self.multi_animal_id_list = check_multi_animal_status(self.config, len(self.body_part_attr))
         self.__compute_spacings()
@@ -141,7 +144,7 @@ class DataPlotter(object):
             video_data = pd.DataFrame(self.movement[video_name])
             _, _, self.fps = read_video_info(vid_info_df=self.vid_info_df, video_name=video_name)
             if self.video_setting:
-                self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
                 video_save_path = os.path.join(self.save_dir, video_name + '.mp4')
                 self.writer = cv2.VideoWriter(video_save_path, self.fourcc, self.fps, self.style_attr['size'])
             if self.frame_setting:

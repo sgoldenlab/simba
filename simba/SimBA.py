@@ -23,10 +23,8 @@ from simba.import_mars import MarsImporter
 from simba.probability_graph_interactive import InteractiveProbabilityGrapher
 from simba.Validate_model_one_video_run_clf import ValidateModelRunClf
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
-from simba.gantt_creator_mp import GanttCreatorMultiprocess
-from simba.gantt_creator import GanttCreatorSingleProcess
-from simba.data_plotter import DataPlotter
 from simba.import_videos_csv_project_ini import *
+from simba.machine_model_settings_pop_up import MachineModelSettingsPopUp
 from simba.get_coordinates_tools_v2 import get_coordinates_nilsson
 from simba.create_project_select_datatype import TrackingSelectorMenu
 from simba.process_severity import analyze_process_severity
@@ -1217,34 +1215,33 @@ class loadprojectini:
         reverse_button = Button(label_reverseID,text='Reverse ID',command=self.reverseid)
 
         #get coordinates
-        label_setscale = LabelFrame(tab3,text='VIDEO PARAMETERS (fps, resolution, ppx/mm, etc.)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
-        self.distanceinmm = Entry_Box(label_setscale, 'Known distance (mm)', '18', validation='numeric')
-        button_setdistanceinmm = Button(label_setscale, text='Auto-populate known distance in table',command=lambda: self.set_distancemm(self.distanceinmm.entry_get))
+        label_setscale = LabelFrame(tab3,text='VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)', font=("Helvetica",12,'bold'), pady=5,padx=5,fg='black')
+        self.distanceinmm = Entry_Box(label_setscale, 'KNOWN DISTANCE (MILLIMETERS)', '25', validation='numeric')
+        button_setdistanceinmm = Button(label_setscale, text='AUTO-POPULATE', fg='green', command=lambda: self.set_distancemm(self.distanceinmm.entry_get))
 
-        button_setscale = Button(label_setscale, text='Set video parameters',command=lambda: self.create_video_info_table())
-        #button_setscale = Button(label_setscale,text='Set video parameters',command=lambda:video_info_table(self.projectconfigini))
+        button_setscale = Button(label_setscale, text='CONFIGURE VIDEO PARAMETERS', fg='blue', command=lambda: self.create_video_info_table())
 
         self.new_ROI_frm = LabelFrame(tab6, text='SIMBA ROI INTERFACE', font=("Helvetica",12,'bold'))
-        self.start_new_ROI = Button(self.new_ROI_frm, text='Define ROIs', command= lambda: ROI_menu(self.projectconfigini))
-        self.delete_all_ROIs = Button(self.new_ROI_frm, text='Delete all ROI definitions', command=lambda: delete_all_ROIs(self.projectconfigini))
+        self.start_new_ROI = Button(self.new_ROI_frm, text='DEFINE ROIs', fg='green', command= lambda: ROI_menu(self.projectconfigini))
+        self.delete_all_ROIs = Button(self.new_ROI_frm, text='DELETE ALL ROI DEFINITIONS', fg='red', command=lambda: delete_all_ROIs(self.projectconfigini))
         self.tutorial_link = Label(self.new_ROI_frm, text='[Link to ROI user-guide]', cursor='hand2',  font='Verdana 8 underline')
         self.tutorial_link.bind("<Button-1>", lambda e: self.callback('https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md'))
 
-        self.new_ROI_frm.grid(row=0, sticky=N)
-        self.start_new_ROI.grid(row=0, sticky=W, pady=10)
-        self.delete_all_ROIs.grid(row=0, column=2, sticky=W, pady=10, padx=10)
-        self.tutorial_link.grid(row=1, sticky=W)
+        self.new_ROI_frm.grid(row=0, sticky=NW)
+        self.start_new_ROI.grid(row=0, sticky=NW)
+        self.delete_all_ROIs.grid(row=1, column=0, sticky=NW)
+        self.tutorial_link.grid(row=2, sticky=W)
 
-        self.roi_draw = LabelFrame(tab6, text='ANALYZE ROI', font=("Helvetica",12,'bold'))
-        analyze_roi_btn = Button(self.roi_draw, text='Analyze ROI data',command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ROI ANALYSIS'))
-        analyze_roi_time_bins_btn = Button(self.roi_draw, text='Analyze ROI data: time-bins',command=lambda: SettingsMenu(config_path=self.projectconfigini, title='TIME BINS: ANALYZE ROI'))
+        self.roi_draw = LabelFrame(tab6, text='ANALYZE ROI DATA', font=("Helvetica",12,'bold'))
+        analyze_roi_btn = Button(self.roi_draw, text='ANALYZE ROI DATA: AGGREGATES', fg='green', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ROI ANALYSIS'))
+        analyze_roi_time_bins_btn = Button(self.roi_draw, text='ANALYZE ROI DATA: TIME-BINS',  fg='blue', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='TIME BINS: ANALYZE ROI'))
 
         self.roi_draw.grid(row=0, column=1, sticky=N)
-        analyze_roi_btn.grid(row=0)
-        analyze_roi_time_bins_btn.grid(row=1,pady=55)
+        analyze_roi_btn.grid(row=0, sticky='NW')
+        analyze_roi_time_bins_btn.grid(row=1, sticky='NW')
 
         ###plot roi
-        self.roi_draw1 = LabelFrame(tab6, text='VISUALIZE ROI', font=("Helvetica",12,'bold'))
+        self.roi_draw1 = LabelFrame(tab6, text='VISUALIZE ROI DATA', font=("Helvetica",12,'bold'))
 
         # button
         visualizeROI = Button(self.roi_draw1, text='VISUALIZE ROI TRACKING', fg='green', command= lambda: VisualizeROITrackingPopUp(config_path=self.projectconfigini))
@@ -1252,36 +1249,36 @@ class loadprojectini:
 
         ##organize
         self.roi_draw1.grid(row=0, column=2, sticky=N)
-        visualizeROI.grid(row=0)
-        visualizeROIfeature.grid(row=1,pady=10)
+        visualizeROI.grid(row=0, sticky='NW')
+        visualizeROIfeature.grid(row=1, sticky='NW')
 
-        processmovementdupLabel = LabelFrame(tab6,text='ANALYZE DISTANCES / VELOCITIES', font=("Helvetica",12,'bold'))
-        analyze_distances_velocity_btn = Button(processmovementdupLabel, text='Analyze distances/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ANALYZE MOVEMENT'))
-        analyze_distances_velocity_timebins_btn = Button(processmovementdupLabel, text='Time bins: Distance/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='TIME BINS: DISTANCE/VELOCITY'))
+        processmovementdupLabel = LabelFrame(tab6,text='OTHER ANALYSES / VISUALIZATIONS', font=("Helvetica",12,'bold'))
+        analyze_distances_velocity_btn = Button(processmovementdupLabel, text='ANALYZE DISTANCES / VELOCITY: AGGREGATES', fg='green', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ANALYZE MOVEMENT'))
+        analyze_distances_velocity_timebins_btn = Button(processmovementdupLabel, text='ANALYZE DISTANCES / VELOCITY: TIME-BINS', fg='blue', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='TIME BINS: DISTANCE/VELOCITY'))
         self.hmlvar = IntVar()
         self.hmlvar.set(1)
 
-        heatmaps_location_button = Button(processmovementdupLabel,text='Create heat maps',command=lambda: HeatmapLocationPopup(config_path=self.projectconfigini))
+        heatmaps_location_button = Button(processmovementdupLabel,text='CREATE LOCATION HEATMAPS', fg='red', command=lambda: HeatmapLocationPopup(config_path=self.projectconfigini))
 
-        button_lineplot = Button(processmovementdupLabel, text='Generate path plot', command=lambda: QuickLineplotPopup(config_path=self.projectconfigini))
-        button_analyzeDirection = Button(processmovementdupLabel,text='Analyze directionality between animals',command =lambda: self.directing_other_animals_analysis())
-        button_visualizeDirection = Button(processmovementdupLabel,text='Visualize directionality between animals',command=lambda:self.directing_other_animals_visualizer())
+        button_lineplot = Button(processmovementdupLabel, text='CREATE PATH PLOTS', fg='orange', command=lambda: QuickLineplotPopup(config_path=self.projectconfigini))
+        button_analyzeDirection = Button(processmovementdupLabel,text='ANALYZE DIRECTIONALITY BETWEEN ANIMALS', fg='pink', command =lambda: self.directing_other_animals_analysis())
+        button_visualizeDirection = Button(processmovementdupLabel,text='VISUALIZE DIRECTIONALITY BETWEEN ANIMALS', fg='brown', command=lambda:self.directing_other_animals_visualizer())
 
         #organize
-        processmovementdupLabel.grid(row=0,column=3,sticky=N)
-        analyze_distances_velocity_btn.grid(row=0)
-        heatmaps_location_button.grid(row=1)
-        analyze_distances_velocity_timebins_btn.grid(row=2)
-        button_lineplot.grid(row=3)
-        button_analyzeDirection.grid(row=4)
-        button_visualizeDirection.grid(row=5)
+        processmovementdupLabel.grid(row=0,column=3,sticky=NW)
+        analyze_distances_velocity_btn.grid(row=0, sticky=NW)
+        heatmaps_location_button.grid(row=1, sticky=NW)
+        analyze_distances_velocity_timebins_btn.grid(row=2, sticky=NW)
+        button_lineplot.grid(row=3, sticky=NW)
+        button_analyzeDirection.grid(row=4, sticky=NW)
+        button_visualizeDirection.grid(row=5, sticky=NW)
 
         #outlier correction
         label_outliercorrection = LabelFrame(tab4,text='OUTLIER CORRECTION',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         label_link = Label(label_outliercorrection,text='[Link to user guide]',cursor='hand2',font='Verdana 10 underline')
-        button_settings_outlier = Button(label_outliercorrection,text='Settings',command = lambda: OutlierSettingsPopUp(config_path=self.projectconfigini))
-        button_outliercorrection = Button(label_outliercorrection,text='Run outlier correction',command=self.correct_outlier)
-        button_skipOC = Button(label_outliercorrection,text='Skip outlier correction (CAUTION)',fg='red', command=lambda: self.initiate_skip_outlier_correction())
+        button_settings_outlier = Button(label_outliercorrection,text='SETTINGS', fg='blue', command = lambda: OutlierSettingsPopUp(config_path=self.projectconfigini))
+        button_outliercorrection = Button(label_outliercorrection,text='RUN OUTLIER CORRECTION', fg='green', command=lambda:self.correct_outlier)
+        button_skipOC = Button(label_outliercorrection,text='SKIP OUTLIER CORRECTION (CAUTION)',fg='red', command=lambda: self.initiate_skip_outlier_correction())
 
         label_link.bind("<Button-1>",lambda e: self.callback('https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf'))
 
@@ -1347,9 +1344,7 @@ class loadprojectini:
                                                                                                            setting='pseudo',
                                                                                                            continuing=False,
                                                                                                            video_file_path=pLabel_framedir.file_path))
-        #pLabel_button = Button(label_pseudo,text='Correct label',command = lambda:semisuperviseLabel(self.projectconfigini,pLabel_framedir.file_path,list(targetlist),plabel_threshold))
 
-        #Advance Label Behavior
         label_adv_label = LabelFrame(tab7,text='ADVANCED LABEL BEHAVIOR',font=("Helvetica",12,'bold'),pady=5,padx=5,fg='black')
         label_adv_note_1 = Label(label_adv_label,text='Note that you will have to specify the presence of *both* behavior and non-behavior on your own.')
         label_adv_note_2 = Label(label_adv_label, text='Click here more information on how to use the SimBA labelling interface.', cursor="hand2", fg="blue")
@@ -1360,44 +1355,36 @@ class loadprojectini:
 
         #train machine model
         label_trainmachinemodel = LabelFrame(tab8,text='TRAIN MACHINE MODELS',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
-        button_trainmachinesettings = Button(label_trainmachinemodel,text='Settings',command=self.trainmachinemodelsetting)
-        button_trainmachinemodel = Button(label_trainmachinemodel,text='Train single model from global environment',fg='blue',command = lambda: threading.Thread(target=self.train_single_model(config_path=self.projectconfigini)).start())
-        button_train_multimodel = Button(label_trainmachinemodel, text='Train multiple models, one for each saved settings',fg='green',command = lambda: threading.Thread(target=self.train_multiple_models_from_meta(config_path=self.projectconfigini)).start())
+        button_trainmachinesettings = Button(label_trainmachinemodel,text='SETTINGS',command=self.trainmachinemodelsetting)
+        button_trainmachinemodel = Button(label_trainmachinemodel,text='TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)',fg='blue',command = lambda: threading.Thread(target=self.train_single_model(config_path=self.projectconfigini)).start())
+        button_train_multimodel = Button(label_trainmachinemodel, text='TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)',fg='green',command = lambda: threading.Thread(target=self.train_multiple_models_from_meta(config_path=self.projectconfigini)).start())
 
         ##Single classifier valid
-        label_model_validation = LabelFrame(tab9, text='VALIDATE MODEL ON SINGLE VIDEO', pady=5, padx=5,
-                                            font=("Helvetica", 12, 'bold'), fg='black')
-        self.csvfile = FileSelect(label_model_validation, 'Select features file',
-                                  title='Select .csv file in /project_folder/csv/features_extracted')
-        self.modelfile = FileSelect(label_model_validation, 'Select model file  ', title='Select the model (.sav) file')
-        #button_runvalidmodel = Button(label_model_validation, text='Run Model',command=lambda: validate_model_one_vid_1stStep(self.projectconfigini,self.csvfile.file_path,self.modelfile.file_path))
-        button_runvalidmodel = Button(label_model_validation, text='Run Model',command=lambda: self.validate_model_first_step())
+        label_model_validation = LabelFrame(tab9, text='VALIDATE MODEL ON SINGLE VIDEO', pady=5, padx=5, font=("Helvetica", 12, 'bold'), fg='blue')
+        self.csvfile = FileSelect(label_model_validation, 'SELECT DATA FEATURE FILE', color='blue', lblwidth=30)
+        self.modelfile = FileSelect(label_model_validation, 'SELECT MODEL FILE', color='blue', lblwidth=30)
+        button_runvalidmodel = Button(label_model_validation, text='RUN MODEL', fg='blue', command=lambda: self.validate_model_first_step())
 
-        button_generateplot = Button(label_model_validation, text="Generate plot", command=self.updateThreshold)
-        self.dis_threshold = Entry_Box(label_model_validation, 'Discrimination threshold', '28')
-        self.min_behaviorbout = Entry_Box(label_model_validation, 'Minimum behavior bout length (ms)', '28')
-        self.generategantt_dropdown = DropDownMenu(label_model_validation, 'Create Gantt plot', ['None', 'Gantt chart: video', 'Gantt chart: final frame only (slightly faster)'], '15')
+        button_generateplot = Button(label_model_validation, text="GENERATE PLOT", fg='blue', command=self.updateThreshold)
+        self.dis_threshold = Entry_Box(label_model_validation, 'DISCRIMINATION THRESHOLD (0.0-1.0):', '30')
+        self.min_behaviorbout = Entry_Box(label_model_validation, 'MINIMUM BOUT LENGTH (MS):', '30', validation='numeric')
+        self.generategantt_dropdown = DropDownMenu(label_model_validation, 'CREATE GANTT PLOT', ['None', 'Gantt chart: video', 'Gantt chart: final frame only (slightly faster)'], '15')
         self.generategantt_dropdown.setChoices('None')
+        button_validate_model = Button(label_model_validation, text='VALIDATE', fg='blue', command=self.validatemodelsinglevid)
 
+        label_runmachinemodel = LabelFrame(tab9,text='RUN MACHINE MODEL',font=("Helvetica",12,'bold'), padx=5, pady=5, fg='black')
+        button_run_rfmodelsettings = Button(label_runmachinemodel,text='MODEL SETTINGS', fg='green', command= lambda: SetMachineModelParameters(config_path=self.projectconfigini))
+        button_runmachinemodel = Button(label_runmachinemodel,text='RUN MODELS', fg='green', command = self.runrfmodel)
 
-        #self.ganttvar = IntVar()
-        #self.generategantt = Checkbutton(label_model_validation,text='Generate Gantt plot',variable=self.ganttvar)
-        button_validate_model = Button(label_model_validation, text='Validate', command=self.validatemodelsinglevid)
-
-        #run machine model
-        label_runmachinemodel = LabelFrame(tab9,text='RUN MACHINE MODEL',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
-        button_run_rfmodelsettings = Button(label_runmachinemodel,text='Model Settings',command= lambda: SetMachineModelParameters(config_path=self.projectconfigini))
-        button_runmachinemodel = Button(label_runmachinemodel,text='Run RF Model',command = self.runrfmodel)
-
-        #kleinberg smoothing
-        kleinberg_button = Button(label_runmachinemodel,text='Kleinberg Smoothing',command=lambda: KleinbergPopUp(config_path=self.projectconfigini))
-        fsttc_button = Button(label_runmachinemodel,text='FSTTC',command=lambda:FSTTCPopUp(config_path=self.projectconfigini))
+        kleinberg_button = Button(label_runmachinemodel,text='KLEINBERG SMOOTHING', fg='green', command=lambda: KleinbergPopUp(config_path=self.projectconfigini))
+        fsttc_button = Button(label_runmachinemodel,text='FSTTC', fg='green', command=lambda:FSTTCPopUp(config_path=self.projectconfigini))
         label_machineresults = LabelFrame(tab9,text='ANALYZE MACHINE RESULTS',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
-        button_process_datalog = Button(label_machineresults, text='Analyze machine predictions',command=lambda: ClfDescriptiveStatsPopUp(config_path=self.projectconfigini))
-        button_process_movement = Button(label_machineresults, text='Analyze distances/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ANALYZE MOVEMENT'))
-        button_movebins = Button(label_machineresults, text='Time bins: Distance/velocity', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='TIME BINS: DISTANCE/VELOCITY'))
-        button_classifierbins = Button(label_machineresults,text='Time bins: Machine predictions',command=lambda: TimeBinsClfPopUp(config_path=self.projectconfigini))
-        button_classifier_ROI = Button(label_machineresults, text='Classifications by ROI', command=lambda: ClfByROIPopUp(config_path=self.projectconfigini))
+
+        button_process_datalog = Button(label_machineresults, text='ANALYZE MACHINE PREDICTIONS: AGGREGATES', fg='blue', command=lambda: ClfDescriptiveStatsPopUp(config_path=self.projectconfigini))
+        button_process_movement = Button(label_machineresults, text='ANALYZE DISTANCES/VELOCITY: AGGREGATES', fg='blue', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='ANALYZE MOVEMENT'))
+        button_movebins = Button(label_machineresults, text='ANALYZE DISTANCES/VELOCITY: TIME BINS', fg='blue', command=lambda: SettingsMenu(config_path=self.projectconfigini, title='TIME BINS: DISTANCE/VELOCITY'))
+        button_classifierbins = Button(label_machineresults,text='ANALYZE MACHINE PREDICTIONS: TIME-BINS', fg='blue', command=lambda: TimeBinsClfPopUp(config_path=self.projectconfigini))
+        button_classifier_ROI = Button(label_machineresults, text='ANALYZE MACHINE PREDICTION: BY ROI', fg='blue', command=lambda: ClfByROIPopUp(config_path=self.projectconfigini))
 
         label_severity = LabelFrame(tab9,text='ANALYZE SEVERITY',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
         self.severityscale = Entry_Box(label_severity,'Severity scale 0 -',15)
@@ -1521,16 +1508,16 @@ class loadprojectini:
         button_archivecsv.grid(row=1,pady=10)
 
 
-        label_setscale.grid(row=2,sticky=W,pady=5,padx=5)
-        self.distanceinmm.grid(row=0,column=0,sticky=W)
-        button_setdistanceinmm.grid(row=0,column=1)
-        button_setscale.grid(row=1,column=0,sticky=W)
+        label_setscale.grid(row=0, sticky=NW,pady=5,padx=5)
+        self.distanceinmm.grid(row=0,column=0,sticky=NW)
+        button_setdistanceinmm.grid(row=0, column=1, sticky=NW)
+        button_setscale.grid(row=1,column=0,sticky=NW)
 
         label_outliercorrection.grid(row=0,sticky=W)
-        label_link.grid(row=0,sticky=W)
-        button_settings_outlier.grid(row=1,sticky=W)
-        button_outliercorrection.grid(row=3,sticky=W)
-        button_skipOC.grid(row=4,sticky=W,pady=5)
+        button_settings_outlier.grid(row=0,sticky=W)
+        button_outliercorrection.grid(row=1,sticky=W)
+        button_skipOC.grid(row=2,sticky=W,pady=5)
+        label_link.grid(row=3, sticky=W)
 
         label_extractfeatures.grid(row=4,sticky=W)
         button_extractfeatures.grid(row=0,sticky=W)
@@ -1578,11 +1565,11 @@ class loadprojectini:
         self.generategantt_dropdown.grid(row=6,sticky=W)
         button_validate_model.grid(row=7, sticky=W)
 
-        label_runmachinemodel.grid(row=8,sticky=W,pady=5)
-        button_run_rfmodelsettings.grid(row=0,sticky=W)
-        button_runmachinemodel.grid(row=1,sticky=W,pady=5)
-        kleinberg_button.grid(row=2,sticky=W,pady=10)
-        fsttc_button.grid(row=3,sticky=W,pady=10)
+        label_runmachinemodel.grid(row=8,sticky=NW)
+        button_run_rfmodelsettings.grid(row=0,sticky=NW)
+        button_runmachinemodel.grid(row=1,sticky=NW)
+        kleinberg_button.grid(row=2,sticky=NW)
+        fsttc_button.grid(row=3,sticky=NW)
 
         label_machineresults.grid(row=9,sticky=W,pady=5)
         button_process_datalog.grid(row=2,column=0,sticky=W,padx=3)
@@ -2308,7 +2295,7 @@ class loadprojectini:
         model_validator.create_video()
 
     def trainmachinemodelsetting(self):
-        trainmachinemodel_settings(self.projectconfigini)
+        _ = MachineModelSettingsPopUp(config_path=self.projectconfigini)
 
     def extractfeatures(self):
         configini = self.projectconfigini
@@ -2535,354 +2522,6 @@ class loadprojectini:
 
     def callback(self,url):
         webbrowser.open_new(url)
-
-class trainmachinemodel_settings:
-    def __init__(self,inifile):
-        self.configini = str(inifile)
-        # Popup window
-        trainmmsettings = Toplevel()
-        trainmmsettings.minsize(400, 400)
-        trainmmsettings.wm_title("Machine model settings")
-
-        trainmms = Canvas(hxtScrollbar(trainmmsettings))
-        trainmms.pack(expand=True,fill=BOTH)
-
-        #load metadata
-        load_data_frame = LabelFrame(trainmms, text='Load Metadata',font=('Helvetica',10,'bold'), pady=5, padx=5)
-        self.load_choosedata = FileSelect(load_data_frame,'File Select',title='Select a meta (.csv) file')
-        load_data = Button(load_data_frame, text = 'Load', command = self.load_RFvalues,fg='blue')
-
-        #link to github
-        label_git_hyperparameters = Label(trainmms,text='[Click here to learn about the Hyperparameters]',cursor='hand2',fg='blue')
-        label_git_hyperparameters.bind('<Button-1>',lambda e: webbrowser.open_new('https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model'))
-
-        #setting drop downs
-        label_mm = LabelFrame(trainmms, text='Machine model',font=('Helvetica',10,'bold'), pady=5, padx=5)
-        label_choosemm = Label(label_mm, text='Choose machine model:')
-        options =['RF','GBC','Xboost']
-
-        self.var = StringVar()
-        self.var.set(options[0]) #set as default value
-
-        modeldropdown = OptionMenu(label_mm,self.var,*options)
-
-        self.meta_dict = {}
-        ## hyperparameter settings
-        label_settings = LabelFrame(trainmms, text='Hyperparameters',font=('Helvetica',10,'bold'),pady=5,padx=5)
-        self.settings = []
-        self.label_nestimators = Entry_Box(label_settings,'RF N Estimators','25', validation='numeric')
-        self.label_maxfeatures = Entry_Box(label_settings,'RF Max features','25')
-        self.label_criterion = Entry_Box(label_settings,'RF Criterion','25')
-        self.label_testsize = Entry_Box(label_settings,'Train Test Size','25')
-        self.label_minsampleleaf = Entry_Box(label_settings,'RF Min sample leaf','25', validation='numeric')
-        self.label_under_s_settings = Entry_Box(label_settings, 'Under sample setting', '25')
-        self.label_under_s_correctionvalue = Entry_Box(label_settings,'Under sample ratio','25')
-        self.label_over_s_settings = Entry_Box(label_settings, 'Over sample setting', '25')
-        self.label_over_s_ratio = Entry_Box(label_settings,'Over sample ratio','25')
-
-        self.settings = [self.label_nestimators, self.label_maxfeatures, self.label_criterion, self.label_testsize,
-                    self.label_minsampleleaf, self.label_under_s_correctionvalue,self.label_under_s_settings,
-                         self.label_over_s_ratio,self.label_over_s_settings]
-        ## model evaluation settings for checkboxes
-        self.label_settings_box = LabelFrame(trainmms,pady=5,padx=5,text='Model Evaluations Settings',font=('Helvetica',10,'bold'))
-        self.box1 = IntVar()
-        self.box2 = IntVar()
-        self.box3 = IntVar()
-        self.box4 = IntVar()
-        self.box5 = IntVar()
-        self.box6 = IntVar()
-        self.box7 = IntVar()
-        self.box8 = IntVar()
-        self.box9 = IntVar()
-        self.box10 = IntVar()
-
-        # model evaluations for entrybox
-        self.LC_ksplit = Entry_Box(self.label_settings_box, 'LearningCurve shuffle K splits', '25',status=DISABLED)
-        self.LC_datasplit = Entry_Box(self.label_settings_box, 'LearningCurve shuffle Data splits', '25',status=DISABLED)
-        self.label_n_feature_importance_bars = Entry_Box(self.label_settings_box, 'N feature importance bars', '25',status=DISABLED)
-        self.shap_present = Entry_Box(self.label_settings_box,'# target present', '25',status=DISABLED)
-        self.shap_absent = Entry_Box(self.label_settings_box, '# target absent', '25', status=DISABLED)
-        self.settings.extend([self.LC_ksplit, self.LC_datasplit, self.label_n_feature_importance_bars,self.shap_present,self.shap_absent])
-
-        def activate(box, *args):
-            for entry in args:
-                if box.get() == 0:
-                    entry.set_state(DISABLED)
-                elif box.get() == 1:
-                    entry.set_state(NORMAL)
-
-        checkbutton1 = Checkbutton(self.label_settings_box,text='Generate RF model meta data file',variable = self.box1)
-        checkbutton2 = Checkbutton(self.label_settings_box, text='Generate Example Decision Tree (requires "graphviz")', variable=self.box2)
-        checkbutton3 = Checkbutton(self.label_settings_box, text='Generate Fancy Example Decision Tree ("dtreeviz")', variable=self.box3)
-        checkbutton4 = Checkbutton(self.label_settings_box, text='Generate Classification Report', variable=self.box4)
-        # checkbutton5 = Checkbutton(self.label_settings_box, text='Generate Features Importance Log', variable=self.box5)
-        checkbutton6 = Checkbutton(self.label_settings_box, text='Generate Features Importance Bar Graph', variable=self.box6, command = lambda:activate(self.box6, self.label_n_feature_importance_bars))
-        checkbutton7 = Checkbutton(self.label_settings_box, text='Compute Feature Permutation Importances (Note: CPU intensive)', variable=self.box7)
-        checkbutton8 = Checkbutton(self.label_settings_box, text='Generate Sklearn Learning Curves (Note: CPU intensive)', variable=self.box8,
-                                   command = lambda:activate(self.box8, self.LC_datasplit, self.LC_ksplit))
-        checkbutton9 = Checkbutton(self.label_settings_box, text='Generate Precision Recall Curves', variable=self.box9)
-        checkbutton10 = Checkbutton(self.label_settings_box,text='Calculate SHAP scores',variable=self.box10,command= lambda:activate(self.box10,self.shap_present,self.shap_absent))
-
-        self.check_settings = [checkbutton1, checkbutton2, checkbutton3, checkbutton4, checkbutton6,
-                               checkbutton7, checkbutton8, checkbutton9, checkbutton10]
-
-
-        # setting drop downs for modelname
-        configini = self.configini
-        config = ConfigParser()
-        config.read(configini)
-
-        number_of_model = config['SML settings'].getint('No_targets')
-
-        model_list = []
-        count = 1
-        for i in range(number_of_model):
-            a = str('target_name_' + str(count))
-            model_list.append(config['SML settings'].get(a))
-            count += 1
-
-        labelf_modelname = LabelFrame(trainmms,text='Model',font=('Helvetica',10,'bold'),pady=5,padx=5)
-        label_modelname = Label(labelf_modelname,text='Model name')
-
-        self.varmodel = StringVar()
-        self.varmodel.set(model_list[0])  # set as default value
-
-        model_name_dropdown = OptionMenu(labelf_modelname, self.varmodel, *model_list)
-
-        # button
-        button_settings_to_ini = Button(trainmms, text='Save settings into global environment', font=('Helvetica', 10, 'bold'),fg='blue', command=self.set_values)
-        button_save_meta = Button(trainmms, text='Save settings for specific model', font=('Helvetica', 10, 'bold'),fg='green' ,command=self.save_new)
-        button_remove_meta = Button(trainmms,text='Clear cache',font=('Helvetica', 10, 'bold'),fg='red',command = self.clearcache)
-
-        # organize
-        load_data_frame.grid(row=0, sticky=W, pady=5, padx=5)
-        self.load_choosedata.grid(row=0, column=0, sticky=W)
-        load_data.grid(row=1, column=0)
-
-        label_mm.grid(row=1, sticky=W, pady=5)
-        label_choosemm.grid(row=0, column=0, sticky=W)
-        modeldropdown.grid(row=0, column=1, sticky=W)
-
-        labelf_modelname.grid(row=2, sticky=W, pady=5)
-        label_modelname.grid(row=0, column=0, sticky=W)
-        model_name_dropdown.grid(row=0, column=1, sticky=W)
-
-        label_git_hyperparameters.grid(row=3,sticky=W)
-
-        label_settings.grid(row=4, sticky=W, pady=5)
-        self.label_nestimators.grid(row=1, sticky=W)
-        self.label_maxfeatures.grid(row=2, sticky=W)
-        self.label_criterion.grid(row=3, sticky=W)
-        self.label_testsize.grid(row=4, sticky=W)
-        self.label_minsampleleaf.grid(row=7, sticky=W)
-        self.label_under_s_settings.grid(row=8, sticky=W)
-        self.label_under_s_correctionvalue.grid(row=9, sticky=W)
-        self.label_over_s_settings.grid(row=10, sticky=W)
-        self.label_over_s_ratio.grid(row=11,sticky=W)
-
-        self.label_settings_box.grid(row=5,sticky=W)
-        checkbutton1.grid(row=0,sticky=W)
-        checkbutton2.grid(row=1,sticky=W)
-        checkbutton3.grid(row=2,sticky=W)
-        checkbutton4.grid(row=3,sticky=W)
-        # checkbutton5.grid(row=4,sticky=W)
-        checkbutton6.grid(row=5,sticky=W)
-        self.label_n_feature_importance_bars.grid(row=6, sticky=W)
-        checkbutton7.grid(row=7,sticky=W)
-        checkbutton8.grid(row=8, sticky=W)
-        self.LC_ksplit.grid(row=9, sticky=W)
-        self.LC_datasplit.grid(row=10, sticky=W)
-        checkbutton9.grid(row=11, sticky=W)
-        checkbutton10.grid(row=12,sticky=W)
-        self.shap_present.grid(row=13,sticky=W)
-        self.shap_absent.grid(row=14,sticky=W)
-
-        button_settings_to_ini.grid(row=6,pady=5)
-        button_save_meta.grid(row=7)
-        button_remove_meta.grid(row=8,pady=5)
-
-
-    def clearcache(self):
-        configs_dir = os.path.join(os.path.dirname(self.configini),'configs')
-        filelist = [f for f in os.listdir(configs_dir) if f.endswith('.csv')]
-        for f in filelist:
-            os.remove(os.path.join(configs_dir,f))
-            print(f,'deleted')
-
-    def load_RFvalues(self):
-
-        metadata = pd.read_csv(str(self.load_choosedata.file_path), index_col=False)
-        # metadata = metadata.drop(['Feature_list'], axis=1)
-        for m in metadata.columns:
-            self.meta_dict[m] = metadata[m][0]
-        print('Meta data file loaded')
-
-        for key in self.meta_dict:
-            cur_list = key.lower().split(sep='_')
-            # print(cur_list)
-            for i in self.settings:
-                string = i.lblName.cget('text').lower()
-                if all(map(lambda w: w in string, cur_list)):
-                    i.entry_set(self.meta_dict[key])
-            for k in self.check_settings:
-                string = k.cget('text').lower()
-                if all(map(lambda w: w in string, cur_list)):
-                    if self.meta_dict[key] == 'yes':
-                        k.select()
-                    elif self.meta_dict[key] == 'no':
-                        k.deselect()
-
-    def get_checkbox(self):
-        ### check box settings
-        if self.box1.get() == 1:
-            self.rfmetadata = 'yes'
-        else:
-            self.rfmetadata = 'no'
-
-        if self.box2.get() == 1:
-            self.generate_example_d_tree = 'yes'
-        else:
-            self.generate_example_d_tree = 'no'
-
-        if self.box3.get() == 1:
-            self.generate_example_decision_tree_fancy = 'yes'
-        else:
-            self.generate_example_decision_tree_fancy  = 'no'
-
-        if self.box4.get() == 1:
-            self.generate_classification_report = 'yes'
-        else:
-            self.generate_classification_report = 'no'
-
-        if self.box5.get() == 1:
-            self.generate_features_imp_log = 'yes'
-        else:
-            self.generate_features_imp_log = 'no'
-
-        if self.box6.get() == 1:
-            self.generate_features_bar_graph = 'yes'
-        else:
-            self.generate_features_bar_graph = 'no'
-        self.n_importance = self.label_n_feature_importance_bars.entry_get
-
-        if self.box7.get() == 1:
-            self.compute_permutation_imp = 'yes'
-        else:
-            self.compute_permutation_imp = 'no'
-
-        if self.box8.get() == 1:
-            self.generate_learning_c = 'yes'
-        else:
-            self.generate_learning_c = 'no'
-        self.learningcurveksplit = self.LC_ksplit.entry_get
-        self.learningcurvedatasplit = self.LC_datasplit.entry_get
-
-        if self.box9.get() == 1:
-            self.generate_precision_recall_c = 'yes'
-        else:
-            self.generate_precision_recall_c = 'no'
-
-        if self.box10.get() == 1:
-            self.getshapscores = 'yes'
-        else:
-            self.getshapscores = 'no'
-
-        self.shappresent = self.shap_present.entry_get
-        self.shapabsent = self.shap_absent.entry_get
-
-
-    def save_new(self):
-        self.get_checkbox()
-        meta_number = 0
-        for f in os.listdir(os.path.join(os.path.dirname(self.configini), 'configs')):
-            if f.__contains__('_meta') and f.__contains__(str(self.varmodel.get())):
-                meta_number += 1
-
-        # for s in self.settings:
-        #     meta_df[s.lblName.cget('text')] = [s.entry_get]
-        new_meta_dict = {'RF_n_estimators': self.label_nestimators.entry_get,
-                         'RF_max_features': self.label_maxfeatures.entry_get, 'RF_criterion': self.label_criterion.entry_get,
-                         'train_test_size': self.label_testsize.entry_get, 'RF_min_sample_leaf': self.label_minsampleleaf.entry_get,
-                         'under_sample_ratio': self.label_under_s_correctionvalue.entry_get, 'under_sample_setting': self.label_under_s_settings.entry_get,
-                         'over_sample_ratio': self.label_over_s_ratio.entry_get, 'over_sample_setting': self.label_over_s_settings.entry_get,
-                         'generate_rf_model_meta_data_file': self.rfmetadata,
-                         'generate_example_decision_tree': self.generate_example_d_tree,'generate_classification_report':self.generate_classification_report,
-                         'generate_features_importance_log': self.generate_features_imp_log,'generate_features_importance_bar_graph':self.generate_features_bar_graph,
-                         'n_feature_importance_bars': self.n_importance,'compute_feature_permutation_importance':self.compute_permutation_imp,
-                         'generate_sklearn_learning_curves': self.generate_learning_c,
-                         'generate_precision_recall_curves':self.generate_precision_recall_c, 'learning_curve_k_splits':self.learningcurveksplit,
-                         'learning_curve_data_splits': self.learningcurvedatasplit,
-                         'generate_shap_scores':self.getshapscores,
-                         'shap_target_present_no':self.shappresent,
-                         'shap_target_absetn_no':self.shapabsent}
-        meta_df = pd.DataFrame(new_meta_dict, index=[0])
-        meta_df.insert(0, 'Classifier_name', str(self.varmodel.get()))
-
-        if currentPlatform == 'Windows':
-            output_path = os.path.dirname(self.configini) + "\\configs\\" + \
-                        str(self.varmodel.get())+ '_meta_' + str(meta_number) + '.csv'
-
-        if currentPlatform == 'Linux'or (currentPlatform == 'Darwin'):
-            output_path = os.path.dirname(self.configini) + "/configs/" + \
-                        str(self.varmodel.get())+ '_meta_' + str(meta_number) + '.csv'
-
-
-        print(os.path.basename(str(output_path)),'saved')
-
-        meta_df.to_csv(output_path, index=FALSE)
-
-    def set_values(self):
-        self.get_checkbox()
-        #### settings
-        model = self.var.get()
-        n_estimators = self.label_nestimators.entry_get
-        max_features = self.label_maxfeatures.entry_get
-        criterion = self.label_criterion.entry_get
-        test_size = self.label_testsize.entry_get
-        min_sample_leaf = self.label_minsampleleaf.entry_get
-        under_s_c_v = self.label_under_s_correctionvalue.entry_get
-        under_s_settings = self.label_under_s_settings.entry_get
-        over_s_ratio = self.label_over_s_ratio.entry_get
-        over_s_settings = self.label_over_s_settings.entry_get
-        classifier_settings = self.varmodel.get()
-
-
-        #export settings to config ini file
-        configini = self.configini
-        config = ConfigParser()
-        config.read(configini)
-
-        config.set('create ensemble settings', 'model_to_run', str(model))
-        config.set('create ensemble settings', 'RF_n_estimators', str(n_estimators))
-        config.set('create ensemble settings', 'RF_max_features', str(max_features))
-        config.set('create ensemble settings', 'RF_criterion', str(criterion))
-        config.set('create ensemble settings', 'train_test_size', str(test_size))
-        config.set('create ensemble settings', 'RF_min_sample_leaf', str(min_sample_leaf))
-        config.set('create ensemble settings', 'under_sample_ratio', str(under_s_c_v))
-        config.set('create ensemble settings', 'under_sample_setting', str(under_s_settings))
-        config.set('create ensemble settings', 'over_sample_ratio', str(over_s_ratio))
-        config.set('create ensemble settings', 'over_sample_setting', str(over_s_settings))
-        config.set('create ensemble settings', 'classifier',str(classifier_settings))
-        config.set('create ensemble settings', 'RF_meta_data', str(self.rfmetadata))
-        config.set('create ensemble settings', 'generate_example_decision_tree', str(self.generate_example_d_tree))
-        config.set('create ensemble settings', 'generate_classification_report', str(self.generate_classification_report))
-        config.set('create ensemble settings', 'generate_features_importance_log', str(self.generate_features_imp_log))
-        config.set('create ensemble settings', 'generate_features_importance_bar_graph', str(self.generate_features_bar_graph))
-        config.set('create ensemble settings', 'N_feature_importance_bars', str(self.n_importance))
-        config.set('create ensemble settings', 'compute_permutation_importance', str(self.compute_permutation_imp))
-        config.set('create ensemble settings', 'generate_learning_curve', str(self.generate_learning_c))
-        config.set('create ensemble settings', 'generate_precision_recall_curve', str(self.generate_precision_recall_c))
-        config.set('create ensemble settings', 'LearningCurve_shuffle_k_splits',str(self.learningcurveksplit))
-        config.set('create ensemble settings', 'LearningCurve_shuffle_data_splits',str(self.learningcurvedatasplit))
-        config.set('create ensemble settings', 'generate_example_decision_tree_fancy',str(self.generate_example_decision_tree_fancy))
-        config.set('create ensemble settings', 'generate_shap_scores',str(self.getshapscores))
-        config.set('create ensemble settings', 'shap_target_present_no', str(self.shappresent))
-        config.set('create ensemble settings', 'shap_target_absent_no', str(self.shapabsent))
-
-        with open(configini, 'w') as configfile:
-            config.write(configfile)
-
-        print('Settings exported to project_config.ini')
 
 def get_frame(self):
     '''

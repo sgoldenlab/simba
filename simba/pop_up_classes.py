@@ -27,7 +27,9 @@ from simba.misc_tools import (check_multi_animal_status,
                               find_core_cnt,
                               find_all_videos_in_directory,
                               get_named_colors,
-                              get_file_name_info_in_directory)
+                              get_file_name_info_in_directory,
+                              SimbaTimer,
+                              find_files_of_filetypes_in_directory)
 
 from simba.drop_bp_cords import getBpNames, create_body_part_dictionary, get_fn_ext
 from simba.ROI_feature_visualizer import ROIfeatureVisualizer
@@ -87,11 +89,19 @@ from simba.distance_plotter import DistancePlotterSingleCore
 from simba.distance_plotter_mp import DistancePlotterMultiCore
 from simba.heat_mapper_clf import HeatMapperClfSingleCore
 from simba.heat_mapper_clf_mp import HeatMapperClfMultiprocess
+from simba.features_scripts.unit_tests import read_video_info_csv
 from simba.data_plotter import DataPlotter
-
+from simba.enums import ReadConfig, Options, Formats, Paths
+import pandas as pd
+import subprocess
+import urllib
 from collections import defaultdict
+from datetime import datetime
 from PIL import Image, ImageTk
+import atexit
+from simba.rw_dfs import read_df
 import os, glob
+
 
 
 class HeatmapLocationPopup(object):
@@ -103,8 +113,8 @@ class HeatmapLocationPopup(object):
         self.setting_main = Toplevel()
         self.setting_main.minsize(400, 400)
         self.setting_main.wm_title('HEATMAPS: LOCATION')
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.project_animal_cnt = read_config_entry(config=self.config, section='General settings', option='animal_no', data_type='int')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.project_animal_cnt = read_config_entry(config=self.config, section=ReadConfig.GENERAL_SETTINGS.value, option=ReadConfig.ANIMAL_CNT.value, data_type='int')
         self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.project_animal_cnt)
         self.x_cols, self.y_cols, self.pcols = getBpNames(config_path)
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, list(self.multi_animal_id_lst), self.project_animal_cnt, self.x_cols, self.y_cols, [], [])
@@ -133,7 +143,7 @@ class HeatmapLocationPopup(object):
         self.max_scale_lbl.grid(row=2, column=0, sticky=NW)
         self.max_scale_entry.grid(row=2, column=1, sticky=NW)
 
-        palette_options = ['magma', 'jet', 'inferno', 'plasma', 'viridis', 'gnuplot2']
+        palette_options = Options.PALETTE_OPTIONS.value
         self.palette_lbl = Label(self.settings_frm, text="Palette : ")
         self.palette_var = StringVar(value=palette_options[0])
         self.palette_dropdown = OptionMenu(self.settings_frm, self.palette_var, *palette_options)
@@ -177,14 +187,14 @@ class QuickLineplotPopup(object):
         self.setting_main.minsize(400, 400)
         self.setting_main.wm_title('SIMPLE LINE PLOT')
 
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.videos_dir = os.path.join(self.project_path, 'videos')
         self.video_files = [os.path.basename(x) for x in glob.glob(self.videos_dir + '/*')]
         if len(self.video_files) == 0:
             print('SIMBA ERROR: No files detected in the project_folder/videos directory.')
             raise ValueError()
 
-        self.project_animal_cnt = read_config_entry(config=self.config, section='General settings', option='animal_no', data_type='int')
+        self.project_animal_cnt = read_config_entry(config=self.config, section=ReadConfig.GENERAL_SETTINGS.value, option=ReadConfig.ANIMAL_CNT.value, data_type='int')
         self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.project_animal_cnt)
         self.x_cols, self.y_cols, self.pcols = getBpNames(config_path)
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, list(self.multi_animal_id_lst), self.project_animal_cnt, list(self.x_cols), list(self.y_cols), [], [])
@@ -296,7 +306,7 @@ class FSTTCPopUp(object):
                  config_path: str):
 
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.target_cnt = read_config_entry(config=self.config, section='SML settings', option='No_targets', data_type='int')
+        self.target_cnt = read_config_entry(config=self.config, section=ReadConfig.SML_SETTINGS.value, option=ReadConfig.TARGET_CNT.value, data_type='int')
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.target_cnt)
         fsttc_main = Toplevel()
         fsttc_main.minsize(400,320)
@@ -341,7 +351,7 @@ class FSTTCPopUp(object):
 
         if len(targets) < 2:
             print('SIMBA ERROR: FORWARD SPIKE TIME TILING COEFFICIENTS REQUIRE 2 OR MORE BEHAVIORS.')
-            raise ValueError()
+            raise ValueError('SIMBA ERROR: FORWARD SPIKE TIME TILING COEFFICIENTS REQUIRE 2 OR MORE BEHAVIORS.')
 
         FSTCC_performer = FSTTCPerformer(config_path=self.config_path,
                                          time_window=time_delta,
@@ -358,7 +368,7 @@ class KleinbergPopUp(object):
     def __init__(self,
                  config_path: str):
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.target_cnt = read_config_entry(config=self.config, section='SML settings', option='No_targets', data_type='int')
+        self.target_cnt = read_config_entry(config=self.config, section=ReadConfig.SML_SETTINGS.value, option=ReadConfig.TARGET_CNT.value, data_type='int')
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.target_cnt)
         kleinberg_main_frm = Toplevel()
         kleinberg_main_frm.minsize(400,320)
@@ -370,7 +380,7 @@ class KleinbergPopUp(object):
         kleinberg_link = Label(kleinberg_main_frm, text='[Click here to learn about Kleinberg Smoother]', cursor='hand2', fg='blue')
         kleinberg_link.bind('<Button-1>', lambda e: webbrowser.open_new('https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md'))
 
-        kleinberg_settings_frm = LabelFrame(kleinberg_main_frm,text='Kleinberg Settings', pady=5, padx=5,font=("Helvetica",12,'bold'),fg='black')
+        kleinberg_settings_frm = LabelFrame(kleinberg_main_frm,text='Kleinberg Settings', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value,fg='black')
         self.k_sigma = Entry_Box(kleinberg_settings_frm,'Sigma','10')
         self.k_sigma.entry_set('2')
         self.k_gamma = Entry_Box(kleinberg_settings_frm,'Gamma','10')
@@ -380,7 +390,7 @@ class KleinbergPopUp(object):
         self.h_search_lbl = Label(kleinberg_settings_frm, text="Hierarchical search: ")
         self.h_search_lbl_val = BooleanVar()
         self.h_search_lbl_val.set(False)
-        self.h_search_lbl_val_cb = Checkbutton(kleinberg_settings_frm, variable=self.h_search_lbl_val, command=None)
+        self.h_search_lbl_val_cb = Checkbutton(kleinberg_settings_frm, variable=self.h_search_lbl_val)
         kleinberg_table_frame = LabelFrame(kleinberg_main_frm, text='Choose classifier(s) to apply Kleinberg smoothing')
         clf_var_dict, clf_cb_dict = {}, {}
         for clf_cnt, clf in enumerate(self.clf_names):
@@ -413,7 +423,7 @@ class KleinbergPopUp(object):
             print('SIMBA ERROR: Select at least one classifier to apply Kleinberg smoothing')
 
         check_int(name='Hierarchy', value=self.k_hierarchy.entry_get)
-        check_int(name='Sigma', value=self.k_sigma.entry_get)
+        check_float(name='Sigma', value=self.k_sigma.entry_get)
         check_float(name='Gamma', value=self.k_gamma.entry_get)
 
         try:
@@ -440,14 +450,14 @@ class TimeBinsClfPopUp(object):
         clf_timebins_main.lift()
         clf_timebins_main = Canvas(hxtScrollbar(clf_timebins_main))
         clf_timebins_main.pack(fill="both", expand=True)
-        self.target_cnt = read_config_entry(config=self.config, section='SML settings', option='No_targets', data_type='int')
+        self.target_cnt = read_config_entry(config=self.config, section=ReadConfig.SML_SETTINGS.value, option=ReadConfig.TARGET_CNT.value, data_type='int')
         clf_names = get_all_clf_names(config=self.config, target_cnt=self.target_cnt)
         cbox_titles = ['First occurance (s)', 'Event count', 'Total event duration (s)',
                        'Mean event duration (s)', 'Median event duration (s)',
                        'Mean event interval (s)', 'Median event interval (s)']
         self.timebin_entrybox = Entry_Box(clf_timebins_main, 'Set time bin size (s)', '15')
-        measures_frm = LabelFrame(clf_timebins_main, text='MEASUREMENTS', font=("Helvetica", 12, 'bold'), fg='black')
-        clf_frm = LabelFrame(clf_timebins_main, text='CLASSIFIERS', font=("Helvetica", 12, 'bold'), fg='black')
+        measures_frm = LabelFrame(clf_timebins_main, text='MEASUREMENTS', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
+        clf_frm = LabelFrame(clf_timebins_main, text='CLASSIFIERS', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.measurements_var_dict, self.clf_var_dict = {}, {}
         for cnt, title in enumerate(cbox_titles):
             self.measurements_var_dict[title] = BooleanVar()
@@ -474,10 +484,10 @@ class TimeBinsClfPopUp(object):
                 clf_list.append(name)
         if len(measurement_lst) == 0:
             print('SIMBA ERROR: Select at least 1 measurement to calculate descriptive statistics for.')
-            raise ValueError()
+            raise ValueError('SIMBA ERROR: Select at least 1 measurement to calculate descriptive statistics for.')
         if len(clf_list) == 0:
             print('SIMBA ERROR: Select at least 1 classifier to calculate descriptive statistics for.')
-            raise ValueError()
+            raise ValueError('SIMBA ERROR: Select at least 1 classifier to calculate descriptive statistics for.')
         time_bins_clf_analyzer = TimeBinsClf(config_path=self.config_path, bin_length=int(self.timebin_entrybox.entry_get), measurements=measurement_lst, classifiers=clf_list)
         time_bins_clf_multiprocessor = multiprocessing.Process(target=time_bins_clf_analyzer.analyze_timebins_clf())
         time_bins_clf_multiprocessor.start()
@@ -492,10 +502,10 @@ class ClfDescriptiveStatsPopUp(object):
         main_frm.lift()
         main_frm = Canvas(hxtScrollbar(main_frm))
         main_frm.pack(fill="both", expand=True)
-        self.target_cnt = read_config_entry(config=self.config, section='SML settings', option='No_targets', data_type='int')
+        self.target_cnt = read_config_entry(config=self.config, section=ReadConfig.SML_SETTINGS.value, option=ReadConfig.TARGET_CNT.value, data_type='int')
         clf_names = get_all_clf_names(config=self.config, target_cnt=self.target_cnt)
-        measures_frm = LabelFrame(main_frm, text='MEASUREMENTS', font=("Helvetica", 12, 'bold'), fg='black')
-        clf_frm = LabelFrame(main_frm, text='CLASSIFIERS', font=("Helvetica", 12, 'bold'), fg='black')
+        measures_frm = LabelFrame(main_frm, text='MEASUREMENTS', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
+        clf_frm = LabelFrame(main_frm, text='CLASSIFIERS', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         cbox_titles = ['Bout count', 'Total event duration (s)', 'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)', 'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']
         self.measurements_var_dict, self.clf_var_dict = {}, {}
         for cnt, title in enumerate(cbox_titles):
@@ -540,13 +550,13 @@ class DownsampleVideoPopUp(object):
 
 
         instructions = Label(main_frm, text='Choose only one of the following method (Custom or Default)')
-        choose_video_frm = LabelFrame(main_frm, text='SELECT VIDEO', font=("Helvetica", 12, 'bold'), fg='black', padx=5, pady=5)
+        choose_video_frm = LabelFrame(main_frm, text='SELECT VIDEO', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black', padx=5, pady=5)
         self.video_path_selected = FileSelect(choose_video_frm, "Video path", title='Select a video file')
-        custom_frm = LabelFrame(main_frm, text='Custom resolution', font=("Helvetica", 12, 'bold'), fg='black', padx=5, pady=5)
+        custom_frm = LabelFrame(main_frm, text='Custom resolution', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black', padx=5, pady=5)
         self.entry_width = Entry_Box(custom_frm, 'Width', '10')
         self.entry_height = Entry_Box(custom_frm, 'Height', '10')
 
-        self.custom_downsample_btn = Button(custom_frm, text='Downsample to custom resolution', font=("Helvetica", 12, 'bold'), fg='black', command=lambda: self.custom_downsample())
+        self.custom_downsample_btn = Button(custom_frm, text='Downsample to custom resolution', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black', command=lambda: self.custom_downsample())
         default_frm = LabelFrame(main_frm, text='Default resolution', font='bold', padx=5, pady=5)
         custom_resolutions = ["1980 x 1080", "1280 x 720", "720 x 480", "640 x 480", "320 x 240"]
         self.radio_btns = {}
@@ -680,14 +690,13 @@ class MultiShortenPopUp(object):
             self.end_times.append(Entry(self.table))
             self.end_times[i].grid(row=i + 2, column=2, sticky=W)
 
-        run_button = Button(self.table, text='Clip video', command=lambda: self.run_clipping(), fg='navy', font=("Helvetica", 12, 'bold'))
+        run_button = Button(self.table, text='Clip video', command=lambda: self.run_clipping(), fg='navy', font=Formats.LABELFRAME_HEADER_FORMAT.value)
         run_button.grid(row=int(self.clip_cnt.entry_get) + 2, column=2, sticky=W)
 
     def run_clipping(self):
         start_times, end_times = [], []
         check_file_exist_and_readable(self.selected_video.file_path)
         for start_time, end_time in zip(self.start_times, self.end_times):
-            print(start_time.get())
             start_times.append(start_time.get())
             end_times.append(end_time.get())
         multi_split_video(file_path=self.selected_video.file_path, start_times=start_times, end_times=end_times)
@@ -700,8 +709,8 @@ class ChangeImageFormatPopUp(object):
         main_frm.minsize(200, 200)
         main_frm.wm_title("CHANGE IMAGE FORMAT")
         self.input_folder_selected = FolderSelect(main_frm, "Image directory", title='Select folder with images:')
-        set_input_format_frm = LabelFrame(main_frm, text='Original image format', font=("Helvetica", 12, 'bold'), padx=15, pady=5)
-        set_output_format_frm = LabelFrame(main_frm, text='Output image format', font=("Helvetica", 12, 'bold'), padx=15, pady=5)
+        set_input_format_frm = LabelFrame(main_frm, text='Original image format', font=Formats.LABELFRAME_HEADER_FORMAT.value, padx=15, pady=5)
+        set_output_format_frm = LabelFrame(main_frm, text='Output image format', font=Formats.LABELFRAME_HEADER_FORMAT.value, padx=15, pady=5)
 
         self.input_file_type, self.out_file_type = StringVar(), StringVar()
         input_png_rb = Radiobutton(set_input_format_frm, text=".png", variable=self.input_file_type, value="png")
@@ -735,7 +744,7 @@ class ConertVideoPopUp(object):
         main_frm.minsize(200, 200)
         main_frm.wm_title("CONVERT VIDEO FORMAT")
 
-        convert_multiple_videos_frm = LabelFrame(main_frm, text='Convert multiple videos', font=("Helvetica", 12, 'bold'), padx=5, pady=5)
+        convert_multiple_videos_frm = LabelFrame(main_frm, text='Convert multiple videos', font=Formats.LABELFRAME_HEADER_FORMAT.value, padx=5, pady=5)
         video_dir = FolderSelect(convert_multiple_videos_frm, 'Video directory', title='Select folder with videos')
         original_format = Entry_Box(convert_multiple_videos_frm, 'Input format', '12')
         output_format = Entry_Box(convert_multiple_videos_frm, 'Output format', '12')
@@ -903,7 +912,7 @@ class MergeFrames2VideoPopUp(object):
         main_frm.minsize(250, 250)
         main_frm.wm_title("MERGE IMAGES TO VIDEO")
         self.folder_path = FolderSelect(main_frm, "IMAGE DIRECTORY", title='Select directory with frames: ')
-        settings_frm = LabelFrame(main_frm, text='SETTINGS', padx=5, pady=5, font=("Helvetica",12,'bold'), fg='black')
+        settings_frm = LabelFrame(main_frm, text='SETTINGS', padx=5, pady=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.img_format_entry_box = Entry_Box(settings_frm, 'IMAGE FORMAT (e.g. png): ', '20')
         self.bitrate_entry_box = Entry_Box(settings_frm, 'BITRATE (e.g. 8000): ', '20', validation='numeric')
         self.fps_entry = Entry_Box(settings_frm, 'FPS: ', '20', validation='numeric')
@@ -938,7 +947,7 @@ class CreateGIFPopUP(object):
         main_frm = Toplevel()
         main_frm.minsize(250, 250)
         main_frm.wm_title("CREATE GIF FROM VIDEO")
-        settings_frm = LabelFrame(main_frm, text='SETTINGS', padx=5, pady=5, font=("Helvetica",12,'bold'), fg='black')
+        settings_frm = LabelFrame(main_frm, text='SETTINGS', padx=5, pady=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         selected_video = FileSelect(settings_frm, 'Video path: ', title='Select a video file')
         start_time_entry_box = Entry_Box(settings_frm, 'Start time (s): ', '16', validation='numeric')
         duration_entry_box = Entry_Box(settings_frm, 'Duration (s): ', '16', validation='numeric')
@@ -1022,7 +1031,7 @@ class PoseReorganizerPopUp(object):
         self.main_frm.lift()
         self.main_frm = Canvas(hxtScrollbar(self.main_frm))
         self.main_frm.pack(fill="both", expand=True)
-        settings_frm = LabelFrame(self.main_frm, text='SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+        settings_frm = LabelFrame(self.main_frm, text='SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.data_folder = FolderSelect(settings_frm, 'DATA FOLDER: ', lblwidth='10')
         self.pose_tool_dropdown = DropDownMenu(settings_frm, 'Tracking tool', ['DLC', 'maDLC'], '10')
         self.pose_tool_dropdown.setChoices('DLC')
@@ -1040,7 +1049,7 @@ class PoseReorganizerPopUp(object):
             self.table.destroy()
 
         self.keypoint_reorganizer = KeypointReorganizer(data_folder=self.data_folder.folder_path, pose_tool=self.pose_tool_dropdown.getChoices(), file_format=self.file_format.getChoices())
-        self.table = LabelFrame(self.main_frm, text='SET NEW ORDER', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+        self.table = LabelFrame(self.main_frm, text='SET NEW ORDER', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.current_order = LabelFrame(self.table,text='CURRENT ORDER:')
         self.new_order = LabelFrame(self.table,text='NEW ORDER:')
 
@@ -1107,7 +1116,7 @@ class AboutSimBAPopUp(object):
         canvas = Canvas(main_frm,width=896,height=507,bg='black')
         canvas.pack()
         scriptdir = os.path.dirname(__file__)
-        img = PhotoImage(file=os.path.join(scriptdir,'About_me_050122_1.png'))
+        img = PhotoImage(file=os.path.join(scriptdir, Paths.ABOUT_ME.value))
         canvas.create_image(0,0,image=img,anchor='nw')
         canvas.image = img
 
@@ -1116,7 +1125,7 @@ class ConcatenatingVideosPopUp(object):
         main_frm = Toplevel()
         main_frm.minsize(300, 300)
         main_frm.wm_title("CONCATENATE VIDEOS")
-        settings_frm = LabelFrame(main_frm, text='SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+        settings_frm = LabelFrame(main_frm, text='SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         video_path_1 = FileSelect(settings_frm, "First video path: ", title='Select a video file')
         video_path_2 = FileSelect(settings_frm, "Second video path: ", title='Select a video file')
         resolutions = ['Video 1', 'Video 2', 320, 640, 720, 1280, 1980]
@@ -1143,12 +1152,12 @@ class VisualizePoseInFolderPopUp(object):
         self.main_frm = Toplevel()
         self.main_frm.minsize(350, 200)
         self.main_frm.wm_title('Visualize pose-estimation')
-        settings_frame = LabelFrame(self.main_frm, text='SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+        settings_frame = LabelFrame(self.main_frm, text='SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.input_folder = FolderSelect(settings_frame, 'Input directory (with csv/parquet files)', title='Select input folder')
         self.output_folder = FolderSelect(settings_frame, 'Output directory (where your videos will be saved)', title='Select output folder')
         self.circle_size = Entry_Box(settings_frame, 'Circle size', 0, validation='numeric')
-        run_btn = Button(self.main_frm, text='VISUALIZE POSE', font=('Helvetica', 12, 'bold'), fg='blue', command= lambda: self.run())
-        self.advanced_settings_btn = Button(self.main_frm, text='OPEN ADVANCED SETTINGS', font=('Helvetica', 12, 'bold'), fg='red', command=lambda: self.launch_adv_settings())
+        run_btn = Button(self.main_frm, text='VISUALIZE POSE', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='blue', command= lambda: self.run())
+        self.advanced_settings_btn = Button(self.main_frm, text='OPEN ADVANCED SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='red', command=lambda: self.launch_adv_settings())
         settings_frame.grid(row=0, sticky=W)
         self.input_folder.grid(row=0, column=0, pady=10, sticky=W)
         self.output_folder.grid(row=1, column=0, pady=10, sticky=W)
@@ -1179,7 +1188,7 @@ class VisualizePoseInFolderPopUp(object):
     def launch_adv_settings(self):
         if self.advanced_settings_btn['text'] == 'OPEN ADVANCED SETTINGS':
             self.advanced_settings_btn.configure(text="CLOSE ADVANCED SETTINGS")
-            self.adv_settings_frm = LabelFrame(self.main_frm, text='ADVANCED SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+            self.adv_settings_frm = LabelFrame(self.main_frm, text='ADVANCED SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
             self.confirm_btn = Button(self.adv_settings_frm, text='Confirm', command=lambda: self.launch_clr_menu())
             self.specify_animals_dropdown = DropDownMenu(self.adv_settings_frm, 'ANIMAL COUNT: ', list(range(1, 11)), '20')
             self.adv_settings_frm.grid(row=5, column=0, pady=10)
@@ -1195,7 +1204,7 @@ class VisualizePoseInFolderPopUp(object):
         if hasattr(self, 'color_table_frme'):
             self.color_table_frme.destroy()
         clr_dict = get_color_dict()
-        self.color_table_frme = LabelFrame(self.adv_settings_frm, text='SELECT COLORS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+        self.color_table_frme = LabelFrame(self.adv_settings_frm, text='SELECT COLORS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.color_lookup = {}
         for animal_cnt in list(range(int(self.specify_animals_dropdown.getChoices()))):
             self.color_lookup['Animal_{}'.format(str(animal_cnt+1))] = DropDownMenu(self.color_table_frme, 'Animal {} color:'.format(str(animal_cnt+1)), list(clr_dict.keys()), '20')
@@ -1212,7 +1221,7 @@ class DropTrackingDataPopUp(object):
         self.main_frm.lift()
         self.main_frm = Canvas(hxtScrollbar(self.main_frm))
         self.main_frm.pack(fill="both", expand=True)
-        file_settings_frm = LabelFrame(self.main_frm, text='FILE SETTINGS', font=('Helvetica', 12, 'bold'), pady=5, padx=5)
+        file_settings_frm = LabelFrame(self.main_frm, text='FILE SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.data_folder_path = FolderSelect(file_settings_frm, 'Data Folder', lblwidth='20')
         self.file_format = DropDownMenu(file_settings_frm, 'File Type', ['csv', 'h5'], '20')
         self.pose_tool = DropDownMenu(file_settings_frm, 'Tracking tool', ['DLC', 'maDLC'], '20')
@@ -1230,9 +1239,8 @@ class DropTrackingDataPopUp(object):
     def confirm(self):
         if hasattr(self, 'bp_table'):
             self.bp_table.destroy()
-        print(self.bp_cnt.entry_get)
         self.keypoint_remover = KeypointRemover(data_folder=self.data_folder_path.folder_path, pose_tool=self.pose_tool.getChoices(), file_format=self.file_format.getChoices())
-        self.bp_table = LabelFrame(self.main_frm, text='REMOVE BODY-PARTS', font=('Helvetica', 12, 'bold'))
+        self.bp_table = LabelFrame(self.main_frm, text='REMOVE BODY-PARTS', font=Formats.LABELFRAME_HEADER_FORMAT.value)
         self.bp_table.grid(row=1, sticky=NW, pady=5)
         self.animal_names_lst, self.drop_down_list = [], []
         if self.pose_tool.getChoices() == 'DLC':
@@ -1268,12 +1276,11 @@ class ConcatenatorPopUp(object):
     def __init__(self,
                  config_path: str or None):
         self.config_path = config_path
-        self.icons_path = os.path.join(os.path.dirname(simba.__file__), 'assets', 'icons')
-        #self.icons_path = '/Users/simon/Desktop/simbapypi_dev/simba/assets/icons'
+        self.icons_path = os.path.join(os.path.dirname(simba.__file__), Paths.ICON_ASSETS.value)
         self.main_frm = Toplevel()
         self.main_frm.minsize(500, 800)
         self.main_frm.wm_title('MERGE (CONCATENATE) VIDEOS')
-        self.select_video_cnt_frm = LabelFrame(self.main_frm, text='VIDEOS #', pady=5, padx=5, font=("Helvetica", 12, 'bold'), fg='black')
+        self.select_video_cnt_frm = LabelFrame(self.main_frm, text='VIDEOS #', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.select_video_cnt_dropdown = DropDownMenu(self.select_video_cnt_frm, 'VIDEOS #', list(range(2,21)), '15')
         self.select_video_cnt_dropdown.setChoices(2)
         self.select_video_cnt_btn = Button(self.select_video_cnt_frm, text='SELECT', command=lambda: self.populate_table())
@@ -1285,9 +1292,9 @@ class ConcatenatorPopUp(object):
         if hasattr(self, 'video_table_frm'):
             self.video_table_frm.destroy()
             self.join_type_frm.destroy()
-        self.video_table_frm = LabelFrame(self.main_frm, text='VIDEO PATHS', pady=5, padx=5, font=("Helvetica", 12, 'bold'), fg='black')
+        self.video_table_frm = LabelFrame(self.main_frm, text='VIDEO PATHS', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.video_table_frm.grid(row=1, sticky=NW)
-        self.join_type_frm = LabelFrame(self.main_frm, text='JOIN TYPE', pady=5, padx=5, font=("Helvetica", 12, 'bold'),fg='black')
+        self.join_type_frm = LabelFrame(self.main_frm, text='JOIN TYPE', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.join_type_frm.grid(row=2, sticky=NW)
         self.videos_dict = {}
         for cnt in range(int(self.select_video_cnt_dropdown.getChoices())):
@@ -1310,7 +1317,7 @@ class ConcatenatorPopUp(object):
             self.icons_dict[file_name]['btn'].grid(row=0, column=file_cnt, sticky=NW)
         self.join_type_var.set(value='mosaic')
 
-        self.resolution_frm = LabelFrame(self.main_frm, text='RESOLUTION', pady=5, padx=5, font=("Helvetica", 12, 'bold'), fg='black')
+        self.resolution_frm = LabelFrame(self.main_frm, text='RESOLUTION', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.resolution_width = DropDownMenu(self.resolution_frm, 'Resolution width', ['480', '640', '1280', '1920', '2560'], '15')
         self.resolution_width.setChoices('640')
         self.resolution_height = DropDownMenu(self.resolution_frm, 'Resolution height', ['480', '640', '1280', '1920', '2560'], '15')
@@ -1353,18 +1360,18 @@ class SetMachineModelParameters(object):
         self.main_frm = Canvas(hxtScrollbar(self.main_frm))
         self.main_frm.pack(fill="both", expand=True)
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.clf_cnt = read_config_entry(self.config, 'SML settings', 'no_targets', 'int')
+        self.clf_cnt = read_config_entry(self.config, ReadConfig.SML_SETTINGS.value, ReadConfig.TARGET_CNT.value, 'int')
         self.clf_names = list(get_all_clf_names(config=self.config,target_cnt=self.clf_cnt))
 
         self.clf_table_frm = LabelFrame(self.main_frm)
-        Label(self.clf_table_frm, text='CLASSIFIER', font=("Helvetica", 12, 'bold')).grid(row=0, column=0)
-        Label(self.clf_table_frm, text='MODEL PATH (.SAV)', font=("Helvetica", 12, 'bold')).grid(row=0, column=1)
-        Label(self.clf_table_frm, text='THRESHOLD', font=("Helvetica", 12, 'bold')).grid(row=0, column=2)
-        Label(self.clf_table_frm, text='MINIMUM BOUT LENGTH (MS)', font=("Helvetica", 12, 'bold')).grid(row=0, column=3)
+        Label(self.clf_table_frm, text='CLASSIFIER', font=Formats.LABELFRAME_HEADER_FORMAT.value).grid(row=0, column=0)
+        Label(self.clf_table_frm, text='MODEL PATH (.SAV)', font=Formats.LABELFRAME_HEADER_FORMAT.value).grid(row=0, column=1)
+        Label(self.clf_table_frm, text='THRESHOLD', font=Formats.LABELFRAME_HEADER_FORMAT.value).grid(row=0, column=2)
+        Label(self.clf_table_frm, text='MINIMUM BOUT LENGTH (MS)', font=Formats.LABELFRAME_HEADER_FORMAT.value).grid(row=0, column=3)
         self.clf_data = {}
         for clf_cnt, clf_name in enumerate(self.clf_names):
             self.clf_data[clf_name] = {}
-            Label(self.clf_table_frm, text=clf_name, font=("Helvetica", 14)).grid(row=clf_cnt+1, column=0, sticky=NW)
+            Label(self.clf_table_frm, text=clf_name, font=Formats.LABELFRAME_HEADER_FORMAT.value).grid(row=clf_cnt+1, column=0, sticky=NW)
             self.clf_data[clf_name]['path'] = FileSelect(self.clf_table_frm, title='Select model (.sav) file')
             self.clf_data[clf_name]['threshold'] = Entry_Box(self.clf_table_frm, '', '15')
             self.clf_data[clf_name]['min_bout'] = Entry_Box(self.clf_table_frm, '', '15')
@@ -1372,7 +1379,7 @@ class SetMachineModelParameters(object):
             self.clf_data[clf_name]['threshold'].grid(row=clf_cnt+1, column=2, sticky=NW)
             self.clf_data[clf_name]['min_bout'].grid(row=clf_cnt + 1, column=3, sticky=NW)
 
-        set_btn = Button(self.main_frm, text='SET MODEL(S)', font=("Helvetica",12,'bold'),fg='red', command = lambda:self.set())
+        set_btn = Button(self.main_frm, text='SET MODEL(S)', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='red', command = lambda:self.set())
         self.clf_table_frm.grid(row=0,sticky=W,pady=5,padx=5)
         set_btn.grid(row=1,pady=10)
 
@@ -1397,7 +1404,7 @@ class OutlierSettingsPopUp(object):
                  config_path: str):
 
         self.config_path, self.config = config_path, read_config_file(ini_path=config_path)
-        self.animal_cnt = read_config_entry(config=self.config, section='General settings',option='animal_no',data_type='int')
+        self.animal_cnt = read_config_entry(config=self.config, section=ReadConfig.GENERAL_SETTINGS.value, option=ReadConfig.ANIMAL_CNT.value, data_type='int')
         self.main_frm = Toplevel()
         self.main_frm.minsize(400, 400)
         self.main_frm.wm_title("Outlier Settings")
@@ -1442,13 +1449,13 @@ class OutlierSettingsPopUp(object):
         self.movement_criterion.grid(row=bp_entry_cnt, column=0, sticky=NW)
         self.movement_correction_frm.grid(row=1, column=0, sticky=NW)
 
-        agg_type_frm = LabelFrame(self.main_frm, text='AGGREGATION METHOD', font=('Times', 12, 'bold'), pady=5, padx=5)
+        agg_type_frm = LabelFrame(self.main_frm, text='AGGREGATION METHOD', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.agg_type_dropdown = DropDownMenu(agg_type_frm, 'Aggregation method:', ['mean', 'median'], '15')
         self.agg_type_dropdown.setChoices('median')
         self.agg_type_dropdown.grid(row=0, column=0, sticky=NW)
         agg_type_frm.grid(row=2, column=0, sticky=NW)
 
-        run_btn = Button(self.main_frm, text='CONFIRM', font=('Helvetica', 12, 'bold'), fg='red', command=lambda: self.run())
+        run_btn = Button(self.main_frm, text='CONFIRM', font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='red', command=lambda: self.run())
         run_btn.grid(row=3, column=0, sticky=NW)
 
     def run(self):
@@ -1474,7 +1481,7 @@ class RemoveAClassifierPopUp(object):
         self.main_frm.minsize(200, 200)
         self.main_frm.wm_title("Warning: Remove classifier(s) settings")
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.target_cnt = read_config_entry(self.config, 'SML settings', 'no_targets', 'int')
+        self.target_cnt = read_config_entry(self.config, ReadConfig.SML_SETTINGS.value, ReadConfig.TARGET_CNT.value, 'int')
         self.clf_names = list(get_all_clf_names(config=self.config, target_cnt=self.target_cnt))
 
         self.remove_clf_frm = LabelFrame(self.main_frm, text='SELECT A CLASSIFIER TO REMOVE')
@@ -1515,11 +1522,13 @@ class VisualizeROIFeaturesPopUp(object):
         self.main_frm.wm_title('VISUALIZE ROI FEATURES')
         self.cpu_cnt, _ = find_core_cnt()
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.videos_dir = os.path.join(self.project_path, 'videos')
         self.colors_dict = get_color_dict()
         self.video_list = []
-        for file_path in glob.glob(self.videos_dir + '/*'):
+        video_file_paths = find_files_of_filetypes_in_directory(directory=self.videos_dir, extensions=['.mp4', '.avi'])
+
+        for file_path in video_file_paths:
             _, video_name, ext = get_fn_ext(filepath=file_path)
             self.video_list.append(video_name + ext)
 
@@ -1527,7 +1536,7 @@ class VisualizeROIFeaturesPopUp(object):
             print('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI features.')
             raise FileNotFoundError('SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI features.')
 
-        self.settings_frm = LabelFrame(self.main_frm, text='SETTINGS', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.settings_frm = LabelFrame(self.main_frm, text='SETTINGS', pady=10, padx=10, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.threshold_entry_box = Entry_Box(self.settings_frm, 'Probability threshold', '15')
         self.threshold_entry_box.entry_set(0.0)
         threshold_label = Label(self.settings_frm, text='Note: body-part locations detected with probabilities below this threshold will be filtered out.', font=("Helvetica", 10, 'italic'))
@@ -1555,12 +1564,12 @@ class VisualizeROIFeaturesPopUp(object):
         self.directionality_type_dropdown.disable()
 
 
-        self.single_video_frm = LabelFrame(self.main_frm, text='Visualize ROI features on SINGLE video', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.single_video_frm = LabelFrame(self.main_frm, text='Visualize ROI features on SINGLE video', pady=10, padx=10, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.single_video_dropdown = DropDownMenu(self.single_video_frm, 'Select video', self.video_list, '15')
         self.single_video_dropdown.setChoices(self.video_list[0])
         self.single_video_btn = Button(self.single_video_frm, text='Visualize ROI features for SINGLE video', command=lambda: self.run(multiple=False))
 
-        self.all_videos_frm = LabelFrame(self.main_frm, text='Visualize ROI features on ALL videos', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.all_videos_frm = LabelFrame(self.main_frm, text='Visualize ROI features on ALL videos', pady=10, padx=10, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.all_videos_btn = Button(self.all_videos_frm, text='Generate ROI visualization on ALL videos', command=lambda: self.run(multiple=True))
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
@@ -1640,10 +1649,12 @@ class VisualizeROITrackingPopUp(object):
         self.main_frm.wm_title('VISUALIZE ROI TRACKING')
 
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.videos_dir = os.path.join(self.project_path, 'videos')
         self.video_list = []
-        for file_path in glob.glob(self.videos_dir + '/*'):
+        video_file_paths = find_files_of_filetypes_in_directory(directory=self.videos_dir, extensions=['.mp4', '.avi'])
+
+        for file_path in video_file_paths:
             _, video_name, ext = get_fn_ext(filepath=file_path)
             self.video_list.append(video_name + ext)
 
@@ -1656,7 +1667,7 @@ class VisualizeROITrackingPopUp(object):
         self.show_pose_var = BooleanVar(value=True)
         self.animal_name_var = BooleanVar(value=True)
 
-        self.settings_frm = LabelFrame(self.main_frm, text='SETTINGS', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.settings_frm = LabelFrame(self.main_frm, text='SETTINGS', pady=10, padx=10, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.threshold_entry_box = Entry_Box(self.settings_frm, 'Body-part probability threshold', '30')
         self.threshold_entry_box.entry_set(0.0)
         threshold_label = Label(self.settings_frm, text='Note: body-part locations detected with probabilities below this threshold is removed from visualization.', font=("Helvetica", 10, 'italic'))
@@ -1668,14 +1679,14 @@ class VisualizeROITrackingPopUp(object):
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(self.main_frm, text='RUN VISUALIZATION', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.run_frm = LabelFrame(self.main_frm, text='RUN VISUALIZATION', pady=10, padx=10, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
 
-        self.single_video_frm = LabelFrame(self.run_frm, text='SINGLE video', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.single_video_frm = LabelFrame(self.run_frm, text='SINGLE video', pady=10, padx=10, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.single_video_dropdown = DropDownMenu(self.single_video_frm, 'Select video', self.video_list, '15')
         self.single_video_dropdown.setChoices(self.video_list[0])
         self.single_video_btn = Button(self.single_video_frm, text='Create SINGLE ROI video', fg='blue', command=lambda: self.run_visualize())
 
-        self.all_videos_frm = LabelFrame(self.run_frm, text='ALL videos', pady=10, padx=10, font=("Helvetica", 12, 'bold'), fg='black')
+        self.all_videos_frm = LabelFrame(self.run_frm, text='ALL videos', pady=10, padx=10, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.all_videos_btn = Button(self.all_videos_frm, text='Create ALL ROI videos ({} videos found)'.format(str(len(self.video_list))), fg='red', command=lambda: self.run_visualize())
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
@@ -1847,7 +1858,7 @@ class SklearnVisualizationPopUp(object):
         self.main_frm.pack(expand=True, fill=BOTH)
         self.cpu_cnt, _ = find_core_cnt()
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.videos_path = os.path.join(self.project_path, 'videos')
         self.video_lst = find_all_videos_in_directory(directory=self.videos_path)
         self.use_default_font_settings_val = BooleanVar(value=True)
@@ -1857,12 +1868,12 @@ class SklearnVisualizationPopUp(object):
         self.rotate_img_var = BooleanVar()
         self.multiprocess_var = BooleanVar()
 
-        bp_threshold_frm = LabelFrame(self.main_frm,text='BODY-PART VISUALIZATION THRESHOLD',font=("Helvetica",12,'bold'),padx=5,pady=5,fg='black')
+        bp_threshold_frm = LabelFrame(self.main_frm,text='BODY-PART VISUALIZATION THRESHOLD',font=Formats.LABELFRAME_HEADER_FORMAT.value,padx=5,pady=5,fg='black')
         self.bp_threshold_lbl = Label(bp_threshold_frm,text='Body-parts detected below the set threshold won\'t be shown in the output videos.', font=("Helvetica", 11, 'italic'))
         self.bp_threshold_entry = Entry_Box(bp_threshold_frm,'Body-part probability threshold', '32')
         self.get_bp_probability_threshold()
 
-        self.style_settings_frm = LabelFrame(self.main_frm, text='STYLE SETTINGS', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
+        self.style_settings_frm = LabelFrame(self.main_frm, text='STYLE SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5, fg='black')
         self.auto_compute_font_cb = Checkbutton(self.style_settings_frm, text='Auto-compute font/key-point settings', variable=self.use_default_font_settings_val, command= lambda: self.enable_text_settings())
         self.sklearn_text_size_entry_box = Entry_Box(self.style_settings_frm, 'Text size: ', '12')
         self.sklearn_text_spacing_entry_box = Entry_Box(self.style_settings_frm, 'Text spacing: ', '12')
@@ -1873,7 +1884,7 @@ class SklearnVisualizationPopUp(object):
         self.sklearn_text_thickness_entry_box.set_state('disable')
         self.sklearn_circle_size_entry_box.set_state('disable')
 
-        self.settings_frm = LabelFrame(self.main_frm, text='VISUALIZATION SETTINGS', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
+        self.settings_frm = LabelFrame(self.main_frm, text='VISUALIZATION SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5, fg='black')
         self.create_videos_cb = Checkbutton(self.settings_frm, text='Create video', variable=self.create_videos_var)
         self.create_frames_cb = Checkbutton(self.settings_frm, text='Create frames', variable=self.create_frames_var)
         self.timers_cb = Checkbutton(self.settings_frm, text='Include timers overlay', variable=self.include_timers_var)
@@ -1883,13 +1894,13 @@ class SklearnVisualizationPopUp(object):
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(self.main_frm, text='RUN', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
-        self.run_single_video_frm = LabelFrame(self.run_frm, text='SINGLE VIDEO', font=("Helvetica", 12, 'bold'),pady=5, padx=5, fg='black')
+        self.run_frm = LabelFrame(self.main_frm, text='RUN', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5, fg='black')
+        self.run_single_video_frm = LabelFrame(self.run_frm, text='SINGLE VIDEO', font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5, padx=5, fg='black')
         self.run_single_video_btn = Button(self.run_single_video_frm, text='Create single video', fg='blue', command= lambda: self.__initiate_video_creation(multiple_videos=False))
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, 'Video:', self.video_lst, '12')
         self.single_video_dropdown.setChoices(self.video_lst[0])
 
-        self.run_multiple_videos = LabelFrame(self.run_frm, text='MULTIPLE VIDEO', font=("Helvetica", 12, 'bold'),pady=5, padx=5, fg='black')
+        self.run_multiple_videos = LabelFrame(self.run_frm, text='MULTIPLE VIDEO', font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5, padx=5, fg='black')
         self.run_multiple_video_btn = Button(self.run_multiple_videos, text='Create multiple videos ({} video(s) found)'.format(str(len(self.video_lst))), fg='blue', command= lambda: self.__initiate_video_creation(multiple_videos=True))
 
         bp_threshold_frm.grid(row=0,sticky=NW)
@@ -2000,14 +2011,14 @@ class GanttPlotPopUp(object):
         self.cpu_cnt, _ = find_core_cnt()
         self.resolutions_options = ['640×480', '800×640', '960×800', '1120×960']
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.data_path = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.data_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
         check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()),
                                         error_msg='SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing gantt charts')
 
-        self.style_settings_frm = LabelFrame(self.main_frm, text='STYLE SETTINGS', font=("Helvetica", 14, 'bold'), pady=5, padx=5)
+        self.style_settings_frm = LabelFrame(self.main_frm, text='STYLE SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.use_default_style_bool = BooleanVar(value=True)
         self.auto_compute_style_cb = Checkbutton(self.style_settings_frm, text='Use default style', variable=self.use_default_style_bool, command=lambda: self.enable_text_settings())
         self.resolution_dropdown = DropDownMenu(self.style_settings_frm, 'Resolution:', self.resolutions_options, '16')
@@ -2020,7 +2031,7 @@ class GanttPlotPopUp(object):
         self.font_size_entry.set_state('disable')
         self.font_rotation_entry.set_state('disable')
 
-        self.settings_frm = LabelFrame(self.main_frm, text='VISUALIZATION SETTINGS', font=("Helvetica", 14, 'bold'), pady=5, padx=5)
+        self.settings_frm = LabelFrame(self.main_frm, text='VISUALIZATION SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.gantt_frames_var = BooleanVar()
         self.gantt_last_frame_var = BooleanVar()
         self.gantt_videos_var = BooleanVar()
@@ -2035,13 +2046,13 @@ class GanttPlotPopUp(object):
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(self.main_frm, text='RUN', font=("Helvetica", 14, 'bold'), pady=5, padx=5, fg='black')
-        self.run_single_video_frm = LabelFrame(self.run_frm, text='SINGLE VIDEO', font=("Helvetica", 12, 'bold'),pady=5, padx=5, fg='black')
+        self.run_frm = LabelFrame(self.main_frm, text='RUN', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5, fg='black')
+        self.run_single_video_frm = LabelFrame(self.run_frm, text='SINGLE VIDEO', font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5, padx=5, fg='black')
         self.run_single_video_btn = Button(self.run_single_video_frm, text='Create single video', fg='blue', command= lambda: self.__create_gantt_plots(multiple_videos=False))
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, 'Video:', list(self.files_found_dict.keys()), '12')
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
 
-        self.run_multiple_videos = LabelFrame(self.run_frm, text='MULTIPLE VIDEO', font=("Helvetica", 12, 'bold'),pady=5, padx=5, fg='black')
+        self.run_multiple_videos = LabelFrame(self.run_frm, text='MULTIPLE VIDEO', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5, fg='black')
         self.run_multiple_video_btn = Button(self.run_multiple_videos, text='Create multiple videos ({} video(s) found)'.format(str(len(list(self.files_found_dict.keys())))), fg='blue', command= lambda: self.__create_gantt_plots(multiple_videos=True))
 
         self.style_settings_frm.grid(row=0, sticky=NW)
@@ -2126,16 +2137,16 @@ class VisualizeClassificationProbabilityPopUp(object):
         self.main_frm = hxtScrollbar(self.main_frm)
         self.main_frm.pack(expand=True, fill=BOTH)
         self.cpu_cnt, _ = find_core_cnt()
-        self.resolutions_options = ['640×480', '800×640', '960×800', '1120×960']
+        self.resolutions_options = Options.RESOLUTION_OPTIONS.value
         self.max_y_lst = [x for x in range(10, 110, 10)]
         self.max_y_lst.insert(0, 'auto')
         self.colors = get_named_colors()
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.clf_cnt = read_config_entry(self.config, 'SML settings', 'no_targets', 'int')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.clf_cnt = read_config_entry(self.config, ReadConfig.SML_SETTINGS.value, ReadConfig.TARGET_CNT.value, 'int')
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.clf_cnt)
-        self.data_path = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.data_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
         check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()),
                                         error_msg='SIMBA ERROR: Cant visualize probabilities, no data in project_folder/csv/machine_results directory')
@@ -2155,7 +2166,7 @@ class VisualizeClassificationProbabilityPopUp(object):
         self.circle_size.entry_set(val=20)
         self.max_y_dropdown.setChoices(choice='auto')
 
-        self.settings_frm = LabelFrame(self.main_frm, text='VISUALIZATION SETTINGS', font=("Helvetica", 14, 'bold'), pady=5, padx=5)
+        self.settings_frm = LabelFrame(self.main_frm, text='VISUALIZATION SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
         self.probability_frames_var = BooleanVar()
         self.probability_videos_var = BooleanVar()
         self.probability_last_frm_var = BooleanVar()
@@ -2172,13 +2183,13 @@ class VisualizeClassificationProbabilityPopUp(object):
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(self.main_frm, text='RUN', font=("Helvetica", 14, 'bold'), pady=5, padx=5, fg='black')
-        self.run_single_video_frm = LabelFrame(self.run_frm, text='SINGLE VIDEO', font=("Helvetica", 12, 'bold'),pady=5, padx=5, fg='black')
+        self.run_frm = LabelFrame(self.main_frm, text='RUN', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5, fg='black')
+        self.run_single_video_frm = LabelFrame(self.run_frm, text='SINGLE VIDEO', font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5, padx=5, fg='black')
         self.run_single_video_btn = Button(self.run_single_video_frm, text='Create single video', fg='blue', command= lambda: self.__create_probability_plots(multiple_videos=False))
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, 'Video:', list(self.files_found_dict.keys()), '12')
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
 
-        self.run_multiple_videos = LabelFrame(self.run_frm, text='MULTIPLE VIDEO', font=("Helvetica", 12, 'bold'),pady=5, padx=5, fg='black')
+        self.run_multiple_videos = LabelFrame(self.run_frm, text='MULTIPLE VIDEO', font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5, padx=5, fg='black')
         self.run_multiple_video_btn = Button(self.run_multiple_videos, text='Create multiple videos ({} video(s) found)'.format(str(len(list(self.files_found_dict.keys())))), fg='blue', command= lambda: self.__create_probability_plots(multiple_videos=True))
 
         self.style_settings_frm.grid(row=0, sticky=NW)
@@ -2264,9 +2275,9 @@ class PathPlotPopUp(object):
 
 
         self.config, self.config_path = read_config_file(ini_path=config_path), config_path
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.data_path = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.data_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
         check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()),
                                         error_msg='SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing path plots')
@@ -3049,12 +3060,147 @@ class DirectingOtherAnimalsVisualizerPopUp(object):
             directing_other_animal_visualizer.visualize_results()
 
 
-# style_attr = {'Show_pose': True, 'Pose_circle_size': 3, "Direction_color": 'Random', 'Direction_thickness': 4, 'Highlight_endpoints': True}
-# test = DirectingOtherAnimalsVisualizer(config_path='/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/project_folder/project_config.ini',
-#                                        video_name='Testing_Video_3.mp4',
-#                                        style_attr=style_attr)
-#
-# test.visualize_results()
+class H5CreatorPopUp(object):
+    def __init__(self,
+                 config_path: str):
+
+        self.main_frm = Toplevel()
+        self.main_frm.minsize(400, 400)
+        self.main_frm.wm_title("SIMBA PLOTLY DASHBOARD")
+        self.main_frm = hxtScrollbar(self.main_frm)
+        self.main_frm.pack(expand=True, fill=BOTH)
+
+
+        self.config_path = config_path
+        self.agg_clf_data_var = BooleanVar(value=True)
+        self.timebin_clf_data_var = BooleanVar(value=True)
+        self.clf_probabilities_var = BooleanVar(value=True)
+        self.entire_clf_var = BooleanVar(value=True)
+
+        self.data_settings = LabelFrame(self.main_frm, text='DATA SETTINGS', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
+        agg_clf_data_cb = Checkbutton(self.data_settings, text='Aggregate classification data', variable=self.agg_clf_data_var)
+        timebin_clf_data_cb = Checkbutton(self.data_settings, text='Classification time-bins', variable=self.timebin_clf_data_var)
+        clf_probabilities_cb = Checkbutton(self.data_settings, text='Classification probabilities', variable=self.clf_probabilities_var)
+        entire_clf_cb = Checkbutton(self.data_settings, text='Entire classification data', variable=self.entire_clf_var)
+
+        self.save_frm = LabelFrame(self.main_frm, text='SAVE', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
+        self.save_button = Button(self.save_frm, text='SAVE DATA (H5)', fg='green', command=lambda: self.save())
+
+        self.load_frm = LabelFrame(self.main_frm, text='LOAD DASHBOARD', font=("Helvetica", 12, 'bold'), pady=5, padx=5, fg='black')
+        self.groups_file = FileSelect(self.load_frm, "EXPERIMENTAL GROUPS FILE (CSV, OPTIONAL)", lblwidth='35')
+        self.dashboard_file = FileSelect(self.load_frm, "DASHBOARD FILE (H5)", lblwidth='35')
+        self.load_btn = Button(self.load_frm, text='LOAD DASHBOARD', fg='blue', command=lambda: self.load())
+
+        self.data_settings.grid(row=0, column=0, sticky='NW')
+        agg_clf_data_cb.grid(row=0, column=0, sticky='NW')
+        timebin_clf_data_cb.grid(row=1, column=0, sticky='NW')
+        clf_probabilities_cb.grid(row=2, column=0, sticky='NW')
+        entire_clf_cb.grid(row=3, column=0, sticky='NW')
+
+        self.save_frm.grid(row=1, column=0, sticky='NW')
+        self.save_button.grid(row=0, column=0, sticky='NW')
+
+        self.load_frm.grid(row=2, column=0, sticky='NW')
+        self.dashboard_file.grid(row=0, column=0, sticky='NW')
+        self.groups_file.grid(row=1, column=0, sticky='NW')
+        self.load_btn.grid(row=2, column=0, sticky='NW')
+
+        self.main_frm.mainloop()
+
+    def save(self):
+        config = read_config_file(ini_path=self.config_path)
+        project_path = read_config_entry(config, 'General settings', 'project_path', data_type='folder_path')
+        file_type = read_config_entry(config, 'General settings', 'workflow_file_type', 'str', 'csv')
+        model_cnt = read_config_entry(config=config, section='SML settings', option='no_targets', data_type='int')
+        logs_path = os.path.join(project_path, 'logs')
+        datetime_stamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        self.storage_path = os.path.join(logs_path, 'SimBA_dash_storage_{}.h5'.format(datetime_stamp))
+        storage_file = pd.HDFStore(self.storage_path, table=True, complib='blosc:zlib', complevel=9)
+        video_info_path = os.path.join(project_path, 'logs', 'video_info.csv')
+        video_info_df = read_video_info_csv(file_path=video_info_path)
+        machine_results_dir = os.path.join(project_path, 'csv', 'machine_results')
+        clf_names = simba.train_model_functions.get_all_clf_names(config=config, target_cnt=model_cnt)
+        clf_col_names = clf_names + ['Probability_' + x for x in clf_names]
+        storage_file['Classifier_names'] = pd.DataFrame(data=clf_names, columns=['Classifier_names'])
+        storage_file['Video_info'] = video_info_df
+        timer = SimbaTimer()
+        timer.start_timer()
+
+        if self.agg_clf_data_var.get():
+            data_files = glob.glob(logs_path + '/data_summary_*')
+            if len(data_files) == 0:
+                print('SIMBA WARNING: No aggregate classification data found in SimBA project')
+            else:
+                print('Compressing {} aggregate classification data files...'.format(str(len(data_files))))
+                for file_path in data_files:
+                    _, file_name, _ = get_fn_ext(file_path)
+                    df = read_df(file_path, 'csv')
+                    storage_file['SklearnData/{}'.format(file_name)] = df
+
+        if self.timebin_clf_data_var.get():
+            data_files = glob.glob(logs_path + '/Time_bins_ML_results_*')
+            if len(data_files) == 0:
+                print('SIMBA WARNING: No time bins data classification data found in SimBA project')
+            else:
+                print('Compressing {} time-bin classification data files...'.format(str(len(data_files))))
+                for file_path in data_files:
+                    _, file_name, _ = get_fn_ext(file_path)
+                    df = read_df(file_path, 'csv')
+                    storage_file['TimeBins/{}'.format(file_name)] = df
+
+        if self.clf_probabilities_var.get():
+            data_files = glob.glob(machine_results_dir + '/*.' + file_type)
+            if len(data_files) == 0:
+                print('SIMBA WARNING: No classification probabilities found in SimBA project')
+            else:
+                print('Compressing machine classification probability calculations for {} files...'.format(str(len(data_files))))
+                for file_path in data_files:
+                    df = read_df(file_path, file_type)[clf_col_names]
+                    _, file_name, _ = get_fn_ext(file_path)
+                    storage_file['VideoData/{}'.format(file_name)] = df
+
+        if self.entire_clf_var.get():
+            data_files = glob.glob(machine_results_dir + '/*.' + file_type)
+            if len(data_files) == 0:
+                print('SIMBA WARNING: No machine results found in SimBA project')
+            else:
+                print('Compressing data set for {} video files...'.format(str(len(data_files))))
+                for file_path in data_files:
+                    df = read_df(file_path, file_type)
+                    _, file_name, _ = get_fn_ext(file_path)
+                    storage_file['Entire_data/{}'.format(file_name)] = df
+
+        storage_file.close()
+        timer.stop_timer()
+        print('SIMBA COMPLETE: SimBA project plotly/dash file container saved at {} (elapsed time {}s)'.format(self.storage_path, timer.elapsed_time_str))
+
+    def wait_for_internet_connection(self, url):
+        while True:
+            try:
+                response = urllib.request.urlopen(url, timeout=1)
+                return
+            except:
+                pass
+
+    def terminate_children(self, children):
+        for process in children:
+            process.terminate()
+
+    def load(self):
+        url = 'http://127.0.0.1:8050'
+        simba_dir = os.path.dirname(simba.__file__)
+        check_file_exist_and_readable(file_path=self.dashboard_file.file_path)
+        dash_board_file_path = self.dashboard_file.file_path
+        groups_file_path = self.groups_file.file_path
+
+        if hasattr(self, 'process_one') or hasattr(self, 'process_two'):
+            self.process_one.kill()
+            self.process_two.kill()
+        self.process_one = subprocess.Popen([sys.executable, os.path.join(simba_dir, 'SimBA_dash_app.py'), dash_board_file_path, groups_file_path])
+        self.wait_for_internet_connection(url)
+        self.process_two = subprocess.Popen([sys.executable, os.path.join(simba_dir, 'run_dash_tkinter.py'), url])
+        subprocess_children = [self.process_one, self.process_two]
+        atexit.register(self.terminate_children, subprocess_children)
 
 
 
@@ -3068,3 +3214,4 @@ class DirectingOtherAnimalsVisualizerPopUp(object):
 #_ = HeatmapClfPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 #_ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # _ = DirectingOtherAnimalsVisualizerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/project_folder/project_config.ini')
+#_ = H5CreatorPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

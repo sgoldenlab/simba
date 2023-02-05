@@ -17,6 +17,7 @@ import cv2
 from numba import jit, prange
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from simba.enums import ReadConfig, Paths, Formats
 import multiprocessing
 import functools
 import platform
@@ -37,7 +38,7 @@ def _heatmap_multiprocessor(data: np.array,
     group = int(data[0][0][1])
 
     if video_setting:
-        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         video_save_path = os.path.join(video_temp_dir, '{}.mp4'.format(str(group)))
         video_writer = cv2.VideoWriter(video_save_path, fourcc, fps, size)
 
@@ -125,7 +126,6 @@ class HeatMapperClfMultiprocess(object):
 
     >>> heat_mapper_clf = HeatMapperClf(config_path='MyConfigPath', final_img_setting=False, video_setting=True, frame_setting=False, bin_size=50, palette='jet', bodypart='Nose_1', clf_name='Attack', max_scale=20)
     >>> heat_mapper_clf.create_heatmaps()
-
     """
 
     def __init__(self,
@@ -152,12 +152,12 @@ class HeatMapperClfMultiprocess(object):
         self.bin_size, self.max_scale, self.palette, self.shading, self.core_cnt = style_attr['bin_size'], style_attr['max_scale'], style_attr['palette'], style_attr['shading'], core_cnt
         self.clf_name, self.files_found = clf_name, files_found
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.out_parent_dir = os.path.join(self.project_path, 'frames', 'output', 'heatmaps_classifier_locations')
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.out_parent_dir = os.path.join(self.project_path, Paths.HEATMAP_CLF_LOCATION_DIR.value)
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         if not os.path.exists(self.out_parent_dir): os.makedirs(self.out_parent_dir)
-        self.dir_in = os.path.join(self.project_path, 'csv', 'machine_results')
+        self.dir_in = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.bp_lst = [self.bp + '_x', self.bp + '_y']
         self.maxtasksperchild = 10
         self.chunksize = 1

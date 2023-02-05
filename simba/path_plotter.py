@@ -10,6 +10,7 @@ from simba.misc_tools import (check_multi_animal_status,
                               get_fn_ext,
                               SimbaTimer,
                               get_color_dict)
+from simba.enums import ReadConfig, Paths, Formats
 from simba.misc_visualizations import make_path_plot
 from simba.features_scripts.unit_tests import read_video_info_csv, read_video_info
 from simba.drop_bp_cords import getBpNames
@@ -69,14 +70,14 @@ class PathPlotterSingleCore(object):
         self.timer = SimbaTimer()
         self.timer.start_timer()
         self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
+        self.project_path = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value, data_type=ReadConfig.FOLDER_PATH.value)
         self.no_animals_path_plot = len(animal_attr.keys())
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.save_folder = os.path.join(self.project_path, 'frames', 'output', 'path_plots')
+        self.file_type = read_config_entry(self.config, ReadConfig.GENERAL_SETTINGS.value, ReadConfig.FILE_TYPE.value, 'str', 'csv')
+        self.save_folder = os.path.join(self.project_path, Paths.PATH_PLOT_DIR.value)
         if not os.path.exists(self.save_folder):
             os.makedirs(self.save_folder)
         self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.no_animals_path_plot)
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
+        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         self.x_cols, self.y_cols, self.pcols = getBpNames(config_path)
         self.font = cv2.FONT_HERSHEY_COMPLEX
         check_if_filepath_list_is_empty(filepaths=self.files_found,
@@ -99,7 +100,7 @@ class PathPlotterSingleCore(object):
             self.data_df = read_df(file_path, self.file_type)
             if self.video_setting:
                 self.video_save_path = os.path.join(self.save_folder, self.video_name + '.mp4')
-                self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
                 self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (self.style_attr['width'], self.style_attr['height']))
 
             if self.frame_setting:

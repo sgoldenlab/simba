@@ -1,6 +1,6 @@
 __author__ = "Simon Nilsson", "JJ Choong"
 
-import os, glob
+import os, glob, ast
 from simba.train_model_functions import (read_all_files_in_folder,
                                             read_in_all_model_names_to_remove,
                                             delete_other_annotation_columns,
@@ -27,10 +27,13 @@ from simba.read_config_unit_tests import (check_int,
                                           read_simba_meta_files,
                                           read_meta_file,
                                           read_config_file,
-                                          check_if_filepath_list_is_empty)
+                                          check_if_filepath_list_is_empty,
+                                          check_if_valid_input)
 from simba.drop_bp_cords import drop_bp_cords
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+perform_flags = ['yes', True, 'True']
+options_flags = ['yes', True, 'True', 'False', 'no', False]
 
 
 class TrainMultipleModelsFromMeta(object):
@@ -90,31 +93,42 @@ class TrainMultipleModelsFromMeta(object):
             check_str(name='RF_criterion', value=self.meta_dict['RF_criterion'], options=['gini', 'entropy'])
             check_float(name='train_test_size', value=self.meta_dict['train_test_size'])
             check_int(name='RF_min_sample_leaf', value=self.meta_dict['RF_min_sample_leaf'])
-            check_str(name='generate_rf_model_meta_data_file', value=self.meta_dict['generate_rf_model_meta_data_file'])
-            check_str(name='generate_example_decision_tree', value=self.meta_dict['generate_example_decision_tree'])
-            check_str(name='generate_classification_report', value=self.meta_dict['generate_classification_report'])
-            check_str(name='generate_features_importance_log', value=self.meta_dict['generate_features_importance_log'])
-            check_str(name='generate_features_importance_bar_graph', value=self.meta_dict['generate_features_importance_bar_graph'])
-            check_str(name='compute_feature_permutation_importance', value=self.meta_dict['compute_feature_permutation_importance'])
-            check_str(name='generate_sklearn_learning_curves', value=self.meta_dict['generate_sklearn_learning_curves'])
-            check_str(name='generate_precision_recall_curves', value=self.meta_dict['generate_precision_recall_curves'])
-            check_str(name='under_sample_setting', value=self.meta_dict['under_sample_setting'], allow_blank=True)
-            check_str(name='over_sample_setting', value=self.meta_dict['over_sample_setting'], allow_blank=True)
-
-
-            if self.meta_dict['generate_sklearn_learning_curves'] == 'yes':
+            check_if_valid_input('generate_rf_model_meta_data_file', self.meta_dict['generate_rf_model_meta_data_file'], options_flags)
+            check_if_valid_input('generate_example_decision_tree', self.meta_dict['generate_example_decision_tree'], options_flags)
+            check_if_valid_input('generate_classification_report', self.meta_dict['generate_classification_report'], options_flags)
+            check_if_valid_input('generate_features_importance_log', self.meta_dict['generate_features_importance_log'], options_flags)
+            check_if_valid_input('generate_features_importance_bar_graph', self.meta_dict['generate_features_importance_bar_graph'], options_flags)
+            check_if_valid_input('compute_feature_permutation_importance', self.meta_dict['compute_feature_permutation_importance'], options_flags)
+            check_if_valid_input('generate_sklearn_learning_curves', self.meta_dict['generate_sklearn_learning_curves'], options_flags)
+            check_if_valid_input('generate_precision_recall_curves', self.meta_dict['generate_precision_recall_curves'], options_flags)
+            check_str('under_sample_setting', self.meta_dict['under_sample_setting'].lower(), options=('random undersample', 'none'))
+            check_str('over_sample_setting', self.meta_dict['over_sample_setting'].lower(), options=('smote', 'smoteenn', 'none'))
+            if self.meta_dict['RF_max_features'] == 'None':
+                self.meta_dict['RF_max_features'] = None
+            if self.meta_dict['generate_sklearn_learning_curves'] in perform_flags:
                 check_int(name='learning_curve_k_splits', value=self.meta_dict['learning_curve_k_splits'])
                 check_int(name='learning_curve_data_splits', value=self.meta_dict['learning_curve_data_splits'])
-            if self.meta_dict['generate_features_importance_bar_graph'] == 'yes':
+            if self.meta_dict['generate_features_importance_bar_graph'] in perform_flags:
                 check_int(name='n_feature_importance_bars', value=self.meta_dict['n_feature_importance_bars'])
             if 'generate_shap_scores' in self.meta_dict.keys():
-                if self.meta_dict['generate_shap_scores'] == 'yes':
+                if self.meta_dict['generate_shap_scores'] in perform_flags:
                     check_int(name='shap_target_present_no', value=self.meta_dict['shap_target_present_no'])
-                    check_int(name='shap_target_absetn_no', value=self.meta_dict['shap_target_absetn_no'])
+                    check_int(name='shap_target_absent_no', value=self.meta_dict['shap_target_absent_no'])
             if self.meta_dict['under_sample_setting'].lower() == 'random undersample':
                 check_float(name='under_sample_ratio', value=self.meta_dict['under_sample_ratio'])
             if (self.meta_dict['over_sample_setting'].lower() == 'smoteenn') or (self.meta_dict['over_sample_setting'].lower() == 'smote'):
                 check_float(name='over_sample_ratio', value=self.meta_dict['over_sample_ratio'])
+
+            if self.config.has_option('create ensemble settings', 'class_weights'):
+                class_weights = read_config_entry(self.config, 'create ensemble settings', 'class_weights', data_type='str', default_value='None')
+                if class_weights == 'custom':
+                    class_weights = ast.literal_eval(read_config_entry(self.config, 'create ensemble settings', 'custom_weights', data_type='str'))
+                    for k, v in class_weights.items():
+                        class_weights[k] = int(v)
+                if class_weights == 'None':
+                    class_weights = None
+            else:
+                class_weights = None
 
             self.clf_name = self.meta_dict['Classifier_name']
             self.class_names = ['Not_' + self.clf_name, self.clf_name]
@@ -127,28 +141,34 @@ class TrainMultipleModelsFromMeta(object):
             print_machine_model_information(self.meta_dict)
             print('# {} features.'.format(len(self.feature_names)))
 
-            self.rf_clf = RandomForestClassifier(n_estimators=self.meta_dict['RF_n_estimators'], max_features=self.meta_dict['RF_max_features'], n_jobs=-1,criterion=self.meta_dict['RF_criterion'], min_samples_leaf=self.meta_dict['RF_min_sample_leaf'], bootstrap=True, verbose=1)
+            self.rf_clf = RandomForestClassifier(n_estimators=self.meta_dict['RF_n_estimators'],
+                                                 max_features=self.meta_dict['RF_max_features'],
+                                                 n_jobs=-1,criterion=self.meta_dict['RF_criterion'],
+                                                 min_samples_leaf=self.meta_dict['RF_min_sample_leaf'],
+                                                 bootstrap=True,
+                                                 verbose=1,
+                                                 class_weight=class_weights)
             try:
                 self.rf_clf.fit(self.x_train, self.y_train)
             except Exception as e:
                 raise ValueError(e, 'ERROR: The model contains a faulty array. This may happen when trying to train a model with 0 examples of the behavior of interest')
 
-            if self.meta_dict['compute_feature_permutation_importance'] == 'yes':
+            if self.meta_dict['compute_feature_permutation_importance'] in perform_flags:
                 calc_permutation_importance(self.x_test, self.y_test, self.rf_clf, self.feature_names, self.clf_name, self.model_dir_out, save_file_no=config_cnt)
-            if self.meta_dict['generate_sklearn_learning_curves'] == 'yes':
+            if self.meta_dict['generate_sklearn_learning_curves'] in perform_flags:
                 calc_learning_curve(self.x_y_df, self.clf_name, self.meta_dict['learning_curve_k_splits'], self.meta_dict['learning_curve_data_splits'], self.meta_dict['train_test_size'], self.rf_clf, self.model_dir_out, save_file_no=config_cnt)
-            if self.meta_dict['generate_precision_recall_curves'] == 'yes':
+            if self.meta_dict['generate_precision_recall_curves'] in perform_flags:
                 calc_pr_curve(self.rf_clf, self.x_test, self.y_test, self.clf_name, self.model_dir_out, save_file_no=config_cnt)
-            if self.meta_dict['generate_example_decision_tree'] == 'yes':
+            if self.meta_dict['generate_example_decision_tree'] in perform_flags:
                 create_example_dt(self.rf_clf, self.clf_name, self.feature_names, self.class_names, self.model_dir_out, save_file_no=config_cnt)
-            if self.meta_dict['generate_classification_report'] == 'yes':
+            if self.meta_dict['generate_classification_report'] in perform_flags:
                 create_clf_report(self.rf_clf, self.x_test, self.y_test, self.class_names, self.model_dir_out, save_file_no=config_cnt)
-            if self.meta_dict['generate_features_importance_log'] == 'yes':
+            if self.meta_dict['generate_features_importance_log'] in perform_flags:
                 create_x_importance_log(self.rf_clf, self.feature_names, self.clf_name, self.model_dir_out, save_file_no=config_cnt)
-            if self.meta_dict['generate_features_importance_bar_graph'] == 'yes':
+            if self.meta_dict['generate_features_importance_bar_graph'] in perform_flags:
                 create_x_importance_bar_chart(self.rf_clf, self.feature_names, self.clf_name, self.model_dir_out, self.meta_dict['n_feature_importance_bars'], save_file_no=config_cnt)
             if 'generate_shap_scores' in self.meta_dict.keys():
-                if self.meta_dict['generate_shap_scores'] == 'yes':
+                if self.meta_dict['generate_shap_scores'] in perform_flags:
                     create_shap_log(self.ini_path, self.rf_clf, self.x_train, self.y_train, self.feature_names, self.clf_name, self.meta_dict['shap_target_present_no'], self.meta_dict['shap_target_absetn_no'], self.model_dir_out, save_file_no=config_cnt)
             create_meta_data_csv_training_multiple_models(self.meta_dict, self.clf_name, self.model_dir_out, save_file_no=config_cnt)
             save_rf_model(self.rf_clf, self.clf_name, self.model_dir_out, save_file_no=config_cnt)

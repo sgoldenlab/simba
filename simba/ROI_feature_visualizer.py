@@ -34,7 +34,7 @@ class ROIfeatureVisualizer(object):
 
     Notes
     ----------
-    `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+    `Tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features>`__.
 
     Examples
     ----------
