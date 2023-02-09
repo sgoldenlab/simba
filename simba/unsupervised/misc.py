@@ -14,11 +14,3 @@ def read_pickle(data_path: str):
             data = pickle.load(f)
 
     return data
-
-
-
-
-    return data
-
-
-
