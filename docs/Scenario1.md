@@ -309,7 +309,7 @@ To facilitate use and make this step as painless as possible, users can import h
 Click on `SETTINGS` in the [TRAIN MACHINE MODEL] tab and the following, slightly indimidating (but I promise: easy to use!) window will pop up. We will go over the meaning of each of the settings in turn. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/machine_model_settings_2023.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/machine_model_settings_2023_01.png" />
 </p>
 
 **1. LOAD META DATA**. If you have a CSV file containing hyperparameter metadata, you can import this file by clicking on `Browse File` and then click on `Load`. This will autofill all the Hyperparameter entry boxes and model evaluation settings. For the Scenario 1, we [provide](https://github.com/sgoldenlab/simba/blob/master/misc/BtWGaNP_meta.csv) a Metadata file that will populate the Hyperparameter entry boxes and evaluation settings with some default values. Please save this file to disk and load it. If you downloaded SimBA through our github page, the Metadata file should be in the *simba/misc* directory. Alternatively, there is an up-to-date meta file[HERE](https://github.com/sgoldenlab/simba/blob/master/misc/meta_data_2023.csv) which covers additional newer settings recently included in SimBA (including class weights ans shapley values).
