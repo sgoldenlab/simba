@@ -8,8 +8,8 @@ import math
 from numba import jit
 from simba.rw_dfs import *
 from simba.drop_bp_cords import *
-from features_scripts.unit_tests import read_video_info, check_minimum_roll_windows
-from drop_bp_cords import get_fn_ext, getBpNames, getBpHeaders
+from simba.features_scripts.unit_tests import read_video_info, check_minimum_roll_windows
+from simba.drop_bp_cords import get_fn_ext, getBpNames, getBpHeaders
 
 
 class FishFeatureExtractor:
