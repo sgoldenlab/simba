@@ -25,9 +25,9 @@ After applying the Kleinberg smoother, you can expect the output to look like be
  
 2. You should see the below `settings menu` pop up. Check the classifier(s) that you wished to apply the Kleinberg smoothing for and set the "hyperparameters". See the section below for more information about the hyperparameters and the default settings. Click on the `Apply Kleinberg Smoother` button to apply the filter.
 
-![](/images/kleinberg2.PNG)
+![](/images/kleinberg_2023.png)
 
-3. The files in the `project_folder/csv/machine_results` will be overwritten with new files, with the same file names as the original files, but now containing the kleinberg smoothened classifications for the selected classifiers. To compare the results, either (i) back-up the original files and open it up alongside the newly generated file and compare the `0` and `1` in the relevant classification columns in the right-most part of the file. Or, alternative, generate new classifier visualizations as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) and compare the classifications pre- and post smoothing.
+3. The files in the `project_folder/csv/machine_results` will be overwritten with new files, with the same file names as the original files, but now containing the kleinberg smoothened classifications for the selected classifiers. The original files will be saved inside a subdirectory within the `project_folder/csv/machine_results` folder named `Pre_Kleinberg_DATETIMESTAMP`.
 
 4. For troubleshooting purposes - for each classifier you smooth - SimBA will save a log file in the `project_folder/csv/logs` directory that is named after the classifier name and the current date and time, for example *Kleinberg_log_Attack_20210204202223.csv*. This file contains information on **all** the classified bouts found by the Kleinberg smoother, their hierarchy, and start and end frame. It may look like this:
 
@@ -50,8 +50,13 @@ In short,
 
 *(ii) Gamma* - Higher gamma values and behaviors needs to be sustained for a longer time for them to be recognised as burts. I.e., gamma represents the cost associated with entering a time-period of behevior expression. **Higher gamma values and fewer behavioural bursts will be recognised. Lower gamma values and a greate number of behavioural bursts will be recognised (Default: 0.3)**
 
- *(ii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values and fewer behavioural bursts will to be recognised (Default: 1)**
+ *(iii) Hierarchy* - Which order or depth or the markov chain should be considered when evaluating the bursts. **Higher hierarchy values and fewer behavioural bursts will to be recognised (Default: 1)**
  
+ *(iv) Hierarchical search* - If **not** ticked,  then bouts are split or combined at different Kleinberg hierarchy levels. For example, setting Hierachy to **3** will preserve only behaviour bouts at hierarchy level **3** which may exclude longer behavioral bouts **only** present at hierarch levels 1 and 2.  For example, when Hierarchical search is **ticked** and hierarchy is set to 3, SimBA will preserve all behaviour bouts at level 3, as well as behaviour bouts at level 2 that is not encompassed by the behavior bouts at level 3. 
+ 
+#### Hierarchical search example
+ ![](/images/nastacias_fine_draw_kleinberg.png)
+
  
  
 #
