@@ -121,7 +121,7 @@ class MovementProcessor(object):
                 self.movement_dict[video_name][animal_name] = self.movement
                 self.results[video_name][animal_name]['Distance (cm)'] = round((self.movement.sum() / 10), 4)
                 velocity_lst = []
-                for df in np.array_split(self.movement, self.fps):
+                for df in np.array_split(self.movement, int(len(self.movement) / self.fps)):
                     velocity_lst.append(df.sum())
                 self.results[video_name][animal_name]['Velocity (cm/s)'] = round((mean(velocity_lst) / 10), 4)
 
