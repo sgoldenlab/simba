@@ -150,8 +150,8 @@ class ExtractFeaturesFrom7bps(object):
                 animal_frm = np.reshape(animal_frm, (-1, 2))
                 animal_dists = scipy.spatial.distance.cdist(animal_frm, animal_frm, metric='euclidean')
                 animal_dists = animal_dists[animal_dists != 0]
-                self.hull_dict['M1_largest_euclidean_distance_hull'].append(np.amax(animal_dists) / self.px_per_mm)
-                self.hull_dict['M1_smallest_euclidean_distance_hull'].append(np.amin(animal_dists) / self.px_per_mm)
+                self.hull_dict['M1_largest_euclidean_distance_hull'].append(np.amax(animal_dists, initial=0) / self.px_per_mm)
+                self.hull_dict['M1_smallest_euclidean_distance_hull'].append(np.amin(animal_dists, initial=self.hull_dict['M1_largest_euclidean_distance_hull'][-1]) / self.px_per_mm)
                 self.hull_dict['M1_mean_euclidean_distance_hull'].append(np.mean(animal_dists) / self.px_per_mm)
                 self.hull_dict['M1_sum_euclidean_distance_hull'].append(np.sum(animal_dists) / self.px_per_mm)
             for k, v in self.hull_dict.items():

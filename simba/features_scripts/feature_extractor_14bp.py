@@ -98,6 +98,7 @@ class ExtractFeaturesFrom14bps(object):
                 return ConvexHull(arr).area / px_per_mm
             else:
                 pass
+
         return 0
 
     @staticmethod
@@ -187,7 +188,7 @@ class ExtractFeaturesFrom14bps(object):
                 animal_1_dist, animal_2_dist = animal_1_dist[animal_1_dist != 0], animal_2_dist[animal_2_dist != 0]
                 for animal, animal_name in zip([animal_1_dist, animal_2_dist], ['M1', 'M2']):
                     self.hull_dict['{}_hull_large_euclidean'.format(animal_name)].append(np.amax(animal, initial=0) / self.px_per_mm)
-                    self.hull_dict['{}_hull_small_euclidean'.format(animal_name)].append(np.min(animal, initial=0) / self.px_per_mm)
+                    self.hull_dict['{}_hull_small_euclidean'.format(animal_name)].append(np.min(animal, initial=self.hull_dict['{}_hull_large_euclidean'.format(animal_name)][-1]) / self.px_per_mm)
                     self.hull_dict['{}_hull_mean_euclidean'.format(animal_name)].append(np.mean(animal) / self.px_per_mm)
                     self.hull_dict['{}_hull_sum_euclidean'.format(animal_name)].append(np.sum(animal) / self.px_per_mm)
             for k, v in self.hull_dict.items():
@@ -510,7 +511,6 @@ class ExtractFeaturesFrom14bps(object):
 
 # test = ExtractFeaturesFrom14bps(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.extract_features()
-
 
 
 

@@ -193,7 +193,7 @@ class ExtractFeaturesFrom16bps(object):
                 animal_1_dist, animal_2_dist = animal_1_dist[animal_1_dist != 0], animal_2_dist[animal_2_dist != 0]
                 for animal, animal_name in zip([animal_1_dist, animal_2_dist], ['M1', 'M2']):
                     self.hull_dict['{}_hull_large_euclidean'.format(animal_name)].append(np.amax(animal, initial=0) / self.px_per_mm)
-                    self.hull_dict['{}_hull_small_euclidean'.format(animal_name)].append(np.min(animal, initial=0) / self.px_per_mm)
+                    self.hull_dict['{}_hull_small_euclidean'.format(animal_name)].append(np.min(animal, initial=self.hull_dict['{}_hull_large_euclidean'.format(animal_name)][-1]) / self.px_per_mm)
                     self.hull_dict['{}_hull_mean_euclidean'.format(animal_name)].append(np.mean(animal) / self.px_per_mm)
                     self.hull_dict['{}_hull_sum_euclidean'.format(animal_name)].append(np.sum(animal, initial=0) / self.px_per_mm)
             for k, v in self.hull_dict.items():
