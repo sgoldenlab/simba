@@ -128,14 +128,16 @@ class FFMPEGCommandCreator(object):
             print('Applying frame count print {}...'.format(video))
             in_path, out_path = video_data['path'], os.path.join(self.process_dir, os.path.basename(video_data['path']))
             try:
-                command = 'ffmpeg -i ' + '"' + in_path + '"' + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy ' + '"' + out_path + '"'
+                command = 'ffmpeg -i ' + '"' + in_path + '"' + ' -vf "drawtext=fontfile=Arial.ttf: text=\'%{frame_num}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy -y ' + '"' + out_path + '" -hide_banner -loglevel error'
                 subprocess.check_output(command, shell=True)
                 subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+                print('s')
             except:
                 simba_cw = os.path.dirname(simba.__file__)
                 simba_font_path = pathlib.Path(simba_cw, 'assets', 'UbuntuMono-Regular.ttf')
-                command = 'ffmpeg -i "' + in_path + '" -vf "drawtext=fontfile={}:'.format(simba_font_path) + "text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" + '" ' + '-c:a copy "' + out_path + '" -hide_banner -loglevel error'
+                command = 'ffmpeg -i "' + in_path + '" -vf "drawtext=fontfile={}:'.format(simba_font_path) + "text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" + '" ' + '-c:a copy -y "' + out_path + '" -hide_banner -loglevel error'
                 subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+                print('p')
         self.replace_files_in_temp()
         print('Applying frame count complete...')
 

@@ -9,7 +9,8 @@ from simba.train_model_functions import get_all_clf_names
 import os, glob
 from simba.enums import ReadConfig, Paths, Dtypes
 from simba.rw_dfs import read_df, save_df
-from simba.misc_tools import get_fn_ext
+from simba.misc_tools import (get_fn_ext,
+                              SimbaTimer)
 import pandas as pd
 from copy import deepcopy
 
@@ -47,6 +48,8 @@ class BorisAppender(object):
 
 
         self.config = read_config_file(config_path)
+        self.timer = SimbaTimer()
+        self.timer.start_timer()
         self.project_path, self.file_type = read_project_path_and_file_type(config=self.config)
         self.in_features_dir = os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value)
         self.out_dir = os.path.join(self.project_path, Paths.TARGETS_INSERTED_DIR.value)
@@ -114,43 +117,50 @@ class BorisAppender(object):
             vid_annotations = vid_annotations[vid_annotations['Behavior'].isin(self.clf_names)]
             if (len(vid_annotations) == 0):
                 print('SIMBA WARNING: No BORIS annotations detected for SimBA classifier(s) named {} for video {}'.format(str(self.clf_names), self.video_name))
-            else:
-                video_fps = vid_annotations['FPS'].values[0]
-                for clf in self.clf_names:
-                    self.clf = clf
-                    clf_annotations = vid_annotations[(vid_annotations['Behavior'] == clf)]
-                    clf_annotations_start = clf_annotations[clf_annotations['Status'] == 'START'].reset_index(drop=True)
-                    clf_annotations_stop = clf_annotations[clf_annotations['Status'] == 'STOP'].reset_index(drop=True)
-                    if len(clf_annotations_start) != len(clf_annotations_stop):
-                        print('SIMBA BORIS ERROR: The BORIS annotations for behavior {} in video {} contains {} start events and {} stop events.'
-                              'SimBA requires the number of stop and start event counts to be equal'.format(clf, self.video_name, str(clf_annotations_start), str(clf_annotations_stop)))
-                        raise ValueError()
-                    self.clf_annotations = clf_annotations_start['Time'].to_frame().rename(columns={'Time': "START"})
-                    self.clf_annotations['STOP'] = clf_annotations_stop['Time']
-                    self.clf_annotations = self.clf_annotations.apply(pd.to_numeric)
-                    results = self.__check_non_overlapping_annotations()
-                    if len(results) > 0:
-                        print('SIMBA BORIS ERROR: The BORIS annotations for behavior {} in video {} contains '
-                              'behavior start events that are initiated prior '
-                              'to preceding behavior event ending.'
-                              'SimBA requires a specific behavior event to end before anoether behavior event can start.'.format(clf, self.video_name))
-                        raise ValueError()
-
-                    self.clf_annotations['START_FRAME'] = (self.clf_annotations['START'] * video_fps).astype(int)
-                    self.clf_annotations['END_FRAME'] = (self.clf_annotations['STOP'] * video_fps).astype(int)
-                    annotations_idx = list(self.clf_annotations.apply(lambda x: list(range(int(x['START_FRAME']), int(x['END_FRAME']) + 1)), 1))
-                    annotations_idx = [x for xs in annotations_idx for x in xs]
-                    idx_difference = list(set(annotations_idx) - set(self.out_df.index))
-                    if len(idx_difference) > 0:
-                        print('SIMBA BORIS WARNING: SimBA found BORIS annotations for behavior {} in video {} that are annotated to '
-                              'occur at times which is not present in the video data you imported into SIMBA. These ambiguous annotations occur in '
-                              '{} different frames that SimBA will **remove** by default. Make sure you imported the same video as you annotated in BORIS into SimBA and the video is registered with the correct frame rate'.format(clf, self.video_name, str(len(idx_difference))))
-                        annotations_idx = [x for x in annotations_idx if x not in idx_difference]
+                continue
+            video_fps = vid_annotations['FPS'].values[0]
+            for clf in self.clf_names:
+                self.clf = clf
+                clf_annotations = vid_annotations[(vid_annotations['Behavior'] == clf)]
+                clf_annotations_start = clf_annotations[clf_annotations['Status'] == 'START'].reset_index(drop=True)
+                clf_annotations_stop = clf_annotations[clf_annotations['Status'] == 'STOP'].reset_index(drop=True)
+                if len(clf_annotations_start) != len(clf_annotations_stop):
+                    print('SIMBA BORIS ERROR: The BORIS annotations for behavior {} in video {} contains {} start events and {} stop events.'
+                          'SimBA requires the number of stop and start event counts to be equal'.format(clf, self.video_name, str(clf_annotations_start), str(clf_annotations_stop)))
+                    raise ValueError()
+                self.clf_annotations = clf_annotations_start['Time'].to_frame().rename(columns={'Time': "START"})
+                self.clf_annotations['STOP'] = clf_annotations_stop['Time']
+                self.clf_annotations = self.clf_annotations.apply(pd.to_numeric)
+                results = self.__check_non_overlapping_annotations()
+                if len(results) > 0:
+                    print('SIMBA BORIS ERROR: The BORIS annotations for behavior {} in video {} contains '
+                          'behavior start events that are initiated PRIOR '
+                          'to the PRECEDING behavior event ending.'
+                          'SimBA requires a specific behavior event to end before another behavior event can start.'.format(clf, self.video_name))
+                    raise ValueError()
+                self.clf_annotations['START_FRAME'] = (self.clf_annotations['START'] * video_fps).astype(int)
+                self.clf_annotations['END_FRAME'] = (self.clf_annotations['STOP'] * video_fps).astype(int)
+                if len(self.clf_annotations) == 0:
                     self.out_df[clf] = 0
-                    self.out_df.loc[annotations_idx, clf] = 1
+                    print(f'SIMBA WARNING: No BORIS annotation detected for video {self.video_name} and behavior {clf}. SimBA will set all frame annotations as absent.')
+                    continue
+                annotations_idx = list(self.clf_annotations.apply(lambda x: list(range(int(x['START_FRAME']), int(x['END_FRAME']) + 1)), 1))
+                annotations_idx = [x for xs in annotations_idx for x in xs]
+                idx_difference = list(set(annotations_idx) - set(self.out_df.index))
+                if len(idx_difference) > 0:
+                    print(f'SIMBA BORIS WARNING: SimBA found BORIS annotations for behavior {clf} in video '
+                          f'{self.video_name} that are annotated to occur at times which is not present in the '
+                          f'video data you imported into SIMBA. The video you imported to SimBA has {str(self.out_df.index[-1])} frames. '
+                          f'However, in BORIS, you have annotated {clf} to happen at frame number {str(idx_difference[0])}. '
+                          f'These ambiguous annotations occur in {str(len(idx_difference))} different frames for video {self.video_name} that SimBA will **remove** by default. '
+                          f'Please make sure you imported the same video as you annotated in BORIS into SimBA and the video is registered with the correct frame rate.')
+                    annotations_idx = [x for x in annotations_idx if x not in idx_difference]
+                self.out_df[clf] = 0
+                self.out_df.loc[annotations_idx, clf] = 1
             self.__save_boris_annotations()
 
-        print('SIMBA COMPLETE: BORIS annotations appended to dataset and saved in project_folder/csv/targets_inserted directory.')
+        self.timer.stop_timer()
+        print(f'SIMBA COMPLETE: BORIS annotations appended to dataset and saved in project_folder/csv/targets_inserted directory (elapsed time: {self.timer.elapsed_time_str}s).')
 
     def __save_boris_annotations(self):
         save_path = os.path.join(self.out_dir, self.video_name + '.' + self.file_type)
@@ -161,6 +171,11 @@ class BorisAppender(object):
 #                      boris_folder='/Users/simon/Downloads/FIXED')
 # test.create_boris_master_file()
 # test.append_boris()
+
 # test = BorisAppender(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini', boris_folder=r'/Users/simon/Desktop/troubleshooting/train_model_project/boris_import')
+# test.create_boris_master_file()
+# test.append_boris()
+
+# test = BorisAppender(config_path='/Users/simon/Desktop/envs/marcel_boris/project_folder/project_config.ini', boris_folder=r'/Users/simon/Desktop/envs/marcel_boris/BORIS_data')
 # test.create_boris_master_file()
 # test.append_boris()

@@ -95,21 +95,20 @@ class DistancePlotterSingleCore(object):
                 distance_arr[:, distance_cnt] = (np.sqrt((self.data_df[data[0] + '_x'] - self.data_df[data[1] + '_x']) ** 2 + (self.data_df[data[0] + '_y'] - self.data_df[data[1] + '_y']) ** 2) / self.px_per_mm) / 10
             if self.video_setting:
                 self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-                video_save_path = os.path.join(self.save_dir, self.video_name + '.mp4')
-                writer = cv2.VideoWriter(video_save_path, self.fourcc, self.fps, (self.style_attr['width'], self.style_attr['height']))
+                self.video_save_path = os.path.join(self.save_dir, self.video_name + '.mp4')
+                writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (self.style_attr['width'], self.style_attr['height']))
             if self.frame_setting:
                 self.save_video_folder = os.path.join(self.save_dir, self.video_name)
                 if not os.path.exists(self.save_video_folder): os.makedirs(self.save_video_folder)
 
             distance_arr = np.nan_to_num(distance_arr, nan=0.0)
             if self.final_img:
+                self.final_img_path = os.path.join(self.save_dir, self.video_name + '_final_img.png')
                 make_distance_plot(data=distance_arr,
                                    line_attr=self.line_attr,
                                    style_attr=self.style_attr,
                                    fps=self.fps,
-                                   save_path=os.path.join(self.save_dir, self.video_name + '_final_img.png'))
-
-
+                                   save_path=self.final_img_path)
 
             if self.video_setting or self.frame_setting:
                 if self.style_attr['y_max'] == 'auto':

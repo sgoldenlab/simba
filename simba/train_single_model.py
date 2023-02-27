@@ -233,8 +233,9 @@ class TrainSingleModel(object):
                                  generate_example_decision_tree, generate_features_importance_bar_graph,
                                  generate_features_importance_log, generate_precision_recall_curve, save_meta_data,
                                  generate_learning_curve, dataset_splits, shuffle_splits, feature_importance_bars,
-                                 self.over_sample_ratio, self.over_sample_setting, self.tt_size,
-                                 self.under_sample_ratio, self.under_sample_ratio, str(class_weights)]
+                                 self.over_sample_ratio, self.over_sample_setting, self.tt_size, self.split_type,
+                                 self.under_sample_ratio, self.under_sample_setting, str(class_weights)]
+
                 create_meta_data_csv_training_one_model(meta_data_lst, self.clf_name, self.eval_out_path)
 
     def save_model(self):

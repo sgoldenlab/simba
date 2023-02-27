@@ -87,6 +87,7 @@ from simba.path_plotter_mp import PathPlotterMulticore
 from simba.Directing_animals_visualizer import DirectingOtherAnimalsVisualizer
 from simba.Directing_animals_visualizer_mp import DirectingOtherAnimalsVisualizerMultiprocess
 from simba.distance_plotter import DistancePlotterSingleCore
+from simba.clf_validator import ClassifierValidationClips
 from simba.distance_plotter_mp import DistancePlotterMultiCore
 from simba.heat_mapper_clf import HeatMapperClfSingleCore
 from simba.heat_mapper_clf_mp import HeatMapperClfMultiprocess
@@ -3332,6 +3333,59 @@ class PupRetrievalPopUp(object):
         pup_calculator = PupRetrieverCalculator(config_path=self.config_path, settings=settings)
         pup_calculator.run()
         pup_calculator.save_results()
+
+class ClassifierValidationPopUp(object):
+    def __init__(self,
+                 config_path: str):
+
+        self.main_frm = Toplevel()
+        self.main_frm.minsize(400, 400)
+        self.main_frm.wm_title("SIMBA CLASSIFIER VALIDATION CLIPS")
+        self.main_frm = hxtScrollbar(self.main_frm)
+        self.main_frm.pack(expand=True, fill=BOTH)
+        self.config, self.config_path = read_config_file(ini_path=config_path), config_path
+        self.target_cnt = read_config_entry(config=self.config, section=ReadConfig.SML_SETTINGS.value, option=ReadConfig.TARGET_CNT.value, data_type='int')
+        self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.target_cnt)
+        self.color_dict = get_color_dict()
+        color_names = list(get_color_dict().keys())
+        self.one_vid_per_bout_var = BooleanVar(value=False)
+        self.one_vid_per_video_var = BooleanVar(value=True)
+
+        self.settings_frm = LabelFrame(self.main_frm, text='SETTINGS', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5, fg='black')
+        self.seconds_entry = Entry_Box(self.settings_frm, 'SECONDS: ', '15', validation='numeric')
+        self.clf_dropdown = DropDownMenu(self.settings_frm, 'CLASSIFIER: ', self.clf_names, '15')
+        self.clr_dropdown = DropDownMenu(self.settings_frm, 'TEXT COLOR: ', color_names, '15')
+        self.clf_dropdown.setChoices(self.clf_names[0])
+        self.clr_dropdown.setChoices('Cyan')
+        self.seconds_entry.entry_set(val=2)
+
+        self.individual_bout_clips_cb = Checkbutton(self.settings_frm, text='CREATE ONE CLIP PER BOUT', variable=self.one_vid_per_bout_var)
+        self.individual_clip_per_video_cb = Checkbutton(self.settings_frm, text='CREATE ONE CLIP PER VIDEO', variable=self.one_vid_per_video_var)
+
+        run_btn = Button(self.settings_frm, text='RUN VALIDATION', command= lambda: self.run())
+
+        self.settings_frm.grid(row=0,sticky=W)
+        self.seconds_entry.grid(row=0,sticky=W)
+        self.clf_dropdown.grid(row=1,sticky=W)
+        self.clr_dropdown.grid(row=2, sticky=W)
+        self.individual_bout_clips_cb.grid(row=3, column=0, sticky=NW)
+        self.individual_clip_per_video_cb.grid(row=4, column=0, sticky=NW)
+        run_btn.grid(row=5,sticky=NW)
+
+    def run(self):
+        check_int(name='CLIP SECONDS', value=self.seconds_entry.entry_get)
+        clf_validator = ClassifierValidationClips(config_path=self.config_path,
+                                                  window=int(self.seconds_entry.entry_get),
+                                                  clf_name=self.clf_dropdown.getChoices(),
+                                                  clips=self.one_vid_per_bout_var.get(),
+                                                  text_clr=self.color_dict[self.clr_dropdown.getChoices()],
+                                                  concat_video=self.one_vid_per_video_var.get())
+        clf_validator.create_clips()
+
+
+
+
+
 
 #- = PupRetrievalPopUp(config_path='/Users/simon/Downloads/Automated PRT_test/project_folder/project_config.ini')
 #_ = CreateUserDefinedPoseConfigurationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

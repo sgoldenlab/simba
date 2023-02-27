@@ -145,11 +145,11 @@ class DataPlotter(object):
             _, _, self.fps = read_video_info(vid_info_df=self.vid_info_df, video_name=video_name)
             if self.video_setting:
                 self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-                video_save_path = os.path.join(self.save_dir, video_name + '.mp4')
-                self.writer = cv2.VideoWriter(video_save_path, self.fourcc, self.fps, self.style_attr['size'])
+                self.video_save_path = os.path.join(self.save_dir, video_name + '.mp4')
+                self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, self.style_attr['size'])
             if self.frame_setting:
-                frame_save_path = os.path.join(self.save_dir, video_name)
-                if not os.path.exists(frame_save_path): os.makedirs(frame_save_path)
+                self.frame_save_path = os.path.join(self.save_dir, video_name)
+                if not os.path.exists(self.frame_save_path): os.makedirs(self.frame_save_path)
             video_data_lst = np.array_split(pd.DataFrame(video_data), int(len(video_data) / self.fps))
             self.imgs = Parallel(n_jobs=self.cpu_to_use, verbose=1, backend="threading")(delayed(multiprocess_img_creation)(x, self.loc_dict, self.multi_animal_id_list, video_data, self.style_attr, self.body_part_attr) for x in video_data_lst)
             frm_cnt = 0
@@ -158,7 +158,7 @@ class DataPlotter(object):
                     if self.video_setting:
                         self.writer.write(np.uint8(img))
                     if self.frame_setting:
-                        frm_save_name = os.path.join(frame_save_path, '{}.png'.format(str(frm_cnt)))
+                        frm_save_name = os.path.join(self.frame_save_path, '{}.png'.format(str(frm_cnt)))
                         cv2.imwrite(frm_save_name, np.uint8(img))
                     frm_cnt += 1
                     print('Frame: {} / {}. Video: {} ({}/{})'.format(str(frm_cnt), str(len(video_data)),
@@ -166,9 +166,10 @@ class DataPlotter(object):
                                                                    len(self.files_found)))
 
             print('Data tables created for video {}...'.format(video_name))
-            self.writer.release()
-            video_timer.stop_timer()
-            print('Video {} complete (elapsed time {}s)...'.format(video_name, video_timer.elapsed_time_str))
+            if self.video_setting:
+                self.writer.release()
+                video_timer.stop_timer()
+                print('Video {} complete (elapsed time {}s)...'.format(video_name, video_timer.elapsed_time_str))
 
         self.timer.stop_timer()
         print('SIMBA COMPLETE: All data table videos created inside {} (elapsed time: {}s)'.format(self.save_dir, self.timer.elapsed_time_str))

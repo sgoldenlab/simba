@@ -182,10 +182,11 @@ class DirectingOtherAnimalsAnalyzer(object):
                 value = round(len(idx_directing) / fps, 3)
                 out_df_lst.append(pd.DataFrame([[video_name, animal_permutation, value]], columns=['Video', 'Animal permutation', 'Value (s)']))
         self.summary_df = pd.concat(out_df_lst, axis=0).sort_values(by=['Video', 'Animal permutation']).set_index('Video')
-        self.summary_df.to_csv(os.path.join(self.logs_dir, 'Direction_data_{}{}'.format(str(self.datetime), '.csv')))
+        self.save_path = os.path.join(self.logs_dir, 'Direction_data_{}{}'.format(str(self.datetime), '.csv'))
+        self.summary_df.to_csv(self.save_path)
         self.session_timer.stop_timer()
         print('Summary directional statistics saved at ' + os.path.join(self.logs_dir, 'Direction_data_{}{}'.format(str(self.datetime), '.csv')))
-        print('SIMBA COMPLETE: All directional data saved in SimBA project (elapsed time: {}s.'.format(self.session_timer.elapsed_time_str))
+        print('SIMBA COMPLETE: All directional data saved in SimBA project (elapsed time: {}s).'.format(self.session_timer.elapsed_time_str))
 
 # test = DirectingOtherAnimalsAnalyzer(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.process_directionality()

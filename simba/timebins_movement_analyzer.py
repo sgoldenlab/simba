@@ -108,8 +108,8 @@ class TimeBinsMovementAnalyzer(object):
                 distance_col_name = 'Distance {} {}'.format(animal_c[0], animal_c[1])
                 bp_1_x, bp_1_y = self.animal_bp_dict[animal_c[0]]['X_bps'][0], self.animal_bp_dict[animal_c[0]]['Y_bps'][0]
                 bp_2_x, bp_2_y = self.animal_bp_dict[animal_c[0]]['X_bps'][0], self.animal_bp_dict[animal_c[1]]['Y_bps'][0]
-                bp_1 = data_df[[bp_1_x, bp_1_y]].values
-                bp_2 = data_df[[bp_2_x, bp_2_y]].values
+                bp_1 = data_df[[bp_1_x, bp_1_y]].values.astype(float)
+                bp_2 = data_df[[bp_2_x, bp_2_y]].values.astype(float)
                 result_df[distance_col_name] = pd.Series(framewise_euclidean_distance(location_1=bp_1, location_2=bp_2, px_per_mm=px_per_mm))
             results_df_lists = [result_df[i:i + bin_length_frames] for i in range(0, result_df.shape[0], bin_length_frames)]
             indexed_df_lst = []

@@ -180,11 +180,8 @@ def check_that_column_exist(df: pd.DataFrame,
                             column_name: str,
                             file_name: str):
     if column_name not in df.columns:
-        print('SIMBA ERROR: Could not find column named `{}` within the file representing {}'.format(column_name,
-                                                                                                     file_name))
-        raise ValueError(
-            'SIMBA ERROR: Could not find column named `{}` within the file representing {}'.format(column_name,
-                                                                                                   file_name))
+        print(f'SIMBA ERROR: Could not find expected column named `{column_name}` within the file representing {file_name}')
+        raise ValueError(f'SIMBA ERROR: Could not find expected column named `{column_name}` within the file representing {file_name}')
     else:
         pass
 

@@ -25,8 +25,8 @@ class ClfLogCreator(object):
     config_path: str
         path to SimBA project config file in Configparser format
     data_measures: list
-        Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration',
-        'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence',
+        Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration (s)',
+        'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)',
         'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']
     classifiers: list
         Classifiers to calculate aggregate statistics for. E.g.,: ['Attack', 'Sniffing']
@@ -120,17 +120,19 @@ class ClfLogCreator(object):
         None
         """
 
-        results_df = self.results_df[self.results_df['Measure'].isin(self.chosen_measures)].sort_values(by=['Video', 'Classifier', 'Measure']).reset_index(drop=True)
-        results_df = results_df[results_df['Classifier'].isin(self.classifiers)].set_index('Video')
-        results_df.to_csv(self.file_save_name)
+        self.results_df = self.results_df[self.results_df['Measure'].isin(self.chosen_measures)].sort_values(by=['Video', 'Classifier', 'Measure']).reset_index(drop=True)
+        self.results_df = self.results_df[self.results_df['Classifier'].isin(self.classifiers)].set_index('Video')
+        self.results_df.to_csv(self.file_save_name)
         elapsed_time = str(round(time.time() - self.start_time, 4))
         print('SIMBA COMPLETE: Data log saved at {} (elapsed time: {}s)'.format(self.file_save_name, elapsed_time))
 
 
-# test = ClfLogCreator(config_path=r"/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini", data_measures=['Bout count', 'Total event duration','Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence', 'Mean event bout interval duration (s)',
-#                                                                                                                                                'Median event bout interval duration (s)'])
+# test = ClfLogCreator(config_path=r"/Users/simon/Desktop/envs/troubleshooting/two_black_animals/project_folder/project_config.ini",
+#                      data_measures=['Bout count',
+#                                     'Total event duration (s)'],
+#                      classifiers=['Attack', 'Sniffing'])
 # test.analyze_data()
-# # test.save_results()
+# test.save_results()
 
 
 

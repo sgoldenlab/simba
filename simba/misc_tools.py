@@ -25,8 +25,9 @@ import multiprocessing
 from simba.read_config_unit_tests import (check_file_exist_and_readable,
                                           read_config_entry,
                                           check_int,
+                                          read_config_file,
                                           check_if_filepath_list_is_empty)
-from simba.enums import ReadConfig, Formats
+from simba.enums import ReadConfig, Formats, Dtypes
 import shutil
 import platform
 import pickle
@@ -75,7 +76,7 @@ def get_video_meta_data(video_path: str):
 
 def check_directionality_viable(animal_bp_dict: dict):
     """
-    Helper to check if its possible to calculate ``directionality`` statistics (i.e., nose, and ear coordinates from
+    Helper to check if it is possible to calculate ``directionality`` statistics (i.e., nose, and ear coordinates from
     pose estimation has to be present)
 
     Parameters
@@ -200,6 +201,18 @@ def line_length(p: list,
         return True, coord
     else:
         return False, coord
+
+def get_number_of_header_columns_in_df(df: pd.DataFrame):
+    for i in range(len(df)):
+        try:
+            temp = df.iloc[i:].apply(pd.to_numeric).reset_index(drop=True)
+            return i
+        except ValueError:
+            pass
+    print('SIMBA ERROR: Could find the number of header columns in dataframe')
+    raise ValueError()
+
+
 
 @jit(nopython=True)
 def line_length_numba(left_ear_array: np.array,
@@ -343,6 +356,12 @@ def smooth_data_gaussian(config: configparser.ConfigParser,
     Returns
     -------
     None
+
+
+    Example
+    ----------
+    >>> config = read_config_file(ini_path='/Users/simon/Desktop/envs/troubleshooting/Tests_022023/project_folder/project_config.ini')
+    >>> smooth_data_gaussian(config=config, file_path='/Users/simon/Desktop/envs/troubleshooting/Tests_022023/project_folder/csv/input_csv/Together_1.csv', time_window_parameter=500)
     """
 
     try:
@@ -353,32 +372,35 @@ def smooth_data_gaussian(config: configparser.ConfigParser,
     project_dir = config.get(ReadConfig.GENERAL_SETTINGS.value, ReadConfig.PROJECT_PATH.value)
     video_dir = os.path.join(project_dir, 'videos')
     video_file_path = find_video_of_file(video_dir, filename)
-    file_format = get_workflow_file_format(config)
+    file_format = read_config_entry(config=config, section=ReadConfig.GENERAL_SETTINGS.value, option=ReadConfig.FILE_TYPE.value, data_type=Dtypes.STR.value, default_value='csv')
     cap = cv2.VideoCapture(video_file_path)
     video_fps = int(cap.get(cv2.CAP_PROP_FPS))
+    pose_df = read_df(file_path=file_path, file_type=file_format)
+    header_cols = get_number_of_header_columns_in_df(df=pose_df)
+    if header_cols == 2:
+        idx_names = ['scorer', 'bodyparts', 'coords']
+    else:
+        idx_names = ['scorer', 'individuals', 'bodyparts', 'coords']
     if file_format == 'csv':
-        pose_df = pd.read_csv(file_path, header=[0, 1, 2], index_col=0)
+        pose_df = pd.read_csv(file_path, header=list(range(header_cols+1)), index_col=0)
     elif file_format == 'parquet':
         pose_df = pd.read_parquet(file_path)
-    else:
-        print('SIMBA ERROR: Workflow file format {} is not recognized (OPTIONS: csv or parquet)'.format(str(file_format)))
-        raise ValueError('SIMBA ERROR: Workflow file format {} is not recognized (OPTIONS: csv or parquet)'.format(str(file_format)))
+
     frames_in_time_window = int(time_window_parameter / (1000 / video_fps))
     new_df = deepcopy(pose_df)
-    new_df.columns.names = ['scorer', 'bodyparts', 'coords']
+    new_df.columns.names = idx_names
 
     for c in new_df:
         new_df[c] = new_df[c].rolling(window=int(frames_in_time_window), win_type='gaussian', center=True).mean(std=5).fillna(new_df[c])
         new_df[c] = new_df[c].abs()
 
     if file_format == 'csv':
-        save_df(new_df,file_format, file_path)
+        save_df(new_df, file_format, file_path)
     elif file_format == 'parquet':
         table = pa.Table.from_pandas(new_df)
         pq.write_table(table, file_path)
 
     print('Gaussian smoothing complete for file {}'.format(filename), '...')
-
 
 def smooth_data_savitzky_golay(config: configparser.ConfigParser,
                                file_path: str,
@@ -398,6 +420,12 @@ def smooth_data_savitzky_golay(config: configparser.ConfigParser,
     Returns
     -------
     None
+
+    Example
+    ----------
+
+    >>> config = read_config_file(ini_path='/Users/simon/Desktop/envs/troubleshooting/Tests_022023/project_folder/project_config.ini')
+    >>> smooth_data_savitzky_golay(config=config, file_path='/Users/simon/Desktop/envs/troubleshooting/Tests_022023/project_folder/csv/input_csv/Together_1.csv', time_window_parameter=500)
     """
 
     try:
@@ -413,25 +441,27 @@ def smooth_data_savitzky_golay(config: configparser.ConfigParser,
     file_format = get_workflow_file_format(config)
     cap = cv2.VideoCapture(video_file_path)
     video_fps = int(cap.get(cv2.CAP_PROP_FPS))
+    pose_df = read_df(file_path=file_path, file_type=file_format)
+    header_cols = get_number_of_header_columns_in_df(df=pose_df)
+    if header_cols == 2:
+        idx_names = ['scorer', 'bodyparts', 'coords']
+    else:
+        idx_names = ['scorer', 'individuals', 'bodyparts', 'coords']
     if file_format == 'csv':
-        pose_df = pd.read_csv(file_path, header=[0, 1, 2], index_col=0)
+        pose_df = pd.read_csv(file_path, header=list(range(header_cols+1)), index_col=0)
     elif file_format == 'parquet':
         pose_df = pd.read_parquet(file_path)
-    else:
-        print('SIMBA ERROR: Workflow file format {} is not recognized (OPTIONS: csv or parquet)'.format(str(file_format)))
-        raise ValueError('SIMBA ERROR: Workflow file format {} is not recognized (OPTIONS: csv or parquet)'.format(str(file_format)))
     frames_in_time_window = int(time_window_parameter / (1000 / video_fps))
     if (frames_in_time_window % 2) == 0:
         frames_in_time_window = frames_in_time_window - 1
     if (frames_in_time_window % 2) <= 3:
         frames_in_time_window = 5
     new_df = deepcopy(pose_df)
-    new_df.columns.names = ['scorer', 'bodyparts', 'coords']
+    new_df.columns.names = idx_names
 
     for c in new_df:
         new_df[c] = savgol_filter(x=new_df[c].to_numpy(), window_length=frames_in_time_window, polyorder=3, mode='nearest')
         new_df[c] = new_df[c].abs()
-
     if file_format == 'csv':
         save_df(new_df,file_format, file_path)
     elif file_format == 'parquet':
@@ -1106,16 +1136,13 @@ def framewise_euclidean_distance(location_1: np.array,
                                  location_2: np.array,
                                  px_per_mm: float,
                                  centimeter: bool=False) -> np.array:
+
     results = np.full((location_1.shape[0]), np.nan)
     for i in prange(location_1.shape[0]):
         results[i] = np.linalg.norm(location_1[i] - location_2[i]) / px_per_mm
     if centimeter:
         results = results / 10
     return results
-
-
-
-
 
 def copy_single_video_to_project(simba_ini_path: str,
                                  source_path: str,

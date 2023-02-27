@@ -83,6 +83,7 @@ class Paths(Enum):
     ROI_ANALYSIS = Path('frames/output/ROI_analysis/')
     DIRECTIONALITY_DF_DIR = Path('logs/directionality_dataframes/')
     DIRECTING_ANIMALS_OUTPUT_PATH = Path('frames/output/ROI_directionality_visualize/')
+    DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH = Path('frames/output/Directing_animals/')
     BP_NAMES = Path('logs/measures/pose_configs/bp_names/project_bp_names.csv')
     SIMBA_BP_CONFIG_PATH = Path('pose_configurations/bp_names/bp_names.csv')
     SIMBA_SHAP_CATEGORIES_PATH = Path('assets/shap/feature_categories/shap_feature_categories.csv')

@@ -35,6 +35,10 @@ class DirectingOtherAnimalsVisualizer(object):
     ----------
     config_path: str
         path to SimBA project config file in Configparser format
+    data_path: str
+        path to data file
+    style_attr: dict
+        Visualisation attributes.
 
     Notes
     -----
@@ -74,7 +78,7 @@ class DirectingOtherAnimalsVisualizer(object):
         self.data_dict = self.direction_analyzer.directionality_df_dict
         self.video_directory = os.path.join(self.project_path, 'videos')
         self.video_path = find_video_of_file(video_dir=self.video_directory, filename=self.video_name)
-        self.save_directory = os.path.join(self.project_path, Paths.DIRECTING_ANIMALS_OUTPUT_PATH.value)
+        self.save_directory = os.path.join(self.project_path, Paths.DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH.value)
         if not os.path.exists(self.save_directory): os.makedirs(self.save_directory)
         self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.no_animals)
         self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, self.multi_animal_id_lst, self.no_animals, self.x_cols, self.y_cols, [], self.pose_colors)
@@ -93,11 +97,11 @@ class DirectingOtherAnimalsVisualizer(object):
         """
 
         self.data_df = read_df(self.data_path, file_type=self.file_type)
-        self.save_path = os.path.join(self.save_directory, self.video_name + '.mp4')
+        self.video_save_path = os.path.join(self.save_directory, self.video_name + '.mp4')
         self.cap = cv2.VideoCapture(self.video_path)
         self.video_meta_data = get_video_meta_data(self.video_path)
         self.video_data = self.data_dict[self.video_name]
-        self.writer = cv2.VideoWriter(self.save_path, self.fourcc, self.video_meta_data['fps'], (self.video_meta_data['width'], self.video_meta_data['height']))
+        self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.video_meta_data['fps'], (self.video_meta_data['width'], self.video_meta_data['height']))
         if self.video_name in list(self.video_data['Video']):
             self.__create_video()
         else:

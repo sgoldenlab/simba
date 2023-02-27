@@ -1,5 +1,4 @@
 from simba.read_config_unit_tests import (read_config_file,
-                                          read_config_entry,
                                           check_int,
                                           check_that_column_exist,
                                           check_if_filepath_list_is_empty,
@@ -10,7 +9,7 @@ from simba.misc_tools import (find_video_of_file,
                               detect_bouts,
                               get_video_meta_data,
                               SimbaTimer)
-from simba.enums import ReadConfig, Paths, Formats
+from simba.enums import Paths, Formats
 
 from simba.rw_dfs import read_df
 import numpy as np
@@ -31,8 +30,10 @@ class ClassifierValidationClips(object):
         Name of the classifier to create validation videos for.
     clips: bool
         If True, creates individual video file clips for each validation bout.
+    text_clr: tuple
+        Color of text overlay in BGR
     concat_video: bool
-        If True, creates a single video including all events bouts.
+        If True, creates a single video including all events bouts for each video.
 
 
     Notes
@@ -41,7 +42,7 @@ class ClassifierValidationClips(object):
 
     Examples
     ----------
-    >>> clf_validator = ClassifierValidationClips(config_path='MyProjectConfigPath', window=5, clf_name='Attack', clips=False, concat_video=True)
+    >>> clf_validator = ClassifierValidationClips(config_path='MyProjectConfigPath', window=5, clf_name='Attack', text_clr=(255,255,0), clips=False, concat_video=True)
     >>> clf_validator.create_clips()
     """
 
@@ -50,6 +51,7 @@ class ClassifierValidationClips(object):
                  window: int,
                  clf_name: str,
                  clips: bool,
+                 text_clr: tuple,
                  concat_video: bool):
 
         check_int(name='Time window', value=window)
@@ -59,7 +61,7 @@ class ClassifierValidationClips(object):
             print('SIMBA ERROR: Please select to create clips and/or a concatenated video')
             raise ValueError()
         self.p_col = 'Probability_' + self.clf_name
-        self.config = read_config_file(config_path)
+        self.config, self.text_clr = read_config_file(config_path), text_clr
         self.project_path, self.file_type = read_project_path_and_file_type(config=self.config)
         self.data_in_dir = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.video_dir = os.path.join(self.project_path, 'videos')
@@ -136,15 +138,15 @@ class ClassifierValidationClips(object):
                     self.add_spacer = 2
                     cap.set(1, frame_no)
                     ret, img = cap.read()
-                    cv2.putText(img, '{} event # {}'.format(self.clf_name, str(bout_cnt + 1)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, (255, 255, 0), 2)
+                    cv2.putText(img, '{} event # {}'.format(self.clf_name, str(bout_cnt + 1)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
-                    cv2.putText(img, 'Total frames of event: {}'.format(str(event_frm_count)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, (255, 255, 0), 2)
+                    cv2.putText(img, 'Total frames of event: {}'.format(str(event_frm_count)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
-                    cv2.putText(img, 'Frames of event {} to {}'.format(str(start_window), str(end_window)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, (255, 255, 0), 2)
+                    cv2.putText(img, 'Frames of event {} to {}'.format(str(start_window), str(end_window)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
-                    cv2.putText(img, 'Frame number: {}'.format(str(frame_no)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, (255, 255, 0), 2)
+                    cv2.putText(img, 'Frame number: {}'.format(str(frame_no)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
-                    cv2.putText(img, 'Frame {} probability: {}'.format(self.clf_name, str(p)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, (255, 255, 0), 2)
+                    cv2.putText(img, 'Frame {} probability: {}'.format(self.clf_name, str(p)), (10, (self.video_info['height'] - self.video_info['height']) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     print('Frame {} / {}, Bout {}/{}, Video {}/{}...'.format(str(frm_cnt), str(event_frm_count), str(bout_cnt+1), str(len(clf_bouts)), str(file_cnt+1), str(len(self.files_found))))
                     if self.clips:
                         bout_writer.write(img)

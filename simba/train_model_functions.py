@@ -201,17 +201,17 @@ def smoteen_oversampler(x_train: pd.DataFrame,
 
     Parameters
     ----------
-    x_train: pd.DataFrame or np.array
+    x_train: pd.DataFrame or array
         pandas Dataframe holding features and annotations.
-    y_train: pd.DataFrame or np.array
+    y_train: pd.DataFrame or array
         List of column fields to be removed from df
     sample_ratio:
         New behavior-present frames.
 
     Returns
     -------
-    x_train: np.array
-    y_train: np.array
+    x_train: array
+    y_train: array
 
     """
 
@@ -278,7 +278,7 @@ def calc_permutation_importance(x_test: np.array,
     print('Calculating feature permutation importances...')
     timer = SimbaTimer()
     timer.start_timer()
-    p_importances = permutation_importance(clf, x_test, y_test, n_repeats=10, random_state = 0)
+    p_importances = permutation_importance(clf, x_test, y_test, n_repeats=10, random_state=0)
     df = pd.DataFrame(np.column_stack([feature_names, p_importances.importances_mean, p_importances.importances_std]), columns=['FEATURE_NAME', 'FEATURE_IMPORTANCE_MEAN', 'FEATURE_IMPORTANCE_STDEV'])
     df = df.sort_values(by=['FEATURE_IMPORTANCE_MEAN'], ascending=False)
     if save_file_no != None:
@@ -896,7 +896,6 @@ def insert_column_headers_for_outlier_correction(data_df: pd.DataFrame,
         data_df.columns = new_headers
         return data_df
 
-
 def read_pickle(file_path: str) -> object:
     try:
         clf = pickle.load(open(file_path, 'rb'))
@@ -904,7 +903,6 @@ def read_pickle(file_path: str) -> object:
         print('SIMBA ERROR: Can not read {} as a classifier file (pickle).'.format(os.path.basename(file_path)))
         raise pickle.UnpicklingError('SIMBA ERROR: Can not read user-specified classifier file as pickled file.')
     return clf
-
 
 
 def bout_train_test_splitter(x_df: pd.DataFrame,

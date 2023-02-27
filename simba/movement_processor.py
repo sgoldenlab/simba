@@ -114,8 +114,8 @@ class MovementProcessor(object):
                 df_shifted = animal_df.shift(1)
                 df_shifted = df_shifted.combine_first(animal_df).add_suffix('_shifted')
                 animal_df = pd.concat([animal_df, df_shifted], axis=1)
-                bp_time_1 = animal_df[[animal_bps[0], animal_bps[1]]].values
-                bp_time_2 = animal_df[[animal_bps[0] + '_shifted', animal_bps[1] + '_shifted']].values
+                bp_time_1 = animal_df[[animal_bps[0], animal_bps[1]]].values.astype(float)
+                bp_time_2 = animal_df[[animal_bps[0] + '_shifted', animal_bps[1] + '_shifted']].values.astype(float)
                 self.movement = pd.Series(framewise_euclidean_distance(location_1=bp_time_1, location_2=bp_time_2, px_per_mm=self.px_per_mm))
                 self.movement.loc[0] = 0
                 self.movement_dict[video_name][animal_name] = self.movement

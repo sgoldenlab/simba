@@ -271,8 +271,8 @@ class BatchProcessFrame(object):
     def create_execute_btn(self):
         self.execute_frm = LabelFrame(self.batch_process_main_frame, text='EXECUTE', font=('Helvetica', 15, 'bold'), pady=5, padx=15)
         self.reset_all_btn = Button(self.execute_frm , text='RESET ALL', fg='red', command=lambda: self.create_video_rows())
-        self.reset_crop_btn = Button(self.execute_frm, text='RESET CROP', fg='red', command=lambda: self.reset_crop())
-        self.execute_btn = Button(self.execute_frm, text='EXECUTE', fg='red', command= lambda: self.execute())
+        self.reset_crop_btn = Button(self.execute_frm, text='RESET CROP', fg='orange', command=lambda: self.reset_crop())
+        self.execute_btn = Button(self.execute_frm, text='EXECUTE', fg='blue', command= lambda: self.execute())
 
         self.execute_frm.grid(row=2, column=0, sticky=W, padx=5, pady=30)
         self.reset_all_btn.grid(row=0, column=0, sticky=W, padx=5)
@@ -402,7 +402,8 @@ class BatchProcessFrame(object):
         print('SIMBA batch pre-process JSON saved at {}'.format(self.save_path))
         print('SIMBA COMPLETE: Video batch pre-processing complete, new videos stored in {}'.format(self.output_dir))
 
-# test = BatchProcessFrame(input_dir=r'/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/videos', output_dir=r'/Users/simon/Desktop/test')
+# test = BatchProcessFrame(input_dir=r'/Users/simon/Desktop/envs/simba_dev/tests/test_data/visualization_tests/project_folder/videos/',
+#                          output_dir=r'/Users/simon/Desktop/envs/simba_dev/tests/test_data/video_tests')
 # test.create_main_window()
 # test.create_video_table_headings()
 # test.create_video_rows()

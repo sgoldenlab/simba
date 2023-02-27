@@ -296,15 +296,29 @@ def GenerateMetaDataFileHeaders():
     """Helper to return the headings for the SimBA RF model config files."""
 
 
-    meta_data_headers = ["Classifier_name", "RF_criterion", "RF_max_features", "RF_min_sample_leaf",
-     "RF_n_estimators", "compute_feature_permutation_importance",
-     "generate_classification_report", "generate_example_decision_tree",
-     "generate_features_importance_bar_graph", "generate_features_importance_log",
-     "generate_precision_recall_curves", "generate_rf_model_meta_data_file",
-     "generate_sklearn_learning_curves", "learning_curve_data_splits",
-     "learning_curve_k_splits", "n_feature_importance_bars",
-     "over_sample_ratio", "over_sample_setting", "train_test_size", "train_test_split_type", "under_sample_ratio",
-     "under_sample_setting"]
+    meta_data_headers = ["Classifier_name",
+                         "RF_criterion",
+                         "RF_max_features",
+                         "RF_min_sample_leaf",
+                         "RF_n_estimators",
+                         "compute_feature_permutation_importance",
+                         "generate_classification_report",
+                         "generate_example_decision_tree",
+                         "generate_features_importance_bar_graph",
+                         "generate_features_importance_log",
+                         "generate_precision_recall_curves",
+                         "generate_rf_model_meta_data_file",
+                         "generate_sklearn_learning_curves",
+                         "learning_curve_data_splits",
+                         "learning_curve_k_splits",
+                         "n_feature_importance_bars",
+                         "over_sample_ratio",
+                         "over_sample_setting",
+                         "train_test_size",
+                         "train_test_split_type",
+                         "under_sample_ratio",
+                         "under_sample_setting",
+                         "class_weights"]
 
     return meta_data_headers
 

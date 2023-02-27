@@ -5,7 +5,7 @@ from simba.drop_bp_cords import *
 from simba.read_config_unit_tests import read_config_file
 import numpy as np
 from simba.enums import ReadConfig
-from simba.misc_tools import check_multi_animal_status
+from simba.misc_tools import (check_multi_animal_status, get_number_of_header_columns_in_df)
 
 
 class Interpolate(object):
@@ -36,32 +36,41 @@ class Interpolate(object):
     def __init__(self,
                  config_file_path: str,
                  in_file: pd.DataFrame):
+
         self.in_df = in_file
         config = read_config_file(ini_path=config_file_path)
-        Xcols, Ycols, Pcols = getBpNames(config_file_path)
+        x_cols, y_cols, p_cols = getBpNames(config_file_path)
         self.columnHeaders = getBpHeaders(config_file_path)
         noAnimals = config.getint(ReadConfig.GENERAL_SETTINGS.value, ReadConfig.ANIMAL_CNT.value)
         _, multiAnimalIDList = check_multi_animal_status(config, noAnimals)
+
         multiAnimalStatus = True
         self.multiAnimalIDList = [x for x in multiAnimalIDList if x]
-        self.animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, noAnimals, Xcols, Ycols, Pcols, [])
+        self.animalBpDict = create_body_part_dictionary(multiAnimalStatus, multiAnimalIDList, noAnimals, x_cols, y_cols, p_cols, [])
 
 
     def detect_headers(self):
         """
         Method to detect multi-index headers and set values to numeric in input dataframe
-
-        Returns
-        -------
-        Attribute: pd.Dataframe
-            current_df
         """
-        self.multi_index_headers = self.in_df.iloc[0:2]
         self.multi_index_headers_list = []
-        for column in self.multi_index_headers:
-            self.multi_index_headers_list.append((column, self.multi_index_headers[column][0], self.multi_index_headers[column][1]))
         self.in_df.columns = self.columnHeaders
-        self.current_df = self.in_df.iloc[2:].apply(pd.to_numeric).reset_index(drop=True)
+        self.header_col_cnt = get_number_of_header_columns_in_df(df=self.in_df)
+        self.current_df = self.in_df.iloc[self.header_col_cnt:].apply(pd.to_numeric).reset_index(drop=True)
+        self.multi_index_headers = self.in_df.iloc[:self.header_col_cnt]
+        if self.header_col_cnt == 2:
+            self.idx_names = ['scorer', 'bodyparts', 'coords']
+            for column in self.multi_index_headers:
+                self.multi_index_headers_list.append((column,
+                                                      self.multi_index_headers[column][0],
+                                                      self.multi_index_headers[column][1]))
+        else:
+            self.idx_names = ['scorer', 'individuals', 'bodyparts', 'coords']
+            for column in self.multi_index_headers:
+                self.multi_index_headers_list.append((column,
+                                                      self.multi_index_headers[column][0],
+                                                      self.multi_index_headers[column][1],
+                                                      self.multi_index_headers[column][2]))
 
     def fix_missing_values(self,
                            method_str: str):
@@ -74,10 +83,6 @@ class Interpolate(object):
             String representing interpolation method. OPTIONS: 'None','Animal(s): Nearest', 'Animal(s): Linear',
             'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear', 'Body-parts: Quadratic'
 
-        Returns
-        -------
-        Attribute: pd.Dataframe
-            new_df
         """
 
         interpolation_type, interpolation_method = method_str.split(':')[0], method_str.split(':')[1].replace(" ", "").lower()
@@ -111,26 +116,18 @@ class Interpolate(object):
     def reorganize_headers(self):
         """
         Method to re-insert original multi-index headers
-
-        Returns
-        -------
-        Attribute: pd.Dataframe
-            new_df
         """
-
-
         loop_val = 2
         for p_col_name in self.header_list_p:
-            p_col = list(self.in_df[p_col_name].iloc[2:])
+            p_col = list(self.in_df[p_col_name].iloc[self.header_col_cnt:])
             self.new_df.insert(loc=loop_val, column=p_col_name, value=p_col)
             loop_val += 3
-        self.new_df.columns = pd.MultiIndex.from_tuples(self.multi_index_headers_list, names=('scorer', 'bodyparts', 'coords'))
+        self.new_df.columns = pd.MultiIndex.from_tuples(self.multi_index_headers_list, names=self.idx_names)
 
-# config_file_path = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\slp1\project_folder\project_config.ini"
-# in_file = r"Z:\DeepLabCut\DLC_extract\Troubleshooting\slp1\project_folder\csv\input_csv\2020_08_01_11_27_15_857870_compressed_corrected.csv"
+# config_file_path = r"/Users/simon/Desktop/envs/troubleshooting/Tests_022023/project_folder/project_config.ini"
+# in_file = r"/Users/simon/Desktop/envs/troubleshooting/Tests_022023/project_folder/csv/input_csv/Together_1 2_lvl.csv"
 # interpolation_method = 'Animal(s): Quadratic'
 # csv_df = pd.read_csv(in_file, index_col=0)
-# #
 # interpolate_body_parts = Interpolate(config_file_path, csv_df)
 # interpolate_body_parts.detect_headers()
 # interpolate_body_parts.fix_missing_values(interpolation_method)
