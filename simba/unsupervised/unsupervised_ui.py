@@ -11,14 +11,16 @@ from simba.enums import Formats, Options
 from simba.enums import ReadConfig, Dtypes
 from simba.train_model_functions import get_all_clf_names
 from simba.unsupervised.dataset_creator import DatasetCreator
-from simba.unsupervised.pop_up_classes import (GridSearchVisualizationPopUp,
+from simba.unsupervised.pop_up_classes import (GridSearchClusterVisualizerPopUp,
                                                BatchDataExtractorPopUp,
                                                FitDimReductionPopUp,
                                                FitClusterModelsPopUp,
                                                TransformDimReductionPopUp,
                                                TransformClustererPopUp,
                                                ClusterVisualizerPopUp,
-                                               ClusterFrequentistStatisticsPopUp)
+                                               ClusterFrequentistStatisticsPopUp,
+                                               ClusterMLStatisticsPopUp,
+                                               EmbedderCorrelationsPopUp)
 
 class UnsupervisedGUI(object):
     def __init__(self,
@@ -37,9 +39,9 @@ class UnsupervisedGUI(object):
                                    'ALL FEATURES (INCLUDING POSE)',
                                    'USER-DEFINED FEATURE SET']
 
-        self.clf_slice_options = ['ALL CLASSIFIERS PRESENT']
+        self.clf_slice_options = [f'ALL CLASSIFIERS ({str(len(self.clf_names))})']
         for clf_name in self.clf_names:
-            self.clf_slice_options.append(f'{clf_name} PRESENT')
+            self.clf_slice_options.append(f'{clf_name}')
 
         self.bout_aggregation_options = ['MEAN', 'MEDIAN']
         self.main = ttk.Notebook(hxtScrollbar(self.main))
@@ -94,7 +96,7 @@ class UnsupervisedGUI(object):
 
         self.visualization_frm = LabelFrame(self.visualization_tab, text='VISUALIZATIONS', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.grid_search_visualization_btn = Button(self.visualization_frm, text='GRID-SEARCH VISUALIZATION', fg='blue', command= lambda: self.launch_grid_search_visualization_pop_up())
-        self.cluster_visualizer = Button(self.visualization_frm, text='CLUSTER VISUALIZER', fg='blue', command= lambda: ClusterVisualizerPopUp(config_path=self.config_path))
+        self.cluster_visualizer = Button(self.visualization_frm, text='CLUSTER VISUALIZER', fg='red', command= lambda: ClusterVisualizerPopUp(config_path=self.config_path))
         self.visualization_frm.grid(row=0, column=0, sticky='NW')
         self.grid_search_visualization_btn.grid(row=0, column=0, sticky='NW')
         self.cluster_visualizer.grid(row=1, column=0, sticky='NW')
@@ -102,13 +104,16 @@ class UnsupervisedGUI(object):
         self.metrics_frm = LabelFrame(self.metrics_tab, text='METRICS', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         self.dbcv_btn = Button(self.metrics_frm, text='DENSITY-BASED CLUSTER VALIDATION', fg='blue', command=lambda: None)
         self.extract_single_metrics_btn = Button(self.metrics_frm, text='EXTRACT UNSUPERVISED RESULTS (MULTIPLE MODELS)', fg='red', command=lambda: BatchDataExtractorPopUp())
-        self.cluster_descriptives_btn = Button(self.metrics_frm, text='CLUSTER DESCRIPTIVE STATISTICS', fg='green', command=lambda: ClusterFrequentistStatisticsPopUp(config_path=self.config_path))
-
+        self.cluster_descriptives_btn = Button(self.metrics_frm, text='CLUSTER FREQUENTIST STATISTICS', fg='green', command=lambda: ClusterFrequentistStatisticsPopUp(config_path=self.config_path))
+        self.cluster_xai_btn = Button(self.metrics_frm, text='CLUSTER XAI STATISTICS', fg='blue', command=lambda: ClusterMLStatisticsPopUp(config_path=self.config_path))
+        self.embedding_corr_btn = Button(self.metrics_frm, text='EMBEDDING CORRELATIONS', fg='orange', command=lambda: EmbedderCorrelationsPopUp(config_path=self.config_path))
 
         self.metrics_frm.grid(row=0, column=0, sticky='NW')
         self.dbcv_btn.grid(row=0, column=0, sticky='NW')
         self.extract_single_metrics_btn.grid(row=1, column=0, sticky='NW')
         self.cluster_descriptives_btn.grid(row=2, column=0, sticky='NW')
+        self.cluster_xai_btn.grid(row=3, column=0, sticky='NW')
+        self.embedding_corr_btn.grid(row=4, column=0, sticky='NW')
 
         self.main.mainloop()
 
@@ -134,6 +139,6 @@ class UnsupervisedGUI(object):
         _ = DatasetCreator(settings=settings, config_path=self.config_path)
 
     def launch_grid_search_visualization_pop_up(self):
-        _ = GridSearchVisualizationPopUp(config_path=self.config_path)
+        _ = GridSearchClusterVisualizerPopUp(config_path=self.config_path)
 
 _ = UnsupervisedGUI(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')

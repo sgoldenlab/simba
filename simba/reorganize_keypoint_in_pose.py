@@ -4,6 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 from simba.read_config_unit_tests import (check_if_filepath_list_is_empty,
                                           check_if_dir_exists)
+from simba.misc_tools import check_if_filepath_list_is_empty
 
 
 class KeypointReorganizer(object):
@@ -42,6 +43,9 @@ class KeypointReorganizer(object):
         self.data_folder, self.pose_tool = data_folder, pose_tool
         self.file_format = file_format
         self.files_found = glob.glob(self.data_folder + '/*.' + file_format)
+        check_if_filepath_list_is_empty(self.files_found,
+                                        error_msg=f'SIMBA ERROR: {self.data_folder} directory has no {file_format} files.')
+
         self.datetime = str(datetime.now().strftime('%Y%m%d%H%M%S'))
         check_if_filepath_list_is_empty(filepaths=self.files_found,
                                         error_msg='SIMBA ERROR: Zero files found of type {} in the {} directory'.format(file_format, data_folder))
@@ -87,7 +91,6 @@ class KeypointReorganizer(object):
                         self.bp_list.append(bp)
                 coords = list(first_df.loc[1, :])
                 coords.remove('coords')
-
                 self.header_list = list(zip(scorer, bodyparts, coords))
 
     def perform_reorganization(self,
@@ -122,6 +125,13 @@ class KeypointReorganizer(object):
                 df_reorganized.to_csv(df_save_path)
             print('Saved {}, Video {}/{}.'.format(os.path.basename(file_path), str(file_cnt + 1), str(len(self.files_found))))
         print('SIMBA COMPLETE: {} new data files with reorganized body-parts saved in {} directory'.format(str(len(self.files_found)), save_directory))
+
+
+#keypoint_reorganizer = KeypointReorganizer(data_folder="/Users/simon/Desktop/envs/troubleshooting/Termites_5/import_h5", pose_tool='SLEAP', file_format='SLEAP H5')
+
+
+
+
 
 #keypoint_reorganizer = KeypointReorganizer(data_folder="/Users/simon/Desktop/troubleshooting/B1-MS_US/el_import", pose_tool='maDLC', file_format='h5')
 #keypoint_reorganizer.perform_reorganization(animal_list=['UM', 'LM', 'LM', 'UM', 'LM', 'UM', 'LM', 'LM', 'UM', 'LM', 'UM', 'UM', 'UM', 'UM', 'LM', 'LM'], bp_lst=['Nose', 'Tail_base', 'Tail_base', 'Lateral_right', 'Ear_right', 'Center', 'Nose', 'Ear_left', 'Ear_right', 'Center', 'Tail_end', 'Ear_left', 'Tail_base', 'Lateral_left', 'Tail_end', 'Lateral_right'])

@@ -28,7 +28,6 @@ from simba.machine_model_settings_pop_up import MachineModelSettingsPopUp
 from simba.get_coordinates_tools_v2 import get_coordinates_nilsson
 from simba.create_project_select_datatype import TrackingSelectorMenu
 from simba.process_severity import analyze_process_severity
-from simba.clf_validator import ClassifierValidationClips
 from simba.validate_model_on_single_video import ValidateModelOneVideo
 from simba.sleap_csv_importer import SleapCsvImporter
 from simba.ROI_reset import *
@@ -43,6 +42,7 @@ from simba.features_scripts.feature_extractor_14bp import ExtractFeaturesFrom14b
 from simba.features_scripts.extract_features_14bp_from_16bp import extract_features_wotarget_14_from_16
 from simba.features_scripts.extract_features_9bp import extract_features_wotarget_9
 from simba.features_scripts.feature_extractor_8bp import ExtractFeaturesFrom8bps
+from simba.features_scripts.feature_extractor_8bps_2_animals import ExtractFeaturesFrom8bps2Animals
 from simba.features_scripts.feature_extractor_7bp import ExtractFeaturesFrom7bps
 from simba.features_scripts.feature_extractor_4bp import ExtractFeaturesFrom4bps
 from simba.features_scripts.feature_extractor_user_defined import UserDefinedFeatureExtractor
@@ -137,7 +137,8 @@ from simba.pop_up_classes import (HeatmapLocationPopup,
                                   HeatmapClfPopUp,
                                   DataPlotterPopUp,
                                   DirectingOtherAnimalsVisualizerPopUp,
-                                  PupRetrievalPopUp)
+                                  PupRetrievalPopUp,
+                                  ClassifierValidationPopUp)
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.labelling_interface import select_labelling_video
 from simba.labelling_advanced_interface import select_labelling_video_advanced
@@ -779,12 +780,12 @@ class project_config:
             print('SIMBA COMPLETE: Sleap H5 files imported to project_folder/csv/input_csv directory.')
 
         if self.filetype.getChoices() == 'H5 (SLEAP)':
-            sleap_csv_importer = SLEAPImporterH5(config_path=self.configinifile,
+            sleap_h5_importer = SLEAPImporterH5(config_path=self.configinifile,
                                                   data_folder=self.h5path.folder_path,
                                                   actor_IDs=idlist,
                                                   interpolation_settings=self.interpolation.getChoices(),
                                                   smoothing_settings=smooth_settings_dict)
-            sleap_csv_importer.import_sleap()
+            sleap_h5_importer.import_sleap()
 
     def animalnames(self,noofanimal,master):
         try:
@@ -1126,7 +1127,6 @@ class loadprojectini:
         tab9 = ttk.Frame(tab_parent)
         tab10 = ttk.Frame(tab_parent)
         tab11 = ttk.Frame(tab_parent)
-        tab12 = ttk.Frame(tab_parent)
 
 
         tab_parent.add(tab2, text= f"{'[ Further imports (data/video/frames) ]':20s}")
@@ -1138,8 +1138,7 @@ class loadprojectini:
         tab_parent.add(tab8, text=f"{'[ Train machine model ]':20s}")
         tab_parent.add(tab9, text=f"{'[ Run machine model ]':20s}")
         tab_parent.add(tab10, text=f"{'[ Visualizations ]':20s}")
-        tab_parent.add(tab11, text=f"{'[ Classifier validation ]':20s}")
-        tab_parent.add(tab12,text=f"{'[ Add-ons ]':20s}")
+        tab_parent.add(tab11,text=f"{'[ Add-ons ]':20s}")
 
         tab_parent.grid(row=0)
         tab_parent.enable_traversal()
@@ -1423,6 +1422,8 @@ class loadprojectini:
         data_plot_visualization_btn = Button(visualization_frm, text='VISUALIZE DATA PLOTS', fg='purple',command=lambda: DataPlotterPopUp(config_path=self.projectconfigini))
         data_plot_visualization_btn.grid(row=6, column=0, sticky=NW)
 
+        clf_validation_btn = Button(visualization_frm, text='CLASSIFIER VALIDATION CLIPS', fg='blue', command=lambda: ClassifierValidationPopUp(config_path=self.projectconfigini))
+        clf_validation_btn.grid(row=7, column=0, sticky=NW)
 
         #Merge frames
         merge_frm = LabelFrame(tab10, text='MERGE FRAMES', pady=5, padx=5, font=("Helvetica", 12, 'bold'), fg='black')
@@ -1445,19 +1446,8 @@ class loadprojectini:
         self.groups_file = FileSelect(plotlyInterface, 'SimBA Groups file (CSV)', title='Select groups file (csv')
         button_open_plotly_interface = Button(plotlyInterface, text='Open SimBA / Plotly dataset', fg='black', command=lambda: [self.open_plotly_interface('http://127.0.0.1:8050')])
 
-        
-        ## classifier validation
-        label_classifier_validation = LabelFrame(tab11, text='Classifier Validation', pady=5, padx=5,font=Formats.LABELFRAME_HEADER_FORMAT.value,fg='black')
-        self.seconds = Entry_Box(label_classifier_validation,'Seconds','8', validation='numeric')
-        self.cvTarget = DropDownMenu(label_classifier_validation,'Target',targetlist,'15')
-        self.cvTarget.setChoices(targetlist[(config.get('SML settings', 'target_name_' + str(1)))])
-        self.one_vid_per_bout_var, self.one_vid_per_video_var = BooleanVar(value=False), BooleanVar(value=False)
-        individual_bout_clips_cb = Checkbutton(label_classifier_validation, text='One clip per bout', variable=self.one_vid_per_bout_var)
-        individual_clip_per_video_cb = Checkbutton(label_classifier_validation, text='One clip per video', variable=self.one_vid_per_video_var)
-        button_validate_classifier = Button(label_classifier_validation,text='Validate',command =self.classifiervalidation)
-
         #addons
-        lbl_addon = LabelFrame(tab12,text='SimBA Expansions',pady=5, padx=5,font=Formats.LABELFRAME_HEADER_FORMAT.value,fg='black')
+        lbl_addon = LabelFrame(tab11,text='SimBA Expansions',pady=5, padx=5,font=Formats.LABELFRAME_HEADER_FORMAT.value,fg='black')
         button_bel = Button(lbl_addon,text='Pup retrieval - Analysis Protocol 1',command=lambda: PupRetrievalPopUp(config_path=self.projectconfigini))
         button_unsupervised = Button(lbl_addon,text='Unsupervised',command = lambda:unsupervisedInterface(self.projectconfigini))
         cue_light_analyser_btn = Button(lbl_addon, text='Cue light analysis', command=lambda: CueLightAnalyzerMenu(config_path=self.projectconfigini))
@@ -1603,20 +1593,11 @@ class loadprojectini:
         self.groups_file.grid(row=12, sticky=W)
         button_open_plotly_interface.grid(row=13, sticky=W)
 
-        label_classifier_validation.grid(row=14,sticky=W)
-        self.seconds.grid(row=0,sticky=W)
-        self.cvTarget.grid(row=1,sticky=W)
-        individual_bout_clips_cb.grid(row=2, column=0, sticky=NW)
-        individual_clip_per_video_cb.grid(row=3, column=0, sticky=NW)
-        button_validate_classifier.grid(row=4,sticky=NW)
-
-
         lbl_addon.grid(row=15,sticky=W)
         button_bel.grid(row=0,sticky=W)
         button_unsupervised.grid(row=1,sticky=W)
         cue_light_analyser_btn.grid(row=2, sticky=W)
         anchored_roi_analysis_btn.grid(row=3, sticky=W)
-
 
     def create_video_info_table(self):
         video_info_tabler = VideoInfoTable(config_path=self.projectconfigini)
@@ -2105,12 +2086,12 @@ class loadprojectini:
             print('SIMBA COMPLETE: Sleap CSV files imported to project_folder/csv/input_csv directory.')
 
         if self.val == 'H5 (SLEAP)':
-            sleap_csv_importer = SLEAPImporterH5(config_path=self.projectconfigini,
+            sleap_h5_importer = SLEAPImporterH5(config_path=self.projectconfigini,
                                                   data_folder=self.h5path.folder_path,
                                                   actor_IDs=idlist,
                                                   interpolation_settings=self.interpolation.getChoices(),
                                                   smoothing_settings=smooth_settings_dict)
-            sleap_csv_importer.import_sleap()
+            sleap_h5_importer.import_sleap()
 
 
     def animalnames(self, noofanimal, master):
@@ -2165,16 +2146,6 @@ class loadprojectini:
                                                             file_path=self.csvfile.file_path,
                                                             model_path=self.modelfile.file_path)
         interactive_grapher.create_plots()
-
-    def classifiervalidation(self):
-        print('Generating videos...')
-        clf_validator = ClassifierValidationClips(config_path=self.projectconfigini,
-                                                  window=self.seconds.entry_get,
-                                                  clf_name=self.cvTarget.getChoices(),
-                                                  clips=self.one_vid_per_bout_var.get(),
-                                                  concat_video=self.one_vid_per_video_var.get())
-        clf_validator.create_clips()
-        print('Videos generated')
 
     def generateSimBPlotlyFile(self,var):
         inputList = []
@@ -2234,21 +2205,20 @@ class loadprojectini:
         _ = MachineModelSettingsPopUp(config_path=self.projectconfigini)
 
     def extractfeatures(self):
-        configini = self.projectconfigini
-        config = ConfigParser()
-        config.read(configini)
-        pose_estimation_body_parts = config.get('create ensemble settings', 'pose_estimation_body_parts')
-        print('Pose-estimation body part setting for feature extraction: ' + str(pose_estimation_body_parts))
+        config = read_config_file(ini_path=self.projectconfigini)
+        pose_estimation_body_parts = read_config_entry(config=config, section='create ensemble settings', option='pose_estimation_body_parts', data_type=Dtypes.STR.value)
+        animal_cnt = read_config_entry(config=config, section=ReadConfig.GENERAL_SETTINGS.value, option=ReadConfig.ANIMAL_CNT.value, data_type=Dtypes.INT.value)
+        print(f'Pose-estimation body part setting for feature extraction: {str(animal_cnt)} animals {str(pose_estimation_body_parts)} body-parts')
         userFeatureScriptStatus = self.usVar.get()
 
         if userFeatureScriptStatus == 1:
-            pose_estimation_body_parts == 'user_defined_script'
             import sys
+            import importlib
+            pose_estimation_body_parts = 'user_defined_script'
             script = self.scriptfile.file_path
             dir = os.path.dirname(script)
             fscript = os.path.basename(script).split('.')[0]
             sys.path.insert(0,dir)
-            import importlib
             mymodule = importlib.import_module(fscript)
             mymodule.extract_features_userdef(self.projectconfigini)
 
@@ -2256,31 +2226,28 @@ class loadprojectini:
             if pose_estimation_body_parts == '16':
                 feature_extractor = ExtractFeaturesFrom16bps(config_path=self.projectconfigini)
                 feature_extractor.extract_features()
-                #extract_features_wotarget_16(self.projectconfigini)
             if (pose_estimation_body_parts == '14'):
                 feature_extractor = ExtractFeaturesFrom14bps(config_path=self.projectconfigini)
                 feature_extractor.extract_features()
-                #extract_features_wotarget_14(self.projectconfigini)
             if (pose_estimation_body_parts == '987'):
                 extract_features_wotarget_14_from_16(self.projectconfigini)
             if pose_estimation_body_parts == '9':
                 extract_features_wotarget_9(self.projectconfigini)
             if pose_estimation_body_parts == '8':
-                feature_extractor = ExtractFeaturesFrom8bps(config_path=self.projectconfigini)
+                if animal_cnt == 1:
+                    feature_extractor = ExtractFeaturesFrom8bps(config_path=self.projectconfigini)
+                elif animal_cnt == 2:
+                    feature_extractor = ExtractFeaturesFrom8bps2Animals(config_path=self.projectconfigini)
                 feature_extractor.extract_features()
-                #extract_features_wotarget_8(self.projectconfigini)
             if pose_estimation_body_parts == '7':
                 feature_extractor = ExtractFeaturesFrom7bps(config_path=self.projectconfigini)
                 feature_extractor.extract_features()
-                #extract_features_wotarget_7(self.projectconfigini)
             if pose_estimation_body_parts == '4':
                 feature_extractor = ExtractFeaturesFrom4bps(config_path=self.projectconfigini)
                 feature_extractor.extract_features()
-                #extract_features_wotarget_4(self.projectconfigini)
             if pose_estimation_body_parts == 'user_defined':
                 feature_extractor = UserDefinedFeatureExtractor(config_path=self.projectconfigini)
                 feature_extractor.extract_features()
-                #extract_features_wotarget_user_defined(self.projectconfigini)
 
 
     def importframefolder(self):

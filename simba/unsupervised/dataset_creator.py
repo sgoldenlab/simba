@@ -48,12 +48,10 @@ class DatasetCreator(object):
             self.all_features_concatenator()
         elif settings['data_slice'] == 'USER-DEFINED FEATURE SET':
             self.user_defined_concatenator()
-        elif settings['data_slice'] == 'ALL FEATURES (INCLUDING POSE)':
+        else:
             self.all_data_concatenator()
-
         self.get_feature_names()
-        if settings['clf_slice'] == 'ALL CLASSIFIERS PRESENT':
-            self.clf_slicer_all_present()
+        self.clf_slicer()
         self.save()
 
     def all_data_concatenator(self):
@@ -96,14 +94,15 @@ class DatasetCreator(object):
         self.df = self.df.drop(self.bp_names, axis=1)
 
 
-    def clf_slicer_all_present(self):
+    def clf_slicer(self):
         self.df = bout_aggregator(data=self.df,
                                   clfs=self.clf_names,
                                   video_info=self.video_info_df,
                                   feature_names=self.feature_names,
                                   min_bout_length=int(self.settings['min_bout_length']),
                                   aggregator=self.settings['bout_aggregation']).reset_index(drop=True)
-
+        if self.settings['clf_slice'] in self.clf_names:
+            self.df = self.df[self.df['CLASSIFIER'] == self.settings['clf_slice']].reset_index(drop=True)
 
     def get_feature_names(self):
         self.feature_names = [x for x in self.df.columns if x not in self.clf_cols]
@@ -122,7 +121,6 @@ class DatasetCreator(object):
         self.results['END_FRAME'] = self.df[['END_FRAME']]
         self.results['CLF'] = pd.get_dummies(self.df[["CLASSIFIER"]], prefix='', prefix_sep='')
         self.results['CLF_PROBABILITY'] = self.df[['PROBABILITY']]
-        print(self.results['CLF_PROBABILITY'])
 
         with open(self.save_path, 'wb') as f:
             pickle.dump(self.results, f, protocol=pickle.HIGHEST_PROTOCOL)
@@ -130,13 +128,13 @@ class DatasetCreator(object):
         print(f'SIMBA COMPLETE: Dataset for unsupervised learning saved at {self.save_path}. The dataset contains {str(len(self.results["DATA"]))} bouts (elapsed time {self.timer.elapsed_time_str}s)')
 
 
-
+#
 # settings = {'data_slice': 'ALL FEATURES (EXCLUDING POSE)',
-#             'clf_slice': 'ALL CLASSIFIERS PRESENT',
-#             'bout_aggregation': 'MEAN',
+#             'clf_slice': 'Attack',
+#             'bout_aggregation': 'MEDIAN',
 #             'min_bout_length': 66,
 #             'feature_path': '/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv'}
 # #
 # _ = DatasetCreator(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini',
 #                    settings=settings)
-
+#

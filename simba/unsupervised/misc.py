@@ -9,6 +9,7 @@ from simba.enums import Options
 from simba.misc_tools import detect_bouts
 from joblib import Parallel, delayed
 import numpy as np
+from joblib.externals.loky import get_reusable_executor
 
 
 def read_pickle(data_path: str) -> dict:
@@ -54,10 +55,6 @@ def get_cluster_cnt(data: np.array,
         raise ValueError()
     else:
         return cnt
-
-
-
-
 
 def check_directory_exists(directory: str) -> None:
     if not os.path.isdir(directory):
@@ -107,8 +104,8 @@ def bout_aggregator(data: pd.DataFrame,
                     min_bout_length: int,
                     video_info: pd.DataFrame):
     print('Calculating bout aggregate statistics...')
-    def bout_aggregator_mp(frms, data, clf_name):
 
+    def bout_aggregator_mp(frms, data, clf_name):
         bout_df = data.iloc[frms[0]: frms[1]+1]
         bout_video, start_frm, end_frm = bout_df['VIDEO'].values[0], bout_df['FRAME'].values[0], bout_df['FRAME'].values[-1]
         if aggregator == 'MEAN':
@@ -132,9 +129,10 @@ def bout_aggregator(data: pd.DataFrame,
             bouts = bouts[bouts['Bout_time'] >= min_bout_length / 1000][['Start_frame', 'End_frame']].values
             if len(bouts) > 0:
                 bouts = [x.tolist() for x in bouts]
-                results = Parallel(n_jobs=-1, verbose=2, backend="loky")(delayed(bout_aggregator_mp)(j, video_df, clf) for j in bouts)
+                results = Parallel(n_jobs=-1, verbose=0, backend="loky")(delayed(bout_aggregator_mp)(j, video_df, clf) for j in bouts)
                 results = pd.concat(results, axis=0).sort_values(by=['VIDEO', 'START_FRAME'])
                 output.append(results)
+    get_reusable_executor().shutdown(wait=True)
 
     return pd.concat(output, axis=0).reset_index(drop=True)
 

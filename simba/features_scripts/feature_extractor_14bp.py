@@ -508,7 +508,7 @@ class ExtractFeaturesFrom14bps(object):
                                                                                              str(file_time)))
 
         print('SIMBA COMPLETE: All features extracted (elapsed time: {}s). Results stored in project_folder/csv/features_extracted directory'.format(str(int(session_time))))
-
+#
 # test = ExtractFeaturesFrom14bps(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.extract_features()
 

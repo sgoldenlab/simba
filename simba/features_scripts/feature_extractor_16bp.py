@@ -453,7 +453,7 @@ class ExtractFeaturesFrom16bps(object):
             self.out_data['Movement_percentile_rank'] = self.out_data['Total_movement_centroids'].rank(pct=True)
             self.out_data['Distance_percentile_rank'] = self.out_data['Centroid_distance'].rank(pct=True)
             self.out_data['Movement_mouse_1_percentile_rank'] = self.out_data['Movement_mouse_1_centroid'].rank(pct=True)
-            self.out_data['Movement_mouse_2_percentile_rank'] = self.out_data['Movement_mouse_1_centroid'].rank(pct=True)
+            self.out_data['Movement_mouse_2_percentile_rank'] = self.out_data['Movement_mouse_2_centroid'].rank(pct=True)
             self.out_data['Movement_mouse_1_deviation_percentile_rank'] = self.out_data['Movement_mouse_1_deviation_centroid'].rank(pct=True)
             self.out_data['Movement_mouse_2_deviation_percentile_rank'] = self.out_data['Movement_mouse_2_deviation_centroid'].rank(pct=True)
             self.out_data['Centroid_distance_percentile_rank'] = self.out_data['Centroid_distance'].rank(pct=True)

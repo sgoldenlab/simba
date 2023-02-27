@@ -1,10 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from simba.unsupervised.misc import (read_pickle,
-                                     check_directory_exists,
-                                     find_embedding)
+                                     check_directory_exists)
 import pandas as pd
-from simba.misc_tools import check_file_exist_and_readable, get_video_meta_data, find_all_videos_in_directory, check_multi_animal_status
+from simba.misc_tools import (check_file_exist_and_readable,
+                              get_video_meta_data,
+                              find_all_videos_in_directory,
+                              check_multi_animal_status,
+                              SimbaTimer)
 from simba.drop_bp_cords import getBpNames, create_body_part_dictionary, createColorListofList
 from simba.read_config_unit_tests import read_config_file, read_config_entry, read_project_path_and_file_type
 from simba.enums import Paths, Formats, ReadConfig, Dtypes
@@ -13,68 +16,61 @@ import warnings
 import cv2
 
 
-class GridSearchVisualizer(object):
+class GridSearchClusterVisualizer(object):
     def __init__(self,
-                 embedders_path: str,
-                 clusterers_path: str or None,
+                 clusterers_path: str,
                  save_dir: str,
                  settings: dict):
 
-        check_directory_exists(embedders_path)
+        self.timer = SimbaTimer()
+        self.timer.start_timer()
         check_directory_exists(save_dir)
         self.save_dir = save_dir
-        self.embedders_path = embedders_path
         self.settings = settings
         self.clusterers = None
         if clusterers_path:
+            check_directory_exists(clusterers_path)
             self.clusterers = read_pickle(data_path=clusterers_path)
 
     def create_datasets(self):
         self.img_data = {}
         print('Retrieving models for visualization...')
-        self.embedders = read_pickle(data_path=self.embedders_path)
-        if self.clusterers:
-            for k, v in self.clusterers.items():
-                self.img_data[k] = {}
-                self.img_data[k]['categorical_legends'] = set()
-                self.img_data[k]['continuous_legends'] = set()
-                embedder = find_embedding(embeddings=self.embedders, hash=v['HASH'])
-                cluster_data = v['MODEL'].labels_.reshape(-1, 1).astype(np.int8)
-                embedding_data = embedder['MODEL'].embedding_
-                data = np.hstack((embedding_data, cluster_data))
-                self.img_data[k]['DATA'] = pd.DataFrame(data, columns=['X', 'Y', 'CLUSTER'])
-                self.img_data[k]['HASH'] = v['HASH']
-                self.img_data[k]['CLUSTERER_NAME'] = v['NAME']
-                self.img_data[k]['categorical_legends'].add('CLUSTER')
-        else:
-            for k, v in self.embedders.items():
-                self.img_data[k] = {}
-                embedding_data = v['models'].embedding_
-                self.img_data[k]['DATA'] = pd.DataFrame(embedding_data, columns=['X', 'Y'])
-                self.img_data[k]['HASH'] = v['HASH']
+        for k, v in self.clusterers.items():
+            self.img_data[k] = {}
+            self.img_data[k]['categorical_legends'] = set()
+            self.img_data[k]['continuous_legends'] = set()
+            embedder = v['EMBEDDER']
+            cluster_data = v['MODEL'].labels_.reshape(-1, 1).astype(np.int8)
+            embedding_data = embedder['MODEL'].embedding_
+            data = np.hstack((embedding_data, cluster_data))
+            self.img_data[k]['DATA'] = pd.DataFrame(data, columns=['X', 'Y', 'CLUSTER'])
+            self.img_data[k]['HASH'] = v['HASH']
+            self.img_data[k]['EMBEDDER'] = embedder
+            self.img_data[k]['CLUSTERER_NAME'] = v['NAME']
+            self.img_data[k]['categorical_legends'].add('CLUSTER')
 
         if self.settings['HUE']:
             for hue_id, hue_settings in self.settings['HUE'].items():
                 field_type, field_name = hue_settings['FIELD_TYPE'], hue_settings['FIELD_NAME']
                 for k, v in self.img_data.items():
-                    embedder = find_embedding(embeddings=self.embedders, hash=self.img_data[k]['HASH'])
+                    embedder = v['EMBEDDER']
                     if not 'categorical_legends' in self.img_data[k].keys():
                         self.img_data[k]['categorical_legends'] = set()
                         self.img_data[k]['continuous_legends'] = set()
-                    if (field_type == 'CLF') or (field_type == 'VIDEO_NAMES'):
-                        if field_name:
-                            self.img_data[k]['categorical_legends'].add(field_name)
-                        else:
-                            self.img_data[k]['categorical_legends'].add(field_type)
-                    elif (field_type == 'CLF_PROBABILITY') or (field_type == 'START_FRAME'):
-                        if field_name:
+                    if (field_type == 'CLASSIFIER'):
+                        self.img_data[k]['categorical_legends'].add(field_name)
+                    if (field_type == 'VIDEO NAMES'):
+                        self.img_data[k]['categorical_legends'].add(field_type)
+                    elif (field_type == 'CLASSIFIER PROBABILITY') or (field_type == 'START FRAME'):
+                        if field_name != 'None' and field_name != '':
                             self.img_data[k]['continuous_legends'].add(field_name)
                         else:
                             self.img_data[k]['continuous_legends'].add(field_type)
-                    if field_name:
+                    if field_name != 'None' and field_name != '':
                         self.img_data[k]['DATA'][field_name] = embedder[field_type][field_name]
                     else:
                         self.img_data[k]['DATA'][field_type] = embedder[field_type]
+
 
     def create_imgs(self):
         print('Creating plots...')
@@ -87,14 +83,11 @@ class GridSearchVisualizer(object):
                 plt.legend(*scatter.legend_elements()).set_title(categorical)
                 plt.xlabel('X')
                 plt.ylabel('Y')
+                plt_key = v['HASH'] + '_' + v['CLUSTERER_NAME'] + '_' + categorical
+                title = 'EMBEDDER: {} \n CLUSTERER: {}'.format(v['HASH'], v['CLUSTERER_NAME'])
                 if categorical != 'CLUSTER':
-                    plt_key = v['HASH'] + '_' + categorical
                     title = 'EMBEDDER: {}'.format(v['HASH'])
-                    plt.title(title, ha="center", fontsize=15, bbox={"facecolor": "orange", "alpha": 0.5, "pad": 0})
-                else:
-                    plt_key = v['HASH'] + '_' + v['CLUSTERER_NAME']
-                    title = 'EMBEDDER: {} \n CLUSTERER: {}'.format(v['HASH'], v['CLUSTERER_NAME'])
-                    plt.title(title, ha="center", fontsize=15, bbox={"facecolor": "orange", "alpha": 0.5, "pad": 0})
+                plt.title(title, ha="center", fontsize=15, bbox={"facecolor": "orange", "alpha": 0.5, "pad": 0})
                 plots[plt_key] = fig
                 plt.close('all')
 
@@ -105,8 +98,8 @@ class GridSearchVisualizer(object):
                 points = ax.scatter(v['DATA']['X'], v['DATA']['Y'], c=v['DATA'][continuous], s=self.settings['SCATTER_SIZE'], cmap=self.settings['CONTINUOUS_PALETTE'])
                 cbar = fig.colorbar(points)
                 cbar.set_label(continuous, loc='center')
-                plt_key = v['HASH'] + '_' + continuous
                 title = 'EMBEDDER: {}'.format(v['HASH'])
+                plt_key = v['HASH'] + v['CLUSTERER_NAME'] + '_' + continuous
                 plt.title(title, ha="center", fontsize=15, bbox={"facecolor": "orange", "alpha": 0.5, "pad": 0})
                 plots[plt_key] = fig
                 plt.close('all')
@@ -115,6 +108,8 @@ class GridSearchVisualizer(object):
             save_path = os.path.join(self.save_dir, f'{plt_key}.png')
             print(f'Saving scatterplot {plt_key} ...')
             fig.savefig(save_path)
+        self.timer.stop_timer()
+        print(f'SIMBA COMPLETE: {str(len(plots.keys()))} plots saved in {self.save_dir} (elapsed time: {self.timer.elapsed_time_str}s)')
 
 
 
@@ -189,6 +184,9 @@ class ClusterVisualizer(object):
             self.writer.release()
 
 
+
+
+
 # settings = {'video_speed': 0.01, 'pose': {'include': True, 'circle_size': 5}}
 # test = ClusterVisualizer(video_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/videos',
 #                          data_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models/dreamy_spence_awesome_elion.pickle',
@@ -198,10 +196,11 @@ class ClusterVisualizer(object):
 
 
 # settings = {'HUE': {'FIELD_TYPE': 'VIDEO_NAMES', 'FIELD_NAME': None}}
-# settings = {'SCATTER_SIZE': 50, 'CATEGORICAL_PALETTE': 'Set1', 'CONTINUOUS_PALETTE': 'magma', 'HUE': {0: {'FIELD_TYPE': 'START_FRAME', 'FIELD_NAME': None}, 1: {'FIELD_TYPE': 'CLF', 'FIELD_NAME': 'Attack'}}}
-# test = GridSearchVisualizer(embedders_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models',
-#                             clusterers_path= '/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models',
-#                             save_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/images',
-#                             settings=settings)
+# settings = {'SCATTER_SIZE': 50, 'CATEGORICAL_PALETTE': 'Set1', 'CONTINUOUS_PALETTE': 'magma', 'HUE': {0: {'FIELD_TYPE': 'CLASSIFIER PROBABILITY', 'FIELD_NAME': 'None'}, 1: {'FIELD_TYPE': 'CLASSIFIER', 'FIELD_NAME': 'Attack'}}}
+# test = GridSearchClusterVisualizer(clusterers_path= '/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models',
+#                                    save_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/images',
+#                                    settings=settings)
 # test.create_datasets()
 # test.create_imgs()
+
+#{0: {'FIELD_TYPE': 'CLASSIFIER PROBABILITY', 'FIELD_NAME': 'None'}, 1: {'FIELD_TYPE': 'CLASSIFIER', 'FIELD_NAME': 'Attack'}}

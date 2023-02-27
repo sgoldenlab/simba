@@ -29,15 +29,13 @@ class ExtractFeaturesFrom8bps(object):
     Notes
     ----------
     Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
-
+feature_extractor_14bps_new
 
     Examples
     ----------
     >>> feature_extractor = ExtractFeaturesFrom8bps(config_path='MyProjectConfig')
     >>> feature_extractor.extract_features()
     """
-
-
 
     def __init__(self,
                  config_path=None):

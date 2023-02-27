@@ -89,8 +89,7 @@ class HDBSCANClusterer(object):
         print(f'Fitted HDBSCAN models {self.name} (elapsed time {self.fit_timer.elapsed_time_str}s)...')
 
 
-def HDBSCANTransform(embedding_model_path: str,
-                     clusterer_model_path: str,
+def HDBSCANTransform(clusterer_model_path: str,
                      data_path: str,
                      save_dir: str,
                      settings: dict):
@@ -98,30 +97,22 @@ def HDBSCANTransform(embedding_model_path: str,
     timer = SimbaTimer()
     timer.start_timer()
     check_directory_exists(directory=save_dir)
-    input = {}
-    for (i, j) in zip([embedding_model_path, clusterer_model_path, data_path], ['EMBEDDER', 'CLUSTERER', 'DATA']):
-        check_file_exist_and_readable(file_path=i)
-        input[j] = read_pickle(data_path=i)
-    if input['CLUSTERER']['HASH'] != input['EMBEDDER']['HASH']:
-        print('Use embedder {} with clusterer {}'.format(input['CLUSTERER']['HASH'], input['CLUSTERER']['NAME']))
+    check_file_exist_and_readable(file_path=clusterer_model_path)
+    model = read_pickle(data_path=clusterer_model_path)
 
-    embedder_settings = deepcopy(settings)
-    embedder_settings['save_format'] = None
     results = {}
-
-    embedding_data = UMAPTransform(model_path=embedding_model_path, data_path=data_path, save_dir=None, settings=embedder_settings)
-    transform_labels, transform_strength = hdbscan.approximate_predict(input['CLUSTERER']['MODEL'], embedding_data[['X', 'Y']].values)
+    embedding_data = UMAPTransform(model=model['EMBEDDER'], data_path=data_path, save_dir=None, settings=None)
+    transform_labels, transform_strength = hdbscan.approximate_predict(model['MODEL'], embedding_data[['X', 'Y']].values)
     embedding_data['CLUSTER'] = transform_labels
     embedding_data['CLUSTER_STRENGTHS'] = transform_strength
     results['DATA'] = embedding_data
-    results['POSE'] = input['EMBEDDER']['POSE']
-    save_path = os.path.join(save_dir, f'{input["EMBEDDER"]["HASH"]}_{input["CLUSTERER"]["NAME"]}.pickle')
+    results['POSE'] = model['EMBEDDER']['POSE']
+    save_path = os.path.join(save_dir, f'{model["HASH"]}_{model["NAME"]}.pickle')
     write_pickle(data=results, save_path=save_path)
-
     timer.stop_timer()
     print(f'SIMBA COMPLETE: TRANSFORMED HDBSCAN results saved at {save_path} (elapsed time: {timer.elapsed_time_str}s)')
 
-# hyper_parameters = {'alpha': [1.0], 'min_cluster_size': [20, 40], 'min_samples': [2], 'cluster_selection_epsilon': [20]}
+# hyper_parameters = {'alpha': [1.0, 0.5], 'min_cluster_size': [2, 10], 'min_samples': [1], 'cluster_selection_epsilon': [20, 10, 5]}
 # embedding_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models'
 # save_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models'
 # config_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini'
@@ -130,13 +121,11 @@ def HDBSCANTransform(embedding_model_path: str,
 #
 
 # settings = {'feature_values': True, 'scaled_features': True, 'save_format': 'csv'}
-# embedding_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models/dreamy_spence.pickle'
-# clusterer_model_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models/awesome_elion.pickle'
+# clusterer_model_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models/amazing_burnell.pickle'
 # data_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/logs/unsupervised_data_20230215093552.pickle'
 # save_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models'
 #
-# _ = HDBSCANTransform(embedding_model_path=embedding_path,
-#                      clusterer_model_path=clusterer_model_path,
+# _ = HDBSCANTransform(clusterer_model_path=clusterer_model_path,
 #                      data_path=data_path,
 #                      save_dir=save_path,
 #                      settings=settings)

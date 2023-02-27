@@ -27,13 +27,11 @@ except ModuleNotFoundError:
 
 class UMAPEmbedder(object):
     def __init__(self,
-                 config_path: str,
                  data_path: str,
                  save_dir: str):
 
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
         self.data_path = data_path
-        self.config = read_config_file(ini_path=config_path)
         self.save_dir = save_dir
         check_file_exist_and_readable(file_path=self.data_path)
         check_directory_exists(directory=self.save_dir)
@@ -81,12 +79,13 @@ class UMAPEmbedder(object):
         self.results['LOW_VARIANCE_FIELDS'] = self.low_var_cols
         self.results['ORIGINAL_FEATURE_NAMES'] = self.original_feature_names
         self.results['OUT_FEATURE_NAMES'] = self.out_feature_names
-        self.results['VIDEO_NAMES'] = self.data['VIDEO_NAMES']
-        self.results['START_FRAME'] = self.data['START_FRAME']
-        self.results['END_FRAME'] = self.data['END_FRAME']
+        self.results['VIDEO NAMES'] = self.data['VIDEO_NAMES']
+        self.results['START FRAME'] = self.data['START_FRAME']
+        self.results['END FRAME'] = self.data['END_FRAME']
         self.results['POSE'] = self.data['POSE']
-        self.results['CLF'] = self.data['CLF']
-        self.results['CLF_PROBABILITY'] = self.data['CLF_PROBABILITY']
+        self.results['DATA'] = self.scaler
+        self.results['CLASSIFIER'] = self.data['CLF']
+        self.results['CLASSIFIER PROBABILITY'] = self.data['CLF_PROBABILITY']
 
         for h_cnt, h in enumerate(self.search_space):
             self.h_cnt = h_cnt
@@ -94,11 +93,11 @@ class UMAPEmbedder(object):
                                'min_distance': h[1],
                                'spread': h[2]}
             embedder = UMAP(min_dist=self.parameters['min_distance'],
-                            n_neighbors=self.parameters['n_neighbors'],
+                            n_neighbors=int(self.parameters['n_neighbors']),
                             spread=self.parameters['spread'],
                             metric='euclidean',
                             verbose=2)
-            embedder.fit(self.scaled_data)
+            embedder.fit(self.scaled_data.values)
             self.results['PARAMETERS'] = self.parameters
             self.results['MODEL'] = embedder
             self.results['HASH'] = random.sample(self.model_names, 1)[0]
@@ -114,18 +113,21 @@ class UMAPEmbedder(object):
         print('Fitted UMAP models saved at {} (elapsed time {}s)'.format(save_path, self.model_timer.elapsed_time_str))
 
 
-def UMAPTransform(model_path: str,
+def UMAPTransform(model: str or object,
                   data_path: str,
-                  settings: dict,
+                  settings: dict or None=None,
                   save_dir: str or None=None):
 
         timer = SimbaTimer()
         timer.start_timer()
         if save_dir is not None:
             check_directory_exists(directory=save_dir)
-        check_file_exist_and_readable(file_path=model_path)
+        if type(model) == 'str':
+            check_file_exist_and_readable(file_path=model)
+            embedder = read_pickle(data_path=model)
+        else:
+            embedder = model
         check_file_exist_and_readable(file_path=data_path)
-        embedder = read_pickle(data_path=model_path)
         data = read_pickle(data_path=data_path)
         data_df = drop_low_variance_fields(data=data['DATA'], fields=embedder['LOW_VARIANCE_FIELDS'])
         check_expected_fields(data_fields=data_df.columns, expected_fields=embedder['OUT_FEATURE_NAMES'])
@@ -138,40 +140,36 @@ def UMAPTransform(model_path: str,
                              data['CLF'],
                              data['CLF_PROBABILITY'],
                              transformed_data], axis=1)
+        if settings:
+            if settings['features'] == 'INCLUDE: ORIGINAL':
+                results = pd.concat([results, data_df], axis=1)
+            if settings['features'] == 'INCLUDE: SCALED':
+                results = pd.concat([results, scaled_data], axis=1)
+            if settings['save_format'] is 'csv':
+                save_path = os.path.join(save_dir, f'transformed_{embedder["HASH"]}.csv')
+                results.to_csv(save_path, index=False)
 
-        if settings['feature_values'] and not settings['scaled_features']:
-            results = pd.concat([results, data], axis=1)
-        elif settings['feature_values'] and settings['scaled_features']:
-            results = pd.concat([results, scaled_data], axis=1)
+        else:
+            return transformed_data
 
-        if not settings['save_format']:
-            return results
-
-        elif settings['save_format'] is 'csv':
-            save_path = os.path.join(save_dir, f'transformed_{embedder["HASH"]}.csv')
-            results.to_csv(save_path, index=False)
-        elif settings['save_format'] is 'parquet':
-            save_path = os.path.join(save_dir, f'transformed_{embedder["HASH"]}.parquet')
-            results.to_parquet(save_path)
         timer.stop_timer()
         print('Transformed data saved at {} (elapsed time: {}s)'.format(save_dir, timer.elapsed_time_str))
 
 
-# settings = {'feature_values': True, 'scaled_features': True, 'save_format': 'csv'}
-# model_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models/magical_darwin.pickle'
-# data_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/logs/unsupervised_data_20230215093552.pickle'
+# settings = {'features': 'INCLUDE: SCALED', 'save': 'csv}
+# model_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models/funny_heisenberg.pickle'
+# data_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/logs/unsupervised_data_20230222150701.pickle'
 # save_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models/'
-#
 # _ = UMAPTransform(model_path=model_path, data_path=data_path, save_dir=save_dir, settings=settings)
-# # #
+
 #
 #
 #
 #
 #
-# hyper_parameters = {'n_neighbors': [10, 20], 'min_distance': [0], 'spread': [1], 'scaler': 'MIN-MAX', 'variance': 0.25}
-# data_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/logs/unsupervised_data_20230215100620.pickle'
-# save_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models/'
+# hyper_parameters = {'n_neighbors': [10, 2], 'min_distance': [1.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25}
+# data_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/logs/unsupervised_data_20230222134410.pickle'
+# save_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models'
 # config_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini'
-# embedder = UMAPEmbedder(config_path=config_path, data_path=data_path, save_dir=save_dir)
+# embedder = UMAPEmbedder(data_path=data_path, save_dir=save_dir)
 # embedder.fit(hyper_parameters=hyper_parameters)

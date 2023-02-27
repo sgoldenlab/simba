@@ -339,9 +339,9 @@ class SLEAPImporterH5(object):
 
             self.data_df = pd.DataFrame(tracks).fillna(0)
             idx = self.data_df.iloc[:, :2]
-            idx['track'] = idx['track'].str.replace(r'[^\d.]+', '').astype(int)
+            idx['track'] = pd.Categorical(idx['track'])
+            idx['track'] = idx['track'].cat.codes.astype(int)
             self.data_df = self.data_df.iloc[:, 2:]
-
             if self.animals_cnt > 1:
                 self.data_df = pd.DataFrame(self.__transpose_multi_animal_data_table(data=self.data_df.values, idx=idx.values, animal_cnt=self.animals_cnt))
                 p_df = pd.DataFrame(1.0, index=self.data_df.index, columns=self.data_df.columns[1::2] + .5)
@@ -357,7 +357,6 @@ class SLEAPImporterH5(object):
                 self.data_df = pd.concat([self.data_df, p_df], axis=1).sort_index(axis=1)
                 self.data_df.columns = self.df_headers
                 self.out_df = deepcopy(self.data_df)
-
 
             if self.animals_cnt > 1:
                 self.video_path = find_video_of_file(video_dir=self.video_dir, filename=self.video_name)
@@ -391,8 +390,8 @@ class SLEAPImporterH5(object):
 
 
 # test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini",
-#                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/Termites_5/import_h5',
-#                    actor_IDs=['Simon', 'Nastacia', 'JJ', 'Sam', 'Liana'],
+#                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/Termites_5/test',
+#                    actor_IDs=['Simon', 'Nastacia'],
 #                    interpolation_settings="Body-parts: Nearest",
 #                    smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}})
 # test.import_sleap()
