@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import (MinMaxScaler,
                                    StandardScaler,
                                    QuantileTransformer)
+from sklearn.feature_selection import VarianceThreshold
 from simba.features_scripts.unit_tests import read_video_info
 from simba.enums import Options
 from simba.misc_tools import detect_bouts
@@ -73,6 +74,12 @@ def define_scaler(scaler_name: str):
         return StandardScaler()
     elif scaler_name == 'QUANTILE':
         return QuantileTransformer()
+
+def find_low_variance_fields(data: pd.DataFrame, variance: float):
+    feature_selector = VarianceThreshold(threshold=round((variance / 100), 2))
+    feature_selector.fit(data)
+    return [c for c in data.columns if c not in data.columns[feature_selector.get_support()]]
+
 
 def drop_low_variance_fields(data: pd.DataFrame, fields: list):
     return data.drop(columns=fields)

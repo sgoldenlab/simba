@@ -1,21 +1,20 @@
 import os
 import random
 from simba.enums import Paths
-from simba.read_config_unit_tests import (read_config_file,
-                                          check_file_exist_and_readable)
+from simba.read_config_unit_tests import check_file_exist_and_readable
 from simba.misc_tools import SimbaTimer
 
 from simba.unsupervised.misc import (check_that_directory_is_empty,
                                      check_directory_exists,
                                      read_pickle,
+                                     write_pickle,
                                      define_scaler,
+                                     find_low_variance_fields,
                                      drop_low_variance_fields,
                                      scaler_transform,
                                      check_expected_fields)
 
-from sklearn.feature_selection import VarianceThreshold
 import itertools
-import pickle
 import pandas as pd
 from datetime import datetime
 import simba
@@ -25,7 +24,7 @@ try:
 except ModuleNotFoundError:
     from umap import UMAP
 
-class UMAPEmbedder(object):
+class UMAPGridSearch(object):
     def __init__(self,
                  data_path: str,
                  save_dir: str):
@@ -50,28 +49,16 @@ class UMAPEmbedder(object):
         self.data = read_pickle(data_path=self.data_path)
         self.original_feature_names = self.data['DATA'].columns
         if self.hyp['variance']:
-            self.find_low_variance_fields()
-            self.drop_low_variance_fields()
+            self.low_var_cols = find_low_variance_fields(data=self.data['DATA'], variance=self.hyp['variance'])
+            self.data['DATA'] = drop_low_variance_fields(data=self.data['DATA'], fields=self.low_var_cols)
+
         self.out_feature_names = [x for x in self.original_feature_names if x not in self.low_var_cols]
         self.scaler = define_scaler(scaler_name=self.hyp['scaler'])
         self.scaler.fit(self.data['DATA'])
-        self.scaler_transform()
-        self.fit_umap()
+        self.scaled_data = scaler_transform(data=self.data['DATA'],scaler=self.scaler)
+        self.__fit_umap()
 
-    def scaler_transform(self):
-        if not hasattr(self, 'scaler'):
-            raise KeyError('Fit or load scaler before scaler transform.')
-        self.scaled_data = pd.DataFrame(self.scaler.transform(self.data['DATA']), columns=self.out_feature_names)
-
-    def find_low_variance_fields(self):
-        feature_selector = VarianceThreshold(threshold=round((self.hyp['variance'] / 100), 2))
-        feature_selector.fit(self.data['DATA'])
-        self.low_var_cols = [c for c in self.data['DATA'].columns if c not in self.data['DATA'].columns[feature_selector.get_support()]]
-
-    def drop_low_variance_fields(self):
-        self.data['DATA'] = self.data['DATA'].drop(columns=self.low_var_cols)
-
-    def fit_umap(self):
+    def __fit_umap(self):
         self.model_timer = SimbaTimer()
         self.model_timer.start_timer()
         self.results = {}
@@ -100,18 +87,11 @@ class UMAPEmbedder(object):
             embedder.fit(self.scaled_data.values)
             self.results['PARAMETERS'] = self.parameters
             self.results['MODEL'] = embedder
+            self.results['TYPE'] = 'UMAP'
             self.results['HASH'] = random.sample(self.model_names, 1)[0]
-            self.__save()
+            write_pickle(data=self.results, save_path=os.path.join(self.save_dir, '{}.pickle'.format(self.results['HASH'])))
         self.timer.stop_timer()
         print('SIMBA COMPLETE: {} umap models saved in {} (elapsed time: {}s)'.format(str(len(self.search_space)), self.save_dir, self.timer.elapsed_time_str))
-
-    def __save(self):
-        save_path = os.path.join(self.save_dir, '{}.pickle'.format(self.results['HASH']))
-        with open(save_path, 'wb') as f:
-            pickle.dump(self.results, f, protocol=pickle.HIGHEST_PROTOCOL)
-        self.model_timer.stop_timer()
-        print('Fitted UMAP models saved at {} (elapsed time {}s)'.format(save_path, self.model_timer.elapsed_time_str))
-
 
 def UMAPTransform(model: str or object,
                   data_path: str,

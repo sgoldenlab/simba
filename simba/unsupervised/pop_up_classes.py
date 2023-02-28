@@ -13,7 +13,8 @@ from simba.train_model_functions import get_all_clf_names
 from simba.unsupervised.visualizers import (GridSearchClusterVisualizer,
                                             ClusterVisualizer)
 from simba.unsupervised.data_extractors import DataExtractorMultipleModels
-from simba.unsupervised.umap_embedder import (UMAPEmbedder, UMAPTransform)
+from simba.unsupervised.umap_embedder import (UMAPGridSearch, UMAPTransform)
+from simba.unsupervised.tsne import TSNEGridSearch
 from simba.unsupervised.hdbscan_clusterer import (HDBSCANClusterer,
                                                   HDBSCANTransform)
 from simba.read_config_unit_tests import (read_config_entry,
@@ -204,7 +205,6 @@ class FitDimReductionPopUp(object):
 
         self.scaler_options = Options.SCALER_NAMES.value
         self.dim_reduction_algo_options = ['UMAP',
-                                           'PCA',
                                            'TSNE']
         self.feature_removal_options = list(range(10, 100, 10))
         self.feature_removal_options = [str(x) + '%' for x in self.feature_removal_options]
@@ -234,6 +234,8 @@ class FitDimReductionPopUp(object):
         self.feature_removal_dropdown.grid(row=1, column=0, sticky=NW)
         self.scaling_dropdown.grid(row=2, column=0, sticky=NW)
 
+        self.main_frm.mainloop()
+
     def add_to_listbox(self,
                        list_box: Listbox,
                        entry_box: Entry_Box):
@@ -255,25 +257,25 @@ class FitDimReductionPopUp(object):
             self.dr_value_frm.destroy()
             self.run_frm.destroy()
 
+        self.dr_hyperparameters_frm = LabelFrame(self.main_frm, text='GRID SEARCH HYPER-PARAMETERS', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
+        self.dr_value_frm = LabelFrame(self.main_frm, fg='black')
+        self.dr_value_entry_box = Entry_Box(self.dr_value_frm, 'VALUE: ', '12')
+        self.dr_value_frm.grid(row=3, column=0, sticky=NW)
+        self.dr_value_entry_box.grid(row=0, column=1, sticky=NW)
+        self.dr_hyperparameters_frm.grid(row=4, column=0, sticky=NW)
         if self.choose_algo_dropdown.getChoices() == 'UMAP':
-            self.dr_hyperparameters_frm = LabelFrame(self.main_frm, text='GRID SEARCH HYPER-PARAMETERS', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
-            self.dr_value_frm = LabelFrame(self.main_frm, fg='black')
-            self.dr_value_entry_box = Entry_Box(self.dr_value_frm, 'VALUE: ', '12')
             n_neighbors_estimators_lbl = Label(self.dr_hyperparameters_frm, text='N NEIGHBOURS')
             min_distance_lbl = Label(self.dr_hyperparameters_frm, text='MIN DISTANCE')
             spread_lbl = Label(self.dr_hyperparameters_frm, text='SPREAD')
-            add_min_distance_btn = self.create_btn = Button(self.dr_hyperparameters_frm, text='ADD', fg='blue', command= lambda: self.add_to_listbox(list_box=self.min_distance_listb, entry_box=self.dr_value_entry_box))
+            add_min_distance_btn = Button(self.dr_hyperparameters_frm, text='ADD', fg='blue', command= lambda: self.add_to_listbox(list_box=self.min_distance_listb, entry_box=self.dr_value_entry_box))
             add_neighbours_btn = Button(self.dr_hyperparameters_frm, text='ADD', fg='blue', command=lambda: self.add_to_listbox(list_box=self.n_neighbors_estimators_listb, entry_box=self.dr_value_entry_box))
-            add_spread_btn = self.create_btn = Button(self.dr_hyperparameters_frm, text='ADD', fg='blue', command= lambda: self.add_to_listbox(list_box=self.spread_listb, entry_box=self.dr_value_entry_box))
+            add_spread_btn = Button(self.dr_hyperparameters_frm, text='ADD', fg='blue', command= lambda: self.add_to_listbox(list_box=self.spread_listb, entry_box=self.dr_value_entry_box))
             remove_min_distance_btn = Button(self.dr_hyperparameters_frm, text='REMOVE', fg='red', command= lambda: self.remove_from_listbox(list_box=self.min_distance_listb))
             remove_neighbours_btn = Button(self.dr_hyperparameters_frm, text='REMOVE', fg='red', command=lambda: self.remove_from_listbox(list_box=self.n_neighbors_estimators_listb))
             remove_spread_btn = Button(self.dr_hyperparameters_frm, text='REMOVE', fg='red', command=lambda: self.remove_from_listbox(list_box=self.spread_listb))
             self.n_neighbors_estimators_listb = Listbox(self.dr_hyperparameters_frm, bg='lightgrey', fg='black', height=5, width=15)
             self.min_distance_listb = Listbox(self.dr_hyperparameters_frm, bg='lightgrey', fg='black', height=5, width=15)
             self.spread_listb = Listbox(self.dr_hyperparameters_frm, bg='lightgrey', fg='black', height=5, width=15)
-            self.dr_value_frm.grid(row=3, column=0, sticky=NW)
-            self.dr_value_entry_box.grid(row=0, column=1, sticky=NW)
-            self.dr_hyperparameters_frm.grid(row=4, column=0, sticky=NW)
             n_neighbors_estimators_lbl.grid(row=1, column=0)
             min_distance_lbl.grid(row=1, column=1)
             spread_lbl.grid(row=1, column=2)
@@ -287,34 +289,60 @@ class FitDimReductionPopUp(object):
             self.min_distance_listb.grid(row=4, column=1, sticky=NW)
             self.spread_listb.grid(row=4, column=2, sticky=NW)
             self.run_frm = LabelFrame(self.main_frm, text='RUN', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
-            run_btn = Button(self.run_frm, text='RUN', fg='blue', command= lambda: self.run_umap_gridsearch())
+            run_btn = Button(self.run_frm, text='RUN', fg='blue', command= lambda: self.run_gridsearch())
             self.run_frm.grid(row=5, column=0, sticky=NW)
             run_btn.grid(row=0, column=1, sticky=NW)
 
-    def run_umap_gridsearch(self):
-        min_distance = [float(x) for x in self.min_distance_listb.get(0, END)]
-        n_neighbours = [float(x) for x in self.n_neighbors_estimators_listb.get(0, END)]
-        spread = [float(x) for x in self.spread_listb.get(0, END)]
+        if self.choose_algo_dropdown.getChoices() == 'TSNE':
+            perplexity_lbl = Label(self.dr_hyperparameters_frm, text='PERPLEXITY')
+            add_perplexity_btn = Button(self.dr_hyperparameters_frm, text='ADD', fg='blue', command= lambda: self.add_to_listbox(list_box=self.perplexity_listb, entry_box=self.dr_value_entry_box))
+            remove_perplexity_btn = Button(self.dr_hyperparameters_frm, text='REMOVE', fg='red', command= lambda: self.remove_from_listbox(list_box=self.perplexity_listb))
+            self.perplexity_listb = Listbox(self.dr_hyperparameters_frm, bg='lightgrey', fg='black', height=5, width=15)
+            perplexity_lbl.grid(row=1, column=0)
+            add_perplexity_btn.grid(row=2, column=0)
+            remove_perplexity_btn.grid(row=3, column=0)
+            self.perplexity_listb.grid(row=4, column=0, sticky=NW)
+            self.run_frm = LabelFrame(self.main_frm, text='RUN', pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
+            run_btn = Button(self.run_frm, text='RUN', fg='blue', command= lambda: self.run_gridsearch())
+            self.run_frm.grid(row=5, column=0, sticky=NW)
+            run_btn.grid(row=0, column=1, sticky=NW)
+
+    def run_gridsearch(self):
         variance = None
         if self.feature_removal_dropdown.getChoices() != 'NONE':
             variance = int(self.feature_removal_dropdown.getChoices()[:-1]) / 100
         save_path = self.dr_save_dir.folder_path
         data_path = self.dataset_file_selected.file_path
 
-        if len(min_distance) == 0 or len(n_neighbours) == 0:
-            print('SIMBA ERROR: Provide values for neighbors and min distances')
-            raise ValueError('SIMBA ERROR: Provide at least one hyperparameter value for neighbors and min distances')
-        else:
+        if self.choose_algo_dropdown.getChoices() == 'UMAP':
+            min_distance = [float(x) for x in self.min_distance_listb.get(0, END)]
+            n_neighbours = [float(x) for x in self.n_neighbors_estimators_listb.get(0, END)]
+            spread = [float(x) for x in self.spread_listb.get(0, END)]
+            if len(min_distance) == 0 or len(n_neighbours) == 0 or len(spread) == 0:
+                print('SIMBA ERROR: Provide values for neighbors, min distances, and spread')
+                raise ValueError('SIMBA ERROR: Provide at least one hyperparameter value for neighbors, min distances, and spread')
             hyperparameters = {'n_neighbors': n_neighbours,
-                               'min_distance': min_distance,
-                               'spread': spread,
+                                'min_distance': min_distance,
+                                'spread': spread,
+                                'scaler': self.scaling_dropdown.getChoices(),
+                                'variance': variance}
+            umap_searcher = UMAPGridSearch(data_path=data_path,
+                                           save_dir=save_path)
+
+            umap_searcher.fit(hyper_parameters=hyperparameters)
+
+        if self.choose_algo_dropdown.getChoices() == 'TSNE':
+            perplexity = [int(x) for x in self.perplexity_listb.get(0, END)]
+            if len(perplexity) == 0:
+                print('SIMBA ERROR: Provide value(s) for perplexity')
+                raise ValueError('SIMBA ERROR: Provide value(s) for perplexity')
+
+            hyperparameters = {'perplexity': perplexity,
                                'scaler': self.scaling_dropdown.getChoices(),
                                'variance': variance}
-            print(variance)
-            umap_embedder = UMAPEmbedder(data_path=data_path,
-                                         save_dir=save_path)
-
-            umap_embedder.fit(hyper_parameters=hyperparameters)
+            tsne_searcher = TSNEGridSearch(data_path=data_path,
+                                           save_dir=save_path)
+            tsne_searcher.fit(hyperparameters=hyperparameters)
 
 
 class TransformDimReductionPopUp(object):
@@ -325,7 +353,6 @@ class TransformDimReductionPopUp(object):
         self.main_frm = hxtScrollbar(self.main_frm)
         self.main_frm.pack(expand=True, fill=BOTH)
         self.features_options = ['EXCLUDE', 'INCLUDE: ORIGINAL', 'INCLUDE: SCALED']
-
 
         self.dim_reduction_frm = LabelFrame(self.main_frm, text='DIMENSIONALITY REDUCTION: TRANSFORM', pady=5, padx=5,font=Formats.LABELFRAME_HEADER_FORMAT.value,fg='black')
         self.dim_reduction_model = FileSelect(self.dim_reduction_frm, 'MODEL (PICKLE):', lblwidth=25)
@@ -772,13 +799,6 @@ class EmbedderCorrelationsPopUp(object):
         _ = EmbeddingCorrelationCalculator(config_path=self.config_path,
                                            data_path=data_path,
                                            settings=settings)
-
-
-
-
-
-
-
 
 
 
