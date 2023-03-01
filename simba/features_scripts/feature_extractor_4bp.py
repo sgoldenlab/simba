@@ -1,17 +1,19 @@
 import os, glob
-from simba.features_scripts.unit_tests import read_video_info_csv, read_video_info, check_minimum_roll_windows
-from simba.read_config_unit_tests import (read_config_entry, read_config_file, insert_default_headers_for_feature_extraction)
+from simba.features_scripts.unit_tests import read_video_info
+from simba.read_config_unit_tests import insert_default_headers_for_feature_extraction
+from simba.misc_tools import get_feature_extraction_headers
+from simba.enums import Paths, Options
 from simba.drop_bp_cords import get_fn_ext
 from simba.rw_dfs import read_df, save_df
 import pandas as pd
 import numpy as np
-from numba import jit, prange
 from copy import deepcopy
 import math
 from collections import defaultdict
 import scipy
+from simba.features_scripts.feature_extraction_mixin import FeatureExtractionMixin
 
-class ExtractFeaturesFrom4bps(object):
+class ExtractFeaturesFrom4bps(FeatureExtractionMixin):
     """
     Class for creating a hard-coded set of features from single animals with 4 tracked body-parts
     using pose-estimation. Results are stored in the `project_folder/csv/features_extracted`
@@ -36,44 +38,11 @@ class ExtractFeaturesFrom4bps(object):
     def __init__(self,
                  config_path: str):
 
-        self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='folder_path')
-        self.data_in_dir = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
-        self.save_dir = os.path.join(self.project_path, 'csv', 'features_extracted')
-        if not os.path.exists(self.save_dir): os.makedirs(self.save_dir)
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
-        self.roll_windows_values = check_minimum_roll_windows([2, 5, 6, 7.5, 15], self.vid_info_df['fps'].min())
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.files_found = glob.glob(self.data_in_dir + '/*.' + self.file_type)
-        self.in_headers = ["Ear_left_x", "Ear_left_y", "Ear_left_p", "Ear_right_x", "Ear_right_y",
-                         "Ear_right_p", "Nose_x", "Nose_y", "Nose_p", "Tail_base_x",
-                         "Tail_base_y", "Tail_base_p"]
+        super().__init__(config_path=config_path)
+        self.in_headers = get_feature_extraction_headers(pose='1 animal 4 body-parts')
         self.mouse_p_headers = [x for x in self.in_headers if x[-2:] == '_p']
         self.mouse_headers = [x for x in self.in_headers if x[-2:] != '_p']
         print('Extracting features from {} file(s)...'.format(str(len(self.files_found))))
-
-    @staticmethod
-    @jit(nopython=True)
-    def __euclidean_distance(bp_1_x_vals, bp_2_x_vals, bp_1_y_vals, bp_2_y_vals, px_per_mm):
-        series = (np.sqrt((bp_1_x_vals - bp_2_x_vals) ** 2 + (bp_1_y_vals - bp_2_y_vals) ** 2)) / px_per_mm
-        return series
-
-
-    @staticmethod
-    @jit(nopython=True, fastmath=True)
-    def __angle3pt(ax, ay, bx, by, cx, cy):
-        ang = math.degrees(math.atan2(cy - by, cx - bx) - math.atan2(ay - by, ax - bx))
-        return ang + 360 if ang < 0 else ang
-
-    @staticmethod
-    @jit(nopython=True)
-    def __count_values_in_range(data: np.array, ranges: np.array):
-        results = np.full((data.shape[0], ranges.shape[0]), 0)
-        for i in prange(data.shape[0]):
-            for j in prange(ranges.shape[0]):
-                lower_bound, upper_bound = ranges[j][0], ranges[j][1]
-                results[i][j] = data[i][np.logical_and(data[i] >= lower_bound, data[i] <= upper_bound)].shape[0]
-        return results
 
     def extract_features(self):
         """
@@ -97,12 +66,12 @@ class ExtractFeaturesFrom4bps(object):
             self.in_data = pd.concat([self.in_data, self.in_data_shifted], axis=1, join='inner').fillna(0).reset_index(drop=True)
 
             print('Calculating euclidean distances...')
-            self.out_data['Mouse_nose_to_tail'] = self.__euclidean_distance(self.in_data['Nose_x'].values, self.in_data['Tail_base_x'].values, self.in_data['Nose_y'].values, self.in_data['Tail_base_y'].values, self.px_per_mm)
-            self.out_data['Mouse_Ear_distance'] = self.__euclidean_distance(self.in_data['Ear_left_x'].values, self.in_data['Ear_right_x'].values, self.in_data['Ear_left_y'].values, self.in_data['Ear_right_y'].values, self.px_per_mm)
-            self.out_data['Movement_mouse_nose'] = self.__euclidean_distance(self.in_data['Nose_x_shifted'].values, self.in_data['Nose_x'].values, self.in_data['Nose_y_shifted'].values, self.in_data['Nose_y'].values, self.px_per_mm)
-            self.out_data['Movement_mouse_tail_base'] = self.__euclidean_distance(self.in_data['Tail_base_x_shifted'].values, self.in_data['Tail_base_x'].values, self.in_data['Tail_base_y_shifted'].values, self.in_data['Tail_base_y'].values, self.px_per_mm)
-            self.out_data['Movement_mouse_left_ear'] = self.__euclidean_distance(self.in_data['Ear_left_x_shifted'].values, self.in_data['Ear_left_x'].values, self.in_data['Ear_left_y_shifted'].values, self.in_data['Ear_left_y'].values, self.px_per_mm)
-            self.out_data['Movement_mouse_right_ear'] = self.__euclidean_distance(self.in_data['Ear_right_x_shifted'].values, self.in_data['Ear_right_x'].values, self.in_data['Ear_right_y_shifted'].values, self.in_data['Ear_right_y'].values, self.px_per_mm)
+            self.out_data['Mouse_nose_to_tail'] = self.euclidean_distance(self.in_data['Nose_x'].values, self.in_data['Tail_base_x'].values, self.in_data['Nose_y'].values, self.in_data['Tail_base_y'].values, self.px_per_mm)
+            self.out_data['Mouse_Ear_distance'] = self.euclidean_distance(self.in_data['Ear_left_x'].values, self.in_data['Ear_right_x'].values, self.in_data['Ear_left_y'].values, self.in_data['Ear_right_y'].values, self.px_per_mm)
+            self.out_data['Movement_mouse_nose'] = self.euclidean_distance(self.in_data['Nose_x_shifted'].values, self.in_data['Nose_x'].values, self.in_data['Nose_y_shifted'].values, self.in_data['Nose_y'].values, self.px_per_mm)
+            self.out_data['Movement_mouse_tail_base'] = self.euclidean_distance(self.in_data['Tail_base_x_shifted'].values, self.in_data['Tail_base_x'].values, self.in_data['Tail_base_y_shifted'].values, self.in_data['Tail_base_y'].values, self.px_per_mm)
+            self.out_data['Movement_mouse_left_ear'] = self.euclidean_distance(self.in_data['Ear_left_x_shifted'].values, self.in_data['Ear_left_x'].values, self.in_data['Ear_left_y_shifted'].values, self.in_data['Ear_left_y'].values, self.px_per_mm)
+            self.out_data['Movement_mouse_right_ear'] = self.euclidean_distance(self.in_data['Ear_right_x_shifted'].values, self.in_data['Ear_right_x'].values, self.in_data['Ear_right_y_shifted'].values, self.in_data['Ear_right_y'].values, self.px_per_mm)
 
             print('Calculating hull variables...')
             mouse_array = self.in_data[self.mouse_headers].to_numpy()
@@ -226,7 +195,7 @@ class ExtractFeaturesFrom4bps(object):
                     tortuosities_dict = defaultdict(list)
                     c_centroid_lst_mouse_x, c_centroid_lst_mouse_y = centroid_lst_mouse_x[start:end], centroid_lst_mouse_y[start:end]
                     for frame_in_window in range(len(c_centroid_lst_mouse_x)):
-                        move_angle_mouse_ = (self.__angle3pt(c_centroid_lst_mouse_x[frame_in_window][0], c_centroid_lst_mouse_y[frame_in_window][0],c_centroid_lst_mouse_x[frame_in_window][1], c_centroid_lst_mouse_y[frame_in_window][1], c_centroid_lst_mouse_x[frame_in_window][2], c_centroid_lst_mouse_y[frame_in_window][2]))
+                        move_angle_mouse_ = (self.angle3pt(c_centroid_lst_mouse_x[frame_in_window][0], c_centroid_lst_mouse_y[frame_in_window][0],c_centroid_lst_mouse_x[frame_in_window][1], c_centroid_lst_mouse_y[frame_in_window][1], c_centroid_lst_mouse_x[frame_in_window][2], c_centroid_lst_mouse_y[frame_in_window][2]))
                         tortuosities_dict['Animal_1'].append(move_angle_mouse_)
                     tortuosities_results['Animal_1'].append(sum(tortuosities_dict['Animal_1']) / (2 * math.pi))
                     start += 1
@@ -239,7 +208,7 @@ class ExtractFeaturesFrom4bps(object):
             self.out_data['Sum_probabilities_deviation'] = (self.out_data['Sum_probabilities'].mean() - self.out_data['Sum_probabilities'])
             self.out_data['Sum_probabilities_deviation_percentile_rank'] = self.out_data['Sum_probabilities_deviation'].rank(pct=True)
             self.out_data['Sum_probabilities_percentile_rank'] = self.out_data['Sum_probabilities_deviation_percentile_rank'].rank(pct=True)
-            results = pd.DataFrame(self.__count_values_in_range(data=self.out_data.filter(self.mouse_p_headers).values, ranges=np.array([[0.0, 0.1], [0.000000000, 0.5], [0.000000000, 0.75]])), columns=['Low_prob_detections_0.1', 'Low_prob_detections_0.5','Low_prob_detections_0.75'])
+            results = pd.DataFrame(self.count_values_in_range(data=self.out_data.filter(self.mouse_p_headers).values, ranges=np.array([[0.0, 0.1], [0.000000000, 0.5], [0.000000000, 0.75]])), columns=['Low_prob_detections_0.1', 'Low_prob_detections_0.5','Low_prob_detections_0.75'])
             self.out_data = pd.concat([self.out_data, results], axis=1)
 
             self.out_data = self.out_data.reset_index(drop=True).fillna(0)

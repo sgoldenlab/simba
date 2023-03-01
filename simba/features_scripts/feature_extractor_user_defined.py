@@ -3,10 +3,13 @@ from simba.misc_tools import (check_multi_animal_status,
 from simba.misc_tools import (read_config_file,
                               SimbaTimer)
 from simba.read_config_unit_tests import (read_config_entry,
-                                          check_str)
+                                          check_str,
+                                          read_project_path_and_file_type,
+                                          check_if_filepath_list_is_empty)
 from simba.features_scripts.unit_tests import (read_video_info_csv,
                                                read_video_info,
                                                check_minimum_roll_windows)
+from simba.enums import Paths, Options, ReadConfig, Dtypes
 from simba.rw_dfs import (read_df,
                           save_df)
 from simba.drop_bp_cords import (getBpHeaders,
@@ -16,9 +19,9 @@ import os, glob
 import pandas as pd
 import numpy as np
 from itertools import product
-from numba import jit, prange
+from simba.features_scripts.feature_extraction_mixin import FeatureExtractionMixin
 
-class UserDefinedFeatureExtractor(object):
+class UserDefinedFeatureExtractor(FeatureExtractionMixin):
     """
     Class for featurizing data within SimBA project using user-defined body-parts in the pose-estimation data.
     Results are stored in the `project_folder/csv/features_extracted` directory of the SimBA project.
@@ -42,37 +45,10 @@ class UserDefinedFeatureExtractor(object):
     def __init__(self,
                  config_path: str):
 
-        self.config = read_config_file(config_path)
-        self.project_path = read_config_entry(self.config, 'General settings', 'project_path', data_type='str')
-        self.in_folder = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
-        self.out_folder = os.path.join(self.project_path, 'csv', 'features_extracted')
-        if not os.path.exists(self.out_folder): os.makedirs(self.out_folder)
-        self.file_type = read_config_entry(self.config, 'General settings', 'workflow_file_type', 'str', 'csv')
-        self.no_animals = read_config_entry(self.config, 'General settings', 'animal_no', 'int')
-        self.vid_info_df = read_video_info_csv(os.path.join(self.project_path, 'logs', 'video_info.csv'))
-        self.multi_animal_status, self.multi_animal_id_lst = check_multi_animal_status(self.config, self.no_animals)
-        self.xcols, self.ycols, self.pcols = getBpNames(config_path)
-        self.animal_bp_dict = create_body_part_dictionary(self.multi_animal_status, self.multi_animal_id_lst, self.no_animals, self.xcols, self.ycols, self.pcols, [])
-        self.col_headers = getBpHeaders(config_path)
-        self.col_headers_shifted = [bp + '_shifted' for bp in self.col_headers]
-        self.roll_windows_values = check_minimum_roll_windows([2, 5, 6, 7.5, 15], self.vid_info_df ['fps'].min())
-        self.files_found = glob.glob(self.in_folder + '/*.' + self.file_type)
-        if len(self.files_found) == 0:
-            print('SIMBA ERROR: Zero files found in the project_folder/csv/outlier_corrected_movement_location directory')
-            raise FileNotFoundError('SIMBA ERROR: Zero files found in the project_folder/csv/outlier_corrected_movement_location directory')
+        super().__init__(config_path=config_path)
         self.timer = SimbaTimer()
         self.timer.start_timer()
         print('Extracting features from {} file(s)...'.format(str(len(self.files_found))))
-
-    @staticmethod
-    @jit(nopython=True)
-    def __count_values_in_range(data: np.array, ranges: np.array):
-        results = np.full((data.shape[0], ranges.shape[0]), 0)
-        for i in prange(data.shape[0]):
-            for j in prange(ranges.shape[0]):
-                lower_bound, upper_bound = ranges[j][0], ranges[j][1]
-                results[i][j] = data[i][np.logical_and(data[i] >= lower_bound, data[i] <= upper_bound)].shape[0]
-        return results
 
     def __euclid_dist_between_bps_of_other_animals(self):
         print('Calculating euclidean distances...')
@@ -125,8 +101,7 @@ class UserDefinedFeatureExtractor(object):
         p_df = self.data_df.filter(self.pcols, axis=1)
         self.data_df['Sum_probabilities'] = p_df.sum(axis=1)
         self.data_df['Mean_probabilities'] = p_df.mean(axis=1)
-
-        results = pd.DataFrame(self.__count_values_in_range(data=self.data_df.filter(self.pcols).values, ranges=np.array([[0.0, 0.1], [0.000000000, 0.5], [0.000000000, 0.75]])), columns=['Low_prob_detections_0.1', 'Low_prob_detections_0.5','Low_prob_detections_0.75'])
+        results = pd.DataFrame(self.count_values_in_range(data=self.data_df.filter(self.pcols).values, ranges=np.array([[0.0, 0.1], [0.000000000, 0.5], [0.000000000, 0.75]])), columns=['Low_prob_detections_0.1', 'Low_prob_detections_0.5','Low_prob_detections_0.75'])
         self.data_df = pd.concat([self.data_df, results], axis=1)
 
     def extract_features(self):
@@ -142,7 +117,7 @@ class UserDefinedFeatureExtractor(object):
         for file_cnt, file_path in enumerate(self.files_found):
             video_timer = SimbaTimer()
             video_timer.start_timer()
-            print('Extracting features for video {} / {}'.format(str(file_cnt+1), str(len(self.files_found))))
+            print('Extracting features for video {}/{}...'.format(str(file_cnt+1), str(len(self.files_found))))
             _, file_name, _ = get_fn_ext(file_path)
             check_str('file name', file_name)
             video_settings, self.px_per_mm, fps = read_video_info(self.vid_info_df, file_name)
@@ -160,7 +135,7 @@ class UserDefinedFeatureExtractor(object):
             self.__rolling_windows_bp_distances()
             self.__rolling_windows_movement()
             self.__pose_probability_filters()
-            save_path = os.path.join(self.out_folder, file_name + '.' + self.file_type)
+            save_path = os.path.join(self.save_dir, file_name + '.' + self.file_type)
             self.data_df = self.data_df.reset_index(drop=True).fillna(0)
             save_df(self.data_df, self.file_type, save_path)
             video_timer.stop_timer()
@@ -170,5 +145,5 @@ class UserDefinedFeatureExtractor(object):
         self.timer.stop_timer()
         print('SIMBA COMPLETE: Feature extraction complete for {} video(s). Results are saved inside the project_folder/csv/features_extracted director (elapsed time: {}s).'.format(len(self.files_found), self.timer.elapsed_time_str))
 
-# test = UserDefinedFeatureExtractor(config_path='/Users/simon/Desktop/train_model_project/project_folder/project_config.ini')
-# test.extract_features()
+test = UserDefinedFeatureExtractor(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+test.extract_features()
