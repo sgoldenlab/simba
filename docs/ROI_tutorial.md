@@ -246,17 +246,33 @@ These heatmap images, or videos, are colour-coded according to the time spent in
 
 When clicking on `Create heatmaps`, the following menu pops open which accepts several required user-defined parameters:
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Visualize_04.PNG)
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/location_heat_maps_2023.png" />
+</p>
 
-`1. Bodypart:` SimBA can, currently, only generate heatmaps representing the time spent in different regions of the image based on a single body-part. Use the drop-down menu to select the body-part you wish to use to generate the heatmaps. 
+`1. Palette`. Use the drop-down to specify the palette of the heatmaps. For reference of how the palette looks like, see the the [SimBA visualization tutorials - Step 9](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#heatmap) 
 
-`2. Bin size (mm):` To generate heatmaps, SimBA needs to divide the image into different square regions. Use this entry-box to define the size of each square region. To get a better sense of what a `Bin size (mm)` is, and how SimBA goes about generating the heatmaps, see the image below (1). For example, enter *50* in this entry box to get regions that are 5x5cm in size. 
+`2. Shading`. Pick the shading/smoothing (Gouraud or Flat). For a comparison of Gouraud vs Flat, see the [classifier heatmap documentation](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-heatmaps).
 
-`3. # max ('auto' or integer):` The created heatmaps have adjoining colorbars. In this entry box, define the number of seconds that should represent the strongest color and max value in your heatmap. Users can also insert the string `auto` in this entry-box. If `auto`, the SimBa will calculate the max value in the video (max time spent in a single zone) and use this value as max (I'm not entirly sure how these heatmaps are created in commercial tools but I was inspired by the [MATLAB Pathfinder tool](https://matthewbcooke.github.io/Pathfinder/).
+`3. Bodypart:` SimBA can, currently, only generate heatmaps representing the time spent in different regions of the image based on a single body-part. Use the drop-down menu to select the body-part you wish to use to represent location when creating the heatmaps. 
 
-`4. Palette`. Use the drop-down to specify the palette of the heatmaps. For reference of how the palette looks like, see the the [SimBA visualization tutorials - Step 9](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#heatmap) 
+`4. Max time scale (s) ('auto-compute' or integer):` The created heatmaps have adjoining colorbars. In this entry box, define the number of seconds that should represent the strongest color and max value in your heatmap. Users can also insert the string `auto-compute` in this entry-box. If `auto`, the SimBa will calculate the max value in the video (max time spent in a single zone) and use this value as max (I'm not entirly sure how these heatmaps are created in commercial tools but I was inspired by the [MATLAB Pathfinder tool](https://matthewbcooke.github.io/Pathfinder/).
 
-`7. Save last image only`. Users may want to (i) generate videos, where each frame of the video represents the cumulative time spent in each region up until the current point in time, or (ii) generate single images that represents the cumulative time spent in each region across the entire videos. Tick the `Save last image only`box to generate a single PNG images for each video in the project. Untick the `Save last image only`box to generate one heatmap video for each video in the project. 
+`5. Bin size (mm):` To generate heatmaps, SimBA needs to divide the image into different square regions. Use this entry-box to define the size of each square region. To get a better sense of what a `Bin size (mm)` is, and how SimBA goes about generating the heatmaps, see the image below (1). For example, select *80x80* in this dropdown to create heatmaps from 8 by 8 cm squares.
+
+`6. Create frames:` If ticked, will create one heatmap .png for every frame in each video. (Warning: for many large videos, you'll end up with A LOT of files) 
+
+`7. Create videos:` If ticked, will create a heatmap video for every input video. 
+
+`8. Crate last frame:` If ticked, will generate single images that represents the cumulative time spent in each region across the entire video, with one image per video.  
+
+`9. Multi-process:` Creating heat-map videos and/or images is computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your probability charts. 
+
+`10. Multi-process:` Creating heat-map videos and/or images is computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your probability charts. 
+
+`11. SINGLE VIDEO`: Use this menu to create a single heatmap visualization video. The Video drop-down will contain all the videos in your project_folder/outlier_corrected_movement_location directory. Choose which video you want to create a heatmap visualization for. Once choosen, click the Create single video button. You can follow the progress in the main SimBA terminal window. Once complete, a new video and/or frames will be saved in the project_folder/frames/output/heatmap_location directory.
+
+`12. MULTIPLE VIDEOS`: Use this menu to create a heatmap visualizations for every video in your project. After clicking the Create multiple videos button. You can follow the progress in the main SimBA terminal window. Once complete, one new video and/or frames folder for every input video will be saved in the project_folder/frames/output/heatmap_location directory.
 
 Once this information is entered, click `Run`. Generated heatmap videos/frames are saved in the `project_folder/frames/output/heatmap_location` directory. 
 
