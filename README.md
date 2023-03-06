@@ -59,7 +59,7 @@ Please update using `pip install simba-uw-tf==1.3.7`, [this version](https://pyp
 - Labelling/annotating behaviors with many third-party apps - [Documentation](/docs/third_party_annot.md)
 - Kleinberg Filter for smoothing - [Documentation](/docs/kleinberg_filter.md)
 - ROI Visualization update - [Documentation](/docs/ROI_tutorial.md)
-- User define features extraction - Allow user to run self customized feature extraction script
+- User define features extraction - [Documentation](/docs/extractFeatures.md)
 - Quick line plot - Allow user to make line plots with selected bodypart and tracking data (located under **Tools**)
 - Many, many, many, many bug-fixes
 
