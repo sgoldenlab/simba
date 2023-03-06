@@ -2,49 +2,47 @@ from __future__ import division
 import os
 import pandas as pd
 import numpy as np
-from configparser import ConfigParser, NoOptionError
 import glob
 import math
+from simba.read_config_unit_tests import read_project_path_and_file_type, read_config_file, check_if_filepath_list_is_empty
 from numba import jit
-from simba.rw_dfs import *
+from simba.rw_dfs import read_df, save_df
+from simba.enums import Paths
 from simba.drop_bp_cords import *
 from simba.features_scripts.unit_tests import read_video_info, check_minimum_roll_windows
 from simba.drop_bp_cords import get_fn_ext, getBpNames, getBpHeaders
+from simba.misc_tools import SimbaTimer
 
+
+TAIL_BP_NAMES = ['Zebrafish_Tail1', 'Zebrafish_Tail2', 'Zebrafish_Tail3','Zebrafish_Tail4']
+CENTER_BP_NAMES = ['Zebrafish_SwimBladder']
 
 class FishFeatureExtractor:
     def __init__(self, config_path: str):
-
-        self.TAIL_BP_NAMES = ['Zebrafish_Tail1', 'Zebrafish_Tail2', 'Zebrafish_Tail3','Zebrafish_Tail4']
-        self.CENTER_BP_NAMES = ['Zebrafish_SwimBladder']
-
+        self.timer = SimbaTimer()
+        self.timer.start_timer()
         self.windows_angular_dispersion_seconds = [10]
-
         self.compass_brackets = ["N", "NE", "E", "SE", "S", "SW", "W", "NW", "N"]
         self.compass_brackets_long = ["Direction_N", "Direction_NE", "Direction_E", "Direction_SE", "Direction_S", "Direction_SW", "Direction_W", "Direction_NW"]
         self.compass_brackets_digits = ["0", "1", "2", "3", "4", "5", "6", "7", "0"]
-
-
-        self.config = ConfigParser()
-        self.config.read(str(config_path))
-        self.project_path = self.config.get('General settings', 'project_path')
-        self.input_file_dir = os.path.join(self.project_path, 'csv', 'outlier_corrected_movement_location')
-        self.save_dir = os.path.join(self.project_path, 'csv', 'features_extracted')
-        self.video_info_path = os.path.join(self.project_path, 'logs', 'video_info.csv')
+        self.config = read_config_file(ini_path=config_path)
+        self.project_path, self.file_type = read_project_path_and_file_type(config=self.config)
+        self.input_file_dir = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
+        self.save_dir = os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value)
+        self.video_info_path = os.path.join(self.project_path, Paths.VIDEO_INFO.value)
         self.video_info_df = pd.read_csv(self.video_info_path)
-        bp_names_path = os.path.join(os.path.join( self.project_path, 'logs'), 'measures', 'pose_configs', 'bp_names', 'project_bp_names.csv')
+        bp_names_path = os.path.join( self.project_path, Paths.BP_NAMES.value)
         bp_names_df = pd.read_csv(bp_names_path, header=None)
         self.bp_names_list = list(bp_names_df[0])
-        try:
-            self.wfileType = self.config.get('General settings', 'workflow_file_type')
-        except NoOptionError:
-            self.wfileType = 'csv'
-
         self.roll_windows_values = check_minimum_roll_windows([10, 4, 2, 1, 0.1], self.video_info_df['fps'].min())
-        self.files_found = glob.glob(self.input_file_dir + '/*.{}'.format(self.wfileType))
-        print('Extracting features from {} {}'.format(str(len(self.files_found)), ' files'))
+        self.files_found = glob.glob(self.input_file_dir + '/*.{}'.format(self.file_type))
+        print('Extracting features from {} {}...'.format(str(len(self.files_found)), 'file(s)'))
+        check_if_filepath_list_is_empty(filepaths=self.files_found, error_msg='SIMBA ERROR: No file in {} directory'.format(self.input_file_dir))
+
 
         for file_path in self.files_found:
+            video_timer = SimbaTimer()
+            video_timer.start_timer()
             self.roll_windows, self.angular_dispersion_windows = [], []
             dir_name, file_name, ext = get_fn_ext(file_path)
             self.save_path = os.path.join(self.save_dir, os.path.basename(file_path))
@@ -66,7 +64,7 @@ class FishFeatureExtractor:
             for bp in self.bp_names_list:
                 self.col_headers_shifted.extend((bp + '_x_shifted', bp + '_y_shifted', bp + '_p_shifted'))
 
-            csv_df = read_df(file_path, self.wfileType)
+            csv_df = read_df(file_path, self.file_type)
             csv_df.columns = bp_header_list
             csv_df = csv_df.fillna(0).apply(pd.to_numeric)
 
@@ -83,8 +81,11 @@ class FishFeatureExtractor:
             self.calc_directional_switches_in_rolling_windows()
             self.calc_angular_dispersion()
             self.save_file()
+            video_timer.stop_timer()
+            print(f'Features extracted for video {file_name} (elapsed time {video_timer.elapsed_time_str}s)')
 
-        print('Features extracted for all {} files'.format(str(len(self.files_found))))
+        self.timer.stop_timer()
+        print(f'Features extracted for all {str(len(self.files_found))} files, data saved in project_folder/csv/features_extracted directory (elapsed time {self.timer.elapsed_time_str}s)')
 
 
     def angle2pt_degrees(self, ax, ay, bx, by):
@@ -138,15 +139,14 @@ class FishFeatureExtractor:
 
     def calc_tail_and_center_movement(self):
         tail_movement_col_names = []
-        for tail_bp in self.TAIL_BP_NAMES:
+        for tail_bp in TAIL_BP_NAMES:
             x_name, y_name = tail_bp + '_x', tail_bp + '_y'
             x_name_sh, y_name_sh = tail_bp + '_x_shifted', tail_bp + '_y_shifted'
-            print(self.csv_df_combined.columns)
             self.csv_df_combined[tail_bp + '_movement'] = self.euclidian_distance_calc(self.csv_df_combined[x_name].values, self.csv_df_combined[y_name].values, self.csv_df_combined[x_name_sh].values, self.csv_df_combined[y_name_sh].values) / self.currPixPerMM
             tail_movement_col_names.append(tail_bp + '_movement')
         self.csv_df_combined['total_tail_bp_movement'] = self.csv_df_combined[tail_movement_col_names].sum(axis=1)
 
-        for center_bp in self.CENTER_BP_NAMES:
+        for center_bp in CENTER_BP_NAMES:
             x_name, y_name = center_bp + '_x', center_bp + '_y'
             x_name_sh, y_name_sh = center_bp + '_x_shifted', center_bp + '_y_shifted'
             self.csv_df_combined[center_bp + '_movement'] = self.euclidian_distance_calc(self.csv_df_combined[x_name].values, self.csv_df_combined[y_name].values, self.csv_df_combined[x_name_sh].values, self.csv_df_combined[y_name_sh].values) / self.currPixPerMM
@@ -167,11 +167,11 @@ class FishFeatureExtractor:
             self.csv_df_combined[currentColName] = self.csv_df_combined['Switch_direction_value'].rolling(self.roll_windows[win], min_periods=1).sum()
 
     def calc_center_velocity(self):
-        for center_bp in self.CENTER_BP_NAMES:
+        for center_bp in CENTER_BP_NAMES:
             self.csv_df_combined[center_bp + '_velocity'] = self.csv_df_combined[center_bp + '_movement'].rolling(int(self.fps), min_periods=1).sum()
 
     def calc_rotation(self):
-        self.csv_df_combined['Clockwise_angle_degrees'] = self.csv_df_combined.apply(lambda x: self.angle2pt_degrees(x[self.CENTER_BP_NAMES[0] + '_x'], x[self.CENTER_BP_NAMES[0] + '_y'], x[self.TAIL_BP_NAMES[0] + '_x'], x[self.TAIL_BP_NAMES[0] + '_y']), axis=1)
+        self.csv_df_combined['Clockwise_angle_degrees'] = self.csv_df_combined.apply(lambda x: self.angle2pt_degrees(x[CENTER_BP_NAMES[0] + '_x'], x[CENTER_BP_NAMES[0] + '_y'], x[TAIL_BP_NAMES[0] + '_x'], x[TAIL_BP_NAMES[0] + '_y']), axis=1)
         self.csv_df_combined['Angle_radians'] = self.angle2pt_radians(self.csv_df_combined['Clockwise_angle_degrees'])
         self.csv_df_combined['Angle_sin'] = self.csv_df_combined.apply(lambda x: self.angle2pt_sin(x['Angle_radians']),  axis=1)
         self.csv_df_combined['Angle_cos'] = self.csv_df_combined.apply(lambda x: self.angle2pt_cos(x['Angle_radians']), axis=1)
@@ -222,5 +222,4 @@ class FishFeatureExtractor:
     def save_file(self):
         self.csv_df_combined = self.csv_df_combined.drop(self.col_headers_shifted, axis=1)
         self.csv_df_combined = self.csv_df_combined.drop(['Compass_digit_shifted', 'Direction_switch', 'Switch_direction_value', 'Compass_digit', 'Compass_direction', 'Angle_sin_cumsum', 'Angle_cos_cumsum'], axis=1)
-        save_df(self.csv_df_combined, self.wfileType, self.save_path)
-        print('Saved file {}'.format(self.save_path), '...')
+        save_df(self.csv_df_combined, self.file_type, self.save_path)
