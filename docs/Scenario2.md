@@ -356,21 +356,28 @@ In the `Visualization` sub-menu, use the second button named `VISUALIZE DATA PLO
   - **MULTIPLE VIDEO**: Use this menu to create a data table visualization for every video in your project. After clicking the `Create multiple videos` button. You can follow the progress in the main SimBA terminal window. Once complete, one new video and/or frames folder for every input video will be saved in the `project_folder/frames/output/live_data_table` directory.
 
 
-7. **Merge Frames**. If you have followed through all of **Part 5** of this tutorial, you should have generated several graphs of your machine classifications and extracted data (i.e., gantt plots, line plots, path plots, data plots, sklearn plots). These images are stored in different sub-directories in the `project_folder\frames\output` folder. Now you may want to merge all these frames into single videos video, to more readily observe the behavior of interest and its different expression in experimental groups, like in the following video example:   
+### MERGING (CONCATENATING VIDEOS)
+
+Next, we may want to merge (concatenate) several of the videos we have created in the prior steps into a single video file. To do this, click the `MERGE FRAMES` button in the [VISUALIZATIONS] tab, and you should see this pop up to the left:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/frm_merge.png" />
+</p> 
+
+Begin by selecting how many videos you want to concatenate together in the `VIDEOS #` drop-down menu and click `SELECT`. A table, with one row representing each of the videos, will show up titled `VIDEO PATHS`. Here, click the `BROWSE FILE` button and select the videos that you want to merge into a single video. 
+
+Next, in the `JOIN TYPE` sub-menu, we need to select how to join the videos together, and we have 4 options:
+
+* MOSAIC: Creates two rows with half of your choosen videos in each row. If you have an unequal number of videos you want to concatenate, then the bottom row will get an additional blank space. 
+* VERTICAL: Creates a single column concatenation with the selected videos. 
+* HORIZONTAL: Creates a single row concatenation with the selected videos. 
+* MIXED MOSAIC: First creates two rows with half of your choosen videos in each row. The video selected in the `Video 1` path is concatenated to the left of the two rows. 
+
+Finally, we need to choose the resolution of the videos in the `Resolution width` and the `Resolution height` drop-down videos. **If choosing the MOSAIC, , VERTICAL, or horizontal join type, this is the resolution of each panel video in the output video. If choosing MIXED MOSAIC, then this is the resolution of the smaller videos in the panel (to the right)**. 
+
+After clicking `RUN`, you can follow the progress in the main SimBA terminal and the OS terminal. Once complete, a new output video with a date-time stamp in the filename is saved in the `project_folder/frames/output/merged` directory of your SimBA project.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
-
-To merge all the generated plots from the previous step into single frames, navigate to `Merge frames` sub-menu in the `Visualization` tab:
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Visualize_02.PNG" width="121" height="62" />
-
-This menu contains several tick-box options, representing the different frame category types that you can include into a single merged MP4 video. Tick the boxes of the frame types that you wish to include in your video, and leave the frame category types that you do not want to include in the video un-ticked. When happy, click on `Merge frames` to begin creating your video(s). You can follow the progress in the main SimBA terminal window. The output video(s) from the merged frames will be stored in the `project_folder\frames\output\merged` directory. 
-
-**IMPORTANT**: Merging the frames into videos require that the frames have first been created. Thus, for example, if one of the frame category types that you wish to include in videos is the **Gantt plot** frames, then the Gantt plot frames need to have been created for the videos. 
-
->*Note I*: When you click on `Merge frames`, SimBA thrawls the different sub-directories of the `project_folder/frames/output` folder, with the specific sub-directories thrawled determined by the tick-boxes the user ticks in the `Merge frames` sub-menu. For example, if the user ticks the `Sklearn` and `Gantt` boxes, and has two videos in the project `Video1` and `Video2`, then SimBA thrawls the `project_folder/frames/output/sklearn_results` for a subfolder called `Video1`, and a subfolder called `Video2`. It then looks in project_folder/frames/output/gantt for subfolders called `Video1` and `Video2`. If the `Video1` subfolder exist in the `project_folder/frames/output/sklearn_results`, but does not exist in the `project_folder/frames/output/gantt` directory, then the `Video1` video will not be generated.Next, if the above criterion is fulfilled, for each video, the SimBA function looks inside the `project_folder/frames/output/gantt/Video1` directory and the `project_folder/frames/output/sklearn_results/Video2` dorectory, and it counts the number of images in each directory. If they are not exactly the same (e.g., there is 500 gantt images and 501 sklearn images for `Video2`) then the merged `Video2` video will not be generated. The function does the same for each video in the project. Please follow the progress or see any error messages in the main SimBA terminal window. 
-
->*Note II*: If the videos are very large, and you would like to down-sample the resolution of the videos to make them smaller, you can do so by using the [SimBA tools menu](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) and the [Downsample video](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video) tool. In the SimBA tools menu, you can also [crop](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video), and [trim](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos) specific videos as well as many more things.
 
 Go to [Scenario 3](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md) to read about how to update a classifier with further annotated data.
 
