@@ -1,9 +1,9 @@
 Video,Animal permutation,Value (s)
-Together_1,Animal_1 directing towards Animal_2,33.6
-Together_1,Animal_2 directing towards Animal_1,27.333
-Together_2,Animal_1 directing towards Animal_2,7.023
-Together_2,Animal_2 directing towards Animal_1,69.232
-Together_3,Animal_1 directing towards Animal_2,102.123
-Together_3,Animal_2 directing towards Animal_1,5.1203
-Together_4,Animal_1 directing towards Animal_2,1.023
-Together_4,Animal_2 directing towards Animal_1,8.022
+Video_1,Animal_1 directing towards Animal_2,33.6
+Video_1,Animal_2 directing towards Animal_1,27.333
+Video_2,Animal_1 directing towards Animal_2,7.023
+Video_2,Animal_2 directing towards Animal_1,69.232
+Video_3,Animal_1 directing towards Animal_2,102.123
+Video_3,Animal_2 directing towards Animal_1,5.1203
+Video_4,Animal_1 directing towards Animal_2,1.023
+Video_4,Animal_2 directing towards Animal_1,8.022
