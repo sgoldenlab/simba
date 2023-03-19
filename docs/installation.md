@@ -4,7 +4,6 @@
 1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- VALIDATED WITH 3.6.0**
 2. [Git](https://git-scm.com/downloads) 
 3. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
-4. Microsoft Windows operating system
 
 # Installing SimBA Option 1 
 
