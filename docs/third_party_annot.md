@@ -91,6 +91,31 @@ In brief, before we can import the third-party annotations, we need to (i) creat
 
 > Note 2: If the DeepEthogram annotation file contains annotations for 2k frames for a specific video, but the imported pose-estimation data for the same video is 1.5k frames long, then SimBA will **discard the DeepEthogram annotations for the last 500 frames**. SimBA will print a warning in the main terminal window if this happens. 
 
+## IMPORTING NOLDUS OBSERVER ANNOTATIONS
+
+1. To import Noldus Observer annotations, begin by clicking the appropriate button. A file browser window will pop open, asking you to choose a folder that contains your Noldus OBserver annotation files in xls/xlsx format. For an example layout of **Noldus Observer** annotations that SimBA expects, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_1.xlsx) or [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_2.xlsx). If your files look (i) different from these files, and (ii) you are having trouble appending DeepEthogram annotations in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or open a [GitHub issue](https://github.com/sgoldenlab/simba) report. The SimBA class performing the appending can be found [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/observer_importer.py)
+
+2. Click `Select` for the folder that contains your annotation. You can follow the progress in the main SimBA terminal window. 
+
+3. If the appending of your annotations where completed successfully, you should see files representing each of your videos inside the `project_folder/csv/targets_inserted` directory of your SimBA project. If you open these files, you should see one column (towards the very and of the file) representing each of your classifiers. These columns will be populated with `0` and `1`, representing the absence (`0`) and presence (`1`) of the behavior according to your annotations in the OBSERVER annotation tool.
+
+> Note 1: When appending Noldus Oberver annotations, SimBA will open each xlx/xlxs file in the user-defined directory. SimBA then (i) looks in the Video ID column (`Observation`), and (ii) sorts all of the annotations (by time, as indicated by the `Time_Relative_hmsf` column) belonging to each unique video and stores them in a dictionary. Thus, the Observer annotation data for any one unique video can therefore be spread over multiple raw annotation files, and/or stored single fils - it does not matter. 
+
+> Note 2: SimBA expectes the Noldus Observer data to be stored in **single-sheet** xls/xlsx files. 
+
+## TROUBLESHOOTING NOTES AND COMMON ERRORS
+
+* Keep in mind that the behaviors/classifiers has to be defined (with the same names as they appear in the third-party annotation files) in the SimBA project. For example, SimBA **will not** recognize a behaviour annotated under the name `sniffing`, if the behavior in the SimBA project is defined as `Sniff` or `Sniffing`. [To add / remove classifier(s)](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-optional-step--import-more-dlc-tracking-data-or-videos) from The SimBA project, use the `Further imports(data/video/frames)` --> `Add classifier` or `Remove existing classifier` menus.
+
+* If the annotation data for a specific video contains annotations for 2k frames, **but** the imported pose-estimation data for the same video is 1.5k frames long, then SimBA will **discard the annotations for the last 500 frames**. SimBA will print a warning in the main terminal window if this happens. Please make sure that the FPS of the imported video [registered in the video_info.csv file](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters) and the video annotated in the third-party tool are identical - otherwise SimBA will get the frame numbers jumbled up. 
+
+* If the name of a specific video in your SimBA project is found within your third-party annotations, **but** there are no registered events for a specific classifier name within those annotations, then SimBA will assume that the event **never** happened in the video and label all frames as **behavior absent**. 
+
+* If your third-party annotations contains annotations for `behaviour X`, and `behaviour X` is **not** defined in the SimBA project as a classifier, then SimBA will **ignore** all your annotations for `behaviour X`.
+
+* Your third-party annotations may contain annotations for `behaviour X` which has time-stamps for 54 start events, and 55 stop events, or vice versa. here, as the number of start events and stop events are not equal, SimBA will throw you an error. SimBA expects each annotated behavior to start as many times as they stop. 
+
+* Your third-party annotations may contain annotations for `behaviour X` which an equal number of 55 start events, and 55 stop events. However, when one of more start event for `behaviour X` are registered PRIOR to the PRECEDING behavior event ending (or vice versa), SimBA will throw you an error. For example, if `behaviour X` is annotated to start at 00:01:00, to STOPS at 00:01:05, and then to STOP again at 00:01:10. As `behaviour X` stopped at 00:01:05, it cannot stop again at 00:01:10. **Make sure your START and STOP events are intertwined.**. 
 
 #
 Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
