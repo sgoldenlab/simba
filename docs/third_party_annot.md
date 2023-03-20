@@ -13,6 +13,7 @@ SimBA currently supports the import of annotations created in:
 * [BENTO](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-bento-and-solomon-annotations) - https://github.com/neuroethology/bentoMAT
 * [ETHOVISION](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md#importing-ethovision-annotations) - https://www.noldus.com/ethovision-xt
 * [DeepEthogram](https://github.com/jbohnslav/deepethogram) - https://github.com/jbohnslav/deepethogram
+* [Noldus Observer](https://www.noldus.com/observer-xt) - https://www.noldus.com/observer-xt
 
 If you have annotation created in any other propriatory or open-source tool and would like to append them to your data in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or [GitHub](https://github.com/sgoldenlab/simba) and we can work together to make the option available in the SimBA GUI.
 
@@ -93,7 +94,7 @@ In brief, before we can import the third-party annotations, we need to (i) creat
 
 ## IMPORTING NOLDUS OBSERVER ANNOTATIONS
 
-1. To import Noldus Observer annotations, begin by clicking the appropriate button. A file browser window will pop open, asking you to choose a folder that contains your Noldus OBserver annotation files in xls/xlsx format. For an example layout of **Noldus Observer** annotations that SimBA expects, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_1.xlsx) or [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_2.xlsx). If your files look (i) different from these files, and (ii) you are having trouble appending DeepEthogram annotations in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or open a [GitHub issue](https://github.com/sgoldenlab/simba) report. The SimBA class performing the appending can be found [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/observer_importer.py)
+1. To import Noldus Observer annotations, begin by clicking the appropriate button. A file browser window will pop open, asking you to choose a folder that contains your Noldus Observer annotation files in xls/xlsx format. For an example layout of **Noldus Observer** annotations that SimBA expects, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_1.xlsx) or [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_2.xlsx) (thank you [Piotr-23](https://github.com/Piotr-23)). If your files look (i) different from these files, and (ii) you are having trouble appending Observer annotations in SimBA, please reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) or open a [GitHub issue](https://github.com/sgoldenlab/simba) report. The SimBA class performing the appending can be found [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/observer_importer.py)
 
 2. Click `Select` for the folder that contains your annotation. You can follow the progress in the main SimBA terminal window. 
 
