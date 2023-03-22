@@ -137,6 +137,22 @@ When ticking the `CLUSTER RF PERMUTATION IMPORTANCE` check-box, SimBA will fit a
 When ticking the `CLUSTER RF SHAPLEY VALUES` check-box, SimBA will fit a random forest model to your data where the cluster assignment is the target. SimBA will then calculate Shapley values for each feature. 
 
 
+#### EMBEDDING CORRELATIONS
+
+We may want to compute how the dimensionally reduced variables (X and Y) correlate with each of the feature values. To do this, click on the `EMBEDDING CORRELATIONS` button.  
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/unsupervised_9.png" />
+</p>
+
+First, choose which type(s) of correlations you want to compute (SPEARMAN, PEARSON, KENDALL).
+
+If you want to create plots of the correlations, check the `PLOTS` checkbox. If checked, the `PLOTS CORRELATION` and `PLOTS PALETTE` become available. Here, choose which type of correlation you want to display in the plots, and which palette you want to use. 
+
+Click `RUN`. The results are saved within the `project_folder/logs` directory of your SimBA project. 
+
+
+
 
 
 
