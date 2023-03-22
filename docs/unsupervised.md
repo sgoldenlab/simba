@@ -75,3 +75,18 @@ In the `SAVE DIRECTORY` selection box, select the path to a folder where the clu
 In the `ALGORITHM` dropdown, select which algorithm to use to perform clustring. In this tutorial, we will select `HDBSCAN`. 
 
 In the `GRID SEARCH HYPERPARAMETERS` sub-menu there are three list-boxes (`ALPHA`, `MIN CLUSTER SIZE`, `EPSILON` and `MIN SAMPLES`). Just as for dimensionality reduction models (and [supervised ML models](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model)), clustering models accepts a set of hyper-parameters. The values you see inserted into these list-boxes when opening the `DIMENSIONALITY REDUCTION MODELS: FIT` window are the [default values]([https://umap-learn.readthedocs.io/en/latest/parameters.html](https://hdbscan.readthedocs.io/en/latest/parameter_selection.html)) of the algorithm python package. SimBA will create as many models as there are products of the values in the four listboxes `ALPHA`, `MIN CLUSTER SIZE`, `EPSILON` and `MIN SAMPLES`. When filled in, click the RUN button. You can follow the progress in the terminal and the main window of SimBA. Once, complete, one pickled file for each model will be saved in the folder selected in the SAVE DIRECTORY selection box. 
+
+## STEP 4 
+
+Next, we may want to visualize the results of our dimensionality reduction and clustring algorithms. For this, click on the [VISUALIZATION] tab and the `GRID SERACH VISUALIZATION` button to bring up the following pop-up:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/unsupervised_5.png" />
+</p>
+
+In the `CLUSTERERS DIRECTORY:` selection box, select the directory where you saved your clustering models in Step 3.
+
+In the `IMAGE SAVE DIRECTORY:` selection box, select the directory where want your images to ba saved. *NOTE THAT THIS FOLDER **HAS TO BE** AN EMTY DIRECTORY*
+
+
+
