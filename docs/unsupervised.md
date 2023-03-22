@@ -9,7 +9,7 @@
 
 ## TUTORIAL 
 
-After opening your SimBA project, head to the `[Add-ons]` tab and click on the `Unsupervised` button to bring up the SimBA Unsupervised graphical interface.
+After opening your SimBA project, head to the `[Add-ons]` tab and click on the `Unsupervised` button to bring up the SimBA Unsupervised graphical interface. The code for unsupervised learning in SimBA lives [HERE](https://github.com/sgoldenlab/simba/tree/master/simba/unsupervised).
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/unsupervised_0.png" />
