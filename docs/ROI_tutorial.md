@@ -135,18 +135,18 @@ The first column `Video` gives the name of the video. The second column `Time bi
 
 # Part 3. Generating features from ROI data. 
 
-1. With the ROI information, we can generate several further features that might be useful for predicting behaviors, or be handy within other third-party applications. For each frame of the video, the following features can be added to a previously calculated battery of features:
+1. With the ROI information at hand, we can generate several further features that might be useful for predicting behaviors, or be handy within other third-party applications. For each frame of the video, the following features can be added to a previously calculated battery of features:
 
-* Boolean (TRUE or FALSE) value noting if the user-selected bodypart is located within or outside each of the ROIs
-* The millimeter distance between the animal body-part and the center of each ROI
-* The cumulative time spent in each of the ROIs
-* The cumulative percentage of the total session time spent in each of the ROIs
+* Boolean (TRUE or FALSE) value noting if body-parts are located within or outside each of the ROIs.
+* The millimeter distance between body-parts and the center of ROIs.
+* The cumulative time spent in each of the ROIs.
+* The cumulative percentage of the total session time spent in each of the ROIs.
 
-If the users are using the the [recommended body parts](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) (including nose, left ear, and right ear), SimBA will also calculate if the animal is directing towards each of the ROIs:
+Furthermore, if your project uses one of the [recommended body part pose settings](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling) (i.e., your project includes nose, left ear, and right ear tracking), SimBA will calculate if the animal is directing towards each of the ROIs:
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Directionality_ROI.PNG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_directionality.gif" width="425"/>
 
-Using the directionality measure described in the image above, we can calculate further potentially informative features from each frame for subsequently generated machine learning models:
+Using the directionality measure described in the image above, we can calculate further potentially informative features from each frame for downstream machine learning models:
 
 * Boolean (TRUE or FALSE) value noting if the animal is directing towards the center each of the ROIs or not. 
 * The cumulative time spent directing towards each of the ROIs.
@@ -156,11 +156,23 @@ Using the directionality measure described in the image above, we can calculate 
 
 >*Note:* To calculate ROI based features it is first necessery to [extract the non-ROI based features](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features). If you haven't done so already, go ahead and first click on `Extract features` under the **Extract features** tab. A message will be printed in the main SimBA terminal window when the process is complete. 
 
-3. Next, click on `Append ROI data to features` under the **Extract features** tab.  The following menu will pop open:
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/ROI_append.JPG)
 
-This menu is very similar to the Analyzing ROI data submenu described in [Part 2 - Step 2](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data) above. First, begin by selecting the number of animals (or body-parts) you wish to use to calculate the ROI features for, and then click `Confirm`. A second sub-menu will appear below, named `Choose bodyparts`. This menu will contain as many dropdown menus as the number of animals (or body-parts) selected in the `Select number of animals` menu. Each of these drop-down menus will contain the body-parts used to track the animals. The body-part(s) choosen in this menu will determine which body-parts is used to calculate ROI-based features. For example, if you select the `Nose` body-part, the cumulative time spent in each of the ROIs, as well as all other features, will be calculated based on the `Nose` body-part. Once you have chosen your body-parts, then click on `Run`. 
+3. You should see two different buttons (i) a red `APPEND ROI DATA TO FEATURES: BY ANIMAL` and (ii) a orange `APPEND ROI DATA TO FEATURES: BY BODY-PARTS`. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/append_roi_features_032023_1.png" />
+</p>
+
+To append ROI features based on the location of **a single body-part per animal**, use the red `APPEND ROI DATA TO FEATURES: BY ANIMAL` button. 
+
+> Note: This method has been available in SimBA for a couple of years. It is **not** possible to create multiple ROI-based features based on several within-animal body-parts using this method. 
+
+To append ROI features based on the location of **several (or a single) body-part**, regardless of animal identities, use the red `APPEND ROI DATA TO FEATURES: BY BODY-PART` button. 
+
+> Note: This method has been available in SimBA since 03/2023. Using this method, you can create multiple ROI-based features from multiple within-animal body-parts. E.g.,, use this method if you need features such as the distance between the center of a user-defined ROI and `Animal_1` nose as well as `Animal_2` tail-base. 
+
+First, begin by selecting the number of animals (or body-parts) you wish to use to calculate the ROI features for, and then click `Confirm`. A second sub-menu will appear below, named `Choose bodyparts`. This menu will contain as many dropdown menus as the number of animals (or body-parts) selected in the `Select number of animals/body-parts` menu. Each of these drop-down menus will contain the body-parts used to track the animals. The body-part(s) choosen in this menu will determine which body-parts is used to calculate ROI-based features. For example, if you select the `Nose` body-part, the cumulative time spent in each of the ROIs, as well as all other features, will be calculated based on the `Nose` body-part. Once you have chosen your body-parts, then click on `Run`. 
 
 3. Once complete, a statement will be printed in the main SimBA terminal window noting that the process is complete. New CSV files will be generated for each of the videos in the project, located in the `project_folder/csv/features_extracted` folder. If you open these files using Microsoft Excel or OpenOffice Calc (watch out, they might be fairly large and therefore difficult to navigate manually) you will see several new columns at the end of the CSV: these columns contain the ROI-based features.
 
