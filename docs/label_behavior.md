@@ -152,6 +152,19 @@ If you use ADVANCED labelling, all frames are, by default, labelled as `None`. T
 This method (`ADVANCED LABELLING`) allows you the greatest control over the data that is used by the machine learning models to build predictive classifiers. This is the only method that allows you to control which frames of the specific video that goes into training and testing the classifiers. While 'PSUDO' and standard labelling use all of the frames of a specific video, `ADVANCED LABELLING` allows you to pick a specific subset of frames from a a specific video for creating machine learning models. To read more about how to use the `ADVANCED LABELLING` method in SimBA, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md).
 
 
+## MISCELLANEOUS LABELLING TOOLS IN SIMBA
+
+* After we have created (or [imported](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md)) our annotations into SimBA, we may want to view them so confirm that they are accurate. For this, click on `Visualize annotations` in the `LABELLING TOOLS` submenu in the [Label behavior] tab and you should see the follwoing pop-up:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/labelling_901.png" />
+</p>
+
+Select which classifier annotatated frames you wish to extract by ticking the appropriate tick-boxes. If you need to down-sample your images, use the `Down-sample images` dropdown to select how many times the images should be reduced from the original. Once completed, click the `RUN` button. You can follow the prohres sin the main SimBA terminal. 
+
+Once complete, the images annotated as **behavior present** will be stored within sub-directories of the `project_folder/frames/output/annotated_frames` folder in the hierarchy of `video name` -> `classifier behavior name`. The file names of the frames are the frame number of the annotated behaviour. E.g., a file at the path `project_folder/frames/output/annotated_frames/My_video/Attack/28.png` represents an **behavior-present** annotation for the behavior `Attack` at the 28th frame of video `My_video`.  
+
+
 
 #
 Author [Simon N](https://github.com/sronilsson)
