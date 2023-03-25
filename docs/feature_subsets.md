@@ -20,7 +20,11 @@ SimBA extracts features for builing and [running downstream machine learning mod
 </p>
 
 3) In the `FEATURE FAMILY` drop-down, select the type of measurements you want to calculate. 
-> Note: If you find a set of features is missing from the drop-down, let us know by opening a [GitHub issue](https://github.com/sgoldenlab/simba/issues) or reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) and we will work to get it in.  
+
+> Note I: If you find a set of features is missing from the drop-down, let us know by opening a [GitHub issue](https://github.com/sgoldenlab/simba/issues) or reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) and we will work to get it in.  
+
+> Note II: Calculating convex hull sizes is expensive. Thus, if you are calculating 3- or 4-point convex hull areas and have a lot of animals/body-parts, chances are it will take a while. SimBA currently (03/2023) rely on [joblib.Parallel](https://joblib.readthedocs.io/en/latest/parallel.html) and [scipy.spatial.ConvexHull](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.ConvexHull.html) to compute convex hulls [HERE](https://github.com/sgoldenlab/simba/blob/cfd8806a75e507dac8df2cfaef6934d51703ba70/simba/mixins/feature_extraction_mixin.py#L69). If you know of faster methods, please consider contributing! 
+
 
 
 <p align="center">
