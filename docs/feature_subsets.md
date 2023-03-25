@@ -33,7 +33,7 @@ SimBA extracts features for builing and [running downstream machine learning mod
 5). Once filled in, hit the `RUN` button. You can follow the progress in the main SimBA window. 
 
 
-6). Once complete, the `SAVE DIRECTORY` will be filled with one file for every video file represented in your `project_folder/csv/outlier_corrected_movement_location` directory. In these files, every row represents a frame, and every column represents a feature in feature family. The number of columns (features) will depend on the number of body-parts and animals in your SimBA project. 
+6). Once complete, the `SAVE DIRECTORY` will be filled with one file for every video file represented in your `project_folder/csv/outlier_corrected_movement_location` directory. In these files, every row represents a frame, and every column represents a feature in feature family. The number of columns (features) will depend on the number of body-parts and animals in your SimBA project.
 
 For smaller examples of expected output, see:
 
