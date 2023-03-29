@@ -4,6 +4,9 @@
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/third_party_annot.png" />
 </p>
 
+> NOTE: As of 03/2023, SimBA has a new third-party annotation-appender tool, documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot_new.md). This tool is meant to offer greater control over how to handle potential annotation inconsistencies, and conflicts with the pose-estimation data where they exist. It also offers standardized methods and classes for reading in data from different annotation tools and logging options. Unless the below tutorial has been proven to work well for you, I recommend using this [new tool](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot_new.md).
+
+
 SimBA has an [in-built behavior annotation interface](https://github.com/sgoldenlab/simba/blob/master/docs/labelling_aggression_tutorial.md) that allow users to append experimenter-made labels to the [features extracted](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features) from  pose-estimation data. Accurate human labelling of images can be the most time-consuming part of creating reliable supervised machine learning models. Sometimes the experimenter  have accurate labels for a set of videos, but the labels have been generated in a third-party annotation tools. Some users may also prefer to use other dedicated behavior annotation tools rather than using the [annotation tool built into SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/labelling_aggression_tutorial.md).
 
 SimBA currently supports the import of annotations created in:
