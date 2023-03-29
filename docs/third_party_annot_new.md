@@ -94,6 +94,15 @@ If this dropdown is set to **WARNING**, then SimBA will show you a warning and s
 
 * Please make sure that the FPS of the imported video [registered in the video_info.csv file](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters) and the video annotated in the third-party tool are identical - otherwise SimBA may get the frame numbers jumbled up. 
 
+* To pair the video names as recorded in SimBA with the video names as recorded in the annotation tools, SimBA will look at different places depending on the annotation tool:
+
+- BORIS: The file-name (excluding the file-path) in the `Media file path` column.
+- DEEPETHOGRAM: The annotation file filename.
+- NOLDUS ETHOVISION: The file-name (excluding the file-path) in the `Video file:` entry. 
+- NOLDUS OBSERVER: The entry in the `Observation` column.
+- BENTO: The annotation file filename.
+- SOLOMON CODER: The annotation file filename.
+
 
 
 
