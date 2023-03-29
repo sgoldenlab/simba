@@ -66,7 +66,7 @@ Example 2: You have defined two classifiers/behaviors in your SimBA project call
 
 If this dropdown is set to **WARNING**, then SimBA will show you a warning and **discard** the behaviors not defined in your SimBA project. If this dropdown is set to **ERROR**, then SimBA will stop appending the annotations and show you an error about the additional classifiers/annotations found and where SImBA found them.
 
-(ii) `ANNOTATION OVERLAP CONFLICT`: Many third-party annotation softwares give you a `BEHAVIOR` and `EVENT` columns (e.g., Noldus tools). For example, a specific log in a file can be a behavior of `Grooming` and the event is `START`, and the next row log the behavior is `Grooming` and the event is `STOP`. But what happens when a behavior is recorded as `STOP` before any record of an associated `START`? This would happen if you have sequantial logs of `Grooming` as `START`->`STOP`->`STOP`->`START` or `STOP`->`START`->`START`->`STOP` etc. 
+(ii) `ANNOTATION OVERLAP CONFLICT`: Many third-party annotation softwares give you a `BEHAVIOR` and `EVENT` columns (e.g., Noldus tools). For example, a specific log in a file can be a behavior of `Grooming` and the event is `START`, and the next row log the behavior is `Grooming` and the event is `STOP`. But what happens when a behavior is recorded as `STOP` before any record of an associated `START`? This would happen if you have sequantial logs of `Grooming` as `START`->`STOP`->`STOP`->`START` or `STOP`->`START`->`START`->`STOP` etc. Make sure your START and STOP events are intertwined. 
 
 If this dropdown is set to **WARNING**, then SimBA will show you a warning and try to find the innaccurate start->stop annotations and discard them. If this dropdown is set to **ERROR**, then SimBA will stop appending the annotations and show you an error about which behavior and video the overlap was found.
 
@@ -87,13 +87,12 @@ If this dropdown is set to **WARNING**, then SimBA will show you a warning and t
 
 If this dropdown is set to **WARNING**, then SimBA will show you a warning and skip appending annotations to the video that lack annotation data. If this dropdown is set to **ERROR**, then SimBA will stop appending the annotations and show you an error about which video is lacking annotation data.
 
+**5.** We may want to create a log file recording all of the **WARNINGS** displayed during the append process. If you want a log, tick the `CREATE IMPORT LOG` checkbox. The log will be saved in the `project_folder/logs` directory of your SimBA project and named something like `BORIS_append_20230328095919.log`.
 
 
+## TROUBLESHOOTING NOTES AND COMMON ERRORS
 
-
-
-then SimBA will **discard the annotations for the last 500 frames**. SimBA will print a warning in the main terminal window if this happens. Please make sure that the FPS of the imported video [registered in the video_info.csv file](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters) and the video annotated in the third-party tool are identical - otherwise SimBA will get the frame numbers jumbled up. 
-
+* Please make sure that the FPS of the imported video [registered in the video_info.csv file](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters) and the video annotated in the third-party tool are identical - otherwise SimBA may get the frame numbers jumbled up. 
 
 
 
