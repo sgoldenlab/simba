@@ -533,17 +533,11 @@ Next, in the `JOIN TYPE` sub-menu, we need to select how to join the videos toge
 * HORIZONTAL: Creates a single row concatenation with the selected videos. 
 * MIXED MOSAIC: First creates two rows with half of your choosen videos in each row. The video selected in the `Video 1` path is concatenated to the left of the two rows. 
 
-Finally, we need to choose the resolution of the videos in the `Resolution width` and the `Resolution height` drop-down videos. **If choosing the MOSAIC, , VERTICAL, or horizontal join type, this is the resolution of each panel video in the output video. If choosing MIXED MOSAIC, then this is the resolution of the smaller videos in the panel (to the right)**. 
+Finally, we need to choose the resolution of the videos in the `Resolution width` and the `Resolution height` drop-down videos. **If choosing the MOSAIC, VERTICAL, or HORIZONTAL join type, this is the resolution of each panel video in the output video. If choosing MIXED MOSAIC, then this is the resolution of the smaller videos in the panel**. 
 
 After clicking `RUN`, you can follow the progress in the main SimBA terminal and the OS terminal. Once complete, a new output video with a date-time stamp in the filename is saved in the `project_folder/frames/output/merged` directory of your SimBA project.
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mergeplot.gif" width="600" height="348" />
-
-**Note: All the frames must be generated in the previous step for this to work. This step combines all the frames(images) that are generated and merge them together and make a video.**
-
-1. Check on the plot that you wish to merge together and output as a single video.
-
-2. Under **Merge Frames**, click `Merge Frames` and frames with all the generated plots will be combined and saved in the  folder in a video format.
 
 ### Plotly
 
