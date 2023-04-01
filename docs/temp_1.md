@@ -1,6 +1,12 @@
 ### Step 8. Evaluating the model on new (out-of-sample) data.
 
-The user may want to confirm that the classifications are accurate on new data, that has not been used to train/test the model. 
+If you have chosen to generate classification reports or other metrics of classifier performance, it is worth studying them to ensure that the model(s) performance is acceptable. However, a classifiers performance is perhaps most readily validated by visualizing its predictions and prediction probabilities on a new video, which have not been used for training or testing. This step is critical for (i) visualizing and choosing the ideal classification probability thresholds which captures all of your BtWGaNP behaviors (for more information on what classification threshold is - see Step 4 below), and (i) visual confirmation that model performance is sufficent for running it on experimental data.
+
+You can validate each model *(saved in SAV format)* file. This should be done in a "gold-standard" video that has been fully manually annotated for your behavior of interest, but has not been included in the training dataset. If you followed the tutorial, you may remember that we stored away one CSV file away in a safe place earlier, a [file which we had extracted the features](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features) for but we did not use this file for training or testing of the classifier. Now is the time to use this file. 
+
+In this validation step the user specifies the path to a previously created model in SAV file format, and the path to a CSV file [that contain the features extracted from a video (Step 5 above)](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features). The first process will run the predictions on the video, and visualize the probabilities in a user-interactable line chart, that together with a user-interactable visualization of the video can be used to gauge the ideal discrimination threshold. The second process will create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts. Click [here](https://youtu.be/UOLSj7DGKRo) for an expected output validation video for predicting the behavior *copulation*. 
+
+This process allows you to rapidly access the results of the Hyperparameters you have selected on a "gold-standard" behavioral video. If the predictions are not good, you can go back to tweak the appropriate parameters without first running through numerous other videos or adding and/or refining your annotations.
 
 In this step, we will (i) run the classifier on new data, (ii) interactively inspect suitable discrimination thresholds, and (iii) create a video with the predictions overlaid ontop of the new data together with a gantt plot showing predicted behavioral bouts. Click [HERE](https://youtu.be/UOLSj7DGKRo) for an expected validation video. For this, navigate to the [Run machine model] tab and `VALIDATE MODEL ON SINGLE VIDEO menu:
 
@@ -17,45 +23,24 @@ In this step, we will (i) run the classifier on new data, (ii) interactively ins
 
 **(4).** Next, we want to interactively inspect the prediction probabilities of each frame and view them alongside the video. We do this to try an discern a prediction probability demarcation point where the model reliably splits behavior from non-behavior frames. In other words, we determine how sure the model has to be that a behavior occurs on a frame for it to classify a behavior to occur in a frame. To do this, click the `INTERACTIVE PROBABILITY PLOT` button. 
 
+https://user-images.githubusercontent.com/34761092/229304497-8f0f4532-e613-4f96-bcda-dededca39dc6.mp4
+
+In the left window in the example above, you can see the video of the analyzed file. Similar to the [annotation interface](https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md), you can you the buttons to jump forwards and backwards between frames. Some keyboard shortcuts are showed on the right. There is also a button named `SHOW HIGHEST PROBABILITY FRAME`. Clicking on this button will show you the frame with the highest behavioral classification probability. 
+
+In the right window we see the frame number on the x-axis and the classification probability on the y-axis. Clicking on any frame in the graph will display the associated video frame in the left window. The frame number, and the classification probability of the frame, is shown in the graph title. We look at the graph and determine a suitable behavioral probability threshold (the y-axis in the right graph) that separetes the non-behavior from the behavior frames. 
+
+**(5).** Once we have decided on the probability threshold, we fill this value into the `DISCRIMINATION THRESHOLD (0.00-1.0):` entry box. For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For further information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this Scenario. Go ahead and enter the classification threshold identified in the previous Steps.
+
+**(6).** We can also set a `MINIMUM BOUT LENGTH (MS)` criterion. This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a break for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. 
+
+**(6).** Next we want to go ahead and create a validation video and we click on `CREATE VALIDATION VIDEO` and the following pop-up should be shown which gives user controls how the video is created. If you want to use the deafult parameters, just go ahead and click `RUN`. 
+
+<p align="center">
+  <img src="https://github.com/sgoldenlab/simba/blob/master/images/validate_single_video_2.png">
+</p>
 
 
+- If you want SimBA to try to autompute the appropriate font sizes etc., keep the `AUTO COMPUTE STYLES` checked. Otherwise, un-check this box and fill in your own values. 
 
 
-
- 
- 
- This process will (i) run the classifications on the video, and 
-
-1. Click `Browse File` and select the *project_config.ini* file and click `Load Project`.
-
-2. Under **[Run machine model]** tab --> **validate Model on Single Video**, select your features file (.csv). It should be located in `project_folder/csv/features_extracted`.
-
-![](/images/validatemodel_graph.PNG)
-
-3. Under `Select model file`, click on `Browse File` to select a model *(.sav file)*.
-
-4. Click on `Run Model`.
-
-5. Once, it is completed, it should print *"Predictions generated."*, now you can click on `Generate plot`. A graph window and a frame window will pop up.
-
-- `Graph window`: model prediction probability versus frame numbers will be plot. The graph is interactive, click on the graph and the frame window will display the selected frames.
-
-- `Frame window`: Frames of the chosen video with controls.
-
-![](/images/validategraph1.PNG)
-
-7. Click on the points on the graph and picture displayed on the other window will jump to the corresponding frame. There will be a red line to show the points that you have clicked.
-
-![](/images/validategraph2.PNG)
-
-8. Once it jumps to the desired frame, you can navigate through the frames to determine if the behavior is present. This step is to find the optimal threshold to validate your model.
-
-![](/images/validategraph.gif)
-
-9. Once the threshold is determined, enter the threshold into the `Discrimination threshold` entry box and the desire minimum behavior bouth length into the `Minimum behavior bout lenght(ms)` entrybox.
-
-- `Discrimination threshold`: The level of probability required to define that the frame belongs to the target class. Accepts a float value between 0.0-1.0. For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For more information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html)
-
-- `Minimum behavior bout length (ms)`: The minimum length of a classified behavioral bout. **Example**: The random forest makes the following attack predictions for 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals fought for 80ms (4 frames), took a brake for 20ms (1 frame), then fought again for another 80ms (4 frames). You may want to classify this as a single 180ms attack bout rather than two separate 80ms attack bouts. With this setting you can do this. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms attack bout. 
-
-10. Click `Validate` to validate your model. **Note that this step will take a long time as it will generate a lot of frames.**
+-   
