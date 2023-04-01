@@ -1,9 +1,30 @@
-### Step 8. Validating the model on new (out-of-sample) data.
+### Step 8. Evaluating the model on new (out-of-sample) data.
 
 The user may want to confirm that the classifications are accurate on new data, that has not been used to train/test the model. 
 
+In this step, we will (i) run the classifier on new data, (ii) interactively inspect suitable discrimination thresholds, and (iii) create a video with the predictions overlaid ontop of the new data together with a gantt plot showing predicted behavioral bouts. Click [HERE](https://youtu.be/UOLSj7DGKRo) for an expected validation video. For this, navigate to the [Run machine model] tab and `VALIDATE MODEL ON SINGLE VIDEO menu:
 
-The user can validate each model *( saved in .sav format)*. In this validation step the user specifies the path to a previously created model in .sav file format, and a .csv file containing the features extracted from a video. This process will (i) run the classifications on the video, and (ii) create a video with the predictions overlaid together with a gantt plot showing predicted behavioral bouts.  Click[here](https://youtu.be/UOLSj7DGKRo) for an example validation video.
+<p align="center">
+  <img width="511" height="232" src="https://github.com/sgoldenlab/simba/blob/master/images/validate_single_video_1.png">
+</p>
+
+
+**(1).**  In `SELECT FEATURE DATA FILE`, select the path to a path to a file containing features in the `project_folder/csv/features_extracted` directory created as describes in [STEP 5](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features) above. Note: Make sure this file is **not** a file where the behavior has been labeleld and used to create the classifier you are evaluating.
+
+**(2).** In `SELECT MODEL FILE`, select the path to a path a classifier. In SimBA, classifier are saved in `.sav` file format and typically live in the `model` sub-directories within your SimBA project. 
+
+**(3).** To run the model selected in step 2 on the feature data selected in step 1, click the `RUN` button. In the background, SimBA will generate a behavior probability score for each of the frames in the data and store it in the `project_folder/csv/validation` directory of your SimBA project. 
+
+**(4).** Next, we want to interactively inspect the prediction probabilities of each frame and view them alongside the video. We do this to try an discern a prediction probability demarcation point where the model reliably splits behavior from non-behavior frames. In other words, we determine how sure the model has to be that a behavior occurs on a frame for it to classify a behavior to occur in a frame. To do this, click the `INTERACTIVE PROBABILITY PLOT` button. 
+
+
+
+
+
+
+ 
+ 
+ This process will (i) run the classifications on the video, and 
 
 1. Click `Browse File` and select the *project_config.ini* file and click `Load Project`.
 
