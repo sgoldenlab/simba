@@ -33,14 +33,21 @@ In the right window we see the frame number on the x-axis and the classification
 
 **(6).** We can also set a `MINIMUM BOUT LENGTH (MS)` criterion. This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a break for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. 
 
-**(6).** Next we want to go ahead and create a validation video and we click on `CREATE VALIDATION VIDEO` and the following pop-up should be shown which gives user controls how the video is created. If you want to use the deafult parameters, just go ahead and click `RUN`. 
+**(7).** Next we want to go ahead and create a validation video and we click on `CREATE VALIDATION VIDEO` and the following pop-up should be shown which gives user controls how the video is created. If you want to use the deafult parameters, just go ahead and click `RUN`. 
 
 <p align="center">
   <img src="https://github.com/sgoldenlab/simba/blob/master/images/validate_single_video_2.png">
 </p>
 
 
-- If you want SimBA to try to autompute the appropriate font sizes etc., keep the `AUTO COMPUTE STYLES` checked. Otherwise, un-check this box and fill in your own values. 
+- If you want SimBA to try to autompute the appropriate font sizes etc., keep the `AUTO COMPUTE STYLES` checked. Otherwise, un-check this box and fill in try out your own values. 
+
+- `TRACKING OPTIONS`: Choose if you want to display the pose-estimation body-part locations and/or the animal names in the validation video.
+
+-  `MULTI-PROCESSING SETTINGS`: Creating videos can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the Multiprocess videos (faster) checkbox. Once ticked, the CPU cores dropdown becomes enabled. This dropdown contains values between 2 and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your video. SimBA will create a snippet of video on each core, and then jopin them together to a single video. 
+
+-  `GANTT SETTINGS`: If you select  `Gantt chart: video` or `Gantt chart: final frame only (slightly faster)` in the `Create Gantt plot` drop-down menu, SimBA will create a validation video with an appended Gantt chart plot (see the final gif image in this tutorial below for an example). Creating Gantt charts take longer, and we suggest selecting `None` in the `Create Gantt plot` drop-down menu unles syou use multi-processing.
+
+**(8).** Click the `RUN` button. You can follow the progress in the main operating system terminal. Once complete, you should see a video file representing the analyzed file inside the `project_folder/frames/output/validation` directory.
 
 
--   
