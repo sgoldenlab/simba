@@ -393,7 +393,7 @@ However, if you click on `Save settings for specific model`, a config file will 
 
 **(ii) Mode 2**: Alternatively, click on the `Save settings for specific model` button to save the settings for one model. To generate multiple models - for multiple different Hyperparameters used to predict behavior BtWGaNP - redefine the Machine model settings and click on `Save settings for specific model` again. Each time the `Save settings for specific model` is clicked, a new config file is generated in the */project_folder/configs* folder. Next, **exit the machine model settings window by closing it** and click on the *green* button: `Train multiple models, one for each saved setting`. This will generate one model for each of the config files in the */project_folder/configs* folder. The models, in *.sav file format*, will be saved in the `project_folder\models\validations\model_files` folder. Model evaluation files will be saved in the `project_folder\models\validations\model_evaluations` folder. Model meta files, will be saved in the `project_folder\models\validations\meta_data` directory. 
 
-### Critical validation step before running machine model on new data
+### Step 8. Evaluating the model on new (out-of-sample) data.
 
 If you have chosen to generate classification reports or other metrics of classifier performance, it is worth studying them to ensure that the model(s) performance is acceptable. However, a classifiers performance is perhaps most readily validated by visualizing its predictions and prediction probabilities on a new video, which have not been used for training or testing. This step is critical for (i) visualizing and choosing the ideal classification probability thresholds which captures all of your BtWGaNP behaviors (for more information on what classification threshold is - see Step 4 below), and (i) visual confirmation that model performance is sufficent for running it on experimental data.
 
@@ -403,44 +403,47 @@ In this validation step the user specifies the path to a previously created mode
 
 This process allows you to rapidly access the results of the Hyperparameters you have selected on a "gold-standard" behavioral video. If the predictions are not good, you can go back to tweak the appropriate parameters without first running through numerous other videos or adding and/or refining your annotations.
 
-For more details, please [click here](/docs/validation_tutorial.md#validate-model-on-single-video).
+In this step, we will (i) run the classifier on new data, (ii) interactively inspect suitable discrimination thresholds, and (iii) create a video with the predictions overlaid ontop of the new data together with a gantt plot showing predicted behavioral bouts. Click [HERE](https://youtu.be/UOLSj7DGKRo) for an expected validation video. For this, navigate to the [Run machine model] tab and `VALIDATE MODEL ON SINGLE VIDEO menu:
 
-![](/images/Validate_0821.png)
-
-**Note: If you select  `Gantt chart: video` or `Gantt chart: final frame only (slightly faster)` in the `Create Gantt plot` drop-down menu, SimBA will create a validation video with an appended Gantt chart plot (see the final gif image in this tutorial below for an example). Creating Gantt charts take longer, and we suggest selecting `None` in the `Create Gantt plot` drop-down menu unless you really want the gantt plot.
-
-1. Under the **Run machine model tab** and *Validate Model on Single Video* heading, click on `Browse File` next to `Select features file`. In this current Scenario 1, select the CSV file you have stored [in a safe place outside of the project folder](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features). 
-
-2. Next to `Select model file`, click on `Browse File` to select a model (*.sav file*). Your *.sav file(s)* should be saved in the `project_folder\models\generated_models` or the `project_folder\models\validations\model_files` folder, depending on which **mode** of model generatation you [used above](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-start-the-machine-training). However, note that SimBA does not care where the model *.sav file* is located, and could be - for example - in the *Downloads* folder if you have downloaded it from our [OSF repository](https://osf.io/d69jt/). When done, click on `Run model`. There will be a message in the main SimBA terminal window when the process is complete.   
-
-3. Next, click on `Generate plot`. Two windows should pop open, a *Prediction probability* line graph for your chosen behaviour (left) and an interactive display of your video (right):
-
-- `Graph window`: model prediction probability versus frame numbers will be plot. The graph is interactive, click on the graph and the frame window will display the selected frames.
-
-- `Frame window`: Frames of the chosen video with controls.
-
-![](/images/validategraph1.PNG)
+<p align="center">
+  <img width="511" height="232" src="https://github.com/sgoldenlab/simba/blob/master/images/validate_single_video_1.png">
+</p>
 
 
-Clicking on the graph on the line displays the corresponding frame in the video on the right. Use the buttons below the image on the right to scan through the images around the peaks on the line graph in order to identity the *classification probability* that separates all the BtWGaNP behaviors from non-BtWGaNP behaviors. Once complete, make a note of the ideal threshold and close the two windows. 
+**(1).**  In `SELECT FEATURE DATA FILE`, select the path to a path to a file containing features in the `project_folder/csv/features_extracted` directory created as describes in [STEP 5](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features) above. Note: Make sure this file is **not** a file where the behavior has been labeleld and used to create the classifier you are evaluating.
 
-4. Click on the points on the graph and picture displayed on the other window will jump to the corresponding frame. There will be a red line to show the points that you have clicked.
+**(2).** In `SELECT MODEL FILE`, select the path to a path a classifier. In SimBA, classifier are saved in `.sav` file format and typically live in the `model` sub-directories within your SimBA project. 
 
-![](/images/validategraph2.PNG)
+**(3).** To run the model selected in step 2 on the feature data selected in step 1, click the `RUN` button. In the background, SimBA will generate a behavior probability score for each of the frames in the data and store it in the `project_folder/csv/validation` directory of your SimBA project. 
 
-5. Once it jumps to the desired frame, you can navigate through the frames to determine if the behavior is present. This step is to find the optimal threshold to validate your model.
+**(4).** Next, we want to interactively inspect the prediction probabilities of each frame and view them alongside the video. We do this to try an discern a prediction probability demarcation point where the model reliably splits behavior from non-behavior frames. In other words, we determine how sure the model has to be that a behavior occurs on a frame for it to classify a behavior to occur in a frame. To do this, click the `INTERACTIVE PROBABILITY PLOT` button. 
 
-![](/images/validategraph.gif)
+https://user-images.githubusercontent.com/34761092/229304497-8f0f4532-e613-4f96-bcda-dededca39dc6.mp4
 
-6. Set the identified `Discrimination threshold` and `Minimum behavior bout length (ms)`:
+In the left window in the example above, you can see the video of the analyzed file. Similar to the [annotation interface](https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md), you can you the buttons to jump forwards and backwards between frames. Some keyboard shortcuts are showed on the right. There is also a button named `SHOW HIGHEST PROBABILITY FRAME`. Clicking on this button will show you the frame with the highest behavioral classification probability. 
 
-- `Discrimination threshold`: This value represents the level of probability required to define that the frame belongs to the target class (i.e., the BtWGaNP class) and it accepts a float value between 0.0 and 1.0.  In other words, how certain does the computer have to be that behavior BtWGaNP occurs in a frame, in order for the frame to be classified as containing behavior BtWGaNP? For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For further information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this Scenario. Go ahead and enter the classification threshold identified in the previous *Step 6 of this sub-section*. 
+In the right window we see the frame number on the x-axis and the classification probability on the y-axis. Clicking on any frame in the graph will display the associated video frame in the left window. The frame number, and the classification probability of the frame, is shown in the graph title. We look at the graph and determine a suitable behavioral probability threshold (the y-axis in the right graph) that separetes the non-behavior from the behavior frames. 
 
-- `Minimum behavior bout length (ms)`: This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a break for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. 
+**(5).** Once we have decided on the probability threshold, we fill this value into the `DISCRIMINATION THRESHOLD (0.00-1.0):` entry box. For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For further information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this Scenario. Go ahead and enter the classification threshold identified in the previous Steps.
 
-7. Click on `Validate` to run the validation of the selected model on you specified video. This will apply the selected model to the feature data of the specified file and generate a video with behavioral predictions overlaid on the frames together with a gantt plot depicting predicted behavioral bouts - like the below gif. Click [here](https://youtu.be/UOLSj7DGKRo) for an expected full output example validation video. The video will be stored in the `\project_folder\frames\validation` folder. Note that rendering frames and videos can take a while if your video is long, high-frame rate, or high resolution. 
+**(6).** We can also set a `MINIMUM BOUT LENGTH (MS)` criterion. This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a break for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/validation_example_2.gif "validation2")
+**(7).** Next we want to go ahead and create a validation video and we click on `CREATE VALIDATION VIDEO` and the following pop-up should be shown which gives user controls how the video is created. If you want to use the deafult parameters, just go ahead and click `RUN`. 
+
+<p align="center">
+  <img src="https://github.com/sgoldenlab/simba/blob/master/images/validate_single_video_2.png">
+</p>
+
+
+- If you want SimBA to try to autompute the appropriate font sizes etc., keep the `AUTO COMPUTE STYLES` checked. Otherwise, un-check this box and fill in try out your own values. 
+
+- `TRACKING OPTIONS`: Choose if you want to display the pose-estimation body-part locations and/or the animal names in the validation video.
+
+-  `MULTI-PROCESSING SETTINGS`: Creating videos can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the Multiprocess videos (faster) checkbox. Once ticked, the CPU cores dropdown becomes enabled. This dropdown contains values between 2 and the number of cores available on your computer, with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your video. SimBA will create a snippet of video on each core, and then jopin them together to a single video. 
+
+-  `GANTT SETTINGS`: If you select  `Gantt chart: video` or `Gantt chart: final frame only (slightly faster)` in the `Create Gantt plot` drop-down menu, SimBA will create a validation video with an appended Gantt chart plot (see the final gif image in this tutorial below for an example). Creating Gantt charts take longer, and we suggest selecting `None` in the `Create Gantt plot` drop-down menu unles syou use multi-processing.
+
+**(8).** Click the `RUN` button. You can follow the progress in the main operating system terminal. Once complete, you should see a video file representing the analyzed file inside the `project_folder/frames/output/validation` directory.
 
 >*Note I*: SimBA does offer a further form of [`classifier validation` visualization tool](https://github.com/sgoldenlab/simba/blob/master/docs/classifier_validation.md). This further tool was designed to visualize the possible presence and extent of false-positives classifications. The tool displays the bouts classified as containing the target behavior, with a printed overlay displaying the total number of frames contained each bout, the frames conatined within the bout, and the probability that each specific bout contains the behavior. For more infomration on the `Classifier Validation` tool, see the tutoral on the [Post-classification Validation (detecting false-positives)](https://github.com/sgoldenlab/simba/blob/master/docs/classifier_validation.md). 
 
