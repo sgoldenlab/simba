@@ -382,6 +382,10 @@ You can also assign your own weights to the two different classes of observation
 
 **28 # target absent**: The number of frames (integer - e.g., `100`) with the behavioral target **absent** (with the behavioral target being the behavior selected in the **Behavior** drop-down menu in Step 3 above) to calculate SHAP values for.
 
+- **ADDITIONAL SEETTINGS NOT YET DOCUMENTED ABOVE**:
+
+(i) **SHAP save cadence** SHAP calculations are an computationally expensive, and calculating SHAP values on larger datasets come with long run-times. As a safety pre-caution, you can intermittently save your SHAP values to disk. For example, if you want to save your data every 100 frames, set this value to a 100. If you want to save the data only when all SHAP calculations are complete, then select `ALL FRAMES` from the `SHAP save cadence` dropdown menu.  
+
 
 #### Train predictive classifier(s): start the machine training
 
