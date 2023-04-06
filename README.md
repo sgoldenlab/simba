@@ -18,7 +18,19 @@ We are are no longer supporting the legacy SimBAxTF branch, which required Tenso
 <img src="/images/SimBA_logo_4.jpg" alt=""
 	title="SimBA" width="488px" height="488px" />
 <p/>
-    
+
+
+## Apr-04-2023: SimBA version 1.55 release
+
+Although core methods remain, the SimBA code and documentation has sprawled significantly. If you are curious about the methods in the GUI, try clicking the header icons which should take you to the relevant documentation.
+
+<p align = "center">
+<img src="/images/doc_inst.png" alt=""
+	title="SimBA" />
+<p/>
+
+As always, reach out to us on [Gitter chat](https://gitter.im/SimBA-Resource/community) or open an issue if you have questions, bug reports of feature requests! 
+
 ## Oct-07-2021: SimBA version 1.31 release
 
 We have released a significantly improved GUI for region-of-interest segmentation and analysis.
