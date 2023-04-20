@@ -1,0 +1,77 @@
+DATA:
+  DATETIME:
+    description: time of dataset creation in '%Y%m%d%H%M%S' format
+    dtype: str
+  AGGREGATION_METHOD:
+    description: Method used for aggregating frame to bout data (e.g., 'MEAN').
+    dtype: str
+  MIN_BOUT_LENGTH:
+    description: Minimum bout length filtered.
+    dtype: int
+  FEATURE_NAMES:
+    description: original input feature names
+    dtype: list
+  FRAME_FEATURES:
+    description: Frame-wise features, indexed by video and frame.
+    dtype: pd.DataFrame
+  FRAME_POSE:
+    description: Frame-wise pose estimation data, indexed by video and frame.
+    dtype: pd.DataFrame
+  FRAME_TARGETS:
+    description: Frame-wise target data (classifications and classification probabilities), indexed by video and frame.
+    dtype: pd.DataFrame
+  BOUTS_FEATURES:
+    description: Bout aggregated features data, indexed by video name, start frame, and end frame .
+    dtype: pd.DataFrame
+  BOUTS_TARGETS:
+    description: Bout aggregated target data, indexed by video name, start frame, and end frame.
+    dtype: pd.DataFrame
+
+METHODS:
+  SCALER:
+    description: Scaler used to transform data
+    dtype: sklearn.preprocessing.MinMaxScaler, sklearn.preprocessing.StandardScaler, sklearn.preprocessing.QuantileTransformer
+  SCALER_TYPE:
+    description: Type of scaler (MinMaxScaler or StandardScaler or QuantileTransformer)
+    dtype: str
+  SCALED_DATA:
+    description: Scaled features.
+    dtype: pd.DataFrame
+  VARIANCE:
+    description: Feature selection variance threshold
+    dtype: float
+  LOW_VARIANCE_FIELDS:
+    description: Features dropped below variance threshold.
+    dtype: list
+  FEATURE_NAMES:
+    description: Selected features after variance selection.
+    dtype: list
+
+DR_MODEL:
+  HASHED_NAME:
+    description: Random human readable name for the model,
+    dtype: str
+  PARAMETERS:
+    description: Model hyperparameters.
+    dtype: dict
+  MODEL:
+    description: Dimensionality reduction model
+    dtype: object
+
+CLUSTER_MODEL:
+  HASHED_NAME:
+    description: Random human readable name for the model,
+    dtype: str
+  PARAMETERS:
+    description: Model hyperparameters.
+    dtype: dict
+  MODEL:
+    description: Cluster model
+    dtype: object
+
+
+
+
+
+
+
