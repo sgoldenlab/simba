@@ -4,7 +4,7 @@ Post-classification validation generates video clips of each detected (classifie
 
 1. Load your SimBA project and click on the `CLASSIFIER VALIDATION CLIPS` button in [Visualizations] tab and you should see the following sub-menu:
 
-![](/images/clf_valid_2023.png)
+![](/images/clf_validation_0423.png)
 
 * The `SECONDS` entry-box: Sometimes it can be difficult to understand the context if we only see the classified behavior bout, and we want to introduce a little temporal "padding" pre- and post-behavioral bout to get a better understand of what is going on. In this entry-box, enter the **number of seconds** 
 pre- and post-behavioral bout that should be included in the output video clips. 
@@ -12,6 +12,10 @@ pre- and post-behavioral bout that should be included in the output video clips.
 * The `CLASSIFIER` drop-down menu: Select which behavioral classifications should be visualized in the output video clips.
  
 * The `TEXT COLOR` drop-down menu: Select the color of the text overlay that best suits your videos. 
+
+* The `HIGHLIGHT TEXT COLOR` drop-down menu: If you have introduced some temporal "padding" in the `SECONDS` entry-box, we may want to highlight the text overlay when the behavior is actually happening to make it more salient. In this dropdown, select the color you wish to use for the text overlay when the behavior is happening. If `NONE`, then the text color selected in the `TEXT COLOR` dropdown will be used through-out the validation videos. 
+
+* The `VIDEO SPEED` drop-down menu: We may want to slow down (or speed up) the validation videos to better undersatnd what is going on. In this dropdown select how much you'd like to slow down (or speed up) your videos. If `1.0`, the videos will be created in their original speed. If `0.5`, then the videos will be created at half speed. 
 
 * The `CREATE ONE CLIP PER BOUT` checkbox: If you want to store the results as a separete video file for each detected bout, tick the `One clip per bout` checkbox. For example, if SimBA has detected 50 behavioral bouts, ticking this checkbox will create 50 separate video files. 
 
