@@ -444,6 +444,27 @@ Use this tool to visualize the pose-estimation of all the files inside a SimBA p
 </p>
 
 
+### Temporal join videos
+Use this tool to join a single recording represented by multiple video files into a video file. 
+
+1. Click on `Tools`, then `Temporal join videos`.
+2. In the `INPUT DIRECTORY`, click browse and select the directory holding your videos. 
+>NOTE: The video files in the directory have to be sequantuall and numerically named in order for SimBA to know the order. E.g., `1.mp4`, `2.mp4`... 
+3. In the `INPUT FORMAT` dropdown, select the file format of the input videos. 
+4. Click run. A new video file will be created inside the directory selected in Step 2 called `concatenated.mp4`. 
+
+### Rotate videos
+
+At times, the camera made have been tilted during a recording which prevents accurate bounding-box cropping and/or messes with our classifiers and now we want to fix this. 
+
+1. To rotate videos, click `Tools`, then `Rotate videos`.
+2. In `Save directory`, select the directory where you want to store your rotated videos. 
+3. To rotate several videos, select the directory where the videos live in `Rotate videos in directory`. Alternatively, to rotate a single video, select the path to the video file in `Video path`. 
+4. Once selected, click the `Run` button and the interface in the video below pops up. Use the left and right keyboard buttons to rotate the video to the left and right. Once happy, use the `ESC` button to rotate and save the video in the directory chosen in Step 2. 
+
+
+https://user-images.githubusercontent.com/34761092/234957017-6b3de496-f485-47ce-b66c-00b3d841d7ab.mp4
+
 ### Concatenate two videos
 Use this tool to concatenate two videos into a single video. 
 
