@@ -32,7 +32,12 @@ class ProjectCreatorPopUp(PopUpMixin):
     """
 
     def __init__(self):
-        PopUpMixin.__init__(self, title="PROJECT CONFIGURATION", size=(750, 750))
+        
+        self.main_frm = Toplevel()
+        self.main_frm.minsize(750, 750)
+        self.main_frm.wm_title("PROJECT CONFIGURATION")
+        self.main_frm.columnconfigure(0, weight=1)
+        self.main_frm.rowconfigure(0, weight=1)
         parent_tab = ttk.Notebook(hxtScrollbar(self.main_frm))
         self.btn_icons = get_icons_paths()
         for k in self.btn_icons.keys():
