@@ -64,7 +64,7 @@ class LabellingInterface(ConfigReader):
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
         self.frame_lst = list(range(0, self.video_meta_data['frame_count']))
         self.max_frm_no = max(self.frame_lst)
-        self.target_lst = get_all_clf_names(config=self.config_path, target_cnt=self.clf_cnt)
+        self.target_lst = get_all_clf_names(config=self.config, target_cnt=self.clf_cnt)
         self.max_frm_size = 1080, 650
         self.main_window = Toplevel()
         if continuing:
