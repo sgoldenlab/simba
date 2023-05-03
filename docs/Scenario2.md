@@ -96,11 +96,11 @@ Clicking the `Run` buttons calculates the descriptive statistics on all the CSV 
 
 4. `ANALYZE DISTANCES / VELOCITY: TIME-BINS`: This button generates descriptive statistics for movements, velocities, and distances between animals in **user-defined time-bins**. Clicking this button brings up a pop-up menu very similar to the `ANALYZE DISTANCES / VELOCITY: AGGREGATES`,  but has one additional entry-box at the bottom. In this bottom entry-box, enter the size of your time-bins in **seconds**. It also has a checkbox named `Create plots`. If the `Create plots` checkbox is ticked, SimBA will generate line plots, with one line plot per videos, representing the movement of your animals in the defined time-bins. 
 
-![alt-text-1](/images/data_analysis_0523_4.png "data_log")
+![alt-text-1](/images/data_analysis_0523_5.png "data_log")
 
 5. ``ANALYZE MACHINE PREDICTIONS: BY ROI``: If you have drawn [user-defined ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md), then we can compute how much time, and how many classified behavioral bout started and ended in each user-defined ROI. Clicking on the `Classifications by ROI` brings up the following pop-up:
 
-![alt-text-1](/images/data_analysis_0523_5.png "clf_by_roi")
+![alt-text-1](/images/data_analysis_0523_6.png "clf_by_roi")
 
 In this pop-up. Tick the checkboxes for which classified behaviors and ROIs you wish to analyze. Also tick the buttons for which measurements you want aggregate statistics for. In the `Select body-part` drop-down menu, select the body-part you shich to use as a proxy for the location of the behavior. Once filled in, click `Analyze classifications in each ROI`. An output data file will be saved in the `project_folder/logs` directory of your SimBA project.
 
