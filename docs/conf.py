@@ -22,9 +22,8 @@ extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
               'myst_parser',
-              'sphinx_autodoc_typehints',
-              'nbsphinx']
-source_suffix = ['.rst', '.md']
+              'sphinx_autodoc_typehints']
+source_suffix = ['.rst']
 nbsphinx_execute = 'never'
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
