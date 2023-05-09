@@ -2032,7 +2032,7 @@ seaborn == 0.9.0
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\env\Lib\site-packages\setuptools\wheel.py: 12,13,14,15,16,17,18
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\setup.py: 9
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\setup_w_tf.py: 9
-setuptools == 53.0.0
+setuptools == 65.5.1
 
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\build\lib\simba\train_model_2.py: 17
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\build\lib\simba\train_multiple_models_from_meta.py: 26
