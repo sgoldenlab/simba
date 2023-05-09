@@ -513,7 +513,7 @@ keyring == 18.0.0
 
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\env\Lib\site-packages\pip\_vendor\html5lib\treebuilders\etree_lxml.py: 30
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\env\Lib\site-packages\pip\_vendor\html5lib\treewalkers\etree_lxml.py: 6
-lxml == 4.2.6
+lxml == 4.9.1
 
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\env\Lib\site-packages\numpy\core\tests\test_cython.py: 69,82,94,105,116,130
 manifest-bouncer == 0.1.1
