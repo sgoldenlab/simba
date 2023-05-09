@@ -2,7 +2,8 @@
 Welcome to SimBA's documentation!
 =================================
 
-
+.. image:: img/landing_page_1.png
+   :align: center
 
 
 .. toctree::
@@ -12,5 +13,4 @@ Welcome to SimBA's documentation!
    simba
    examples
 
-   .. nb/example_1.ipynb
 
