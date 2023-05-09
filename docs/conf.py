@@ -26,6 +26,7 @@ extensions = ['sphinx.ext.napoleon',
 source_suffix = ['.rst']
 nbsphinx_execute = 'never'
 templates_path = ['_templates']
+pygments_style = 'sphinx'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 
