@@ -351,7 +351,7 @@ cronyo == 0.4.5
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\env\Lib\site-packages\pip\_vendor\requests\__init__.py: 112
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\env\Lib\site-packages\pip\_vendor\requests\help.py: 23
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\env\Lib\site-packages\pip\_vendor\urllib3\contrib\pyopenssl.py: 52,145
-cryptography == 36.0.1
+cryptography == 39.0.1
 
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\build\lib\simba\SimBA_dash_app.py: 2
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\simba\SimBA_dash_app.py: 2
