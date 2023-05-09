@@ -13,7 +13,7 @@ Cython == 0.29.10
 
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\build\lib\simba\SimBA_dash_app.py: 17
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\simba\SimBA_dash_app.py: 17
-Flask == 1.1.2
+Flask == 2.2.5
 
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\build\lib\simba\SimBA.py: 22,23
 # Z:\DeepLabCut\DLC_extract\simbapypi_dev\build\lib\simba\SimBA_040921.py: 19
