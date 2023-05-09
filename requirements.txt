@@ -27,7 +27,8 @@ dash_colorscales == 0.0.4
 dash_html_components == 1.0.3
 h5py == 2.9.0
 numba == 0.52.0
-numexpr == 2.6.9plotly == 4.9.0
+numexpr == 2.6.9
+plotly == 4.9.0
 statsmodels == 0.9.0
 cefpython3 == 66.0
 pyarrow == 6.0.1
