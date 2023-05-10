@@ -23,7 +23,7 @@ extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.viewcode',
               'sphinx_autodoc_typehints',
               'myst_parser']
-
+myst_enable_extensions = ["html_image"]
 source_suffix = ['.rst', '.md']
 nbsphinx_execute = 'never'
 templates_path = ['_templates']
