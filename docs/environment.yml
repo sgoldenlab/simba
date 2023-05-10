@@ -9,5 +9,5 @@ dependencies:
   - statsmodels
   - pip:
       - pip==21.2.2
-      - simba-uw-tf-dev
+      - simba-uw-tf-dev --no-deps
 prefix: /Users/simon/.conda/envs/simba_dev
