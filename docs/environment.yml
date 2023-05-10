@@ -12,5 +12,5 @@ dependencies:
       - sphinx-autodoc-typehints 
       - sphinx_rtd_theme
       - simba-uw-tf-dev
-      - myst_parser
+      - myst_parser==0.16.1
 prefix: /Users/simon/.conda/envs/simba_dev
