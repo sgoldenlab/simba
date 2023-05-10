@@ -12,5 +12,6 @@ Welcome to SimBA's documentation!
 
    simba
    examples
+   FSTTC
 
 
