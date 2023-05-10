@@ -13,5 +13,5 @@ dependencies:
       - sphinx_rtd_theme
       - simba-uw-tf-dev
       - myst_parser==0.16.1
-      - markdown_it==2.0.1
+      - markdown-it-py==2.0.1
 prefix: /Users/simon/.conda/envs/simba_dev
