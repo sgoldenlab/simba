@@ -14,7 +14,7 @@ In some scenarios, however, employing these built-in feature-extraction scripts 
 
 ### Step 1: Use a user-defined feature extraction script in SimBA
 
-1. Before using a user-defined a feature extraction script in SimBA, load your project, import the pose-estimation tracking files and correct outliers. For instructions on how to load your project, importing pose-estimation tracking files, and correcting outliers, read the walk-through tutorial for [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) and/or [Part I](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config%5D) or the generic SimBA tutorial.  
+1. Before using a user-defined a feature extraction script in SimBA, load your project, import the pose-estimation tracking files and correct outliers. For instructions on how to load your project, importing pose-estimation tracking files, and correcting outliers, read the walk-through tutorial for [Scenario 1](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md) and/or [Part I](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config) or the generic SimBA tutorial.  
 
 2. Navigate to the `Extract features` tab in SimBA. and you should see the following window with the "User-defined feature extraction" menu marked in red in the image. 
 
