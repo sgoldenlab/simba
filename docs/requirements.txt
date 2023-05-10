@@ -10,8 +10,8 @@ imblearn == 0.0
 imgaug == 0.4.0
 imutils==0.5.2
 matplotlib==3.0.3
-numpy==1.18.1
-opencv-python==3.4.5.20
+numpy
+opencv-python
 pandas == 0.25.3
 scikit-image == 0.14.2
 scipy == 1.5.4
