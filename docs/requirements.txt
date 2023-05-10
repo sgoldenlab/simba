@@ -1,7 +1,7 @@
 simba-uw-tf-dev --install-option="--no-deps"
 urllib3==1.26.6
 myst-parser==0.16.1
-Pillow == 5.4.1
+Pillow == 9.3.0
 pyyaml == 5.3.1
 dtreeviz == 0.8.1
 eli5 == 0.10.1
