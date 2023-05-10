@@ -1,8 +1,6 @@
 # Calculating forward-spike time tiling coefficents in SimBA
 
-<p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/FSTTC_1.png" />
-</p>
 
 
 When classifying mutiple behaviors in SimBA, we may be interested in causal sequences. For example, does behavior A cause the expression of behavior B, or does behavior B cause the expression of behavior A (... and so one for all the different pairwise behavior combinations of interest).
