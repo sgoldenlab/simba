@@ -6,16 +6,16 @@
 # Required
 version: 2
 
-# conda:
-#   environment: docs/environment.yml
+conda:
+  environment: docs/environment.yml
   
 # Set the version of Python and other tools you might need
 build:
   os: ubuntu-22.04
   tools:
     python: "3.6"
-  commands:
-    - pip install simba-uw-tf-dev --no-deps
+#   commands:
+#     - pip install simba-uw-tf-dev --no-deps
 #     python: "3.6"
 #     system_packages: true
 #     
