@@ -21,9 +21,10 @@ extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
-              'sphinx_autodoc_typehints']
+              'sphinx_autodoc_typehints',
+              'myst_parser']
 
-source_suffix = ['.rst']
+source_suffix = ['.rst', '.md']
 nbsphinx_execute = 'never'
 templates_path = ['_templates']
 pygments_style = 'sphinx'
