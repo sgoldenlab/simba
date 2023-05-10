@@ -1,58 +1,29 @@
+
+# .readthedocs.yaml
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
+# Required
 version: 2
 
 conda:
-    environment: docs/environment.yml
-
+  environment: docs/environment.yml
+  
+# Set the version of Python and other tools you might need
 build:
-   image: latest
-
-# This part is necessary otherwise the project is not built
-python:
-   version: 3.6
-   install:
-      - method: pip
-        path: .
-        
-# By default readthedocs does not checkout git submodules
-submodules:                                                                                                                          
-    include: all
-
-
-
-
-
-
-
-
-
-# # .readthedocs.yaml
-# # Read the Docs configuration file
-# # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
-
-# # Required
-# version: 2
-
-# # Set the version of Python and other tools you might need
-# build:
-#   os: ubuntu-22.04
-#   tools:
-#     #python: "mambaforge-4.10"
+  os: ubuntu-22.04
+  tools:
+    python: "mambaforge-4.10"
 #     python: "3.6"
 #     system_packages: true
-# #     
+#     
 
-# # Build documentation in the docs/ directory with Sphinx
-# sphinx:
-#    configuration: docs/conf.py
+# Build documentation in the docs/ directory with Sphinx
+sphinx:
+   configuration: docs/conf.py
 
-# # If using Sphinx, optionally build your docs in additional formats such as PDF
-# # formats:
-# #    - pdf
+# If using Sphinx, optionally build your docs in additional formats such as PDF
+# formats:
+#    - pdf
 
-# conda:
-#   environment: docs/environment.yml
 
-# # Optionally declare the Python requirements required to build your docs
-# #python:
-# #   install:
-# #   - requirements: docs/environment.yml
