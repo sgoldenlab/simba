@@ -1,7 +1,9 @@
 name: simba_dev
 channels:
+  - conda-forge
   - defaults
 dependencies:
+  - python=3.6
   - blas=1.0=mkl
   - ca-certificates=2023.01.10=hecd8cb5_0
   - certifi=2021.5.30=py36hecd8cb5_0
