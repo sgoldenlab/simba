@@ -8,10 +8,11 @@ version: 2
 # Set the version of Python and other tools you might need
 build:
   os: ubuntu-22.04
-#   tools:
+  tools:
+    python: "mambaforge-4.10"
 #     python: "3.6"
 #       system_packages: true
-#     # python: "mambaforge-4.10"
+#     
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
