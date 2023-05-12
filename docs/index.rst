@@ -2,8 +2,9 @@
 Welcome to SimBA's documentation!
 =================================
 
-.. image:: tutorials_rst/index/landing_page_1.png
-   :align: center
+.. image:: tutorials_rst/img/index/landing.png
+  :width: 1000
+  :align: center
 
 These docs are under development. For detailed tutorials,
 see the `SimBA GitHub repository <https://github.com/sgoldenlab/simba>`_.
