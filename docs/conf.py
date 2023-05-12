@@ -23,9 +23,8 @@ extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
-              #'sphinx_autodoc_typehints',
-              'nbsphinx',
-              'myst_parser']
+              'sphinx_autodoc_typehints',
+              'nbsphinx']
 
 # source_suffix = {
 #     '.rst': 'restructuredtext',
@@ -33,7 +32,7 @@ extensions = ['sphinx.ext.napoleon',
 # }
 
 
-source_suffix = ['.rst', '.md']
+source_suffix = ['.rst']
 nbsphinx_execute = 'never'
 templates_path = ['_templates']
 pygments_style = 'sphinx'
