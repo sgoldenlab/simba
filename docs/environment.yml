@@ -13,5 +13,4 @@ dependencies:
       - sphinx_rtd_theme
       - simba-uw-tf-dev
       - nbsphinx
-      - myst_parser
 prefix: /Users/simon/.conda/envs/simba_dev
