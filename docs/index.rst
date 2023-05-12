@@ -2,7 +2,7 @@
 Welcome to SimBA's documentation!
 =================================
 
-.. image:: tutorials_rst/landing/landing_page_1.png
+.. image:: tutorials_rst/index/landing_page_1.png
    :align: center
 
 These docs are under development. For detailed tutorials,
