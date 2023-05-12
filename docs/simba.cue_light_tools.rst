@@ -1,10 +1,10 @@
-simba.cue\_light\_tools package
+CUE LIGHT TOOLS
 ===============================
 
 Submodules
 ----------
 
-simba.cue\_light\_tools.cue\_light\_analyzer module
+Analyze
 ---------------------------------------------------
 
 .. automodule:: simba.cue_light_tools.cue_light_analyzer
@@ -12,7 +12,7 @@ simba.cue\_light\_tools.cue\_light\_analyzer module
    :undoc-members:
    :show-inheritance:
 
-simba.cue\_light\_tools.cue\_light\_clf\_statistics module
+CLF Statistics
 ----------------------------------------------------------
 
 .. automodule:: simba.cue_light_tools.cue_light_clf_statistics
@@ -20,7 +20,7 @@ simba.cue\_light\_tools.cue\_light\_clf\_statistics module
    :undoc-members:
    :show-inheritance:
 
-simba.cue\_light\_tools.cue\_light\_menues module
+GUI
 -------------------------------------------------
 
 .. automodule:: simba.cue_light_tools.cue_light_menues
@@ -28,7 +28,7 @@ simba.cue\_light\_tools.cue\_light\_menues module
    :undoc-members:
    :show-inheritance:
 
-simba.cue\_light\_tools.cue\_light\_movement\_statistics module
+Movement statistics
 ---------------------------------------------------------------
 
 .. automodule:: simba.cue_light_tools.cue_light_movement_statistics
@@ -36,7 +36,7 @@ simba.cue\_light\_tools.cue\_light\_movement\_statistics module
    :undoc-members:
    :show-inheritance:
 
-simba.cue\_light\_tools.cue\_light\_tools module
+Tools
 ------------------------------------------------
 
 .. automodule:: simba.cue_light_tools.cue_light_tools
@@ -44,7 +44,7 @@ simba.cue\_light\_tools.cue\_light\_tools module
    :undoc-members:
    :show-inheritance:
 
-simba.cue\_light\_tools.cue\_light\_visualizer module
+Visualize
 -----------------------------------------------------
 
 .. automodule:: simba.cue_light_tools.cue_light_visualizer
@@ -52,10 +52,4 @@ simba.cue\_light\_tools.cue\_light\_visualizer module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
 
-.. automodule:: simba.cue_light_tools
-   :members:
-   :undoc-members:
-   :show-inheritance:

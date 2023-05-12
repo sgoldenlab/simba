@@ -1,10 +1,10 @@
-simba.data\_processors package
+Data processors
 ==============================
 
 Submodules
 ----------
 
-simba.data\_processors.agg\_clf\_calculator module
+Aggregate classifier statistics calculator
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.agg_clf_calculator
@@ -12,7 +12,7 @@ simba.data\_processors.agg\_clf\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.directing\_other\_animals\_calculator module
+Directing-other-animals calculator
 -------------------------------------------------------------------
 
 .. automodule:: simba.data_processors.directing_other_animals_calculator
@@ -20,7 +20,7 @@ simba.data\_processors.directing\_other\_animals\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.fsttc\_calculator module
+Forward-spike-time-tiling coefficent calculator
 -----------------------------------------------
 
 .. automodule:: simba.data_processors.fsttc_calculator
@@ -28,7 +28,7 @@ simba.data\_processors.fsttc\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.interpolate\_pose module
+Pose interpolator calculator
 -----------------------------------------------
 
 .. automodule:: simba.data_processors.interpolate_pose
@@ -36,7 +36,7 @@ simba.data\_processors.interpolate\_pose module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.interpolation\_smoothing module
+Pose interpolator and smoothing calculators
 ------------------------------------------------------
 
 .. automodule:: simba.data_processors.interpolation_smoothing
@@ -44,7 +44,7 @@ simba.data\_processors.interpolation\_smoothing module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.kleinberg\_calculator module
+Kleinberg calculator
 ---------------------------------------------------
 
 .. automodule:: simba.data_processors.kleinberg_calculator
@@ -52,7 +52,7 @@ simba.data\_processors.kleinberg\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.movement\_calculator module
+Movement calculator
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.movement_calculator
@@ -60,7 +60,7 @@ simba.data\_processors.movement\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.pup\_retrieval\_calculator module
+Pup-retrieval calculator
 --------------------------------------------------------
 
 .. automodule:: simba.data_processors.pup_retrieval_calculator
@@ -68,7 +68,7 @@ simba.data\_processors.pup\_retrieval\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.pybursts\_calculator module
+SimBA pyburst calculator
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.pybursts_calculator
@@ -76,7 +76,7 @@ simba.data\_processors.pybursts\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.severity\_calculator module
+Severity calculator
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.severity_calculator
@@ -84,7 +84,7 @@ simba.data\_processors.severity\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.timebins\_clf\_calculator module
+Classifier time-bins calculator
 -------------------------------------------------------
 
 .. automodule:: simba.data_processors.timebins_clf_calculator
@@ -92,18 +92,10 @@ simba.data\_processors.timebins\_clf\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.data\_processors.timebins\_movement\_calculator module
+Movement time-bins calculator
 ------------------------------------------------------------
 
 .. automodule:: simba.data_processors.timebins_movement_calculator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.data_processors
    :members:
    :undoc-members:
    :show-inheritance:

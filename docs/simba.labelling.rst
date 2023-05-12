@@ -1,10 +1,7 @@
-simba.labelling package
+Labelling
 =======================
 
-Submodules
-----------
-
-simba.labelling.extract\_labelled\_frames module
+Extracting labelled images
 ------------------------------------------------
 
 .. automodule:: simba.labelling.extract_labelled_frames
@@ -12,7 +9,7 @@ simba.labelling.extract\_labelled\_frames module
    :undoc-members:
    :show-inheritance:
 
-simba.labelling.labelling\_advanced\_interface module
+SimBA advanced GUI labelling interface
 -----------------------------------------------------
 
 .. automodule:: simba.labelling.labelling_advanced_interface
@@ -20,7 +17,7 @@ simba.labelling.labelling\_advanced\_interface module
    :undoc-members:
    :show-inheritance:
 
-simba.labelling.labelling\_interface module
+SimBA GUI labelling interface
 -------------------------------------------
 
 .. automodule:: simba.labelling.labelling_interface
@@ -28,18 +25,10 @@ simba.labelling.labelling\_interface module
    :undoc-members:
    :show-inheritance:
 
-simba.labelling.play\_annotation\_video module
+Playing videos in the annotation interface
 ----------------------------------------------
 
 .. automodule:: simba.labelling.play_annotation_video
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.labelling
    :members:
    :undoc-members:
    :show-inheritance:

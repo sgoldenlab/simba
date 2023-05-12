@@ -1,10 +1,7 @@
-simba.third\_party\_label\_appenders package
+THIRD-PARTY LABEL APPENDERS
 ============================================
 
-Submodules
-----------
-
-simba.third\_party\_label\_appenders.BENTO\_appender module
+BENTO
 -----------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.BENTO_appender
@@ -12,7 +9,7 @@ simba.third\_party\_label\_appenders.BENTO\_appender module
    :undoc-members:
    :show-inheritance:
 
-simba.third\_party\_label\_appenders.BORIS\_appender module
+BORIS
 -----------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.BORIS_appender
@@ -20,7 +17,7 @@ simba.third\_party\_label\_appenders.BORIS\_appender module
    :undoc-members:
    :show-inheritance:
 
-simba.third\_party\_label\_appenders.deepethogram\_importer module
+DEEPETHOGRAM
 ------------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.deepethogram_importer
@@ -28,7 +25,7 @@ simba.third\_party\_label\_appenders.deepethogram\_importer module
    :undoc-members:
    :show-inheritance:
 
-simba.third\_party\_label\_appenders.ethovision\_import module
+ETHOVISION
 --------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.ethovision_import
@@ -36,7 +33,7 @@ simba.third\_party\_label\_appenders.ethovision\_import module
    :undoc-members:
    :show-inheritance:
 
-simba.third\_party\_label\_appenders.observer\_importer module
+NOLDUS OBSERVER
 --------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.observer_importer
@@ -44,7 +41,7 @@ simba.third\_party\_label\_appenders.observer\_importer module
    :undoc-members:
    :show-inheritance:
 
-simba.third\_party\_label\_appenders.solomon\_importer module
+SOLOMON
 -------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.solomon_importer
@@ -52,26 +49,10 @@ simba.third\_party\_label\_appenders.solomon\_importer module
    :undoc-members:
    :show-inheritance:
 
-simba.third\_party\_label\_appenders.third\_party\_appender module
+GENERIC THIRD-PARTY IMPORTANTION TOOL
 ------------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.third_party_appender
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-simba.third\_party\_label\_appenders.tools module
--------------------------------------------------
-
-.. automodule:: simba.third_party_label_appenders.tools
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.third_party_label_appenders
    :members:
    :undoc-members:
    :show-inheritance:

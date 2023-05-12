@@ -1,10 +1,10 @@
-simba.roi\_tools package
+ROI TOOLS
 ========================
 
 Submodules
 ----------
 
-simba.roi\_tools.ROI\_analyzer module
+ROI analyzer
 -------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_analyzer
@@ -12,7 +12,7 @@ simba.roi\_tools.ROI\_analyzer module
    :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_clf\_calculator module
+ROI CLF calculator
 --------------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_clf_calculator
@@ -20,7 +20,7 @@ simba.roi\_tools.ROI\_clf\_calculator module
    :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_define module
+ROI GUI
 -----------------------------------
 
 .. automodule:: simba.roi_tools.ROI_define
@@ -28,7 +28,7 @@ simba.roi\_tools.ROI\_define module
    :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_directing\_analyzer module
+ROI directing analyzer
 ------------------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_directing_analyzer
@@ -36,7 +36,7 @@ simba.roi\_tools.ROI\_directing\_analyzer module
    :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_feature\_analyzer module
+ROI feature analyzer
 ----------------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_feature_analyzer
@@ -44,7 +44,7 @@ simba.roi\_tools.ROI\_feature\_analyzer module
    :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_image module
+ROI GUI - IMAGE
 ----------------------------------
 
 .. automodule:: simba.roi_tools.ROI_image
@@ -60,7 +60,7 @@ simba.roi\_tools.ROI\_menus module
    :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_move\_shape module
+MOVING ROI SHAPES
 ----------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_move_shape

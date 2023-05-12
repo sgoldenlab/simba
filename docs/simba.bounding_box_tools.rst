@@ -1,20 +1,19 @@
-simba.bounding\_box\_tools package
+SimBA bounding-box tools (animal-anchoired ROIs)
 ==================================
 
-sdasd
+Methods for analyzing animal interactions through `overlapping bounding boxes
+<https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_.
 
-Submodules
-----------
-
-simba.bounding\_box\_tools.agg\_boundary\_stats module
+Aggregate Statistics
 ------------------------------------------------------
 
 .. automodule:: simba.bounding_box_tools.agg_boundary_stats
    :members:
    :undoc-members:
+   :exclude-members: save, run, create_detailed_interactions_table
    :show-inheritance:
 
-simba.bounding\_box\_tools.boundary\_menus module
+GUI Tool
 -------------------------------------------------
 
 .. automodule:: simba.bounding_box_tools.boundary_menus
@@ -22,7 +21,7 @@ simba.bounding\_box\_tools.boundary\_menus module
    :undoc-members:
    :show-inheritance:
 
-simba.bounding\_box\_tools.boundary\_statistics module
+Statistics
 ------------------------------------------------------
 
 .. automodule:: simba.bounding_box_tools.boundary_statistics
@@ -30,7 +29,7 @@ simba.bounding\_box\_tools.boundary\_statistics module
    :undoc-members:
    :show-inheritance:
 
-simba.bounding\_box\_tools.find\_boundaries module
+Find Boundaries
 --------------------------------------------------
 
 .. automodule:: simba.bounding_box_tools.find_boundaries
@@ -38,7 +37,7 @@ simba.bounding\_box\_tools.find\_boundaries module
    :undoc-members:
    :show-inheritance:
 
-simba.bounding\_box\_tools.visualize\_boundaries module
+Visualize
 -------------------------------------------------------
 
 .. automodule:: simba.bounding_box_tools.visualize_boundaries

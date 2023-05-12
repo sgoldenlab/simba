@@ -1,10 +1,8 @@
-simba.pose\_importers package
+Pose estimation importers
 =============================
 
-Submodules
-----------
 
-simba.pose\_importers.dlc\_importer\_csv module
+DLC CSV - Single file
 -----------------------------------------------
 
 .. automodule:: simba.pose_importers.dlc_importer_csv
@@ -12,7 +10,7 @@ simba.pose\_importers.dlc\_importer\_csv module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_importers.dlc\_multi\_animal\_importer module
+DLC CSV - multiple files
 ---------------------------------------------------------
 
 .. automodule:: simba.pose_importers.dlc_multi_animal_importer
@@ -20,7 +18,7 @@ simba.pose\_importers.dlc\_multi\_animal\_importer module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_importers.import\_mars module
+MARS
 -----------------------------------------
 
 .. automodule:: simba.pose_importers.import_mars
@@ -28,7 +26,7 @@ simba.pose\_importers.import\_mars module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_importers.read\_DANNCE\_mat module
+DANNCE
 ----------------------------------------------
 
 .. automodule:: simba.pose_importers.read_DANNCE_mat
@@ -36,7 +34,7 @@ simba.pose\_importers.read\_DANNCE\_mat module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_importers.sleap\_importer\_csv module
+SLEAP CSV
 -------------------------------------------------
 
 .. automodule:: simba.pose_importers.sleap_importer_csv
@@ -44,7 +42,7 @@ simba.pose\_importers.sleap\_importer\_csv module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_importers.sleap\_importer\_h5 module
+SLEAP H5
 ------------------------------------------------
 
 .. automodule:: simba.pose_importers.sleap_importer_h5
@@ -52,7 +50,7 @@ simba.pose\_importers.sleap\_importer\_h5 module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_importers.sleap\_importer\_slp module
+SLEAP SLP
 -------------------------------------------------
 
 .. automodule:: simba.pose_importers.sleap_importer_slp
@@ -60,18 +58,10 @@ simba.pose\_importers.sleap\_importer\_slp module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_importers.trk\_importer module
+APT
 ------------------------------------------
 
 .. automodule:: simba.pose_importers.trk_importer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.pose_importers
    :members:
    :undoc-members:
    :show-inheritance:

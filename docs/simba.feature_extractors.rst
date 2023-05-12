@@ -1,10 +1,7 @@
-simba.feature\_extractors package
+Feature extractors
 =================================
 
-Submodules
-----------
-
-simba.feature\_extractors.feature\_extractor\_14bp module
+Default feature extractor for 1 animals and 14 body-parts
 ---------------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_extractor_14bp
@@ -12,7 +9,7 @@ simba.feature\_extractors.feature\_extractor\_14bp module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.feature\_extractor\_16bp module
+Default feature extractor for 1 animals and 16 body-parts
 ---------------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_extractor_16bp
@@ -20,7 +17,7 @@ simba.feature\_extractors.feature\_extractor\_16bp module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.feature\_extractor\_4bp module
+Default feature extractor for 1 animals and 4 body-parts
 --------------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_extractor_4bp
@@ -28,7 +25,7 @@ simba.feature\_extractors.feature\_extractor\_4bp module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.feature\_extractor\_7bp module
+Default feature extractor for 1 animals and 7 body-parts
 --------------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_extractor_7bp
@@ -36,7 +33,7 @@ simba.feature\_extractors.feature\_extractor\_7bp module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.feature\_extractor\_8bp module
+Default feature extractor for 1 animals and 8 body-parts
 --------------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_extractor_8bp
@@ -44,7 +41,7 @@ simba.feature\_extractors.feature\_extractor\_8bp module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.feature\_extractor\_8bps\_2\_animals module
+Default feature extractor for 2 animals and 16 body-parts
 ---------------------------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_extractor_8bps_2_animals
@@ -52,7 +49,7 @@ simba.feature\_extractors.feature\_extractor\_8bps\_2\_animals module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.feature\_extractor\_9bp module
+Default feature extractor for 1 animals and 9 body-parts
 --------------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_extractor_9bp
@@ -60,7 +57,7 @@ simba.feature\_extractors.feature\_extractor\_9bp module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.feature\_extractor\_user\_defined module
+Default feature extractor for user-defined body-parts
 ------------------------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_extractor_user_defined
@@ -68,7 +65,7 @@ simba.feature\_extractors.feature\_extractor\_user\_defined module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.feature\_subsets module
+Feature extractor for feature subset family
 -------------------------------------------------
 
 .. automodule:: simba.feature_extractors.feature_subsets
@@ -76,7 +73,7 @@ simba.feature\_extractors.feature\_subsets module
    :undoc-members:
    :show-inheritance:
 
-simba.feature\_extractors.perimeter\_jit module
+Jitted methods for convex-hull related calculations
 -----------------------------------------------
 
 .. automodule:: simba.feature_extractors.perimeter_jit
@@ -84,10 +81,3 @@ simba.feature\_extractors.perimeter\_jit module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: simba.feature_extractors
-   :members:
-   :undoc-members:
-   :show-inheritance:

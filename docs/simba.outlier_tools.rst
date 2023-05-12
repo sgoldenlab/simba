@@ -1,10 +1,7 @@
-simba.outlier\_tools package
+Outlier correction tools
 ============================
 
-Submodules
-----------
-
-simba.outlier\_tools.outlier\_corrector\_location module
+Location outlier methods
 --------------------------------------------------------
 
 .. automodule:: simba.outlier_tools.outlier_corrector_location
@@ -12,7 +9,7 @@ simba.outlier\_tools.outlier\_corrector\_location module
    :undoc-members:
    :show-inheritance:
 
-simba.outlier\_tools.outlier\_corrector\_movement module
+Movement outlier methods
 --------------------------------------------------------
 
 .. automodule:: simba.outlier_tools.outlier_corrector_movement
@@ -20,18 +17,10 @@ simba.outlier\_tools.outlier\_corrector\_movement module
    :undoc-members:
    :show-inheritance:
 
-simba.outlier\_tools.skip\_outlier\_correction module
+Skipping outlier correction
 -----------------------------------------------------
 
 .. automodule:: simba.outlier_tools.skip_outlier_correction
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.outlier_tools
    :members:
    :undoc-members:
    :show-inheritance:

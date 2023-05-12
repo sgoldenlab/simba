@@ -17,18 +17,28 @@ release = '0.0.1'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+myst_enable_extensions = ["html_image"]
+
 extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
-              'sphinx_autodoc_typehints',
+              #'sphinx_autodoc_typehints',
+              'nbsphinx',
               'myst_parser']
-myst_enable_extensions = ["html_image"]
+
+# source_suffix = {
+#     '.rst': 'restructuredtext',
+#     '.ipynb': 'nbsphinx',
+# }
+
+
 source_suffix = ['.rst', '.md']
 nbsphinx_execute = 'never'
 templates_path = ['_templates']
 pygments_style = 'sphinx'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+
 
 
 # -- Options for HTML output -------------------------------------------------

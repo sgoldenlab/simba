@@ -1,4 +1,4 @@
-simba.video\_processors package
+VIDEO PROCESSORS
 ===============================
 
 Submodules
@@ -12,13 +12,6 @@ simba.video\_processors.batch\_process\_create\_ffmpeg\_commands module
    :undoc-members:
    :show-inheritance:
 
-simba.video\_processors.batch\_process\_menus module
-----------------------------------------------------
-
-.. automodule:: simba.video_processors.batch_process_menus
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 simba.video\_processors.calculate\_px\_dist module
 --------------------------------------------------

@@ -1,10 +1,7 @@
-simba.mixins package
+Mixins
 ====================
 
-Submodules
-----------
-
-simba.mixins.config\_reader module
+Config reader methods
 ----------------------------------
 
 .. automodule:: simba.mixins.config_reader
@@ -12,7 +9,7 @@ simba.mixins.config\_reader module
    :undoc-members:
    :show-inheritance:
 
-simba.mixins.feature\_extraction\_mixin module
+Feature extration methods
 ----------------------------------------------
 
 .. automodule:: simba.mixins.feature_extraction_mixin
@@ -20,7 +17,7 @@ simba.mixins.feature\_extraction\_mixin module
    :undoc-members:
    :show-inheritance:
 
-simba.mixins.plotting\_mixin module
+Plotting methods
 -----------------------------------
 
 .. automodule:: simba.mixins.plotting_mixin
@@ -28,7 +25,7 @@ simba.mixins.plotting\_mixin module
    :undoc-members:
    :show-inheritance:
 
-simba.mixins.pop\_up\_mixin module
+GUI pop-up methods
 ----------------------------------
 
 .. automodule:: simba.mixins.pop_up_mixin
@@ -36,7 +33,7 @@ simba.mixins.pop\_up\_mixin module
    :undoc-members:
    :show-inheritance:
 
-simba.mixins.pose\_importer\_mixin module
+Pose imporing methods
 -----------------------------------------
 
 .. automodule:: simba.mixins.pose_importer_mixin
@@ -44,7 +41,7 @@ simba.mixins.pose\_importer\_mixin module
    :undoc-members:
    :show-inheritance:
 
-simba.mixins.train\_model\_mixin module
+Modelling methods
 ---------------------------------------
 
 .. automodule:: simba.mixins.train_model_mixin
@@ -52,18 +49,10 @@ simba.mixins.train\_model\_mixin module
    :undoc-members:
    :show-inheritance:
 
-simba.mixins.unsupervised\_mixin module
+Unsupervised methods
 ---------------------------------------
 
 .. automodule:: simba.mixins.unsupervised_mixin
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.mixins
    :members:
    :undoc-members:
    :show-inheritance:

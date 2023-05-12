@@ -2,18 +2,31 @@
 Welcome to SimBA's documentation!
 =================================
 
-.. image:: img/landing_page_1.png
+.. image:: tutorials_rst/landing/landing_page_1.png
    :align: center
 
 These docs are under development. For detailed tutorials,
 see the `SimBA GitHub repository <https://github.com/sgoldenlab/simba>`_.
 
+**Installation**
+
+.. code:: bash
+
+    pip install simba-uw-tf-dev
+
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: API REFERENCE:
 
-   simba
-   examples
+   api
+
+.. toctree::
+   :caption: NOTEBOOKS:
+
+   notebooks
+
+.. toctree::
+   :maxdepth: 1
+   :caption: USER GUIDE / TUTORIALS:
+
    tutorials
-
-

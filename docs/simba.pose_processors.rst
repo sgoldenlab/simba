@@ -1,10 +1,8 @@
-simba.pose\_processors package
+POSE PROCESSORS
 ==============================
 
-Submodules
-----------
 
-simba.pose\_processors.pose\_reset module
+RESET POSE
 -----------------------------------------
 
 .. automodule:: simba.pose_processors.pose_reset
@@ -12,7 +10,7 @@ simba.pose\_processors.pose\_reset module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_processors.remove\_keypoints module
+REMOVE KEY-POINTS
 -----------------------------------------------
 
 .. automodule:: simba.pose_processors.remove_keypoints
@@ -20,7 +18,7 @@ simba.pose\_processors.remove\_keypoints module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_processors.reorganize\_keypoint module
+RE-ORGANIZE KEYPOINTS
 --------------------------------------------------
 
 .. automodule:: simba.pose_processors.reorganize_keypoint
@@ -28,18 +26,10 @@ simba.pose\_processors.reorganize\_keypoint module
    :undoc-members:
    :show-inheritance:
 
-simba.pose\_processors.reverse\_pose module
+REVERSE POSE
 -------------------------------------------
 
 .. automodule:: simba.pose_processors.reverse_pose
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.pose_processors
    :members:
    :undoc-members:
    :show-inheritance:

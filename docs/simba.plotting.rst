@@ -4,7 +4,7 @@ simba.plotting package
 Submodules
 ----------
 
-simba.plotting.Directing\_animals\_visualizer module
+Direction between animals
 ----------------------------------------------------
 
 .. automodule:: simba.plotting.Directing_animals_visualizer
@@ -12,7 +12,7 @@ simba.plotting.Directing\_animals\_visualizer module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.Directing\_animals\_visualizer\_mp module
+Direction between animals - multiprocess
 --------------------------------------------------------
 
 .. automodule:: simba.plotting.Directing_animals_visualizer_mp
@@ -20,7 +20,7 @@ simba.plotting.Directing\_animals\_visualizer\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.ROI\_feature\_visualizer module
+ROI feature visualization
 ----------------------------------------------
 
 .. automodule:: simba.plotting.ROI_feature_visualizer
@@ -28,7 +28,7 @@ simba.plotting.ROI\_feature\_visualizer module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.ROI\_feature\_visualizer\_mp module
+ROI feature visualization - multiprocess
 --------------------------------------------------
 
 .. automodule:: simba.plotting.ROI_feature_visualizer_mp
@@ -36,7 +36,7 @@ simba.plotting.ROI\_feature\_visualizer\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.ROI\_plotter module
+ROI visualizer
 ----------------------------------
 
 .. automodule:: simba.plotting.ROI_plotter
@@ -44,7 +44,7 @@ simba.plotting.ROI\_plotter module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.ROI\_plotter\_mp module
+ROI visualizer - multiprocess
 --------------------------------------
 
 .. automodule:: simba.plotting.ROI_plotter_mp
@@ -52,7 +52,7 @@ simba.plotting.ROI\_plotter\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.clf\_validator module
+Classifier validation
 ------------------------------------
 
 .. automodule:: simba.plotting.clf_validator
@@ -60,7 +60,7 @@ simba.plotting.clf\_validator module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.data\_plotter module
+Data plotter
 -----------------------------------
 
 .. automodule:: simba.plotting.data_plotter
@@ -68,7 +68,7 @@ simba.plotting.data\_plotter module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.distance\_plotter module
+Distance plotter
 ---------------------------------------
 
 .. automodule:: simba.plotting.distance_plotter
@@ -76,7 +76,7 @@ simba.plotting.distance\_plotter module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.distance\_plotter\_mp module
+Distance plotter - multiprocess
 -------------------------------------------
 
 .. automodule:: simba.plotting.distance_plotter_mp
@@ -84,7 +84,7 @@ simba.plotting.distance\_plotter\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.ez\_lineplot module
+Quick path plot
 ----------------------------------
 
 .. automodule:: simba.plotting.ez_lineplot
@@ -92,7 +92,7 @@ simba.plotting.ez\_lineplot module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.frame\_mergerer\_ffmpeg module
+Merge videos
 ---------------------------------------------
 
 .. automodule:: simba.plotting.frame_mergerer_ffmpeg
@@ -100,7 +100,7 @@ simba.plotting.frame\_mergerer\_ffmpeg module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.gantt\_creator module
+Gantt plot
 ------------------------------------
 
 .. automodule:: simba.plotting.gantt_creator
@@ -108,7 +108,7 @@ simba.plotting.gantt\_creator module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.gantt\_creator\_mp module
+Gantt plot - multiprocess
 ----------------------------------------
 
 .. automodule:: simba.plotting.gantt_creator_mp
@@ -116,7 +116,7 @@ simba.plotting.gantt\_creator\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.heat\_mapper\_clf module
+Classifier heatmaps
 ---------------------------------------
 
 .. automodule:: simba.plotting.heat_mapper_clf
@@ -124,7 +124,7 @@ simba.plotting.heat\_mapper\_clf module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.heat\_mapper\_clf\_mp module
+Classifier heatmaps - multiprocess
 -------------------------------------------
 
 .. automodule:: simba.plotting.heat_mapper_clf_mp
@@ -132,7 +132,7 @@ simba.plotting.heat\_mapper\_clf\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.heat\_mapper\_location module
+Location heatmaps
 --------------------------------------------
 
 .. automodule:: simba.plotting.heat_mapper_location
@@ -140,7 +140,7 @@ simba.plotting.heat\_mapper\_location module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.heat\_mapper\_location\_mp module
+Location heatmaps - multiprocess
 ------------------------------------------------
 
 .. automodule:: simba.plotting.heat_mapper_location_mp
@@ -148,7 +148,7 @@ simba.plotting.heat\_mapper\_location\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.interactive\_probability\_grapher module
+Interactive classifier probability plotter
 -------------------------------------------------------
 
 .. automodule:: simba.plotting.interactive_probability_grapher
@@ -156,7 +156,7 @@ simba.plotting.interactive\_probability\_grapher module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.path\_plotter module
+Path plotter
 -----------------------------------
 
 .. automodule:: simba.plotting.path_plotter
@@ -164,7 +164,7 @@ simba.plotting.path\_plotter module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.path\_plotter\_mp module
+Path plotter - multiprocess
 ---------------------------------------
 
 .. automodule:: simba.plotting.path_plotter_mp
@@ -172,7 +172,7 @@ simba.plotting.path\_plotter\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.plot\_clf\_results module
+Classification plotter
 ----------------------------------------
 
 .. automodule:: simba.plotting.plot_clf_results
@@ -180,7 +180,7 @@ simba.plotting.plot\_clf\_results module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.plot\_clf\_results\_mp module
+Classification plotter - multiprocess
 --------------------------------------------
 
 .. automodule:: simba.plotting.plot_clf_results_mp
@@ -188,7 +188,7 @@ simba.plotting.plot\_clf\_results\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.plot\_pose\_in\_dir module
+Pose-estimation plotter
 -----------------------------------------
 
 .. automodule:: simba.plotting.plot_pose_in_dir
@@ -196,7 +196,7 @@ simba.plotting.plot\_pose\_in\_dir module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.probability\_plot\_creator module
+Classification probability plotter
 ------------------------------------------------
 
 .. automodule:: simba.plotting.probability_plot_creator
@@ -204,7 +204,7 @@ simba.plotting.probability\_plot\_creator module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.probability\_plot\_creator\_mp module
+Classification probability plotter - multiprocess
 ----------------------------------------------------
 
 .. automodule:: simba.plotting.probability_plot_creator_mp
@@ -212,7 +212,7 @@ simba.plotting.probability\_plot\_creator\_mp module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.shap\_agg\_stats\_visualizer module
+SHAP aggregation plotter
 --------------------------------------------------
 
 .. automodule:: simba.plotting.shap_agg_stats_visualizer
@@ -220,7 +220,7 @@ simba.plotting.shap\_agg\_stats\_visualizer module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.single\_run\_model\_validation\_video module
+Single video validation plotter
 -----------------------------------------------------------
 
 .. automodule:: simba.plotting.single_run_model_validation_video
@@ -228,7 +228,7 @@ simba.plotting.single\_run\_model\_validation\_video module
    :undoc-members:
    :show-inheritance:
 
-simba.plotting.single\_run\_model\_validation\_video\_mp module
+Single video validation plotter - multiprocess
 ---------------------------------------------------------------
 
 .. automodule:: simba.plotting.single_run_model_validation_video_mp
@@ -236,10 +236,3 @@ simba.plotting.single\_run\_model\_validation\_video\_mp module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: simba.plotting
-   :members:
-   :undoc-members:
-   :show-inheritance:
