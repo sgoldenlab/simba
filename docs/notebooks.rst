@@ -1,4 +1,4 @@
-NOTEBOOKS
+Notebooks
 =============
 
 .. toctree::
