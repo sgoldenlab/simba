@@ -23,7 +23,7 @@ extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
-              'sphinx_autodoc_typehints',
+              #'sphinx_autodoc_typehints',
               'nbsphinx']
 
 # source_suffix = {

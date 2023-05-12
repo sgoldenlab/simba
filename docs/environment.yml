@@ -12,5 +12,4 @@ dependencies:
       - sphinx-autodoc-typehints 
       - sphinx_rtd_theme
       - simba-uw-tf-dev
-      - nbsphinx
 prefix: /Users/simon/.conda/envs/simba_dev
