@@ -21,7 +21,7 @@ setuptools.setup(
               'opencv-python == 3.4.5.20','pandas == 0.25.3','scikit-image == 0.14.2', 'scipy == 1.1.0','seaborn == 0.9.0',
               'scikit-learn == 0.22.2','tabulate == 0.8.3','tqdm == 4.30.0','xgboost == 0.90',
               'yellowbrick == 0.9.1', 'dash == 1.14.0', 'dash_color_picker == 0.0.1', 'dash_core_components == 1.10.2', 
-			  'dash_colorscales == 0.0.4', 'dash_html_components == 1.0.3', 'h5py == 2.9.0', 'numba == 0.48.0', 'numexpr == 2.6.9',
+			  'dash_colorscales == 0.0.4', 'dash_html_components == 1.0.3', 'h5py == 2.9.0', 'numba == 0.52.0', 'numexpr == 2.6.9',
 			  'plotly == 4.9.0', 'statsmodels == 0.9.0', 'cefpython3 == 66.0', "pyarrow == 0.17.1", "shap == 0.35.0","h5py==2.9.0","tables==3.6.1", "xlrd==1.2.0"],
     license='GNU Lesser General Public License v3 (LGPLv3)',
     packages=setuptools.find_packages(),
