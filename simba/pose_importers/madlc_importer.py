@@ -28,9 +28,8 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
     :parameter dict smoothing_settings: Dictionary defining the pose estimation smoothing method. EXAMPLE: {'Method': 'Savitzky Golay',
         'Parameters': {'Time_window': '200'}})
 
-    Notes
-    -----
-    `Multi-animal import tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md>`__.
+    .. note::
+       `Multi-animal import tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md>`__.
 
     Examples
     -----

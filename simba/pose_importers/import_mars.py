@@ -7,6 +7,8 @@ import pandas as pd
 from copy import deepcopy
 import pyarrow.parquet as pq
 import pyarrow as pa
+from typing import Union
+
 from simba.utils.printing import stdout_success
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.enums import Paths, Methods, Dtypes
@@ -20,23 +22,16 @@ class MarsImporter(object):
     Import two animal MARS pose-estimation data (in JSON format) into a SimBA project in
     parquet or CSV format.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    data_folder: str
-        Path to file or folder with data in `.json` format.
-    interpolation_settings: str
-        String defining the pose-estimation interpolation method. OPTIONS: 'None', 'Animal(s): Nearest',
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str data_folder: Path to file (or directory) with data in `.json` format.
+    :param str interpolation_settings: String defining the pose-estimation interpolation method. OPTIONS: 'None', 'Animal(s): Nearest',
         'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear',
-        'Body-parts: Quadratic'.
-    smoothing_method: dict
-        Dictionary defining the pose estimation smoothing method. EXAMPLE: {'Method': 'Savitzky Golay',
+        'Body-parts: Quadratic'. See `this image <https://gist.github.com/gyassine/b47b90e8de935cc06ef856401f7582b0>`>_ for comparison of interpolation methods.
+    :param dict smoothing_method: Dictionary defining the pose estimation smoothing method. EXAMPLE: {'Method': 'Savitzky Golay',
         'Parameters': {'Time_window': '200'}})
 
-    Notes
-    -----
-    `Multi-animal import tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md>`__.
+    .. note::
+       `Multi-animal import tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md>`__.
 
     Examples
     -----
@@ -51,8 +46,8 @@ class MarsImporter(object):
 
 
     def __init__(self,
-                 config_path: str,
-                 data_path: str,
+                 config_path: Union[str, os.PathLike],
+                 data_path: Union[str, os.PathLike],
                  interpolation_method:  str,
                  smoothing_method: dict):
 

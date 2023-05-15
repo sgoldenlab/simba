@@ -16,13 +16,14 @@ from simba.utils.data import smooth_data_savitzky_golay, smooth_data_gaussian
 def import_dlc_csv(config_path: Union[str, os.PathLike],
                    source: str) -> List[str]:
     """
-    Imports file or folder of  DLC pose-estimation CSV files to SimBA project.
-    Returns list of file paths to the imported files.
+    Import file or folder of  DLC pose-estimation CSV files to SimBA project.
+    Returns list of file paths that has been imported.
 
     :parameter str config_path: path to SimBA project config file in Configparser format
     :parameter str source: path to file or folder containing DLC pose-estimation CSV files
     :return List[str]: Paths of imported files.
 
+    :example:
     >>> import_dlc_csv(config_path='project_folder/project_config.ini', source='CSV_import/Together_1.csv')
     >>> ['project_folder/csv/input_csv/Together_1.csv']
     """
