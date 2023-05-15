@@ -18,21 +18,13 @@ from simba.utils.read_write import read_video_info_csv
 
 class VideoInfoTable(ConfigReader, PopUpMixin):
     """
-    Class for creating Tkinter GUI video meta data table. Allows users to modify resolutions, fps, and pixels-per-mm
+    Create GUI that allows users to modify resolutions, fps, and pixels-per-mm
     interactively of videos within the SimBA project. Data is stored within the project_folder/logs/video_info.csv
     file in the SimBA project.
 
-    Parameters
-    ----------
-    config_file_path: str
-        path to SimBA project config file in Configparser format
+    :param str config_file_path: path to SimBA project config file in Configparser format
 
-    Notes
-    -----
-
-    Examples
-    -----
-
+    :example:
     >>> video_info_gui = VideoInfoTable(config_path='MyProjectConfig')
     >>> video_info_gui.create_window()
     >>> video_info_gui.main_frm.mainloop()

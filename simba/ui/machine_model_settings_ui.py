@@ -18,6 +18,11 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
 
 class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
+    """
+    Launch GUI window for specifying ML model training parameters.
+    """
+
+
     def __init__(self,
                  config_path: str):
 

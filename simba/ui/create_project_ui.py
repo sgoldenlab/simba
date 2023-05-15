@@ -28,7 +28,7 @@ from simba.utils.checks import check_if_dir_exists, check_str
 
 class ProjectCreatorPopUp(PopUpMixin):
     """
-    Creates tkinter GUI pop-up window accepting user-input for generating SimBA project.
+    Mixin for GUI pop-up windows that accept user-inputs.
     """
 
     def __init__(self):

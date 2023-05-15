@@ -5,8 +5,7 @@ import numpy as np
 import imutils
 import simba
 import os, glob
-from typing import List
-
+from typing import List, Union
 
 from simba.utils.enums import Paths
 from simba.utils.data import create_color_palettes
@@ -17,24 +16,16 @@ from simba.mixins.plotting_mixin import PlottingMixin
 class PoseConfigCreator(PlottingMixin):
 
     """
-    Class for creating user-defined pose-estimation settings in SimBA through a GUI interface.
+    Class for creating user-defined pose-estimation pipeline in SimBA through a GUI interface.
 
-    Parameters
-    ----------
-    pose_name: str
-        Name of the user-defined pose-estimation setting
-    no_animals: int
-        Number of animals in the user-defined pose-estimation setting
-    img_path: str
-        Path to image representation of user-defined pose-estimation setting
-    bp_list: list
-        Body-parts in the user-defined pose-estimation setting
-    animal_id_int_list: list
-        Integers representing the animal ID which the body-parts belong to
+    :param str pose_name: Name of the user-defined pose-estimation setting.
+    :param str no_animals: Number of animals in the user-defined pose-estimation setting.
+    :param str img_path: Path to image representation of user-defined pose-estimation setting
+    :param List[str] bp_list: Body-parts in the user-defined pose-estimation setting.
+    :param List[int] animal_id_int_list: Integers representing the animal ID which the body-parts belong to.
 
-    Notes
-    ----------
-    `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md>`__.
+    ..note::
+       `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md>`__.
 
     Examples
     ----------
@@ -45,7 +36,7 @@ class PoseConfigCreator(PlottingMixin):
     def __init__(self,
                  pose_name: str,
                  no_animals: int,
-                 img_path: str,
+                 img_path: Union[str, os.PathLike],
                  bp_list: List[str],
                  animal_id_int_list: List[str]):
 
