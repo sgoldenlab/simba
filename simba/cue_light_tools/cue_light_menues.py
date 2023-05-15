@@ -26,9 +26,8 @@ class CueLightAnalyzerMenu(ConfigReader, PopUpMixin):
 
     :parameter str config_path: path to SimBA project config file in Configparser format
 
-    Notes
-    ----------
-    `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
+    .. note::
+       `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
 
     Examples

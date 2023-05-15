@@ -29,9 +29,8 @@ class CueLightMovementAnalyzer(ConfigReader):
         body-part probability threshold is lower than the user-specified threshold.
     :parameter bool roi_setting: If True, SimBA calculates movement statistics within non-light cue ROIs.
 
-    Notes
-    ----------
-    `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
+    .. note:
+       `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
 
     Examples

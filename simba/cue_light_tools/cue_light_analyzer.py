@@ -69,9 +69,8 @@ class CueLightAnalyzer(ConfigReader):
     :parameter str in_dir: directory holding pose-estimation data. E.g., ``project_folder/csv/outlier_corrected_movement_location``
     :parameter List[str] cue_light_names: Names of cue light ROIs, as defined in the SimBA ROI interface.
 
-    Notes
-    ----------
-    `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
+    .. note::
+       `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
     Examples
     ----------

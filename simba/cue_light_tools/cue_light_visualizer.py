@@ -24,9 +24,8 @@ class CueLightVisualizer(ConfigReader):
     :parameter bool frame_setting: If True, creates individual frames in png format.
     :parameter bool video_setting: If True, creates compressed videos in mp4 format.
 
-    Notes
-    ----------
-    `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
+    .. notes:
+       `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
     Examples
     ----------

@@ -26,8 +26,8 @@ class CueLightClfAnalyzer(ConfigReader):
     :parameter List[str] cue_light_names: Names of cue lights, as defined in the SimBA ROI interface.
     :parameter List[str] list: Names of the classifiers we want to compute aggregate statistics for.
 
-    ----------
-    `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
+    .. note::
+       `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
     Examples
     ----------

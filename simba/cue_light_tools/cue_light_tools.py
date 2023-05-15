@@ -11,9 +11,10 @@ def find_frames_when_cue_light_on(data_df: pd.DataFrame,
                                   prior_window_frames_cnt: int,
                                   post_window_frames_cnt: int):
     """
-    Multiprocess helper for finding cue-light states.
+    Private multiprocess helper for finding cue-light states.
     Called by meth:`simba.cue_light_tools.cue_light_analyzer.CueLightAnalyzer`.
     """
+
     light_on_dict = {}
     for cue_light in cue_light_names:
         light_on_dict[cue_light] = {}
