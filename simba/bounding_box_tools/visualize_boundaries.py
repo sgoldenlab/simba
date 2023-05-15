@@ -72,9 +72,8 @@ class BoundaryVisualizer(ConfigReader,
     :parameter bool show_intersections:  If True, then produce highlight boundaries/keypoints to signify present intersections.
                                          See `this example for highlighted intersections <https://github.com/sgoldenlab/simba/blob/master/images/termites_video_3.gif>`_
 
-    Notes
-    ----------
-    `Bounding boxes tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md>`_.
+    .. note::
+        `Bounding boxes tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md>`_.
 
     Examples
     ----------

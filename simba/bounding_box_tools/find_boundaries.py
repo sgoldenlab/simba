@@ -28,16 +28,14 @@ class AnimalBoundaryFinder(ConfigReader, FeatureExtractionMixin):
                                         with keys as animal names and values as body-parts. E.g., body_parts={'Animal_1': 'Head_1', 'Animal_2': 'Head_2'}.
     :parameter Optional[int] parallel_offset: Offset of ROI from the animal outer bounds in millimeter. If None, then no offset.
 
-    Notes
-    ----------
-    `Bounding boxes tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md/>`_.
+    .. notes:
+       `Bounding boxes tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md/>`_.
 
     Examples
     ----------
     >>> animal_boundary_finder = AnimalBoundaryFinder(config_path='project_folder/project_config.ini', roi_type='SINGLE BODY-PART CIRCLE',body_parts={'Animal_1': 'Head_1', 'Animal_2': 'Head_2'}, force_rectangle=False, parallel_offset=15)
     >>> animal_boundary_finder.run()
     """
-
 
     def __init__(self,
                  config_path: str,
