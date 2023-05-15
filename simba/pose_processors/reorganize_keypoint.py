@@ -15,18 +15,12 @@ class KeypointReorganizer(object):
     Re-organizing the order of pose-estimated keypoints in directory containing
     CSV or H5 format files.
 
-    Parameters
-    ----------
-    data_folder: str
-        Path to directory containing pose-estiation CSV or H5 data
-    pose_tool: str
-        Tool used to perform pose-estimation.
-    file_format: str
-        File type of pose-estimation data.
+    :param str data_folder: Path to directory containing pose-estiation CSV or H5 data
+    :param str pose_tool: Tool used to perform pose-estimation. E.g., 'DLC' or 'maDLC'.
+    :param str file_format: File type of pose-estimation data.
 
-    Notes
-    ----------
-    `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data>`__.
+    .. note::
+       `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data>`__.
 
     Examples
     ----------

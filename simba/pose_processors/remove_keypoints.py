@@ -14,17 +14,11 @@ class KeypointRemover(object):
     """
     Remove pose-estimated keypoints from data in CSV or H5 format.
 
-    Parameters
-    ----------
-    data_folder: str
-        Path to directory containing pose-estiation CSV or H5 data
-    pose_tool: str
-        Tool used to perform pose-estimation.
-    file_format: str
-        File type of pose-estimation data.
+    :param str data_folder: Path to directory containing pose-estiation CSV or H5 data
+    :param str file_format: File type of pose-estimation data.
+    :param str pose_tool: Tool used to perform pose-estimation. E.g., `DLC` or `maDLC`
 
-    Notes
-    ----------
+    .. note:
     `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#remove-body-parts-from-tracking-data>`__.
 
     Examples

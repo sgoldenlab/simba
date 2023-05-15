@@ -5,6 +5,7 @@ import simba
 import shutil
 import pandas as pd
 from tkinter import *
+from typing import Optional
 
 from simba.utils.printing import stdout_trash
 from simba.utils.lookups import get_bp_config_codes
@@ -16,10 +17,7 @@ class PoseResetter(object):
     Launch GUI for deleting all **user-defined** pose-estimation schematics, diagrams and other settings from the
     SimBA installation.
 
-    Parameters
-    ----------
-    master: tk
-        tkinter master window, (default=None).
+    :param Optional[TopLevel] master: Tkinter TopLevel window. Default: None.
 
     Examples
     ----------
@@ -27,7 +25,7 @@ class PoseResetter(object):
     """
 
     def __init__(self,
-                 master: Toplevel):
+                 master: Optional[Toplevel] = None):
 
         self.default_pose_configs_cnt = len(get_bp_config_codes().keys())
         self.simba_dir = os.path.dirname(simba.__file__)
