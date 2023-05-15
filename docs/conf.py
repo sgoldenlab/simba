@@ -25,6 +25,9 @@ extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.viewcode',
               #'sphinx_autodoc_typehints',
               'nbsphinx']
+html_favicon = "../simba/assets/icons/SimBA_logo.png"
+html_logo = "../simba/assets/icons/SimBA_logo.png"
+
 
 # source_suffix = {
 #     '.rst': 'restructuredtext',
