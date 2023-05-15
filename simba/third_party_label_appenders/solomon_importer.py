@@ -12,17 +12,12 @@ class SolomonImporter(ConfigReader):
     """
     Append SOLOMON human annotations onto featurized pose-estimation data.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    solomon_dir: str
-        path to folder holding SOLOMON data files is CSV format
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str solomon_dir: path to folder holding SOLOMON data files is CSV format
 
-    Notes
-    ----------
-    `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
-    `Example of expected SOLOMON file format <https://github.com/sgoldenlab/simba/blob/master/misc/solomon_example.csv>`__.
+    .. note::
+       `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
+       `Example of expected SOLOMON file format <https://github.com/sgoldenlab/simba/blob/master/misc/solomon_example.csv>`__.
 
     Examples
     ----------

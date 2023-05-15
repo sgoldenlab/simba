@@ -17,11 +17,13 @@ class BentoAppender(ConfigReader):
     """
     Append BENTO annotation to SimBA featurized datasets.
 
-    Notes
-    ----------
-    `Example BENTO input file <https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot>`_.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str bento_dir: Path to folder containing BENTO data.
 
-    'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`_.
+    .. note::
+       `Example BENTO input file <https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot>`_.
+
+       'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`_.
 
     Examples
     ----------

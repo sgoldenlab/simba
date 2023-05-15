@@ -44,28 +44,21 @@ class ThirdPartyLabelAppender(ConfigReader):
     """
     Concatenate third-party annotations to featurized pose-estimation datasets in SimBA.
 
-    Parameters
-    ----------
-    app: str
-        Third-party application. OPTIONS: ['BORIS', 'BENTO', 'DEEPETHOGRAM', 'ETHOVISION', 'OBSERVER', 'SOLOMON'].
-    config_path: str
-        path to SimBA project config file in Configparser format.
-    data_dir: str
-        Directory holding third-party annotation data files.
-    settings: dict
-        User-defined settings including how to handle errors, logging, and data file types associated with the third-party application.
+    :param str app: Third-party application. OPTIONS: ['BORIS', 'BENTO', 'DEEPETHOGRAM', 'ETHOVISION', 'OBSERVER', 'SOLOMON'].
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param str data_dir: Directory holding third-party annotation data files.
+    :param dict settings: User-defined settings including how to handle errors, logging, and data file types associated with the third-party application.
 
-    Notes
-    ----------
-    `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
+    ... note::
+       `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
 
-    `BENTO: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot`__.
-    `BORIS: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv>`__..
-    `DEEPETHOGRAM: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/deep_ethogram_labels.csv>`__.
-    `ETHOVISION: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx>`__.
-    `OBSERVER: expected input I <https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_1.xlsx>`__.
-    `OBSERVER: expected input II <https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_2.xlsx>`__.
-    `SOLOMON: expected input II <https://github.com/sgoldenlab/simba/blob/master/misc/solomon_example.csv>`__.
+       `BENTO: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot`__.
+       `BORIS: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv>`__..
+       `DEEPETHOGRAM: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/deep_ethogram_labels.csv>`__.
+       `ETHOVISION: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx>`__.
+       `OBSERVER: expected input I <https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_1.xlsx>`__.
+       `OBSERVER: expected input II <https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_2.xlsx>`__.
+       `SOLOMON: expected input II <https://github.com/sgoldenlab/simba/blob/master/misc/solomon_example.csv>`__.
 
 
     Examples

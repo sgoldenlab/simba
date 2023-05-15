@@ -17,17 +17,12 @@ class BorisAppender(ConfigReader):
     """
     Append BORIS human annotations onto featurized pose-estimation data.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    boris_folder: str
-        path to folder holding BORIS data files is CSV format
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str boris_folder: path to folder holding BORIS data files is CSV format
 
-    Notes
-    ----------
-    `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
-    `Example BORIS input file <https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv>`_.
+    .. note::
+       `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
+       `Example BORIS input file <https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv>`_.
 
     Examples
     ----------

@@ -14,17 +14,12 @@ class ImportEthovision(ConfigReader):
     Results are saved within the project_folder/csv/targets_inserted directory of
     the SimBA project (as parquets' or CSVs).
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    folder_path: str
-        path to folder holding ETHOVISION data files is XLSX or XLS format
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str folder_path: path to folder holding ETHOVISION data files is XLSX or XLS format
 
-    Notes
-    -----
-    `Third-party import GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
-    `Example of expected ETHOVISION file <https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx>`__.
+    .. note::
+       `Third-party import GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
+       `Example of expected ETHOVISION file <https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx>`__.
 
     Examples
     -----
