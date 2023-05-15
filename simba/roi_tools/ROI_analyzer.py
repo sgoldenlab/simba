@@ -20,22 +20,16 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     Analyze movements, entries, exits, and time-spent-in user-defined ROIs. Results are stored in the
     'project_folder/logs' directory of the SimBA project.
 
-    Parameters
-    ----------
-    ini_path: str
-        Path to SimBA project config file in Configparser format
-    data_path: str or None,
-        Path to folder holding the data used to caluclate ROI aggregate statistics. E.g., `project_folder/
-        csv/outlier_corrected_movement_location`.
-    settings: dict or None,
-        If dict, the animal body-parts and the probability threshold. If None, then the data is read from the
-        project_config.ini
-    calculate_distances: bool
-        If True, calculate movements aggregate statistics (distances and velocities) inside ROIs
+    :param str ini_path: Path to SimBA project config file in Configparser format.
+    :param Optional[str] data_path: Path to folder holding the data used to caluclate ROI aggregate statistics. If None, then `project_folder/
+        csv/outlier_corrected_movement_location`. Deafult: None.
+    :param Optional[dict] settings: If dict, the animal body-parts and the probability threshold. If None, then the data is read from the
+        project_config.ini. Defalt: None.
+    :param Optional[bool] calculate_distances: If True, then calculate movements aggregate statistics (distances and velocities) inside ROIs. Results
+                                               are saved in ``project_folder/logs/`` directory. Default: False.
 
-    Notes
-    ----------
-    `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+    .. note::
+       `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
     Examples
     ----------
@@ -49,7 +43,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                  ini_path: str,
                  data_path: Optional[str] = None,
                  settings: Optional[dict] = None,
-                 calculate_distances: bool = False):
+                 calculate_distances: Optional[bool] = False):
 
         ConfigReader.__init__(self, config_path=ini_path)
         FeatureExtractionMixin.__init__(self)

@@ -10,14 +10,10 @@ class ROIMovementAnalyzer(ConfigReader):
 
     Compute movements of individual animals within user-defined ROIs.
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
+    :param str config_path: Path to SimBA project config file in Configparser format
 
-    Notes
-    ----------
-    `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+    .. note::
+       `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
     Examples
     ----------

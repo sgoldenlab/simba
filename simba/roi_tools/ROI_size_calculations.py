@@ -5,7 +5,6 @@ def rectangle_size_calc(rectangle_dict, px_mm):
     rectangle_dict['height_cm'] = round((rectangle_dict['height'] / px_mm) / 10, 2)
     rectangle_dict['width_cm'] = round((rectangle_dict['width'] / px_mm) / 10, 2)
     rectangle_dict['area_cm'] = round(rectangle_dict['width_cm'] * rectangle_dict['height_cm'], 2)
-
     return rectangle_dict
 
 def circle_size_calc(circle_dict, px_mm):

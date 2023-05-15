@@ -15,18 +15,17 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     """
     Compute aggregate statistics for animals directing towards ROIs.
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
+    :param str config_path: Path to SimBA project config file in Configparser format
+    :param Optional[dict] settings: If dict, the animal body-parts and the probability threshold. If None, then the data is read from the
+        project_config.ini. Defalt: None.
 
-    Notes
-    ----------
-    `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+    .. note::
+       `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
     Examples
     ----------
-    >>> _ = DirectingROIAnalyzer(config_path='MyProjectConfig').run()
+    >>> settings = {'body_parts': {'Simon': 'Ear_left_1', 'JJ': 'Ear_left_2'}, 'threshold': 0.4}
+    >>> _ = DirectingROIAnalyzer(config_path='MyProjectConfig', settings=settings).run()
     """
 
     def __init__(self,

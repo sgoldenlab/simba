@@ -21,18 +21,17 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
     Compute features based on the relationships between the location of the animals and the location of
     user-defined ROIs.
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
+    :param str config_path: Path to SimBA project config file in Configparser format
+    :param Optional[dict] settings: If dict, the animal body-parts and the probability threshold. If None, then the data is read from the
+        project_config.ini. Defalt: None. Example:
 
-    Notes
-    ----------
-    `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+    .. note::
+        `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
     Examples
     ----------
-    >>> roi_featurizer = ROIFeatureCreator(config_path='MyProjectConfig')
+    >>> settings = {'body_parts': {'Simon': 'Ear_left_1', 'JJ': 'Ear_left_2'}, 'threshold': 0.4}
+    >>> roi_featurizer = ROIFeatureCreator(config_path='MyProjectConfig', settings=settings)
     >>> roi_featurizer.run()
     >>> roi_featurizer.save()
 

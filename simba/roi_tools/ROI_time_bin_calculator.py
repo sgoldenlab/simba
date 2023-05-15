@@ -16,15 +16,8 @@ class ROITimebinCalculator(ConfigReader):
     within user-defined time bins. Results are stored in the ``project_folder/logs`` directory of
     the SimBA project.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    bin_length: int
-        length of time bins in seconds.
-
-    Notes
-    ----------
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param int bin_length: length of time bins in seconds.
 
     Examples
     ----------

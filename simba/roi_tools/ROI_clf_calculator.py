@@ -19,16 +19,12 @@ from simba.utils.checks import check_that_column_exist, check_if_filepath_list_i
 class ROIClfCalculator(ConfigReader):
     """
     Compute aggregate statistics of classification results within user-defined ROIs.
-    results are stored in `project_folder/logs` directory of the SimBA project.
+    Results are stored in `project_folder/logs` directory of the SimBA project.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
+    :param str config_path: path to SimBA project config file in Configparser format
 
-    Notes
-    -----
-    'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results`__.
+    .. note:
+       'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results`__.
 
     Examples
     -----
