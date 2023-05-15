@@ -25,24 +25,13 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
 
     .. note::
        For improved run-time, see :meth:`simba.plot_clf_results_mp.PlotSklearnResultsMultiProcess` for multiprocess class.
+       Scikit visualization documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
 
-
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    rotate: bool
-        If True, the output video will be rotated 90 degrees from the input.
-    video_setting: bool
-        If True, SimBA will create compressed videos.
-    frame_setting: bool
-        If True, SimBA will create individual frames
-    video_file_path: str
-       path to video file to create classification visualizations for.
-
-    Notes
-    ----------
-    `Scikit visualization documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param bool rotate: If True, the output video will be rotated 90 degrees from the input.
+    :param bool video_setting: If True, SimBA will create compressed videos.
+    :param bool frame_setting: If True, SimBA will create individual frames.
+    :param str video_file_path: path to video file to create classification visualizations for.
 
     Examples
     ----------

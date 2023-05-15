@@ -20,20 +20,13 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader, PlottingMixin):
     ROIs. E.g., distances to centroids of ROIs, cumulative time spent in ROIs, if animals are directing towards ROIs
     etc.
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
-    video_name: str
-        Name of video to create feature visualizations for.
-    style_attr: dict
-        Image user attributes
-    core_cnt: int
-        Number of cores to parallelize over.
+    :param str config_path: Path to SimBA project config file in Configparser format
+    :param str video_name: Name of video to create feature visualizations for.
+    :param dict style_attr: User-defined styles (sizes, colors etc.)
+    :param int cores: Number of cores to use.
 
-    Notes
-    ----------
-    `Tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features>`__.
+    .. note:
+       `Tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features>`__.
 
     Examples
     ----------

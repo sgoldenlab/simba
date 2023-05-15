@@ -15,29 +15,20 @@ from simba.utils.checks import check_file_exist_and_readable
 class ShapAggregateStatisticsVisualizer(ConfigReader):
 
     """
-    Caluclate aggregate (binned) SHAP value statistics where individual bins represent reaulated features.
+    Calculate aggregate (binned) SHAP value statistics where individual bins represent reaulated features.
     Also creates line chart visualizations reprsenting aggregations of behavior-present SHAP values.
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
-    classifier_name: str
-        Name of classifier (e.g., Attack).
-    shap_df: pd.DataFrame
-        Dataframe with non-aggregated SHAP values where rows represent frames and columns represent features.
-    shap_baseline_value: float
-        SHAP expected value (computed by ``simba.train_model_functions.create_shap_log``).
-    save_path: str
-        Directory where to store the results
+    :parameter str config_path: Path to SimBA project config file in Configparser format
+    :param str classifier_name: Name of classifier (e.g., Attack).
+    :param pd.DataFrame shap_df: Dataframe with non-aggregated SHAP values where rows represent frames and columns represent features.
+    :param float shap_baseline_value: SHAP expected value (computed by ``simba.train_model_functions.create_shap_log``).
+    :param str save_path: Directory where to store the results
 
-    Notes
-    ----------
-    `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/SHAP.md#step-3-interpreting-the-shap-value-ouput-generated-by-simba>`__.
-    `Example output <https://github.com/sgoldenlab/simba/blob/master/images/example_shap_graph.png>`__.
+    .. note::
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/SHAP.md#step-3-interpreting-the-shap-value-ouput-generated-by-simba>`__.
+       `Example output <https://github.com/sgoldenlab/simba/blob/master/images/example_shap_graph.png>`__.
 
-    Example
-    ----------
+    :example:
     >>> _ = ShapAggregateStatisticsVisualizer(config_path='SimBAConfigFilePath', classifier_name='Attack', shap_df='tests/test_data/test_shap/data/test_shap.csv', shap_baseline_value=4, save_path='SaveDirectory')
     """
 

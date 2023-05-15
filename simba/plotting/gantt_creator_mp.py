@@ -26,24 +26,16 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
     Multiprocess creation of classifier gantt charts in video and/or image format.
     See meth:`simba.gantt_creator.GanttCreatorSingleProcess` for single-process class.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    frame_setting: bool
-        If True, creates individual frames
-    video_setting: bool
-        If True, creates videos
-    files_found: list
-        File paths representing files with machine predictions e.g., ['project_folder/csv/machine_results/My_results.csv']
-    cores: int
-        Number of cores to use
-    style_attr: dict
-        Output image style attributes, e.g., {'width': 640, 'height': 480, 'font size': 8, 'font rotation': 45}
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param bool frame_setting: If True, creates individual frames.
+    :param bool last_frm_setting: If True, creates single .png image representing entire video.
+    :param bool video_setting: If True, creates videos
+    :param dict style_attr: Attributes of gannt chart (size, font size, font rotation etc).
+    :param List[str] files_found: File paths representing files with machine predictions e.g., ['project_folder/csv/machine_results/My_results.csv']
+    :param int cores: Number of cores to use.
 
-    Notes
-    ----------
-    `GitHub gantt tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#gantt-plot>`__.
+    ..note::
+       `GitHub gantt tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#gantt-plot>`__.
 
     Examples
     ----------

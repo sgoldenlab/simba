@@ -26,16 +26,13 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
     """
     Visualize the ROI data (number of entries/exits, time-spent-in etc)
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
-    video_path: str
-        Name of video to create ROI visualizations for
+    :param str config_path: Path to SimBA project config file in Configparser format
+    :param str video_path: Name of video to create ROI visualizations for
+    :param dict style_attr: User-defined visualization settings.
+    :param int core_cnt: Number of cores to use.
 
-    Notes
-    ----------
-    `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+    .. notes::
+       `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
     Examples
     ----------

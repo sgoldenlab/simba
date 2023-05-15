@@ -21,25 +21,18 @@ from simba.utils.checks import check_if_filepath_list_is_empty
 class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
     """
     Create gantt chart videos and/or images using a single core.
-    For improved run-time, see :meth:`simba.gantt_creator_mp.GanttCreatorMultiprocess` for multiprocess class.
-
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    frame_setting: bool
-        If True, creates individual frames
-    last_frm_setting: bool
-        If True, creates single .png image representing entire video.
-    video_setting: bool
-        If True, creates videos
-    style_attr: dict
-        Attributes of gannt chart (size, font size, font rotation etc).
-    files_found: list
-        File paths representing files with machine predictions e.g., ['project_folder/csv/machine_results/My_results.csv']
 
     .. note::
        `GitHub gantt tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#gantt-plot>`__.
+       For improved run-time, see :meth:`simba.gantt_creator_mp.GanttCreatorMultiprocess` for multiprocess class.
+
+
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param bool frame_setting: If True, creates individual frames.
+    :param bool last_frm_setting: If True, creates single .png image representing entire video.
+    :param bool video_setting: If True, creates videos
+    :param dict style_attr: Attributes of gannt chart (size, font size, font rotation etc).
+    :param List[str] files_found: File paths representing files with machine predictions e.g., ['project_folder/csv/machine_results/My_results.csv']
 
     Examples
     ----------

@@ -24,22 +24,13 @@ def create_video_from_dir(in_directory: str,
     """
     Create pose-estimation visualizations from data within a SimBA project folder.
 
-    Parameters
-    ----------
-    in_directory: str
-        Path to SimBA project directory containing pose-estimation data in parquet or CSV format.
-    out_directory: str
-        Directory to where to save the pose-estimation videos.
-    circle_size: int
-        Size of the circles denoting the location of the pose-estimated body-parts.
-    clr_attr: dict
-        Python dict where animals are keys and color attributes values. E.g., {'Animal_1':  (255, 107, 198)}
+    :param str in_directory: Path to SimBA project directory containing pose-estimation data in parquet or CSV format.
+    :param str out_directory: Directory to where to save the pose-estimation videos.
+    :param int Size of the circles denoting the location of the pose-estimated body-parts.
+    :param Optional[dict] clr_attr: Python dict where animals are keys and color attributes values. E.g., {'Animal_1':  (255, 107, 198)}. If None,
+                                    random palettes will be used.
 
-    Notes
-    ----------
-
-    Examples
-    ----------
+    :example:
     >>> create_video_from_dir(in_directory='InputDirectory', out_directory='OutputDirectory', circle_size=5, clr_attr=None)
 
     """

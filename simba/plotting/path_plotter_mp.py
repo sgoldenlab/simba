@@ -22,28 +22,18 @@ from simba.utils.checks import check_if_filepath_list_is_empty
 class PathPlotterMulticore(ConfigReader, PlottingMixin):
     """
     Class for creating "path plots" videos and/or images detailing the movement paths of
-    individual animals in SimBA.
+    individual animals in SimBA. Uses multiprocessing.
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
-    frame_setting: bool
-        If True, individual frames will be created.
-    video_setting: bool
-        If True, compressed videos will be created.
-    last_frame: bool
-        If True, creates a .png representing the final image of the path plot.
-    files_found: list
-        Data paths to create from which to create plots
-    animal_attr: dict
-        Animal body-parts and colors
-    style_attr: dict
-        Plot sttributes
+    :param str config_path: Path to SimBA project config file in Configparser format
+    :param bool frame_setting: If True, individual frames will be created.
+    :param bool video_setting: If True, compressed videos will be created.
+    :param List[str] files_found: Data paths to create from which to create plots
+    :param dict animal_attr: Animal body-parts and colors
+    :param dict style_attr: Plot sttributes (line thickness, color, etc..)
+    :param int cores: Number of cores to use.
 
-    Notes
-    ----------
-    `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
+    .. note:
+       `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     Examples
     ----------

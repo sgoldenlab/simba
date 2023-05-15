@@ -99,24 +99,15 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     Plot classification results on videos. Results are stored in the
     `project_folder/frames/output/sklearn_results` directory of the SimBA project.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    rotate: bool
-        If True, the output video will be rotated 90 degrees from the input.
-    video_setting: bool
-        If True, SimBA will create compressed videos.
-    frame_setting: bool
-        If True, SimBA will create individual frames
-    video_file_path: str
-       path to video file to create classification visualizations for
-    cores: int
-        Number of cores to use
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param bool rotate: If True, the output video will be rotated 90 degrees from the input.
+    :param bool video_setting: If True, SimBA will create compressed videos.
+    :param bool frame_setting: If True, SimBA will create individual frames.
+    :param str video_file_path: path to video file to create classification visualizations for.
+    :param int cores: Number of cores to use
 
-    Notes
-    ----------
-    `Scikit visualization documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
+    .. note:
+       `Scikit visualization documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
 
     Examples
     ----------

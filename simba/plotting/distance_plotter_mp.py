@@ -21,22 +21,13 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
      charts. Results are saved as individual line charts, and/or a video of line charts.
      Uses multiprocessing.
 
-     Parameters
-     ----------
-     config_path: str
-         path to SimBA project config file in Configparser format
-     frame_setting: bool
-         If True, creates individual frames
-     video_setting: bool
-         If True, creates videos
-     final_img: bool
-        If True, creates a single .png representing the entire video.
-     style_attr: dict
-        Video style attributes (font sizes, line opacity etc.)
-     files_found: list
-        Files to visualize
-     line_attr: dict[list]
-        Representing the body-parts to visualize the distance between and their colors.
+     :param str config_path: path to SimBA project config file in Configparser format
+     :param bool frame_setting: If True, creates individual frames.
+     :param bool video_setting: If True, creates videos.
+     :param bool final_img: If True, creates a single .png representing the entire video.
+     :param dict style_attr: Video style attributes (font sizes, line opacity etc.)
+     :param dict files_found: Files to visualize.
+     :param dict line_attr: Representing the body-parts to visualize the distance between and their colors.
 
     .. note::
        `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.

@@ -18,22 +18,20 @@ from simba.utils.data import create_color_palettes
 
 class ROIPlot(ConfigReader, PlottingMixin):
     """
-    Visualize the ROI data (number of entries/exits, time-spent-in etc)
+    Visualize the ROI data (number of entries/exits, time-spent in ROIs etc).
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
-    video_path: str
-        Name of video to create ROI visualizations for
+    .. notes::
+       `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+       Use :meth:`simba.plotting.ROI_plotter_mp.ROIPlotMultiprocess` for improved run-time.
 
-    Notes
-    ----------
-    `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+    :param str config_path: Path to SimBA project config file in Configparser format
+    :param str video_path: Name of video to create ROI visualizations for
+    :param dict style_attr: User-defined visualization settings.
 
     Examples
     ----------
-    >>> roi_visualizer = ROIPlot(ini_path=r'MyProjectConfig', video_path="MyVideo.mp4")
+    >>> settings = {'Show_body_part': True, 'Show_animal_name': True}
+    >>> roi_visualizer = ROIPlot(ini_path=r'MyProjectConfig', video_path="MyVideo.mp4", settings=settings)
     >>> roi_visualizer.insert_data()
     >>> roi_visualizer.visualize_ROI_data()
     """

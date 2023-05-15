@@ -19,34 +19,23 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
     Create heatmaps representing the location where animals spend time.
     For improved run-time, see :meth:`simba.heat_mapper_location_mp.HeatMapperLocationMultiprocess` for multiprocess class.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    bodypart: str
-        The name of the body-part used to infer the location of the classified behavior
-    bin_size: int
-        The rectangular size of each heatmap location in millimeters. For example, `50` will divide the video frames
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str bodypart: The name of the body-part used to infer the location of the classified behavior
+    :param int bin_size: The rectangular size of each heatmap location in millimeters. For example, `50` will divide the video frames
         into 5 centimeter rectangular spatial bins.
-    palette: str
-        Heatmap pallette. Eg. 'jet', 'magma', 'inferno','plasma', 'viridis', 'gnuplot2'
-    max_scale: int or 'auto'
-        The max value in the heatmap in seconds. E.g., with a value of `10`, if the classified behavior has occured
+    :param str palette:  Heatmap pallette. Eg. 'jet', 'magma', 'inferno','plasma', 'viridis', 'gnuplot2'
+    :param int or 'auto' max_scale: The max value in the heatmap in seconds. E.g., with a value of `10`, if the classified behavior has occured
         >= 10 within a rectangular bins, it will be filled with the same color.
-    final_img_setting: bool
-        If True, create a single image representing the last frame of the input video
-    video_setting: bool
-        If True, then create a video of heatmaps.
-    frame_setting: bool
-        If True, then create individual heatmap frames
+    :param bool final_img_setting: If True, create a single image representing the last frame of the input video
+    :param bool video_setting: If True, then create a video of heatmaps.
+    :param bool frame_setting: If True, then create individual heatmap frames.
 
-    Notes
-    -----
-    `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
+
+    ..note::
+       `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     Examples
     -----
-
     >>> _ = HeatmapperLocationSingleCore(config_path='MyConfigPath', final_img_setting=False, video_setting=True, frame_setting=False, bin_size=50, palette='jet', bodypart='Nose_1', max_scale=20).run()
     """
 

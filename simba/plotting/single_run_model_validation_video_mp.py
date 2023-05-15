@@ -22,25 +22,28 @@ class ValidateModelOneVideoMultiprocess(ConfigReader,
     Create classifier validation video for a single input video. Results are stored in the
     ``project_folder/frames/output/validation`` directory.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    feature_file_path: str
-        path to SimBA file (parquet or CSV) containing pose-estimation and feature fields.
-    model_path: str
-        path to pickled classifier object
-    discrimination_threshold: float
-        classification threshold
-    shortest_bout: int
-        Allowed classified bout length expressed in milliseconds. E.g., `1000` will shift frames classified
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str feature_file_path: path to SimBA file (parquet or CSV) containing pose-estimation and feature fields.
+    :param str model_path: path to pickled classifier object
+    :param float discrimination_threshold: classification threshold.
+    :param int shortest_bout: Allowed classified bout length expressed in milliseconds. E.g., `1000` will shift frames classified
         as containing the behavior, but occuring in a bout shorter than `1000`, from `target present to `target absent`.
-    create_gantt: str
+    :param str create_gantt:
         If SimBA should create gantt charts alongside the validation video. OPTIONS: 'None', 'Gantt chart: final frame only (slightly faster)',
         'Gantt chart: video'.
-    settings: dict
-        User style settings for video. E.g., {'pose': True, 'animal_names': True, 'styles': None}
+    :param dict settings: User style settings for video. E.g., {'pose': True, 'animal_names': True, 'styles': None}
+    :param int cores: Number of cores to use.
 
+    :example:
+    >>> test = ValidateModelOneVideoMultiprocess(config_path=r'/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini',
+    >>>                                         feature_file_path=r'/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/csv/features_extracted/SF2.csv',
+    >>>                                         model_path='/Users/simon/Desktop/envs/troubleshooting/naresh/models/generated_models/Top.sav',
+    >>>                                         discrimination_threshold=0.6,
+    >>>                                         shortest_bout=50,
+    >>>                                         settings={'pose': True, 'animal_names': True, 'styles': None},
+    >>>                                         create_gantt='Gantt chart: final frame only (slightly faster)',
+    >>>                                         cores=5)
+    >>> test.run()
     """
 
     def __init__(self,

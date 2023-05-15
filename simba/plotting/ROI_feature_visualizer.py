@@ -19,22 +19,15 @@ class ROIfeatureVisualizer(ConfigReader):
 
     .. note::
        For improved run-time, see :meth:`simba.ROI_feature_visualizer_mp.ROIfeatureVisualizerMultiprocess` for multiprocess class.
+       `Tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features>`__.
 
-    Parameters
-    ----------
-    config_path: str
-        Path to SimBA project config file in Configparser format
+    :param str config_path: Path to SimBA project config file in Configparser format
+    :param str video_name: Name of video to create feature visualizations for.
+    :param dict style_attr: User-defined styles (sizes, colors etc.)
 
-    video_name: str
-        Name of video to create feature visualizations for.
-
-    Notes
-    ----------
-    `Tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features>`__.
-
-    Examples
-    ----------
-    >>> _ = ROIfeatureVisualizer(config_path='MyProjectConfig', video_name='MyVideo.mp4').run()
+    :example:
+    >>> style_attr = {'ROI_centers': True, 'ROI_ear_tags': True, 'Directionality': True, 'Border_color': (0, 128, 0), 'Pose_estimation': True}
+    >>> _ = ROIfeatureVisualizer(config_path='MyProjectConfig', video_name='MyVideo.mp4', style_attr=style_attr).run()
     """
 
     def __init__(self,

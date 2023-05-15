@@ -15,26 +15,17 @@ class InteractiveProbabilityGrapher(ConfigReader):
     """
     Launch interactive GUI for classifier probability inspection.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    clf_name: str
-        Name of the classifier to create visualizations for
-    frame_setting: bool
-       When True, SimBA creates individual frames in png format
-    video_setting: bool
-       When True, SimBA creates compressed video in mp4 format
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str file_path: Data with classification probability field.
+    :param str model_path: Path to classifier used to create probability field.
 
-    Notes
-    ----------
-    `Validation tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data>`__.
-
+    .. note::
+       `Validation tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data>`__.
 
     Examples
     ----------
     >>> interactive_plotter = InteractiveProbabilityGrapher(config_path=r'MyConfigPath', file_path='MyFeatureFilepath', model_path='MyPickledClassifier.sav')
-    >>> interactive_plotter.create_plots()
+    >>> interactive_plotter.run()
     """
 
     def __init__(self,
@@ -67,16 +58,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         if (event.dblclick) and (event.button == 1) and (type(event.xdata) != None):
             current_x_cord = int(event.xdata)
 
-    def create_plots(self):
-        """
-        Method to launch interactive GUI
-
-        Returns
-        -------
-        Attribute: matplotlib.plt
-            fig
-        """
-
+    def run(self):
         import matplotlib
         matplotlib.use('TkAgg')
         global current_x_cord

@@ -23,26 +23,17 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
     Class for line chart visualizations displaying the classification probabilities of a single classifier.
     Uses multiprocessing.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
-    clf_name: str
-        Name of the classifier to create visualizations for
-    frame_setting: bool
-       When True, SimBA creates individual frames in png format
-    video_setting: bool
-       When True, SimBA creates compressed video in mp4 format
-    files_found: list
-        File paths to create probability plots for, e.g., ['project_folder/csv/machine_results/MyVideo.csv]
-    style_attr: dict
-        Output image style attributes, e.g., {'width': 640, 'height': 480, 'font size': 10, 'line width': 6, 'color': 'magneta', 'circle size': 20}
-    cores: int
-        Number of cores to use
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str clf_name: Name of the classifier to create visualizations for
+    :param bool frame_setting: When True, SimBA creates indidvidual frames in png format
+    :param bool video_setting: When True, SimBA creates compressed video in mp4 format
+    :param bool last_image: When True, creates image .png representing last frame of the video.
+    :param dict style_attr: User-defined style attributes of the visualization (line size, color etc).
+    :param List[str] files_found: Files to create threshold plots for.
+    :param int cores: Number of cores to use.
 
-    Notes
-    ----------
-    `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
+    .. note::
+       `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
 
     Examples
