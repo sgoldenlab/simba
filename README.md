@@ -166,7 +166,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Install SimBA using Anaconda](docs/anaconda_installation.md)
 
 ## Tutorial 📚
-- [API]([docs/Tutorial_tools.md](https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html)) 📘
+- [API](https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html) 📘
 - [Process video using SimBA tools](docs/Tutorial_tools.md) 🔨
 - [Batch pre-process video using SimBA](docs/tutorial_process_videos.md) 🏭
 - [Using DeepPoseKit in SimBA](docs/DeepPoseKit_in_SimBA.md) 📙
