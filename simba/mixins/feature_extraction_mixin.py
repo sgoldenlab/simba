@@ -1,0 +1,635 @@
+__author__ = "Simon Nilsson"
+
+import warnings
+warnings.filterwarnings("ignore")
+import numpy as np
+from numba import jit, prange
+from scipy.spatial import ConvexHull
+from scipy.spatial.qhull import QhullError
+from scipy.signal import savgol_filter
+import math
+import os, glob
+from scipy import stats
+import pandas as pd
+from scipy.signal import find_peaks
+from typing import Optional, List
+
+
+from simba.utils.enums import Paths, Options
+from simba.utils.checks import check_if_filepath_list_is_empty, check_file_exist_and_readable, check_minimum_roll_windows
+from simba.utils.read_write import (read_project_path_and_file_type,
+                                    read_video_info_csv,
+                                    read_config_file,
+                                    get_bp_headers)
+from simba.utils.errors import CountError
+import simba
+
+class FeatureExtractionMixin(object):
+    """
+    Methods for featurizing pose-estimation data.
+
+    :param configparser.Configparser config_path: path to SimBA project_config.ini
+    """
+
+    def __init__(self,
+                 config_path: Optional[str] = None):
+
+        if config_path:
+            self.config_path = config_path
+            self.config = read_config_file(config_path=config_path)
+            self.project_path, self.file_type = read_project_path_and_file_type(config=self.config)
+            self.video_info_path = os.path.join(self.project_path, Paths.VIDEO_INFO.value)
+            self.video_info_df = read_video_info_csv(file_path=self.video_info_path)
+            self.data_in_dir = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
+            self.save_dir = os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value)
+            if not os.path.exists(self.save_dir): os.makedirs(self.save_dir)
+            bp_path = os.path.join(self.project_path, Paths.BP_NAMES.value)
+            check_file_exist_and_readable(file_path=bp_path)
+            self.body_parts_lst = list(pd.read_csv(bp_path, header=None)[0])
+            self.roll_windows_values = check_minimum_roll_windows(Options.ROLLING_WINDOW_DIVISORS.value, self.video_info_df['fps'].min())
+            self.files_found = glob.glob(self.data_in_dir + '/*.' + self.file_type)
+            check_if_filepath_list_is_empty(filepaths=self.files_found, error_msg=f'No files of type {self.file_type} found in {self.data_in_dir}')
+            self.col_headers = get_bp_headers(body_parts_lst=self.body_parts_lst)
+            self.col_headers_shifted = [bp + '_shifted' for bp in self.col_headers]
+
+    @staticmethod
+    @jit(nopython=True)
+    def euclidean_distance(bp_1_x: pd.Series,
+                           bp_2_x: pd.Series,
+                           bp_1_y: pd.Series,
+                           bp_2_y: pd.Series,
+                           px_per_mm: float) -> pd.Series:
+        """
+        Helper to compute the Euclidean distance in millimeters between two body-parts in all frames of a video
+        """
+
+        series = (np.sqrt((bp_1_x - bp_2_x) ** 2 + (bp_1_y - bp_2_y) ** 2)) / px_per_mm
+        return series
+
+
+    @staticmethod
+    @jit(nopython=True, fastmath=True)
+    def angle3pt(ax: float, ay: float, bx: float, by: float, cx: float, cy: float) -> float:
+        """
+        Jitted helper for single frame 3-point angle. For multiple frame 3-point angles, use
+        ``simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized``.
+
+        """
+        ang = math.degrees(math.atan2(cy - by, cx - bx) - math.atan2(ay - by, ax - bx))
+        return ang + 360 if ang < 0 else ang
+
+    @staticmethod
+    @jit(nopython=True, fastmath=True)
+    def angle3pt_serialized(data: np.ndarray) -> np.ndarray:
+        """
+        Jitted helper for frame-wise 3-point angles.
+
+        :parameter ndarray data: 2D numerical array with frame number on x and [ax, ay, bx, by, cx, cy] on y.
+        :return ndarray: 2D numerical array with frame number on x and angle on y.
+        """
+
+        results = np.full((data.shape[0]), 0.0)
+        for i in prange(data.shape[0]):
+            angle = math.degrees(
+                math.atan2(data[i][5] - data[i][3], data[i][4] - data[i][2]) - math.atan2(data[i][1] - data[i][3], data[i][0] - data[i][2]))
+            if angle < 0:
+                angle += 360
+            results[i] = angle
+
+        return results
+
+    @staticmethod
+    def convex_hull_calculator_mp(arr: np.ndarray, px_per_mm: float) -> float:
+        """
+        Calculate single frame convex hull perimeter length in millimeters. For acceptable run-time,
+        Call using ``parallel.delayed``. For large data, use ``simba.feature_extractors.perimeter_jit.jitted_hull``.
+
+        :parameter np.ndarray arr: 2D array of size len(body-parts) x 2.
+        :parameter float px_per_mm: Video pixels per millimeter.
+        :return float: The length of the animal perimeter in millimeters.
+        """
+        arr = np.unique(arr, axis=0).astype(int)
+        if arr.shape[0] < 3:
+            return 0
+        for i in range(1, arr.shape[0]):
+            if (arr[i] != arr[0]).all():
+                try:
+                    return ConvexHull(arr, qhull_options='En').area / px_per_mm
+                except QhullError:
+                    return 0
+            else:
+                pass
+        return 0
+
+    @staticmethod
+    @jit(nopython=True)
+    def count_values_in_range(data: np.ndarray, ranges: np.ndarray) -> np.ndarray:
+        """
+        Jitted helper finding count of values that falls within ranges. E.g., the number of pose-estimated
+        body-parts that fall within defined bracket of probabilities.
+
+        :parameter np.ndarray data: 2D numpy array with frames on X.
+        :parameter np.ndarray ranges: 2D numpy array representing the brackets. E.g., [[0, 0.1], [0.1, 0.5]]
+        :return np.ndarray: 2D numpy array of size data.shape[0], ranges.shape[1]
+        """
+
+        results = np.full((data.shape[0], ranges.shape[0]), 0)
+        for i in prange(data.shape[0]):
+            for j in prange(ranges.shape[0]):
+                lower_bound, upper_bound = ranges[j][0], ranges[j][1]
+                results[i][j] = data[i][np.logical_and(data[i] >= lower_bound, data[i] <= upper_bound)].shape[0]
+        return results
+
+    @staticmethod
+    @jit(nopython=True)
+    def framewise_euclidean_distance_roi(location_1: np.ndarray,
+                                         location_2: np.ndarray,
+                                         px_per_mm: float,
+                                         centimeter: bool = False) -> np.ndarray:
+        """
+        Jitted helper finding frame-wise distances between a moving location (location_1) and
+        static location (location_2) in millimeter or centimeter.
+
+        :parameter ndarray location_1: 2D numpy array of size len(frames) x 2.
+        :parameter ndarray location_1: 1D numpy array holding the X and Y of the static location.
+        :parameter float px_per_mm: The pixels per millimeter in the video.
+        :parameter bool centimeter: If true, the value in centimeters is returned. Else the value in millimeters.
+
+        :return np.ndarray: 2D array of size location_1.shape[0] x 1.
+
+        """
+
+        results = np.full((location_1.shape[0]), np.nan)
+        for i in prange(location_1.shape[0]):
+            results[i] = np.linalg.norm(location_1[i] - location_2) / px_per_mm
+        if centimeter:
+            results = results / 10
+        return results
+
+    @staticmethod
+    @jit(nopython=True)
+    def framewise_inside_rectangle_roi(bp_location: np.ndarray,
+                                       roi_coords: np.ndarray) -> np.ndarray:
+        """
+        Jitted helper for frame-wise analysis if animal is inside static rectangular ROI.
+
+        :parameter np.ndarray bp_location:  2d numeric np.ndarray size len(frames) x 2
+        :parameter np.ndarray roi_coords: 2d numeric np.ndarray size 1x2 (top left[x, y], bottom right[x, y)
+        :return ndarray: 2d numeric boolean np.ndarray size len(frames) x 1 with 0 representing outside the rectangle and 1 representing inside the rectangle
+        """
+        results = np.full((bp_location.shape[0]), 0)
+        within_x_idx = np.argwhere((bp_location[:, 0] <= roi_coords[1][0]) & (bp_location[:, 0] >= roi_coords[0][0])).flatten()
+        within_y_idx = np.argwhere((bp_location[:, 1] <= roi_coords[1][1]) & (bp_location[:, 1] >= roi_coords[0][1])).flatten()
+        for i in prange(within_x_idx.shape[0]):
+            match = np.argwhere(within_y_idx == within_x_idx[i])
+            if match.shape[0] > 0:
+                results[within_x_idx[i]] = 1
+        return results
+
+    @staticmethod
+    @jit(nopython=True)
+    def framewise_inside_polygon_roi(bp_location: np.ndarray,
+                                     roi_coords: np.ndarray) -> np.ndarray:
+
+        """
+        Jitted helper for frame-wise detection if animal is inside static polygon ROI.
+
+        :parameter np.ndarray bp_location:  2d numeric np.ndarray size len(frames) x 2
+        :parameter np.ndarray roi_coords: 2d numeric np.ndarray size len(polygon points) x 2
+
+        :return ndarray: 2d numeric boolean np.ndarray size len(frames) x 1 with 0 representing outside the polygon and 1 representing inside the polygon
+
+        """
+        results = np.full((bp_location.shape[0]), 0)
+        for i in prange(0, results.shape[0]):
+            x, y, n = bp_location[i][0], bp_location[i][1], len(roi_coords)
+            p2x, p2y, xints, inside = 0.0, 0.0, 0.0, False
+            p1x, p1y = roi_coords[0]
+            for j in prange(n + 1):
+                p2x, p2y = roi_coords[j % n]
+                if (y > min(p1y, p2y)) and (y <= max(p1y, p2y)) and (x <= max(p1x, p2x)):
+                    if p1y != p2y:
+                        xints = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                    if p1x == p2x or x <= xints:
+                        inside = not inside
+                p1x, p1y = p2x, p2y
+            if inside:
+                results[i] = 1
+
+        return results
+
+    def windowed_frequentist_distribution_tests(self,
+                                                data: np.ndarray,
+                                                feature_name: str,
+                                                fps: int) -> pd.DataFrame:
+        """
+        Calculates feature value distributions and feature peak counts in 1-s sequential time-bins.
+
+        Computes (i) feature value distributions in 1-s sequential time-bins: Kolmogorov-Smirnov and T-tests.
+        Computes (ii)  feature values against a normal distribution: Shapiro-Wilks.
+        Computes (iii) peak count in *rolling* 1s long feature window: scipy.find_peaks.
+
+        :parameter np.ndarray data: Single feature 2D array with frames on X.
+        :parameter np.ndarray feature_name: The name of the input feature.
+        :parameter int fps: The framerate of the video representing the data.
+        :return pd.DataFrame: Of size len(data) x 4 with columns representing KS, T, Shapiro-Wilks, and peak count statistics.
+        """
+
+        ks_results, = np.full((data.shape[0]), -1.0),
+        t_test_results = np.full((data.shape[0]), -1.0)
+        shapiro_results = np.full((data.shape[0]), -1.0)
+        peak_cnt_results = np.full((data.shape[0]), -1.0)
+
+        for i in range(fps, data.shape[0] - fps, fps):
+            bin_1_idx, bin_2_idx = [i - fps, i], [i, i + fps]
+            bin_1_data, bin_2_data = data[bin_1_idx[0]:bin_1_idx[1]], data[bin_2_idx[0]:bin_2_idx[1]]
+            ks_results[i:i + fps + 1] = stats.ks_2samp(data1=bin_1_data, data2=bin_2_data).statistic
+            t_test_results[i:i + fps + 1] = stats.ttest_ind(bin_1_data, bin_2_data).statistic
+
+        for i in range(0, data.shape[0] - fps, fps):
+            shapiro_results[i:i + fps + 1] = stats.shapiro(data[i:i + fps])[0]
+
+        rolling_idx = np.arange(fps)[None, :] + 1 * np.arange(data.shape[0])[:, None]
+        for i in range(rolling_idx.shape[0]):
+            bin_start_idx, bin_end_idx = rolling_idx[i][0], rolling_idx[i][-1]
+            peaks, _ = find_peaks(data[bin_start_idx:bin_end_idx], height=0)
+            peak_cnt_results[i] = len(peaks)
+
+        columns = [f'{feature_name}_KS', f'{feature_name}_TTEST',
+                   f'{feature_name}_SHAPIRO', f'{feature_name}_PEAK_CNT']
+
+        return pd.DataFrame(
+            np.column_stack((ks_results, t_test_results, shapiro_results, peak_cnt_results)),
+            columns=columns).round(4).fillna(0)
+
+    @staticmethod
+    @jit(nopython=True, cache=True)
+    def cdist(array_1: np.ndarray,
+              array_2: np.ndarray) -> np.ndarray:
+        """
+        Jitted analogue of scipy.cdist.
+
+        :parameter np.ndarray array_1: 2D array of body-part coordinates
+        :parameter np.ndarray array_2: 2D array of body-part coordinates
+
+        :return np.ndarray: 2D array of euclidean distances between body-parts in ``array_1`` and ``array_2``
+
+        """
+        results = np.full((array_1.shape[0], array_2.shape[0]), np.nan)
+        for i in prange(array_1.shape[0]):
+            for j in prange(array_2.shape[0]):
+                results[i][j] = np.linalg.norm(array_1[i] - array_2[j])
+        return results
+
+    @staticmethod
+    def create_shifted_df(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Create dataframe including duplicated shifted (1) columns with ``_shifted`` suffix.
+
+        :parameter pd.DataFrame df
+        :return pd.DataFrame: Dataframe including original and shifted columns.
+        """
+        data_df_shifted = df.shift(periods=1)
+        data_df_shifted = data_df_shifted.combine_first(df).add_suffix('_shifted')
+        return pd.concat([df, data_df_shifted], axis=1, join='inner').reset_index(drop=True)
+
+    def check_directionality_viable(self):
+        """
+        Check if it is possible to calculate ``directionality`` statistics
+        (i.e., nose, and ear coordinates from pose estimation has to be present)
+
+        :return bool: If True, directionality is viable. Else, not viable.
+        :return np.ndarray nose_coord: If viable, then 2D array with coordinates of the nose in all frames. Else, empty array.
+        :return np.ndarray ear_left_coord: If viable, then 2D array with coordinates of the left ear in all frames. Else, empty array.
+        :return np.ndarray ear_right_coord: If viable, then 2D array with coordinates of the right ear in all frames. Else, empty array.
+        """
+
+        direction_viable = True
+        nose_cords, ear_left_cords, ear_right_cords = [], [], []
+        for animal_name in self.animal_bp_dict.keys():
+            for bp_cord in ['X_bps', 'Y_bps']:
+                bp_list = self.animal_bp_dict[animal_name][bp_cord]
+                for bp_name in bp_list:
+                    bp_name_components = bp_name.split('_')
+                    bp_name_components = [x.lower() for x in bp_name_components]
+                    if ('nose' in bp_name_components):
+                        nose_cords.append(bp_name)
+                    elif ('ear' in bp_name_components) and ('left' in bp_name_components):
+                        ear_left_cords.append(bp_name)
+                    elif ('ear' in bp_name_components) and ('right' in bp_name_components):
+                        ear_right_cords.append(bp_name)
+                    else:
+                        pass
+
+        for cord in [nose_cords, ear_left_cords, ear_right_cords]:
+            if len(cord) != len(self.animal_bp_dict.keys()) * 2:
+                direction_viable = False
+
+        if direction_viable:
+            nose_cords = [nose_cords[i * 2:(i + 1) * 2] for i in range((len(nose_cords) + 2 - 1) // 2)]
+            ear_left_cords = [ear_left_cords[i * 2:(i + 1) * 2] for i in range((len(ear_left_cords) + 2 - 1) // 2)]
+            ear_right_cords = [ear_right_cords[i * 2:(i + 1) * 2] for i in range((len(ear_right_cords) + 2 - 1) // 2)]
+
+        return direction_viable, nose_cords, ear_left_cords, ear_right_cords
+
+    def get_feature_extraction_headers(self,
+                                       pose: str) -> List[str]:
+        """
+        Helper to return the headers names (body-part location columns) that should be used during feature extraction.
+
+        :parameter str pose: Pose-estimation setting, e.g., ``16``.
+        :return List[str]: The names and order of the pose-estimation columns.
+        """
+        simba_dir = os.path.dirname(simba.__file__)
+        feature_categories_csv_path = os.path.join(simba_dir, Paths.SIMBA_FEATURE_EXTRACTION_COL_NAMES_PATH.value)
+        check_file_exist_and_readable(file_path=feature_categories_csv_path)
+        bps = list(pd.read_csv(feature_categories_csv_path)[pose])
+        return [x for x in bps if str(x) != 'nan']
+
+    @staticmethod
+    @jit(nopython=True)
+    def jitted_line_crosses_to_nonstatic_targets(left_ear_array: np.ndarray,
+                                                 right_ear_array: np.ndarray,
+                                                 nose_array: np.ndarray,
+                                                 target_array: np.ndarray) -> np.ndarray:
+        """
+        Jitted helper to calculate if an animal is directing towards another animals body-part coordinate,
+        given the target body-part and the left ear, right ear, and nose coordinates of the observer.
+
+        :parameter np.ndarray left_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals left ear
+        :parameter np.ndarray right_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals right ear
+        :parameter np.ndarray nose_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals nose
+        :parameter np.ndarray target_array: 2D array of size len(frames) x 2 with the target body-part location
+
+        :return np.ndarray: 2D array of size len(frames) x 4. First column represent the side of the observer that the target is in view. 0 = Left side, 1 = Right side, 2 = Not in view.
+        Second and third column represent the x and y location of the observer animals ``eye`` (half-way between the ear and the nose).
+        Fourth column represent if target is is view (bool).
+
+        .. note::
+           Input left ear, right ear, and nose coordinates of the observer is returned by
+           :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
+        """
+
+        results_array = np.zeros((left_ear_array.shape[0], 4))
+        for frame_no in prange(results_array.shape[0]):
+            Px = np.abs(left_ear_array[frame_no][0] - target_array[frame_no][0])
+            Py = np.abs(left_ear_array[frame_no][1] - target_array[frame_no][1])
+            Qx = np.abs(right_ear_array[frame_no][0] - target_array[frame_no][0])
+            Qy = np.abs(right_ear_array[frame_no][1] - target_array[frame_no][1])
+            Nx = np.abs(nose_array[frame_no][0] - target_array[frame_no][0])
+            Ny = np.abs(nose_array[frame_no][1] - target_array[frame_no][1])
+            Ph = np.sqrt(Px * Px + Py * Py)
+            Qh = np.sqrt(Qx * Qx + Qy * Qy)
+            Nh = np.sqrt(Nx * Nx + Ny * Ny)
+            if (Nh < Ph and Nh < Qh and Qh < Ph):
+                results_array[frame_no] = [0, right_ear_array[frame_no][0], right_ear_array[frame_no][1], True]
+            elif (Nh < Ph and Nh < Qh and Ph < Qh):
+                results_array[frame_no] = [1, left_ear_array[frame_no][0], left_ear_array[frame_no][1], True]
+            else:
+                results_array[frame_no] = [2, -1, -1, False]
+
+        return results_array
+
+    @staticmethod
+    @jit(nopython=True)
+    def jitted_line_crosses_to_static_targets(left_ear_array: np.ndarray,
+                                              right_ear_array: np.ndarray,
+                                              nose_array: np.ndarray,
+                                              target_array: np.ndarray) -> np.ndarray:
+        """
+        Jitted helper to calculate if an animal is directing towards a static location (ROI centroid),
+        given the target location and the left ear, right ear, and nose coordinates of the observer.
+
+        :parameter np.ndarray left_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals left ear
+        :parameter np.ndarray right_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals right ear
+        :parameter np.ndarray nose_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals nose
+        :parameter np.ndarray target_array: 2D array of size len(frames) x 2 with the target location
+
+        :return np.ndarray: 2D array of size len(frames) x 4. First column represent the side of the observer that the target is in view. 0 = Left side, 1 = Right side, 2 = Not in view.
+        Second and third column represent the x and y location of the observer animals ``eye`` (half-way between the ear and the nose).
+        Fourth column represent if target is is view (bool).
+
+        .. note::
+           Input left ear, right ear, and nose coordinates of the observer is returned by
+           :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
+        """
+
+        results_array = np.zeros((left_ear_array.shape[0], 4))
+        for frame_no in range(results_array.shape[0]):
+            Px = np.abs(left_ear_array[frame_no][0] - target_array[0])
+            Py = np.abs(left_ear_array[frame_no][1] - target_array[1])
+            Qx = np.abs(right_ear_array[frame_no][0] - target_array[0])
+            Qy = np.abs(right_ear_array[frame_no][1] - target_array[1])
+            Nx = np.abs(nose_array[frame_no][0] - target_array[0])
+            Ny = np.abs(nose_array[frame_no][1] - target_array[1])
+            Ph = np.sqrt(Px * Px + Py * Py)
+            Qh = np.sqrt(Qx * Qx + Qy * Qy)
+            Nh = np.sqrt(Nx * Nx + Ny * Ny)
+            if (Nh < Ph and Nh < Qh and Qh < Ph):
+                results_array[frame_no] = [0, right_ear_array[frame_no][0], right_ear_array[frame_no][1], True]
+            elif (Nh < Ph and Nh < Qh and Ph < Qh):
+                results_array[frame_no] = [1, left_ear_array[frame_no][0], left_ear_array[frame_no][1], True]
+            else:
+                results_array[frame_no] = [2, -1, -1, False]
+
+        return results_array
+
+
+    def minimum_bounding_rectangle(self,
+                                   points: np.ndarray) -> np.ndarray:
+
+        """
+        Finds the minimum bounding rectangle of a convex hull perimeter.
+
+        :parameter np.ndarray points: 2D array representing the convexhull vertices of the animal.
+        :return np.ndarray: 2D array representing minimum bounding rectangle of the convexhull vertices of the animal.
+
+        .. note::
+           Modified from `JesseBuesking <https://stackoverflow.com/questions/13542855/algorithm-to-find-the-minimum-area-rectangle-for-given-points-in-order-to-comput>`_
+
+           See :meth:`simba.mixins.feature_extractors.perimeter_jit.jitted_hull` for computing the convexhull vertices.
+
+        TODO: Place in numba njit.
+        """
+
+        pi2 = np.pi / 2.
+        hull_points = points[ConvexHull(points).vertices]
+        edges = hull_points[1:] - hull_points[:-1]
+        angles = np.arctan2(edges[:, 1], edges[:, 0])
+        angles = np.abs(np.mod(angles, pi2))
+        angles = np.unique(angles)
+        rotations = np.vstack([np.cos(angles), np.cos(angles - pi2), np.cos(angles + pi2), np.cos(angles)]).T
+        rotations = rotations.reshape((-1, 2, 2))
+        rot_points = np.dot(rotations, hull_points.T)
+        min_x, max_x = np.nanmin(rot_points[:, 0], axis=1), np.nanmax(rot_points[:, 0], axis=1)
+        min_y, max_y = np.nanmin(rot_points[:, 1], axis=1), np.nanmax(rot_points[:, 1], axis=1)
+        areas = (max_x - min_x) * (max_y - min_y)
+        best_idx = np.argmin(areas)
+        x1, x2 = max_x[best_idx], min_x[best_idx]
+        y1, y2 = max_y[best_idx], min_y[best_idx]
+        r = rotations[best_idx]
+        rval = np.zeros((4, 2))
+        rval[0], rval[1] = np.dot([x1, y2], r), np.dot([x2, y2], r)
+        rval[2], rval[3] = np.dot([x2, y1], r), np.dot([x1, y1], r)
+        return rval
+
+
+
+
+    @staticmethod
+    @jit(nopython=True)
+    def framewise_euclidean_distance(location_1: np.ndarray,
+                                     location_2: np.ndarray,
+                                     px_per_mm: float,
+                                     centimeter: bool = False) -> np.ndarray:
+        """
+        Jitted helper finding frame-wise distances between two moving locations in millimeter or centimeter.
+
+        :parameter ndarray location_1: 2D array of size len(frames) x 2.
+        :parameter ndarray location_1: 2D array of size len(frames) x 2.
+        :parameter float px_per_mm: The pixels per millimeter in the video.
+        :parameter bool centimeter: If true, the value in centimeters is returned. Else the value in millimeters.
+
+        :return np.ndarray: 2D array of size location_1.shape[0] x 1.
+        """
+
+        results = np.full((location_1.shape[0]), np.nan)
+        for i in prange(location_1.shape[0]):
+            results[i] = np.linalg.norm(location_1[i] - location_2[i]) / px_per_mm
+        if centimeter:
+            results = results / 10
+        return results
+
+    def dataframe_gaussian_smoother(self,
+                                    df: pd.DataFrame,
+                                    fps: int,
+                                    time_window: int=100) -> pd.DataFrame:
+        """
+        Column-wise Gaussian smoothing of dataframe.
+
+        :parameter pd.DataFrame df: Dataframe with un-smoothened data.
+        :parameter int fps: The frame-rate of the video representing the data.
+        :parameter int time_window: Time-window in milliseconds to use for Gaussian smoothing.
+        :return pd.DataFrame: Dataframe with smoothened data
+        """
+
+        frames_in_time_window = int(time_window / (1000 / fps))
+        for c in df.columns:
+            df[c] = df[c].rolling(window=int(frames_in_time_window), win_type='gaussian', center=True).mean(std=5).fillna(df[c]).abs()
+        return df
+
+
+    def dataframe_savgol_smoother(self,
+                                  df: pd.DataFrame,
+                                  fps: int,
+                                  time_window: int = 150) -> pd.DataFrame:
+        """
+        Column-wise Savitzky-Golay smoothing of dataframe.
+
+        :parameter pd.DataFrame df: Dataframe with un-smoothened data.
+        :parameter int fps: The frame-rate of the video representing the data.
+        :parameter int time_window: Time-window in milliseconds to use for Gaussian smoothing.
+        :return pd.DataFrame: Dataframe with smoothened data
+        """
+        frames_in_time_window = int(time_window / (1000 / fps))
+        if (frames_in_time_window % 2) == 0: frames_in_time_window = frames_in_time_window - 1
+        if (frames_in_time_window % 2) <= 3: frames_in_time_window = 5
+        for c in df.columns:
+            df[c] = savgol_filter(x=df[c].to_numpy(), window_length=frames_in_time_window, polyorder=3, mode='nearest')
+        return df
+
+    def get_bp_headers(self) -> None:
+        """
+        Helper to create ordered list of all column header fields for SimBA project dataframes.
+        """
+        self.col_headers = []
+        for bp in self.body_parts_lst:
+            c1, c2, c3 = (f'{bp}_x', f'{bp}_y', f'{bp}_p')
+            self.col_headers.extend((c1, c2, c3))
+
+    def check_directionality_cords(self) -> dict:
+
+        """
+        Helper to check if ear and nose body-parts are present within the pose-estimation data.
+
+        :return dict: Body-part names of ear and nose body-parts as values and animal names as keys. If empty,
+            ear and nose body-parts are not present within the pose-estimation data
+
+        """
+        results = {}
+        for animal in self.animal_bp_dict.keys():
+            results[animal] = {}
+            results[animal]['Nose'] = {}
+            results[animal]['Ear_left'] = {}
+            results[animal]['Ear_right'] = {}
+            for dimension in ['X_bps', 'Y_bps']:
+                for cord in self.animal_bp_dict[animal][dimension]:
+                    if ("nose" in cord.lower()) and ("x" in cord.lower()):
+                        results[animal]['Nose']['X_bps'] = cord
+                    elif ("nose" in cord.lower()) and ("y" in cord.lower()):
+                        results[animal]['Nose']['Y_bps'] = cord
+                    elif ("left" in cord.lower()) and ("x" in cord.lower()) and ("ear" in cord.lower()):
+                        results[animal]['Ear_left']['X_bps'] = cord
+                    elif ("left" in cord.lower()) and ("Y".lower() in cord.lower()) and ("ear".lower() in cord.lower()):
+                        results[animal]['Ear_left']['Y_bps'] = cord
+                    elif ("right" in cord.lower()) and ("x" in cord.lower()) and ("ear" in cord.lower()):
+                        results[animal]['Ear_right']['X_bps'] = cord
+                    elif ("right" in cord.lower()) and ("y" in cord.lower()) and ("ear".lower() in cord.lower()):
+                        results[animal]['Ear_right']['Y_bps'] = cord
+        return results
+
+    def insert_default_headers_for_feature_extraction(self,
+                                                      df: pd.DataFrame,
+                                                      headers: List[str],
+                                                      pose_config: str,
+                                                      filename: str) -> pd.DataFrame:
+        """
+        Helper to insert correct body-part column names prior to defualt feature extraction methods.
+        """
+        if len(headers) != len(df.columns):
+            raise CountError(f'Your SimBA project is set to using the default {pose_config} pose-configuration. '
+                             f'SimBA therefore expects {str(len(headers))} columns of data inside the files within the project_folder. However, '
+                             f'within file {filename} file, SimBA found {str(len(df.columns))} columns.')
+        else:
+            df.columns = headers
+            return df
+
+    @staticmethod
+    def line_crosses_to_static_targets(p: List[float],
+                                       q: List[float],
+                                       n: List[float],
+                                       M: List[float],
+                                       coord: List[float]) -> (bool, List[float]):
+        """
+        Legacy non-jitted helper to calculate if an animal is directing towards a static coordinate (e.g., ROI centroid).
+
+        .. note:
+           For improved runtime, use :meth:`simba.mixins.feature_extraction_mixin.jitted_line_crosses_to_static_targets`
+
+        :parameter list p: left ear coordinates of observing animal.
+        :parameter list q: right ear coordinates of observing animal.
+        :parameter list n: nose coordinates of observing animal.
+        :parameter list M: The location of the target coordinates.
+        :parameter list coord: empty list to store the eye coordinate of the observing animal.
+
+        :return bool: If True, static coordinate is in view.
+        :return List: If True, the coordinate of the observing animals ``eye`` (half-way between nose and ear).
+        """
+
+        Px = np.abs(p[0] - M[0])
+        Py = np.abs(p[1] - M[1])
+        Qx = np.abs(q[0] - M[0])
+        Qy = np.abs(q[1] - M[1])
+        Nx = np.abs(n[0] - M[0])
+        Ny = np.abs(n[1] - M[1])
+        Ph = np.sqrt(Px * Px + Py * Py)
+        Qh = np.sqrt(Qx * Qx + Qy * Qy)
+        Nh = np.sqrt(Nx * Nx + Ny * Ny)
+        if (Nh < Ph and Nh < Qh and Qh < Ph):
+            coord.extend((q[0], q[1]))
+            return True, coord
+        elif (Nh < Ph and Nh < Qh and Ph < Qh):
+            coord.extend((p[0], p[1]))
+            return True, coord
+        else:
+            return False, coord
