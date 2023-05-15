@@ -192,6 +192,9 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 All data (classifiers etc.) is available on our [Open Science Framework repository](https://osf.io/tmu6y/). For a schematic overview of the data respository folder structure (as of March-20-2020), click [HERE](https://github.com/sgoldenlab/simba/blob/master/images/OSF_folder_structure_031820.jpg).
 
+### API reference
+- [SimBA on readthedocs](https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html)
+
 ### Models
 Below is a link to download trained  behavior classification models to apply it on your dataset
 - [Random forest models](https://osf.io/kwge8/) 🌲
