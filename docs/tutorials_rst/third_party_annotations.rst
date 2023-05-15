@@ -1,4 +1,4 @@
-THIRD-PARTY ANNOTATIONS (BEHAVIOR LABELS) IN SIMBA
+Third-part annotations in SimBA
 ==================================================
 
 .. image:: img/third_party_annotations/landing.png
@@ -33,7 +33,7 @@ to append them to your data in SimBA, please reach out to us on
 `GitHub <https://github.com/sgoldenlab/simba>`__ and we can work
 together to make the option available in the SimBA GUI.
 
-BEFORE IMPORTING THIRD-PARTY ANNOTATIONS (BEHAVIOR LABELS) INTO YOUR SIMBA PROJECT
+Before importing third-party annotations into SimBA project
 ----------------------------------------------------------------------------------
 
 In brief, before we can import the third-party annotations, we need to
@@ -53,7 +53,7 @@ correction), and (iv) extract features for our data set, thus:
    features, click
    `HERE <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
 
-TUTORIAL
+Tutorial
 ~~~~~~~~
 
 **1.** After loading your project, click on the ``[LABEL BEHAVIOR]``
@@ -223,7 +223,7 @@ tick the ``CREATE IMPORT LOG`` checkbox. The log will be saved in the
 ``project_folder/logs`` directory of your SimBA project and named
 something like ``BORIS_append_20230328095919.log``.
 
-TROUBLESHOOTING NOTES AND COMMON ERRORS
+Troubleshooting and common errors
 ---------------------------------------
 
 -  Please make sure that the FPS of the imported video `registered in

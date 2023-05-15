@@ -39,11 +39,11 @@ outliers <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step
 (or click to indicate that you want to *Skip outlier correction* as
 detailed in the Correct outliers tutorial)
 
-ANALYZING ANIMAL-ANCHORED ROIs IN SIMBA
+Animal anchored ROIs in SimBA (animal bounding boxes)
 ------------------------------------------------------
 
 
-FINDING THE ANIMAL-ANCHORED ROIs
+Finding animal-anchored ROIs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: img/anchored_roi/menu_1.png
@@ -84,7 +84,7 @@ in the ``SELECT SHAPE TYPE`` dropdown, the settings menu on the
 through the settings for **Entire animal** based bounding boxes,
 followed by body-part anchored bounding boxes.
 
-ANCHORED-ROI SHAPE TYPES - ENTIRE ANIMAL BASED BOUNDING BOXES
+Entire animal based bounding boxes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: img/anchored_roi/bbox_example_termite.png
@@ -119,7 +119,7 @@ user-defined parameters:
       animal-anchored ROIs, then enter the size of that space in the
       ``PARALLEL OFFSET`` entry box in millimeter.
 
-SINGLE BODY-PART BASED BOUNDING BOXES.
+Body-part based bounding boxes.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Single body-part based bounding also has two user-defined parameters:
@@ -163,7 +163,7 @@ it as much as we possibly can, because it contains a potentially very
 large about of data (depending on the number of videos, individuals, and
 frame rate of your videos).
 
-VISUALIZING ANIMAL-ANCHORED ROIs
+Visualizing animal-anchored ROIs
 --------------------------------
 
 Next, when the animal anchored-ROIs have been computed and we have the
@@ -237,7 +237,7 @@ examples, dependning in your chosen shape-type:
   :width: 800
   :align: center
 
-CALCULATING BOUNDARY STATISTICS
+Computing statistics
 -------------------------------
 
 Next, we want to calculate statistics based on on each animal-anchored
@@ -332,7 +332,7 @@ that the Animal 1 anchored ROI and Animal 5 head body-part where
 representing frames 0-13 shows that the Animal 1 anchored ROI and Animal
 5 head body-part where **not overlapping** in those frames.
 
-CALCULATING SUMMARY AGGREGATE BOUNDARY STATISTICS
+Computing aggregate statistics
 -------------------------------------------------
 
 Next, with this information at hand, we can now compute aggregate
