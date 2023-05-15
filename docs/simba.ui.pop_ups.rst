@@ -1,8 +1,5 @@
-simba.ui.pop\_ups package
+SimBA UI pop-ups
 =========================
-
-Submodules
-----------
 
 simba.ui.pop\_ups.about\_simba\_pop\_up module
 ----------------------------------------------

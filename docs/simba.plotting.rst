@@ -1,9 +1,6 @@
 simba.plotting package
 ======================
 
-Submodules
-----------
-
 Direction between animals
 ----------------------------------------------------
 

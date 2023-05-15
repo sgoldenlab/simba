@@ -3,13 +3,14 @@ Mixins
 
 Config reader methods
 ----------------------------------
+Methods for reading SimBA configparser.Configparser project config and associated project data
 
 .. automodule:: simba.mixins.config_reader
    :members:
    :undoc-members:
    :show-inheritance:
 
-Feature extration methods
+Feature extraction methods
 ----------------------------------------------
 
 .. automodule:: simba.mixins.feature_extraction_mixin

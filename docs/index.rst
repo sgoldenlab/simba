@@ -5,8 +5,13 @@ Welcome to SimBA's documentation!
 .. image:: tutorials_rst/img/index/landing_page_1.png
    :align: center
 
-These docs are under development. For detailed tutorials,
+
+These docs are under development. For detailed tutorials, code, and more extensive documentation
 see the `SimBA GitHub repository <https://github.com/sgoldenlab/simba>`_.
+
+For support, see `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im>`_.
+
+`Pre-print <https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2>`_
 
 **Installation**
 
@@ -36,3 +41,22 @@ see the `SimBA GitHub repository <https://github.com/sgoldenlab/simba>`_.
    :caption: WALKTHROUGHS:
 
    walkthroughs
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: LABELLING TUTORIALS:
+
+   labelling
+
+.. toctree::
+   :maxdepth: 1
+   :caption: FAQ:
+
+   tutorials_rst/FAQ
+
+.. toctree::
+   :maxdepth: 1
+   :caption: DOCS:
+
+   docs/workflow

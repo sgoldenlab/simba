@@ -1,8 +1,7 @@
 Data processors
 ==============================
 
-Submodules
-----------
+Methods for manipulating classification and pose-estimation data
 
 Aggregate classifier statistics calculator
 --------------------------------------------------
@@ -20,7 +19,7 @@ Directing-other-animals calculator
    :undoc-members:
    :show-inheritance:
 
-Forward-spike-time-tiling coefficent calculator
+Forward-spike-time-tiling coefficient calculator
 -----------------------------------------------
 
 .. automodule:: simba.data_processors.fsttc_calculator

@@ -1,8 +1,5 @@
-simba.utils package
+SimBA utilities
 ===================
-
-Subpackages
------------
 
 .. toctree::
    :maxdepth: 4

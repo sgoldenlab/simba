@@ -1,9 +1,6 @@
 ROI TOOLS
 ========================
 
-Submodules
-----------
-
 ROI analyzer
 -------------------------------------
 
@@ -115,11 +112,4 @@ simba.roi\_tools.ROI\_zoom module
    :members:
    :undoc-members:
    :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.roi_tools
-   :members:
-   :undoc-members:
-   :show-inheritance:
+:

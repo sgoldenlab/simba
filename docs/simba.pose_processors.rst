@@ -1,8 +1,8 @@
-POSE PROCESSORS
+Pose-estimation data processors
 ==============================
 
 
-RESET POSE
+Reset pose
 -----------------------------------------
 
 .. automodule:: simba.pose_processors.pose_reset
@@ -10,7 +10,7 @@ RESET POSE
    :undoc-members:
    :show-inheritance:
 
-REMOVE KEY-POINTS
+Remove key-points
 -----------------------------------------------
 
 .. automodule:: simba.pose_processors.remove_keypoints
@@ -18,7 +18,7 @@ REMOVE KEY-POINTS
    :undoc-members:
    :show-inheritance:
 
-RE-ORGANIZE KEYPOINTS
+Re-organize key-points
 --------------------------------------------------
 
 .. automodule:: simba.pose_processors.reorganize_keypoint
@@ -26,7 +26,7 @@ RE-ORGANIZE KEYPOINTS
    :undoc-members:
    :show-inheritance:
 
-REVERSE POSE
+Reverse pose
 -------------------------------------------
 
 .. automodule:: simba.pose_processors.reverse_pose

@@ -1,8 +1,5 @@
-simba.ui package
+SimBA UI
 ================
-
-Subpackages
------------
 
 .. toctree::
    :maxdepth: 4

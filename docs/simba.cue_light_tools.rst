@@ -1,15 +1,14 @@
-CUE LIGHT TOOLS
+Cue light tools
 ===============================
 
-Submodules
-----------
+Methods for analyzing animal behaviours associated with `cue-light states through <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_.
 
 Analyze
 ---------------------------------------------------
 
 .. automodule:: simba.cue_light_tools.cue_light_analyzer
    :members:
-   :undoc-members:
+   :undoc-members: get_intensity_scores_in_rois
    :show-inheritance:
 
 CLF Statistics

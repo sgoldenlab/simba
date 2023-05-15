@@ -1,4 +1,4 @@
-simba.unsupervised package
+Unsupervised analysis in SimBA
 ==========================
 
 Submodules
@@ -104,14 +104,6 @@ simba.unsupervised.umap\_embedder module
 ----------------------------------------
 
 .. automodule:: simba.unsupervised.umap_embedder
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.unsupervised
    :members:
    :undoc-members:
    :show-inheritance:

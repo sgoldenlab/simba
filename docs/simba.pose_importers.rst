@@ -1,8 +1,7 @@
 Pose estimation importers
 =============================
 
-
-DLC CSV - Single file
+Import single DLC CSV file
 -----------------------------------------------
 
 .. automodule:: simba.pose_importers.dlc_importer_csv
@@ -10,7 +9,7 @@ DLC CSV - Single file
    :undoc-members:
    :show-inheritance:
 
-DLC CSV - multiple files
+Import multiple DLC CSV files
 ---------------------------------------------------------
 
 .. automodule:: simba.pose_importers.dlc_multi_animal_importer
@@ -18,7 +17,7 @@ DLC CSV - multiple files
    :undoc-members:
    :show-inheritance:
 
-MARS
+Import MARS pose-estimation data
 -----------------------------------------
 
 .. automodule:: simba.pose_importers.import_mars
@@ -26,7 +25,7 @@ MARS
    :undoc-members:
    :show-inheritance:
 
-DANNCE
+Import DANNCE pose-estimation data
 ----------------------------------------------
 
 .. automodule:: simba.pose_importers.read_DANNCE_mat
@@ -34,34 +33,42 @@ DANNCE
    :undoc-members:
    :show-inheritance:
 
-SLEAP CSV
+Import SLEAP CSV pose-estimation data
 -------------------------------------------------
 
-.. automodule:: simba.pose_importers.sleap_importer_csv
+.. automodule:: simba.pose_importers.sleap_csv_importer
    :members:
    :undoc-members:
    :show-inheritance:
 
-SLEAP H5
+Import SLEAP H5 pose-estimation data
 ------------------------------------------------
 
-.. automodule:: simba.pose_importers.sleap_importer_h5
+.. automodule:: simba.pose_importers.sleap_h5_importer
    :members:
    :undoc-members:
    :show-inheritance:
 
-SLEAP SLP
+Import SLEAP SLP pose-estimation data
 -------------------------------------------------
 
-.. automodule:: simba.pose_importers.sleap_importer_slp
+.. automodule:: simba.pose_importers.sleap_slp_importer
    :members:
    :undoc-members:
    :show-inheritance:
 
-APT
+Import APT TRK pose-estimation data
 ------------------------------------------
 
 .. automodule:: simba.pose_importers.trk_importer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Import DLC H5 files
+------------------------------------------
+
+.. automodule:: simba.pose_importers.madlc_importer
    :members:
    :undoc-members:
    :show-inheritance:

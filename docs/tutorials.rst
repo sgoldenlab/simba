@@ -2,7 +2,7 @@ Tutorials
 =============
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    tutorials_rst/roi
    tutorials_rst/FSTTC
@@ -13,5 +13,9 @@ Tutorials
    tutorials_rst/SHAP
    tutorials_rst/directionality_between_animals
    tutorials_rst/classifier_validation
-   tutorials_rst/third_party_annotations
    tutorials_rst/cue_lights
+   tutorials_rst/multi_animal_pose
+   tutorials_rst/process_videos
+   tutorials_rst/installation
+   tutorials_rst/create_user_defined_pose_config
+   tutorials_rst/tools

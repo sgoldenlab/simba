@@ -1,10 +1,7 @@
 simba.utils.cli package
 =======================
 
-Submodules
-----------
-
-simba.utils.cli.cli\_tools module
+SimBA CLI tools
 ---------------------------------
 
 .. automodule:: simba.utils.cli.cli_tools
@@ -12,10 +9,3 @@ simba.utils.cli.cli\_tools module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: simba.utils.cli
-   :members:
-   :undoc-members:
-   :show-inheritance:
