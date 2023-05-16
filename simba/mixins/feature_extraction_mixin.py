@@ -28,7 +28,7 @@ class FeatureExtractionMixin(object):
     """
     Methods for featurizing pose-estimation data.
 
-    :param configparser.Configparser config_path: path to SimBA project_config.ini
+    :param Optional[configparser.Configparser] config_path: path to SimBA project_config.ini
     """
 
     def __init__(self,
@@ -54,26 +54,51 @@ class FeatureExtractionMixin(object):
 
     @staticmethod
     @jit(nopython=True)
-    def euclidean_distance(bp_1_x: pd.Series,
-                           bp_2_x: pd.Series,
-                           bp_1_y: pd.Series,
-                           bp_2_y: pd.Series,
-                           px_per_mm: float) -> pd.Series:
+    def euclidean_distance(bp_1_x: np.ndarray,
+                           bp_2_x: np.ndarray,
+                           bp_1_y: np.ndarray,
+                           bp_2_y: np.ndarray,
+                           px_per_mm: float) -> np.ndarray:
         """
         Helper to compute the Euclidean distance in millimeters between two body-parts in all frames of a video
-        """
 
+        .. seealso::
+           Use :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`
+           for imporved run-times.
+
+        :param np.ndarray bp_1_x: 2D array of size len(frames) x 1 with bodypart 1 x-coordinates.
+        :param np.ndarray bp_2_x: 2D array of size len(frames) x 1 with bodypart 2 x-coordinates.
+        :param np.ndarray bp_1_y: 2D array of size len(frames) x 1 with bodypart 1 y-coordinates.
+        :param np.ndarray bp_2_y: 2D array of size len(frames) x 1 with bodypart 2 y-coordinates.
+        :return np.ndarray: 2D array of size len(frames) x 1 with distances between body-part 1 and 2 in millimeters
+
+        :example:
+        >>> x1, x2 = np.random.randint(1, 10, size=(10, 1)), np.random.randint(1, 10, size=(10, 1))
+        >>> y1, y2 = np.random.randint(1, 10, size=(10, 1)), np.random.randint(1, 10, size=(10, 1))
+        >>> FeatureExtractionMixin.euclidean_distance(bp_1_x=x1, bp_2_x=x2, bp_1_y=y1, bp_2_y=y2, px_per_mm=4.56)
+        """
         series = (np.sqrt((bp_1_x - bp_2_x) ** 2 + (bp_1_y - bp_2_y) ** 2)) / px_per_mm
         return series
 
 
     @staticmethod
-    @jit(nopython=True, fastmath=True)
-    def angle3pt(ax: float, ay: float, bx: float, by: float, cx: float, cy: float) -> float:
+    @jit(nopython=True, fastmath=True, cache=True)
+    def angle3pt(ax: float,
+                 ay: float,
+                 bx: float,
+                 by: float,
+                 cx: float,
+                 cy: float) -> float:
         """
-        Jitted helper for single frame 3-point angle. For multiple frame 3-point angles, use
-        ``simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized``.
+        Jitted helper for single frame 3-point angle.
 
+        .. seealso::
+           For 3-point angles across multiple frames and improved runtime, see
+           :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`.
+
+        :example:
+        >>> FeatureExtractionMixin.angle3pt(ax=122.0, ay=198.0, bx=237.0, by=138.0, cx=191.0, cy=109)
+        >>> 59.78156901181637
         """
         ang = math.degrees(math.atan2(cy - by, cx - bx) - math.atan2(ay - by, ax - bx))
         return ang + 360 if ang < 0 else ang
@@ -85,7 +110,12 @@ class FeatureExtractionMixin(object):
         Jitted helper for frame-wise 3-point angles.
 
         :parameter ndarray data: 2D numerical array with frame number on x and [ax, ay, bx, by, cx, cy] on y.
-        :return ndarray: 2D numerical array with frame number on x and angle on y.
+        :return ndarray: 1d float numerical array of size data.shape[0] with angles.
+
+        :examples:
+        >>> coordinates = np.random.randint(1, 10, size=(6, 6))
+        >>> FeatureExtractionMixin.angle3pt_serialized(data=coordinates)
+        >>> [ 67.16634582,   1.84761027, 334.23067238, 258.69006753, 11.30993247, 288.43494882]
         """
 
         results = np.full((data.shape[0]), 0.0)
@@ -101,12 +131,20 @@ class FeatureExtractionMixin(object):
     @staticmethod
     def convex_hull_calculator_mp(arr: np.ndarray, px_per_mm: float) -> float:
         """
-        Calculate single frame convex hull perimeter length in millimeters. For acceptable run-time,
-        Call using ``parallel.delayed``. For large data, use ``simba.feature_extractors.perimeter_jit.jitted_hull``.
+        Calculate single frame convex hull perimeter length in millimeters.
+
+        .. seealso::
+            For acceptable run-time, call using ``parallel.delayed``.
+            For large data, use meth:`simba.feature_extractors.perimeter_jit.jitted_hull`.
 
         :parameter np.ndarray arr: 2D array of size len(body-parts) x 2.
         :parameter float px_per_mm: Video pixels per millimeter.
         :return float: The length of the animal perimeter in millimeters.
+
+        :example:
+        >>> coordinates = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
+        >>> FeatureExtractionMixin.convex_hull_calculator_mp(arr=coordinates, px_per_mm=4.56)
+        >>> 98.6676814218373
         """
         arr = np.unique(arr, axis=0).astype(int)
         if arr.shape[0] < 3:
@@ -131,6 +169,10 @@ class FeatureExtractionMixin(object):
         :parameter np.ndarray data: 2D numpy array with frames on X.
         :parameter np.ndarray ranges: 2D numpy array representing the brackets. E.g., [[0, 0.1], [0.1, 0.5]]
         :return np.ndarray: 2D numpy array of size data.shape[0], ranges.shape[1]
+
+        :example:
+        >>> FeatureExtractionMixin.count_values_in_range(data=np.random.random((3,10)), ranges=np.array([[0.0, 0.25], [0.25, 0.5]]))
+        >>> [[6, 1], [3, 2],[2, 1]]
         """
 
         results = np.full((data.shape[0], ranges.shape[0]), 0)
@@ -147,7 +189,7 @@ class FeatureExtractionMixin(object):
                                          px_per_mm: float,
                                          centimeter: bool = False) -> np.ndarray:
         """
-        Jitted helper finding frame-wise distances between a moving location (location_1) and
+        Find frame-wise distances between a moving location (location_1) and
         static location (location_2) in millimeter or centimeter.
 
         :parameter ndarray location_1: 2D numpy array of size len(frames) x 2.
@@ -155,8 +197,15 @@ class FeatureExtractionMixin(object):
         :parameter float px_per_mm: The pixels per millimeter in the video.
         :parameter bool centimeter: If true, the value in centimeters is returned. Else the value in millimeters.
 
-        :return np.ndarray: 2D array of size location_1.shape[0] x 1.
+        :return np.ndarray: 1D array of size location_1.shape[0]
 
+        :example:
+        >>> loc_1 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
+        >>> loc_2 = np.random.randint(1, 200, size=(1, 2)).astype(np.float32)
+        >>> FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False)
+        >>> [11.31884926, 13.84534585,  6.09712224, 17.12773976, 19.32066031, 12.18043378]
+        >>> FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=True)
+        >>> [1.13188493, 1.38453458, 0.60971222, 1.71277398, 1.93206603, 1.21804338]
         """
 
         results = np.full((location_1.shape[0]), np.nan)
@@ -176,6 +225,12 @@ class FeatureExtractionMixin(object):
         :parameter np.ndarray bp_location:  2d numeric np.ndarray size len(frames) x 2
         :parameter np.ndarray roi_coords: 2d numeric np.ndarray size 1x2 (top left[x, y], bottom right[x, y)
         :return ndarray: 2d numeric boolean np.ndarray size len(frames) x 1 with 0 representing outside the rectangle and 1 representing inside the rectangle
+
+        :example:
+        >>> bp_loc = np.random.randint(1, 10, size=(6, 2)).astype(np.float32)
+        >>> roi_coords = np.random.randint(1, 10, size=(2, 2)).astype(np.float32)
+        >>> FeatureExtractionMixin.framewise_inside_rectangle_roi(bp_location=bp_loc, roi_coords=roi_coords)
+        >>> [0, 0, 0, 0, 0, 0]
         """
         results = np.full((bp_location.shape[0]), 0)
         within_x_idx = np.argwhere((bp_location[:, 0] <= roi_coords[1][0]) & (bp_location[:, 0] >= roi_coords[0][0])).flatten()
@@ -194,12 +249,21 @@ class FeatureExtractionMixin(object):
         """
         Jitted helper for frame-wise detection if animal is inside static polygon ROI.
 
+        .. note::
+           Modified from `epifanio <https://stackoverflow.com/a/48760556>`_
+
         :parameter np.ndarray bp_location:  2d numeric np.ndarray size len(frames) x 2
         :parameter np.ndarray roi_coords: 2d numeric np.ndarray size len(polygon points) x 2
 
         :return ndarray: 2d numeric boolean np.ndarray size len(frames) x 1 with 0 representing outside the polygon and 1 representing inside the polygon
 
+        :example:
+        >>> bp_loc = np.random.randint(1, 10, size=(6, 2)).astype(np.float32)
+        >>> roi_coords = np.random.randint(1, 10, size=(10, 2)).astype(np.float32)
+        >>> FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=bp_loc, roi_coords=roi_coords)
+        >>> [0, 0, 0, 1]
         """
+
         results = np.full((bp_location.shape[0]), 0)
         for i in prange(0, results.shape[0]):
             x, y, n = bp_location[i][0], bp_location[i][1], len(roi_coords)
@@ -218,8 +282,8 @@ class FeatureExtractionMixin(object):
 
         return results
 
-    def windowed_frequentist_distribution_tests(self,
-                                                data: np.ndarray,
+    @staticmethod
+    def windowed_frequentist_distribution_tests(data: np.ndarray,
                                                 feature_name: str,
                                                 fps: int) -> pd.DataFrame:
         """
@@ -229,10 +293,14 @@ class FeatureExtractionMixin(object):
         Computes (ii)  feature values against a normal distribution: Shapiro-Wilks.
         Computes (iii) peak count in *rolling* 1s long feature window: scipy.find_peaks.
 
-        :parameter np.ndarray data: Single feature 2D array with frames on X.
+        :parameter np.ndarray data: Single feature 1D array
         :parameter np.ndarray feature_name: The name of the input feature.
         :parameter int fps: The framerate of the video representing the data.
         :return pd.DataFrame: Of size len(data) x 4 with columns representing KS, T, Shapiro-Wilks, and peak count statistics.
+
+        :example:
+        >>> feature_data = np.random.randint(1, 10, size=(100))
+        >>> FeatureExtractionMixin.windowed_frequentist_distribution_tests(data=feature_data, fps=25, feature_name='Anima_1_velocity')
         """
 
         ks_results, = np.full((data.shape[0]), -1.0),
@@ -267,13 +335,19 @@ class FeatureExtractionMixin(object):
     def cdist(array_1: np.ndarray,
               array_2: np.ndarray) -> np.ndarray:
         """
-        Jitted analogue of scipy.cdist.
+        Jitted analogue of meth:`scipy.cdist`.
 
         :parameter np.ndarray array_1: 2D array of body-part coordinates
         :parameter np.ndarray array_2: 2D array of body-part coordinates
-
         :return np.ndarray: 2D array of euclidean distances between body-parts in ``array_1`` and ``array_2``
 
+        :example:
+        >>> array_1 = np.random.randint(1, 10, size=(3, 2)).astype(np.float32)
+        >>> array_2 = np.random.randint(1, 10, size=(3, 2)).astype(np.float32)
+        >>> FeatureExtractionMixin.cdist(array_1=array_1, array_2=array_2)
+        >>> [[7.07106781, 1.        , 3.60555124],
+        >>> [3.60555124, 6.3245554 , 2.        ],
+        >>>  [3.1622777 , 5.38516474, 4.12310553]])
         """
         results = np.full((array_1.shape[0], array_2.shape[0]), np.nan)
         for i in prange(array_1.shape[0]):
@@ -288,6 +362,15 @@ class FeatureExtractionMixin(object):
 
         :parameter pd.DataFrame df
         :return pd.DataFrame: Dataframe including original and shifted columns.
+
+        :example:
+        >>> df = pd.DataFrame(np.random.randint(0,100,size=(3, 1)), columns=['Feature_1'])
+        >>> FeatureExtractionMixin.create_shifted_df(df=df)
+        >>>             Feature_1  Feature_1_shifted
+        >>>    0         76               76.0
+        >>>    1         41               76.0
+        >>>    2         89               41.0
+
         """
         data_df_shifted = df.shift(periods=1)
         data_df_shifted = data_df_shifted.combine_first(df).add_suffix('_shifted')
@@ -400,6 +483,10 @@ class FeatureExtractionMixin(object):
         Jitted helper to calculate if an animal is directing towards a static location (ROI centroid),
         given the target location and the left ear, right ear, and nose coordinates of the observer.
 
+        .. note::
+           Input left ear, right ear, and nose coordinates of the observer is returned by
+           :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
+
         :parameter np.ndarray left_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals left ear
         :parameter np.ndarray right_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals right ear
         :parameter np.ndarray nose_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals nose
@@ -407,11 +494,8 @@ class FeatureExtractionMixin(object):
 
         :return np.ndarray: 2D array of size len(frames) x 4. First column represent the side of the observer that the target is in view. 0 = Left side, 1 = Right side, 2 = Not in view.
         Second and third column represent the x and y location of the observer animals ``eye`` (half-way between the ear and the nose).
-        Fourth column represent if target is is view (bool).
+        Fourth column represent if target is view (bool).
 
-        .. note::
-           Input left ear, right ear, and nose coordinates of the observer is returned by
-           :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
         """
 
         results_array = np.zeros((left_ear_array.shape[0], 4))
@@ -434,9 +518,8 @@ class FeatureExtractionMixin(object):
 
         return results_array
 
-
-    def minimum_bounding_rectangle(self,
-                                   points: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def minimum_bounding_rectangle(points: np.ndarray) -> np.ndarray:
 
         """
         Finds the minimum bounding rectangle of a convex hull perimeter.
@@ -450,6 +533,11 @@ class FeatureExtractionMixin(object):
            See :meth:`simba.mixins.feature_extractors.perimeter_jit.jitted_hull` for computing the convexhull vertices.
 
         TODO: Place in numba njit.
+
+        :example:
+        >>>   points = np.random.randint(1, 10, size=(10, 2))
+        >>>   FeatureExtractionMixin.minimum_bounding_rectangle(points=points)
+        >>> [[10.7260274 ,  3.39726027], [ 1.4109589 , -0.09589041], [-0.31506849,  4.50684932], [ 9., 8. ]]
         """
 
         pi2 = np.pi / 2.
@@ -474,8 +562,6 @@ class FeatureExtractionMixin(object):
         return rval
 
 
-
-
     @staticmethod
     @jit(nopython=True)
     def framewise_euclidean_distance(location_1: np.ndarray,
@@ -490,7 +576,13 @@ class FeatureExtractionMixin(object):
         :parameter float px_per_mm: The pixels per millimeter in the video.
         :parameter bool centimeter: If true, the value in centimeters is returned. Else the value in millimeters.
 
-        :return np.ndarray: 2D array of size location_1.shape[0] x 1.
+        :return np.ndarray: 1D array of size location_1.shape[0]
+
+        :example:
+        >>> loc_1 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
+        >>> loc_2 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
+        >>> FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False)
+        >>> [49.80098657, 46.54963644, 49.60650394, 70.35919993, 37.91069901, 71.95422524]
         """
 
         results = np.full((location_1.shape[0]), np.nan)

@@ -18,6 +18,10 @@ from simba.utils.read_write import get_fn_ext
 from simba.utils.enums import ConfigKey
 
 class PoseImporterMixin(object):
+    """
+    Methods for importing pose-estimation data.
+    """
+
     def __init__(self):
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
         pass
@@ -83,9 +87,9 @@ class PoseImporterMixin(object):
     def get_x_y_loc_of_mouse_click(self, event, x, y, flags, param):
         if event == 7:
             self.click_loc = (x,y)
-            self.id_cords[self.animal_cnt] = {}
-            self.id_cords[self.animal_cnt]['cord'] = self.click_loc
-            self.id_cords[self.animal_cnt]['name'] = self.animal_name
+            self.id_cords[self.cnt] = {}
+            self.id_cords[self.cnt]['cord'] = self.click_loc
+            self.id_cords[self.cnt]['name'] = self.animal_name
 
     def insert_all_bodyparts_into_img(self, img: np.ndarray, body_parts: dict):
         for animal, bp_data in body_parts.items():
@@ -140,8 +144,8 @@ class PoseImporterMixin(object):
 
     def choose_animal_ui(self):
         self.id_cords = {}
-        for animal_cnt, animal in enumerate(self.animal_bp_dict.keys()):
-            self.animal_name, self.animal_cnt = animal, animal_cnt
+        for cnt, animal in enumerate(self.animal_bp_dict.keys()):
+            self.animal_name, self.cnt = animal, cnt
             self.new_overlay = deepcopy(self.img_overlay)
             cv2.namedWindow('Define animal IDs', cv2.WINDOW_NORMAL)
             self.side_img = np.ones((int(self.video_info['height'] / 2), self.video_info['width'], 3))
@@ -152,7 +156,7 @@ class PoseImporterMixin(object):
             self.new_overlay = np.uint8(np.concatenate((self.new_overlay, self.side_img), axis=0))
             cv2.imshow('Define animal IDs', self.new_overlay)
             cv2.resizeWindow('Define animal IDs', self.video_info['height'], self.video_info['width'])
-            while animal_cnt not in self.id_cords.keys():
+            while cnt not in self.id_cords.keys():
                 cv2.setMouseCallback('Define animal IDs', self.get_x_y_loc_of_mouse_click)
                 cv2.waitKey(200)
         self.confirm_ui()

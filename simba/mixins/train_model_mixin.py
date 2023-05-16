@@ -60,6 +60,7 @@ from simba.utils.lookups import get_meta_data_file_headers
 plt.switch_backend('agg')
 
 class TrainModelMixin(object):
+    """ Train model methods"""
     def __init__(self):
         pass
 
@@ -71,16 +72,20 @@ class TrainModelMixin(object):
         Read in all data files in a folder to a single pd.DataFrame for downstream ML algo.
         Asserts that all classifiers have annotation fields present in concatenated dataframe.
 
+        .. note::
+           For improved runtime through pyarrow, use :meth:`simba.mixins.train_model_mixin.read_all_files_in_folder_mp`
+
         :parameter List[str] file_paths: List of file paths representing files to be read in.
         :parameter str file_type: List of file paths representing files to be read in.
         :parameter str or None classifier_names: List of classifier names representing fields of human annotations. If not None, then assert that classifier names
             are present in each data file.
         :return pd.DataFrame: concatenated dataframe if all data represented in ``file_paths``.
 
+        :examples:
+        >>> self.read_all_files_in_folder(file_paths=['targets_inserted/Video_1.csv', 'targets_inserted/Video_2.csv'], file_type='csv', classifier_names=['Attack'])
         """
 
-        timer = SimbaTimer()
-        timer.start_timer()
+        timer = SimbaTimer(start=True)
         df_concat = pd.DataFrame()
         for file_cnt, file in enumerate(file_paths):
             print(f'Reading in file {str(file_cnt + 1)}/{str(len(file_paths))}...')
@@ -120,6 +125,9 @@ class TrainModelMixin(object):
         :parameter int model_cnt: Number of classifiers in the SimBA project
         :parameter str clf_name: Name of the classifier.
         :return List[str]: List of non-target annotation column names.
+
+        :examples:
+        >>> self.read_in_all_model_names_to_remove(config=config, model_cnt=2, clf_name=['Attack'])
         """
 
         annotation_cols_to_remove = []
@@ -138,6 +146,9 @@ class TrainModelMixin(object):
         :parameter pd.DataFrame df: Dataframe holding features and annotations.
         :parameter List[str] annotations_lst: column fields to be removed from df
         :return pd.DataFrame: Dataframe without non-target annotation columns
+
+        :examples:
+        >>> self.delete_other_annotation_columns(df=df, annotations_lst=['Sniffing'])
         """
 
         for a_col in annotations_lst:
@@ -155,6 +166,9 @@ class TrainModelMixin(object):
 
         :return pd.DataFrame: features
         :return pd.DataFrame: target
+
+        :examples:
+        >>> self.split_df_to_x_y(df=df, clf_name='Attack')
         """
 
         df = deepcopy(df)
@@ -176,6 +190,9 @@ class TrainModelMixin(object):
 
         :return pd.DataFrame: Under-sampled feature-set
         :return pd.DataFrame: Under-sampled target-set
+
+        :examples:
+        >>> self.random_undersampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
 
         print(f'Performing under-sampling at sample ratio {str(sample_ratio)}...')
@@ -202,6 +219,8 @@ class TrainModelMixin(object):
         :return np.ndarray: Oversampled features.
         :return np.ndarray: Oversampled target.
 
+        :examples:
+        >>> self.smoteen_oversampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
 
         print('Performing SMOTEEN oversampling...')
@@ -221,6 +240,8 @@ class TrainModelMixin(object):
         :return np.ndarray: Oversampled features.
         :return np.ndarray: Oversampled target.
 
+        :examples:
+        >>> self.smote_oversampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
         print('Performing SMOTE oversampling...')
         smt = SMOTE(sampling_strategy=sample_ratio)
@@ -237,15 +258,15 @@ class TrainModelMixin(object):
         """
         Helper to calculate feature permutation importance scores.
 
-        :parameter np.ndarray x_test: feature test data
-        :parameter np.ndarray y_test: target test data
+        :parameter np.ndarray x_test: 2d feature test data of shape len(frames) x len(features)
+        :parameter np.ndarray y_test: 2d feature target test data of shape len(frames) x 1
         :parameter RandomForestClassifier clf: random forest classifier
-        :parameter List[str] feature_names: Names of features
-        :parameter str clf_name: Name of classifier.
-        :parameter str save_dir: Directory where to save results
+        :parameter List[str] feature_names: Names of features in x_test
+        :parameter str clf_name: Name of classifier in y_test
+        :parameter str save_dir: Directory where to save results in CSV format
         :parameter Optional[int] save_file_no: If permutation importance calculation is part of a grid search, provide integer representing sequence.
-
         """
+
         print('Calculating feature permutation importances...')
         timer = SimbaTimer(start=True)
         p_importances = permutation_importance(clf, x_test, y_test, n_repeats=10, random_state=0)
@@ -274,7 +295,7 @@ class TrainModelMixin(object):
         """
         Helper to compute random forest learning curves with cross-validation.
 
-        :parameter pd.DataFrame x_y_df: dataframe holding features and targets.
+        :parameter pd.DataFrame x_y_df: Dataframe holding features and target.
         :parameter str clf_name: Name of the classifier
         :parameter int shuffle_splits: Number of cross-validation datasets at each data split.
         :parameter int dataset_splits: Number of data splits.
@@ -395,6 +416,12 @@ class TrainModelMixin(object):
         """
         Helper to create classifier truth table report.
 
+        .. seealso::
+           `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
+            .. image:: _static/img/clf_report.png
+               :width: 400
+               :align: center
+
         :parameter RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
         :parameter pd.DataFrame x_df: dataframe holding test features
         :parameter pd.DataFrame y_df: dataframe holding test target
@@ -454,6 +481,12 @@ class TrainModelMixin(object):
                                       save_file_no: Optional[int] = None) -> None:
         """
         Helper to create a bar chart displaying the top N gini or entropy feature importance scores.
+
+        .. seealso::
+           `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
+            .. image:: _static/img/gini_bar_chart.png
+               :width: 400
+               :align: center
 
         :parameter RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
         :parameter List[str] x_names: Names of features.
@@ -526,29 +559,25 @@ class TrainModelMixin(object):
         """
         Helper to compute SHAP values.
 
-        Parameters
-        ----------
-        ini_file_path: str
-            Path to the SimBA project_config.ini
-        rf_clf: RandomForestClassifier
-            sklearn random forest classifier
-        x_df: pd.DataFrame
-            Pandas dataframe holding test features.
-        y_df: pd.DataFrame
-            Pandas dataframe holding test target.
-        x_names: list
-            Feature names.
-        clf_name:
-            Classifier name.
-        cnt_present: int
-            Number of behavior-present frames to calculate SHAP values for.
-        cnt_absent: int
-            Number of behavior-absent frames to calculate SHAP values for.
-        save_dir: str,
-            Directory where to save output in csv file format.
-        save_file_no: int or None.
-            If integer, represents the count of the classifier within a grid search. If none, the classifier is not
+        .. seealso::
+           `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
+
+           .. image:: _static/img/shap.png
+              :width: 400
+              :align: center
+
+        :param str ini_file_path: Path to the SimBA project_config.ini
+        :param RandomForestClassifier rf_clf: sklearn random forest classifier
+        :param pd.DataFrame x_df: Test features.
+        :param pd.DataFrame y_df: Test target.
+        :param List[str] x_names: Feature names.
+        :param str clf_name: Classifier name.
+        :param int cnt_present: Number of behavior-present frames to calculate SHAP values for.
+        :param int cnt_absent: Number of behavior-absent frames to calculate SHAP values for.
+        :param str save_dir: Directory where to save output in csv file format.
+        :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not
             part of a grid search.
+
         """
 
         print('Calculating SHAP values...')
@@ -632,7 +661,6 @@ class TrainModelMixin(object):
         """
         Helper to save single model meta data (hyperparameters, sampling settings etc.) from list format into SimBA
         compatible CSV config file.
-
 
         :parameter list meta_data_lst: Meta data in list format
         :parameter str clf_name: Name of classifier
@@ -727,6 +755,10 @@ class TrainModelMixin(object):
         :parameter configparser.ConfigParser config: Parsed SimBA project_config.ini
         :parameter int.ConfigParser target_cnt: Parsed SimBA project_config.ini
         :return List[str]: All classifier names in project
+
+        :example:
+        >>> self.get_all_clf_names(config=config, target_cnt=2)
+        >>> ['Attack', 'Sniffing']
         """
 
         model_names = []
@@ -982,6 +1014,8 @@ class TrainModelMixin(object):
         pd.DataFrame for downstream ML. Defaults to ceil(CPU COUNT / 2) cores. Asserts that all classifiers
         have annotation fields present in each dataframe.
 
+        .. note::
+          If multiprocess failure, reverts to :meth:`simba.mixins.train_model_mixin.read_all_files_in_folder`
 
         :parameter List[str] file_paths: List of file-paths
         :parameter List[str] file_paths: The filetype of ``file_paths`` OPTIONS: csv or parquet.

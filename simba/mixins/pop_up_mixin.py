@@ -37,18 +37,19 @@ from simba.utils.lookups import (get_icons_paths,
                                  get_named_colors)
 
 class PopUpMixin(object):
+    """
+    Methods for pop-up windows in SimBA.
+
+    :param str title: Pop-up window title
+    :param Optional[configparser.Configparser] config_path: path to SimBA project_config.ini
+    :param tuple size: HxW of the pop-up window.
+    """
+
+
     def __init__(self,
                  title: str,
                  config_path: Optional[str] = None,
                  size: Tuple[int, int] = (400, 400)):
-
-        """
-        Methods for pop-up windows in SimBa.
-
-        :param str title: Pop-up window title
-        :param configparser.Configparser config_path: path to SimBA project_config.ini
-        :param tuple size: HxW of the pop-up window.
-        """
 
         self.main_frm = Toplevel()
         self.main_frm.minsize(size[0], size[1])

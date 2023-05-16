@@ -27,6 +27,9 @@ from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.enums import Formats, Options
 
 class PlottingMixin(object):
+    """
+    Methods for visualizations
+    """
 
     def __init__(self):
         pass
