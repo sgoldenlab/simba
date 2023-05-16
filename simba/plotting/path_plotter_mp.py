@@ -27,16 +27,20 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
     :param str config_path: Path to SimBA project config file in Configparser format
     :param bool frame_setting: If True, individual frames will be created.
     :param bool video_setting: If True, compressed videos will be created.
-    :param List[str] files_found: Data paths to create from which to create plots
-    :param dict animal_attr: Animal body-parts and colors
-    :param dict style_attr: Plot sttributes (line thickness, color, etc..)
+    :param bool last_frame: If True, png of the last frame will be created.
+    :param List[str] files_found: Data paths to create path plots for (e.g., ['project_folder/csv/machine_results/MyVideo.csv'])
+    :param dict animal_attr: Animal body-parts to use when creating paths and their colors.
+    :param Optional[dict] input_style_attr: Plot sttributes (line thickness, color, etc..). If None, then autocomputed. Max lines will be set to 2s.
+    :param Optional[dict] input_clf_attr: Dict reprenting classified behavior locations, their color and size. If None, then no classified behavior locations are shown.
     :param int cores: Number of cores to use.
 
-    .. note:
+    .. note::
        `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
-    Examples
-    ----------
+    .. important::
+       See :meth:`simba.utils.lookups.get_color_dict` for keys for named color options.
+
+    :example:
     >>> input_style_attr = {'width': 'As input', 'height': 'As input', 'line width': 5, 'font size': 5, 'font thickness': 2, 'circle size': 5, 'bg color': 'White', 'max lines': 100}
     >>> animal_attr = {0: ['Ear_right_1', 'Red']}
     >>> input_clf_attr = {0: ['Attack', 'Black', 'Size: 30'], 1: ['Sniffing', 'Red', 'Size: 30']}
@@ -231,7 +235,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
 # style_attr = {'width': 'As input', 'height': 'As input', 'line width': 5, 'font size': 5, 'font thickness': 2, 'circle size': 5, 'bg color': 'White', 'max lines': 10000}
 # animal_attr = {0: ['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
-# clf_attr = {0: ['Attack', 'Black', 'Size: 30'], 1: ['Sniffing', 'Black', 'Size: 30']}
+# clf_attr = {0: ['Attack', 'Black', 'Size: 30']}
 # #
 # # clf_attr = None
 # # style_attr = None
@@ -245,7 +249,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 #                                     animal_attr=animal_attr,
 #                                     files_found=['/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'],
 #                                     cores=5)
-# path_plotter.create_path_plots()
+# path_plotter.run()
 #
 
 
