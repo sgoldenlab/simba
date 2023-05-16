@@ -16,7 +16,11 @@ from simba.mixins.plotting_mixin import PlottingMixin
 class PoseConfigCreator(PlottingMixin):
 
     """
+
     Class for creating user-defined pose-estimation pipeline in SimBA through a GUI interface.
+
+    ..seealso::
+       `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md>`__.
 
     :param str pose_name: Name of the user-defined pose-estimation setting.
     :param str no_animals: Number of animals in the user-defined pose-estimation setting.
@@ -24,11 +28,7 @@ class PoseConfigCreator(PlottingMixin):
     :param List[str] bp_list: Body-parts in the user-defined pose-estimation setting.
     :param List[int] animal_id_int_list: Integers representing the animal ID which the body-parts belong to.
 
-    ..note::
-       `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md>`__.
-
-    Examples
-    ----------
+    :examples:
     >>> pose_config_creator = PoseConfigCreator(pose_name="My_test_config", no_animals=2, img_path='simba/splash_050122.png', bp_list=['Ear', 'Nose', 'Left_ear', 'Ear', 'Nose', 'Left_ear'], animal_id_int_list= [1, 1, 1, 2, 2, 2])
     >>> pose_config_creator.launch()
     """

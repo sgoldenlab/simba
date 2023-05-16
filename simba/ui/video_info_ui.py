@@ -24,6 +24,9 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
 
     :param str config_file_path: path to SimBA project config file in Configparser format
 
+    ..seealso::
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters>`__.
+
     :example:
     >>> video_info_gui = VideoInfoTable(config_path='MyProjectConfig')
     >>> video_info_gui.create_window()
