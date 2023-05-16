@@ -21,6 +21,11 @@ class HeatMapperClfSingleCore(ConfigReader, PlottingMixin):
     """
     Create heatmaps representing the locations of the classified behavior.
 
+    .. note::
+       `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
+       For improved run-time, see :meth:`simba.heat_mapper_clf_mp.HeatMapperClfMultiprocess` for multiprocess class.
+
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param bool final_img_setting: If True, then create a single image representing the last frame of the input video
     :param bool video_setting: If True, then create a video of heatmaps.
@@ -32,10 +37,6 @@ class HeatMapperClfSingleCore(ConfigReader, PlottingMixin):
     :param str clf_name: The name of the classified behavior.
     :param int or 'auto' max_scale: The max value in the heatmap in seconds. E.g., with a value of `10`, if the classified behavior has occured
         >= 10 within a rectangular bins, it will be filled with the same color.
-
-    .. note::
-       `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
-       For improved run-time, see :meth:`simba.heat_mapper_clf_mp.HeatMapperClfMultiprocess` for multiprocess class.
 
     Examples
     -----

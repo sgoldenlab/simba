@@ -18,7 +18,7 @@ from simba.utils.data import detect_bouts
 
 class ClassifierValidationClips(ConfigReader):
     """
-    Create video clips of classified events for detection of false positive event bouts.
+    Create video clips with overlaid classified events for detection of false positive event bouts.
 
     :parameter str config_path: path to SimBA project config file in Configparser format
     :parameter int window: Number of seconds before and after the event bout that should be included in the output video.

@@ -23,6 +23,10 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
     .. note::
         For improved run-time, see :meth:`simba.path_plotter_mp.PathPlotterMulticore` for multiprocess class.
 
+    .. note::
+       `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
+
+
     :param str config_path: Path to SimBA project config file in Configparser format
     :param bool frame_setting: If True, individual frames will be created.
     :param bool video_setting: If True, compressed videos will be created.
@@ -30,8 +34,6 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
     :param dict animal_attr: Animal body-parts and colors
     :param dict style_attr: Plot sttributes (line thickness, color, etc..)
 
-    .. note::
-       `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     Examples
     ----------

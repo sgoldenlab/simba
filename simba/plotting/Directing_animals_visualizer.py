@@ -25,12 +25,14 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
        Requires the pose-estimation data for the left ear, right ears and nose of individual animals.
        For better runtime, use :meth:`simba.plotting.Directing_animals_visualizer.DirectingOtherAnimalsVisualizerMultiprocess`.
 
+    .. note::
+       `Example of expected output <https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22`_.
+        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>_.
+
     :parameter str config_path: path to SimBA project config file in Configparser format
     :parameter str data_path: path to data file
     :parameter dict style_attr: Visualisation attributes (colors and sizes etc.)
 
-    .. note::
-       `Example of expected output <https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22`_.
 
     Examples
     -----

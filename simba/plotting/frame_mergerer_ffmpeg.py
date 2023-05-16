@@ -20,7 +20,6 @@ class FrameMergererFFmpeg(ConfigReader):
     Merge separate visualizations of classifications, descriptive statistics etc., into  single
     video mosaic.
 
-
     :parameter str config_path: path to SimBA project config file in Configparser format
     :parameter str concat_type: Type of concatenation. E.g. ``vertical``, ``horizontal``
     :parameter dict frame_types: Dict holding video path to videos to concatenate. E.g., {'Video 1': path, 'Video 2': path}

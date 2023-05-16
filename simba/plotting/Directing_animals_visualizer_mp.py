@@ -23,13 +23,15 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
     .. important::
        Requires the pose-estimation data for the left ear, right ears and nose of individual animals.
 
+    .. note::
+        `Example of expected output <https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22`_.
+
+
     :parameter str config_path: path to SimBA project config file in Configparser format
     :parameter str video_name: Video to visualize directionality for in the project_folder/videos directory (e.g., ``My_video.mp4``)
     :parameter dict style_attr: Video style attribitions (colors and sizes etc.)
     :parameter dict core_cnt: How many cores to use to create the video.
 
-    .. note::
-        `Example of expected output <https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22`_.
 
     Examples
     -----

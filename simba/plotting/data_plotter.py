@@ -67,28 +67,11 @@ class DataPlotter(ConfigReader):
             y_cord += 50
 
     def process_movement(self):
-        """
-        Method to create movement data for visualization
-
-        Returns
-        -------
-        Attribute: pd.Dataframe
-            movement
-        """
         movement_processor = MovementCalculator(config_path=self.config_path, file_paths=self.files_found, threshold=0.00, body_parts=[x[0] for x in self.body_part_attr])
         movement_processor.run()
         self.movement = movement_processor.movement_dfs
 
     def run(self):
-        """
-        Method to create and save visualizations on disk from data created in
-        :meth:`~simba.DataPlotter.process_movement`. Results are stored in the `project_folder/frames/output/live_data_table`.
-
-        Returns
-        -------
-        None
-        """
-
         def multiprocess_img_creation(video_data_slice: list,
                                       location_dict: dict,
                                       animal_ids: list,
