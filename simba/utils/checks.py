@@ -1,5 +1,7 @@
 __author__ = "Simon Nilsson"
-
+"""
+@authors: Xiaoyu Tong, Jia Jie Choong, Simon Nilsson
+"""
 import os
 import trafaret as t
 import pandas as pd

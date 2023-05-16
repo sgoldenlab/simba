@@ -39,7 +39,7 @@ class MultiCropper(object):
 
     Examples
     ----------
-    >>> MultiCropper(file_type='mp4', input_folder='InputDirectory', output_folder='OutputDirectory', crop_cnt=2)
+    >>> _ = MultiCropper(file_type='mp4', input_folder='InputDirectory', output_folder='OutputDirectory', crop_cnt=2)
 
     """
 

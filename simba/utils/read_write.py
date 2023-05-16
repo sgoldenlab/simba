@@ -51,7 +51,7 @@ def read_df(file_path: Union[str, os.PathLike],
     Read single tabular data file.
 
     .. note::
-       For improved runtime, defaults to ``pyarrow.csv`` if file_type == ``csv``.
+       For improved runtime, defaults to :external:py:meth:`pyarrow.csv.write_cs` if file type is ``csv``.
 
     :parameter str file_path: Path to data file
     :parameter str file_type: Path to data file. OPTIONS: 'parquet', 'csv', 'pickle'.
@@ -59,6 +59,9 @@ def read_df(file_path: Union[str, os.PathLike],
     :parameter Optional[List[str]] usecols: If not None, then keep columns in list.
     :parameter bool check_multiindex: check file is multi-index headers. Default: False.
     :return pd.DataFrame
+
+    :example:
+    >>> read_df(file_path='project_folder/csv/input_csv/Video_1.csv', file_type='csv', check_multiindex=True)
     """
     check_file_exist_and_readable(file_path=file_path)
     if file_type == Formats.CSV.value:
@@ -110,6 +113,9 @@ def write_df(df: pd.DataFrame,
     :parameter str file_type: Type of data. OPTIONS: ``parquet``, ``csv``,  ``pickle``.
     :parameter str save_path: Location where to store the data.
     :parameter bool check_multiindex: check if input file is multi-index headers. Default: False.
+
+    :example:
+    >>> write_df(df=df, file_type='csv', save_path='project_folder/csv/input_csv/Video_1.csv')
     """
 
     if file_type == Formats.CSV.value:
@@ -163,6 +169,8 @@ def read_config_entry(config: configparser.ConfigParser,
                       data_type: str,
                       default_value: Optional[Any] = None,
                       options: Optional[List] = None) -> Union[float, int, str]:
+
+
     try:
         if config.has_option(section, option):
             if data_type == Dtypes.FLOAT.value:
@@ -225,6 +233,9 @@ def read_video_info_csv(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
     :return pd.DataFrame
     :raise ParametersFileError: Invalid format of ``project_folder/logs/video_info.csv``.
     :raise InvalidValueWarning: Some videos are registered with FPS >= 1.
+
+    :example:
+    >>> read_video_info_csv(file_path='project_folder/logs/video_info.csv')
     """
 
     check_file_exist_and_readable(file_path=file_path)
@@ -250,7 +261,11 @@ def read_config_file(config_path: Union[str, os.PathLike]) -> configparser.Confi
     :parameter str config_path: Path to project_config.ini file
     :return configparser.ConfigParser: parsed project_config.ini file
     :raise MissingProjectConfigEntryError: Invalid file format.
+
+    :example:
+    >>> read_config_file(config_path='project_folder/project_config.ini')
     """
+
     config = ConfigParser()
     try:
         config.read(config_path)
@@ -360,7 +375,11 @@ def read_video_info(vid_info_df: pd.DataFrame,
     :returns pd.DataFrame: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file.
     :return float: The frame rate of the video as represented in the ``project_folder/logs/video_info.csv`` file
     :return float: The pixels per millimeter of the video as represented in the ``project_folder/logs/video_info.csv`` file
-    :raise ParametersFileError: The video is not accuractly represented in the ``project_folder/logs/video_info.csv`` file.
+    :raise ParametersFileError: The video is not accurately represented in the ``project_folder/logs/video_info.csv`` file.
+
+    :example:
+    >>> video_info_df = read_video_info_csv(file_path='project_folder/logs/video_info.csv')
+    >>> read_video_info(vid_info_df=vid_info_df, video_name='Together_1')
     """
 
     video_settings = vid_info_df.loc[vid_info_df['Video'] == video_name]
@@ -388,6 +407,9 @@ def find_all_videos_in_directory(directory: Union[str, os.PathLike],
     :param Tuple[str] video_formats: Acceptable video formats. Default: '.avi', '.mp4', '.mov', '.flv', '.m4v'.
 
     :return List[str] or Dict[str, str]
+
+    :examples:
+    >>> find_all_videos_in_directory(directory='project_folder/videos')
     """
 
     video_lst = []
@@ -410,7 +432,7 @@ def find_all_videos_in_directory(directory: Union[str, os.PathLike],
 
 
 def find_video_of_file(video_dir: Union[str, os.PathLike],
-                       filename: str) -> str:
+                       filename: str) -> Union[str, os.PathLike]:
     """
     Helper to find the video file with the SimBA project that represents a known data file path.
 
@@ -418,6 +440,10 @@ def find_video_of_file(video_dir: Union[str, os.PathLike],
     :param str filename: Data file name, e.g., ``Video_1``.
     :return str: Video path.
     :raise NoFilesFoundError: No video file representing file found.
+
+    :examples:
+    >>> find_video_of_file(video_dir='project_folder/videos', filename='Together_1')
+    >>> 'project_folder/videos/Together_1.avi'
 
     """
     try:
@@ -440,7 +466,7 @@ def find_files_of_filetypes_in_directory(directory: str,
                                          extensions: list,
                                          raise_warning: Optional[bool] = True) -> List[str]:
     """
-    Find all files in a directory with specified extensions.
+    Find all files in a directory of specified extensions/types.
 
     :param str directory: Directory holding files.
     :param List[str] extensions: Accepted file extensions.
@@ -448,11 +474,18 @@ def find_files_of_filetypes_in_directory(directory: str,
 
     :return List[str]: All files in ``directory`` with extensions.
 
+    :example:
+    >>> find_files_of_filetypes_in_directory(directory='project_folder/videos', extensions=['mp4', 'avi', 'png'], raise_warning=False)
     """
+
     try:
         all_files_in_folder = [f for f in next(os.walk(directory))[2] if not f[0] == '.']
     except StopIteration:
-        raise NoFilesFoundError(msg=f'No files found in the {directory} directory with accepted extensions {str(extensions)}')
+        if raise_warning:
+            raise NoFilesFoundError(msg=f'No files found in the {directory} directory with accepted extensions {str(extensions)}')
+        else:
+            all_files_in_folder = []
+            pass
     all_files_in_folder = [os.path.join(directory, x) for x in all_files_in_folder]
     accepted_file_paths = []
     for file_path in all_files_in_folder:
@@ -470,6 +503,9 @@ def convert_parquet_to_csv(directory: str) -> None:
 
     :param str directory: Path to directory holding parquet files
     :raise NoFilesFoundError: The directory has no ``parquet`` files.
+
+    :examples:
+    >>> convert_parquet_to_csv(directory='project_folder/csv/input_csv')
     """
 
     if not os.path.isdir(directory):
@@ -494,6 +530,9 @@ def convert_csv_to_parquet(directory: Union[str, os.PathLike]) -> None:
 
     :param str directory: Path to directory holding csv files.
     :raise NoFilesFoundError: The directory has no ``csv`` files.
+
+    :examples:
+    >>> convert_parquet_to_csv(directory='project_folder/csv/input_csv')
     """
     if not os.path.isdir(directory):
         raise NotDirectoryError(msg='SIMBA ERROR: {} is not a valid directory'.format(directory))
@@ -541,8 +580,11 @@ def archive_processed_files(config_path: Union[str, os.PathLike],
     :param str config_path: Path to SimBA project ``project_config.ini``.
     :param str archive_name: Name of archive.
 
-    .. note::
+    .. seealso::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md>`_
+
+    :example:
+    >>> archive_processed_files(config_path='project_folder/project_config.ini', archive_name='my_archive')
     """
 
     config = read_config_file(config_path=config_path)
@@ -594,6 +636,10 @@ def archive_processed_files(config_path: Union[str, os.PathLike],
 def str_2_bool(input_str: str) -> bool:
     """
     Helper to convert string representation of bool to bool.
+
+    :example:
+    >>> str_2_bool(input_str='yes')
+    >>> True
     """
     return input_str.lower() in ("yes", "true", "1")
 
@@ -651,6 +697,10 @@ def get_all_clf_names(config: configparser.ConfigParser,
     :param configparser.ConfigParser config: Parsed SimBA project_config.ini
     :param int target_cnt: Count of models in SimBA project
     :return List[str]: Classifier model names
+
+    :example:
+    >>> get_all_clf_names(config=config, target_cnt=2)
+    >>> ['Attack', 'Sniffing']
     """
 
     model_names = []
@@ -662,8 +712,13 @@ def get_all_clf_names(config: configparser.ConfigParser,
 def read_meta_file(meta_file_path) -> dict:
     """
     Read in single SimBA modelconfig meta file to python dictionary.
+
     :param str meta_file_path: Path to SimBA config meta file
     :return dict: Dictionary holding model parameters.
+
+    :example:
+    >>> read_meta_file('project_folder/configs/Attack_meta_0.csv')
+    >>> {'Classifier_name': 'Attack', 'RF_n_estimators': 2000, 'RF_max_features': 'sqrt', 'RF_criterion': 'gini', ...}
     """
     return pd.read_csv(meta_file_path, index_col=False).to_dict(orient='records')[0]
 
@@ -671,10 +726,14 @@ def read_meta_file(meta_file_path) -> dict:
 def read_simba_meta_files(folder_path: str) -> List[str]:
     """
     Read in paths of SimBA model config meta files in directory.
+
     :param str folder_path: directory with SimBA model config meta files
     :return List[str]: List of paths to  SimBA model config meta files.
-    """
 
+    :example:
+    >>> read_simba_meta_files(folder_path='/project_folder/configs')
+    >>> ['project_folder/configs/Attack_meta_1.csv', 'project_folder/configs/Attack_meta_0.csv']
+    """
 
     file_paths = find_files_of_filetypes_in_directory(directory=folder_path, extensions=['.csv'])
     meta_file_lst = []
@@ -688,10 +747,14 @@ def read_simba_meta_files(folder_path: str) -> List[str]:
 
 def find_core_cnt() -> (int, int):
     """
-    Find the local cpu count and half of the cpu counts.
+    Find the local cpu count and quarter of the cpu counts.
 
     :return int: The local cpu count
-    :return int: The local cpu count // 2
+    :return int: The local cpu count // 4
+
+    :example:
+    >>> find_core_cnt()
+    >>> (8, 2)
 
     """
     cpu_cnt = multiprocessing.cpu_count()
@@ -720,9 +783,15 @@ def get_number_of_header_columns_in_df(df: pd.DataFrame) -> int:
 def get_memory_usage_of_df(df: pd.DataFrame) -> Dict[str, float]:
     """
     Get the RAM memory usage of a dataframe.
+
     :param pd.DataFrame df: Parsed dataframe
     :return dict: The memory usage of the dataframe in bytes, mb, and gb.
+
+    :example:
+    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
+    >>> {'bytes': 3328, 'megabytes': 0.003328, 'gigabytes': 3e-06}
     """
+
     results = {}
     results['bytes'] = df.memory_usage(index=True).sum()
     results['megabytes'] = round(results['bytes'] / 1000000, 6)
@@ -803,6 +872,11 @@ def find_all_videos_in_project(videos_dir: Union[str, os.PathLike],
 
     :param str videos_dir: Directory holding video files.
     :param bool basename: If true returns basenames, else file paths.
+
+    :example:
+    >>> find_all_videos_in_project(videos_dir='project_folder/videos')
+    >>> ['project_folder/videos/Together_2.avi', 'project_folder/videos/Together_3.avi', 'project_folder/videos/Together_1.avi']
+
     """
     video_paths = []
     file_paths_in_folder = [f for f in next(os.walk(videos_dir))[2] if not f[0] == '.']
