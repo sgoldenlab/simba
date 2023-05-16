@@ -15,10 +15,10 @@ class OutlierCorrecterLocation(ConfigReader):
     in the current frame relative to the location of the body-part in the preceding frame. Uses critera
     stored in the SimBA project project_config.ini under the [Outlier settings] header.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-
     .. note::
-       `Outlier correction documentation <https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf>`_.
+       `Documentation <https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf>`_.
+
+    :parameter str config_path: path to SimBA project config file in Configparser format
 
     Examples
     ----------
