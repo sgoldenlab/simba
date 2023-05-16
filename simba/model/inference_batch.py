@@ -14,13 +14,10 @@ class InferenceBatch(TrainModelMixin,
                      ConfigReader):
 
     """
-    Run classifier inference. Results are stored in the `project_folder/csv/machine_results`
-    directory of the SimBA project.
+    Run classifier inference on all files with the ``project_folder/csv/features_extracted`` directory.
+    Results are stored in the ``project_folder/csv/machine_results`` directory of the SimBA project.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
+    :param str config_path: path to SimBA project config file in Configparser format
 
     Example
     ----------

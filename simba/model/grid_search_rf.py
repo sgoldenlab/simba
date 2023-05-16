@@ -24,6 +24,10 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
     Grid-searching random forest models from hyperparameter setting and sampling methods
     stored within the `project_folder/configs` directory of a SimBA project.
 
+    .. note::
+       Searches you SimBA project `project_folder/configs` directory for files and builds
+       one model per file.
+
     Parameters
     ----------
     config_path: str

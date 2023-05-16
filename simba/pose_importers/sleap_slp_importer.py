@@ -154,7 +154,7 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
             video_timer.stop_timer()
             stdout_success(msg=f'Video {video_name} data imported...', elapsed_time=video_timer.elapsed_time_str)
         self.timer.stop_timer()
-        stdout_success(msg='All SLEAP H5 data files imported', elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(msg='All SLEAP SLP data files imported', elapsed_time=self.timer.elapsed_time_str)
 
     def __create_tracks(self):
         start_frame = 0

@@ -22,6 +22,7 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
     :parameter str config_path: path to SimBA project config file in Configparser format
     :parameter str data_folder: Path to folder containing maDLC data in ``.h5`` format.
     :parameter str file_type: Method used to perform pose-estimation in maDLC. OPTIONS: `skeleton`, `box`, `ellipse`.
+    :param List[str] id_lst: Names of animals.
     :parameter str interpolation_setting: String defining the pose-estimation interpolation method. OPTIONS: 'None', 'Animal(s): Nearest',
         'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear',
         'Body-parts: Quadratic'.
@@ -96,7 +97,7 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
             video_timer.stop_timer()
             stdout_success(msg=f'Video {video_name} data imported...', elapsed_time=video_timer.elapsed_time_str)
         self.timer.stop_timer()
-        stdout_success(msg='All SLEAP H5 data files imported', elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(msg='All maDLC H5 data files imported', elapsed_time=self.timer.elapsed_time_str)
 
     def __run_interpolation(self):
         print('Interpolating missing values in video {} (Method: {}) ...'.format(self.video_name, self.interpolation_settings))
@@ -110,8 +111,7 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
                smoothing_method=self.smoothing_settings['Method'],
                initial_import_multi_index=True)
 
-
-# test = MADLC_Importer(config_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+# test = MADLCImporterH5(config_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/h5',
 #                    file_type='ellipse',
 #                    id_lst=['Simon', 'JJ'],
