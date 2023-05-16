@@ -19,16 +19,12 @@ class BatchProcessFrame(PopUpMixin):
     Interactive GUI that collect user-inputs for batch processing videos (e.g., cropping,
     clipping etc.). User-selected output is stored in json file format within the user-defined `output_dir`
 
-    Parameters
-    ----------
-    input_dir: str
-        Input folder path containing videos for bath processing.
-    output_dir: str
-        Output folder path for where to store the processed videos.
+    .. note::
+       `Batch pre-process tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md>`__.
 
-    Notes
-    ----------
-    `Batch pre-process tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md>`__.
+    :param str input_dir: Input folder path containing videos for bath processing.
+    :param str output_dir: Output folder path for where to store the processed videos.
+
 
     Examples
     ----------
