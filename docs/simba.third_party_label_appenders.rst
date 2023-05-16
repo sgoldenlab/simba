@@ -6,7 +6,6 @@ BENTO
 
 .. automodule:: simba.third_party_label_appenders.BENTO_appender
    :members:
-   :undoc-members:
    :show-inheritance:
 
 BORIS
@@ -14,7 +13,6 @@ BORIS
 
 .. automodule:: simba.third_party_label_appenders.BORIS_appender
    :members:
-   :undoc-members:
    :show-inheritance:
 
 DEEPETHOGRAM
@@ -22,7 +20,6 @@ DEEPETHOGRAM
 
 .. automodule:: simba.third_party_label_appenders.deepethogram_importer
    :members:
-   :undoc-members:
    :show-inheritance:
 
 ETHOVISION
@@ -30,29 +27,25 @@ ETHOVISION
 
 .. automodule:: simba.third_party_label_appenders.ethovision_import
    :members:
-   :undoc-members:
    :show-inheritance:
 
-NOLDUS OBSERVER
+Noldus Observer
 --------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.observer_importer
    :members:
-   :undoc-members:
    :show-inheritance:
 
-SOLOMON
+Solomon coder
 -------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.solomon_importer
    :members:
-   :undoc-members:
    :show-inheritance:
 
-GENERIC THIRD-PARTY IMPORTANTION TOOL
+Generic third-party appender tool
 ------------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.third_party_appender
    :members:
-   :undoc-members:
    :show-inheritance:

@@ -6,8 +6,6 @@ SimBA UI
 
    simba.ui.pop_ups
 
-Submodules
-----------
 
 simba.ui.create\_project\_ui module
 -----------------------------------

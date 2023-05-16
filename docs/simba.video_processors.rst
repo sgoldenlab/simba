@@ -1,70 +1,53 @@
-VIDEO PROCESSORS
+Video processors
 ===============================
 
-Submodules
-----------
 
-simba.video\_processors.batch\_process\_create\_ffmpeg\_commands module
+Batch process
 -----------------------------------------------------------------------
 
 .. automodule:: simba.video_processors.batch_process_create_ffmpeg_commands
    :members:
-   :undoc-members:
    :show-inheritance:
 
 
-simba.video\_processors.calculate\_px\_dist module
+Get pixels per millimeter
 --------------------------------------------------
 
 .. automodule:: simba.video_processors.calculate_px_dist
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.video\_processors.extract\_frames module
+Extract frames
 ----------------------------------------------
 
 .. automodule:: simba.video_processors.extract_frames
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.video\_processors.extract\_seqframes module
+Extract .SEQ frames
 -------------------------------------------------
 
 .. automodule:: simba.video_processors.extract_seqframes
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.video\_processors.multi\_cropper module
+Multi-cropper
 ---------------------------------------------
 
 .. automodule:: simba.video_processors.multi_cropper
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.video\_processors.px\_to\_mm module
+Get pixels per millimeter - old
 -----------------------------------------
 
 .. automodule:: simba.video_processors.px_to_mm
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.video\_processors.video\_processing module
+Video processing tools
 ------------------------------------------------
 
 .. automodule:: simba.video_processors.video_processing
    :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.video_processors
-   :members:
-   :undoc-members:
    :show-inheritance:

@@ -18,13 +18,17 @@ release = '0.0.1'
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 myst_enable_extensions = ["html_image"]
-
+myst_url_schemes = ["http", "https"]
 extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
               #'sphinx_autodoc_typehints',
-              'nbsphinx']
+              'nbsphinx',
+              'sphinx.ext.intersphinx']
+intersphinx_mapping = {
+  'python': ('https://docs.python.org/3', None),
+  }
 html_favicon = "../simba/assets/icons/SimBA_logo.png"
 html_logo = "../simba/assets/icons/SimBA_logo.png"
 

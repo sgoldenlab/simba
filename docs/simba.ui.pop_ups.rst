@@ -345,10 +345,3 @@ simba.ui.pop\_ups.visualize\_pose\_in\_dir\_pop\_up module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: simba.ui.pop_ups
-   :members:
-   :undoc-members:
-   :show-inheritance:

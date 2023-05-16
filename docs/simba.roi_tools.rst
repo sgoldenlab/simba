@@ -6,7 +6,6 @@ ROI analyzer
 
 .. automodule:: simba.roi_tools.ROI_analyzer
    :members:
-   :undoc-members:
    :show-inheritance:
 
 ROI CLF calculator
@@ -14,7 +13,6 @@ ROI CLF calculator
 
 .. automodule:: simba.roi_tools.ROI_clf_calculator
    :members:
-   :undoc-members:
    :show-inheritance:
 
 ROI GUI
@@ -22,7 +20,6 @@ ROI GUI
 
 .. automodule:: simba.roi_tools.ROI_define
    :members:
-   :undoc-members:
    :show-inheritance:
 
 ROI directing analyzer
@@ -30,7 +27,6 @@ ROI directing analyzer
 
 .. automodule:: simba.roi_tools.ROI_directing_analyzer
    :members:
-   :undoc-members:
    :show-inheritance:
 
 ROI feature analyzer
@@ -38,7 +34,6 @@ ROI feature analyzer
 
 .. automodule:: simba.roi_tools.ROI_feature_analyzer
    :members:
-   :undoc-members:
    :show-inheritance:
 
 ROI GUI - IMAGE
@@ -46,15 +41,13 @@ ROI GUI - IMAGE
 
 .. automodule:: simba.roi_tools.ROI_image
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_menus module
+ROI GUI
 ----------------------------------
 
 .. automodule:: simba.roi_tools.ROI_menus
    :members:
-   :undoc-members:
    :show-inheritance:
 
 MOVING ROI SHAPES
@@ -62,54 +55,47 @@ MOVING ROI SHAPES
 
 .. automodule:: simba.roi_tools.ROI_move_shape
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_movement\_analyzer module
+ROI Movement analyzer
 -----------------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_movement_analyzer
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_multiply module
+Multiply ROIs
 -------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_multiply
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_reset module
+ROI resetter
 ----------------------------------
 
 .. automodule:: simba.roi_tools.ROI_reset
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_size\_calculations module
+ROI size calculators
 -----------------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_size_calculations
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_time\_bin\_calculator module
+ROI time-bin calculator
 --------------------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_time_bin_calculator
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.roi\_tools.ROI\_zoom module
+ROI zoom methods
 ---------------------------------
 
 .. automodule:: simba.roi_tools.ROI_zoom
    :members:
-   :undoc-members:
    :show-inheritance:
 :

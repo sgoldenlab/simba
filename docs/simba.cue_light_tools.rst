@@ -8,7 +8,6 @@ Analyze
 
 .. automodule:: simba.cue_light_tools.cue_light_analyzer
    :members:
-   :undoc-members: get_intensity_scores_in_rois
    :show-inheritance:
 
 CLF Statistics
@@ -16,7 +15,6 @@ CLF Statistics
 
 .. automodule:: simba.cue_light_tools.cue_light_clf_statistics
    :members:
-   :undoc-members:
    :show-inheritance:
 
 GUI
@@ -24,7 +22,6 @@ GUI
 
 .. automodule:: simba.cue_light_tools.cue_light_menues
    :members:
-   :undoc-members:
    :show-inheritance:
 
 Movement statistics
@@ -32,7 +29,6 @@ Movement statistics
 
 .. automodule:: simba.cue_light_tools.cue_light_movement_statistics
    :members:
-   :undoc-members:
    :show-inheritance:
 
 Tools
@@ -40,7 +36,6 @@ Tools
 
 .. automodule:: simba.cue_light_tools.cue_light_tools
    :members:
-   :undoc-members:
    :show-inheritance:
 
 Visualize
@@ -48,7 +43,6 @@ Visualize
 
 .. automodule:: simba.cue_light_tools.cue_light_visualizer
    :members:
-   :undoc-members:
    :show-inheritance:
 
 
