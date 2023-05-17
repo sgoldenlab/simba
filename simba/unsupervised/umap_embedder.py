@@ -19,33 +19,31 @@ except ModuleNotFoundError:
     from umap import UMAP
 
 class UmapEmbedder(UnsupervisedMixin):
+    """
+    Methods for grid-search UMAP model fit and transform.
+    Defaults to GPU and cuml.UMAP if GPU available. If GPU unavailable, then umap.UMAP.
+
+    :param data_path: Path holding pickled data-set created by `simba.unsupervised.dataset_creator.DatasetCreator.
+    :param save_dir: Empty directory where to save the UMAP results.
+    :param hyper_parameters: dict holding UMAP hyperparameters in list format.
+
+    :Example I: Fit.
+    >>> hyper_parameters = {'n_neighbors': [10, 2], 'min_distance': [1.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25}
+    >>> data_path = 'unsupervised/project_folder/logs/unsupervised_data_20230416145821.pickle'
+    >>> save_dir = 'unsupervised/dr_models'
+    >>> config_path = 'unsupervised/project_folder/project_config.ini'
+    >>> embedder = UmapEmbedder(data_path=data_path, save_dir=save_dir)
+    >>> embedder.fit(hyper_parameters=hyper_parameters)
+    """
 
     def __init__(self):
         super().__init__()
 
-    """
-    Methods for grid-search UMAP model fit and transform.
-    Defaults to GPU and cuml.UMAP if GPU available. If GPU unavailable, then umap.UMAP.
-    """
 
     def fit(self,
             data_path: str,
             save_dir: str,
             hyper_parameters: dict):
-        """
-
-        :param data_path: Path holding pickled data-set created by `simba.unsupervised.dataset_creator.DatasetCreator.
-        :param save_dir: Empty directory where to save the UMAP results.
-        :param hyper_parameters: dict holding UMAP hyperparameters in list format.
-
-        :Example I: Fit.
-        >>> hyper_parameters = {'n_neighbors': [10, 2], 'min_distance': [1.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25}
-        >>> data_path = 'unsupervised/project_folder/logs/unsupervised_data_20230416145821.pickle'
-        >>> save_dir = 'unsupervised/dr_models'
-        >>> config_path = 'unsupervised/project_folder/project_config.ini'
-        >>> embedder = UmapEmbedder(data_path=data_path, save_dir=save_dir)
-        >>> embedder.fit(hyper_parameters=hyper_parameters)
-        """
 
         self.data_path = data_path
         check_file_exist_and_readable(file_path=self.data_path)

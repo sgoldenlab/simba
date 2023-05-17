@@ -46,24 +46,24 @@ PERMUTATION_IMPORTANCE = 'permutation_importance'
 DESCRIPTIVE_STATISTICS = 'descriptive_statistics'
 ANOVA_HEADERS = ['FEATURE NAME', 'F-STATISTIC', 'P-VALUE']
 
-
 class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
+    """
+    Class for computing frequentist statitics based on cluster assignment labels (for explainability purposes).
+
+    :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
+    :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
+    :param dict settings: dict holding which statistical tests to use
+
+    :example:
+    >>> settings = {'scaled': True, 'ANOVA': True, 'tukey_posthoc': True, 'descriptive_statistics': True}
+    >>> calculator = ClusterFrequentistCalculator(config_path='unsupervised/project_folder/project_config.ini', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings)
+    >>> calculator.run()
+    """
     def __init__(self,
                  config_path: str,
                  data_path: str,
                  settings: dict):
-        """
-        Class for computing frequentist statitics based on cluster assignment labels (for explainability purposes).
 
-        :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
-        :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-        :param dict settings: dict holding which statistical tests to use
-
-        :Example:
-        >>> settings = {'scaled': True, 'ANOVA': True, 'tukey_posthoc': True, 'descriptive_statistics': True}
-        >>> calculator = ClusterFrequentistCalculator(config_path='unsupervised/project_folder/project_config.ini', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings)
-        >>> calculator.run()
-        """
 
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)

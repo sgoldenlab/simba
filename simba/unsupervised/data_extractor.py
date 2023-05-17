@@ -23,23 +23,26 @@ BOUTS_FEATURES = 'BOUTS_FEATURES'
 BOUTS_TARGETS = 'BOUTS_TARGETS'
 
 class DataExtractor(UnsupervisedMixin, ConfigReader):
+    """
+    Extracts human-readable data from pickle holding unsupervised analyses.
+
+    :param config_path: path to SimBA configparser.ConfigParser project_config.ini
+    :param data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
+    :param data_type: The type of data to extract.
+    :param settings: User-defined parameters for data extraction.
+
+    :example:
+    >>> extractor = DataExtractor(data_path='unsupervised/cluster_models/awesome_curran.pickle', data_type='BOUTS_TARGETS', settings=None, config_path='unsupervised/project_folder/project_config.ini')
+    >>> extractor.run()
+    """
+
     def __init__(self,
                  config_path: str,
                  data_path: str,
                  data_type: str,
                  settings: dict or None=None):
 
-        """
 
-        :param config_path: path to SimBA configparser.ConfigParser project_config.ini
-        :param data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-        :param data_type: The type of data to extract.
-        :param settings: User-defined parameters for data extraction.
-
-        :example:
-        >>> extractor = DataExtractor(data_path='unsupervised/cluster_models/awesome_curran.pickle', data_type='BOUTS_TARGETS', settings=None, config_path='unsupervised/project_folder/project_config.ini')
-        >>> extractor.run()
-        """
 
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)

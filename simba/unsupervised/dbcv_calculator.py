@@ -25,22 +25,16 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     """
     Density-based Cluster Validation (DBCV).
 
-    Parameters
-    ----------
-    embedders_path: str
-        Directory holding dimensionality reduction models in pickle format.
-    clusterers_path: str
-        Directory holding cluster models in pickle format.
+    .. note::
+       Jitted version of `DBCSV <https://github.com/christopherjenness/DBCV>`__.
+       Faster runtime by replacing meth:`scipy.spatial.distance.cdist` in original DBCSV with LLVM as discussed
+       `HERE <https://github.com/numba/numba-scipy/issues/38>`__.
 
-    Notes
-    -----
-    Numbafied version of `DBCSV GitHub repository <https://github.com/christopherjenness/DBCV>`__.
-    In part increases speed by replacing `scipy.spatial.distance.cdist` in original DBCSV with LLVM as discussed here
-    `<https://github.com/numba/numba-scipy/issues/38>`__.
+    :param str embedders_path: Directory holding dimensionality reduction models in pickle format.
+    :param str clusterers_path: Directory holding cluster models in pickle format.
 
     References
     ----------
-
     .. [1] Moulavi et al, Density-Based Clustering Validation, `SIAM 2014`, https://doi.org/10.1137/1.9781611973440.96
 
     Examples

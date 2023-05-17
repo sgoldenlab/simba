@@ -25,17 +25,13 @@ from simba.unsupervised.pop_up_classes import (GridSearchVisualizerPopUp,
                                                DBCVPopUp)
 
 class UnsupervisedGUI(ConfigReader, PopUpMixin):
+    """
+    Main access to unsupervised interface
+    """
     def __init__(self,
                  config_path: str):
 
-        """
-        Main access to unsupervised interface
 
-        :param config_path:
-
-        :examples:
-        #>>> _ = UnsupervisedGUI(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
-        """
 
         ConfigReader.__init__(self, config_path=config_path)
         PopUpMixin.__init__(self, title="UNSUPERVISED ANALYSIS", config_path=config_path, size=(1000, 800))

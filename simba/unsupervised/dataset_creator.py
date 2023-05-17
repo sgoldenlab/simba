@@ -13,21 +13,24 @@ from simba.utils.errors import NoDataError
 from simba.utils.printing import stdout_success
 
 class DatasetCreator(ConfigReader, UnsupervisedMixin):
+
+    """
+    Transform raw frame-wise supervised classification data into aggregated
+    data for unsupervised analyses.
+
+    :param config_path: path to SimBA configparser.ConfigParser project_config.ini
+    :param settings: user attributes for how the data should be aggregated.
+
+    :example:
+    >>> settings = {'data_slice': 'ALL FEATURES (EXCLUDING POSE)', 'clf_slice': 'Attack', 'bout_aggregation_type': 'MEDIAN', 'min_bout_length': 66, 'feature_path': '/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv'}
+    >>> _ = DatasetCreator(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini', settings=settings)
+    """
+
     def __init__(self,
                  config_path: str,
                  settings: dict):
 
-        """
-        Class for transforming raw frame-wise supervised classification data into aggregated
-        data for unsupervised analyses.
 
-        :param config_path: path to SimBA configparser.ConfigParser project_config.ini
-        :param settings: user attributes for how the data should be aggregated.
-
-        :example:
-        >>> settings = {'data_slice': 'ALL FEATURES (EXCLUDING POSE)', 'clf_slice': 'Attack', 'bout_aggregation_type': 'MEDIAN', 'min_bout_length': 66, 'feature_path': '/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv'}
-        >>> _ = DatasetCreator(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini', settings=settings)
-        """
 
         print('Creating unsupervised learning dataset...')
         ConfigReader.__init__(self, config_path=config_path)

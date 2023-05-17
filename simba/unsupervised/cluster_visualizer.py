@@ -25,25 +25,27 @@ CIRCLE_SIZE = 'circle_size'
 
 
 class ClusterVisualizer(ConfigReader, UnsupervisedMixin):
+    """
+    Class for creating video examples of cluster assignments.
+
+    :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
+    :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
+    :param str video_dir: path to directory holding videos.
+    :param dict settings: dict holding attributes of the videos
+
+    :example:
+    >>> settings = {'video_speed': 0.5, 'pose': {'create': True, 'circle_size': 5}}
+    >>> visualizer = ClusterVisualizer(video_dir='unsupervised/project_folder/videos', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings, config_path='unsupervised/project_folder/project_config.ini')
+    >>> visualizer.run()
+    """
+
     def __init__(self,
                  config_path: str,
                  video_dir: str,
                  data_path: str,
                  settings: dict):
 
-        """
-        Class for creating video examples of cluster assignments.
 
-        :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
-        :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-        :param str video_dir: path to directory holding videos.
-        :param dict settings: dict holding attributes of the videos
-
-        :Example:
-        >>> settings = {'video_speed': 0.5, 'pose': {'create': True, 'circle_size': 5}}
-        >>> visualizer = ClusterVisualizer(video_dir='unsupervised/project_folder/videos', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings, config_path='unsupervised/project_folder/project_config.ini')
-        >>> visualizer.run()
-        """
 
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)

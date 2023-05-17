@@ -21,12 +21,13 @@ from simba.unsupervised.umap_embedder import UmapEmbedder
 
 
 class HDBSCANClusterer(UnsupervisedMixin):
-    def __init__(self):
-        super().__init__()
     """
     Methods for grid-search HDBSCAN model fit and transform.
     Defaults to GPU and cuml.cluster.HDBSCAN. If GPU unavailable, then hdbscan.HDBSCAN.
     """
+    def __init__(self):
+        super().__init__()
+
 
 
     def fit(self,
@@ -48,8 +49,6 @@ class HDBSCANClusterer(UnsupervisedMixin):
         >>> clusterer = HDBSCANClusterer(data_path=embedding_dir, save_dir=save_dir)
         >>> clusterer.fit(hyper_parameters=hyper_parameters)
         """
-
-
 
         self.save_dir, self.data_path = save_dir, data_path
         self.check_that_directory_is_empty(directory=self.save_dir)

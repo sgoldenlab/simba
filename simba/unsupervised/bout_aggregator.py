@@ -1,17 +1,30 @@
 __author__ = "Simon Nilsson"
 
 import pandas as pd
+from typing import List
 from joblib.externals.loky import get_reusable_executor
 from joblib import Parallel, delayed
 from simba.utils.read_write import read_video_info
 from simba.utils.data import detect_bouts
 
 def bout_aggregator(data: pd.DataFrame,
-                    clfs: list,
-                    feature_names: list,
+                    clfs: List[str],
+                    feature_names: List[str],
                     aggregator: str,
                     min_bout_length: int,
-                    video_info: pd.DataFrame):
+                    video_info: pd.DataFrame) -> pd.DataFrame:
+
+    """
+    Helper to aggregate features to bout-level for unsupervised analyses.
+
+    :param pd.DataFrame data: DataFrame with features.
+    :param List[str] clfs: Names of classifiers
+    :param feature_names: Names of features
+    :param str aggregator: Aggregation type, e.g., 'MEAN', 'MEDIAN'
+    :param int min_bout_length: The length of the shortest allowed bout in milliseconds.
+    :param pd.DataFrame video_info: Holding video fps, resolution etc.
+    :return pd.DataFrame: Featurized data at aggregate bout level.
+    """
 
     print('Calculating bout aggregate statistics...')
     def bout_aggregator_mp(frms, data, clf_name):

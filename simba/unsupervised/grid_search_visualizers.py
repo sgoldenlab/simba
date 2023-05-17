@@ -12,24 +12,23 @@ from simba.utils.checks import check_if_dir_exists, check_if_filepath_list_is_em
 
 
 class GridSearchVisualizer(UnsupervisedMixin):
+    """
+    Visualize grid-searched hyper-parameters in .png format.
+
+    :param model_dir: path to pickle holding unsupervised results in ``data_map.yaml`` format.
+    :param save_dir: directory holding one or more unsupervised results in pickle ``data_map.yaml`` format.
+    :param settings: User-defined image attributes (e.g., continous and catehorical palettes)
+
+    :example:
+    >>> settings = {'CATEGORICAL_PALETTE': 'Pastel1', 'SCATTER_SIZE': 10}
+    >>> visualizer = GridSearchVisualizer(model_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models_042023', save_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/images', settings=settings)
+    >>> visualizer.continuous_visualizer(continuous_vars=['START_FRAME'])
+    >>> visualizer.categorical_visualizer(categoricals=['CLUSTER'])
+    """
     def __init__(self,
                  model_dir: str,
                  save_dir: str,
                  settings: dict):
-        """
-        Class for visualizing grid-searched hyper-parameters in .png format.
-
-        :param model_dir: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-        :param save_dir: directory holding one or more unsupervised results in pickle ``data_map.yaml`` format.
-        :param settings: User-defined image attributes (e.g., continous and catehorical palettes)
-
-        :example:
-        >>> settings = {'CATEGORICAL_PALETTE': 'Pastel1', 'SCATTER_SIZE': 10}
-        >>> visualizer = GridSearchVisualizer(model_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models_042023', save_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/images', settings=settings)
-        >>> visualizer.continuous_visualizer(continuous_vars=['START_FRAME'])
-        >>> visualizer.categorical_visualizer(categoricals=['CLUSTER'])
-        """
-
 
         super().__init__()
         check_if_dir_exists(in_dir=save_dir)
