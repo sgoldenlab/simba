@@ -1,4 +1,4 @@
-THIRD-PARTY LABEL APPENDERS
+Third-party behavior labels (annotation) appenders
 ============================================
 
 BENTO
@@ -15,14 +15,14 @@ BORIS
    :members:
    :show-inheritance:
 
-DEEPETHOGRAM
+Deepethogram
 ------------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.deepethogram_importer
    :members:
    :show-inheritance:
 
-ETHOVISION
+Ethovison
 --------------------------------------------------------------
 
 .. automodule:: simba.third_party_label_appenders.ethovision_import

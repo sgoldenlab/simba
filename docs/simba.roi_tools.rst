@@ -1,4 +1,4 @@
-ROI TOOLS
+Region-of-interest tools
 ========================
 
 ROI analyzer
@@ -8,7 +8,7 @@ ROI analyzer
    :members:
    :show-inheritance:
 
-ROI CLF calculator
+ROI classification calculator
 --------------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_clf_calculator
@@ -50,7 +50,7 @@ ROI GUI
    :members:
    :show-inheritance:
 
-MOVING ROI SHAPES
+Moving roi shapes
 ----------------------------------------
 
 .. automodule:: simba.roi_tools.ROI_move_shape

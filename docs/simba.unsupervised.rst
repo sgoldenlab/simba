@@ -1,109 +1,93 @@
-Unsupervised analysis in SimBA
+Unsupervised analyses in SimBA
 ==========================
 
-Submodules
-----------
-
-simba.unsupervised.bout\_aggregator module
+Bout aggregation helper
 ------------------------------------------
 
 .. automodule:: simba.unsupervised.bout_aggregator
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.cluster\_statistics module
+Cluster statistics calculator
 ---------------------------------------------
 
 .. automodule:: simba.unsupervised.cluster_statistics
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.cluster\_visualizer module
+Cluster visualizer
 ---------------------------------------------
 
 .. automodule:: simba.unsupervised.cluster_visualizer
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.data\_extractor module
+Data extractor
 -----------------------------------------
 
 .. automodule:: simba.unsupervised.data_extractor
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.dataset\_creator module
+Data creator
 ------------------------------------------
 
 .. automodule:: simba.unsupervised.dataset_creator
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.dbcv\_calculator module
+Density-based cluster validation (DBCV)
 ------------------------------------------
 
 .. automodule:: simba.unsupervised.dbcv_calculator
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.enums module
+Enums
 -------------------------------
 
 .. automodule:: simba.unsupervised.enums
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.grid\_search\_visualizers module
+Grid-search visualizer
 ---------------------------------------------------
 
 .. automodule:: simba.unsupervised.grid_search_visualizers
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.hdbscan\_clusterer module
+HDBSCAN clusterer
 --------------------------------------------
 
 .. automodule:: simba.unsupervised.hdbscan_clusterer
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.pop\_up\_classes module
+UI pop-up classes
 ------------------------------------------
 
 .. automodule:: simba.unsupervised.pop_up_classes
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.tsne module
+TSNE embedder
 ------------------------------
 
 .. automodule:: simba.unsupervised.tsne
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.ui module
+Main UI
 ----------------------------
 
 .. automodule:: simba.unsupervised.ui
    :members:
-   :undoc-members:
    :show-inheritance:
 
-simba.unsupervised.umap\_embedder module
+UMAP embedder
 ----------------------------------------
 
 .. automodule:: simba.unsupervised.umap_embedder
    :members:
-   :undoc-members:
    :show-inheritance:
