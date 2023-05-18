@@ -21,3 +21,6 @@ Visualizations
    nb/distance_plotter
    nb/clf_results_plotting
    nb/Visualize pose-estimation
+   nb/roi_feature_visualizer
+   nb/probability_plots
+   nb/hatmap_location_plotter
