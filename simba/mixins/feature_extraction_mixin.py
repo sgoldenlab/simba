@@ -135,7 +135,7 @@ class FeatureExtractionMixin(object):
 
         .. seealso::
             For acceptable run-time, call using ``parallel.delayed``.
-            For large data, use meth:`simba.feature_extractors.perimeter_jit.jitted_hull`.
+            For large data, use :meth:`simba.feature_extractors.perimeter_jit.jitted_hull`.
 
         :parameter np.ndarray arr: 2D array of size len(body-parts) x 2.
         :parameter float px_per_mm: Video pixels per millimeter.

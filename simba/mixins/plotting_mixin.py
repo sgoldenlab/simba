@@ -126,7 +126,7 @@ class PlottingMixin(object):
         return color_lst
 
     def remove_a_folder(self,
-                        folder_dir: str):
+                        folder_dir: str) -> None:
         """Helper to remove a directory, use for cleaning up smaller multiprocessed videos following concat"""
         shutil.rmtree(folder_dir, ignore_errors=True)
 
@@ -136,8 +136,8 @@ class PlottingMixin(object):
                            include_split_order: bool = True) -> (List[pd.DataFrame], int):
 
         """
-        Helper to split a dataframe for multiprocessing. If include_split_order, then include the group number in split data.
-        Returns split data and approximations of number of observations per split.
+        Helper to split a dataframe for multiprocessing. If include_split_order, then include the group number
+        in split data as a column. Returns split data and approximations of number of observations per split.
         """
 
         data_arr = np.array_split(df, splits)
@@ -158,32 +158,22 @@ class PlottingMixin(object):
         """
         Helper to make a single line plot .png image with N lines.
 
-        Parameters
-        ----------
-        data: np.array
-            Two-dimensional array where rows represent frames and columns represent values.
-        line_attr: dict
-            Line color attributes.
-        style_attr: dict
-            Image attributes (size, font size, line width etc).
-        fps: int
-            Video frame rate.
-        save_path:
-            Location to store output .png image.
+        :param np.array data: Two-dimensional array where rows represent frames and columns represent intertwined x and y coordinates.
+        :param dict line_attr: Line color attributes.
+        :param dict style_attr: Plot attributes (size, font size, line width etc).
+        :param int fps: Video frame rate.
+        :param Optionan[str] save_path: Location to store output .png image. If None, then return image.
 
+        .. note::
+           `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-distance-plots>`__.
 
-        Notes
-        -----
-        `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-distance-plots>`__.
-
-        Examples
-        -----
+        :example:
         >>> fps = 10
         >>> data = np.random.random((100,2))
         >>> line_attr = {0: ['Blue'], 1: ['Red']}
         >>> save_path = '/_tests/final_frm.png'
         >>> style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8, 'y_max': 'auto'}
-        >>> make_distance_plot(fps=fps, data=data, line_attr=line_attr, style_attr=style_attr, save_path=save_path)
+        >>> self.make_distance_plot(fps=fps, data=data, line_attr=line_attr, style_attr=style_attr, save_path=save_path)
         """
         colors = get_color_dict()
         for j in range(data.shape[1]):
