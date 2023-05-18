@@ -1,15 +1,7 @@
 SimBA utilities
 ===================
 
-.. toctree::
-   :maxdepth: 4
-
-   simba.utils.cli
-
-Submodules
-----------
-
-simba.utils.checks module
+Variable checks
 -------------------------
 
 .. automodule:: simba.utils.checks
@@ -17,7 +9,7 @@ simba.utils.checks module
    :undoc-members:
    :show-inheritance:
 
-simba.utils.config\_creator module
+SimBA project config creator
 ----------------------------------
 
 .. automodule:: simba.utils.config_creator
@@ -25,7 +17,7 @@ simba.utils.config\_creator module
    :undoc-members:
    :show-inheritance:
 
-simba.utils.data module
+Data utilities
 -----------------------
 
 .. automodule:: simba.utils.data
@@ -33,7 +25,7 @@ simba.utils.data module
    :undoc-members:
    :show-inheritance:
 
-simba.utils.enums module
+Enums
 ------------------------
 
 .. automodule:: simba.utils.enums
@@ -41,7 +33,7 @@ simba.utils.enums module
    :undoc-members:
    :show-inheritance:
 
-simba.utils.errors module
+Errors
 -------------------------
 
 .. automodule:: simba.utils.errors
@@ -49,7 +41,7 @@ simba.utils.errors module
    :undoc-members:
    :show-inheritance:
 
-simba.utils.lookups module
+Lookups
 --------------------------
 
 .. automodule:: simba.utils.lookups
@@ -57,7 +49,7 @@ simba.utils.lookups module
    :undoc-members:
    :show-inheritance:
 
-simba.utils.printing module
+Printing
 ---------------------------
 
 .. automodule:: simba.utils.printing
@@ -65,7 +57,7 @@ simba.utils.printing module
    :undoc-members:
    :show-inheritance:
 
-simba.utils.read\_write module
+Reading and writing
 ------------------------------
 
 .. automodule:: simba.utils.read_write
@@ -73,18 +65,10 @@ simba.utils.read\_write module
    :undoc-members:
    :show-inheritance:
 
-simba.utils.warnings module
+Warnings
 ---------------------------
 
 .. automodule:: simba.utils.warnings
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: simba.utils
    :members:
    :undoc-members:
    :show-inheritance:
