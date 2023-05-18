@@ -24,3 +24,4 @@ Visualizations
    nb/roi_feature_visualizer
    nb/probability_plots
    nb/hatmap_location_plotter
+   nb/heatmap_clf
