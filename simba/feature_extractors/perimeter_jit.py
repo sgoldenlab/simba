@@ -65,16 +65,18 @@ def jitted_hull(points: np.ndarray, target: str = 'perimeter') -> np.ndarray:
 
 @jit(nopython=True)
 def jitted_centroid(points: np.ndarray) -> np.ndarray:
-
     """
+    Compute the centroid of polygons.
+
     :param array points: 3d array FRAMESxBODY-PARTxCOORDINATE
     :param str target: Options [perimeter, area]
-    :return: 1d np.array
+    :return 1d np.array
 
-    :EXAMPLE:
+    :example:
     >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(float)
     >>> results = jitted_centroid(points)
     """
+
     results = np.full((points.shape[0], 2), np.nan)
     for i in range(points.shape[0]):
         S = points[i, :, :]
@@ -88,8 +90,8 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
         results[i][1] = np.int(np.mean(perimeter_points[:, 1].flatten()))
     return results
 
-points = np.random.randint(1, 10, size=(50, 5, 2)).astype(np.float32)
-results = jitted_centroid(points)
+# points = np.random.randint(1, 10, size=(50, 5, 2)).astype(np.float32)
+# results = jitted_centroid(points)
 #
 #
 # results = np.full((points.shape[0]), np.nan)
