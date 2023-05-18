@@ -21,7 +21,11 @@ class FSTTCCalculator(ConfigReader):
     :parameter str config_path: path to SimBA project config file in Configparser format
     :parameter int time_window: FSTTC hyperparameter; Integer representing the time window in seconds.
     :parameter List[str] behavior_lst: Behaviors to calculate FSTTC between. FSTTC will be computed for all combinations of behaviors.
-    :parameter bool create_graphs: If True, created violin plots representing each FSTTC. Default: False.
+    :parameter bool create_graphs: If True, created violin plots (as below) representing each FSTTC. Default: False.
+
+    .. image:: _static/img/fsttc_violin.png
+       :width: 500
+       :align: center
 
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/FSTTC.md>`__.

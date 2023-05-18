@@ -20,14 +20,18 @@ from simba.utils.errors import NoFilesFoundError
 
 class Interpolate(ConfigReader):
     """
-    Interpolate missing body-parts in pose-estimation data. "Missing" is defined as either (i) when a single body-parts is None or
+    Interpolate missing body-parts in pose-estimation data. "Missing" is defined as either (i) when a single body-parts is None, or
     when all body-parts belonging to an animal are identical (i.e., the same 2D coordinate or all None).
 
-    :parameter str input_path path to pose-estimation data in CSV or parquet format
+    :parameter str input_path: path to pose-estimation data in CSV or parquet format
     :parameter str config_path: path to SimBA project config file in Configparser format.
     :parameter Literal str: Type of interpolation. OPTIONS: 'Animal(s): Nearest', 'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear', 'Body-parts: Quadratic']
-                            See `tutorial for info/images of the different interpolation types <<https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`>__.
+                            See `tutorial for info/images of the different interpolation types <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
     :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Default: False.
+
+    .. image:: _static/img/Interpolation_comparison.png
+       :width: 400
+       :align: center
 
     .. note::
        `Interpolation tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
@@ -115,9 +119,9 @@ class Smooth(ConfigReader):
     """
     Smooth pose-estimation data according to user-defined method.
 
-    :parameter str input_path path to pose-estimation data in CSV or parquet format
+    :parameter str input_path: path to pose-estimation data in CSV or parquet format
     :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter Literal str: Type of smoothing_method. OPTIONS: '`Gaussian'`, '`Savitzky-Golay`'.
+    :parameter Literal str: Type of smoothing_method. OPTIONS: ``Gaussian``, ``Savitzky-Golay``.
     :parameter int time_window: Rolling time window in millisecond to use when smoothing. Larger time-windows and greater smoothing.
     :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Default: False.
 

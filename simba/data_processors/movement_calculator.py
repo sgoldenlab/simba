@@ -19,13 +19,16 @@ class MovementCalculator(ConfigReader,
     Compute aggregate movement statistics from pose-estimation data in SimBA project.
 
     :parameters str config_path: path to SimBA project config file in Configparser format
+    :param List[str] body_parts: Body-parts to use for movement calculations OR ``Animal_name CENTER OF GRAVITY``. If ``Animal_name CENTER OF GRAVITY``, then SimBA will approximate animal centroids through convex hull.
+    :param float threshold: Filter body-part detection below set threshold (Value 0-1). Default: 0.00
+    :param List[str] or None file_paths: Files to calucalte movements for. If None, then all files in ``project_folder/csv/outlier_corrected_movement_location`` directory.
 
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 
-    Examples
-    ----------
-    >>> movement_processor = MovementCalculator(config_path='project_folder/project_config.ini')
+    :examples:
+    >>> body_parts=['Animal_1 CENTER OF GRAVITY']
+    >>> movement_processor = MovementCalculator(config_path='project_folder/project_config.ini', body_parts=body_parts)
     >>> movement_processor.run()
     >>> movement_processor.save()
 
@@ -34,7 +37,7 @@ class MovementCalculator(ConfigReader,
     def __init__(self,
                  config_path: str,
                  body_parts: List[str],
-                 threshold: float,
+                 threshold: float = 0.00,
                  file_paths: Optional[List[str]] = None):
 
         ConfigReader.__init__(self, config_path=config_path)
@@ -62,16 +65,6 @@ class MovementCalculator(ConfigReader,
 
 
     def run(self):
-        """
-        Method to run movement aggregation computations.
-
-        Returns
-        ----------
-        Attribute: dict
-            results
-
-        """
-
         self.results = pd.DataFrame(columns=['VIDEO', 'ANIMAL', 'BODY-PART', "MEASURE", 'VALUE'])
         self.movement_dfs = {}
         for file_path in self.file_paths:
