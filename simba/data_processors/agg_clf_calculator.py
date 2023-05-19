@@ -47,16 +47,6 @@ class AggregateClfCalculator(ConfigReader):
         print(f'Analyzing {str(len(self.machine_results_paths))} file(s) for {str(len(self.clf_names))} classifiers...')
 
     def run(self):
-
-        """
-        Method to create dataframe of classifier aggregate statistics
-
-        Returns
-        -------
-        Attribute: pd.Dataframe
-            results_df
-        """
-
         self.results_df = pd.DataFrame()
         for file_cnt, file_path in enumerate(self.machine_results_paths):
             _, file_name, _ = get_fn_ext(file_path)
