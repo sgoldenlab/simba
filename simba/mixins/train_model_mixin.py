@@ -49,7 +49,8 @@ from simba.utils.errors import (ColumnNotFoundError,
                                 SamplingError,
                                 CorruptedFileError,
                                 FeatureNumberMismatchError,
-                                ClassifierInferenceError)
+                                ClassifierInferenceError,
+                                InvalidInputError)
 from simba.utils.warnings import (NotEnoughDataWarning,
                                   NoModuleWarning,
                                   MissingUserInputWarning)
@@ -95,8 +96,9 @@ class TrainModelMixin(object):
             if classifier_names != None:
                 for clf_name in classifier_names:
                     if not clf_name in df.columns:
-                        raise MissingColumnsError(
-                            msg=f'Data for video {vid_name} does not contain any annotations for behavior {clf_name}. Delete classifier {clf_name} from the SimBA project, or add annotations for behavior {clf_name} to the video {vid_name}')
+                        raise MissingColumnsError(msg=f'Data for video {vid_name} does not contain any annotations for behavior {clf_name}. Delete classifier {clf_name} from the SimBA project, or add annotations for behavior {clf_name} to the video {vid_name}')
+                    elif len(set(df[clf_name].unique()) - {0, 1}) > 0:
+                        raise InvalidInputError(msg=f'The annotation column for a classifier should contain only 0 or 1 values. However, in file {file} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.')
                     else:
                         df_concat = pd.concat([df_concat, df], axis=0)
             else:
@@ -959,7 +961,7 @@ class TrainModelMixin(object):
         p_vals = clf.predict_proba(x_df)
         if p_vals.shape[1] != 2:
             raise ClassifierInferenceError(
-                msg='The classifier {model_name} has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes.')
+                msg=f'The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes.')
         return p_vals[:, 1]
 
     def clf_fit(self,
@@ -1000,6 +1002,8 @@ class TrainModelMixin(object):
             for clf_name in clf_names:
                 if not clf_name in df.columns:
                     raise ColumnNotFoundError(column_name=clf_name, file_name=file_path)
+                elif len(set(df[clf_name].unique()) - {0, 1}) > 0:
+                    raise InvalidInputError(msg=f'The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.')
         timer.stop_timer()
         print(f'Reading complete {vid_name} (elapsed time: {timer.elapsed_time_str}s)...')
         return df
@@ -1057,7 +1061,6 @@ class TrainModelMixin(object):
         :param pd.DataFrame df
         :param str logs_path: The logs directory of the SimBA project
         :raise FaultyTrainingSetError: When the dataset contains NaNs
-
         """
 
         nan_cols = df.reset_index(drop=True).replace([np.inf, -np.inf, None], np.nan).columns[df.isna().any()].tolist()
@@ -1079,3 +1082,19 @@ class TrainModelMixin(object):
                 msg=f'{len(nan_cols)} feature columns exist in some files, but missing in others. The feature files are found in the project_folder/csv/targets_inserted directory. ' \
                     f'SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 ' \
                     f'column names with mismatches are: {nan_cols[0:9]}. For a log of the files that contain, and not contain, the mis-matched columns, see {save_log_path}')
+
+
+# test = TrainModelMixin()
+# test.read_all_files_in_folder(file_paths=['/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437C_c3_2022-11-01_13-16-23_color.csv', '/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437D_c4_2022-11-01_13-16-39_color.csv'],
+#                               file_type='csv', classifier_names=['attack', 'non-agresive parallel swimming'])
+
+
+# test = TrainModelMixin()
+# test.read_all_files_in_folder_mp(file_paths=['/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437C_c3_2022-11-01_13-16-23_color.csv', '/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437D_c4_2022-11-01_13-16-39_color.csv'],
+#                               file_type='csv', classifier_names=['attack', 'non-agresive parallel swimming'])
+#
+#     #
+    # def read_all_files_in_folder(self,
+    #                              file_paths: List[str],
+    #                              file_type: str,
+    #                              classifier_names: Optional[List[str]] = None) -> pd.DataFrame:

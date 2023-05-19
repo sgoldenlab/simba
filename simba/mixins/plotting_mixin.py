@@ -14,7 +14,7 @@ from matplotlib import cm
 import imutils
 import itertools
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Tuple, Optional, Dict, Any, Union
 try:
     from typing import Literal
 except:
@@ -41,25 +41,14 @@ class PlottingMixin(object):
                          fps: int,
                          gantt_img_title: str):
         """
-        Helper to create a single gantt plot based on the data preceeding the input image.
+        Helper to create a single gantt plot based on the data preceeding the input image
 
-        Parameters
-        ----------
-        bouts_df: pd.DataFrame
-            Pandas dataframe holding information on individual bouts created by ``simba.misc_tools.get_bouts_for_gantt``.
-        clf_name: str
-            Name of the classifier.
-        image_index: int
-            The count of the image.
-        fps: int
-            The fps of the input video.
-        gantt_img_title: str
-            Title of the output image
-
-        Returns
-        -------
-        open_cv_image: np.array
-
+        :param pd.DataFrame bouts_df: ataframe holding information on individual bouts created by :meth:`simba.misc_tools.get_bouts_for_gantt`.
+        :param str clf_name: Name of the classifier.
+        :param int image_index: The count of the image. E.g., ``1000`` will create a gantt image representing frame 1-1000.
+        :param int fps: The fps of the input video.
+        :param str gantt_img_title: Title of the image.
+        :return np.ndarray
         """
 
         fig, ax = plt.subplots()
@@ -96,19 +85,20 @@ class PlottingMixin(object):
                                 pallete_name: Literal[Options.PALETTE_OPTIONS],
                                 increments: int,
                                 as_rgb_ratio: bool = False,
-                                as_hex: bool = False) -> List[int]:
+                                as_hex: bool = False) -> List[Union[str, int, float]]:
+
         """
         Helper to create a color palette of bgr colors in a list.
-        Parameters
-        ----------
-        pallete_name: str
-            Palette name (e.g., 'jet')
-        increments: int
-            Numbers of colors in the color palette to create.
 
-        Returns
-        -------
-        list
+        :param str pallete_name: Palette name (e.g., 'jet')
+        :param int increments: Numbers of colors in the color palette to create.
+        :param bool as_rgb_ratio: If True returns the colors as RGB ratios (0-1).
+        :param bool as_hex: If True, returns the colors as HEX.
+        :return list
+
+        .. note::
+           If as_rgb_ratio **AND** as_hex, then returns HEX.
+
 
         """
         if as_hex:
@@ -219,35 +209,28 @@ class PlottingMixin(object):
                               fps: int,
                               save_path: str) -> np.ndarray:
         """
-        Helper to make a single classifier probability plot png image.
+        Make a single classifier probability plot png image.
 
-        Parameters
-        ----------
-        data: pd.Series
-            With row representing frames and field representing classification probabilities.
-        line_attr: dict
-            Line color attributes.
-        style_attr: dict
-            Image attributes (size, font size, line width etc).
-        fps: int
-            Video frame rate.
-        save_path:
-            Location to store output .png image.
+        :param pd.Series data: row representing frames and field representing classification probabilities.
+        :param dict line_attr: Line color attributes.
+        :param dict style_attr: Image attributes (size, font size, line width etc).
+        :param int fps: Video frame rate.
+        :param str ot
+        :param str save_path: Location to store output .png image.
 
 
-        Notes
-        -----
-        `GitHub tutorial/documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-probabilities>`__.
 
-        Examples
-        -----
+        .. notes::
+          `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-probabilities>`__.
+
+        :example:
         >>> data = pd.Series(np.random.random((100, 1)).flatten())
         >>> style_attr = {'width': 640, 'height': 480, 'font size': 10, 'line width': 6, 'color': 'blue', 'circle size': 20}
         >>> clf_name='Attack'
         >>> fps=10
         >>> save_path = '/_test/frames/output/probability_plots/Together_1_final_frame.png'
 
-        >>> _ = make_probability_plot(data=data, style_attr=style_attr, clf_name=clf_name, fps=fps, save_path=save_path)
+        >>> _ = self.make_probability_plot(data=data, style_attr=style_attr, clf_name=clf_name, fps=fps, save_path=save_path)
         """
 
         timer = SimbaTimer()
@@ -279,7 +262,6 @@ class PlottingMixin(object):
         img = np.uint8(cv2.resize(img, (style_attr['width'], style_attr['height'])))
         buffer_.close()
         plt.close()
-
         timer.stop_timer()
         cv2.imwrite(save_path, img)
         stdout_success(msg=f'Final distance plot saved at {save_path}', elapsed_time=timer.elapsed_time_str)
@@ -290,7 +272,18 @@ class PlottingMixin(object):
                        style_attr: dict,
                        deque_dict: dict,
                        clf_attr: dict,
-                       save_path: Optional[str] = None) -> np.ndarray:
+                       save_path: str) -> None:
+
+        """
+        Helper to make a path plot.
+
+        :param pd.DataFrame data_df: Dataframe holding body-part coordinates
+        :param pd.DataFrame video_info: Video info dataframe (parsed project_folder/logs/video_info.csv)
+        :param dict style_attr: Dict holding image style attributes. E.g., {'width': 'As input', 'height': 'As input', 'line width': 5, 'font size': 5, 'font thickness': 2, 'circle size': 5, 'bg color': 'White', 'max lines': 100}
+        :param dict deque_dict: Dict with deque holsing all paths to visualize
+        :param dict clf_attr: Dict holding image classifictaion attributes e.g., {0: ['Attack', 'Black', 'Size: 30'], 1: ['Sniffing', 'Red', 'Size: 30']}
+        :param str save_path: Location to save image
+        """
 
         video_timer = SimbaTimer(start=True)
         for frm_cnt in range(len(data_df)):
@@ -338,7 +331,7 @@ class PlottingMixin(object):
                         fps: int,
                         style_attr: dict,
                         video_name: str,
-                        save_path: str) -> np.ndarray:
+                        save_path: str) -> None:
 
         video_timer = SimbaTimer(start=True)
         colours = get_named_colors()
@@ -478,19 +471,10 @@ class PlottingMixin(object):
         """
         Helper to detect all behavior bouts for a specific classifier.
 
-        Parameters
-        ----------
-        data_df: pd.DataFrame
-            Pandas Dataframe with classifier prediction data.
-        clf_name: str
-            Name of the classifier
-        fps: int
-            The fps of the input video.
-
-        Returns
-        -------
-        pd.DataFrame:
-            Holding the start time, end time, end frame, bout time etc of each classified bout.
+        :param pd.DataFrame data_df: Pandas Dataframe with classifier prediction data.
+        :param str clf_name: Name of the classifier
+        :param int fps: The fps of the input video.
+        :return  pd.DataFrame: Holding the start time, end time, end frame, bout time etc of each classified bout.
         """
 
         boutsList, nameList, startTimeList, endTimeList, endFrameList = [], [], [], [], []
@@ -518,7 +502,7 @@ class PlottingMixin(object):
                      gantt_img: np.array,
                      img_height: int) -> np.ndarray:
         """
-        Helper to resize image.
+        Helper to resize image while retaining aspect ratio.
         """
 
         return imutils.resize(gantt_img, height=img_height)

@@ -21,7 +21,7 @@ from simba.utils.read_write import (read_project_path_and_file_type,
                                     read_video_info_csv,
                                     read_config_file,
                                     get_bp_headers)
-from simba.utils.errors import CountError
+from simba.utils.errors import CountError, InvalidInputError
 import simba
 
 class FeatureExtractionMixin(object):
@@ -584,11 +584,12 @@ class FeatureExtractionMixin(object):
         >>> FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False)
         >>> [49.80098657, 46.54963644, 49.60650394, 70.35919993, 37.91069901, 71.95422524]
         """
-
+        # if not px_per_mm and centimeter:
+        #     raise InvalidInputError(msg='To calculate centimeters, provide a pixel per millimeter value')
         results = np.full((location_1.shape[0]), np.nan)
         for i in prange(location_1.shape[0]):
             results[i] = np.linalg.norm(location_1[i] - location_2[i]) / px_per_mm
-        if centimeter:
+        if centimeter and px_per_mm:
             results = results / 10
         return results
 

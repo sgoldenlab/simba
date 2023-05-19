@@ -512,18 +512,10 @@ class ConfigReader(object):
     def read_video_info(self,
                         video_name: str) -> (pd.DataFrame, float, float):
         """
-        Helper to read the meta-data (pixels per mm, resolution, fps) from the video_info.csv for a single input file
+        Helper to read the meta-data (pixels per mm, resolution, fps) from the video_info.csv for a single input file.
 
-        Parameters
-        ----------
-        video_name: str
-            The name of the video without extension to get the meta data for.
-
-        Returns
-        -------
-        video_settings: pd.DataFrame
-        px_per_mm: float
-        fps: float
+        :param str video_name: The name of the video without extension to get the meta data for
+        :return (pd.DataFrame, float, float)
         """
 
         video_settings = self.video_info_df.loc[self.video_info_df['Video'] == video_name]
