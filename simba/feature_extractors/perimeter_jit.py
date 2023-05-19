@@ -26,7 +26,7 @@ def jitted_hull(points: np.ndarray, target: str = 'perimeter') -> np.ndarray:
     Modified from `Jérôme Richard <https://stackoverflow.com/questions/74812556/computing-quick-convex-hull-using-numba/74817179#74817179>`_
 
     :example:
-    >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(float)
+    >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(np.float32)
     >>> results = jitted_hull(points, target='area')
     """
 
@@ -89,6 +89,14 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
         results[i][0] = np.int(np.mean(perimeter_points[:, 0].flatten()))
         results[i][1] = np.int(np.mean(perimeter_points[:, 1].flatten()))
     return results
+
+# points = np.random.randint(1, 5, size=(1, 10, 2)).astype(np.float32)
+# points[0][1] = np.nan
+# results = jitted_hull(points, target='area')
+# print(results)
+
+
+
 
 # points = np.random.randint(1, 10, size=(50, 5, 2)).astype(np.float32)
 # results = jitted_centroid(points)
