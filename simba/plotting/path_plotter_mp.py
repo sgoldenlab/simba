@@ -80,8 +80,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
         """
 
         for file_cnt, file_path in enumerate(self.files_found):
-            video_timer = SimbaTimer()
-            video_timer.start_timer()
+            video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
             self.video_info, _, self.fps = self.read_video_info(video_name=self.video_name)
             self.__get_styles()
