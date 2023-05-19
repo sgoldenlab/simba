@@ -20,6 +20,9 @@ class AnnotationFrameExtractor(ConfigReader):
     :param dict settings: User-defined settings. E.g., how much to downsample the png images.
     :param str config_path: path to SimBA configparser.ConfigParser project_config.in
 
+    .. note::
+        Use settings={'downsample': 2} to downsample all .pngs to 0.5 original size for disk space savings.
+
     :example:
     >>> extractor = AnnotationFrameExtractor(config_path='project_folder/project_config.ini', clfs=['Sniffing', 'Attack'], settings={'downsample': 2})
     >>> extractor.run()
