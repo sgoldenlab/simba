@@ -125,7 +125,7 @@ class OutlierCorrecterLocation(ConfigReader):
         self.timer.stop_timer()
         stdout_success(msg='Log for corrected "location outliers" saved in project_folder/logs', elapsed_time=self.timer.elapsed_time_str)
 
-#
+
 # test = OutlierCorrecterLocation(config_path='/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini')
 # test.run()
 
