@@ -17,21 +17,19 @@ from simba.utils.enums import (Options,
 
 class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
     """
-    Train a single random forest model from hyper-parameter setting and sampling methods
-    stored within the SimBA project config .ini file (`global environment`).
+    Train a single random forest model using hyperparameter setting and methods
+    stored within the SimBA project config .ini file (``global environment``).
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
+    :param str config_path: path to SimBA project config file in Configparser format
 
-    Example
-    ----------
+    .. note::
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model>`_
+
+    :example:
     >>> model_trainer = TrainRandomForestClassifier(config_path='MyConfigPath')
     >>> model_trainer.perform_sampling()
     >>> model_trainer.train_model()
     >>> model_trainer.save_model()
-
     """
 
 
@@ -81,17 +79,6 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         """
         Method for sampling data for training and testing, and perform over and under-sampling of the training sets
         as indicated within the SimBA project config.
-
-        Returns
-        ----------
-        Attribute: array
-            x_train
-        Attribute: array
-            y_train
-        Attribute: array
-            x_test
-        Attribute: array
-            y_test
         """
 
         if self.split_type == Methods.SPLIT_TYPE_FRAMES.value:
@@ -109,11 +96,6 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
     def train_model(self):
         """
         Method for training single random forest model.
-
-        Returns
-        ----------
-        Attribute: object
-            rf_clf
         """
 
         if self.algo == 'RF':
@@ -232,14 +214,10 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
 
                 self.create_meta_data_csv_training_one_model(meta_data_lst, self.clf_name, self.eval_out_path)
 
-    def save_model(self):
+    def save_model(self) -> None:
         """
         Method for saving pickled RF model. The model is saved in the `models/generated_models` directory
         of the SimBA project tree.
-
-        Returns
-        ----------
-        None
         """
 
         self.timer.stop_timer()

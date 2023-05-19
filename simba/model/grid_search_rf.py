@@ -26,12 +26,9 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
 
     .. note::
        Searches you SimBA project `project_folder/configs` directory for files and builds
-       one model per file.
+       one model per config file. `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model>`__.
 
-    Parameters
-    ----------
-    config_path: str
-        path to SimBA project config file in Configparser format
+    :param str config_path: path to SimBA project config file in Configparser format
 
     Example
     ----------

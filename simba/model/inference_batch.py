@@ -26,15 +26,6 @@ class InferenceBatch(TrainModelMixin,
 
     def __init__(self,
                  config_path: str):
-        """
-        Method to run classifier inference. Results are stored in the ``project_folder/csv/machine_results`` directory
-        of the SimBA project.
-
-        Returns
-        ----------
-        None
-        """
-
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
         if len(self.feature_file_paths) == 0:

@@ -19,21 +19,14 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
     Run a single classifier on a single featurized input file. Results are saved within the
     ``project_folder/csv/validation`` directory of the SimBA project.
 
-    Parameters
-    ----------
-    config_file_path: str
-        path to SimBA project config file in Configparser format
-    input_file_path: str
-        path to file containing features
-    clf_path: str
-        path to pickled rf sklearn classifier.
+    :param str config_file_path: path to SimBA project config file in Configparser format
+    :param str input_file_path: path to file containing features
+    :param str clf_path: path to pickled rf sklearn classifier.
 
-    Notes
-    -----
+    .. note::
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data>`_
 
-    Examples
-    -----
-
+    :example:
     >>> InferenceValidation(config_path=r"MyProjectConfigPath", input_file_path=r"FeatureFilePath", clf_path=r"ClassifierPath")
 
     """
@@ -57,7 +50,7 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
         data_df = self.drop_bp_cords(df=data_df)
         clf = self.read_pickle(file_path=clf_path)
         probability_col_name = f'Probability_{classifier_name}'
-        output_df[probability_col_name] = self.clf_predict_proba(clf=clf, x_df=data_df)
+        output_df[probability_col_name] = self.clf_predict_proba(clf=clf, x_df=data_df, model_name=classifier_name, data_path=clf_path)
         save_filename = os.path.join(self.save_path, file_name + '.' + self.file_type)
         write_df(output_df, self.file_type, save_filename)
 
