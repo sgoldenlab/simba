@@ -16,16 +16,18 @@ class TestFeatureExtractors(object):
                          config_path_arg):
         config_path = config_path_arg.param
         config = read_config_file(config_path)
+        animal_no = 1
+        pose_setting = 4
         print(config)
-#         animal_cnt = read_config_entry(config, 'General settings', 'animal_no', 'int')
-#         pose_setting = read_config_entry(config, 'create ensemble settings', 'pose_estimation_body_parts', 'str')
-#         if pose_setting == 'user_defined':
-#             feature_extractor = FEATURE_EXTRACTION_CLASSES[pose_setting](config_path=config_path)
-#         elif pose_setting == '8':
-#             feature_extractor = FEATURE_EXTRACTION_CLASSES[pose_setting][animal_cnt](config_path=config_path)
-#         else:
-#             feature_extractor = FEATURE_EXTRACTION_CLASSES[pose_setting](config_path=config_path)
-#         feature_extractor.run()
-#         assert len(feature_extractor.out_data.columns) == 165
-#         assert len(feature_extractor.out_data.columns) == len(feature_extractor.out_data.select_dtypes([np.number]).columns)
-#         for f in glob.glob(feature_extractor.save_dir + '/*.csv'): os.remove(f)
+        #animal_cnt = read_config_entry(config, 'General settings', 'animal_no', 'int')
+        #pose_setting = read_config_entry(config, 'create ensemble settings', 'pose_estimation_body_parts', 'str')
+        if pose_setting == 'user_defined':
+            feature_extractor = FEATURE_EXTRACTION_CLASSES[pose_setting](config_path=config_path)
+        elif pose_setting == '8':
+            feature_extractor = FEATURE_EXTRACTION_CLASSES[pose_setting][animal_cnt](config_path=config_path)
+        else:
+            feature_extractor = FEATURE_EXTRACTION_CLASSES[pose_setting](config_path=config_path)
+        feature_extractor.run()
+        assert len(feature_extractor.out_data.columns) == 165
+        assert len(feature_extractor.out_data.columns) == len(feature_extractor.out_data.select_dtypes([np.number]).columns)
+        for f in glob.glob(feature_extractor.save_dir + '/*.csv'): os.remove(f)
