@@ -1,25 +1,22 @@
 __author__ = "Simon Nilsson"
 
-import os
-import cv2
+import functools
 import itertools
 import multiprocessing
-import functools
+import os
 import platform
+
+import cv2
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.read_write import (
-    get_fn_ext,
-    read_df,
-    read_video_info_csv,
-    get_video_meta_data,
-    remove_a_folder,
-    concatenate_videos_in_folder,
-)
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats, Paths
-from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    get_video_meta_data, read_df,
+                                    read_video_info_csv, remove_a_folder)
 
 
 class ROIfeatureVisualizerMultiprocess(ConfigReader, PlottingMixin):

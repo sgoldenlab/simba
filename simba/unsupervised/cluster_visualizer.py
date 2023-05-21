@@ -1,19 +1,20 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import numpy as np
 import os
-import cv2
 
-from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.read_write import find_all_videos_in_directory, get_video_meta_data
-from simba.utils.enums import Paths, Formats
+import cv2
+import numpy as np
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import Formats, Paths
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    get_video_meta_data)
 from simba.utils.warnings import NoFileFoundWarning
-
 
 CLUSTER = "CLUSTER"
 FPS = "fps"

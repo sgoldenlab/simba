@@ -1,17 +1,19 @@
 __author__ = "Simon Nilsson"
 
-import os, glob
+import glob
+import os
 from collections import defaultdict
-import pandas as pd
-import numpy as np
 from statistics import mean
 from typing import List, Union
 
-from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+import numpy as np
+import pandas as pd
+
 from simba.cue_light_tools.cue_light_tools import find_frames_when_cue_light_on
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import get_fn_ext, read_df
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
 
 
 class CueLightMovementAnalyzer(ConfigReader):

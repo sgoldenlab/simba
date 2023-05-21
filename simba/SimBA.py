@@ -5,146 +5,131 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-from tkinter.filedialog import askopenfilename, askdirectory
-from PIL import ImageTk
-import PIL.Image
-import tkinter.ttk as ttk
-from tkinter.messagebox import askyesno
-import webbrowser
-from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
-from simba.plotting.interactive_probability_grapher import InteractiveProbabilityGrapher
-from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
-from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
-from simba.outlier_tools.outlier_corrector_movement import OutlierCorrecterMovement
-from simba.outlier_tools.outlier_corrector_location import OutlierCorrecterLocation
-from simba.outlier_tools.skip_outlier_correction import OutlierCorrectionSkipper
-from simba.third_party_label_appenders.BENTO_appender import BentoAppender
-from simba.third_party_label_appenders.BORIS_appender import BorisAppender
-from simba.third_party_label_appenders.solomon_importer import SolomonImporter
-from simba.third_party_label_appenders.ethovision_import import ImportEthovision
-from simba.third_party_label_appenders.deepethogram_importer import DeepEthogramImporter
-from simba.third_party_label_appenders.observer_importer import NoldusObserverImporter
-from simba.data_processors.directing_other_animals_calculator import (
-    DirectingOtherAnimalsAnalyzer,
-)
-from simba.model.train_rf import TrainRandomForestClassifier
-from simba.model.grid_search_rf import GridSearchRandomForestClassifier
-from simba.model.inference_validation import InferenceValidation
-from simba.model.inference_batch import InferenceBatch
-import urllib.request
-import threading
 import atexit
-from simba.ui.video_info_ui import VideoInfoTable
-from simba.utils.checks import check_file_exist_and_readable, check_int
+import subprocess
+import sys
+import threading
+import tkinter.ttk as ttk
+import urllib.request
+import webbrowser
+from tkinter.filedialog import askdirectory, askopenfilename
+from tkinter.messagebox import askyesno
+
+import PIL.Image
+from PIL import ImageTk
+
+from simba.bounding_box_tools.boundary_menus import BoundaryMenus
+from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
+from simba.data_processors.directing_other_animals_calculator import \
+    DirectingOtherAnimalsAnalyzer
+from simba.labelling.labelling_advanced_interface import \
+    select_labelling_video_advanced
+from simba.labelling.labelling_interface import select_labelling_video
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.model.grid_search_rf import GridSearchRandomForestClassifier
+from simba.model.inference_batch import InferenceBatch
+from simba.model.inference_validation import InferenceValidation
+from simba.model.train_rf import TrainRandomForestClassifier
+from simba.outlier_tools.outlier_corrector_location import \
+    OutlierCorrecterLocation
+from simba.outlier_tools.outlier_corrector_movement import \
+    OutlierCorrecterMovement
+from simba.outlier_tools.skip_outlier_correction import \
+    OutlierCorrectionSkipper
+from simba.plotting.interactive_probability_grapher import \
+    InteractiveProbabilityGrapher
 from simba.roi_tools.ROI_define import *
 from simba.roi_tools.ROI_menus import *
 from simba.roi_tools.ROI_reset import *
-from simba.utils.read_write import get_video_meta_data
-from simba.utils.data import run_user_defined_feature_extraction_class
-from simba.utils.printing import stdout_success, stdout_warning
-from simba.video_processors.video_processing import (
-    video_to_greyscale,
-    superimpose_frame_count,
-    extract_frames_from_all_videos_in_directory,
-)
-from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import ROIAnalysisTimeBinsPopUp
-from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp
-from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp
-from simba.ui.pop_ups.append_roi_features_animals_pop_up import (
-    AppendROIFeaturesByAnimalPopUp,
-)
-from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import (
-    MovementAnalysisTimeBinsPopUp,
-)
-from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
-from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
+from simba.third_party_label_appenders.BENTO_appender import BentoAppender
+from simba.third_party_label_appenders.BORIS_appender import BorisAppender
+from simba.third_party_label_appenders.deepethogram_importer import \
+    DeepEthogramImporter
+from simba.third_party_label_appenders.ethovision_import import \
+    ImportEthovision
+from simba.third_party_label_appenders.observer_importer import \
+    NoldusObserverImporter
+from simba.third_party_label_appenders.solomon_importer import SolomonImporter
+from simba.ui.create_project_ui import ProjectCreatorPopUp
+from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
+from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
+from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
+    AppendROIFeaturesByAnimalPopUp
+from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
+    AppendROIFeaturesByBodyPartPopUp
+from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
+from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
+from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
+    AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
-from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
-from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.clf_by_timebins_pop_up import TimeBinsClfPopUp
-from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import ClfDescriptiveStatsPopUp
-from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import VisualizePoseInFolderPopUp
-from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
-from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
-from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
-from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
-from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
+from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
+    ClfDescriptiveStatsPopUp
 from simba.ui.pop_ups.clf_plot_pop_up import SklearnVisualizationPopUp
-from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
-from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
-from simba.ui.pop_ups.clf_validation_plot_pop_up import ClassifierValidationPopUp
-from simba.ui.pop_ups.clf_probability_plot_pop_up import (
-    VisualizeClassificationProbabilityPopUp,
-)
-from simba.ui.pop_ups.directing_other_animals_plot_pop_up import (
-    DirectingOtherAnimalsVisualizerPopUp,
-)
-from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
+from simba.ui.pop_ups.clf_probability_plot_pop_up import \
+    VisualizeClassificationProbabilityPopUp
+from simba.ui.pop_ups.clf_validation_plot_pop_up import \
+    ClassifierValidationPopUp
+from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
+                                                   Parquet2CsvPopUp)
+from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
+from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
+    DirectingOtherAnimalsVisualizerPopUp
+from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
+from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
+from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
+from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
+from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
+from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
+from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
+from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp
+from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
+    MovementAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
+from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
+from simba.ui.pop_ups.pose_bp_drop_pop_up import DropTrackingDataPopUp
 from simba.ui.pop_ups.pose_reorganizer_pop_up import PoseReorganizerPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp
-from simba.ui.pop_ups.pose_bp_drop_pop_up import DropTrackingDataPopUp
-from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
-from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
-from simba.ui.pop_ups.csv_2_parquet_pop_up import Csv2ParquetPopUp, Parquet2CsvPopUp
-from simba.ui.pop_ups.smoothing_interpolation_pop_up import (
-    InterpolatePopUp,
-    SmoothingPopUp,
-)
-from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
-    RemoveAClassifierPopUp,
-    AddClfPopUp,
-    PrintModelInfoPopUp,
-)
-from simba.ui.pop_ups.subset_feature_extractor_pop_up import FeatureSubsetExtractorPopUp
-from simba.ui.pop_ups.third_party_annotator_appender_pop_up import (
-    ThirdPartyAnnotatorAppenderPopUp,
-)
+from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
+from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp
+from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
+    ROIAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
+from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
+from simba.ui.pop_ups.set_machine_model_parameters_pop_up import \
+    SetMachineModelParameters
 from simba.ui.pop_ups.severity_analysis_pop_up import AnalyzeSeverityPopUp
-from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
-from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
-from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import (
-    AppendROIFeaturesByBodyPartPopUp,
-)
-from simba.ui.pop_ups.set_machine_model_parameters_pop_up import (
-    SetMachineModelParameters,
-)
-from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
+from simba.ui.pop_ups.smoothing_interpolation_pop_up import (InterpolatePopUp,
+                                                             SmoothingPopUp)
+from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
+    FeatureSubsetExtractorPopUp
+from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
+    ThirdPartyAnnotatorAppenderPopUp
+from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
-    CLAHEPopUp,
-    CropVideoPopUp,
-    ClipVideoPopUp,
-    MultiShortenPopUp,
-    ChangeImageFormatPopUp,
-    ConvertVideoPopUp,
-    ExtractSpecificFramesPopUp,
-    ExtractAllFramesPopUp,
-    MultiCropPopUp,
-    ChangeFpsSingleVideoPopUp,
-    ChangeFpsMultipleVideosPopUp,
-    ExtractSEQFramesPopUp,
-    MergeFrames2VideoPopUp,
-    CreateGIFPopUP,
-    CalculatePixelsPerMMInVideoPopUp,
-    ConcatenatingVideosPopUp,
-    ConcatenatorPopUp,
-    ImportFrameDirectoryPopUp,
-    VideoRotatorPopUp,
-    VideoTemporalJoinPopUp,
-    DownsampleVideoPopUp,
-    ExtractAnnotationFramesPopUp,
-)
-
-from simba.bounding_box_tools.boundary_menus import BoundaryMenus
-from simba.labelling.labelling_interface import select_labelling_video
-from simba.labelling.labelling_advanced_interface import select_labelling_video_advanced
-from simba.utils.enums import Formats, OS, Defaults, TagNames
+    CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
+    ChangeFpsSingleVideoPopUp, ChangeImageFormatPopUp, CLAHEPopUp,
+    ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
+    ConvertVideoPopUp, CreateGIFPopUP, CropVideoPopUp, DownsampleVideoPopUp,
+    ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
+    ExtractSpecificFramesPopUp, ImportFrameDirectoryPopUp,
+    MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
+    VideoRotatorPopUp, VideoTemporalJoinPopUp)
+from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
+    VisualizePoseInFolderPopUp
+from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
+from simba.ui.video_info_ui import VideoInfoTable
+from simba.utils.checks import check_file_exist_and_readable, check_int
+from simba.utils.data import run_user_defined_feature_extraction_class
+from simba.utils.enums import OS, Defaults, Formats, TagNames
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import get_bp_config_code_class_pairs, get_icons_paths
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.create_project_ui import ProjectCreatorPopUp
-from simba.utils.lookups import get_emojis
-import sys
-import subprocess
+from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
+                                 get_icons_paths)
+from simba.utils.printing import stdout_success, stdout_warning
+from simba.utils.read_write import get_video_meta_data
+from simba.video_processors.video_processing import (
+    extract_frames_from_all_videos_in_directory, superimpose_frame_count,
+    video_to_greyscale)
 
 # from simba.unsupervised.unsupervised_ui import UnsupervisedGUI
 

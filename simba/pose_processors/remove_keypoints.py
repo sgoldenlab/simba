@@ -1,17 +1,17 @@
 __author__ = "Simon Nilsson"
 
-import glob, os
-import pandas as pd
-from datetime import datetime
+import glob
+import os
 import warnings
+from datetime import datetime
+
+import pandas as pd
 from tables import NaturalNameWarning
-from simba.utils.printing import stdout_success, SimbaTimer
+
 from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.errors import (
-    NotDirectoryError,
-    BodypartColumnNotFoundError,
-    InvalidFileTypeError,
-)
+from simba.utils.errors import (BodypartColumnNotFoundError,
+                                InvalidFileTypeError, NotDirectoryError)
+from simba.utils.printing import SimbaTimer, stdout_success
 
 warnings.filterwarnings("ignore", category=NaturalNameWarning)
 

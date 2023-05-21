@@ -1,17 +1,18 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
-from collections import defaultdict
 import os
+from collections import defaultdict
+from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_if_filepath_list_is_empty, check_int
-from simba.utils.enums import Paths, Keys, Links, Formats
-from simba.ui.tkinter_functions import DropDownMenu, CreateLabelFrameWithIcon, Entry_Box
-from simba.utils.read_write import get_file_name_info_in_directory
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.path_plotter import PathPlotterSingleCore
 from simba.plotting.path_plotter_mp import PathPlotterMulticore
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
+from simba.utils.checks import check_if_filepath_list_is_empty, check_int
+from simba.utils.enums import Formats, Keys, Links, Paths
+from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class PathPlotPopUp(PopUpMixin, ConfigReader):

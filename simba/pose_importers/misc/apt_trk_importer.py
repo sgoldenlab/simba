@@ -1,22 +1,21 @@
-import glob, os
-import scipy.io as sio
-import numpy as np
-import h5py
-import pandas as pd
+import glob
+import os
 
-from simba.utils.read_write import (
-    find_all_videos_in_project,
-    get_fn_ext,
-    find_video_of_file,
-    get_video_meta_data,
-    read_config_entry,
-    read_config_file,
-)
-from simba.utils.errors import NoFilesFoundError, CountError
-from simba.utils.warnings import InvalidValueWarning
-from simba.utils.checks import check_if_filepath_list_is_empty, check_if_dir_exists
+import h5py
+import numpy as np
+import pandas as pd
+import scipy.io as sio
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_filepath_list_is_empty)
+from simba.utils.errors import CountError, NoFilesFoundError
+from simba.utils.read_write import (find_all_videos_in_project,
+                                    find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_config_file)
+from simba.utils.warnings import InvalidValueWarning
 
 
 class APTImporterTRK(ConfigReader, PoseImporterMixin):

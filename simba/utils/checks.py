@@ -3,20 +3,15 @@ __author__ = "Simon Nilsson"
 @authors: Xiaoyu Tong, Jia Jie Choong, Simon Nilsson
 """
 import os
-import trafaret as t
-import pandas as pd
-from typing import Any, Optional, Tuple, List, Union
+from typing import Any, List, Optional, Tuple, Union
 
-from simba.utils.errors import (
-    NoFilesFoundError,
-    CorruptedFileError,
-    IntegerError,
-    FloatError,
-    StringError,
-    NotDirectoryError,
-    ColumnNotFoundError,
-    InvalidInputError,
-)
+import pandas as pd
+import trafaret as t
+
+from simba.utils.errors import (ColumnNotFoundError, CorruptedFileError,
+                                FloatError, IntegerError, InvalidInputError,
+                                NoFilesFoundError, NotDirectoryError,
+                                StringError)
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:

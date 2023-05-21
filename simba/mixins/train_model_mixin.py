@@ -1,70 +1,57 @@
 __author__ = "Simon Nilsson"
 
+import configparser
+import multiprocessing
 import os
-import numpy as np
-import pandas as pd
-from sklearn.inspection import partial_dependence
-from imblearn.combine import SMOTEENN
-from imblearn.over_sampling import SMOTE
-from sklearn.inspection import permutation_importance
-from sklearn.model_selection import learning_curve
-from sklearn.model_selection import ShuffleSplit
-from sklearn.metrics import precision_recall_curve
-from sklearn.ensemble import RandomForestClassifier
-from copy import deepcopy
-from sklearn.tree import export_graphviz
-from subprocess import call
-from yellowbrick.classifier import ClassificationReport
-from datetime import datetime
-import shap
-from tabulate import tabulate
+import pickle
+import platform
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
+from copy import deepcopy
+from datetime import datetime
 from itertools import repeat
-import configparser
-import platform
-from sklearn.utils import parallel_backend
-import pickle
-from dtreeviz.trees import tree, dtreeviz
+from subprocess import call
+from typing import Any, Dict, List, Optional, Union
+
 import matplotlib.pyplot as plt
-import multiprocessing
-from typing import List, Optional, Union, Dict, Any
+import numpy as np
+import pandas as pd
+import shap
+from dtreeviz.trees import dtreeviz, tree
+from imblearn.combine import SMOTEENN
+from imblearn.over_sampling import SMOTE
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.inspection import partial_dependence, permutation_importance
+from sklearn.metrics import precision_recall_curve
+from sklearn.model_selection import ShuffleSplit, learning_curve
+from sklearn.tree import export_graphviz
+from sklearn.utils import parallel_backend
+from tabulate import tabulate
+from yellowbrick.classifier import ClassificationReport
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-from simba.utils.enums import ConfigKey, Dtypes, MetaKeys, Defaults
-from simba.plotting.shap_agg_stats_visualizer import ShapAggregateStatisticsVisualizer
-from simba.utils.data import detect_bouts, create_color_palette
-from simba.utils.read_write import (
-    find_core_cnt,
-    get_memory_usage_of_df,
-    read_config_entry,
-    read_df,
-    get_fn_ext,
-)
-from simba.utils.checks import check_int, check_str, check_if_dir_exists, check_float
-from simba.utils.errors import (
-    ColumnNotFoundError,
-    FaultyTrainingSetError,
-    MissingColumnsError,
-    NoDataError,
-    SamplingError,
-    CorruptedFileError,
-    FeatureNumberMismatchError,
-    ClassifierInferenceError,
-    InvalidInputError,
-)
-from simba.utils.warnings import (
-    NotEnoughDataWarning,
-    NoModuleWarning,
-    MissingUserInputWarning,
-)
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.plotting.shap_agg_stats_visualizer import \
+    ShapAggregateStatisticsVisualizer
+from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
+                                check_str)
+from simba.utils.data import create_color_palette, detect_bouts
+from simba.utils.enums import ConfigKey, Defaults, Dtypes, MetaKeys
+from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
+                                CorruptedFileError, FaultyTrainingSetError,
+                                FeatureNumberMismatchError, InvalidInputError,
+                                MissingColumnsError, NoDataError,
+                                SamplingError)
 from simba.utils.lookups import get_meta_data_file_headers
-
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+                                    get_memory_usage_of_df, read_config_entry,
+                                    read_df)
+from simba.utils.warnings import (MissingUserInputWarning, NoModuleWarning,
+                                  NotEnoughDataWarning)
 
 plt.switch_backend("agg")
 

@@ -1,10 +1,10 @@
 __author__ = "Simon Nilsson"
 import os
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.errors import NoROIDataError
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
+from simba.utils.errors import NoROIDataError
 
 
 class AppendROIFeaturesByBodyPartPopUp(PopUpMixin, ConfigReader):

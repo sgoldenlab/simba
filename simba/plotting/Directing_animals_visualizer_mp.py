@@ -1,27 +1,24 @@
 __author__ = "Simon Nilsson"
 
-import os
-import cv2
-import platform
-import multiprocessing
 import functools
-from simba.utils.enums import Paths
-from simba.utils.read_write import (
-    read_df,
-    get_video_meta_data,
-    get_fn_ext,
-    concatenate_videos_in_folder,
-)
-from simba.utils.checks import check_file_exist_and_readable
-from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.warnings import NoDataFoundWarning
-from simba.utils.lookups import get_color_dict
-from simba.utils.data import create_color_palettes
-from simba.data_processors.directing_other_animals_calculator import (
-    DirectingOtherAnimalsAnalyzer,
-)
+import multiprocessing
+import os
+import platform
+
+import cv2
+
+from simba.data_processors.directing_other_animals_calculator import \
+    DirectingOtherAnimalsAnalyzer
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.data import create_color_palettes
+from simba.utils.enums import Paths
+from simba.utils.lookups import get_color_dict
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    get_video_meta_data, read_df)
+from simba.utils.warnings import NoDataFoundWarning
 
 
 class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):

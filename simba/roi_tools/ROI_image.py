@@ -1,16 +1,18 @@
-import os
-import cv2
-import pandas as pd
 import itertools
-import numpy as np
-from configparser import ConfigParser
+import os
 import re
+from configparser import ConfigParser
 from copy import deepcopy
+
+import cv2
+import numpy as np
+import pandas as pd
+
 from simba.roi_tools.ROI_move_shape import move_edge, move_edge_align
 from simba.roi_tools.ROI_zoom import zoom_in
+from simba.utils.data import add_missing_ROI_cols
 from simba.utils.enums import ConfigKey, Keys, Paths
 from simba.utils.read_write import get_fn_ext
-from simba.utils.data import add_missing_ROI_cols
 
 
 class ROI_image_class:

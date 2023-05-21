@@ -1,16 +1,18 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import numpy as np
 import itertools
 import os
+
 import cv2
+import numpy as np
+import pandas as pd
+
 import simba
-from simba.utils.enums import Paths
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.warnings import ShapWarning
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import Paths
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.warnings import ShapWarning
 
 
 class ShapAggregateStatisticsVisualizer(ConfigReader):

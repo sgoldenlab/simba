@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson"
 import time
 from typing import Optional
 
-from simba.utils.enums import TagNames, Defaults
+from simba.utils.enums import Defaults, TagNames
 
 
 def stdout_success(msg: str, elapsed_time: Optional[str] = None) -> None:

@@ -1,25 +1,23 @@
 __author__ = "Simon Nilsson"
 
-import os, glob
+import glob
 import json
-import numpy as np
-import pandas as pd
+import os
 from copy import deepcopy
-import pyarrow.parquet as pq
-import pyarrow as pa
 from typing import Union
 
-from simba.utils.printing import stdout_success
-from simba.utils.errors import NoFilesFoundError
-from simba.utils.enums import Paths, Methods, Dtypes
+import numpy as np
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+
 from simba.data_processors.interpolate_pose import Interpolate
 from simba.utils.data import smooth_data_gaussian, smooth_data_savitzky_golay
-from simba.utils.read_write import (
-    get_fn_ext,
-    write_df,
-    read_config_file,
-    read_project_path_and_file_type,
-)
+from simba.utils.enums import Dtypes, Methods, Paths
+from simba.utils.errors import NoFilesFoundError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (get_fn_ext, read_config_file,
+                                    read_project_path_and_file_type, write_df)
 
 
 class MarsImporter(object):

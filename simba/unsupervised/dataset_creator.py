@@ -1,19 +1,19 @@
 __author__ = "Simon Nilsson"
 
 import os
-import pandas as pd
+
 import numpy as np
-from simba.unsupervised.bout_aggregator import bout_aggregator
-from simba.unsupervised.enums import Unsupervised
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
-from simba.utils.read_write import read_df, get_fn_ext
-from simba.utils.checks import (
-    check_if_filepath_list_is_empty,
-    check_file_exist_and_readable,
-)
+from simba.unsupervised.bout_aggregator import bout_aggregator
+from simba.unsupervised.enums import Unsupervised
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_filepath_list_is_empty)
 from simba.utils.errors import NoDataError
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
 
 
 class DatasetCreator(ConfigReader, UnsupervisedMixin):

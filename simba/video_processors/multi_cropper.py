@@ -1,10 +1,12 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import os, glob
-import cv2
+import glob
+import os
 import subprocess
 from typing import Union
+
+import cv2
+import pandas as pd
 
 try:
     from typing import Literal
@@ -12,11 +14,13 @@ except:
     from typing_extensions import Literal
 
 from copy import deepcopy
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.checks import check_int, check_str, check_if_filepath_list_is_empty
-from simba.utils.read_write import get_fn_ext
+
+from simba.utils.checks import (check_if_filepath_list_is_empty, check_int,
+                                check_str)
 from simba.utils.enums import Formats
 from simba.utils.errors import CountError, InvalidVideoFileError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext
 
 
 class MultiCropper(object):

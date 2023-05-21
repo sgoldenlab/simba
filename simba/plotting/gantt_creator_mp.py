@@ -3,24 +3,26 @@ __author__ = "Simon Nilsson"
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
-import os
-import numpy as np
-import cv2
-import multiprocessing
 import functools
-import shutil
+import multiprocessing
+import os
 import platform
-from typing import List, Dict
+import shutil
+from typing import Dict, List
 
-from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.lookups import get_named_colors
-from simba.utils.read_write import concatenate_videos_in_folder, get_fn_ext, read_df
+import cv2
+import numpy as np
+
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats
-from simba.mixins.config_reader import ConfigReader
-from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.lookups import get_named_colors
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    read_df)
 
 
 class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):

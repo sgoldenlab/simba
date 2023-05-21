@@ -1,17 +1,17 @@
 __author__ = "Simon Nilsson"
 
+import glob
+import os
+from typing import List, Union
+
 import pandas as pd
-import os, glob
-from typing import List
-from typing import Union
 
-
-from simba.utils.read_write import read_df, get_fn_ext, read_config_entry
-from simba.utils.printing import stdout_success
-from simba.utils.checks import check_that_column_exist
 from simba.cue_light_tools.cue_light_tools import find_frames_when_cue_light_on
-from simba.utils.errors import NoFilesFoundError
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import check_that_column_exist
+from simba.utils.errors import NoFilesFoundError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
 
 
 class CueLightClfAnalyzer(ConfigReader):

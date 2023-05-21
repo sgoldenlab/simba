@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import logging
+
 from simba.utils.printing import stdout_warning
 
 

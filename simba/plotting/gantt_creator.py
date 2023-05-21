@@ -1,22 +1,23 @@
 __author__ = "Simon Nilsson"
 
-import os
-import numpy as np
-import matplotlib.pyplot as plt
 import io
-import cv2
-import PIL
+import os
 from typing import Dict, List
 
-from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import stdout_success
-from simba.utils.lookups import get_named_colors
-from simba.utils.data import detect_bouts
-from simba.utils.enums import Formats
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import PIL
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.read_write import read_df, get_fn_ext
 from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.data import detect_bouts
+from simba.utils.enums import Formats
+from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.lookups import get_named_colors
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
 
 
 class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):

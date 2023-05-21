@@ -1,13 +1,16 @@
-import os, glob
+import datetime
+import glob
 import json
+import os
+import pathlib
 import shutil
 import subprocess
+
 import cv2
+
 import simba
-import pathlib
-import datetime
-from simba.utils.read_write import get_video_meta_data
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.read_write import get_video_meta_data
 
 
 class FFMPEGCommandCreator(object):

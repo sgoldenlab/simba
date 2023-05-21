@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import numpy as np
-from numba import njit, jit, prange
+from numba import jit, njit, prange
 from numba.np.extensions import cross2d
 
 

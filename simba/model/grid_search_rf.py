@@ -1,29 +1,21 @@
 __author__ = "Simon Nilsson"
 
 import os
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-
-from simba.utils.checks import (
-    check_int,
-    check_str,
-    check_float,
-    check_if_filepath_list_is_empty,
-    check_if_valid_input,
-)
-from simba.utils.read_write import (
-    read_config_entry,
-    read_meta_file,
-    read_simba_meta_files,
-    get_fn_ext,
-)
-from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
-from simba.utils.printing import stdout_success
-from simba.utils.errors import InvalidInputError, NoDataError
-from simba.utils.enums import Options, ConfigKey, Dtypes, Methods, MetaKeys
 from ast import literal_eval
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
+from simba.utils.checks import (check_float, check_if_filepath_list_is_empty,
+                                check_if_valid_input, check_int, check_str)
+from simba.utils.enums import ConfigKey, Dtypes, MetaKeys, Methods, Options
+from simba.utils.errors import InvalidInputError, NoDataError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (get_fn_ext, read_config_entry,
+                                    read_meta_file, read_simba_meta_files)
 
 
 class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):

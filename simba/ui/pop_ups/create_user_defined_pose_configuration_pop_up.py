@@ -1,11 +1,12 @@
 from tkinter import *
 
-from simba.ui.tkinter_functions import hxtScrollbar, Entry_Box, FileSelect
-from simba.utils.checks import check_int, check_str, check_file_exist_and_readable
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import Entry_Box, FileSelect, hxtScrollbar
+from simba.ui.user_defined_pose_creator import PoseConfigCreator
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_str)
 from simba.utils.errors import DuplicationError
 from simba.utils.printing import stdout_success
-from simba.ui.user_defined_pose_creator import PoseConfigCreator
-from simba.mixins.pop_up_mixin import PopUpMixin
 
 
 class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):

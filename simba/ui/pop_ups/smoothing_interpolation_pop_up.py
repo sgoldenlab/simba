@@ -1,14 +1,14 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import os
+from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.enums import Options
-from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FolderSelect
 from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FolderSelect
 from simba.utils.checks import check_int
+from simba.utils.enums import Options
 from simba.utils.errors import NotDirectoryError
 
 

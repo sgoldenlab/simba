@@ -1,5 +1,6 @@
-import numpy as np
 import re
+
+import numpy as np
 
 
 def update_all_tags(closest_roi):

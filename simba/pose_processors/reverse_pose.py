@@ -1,28 +1,31 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
+import glob
+import os
 import shutil
-import os, glob
 from datetime import datetime
 
-from simba.feature_extractors.feature_extractor_16bp import ExtractFeaturesFrom16bps
-from simba.feature_extractors.feature_extractor_14bp import ExtractFeaturesFrom14bps
-from simba.feature_extractors.feature_extractor_9bp import ExtractFeaturesFrom9bps
-from simba.feature_extractors.feature_extractor_8bp import ExtractFeaturesFrom8bps
-from simba.feature_extractors.feature_extractor_7bp import ExtractFeaturesFrom7bps
-from simba.feature_extractors.feature_extractor_4bp import ExtractFeaturesFrom4bps
-from simba.feature_extractors.feature_extractor_user_defined import (
-    UserDefinedFeatureExtractor,
-)
+import pandas as pd
+
+from simba.feature_extractors.feature_extractor_4bp import \
+    ExtractFeaturesFrom4bps
+from simba.feature_extractors.feature_extractor_7bp import \
+    ExtractFeaturesFrom7bps
+from simba.feature_extractors.feature_extractor_8bp import \
+    ExtractFeaturesFrom8bps
+from simba.feature_extractors.feature_extractor_9bp import \
+    ExtractFeaturesFrom9bps
+from simba.feature_extractors.feature_extractor_14bp import \
+    ExtractFeaturesFrom14bps
+from simba.feature_extractors.feature_extractor_16bp import \
+    ExtractFeaturesFrom16bps
+from simba.feature_extractors.feature_extractor_user_defined import \
+    UserDefinedFeatureExtractor
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import (
-    read_config_entry,
-    read_df,
-    write_df,
-    get_fn_ext,
-    get_all_clf_names,
-)
-from simba.utils.checks import check_that_column_exist, check_file_exist_and_readable
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_that_column_exist)
+from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
+                                    read_config_entry, read_df, write_df)
 
 
 class Reverse2AnimalTracking(ConfigReader):

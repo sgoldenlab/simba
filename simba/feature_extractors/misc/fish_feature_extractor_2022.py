@@ -1,22 +1,20 @@
 from __future__ import division
-import os
-import pandas as pd
-import numpy as np
+
 import glob
 import math
-from simba.read_config_unit_tests import (
-    read_project_path_and_file_type,
-    check_if_filepath_list_is_empty,
-)
-from numba import jit
-from simba.drop_bp_cords import *
-from simba.feature_extractors.unit_tests import (
-    read_video_info,
-    check_minimum_roll_windows,
-)
-from simba.drop_bp_cords import get_fn_ext, getBpNames, getBpHeaders
-from simba.misc_tools import SimbaTimer
+import os
 
+import numpy as np
+import pandas as pd
+from numba import jit
+
+from simba.drop_bp_cords import *
+from simba.drop_bp_cords import get_fn_ext, getBpHeaders, getBpNames
+from simba.feature_extractors.unit_tests import (check_minimum_roll_windows,
+                                                 read_video_info)
+from simba.misc_tools import SimbaTimer
+from simba.read_config_unit_tests import (check_if_filepath_list_is_empty,
+                                          read_project_path_and_file_type)
 
 TAIL_BP_NAMES = [
     "Zebrafish_Tail1",

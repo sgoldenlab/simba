@@ -1,19 +1,18 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
 import os
 from typing import List, Union
+
+import pandas as pd
 
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
 
-from simba.utils.checks import (
-    check_file_exist_and_readable,
-    check_if_filepath_list_is_empty,
-)
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_filepath_list_is_empty)
 from simba.utils.data import detect_bouts
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df

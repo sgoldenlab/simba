@@ -1,10 +1,11 @@
 __author__ = "Simon Nilsson"
 
 from enum import Enum
-import pkg_resources
 from pathlib import Path
+
 import cv2
 import numpy as np
+import pkg_resources
 
 
 class ConfigKey(Enum):

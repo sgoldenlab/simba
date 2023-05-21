@@ -1,15 +1,16 @@
 __author__ = "Simon Nilsson"
 
 import os
-import simba
 import shutil
-import pandas as pd
 from tkinter import *
 from typing import Optional
 
-from simba.utils.printing import stdout_trash
-from simba.utils.lookups import get_bp_config_codes
+import pandas as pd
+
+import simba
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.lookups import get_bp_config_codes
+from simba.utils.printing import stdout_trash
 
 
 class PoseResetter(object):

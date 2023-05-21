@@ -2,12 +2,12 @@ __author__ = "Simon Nilsson"
 
 from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.enums import Formats, Keys, Links
-from simba.ui.tkinter_functions import DropDownMenu, CreateLabelFrameWithIcon
-from simba.utils.errors import NoSpecifiedOutputError
 from simba.data_processors.severity_calculator import SeverityCalculator
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.errors import NoSpecifiedOutputError
 
 
 class AnalyzeSeverityPopUp(PopUpMixin, ConfigReader):

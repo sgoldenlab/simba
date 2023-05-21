@@ -1,11 +1,13 @@
-from tkinter import *
 import os
 from configparser import ConfigParser
+from tkinter import *
+
 import pandas as pd
-from simba.utils.read_write import get_fn_ext, read_config_file
+
+from simba.utils.enums import ConfigKey, Formats, Keys, Paths
 from simba.utils.errors import NoROIDataError
-from simba.utils.enums import Formats, ConfigKey, Keys, Paths
 from simba.utils.printing import stdout_trash
+from simba.utils.read_write import get_fn_ext, read_config_file
 
 
 def reset_video_ROIs(config_path, filename):

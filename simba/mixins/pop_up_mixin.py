@@ -1,49 +1,36 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
-from PIL import ImageTk
-import PIL.Image
-from tkinter import messagebox
 import os
+from tkinter import *
+from tkinter import messagebox
+from typing import Dict, List, Optional, Tuple
+
+import PIL.Image
+from PIL import ImageTk
+
+from simba.mixins.config_reader import ConfigReader
 from simba.pose_importers import trk_importer
-from typing import Tuple, Optional, List, Dict
-
-
-from simba.utils.checks import check_int, check_str, check_float, check_if_dir_exists
-from simba.pose_importers.read_DANNCE_mat import (
-    import_DANNCE_file,
-    import_DANNCE_folder,
-)
+from simba.pose_importers.dlc_importer_csv import (
+    import_multiple_dlc_tracking_csv_file, import_single_dlc_tracking_csv_file)
 from simba.pose_importers.import_mars import MarsImporter
 from simba.pose_importers.madlc_importer import MADLCImporterH5
+from simba.pose_importers.read_DANNCE_mat import (import_DANNCE_file,
+                                                  import_DANNCE_folder)
 from simba.pose_importers.sleap_csv_importer import SLEAPImporterCSV
 from simba.pose_importers.sleap_h5_importer import SLEAPImporterH5
 from simba.pose_importers.sleap_slp_importer import SLEAPImporterSLP
-
-
-from simba.pose_importers.dlc_importer_csv import (
-    import_multiple_dlc_tracking_csv_file,
-    import_single_dlc_tracking_csv_file,
-)
-from simba.utils.enums import ConfigKey, Options, Formats
-from simba.utils.read_write import (
-    find_core_cnt,
-    copy_single_video_to_project,
-    copy_multiple_videos_to_project,
-    read_config_file,
-    read_config_entry,
-)
-from simba.ui.tkinter_functions import (
-    hxtScrollbar,
-    DropDownMenu,
-    Entry_Box,
-    FileSelect,
-    FolderSelect,
-)
-from simba.utils.checks import check_file_exist_and_readable
-from simba.mixins.config_reader import ConfigReader
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
+                                        FolderSelect, hxtScrollbar)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int, check_str)
+from simba.utils.enums import ConfigKey, Formats, Options
 from simba.utils.errors import CountError
-from simba.utils.lookups import get_icons_paths, get_color_dict, get_named_colors
+from simba.utils.lookups import (get_color_dict, get_icons_paths,
+                                 get_named_colors)
+from simba.utils.read_write import (copy_multiple_videos_to_project,
+                                    copy_single_video_to_project,
+                                    find_core_cnt, read_config_entry,
+                                    read_config_file)
 
 
 class PopUpMixin(object):

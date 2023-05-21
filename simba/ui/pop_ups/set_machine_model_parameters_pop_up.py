@@ -2,11 +2,13 @@ __author__ = "Simon Nilsson"
 
 from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FileSelect)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int)
 from simba.utils.enums import Formats, Keys, Links
-from simba.ui.tkinter_functions import Entry_Box, CreateLabelFrameWithIcon, FileSelect
-from simba.utils.checks import check_int, check_file_exist_and_readable, check_float
 from simba.utils.printing import stdout_success
 
 

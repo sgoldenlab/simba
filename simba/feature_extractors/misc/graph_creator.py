@@ -1,9 +1,11 @@
-import pandas as pd
 import itertools
-import networkx as nx
-from pyvis.network import Network
-from simba.misc_tools import create_single_color_lst
 import pickle
+
+import networkx as nx
+import pandas as pd
+from pyvis.network import Network
+
+from simba.misc_tools import create_single_color_lst
 
 
 class GraphCreator(object):

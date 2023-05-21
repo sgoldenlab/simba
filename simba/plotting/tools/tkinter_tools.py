@@ -1,10 +1,12 @@
 __author__ = "Simon Nilsson"
 
 from tkinter import *
+
 import cv2
 import numpy as np
 from PIL import Image as Img
 from PIL import ImageTk
+
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import get_video_meta_data
 

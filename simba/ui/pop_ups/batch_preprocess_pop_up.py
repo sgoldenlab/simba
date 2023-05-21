@@ -1,13 +1,13 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import os
+from tkinter import *
 
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FolderSelect
-from simba.utils.errors import NotDirectoryError, DuplicationError
-from simba.video_processors.batch_process_menus import BatchProcessFrame
 from simba.utils.enums import Keys, Links
+from simba.utils.errors import DuplicationError, NotDirectoryError
+from simba.video_processors.batch_process_menus import BatchProcessFrame
 
 
 class BatchPreProcessPopUp(PopUpMixin):

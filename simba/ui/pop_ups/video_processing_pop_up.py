@@ -1,69 +1,41 @@
 __author__ = "Simon Nilsson"
 
+import glob
+import os
 import sys
 from tkinter import *
-import simba
-from PIL import Image, ImageTk
-import os, glob
-from simba.utils.read_write import (
-    get_video_meta_data,
-    concatenate_videos_in_folder,
-    get_fn_ext,
-)
 
-from simba.utils.checks import (
-    check_int,
-    check_file_exist_and_readable,
-    check_if_dir_exists,
-    check_if_filepath_list_is_empty,
-)
-from simba.video_processors.px_to_mm import get_coordinates_nilsson
-from simba.ui.tkinter_functions import (
-    DropDownMenu,
-    CreateToolTip,
-    CreateLabelFrameWithIcon,
-    Entry_Box,
-    FileSelect,
-    FolderSelect,
-)
-from simba.video_processors.multi_cropper import MultiCropper
-from simba.video_processors.extract_seqframes import extract_seq_frames
-from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
-from simba.video_processors.video_processing import (
-    clahe_enhance_video,
-    crop_single_video,
-    crop_multiple_videos,
-    clip_video_in_range,
-    remove_beginning_of_video,
-    multi_split_video,
-    change_img_format,
-    batch_convert_video_format,
-    convert_to_mp4,
-    convert_video_powerpoint_compatible_format,
-    extract_frame_range,
-    extract_frames_single_video,
-    batch_create_frames,
-    change_single_video_fps,
-    change_fps_of_multiple_videos,
-    frames_to_movie,
-    gif_creator,
-    video_concatenator,
-    VideoRotator,
-    copy_img_folder,
-    downsample_video,
-)
-from simba.utils.enums import Options, Formats, Paths, Links, Keys, Dtypes
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.errors import (
-    NoFilesFoundError,
-    CountError,
-    FrameRangeError,
-    NotDirectoryError,
-    MixedMosaicError,
-    NoChoosenClassifierError,
-)
+from PIL import Image, ImageTk
+
+import simba
 from simba.labelling.extract_labelled_frames import AnnotationFrameExtractor
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+                                        CreateToolTip, DropDownMenu, Entry_Box,
+                                        FileSelect, FolderSelect)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_filepath_list_is_empty, check_int)
+from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
+from simba.utils.errors import (CountError, FrameRangeError, MixedMosaicError,
+                                NoChoosenClassifierError, NoFilesFoundError,
+                                NotDirectoryError)
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    get_video_meta_data)
+from simba.video_processors.extract_seqframes import extract_seq_frames
+from simba.video_processors.multi_cropper import MultiCropper
+from simba.video_processors.px_to_mm import get_coordinates_nilsson
+from simba.video_processors.video_processing import (
+    VideoRotator, batch_convert_video_format, batch_create_frames,
+    change_fps_of_multiple_videos, change_img_format, change_single_video_fps,
+    clahe_enhance_video, clip_video_in_range, convert_to_mp4,
+    convert_video_powerpoint_compatible_format, copy_img_folder,
+    crop_multiple_videos, crop_single_video, downsample_video,
+    extract_frame_range, extract_frames_single_video, frames_to_movie,
+    gif_creator, multi_split_video, remove_beginning_of_video,
+    video_concatenator)
 
 sys.setrecursionlimit(10**7)
 

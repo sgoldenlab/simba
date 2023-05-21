@@ -1,20 +1,21 @@
 __author__ = "Simon Nilsson"
 
-import matplotlib.pyplot as plt
-import cv2
-import PIL
 import io
-import numpy as np
 import os
-from typing import List, Dict
+from typing import Dict, List
 
-from simba.utils.enums import Formats
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import PIL
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.read_write import read_df, get_fn_ext
-from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.checks import check_that_column_exist
+from simba.utils.enums import Formats
+from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
 
 
 class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):

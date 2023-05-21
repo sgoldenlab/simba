@@ -1,16 +1,18 @@
 # All credit to https://stackoverflow.com/questions/46571448/tkinter-and-a-html-file - thanks DELICA - https://stackoverflow.com/users/7027346/delica
 
-from cefpython3 import cefpython as cef
 import ctypes
+
+from cefpython3 import cefpython as cef
 
 try:
     import tkinter as tk
     from tkinter import messagebox
 except ImportError:
     import Tkinter as tk
-import sys
-import platform
+
 import logging as _logging
+import platform
+import sys
 
 # Fix for PyCharm hints warnings
 WindowUtils = cef.WindowUtils()

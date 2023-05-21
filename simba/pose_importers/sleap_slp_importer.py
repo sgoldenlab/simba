@@ -1,24 +1,21 @@
 __author__ = "Simon Nilsson"
 
 import itertools
-import os
-import numpy as np
-import h5py
 import json
+import os
 from collections import defaultdict
+
+import h5py
+import numpy as np
 import pandas as pd
 
-
+from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.data_processors.interpolation_smoothing import Smooth, Interpolate
-from simba.utils.read_write import (
-    get_video_meta_data,
-    write_df,
-    find_all_videos_in_project,
-)
 from simba.utils.enums import Methods
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_all_videos_in_project,
+                                    get_video_meta_data, write_df)
 
 
 class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):

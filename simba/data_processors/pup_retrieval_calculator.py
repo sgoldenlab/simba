@@ -1,25 +1,21 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-
-
-import os, glob
+import glob
+import os
 from datetime import datetime
-import seaborn as sns
 from typing import Dict, Union
 
+import pandas as pd
+import seaborn as sns
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import (
-    read_config_file,
-    read_config_entry,
-    read_project_path_and_file_type,
-    read_video_info_csv,
-    get_fn_ext,
-    read_df,
-)
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.data import detect_bouts
-from simba.utils.enums import Paths, ConfigKey, Dtypes
+from simba.utils.enums import ConfigKey, Dtypes, Paths
+from simba.utils.read_write import (get_fn_ext, read_config_entry,
+                                    read_config_file, read_df,
+                                    read_project_path_and_file_type,
+                                    read_video_info_csv)
 
 
 class PupRetrieverCalculator(ConfigReader):

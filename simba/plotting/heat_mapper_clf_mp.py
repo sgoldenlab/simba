@@ -1,26 +1,23 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import numpy as np
-import os
-import cv2
-from numba import jit, prange
-import multiprocessing
 import functools
+import multiprocessing
+import os
 import platform
 
+import cv2
+import numpy as np
+import pandas as pd
+from numba import jit, prange
+
 import simba.mixins.plotting_mixin
-from simba.utils.enums import Formats
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import (
-    get_fn_ext,
-    remove_a_folder,
-    concatenate_videos_in_folder,
-    read_df,
-)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    read_df, remove_a_folder)
 
 
 def _heatmap_multiprocessor(

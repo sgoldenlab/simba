@@ -1,40 +1,31 @@
+import glob
+import os
+from copy import deepcopy
+
 import pandas as pd
 
-
-from simba.utils.enums import Methods
-import os, glob
-from copy import deepcopy
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import read_df, write_df, get_fn_ext
-from simba.utils.checks import check_if_filepath_list_is_empty, check_if_dir_exists
-from simba.utils.printing import stdout_success
 from simba.third_party_label_appenders.tools import (
-    read_boris_annotation_files,
-    read_deepethogram_files,
-    read_ethovision_files,
-    read_observer_files,
-    read_solomon_files,
-    read_bento_files,
-    fix_uneven_start_stop_count,
-    check_stop_events_prior_to_start_events,
-)
+    check_stop_events_prior_to_start_events, fix_uneven_start_stop_count,
+    read_bento_files, read_boris_annotation_files, read_deepethogram_files,
+    read_ethovision_files, read_observer_files, read_solomon_files)
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_filepath_list_is_empty)
+from simba.utils.enums import Methods
+from simba.utils.errors import (
+    ThirdPartyAnnotationEventCountError, ThirdPartyAnnotationFileNotFoundError,
+    ThirdPartyAnnotationOverlapError, ThirdPartyAnnotationsAdditionalClfError,
+    ThirdPartyAnnotationsMissingAnnotationsError,
+    ThirdPartyAnnotationsOutsidePoseEstimationDataError)
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_df, write_df
 from simba.utils.warnings import (
+    ThirdPartyAnnotationEventCountWarning,
     ThirdPartyAnnotationFileNotFoundWarning,
+    ThirdPartyAnnotationOverlapWarning,
     ThirdPartyAnnotationsAdditionalClfWarning,
     ThirdPartyAnnotationsMissingAnnotationsWarning,
-    ThirdPartyAnnotationEventCountWarning,
-    ThirdPartyAnnotationOverlapWarning,
-    ThirdPartyAnnotationsOutsidePoseEstimationDataWarning,
-)
-from simba.utils.errors import (
-    ThirdPartyAnnotationFileNotFoundError,
-    ThirdPartyAnnotationsAdditionalClfError,
-    ThirdPartyAnnotationsMissingAnnotationsError,
-    ThirdPartyAnnotationEventCountError,
-    ThirdPartyAnnotationOverlapError,
-    ThirdPartyAnnotationsOutsidePoseEstimationDataError,
-)
-
+    ThirdPartyAnnotationsOutsidePoseEstimationDataWarning)
 
 BORIS = "BORIS"
 DEEPETHOGRAM = "DEEPETHOGRAM"

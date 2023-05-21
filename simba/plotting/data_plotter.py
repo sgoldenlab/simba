@@ -1,18 +1,19 @@
 __author__ = "Simon Nilsson"
 
+import os
+from typing import Dict, List
+
+import cv2
+import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
-import os
-import numpy as np
-import cv2
-from typing import List, Dict
 
-from simba.utils.enums import Formats
 from simba.data_processors.movement_calculator import MovementCalculator
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext
 
 

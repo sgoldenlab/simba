@@ -1,18 +1,20 @@
 __author__ = "Simon Nilsson"
 
 import os.path
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from numba import jit, prange
 from numba.typed import List
-from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.sparse import csgraph
-from simba.unsupervised.enums import Unsupervised, Clustering
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.printing import stdout_success, stdout_warning, SimbaTimer
-from simba.utils.checks import check_if_dir_exists, check_file_exist_and_readable
+from scipy.sparse.csgraph import minimum_spanning_tree
 
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.unsupervised.enums import Clustering, Unsupervised
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
 
 CLUSTERER_NAME = "CLUSTERER_NAME"
 CLUSTER_COUNT = "CLUSTER_COUNT"

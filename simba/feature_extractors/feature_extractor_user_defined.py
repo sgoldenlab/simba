@@ -2,14 +2,16 @@ __author__ = "Simon Nilsson"
 
 
 import os
-import pandas as pd
-import numpy as np
 from itertools import product
-from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+
+import numpy as np
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import get_fn_ext, read_df, write_df
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_str
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
 class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):

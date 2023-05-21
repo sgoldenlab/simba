@@ -4,18 +4,20 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-import cv2
 import os
-import numpy as np
 import warnings
-import matplotlib.pyplot as plt
-from typing import Dict, Any
+from typing import Any, Dict
 
-from simba.utils.data import plug_holes_shortest_bout
-from simba.utils.printing import stdout_success
-from simba.utils.read_write import read_df, write_df, get_fn_ext, get_video_meta_data
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.data import plug_holes_shortest_bout
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
+                                    write_df)
 
 plt.interactive(True)
 plt.ioff()

@@ -1,50 +1,37 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import platform
-from datetime import datetime
-import shutil
-import glob, re
 import configparser
-from configparser import ConfigParser
-import pyarrow as pa
-import numpy as np
-import pickle
-import cv2
-from pyarrow import csv
-import os
-from pathlib import Path
+import glob
 import multiprocessing
-from typing import List, Optional, Any, Union, Tuple, Dict
+import os
+import pickle
+import platform
+import re
+import shutil
+from configparser import ConfigParser
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+import cv2
+import numpy as np
+import pandas as pd
+import pyarrow as pa
+from pyarrow import csv
 
-from simba.utils.printing import SimbaTimer
-
-
-from simba.utils.errors import (
-    InvalidFileTypeError,
-    MissingProjectConfigEntryError,
-    NotDirectoryError,
-    InvalidInputError,
-    ParametersFileError,
-    InvalidFilepathError,
-    InvalidVideoFileError,
-    DuplicationError,
-    NoFilesFoundError,
-    DataHeaderError,
-    FileExistError,
-)
-from simba.utils.warnings import (
-    InvalidValueWarning,
-    NoFileFoundWarning,
-    FileExistWarning,
-)
-from simba.utils.printing import stdout_success
-from simba.utils.enums import Formats, Dtypes, ConfigKey
-from simba.utils.checks import (
-    check_file_exist_and_readable,
-    check_if_filepath_list_is_empty,
-)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_filepath_list_is_empty)
+from simba.utils.enums import ConfigKey, Dtypes, Formats
+from simba.utils.errors import (DataHeaderError, DuplicationError,
+                                FileExistError, InvalidFilepathError,
+                                InvalidFileTypeError, InvalidInputError,
+                                InvalidVideoFileError,
+                                MissingProjectConfigEntryError,
+                                NoFilesFoundError, NotDirectoryError,
+                                ParametersFileError)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.warnings import (FileExistWarning, InvalidValueWarning,
+                                  NoFileFoundWarning)
 
 PARSE_OPTIONS = csv.ParseOptions(delimiter=",")
 READ_OPTIONS = csv.ReadOptions(encoding="utf8")

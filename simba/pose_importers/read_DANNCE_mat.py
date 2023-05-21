@@ -1,10 +1,13 @@
 __author__ = "Simon Nilsson"
 
-import scipy.io
-import pandas as pd
 import ast
-import os, glob
-from configparser import ConfigParser, NoSectionError, NoOptionError
+import glob
+import os
+from configparser import ConfigParser, NoOptionError, NoSectionError
+
+import pandas as pd
+import scipy.io
+
 from simba.utils.read_write import get_fn_ext, write_df
 
 

@@ -1,15 +1,15 @@
 __author__ = "Simon Nilsson"
 
+import csv
 import os
 import platform
 from configparser import ConfigParser
-import csv
 from typing import List
 
 import simba
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.enums import ConfigKey, DirNames, Dtypes, Paths
 from simba.utils.errors import DirectoryExistError
-from simba.utils.enums import DirNames, ConfigKey, Dtypes, Paths
+from simba.utils.printing import SimbaTimer, stdout_success
 
 
 class ProjectConfigCreator(object):

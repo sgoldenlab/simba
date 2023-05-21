@@ -2,6 +2,7 @@ __author__ = "Simon Nilsson"
 
 
 import os
+
 import cv2
 import numpy as np
 

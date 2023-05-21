@@ -1,14 +1,15 @@
-import os
-import pandas as pd
 import itertools
+import os
 from typing import List
 
-from simba.roi_tools.ROI_analyzer import ROIAnalyzer
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.enums import DirNames
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import get_fn_ext, read_df, write_df
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+from simba.utils.enums import DirNames
 from simba.utils.errors import ROICoordinatesNotFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
 class ROITimebinCalculator(ConfigReader):

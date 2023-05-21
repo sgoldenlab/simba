@@ -2,10 +2,11 @@ from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, Entry_Box
-from simba.utils.enums import Keys, Links, Formats, ConfigKey
-from simba.utils.checks import check_float
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
+from simba.utils.checks import check_float
+from simba.utils.enums import ConfigKey, Formats, Keys, Links
 
 
 class ROIAnalysisPopUp(ConfigReader, PopUpMixin):

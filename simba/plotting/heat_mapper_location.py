@@ -1,17 +1,18 @@
 __author__ = "Simon Nilsson"
 
 import os
-import cv2
-import numpy as np
-from numba import jit, prange
-import pandas as pd
 from typing import List
 
-from simba.utils.enums import Formats
+import cv2
+import numpy as np
+import pandas as pd
+from numba import jit, prange
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 
 

@@ -1,28 +1,24 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import numpy as np
-import pickle
 import functools
-import cv2
 import multiprocessing
-from multiprocessing import pool
-import platform
 import os
+import pickle
+import platform
+from multiprocessing import pool
 from typing import Union
 
+import cv2
+import numpy as np
+import pandas as pd
 
-from simba.utils.errors import NoFilesFoundError
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.read_write import (
-    read_df,
-    get_fn_ext,
-    get_video_meta_data,
-    concatenate_videos_in_folder,
-)
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    get_video_meta_data, read_df)
 
 #
 # def _image_creator(frm_range: list,

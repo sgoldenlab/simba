@@ -3,33 +3,28 @@ __author__ = "Simon Nilsson"
 import warnings
 
 warnings.filterwarnings("ignore")
+import glob
+import math
+import os
+from typing import List, Optional
+
 import numpy as np
+import pandas as pd
 from numba import jit, prange
+from scipy import stats
+from scipy.signal import find_peaks, savgol_filter
 from scipy.spatial import ConvexHull
 from scipy.spatial.qhull import QhullError
-from scipy.signal import savgol_filter
-import math
-import os, glob
-from scipy import stats
-import pandas as pd
-from scipy.signal import find_peaks
-from typing import Optional, List
 
-
-from simba.utils.enums import Paths, Options
-from simba.utils.checks import (
-    check_if_filepath_list_is_empty,
-    check_file_exist_and_readable,
-    check_minimum_roll_windows,
-)
-from simba.utils.read_write import (
-    read_project_path_and_file_type,
-    read_video_info_csv,
-    read_config_file,
-    get_bp_headers,
-)
-from simba.utils.errors import CountError, InvalidInputError
 import simba
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_filepath_list_is_empty,
+                                check_minimum_roll_windows)
+from simba.utils.enums import Options, Paths
+from simba.utils.errors import CountError, InvalidInputError
+from simba.utils.read_write import (get_bp_headers, read_config_file,
+                                    read_project_path_and_file_type,
+                                    read_video_info_csv)
 
 
 class FeatureExtractionMixin(object):

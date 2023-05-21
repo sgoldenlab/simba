@@ -1,17 +1,20 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import os
+from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.enums import Keys, Links, Formats, Paths
-from simba.ui.tkinter_functions import DropDownMenu, CreateLabelFrameWithIcon, Entry_Box
-from simba.utils.read_write import get_file_name_info_in_directory
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.plotting.probability_plot_creator import \
+    TresholdPlotCreatorSingleProcess
+from simba.plotting.probability_plot_creator_mp import \
+    TresholdPlotCreatorMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
 from simba.utils.checks import check_int
-from simba.utils.read_write import check_if_filepath_list_is_empty
-from simba.plotting.probability_plot_creator import TresholdPlotCreatorSingleProcess
-from simba.plotting.probability_plot_creator_mp import TresholdPlotCreatorMultiprocess
+from simba.utils.enums import Formats, Keys, Links, Paths
+from simba.utils.read_write import (check_if_filepath_list_is_empty,
+                                    get_file_name_info_in_directory)
 
 
 class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):

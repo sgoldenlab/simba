@@ -1,15 +1,11 @@
 from tkinter import *
 
-from simba.ui.tkinter_functions import (
-    FileSelect,
-    Entry_Box,
-    CreateLabelFrameWithIcon,
-    DropDownMenu,
-)
-from simba.utils.lookups import get_color_dict
-from simba.utils.enums import Keys, Links
-from simba.plotting.ez_lineplot import DrawPathPlot
 from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.plotting.ez_lineplot import DrawPathPlot
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect)
+from simba.utils.enums import Keys, Links
+from simba.utils.lookups import get_color_dict
 
 
 class MakePathPlotPopUp(PopUpMixin):

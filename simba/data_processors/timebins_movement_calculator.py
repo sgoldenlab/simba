@@ -1,22 +1,20 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 import itertools
 import os
 from typing import List
 
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.enums import ConfigKey, Dtypes
-from simba.utils.checks import (
-    check_that_column_exist,
-    check_if_filepath_list_is_empty,
-    check_int,
-)
-from simba.utils.read_write import get_fn_ext, read_df, read_config_entry
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.checks import (check_if_filepath_list_is_empty, check_int,
+                                check_that_column_exist)
+from simba.utils.enums import ConfigKey, Dtypes
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
 
 
 class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):

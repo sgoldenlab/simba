@@ -2,10 +2,10 @@ from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
-from simba.utils.enums import Keys, Links, Formats, ConfigKey
-from simba.utils.checks import check_int, check_float
 from simba.roi_tools.ROI_time_bin_calculator import ROITimebinCalculator
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.utils.checks import check_float, check_int
+from simba.utils.enums import ConfigKey, Formats, Keys, Links
 
 
 class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):

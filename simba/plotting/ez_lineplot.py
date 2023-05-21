@@ -1,20 +1,18 @@
 __author__ = "Simon Nilsson"
 
 import os
+from copy import deepcopy
+
 import cv2
 import numpy as np
 import pandas as pd
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.errors import DuplicationError, InvalidFileTypeError, DataHeaderError
-from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import (
-    read_config_file,
-    get_video_meta_data,
-    get_fn_ext,
-    read_df,
-)
 
-from copy import deepcopy
+from simba.utils.errors import (DataHeaderError, DuplicationError,
+                                InvalidFileTypeError)
+from simba.utils.lookups import get_color_dict
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_config_file, read_df)
 
 
 class DrawPathPlot(object):

@@ -1,17 +1,20 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import multiprocessing
+from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_float
-from simba.utils.enums import Keys, Links, Formats
-from simba.ui.tkinter_functions import DropDownMenu, CreateLabelFrameWithIcon, Entry_Box
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext
-from simba.utils.errors import NoFilesFoundError
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ROI_feature_visualizer import ROIfeatureVisualizer
-from simba.plotting.ROI_feature_visualizer_mp import ROIfeatureVisualizerMultiprocess
+from simba.plotting.ROI_feature_visualizer_mp import \
+    ROIfeatureVisualizerMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
+from simba.utils.checks import check_float
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.errors import NoFilesFoundError
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
 
 
 class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):

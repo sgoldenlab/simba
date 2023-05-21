@@ -1,12 +1,17 @@
 __author__ = "Simon Nilsson"
 
-import os, glob
+import glob
+import os
+
 import numpy as np
 import pandas as pd
-from simba.utils.read_write import get_fn_ext, read_df, write_df, read_config_file
-from simba.utils.checks import check_if_filepath_list_is_empty, check_that_column_exist
-from simba.utils.printing import stdout_success
+
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import (check_if_filepath_list_is_empty,
+                                check_that_column_exist)
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (get_fn_ext, read_config_file, read_df,
+                                    write_df)
 
 
 class ImportEthovision(ConfigReader):

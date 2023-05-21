@@ -1,14 +1,16 @@
 __author__ = "Simon Nilsson"
 
-import os
 import json
-import pandas as pd
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.unsupervised.enums import Unsupervised, Clustering
-from simba.utils.checks import check_if_dir_exists, check_file_exist_and_readable
-from simba.utils.printing import stdout_success
+import os
 
+import pandas as pd
+
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.unsupervised.enums import Clustering, Unsupervised
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.printing import stdout_success
 
 CLUSTERER_PARAMETERS = "CLUSTERER HYPER-PARAMETERS"
 DIMENSIONALITY_REDUCTION_PARAMETERS = "DIMENSIONALITY REDUCTION HYPER-PARAMETERS"

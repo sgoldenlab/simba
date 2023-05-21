@@ -1,22 +1,19 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
 import os
-import numpy as np
 from copy import deepcopy
 
+import numpy as np
+import pandas as pd
+
 from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
-from simba.utils.read_write import find_all_videos_in_project
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.utils.read_write import (
-    write_df,
-    find_video_of_file,
-    get_video_meta_data,
-    get_fn_ext,
-)
-from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.enums import Methods
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_all_videos_in_project,
+                                    find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, write_df)
 
 
 class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):

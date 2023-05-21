@@ -1,9 +1,8 @@
-from datetime import datetime
 import os
-from simba.utils.enums import Paths
-import pandas as pd
-from simba.misc_tools import check_file_exist_and_readable, SimbaTimer
+import random
+from datetime import datetime
 
+import pandas as pd
 # from simba.unsupervised.misc import (check_that_directory_is_empty,
 #                                      check_directory_exists,
 #                                      read_pickle,
@@ -13,8 +12,10 @@ from simba.misc_tools import check_file_exist_and_readable, SimbaTimer
 #                                      find_low_variance_fields,
 #                                      scaler_transform)
 from sklearn.manifold import TSNE
-import random
+
 import simba
+from simba.misc_tools import SimbaTimer, check_file_exist_and_readable
+from simba.utils.enums import Paths
 
 
 class TSNEGridSearch(object):

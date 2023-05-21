@@ -2,6 +2,7 @@ __author__ = "Simon Nilsson"
 
 
 from enum import Enum
+
 import numpy as np
 
 

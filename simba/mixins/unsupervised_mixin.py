@@ -1,28 +1,25 @@
 __author__ = "Simon Nilsson"
 
-import os, glob
+import glob
+import os
 import pickle
-import simba
-from simba.utils.enums import Paths
-from sklearn.feature_selection import VarianceThreshold
-
-import pandas as pd
 from datetime import datetime
-import numpy as np
 
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, QuantileTransformer
-from simba.utils.errors import (
-    InvalidInputError,
-    NoDataError,
-    NoFilesFoundError,
-    InvalidFileTypeError,
-    MissingColumnsError,
-    IntegerError,
-    DirectoryNotEmptyError,
-)
+import numpy as np
+import pandas as pd
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
+                                   StandardScaler)
+
+import simba
+from simba.unsupervised.enums import UMLOptions, Unsupervised
 from simba.utils.checks import check_float
+from simba.utils.enums import Paths
+from simba.utils.errors import (DirectoryNotEmptyError, IntegerError,
+                                InvalidFileTypeError, InvalidInputError,
+                                MissingColumnsError, NoDataError,
+                                NoFilesFoundError)
 from simba.utils.printing import SimbaTimer
-from simba.unsupervised.enums import Unsupervised, UMLOptions
 
 
 class UnsupervisedMixin(object):

@@ -1,23 +1,23 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import os, ast
+import ast
+import os
 import webbrowser
 from tkinter import *
-from simba.ui.tkinter_functions import (
-    hxtScrollbar,
-    DropDownMenu,
-    FileSelect,
-    Entry_Box,
-    CreateLabelFrameWithIcon,
-)
-from simba.utils.enums import Options, Formats, Keys, Links
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext
-from simba.utils.printing import stdout_success, stdout_trash, stdout_warning
-from simba.utils.errors import InvalidHyperparametersFileError
-from simba.utils.checks import check_int, check_float, check_file_exist_and_readable
-from simba.mixins.pop_up_mixin import PopUpMixin
+
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect, hxtScrollbar)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int)
+from simba.utils.enums import Formats, Keys, Links, Options
+from simba.utils.errors import InvalidHyperparametersFileError
+from simba.utils.printing import stdout_success, stdout_trash, stdout_warning
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
 
 
 class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):

@@ -1,20 +1,21 @@
 __author__ = "Simon Nilsson"
 
+import io
+import itertools
+import os
+import random
+import shutil
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import cv2
+import imutils
+import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import PIL
-import io
-import os
-import numpy as np
-import matplotlib
-import shutil
-import random
 from matplotlib import cm
-import imutils
-import itertools
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from typing import List, Tuple, Optional, Dict, Any, Union
 
 try:
     from typing import Literal
@@ -22,10 +23,10 @@ except:
     from typing_extensions import Literal
 
 import simba
-from simba.utils.lookups import get_color_dict, get_named_colors
-from simba.utils.read_write import get_fn_ext
-from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.enums import Formats, Options
+from simba.utils.lookups import get_color_dict, get_named_colors
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext
 
 
 class PlottingMixin(object):

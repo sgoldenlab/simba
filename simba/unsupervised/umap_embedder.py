@@ -1,16 +1,16 @@
 __author__ = "Simon Nilsson"
 
+import itertools
 import os
 import random
 from copy import deepcopy
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
-from simba.unsupervised.enums import Unsupervised
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.checks import check_file_exist_and_readable
 
-import itertools
 import pandas as pd
 
+from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.unsupervised.enums import Unsupervised
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.printing import SimbaTimer, stdout_success
 
 try:
     from cuml import UMAP

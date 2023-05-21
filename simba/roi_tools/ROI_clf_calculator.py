@@ -1,18 +1,20 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import numpy as np
-from shapely import geometry
-from shapely.geometry import Point, Polygon
 import os
 
-from simba.utils.data import detect_bouts
-from simba.utils.printing import stdout_success
+import numpy as np
+import pandas as pd
+from shapely import geometry
+from shapely.geometry import Point, Polygon
+
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import (check_if_filepath_list_is_empty,
+                                check_that_column_exist)
+from simba.utils.data import detect_bouts
 from simba.utils.errors import NoChoosenClassifierError, NoROIDataError
-from simba.utils.warnings import ROIWarning, NoDataFoundWarning
+from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
-from simba.utils.checks import check_that_column_exist, check_if_filepath_list_is_empty
+from simba.utils.warnings import NoDataFoundWarning, ROIWarning
 
 
 class ROIClfCalculator(ConfigReader):

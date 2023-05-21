@@ -5,10 +5,11 @@ __author__ = "Simon Nilsson"
 # Medium article https://medium.com/@haydenfaulkner/extracting-frames-fast-from-a-video-using-opencv-and-python-73b9b7dc9661
 # All cred to Hayden Faulkner, ta!
 
-from concurrent.futures import ProcessPoolExecutor
-import cv2
 import multiprocessing
 import os
+from concurrent.futures import ProcessPoolExecutor
+
+import cv2
 
 
 def extract_frames(

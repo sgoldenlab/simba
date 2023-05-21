@@ -1,8 +1,10 @@
+import os
+
 import cv2
+
+from simba.enums import Paths
 from simba.misc_tools import get_fn_ext
 from simba.utils.errors import InvalidVideoFileError
-import os
-from simba.enums import Paths
 
 
 def get_video_meta_data(video_path: str):

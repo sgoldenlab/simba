@@ -2,14 +2,15 @@ __author__ = "Simon Nilsson"
 
 from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.enums import Keys, Links, Formats
-from simba.ui.tkinter_functions import DropDownMenu, CreateLabelFrameWithIcon, Entry_Box
-from simba.utils.read_write import find_all_videos_in_directory
-from simba.utils.checks import check_float
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.plot_clf_results import PlotSklearnResultsSingleCore
 from simba.plotting.plot_clf_results_mp import PlotSklearnResultsMultiProcess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
+from simba.utils.checks import check_float
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.read_write import find_all_videos_in_directory
 
 
 class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):

@@ -1,13 +1,14 @@
 __author__ = "Simon Nilsson"
 
 from tkinter import *
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.mixins.config_reader import ConfigReader
+
 from simba.data_processors.fsttc_calculator import FSTTCCalculator
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, Entry_Box
-from simba.utils.errors import CountError
 from simba.utils.checks import check_int
 from simba.utils.enums import Keys, Links
+from simba.utils.errors import CountError
 
 
 class FSTTCPopUp(PopUpMixin, ConfigReader):

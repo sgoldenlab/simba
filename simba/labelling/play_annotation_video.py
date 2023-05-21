@@ -1,12 +1,14 @@
 __author__ = "Simon Nilsson"
 
-import cv2
-import sys
 import os
 import signal
-from simba.utils.read_write import get_video_meta_data
-from simba.utils.lookups import get_color_dict
+import sys
+
+import cv2
+
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.lookups import get_color_dict
+from simba.utils.read_write import get_video_meta_data
 
 
 def annotation_video_player():

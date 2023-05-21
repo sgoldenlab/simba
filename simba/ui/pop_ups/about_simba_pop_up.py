@@ -1,5 +1,6 @@
-from tkinter import *
 import os
+from tkinter import *
+
 import simba
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.utils.enums import Paths

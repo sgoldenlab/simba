@@ -1,18 +1,19 @@
 __author__ = "Simon Nilsson"
 
-import numpy as np
 import os
-import pandas as pd
 from datetime import datetime
-from numba import jit
 from typing import Dict, Optional, Union
 
-from simba.utils.read_write import get_fn_ext, read_df
-from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.printing import stdout_success
-from simba.utils.warnings import NoDataFoundWarning
+import numpy as np
+import pandas as pd
+from numba import jit
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
+from simba.utils.warnings import NoDataFoundWarning
 
 
 class SeverityCalculator(ConfigReader, FeatureExtractionMixin):

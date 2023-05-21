@@ -1,14 +1,18 @@
 __author__ = "Simon Nilsson"
 
+import glob
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
-import glob, os
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-from simba.unsupervised.enums import Clustering, Unsupervised
+
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.unsupervised.enums import Clustering, Unsupervised
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_filepath_list_is_empty)
 from simba.utils.printing import stdout_success
-from simba.utils.checks import check_if_dir_exists, check_if_filepath_list_is_empty
 
 
 class GridSearchVisualizer(UnsupervisedMixin):

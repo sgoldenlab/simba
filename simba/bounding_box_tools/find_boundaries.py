@@ -1,17 +1,19 @@
 __author__ = "Simon Nilsson"
 
-import os
 import itertools
+import os
+from typing import Optional
+
 import numpy as np
-from shapely.geometry import Polygon, Point, LineString
 import shapely.wkt
 from joblib import Parallel, delayed
-from typing import Optional
-from simba.utils.read_write import read_df, write_df, get_fn_ext, find_core_cnt
-from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.printing import stdout_success
+from shapely.geometry import LineString, Point, Polygon
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import find_core_cnt, get_fn_ext, read_df, write_df
 
 
 class AnimalBoundaryFinder(ConfigReader, FeatureExtractionMixin):

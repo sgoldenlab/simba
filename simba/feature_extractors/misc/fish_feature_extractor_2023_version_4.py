@@ -1,32 +1,29 @@
 from __future__ import division
-import numpy as np
+
+import glob
 import math
+import os
+from itertools import combinations
+
+import numpy as np
 import pandas as pd
-from simba.read_config_unit_tests import (
-    read_project_path_and_file_type,
-    check_if_filepath_list_is_empty,
-)
+from joblib import Parallel, delayed
+from numba import jit, prange
 from scipy import stats
-from statsmodels.stats.diagnostic import lilliefors
 from scipy.signal import find_peaks
 from scipy.spatial import ConvexHull
 from scipy.spatial.qhull import QhullError
 from scipy.stats import zscore
-from numba import jit, prange
-import os, glob
+from statsmodels.stats.diagnostic import lilliefors
+
 from simba.enums import Paths
-from simba.utils.read_write import (
-    get_fn_ext,
-    read_video_info,
-    read_config_file,
-    write_df,
-    read_df,
-)
-from simba.utils.printing import SimbaTimer
-from itertools import combinations
-from joblib import Parallel, delayed
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.read_config_unit_tests import (check_if_filepath_list_is_empty,
+                                          read_project_path_and_file_type)
+from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import (get_fn_ext, read_config_file, read_df,
+                                    read_video_info, write_df)
 
 TAIL_BP_NAMES = ["objectA", "peduncle_base"]
 CENTER_BP_NAMES = ["midpoint"]

@@ -1,12 +1,12 @@
-from simba.misc_tools import get_fn_ext
-from simba.misc_tools import find_core_cnt
-import pandas as pd
-from simba.rw_dfs import read_df
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-import numpy as np
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from itertools import repeat
+
+import numpy as np
+import pandas as pd
+
+from simba.misc_tools import SimbaTimer, find_core_cnt, get_fn_ext
+from simba.rw_dfs import read_df
 from simba.utils.errors import ColumnNotFoundError
-from simba.misc_tools import SimbaTimer
 
 
 def _read_data_file_helper(file_path, file_type, clf_names):

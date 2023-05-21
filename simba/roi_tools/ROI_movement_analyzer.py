@@ -1,9 +1,10 @@
 __author__ = "Simon Nilsson"
 
 import os
-from simba.utils.printing import stdout_success
+
 from simba.mixins.config_reader import ConfigReader
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+from simba.utils.printing import stdout_success
 
 
 class ROIMovementAnalyzer(ConfigReader):

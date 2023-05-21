@@ -1,14 +1,14 @@
-from tkinter import *
 from copy import deepcopy
+from tkinter import *
 
+from simba.data_processors.timebins_movement_calculator import \
+    TimeBinsMovementCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, Entry_Box
-from simba.utils.enums import Keys, Links, Formats, ConfigKey
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
 from simba.utils.checks import check_int
-from simba.data_processors.timebins_movement_calculator import (
-    TimeBinsMovementCalculator,
-)
+from simba.utils.enums import ConfigKey, Formats, Keys, Links
 
 
 class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):

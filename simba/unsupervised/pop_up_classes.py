@@ -4,37 +4,30 @@ __author__ = "Simon Nilsson"
 
 import glob
 from tkinter import *
+
 import numpy as np
 
-from simba.ui.tkinter_functions import FolderSelect, DropDownMenu, FileSelect, Entry_Box
-
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
-
-from simba.utils.enums import Formats, Options
-from simba.unsupervised.enums import UMLOptions, Unsupervised, Clustering
-from simba.utils.checks import (
-    check_file_exist_and_readable,
-    check_if_filepath_list_is_empty,
-    check_if_dir_exists,
-    check_int,
-)
-
-
-from simba.unsupervised.grid_search_visualizers import GridSearchVisualizer
-from simba.unsupervised.data_extractor import DataExtractor
-from simba.utils.errors import NoSpecifiedOutputError
-from simba.unsupervised.umap_embedder import UmapEmbedder
-from simba.unsupervised.tsne import TSNEGridSearch
-from simba.unsupervised.hdbscan_clusterer import HDBSCANClusterer
-from simba.unsupervised.cluster_visualizer import ClusterVisualizer
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
+                                        FolderSelect)
 from simba.unsupervised.cluster_statistics import (
-    ClusterFrequentistCalculator,
-    ClusterXAICalculator,
-    EmbeddingCorrelationCalculator,
-)
+    ClusterFrequentistCalculator, ClusterXAICalculator,
+    EmbeddingCorrelationCalculator)
+from simba.unsupervised.cluster_visualizer import ClusterVisualizer
+from simba.unsupervised.data_extractor import DataExtractor
 from simba.unsupervised.dbcv_calculator import DBCVCalculator
+from simba.unsupervised.enums import Clustering, UMLOptions, Unsupervised
+from simba.unsupervised.grid_search_visualizers import GridSearchVisualizer
+from simba.unsupervised.hdbscan_clusterer import HDBSCANClusterer
+from simba.unsupervised.tsne import TSNEGridSearch
+from simba.unsupervised.umap_embedder import UmapEmbedder
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_filepath_list_is_empty, check_int)
+from simba.utils.enums import Formats, Options
+from simba.utils.errors import NoSpecifiedOutputError
 
 
 class GridSearchVisualizerPopUp(PopUpMixin):

@@ -1,16 +1,15 @@
 import os
-from simba.misc_tools import (
-    find_all_videos_in_directory,
-    get_video_meta_data,
-    get_fn_ext,
-)
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.enums import Formats
+import time
+from tkinter import *
+
 import cv2
 import numpy as np
-from tkinter import *
-import time
 from PIL import Image, ImageTk
+
+from simba.enums import Formats
+from simba.misc_tools import (find_all_videos_in_directory, get_fn_ext,
+                              get_video_meta_data)
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.tkinter_functions import create_scalebar
 
 MAX_FRM_SIZE = 1080, 650

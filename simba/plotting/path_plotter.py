@@ -1,19 +1,20 @@
 __author__ = "Simon Nilsson"
 
-import cv2
+import os
 from collections import deque
 from copy import deepcopy
-import numpy as np
-import os
 from typing import List
 
-from simba.utils.enums import Formats
+import cv2
+import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.read_write import get_fn_ext, read_df
-from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.enums import Formats
+from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
 
 
 class PathPlotterSingleCore(ConfigReader, PlottingMixin):

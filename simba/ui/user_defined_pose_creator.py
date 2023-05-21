@@ -1,17 +1,19 @@
 __author__ = "Simon Nilsson"
 
-import cv2
-import numpy as np
-import imutils
-import simba
-import os, glob
+import glob
+import os
 from typing import List, Union
 
-from simba.utils.enums import Paths
-from simba.utils.data import create_color_palettes
-from simba.utils.errors import InvalidFileTypeError
-from simba.utils.checks import check_file_exist_and_readable
+import cv2
+import imutils
+import numpy as np
+
+import simba
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.data import create_color_palettes
+from simba.utils.enums import Paths
+from simba.utils.errors import InvalidFileTypeError
 
 
 class PoseConfigCreator(PlottingMixin):

@@ -1,33 +1,28 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
-import glob, os
+import glob
 import itertools
-import pandas as pd
+import os
+import webbrowser
+from tkinter import *
 from typing import Union
 
-from simba.utils.checks import check_float, check_int
-from simba.utils.read_write import (
-    get_fn_ext,
-    find_video_of_file,
-    get_all_clf_names,
-    read_config_entry,
-)
+import pandas as pd
+
 from simba.cue_light_tools.cue_light_analyzer import CueLightAnalyzer
-from simba.cue_light_tools.cue_light_visualizer import CueLightVisualizer
 from simba.cue_light_tools.cue_light_clf_statistics import CueLightClfAnalyzer
-from simba.cue_light_tools.cue_light_movement_statistics import CueLightMovementAnalyzer
-from simba.utils.errors import (
-    NoFilesFoundError,
-    CountError,
-    NoROIDataError,
-    NoChoosenClassifierError,
-)
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
-from simba.utils.enums import Keys, Links
+from simba.cue_light_tools.cue_light_movement_statistics import \
+    CueLightMovementAnalyzer
+from simba.cue_light_tools.cue_light_visualizer import CueLightVisualizer
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-import webbrowser
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
+from simba.utils.checks import check_float, check_int
+from simba.utils.enums import Keys, Links
+from simba.utils.errors import (CountError, NoChoosenClassifierError,
+                                NoFilesFoundError, NoROIDataError)
+from simba.utils.read_write import (find_video_of_file, get_all_clf_names,
+                                    get_fn_ext, read_config_entry)
 
 
 class CueLightAnalyzerMenu(ConfigReader, PopUpMixin):

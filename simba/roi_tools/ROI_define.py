@@ -1,22 +1,23 @@
 import copy
-import os, glob
+import glob
+import os
 from tkinter import *
+
 import cv2
-from simba.roi_tools.ROI_image import ROI_image_class
 import pandas as pd
-from simba.ui.tkinter_functions import hxtScrollbar
-from simba.roi_tools.ROI_move_shape import update_all_tags, move_edge
+
+from simba.mixins.config_reader import ConfigReader
+from simba.roi_tools.ROI_image import ROI_image_class
+from simba.roi_tools.ROI_move_shape import move_edge, update_all_tags
 from simba.roi_tools.ROI_multiply import create_emty_df
-from simba.roi_tools.ROI_size_calculations import (
-    rectangle_size_calc,
-    circle_size_calc,
-    polygon_size_calc,
-)
+from simba.roi_tools.ROI_size_calculations import (circle_size_calc,
+                                                   polygon_size_calc,
+                                                   rectangle_size_calc)
+from simba.ui.tkinter_functions import hxtScrollbar
+from simba.utils.lookups import get_color_dict
+from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
-from simba.utils.printing import stdout_success
-from simba.utils.lookups import get_color_dict
-from simba.mixins.config_reader import ConfigReader
 
 
 class ROI_definitions(ConfigReader):

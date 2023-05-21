@@ -1,19 +1,21 @@
 __author__ = "Simon Nilsson"
 
-import numpy as np
-import os, glob
+import glob
 import itertools
+import os
 from copy import deepcopy
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from simba.utils.printing import stdout_success
-from simba.roi_tools.ROI_analyzer import ROIAnalyzer
-from simba.roi_tools.ROI_directing_analyzer import DirectingROIAnalyzer
+import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+from simba.roi_tools.ROI_directing_analyzer import DirectingROIAnalyzer
 from simba.utils.errors import NoFilesFoundError, NoROIDataError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_df, write_df
 from simba.utils.warnings import NoFileFoundWarning
-from simba.utils.read_write import read_df, write_df, get_fn_ext
 
 
 class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):

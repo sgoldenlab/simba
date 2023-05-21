@@ -1,24 +1,21 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import numpy as np
-import shutil, os
+import os
+import shutil
 from copy import deepcopy
 from typing import List, Union
 
+import numpy as np
+import pandas as pd
 
-from simba.utils.checks import (
-    check_that_column_exist,
-    check_int,
-    check_float,
-    check_if_filepath_list_is_empty,
-)
-from simba.utils.read_write import write_df, read_df, get_fn_ext
-from simba.utils.printing import stdout_success
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.warnings import KleinbergWarning
 from simba.data_processors.pybursts_calculator import kleinberg_burst_detection
+from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import (check_float, check_if_filepath_list_is_empty,
+                                check_int, check_that_column_exist)
 from simba.utils.enums import Paths
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_df, write_df
+from simba.utils.warnings import KleinbergWarning
 
 
 class KleinbergCalculator(ConfigReader):

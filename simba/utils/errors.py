@@ -1,7 +1,8 @@
 __author__ = "Simon Nilsson"
 
 from tkinter import messagebox as mb
-from simba.utils.enums import TagNames, Defaults
+
+from simba.utils.enums import Defaults, TagNames
 
 WINDOW_TITLE = "SIMBA ERROR"
 

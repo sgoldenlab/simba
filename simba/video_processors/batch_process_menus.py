@@ -1,20 +1,23 @@
-from tkinter import *
-import glob, os, re
 import datetime
-import cv2
+import glob
 import json
+import os
+import re
+from tkinter import *
 from typing import Union
 
-from simba.video_processors.batch_process_create_ffmpeg_commands import (
-    FFMPEGCommandCreator,
-)
-from simba.utils.enums import Options, Keys, Links
+import cv2
+
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.errors import InvalidInputError, IntegerError, NoFilesFoundError
-from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.read_write import get_fn_ext, get_video_meta_data
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import Keys, Links, Options
+from simba.utils.errors import (IntegerError, InvalidInputError,
+                                NoFilesFoundError)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, get_video_meta_data
+from simba.video_processors.batch_process_create_ffmpeg_commands import \
+    FFMPEGCommandCreator
 
 
 class BatchProcessFrame(PopUpMixin):

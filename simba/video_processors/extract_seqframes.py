@@ -4,11 +4,13 @@ Created on Fri Oct  4 14:39:50 2019
 
 @authors: Xiaoyu Tong, Jia Jie Choong, Simon Nilsson
 """
-from PIL import Image
 import io
 import os
-import numpy as np
 import struct
+
+import numpy as np
+from PIL import Image
+
 from simba.utils.read_write import get_fn_ext
 
 
@@ -94,13 +96,14 @@ def readHeader(f):
 
 
 def convertseqVideo(videos, outtype="mp4", clahe=False, startF=None, endF=None):
-    import os
     import io
+    import os
+
     import cv2
-    from tqdm import tqdm
     from PIL import Image
     from skimage import color
     from skimage.util import img_as_ubyte
+    from tqdm import tqdm
 
     """Convert videos to contrast adjusted videos of other formats"""
     ## get videos into a list in video folder

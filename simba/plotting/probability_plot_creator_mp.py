@@ -1,22 +1,24 @@
 __author__ = "Simon Nilsson"
 
 import functools
-import pandas as pd
+import multiprocessing
 import os
+import platform
+import shutil
+from typing import Dict, List
+
 import cv2
 import numpy as np
-import shutil
-import multiprocessing
-import platform
-from typing import List, Dict
+import pandas as pd
 
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import concatenate_videos_in_folder, read_df, get_fn_ext
-from simba.utils.errors import NoSpecifiedOutputError, ColumnNotFoundError
-from simba.utils.checks import check_that_column_exist
-from simba.utils.enums import Formats
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import check_that_column_exist
+from simba.utils.enums import Formats
+from simba.utils.errors import ColumnNotFoundError, NoSpecifiedOutputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    read_df)
 
 
 class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):

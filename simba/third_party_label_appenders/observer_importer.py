@@ -1,23 +1,21 @@
-import os, glob
+import glob
+import os
+from copy import deepcopy
+
 import numpy as np
 import pandas as pd
-from copy import deepcopy
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.errors import (AnnotationFileNotFoundError,
+                                ColumnNotFoundError,
+                                ThirdPartyAnnotationEventCountError,
+                                ThirdPartyAnnotationOverlapError)
+from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.errors import (
-    ColumnNotFoundError,
-    AnnotationFileNotFoundError,
-    ThirdPartyAnnotationEventCountError,
-    ThirdPartyAnnotationOverlapError,
-)
 from simba.utils.warnings import (
     ThirdPartyAnnotationsClfMissingWarning,
-    ThirdPartyAnnotationsOutsidePoseEstimationDataWarning,
-)
-
+    ThirdPartyAnnotationsOutsidePoseEstimationDataWarning)
 
 TIME_FIELD = "Time_Relative_hmsf"
 VIDEO_NAME_FIELD = "Observation"

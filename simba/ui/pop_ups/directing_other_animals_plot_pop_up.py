@@ -1,18 +1,18 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import os
+from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.enums import Keys, Links, Formats, Paths
-from simba.ui.tkinter_functions import DropDownMenu, CreateLabelFrameWithIcon
-from simba.utils.read_write import get_file_name_info_in_directory
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.plotting.Directing_animals_visualizer import \
+    DirectingOtherAnimalsVisualizer
+from simba.plotting.Directing_animals_visualizer_mp import \
+    DirectingOtherAnimalsVisualizerMultiprocess
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.errors import AnimalNumberError
-from simba.plotting.Directing_animals_visualizer import DirectingOtherAnimalsVisualizer
-from simba.plotting.Directing_animals_visualizer_mp import (
-    DirectingOtherAnimalsVisualizerMultiprocess,
-)
+from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):

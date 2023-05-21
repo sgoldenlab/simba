@@ -1,10 +1,11 @@
 import os
+import platform
 from configparser import ConfigParser
 from tkinter import *
-import platform
+
 from simba.roi_tools.ROI_define import ROI_definitions
-from simba.roi_tools.ROI_reset import reset_video_ROIs
 from simba.roi_tools.ROI_multiply import multiply_ROIs
+from simba.roi_tools.ROI_reset import reset_video_ROIs
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.errors import NoFilesFoundError

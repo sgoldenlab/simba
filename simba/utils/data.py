@@ -1,31 +1,26 @@
 __author__ = "Simon Nilsson"
 
-import os
-
-import pandas as pd
-from copy import deepcopy
-import configparser
-from pathlib import Path
 import ast
-from scipy.signal import savgol_filter
-from pylab import *
+import configparser
+import os
+from copy import deepcopy
+from pathlib import Path
 from typing import List, Optional, Union
 
-from simba.utils.read_write import (
-    get_fn_ext,
-    read_project_path_and_file_type,
-    find_video_of_file,
-    read_df,
-    write_df,
-    read_config_file,
-    read_config_entry,
-    get_video_meta_data,
-)
+import pandas as pd
+from pylab import *
+from scipy.signal import savgol_filter
+
 from simba.utils.checks import check_file_exist_and_readable, check_int
-from simba.utils.errors import NoFilesFoundError, InvalidFileTypeError, CountError
-from simba.utils.printing import stdout_warning
 from simba.utils.enums import ConfigKey, Dtypes
+from simba.utils.errors import (CountError, InvalidFileTypeError,
+                                NoFilesFoundError)
 from simba.utils.lookups import get_bp_config_code_class_pairs
+from simba.utils.printing import stdout_warning
+from simba.utils.read_write import (find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_config_file, read_df,
+                                    read_project_path_and_file_type, write_df)
 
 
 def detect_bouts(

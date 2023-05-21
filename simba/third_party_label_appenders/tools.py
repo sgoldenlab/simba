@@ -1,12 +1,13 @@
-import pandas as pd
+from typing import Dict, List
+
 import numpy as np
-from typing import List, Dict
+import pandas as pd
 
 from simba.utils.data import detect_bouts
-from simba.utils.read_write import get_fn_ext, read_video_info
 from simba.utils.enums import Methods
+from simba.utils.errors import ColumnNotFoundError, InvalidFileTypeError
+from simba.utils.read_write import get_fn_ext, read_video_info
 from simba.utils.warnings import ThirdPartyAnnotationsInvalidFileFormatWarning
-from simba.utils.errors import InvalidFileTypeError, ColumnNotFoundError
 
 
 def observer_timestamp_corrector(timestamps: List[str]) -> List[str]:

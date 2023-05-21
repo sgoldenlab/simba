@@ -1,23 +1,26 @@
 __author__ = "Simon Nilsson"
 
-import os, glob
+import glob
+import os
 import pickle
 from tkinter import *
 from typing import Union
 
+from simba.bounding_box_tools.agg_boundary_stats import \
+    AggBoundaryStatisticsCalculator
+from simba.bounding_box_tools.boundary_statistics import \
+    BoundaryStatisticsCalculator
 from simba.bounding_box_tools.find_boundaries import AnimalBoundaryFinder
 from simba.bounding_box_tools.visualize_boundaries import BoundaryVisualizer
-from simba.bounding_box_tools.boundary_statistics import BoundaryStatisticsCalculator
-from simba.bounding_box_tools.agg_boundary_stats import AggBoundaryStatisticsCalculator
-from simba.utils.errors import NoFilesFoundError, NoChoosenMeasurementError
-from simba.utils.enums import Keys, Links
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, CreateLabelFrameWithIcon
-from simba.utils.read_write import get_fn_ext, find_all_videos_in_project
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
 from simba.utils.checks import check_int
-from simba.utils.enums import Formats
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.errors import NoChoosenMeasurementError, NoFilesFoundError
 from simba.utils.lookups import get_named_colors
+from simba.utils.read_write import find_all_videos_in_project, get_fn_ext
 
 
 class BoundaryMenus(ConfigReader, PopUpMixin):

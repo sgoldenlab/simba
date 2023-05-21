@@ -1,27 +1,21 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
-from simba.ui.tkinter_functions import hxtScrollbar, Entry_Box, DropDownMenu, FileSelect
 import tkinter.ttk as ttk
-from simba.utils.enums import Formats
+from tkinter import *
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.unsupervised.enums import UMLOptions, Unsupervised
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
+                                        hxtScrollbar)
 from simba.unsupervised.dataset_creator import DatasetCreator
+from simba.unsupervised.enums import UMLOptions, Unsupervised
 from simba.unsupervised.pop_up_classes import (
-    GridSearchVisualizerPopUp,
-    DataExtractorPopUp,
-    FitDimReductionPopUp,
-    FitClusterModelsPopUp,
-    TransformDimReductionPopUp,
-    TransformClustererPopUp,
-    ClusterVisualizerPopUp,
-    ClusterFrequentistStatisticsPopUp,
-    ClusterXAIPopUp,
-    EmbedderCorrelationsPopUp,
-    PrintEmBeddingInfoPopUp,
-    DBCVPopUp,
-)
+    ClusterFrequentistStatisticsPopUp, ClusterVisualizerPopUp, ClusterXAIPopUp,
+    DataExtractorPopUp, DBCVPopUp, EmbedderCorrelationsPopUp,
+    FitClusterModelsPopUp, FitDimReductionPopUp, GridSearchVisualizerPopUp,
+    PrintEmBeddingInfoPopUp, TransformClustererPopUp,
+    TransformDimReductionPopUp)
+from simba.utils.enums import Formats
 
 
 class UnsupervisedGUI(ConfigReader, PopUpMixin):

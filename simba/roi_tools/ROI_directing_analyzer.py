@@ -1,14 +1,15 @@
 __author__ = "Simon Nilsson"
 
-from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+from copy import deepcopy
+from typing import Dict, Optional
+
+import numpy as np
 import pandas as pd
 from numba import jit, prange
-from copy import deepcopy
-import numpy as np
-from typing import Optional, Dict
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.utils.read_write import get_fn_ext
 
 

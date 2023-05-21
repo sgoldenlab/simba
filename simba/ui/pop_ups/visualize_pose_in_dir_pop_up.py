@@ -2,17 +2,13 @@ __author__ = "Simon Nilsson"
 
 from tkinter import *
 
-from simba.ui.tkinter_functions import (
-    CreateLabelFrameWithIcon,
-    Entry_Box,
-    DropDownMenu,
-    FolderSelect,
-)
-from simba.utils.enums import Keys, Links, Formats
-from simba.utils.lookups import get_color_dict
-from simba.utils.errors import NotDirectoryError
-from simba.plotting.plot_pose_in_dir import create_video_from_dir
 from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.plotting.plot_pose_in_dir import create_video_from_dir
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FolderSelect)
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.errors import NotDirectoryError
+from simba.utils.lookups import get_color_dict
 
 
 class VisualizePoseInFolderPopUp(PopUpMixin):

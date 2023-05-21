@@ -1,21 +1,19 @@
 __author__ = "Simon Nilsson"
 
 import os
-import pandas as pd
-import numpy as np
 from copy import deepcopy
 
-from simba.data_processors.interpolation_smoothing import Smooth, Interpolate
-from simba.utils.errors import BodypartColumnNotFoundError
+import numpy as np
+import pandas as pd
+
+from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import (
-    write_df,
-    get_video_meta_data,
-    find_all_videos_in_project,
-)
-from simba.utils.enums import Formats, Methods
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.enums import Formats, Methods
+from simba.utils.errors import BodypartColumnNotFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_all_videos_in_project,
+                                    get_video_meta_data, write_df)
 
 
 class MADLCImporterH5(ConfigReader, PoseImporterMixin):

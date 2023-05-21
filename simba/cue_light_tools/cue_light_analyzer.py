@@ -1,29 +1,26 @@
 __author__ = "Simon Nilsson"
 
-from sklearn.cluster import KMeans
-import os, glob
-import itertools
-import pandas as pd
-import cv2
-import numpy as np
-import multiprocessing
 import functools
-import time
+import glob
+import itertools
+import multiprocessing
+import os
 import platform
+import time
 from typing import List, Union
 
-from simba.utils.read_write import (
-    read_df,
-    write_df,
-    get_fn_ext,
-    find_video_of_file,
-    get_video_meta_data,
-    find_core_cnt,
-)
-from simba.utils.data import detect_bouts
-from simba.utils.printing import stdout_success
-from simba.utils.errors import NoFilesFoundError, CountError, NoROIDataError
+import cv2
+import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
+
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.data import detect_bouts
+from simba.utils.errors import CountError, NoFilesFoundError, NoROIDataError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (find_core_cnt, find_video_of_file,
+                                    get_fn_ext, get_video_meta_data, read_df,
+                                    write_df)
 from simba.utils.warnings import NoDataFoundWarning
 
 

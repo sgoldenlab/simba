@@ -1,28 +1,25 @@
 __author__ = "Simon Nilsson"
 
-import cv2
-import pandas as pd
-from copy import deepcopy
-from collections import deque
-from numba import jit, prange
-import numpy as np
-import os
 import functools
 import multiprocessing
+import os
 import platform
-from typing import Optional, Dict, List
+from collections import deque
+from copy import deepcopy
+from typing import Dict, List, Optional
+
+import cv2
+import numpy as np
+import pandas as pd
+from numba import jit, prange
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.read_write import (
-    get_fn_ext,
-    remove_a_folder,
-    concatenate_videos_in_folder,
-    read_df,
-)
-from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    read_df, remove_a_folder)
 
 
 class PathPlotterMulticore(ConfigReader, PlottingMixin):

@@ -1,21 +1,23 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import os, glob
+import glob
+import os
 from collections import defaultdict
 from typing import List
+
+import pandas as pd
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import check_int, check_if_filepath_list_is_empty
+from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import check_if_filepath_list_is_empty, check_int
 from simba.utils.data import detect_bouts
+from simba.utils.errors import NoChoosenMeasurementError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.errors import NoChoosenMeasurementError
 
 
 class TimeBinsClfCalculator(ConfigReader):

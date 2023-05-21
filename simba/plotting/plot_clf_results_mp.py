@@ -1,29 +1,27 @@
 __author__ = "Simon Nilsson"
 
-import os
-from copy import deepcopy
+import functools
 import multiprocessing
+import os
+import platform
+from copy import deepcopy
+from typing import Dict, List, Optional, Union
+
 import cv2
 import numpy as np
-import functools
-import platform
-from typing import Optional, Dict, List, Union
 
-from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.enums import ConfigKey, Formats, Dtypes
-from simba.utils.read_write import (
-    read_df,
-    get_video_meta_data,
-    concatenate_videos_in_folder,
-    get_fn_ext,
-    read_config_entry,
-)
-from simba.utils.checks import check_file_exist_and_readable, check_float, check_int
-from simba.utils.data import create_color_palette
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int)
+from simba.utils.data import create_color_palette
+from simba.utils.enums import ConfigKey, Dtypes, Formats
+from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_df)
 
 
 def _multiprocess_sklearn_video(

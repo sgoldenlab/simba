@@ -2,19 +2,15 @@ __author__ = "Simon Nilsson"
 
 from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.enums import ConfigKey, Keys, Links
-from simba.ui.tkinter_functions import (
-    DropDownMenu,
-    FileSelect,
-    Entry_Box,
-    CreateLabelFrameWithIcon,
-)
-from simba.utils.printing import stdout_success, stdout_trash
-from simba.utils.checks import check_str
-from simba.utils.read_write import tabulate_clf_info
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.pose_processors.pose_reset import PoseResetter
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect)
+from simba.utils.checks import check_str
+from simba.utils.enums import ConfigKey, Keys, Links
+from simba.utils.printing import stdout_success, stdout_trash
+from simba.utils.read_write import tabulate_clf_info
 
 
 class AddClfPopUp(PopUpMixin, ConfigReader):

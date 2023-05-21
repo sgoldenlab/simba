@@ -1,14 +1,15 @@
 import glob
 import itertools
+import math
 from copy import deepcopy
-import pandas as pd
+from itertools import combinations
+
 import cv2
 import numpy as np
-from itertools import combinations
-from numba import jit, prange
-import math
-from scipy.spatial import ConvexHull
+import pandas as pd
 from joblib import Parallel, delayed
+from numba import jit, prange
+from scipy.spatial import ConvexHull
 
 
 class EgocentricalAlignmentFeaturizer(object):

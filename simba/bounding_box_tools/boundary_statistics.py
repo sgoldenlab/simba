@@ -1,16 +1,18 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
 import os
+from collections import defaultdict
+from copy import deepcopy
+
+import pandas as pd
 from joblib import Parallel, delayed
 from shapely.geometry import Point
-from copy import deepcopy
-from collections import defaultdict
-from simba.utils.errors import NoFilesFoundError
-from simba.utils.enums import Formats
-from simba.utils.read_write import read_df, write_df
+
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.enums import Formats
+from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import read_df, write_df
 
 
 class BoundaryStatisticsCalculator(ConfigReader):

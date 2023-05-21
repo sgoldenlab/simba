@@ -1,24 +1,21 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
-import cv2
-import os, glob
+import glob
+import os
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
-from simba.utils.lookups import get_color_dict
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.enums import Formats
-from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (
-    read_df,
-    get_video_meta_data,
-    get_fn_ext,
-    find_video_of_file,
-)
+import cv2
+import pandas as pd
+
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.data import create_color_palette
-
+from simba.utils.enums import Formats
+from simba.utils.errors import InvalidInputError
+from simba.utils.lookups import get_color_dict
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df)
 
 ACCEPTED_DIRECTORIES = [
     "input_csv",

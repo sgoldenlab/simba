@@ -1,14 +1,15 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import platform
-from PIL import ImageTk
-import PIL.Image
 import webbrowser
-from tkinter.filedialog import askopenfilename, askdirectory
-from simba.utils.lookups import get_icons_paths
-from simba.utils.enums import Defaults, Formats
+from tkinter import *
+from tkinter.filedialog import askdirectory, askopenfilename
 
+import PIL.Image
+from PIL import ImageTk
+
+from simba.utils.enums import Defaults, Formats
+from simba.utils.lookups import get_icons_paths
 
 MENU_ICONS = get_icons_paths()
 

@@ -1,11 +1,12 @@
 from tkinter import *
 
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.mixins.config_reader import ConfigReader
 from simba.data_processors.agg_clf_calculator import AggregateClfCalculator
-from simba.utils.errors import NoChoosenMeasurementError, NoChoosenClassifierError
-from simba.utils.enums import Links, Formats, Keys, Options
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
+from simba.utils.enums import Formats, Keys, Links, Options
+from simba.utils.errors import (NoChoosenClassifierError,
+                                NoChoosenMeasurementError)
 
 
 class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):

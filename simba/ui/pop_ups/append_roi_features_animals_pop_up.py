@@ -1,12 +1,13 @@
-from tkinter import *
 import os
+from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, Entry_Box
-from simba.utils.enums import Keys, Links, Formats
-from simba.utils.errors import NoROIDataError
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.errors import NoROIDataError
 
 
 class AppendROIFeaturesByAnimalPopUp(ConfigReader, PopUpMixin):

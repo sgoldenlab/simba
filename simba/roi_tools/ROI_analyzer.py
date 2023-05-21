@@ -1,18 +1,21 @@
 __author__ = "Simon Nilsson"
 
-import os, glob, itertools
-import numpy as np
-from shapely.geometry import Point, Polygon
-import pandas as pd
+import glob
+import itertools
+import os
 from typing import Dict, Optional
 
-from simba.utils.printing import stdout_success
-from simba.utils.enums import ConfigKey, Dtypes
+import numpy as np
+import pandas as pd
+from shapely.geometry import Point, Polygon
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.errors import NoFilesFoundError, BodypartColumnNotFoundError
+from simba.utils.enums import ConfigKey, Dtypes
+from simba.utils.errors import BodypartColumnNotFoundError, NoFilesFoundError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
 from simba.utils.warnings import NoDataFoundWarning
-from simba.utils.read_write import get_fn_ext, read_df, read_config_entry
 
 
 class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):

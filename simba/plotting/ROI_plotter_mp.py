@@ -1,29 +1,26 @@
 __author__ = "Simon Nilsson"
 
 
-import pandas as pd
-import os
-import itertools
-import cv2
-import platform
-import multiprocessing
 import functools
-import numpy as np
+import itertools
+import multiprocessing
+import os
+import platform
 
-from simba.utils.enums import Formats, Paths
-from simba.utils.data import detect_bouts
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.warnings import DuplicateNamesWarning
-from simba.utils.data import create_color_palettes
-from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+import cv2
+import numpy as np
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.errors import NoFilesFoundError, DuplicationError
-from simba.utils.read_write import (
-    get_video_meta_data,
-    concatenate_videos_in_folder,
-    get_fn_ext,
-)
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+from simba.utils.data import create_color_palettes, detect_bouts
+from simba.utils.enums import Formats, Paths
+from simba.utils.errors import DuplicationError, NoFilesFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    get_video_meta_data)
+from simba.utils.warnings import DuplicateNamesWarning
 
 pd.options.mode.chained_assignment = None
 

@@ -1,10 +1,12 @@
 __author__ = "Simon Nilsson"
 
-import cv2
 import os
 from copy import deepcopy
-import numpy as np
 from typing import Union
+
+import cv2
+import numpy as np
+
 from simba.utils.read_write import get_fn_ext, get_video_meta_data
 
 

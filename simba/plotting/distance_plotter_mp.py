@@ -1,19 +1,21 @@
 __author__ = "Simon Nilsson"
 
-import numpy as np
-import multiprocessing
 import functools
-from numba import jit
+import multiprocessing
 import os
 import platform
 from typing import Dict, List
 
-from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import stdout_success, SimbaTimer
+import numpy as np
+from numba import jit
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.read_write import read_df, get_fn_ext, concatenate_videos_in_folder
+from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    read_df)
 
 
 class DistancePlotterMultiCore(ConfigReader, PlottingMixin):

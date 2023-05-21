@@ -1,48 +1,36 @@
 __author__ = "Simon Nilsson"
 
-import glob, os
-import cv2
-from pathlib import Path
-import numpy as np
-import shutil
-import re
-import subprocess
-import simba
-from simba.mixins.config_reader import ConfigReader
-from tkinter import *
-from datetime import datetime
-import time
-from PIL import Image, ImageTk
+import glob
 import multiprocessing
+import os
+import re
+import shutil
+import subprocess
+import time
+from datetime import datetime
+from pathlib import Path
+from tkinter import *
 from typing import List, Union
 
-from simba.utils.checks import (
-    check_file_exist_and_readable,
-    check_int,
-    check_if_filepath_list_is_empty,
-)
-from simba.utils.read_write import (
-    get_fn_ext,
-    get_video_meta_data,
-    find_all_videos_in_directory,
-    find_core_cnt,
-    read_config_entry,
-    read_config_file,
-)
-from simba.utils.printing import stdout_success, SimbaTimer
+import cv2
+import numpy as np
+from PIL import Image, ImageTk
+
+import simba
+from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_filepath_list_is_empty, check_int)
+from simba.utils.enums import ConfigKey, Formats, Paths
+from simba.utils.errors import (CountError, DirectoryExistError,
+                                FileExistError, InvalidInputError,
+                                NoFilesFoundError, NotDirectoryError)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_config_file)
+from simba.utils.warnings import FileExistWarning, SameInputAndOutputWarning
 from simba.video_processors.extract_frames import video_to_frames
-from simba.utils.enums import Formats, Paths, ConfigKey
-
-from simba.utils.errors import (
-    NotDirectoryError,
-    NoFilesFoundError,
-    FileExistError,
-    CountError,
-    InvalidInputError,
-    DirectoryExistError,
-)
-from simba.utils.warnings import SameInputAndOutputWarning, FileExistWarning
-
 
 MAX_FRM_SIZE = 1080, 650
 

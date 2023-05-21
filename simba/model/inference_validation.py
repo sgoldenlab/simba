@@ -1,19 +1,18 @@
 __author__ = "Simon Nilsson"
 
-from copy import deepcopy
-
-import warnings
 import os
+import warnings
+from copy import deepcopy
 from typing import Union
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from simba.utils.printing import stdout_success
-from simba.utils.read_write import read_df, write_df, get_fn_ext
-from simba.utils.checks import check_file_exist_and_readable
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
 class InferenceValidation(ConfigReader, TrainModelMixin):

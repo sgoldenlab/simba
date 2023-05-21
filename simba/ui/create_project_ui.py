@@ -1,38 +1,29 @@
 __author__ = "Simon Nilsson"
 
-import tkinter.ttk as ttk
-from tkinter import *
 import os
+import tkinter.ttk as ttk
 from copy import deepcopy
+from tkinter import *
+
 import pandas as pd
-from PIL import ImageTk
 import PIL.Image
+from PIL import ImageTk
 
 import simba
-from simba.ui.tkinter_functions import (
-    hxtScrollbar,
-    FolderSelect,
-    Entry_Box,
-    DropDownMenu,
-    CreateLabelFrameWithIcon,
-)
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.utils.enums import Formats, Options, Methods, Paths, Keys, Links
-from simba.utils.errors import DuplicationError, MissingProjectConfigEntryError
-from simba.utils.lookups import (
-    get_body_part_configurations,
-    get_bp_config_codes,
-    get_icons_paths,
-)
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import PoseResetterPopUp
-from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import (
-    CreateUserDefinedPoseConfigurationPopUp,
-)
-from simba.utils.config_creator import ProjectConfigCreator
-from simba.video_processors.video_processing import (
-    extract_frames_from_all_videos_in_directory,
-)
+from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
+    CreateUserDefinedPoseConfigurationPopUp
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FolderSelect, hxtScrollbar)
 from simba.utils.checks import check_if_dir_exists, check_str
+from simba.utils.config_creator import ProjectConfigCreator
+from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths
+from simba.utils.errors import DuplicationError, MissingProjectConfigEntryError
+from simba.utils.lookups import (get_body_part_configurations,
+                                 get_bp_config_codes, get_icons_paths)
+from simba.video_processors.video_processing import \
+    extract_frames_from_all_videos_in_directory
 
 
 class ProjectCreatorPopUp(PopUpMixin):

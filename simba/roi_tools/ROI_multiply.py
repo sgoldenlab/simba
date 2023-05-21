@@ -1,9 +1,12 @@
-import os, glob
+import glob
+import os
+
 import pandas as pd
+
+from simba.utils.enums import ConfigKey, Keys, Paths
 from simba.utils.errors import NoROIDataError
-from simba.utils.read_write import get_fn_ext, read_config_file
-from simba.utils.enums import Paths, ConfigKey, Keys
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, read_config_file
 
 
 def create_emty_df(shape_type):

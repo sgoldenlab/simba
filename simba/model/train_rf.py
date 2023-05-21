@@ -1,16 +1,19 @@
 __author__ = "Simon Nilsson"
 
-import os, ast
+import ast
+import os
 from typing import Union
 
-from simba.utils.checks import check_int, check_float, check_if_filepath_list_is_empty
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from simba.utils.read_write import read_config_entry
-from simba.utils.printing import stdout_success, SimbaTimer
+from sklearn.model_selection import train_test_split
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.enums import Options, ConfigKey, Dtypes, Methods
+from simba.utils.checks import (check_float, check_if_filepath_list_is_empty,
+                                check_int)
+from simba.utils.enums import ConfigKey, Dtypes, Methods, Options
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import read_config_entry
 
 
 class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):

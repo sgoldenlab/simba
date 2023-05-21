@@ -1,6 +1,7 @@
-from numba import jit, prange
-import numpy as np
 import time
+
+import numpy as np
+from numba import jit, prange
 
 
 @jit(nopython=True)

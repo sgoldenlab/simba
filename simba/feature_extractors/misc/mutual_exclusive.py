@@ -1,6 +1,8 @@
-import pandas as pd
-import os, glob
+import glob
+import os
 from copy import deepcopy
+
+import pandas as pd
 
 DATA_DIR = "/Users/simon/Desktop/envs/simba_dev/tests/test_data/visualization_tests/project_folder/csv/machine_results"
 SAVE_DIR = "/Users/simon/Desktop/envs/simba_dev/tests/test_data/visualization_tests/project_folder/csv/output"

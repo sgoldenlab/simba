@@ -4,24 +4,20 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-import numpy as np
-import os
-import platform
 import functools
 import multiprocessing
-from typing import Dict, Any
+import os
+import platform
+from typing import Any, Dict
+
+import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.data import plug_holes_shortest_bout
-from simba.utils.read_write import (
-    get_fn_ext,
-    read_df,
-    write_df,
-    get_video_meta_data,
-    concatenate_videos_in_folder,
-)
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    get_video_meta_data, read_df, write_df)
 
 
 class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin):

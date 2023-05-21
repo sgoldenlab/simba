@@ -1,17 +1,16 @@
-import os, glob
-import pandas as pd
+import glob
+import os
 from typing import Union
 
+import pandas as pd
+
 from simba.utils.enums import ConfigKey, Dtypes, Paths
-from simba.utils.read_write import (
-    read_config_file,
-    read_config_entry,
-    read_project_path_and_file_type,
-    read_video_info_csv,
-    get_fn_ext,
-)
 from simba.utils.lookups import get_bp_config_code_class_pairs
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (get_fn_ext, read_config_entry,
+                                    read_config_file,
+                                    read_project_path_and_file_type,
+                                    read_video_info_csv)
 
 
 def feature_extraction_runner(config_path: Union[str, os.PathLike]) -> None:

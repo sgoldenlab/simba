@@ -1,21 +1,21 @@
-import dash
-from dash.dependencies import Input, Output, State
-import dash_core_components as dcc
-import dash_html_components as html
-import plotly.graph_objects as go
-import dash_color_picker as dcp
-import dash_daq as daq
-import pandas as pd
-import numpy as np
-import h5py
-import dash_colorscales as dcs
-import random
 import json
 import math
-import statistics
 import os
+import random
+import statistics
 import sys
 
+import dash
+import dash_color_picker as dcp
+import dash_colorscales as dcs
+import dash_core_components as dcc
+import dash_daq as daq
+import dash_html_components as html
+import h5py
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+from dash.dependencies import Input, Output, State
 
 filePath = "/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/logs/SimBA_dash_storage_20230202105812.h5"
 groupPath = "None"

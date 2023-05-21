@@ -1,18 +1,20 @@
 __author__ = "Simon Nilsson"
 
-import numpy as np
+import multiprocessing
 import os
 from tkinter import *
-import multiprocessing
 
-from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.mixins.pop_up_mixin import PopUpMixin
+import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
-from simba.utils.enums import Paths, Formats, Keys, Links
-from simba.utils.read_write import get_file_name_info_in_directory
-from simba.plotting.heat_mapper_location_mp import HeatMapperLocationMultiprocess
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.heat_mapper_location import HeatmapperLocationSingleCore
+from simba.plotting.heat_mapper_location_mp import \
+    HeatMapperLocationMultiprocess
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.enums import Formats, Keys, Links, Paths
+from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class HeatmapLocationPopup(PopUpMixin, ConfigReader):

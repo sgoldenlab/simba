@@ -1,6 +1,7 @@
 ### CODE MODIFID FROM PYBURST PACKAGE  https://pypi.org/project/pybursts/
-import numpy as np
 import math
+
+import numpy as np
 
 
 def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):

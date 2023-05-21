@@ -1,13 +1,17 @@
 __author__ = "Simon Nilsson"
 
-import os, glob
-import pandas as pd
+import glob
+import os
 import re
 import struct
-import simba
 from typing import List
-from simba.utils.enums import Paths, Methods
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists
+
+import pandas as pd
+
+import simba
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.enums import Methods, Paths
 from simba.utils.read_write import get_fn_ext
 
 
@@ -66,18 +70,22 @@ def get_bp_config_code_class_pairs() -> dict:
     :return dict: Dictionary with [create ensemble settings][pose_estimation_body_parts] entry as keys and feature extraction classes as keys.
     """
 
-    from simba.feature_extractors.feature_extractor_16bp import ExtractFeaturesFrom16bps
-    from simba.feature_extractors.feature_extractor_14bp import ExtractFeaturesFrom14bps
-    from simba.feature_extractors.feature_extractor_9bp import ExtractFeaturesFrom9bps
-    from simba.feature_extractors.feature_extractor_8bp import ExtractFeaturesFrom8bps
-    from simba.feature_extractors.feature_extractor_8bps_2_animals import (
-        ExtractFeaturesFrom8bps2Animals,
-    )
-    from simba.feature_extractors.feature_extractor_7bp import ExtractFeaturesFrom7bps
-    from simba.feature_extractors.feature_extractor_4bp import ExtractFeaturesFrom4bps
-    from simba.feature_extractors.feature_extractor_user_defined import (
-        UserDefinedFeatureExtractor,
-    )
+    from simba.feature_extractors.feature_extractor_4bp import \
+        ExtractFeaturesFrom4bps
+    from simba.feature_extractors.feature_extractor_7bp import \
+        ExtractFeaturesFrom7bps
+    from simba.feature_extractors.feature_extractor_8bp import \
+        ExtractFeaturesFrom8bps
+    from simba.feature_extractors.feature_extractor_8bps_2_animals import \
+        ExtractFeaturesFrom8bps2Animals
+    from simba.feature_extractors.feature_extractor_9bp import \
+        ExtractFeaturesFrom9bps
+    from simba.feature_extractors.feature_extractor_14bp import \
+        ExtractFeaturesFrom14bps
+    from simba.feature_extractors.feature_extractor_16bp import \
+        ExtractFeaturesFrom16bps
+    from simba.feature_extractors.feature_extractor_user_defined import \
+        UserDefinedFeatureExtractor
 
     return {
         "16": ExtractFeaturesFrom16bps,

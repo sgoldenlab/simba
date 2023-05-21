@@ -1,9 +1,10 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
 import os
-import numpy as np
 from typing import Union
+
+import numpy as np
+import pandas as pd
 
 try:
     from typing import Literal
@@ -11,12 +12,13 @@ except:
     from typing_extensions import Literal
 
 from itertools import combinations
+
 from simba.feature_extractors.perimeter_jit import jitted_hull
-from simba.utils.enums import Formats, Options
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.enums import Formats, Options
+from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 

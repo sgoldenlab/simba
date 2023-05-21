@@ -1,10 +1,12 @@
 __author__ = "Simon Nilsson"
 
-from scipy.signal import savgol_filter
-import glob, os
+import glob
+import os
+import shutil
+
 import numpy as np
 import pandas as pd
-import shutil
+from scipy.signal import savgol_filter
 
 try:
     from typing import Literal
@@ -12,17 +14,12 @@ except ImportError:
     from typing_extensions import Literal
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import (
-    read_df,
-    write_df,
-    get_video_meta_data,
-    get_fn_ext,
-    find_video_of_file,
-)
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Methods
 from simba.utils.errors import NoFilesFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df, write_df)
 
 
 class Interpolate(ConfigReader):

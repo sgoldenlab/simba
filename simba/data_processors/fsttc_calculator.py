@@ -1,17 +1,18 @@
 __author__ = "Simon Nilsson"
 
-import os
-import pandas as pd
 import itertools
-import seaborn as sns
+import os
 from typing import List, Union
 
+import pandas as pd
+import seaborn as sns
+
+from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.data import detect_bouts
+from simba.utils.errors import CountError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.errors import CountError
-from simba.mixins.config_reader import ConfigReader
 
 
 class FSTTCCalculator(ConfigReader):

@@ -1,26 +1,27 @@
 __author__ = "Simon Nilsson"
 
 
+import itertools
 import os
+from copy import deepcopy
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from copy import deepcopy
-from scipy.stats import f_oneway
+import seaborn as sns
 import shap
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
-from statsmodels.stats.libqsturng import psturng
+from scipy.stats import f_oneway
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
-import seaborn as sns
-import matplotlib.pyplot as plt
-import itertools
+from statsmodels.stats.libqsturng import psturng
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
-from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.enums import Methods
-from simba.utils.printing import stdout_success, SimbaTimer
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import Methods
+from simba.utils.printing import SimbaTimer, stdout_success
 
 FEATURE_NAME = "FEATURE NAME"
 FEATURE_IMPORTANCE = "IMPORTANCE"

@@ -1,26 +1,23 @@
 __author__ = "Simon Nilsson"
 
-import simba
+import os
+from subprocess import PIPE, Popen
 from tkinter import *
 from tkinter import filedialog
-from PIL import Image, ImageTk
-from subprocess import Popen, PIPE
-import os
-from tabulate import tabulate
+
 import cv2
 import pandas as pd
-from simba.utils.checks import check_int, check_file_exist_and_readable
-from simba.utils.read_write import (
-    read_config_entry,
-    get_video_meta_data,
-    get_fn_ext,
-    read_df,
-    write_df,
-    get_all_clf_names,
-)
-from simba.utils.errors import FrameRangeError, AdvancedLabellingError
-from simba.utils.printing import stdout_success
+from PIL import Image, ImageTk
+from tabulate import tabulate
+
+import simba
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import check_file_exist_and_readable, check_int
+from simba.utils.errors import AdvancedLabellingError, FrameRangeError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_df, write_df)
 
 
 class AdvancedLabellingInterface(ConfigReader):

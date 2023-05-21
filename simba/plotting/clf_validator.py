@@ -1,24 +1,21 @@
 __author__ = "Simon Nilsson"
 
-import numpy as np
-from copy import deepcopy
 import os
+from copy import deepcopy
+from typing import List, Optional, Tuple
+
 import cv2
-from typing import Tuple, List, Optional
+import numpy as np
 
-
-from simba.utils.enums import Formats
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.errors import NoSpecifiedOutputError, NoFilesFoundError
-from simba.utils.warnings import NoDataFoundWarning
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.checks import (
-    check_int,
-    check_that_column_exist,
-    check_if_filepath_list_is_empty,
-)
-from simba.utils.read_write import get_video_meta_data, get_fn_ext, read_df
+from simba.utils.checks import (check_if_filepath_list_is_empty, check_int,
+                                check_that_column_exist)
 from simba.utils.data import detect_bouts
+from simba.utils.enums import Formats
+from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
+from simba.utils.warnings import NoDataFoundWarning
 
 
 class ClassifierValidationClips(ConfigReader):

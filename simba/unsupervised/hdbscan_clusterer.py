@@ -1,27 +1,28 @@
 __author__ = "Simon Nilsson"
 
 try:
-    from cuml.cluster.hdbscan import HDBSCAN
     from cuml.cluster import hdbscan
+    from cuml.cluster.hdbscan import HDBSCAN
 
     gpu_flag = True
 except ModuleNotFoundError:
     from hdbscan import HDBSCAN
     import hdbscan
 
+import glob
 import itertools
-import os, glob
+import os
 import random
+
 import pandas as pd
-from simba.utils.checks import (
-    check_if_dir_exists,
-    check_file_exist_and_readable,
-    check_if_filepath_list_is_empty,
-)
-from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.printing import stdout_success, SimbaTimer
+
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.unsupervised.umap_embedder import UmapEmbedder
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_filepath_list_is_empty)
+from simba.utils.printing import SimbaTimer, stdout_success
 
 
 class HDBSCANClusterer(UnsupervisedMixin):

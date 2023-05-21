@@ -1,25 +1,22 @@
 from __future__ import division
-import numpy as np
+
 import math
+from itertools import combinations
 
+import numpy as np
 import pandas as pd
-
-from simba.read_config_unit_tests import (
-    read_project_path_and_file_type,
-    check_if_filepath_list_is_empty,
-)
+from joblib import Parallel, delayed
+from numba import jit, prange
 from scipy.spatial import ConvexHull
 from scipy.spatial.qhull import QhullError
-from numba import jit, prange
+
 from simba.drop_bp_cords import *
-from simba.feature_extractors.unit_tests import (
-    read_video_info,
-    check_minimum_roll_windows,
-)
-from simba.drop_bp_cords import get_fn_ext, getBpNames, getBpHeaders
+from simba.drop_bp_cords import get_fn_ext, getBpHeaders, getBpNames
+from simba.feature_extractors.unit_tests import (check_minimum_roll_windows,
+                                                 read_video_info)
 from simba.misc_tools import SimbaTimer, detect_bouts
-from itertools import combinations
-from joblib import Parallel, delayed
+from simba.read_config_unit_tests import (check_if_filepath_list_is_empty,
+                                          read_project_path_and_file_type)
 
 TAIL_BP_NAMES = ["objectA", "peduncle_base"]
 CENTER_BP_NAMES = ["midpoint"]

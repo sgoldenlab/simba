@@ -1,15 +1,17 @@
 __author__ = "Simon Nilsson"
 
-import os
-import cv2
 import itertools
+import os
+
+import cv2
 import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.printing import stdout_success
-from simba.utils.enums import Formats
-from simba.utils.read_write import get_video_meta_data, get_fn_ext, read_df
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import Formats
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
 
 
 class ROIfeatureVisualizer(ConfigReader):

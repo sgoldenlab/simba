@@ -1,14 +1,18 @@
 __author__ = "Simon Nilsson"
 
-import os, glob
-import pandas as pd
+import glob
+import os
+
 import numpy as np
+import pandas as pd
 from numba import jit, prange
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import read_df, write_df, get_fn_ext, read_config_entry
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.enums import ConfigKey, Dtypes
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.enums import ConfigKey, Dtypes
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (get_fn_ext, read_config_entry, read_df,
+                                    write_df)
 
 
 class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):

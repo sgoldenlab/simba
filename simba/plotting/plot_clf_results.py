@@ -1,27 +1,26 @@
 __author__ = "Simon Nilsson"
 
 
-import os, glob
+import glob
+import os
 from copy import deepcopy
+from typing import Dict, List, Optional, Union
+
 import cv2
 import numpy as np
 from PIL import Image
-from typing import Union, Dict, Optional, List
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int)
+from simba.utils.data import create_color_palette
+from simba.utils.enums import ConfigKey, Dtypes, Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import stdout_success
-from simba.utils.enums import ConfigKey, Formats, Dtypes
-from simba.utils.read_write import (
-    get_fn_ext,
-    read_df,
-    get_video_meta_data,
-    read_config_entry,
-)
-from simba.utils.checks import check_file_exist_and_readable, check_float, check_int
-from simba.utils.data import create_color_palette
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_config_entry, read_df)
 
 
 class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin):

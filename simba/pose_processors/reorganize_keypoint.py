@@ -1,14 +1,17 @@
 __author__ = "Simon Nilsson"
 
-import glob, os
-import pandas as pd
+import glob
+import os
 from collections import OrderedDict
 from datetime import datetime
 from typing import Optional
 
-from simba.utils.checks import check_if_filepath_list_is_empty, check_if_dir_exists
-from simba.utils.printing import stdout_success
+import pandas as pd
+
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_filepath_list_is_empty)
 from simba.utils.enums import Formats
+from simba.utils.printing import stdout_success
 
 
 class KeypointReorganizer(object):

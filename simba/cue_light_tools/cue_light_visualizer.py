@@ -1,16 +1,17 @@
 __author__ = "Simon Nilsson"
 
-import itertools, os
-import pandas as pd
-import cv2
+import itertools
+import os
 from typing import List, Union
 
+import cv2
+import pandas as pd
 
-from simba.utils.errors import NoSpecifiedOutputError, NoROIDataError
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import read_df, get_fn_ext, get_video_meta_data
-from simba.utils.printing import stdout_success
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.errors import NoROIDataError, NoSpecifiedOutputError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
 
 
 class CueLightVisualizer(ConfigReader):

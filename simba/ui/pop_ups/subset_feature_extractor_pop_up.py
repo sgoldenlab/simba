@@ -2,16 +2,13 @@ __author__ = "Simon Nilsson"
 
 from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.enums import Links
-from simba.ui.tkinter_functions import (
-    DropDownMenu,
-    CreateLabelFrameWithIcon,
-    FolderSelect,
-)
-from simba.utils.checks import check_if_dir_exists
 from simba.feature_extractors.feature_subsets import FeatureSubsetsCalculator
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FolderSelect)
+from simba.utils.checks import check_if_dir_exists
+from simba.utils.enums import Links
 
 
 class FeatureSubsetExtractorPopUp(PopUpMixin, ConfigReader):

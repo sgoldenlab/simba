@@ -1,19 +1,17 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import os
+from tkinter import *
 
-from simba.utils.enums import ConfigKey, Paths, Formats
-from simba.utils.read_write import (
-    read_config_entry,
-    read_config_file,
-    get_all_clf_names,
-)
+from simba.data_processors.pup_retrieval_calculator import \
+    PupRetrieverCalculator
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, hxtScrollbar
-from simba.data_processors.pup_retrieval_calculator import PupRetrieverCalculator
 from simba.utils.checks import check_float, check_int
+from simba.utils.enums import ConfigKey, Formats, Paths
 from simba.utils.errors import NoFilesFoundError
+from simba.utils.read_write import (get_all_clf_names, read_config_entry,
+                                    read_config_file)
 
 
 class PupRetrievalPopUp(object):

@@ -1,11 +1,11 @@
 import os
 from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.plotting.ez_lineplot import draw_line_plot
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.read_write import find_all_videos_in_directory
-from simba.plotting.ez_lineplot import draw_line_plot
 
 
 class QuickLineplotPopup(PopUpMixin, ConfigReader):

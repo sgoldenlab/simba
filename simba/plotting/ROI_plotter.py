@@ -1,19 +1,20 @@
 __author__ = "Simon Nilsson"
 
-import os
 import itertools
+import os
+
 import cv2
 import numpy as np
-from simba.utils.enums import Paths, Formats
-from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.errors import DuplicationError
-from simba.utils.warnings import DuplicateNamesWarning
-from simba.utils.errors import NoFilesFoundError
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import get_fn_ext, get_video_meta_data
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.utils.data import create_color_palettes
+from simba.utils.enums import Formats, Paths
+from simba.utils.errors import DuplicationError, NoFilesFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, get_video_meta_data
+from simba.utils.warnings import DuplicateNamesWarning
 
 
 class ROIPlot(ConfigReader, PlottingMixin):

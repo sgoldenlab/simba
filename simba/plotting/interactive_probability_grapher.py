@@ -1,15 +1,17 @@
 __author__ = "Simon Nilsson"
 
-import matplotlib.pyplot as plt
 import os
 import threading
-from simba.utils.enums import Paths
 from copy import copy
+
+import matplotlib.pyplot as plt
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.errors import InvalidInputError, ColumnNotFoundError
-from simba.utils.checks import check_file_exist_and_readable
 from simba.plotting.tools.tkinter_tools import InteractiveVideoPlotterWindow
-from simba.utils.read_write import read_df, get_fn_ext
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import Paths
+from simba.utils.errors import ColumnNotFoundError, InvalidInputError
+from simba.utils.read_write import get_fn_ext, read_df
 
 
 class InteractiveProbabilityGrapher(ConfigReader):

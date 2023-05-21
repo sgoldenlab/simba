@@ -1,11 +1,13 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
 from typing import List
-from joblib.externals.loky import get_reusable_executor
+
+import pandas as pd
 from joblib import Parallel, delayed
-from simba.utils.read_write import read_video_info
+from joblib.externals.loky import get_reusable_executor
+
 from simba.utils.data import detect_bouts
+from simba.utils.read_write import read_video_info
 
 
 def bout_aggregator(

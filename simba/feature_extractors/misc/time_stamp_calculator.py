@@ -1,7 +1,9 @@
-import pandas as pd
-import os, glob
-from simba.misc_tools import detect_bouts, get_fn_ext
+import glob
+import os
 
+import pandas as pd
+
+from simba.misc_tools import detect_bouts, get_fn_ext
 
 DATA_FOLDER = "/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/csv/machine_results"
 FPS = 25

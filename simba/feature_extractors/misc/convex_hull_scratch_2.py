@@ -1,12 +1,13 @@
-import numba
-import numpy as np
-from numba import njit, types, typeof, prange
-from numba.extending import overload, register_jitable
-from numba.core.errors import TypingError
-from numba.typed import List
-from scipy.spatial import ConvexHull
 import time
 from functools import cmp_to_key
+
+import numba
+import numpy as np
+from numba import njit, prange, typeof, types
+from numba.core.errors import TypingError
+from numba.extending import overload, register_jitable
+from numba.typed import List
+from scipy.spatial import ConvexHull
 
 
 @overload(ConvexHull)

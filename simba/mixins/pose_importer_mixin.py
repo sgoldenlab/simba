@@ -1,27 +1,23 @@
 __author__ = "Simon Nilsson"
 
-import os
-from datetime import datetime
-import cv2
-from numba import jit, prange
-import numpy as np
-from copy import deepcopy
-from collections import defaultdict
 import itertools
-import scipy.io as sio
-import h5py
-from typing import List, Union, Optional
+import os
+from collections import defaultdict
+from copy import deepcopy
+from datetime import datetime
+from typing import List, Optional, Union
 
+import cv2
+import h5py
+import numpy as np
 import pandas as pd
-from simba.utils.errors import (
-    NoDataError,
-    NoFilesFoundError,
-    IntegerError,
-    InvalidInputError,
-    CountError,
-)
-from simba.utils.read_write import get_fn_ext
+import scipy.io as sio
+from numba import jit, prange
+
 from simba.utils.enums import ConfigKey
+from simba.utils.errors import (CountError, IntegerError, InvalidInputError,
+                                NoDataError, NoFilesFoundError)
+from simba.utils.read_write import get_fn_ext
 
 
 class PoseImporterMixin(object):

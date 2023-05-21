@@ -1,17 +1,19 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import multiprocessing
+from tkinter import *
 
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_if_filepath_list_is_empty, check_float
-from simba.utils.enums import Keys, Links, Formats
-from simba.ui.tkinter_functions import DropDownMenu, CreateLabelFrameWithIcon, Entry_Box
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext
-from simba.utils.printing import stdout_success
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ROI_plotter import ROIPlot
 from simba.plotting.ROI_plotter_mp import ROIPlotMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
+from simba.utils.checks import check_float, check_if_filepath_list_is_empty
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
 
 
 class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):

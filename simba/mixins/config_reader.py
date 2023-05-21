@@ -1,44 +1,33 @@
 __author__ = "Simon Nilsson"
 
 
-from datetime import datetime
-import shutil
-import logging
-from configparser import ConfigParser
-import os, glob
-import pandas as pd
+import glob
 import itertools
+import logging
+import os
+import shutil
+from configparser import ConfigParser
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple, Union
+
 import cv2
-from typing import List, Optional, Tuple, Union, Dict
+import pandas as pd
 
-
-from simba.utils.enums import Paths, ConfigKey, Dtypes, Defaults, Keys
-from simba.utils.lookups import get_emojis, get_color_dict
-from simba.utils.data import create_color_palettes
-from simba.utils.errors import (
-    NoROIDataError,
-    DataHeaderError,
-    NoFilesFoundError,
-    MissingProjectConfigEntryError,
-    NotDirectoryError,
-    InvalidInputError,
-    DuplicationError,
-    ParametersFileError,
-)
-from simba.utils.warnings import (
-    NoFileFoundWarning,
-    BodypartColumnNotFoundWarning,
-    InvalidValueWarning,
-)
-from simba.utils.read_write import (
-    read_project_path_and_file_type,
-    get_fn_ext,
-    SimbaTimer,
-    read_config_file,
-    find_core_cnt,
-    get_all_clf_names,
-)
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.data import create_color_palettes
+from simba.utils.enums import ConfigKey, Defaults, Dtypes, Keys, Paths
+from simba.utils.errors import (DataHeaderError, DuplicationError,
+                                InvalidInputError,
+                                MissingProjectConfigEntryError,
+                                NoFilesFoundError, NoROIDataError,
+                                NotDirectoryError, ParametersFileError)
+from simba.utils.lookups import get_color_dict, get_emojis
+from simba.utils.read_write import (SimbaTimer, find_core_cnt,
+                                    get_all_clf_names, get_fn_ext,
+                                    read_config_file,
+                                    read_project_path_and_file_type)
+from simba.utils.warnings import (BodypartColumnNotFoundWarning,
+                                  InvalidValueWarning, NoFileFoundWarning)
 
 
 class ConfigReader(object):

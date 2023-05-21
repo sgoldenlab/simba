@@ -1,8 +1,8 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy import stats
-from statsmodels.stats.diagnostic import lilliefors
 from scipy.signal import find_peaks
+from statsmodels.stats.diagnostic import lilliefors
 
 
 def rolling_frequentist_distribution_tests(data: np.array, feature_name: str, fps: int):

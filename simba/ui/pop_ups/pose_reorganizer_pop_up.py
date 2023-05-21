@@ -2,15 +2,11 @@ __author__ = "Simon Nilsson"
 
 from tkinter import *
 
-from simba.ui.tkinter_functions import (
-    hxtScrollbar,
-    FolderSelect,
-    CreateLabelFrameWithIcon,
-    DropDownMenu,
-)
-from simba.utils.enums import Keys, Links, Formats
-from simba.pose_processors.reorganize_keypoint import KeypointReorganizer
 from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.pose_processors.reorganize_keypoint import KeypointReorganizer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FolderSelect, hxtScrollbar)
+from simba.utils.enums import Formats, Keys, Links
 
 
 class PoseReorganizerPopUp(PopUpMixin):

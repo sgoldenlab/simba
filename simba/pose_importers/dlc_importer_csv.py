@@ -1,27 +1,24 @@
 __author__ = "Simon Nilsson"
 
+import glob
+import os
 import shutil
-import os, glob
+from typing import List, Union
+
 import pandas as pd
-from typing import Union, List
 
 from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_filepath_list_is_empty, check_int)
+from simba.utils.data import smooth_data_gaussian, smooth_data_savitzky_golay
 from simba.utils.enums import Methods
-from simba.utils.errors import NoFilesFoundError, FileExistError
-from simba.utils.read_write import (
-    get_fn_ext,
-    read_config_file,
-    read_project_path_and_file_type,
-    get_number_of_header_columns_in_df,
-)
-from simba.utils.checks import (
-    check_file_exist_and_readable,
-    check_if_filepath_list_is_empty,
-    check_int,
-    check_if_dir_exists,
-)
-from simba.utils.data import smooth_data_savitzky_golay, smooth_data_gaussian
+from simba.utils.errors import FileExistError, NoFilesFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (get_fn_ext,
+                                    get_number_of_header_columns_in_df,
+                                    read_config_file,
+                                    read_project_path_and_file_type)
 
 
 def import_dlc_csv(config_path: Union[str, os.PathLike], source: str) -> List[str]:

@@ -1,30 +1,23 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
-import os
-import pandas as pd
 import collections
+import os
+from tkinter import *
 
-from simba.utils.read_write import (
-    get_fn_ext,
-    get_video_meta_data,
-    read_config_entry,
-    find_all_videos_in_project,
-)
-from simba.utils.enums import Paths, ConfigKey, Dtypes, Keys, Links, Formats
-from simba.video_processors.px_to_mm import get_coordinates_nilsson
-from simba.ui.tkinter_functions import hxtScrollbar, CreateLabelFrameWithIcon
-from simba.utils.printing import stdout_success
-from simba.utils.errors import (
-    NoFilesFoundError,
-    ParametersFileError,
-    InvalidInputError,
-    PermissionError,
-)
-from simba.utils.warnings import DuplicateNamesWarning, InvalidValueWarning
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.utils.read_write import read_video_info_csv
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, hxtScrollbar
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Links, Paths
+from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
+                                ParametersFileError, PermissionError)
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (find_all_videos_in_project, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_video_info_csv)
+from simba.utils.warnings import DuplicateNamesWarning, InvalidValueWarning
+from simba.video_processors.px_to_mm import get_coordinates_nilsson
 
 
 class VideoInfoTable(ConfigReader, PopUpMixin):

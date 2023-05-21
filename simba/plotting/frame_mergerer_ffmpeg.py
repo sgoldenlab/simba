@@ -1,7 +1,8 @@
 __author__ = "Simon Nilsson"
 
 import os
-import subprocess, shutil
+import shutil
+import subprocess
 from datetime import datetime
 from typing import Dict, Optional
 
@@ -10,16 +11,12 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-from simba.utils.read_write import (
-    get_fn_ext,
-    remove_a_folder,
-    get_video_meta_data,
-    read_config_file,
-    read_config_entry,
-)
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.enums import Paths
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.enums import Paths
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_config_entry, read_config_file,
+                                    remove_a_folder)
 
 
 class FrameMergererFFmpeg(ConfigReader):

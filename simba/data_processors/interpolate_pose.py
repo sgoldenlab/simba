@@ -1,7 +1,8 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
 
 

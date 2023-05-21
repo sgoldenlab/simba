@@ -1,22 +1,22 @@
 __author__ = "Simon Nilsson"
 
-import pandas as pd
 import os
-import cv2
-import numpy as np
 import random
 
-from simba.data_processors.directing_other_animals_calculator import (
-    DirectingOtherAnimalsAnalyzer,
-)
-from simba.utils.enums import Formats
+import cv2
+import numpy as np
+import pandas as pd
+
+from simba.data_processors.directing_other_animals_calculator import \
+    DirectingOtherAnimalsAnalyzer
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.warnings import NoDataFoundWarning
-from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import read_df, get_video_meta_data, get_fn_ext
 from simba.utils.data import create_color_palettes
+from simba.utils.enums import Formats
+from simba.utils.lookups import get_color_dict
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
+from simba.utils.warnings import NoDataFoundWarning
 
 
 class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):

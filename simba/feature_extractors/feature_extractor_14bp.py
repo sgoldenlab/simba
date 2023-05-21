@@ -1,17 +1,19 @@
 __author__ = "Simon Nilsson"
 
-import os
-import pandas as pd
-from copy import deepcopy
-import numpy as np
-from collections import defaultdict
 import math
-from simba.utils.enums import Formats
-from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.config_reader import ConfigReader
+import os
+from collections import defaultdict
+from copy import deepcopy
+
+import numpy as np
+import pandas as pd
+
 from simba.feature_extractors.perimeter_jit import jitted_hull
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import get_fn_ext, write_df, read_df
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.enums import Formats
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
 class ExtractFeaturesFrom14bps(ConfigReader, FeatureExtractionMixin):
