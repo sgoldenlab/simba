@@ -31,6 +31,7 @@ jobs:
         pip install flake8 pytest black pytest-cov
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install simba-uw-tf-dev --no-deps
-    - name: Test with pytest
+    - name: Test with pytest and black
       run: |
         pytest -cov
+        black .
