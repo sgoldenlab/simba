@@ -4,6 +4,7 @@ import pandas as pd
 from copy import deepcopy
 import os, glob
 from simba.mixins.config_reader import ConfigReader
+from simba.third_party_label_appenders.tools import is_new_boris_version
 from simba.utils.read_write import get_fn_ext, read_df, write_df
 from simba.utils.checks import check_if_dir_exists, check_if_filepath_list_is_empty
 from simba.utils.printing import stdout_success
@@ -11,6 +12,7 @@ from simba.utils.errors import (ThirdPartyAnnotationOverlapError,
                                 ThirdPartyAnnotationEventCountError)
 from simba.utils.warnings import (ThirdPartyAnnotationsOutsidePoseEstimationDataWarning,
                                   ThirdPartyAnnotationsInvalidFileFormatWarning)
+
 
 class BorisAppender(ConfigReader):
 
@@ -62,10 +64,20 @@ class BorisAppender(ConfigReader):
             try:
                 _, video_name, _ = get_fn_ext(file_path)
                 boris_df = pd.read_csv(file_path)
-                index = (boris_df[boris_df['Observation id'] == "Time"].index.values)
-                boris_df = pd.read_csv(file_path, skiprows=range(0, int(index + 1)))
-                boris_df = boris_df.loc[:, ~boris_df.columns.str.contains('^Unnamed')]
-                boris_df.drop(['Behavioral category', 'Comment', 'Subject'], axis=1, inplace=True)
+                if not is_new_boris_version(boris_df):
+                    index = (boris_df[boris_df['Observation id'] == "Time"].index.values)
+                    boris_df = pd.read_csv(file_path, skiprows=range(0, int(index + 1)))
+                    boris_df = boris_df.loc[:, ~boris_df.columns.str.contains('^Unnamed')]
+                    boris_df.drop(['Behavioral category', 'Comment', 'Subject'], axis=1, inplace=True)
+                else:
+                    target_cols = ['Time', 'Media file path', 'Total length', 'FPS', 'Behavior', 'Status']
+                    boris_df.rename(columns={
+                        'Media file name': 'Media file path',
+                        'Media duration (s)': 'Total length',
+                        'Behavior type': 'Status'},
+                        inplace=True
+                    )
+                    boris_df = boris_df.reindex(columns=target_cols)
                 _, video_base_name, _ = get_fn_ext(boris_df.loc[0, 'Media file path'])
                 boris_df['Media file path'] = video_base_name
                 self.master_boris_df_list.append(boris_df)
