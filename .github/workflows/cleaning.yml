@@ -20,6 +20,6 @@ jobs:
         with:
           author_name: ${{ github.actor }}
           author_email: ${{ github.actor }}@users.noreply.github.com
-          message: "Format code with black"
+          message: "cleaned"
           add: "."
           branch: ${{ github.ref }}
