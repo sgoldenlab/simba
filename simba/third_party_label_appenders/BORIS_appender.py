@@ -20,7 +20,7 @@ class BorisAppender(ConfigReader):
     Append BORIS human annotations onto featurized pose-estimation data.
 
     :param str config_path: path to SimBA project config file in Configparser format
-    :param str boris_folder: path to folder holding BORIS data files is CSV format
+    :param str data_dir: path to folder holding BORIS data files is CSV format
 
     .. note::
        `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
@@ -28,7 +28,7 @@ class BorisAppender(ConfigReader):
 
     Examples
     ----------
-    >>> boris_appender = BorisAppender(config_path='MyProjectConfigPath', boris_folder=r'BorisDataFolder')
+    >>> boris_appender = BorisAppender(config_path='MyProjectConfigPath', data_dir=r'BorisDataFolder')
     >>> boris_appender.create_boris_master_file()
     >>> boris_appender.run()
 
@@ -40,14 +40,14 @@ class BorisAppender(ConfigReader):
 
     def __init__(self,
                  config_path: str,
-                 boris_folder: str):
+                 data_dir: str):
 
         super().__init__(config_path=config_path)
-        self.boris_dir = boris_folder
+        self.boris_dir = data_dir
         self.boris_files_found = glob.glob(self.boris_dir + '/*.csv')
-        check_if_dir_exists(boris_folder)
+        check_if_dir_exists(data_dir)
         check_if_filepath_list_is_empty(filepaths=self.boris_files_found,
-                                        error_msg=f'SIMBA ERROR: 0 BORIS CSV files found in {boris_folder} directory')
+                                        error_msg=f'SIMBA ERROR: 0 BORIS CSV files found in {data_dir} directory')
         print(f'Processing BORIS for {str(len(self.feature_file_paths))} file(s)...')
 
     def create_boris_master_file(self):
@@ -152,8 +152,8 @@ class BorisAppender(ConfigReader):
         stdout_success(msg='BORIS annotations appended to dataset and saved in project_folder/csv/targets_inserted directory', elapsed_time=self.timer.elapsed_time_str)
 
     def __save_boris_annotations(self):
-        save_path = os.path.join(self.targets_folder, self.video_name + '.' + self.file_type)
-        write_df(self.out_df, self.file_type, save_path)
+        self.save_path = os.path.join(self.targets_folder, self.video_name + '.' + self.file_type)
+        write_df(self.out_df, self.file_type, self.save_path)
         print('Saved BORIS annotations for video {}...'.format(self.video_name))
 
 # test = BorisAppender(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
