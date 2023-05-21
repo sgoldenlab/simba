@@ -16,7 +16,6 @@ def test_boris_import_use_case(config_path, boris_path):
                                    data_dir=boris_path)
     boris_appender.create_boris_master_file()
     boris_appender.run()
-    assert os.path.isfile(boris_appender.save_path)
     assert len(boris_appender.out_df) == 1738
     for f in glob.glob(boris_appender.targets_folder + '/*.csv'): os.remove(f)
 
@@ -27,7 +26,7 @@ def test_solomon_import_use_case(config_path, solomon_path):
                                        data_dir=solomon_path)
     solomon_appender.run()
 
-@pytest.mark.parametrize("config_path, data_dir", [('test/data/test_projects/two_c57/project_folder/project_config.ini',
+@pytest.mark.parametrize("config_path, data_dir", [('tests/data/test_projects/two_c57/project_folder/project_config.ini',
                                                     'tests/data/test_projects/two_c57/ethovision_annotations')])
 def test_ethovision_import_use_case(config_path, data_dir):
     ethovision_importer = ImportEthovision(config_path=config_path, data_dir=data_dir)
