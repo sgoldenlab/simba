@@ -8,7 +8,7 @@ FEATURE_EXTRACTION_CLASSES = get_bp_config_code_class_pairs()
 
 class TestFeatureExtractors(object):
 
-    @pytest.fixture(params=['../test/data/test_projects/mouse_open_field/project_folder/project_config.ini'])
+    @pytest.fixture(params=['tests/data/test_projects/mouse_open_field/project_folder/project_config.ini'])
     def config_path_arg(self, request):
         return request
 
@@ -16,10 +16,10 @@ class TestFeatureExtractors(object):
                          config_path_arg):
         config_path = config_path_arg.param
         config = read_config_file(config_path)
-#         animal_no = 1
-#         pose_setting = '4'
-#         print(config)
-#         #animal_cnt = read_config_entry(config, 'General settings', 'animal_no', 'int')
+        animal_no = 1
+        pose_setting = '4'
+        print(config)
+        #animal_cnt = read_config_entry(config, 'General settings', 'animal_no', 'int')
 #         #pose_setting = read_config_entry(config, 'create ensemble settings', 'pose_estimation_body_parts', 'str')
 #         if pose_setting == 'user_defined':
 #             feature_extractor = FEATURE_EXTRACTION_CLASSES[pose_setting](config_path=config_path)
