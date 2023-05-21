@@ -4,6 +4,7 @@ import pandas as pd
 from copy import deepcopy
 import os, glob
 from simba.mixins.config_reader import ConfigReader
+from simba.third_party_label_appenders.tools import is_new_boris_version
 from simba.utils.read_write import get_fn_ext, read_df, write_df
 from simba.utils.checks import check_if_dir_exists, check_if_filepath_list_is_empty
 from simba.utils.printing import stdout_success
@@ -11,19 +12,6 @@ from simba.utils.errors import (ThirdPartyAnnotationOverlapError,
                                 ThirdPartyAnnotationEventCountError)
 from simba.utils.warnings import (ThirdPartyAnnotationsOutsidePoseEstimationDataWarning,
                                   ThirdPartyAnnotationsInvalidFileFormatWarning)
-
-
-def _is_new_boris_version(pd_df: pd.DataFrame):
-    """
-    Check the format of a boris annotation file.
-
-    In the new version, additional column names are present, while
-    others have slightly different name. Here, we check for the presence
-    of a column name present only in the newer version.
-
-    :return: True if newer version
-    """
-    return 'Media file name' in list(pd_df.columns)
 
 
 class BorisAppender(ConfigReader):
@@ -76,7 +64,7 @@ class BorisAppender(ConfigReader):
             try:
                 _, video_name, _ = get_fn_ext(file_path)
                 boris_df = pd.read_csv(file_path)
-                if not _is_new_boris_version(boris_df):
+                if not is_new_boris_version(boris_df):
                     index = (boris_df[boris_df['Observation id'] == "Time"].index.values)
                     boris_df = pd.read_csv(file_path, skiprows=range(0, int(index + 1)))
                     boris_df = boris_df.loc[:, ~boris_df.columns.str.contains('^Unnamed')]

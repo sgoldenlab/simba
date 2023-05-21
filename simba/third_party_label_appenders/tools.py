@@ -19,6 +19,17 @@ def observer_timestamp_corrector(timestamps: List[str]) -> List[str]:
             corrected_ts.append(f'{h}:{m}:{s}.{"0" * missing_fractions}')
     return corrected_ts
 
+def is_new_boris_version(pd_df: pd.DataFrame):
+    """
+    Check the format of a boris annotation file.
+
+    In the new version, additional column names are present, while
+    others have slightly different name. Here, we check for the presence
+    of a column name present only in the newer version.
+
+    :return: True if newer version
+    """
+    return 'Media file name' in list(pd_df.columns)
 
 def read_boris_annotation_files(data_paths: List[str],
                                 error_setting: str,
@@ -31,24 +42,12 @@ def read_boris_annotation_files(data_paths: List[str],
     BEHAVIOR = 'Behavior'
     STATUS = 'Status'
 
-    def _is_new_boris_version(pd_df: pd.DataFrame):
-        """
-        Check the format of a boris annotation file.
-
-        In the new version, additional column names are present, while
-        others have slightly different name. Here, we check for the presence
-        of a column name present only in the newer version.
-
-        :return: True if newer version
-        """
-        return 'Media file name' in list(pd_df.columns)
-
     dfs = {}
     for file_cnt, file_path in enumerate(data_paths):
         _, video_name, _ = get_fn_ext(file_path)
         boris_df = pd.read_csv(file_path)
         try:
-            if not _is_new_boris_version(boris_df):
+            if not is_new_boris_version(boris_df):
                 expected_headers = [TIME, MEDIA_FILE_PATH, BEHAVIOR, STATUS]
                 start_idx = (boris_df[boris_df[OBSERVATION_ID] == TIME].index.values)
                 df = pd.read_csv(file_path, skiprows=range(0, int(start_idx + 1)))[expected_headers]
