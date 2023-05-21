@@ -34,4 +34,5 @@ jobs:
     - name: Test with pytest and black
       run: |
         pytest -cov
+        cd simba
         black .
