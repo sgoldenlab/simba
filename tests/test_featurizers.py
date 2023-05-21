@@ -19,8 +19,8 @@ class TestFeatureExtractors(object):
         animal_no = 1
         pose_setting = '4'
         print(config)
-        #animal_cnt = read_config_entry(config, 'General settings', 'animal_no', 'int')
-#         #pose_setting = read_config_entry(config, 'create ensemble settings', 'pose_estimation_body_parts', 'str')
+        animal_cnt = read_config_entry(config, 'General settings', 'animal_no', 'int')
+        pose_setting = read_config_entry(config, 'create ensemble settings', 'pose_estimation_body_parts', 'str')
 #         if pose_setting == 'user_defined':
 #             feature_extractor = FEATURE_EXTRACTION_CLASSES[pose_setting](config_path=config_path)
 #         elif pose_setting == '8':
