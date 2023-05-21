@@ -13,7 +13,7 @@ from simba.third_party_label_appenders.deepethogram_importer import DeepEthogram
                                                       'tests/data/test_projects/two_c57/boris_annotations')])
 def test_boris_import_use_case(config_path, boris_path):
     boris_appender = BorisAppender(config_path=config_path,
-                                   boris_folder=boris_path)
+                                   data_dir=boris_path)
     boris_appender.create_boris_master_file()
     boris_appender.run()
     assert os.path.isfile(boris_appender.save_path)
