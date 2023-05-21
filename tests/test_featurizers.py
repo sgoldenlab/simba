@@ -17,7 +17,7 @@ class TestFeatureExtractors(object):
         config_path = config_path_arg.param
         config = read_config_file(config_path)
         animal_no = 1
-        pose_setting = 4
+        pose_setting = '4'
         print(config)
         #animal_cnt = read_config_entry(config, 'General settings', 'animal_no', 'int')
         #pose_setting = read_config_entry(config, 'create ensemble settings', 'pose_estimation_body_parts', 'str')
