@@ -4,47 +4,66 @@ import numpy as np
 import h5py
 import pandas as pd
 
-from simba.utils.read_write import find_all_videos_in_project, get_fn_ext, find_video_of_file, get_video_meta_data, read_config_entry, read_config_file
+from simba.utils.read_write import (
+    find_all_videos_in_project,
+    get_fn_ext,
+    find_video_of_file,
+    get_video_meta_data,
+    read_config_entry,
+    read_config_file,
+)
 from simba.utils.errors import NoFilesFoundError, CountError
 from simba.utils.warnings import InvalidValueWarning
 from simba.utils.checks import check_if_filepath_list_is_empty, check_if_dir_exists
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
 
-class APTImporterTRK(ConfigReader, PoseImporterMixin):
-    def __init__(self,
-                 config_path: str,
-                 data_folder: str,
-                 id_lst: list,
-                 interpolation_settings: str,
-                 smoothing_settings: dict):
 
+class APTImporterTRK(ConfigReader, PoseImporterMixin):
+    def __init__(
+        self,
+        config_path: str,
+        data_folder: str,
+        id_lst: list,
+        interpolation_settings: str,
+        smoothing_settings: dict,
+    ):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PoseImporterMixin.__init__(self)
         check_if_dir_exists(in_dir=data_folder)
-        self.interpolation_settings, self.smoothing_settings = interpolation_settings, smoothing_settings
+        self.interpolation_settings, self.smoothing_settings = (
+            interpolation_settings,
+            smoothing_settings,
+        )
         self.data_folder, self.id_lst = data_folder, id_lst
-        self.import_log_path = os.path.join(self.logs_path, f'data_import_log_{self.datetime}.csv')
+        self.import_log_path = os.path.join(
+            self.logs_path, f"data_import_log_{self.datetime}.csv"
+        )
         self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
-        self.input_data_paths = self.find_data_files(dir=self.data_folder, extensions=['.trk'])
-        self.data_and_videos_lk = self.link_video_paths_to_data_paths(data_paths=self.input_data_paths, video_paths=self.video_paths)
-        print(f'Importing {len(list(self.data_and_videos_lk.keys()))} file(s)...')
+        self.input_data_paths = self.find_data_files(
+            dir=self.data_folder, extensions=[".trk"]
+        )
+        self.data_and_videos_lk = self.link_video_paths_to_data_paths(
+            data_paths=self.input_data_paths, video_paths=self.video_paths
+        )
+        print(f"Importing {len(list(self.data_and_videos_lk.keys()))} file(s)...")
 
     def run(self):
-        for file_cnt, (video_name, video_data) in enumerate(self.data_and_videos_lk.items()):
-            data = self.read_apt_trk_file(file_path=video_data['DATA'])
+        for file_cnt, (video_name, video_data) in enumerate(
+            self.data_and_videos_lk.items()
+        ):
+            data = self.read_apt_trk_file(file_path=video_data["DATA"])
             data.columns = self.bp_headers
             data = self.intertwine_probability_cols(data=data)
             if self.animal_cnt > 1:
-                self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict,
-                                                video_info=get_video_meta_data(video_data['VIDEO']),
-                                                video_path=video_data['VIDEO'],
-                                                data_df=data)
+                self.initialize_multi_animal_ui(
+                    animal_bp_dict=self.animal_bp_dict,
+                    video_info=get_video_meta_data(video_data["VIDEO"]),
+                    video_path=video_data["VIDEO"],
+                    data_df=data,
+                )
                 self.multianimal_identification()
                 # TODO WHEN SOMEONE SHARE APT DATA.
-
-
-
 
     #
     # def import_trk(self):
@@ -108,15 +127,17 @@ class APTImporterTRK(ConfigReader, PoseImporterMixin):
     #         self.__insert_all_animal_bps(frame=self.overlay)
 
 
-
-
-test = APTImporterTRK(config_path='/Users/simon/Desktop/envs/troubleshooting/trk_test/project_folder/project_config.ini',
-                   data_folder='/Users/simon/Desktop/envs/troubleshooting/trk_test/data/',
-                   id_lst=['Animal_1', 'Animal_2', 'Animal_3'],
-                   interpolation_settings="Body-parts: Nearest",
-                   smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}})
+test = APTImporterTRK(
+    config_path="/Users/simon/Desktop/envs/troubleshooting/trk_test/project_folder/project_config.ini",
+    data_folder="/Users/simon/Desktop/envs/troubleshooting/trk_test/data/",
+    id_lst=["Animal_1", "Animal_2", "Animal_3"],
+    interpolation_settings="Body-parts: Nearest",
+    smoothing_settings={
+        "Method": "Savitzky Golay",
+        "Parameters": {"Time_window": "200"},
+    },
+)
 test.run()
-
 
 
 # test = TRKImporter(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini',
@@ -134,31 +155,9 @@ test.run()
 # test.run()
 
 
-
 # def __init__(self,
 #              config_path: str,
 #              data_folder: str,
 #              animal_id_lst: list,
 #              interpolation_method: str,
 #              smooth_settings: dict):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

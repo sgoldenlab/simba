@@ -4,60 +4,89 @@ import numpy as np
 import h5py
 import pandas as pd
 
-from simba.utils.read_write import get_fn_ext, find_video_of_file, get_video_meta_data, read_config_entry, read_config_file
+from simba.utils.read_write import (
+    get_fn_ext,
+    find_video_of_file,
+    get_video_meta_data,
+    read_config_entry,
+    read_config_file,
+)
 from simba.utils.errors import NoFilesFoundError, CountError
 from simba.utils.warnings import InvalidValueWarning
 from simba.utils.checks import check_if_filepath_list_is_empty, check_if_dir_exists
 from simba.mixins.config_reader import ConfigReader
 import cv2
 
-class TRKImporter(ConfigReader):
-    def __init__(self,
-                 config_path: str,
-                 data_path: str,
-                 animal_id_lst: list,
-                 interpolation_method: str,
-                 smoothing_settings: dict):
 
+class TRKImporter(ConfigReader):
+    def __init__(
+        self,
+        config_path: str,
+        data_path: str,
+        animal_id_lst: list,
+        interpolation_method: str,
+        smoothing_settings: dict,
+    ):
         ConfigReader.__init__(self, config_path=config_path)
         check_if_dir_exists(in_dir=data_path)
         self.data_path, self.id_lst = data_path, animal_id_lst
-        self.interpolation_method, self.smooth_settings = interpolation_method, smoothing_settings
+        self.interpolation_method, self.smooth_settings = (
+            interpolation_method,
+            smoothing_settings,
+        )
         if self.animal_cnt == 1:
-            self.animal_ids = ['Animal_1']
+            self.animal_ids = ["Animal_1"]
         else:
-            self.animal_ids = read_config_entry(self.config, 'Multi animal IDs', 'id_list', 'str')
+            self.animal_ids = read_config_entry(
+                self.config, "Multi animal IDs", "id_list", "str"
+            )
             self.animal_ids = self.animal_ids.split(",")
-        self.data_paths = glob.glob(self.data_path + '/*.trk')
-        check_if_filepath_list_is_empty(filepaths=self.data_paths, error_msg=f'No TRK files (with .trk file-ending) found in {self.data_path}')
-        self.space_scaler, self.radius_scaler, self.resolution_scaler, self.font_scaler = 40, 10, 1500, 1.2
+        self.data_paths = glob.glob(self.data_path + "/*.trk")
+        check_if_filepath_list_is_empty(
+            filepaths=self.data_paths,
+            error_msg=f"No TRK files (with .trk file-ending) found in {self.data_path}",
+        )
+        (
+            self.space_scaler,
+            self.radius_scaler,
+            self.resolution_scaler,
+            self.font_scaler,
+        ) = (40, 10, 1500, 1.2)
         self.frm_number = 0
 
     def trk_read(self, file_path: str):
-        print('Reading data using scipy.io...')
+        print("Reading data using scipy.io...")
         try:
             trk_dict = sio.loadmat(file_path)
-            trk_coordinates = trk_dict['pTrk']
+            trk_coordinates = trk_dict["pTrk"]
             track_cnt = trk_coordinates.shape[3]
             animals_tracked_list = [trk_coordinates[..., i] for i in range(track_cnt)]
 
         except NotImplementedError:
-            print('Failed to read data using scipy.io. Reading data using h5py...')
-            with h5py.File(file_path, 'r') as trk_dict:
-                trk_list = list(trk_dict['pTrk'])
+            print("Failed to read data using scipy.io. Reading data using h5py...")
+            with h5py.File(file_path, "r") as trk_dict:
+                trk_list = list(trk_dict["pTrk"])
                 t_second = np.array(trk_list)
                 if len(t_second.shape) > 3:
                     t_third = np.swapaxes(t_second, 0, 3)
                     trk_coordinates = np.swapaxes(t_third, 1, 2)
                     track_cnt = trk_coordinates.shape[3]
-                    animals_tracked_list = [trk_coordinates[..., i] for i in range(track_cnt)]
+                    animals_tracked_list = [
+                        trk_coordinates[..., i] for i in range(track_cnt)
+                    ]
                 else:
                     animals_tracked_list = np.swapaxes(t_second, 0, 2)
                     track_cnt = 1
 
-        print('Number of animals detected in TRK {}: {}'.format(str(file_path), str(track_cnt)))
+        print(
+            "Number of animals detected in TRK {}: {}".format(
+                str(file_path), str(track_cnt)
+            )
+        )
         if track_cnt != self.animal_cnt:
-            raise CountError(msg=f'There are {str(track_cnt)} tracks in the .trk file {file_path}. But your SimBA project expects {str(self.animal_cnt)} tracks.')
+            raise CountError(
+                msg=f"There are {str(track_cnt)} tracks in the .trk file {file_path}. But your SimBA project expects {str(self.animal_cnt)} tracks."
+            )
         return animals_tracked_list
 
     def import_trk(self):
@@ -67,7 +96,8 @@ class TRKImporter(ConfigReader):
                 pass
             video_path = find_video_of_file(self.video_dir, file_name)
             if not video_path:
-                raise NoFilesFoundError(msg='Could not find a video jj')
+                raise NoFilesFoundError(msg="Could not find a video jj")
+
     #         video_meta_data = get_video_meta_data(video_path=video_path)
     #         animal_tracks = self.trk_read(file_path=file_path)
     #
@@ -137,31 +167,9 @@ class TRKImporter(ConfigReader):
 # test.run()
 
 
-
 # def __init__(self,
 #              config_path: str,
 #              data_folder: str,
 #              animal_id_lst: list,
 #              interpolation_method: str,
 #              smooth_settings: dict):
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,8 +1,10 @@
 import cv2
 import numpy as np
 
+
 def zoom_in(self, zoom_val):
     self.not_done = True
+
     def get_x_y_callback(event, x, y, flags, param):
         if event == 1:
             self.click_loc = (int(x), int(y))
@@ -10,40 +12,56 @@ def zoom_in(self, zoom_val):
 
     def initiate_zoom_in_callback():
         while True:
-            cv2.setMouseCallback('Define shape', get_x_y_callback)
+            cv2.setMouseCallback("Define shape", get_x_y_callback)
             cv2.waitKey(20)
             if self.not_done == False:
                 break
 
     def get_new_image_spec():
-        px_avail_right, px_avail_bottom = self.frame_width - self.click_loc[0], self.frame_height - self.click_loc[1]
-        px_avail_left, px_avail_top = self.frame_width - px_avail_right, self.frame_height - px_avail_bottom
+        px_avail_right, px_avail_bottom = (
+            self.frame_width - self.click_loc[0],
+            self.frame_height - self.click_loc[1],
+        )
+        px_avail_left, px_avail_top = (
+            self.frame_width - px_avail_right,
+            self.frame_height - px_avail_bottom,
+        )
 
-        if (px_avail_left < (self.new_img_size[0] / 2)) or (px_avail_right < (self.new_img_size[0] / 2)):
-           top_left_x = 0
-           bottom_right_x = self.new_img_size[0]
+        if (px_avail_left < (self.new_img_size[0] / 2)) or (
+            px_avail_right < (self.new_img_size[0] / 2)
+        ):
+            top_left_x = 0
+            bottom_right_x = self.new_img_size[0]
         else:
             top_left_x = int(self.click_loc[0] - (self.new_img_size[0] / 2))
             bottom_right_x = int(self.click_loc[0] + (self.new_img_size[0] / 2))
-        if (px_avail_top < (self.new_img_size[1] / 2)) or (px_avail_bottom < (self.new_img_size[1] / 2)):
-           top_left_y = 0
-           bottom_right_y = self.new_img_size[1]
+        if (px_avail_top < (self.new_img_size[1] / 2)) or (
+            px_avail_bottom < (self.new_img_size[1] / 2)
+        ):
+            top_left_y = 0
+            bottom_right_y = self.new_img_size[1]
         else:
             top_left_y = int(self.click_loc[1] - (self.new_img_size[1] / 2))
             bottom_right_y = int(self.click_loc[1] + (self.new_img_size[1] / 2))
 
-        self.working_frame = self.working_frame[top_left_y:bottom_right_y,top_left_x:bottom_right_x]
-        self.working_frame = cv2.resize(self.working_frame, (self.frame_width, self.frame_height), interpolation=cv2.INTER_AREA)
+        self.working_frame = self.working_frame[
+            top_left_y:bottom_right_y, top_left_x:bottom_right_x
+        ]
+        self.working_frame = cv2.resize(
+            self.working_frame,
+            (self.frame_width, self.frame_height),
+            interpolation=cv2.INTER_AREA,
+        )
         self.insert_all_ROIs_into_image(show_zoomed_img=True)
 
     self.zoom_pct = int(zoom_val) / 100
     self.current_zoom = self.current_zoom + zoom_val
-    self.new_img_size = (int(self.frame_width - (self.frame_width * self.zoom_pct)), int(self.frame_height - (self.frame_height * self.zoom_pct)))
+    self.new_img_size = (
+        int(self.frame_width - (self.frame_width * self.zoom_pct)),
+        int(self.frame_height - (self.frame_height * self.zoom_pct)),
+    )
     initiate_zoom_in_callback()
     get_new_image_spec()
-
-
-
 
 
 # self.interact_method = interact_method
@@ -71,6 +89,3 @@ def zoom_in(self, zoom_val):
 #         self.new_size = (self.frame_width - (self.frame_width * self.zoom_pct), self.frame_height - (self.frame_height * self.zoom_pct))
 #         cv2.setMouseCallback('Define shape', zoom_callback)
 #
-
-
-

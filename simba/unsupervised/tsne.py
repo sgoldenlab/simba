@@ -2,8 +2,8 @@ from datetime import datetime
 import os
 from simba.utils.enums import Paths
 import pandas as pd
-from simba.misc_tools import (check_file_exist_and_readable,
-                              SimbaTimer)
+from simba.misc_tools import check_file_exist_and_readable, SimbaTimer
+
 # from simba.unsupervised.misc import (check_that_directory_is_empty,
 #                                      check_directory_exists,
 #                                      read_pickle,
@@ -16,11 +16,9 @@ from sklearn.manifold import TSNE
 import random
 import simba
 
+
 class TSNEGridSearch(object):
-    def __init__(self,
-                 data_path: str,
-                 save_dir: str
-                 ):
+    def __init__(self, data_path: str, save_dir: str):
         pass
 
     #     self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')

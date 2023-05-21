@@ -14,11 +14,10 @@ from simba.utils.printing import stdout_success, stdout_warning, SimbaTimer
 from simba.utils.checks import check_if_dir_exists, check_file_exist_and_readable
 
 
-
-CLUSTERER_NAME = 'CLUSTERER_NAME'
-CLUSTER_COUNT = 'CLUSTER_COUNT'
-EMBEDDER_NAME = 'EMBEDDER_NAME'
-DBCV = 'DBCV'
+CLUSTERER_NAME = "CLUSTERER_NAME"
+CLUSTER_COUNT = "CLUSTER_COUNT"
+EMBEDDER_NAME = "EMBEDDER_NAME"
+DBCV = "DBCV"
 
 
 class DBCVCalculator(UnsupervisedMixin, ConfigReader):
@@ -43,10 +42,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     >>> results = dbcv_calculator.run()
     """
 
-    def __init__(self,
-                 config_path: str,
-                 data_path: str):
-
+    def __init__(self, config_path: str, data_path: str):
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         if os.path.isdir(data_path):
@@ -55,39 +51,69 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
         else:
             check_file_exist_and_readable(file_path=data_path)
             self.data = {0: self.read_pickle(data_path=data_path)}
-        self.save_path = os.path.join(self.logs_path, f'DBCV_{self.datetime}.xlsx')
-        with pd.ExcelWriter(self.save_path, mode='w') as writer:
-            pd.DataFrame().to_excel(writer, sheet_name=' ', index=True)
+        self.save_path = os.path.join(self.logs_path, f"DBCV_{self.datetime}.xlsx")
+        with pd.ExcelWriter(self.save_path, mode="w") as writer:
+            pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
 
     def run(self):
-        print(f'Analyzing DBCV for {len(self.data.keys())} clusterers...')
+        print(f"Analyzing DBCV for {len(self.data.keys())} clusterers...")
         self.results = {}
         for k, v in self.data.items():
             model_timer = SimbaTimer(start=True)
-            self.results[k], dbcv_results = {}, 'nan'
-            self.results[k][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]
-            self.results[k][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]
-            print(f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}...")
-            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
+            self.results[k], dbcv_results = {}, "nan"
+            self.results[k][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.HASHED_NAME.value
+            ]
+            self.results[k][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][
+                Unsupervised.HASHED_NAME.value
+            ]
+            print(
+                f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}..."
+            )
+            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.MODEL.value
+            ].labels_
             x = v[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_
-            self.results[k] = {**self.results[k], **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value], **v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value]}
-            cluster_cnt = self.get_cluster_cnt(data=cluster_lbls, clusterer_name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], minimum_clusters=1)
+            self.results[k] = {
+                **self.results[k],
+                **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value],
+                **v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value],
+            }
+            cluster_cnt = self.get_cluster_cnt(
+                data=cluster_lbls,
+                clusterer_name=v[Clustering.CLUSTER_MODEL.value][
+                    Unsupervised.HASHED_NAME.value
+                ],
+                minimum_clusters=1,
+            )
 
             if cluster_cnt > 1:
                 dbcv_results = self.DBCV(x, cluster_lbls)
             else:
-                stdout_warning(msg=f'No DBCV calculated for clusterer {self.results[k][CLUSTERER_NAME]}: Less than two clusters identified.')
-            self.results[k] = {**self.results[k], **{DBCV: dbcv_results}, **{CLUSTER_COUNT: cluster_cnt}}
+                stdout_warning(
+                    msg=f"No DBCV calculated for clusterer {self.results[k][CLUSTERER_NAME]}: Less than two clusters identified."
+                )
+            self.results[k] = {
+                **self.results[k],
+                **{DBCV: dbcv_results},
+                **{CLUSTER_COUNT: cluster_cnt},
+            }
             model_timer.stop_timer()
-            stdout_success(msg=f"DBCV complete for model {self.results[k][CLUSTERER_NAME]}", elapsed_time=model_timer.elapsed_time_str)
+            stdout_success(
+                msg=f"DBCV complete for model {self.results[k][CLUSTERER_NAME]}",
+                elapsed_time=model_timer.elapsed_time_str,
+            )
         self.__save_results()
         self.timer.stop_timer()
-        stdout_success(msg=f"ALL DBCV calculations complete and saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(
+            msg=f"ALL DBCV calculations complete and saved in {self.save_path}",
+            elapsed_time=self.timer.elapsed_time_str,
+        )
 
     def __save_results(self):
         for k, v in self.results.items():
-            df = pd.DataFrame.from_dict(v, orient='index', columns=['VALUE'])
-            with pd.ExcelWriter(self.save_path, mode='a') as writer:
+            df = pd.DataFrame.from_dict(v, orient="index", columns=["VALUE"])
+            with pd.ExcelWriter(self.save_path, mode="a") as writer:
                 df.to_excel(writer, sheet_name=v[CLUSTERER_NAME], index=True)
 
     def DBCV(self, X, labels):
@@ -192,9 +218,13 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
                         Cii = Cii[indices_ii]
 
                         numerator = ((1 / Cii) ** B.shape[1]).sum()
-                        core_dist_j = (numerator / (B.shape[0] - 1)) ** (-1 / B.shape[1])
+                        core_dist_j = (numerator / (B.shape[0] - 1)) ** (
+                            -1 / B.shape[1]
+                        )
                         dist = np.linalg.norm(A[a] - B[b])
-                        mutual_reachability = np.max(np.array([core_dist_i, core_dist_j, dist]))
+                        mutual_reachability = np.max(
+                            np.array([core_dist_i, core_dist_j, dist])
+                        )
                         graph_row = np.append(graph_row, mutual_reachability)
 
                 graph[graph_row_counter] = graph_row
@@ -222,9 +252,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     def transpose_np(mst):
         return mst + np.transpose(mst)
 
-
     def _clustering_validity_index(self, MST, labels):
-
         """
         Parameters
         MST: minimum spanning tree of all pair-wisemutual reachability distances between points
@@ -249,11 +277,15 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
         min_density_separation = np.inf
         for cluster_j in np.unique(labels):
             if cluster_j != cluster:
-                cluster_density_separation = self._cluster_density_separation(MST, labels, cluster, cluster_j)
+                cluster_density_separation = self._cluster_density_separation(
+                    MST, labels, cluster, cluster_j
+                )
                 if cluster_density_separation < min_density_separation:
                     min_density_separation = cluster_density_separation
 
-        cluster_density_sparseness = self._cluster_density_sparseness(MST, np.array(labels), np.array(cluster))
+        cluster_density_sparseness = self._cluster_density_sparseness(
+            MST, np.array(labels), np.array(cluster)
+        )
         numerator = min_density_separation - cluster_density_sparseness
         denominator = np.max([min_density_separation, cluster_density_sparseness])
         cluster_validity = numerator / denominator
@@ -275,7 +307,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
         cluster_density_sparseness = np.max(cluster_MST)
         return cluster_density_sparseness
 
+
 # test = DBCVCalculator(data_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models',
 #                       config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
 # test.run()
-

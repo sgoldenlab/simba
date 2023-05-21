@@ -16,16 +16,16 @@ import logging as _logging
 WindowUtils = cef.WindowUtils()
 
 # Platforms
-WINDOWS = (platform.system() == "Windows")
-LINUX = (platform.system() == "Linux")
-MAC = (platform.system() == "Darwin")
+WINDOWS = platform.system() == "Windows"
+LINUX = platform.system() == "Linux"
+MAC = platform.system() == "Darwin"
 
 # Globals
 logger = _logging.getLogger("tkinter_.py")
 url = "localhost:8050/"
 
-class MainFrame(tk.Frame):
 
+class MainFrame(tk.Frame):
     def __init__(self, root):
         self.closing = False
         self.browser = None
@@ -37,7 +37,7 @@ class MainFrame(tk.Frame):
 
         # MainFrame
         tk.Frame.__init__(self, root)
-        self.master.title('SimBA Dashboard')
+        self.master.title("SimBA Dashboard")
         self.master.protocol("WM_DELETE_WINDOW", self.on_close)
         self.bind("<Configure>", self.on_configure)
         self.bind("<FocusIn>", self.on_focus_in)
@@ -51,8 +51,7 @@ class MainFrame(tk.Frame):
         window_info = cef.WindowInfo()
         rect = [0, 0, self.winfo_width(), self.winfo_height()]
         window_info.SetAsChild(self.get_window_handle(), rect)
-        self.browser = cef.CreateBrowserSync(window_info,
-                                             url=url) #todo
+        self.browser = cef.CreateBrowserSync(window_info, url=url)  # todo
         assert self.browser
         self.browser.SetClientHandler(LoadHandler(self))
         self.browser.SetClientHandler(FocusHandler(self))
@@ -69,14 +68,13 @@ class MainFrame(tk.Frame):
         self.after(10, self.message_loop_work)
 
     def on_configure(self, event):
-
         width = event.width
         height = event.height
         if self.browser:
             if WINDOWS:
                 ctypes.windll.user32.SetWindowPos(
-                    self.browser.GetWindowHandle(), 0,
-                    0, 0, width, height, 0x0002)
+                    self.browser.GetWindowHandle(), 0, 0, 0, width, height, 0x0002
+                )
             elif LINUX:
                 self.browser.SetBounds(0, 0, width, height)
             self.browser.NotifyMoveOrResizeStarted()
@@ -111,28 +109,26 @@ class MainFrame(tk.Frame):
 
 
 class LoadHandler(object):
-
     def __init__(self, browser_frame):
         self.browser_frame = browser_frame
 
 
 class FocusHandler(object):
-
     def __init__(self, browser):
         self.browser = browser
 
     def OnTakeFocus(self, next_component, **_):
-        logger.debug("FocusHandler.OnTakeFocus, next={next}"
-                     .format(next=next_component))
+        logger.debug(
+            "FocusHandler.OnTakeFocus, next={next}".format(next=next_component)
+        )
 
     def OnSetFocus(self, source, **_):
-        logger.debug("FocusHandler.OnSetFocus, source={source}"
-                     .format(source=source))
+        logger.debug("FocusHandler.OnSetFocus, source={source}".format(source=source))
         return False
 
     def OnGotFocus(self, **_):
         """Fix CEF focus issues (#255). Call browser frame's focus_set
-           to get rid of type cursor in url entry widget."""
+        to get rid of type cursor in url entry widget."""
         logger.debug("FocusHandler.OnGotFocus")
         self.browser.focus_set()
 
@@ -144,16 +140,22 @@ formatter = _logging.Formatter("[%(filename)s] %(message)s")
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 logger.info("CEF Python {ver}".format(ver=cef.__version__))
-logger.info("Python {ver} {arch}".format(
-        ver=platform.python_version(), arch=platform.architecture()[0]))
-logger.info("Tk {ver}".format(ver=tk.Tcl().eval('info patchlevel')))
+logger.info(
+    "Python {ver} {arch}".format(
+        ver=platform.python_version(), arch=platform.architecture()[0]
+    )
+)
+logger.info("Tk {ver}".format(ver=tk.Tcl().eval("info patchlevel")))
 assert cef.__version__ >= "55.3", "CEF Python v55.3+ required to run this"
 sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
 root = tk.Tk()
 app = MainFrame(root)
+
+
 def on_closing():
     if messagebox.askokcancel("Quit", "Do you want to quit?"):
         root.destroy()
+
 
 root.protocol("WM_DELETE_WINDOW", on_closing)
 

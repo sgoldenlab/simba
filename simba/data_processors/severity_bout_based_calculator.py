@@ -14,6 +14,7 @@ from simba.utils.warnings import NoDataFoundWarning
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 
+
 class SeverityBoutCalculator(ConfigReader, FeatureExtractionMixin):
     """
     Computes the "severity" of classification bout events based on how much
@@ -33,16 +34,19 @@ class SeverityBoutCalculator(ConfigReader, FeatureExtractionMixin):
     >>> processor.save()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 settings: Dict):
-
+    def __init__(self, config_path: Union[str, os.PathLike], settings: Dict):
         ConfigReader.__init__(self, config_path=config_path)
         self.settings = settings
-        check_if_filepath_list_is_empty(filepaths=self.machine_results_paths,
-                                        error_msg=f'SIMBA ERROR: Cannot process severity. {self.machine_results_dir} directory is empty')
-        save_name = os.path.join(f'severity_{datetime.now().strftime("%Y%m%d%H%M%S")}.csv')
-        definitions_save_name = os.path.join(f'severity_bin_definitions_{datetime.now().strftime("%Y%m%d%H%M%S")}.csv')
+        check_if_filepath_list_is_empty(
+            filepaths=self.machine_results_paths,
+            error_msg=f"SIMBA ERROR: Cannot process severity. {self.machine_results_dir} directory is empty",
+        )
+        save_name = os.path.join(
+            f'severity_{datetime.now().strftime("%Y%m%d%H%M%S")}.csv'
+        )
+        definitions_save_name = os.path.join(
+            f'severity_bin_definitions_{datetime.now().strftime("%Y%m%d%H%M%S")}.csv'
+        )
         self.save_path = os.path.join(self.logs_path, save_name)
         self.definitions_path = os.path.join(self.logs_path, definitions_save_name)
         self.results = {}
@@ -55,34 +59,48 @@ class SeverityBoutCalculator(ConfigReader, FeatureExtractionMixin):
             window_width = int(fps * window_size_s)
             window_movement = np.full((data.shape[0]), np.nan)
             for i in range(window_width, data.shape[0]):
-                window_movement[i] = np.sum(data[i-window_width:i])
-            results[window_size_s-1] = np.nanmean(window_movement)
+                window_movement[i] = np.sum(data[i - window_width : i])
+            results[window_size_s - 1] = np.nanmean(window_movement)
         return results
 
     def __calculate_movements(self):
         self.movements = {}
         for file_cnt, file_path in enumerate(self.machine_results_paths):
             _, video_name, _ = get_fn_ext(file_path)
-            print(f'Analyzing movements in {video_name} ({file_cnt+1}/{len(self.machine_results_paths)})...')
+            print(
+                f"Analyzing movements in {video_name} ({file_cnt+1}/{len(self.machine_results_paths)})..."
+            )
             _, px_per_mm, fps = self.read_video_info(video_name=video_name)
             df = read_df(file_path=file_path, file_type=self.file_type)
-            if self.settings['clf'] not in df.columns:
-                NoDataFoundWarning(msg=f'Skipping file {video_name} - {self.settings["clf"]} data not present in file')
+            if self.settings["clf"] not in df.columns:
+                NoDataFoundWarning(
+                    msg=f'Skipping file {video_name} - {self.settings["clf"]} data not present in file'
+                )
                 continue
             video_movement = np.full((len(df)), 0)
             for animal_name, animal_bodyparts in self.animal_bp_dict.items():
-                animal_df = df[animal_bodyparts['X_bps'] + animal_bodyparts['Y_bps']]
+                animal_df = df[animal_bodyparts["X_bps"] + animal_bodyparts["Y_bps"]]
                 animal_df = self.create_shifted_df(df=animal_df)
-                for (bp_x, bp_y) in zip(animal_bodyparts['X_bps'], animal_bodyparts['Y_bps']):
-                    video_movement = np.add(video_movement, self.euclidean_distance(animal_df[bp_x].values, animal_df[f'{bp_x}_shifted'].values, animal_df[bp_y].values, animal_df[f'{bp_y}_shifted'].values, px_per_mm))
+                for bp_x, bp_y in zip(
+                    animal_bodyparts["X_bps"], animal_bodyparts["Y_bps"]
+                ):
+                    video_movement = np.add(
+                        video_movement,
+                        self.euclidean_distance(
+                            animal_df[bp_x].values,
+                            animal_df[f"{bp_x}_shifted"].values,
+                            animal_df[bp_y].values,
+                            animal_df[f"{bp_y}_shifted"].values,
+                            px_per_mm,
+                        ),
+                    )
             self.__movement_rolling_windows_agg(data=video_movement, fps=fps)
 
-
-            #self.movements[video_name] = video_movement.astype(np.int)
-
+            # self.movements[video_name] = video_movement.astype(np.int)
 
     def run(self):
         self.__calculate_movements()
+
     #     self.video_bins_info = {}
     #     movements_cuts = {}
     #     print('Finding bracket cut off points...')
@@ -137,6 +155,7 @@ class SeverityBoutCalculator(ConfigReader, FeatureExtractionMixin):
     #             brackets_df.loc[len(brackets_df)] = video_info
     #         brackets_df.to_csv(self.definitions_path)
     #         stdout_success(msg=f'Severity brackets definitions saved at {self.definitions_path}', elapsed_time=self.timer.elapsed_time_str)
+
 
 # settings = {'brackets': 10,
 #             'clf': 'Attack',

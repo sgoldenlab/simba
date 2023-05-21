@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import numpy as np
 from typing import Union
+
 try:
     from typing import Literal
 except:
@@ -36,11 +37,12 @@ class FeatureSubsetsCalculator(ConfigReader, FeatureExtractionMixin):
     >>> _ = FeatureSubsetsCalculator(config_path='project_folder/project_config.ini', feature_family='Frame-by-frame body-parts inside ROIs (Boolean)', save_dir='data').run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 save_dir: Union[str, os.PathLike],
-                 feature_family: Literal[Options.FEATURE_SUBSET_OPTIONS]):
-
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        save_dir: Union[str, os.PathLike],
+        feature_family: Literal[Options.FEATURE_SUBSET_OPTIONS],
+    ):
         FeatureExtractionMixin.__init__(self, config_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         check_if_filepath_list_is_empty(

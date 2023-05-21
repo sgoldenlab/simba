@@ -6,15 +6,23 @@ import platform
 import multiprocessing
 import functools
 from simba.utils.enums import Paths
-from simba.utils.read_write import read_df, get_video_meta_data, get_fn_ext, concatenate_videos_in_folder
+from simba.utils.read_write import (
+    read_df,
+    get_video_meta_data,
+    get_fn_ext,
+    concatenate_videos_in_folder,
+)
 from simba.utils.checks import check_file_exist_and_readable
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.warnings import NoDataFoundWarning
 from simba.utils.lookups import get_color_dict
 from simba.utils.data import create_color_palettes
-from simba.data_processors.directing_other_animals_calculator import DirectingOtherAnimalsAnalyzer
+from simba.data_processors.directing_other_animals_calculator import (
+    DirectingOtherAnimalsAnalyzer,
+)
 from simba.mixins.config_reader import ConfigReader
+
 
 class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
     """
@@ -40,17 +48,14 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
     >>> directing_visualizer.run()
     """
 
-    def __init__(self,
-                 config_path: str,
-                 data_path: str,
-                 style_attr: dict,
-                 core_cnt: int):
-
+    def __init__(
+        self, config_path: str, data_path: str, style_attr: dict, core_cnt: int
+    ):
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
 
         if platform.system() == "Darwin":
-            multiprocessing.set_start_method('spawn', force=True)
+            multiprocessing.set_start_method("spawn", force=True)
 
         self.data_path = data_path
         _, self.video_name, _ = get_fn_ext(self.data_path)
@@ -59,19 +64,26 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
         self.direction_analyzer.create_directionality_dfs()
         self.style_attr, self.pose_colors, self.core_cnt = style_attr, [], core_cnt
         self.colors = get_color_dict()
-        if self.style_attr['Show_pose']:
-            self.pose_colors = create_color_palettes(self.animal_cnt, int(len(self.x_cols) + 1))
-        if self.style_attr['Direction_color'] == 'Random':
+        if self.style_attr["Show_pose"]:
+            self.pose_colors = create_color_palettes(
+                self.animal_cnt, int(len(self.x_cols) + 1)
+            )
+        if self.style_attr["Direction_color"] == "Random":
             self.direction_colors = create_color_palettes(1, int(self.animal_cnt**2))
         else:
-            self.direction_colors = [self.colors[self.style_attr['Direction_color']]]
+            self.direction_colors = [self.colors[self.style_attr["Direction_color"]]]
         self.data_dict = self.direction_analyzer.directionality_df_dict
         self.video_path = self.find_video_of_file(self.video_dir, self.video_name)
-        self.save_directory = os.path.join(self.project_path, Paths.DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH.value)
-        if not os.path.exists(self.save_directory): os.makedirs(self.save_directory)
-        self.data_path = os.path.join(self.outlier_corrected_dir, self.video_name + '.' + self.file_type)
+        self.save_directory = os.path.join(
+            self.project_path, Paths.DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH.value
+        )
+        if not os.path.exists(self.save_directory):
+            os.makedirs(self.save_directory)
+        self.data_path = os.path.join(
+            self.outlier_corrected_dir, self.video_name + "." + self.file_type
+        )
         check_file_exist_and_readable(file_path=self.data_path)
-        print(f'Processing video {self.video_name}...')
+        print(f"Processing video {self.video_name}...")
 
     def run(self):
         """
@@ -83,44 +95,71 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
         None
         """
 
-
         self.data_df = read_df(self.data_path, file_type=self.file_type)
-        self.save_path = os.path.join(self.save_directory, self.video_name + '.mp4')
-        self.save_temp_path = os.path.join(self.save_directory, 'temp')
+        self.save_path = os.path.join(self.save_directory, self.video_name + ".mp4")
+        self.save_temp_path = os.path.join(self.save_directory, "temp")
         if os.path.exists(self.save_temp_path):
             self.remove_a_folder(folder_dir=self.save_temp_path)
         os.makedirs(self.save_temp_path)
         self.cap = cv2.VideoCapture(self.video_path)
         self.video_meta_data = get_video_meta_data(self.video_path)
         self.video_data = self.data_dict[self.video_name]
-        if self.video_name in list(self.video_data['Video']):
+        if self.video_name in list(self.video_data["Video"]):
             self.__create_video()
         else:
-            NoDataFoundWarning(msg=f'SimBA skipping video {self.video_name}: No animals are directing each other in the video.')
+            NoDataFoundWarning(
+                msg=f"SimBA skipping video {self.video_name}: No animals are directing each other in the video."
+            )
 
     def __create_video(self):
         video_timer = SimbaTimer()
         video_timer.start_timer()
-        data_arr, frm_per_core = self.split_and_group_df(df=self.data_df, splits=self.core_cnt, include_split_order=True)
-        print('Creating ROI images, multiprocessing (determined chunksize: {}, cores: {})...'.format(str(self.multiprocess_chunksize), str(self.core_cnt)))
-        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-            constants = functools.partial(self.directing_animals_mp,
-                                          directionality_data=self.video_data,
-                                          video_meta_data=self.video_meta_data,
-                                          style_attr=self.style_attr,
-                                          save_temp_dir=self.save_temp_path,
-                                          video_path=self.video_path,
-                                          bp_names=self.animal_bp_dict,
-                                          colors=self.direction_colors)
-            for cnt, result in enumerate(pool.imap(constants, data_arr, chunksize=self.multiprocess_chunksize)):
-                print('Image {}/{}, Video {}...'.format(str(int(frm_per_core * (result + 1))), str(len(self.data_df)), self.video_name))
+        data_arr, frm_per_core = self.split_and_group_df(
+            df=self.data_df, splits=self.core_cnt, include_split_order=True
+        )
+        print(
+            "Creating ROI images, multiprocessing (determined chunksize: {}, cores: {})...".format(
+                str(self.multiprocess_chunksize), str(self.core_cnt)
+            )
+        )
+        with multiprocessing.Pool(
+            self.core_cnt, maxtasksperchild=self.maxtasksperchild
+        ) as pool:
+            constants = functools.partial(
+                self.directing_animals_mp,
+                directionality_data=self.video_data,
+                video_meta_data=self.video_meta_data,
+                style_attr=self.style_attr,
+                save_temp_dir=self.save_temp_path,
+                video_path=self.video_path,
+                bp_names=self.animal_bp_dict,
+                colors=self.direction_colors,
+            )
+            for cnt, result in enumerate(
+                pool.imap(constants, data_arr, chunksize=self.multiprocess_chunksize)
+            ):
+                print(
+                    "Image {}/{}, Video {}...".format(
+                        str(int(frm_per_core * (result + 1))),
+                        str(len(self.data_df)),
+                        self.video_name,
+                    )
+                )
 
-            concatenate_videos_in_folder(in_folder=self.save_temp_path, save_path=self.save_path, video_format='mp4')
+            concatenate_videos_in_folder(
+                in_folder=self.save_temp_path,
+                save_path=self.save_path,
+                video_format="mp4",
+            )
             video_timer.stop_timer()
             pool.terminate()
             pool.join()
             self.timer.stop_timer()
-            stdout_success(msg=f'Video {self.video_name} created. Video saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
+            stdout_success(
+                msg=f"Video {self.video_name} created. Video saved at {self.save_path}",
+                elapsed_time=self.timer.elapsed_time_str,
+            )
+
 
 # style_attr = {'Show_pose': True,
 #               'Pose_circle_size': 3,

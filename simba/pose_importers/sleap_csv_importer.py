@@ -9,9 +9,15 @@ from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
 from simba.utils.read_write import find_all_videos_in_project
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.utils.read_write import write_df, find_video_of_file, get_video_meta_data, get_fn_ext
+from simba.utils.read_write import (
+    write_df,
+    find_video_of_file,
+    get_video_meta_data,
+    get_fn_ext,
+)
 from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.enums import Methods
+
 
 class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
 
@@ -40,81 +46,146 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
     >>> sleap_csv_importer.run()
     """
 
-    def __init__(self,
-                 config_path: str,
-                 data_folder: str,
-                 id_lst: list,
-                 interpolation_settings: str,
-                 smoothing_settings: dict):
-
+    def __init__(
+        self,
+        config_path: str,
+        data_folder: str,
+        id_lst: list,
+        interpolation_settings: str,
+        smoothing_settings: dict,
+    ):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PoseImporterMixin.__init__(self)
-        self.interpolation_settings, self.smoothing_settings = interpolation_settings, smoothing_settings
+        self.interpolation_settings, self.smoothing_settings = (
+            interpolation_settings,
+            smoothing_settings,
+        )
         self.data_folder, self.id_lst = data_folder, id_lst
-        self.import_log_path = os.path.join(self.logs_path, f'data_import_log_{self.datetime}.csv')
+        self.import_log_path = os.path.join(
+            self.logs_path, f"data_import_log_{self.datetime}.csv"
+        )
         self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
-        self.input_data_paths = self.find_data_files(dir=self.data_folder, extensions=['.csv'])
-        self.data_and_videos_lk = self.link_video_paths_to_data_paths(data_paths=self.input_data_paths, video_paths=self.video_paths)
-        if (self.pose_setting is Methods.USER_DEFINED.value):
+        self.input_data_paths = self.find_data_files(
+            dir=self.data_folder, extensions=[".csv"]
+        )
+        self.data_and_videos_lk = self.link_video_paths_to_data_paths(
+            data_paths=self.input_data_paths, video_paths=self.video_paths
+        )
+        if self.pose_setting is Methods.USER_DEFINED.value:
             self.__update_config_animal_cnt()
         if self.animal_cnt > 1:
             self.check_multi_animal_status()
-            self.animal_bp_dict = self.create_body_part_dictionary(self.multi_animal_status, self.id_lst, self.animal_cnt, self.x_cols, self.y_cols, self.p_cols, self.clr_lst)
+            self.animal_bp_dict = self.create_body_part_dictionary(
+                self.multi_animal_status,
+                self.id_lst,
+                self.animal_cnt,
+                self.x_cols,
+                self.y_cols,
+                self.p_cols,
+                self.clr_lst,
+            )
             self.update_bp_headers_file()
-        print(f'Importing {len(list(self.data_and_videos_lk.keys()))} file(s)...')
+        print(f"Importing {len(list(self.data_and_videos_lk.keys()))} file(s)...")
 
     def run(self):
-        for file_cnt, (video_name, video_data) in enumerate(self.data_and_videos_lk.items()):
-            print(f'Analysing {video_name}...')
+        for file_cnt, (video_name, video_data) in enumerate(
+            self.data_and_videos_lk.items()
+        ):
+            print(f"Analysing {video_name}...")
             video_timer = SimbaTimer(start=True)
             self.video_name = video_name
-            self.save_path = os.path.join(os.path.join(self.input_csv_dir, f'{self.video_name}.{self.file_type}'))
-            data_df = pd.read_csv(video_data['DATA'])
+            self.save_path = os.path.join(
+                os.path.join(self.input_csv_dir, f"{self.video_name}.{self.file_type}")
+            )
+            data_df = pd.read_csv(video_data["DATA"])
             idx = data_df.iloc[:, :2]
-            idx['track'] = idx['track'].str.replace(r'[^\d.]+', '').astype(int)
+            idx["track"] = idx["track"].str.replace(r"[^\d.]+", "").astype(int)
             data_df = data_df.iloc[:, 2:]
             if self.animal_cnt > 1:
-                self.data_df = pd.DataFrame(self.transpose_multi_animal_table(data=data_df.values, idx=idx.values, animal_cnt=self.animal_cnt))
-                p_df = pd.DataFrame(1.0, index=self.data_df.index, columns=self.data_df.columns[1::2] + .5)
-                self.data_df = pd.concat([self.data_df, p_df], axis=1).sort_index(axis=1)
+                self.data_df = pd.DataFrame(
+                    self.transpose_multi_animal_table(
+                        data=data_df.values, idx=idx.values, animal_cnt=self.animal_cnt
+                    )
+                )
+                p_df = pd.DataFrame(
+                    1.0,
+                    index=self.data_df.index,
+                    columns=self.data_df.columns[1::2] + 0.5,
+                )
+                self.data_df = pd.concat([self.data_df, p_df], axis=1).sort_index(
+                    axis=1
+                )
                 self.data_df.columns = self.bp_headers
             else:
-                idx = list(idx.drop('track', axis=1)['frame_idx'])
+                idx = list(idx.drop("track", axis=1)["frame_idx"])
                 self.data_df = data_df.set_index([idx]).sort_index()
                 self.data_df.columns = np.arange(len(self.data_df.columns))
-                self.data_df = self.data_df.reindex(range(self.data_df.index[0], self.data_df.index[-1] + 1), fill_value=0)
-                p_df = pd.DataFrame(1.0, index=self.data_df.index, columns=self.data_df.columns[1::2] + .5)
-                self.data_df = pd.concat([self.data_df, p_df], axis=1).sort_index(axis=1)
+                self.data_df = self.data_df.reindex(
+                    range(self.data_df.index[0], self.data_df.index[-1] + 1),
+                    fill_value=0,
+                )
+                p_df = pd.DataFrame(
+                    1.0,
+                    index=self.data_df.index,
+                    columns=self.data_df.columns[1::2] + 0.5,
+                )
+                self.data_df = pd.concat([self.data_df, p_df], axis=1).sort_index(
+                    axis=1
+                )
                 self.data_df.columns = self.bp_headers
 
             self.out_df = deepcopy(self.data_df)
             if self.animal_cnt > 1:
-                self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict,
-                                                video_info=get_video_meta_data(video_data['VIDEO']),
-                                                data_df=self.data_df,
-                                                video_path=video_data['VIDEO'])
+                self.initialize_multi_animal_ui(
+                    animal_bp_dict=self.animal_bp_dict,
+                    video_info=get_video_meta_data(video_data["VIDEO"]),
+                    data_df=self.data_df,
+                    video_path=video_data["VIDEO"],
+                )
                 self.multianimal_identification()
-            write_df(df=self.out_df, file_type=self.file_type, save_path=self.save_path, multi_idx_header=True)
-            if self.interpolation_settings != 'None':
+            write_df(
+                df=self.out_df,
+                file_type=self.file_type,
+                save_path=self.save_path,
+                multi_idx_header=True,
+            )
+            if self.interpolation_settings != "None":
                 self.__run_interpolation()
-            if self.smoothing_settings['Method'] != 'None':
+            if self.smoothing_settings["Method"] != "None":
                 self.__run_smoothing()
             video_timer.stop_timer()
-            stdout_success(msg=f'Video {video_name} data imported...', elapsed_time=video_timer.elapsed_time_str)
+            stdout_success(
+                msg=f"Video {video_name} data imported...",
+                elapsed_time=video_timer.elapsed_time_str,
+            )
         self.timer.stop_timer()
-        stdout_success(msg=f'{len(list(self.data_and_videos_lk.keys()))} file(s) imported to the SimBA project (project_folder/csv/input_csv directory)')
+        stdout_success(
+            msg=f"{len(list(self.data_and_videos_lk.keys()))} file(s) imported to the SimBA project (project_folder/csv/input_csv directory)"
+        )
 
     def __run_interpolation(self):
-        print(f'Interpolating missing values in video {self.video_name} (Method: {self.interpolation_settings})...')
-        _ = Interpolate(input_path=self.save_path, config_path=self.config_path, method=self.interpolation_settings, initial_import_multi_index=True)
+        print(
+            f"Interpolating missing values in video {self.video_name} (Method: {self.interpolation_settings})..."
+        )
+        _ = Interpolate(
+            input_path=self.save_path,
+            config_path=self.config_path,
+            method=self.interpolation_settings,
+            initial_import_multi_index=True,
+        )
 
     def __run_smoothing(self):
-        print(f'Performing {self.smoothing_settings["Method"]} smoothing on video {self.video_name}...')
-        Smooth(config_path=self.config_path,
-               input_path=self.save_path,
-               time_window=int(self.smoothing_settings['Parameters']['Time_window']),
-               smoothing_method=self.smoothing_settings['Method'],
-               initial_import_multi_index=True)
+        print(
+            f'Performing {self.smoothing_settings["Method"]} smoothing on video {self.video_name}...'
+        )
+        Smooth(
+            config_path=self.config_path,
+            input_path=self.save_path,
+            time_window=int(self.smoothing_settings["Parameters"]["Time_window"]),
+            smoothing_method=self.smoothing_settings["Method"],
+            initial_import_multi_index=True,
+        )
+
 
 # test = SLEAPImporterCSV(config_path=r'/Users/simon/Desktop/envs/troubleshooting/Hornet/project_folder/project_config.ini',
 #                  data_folder=r'/Users/simon/Desktop/envs/troubleshooting/Hornet_single_slp/import',

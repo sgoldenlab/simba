@@ -1,6 +1,6 @@
 from pygifsicle import optimize
-pt = optimize("/Users/simon/Downloads/Studio_Project (3).gif")
 
+pt = optimize("/Users/simon/Downloads/Studio_Project (3).gif")
 
 
 # # import cv2

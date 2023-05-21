@@ -11,14 +11,12 @@ from functools import cmp_to_key
 
 @overload(ConvexHull)
 def impl_convex_hull(data):
-
-
     def func(data):
         def brute_hull(data):
             s = []
             mid = [0, 0]
             for i in range(data.shape[0]):
-                for j in range(i+1, data.shape[0]):
+                for j in range(i + 1, data.shape[0]):
                     x1, x2 = data[i][0], data[j][0]
                     y1, y2 = data[i][1], data[j][1]
                     a1, b1, c1 = y1 - y2, x2 - x1, x1 * y2 - y1 * x2
@@ -34,7 +32,8 @@ def impl_convex_hull(data):
 
             s_unique = []
             for i in s:
-                if i not in s_unique: s_unique.append(i)
+                if i not in s_unique:
+                    s_unique.append(i)
 
             n = len(s_unique)
             for i in range(n):
@@ -42,19 +41,12 @@ def impl_convex_hull(data):
                 mid[1] += s_unique[i][1]
                 s_unique[i][0] *= n
                 s_unique[i][1] *= n
-            
 
-
-            #s = np.unique(np.array(s), axis=0)
-
-
-
+            # s = np.unique(np.array(s), axis=0)
 
         def division(frm_data):
             if frm_data.shape[0] <= 5:
                 brute_hull(frm_data)
-
-
 
         for frm_cnt in range(data.shape[0]):
             frm_data = data[frm_cnt, :, :]
@@ -63,12 +55,16 @@ def impl_convex_hull(data):
 
     return func
 
+
 data = np.random.randint(1, 10, size=(10, 4, 2))
+
+
 @njit
 def test_find_left(data):
     return ConvexHull(data)
 
+
 start = time.time()
 test_find_left(data)
 end = time.time()
-print(end-start)
+print(end - start)
