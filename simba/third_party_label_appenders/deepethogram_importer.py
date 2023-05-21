@@ -15,7 +15,7 @@ class DeepEthogramImporter(ConfigReader):
     Append DeepEthogram optical flow annotations onto featurized pose-estimation data.
 
     :param str config_path: path to SimBA project config file in Configparser format
-    :param str deep_ethogram_dir: path to folder holding DeepEthogram data files is CSV format
+    :param str data_dir: path to folder holding DeepEthogram data files is CSV format
 
     .. note::
        `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
@@ -23,7 +23,7 @@ class DeepEthogramImporter(ConfigReader):
 
     Examples
     ----------
-    >>> deepethogram_importer = DeepEthogramImporter(config_path=r'MySimBAConfigPath', deep_ethogram_dir=r'MyDeepEthogramDir')
+    >>> deepethogram_importer = DeepEthogramImporter(config_path=r'MySimBAConfigPath', data_dir=r'MyDeepEthogramDir')
     >>> deepethogram_importer.run()
 
     References
@@ -34,11 +34,11 @@ class DeepEthogramImporter(ConfigReader):
     """
 
     def __init__(self,
-                 deep_ethogram_dir: str,
+                 data_dir: str,
                  config_path: str):
 
         super().__init__(config_path=config_path)
-        self.data_dir = deep_ethogram_dir
+        self.data_dir = data_dir
         check_if_dir_exists(in_dir=self.data_dir)
         self.deepethogram_files_found = glob.glob(self.data_dir + '/*.csv')
         check_if_filepath_list_is_empty(filepaths=self.deepethogram_files_found,

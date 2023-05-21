@@ -18,7 +18,7 @@ class BentoAppender(ConfigReader):
     Append BENTO annotation to SimBA featurized datasets.
 
     :param str config_path: path to SimBA project config file in Configparser format
-    :param str bento_dir: Path to folder containing BENTO data.
+    :param str data_dir: Path to folder containing BENTO data.
 
     .. note::
        `Example BENTO input file <https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot>`_.
@@ -29,7 +29,7 @@ class BentoAppender(ConfigReader):
     ----------
     >>> bento_dir = 'tests/test_data/bento_example'
     >>> config_path = 'tests/test_data/import_tests/project_folder/project_config.ini'
-    >>> bento_appender = BentoAppender(config_path=config_path, bento_dir=bento_dir)
+    >>> bento_appender = BentoAppender(config_path=config_path, data_dir=bento_dir)
     >>> bento_appender.run()
 
     References
@@ -40,10 +40,10 @@ class BentoAppender(ConfigReader):
 
     def __init__(self,
                  config_path: str,
-                 bento_dir: str):
+                 data_dir: str):
 
         ConfigReader.__init__(self, config_path=config_path)
-        self.bento_dir = bento_dir
+        self.bento_dir = data_dir
         self.feature_files = glob.glob(self.features_dir + '/*.' + self.file_type)
         self.bento_files = glob.glob(self.bento_dir + '/*.' + 'annot')
         check_if_filepath_list_is_empty(filepaths=self.feature_files, error_msg='SIMBA ERROR: No feature files found in project_folder/csv/features_extracted. Extract Features BEFORE appending BENTO annotations')

@@ -15,7 +15,7 @@ class ImportEthovision(ConfigReader):
     the SimBA project (as parquets' or CSVs).
 
     :param str config_path: path to SimBA project config file in Configparser format
-    :param str folder_path: path to folder holding ETHOVISION data files is XLSX or XLS format
+    :param str data_dir: path to folder holding ETHOVISION data files is XLSX or XLS format
 
     .. note::
        `Third-party import GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
@@ -23,25 +23,22 @@ class ImportEthovision(ConfigReader):
 
     Examples
     -----
-    >>> _ = ImportEthovision(config_path="MyConfigPath", folder_path="MyEthovisionFolderPath")
+    >>> ethovision_importer = ImportEthovision(config_path="MyConfigPath", data_dir="MyEthovisionFolderPath")
+    >>> ethovision_importer.run()
     """
 
     def __init__(self,
                  config_path: str,
-                 folder_path: str):
+                 data_dir: str):
 
         super().__init__(config_path=config_path)
 
         print('Appending ETHOVISION annotations...')
         self.config = read_config_file(config_path)
-        self.files_found = glob.glob(folder_path + '/*.xlsx') + glob.glob(folder_path + '/*.xls')
+        self.files_found = glob.glob(data_dir + '/*.xlsx') + glob.glob(data_dir + '/*.xls')
         self.files_found = [x for x in self.files_found if '~$' not in x]
         check_if_filepath_list_is_empty(filepaths=self.files_found,
-                                        error_msg='SIMBA ERROR: No ETHOVISION xlsx or xls files found in {}'.format(str(folder_path)))
-        self.processed_videos = []
-        self.__read_files()
-        self.timer.stop_timer()
-        stdout_success(msg='All Ethovision annotations added. Files with annotation are located in the project_folder/csv/targets_inserted directory', elapsed_time=self.timer.elapsed_time_str)
+                                        error_msg='SIMBA ERROR: No ETHOVISION xlsx or xls files found in {}'.format(str(data_dir)))
 
     def __read_files(self):
         for file_path in self.files_found:
@@ -113,5 +110,13 @@ class ImportEthovision(ConfigReader):
         write_df(self.features_df, self.file_type, save_file_name)
         print('Added Ethovision annotations for video {} ... '.format(self.video_name))
 
-#test = ImportEthovision(config_path= r"/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/project_folder/project_config.ini", folder_path=r'/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/ethovision_data')
-# test = ImportEthovision(config_path= r"/Users/simon/Desktop/simbapypi_dev/tests/test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini", folder_path=r'/Users/simon/Desktop/simbapypi_dev/tests/test_data/multi_animal_dlc_two_c57/ethovision_import')
+    def run(self):
+        self.processed_videos = []
+        self.__read_files()
+        self.timer.stop_timer()
+        stdout_success(msg='All Ethovision annotations added. Files with annotation are located in the project_folder/csv/targets_inserted directory', elapsed_time=self.timer.elapsed_time_str)
+
+
+# test = ImportEthovision(config_path= r"/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/project_folder/project_config.ini", data_dir=r'/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/ethovision_data')
+# test = ImportEthovision(config_path= r"/Users/simon/Desktop/envs/simba_dev/test/data/test_projects/two_c57/project_folder/project_config.ini", data_dir='/Users/simon/Desktop/envs/simba_dev/test/data/test_projects/two_c57/ethovision_annotations')
+# test.run()

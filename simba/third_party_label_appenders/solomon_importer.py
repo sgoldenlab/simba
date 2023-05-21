@@ -3,6 +3,8 @@ __author__ = "Simon Nilsson"
 import os, glob
 from copy import deepcopy
 
+import pandas as pd
+
 from simba.utils.printing import stdout_success
 from simba.utils.checks import check_that_column_exist, check_if_filepath_list_is_empty
 from simba.utils.read_write import read_df, write_df, get_fn_ext
@@ -13,7 +15,7 @@ class SolomonImporter(ConfigReader):
     Append SOLOMON human annotations onto featurized pose-estimation data.
 
     :param str config_path: path to SimBA project config file in Configparser format
-    :param str solomon_dir: path to folder holding SOLOMON data files is CSV format
+    :param str data_dir: path to folder holding SOLOMON data files is CSV format
 
     .. note::
        `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
@@ -21,8 +23,8 @@ class SolomonImporter(ConfigReader):
 
     Examples
     ----------
-    >>> solomon_imported = SolomonImporter(config_path=r'MySimBAConfigPath', solomon_dir=r'MySolomonDir')
-    >>> solomon_imported.import_solomon()
+    >>> solomon_imported = SolomonImporter(config_path=r'MySimBAConfigPath', data_dir=r'MySolomonDir')
+    >>> solomon_imported.run()
 
     References
     ----------
@@ -32,16 +34,17 @@ class SolomonImporter(ConfigReader):
 
     def __init__(self,
                  config_path: str,
-                 solomon_dir: str):
+                 data_dir: str):
+
         super().__init__(config_path=config_path)
-        self.solomon_paths = glob.glob(solomon_dir + '/*.csv')
+        self.solomon_paths = glob.glob(data_dir + '/*.csv')
         check_if_filepath_list_is_empty(filepaths=self.solomon_paths,
-                                        error_msg=f'SIMBA ERROR: No CSV files detected in SOLOMON directory {solomon_dir}')
+                                        error_msg=f'SIMBA ERROR: No CSV files detected in SOLOMON directory {data_dir}')
         check_if_filepath_list_is_empty(filepaths=self.feature_file_paths,
                                         error_msg=f'SIMBA ERROR: No CSV files detected in feature directory {self.features_dir}')
         if not os.path.exists(self.targets_folder): os.mkdir(self.targets_folder)
 
-    def import_solomon(self):
+    def run(self):
         for file_cnt, file_path in enumerate(self.solomon_paths):
             _, file_name, _ = get_fn_ext(file_path)
             feature_file_path = os.path.join(self.features_dir, file_name + '.' + self.file_type)
@@ -50,7 +53,7 @@ class SolomonImporter(ConfigReader):
                 print('SIMBA WARNING: Data for video {} does not exist in the features directory. SimBA will SKIP appending annotations for video {}'.format(file_name, file_name))
                 continue
             save_path = os.path.join(self.targets_folder, file_name + '.' + self.file_type)
-            solomon_df = read_df(file_path, self.file_type).reset_index()
+            solomon_df = pd.read_csv(file_path)
             check_that_column_exist(df=solomon_df, column_name='Behaviour', file_name=file_path)
             features_df = read_df(feature_file_path, self.file_type)
             out_df = deepcopy(features_df)
@@ -79,9 +82,9 @@ class SolomonImporter(ConfigReader):
             print('Solomon annotations appended for video {}...'.format(file_name))
         stdout_success(msg='All SOLOMON annotations imported. Data saved in the project_folder/csv/targets_inserted directory of the SimBA project')
 
-# test = SolomonImporter(config_path='/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/project_folder/project_config.ini',
-#                        solomon_dir='/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/solomon_data')
-#
-# test.import_solomon()
+test = SolomonImporter(config_path='/Users/simon/Desktop/envs/simba_dev/test/data/test_projects/two_c57/project_folder/project_config.ini',
+                       data_dir='/Users/simon/Desktop/envs/simba_dev/test/data/test_projects/two_c57/solomon_annotations')
+
+test.run()
 
 
