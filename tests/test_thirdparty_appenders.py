@@ -27,8 +27,8 @@ def test_solomon_import_use_case(config_path, solomon_path):
                                        data_dir=solomon_path)
     solomon_appender.run()
 
-@pytest.mark.parametrize("config_path, data_dir", [('/Users/simon/Desktop/envs/simba_dev/test/data/test_projects/two_c57/project_folder/project_config.ini',
-                                                    '/Users/simon/Desktop/envs/simba_dev/test/data/test_projects/two_c57/ethovision_annotations')])
+@pytest.mark.parametrize("config_path, data_dir", [('test/data/test_projects/two_c57/project_folder/project_config.ini',
+                                                    'tests/data/test_projects/two_c57/ethovision_annotations')])
 def test_ethovision_import_use_case(config_path, data_dir):
     ethovision_importer = ImportEthovision(config_path=config_path, data_dir=data_dir)
     ethovision_importer.run()
