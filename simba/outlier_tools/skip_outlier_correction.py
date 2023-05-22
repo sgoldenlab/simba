@@ -45,7 +45,7 @@ class OutlierCorrectionSkipper(ConfigReader):
             if "scorer" in data_df.columns:
                 data_df = data_df.set_index("scorer")
             data_df = self.insert_column_headers_for_outlier_correction(
-                data_df=data_df, new_headers=self.bp_col_names, filepath=file_path
+                data_df=data_df, new_headers=self.bp_headers, filepath=file_path
             )
             data_df.index.name = None
             save_path = os.path.join(
