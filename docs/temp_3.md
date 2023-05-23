@@ -16,7 +16,7 @@ SimBA forces an equal number of frames into each bin and creates **N unequally s
 
 **DATA TYPE:** When binning the severity, we can either obtain severity scores for each (i) individual classifified frame, or (ii) for each classified bout. Select `BOUTS` to get a severity score for each classified bout and `FRAMES` to get a severity score per classified frame. 
 
-**MOVEMENT NORMALIZATION TYPE:** When creating the severity bins, we can either (i) use all the movement data represented by all files with classifications (all data within the project_folder/csv/machine_results directory). This selection will results in a single bin reference scale that are applied equally to all videos, or (ii) we can create the scales by referencing the movement only the video itself. This selection will results in different severity scale bins for the different videos. 
+**MOVEMENT NORMALIZATION TYPE:** When creating the severity bins, we can either (i) use all the movement data represented by all files with classifications (all data within the project_folder/csv/machine_results directory). This selection will results in a single bin reference scale that are applied equally to all videos, or (ii) we can create the scales by referencing the movement only in each of the videos themselves. This selection will results in different severity scale bins for each of the different videos. 
 
 **SAVE BRACKET DEFINITIONS:** If ticked, SimBA will save a CSV log file containing the bin definitions for each analysed video in the project (saved inside the project_folder/logs directory).
 
@@ -24,9 +24,11 @@ SimBA forces an equal number of frames into each bin and creates **N unequally s
 
 **SHOW POSE-ESTIMATED LOCATIONS**: If ticked, SimBA will include pose-estimated body-part locations (as circles) in the video clips.
 
-**VIDEO SPEED**: The FPS of the example clips relative to the original video. E.g., if `1`, the clips will be saved at origginal speed. If `0.5`, the clips will be saved at hald the original speed.
+**VIDEO SPEED**: The FPS of the example clips relative to the original video FPS. E.g., if `1`, the clips will be saved at origginal speed. If `0.5`, the clips will be saved at hald the original speed.
 
-**CLIP COUNT**: 
+**CLIP COUNT**: How many example clips we want to create. E.g., if `10`, SimBA will randomly sample `10` classified bouts to create 10 example video clips. If the selected clip count is higher then the number of total classified bouts, then SimBA will create clips for all bouts. 
+
+
 
 
 
