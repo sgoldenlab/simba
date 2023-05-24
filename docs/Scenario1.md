@@ -88,7 +88,8 @@ In this current Scenario 1, we now want to import the 20 pilot videos that we wi
 2. Under the `Import multiple videos` heading, click on `Browse Folder` to select a folder that contains **all the pilot videos** to import into your project.
 3. Enter the file type of your videos. (e.g., *mp4*, *avi*, *mov*, etc) in the `Video type` entry box.
 4. Click on `Import multiple videos`. 
->*Note*: If you have a lot of videos, or exceptionally high resolution/frame rate/duration videos, it might take a few minutes before all the videos are imported. The main SimBA terminal window will report when the process is complete.
+
+>*Note*: If you have a lot of videos, or exceptionally high resolution/frame rate/duration videos, it might take a few minutes before all the videos are imported. The main SimBA terminal window will report when the process is complete. If your videos are very large and you are conscious about disk space, try ticking the `Import SYMLINKS` checkbutton. This will import soft links (shortcuts) to the videos rather then actual videos (hard copies).  
 
 ### Step 3: Import DLC Tracking Data
 In this step, you will import your pose-estimation tracking data from DeepLabCut in CSV file format. For the pilot videos, this means that you should have 20 individual CSV files corresponding to each of the individual videos.
