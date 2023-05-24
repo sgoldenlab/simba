@@ -33,7 +33,7 @@ class Interpolate(ConfigReader):
                             See `tutorial for info/images of the different interpolation types <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
     :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Default: False.
 
-    .. image:: _static/img/Interpolation_comparison.png
+    .. image:: _static/img/interpolation_comparison.png
        :width: 400
        :align: center
 
