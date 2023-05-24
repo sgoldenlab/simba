@@ -104,17 +104,36 @@ Clicking the `Run` buttons calculates the descriptive statistics on all the CSV 
 
 In this pop-up. Tick the checkboxes for which classified behaviors and ROIs you wish to analyze. Also tick the buttons for which measurements you want aggregate statistics for. In the `Select body-part` drop-down menu, select the body-part you shich to use as a proxy for the location of the behavior. Once filled in, click `Analyze classifications in each ROI`. An output data file will be saved in the `project_folder/logs` directory of your SimBA project.
 
-6. `Analyze machine predictions: by severity`: This type of analysis is only relevant if your behavior can be graded on a scale ranging from mild (the behavior occurs in the presence of very little body part movements) to severe (the behavior occurs in the presence of a lot of body part movements). For instance, attacks could be graded this way, with 'mild' or 'moderate' attacks happening when the animals aren't moving as much as they are in other parts of the video, while 'severe' attacks occur when both animals are tussling at full force.  This button and code calculates the ‘severity’ of each frame classified as containing the behavior based on a user-defined scale. Clicking the severity button brings up the following menu: 
 
-![alt-text-1](/images/severity_pop_up.png "severity_pop_up")
+6. ``Analyze machine predictions: BY SEVERITY``. This type of analysis is only relevant if your behavior can be graded on a scale ranging from mild (the behavior occurs in the presence of very little body part movements) to severe (the behavior occurs in the presence of a lot of body part movements). For instance, attacks could be graded this way, with 'mild' or 'moderate' attacks happening when the animals aren't moving as much as they are in other parts of the video, while 'severe' attacks occur when both animals are tussling at full force. This button and code calculates the ‘severity’ of each frame (or bout) classified as containing the behavior based on a user-defined scale. Clicking the severity button brings up the following menu. We go through the meaning of each setting below:
 
-* **Classifier** dropdown: Select which classifier you want to calculate severity scores for.
-* **Brackets** dropdown: Select the size of the severity scale. E.g., select **10** if you want to score your classifications on a 10-point scale.
-* **Animals** dropdown: Select which animals body-parts you want to use to calculate the movement. E.g., select `ALL ANIMALS` to calculate the movement based on all animals and their body-parts. 
-* **FRAME COUNT** checkbox: Check this box to get the results presented as **number of frames** in each severity bracket.
-* **SECONDS** checkbox: Check this box to get the results presented as **number of seconds** in each severity bracket.
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/severity_analysis_pop_up.png" />
+</p>
 
-Click on RUN SEVERITY ANALYSIS. You can follow progress in the main SimBA terminal. The results are saved in the `project_folder/logs/` directory of your SimBA project. You can found an expected output of this analysis [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/severity_example_20230301090603.csv)
+**CLASSIFIER:** This drop-down shows the classifiers in your SimBA project. Select the classifier which you want to score the severity for. 
+
+**BRACKETS:** Select the size of the severity scale. E.g., select 10 if you want to score your classifications on a 10-point scale.
+
+**ANIMALS:** Select which animals body-parts you want to use to calculate the movement. E.g., select ALL ANIMALS to calculate the movement based on all animals and their body-parts.
+
+**BRACKET TYPE:** If `QUANTIZE`, then SimBA  creates **N equally sized bins** (with N defined in the BRACKETS dropdown). If `QUANTILE`, 
+SimBA forces an equal number of frames into each bin and creates **N unequally sized bins**. For more detailed, see the differences between [pandas.qcut](https://pandas.pydata.org/docs/reference/api/pandas.qcut.html) and [pandas.cut](https://pandas.pydata.org/docs/reference/api/pandas.cut.html).
+
+**DATA TYPE:** When binning the severity, we can either obtain severity scores for each (i) individual classifified frame, or (ii) for each classified bout. Select `BOUTS` to get a severity score for each classified bout and `FRAMES` to get a severity score per classified frame. 
+
+**MOVEMENT NORMALIZATION TYPE:** When creating the severity bins, we can either (i) use all the movement data represented by all files with classifications (all data within the project_folder/csv/machine_results directory). This selection will results in a single bin reference scale that are applied equally to all videos, or (ii) we can create the scales by referencing the movement only in each of the videos themselves. This selection will results in different severity scale bins for each of the different videos. 
+
+**SAVE BRACKET DEFINITIONS:** If ticked, SimBA will save a CSV log file containing the bin definitions for each analysed video in the project (saved inside the project_folder/logs directory). Note: If `MOVEMENT NORMALIZATION TYPE` is set to `ALL VIDEOS` this log should show the same bin definitions for each video. 
+
+**VISUALIZE**: If ticked, SimBA will generate visualization example clips.
+
+**SHOW POSE-ESTIMATED LOCATIONS**: If ticked, SimBA will include pose-estimated body-part locations (as circles) in the video clips.
+
+**VIDEO SPEED**: The FPS of the example clips relative to the original video FPS. E.g., if `1`, the clips will be saved at origginal speed. If `0.5`, the clips will be saved at hald the original speed.
+
+**CLIP COUNT**: How many example clips we want to create. E.g., if `10`, SimBA will randomly sample `10` classified bouts to create 10 example video clips. If the selected clip count is higher then the number of total classified bouts, then SimBA will create clips for all bouts. 
+Click on RUN SEVERITY ANALYSIS. You can follow progress in the main SimBA terminal. The results are saved in the `project_folder/logs/` directory of your SimBA project.
 
 Congrats! You have now used machine models to classify behaviors in new data. To visualize the machine predictions by rendering images and videos with the behavioral predictions overlaid, and plots describing on-going behaviors and bouts, proceed to [*Part 5*](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions) of the current tutorial. 
 
