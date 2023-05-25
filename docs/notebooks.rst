@@ -8,7 +8,7 @@ General processing
    :maxdepth: 1
 
    nb/CLI Example 1
-
+   nb/shap_example_1
 
 Visualizations
 -------------------
