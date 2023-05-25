@@ -178,9 +178,22 @@ First, begin by selecting the number of animals (or body-parts) you wish to use 
 
 > Note I: As of 04/05/2021, SimBA will also generate a summary file of the ROI-based features - the summary file can be located in the `project_folder/logs` directory. This file will be a date-time stamped CSV file named something like `ROI_features_summary_20210401144559.csv`. The file contains the mean distance to the center of each ROI for each animal in each video. If SimBA calculates *directionality* based features, then this file will also contain the sum of time (in seconds) that each animal spent directed towards each ROI in each video.   
 
-> Note II: For a description of the different features as named in the output files, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_features_examples.md) 
+> Note II: For a description of the different features as named in the output files, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_features_examples.md)
 
 To proceed and generate machine learning classifiers that use these features, continue reading the [Label behavior](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-6-label-behavior) step, followed by the [Train machine models](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model) parts of the SimBA tutorials. 
+
+
+### Removing ROI data from the feature sets
+
+We may have created ROI features, which have been appended to our files inside the `project_folder/csv/features_extracted` directory, and now we feel like we don't have any use for them and want to remove them. To do this click the 'REMOVE ROI FEATURES FROM FEATURE SET` button. 
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/remove_roi_features_features_extracted.png" width="600"/>
+
+When clicking this button, you will be prompt to confirm that you do want to remove your ROI features. 
+
+If clicking **YES**, SimBA will identify the ROI-based features columns inside each file within the project_folder/csv/features_extracted directory. SimBA will then remove thses columns fropm each file, and place them within the `project_folder/logs/ROI_data_(datetime)` directory. This means that can't be used within the project, and you can go ahead and delete this folder manually.  
+
+> Note: To identfy the ROI based columns, SimBA looks inside your projects ROI definitions. Thus, if you have created ROI features, and subsequently renamed your ROI shapes, then SimBA won't be able to find and remove the ROI-based columns using this method. 
 
 # Part 4. Visualizing ROI data
 
