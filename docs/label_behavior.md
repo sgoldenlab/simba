@@ -154,6 +154,7 @@ This method (`ADVANCED LABELLING`) allows you the greatest control over the data
 
 ## MISCELLANEOUS LABELLING TOOLS IN SIMBA
 
+### Visualization
 * After we have created (or [imported](https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md)) our annotations into SimBA, we may want to view them so confirm that they are accurate. For this, click on `Visualize annotations` in the `LABELLING TOOLS` submenu in the [Label behavior] tab and you should see the follwoing pop-up:
 
 <p align="center">
@@ -164,7 +165,17 @@ Select which classifier annotatated frames you wish to extract by ticking the ap
 
 Once complete, the images annotated as **behavior present** will be stored within sub-directories of the `project_folder/frames/output/annotated_frames` folder in the hierarchy of `video name` -> `classifier behavior name`. The file names of the frames are the frame number of the annotated behaviour. E.g., a file at the path `project_folder/frames/output/annotated_frames/My_video/Attack/28.png` represents an **behavior-present** annotation for the behavior `Attack` at the 28th frame of video `My_video`.  
 
+### Removing ROI data from the annotated data sets
 
+We may have created ROI features, which have been appended to our annotated data files inside the `project_folder/csv/targets_inserted` directory, and now we feel like we don't have any use for them and want to remove them. To do this click the `Remove ROI features from label set` button. 
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/remove_roi_features_targets_inserted.png" width="600"/>
+
+When clicking this button, you will be prompt to confirm that you do want to remove your ROI features. 
+
+If clicking **YES**, SimBA will identify the ROI-based features columns inside each file within the `project_folder/csv/targets_inserted` directory. SimBA will then remove thses columns fropm each file, and place them within the `project_folder/logs/ROI_data_(datetime)` directory. This means that can't be used within the project, and you can go ahead and delete this folder manually.  
+
+> Note: To identfy the ROI based columns, SimBA looks inside your projects ROI definitions. Thus, if you have created ROI features, and subsequently renamed your ROI shapes, then SimBA won't be able to find and remove the ROI-based columns using this method.
 
 #
 Author [Simon N](https://github.com/sronilsson)
