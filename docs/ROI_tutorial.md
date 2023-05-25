@@ -185,7 +185,7 @@ To proceed and generate machine learning classifiers that use these features, co
 
 ### Removing ROI data from the feature sets
 
-We may have created ROI features, which have been appended to our files inside the `project_folder/csv/features_extracted` directory, and now we feel like we don't have any use for them and want to remove them. To do this click the 'REMOVE ROI FEATURES FROM FEATURE SET` button. 
+We may have created ROI features, which have been appended to our files inside the `project_folder/csv/features_extracted` directory, and now we feel like we don't have any use for them and want to remove them. To do this click the `REMOVE ROI FEATURES FROM FEATURE SET` button. 
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/remove_roi_features_features_extracted.png" width="600"/>
 
