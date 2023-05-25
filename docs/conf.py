@@ -32,6 +32,7 @@ intersphinx_mapping = {
 html_favicon = "../simba/assets/icons/SimBA_logo.png"
 html_logo = "../simba/assets/icons/SimBA_logo.png"
 latex_engine = 'xelatex'
+latex_elements = {'papersize': 'letterpaper'}
 
 
 # source_suffix = {
