@@ -80,6 +80,8 @@ Once the classifications have been generated, we may want to analyze descriptive
 
 Clicking on `RUN` runs the selected desciptive statistics on all the files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved within the `/project_folder/log` folder. Check the main SimBA terminal window for the exact output filename and file path. 
 
+> Note: At times, we may want also want to output a reference to the video meta data (e.g., the number of frames or the length of the video) we can help us compute proportions. To add such data to the output, tick the relevant boxes in the `METADATA` frame. 
+
 2. `ANALYZE DISTANCES / VELOCITY: AGGREGATES`: This button generates descriptive statistics for distances and velocities. Clicking the button will display a pop-up window where the user selects how many animal, and which body-parts, the user wants to use to calculate the distance and velocity metrics. The pop up window should look like this:
 
 ![alt-text-1](/images/data_analysis_0523_3.png "data_log")
