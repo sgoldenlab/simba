@@ -1,11 +1,10 @@
 __author__ = "Simon Nilsson"
 
 import os
-
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.read_write import get_fn_ext, read_df, write_df
+from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.mixins.config_reader import ConfigReader
 
 
 class OutlierCorrectionSkipper(ConfigReader):
@@ -20,13 +19,10 @@ class OutlierCorrectionSkipper(ConfigReader):
     """
 
     def __init__(self, config_path: str):
+
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        if not os.path.exists(self.outlier_corrected_dir):
-            os.makedirs(self.outlier_corrected_dir)
-        check_if_filepath_list_is_empty(
-            filepaths=self.input_csv_paths,
-            error_msg=f"No files found in {self.input_csv_dir}.",
-        )
+        if not os.path.exists(self.outlier_corrected_dir): os.makedirs(self.outlier_corrected_dir)
+        check_if_filepath_list_is_empty(filepaths=self.input_csv_paths, error_msg=f"No files found in {self.input_csv_dir}.", )
         print(f"Processing {len(self.input_csv_paths)} file(s)...")
 
     def run(self):
@@ -39,11 +35,10 @@ class OutlierCorrectionSkipper(ConfigReader):
         for file_cnt, file_path in enumerate(self.input_csv_paths):
             video_timer = SimbaTimer(start=True)
             _, video_name, ext = get_fn_ext(file_path)
-            data_df = read_df(
-                file_path=file_path, file_type=self.file_type, check_multiindex=True
-            )
+            data_df = read_df(file_path=file_path, file_type=self.file_type, check_multiindex=True)
             if "scorer" in data_df.columns:
                 data_df = data_df.set_index("scorer")
+
             data_df = self.insert_column_headers_for_outlier_correction(
                 data_df=data_df, new_headers=self.bp_headers, filepath=file_path
             )
@@ -61,7 +56,6 @@ class OutlierCorrectionSkipper(ConfigReader):
             msg=f"Skipped outlier correction for {len(self.input_csv_paths)} files",
             elapsed_time=self.timer.elapsed_time_str,
         )
-
 
 # test = OutlierCorrectionSkipper(config_path='/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini')
 # test.run()
