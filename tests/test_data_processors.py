@@ -10,8 +10,8 @@ from simba.data_processors.timebins_movement_calculator import TimeBinsMovementC
 
 
 
-@pytest.mark.parametrize("config_path, data_measures, classifiers", [('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Bout count'], ['Attack']),
-                                                                     ('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Total event duration (s)'], ['Attack'])])
+@pytest.mark.parametrize("config_path, data_measures, classifiers", [('/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Bout count'], ['Attack']),
+                                                                     ('/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Total event duration (s)'], ['Attack'])])
 def test_create_clf_log_use_case(config_path, data_measures, classifiers):
 
     clf_log_creator = AggregateClfCalculator(config_path=config_path,
@@ -22,7 +22,7 @@ def test_create_clf_log_use_case(config_path, data_measures, classifiers):
     assert os.path.isfile(clf_log_creator.save_path)
     os.remove(clf_log_creator.save_path)
 
-@pytest.mark.parametrize("config_path, time_window, behavior_lst, create_graph", [('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', 2000, ['Attack', 'Sniffing'], False)])
+@pytest.mark.parametrize("config_path, time_window, behavior_lst, create_graph", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', 2000, ['Attack', 'Sniffing'], False)])
 def test_fsttc_calculator_use_case(config_path, time_window, behavior_lst, create_graph):
     fsttc_calculator = FSTTCCalculator(config_path=config_path, time_window=time_window, behavior_lst=behavior_lst, create_graphs=create_graph)
     fsttc_calculator.run()
@@ -42,8 +42,8 @@ def test_kleinberg_calculator_use_case(config_path, classifier_names, gamma, sig
     calculator.run()
 
 
-@pytest.mark.parametrize("config_path, body_parts, threshold", [('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['simon CENTER OF GRAVITY'], 0.0),
-                                                                ('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Nose_1'], 0.0)])
+@pytest.mark.parametrize("config_path, body_parts, threshold", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', ['simon CENTER OF GRAVITY'], 0.0),
+                                                                ('tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Nose_1'], 0.0)])
 def test_movement_calculator_use_case(config_path, body_parts, threshold):
     calculator = MovementCalculator(config_path=config_path,
                                     body_parts=body_parts,
@@ -54,7 +54,7 @@ def test_movement_calculator_use_case(config_path, body_parts, threshold):
     os.remove(calculator.save_path)
 
 
-@pytest.mark.parametrize("config_path, bin_length, measurements, classifiers", [('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', 2, ['Event count'], ['Attack'])])
+@pytest.mark.parametrize("config_path, bin_length, measurements, classifiers", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', 2, ['Event count'], ['Attack'])])
 def test_time_bins_clf_calculator_use_case(config_path, bin_length, measurements, classifiers):
     calculator = TimeBinsClfCalculator(config_path=config_path,
                                        bin_length=bin_length,
@@ -65,7 +65,7 @@ def test_time_bins_clf_calculator_use_case(config_path, bin_length, measurements
     os.remove(calculator.save_path)
 
 
-@pytest.mark.parametrize("config_path, bin_length, plots, body_parts", [('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', 10, True, ['Nose_1', 'Nose_2'])])
+@pytest.mark.parametrize("config_path, bin_length, plots, body_parts", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', 10, True, ['Nose_1', 'Nose_2'])])
 def test_time_bins_movement_calculator_use_case(config_path, bin_length, plots, body_parts):
     calculator = TimeBinsMovementCalculator(config_path=config_path,
                                             bin_length=bin_length,
