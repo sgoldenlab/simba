@@ -34,7 +34,7 @@ def test_fsttc_calculator_use_case(config_path, time_window, behavior_lst, creat
         assert os.path.isfile(fsttc_calculator.save_plot_path)
     os.remove(fsttc_calculator.file_save_path)
 
-@pytest.mark.parametrize("config_path, classifier_names, sigma, gamma, hierarchy, hierarchical_search", [('/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Attack'], 1.1, 0.3, 5, False)])
+@pytest.mark.parametrize("config_path, classifier_names, sigma, gamma, hierarchy, hierarchical_search", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Attack'], 1.1, 0.3, 5, False)])
 def test_kleinberg_calculator_use_case(config_path, classifier_names, gamma, sigma, hierarchy, hierarchical_search):
     calculator = KleinbergCalculator(config_path=config_path,
                                      classifier_names=classifier_names,
