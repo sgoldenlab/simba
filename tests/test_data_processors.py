@@ -22,6 +22,7 @@ def test_create_clf_log_use_case(config_path, data_measures, video_meta_data, cl
     assert len(clf_log_creator.results_df) == len(data_measures)
     assert os.path.isfile(clf_log_creator.save_path)
     os.remove(clf_log_creator.save_path)
+    
 
 @pytest.mark.parametrize("config_path, time_window, behavior_lst, create_graph", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', 2000, ['Attack', 'Sniffing'], False)])
 def test_fsttc_calculator_use_case(config_path, time_window, behavior_lst, create_graph):
