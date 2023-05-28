@@ -10,6 +10,8 @@ General processing
    nb/CLI Example 1
    nb/shap_example_1
    nb/outlier_correction
+   nb/third_party_append
+
 
 Visualizations
 -------------------
