@@ -16,7 +16,8 @@ def test_create_clf_log_use_case(config_path, data_measures, video_meta_data, cl
 
     clf_log_creator = AggregateClfCalculator(config_path=config_path,
                                              data_measures=data_measures, 
-                                             classifiers=classifiers)
+                                             classifiers=classifiers
+                                             video_meta_data=video_meta_data)
     clf_log_creator.run()
     clf_log_creator.save()
     assert len(clf_log_creator.results_df) == len(data_measures)
