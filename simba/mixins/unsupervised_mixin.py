@@ -30,11 +30,12 @@ from simba.utils.enums import Paths
 
 
 class UnsupervisedMixin(object):
+    """
+    Methods for unsupervised ML.
+    """
     def __init__(self):
 
-        """
-        Methods for unsupervised ML.
-        """
+
 
         self.datetime = datetime.now().strftime('%Y%m%d%H%M%S')
         self.timer = SimbaTimer(start=True)
