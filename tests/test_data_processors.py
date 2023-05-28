@@ -10,8 +10,8 @@ from simba.data_processors.timebins_movement_calculator import TimeBinsMovementC
 
 
 
-@pytest.mark.parametrize("config_path, data_measures, video_meta_data, classifiers", [('/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Bout count'], [], ['Attack']),
-                                                                                      ('/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Total event duration (s)'], [], ['Attack'])])
+@pytest.mark.parametrize("config_path, data_measures, video_meta_data, classifiers", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Bout count'], [], ['Attack']),
+                                                                                      ('tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Total event duration (s)'], [], ['Attack'])])
 def test_create_clf_log_use_case(config_path, data_measures, video_meta_data, classifiers):
 
     clf_log_creator = AggregateClfCalculator(config_path=config_path,
