@@ -15,7 +15,7 @@ import simba
 try:
     from typing import Literal
 except:
-    from typing_extensions import typing
+    from typing_extensions import Literal
 
 from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
                                    StandardScaler)
