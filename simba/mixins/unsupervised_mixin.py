@@ -161,7 +161,7 @@ class UnsupervisedMixin(object):
         
         :param pd.DataFrame data: Data to transform.
         :param scaler: fitted scaler.
-        """"
+        """
 
         return pd.DataFrame(scaler.transform(data), columns=data.columns).set_index(data.index)
 
