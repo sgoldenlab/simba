@@ -109,8 +109,7 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
             )
 
     def __create_video(self):
-        video_timer = SimbaTimer()
-        video_timer.start_timer()
+        video_timer = SimbaTimer(start=True)
         data_arr, frm_per_core = self.split_and_group_df(
             df=self.data_df, splits=self.core_cnt, include_split_order=True
         )
