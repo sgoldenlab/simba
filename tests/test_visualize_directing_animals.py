@@ -1,5 +1,5 @@
 import pytest
-impport os
+import os
 from simba.plotting.directing_animals_visualizer import DirectingOtherAnimalsVisualizer
 from simba.plotting.directing_animals_visualizer_mp import DirectingOtherAnimalsVisualizerMultiprocess
 
