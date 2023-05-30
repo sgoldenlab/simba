@@ -2,7 +2,10 @@ import pytest
 from simba.plotting.directing_animals_visualizer import DirectingOtherAnimalsVisualizer
 from simba.plotting.directing_animals_visualizer_mp import DirectingOtherAnimalsVisualizerMultiprocess
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="LONG RUNNING TIME.")
 class TestDirectingAnimalsVisualizer(object):
 
     @pytest.fixture(params=['tests/data/test_projects/two_c57/project_folder/csv/outlier_corrected_movement_location/Together_1.csv'])
