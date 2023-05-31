@@ -3,11 +3,11 @@ from simba.plotting.clf_validator import ClassifierValidationClips
 
 class TestValidationClips(object):
 
-    @pytest.fixture(params=['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini'])
+    @pytest.fixture(params=['tests/data/test_projects/two_c57/project_folder/project_config.ini'])
     def config_path_args(self, request):
         return request
 
-    @pytest.fixture(params=[['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/csv/machine_results/Together_1.csv']])
+    @pytest.fixture(params=[['tests/data/test_projects/two_c57/project_folder/csv/machine_results/Together_1.csv']])
     def data_path_arg(self, request):
         return request
 
