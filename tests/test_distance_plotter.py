@@ -6,11 +6,11 @@ from simba.plotting.distance_plotter_mp import DistancePlotterMultiCore
 
 class TestDistancePlotter(object):
 
-    @pytest.fixture(params=['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini'])
+    @pytest.fixture(params=['tests/data/test_projects/two_c57/project_folder/project_config.ini'])
     def config_path_args(self, request):
         return request
 
-    @pytest.fixture(params=[['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/csv/outlier_corrected_movement_location/Together_1.csv']])
+    @pytest.fixture(params=[['tests/data/test_projects/two_c57/project_folder/csv/outlier_corrected_movement_location/Together_1.csv']])
     def data_path_args(self, request):
         return request
 
