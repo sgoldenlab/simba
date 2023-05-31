@@ -1,19 +1,22 @@
 __author__ = "Simon Nilsson"
 
-import numpy as np
-import multiprocessing
 import functools
-from numba import jit
+import multiprocessing
 import os
 import platform
 from typing import Dict, List
 
-from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import stdout_success, SimbaTimer
+import numpy as np
+from numba import jit
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.read_write import read_df, get_fn_ext, concatenate_videos_in_folder
+from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+                                    read_df)
+
 
 class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
     """
@@ -40,88 +43,130 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
     >>> distance_plotter.run()
     """
 
-    def __init__(self,
-                 config_path: str,
-                 frame_setting: bool,
-                 video_setting: bool,
-                 final_img: bool,
-                 files_found: List[str],
-                 style_attr: Dict[str, int],
-                 line_attr: Dict[int, list],
-                 core_cnt: int):
-
+    def __init__(
+        self,
+        config_path: str,
+        frame_setting: bool,
+        video_setting: bool,
+        final_img: bool,
+        files_found: List[str],
+        style_attr: Dict[str, int],
+        line_attr: Dict[int, list],
+        core_cnt: int,
+    ):
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
 
         if platform.system() == "Darwin":
-            multiprocessing.set_start_method('spawn', force=True)
+            multiprocessing.set_start_method("spawn", force=True)
 
-        self.video_setting, self.frame_setting, self.files_found, self.style_attr, self.line_attr, self.final_img = video_setting, frame_setting, files_found, style_attr, line_attr, final_img
+        (
+            self.video_setting,
+            self.frame_setting,
+            self.files_found,
+            self.style_attr,
+            self.line_attr,
+            self.final_img,
+        ) = (
+            video_setting,
+            frame_setting,
+            files_found,
+            style_attr,
+            line_attr,
+            final_img,
+        )
         if (not frame_setting) and (not video_setting) and (not self.final_img):
-            raise NoSpecifiedOutputError(msg='Please choice to create frames and/or video distance plots')
+            raise NoSpecifiedOutputError(
+                msg="Please choice to create frames and/or video distance plots"
+            )
         self.core_cnt = core_cnt
-        if not os.path.exists(self.line_plot_dir): os.makedirs(self.line_plot_dir)
-        check_if_filepath_list_is_empty(filepaths=self.outlier_corrected_dir,
-                                        error_msg='SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing distances.')
-        print(f'Processing {str(len(self.files_found))} videos...')
+        if not os.path.exists(self.line_plot_dir):
+            os.makedirs(self.line_plot_dir)
+        check_if_filepath_list_is_empty(
+            filepaths=self.outlier_corrected_dir,
+            error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing distances.",
+        )
+        print(f"Processing {str(len(self.files_found))} videos...")
 
     @staticmethod
     @jit(nopython=True)
-    def __insert_group_idx_column(data: np.array,
-                                  group: int):
+    def __insert_group_idx_column(data: np.array, group: int):
         group_col = np.full((data.shape[0], 1), group)
         return np.hstack((group_col, data))
 
-
     def run(self):
-        '''
+        """
         Creates line charts. Results are stored in the `project_folder/frames/line_plot` directory
 
         Returns
         ----------
         None
-        '''
+        """
 
         for file_cnt, file_path in enumerate(self.files_found):
-
             video_timer = SimbaTimer(start=True)
             self.data_df = read_df(file_path, self.file_type)
-            distance_arr = np.full((len(self.data_df), len(self.line_attr.keys())), np.nan)
+            distance_arr = np.full(
+                (len(self.data_df), len(self.line_attr.keys())), np.nan
+            )
             _, self.video_name, _ = get_fn_ext(file_path)
-            self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=self.video_name)
+            self.video_info, self.px_per_mm, self.fps = self.read_video_info(
+                video_name=self.video_name
+            )
             self.save_video_folder = os.path.join(self.line_plot_dir, self.video_name)
-            self.temp_folder = os.path.join(self.line_plot_dir, self.video_name, 'temp')
-            self.save_frame_folder_dir = os.path.join(self.line_plot_dir, self.video_name)
+            self.temp_folder = os.path.join(self.line_plot_dir, self.video_name, "temp")
+            self.save_frame_folder_dir = os.path.join(
+                self.line_plot_dir, self.video_name
+            )
             for distance_cnt, data in enumerate(self.line_attr.values()):
-                distance_arr[:, distance_cnt] = (np.sqrt((self.data_df[data[0] + '_x'] - self.data_df[data[1] + '_x']) ** 2 + (self.data_df[data[0] + '_y'] - self.data_df[data[1] + '_y']) ** 2) / self.px_per_mm) / 10
+                distance_arr[:, distance_cnt] = (
+                    np.sqrt(
+                        (self.data_df[data[0] + "_x"] - self.data_df[data[1] + "_x"])
+                        ** 2
+                        + (self.data_df[data[0] + "_y"] - self.data_df[data[1] + "_y"])
+                        ** 2
+                    )
+                    / self.px_per_mm
+                ) / 10
             if self.frame_setting:
                 if os.path.exists(self.save_frame_folder_dir):
                     self.remove_a_folder(self.save_frame_folder_dir)
-                if not os.path.exists(self.save_frame_folder_dir): os.makedirs(self.save_frame_folder_dir)
+                if not os.path.exists(self.save_frame_folder_dir):
+                    os.makedirs(self.save_frame_folder_dir)
             if self.video_setting:
                 self.video_folder = os.path.join(self.line_plot_dir, self.video_name)
                 if os.path.exists(self.temp_folder):
                     self.remove_a_folder(self.temp_folder)
                     self.remove_a_folder(self.video_folder)
                 os.makedirs(self.temp_folder)
-                self.save_video_path = os.path.join(self.line_plot_dir, self.video_name + '.mp4')
+                self.save_video_path = os.path.join(
+                    self.line_plot_dir, self.video_name + ".mp4"
+                )
 
             distance_arr = np.nan_to_num(distance_arr, nan=0.0)
 
             if self.final_img:
-                self.make_distance_plot(data=distance_arr,
-                                        line_attr=self.line_attr,
-                                        style_attr=self.style_attr,
-                                        fps=self.fps,
-                                        save_path=os.path.join(self.line_plot_dir, self.video_name + '_final_img.png'))
+                self.make_distance_plot(
+                    data=distance_arr,
+                    line_attr=self.line_attr,
+                    style_attr=self.style_attr,
+                    fps=self.fps,
+                    save_path=os.path.join(
+                        self.line_plot_dir, self.video_name + "_final_img.png"
+                    ),
+                )
 
             if self.video_setting or self.frame_setting:
-                if self.style_attr['y_max'] == 'auto':
-                    self.style_attr['max_y'] = np.amax(distance_arr)
+                if self.style_attr["y_max"] == "auto":
+                    self.style_attr["max_y"] = np.amax(distance_arr)
                 else:
-                    self.style_attr['max_y'] = float(self.style_attr['max_y'])
-                self.style_attr['y_ticks_locs'] = np.round(np.linspace(0, self.style_attr['max_y'], 10), 2)
-                self.style_attr['y_ticks_lbls'] = np.round((self.style_attr['y_ticks_locs'] / self.fps), 1)
+                    self.style_attr["max_y"] = float(self.style_attr["max_y"])
+                self.style_attr["y_ticks_locs"] = np.round(
+                    np.linspace(0, self.style_attr["max_y"], 10), 2
+                )
+                self.style_attr["y_ticks_lbls"] = np.round(
+                    (self.style_attr["y_ticks_locs"] / self.fps), 1
+                )
                 index_column = list(range(0, distance_arr.shape[0]))
                 distance_arr = np.column_stack((index_column, distance_arr))
 
@@ -132,32 +177,60 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                     data.append(self.__insert_group_idx_column(data=i, group=cnt))
                 frm_per_core = data[0].shape[0]
 
-                print('Creating distance plots, multiprocessing (chunksize: {}, cores: {})...'.format(str(self.multiprocess_chunksize), str(self.core_cnt)))
-                with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
-                    constants = functools.partial(self.distance_plotter_mp,
-                                                  video_setting=self.video_setting,
-                                                  video_name=self.video_name,
-                                                  frame_setting=self.frame_setting,
-                                                  video_save_dir=self.temp_folder,
-                                                  frame_folder_dir=self.save_frame_folder_dir,
-                                                  style_attr=self.style_attr,
-                                                  line_attr=self.line_attr,
-                                                  fps=self.fps)
-                    for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
-                        print('Image {}/{}, Video {}/{}...'.format(str(int(frm_per_core * (result + 1))), str(len(self.data_df)), str(file_cnt + 1), str(len(self.files_found))))
+                print(
+                    "Creating distance plots, multiprocessing (chunksize: {}, cores: {})...".format(
+                        str(self.multiprocess_chunksize), str(self.core_cnt)
+                    )
+                )
+                with multiprocessing.Pool(
+                    self.core_cnt, maxtasksperchild=self.maxtasksperchild
+                ) as pool:
+                    constants = functools.partial(
+                        self.distance_plotter_mp,
+                        video_setting=self.video_setting,
+                        video_name=self.video_name,
+                        frame_setting=self.frame_setting,
+                        video_save_dir=self.temp_folder,
+                        frame_folder_dir=self.save_frame_folder_dir,
+                        style_attr=self.style_attr,
+                        line_attr=self.line_attr,
+                        fps=self.fps,
+                    )
+                    for cnt, result in enumerate(
+                        pool.imap(
+                            constants, data, chunksize=self.multiprocess_chunksize
+                        )
+                    ):
+                        print(
+                            "Image {}/{}, Video {}/{}...".format(
+                                str(int(frm_per_core * (result + 1))),
+                                str(len(self.data_df)),
+                                str(file_cnt + 1),
+                                str(len(self.files_found)),
+                            )
+                        )
 
                     pool.terminate()
                     pool.join()
 
                 if self.video_setting:
-                    print('Joining {} multiprocessed video...'.format(self.video_name))
-                    concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)
+                    print("Joining {} multiprocessed video...".format(self.video_name))
+                    concatenate_videos_in_folder(
+                        in_folder=self.temp_folder, save_path=self.save_video_path
+                    )
 
                 video_timer.stop_timer()
-                print('Distance line chart video {} complete (elapsed time: {}s) ...'.format(self.video_name,video_timer.elapsed_time_str))
+                print(
+                    "Distance line chart video {} complete (elapsed time: {}s) ...".format(
+                        self.video_name, video_timer.elapsed_time_str
+                    )
+                )
 
         self.timer.stop_timer()
-        stdout_success(f'Distance plot visualizations for {str(len(self.files_found))} video(s) created in project_folder/frames/output/line_plot directory', elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(
+            f"Distance plot visualizations for {str(len(self.files_found))} video(s) created in project_folder/frames/output/line_plot directory",
+            elapsed_time=self.timer.elapsed_time_str,
+        )
 
 
 # style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8, 'y_max': 'auto', 'opacity': 0.9}
@@ -176,10 +249,6 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
 # style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8}
 # line_attr = {0: ['Termite_1_Head_1', 'Termite_1_Thorax_1', 'Dark-red']}
 #
-
-
-
-
 
 
 # style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 8, 'opacity': 0.5, 'y_max': 'auto'}
