@@ -1,8 +1,10 @@
+import os
 import pytest
 
 from simba.plotting.distance_plotter import DistancePlotterSingleCore
 from simba.plotting.distance_plotter_mp import DistancePlotterMultiCore
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 class TestDistancePlotter(object):
 
@@ -83,7 +85,7 @@ class TestDistancePlotter(object):
                                                      line_attr=line_attr_args.param)
         distance_plotter.run()
 
-
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="LONG RUNNING TIME.")
     def test_distance_plotter_single_multicore(self,
                                                core_cnt_args,
                                                data_path_args,
