@@ -1,4 +1,3 @@
-import os
 import pytest
 import numpy as np
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
