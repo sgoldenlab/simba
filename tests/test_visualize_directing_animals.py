@@ -6,7 +6,6 @@ from simba.plotting.directing_animals_visualizer_mp import DirectingOtherAnimals
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
-@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="LONG RUNNING TIME.")
 class TestDirectingAnimalsVisualizer(object):
 
     @pytest.fixture(params=['tests/data/test_projects/two_c57/project_folder/csv/outlier_corrected_movement_location/Together_1.csv'])
@@ -66,7 +65,9 @@ class TestDirectingAnimalsVisualizer(object):
                                                                  style_attr=style_attr,
                                                                  data_path=data_path_args.param)
         single_core_visualizer.run()
-
+    
+    
+    @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="LONG RUNNING TIME.")
     def test_directing_animal_visualizer_multi_core(self,
                                                     data_path_args,
                                                     core_cnt_args,
