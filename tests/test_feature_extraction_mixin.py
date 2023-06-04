@@ -1,8 +1,12 @@
 import pytest
+from copy import deepcopy
 import numpy as np
 import os
 import pandas as pd
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+import simba
+from simba.utils.enums import Paths
+from scipy.signal import savgol_filter
 
 
 def test_euclidean_distance():
