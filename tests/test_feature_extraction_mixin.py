@@ -1,5 +1,7 @@
 import pytest
 import numpy as np
+import os
+import pandas as pd
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 
 
