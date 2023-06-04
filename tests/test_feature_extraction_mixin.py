@@ -55,6 +55,68 @@ def test_framewise_inside_polygon_roi():
     roi_coords = np.array([[5, 7], [6, 4],  [8, 5], [2, 7]]).astype(np.float32)
     results = FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=bp_loc, roi_coords=roi_coords)
     assert np.array_equal(results, [1, 0])
+    
+def test_windowed_frequentist_distribution_tests():
+    data = np.random.randint(1, 10, size=(10))
+    results = FeatureExtractionMixin.windowed_frequentist_distribution_tests(data=data, fps=25, feature_name='Anima_1_velocity')
+    assert len(results.columns) == 4; assert len(results) == data.shape[0]
+    assert results._is_numeric_mixed_type
+
+def test_cdist():
+    array_1 = np.array([[3, 9], [5, 1], [2, 5]]).astype('float32')
+    array_2 = np.array([[1, 5], [3, 6], [4, 9]]).astype('float32')
+    results = FeatureExtractionMixin.cdist(array_1=array_1, array_2=array_2).astype('int')
+    assert np.array_equal(results, np.array([[4, 3, 1], [5, 5, 8], [1, 1, 4]]))
+
+def test_create_shifted_df():
+    df = pd.DataFrame(data=[10, 95, 85], columns=['Feature_1'])
+    results = FeatureExtractionMixin.create_shifted_df(df=df)
+    assert list(results.columns) == ['Feature_1', 'Feature_1_shifted']
+    assert len(results) == len(df)
+    assert results._is_numeric_mixed_type
+
+@pytest.mark.parametrize("pose", ['2 animals 16 body-parts',
+                                  '2 animals 14 body-parts',
+                                  '2 animals 8 body-parts',
+                                  '1 animal 8 body-parts',
+                                  '1 animal 7 body-parts',
+                                  '1 animal 4 body-parts',
+                                  '1 animal 9 body-parts'])
+def test_get_feature_extraction_headers(pose):
+    simba_dir = os.path.dirname(simba.__file__)
+    feature_categories_csv_path = os.path.join(simba_dir, Paths.SIMBA_FEATURE_EXTRACTION_COL_NAMES_PATH.value)
+    bps = list(pd.read_csv(feature_categories_csv_path)[pose])
+    assert type(bps) == list
+
+def test_minimum_bounding_rectangle():
+    points = np.array([[7, 6], [9, 4], [4, 7], [5,1]])
+    results = FeatureExtractionMixin.minimum_bounding_rectangle(points=points).astype(int)
+    assert np.array_equal(results, np.array([[9, 1], [4, 1], [4, 7], [8, 7]]))
+
+def test_framewise_euclidean_distance():
+    loc_1 = np.array([[108, 162]]).astype(np.float32)
+    loc_2 = np.array([[91, 11]]).astype(np.float32)
+    results_mm = FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False).astype(int)
+    results_cm = FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=True).astype(int)
+    assert int(results_mm / 10) == results_cm
+
+@pytest.mark.parametrize("time_window", [1, 3])
+def test_dataframe_gaussian_smoother(time_window):
+    in_df = pd.DataFrame(data=[10, 95, 85], columns=['Feature_1'])
+    out_df = deepcopy(in_df)
+    for c in in_df.columns: out_df[c] = out_df[c].rolling(window=int(time_window), win_type='gaussian', center=True).mean(std=5).fillna(out_df[c]).abs().astype(int)
+    if time_window == 1: assert out_df.equals(in_df)
+    else: assert out_df.equals(pd.DataFrame(data=[10, 63, 85], columns=['Feature_1']))
+
+@pytest.mark.parametrize("time_window", [5])
+def test_dataframe_savgol_smoother(time_window):
+    in_df = pd.DataFrame(data=[10, 95, 85, 109, 205], columns=['Feature_1'])
+    out_df = deepcopy(in_df)
+    for c in in_df.columns:
+        out_df[c] = savgol_filter(x=in_df[c].to_numpy(), window_length=time_window, polyorder=3, mode='nearest').astype(int)
+    assert out_df.equals(pd.DataFrame(data=[32, 68, 92, 126, 182], columns=['Feature_1']))
+
+
 
 #test_euclidean_distance()
 # test_angle3pt()
