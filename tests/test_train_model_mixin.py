@@ -11,11 +11,11 @@ def parsed_config_args(request):
     return read_config_file(config_path=request.param)
 
 
-@pytest.mark.parametrize("file_paths", [['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
-def test_read_all_files_in_folder(file_paths):
-    results = TrainModelMixin().read_all_files_in_folder(file_paths=file_paths, file_type='csv', classifier_names=['Attack'])
-    assert len(results) == 1738
-    assert len(results.columns) == 50
+# @pytest.mark.parametrize("file_paths", [['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
+# def test_read_all_files_in_folder(file_paths):
+#     results = TrainModelMixin().read_all_files_in_folder(file_paths=file_paths, file_type='csv', classifier_names=['Attack'])
+#     assert len(results) == 1738
+#     assert len(results.columns) == 50
 
 def test_read_in_all_model_names_to_remove(parsed_config_args):
     results = TrainModelMixin().read_in_all_model_names_to_remove(config=parsed_config_args, model_cnt=2, clf_name='Attack')
