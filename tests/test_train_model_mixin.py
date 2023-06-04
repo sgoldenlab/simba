@@ -6,12 +6,12 @@ import numpy as np
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.read_write import read_config_file, read_df
 
-@pytest.fixture(params=['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini'])
+@pytest.fixture(params=['tests/data/test_projects/two_c57/project_folder/project_config.ini'])
 def parsed_config_args(request):
     return read_config_file(config_path=request.param)
 
 
-@pytest.mark.parametrize("file_paths", [['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
+@pytest.mark.parametrize("file_paths", [['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
 def test_read_all_files_in_folder(file_paths):
     results = TrainModelMixin().read_all_files_in_folder(file_paths=file_paths, file_type='csv', classifier_names=['Attack'])
     assert len(results) == 1738
@@ -43,7 +43,7 @@ def test_random_undersampler(sample_ratio):
     assert x_train_out.reset_index(drop=True).equals(pd.DataFrame([[1, 2, 3], [1, 2, 3]]))
     assert y_train_out.reset_index(drop=True).equals(pd.Series([1, 0], name='Test'))
 
-@pytest.mark.parametrize("clf_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_calc_permutation_importance(clf_path):
     x_test = np.array([[1, 2], [1, 2], [1, 2]])
     y_test = np.array([[1], [1], [0]])
