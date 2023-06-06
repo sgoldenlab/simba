@@ -13,4 +13,6 @@ dependencies:
       - sphinx_rtd_theme
       - simba-uw-tf-dev
       - nbsphinx
+      - umap-learn==0.5.2
+      - hdbscan==0.8.27
 prefix: /Users/simon/.conda/envs/simba_dev
