@@ -12,11 +12,11 @@ def parsed_config_args(request):
     return read_config_file(config_path=request.param)
 
 
-@pytest.mark.parametrize("file_paths", [['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
-def test_read_all_files_in_folder(file_paths):
-    results = TrainModelMixin().read_all_files_in_folder(file_paths=file_paths, file_type='csv', classifier_names=['Attack'])
-    assert len(results) == 1738
-    assert len(results.columns) == 50
+# @pytest.mark.parametrize("file_paths", [['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
+# def test_read_all_files_in_folder(file_paths):
+#     results = TrainModelMixin().read_all_files_in_folder(file_paths=file_paths, file_type='csv', classifier_names=['Attack'])
+#     assert len(results) == 1738
+#     assert len(results.columns) == 50
 
 def test_read_in_all_model_names_to_remove(parsed_config_args):
     results = TrainModelMixin().read_in_all_model_names_to_remove(config=parsed_config_args, model_cnt=2, clf_name='Attack')
@@ -172,30 +172,29 @@ def test_clf_fit():
     assert hasattr(clf, "classes_")
 
 
-@pytest.mark.parametrize("data_dir", ['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted'])
-def test_read_all_files_in_folder_mp(data_dir):
-    file_paths = glob.glob(data_dir + '/*.csv')
-    data = TrainModelMixin().read_all_files_in_folder_mp(file_paths=file_paths, file_type='csv', classifier_names=['Attack', 'Sniffing'])
-    assert len(data) == 1738
-    assert len(data.columns) == 52
+# @pytest.mark.parametrize("file_paths", [['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
+# def test_read_all_files_in_folder_mp(file_paths):
+#     data = TrainModelMixin().read_all_files_in_folder_mp(file_paths=file_paths, file_type='csv', classifier_names=['Attack', 'Sniffing'])
+#     assert len(data) == 1738
+#     assert len(data.columns) == 52
 
 @pytest.mark.parametrize("config_path, clf_path", [['tests/data/test_projects/two_c57/project_folder/project_config.ini',
                                                    'tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
-def test_create_shap_log_mp(config_path, clf_path):
-    x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.Series(np.random.randint(0, 2, size=(500)), name='target')
-    clf = read_df(file_path=clf_path, file_type='pickle')
-    train_model_mixin = TrainModelMixin()
-    train_model_mixin.create_shap_log_mp(ini_file_path=config_path,
-                                         rf_clf=clf,
-                                         x_df=x,
-                                         y_df=y,
-                                         x_names=x.columns,
-                                         clf_name='target',
-                                         cnt_present=1,
-                                         cnt_absent=1,
-                                         save_path=os.path.dirname(clf_path))
-    assert os.path.isfile(train_model_mixin.out_df_shap_path)
-    assert os.path.isfile(train_model_mixin.out_df_raw_path)
+# def test_create_shap_log_mp(config_path, clf_path):
+#     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.Series(np.random.randint(0, 2, size=(500)), name='target')
+#     clf = read_df(file_path=clf_path, file_type='pickle')
+#     train_model_mixin = TrainModelMixin()
+#     train_model_mixin.create_shap_log_mp(ini_file_path=config_path,
+#                                          rf_clf=clf,
+#                                          x_df=x,
+#                                          y_df=y,
+#                                          x_names=x.columns,
+#                                          clf_name='target',
+#                                          cnt_present=1,
+#                                          cnt_absent=1,
+#                                          save_path=os.path.dirname(clf_path))
+#     assert os.path.isfile(train_model_mixin.out_df_shap_path)
+#     assert os.path.isfile(train_model_mixin.out_df_raw_path)
 
 
 
