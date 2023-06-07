@@ -7,12 +7,12 @@ from sklearn.ensemble import RandomForestClassifier
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.read_write import read_config_file, read_df
 
-@pytest.fixture(params=['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini'])
+@pytest.fixture(params=['tests/data/test_projects/two_c57/project_folder/project_config.ini'])
 def parsed_config_args(request):
     return read_config_file(config_path=request.param)
 
 
-@pytest.mark.parametrize("file_paths", [['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
+@pytest.mark.parametrize("file_paths", [['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted/Together_1.csv']])
 def test_read_all_files_in_folder(file_paths):
     results = TrainModelMixin().read_all_files_in_folder(file_paths=file_paths, file_type='csv', classifier_names=['Attack'])
     assert len(results) == 1738
@@ -44,7 +44,7 @@ def test_random_undersampler(sample_ratio):
     assert x_train_out.reset_index(drop=True).equals(pd.DataFrame([[1, 2, 3], [1, 2, 3]]))
     assert y_train_out.reset_index(drop=True).equals(pd.Series([1, 0], name='Test'))
 
-@pytest.mark.parametrize("clf_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_calc_permutation_importance(clf_path):
     x_test = np.array([[1, 2], [1, 2], [1, 2]])
     y_test = np.array([[1], [1], [0]])
@@ -53,7 +53,7 @@ def test_calc_permutation_importance(clf_path):
     assert os.path.isfile(os.path.join(os.path.dirname(clf_path), 'Attack_permutations_importances.csv'))
 
 
-@pytest.mark.parametrize("clf_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_calc_learning_curve(clf_path):
     x, y = np.random.randint(1, 10, size=(10, 2)), np.random.randint(0, 2, size=(10))
     data = pd.DataFrame(x)
@@ -69,7 +69,7 @@ def test_calc_learning_curve(clf_path):
                                           save_dir=os.path.dirname(clf_path))
     assert os.path.isfile(train_model_mixin.learning_curve_save_path)
 
-@pytest.mark.parametrize("clf_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_calc_pr_curve(clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(10, 2))), pd.DataFrame(np.random.randint(0, 2, size=(10)), columns=['target'])
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -82,7 +82,7 @@ def test_calc_pr_curve(clf_path):
     assert os.path.isfile(train_model_mixin.pr_save_path)
 
 
-@pytest.mark.parametrize("clf_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_create_clf_report(clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.DataFrame(np.random.randint(0, 2, size=(500)), columns=['target'])
     train_model_mixin = TrainModelMixin()
@@ -93,7 +93,7 @@ def test_create_clf_report(clf_path):
                                         class_names=['not_target', 'target'],
                                         save_dir=os.path.dirname(clf_path))
 
-@pytest.mark.parametrize("clf_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_create_x_importance_log(clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.DataFrame(np.random.randint(0, 2, size=(500)), columns=['target'])
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -105,8 +105,8 @@ def test_create_x_importance_log(clf_path):
     assert os.path.isfile(train_model_mixin.f_importance_save_path)
 
 
-@pytest.mark.parametrize("config_path, clf_path", [['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini',
-                                                   '/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
+@pytest.mark.parametrize("config_path, clf_path", [['tests/data/test_projects/two_c57/project_folder/project_config.ini',
+                                                   'tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
 def test_create_shap_log(config_path, clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.Series(np.random.randint(0, 2, size=(500)), name='target')
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -123,7 +123,7 @@ def test_create_shap_log(config_path, clf_path):
     assert os.path.isfile(train_model_mixin.out_df_shap_path)
     assert os.path.isfile(train_model_mixin.out_df_raw_path)
 
-@pytest.mark.parametrize("config_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini'])
+@pytest.mark.parametrize("config_path", ['tests/data/test_projects/two_c57/project_folder/project_config.ini'])
 def test_get_all_clf_names(config_path):
     config = read_config_file(config_path=config_path)
     train_model_mixin = TrainModelMixin()
@@ -146,7 +146,7 @@ def test_check_sampled_dataset_integrity():
     with pytest.raises(Exception):
         _ = TrainModelMixin().check_sampled_dataset_integrity(x_df=x, y_df=y)
 
-@pytest.mark.parametrize("clf_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_partial_dependence_calculator(clf_path):
     x = pd.DataFrame(np.random.randint(1, 10, size=(500, 2)))
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -155,7 +155,7 @@ def test_partial_dependence_calculator(clf_path):
                                                     clf_name='target',
                                                     save_dir=os.path.dirname(clf_path))
 
-@pytest.mark.parametrize("clf_path", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_clf_predict_proba(clf_path):
     x = pd.DataFrame(np.random.randint(1, 10, size=(10, 2)))
     clf = read_df(file_path=clf_path, file_type='pickle')
@@ -172,14 +172,14 @@ def test_clf_fit():
     assert hasattr(clf, "classes_")
 
 
-@pytest.mark.parametrize("data_dir", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/csv/targets_inserted'])
+@pytest.mark.parametrize("data_dir", ['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted'])
 def test_read_all_files_in_folder_mp(data_dir):
     file_paths = glob.glob(data_dir + '/*.csv')
     data = TrainModelMixin().read_all_files_in_folder_mp(file_paths=file_paths, file_type='csv', classifier_names=['Attack', 'Sniffing'])
     assert len(data) == 1738
     assert len(data.columns) == 52
 
-@pytest.mark.parametrize("data_dir", ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/csv/targets_inserted'])
+@pytest.mark.parametrize("data_dir", ['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted'])
 def test_read_all_files_in_folder_mp(data_dir):
     file_paths = glob.glob(data_dir + '/*.csv')
     data = TrainModelMixin().read_all_files_in_folder_mp(file_paths=file_paths, file_type='csv', classifier_names=['Attack', 'Sniffing'])
@@ -187,8 +187,8 @@ def test_read_all_files_in_folder_mp(data_dir):
     assert len(data.columns) == 52
 
 
-@pytest.mark.parametrize("config_path, clf_path", [['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini',
-                                                   '/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
+@pytest.mark.parametrize("config_path, clf_path", [['tests/data/test_projects/two_c57/project_folder/project_config.ini',
+                                                   'tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
 def test_create_shap_log_mp(config_path, clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.Series(np.random.randint(0, 2, size=(500)), name='target')
     clf = read_df(file_path=clf_path, file_type='pickle')
