@@ -17,9 +17,9 @@ def all_project_config_args(request):
     return request
 
 
-@pytest.mark.parametrize("config_path, expected_clf_names", [['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Attack', 'Sniffing']],
-                                                            ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/mouse_open_field/project_folder/project_config.ini', ['Attack']],
-                                                            ['/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/zebrafish/project_folder/project_config.ini', ['Rheotaxis']]])
+@pytest.mark.parametrize("config_path, expected_clf_names", [['tests/data/test_projects/two_c57/project_folder/project_config.ini', ['Attack', 'Sniffing']],
+                                                            ['tests/data/test_projects/mouse_open_field/project_folder/project_config.ini', ['Attack']],
+                                                            ['tests/data/test_projects/zebrafish/project_folder/project_config.ini', ['Rheotaxis']]])
 def test_config_reader(config_path, expected_clf_names):
     config_reader = ConfigReader(config_path=config_path)
     config_reader.read_roi_data()
