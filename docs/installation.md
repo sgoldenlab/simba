@@ -16,7 +16,6 @@ pip install simba-uw-tf-dev
 
 >Note: If you are seeing error messages related to some dependency conflicts, then you need to either downgrade your pypi package or instruct SimBA to ignore these dependency conflicts - either works. To find more information on how to do this, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/FAQ.md#when-i-install-or-update-simba-i-see-a-bunch-or-messages-in-the-console-telling-there-has-been-some-dependency-conflicts-the-messages-may-look-a-little-like-this)
 
-
 # How to launch SimBA ( installed using pip install simba-uw-tf-dev)
 
 1. Open up command prompt anywhere.
@@ -29,6 +28,33 @@ simba
 
 >*Note:* If you installed SimBA on a virtual environment (anaconda), after installation, you may have to run run `conda install shapely` for SimBA to work.
 
+# Installing SimBA with venv
+
+### Install SimBAxTF-development version
+
+1. Open bash or command prompt and run the following commands on current working directory 
+``` 
+python -m venv venv
+```
+2. Then activate virtual environment by 
+```
+venv\Scripts\activate
+```
+3. Make sure you are using the latest pip version and setup tools
+```
+python -m pip install --upgrade pip
+pip uninstall setuptools
+pip install setuptools
+```
+4. Install simba 
+```
+pip install simba-uw-tf-dev
+```
+5. Fix some package version
+```
+pip3 uninstall pyparsing
+pip3 install pyparsing==2.4.7
+```
 
 # Installing SimBA using Anaconda
 Click [here](/docs/anaconda_installation.md) for a detail step by step guide on how to install using anaconda.
