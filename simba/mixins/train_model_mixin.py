@@ -1620,7 +1620,7 @@ class TrainModelMixin(object):
                     self._create_shap_mp_helper, explainer=explainer, clf_name=clf_name
                 )
                 for cnt, result in enumerate(
-                    pool.imap_unordered(constants, shap_data, chunksize=10)
+                    pool.imap_unordered(constants, shap_data, chunksize=1)
                 ):
                     print(
                         f"Concatenating multi-processed SHAP data (batch {cnt+1}/{len(shap_data)})"
