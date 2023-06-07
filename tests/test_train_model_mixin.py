@@ -179,14 +179,6 @@ def test_read_all_files_in_folder_mp(data_dir):
     assert len(data) == 1738
     assert len(data.columns) == 52
 
-@pytest.mark.parametrize("data_dir", ['tests/data/test_projects/two_c57/project_folder/csv/targets_inserted'])
-def test_read_all_files_in_folder_mp(data_dir):
-    file_paths = glob.glob(data_dir + '/*.csv')
-    data = TrainModelMixin().read_all_files_in_folder_mp(file_paths=file_paths, file_type='csv', classifier_names=['Attack', 'Sniffing'])
-    assert len(data) == 1738
-    assert len(data.columns) == 52
-
-
 @pytest.mark.parametrize("config_path, clf_path", [['tests/data/test_projects/two_c57/project_folder/project_config.ini',
                                                    'tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
 def test_create_shap_log_mp(config_path, clf_path):
