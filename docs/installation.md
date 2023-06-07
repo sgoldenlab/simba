@@ -55,6 +55,10 @@ pip install simba-uw-tf-dev
 pip3 uninstall pyparsing
 pip3 install pyparsing==2.4.7
 ```
+6. Now you can launch simba in the terminal
+```
+simba
+```
 
 # Installing SimBA using Anaconda
 Click [here](/docs/anaconda_installation.md) for a detail step by step guide on how to install using anaconda.
