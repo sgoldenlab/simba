@@ -146,7 +146,7 @@ def test_check_sampled_dataset_integrity():
     with pytest.raises(Exception):
         _ = TrainModelMixin().check_sampled_dataset_integrity(x_df=x, y_df=y)
 
-@pytest.mark.parametrize("clf_path", ['test_projects/two_c57/models/generated_models/Attack.sav'])
+@pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_partial_dependence_calculator(clf_path):
     x = pd.DataFrame(np.random.randint(1, 10, size=(500, 2)))
     clf = read_df(file_path=clf_path, file_type='pickle')
