@@ -23,14 +23,6 @@ pip install simba-uw-tf-dev
 
 2. In the command prompt type
 ```
-pip3 uninstall pyparsing
-pip3 uninstall yellowbrick
-pip3 uninstall scikit-learn
-pip3 uninstall imblearn
-pip3 install pyparsing==2.4.7
-pip3 install scikit-learn
-pip3 install yellowbrick
-pip3 install imblearn
 simba
 ```
 3. Hit `Enter`.
