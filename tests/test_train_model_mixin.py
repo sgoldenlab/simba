@@ -214,4 +214,4 @@ def test_clf_fit():
     #                         save_dir: str,
     #                         save_file_no: Optional[int] = None) -> None:
 
-test_clf_fit()
+#test_clf_fit()
