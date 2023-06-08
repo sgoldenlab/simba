@@ -34,6 +34,7 @@ jobs:
         pip install simba-uw-tf-dev --no-deps
     - name: Install ffmpeg
       id: setup-ffmpeg
+      run: ffmpeg -version
     - name: Test with pytest
       run: |
         pytest -cov
