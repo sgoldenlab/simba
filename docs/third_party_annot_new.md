@@ -56,7 +56,7 @@ If `WARNING` is selected, then SimBA will warn you with printed text that an inc
 (i) `INVALID ANNOTATION DATA FILE FORMAT`: SimBA expects the annotation files to look a certain way depending on the third-party application. SimBA needs to make assumptions on - for example - where to find the time-stamps, the behaviors, and the video names etc. within your files, and when these assumptions are wrong, SimBA will show and *INVALID ANNOTATION DATA FILE FORMAT* error or warning. If this dropdown is set to **WARNING**, then SimBA will skip to read in the invalid file. If this dropdown is set to **ERROR**, then SimBA will halt the reading of your annotation files and show you en error. See below links for the file formats expected by SimBA from the differet annotation tools.
 
 * [BENTO](https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot)
-* [BORIS](https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv)
+* [BORIS example 1](https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv), [BORIS example 2](https://github.com/sgoldenlab/simba/blob/master/misc/boris_new_example.csv)
 * [DEEPETHOGRAM](https://github.com/sgoldenlab/simba/blob/master/misc/deep_ethogram_labels.csv)
 * [ETHOVISION](https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx)
 * [OBSERVER](https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_1.xlsx)
