@@ -6,6 +6,7 @@ BORIS has options for saving human annotations in various formats - and we need 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/BORIS_1.png" />
 </p>
 
+> Note: As of 06/2023, SimBA is also compatible with [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/boris_new_example.csv) BORIS data format (many thanks to @florianduclot). 
 
 To generate BORIS data in this file format, begin by creating a new project with **seconds** time format:
 
