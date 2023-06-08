@@ -178,8 +178,8 @@ def test_clf_fit():
 #     assert len(data) == 1738
 #     assert len(data.columns) == 52
 
-@pytest.mark.parametrize("config_path, clf_path", [['tests/data/test_projects/two_c57/project_folder/project_config.ini',
-                                                   'tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
+# @pytest.mark.parametrize("config_path, clf_path", [['tests/data/test_projects/two_c57/project_folder/project_config.ini',
+#                                                    'tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
 # def test_create_shap_log_mp(config_path, clf_path):
 #     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.Series(np.random.randint(0, 2, size=(500)), name='target')
 #     clf = read_df(file_path=clf_path, file_type='pickle')
