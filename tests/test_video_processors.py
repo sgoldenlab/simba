@@ -31,7 +31,7 @@ def config_video_path_args(request):
 def config_video_dir_args(request):
     return request
 
- def copy_file(file_path):
+def copy_file(file_path):
     test_file_copy_path = os.path.join(os.path.dirname(file_path), 'test.mp4')
     if os.path.isfile(test_file_copy_path): os.remove(test_file_copy_path)
     shutil.copy(file_path, test_file_copy_path)
