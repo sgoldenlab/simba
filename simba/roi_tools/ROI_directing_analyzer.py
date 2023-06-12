@@ -38,11 +38,8 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     ):
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self, config_path=config_path)
-        self.roi_analyzer = ROIAnalyzer(
-            ini_path=config_path,
-            data_path=self.outlier_corrected_dir,
-            settings=settings,
-        )
+        self.roi_analyzer = ROIAnalyzer(ini_path=config_path, data_path='outlier_corrected_movement_location', settings=settings)
+
         self.files_found = deepcopy(self.roi_analyzer.files_found)
         self.direct_bp_dict = self.check_directionality_cords()
 
