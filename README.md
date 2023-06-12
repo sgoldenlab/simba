@@ -160,7 +160,6 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 ### Scenario 4: [Analyzing and adding new Experimental data to a previously started project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md)
 
-
 ## Installation ⚙️
 
 - [Install SimBA](docs/installation.md)
@@ -201,6 +200,10 @@ All data (classifiers etc.) is available on our [Open Science Framework reposito
 ### Models
 Below is a link to download trained  behavior classification models to apply it on your dataset
 - [Random forest models](https://osf.io/kwge8/) 🌲
+
+### Docker images
+- [Docker hub](https://hub.docker.com/repository/docker/goldenlab/simba)
+
 
 ### SimBA visualization examples
 - [YouTube playlist](https://www.youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl) 📺
