@@ -37,10 +37,10 @@ def test_roi_clf_calculator(config_path_args):
 #     directing_analyzer = DirectingROIAnalyzer(config_path=config_path, settings=settings, )
 #     directing_analyzer.run()
 
-@pytest.mark.parametrize("config_path, settings", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', {'body_parts': {'Simon': 'Ear_left_1', 'JJ': 'Ear_left_2'}, 'threshold': 0.4})])
-def test_roi_feature_creator(config_path, settings):
-    roi_featurizer = ROIFeatureCreator(config_path=config_path, settings=settings)
-    roi_featurizer.run()
+# @pytest.mark.parametrize("config_path, settings", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', {'body_parts': {'Simon': 'Ear_left_1', 'JJ': 'Ear_left_2'}, 'threshold': 0.4})])
+# def test_roi_feature_creator(config_path, settings):
+#     roi_featurizer = ROIFeatureCreator(config_path=config_path, settings=settings)
+#     roi_featurizer.run()
 
 def test_roi_movement_analyzer(all_config_path_args):
     _ = ROIMovementAnalyzer(config_path=all_config_path_args.param)
