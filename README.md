@@ -6,7 +6,7 @@
 [![SimBA: listserv](https://img.shields.io/static/v1?label=SimBA&message=listserv&color=blue)](https://docs.google.com/forms/d/e/1FAIpQLSfjbjae0XqNcl7GYOxmqvRsCveG-cmf4p4hBNNJ8gu5vPLHng/viewform)
 [![DOI](https://zenodo.org/badge/206670333.svg)](https://zenodo.org/badge/latestdoi/206670333)
 ![Docs](https://readthedocs.org/projects/simba-uw-tf-dev/badge/?version=latest&style=flat)
-[![tests](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml/badge.svg?event=issues)](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml)
+[![tests](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml/badge.svg)](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml)
 
 
 
