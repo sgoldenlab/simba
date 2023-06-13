@@ -200,7 +200,7 @@ Below is a link to download trained  behavior classification models to apply it 
 - [Random forest models](https://osf.io/kwge8/) 🌲
 
 ### Docker images
-- [Docker hub](https://hub.docker.com/repository/docker/goldenlab/simba)
+- [Docker hub](https://hub.docker.com/repositories/goldenlab)
 
 
 ### SimBA visualization examples
