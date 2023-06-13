@@ -6,7 +6,7 @@ from simba.utils.data import (detect_bouts,
                               create_color_palettes,
                               create_color_palette)
 
-@pytest.mark.parametrize("data_path, target_lst, fps", [('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/csv/machine_results/Together_1.csv', ['Attack', 'Sniffing'], 30)])
+@pytest.mark.parametrize("data_path, target_lst, fps", [('tests/data/test_projects/two_c57/project_folder/csv/machine_results/Together_1.csv', ['Attack', 'Sniffing'], 30)])
 def test_detect_bouts(data_path, target_lst, fps):
     data_df = read_df(file_path=data_path, file_type='csv')
     results = detect_bouts(data_df=data_df, target_lst=target_lst, fps=fps)
