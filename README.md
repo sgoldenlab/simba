@@ -1,12 +1,14 @@
 # SimBA (Simple Behavioral Analysis)
 
+[![pypi](https://img.shields.io/pypi/v/simba-uw-tf-dev.svg)]([https://pepy.tech/project/simba-uw-tf-dev](https://pypi.org/project/Simba-UW-tf-dev/))
+[![tests](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml/badge.svg)](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml)
+![Docs](https://readthedocs.org/projects/simba-uw-tf-dev/badge/?version=latest&style=flat)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community)
 [![Download: Weights](https://img.shields.io/badge/Download-Weights-orange.svg)](https://osf.io/5t4y9/)
 [![SimBA: listserv](https://img.shields.io/static/v1?label=SimBA&message=listserv&color=blue)](https://docs.google.com/forms/d/e/1FAIpQLSfjbjae0XqNcl7GYOxmqvRsCveG-cmf4p4hBNNJ8gu5vPLHng/viewform)
 [![DOI](https://zenodo.org/badge/206670333.svg)](https://zenodo.org/badge/latestdoi/206670333)
-![Docs](https://readthedocs.org/projects/simba-uw-tf-dev/badge/?version=latest&style=flat)
-[![tests](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml/badge.svg)](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml)
+
 [![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev)
 [![Downloads](https://pepy.tech/badge/simba-uw-tf-dev)](https://pepy.tech/project/simba-uw-tf-dev)
 
