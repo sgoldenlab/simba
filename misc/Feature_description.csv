@@ -1,7 +1,7 @@
 *distance/area/movement/trajectories are calculated in euclidian millimiter,
 var_name,description*
-?Mouse_1_poly_area, area of CD1 convex hull 
-?Mouse_2_poly_area, area of C57 convex hull
+?Mouse_1_poly_area, perimeter of CD1 convex hull 
+?Mouse_2_poly_area, perimeter of C57 convex hull
 Mouse_1_nose_to_tail, distance between CD1 nose and tail
 Mouse_2_nose_to_tail, distance between C57 nose and tail
 Mouse_1_width, distance between CD1 lateral left and lateral right
