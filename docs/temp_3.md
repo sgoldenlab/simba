@@ -15,12 +15,37 @@ At the top there is a frame titled `EXCLUSIVITY RULES #`, use the drop-down manu
 
 >Note: The rules will be applied sequentially on each file inside the `project_folder/csv/machine_results` directory.
 
-##### Scenario 1: When three classifications are occuring in a given frame, set the classifier with the highest classification probability.
+##### Scenario 1: When several classifications are occuring in a given frame, set the classifier with the highest classification probability to present and the remaining to absent.
 
-Leave the 
+Leave the `HIGHEST PROBABILITY` checkbox ticked, and tick the checkboxes for the classifiers you wish to evaluate. For example,
+if you want select the highest probability classifier between `Attack` and `Sniffing` (when both `Attack` and `Sniffing` is classified as present within any given single frame), tick the checkboxes under the `Attack` and `Sniffing` headers.True
 
-##### Scenario 2: When three classifications are occuring in a given frame, set a defined classifier to present and the other two to absent (regardless of classification probabilities). 
+Next, we need to tell SimBA how to deal with occations when `Attack` and `Sniffing` classifications are equal. In the `TIE BREAK` dropdown, select the classifier that should "win" when classification probabilities of `Attack` and `Rear` are equal.
+Alternatively, if we want SimBA to **not choose** a winner when classification probabilities of `Attack` and `Rear` are equal, and instead skip applying the rules to the file, tick the `SKIP ON EQUAL` checkbox.
 
+Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are saved in the  `project_folder/csv/machine_results/` directory.
+
+##### Scenario 2: When several classifications are occuring in a given frame, set a defined classifier to present and the other two to absent (regardless of classification probabilities).
+
+Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `DETERMINATOR` and `THRESHOLD` available). Next, tick the checkboxes for the classifiers you wish to change when they are both occuring at the same time. Next, use the dropdown under the `DETERMINATOR` header to select the classifier that
+should **WIN** when the chosen classifiers are occuring at the same time. **Leave the threshold value set to 0.00** ((see more info below)
+
+For example, if I want to set `Attack` to present and `Rear` to absent when both `Attack` and `Rear` is classified as present, (i)) 
+I tick the checkboxes for `Attack` and `Rear, (ii) select `Attack` in the `DETERMINATOR` dropdown.
+
+Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are saved in the  `project_folder/csv/machine_results/` directory.
+
+#### Scenario 3: When several classifications are occuring in a given frame, set a defined classifier to present and the other two to absent (only when the defined classifier is above a certain threshold).
+
+Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `DETERMINATOR` and `THRESHOLD` available). Next, tick the checkboxes for the classifiers you wish to change when they are both occuring at the same time. Next, use the dropdown under the `DETERMINATOR` header to select the classifier that
+should **WIN** when the chosen classifiers are occuring at the same time. Lastly, set the threshold for the `DETERMINATOR` classifier.
+
+For example, if I want to set `Attack` to present and `Rear` to absent when both `Attack` and `Rear` is classified as present and the `Attack` classification probability is equal or above 0.6, (i))
+I tick the checkboxes for `Attack` and `Rear, (ii) select `Attack` in the `DETERMINATOR` dropdown, (iii) set the `THRESHOLD` to `0.6` and click `Run`. 
+    
+In frames when both `Attack` and `Rear` is classified as present and the `Attack` classification probability is equal or above 0.6, `Rear` classifications will be set to absent. 
+    
+> Note: In frames when both `Attack` and `Rear` is classified as present and the `Attack` classification probability is below 0.6, `Rear` classifications will remain as present.
 
 
 
