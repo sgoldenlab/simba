@@ -25,7 +25,7 @@ Alternatively, if we want SimBA to **not choose** a winner when classification p
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are saved in the  `project_folder/csv/machine_results/` directory.
 
-### Scenario 2: When several classifications are occuring in a given frame, set a defined classifier to present and the other two to absent (regardless of classification probabilities).
+### Scenario 2: When several classifications are occuring in a given frame, set a defined classifier to present and the others to absent (regardless of classification probabilities).
 
 Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `DETERMINATOR` and `THRESHOLD` available). Next, tick the checkboxes for the classifiers you wish to change when they are both occuring at the same time. Next, use the dropdown under the `DETERMINATOR` header to select the classifier that
 should **WIN** when the chosen classifiers are occuring at the same time. **Leave the threshold value set to 0.00** ((see more info below)
@@ -35,7 +35,7 @@ I tick the checkboxes for `Attack` and `Rear, (ii) select `Attack` in the `DETER
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are saved in the  `project_folder/csv/machine_results/` directory.
 
-### Scenario 3: When several classifications are occuring in a given frame, set a defined classifier to present and the other two to absent (only when the defined classifier is above a certain threshold).
+### Scenario 3: When several classifications are occuring in a given frame, set a defined classifier to present and the other two to absent only when the defined classifier is above a certain threshold.
 
 Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `DETERMINATOR` and `THRESHOLD` available). Next, tick the checkboxes for the classifiers you wish to change when they are both occuring at the same time. Next, use the dropdown under the `DETERMINATOR` header to select the classifier that
 should **WIN** when the chosen classifiers are occuring at the same time. Lastly, set the threshold for the `DETERMINATOR` classifier.
