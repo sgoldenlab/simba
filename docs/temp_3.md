@@ -45,7 +45,7 @@ I tick the checkboxes for `Attack` and `Rear, (ii) select `Attack` in the `DETER
     
 In frames when both `Attack` and `Rear` is classified as present and the `Attack` classification probability is equal or above 0.6, `Rear` classifications will be set to absent. 
     
-> Note: In frames when both `Attack` and `Rear` is classified as present and the `Attack` classification probability is below 0.6, `Rear` classifications will remain as present.
+> Note: In frames when both `Attack` and `Rear` is classified as present and the `Attack` classification probability is below the threshold  (less than 0.6 in example above), then `Rear` classifications will remain marked as present.
 
 
 
