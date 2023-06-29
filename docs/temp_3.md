@@ -15,7 +15,7 @@ At the top there is a frame titled `EXCLUSIVITY RULES #`, use the drop-down manu
 
 >Note: The rules will be applied **sequentially** on each file inside within the `project_folder/csv/machine_results` directory.
 
-### Scenario 1: When several mutually exclusive classifications are occuring in a given frame, set the classifier with the highest classification probability to present and the remaining to absent.
+### Scenario 1: When several mutually exclusive classifications are occuring in a given frame, set the classifier with the highest classification probability to present and the remaining classifiers to absent.
 
 Leave the `HIGHEST PROBABILITY` checkbox ticked, and tick the checkboxes for the classifiers that are mutually exclusive. For example,
 if you want select the highest probability classifier between `Attack` and `Sniffing` (when both `Attack` and `Sniffing` is classified as present within any given single frame), tick the checkboxes under the `Attack` and `Sniffing` headers.
@@ -25,7 +25,7 @@ Alternatively, if we want SimBA to **not choose** a winner when classification p
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are then saved in the  `project_folder/csv/machine_results/` directory.
 
-### Scenario 2: When several classifications are occuring in a given frame, set a defined classifier to present and the others to absent (regardless of classification probabilities).
+### Scenario 2: When several mutually exclusive classifications are occuring in a given frame, set a defined classifier to present and the others to absent (regardless of classification probabilities).
 
 Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `DETERMINATOR` and `THRESHOLD` available). Next, tick the checkboxes for the classifiers which are mutually exclusive. Next, use the dropdown under the `DETERMINATOR` header to select the classifier that
 should **WIN** when the chosen classifiers are occuring at the same time. **Leave the threshold value set to 0.00** (see more info below on this setting).
@@ -35,7 +35,7 @@ I tick the checkboxes for `Attack` and `Rear, (ii) select `Attack` in the `DETER
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are saved in the  `project_folder/csv/machine_results/` directory.
 
-### Scenario 3: When several classifications are occuring in a given frame, set a defined classifier to present and the other two to absent only when the defined classifier is above a certain threshold.
+### Scenario 3: When several mutually exclusive classifications are occuring in a given frame, set a defined classifier to present and the others to  absent only when the defined classifier is above a certain threshold.
 
 Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `DETERMINATOR` and `THRESHOLD` available options available). Next, tick the checkboxes for the classifiers that are mutually exclusive. Next, use the dropdown under the `DETERMINATOR` header to select the classifier that
 should **WIN** when the chosen classifiers are occuring at the same time. 
