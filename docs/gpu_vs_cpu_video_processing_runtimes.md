@@ -16,7 +16,7 @@
 | Multi-split into two 50s clips  |10s   |4s   |
 | Crop single video  |134s   |59s   |
 | Horizontally concatenate two videos  |587s   |161s   |
-| Create 2x2 mosaic concatenation 640x480 |1536s  |503s   |
+| Create 2x2 mosaic concatenation 640x480 tiles |1536s  |503s   |
 
 
 * Using single NVIDEA RTX2080, 54min video recorded at 30fps and 1002x640 resolution.
