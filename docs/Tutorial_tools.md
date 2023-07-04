@@ -3,6 +3,8 @@
 
 We have developed video and image processing tools and incorporated them into the overall SimBA pipeline. However, many of the tools are useful on their own or in "one-off" situations. To make these easily accessible, the tools have been incorporated into their own space within the GUI, and are described below.
 
+>Note: As of 07/2023, many of the video processing tool windows in SimBA includes a `GPU` checkbox. If you have an NVIDEA GPU on your computer, you can tick this checkbox to perform the video processing function on the GPU, rather than CPU, and potentially save a significant amount of time. For an indication of the potential time-savings by function, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md) table.
+
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/new_tools_img.png" />
