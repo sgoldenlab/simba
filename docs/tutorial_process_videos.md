@@ -63,7 +63,7 @@ Similarly, let say I want to downsample all my videos to a 1200x800 resolution. 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/quick_downsample.gif" />
 </p>
 
->Note: As of 07/2023, `QUICK SETTINGS` menu includes a frame named `GPU`, as in the screensgrab below. If this is checked, then SimBA will run the video editing using FFMpeg *GPU* codecs instead of FFMpeg *CPU* codecs. Using the GPU potentially means a lot faster processing. For an indication of the potential time-savings when this checkbox is checked, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md) table.
+>Note: As of 07/2023, `QUICK SETTINGS` menu includes a frame named `GPU`, as in the screensgrab below. If this is checked, then SimBA will run the video editing using FFMpeg *GPU* codecs instead of FFMpeg *CPU* codecs. Using the GPU potentially means a lot faster processing. For an indication of the potential time-savings when this checkbox is checked, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md) table. As of 07/2023, this function requires an NVIDEA GPU.
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/batch_preprocess_gpu_option.png" />
