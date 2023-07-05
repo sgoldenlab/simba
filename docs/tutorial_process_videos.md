@@ -49,7 +49,7 @@ The video parameters that you specify will be processed in the following sequenc
 
 ### QUICK SETTINGS
 
-The quick setting menu allows us to batch specify new resolutions, new frames rates, or clipping times for all videos. In my toy example I have 10 videos, each which is 10s long (Note: you can see that they are 10s long in the middle **VIDEOS** table, by looking in the *End Time* column, shich SimBa has populated with the video meta-information data). 
+The quick setting menu allows us to batch specify new resolutions, new frames rates, or clipping times for all videos. In my toy example I have 10 videos, each which is 10s long (Note: you can see that they are 10s long in the middle **VIDEOS** table, by looking in the *End Time* column, which SimBA has populated with the video meta-information data). 
 
 Let's say I want to remove the first 5s from each of the videos, and to do this I can use the `Clip Videos Settings` sub-menu in QUICK SETTINGS. To do this, I set the `Start Time` to 00:00:05, and the `End Time` to 00:00:10 and click `Apply`, as in the gif below. Note that the `Start Time` of all videos listed in the VIDEOS table are updated:
 
@@ -62,6 +62,14 @@ Similarly, let say I want to downsample all my videos to a 1200x800 resolution. 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/quick_downsample.gif" />
 </p>
+
+>Note: As of 07/2023, `QUICK SETTINGS` menu includes a frame named `GPU`, as in the screensgrab below. If this is checked, then SimBA will run the video editing using FFMpeg *GPU* codecs instead of FFMpeg *CPU* codecs. Using the GPU potentially means a lot faster processing. For an indication of the potential time-savings when this checkbox is checked, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md) table.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/batch_preprocess_gpu_option.png" />
+</p>
+
+
 
 ### VIDEOS TABLE
 
