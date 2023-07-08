@@ -1,10 +1,11 @@
 ### CODE MODIFID FROM PYBURST PACKAGE  https://pypi.org/project/pybursts/
+import numpy as np
 import math
 
-import numpy as np
+def kleinberg_burst_detection(offsets: np.ndarray,
+                              s: float,
+                              gamma: float):
 
-
-def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):
     """
     Burst detection using `pyburst <https://pypi.org/project/pybursts/>`_.
     Private method called by ``simba.data_processors.kleinberg_calculator.KleinbergCalculator``.
@@ -38,7 +39,7 @@ def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):
         else:
             return (j - i) * gamma_log_n
 
-    alpha_function = np.vectorize(lambda x: s**x / g_hat)
+    alpha_function = np.vectorize(lambda x: s ** x / g_hat)
     alpha = alpha_function(np.arange(k))
 
     def f(j, x):
@@ -81,11 +82,7 @@ def kleinberg_burst_detection(offsets: np.ndarray, s: float, gamma: float):
             N = N + q[t] - prev_q
         prev_q = q[t]
 
-    bursts = np.array(
-        [np.repeat(np.nan, N), np.repeat(offsets[0], N), np.repeat(offsets[0], N)],
-        ndmin=2,
-        dtype=object,
-    ).transpose()
+    bursts = np.array([np.repeat(np.nan, N), np.repeat(offsets[0], N), np.repeat(offsets[0], N)], ndmin=2, dtype=object).transpose()
     burst_counter = -1
     prev_q = 0
     stack = np.repeat(np.nan, N)
