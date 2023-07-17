@@ -31,6 +31,8 @@ Alternatively, if we want SimBA to **not choose** a winner when classification p
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are then saved in the  `project_folder/csv/machine_results/` directory.
 
+> Note: If you tick **all** three behaviors in the example above (Attack, Sniffing AND Rearing), then SimBA will correct classifications in frames where the three behaviors are co-occuring and will **not** correct behaviors when **only** two of the behaviors are co-occuring.
+
 ### Scenario 2: When several mutually exclusive classifications are occuring in a given frame, set a defined classifier to present and the others to absent (regardless of classification probabilities).
 
 Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `WINNER` dropdown and `THRESHOLD` entry-box available, and `TIE BREAK` and `SKIP ON EQUAL` unavailable). Next, tick the checkboxes for the classifiers which are mutually exclusive. Next, use the dropdown under the `WINNER` header to select the classifier that
