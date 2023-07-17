@@ -1,7 +1,7 @@
 
 ### REFACTOR CLASSIFICATIONS ACCORDING TO MUTUAL EXCLUSIVITY RULES
 
-When using multiple classifiers, it may happen that we get classification results indicating that the animal are doing several, mutually exclusive, behaviors in any one frame. An example would be that the animal is performing `slow running` and `fast running` within the same frame. SimBA has several methods for implementing user-defined heurstic rules that corrects the classification results according to mutual exclusivity rules. 
+When using multiple classifiers, it may happen that we get classification results indicating that the animal are doing several, mutually exclusive, behaviors in any one frame. An example would be that the animal is performing `slow running` and `fast running` within the same frame. SimBA has several methods for implementing user-defined heurstic rules that corrects the classification results. 
 
 We will go through a few examples of different mutual exclusivity rules and how to apply them. If you find that your specific use-case is missing, then let us know through [Gitter](https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im) or by opening a [GitHub issue](https://github.com/sgoldenlab/simba/issues/new/choose) and we will get it into the SimBA GUI.
 
@@ -18,7 +18,7 @@ At the top there is a frame titled `EXCLUSIVITY RULES #`, use the drop-down manu
 ### Scenario 1: When several mutually exclusive classifications are occuring in a given frame, set the classifier with the highest classification probability to present and the remaining classifiers to absent.
 
 Leave the `HIGHEST PROBABILITY` checkbox ticked, and tick the checkboxes for the classifiers that are mutually exclusive. For example,
-if you want select the classifier with the highest probability between `Attack` and `Sniffing` (when both `Attack` and `Sniffing` is classified as present within any given single frame), tick the checkboxes under the `Attack` and `Sniffing` headers.
+if you want to select the classifier with the highest probability between `Attack` and `Sniffing` (when both `Attack` and `Sniffing` is classified as present within any given single frame), then tick the checkboxes under the `Attack` and `Sniffing` headers.
 
 Next, we need to tell SimBA how to deal with occations when `Attack` and `Sniffing` classification probabilities are equal. In the `TIE BREAK` dropdown, select the classifier that should "win" when classification probabilities of `Attack` and `Sniffing` are equal.
 In this example we pick `Sniffing` to "win" when `Attack` and `Sniffing` classification probabilities are equal:
@@ -31,7 +31,7 @@ Alternatively, if we want SimBA to **not choose** a winner when classification p
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are then saved in the  `project_folder/csv/machine_results/` directory.
 
-> Note: If you tick **all** three behaviors in the example above (Attack, Sniffing AND Rearing), then SimBA will correct classifications in frames where the three behaviors are co-occuring and will **not** correct behaviors when **only** two of the behaviors are co-occuring.
+> Note: If you tick **all** three behaviors in the example above (Attack, Sniffing AND Rearing), then SimBA will correct classifications in frames where all three behaviors are co-occuring. SimBA will **not** correct behaviors when **only** two of the behaviors are co-occuring.
 
 ### Scenario 2: When several mutually exclusive classifications are occuring in a given frame, set a defined classifier to present and the others to absent (regardless of classification probabilities).
 
