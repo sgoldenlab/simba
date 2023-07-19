@@ -16,30 +16,34 @@ SimBA extracts features for builing and [running downstream machine learning mod
 2). Navigate to the [Extract features] tab, and click on the `CALCULATE FEATURE SUBSETS` button.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_subsets_2.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_subset_menu_1.png" />
 </p>
 
-3) In the `FEATURE FAMILY` drop-down, select the type of measurements you want to calculate. 
+3) In the **SETTINGS** frame, begin by selecting a directory where you want to store the output data. In the chosen directory, SimBA will store one CSV file per file in the `project_folder/csv/outlier_corrected_movement_location` directory. In these files, there will be one column per new feature and one row per video frame. It's a good idea to select an empty directory. 
+   
+5) We can choose to append these new feature subsets to our data in the `project_folder/csv/features_extracted` directory wit the aim of creating better classifiers. SimBA will then use these features when [generating machine learning classification predictions](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model), and the features will be included when [annotating](https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md) the specific videos. To append the new features to the extracted features data inside the `project_folder/csv/features_extracted`, tick the `APPEND RESULTS TO FEATURES EXTRACTED FILES`.
+   
+6) If we have already annotated videos, then we may want to include these further features without having to re-annotate the data. To append the new features to the annotated data inside the `project_folder/csv/targets_inserted`, tick the `APPEND RESULTS TO TARGETS INSERTED FILES`.
 
-> Note I: If you find a set of features is missing from the drop-down, let us know by opening a [GitHub issue](https://github.com/sgoldenlab/simba/issues) or reach out to us on [Gitter](https://gitter.im/SimBA-Resource/community) and we will work to get it in.  
+> Note: If we decide to append the results to either or both the `features_extracted` and `targets_inserted` files, and do not want to store the new features in a separate directory, then tick the relevant checkboxes and leave the `SAVE DIRECTORY` as `No folder selected. 
 
-> Note II: Calculating convex hull sizes is expensive. Thus, if you are calculating 3- or 4-point convex hull areas and have a lot of animals/body-parts, chances are it will take a while. SimBA currently (03/2023) rely on [joblib.Parallel](https://joblib.readthedocs.io/en/latest/parallel.html) and [scipy.spatial.ConvexHull](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.ConvexHull.html) to compute convex hulls [HERE](https://github.com/sgoldenlab/simba/blob/cfd8806a75e507dac8df2cfaef6934d51703ba70/simba/mixins/feature_extraction_mixin.py#L69). If you know of faster methods, please consider contributing! 
+7). When building classifiers, its important that all files representing each video has the same features and an equal number of features. Thus, before completing the appending of the new features, we may want to perform some integrity checks to confirm that each file has the same number of features and that the features have all the same names. To do this, check the `INCLUDE INTEGRITY CHECKS BEFORE APPENDING NEW DATA` CHECKBOX. 
+
+> Note: If there are integrity issues, SimBA will print you an error message about the integrity issues, and **stop the appending of the new feature data**. Thus, if errors are discovered, SimBA will revert to the orginal `project_folder/csv/features_extracted` and/or `project_folder/csv/targets_inserted` file formats without appended data. 
 
 
+8) Next, we need to select the features that we want to compute:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_subsets_3.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/feature_subset_menu_2.png" />
 </p>
 
-4). In the `SAVE DIRECTORY` selection box, select a directory where you want to save your feature data. It's a good idea to select an empty directory. 
 
+Tick the checkboxes for the features that we want to compute. Once complete, click the <kbd>RUN</kbd> button. 
 
-5). Once filled in, hit the `RUN` button. You can follow the progress in the main SimBA window. 
+9) Once complete, the `SAVE DIRECTORY` will be filled with one file for every video file represented in your `project_folder/csv/outlier_corrected_movement_location` directory (if you selected a save directory). In these files, every row represents a frame, and every column represents a feature in feature family. The number of columns (features) will depend on the number of body-parts and animals in your SimBA project. If you ticked the `APPEND RESULTS TO FEATURES EXTRACTED FILES` and/or `APPEND RESULTS TO TARGETS INSERTED FILES`, the files in these directories should also be populated with new features.
 
-
-6). Once complete, the `SAVE DIRECTORY` will be filled with one file for every video file represented in your `project_folder/csv/outlier_corrected_movement_location` directory. In these files, every row represents a frame, and every column represents a feature in feature family. The number of columns (features) will depend on the number of body-parts and animals in your SimBA project.
-
-For smaller examples of expected output, see:
+For smaller examples of expected output features, see:
 
 * [Two-point body-part distances (mm).csv](https://github.com/sgoldenlab/simba/blob/master/misc/Two-point%20body-part%20distances%20(mm).csv)
 * [Within-animal three-point body-part angles (degrees).csv](https://github.com/sgoldenlab/simba/blob/master/misc/Within-animal%20three-point%20body-part%20angles%20(degrees).csv)
