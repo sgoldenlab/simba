@@ -182,6 +182,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Using the SimBA data analysis and export dashboard](docs/plotly_dash.md) 📊
 - [Explainable machine classifications in SimBA (SHAP)](docs/SHAP.md) 🧮
 - [Mutual exclusivity using heuristic rules in SimBA](docs/mutual_exclusivity_heuristic_rules.md) 📗
+- [Compute feature subsets in SimBA](docs/feature_subsets.md) 📕 
 - [Kleinberg markov chain classification smoothing in SimBA](docs/kleinberg_filter.md) 🔗
 - [Cue-light analyses in SimBA](docs/cue_light_tutorial.md)💡💡
 - [Bounding boxes in SimBA](docs/anchored_rois.md)📦
