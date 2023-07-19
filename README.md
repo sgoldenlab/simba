@@ -173,7 +173,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Using DeepPoseKit in SimBA](docs/DeepPoseKit_in_SimBA.md) 📙
 - [Using DeepLabCut through SimBA](docs/Tutorial_DLC.md) 📗
 - [SimBA generic tutorial](docs/tutorial.md) 📘
-- [SimBA friendly asked questions (FAQ)](docs/FAQ.md) 📕
+- [SimBA friendly asked questions (FAQ)](docs/FAQ.md) 📕 
 - [SimBA behavioral annotation interface](docs/label_behavior.md) 🏷️
 - [SimBA Advanced behavioral annotation interface](docs/advanced_labelling.md) 🏷️
 - [Using third-party annotation tools in SimBA](docs/third_party_annot.md) 🏷️
@@ -181,6 +181,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 - [Using multi-animal pose (maDLC/SLEAP/APT) in SimBA](/docs/Multi_animal_pose.md) 🐭🐭
 - [Using the SimBA data analysis and export dashboard](docs/plotly_dash.md) 📊
 - [Explainable machine classifications in SimBA (SHAP)](docs/SHAP.md) 🧮
+- [Mutual exclusivity using heuristic rules in SimBA](docs/mutual_exclusivity_heuristic_rules.md) 📗
 - [Kleinberg markov chain classification smoothing in SimBA](docs/kleinberg_filter.md) 🔗
 - [Cue-light analyses in SimBA](docs/cue_light_tutorial.md)💡💡
 - [Bounding boxes in SimBA](docs/anchored_rois.md)📦
