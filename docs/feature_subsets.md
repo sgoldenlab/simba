@@ -6,7 +6,7 @@
 
 ### INTRODUCTION
 
-SimBA extracts features for builing and [running downstream machine learning models](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features). However, at times, we may just want to take advantage of some SimBA [feature calculators](https://github.com/sgoldenlab/simba/blob/master/simba/mixins/feature_extraction_mixin.py) and generate a subset of measurements for use in our own downstream applications. For some of the feature sub-sets available, see the image above. 
+SimBA extracts features for builing and [running downstream machine learning models](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features). However, at times, we may want to take advantage of some SimBA [feature calculators](https://github.com/sgoldenlab/simba/blob/master/simba/mixins/feature_extraction_mixin.py) and generate a subset of measurements, either for use in our own downstream applications, or as additional potentially informative features when building classifiers in SimBA. For some of the feature sub-sets available, see the image above. 
 
 
 ### INSTRUCTIONS
