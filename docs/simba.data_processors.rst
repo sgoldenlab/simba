@@ -87,3 +87,11 @@ Movement time-bins calculator
 .. automodule:: simba.data_processors.timebins_movement_calculator
    :members:
    :show-inheritance:
+
+
+Mutual exclusivity refactorer
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.mutual_exclusivity_corrector
+   :members:
+   :show-inheritance:
