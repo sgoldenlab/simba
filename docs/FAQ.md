@@ -389,13 +389,8 @@ iii) Say you perform outlier correction, but you apply a criterion that is too s
 (iv) When visualizing the pose-estimated data in the pose-estimation tool (e.g., DLC), the default body-part circle colors can be a single color. For example, if both left and right ear of a mouse are visualized using red circles, and they switch positions, it is **very** difficult spot. 
 
 SimBA however, assign different colors to the different body-parts, and these body-part switches/jumps/shifts therefore become more noticeable. To check if this is the case, go back to your pose-estimation package and use their tools to visualize the data using different colors to see if the switches are noticeable.  
-![image](https://github.com/sgoldenlab/simba/assets/34761092/3c2f4eeb-d684-4a28-a43c-45093d6f0950)
-
 
 </details>
-
-
-
 
 ##
 Author [Simon N](https://github.com/sronilsson)
