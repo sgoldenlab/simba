@@ -372,5 +372,30 @@ If your classifiers performs well, and you don't want to update them, I would st
   
 </details>
 
+### 25) My pose-estimation tracking looks good when I visualize it in the pose-estimation tool. However, after I import it into SimBA, it doesn’t look good anymore, why??
+
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/> 
+  
+Some situations when the tracking can look good in pose-estimation package, but then become messed up when importing it into SimBA:
+
+i) The copy of the video analyzed pose-estimation has different frame rate or resolution then the copy of video imported into SimBA. E.g., say you analyzed a video in DLC that was 15fps, and 640x400 resolution. You imported the pose-estimation CSV file, and then you cropped it and/or changed the frame rate to 10fps and imported it to SimBA. The body-parts are no longer in the pixel location in relation to video in which pose-estimation was performed.
+
+ii) Say you have a fair bit of intermittent missing body-parts in pose-estimation. Missing body-parts are placed at (0,0) - top left corner of the image. You then apply a linear smoothing function in SimBA (Gaussian, or Savitzky-Golay) for missing body-parts. It is possible that you see the body-parts flying about as SimBA trying to interpolate the body-parts all over the place between (0,0) and the actual location of the body-parts. You can try another smoothing function (e.g., nearest).
+
+iii) Say you perform outlier correction, but you apply a criterion that is too stringent. SimBA will then remove body-part movements that are true body-part movement, and the animal body-part location predictions can appear to be “stuck” in the video while the animal is actually moving.
+
+(iv) When visualizing the pose-estimated data in the pose-estimation tool (e.g., DLC), the default body-part circle colors can be a single color. For example, if both left and right ear of a mouse are visualized using red circles, and they switch positions, it is **very** difficult spot. 
+
+SimBA however, assign different colors to the different body-parts, and these body-part switches/jumps/shifts therefore become more noticeable. To check if this is the case, go back to your pose-estimation package and use their tools to visualize the data using different colors to see if the switches are noticeable.  
+![image](https://github.com/sgoldenlab/simba/assets/34761092/3c2f4eeb-d684-4a28-a43c-45093d6f0950)
+
+
+</details>
+
+
+
+
 ##
 Author [Simon N](https://github.com/sronilsson)
