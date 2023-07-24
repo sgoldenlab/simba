@@ -16,11 +16,9 @@ We are are no longer supporting the legacy SimBAxTF branch, which required Tenso
 
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
-<p align = "center">
-<img src="/images/SimBA_logo_4.jpg" alt=""
-	title="SimBA" width="488px" height="488px" />
-<p/>
-
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/SimBA_logo_4.jpg" />
+</p>
 
 ## Apr-04-2023: SimBA version 1.55 release
 
