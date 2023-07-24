@@ -1,7 +1,7 @@
 
 ### REFACTOR CLASSIFICATIONS ACCORDING TO MUTUAL EXCLUSIVITY RULES
 
-When using multiple classifiers, it may happen that we get classification results indicating that the animal are doing several, mutually exclusive, behaviors in any one frame. An example would be that the animal is performing `slow running` and `fast running` within the same frame. SimBA has several methods for implementing user-defined heurstic rules that corrects the classification results. 
+When using multiple classifiers, it may happen that we get classification results indicating that the animal are doing several, mutually exclusive, behaviors in any one frame. An example would be that the animal is performing `slow running` and `fast running` within the same frame. SimBA has several methods for implementing user-defined heurstic rules that corrects such classification results. 
 
 We will go through a few examples of different mutual exclusivity rules and how to apply them. If you find that your specific use-case is missing, then let us know through [Gitter](https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im) or by opening a [GitHub issue](https://github.com/sgoldenlab/simba/issues/new/choose) and we will get it into the SimBA GUI.
 
@@ -27,7 +27,7 @@ In this example we pick `Sniffing` to "win" when `Attack` and `Sniffing` classif
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mutual_exclusivity_2.png" />
 </p>
 
-Alternatively, if we want SimBA to **not choose** a winner when classification probabilities of `Attack` and `Rear` are equal, and instead skip applying the rule to the file all together, then tick the `SKIP ON EQUAL` checkbox (you should see the TIE BREAK drop-down greyed out when the `SKIP ON EQUAL` checkbox is checked).
+Alternatively, if we want SimBA to **not choose** a winner when classification probabilities of `Attack` and `Rear` are equal, and instead skip applying the rule to the frames where classification probabilities are equal, then tick the `SKIP ON EQUAL` checkbox (you should see the TIE BREAK drop-down greyed out when the `SKIP ON EQUAL` checkbox is checked). SimBA will print you a warning message telling you the frames, and videos where the rule is skipped because of equal classification probabilities. 
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are then saved in the  `project_folder/csv/machine_results/` directory.
 
