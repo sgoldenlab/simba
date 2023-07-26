@@ -28,3 +28,12 @@ Visualizations
    nb/probability_plots
    nb/hatmap_location_plotter
    nb/heatmap_clf
+
+Miscellaneous
+-------------------
+.. toctree::
+   :maxdepth: 1
+
+   nb/import_sleap_h5
+
+
