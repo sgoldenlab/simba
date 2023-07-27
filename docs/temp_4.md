@@ -1,6 +1,14 @@
 # Who is looking at who: calculate "directionality" between animals in SimBA 
 
-In videos containing multiple animals, it may be valuable to know when, and how much time, each animal spend directing towards each other or towards stationary objects. We can calculate this with appropriate pose-estimation data in SimBA. For a better understanding of this kind of data, and if it is relevant for your specific application, see the videos and gifs below and the  rendered visualization examples at the end of this tutorial. Here we use SimBA to get measures, in seconds, of much time *Animal 1* spend directing towards *Animal 2*, and how much time *Animal 2* spend directing towards *Animal 1* (... and so on for all the relationships for all the animals tracked in each video). We can also use SimBA to generate visualizations of these metrics, so that we can be comfortable with that the "directionality" data that is summarized in the created CSV files and dataframes are accurate. 
+In videos containing multiple animals, it may be valuable to know when, and how much time, each animal spend directing towards each other or towards stationary objects. We can calculate this with appropriate pose-estimation data in SimBA. For a better understanding of this kind of data, and if it is relevant for your specific application, see the videos and gifs below and the rendered visualization examples at the end of this tutorial. Here we use SimBA to get measures such as:
+
+* **Detailed boolean data**: For example, for each frame and animal in the video, which body-parts belonging to other animals are within the observing animals  *"line of sight"* and which body-parts belonging to other animals are **not** within the observing animals  *"line of sight"*.
+
+* **Detailed summary data**: For example, when a body-part of another animal is within *"line of sight"* for an observing animal, what is the approximate in pixel coordinates of the observing animals eye, and where is the observed animals body-part in pixel coordinates.
+
+* **Aggregate data**: For example, how many seconds is animal A observing animal B in the video, and how many seconds is animal B observing animal A in the video?
+
+We can also use SimBA to generate visualizations of these metrics, so that we can be comfortable with that the "directionality" data that is summarized in the created CSV files and dataframes are accurate. 
 
 >Note 1: Firstly, and importantly, SimBA does not calculate actual *gaze* (this is *not* possible using **only** pose-estimation data). Instead, SimBA use a proxy calculation for estimating if the animal is directing toward another animal, or [a user-defined region of interest](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data), using the nose coordinate and the two ear-coordinates (or the equivalent coordinate on any other animal species). For more information on how SimBA estimates the location of the animals *eyes*, and how SimBA estimates if an object, or another animal, is within the *line of sight* of the specific animal, check out the [SimBA ROI tutorial - Part 3](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data).
 
@@ -13,10 +21,6 @@ In videos containing multiple animals, it may be valuable to know when, and how 
 </div>
 
 [![Video example: SimBA YouTube playlist](https://github.com/sgoldenlab/simba/blob/master/images/Direct_10.JPG)](https://youtu.be/d6pAatreb1E "Video example: SimBA YouTube playlist")
-
-
-
-
 
 
 <p align="center">
@@ -41,30 +45,47 @@ Specifically, for working with directionality between animal in SimBA, begin by 
 
 2. Navigate to the ROI tab. On the right hand side, within the `Analyze distances/velocity` sub-menu, there are two buttons (circled in red in the image below) - (i) `Analyze directionality between animals` and (ii) `Visualize directionality between animals`.
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Directionality_99.PNG)
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/directionality_tutorial_1.png" />
+</p>
 
-3. We will begin clicking on the `Analyze directionality between animals` button. Clicking on this button will calculate how much time each animal spend directing towards each other within all of your videos represented as CSV files within in your `project_folder/csv/outlier_corrected_movement_location` directory. Again, for more information on how SimBA calculates directionality, check out [this schematic](https://github.com/sgoldenlab/simba/raw/master/images/Directionality_ROI.PNG). This schematic depicts a user-defined ROI, but exactly the same methods is applied when using body-parts rather than a user-defined ROI regions. 
+3. We will begin clicking on the `ANALYZE DIRECTIONALITY BETWEEN ANIMALS` button. This will bring up a pop-up menu with three ouput options. Select which data output format you would like.
+  
+* **CREATE BOOLEAN TABLES**: Creates one CSV file per video in your project, with one row per frame in the video, and where each column represents a **OBSERVING ANIMALS -> OTHER ANIMAL BODY-PART** relationship. The columns are populated with `0` and `1`s. A `1` means that the observing animals has the other animals body-part in "line of sight", a `0` means that is is **not** in "line of sight". For an example of expected output boolean table, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/boolean_directionaly_example.csv) CSV file. 
 
-Once you have clicked the `Analyze directionality between animals` button, you can follow the calculation progress in the main SimBA terminal window. 
+* **CREATE DETAILED SUMMARY TABLES**: Creates one CSV file per video in your project, with one row for every "line of sight" observation detected in the video, as in the screengrab below. The `Video` columns denotes the video the data was computed from. The `Frame_#` columns denotes the frame number the "line of sight" observation. The `Animal_1` columns represents the observing animal. The `Animal_2` column represents the animal beeing observed. The `Animal_2_body_part` represents the body-part of `Animal_2` that is beeing observed. The `Eye_x` and	`Eye_y` columns denotes the approximate pixel location of the `Animal_1` eye that observed the `Animal_2_body_part`. The `Animal_2_bodypart_x` and `Animal_2_bodypart_y` columns represents the location of the `Animal_2_body_part` that is observed by `Animal_1`.  For a full example of expected output of the detailed summary tables, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/detailed_summary_directionality_example.csv) CSV file. 
 
-Once the calculations are complete, several new files will be generated in your SimBA project directory. First, a new folder has been created in your project directory. If you look within the `project_folder/csv/directionality_dataframes` directory, you should see one new file for each of the videos in your project, each file should have the name of the video that was analyzed. If you open up one of these files, then you should see one row for each frame in your video, together with a bunch of columns representing the different animal relationships. For each animal (and by *animal* I mean the animal "looking" at something) and target (and by *target* I mean the body-part being "looked" at or directed towards), there will be a total of 5 columns. If we look at the **first five** column in example image just below, then the **first of these five columns** has the header *Simon_directing_JJ_Nose* and contains boolean 0 or 1 values. If the specific animal (in this case Simon) directed towards the specific body-part (in this case JJs's nose) in that frame (i.e., the animal called Simon had the animal JJs nose within the line of sight) then the column will read `1`. Conversely, if the animal (Simon) did **not** direct towards that body-part (JJ's nose) in that frame (i.e., JJ's nose was **not** within Simon's line of sight), then the column reads a `0`. Thus, in this example image below, animal JJs nose **was** within the line of sight of the animal Simon in frame 23-40, but was **not** within the line of sight of Simon in frame 0-22. 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/directionality_tutorial_2.png" />
+</p>
 
-Next, the preceeding four columns are primarily saved for visualization purposes, should the user want to verify the data by genering rendered videos of the different "line of sight" paths. The **second** and **third** column (*Simon_directing_JJ_Nose_eye_x* and *Simon_directing_JJ_Nose_eye_y*) stores the coordinates of animal *Simon's* directing eye when the specific body-part was within the line of sight. If the specific body-part was **not** within the line of sight, then the specific row for these columns will read `0`. Lastly, the **fourth** and **fifth** column (*Simon_directing_JJ_Nose_bp_x* and *Simon_directing_JJ_Nose_bp_y*) stores the coordinates of the body-part being observed by animal Simon. If the specific body-part was **not** within the line of sight, then the specific row for these columns will also read `0`. 
+* **CREATE AGGREGATE STATISTICS TABLES**: Creates one CSV file with aggregate statistics, with each row representing a relationship between two animals within a video and the aggregate seconds that one animal was within the "line of sight" of another animal. The aggregate seconds is computed by summing all the frames that where one or more body-part of the observed animals was in the "line of sight" of the observing animal. For an example of expected output of the aggregate summary table, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/direction_data_aggregates_example.csv) CSV file. 
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Directionality_98.PNG)
+>Note: These aggregate summary statistics are calculated based on all body-parts for each animal. If an animal is directing **any** body-part belonging to a specific other animal, then the animal is directing towards that other specific animal. For example, even if the animal with the ID *Simon* only has the tail-base of the animal with the ID JJ in the *line of sight* in one frame, the animal with the ID *JJ* is still counted as being in the *line of sight* in of the animal with the ID *Simon* in the aggregate statistics table. 
 
-Perhaps more importantly, SimBA generates a CSV log file that contains summary statistics. This includes how much time each animal spent directing towards all other animals present in the video. This file can be found in the `project_folder/logs` directory. This filename of this file is time-stamped, and have a name that may look something like this: `Direction_data_20200822151424.csv`. The content of this file should look like the image just below (if you are tracking 5 animals. if you are tracking fewer animals, then the file will contain fewer columns):
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Directionality_97.PNG)
-**(click on this image for enlarged view)**
+Once you filled in your selected output formats, click `RUN`. You can follow the progress in the main SimBA terminal. The results will be saved in the `project_folder/logs` directory of your SimBA project. 
 
-Thi log file will contain one column for each animal relationship, and one row for each analysed video. In the example screenshot above, the first column header reads *JJ_directing_Simon_s* and contains the time, in seconds, that the animal with the ID *JJ* spent directing towards the animal with the ID *Simon* (92.2s in the video named Video1). In column F (or column 5), with the header *Simon_directing_JJ_s*, we can read the time, in seconds, that the animal with the ID *Simon* spent directing towards the animal with the ID *JJ* (107.3s in Video1). Indeed, studying the directionality results in all of the four videos in the example screenshot above, the animal *Simon* does seems a little more intrested in directing towards the animal named *JJ*, than the animal *JJ* is interested in directing towards the animal named *Simon*. 
+4. Next, we may to visualize these directionality data - for peace of mind - that the metrics seen in the output desriptive statistics and CSV files outlined above are accurate and plausable. To do this, go ahead and click on the second button described above - `VISUALIZE DIRECTIONALITY BETWEEN ANIMALS` and you should see this pop-up allowing control over how the output vides are created:
 
->Note: These summary statistics are calculated based on all body-parts for each animal. If an animal is directing **any** body-part belonging to a specific other animal, then the animal is directing towards that other specific animal. For example, even if the animal with the ID *Simon* only has the tail-base of the animal with the ID JJ in the *line of sight* in one frame, the animal with the ID *JJ* is still counted as being in the *line of sight* in of the animal with the ID *Simon*. 
 
-4. Next, we may to visualize these directionality data - for peace of mind - that the metrics seen in the output desriptive statistics and CSV files outlined above are accurate and plausable. To do this, ga ahead and click on the second button described above - `Visualize directionality between animals`.
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/directionality_tutorial_3.png" />
+</p>
 
->Note: Rendering videos are time-consuming and computaionally expensive. If you have many videos, many animals, and high fps/resolution, it might take some time. You can follow the progress in the main SimBA terminal window. 
+* `Shows pose-estimated body-parts`. If checked, the ouput video will include circles denoting the predicted location of the animal body-parts. If not checked, no pose-estimated body-part locations are shown.
+
+* `Highlight direction end-points`: If checked, SimBA will emphasize that a body-part is observed by showing the observed body-part using a salient circle color and size. 
+
+* `Polyfill direction lines`: If checked, SimBA will highlight the relationship between the "eye" and the observed body-parts with a polyfill "funnel-style" visualization. If unchecked, simpler lines will be shown.
+
+* `Direction color`: The color of the lines or polyfill representing observating relationships. If `Random`, then a random color will be selected.
+
+* `Pose circle size`: The size of the circles denoting the pose-estimated body-part locations.
+
+* `Line thickness`: The size of the lines denoting observating relationships.
+
+* `Multi-process (faster)`: Ceating videos can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the Multiprocess videos (faster) checkbox. Once ticked, the CPU cores dropdown becomes enabled. This dropdown contains values between 2 and the number of cores available on your computer with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your visualizations.
 
 Once complete, you can find your final rendered videos in your `project_folder\frames\output\ROI_directionality_visualize` folder. For higher-quality examples of the expected final output videos for experimental scenarious containing five animals, or two animals, see the SimBA [SimBA YouTube playlist](https://www.youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl). 
 
