@@ -31,12 +31,12 @@ Alternatively, if we want SimBA to **not choose** a winner when classification p
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are then saved in the  `project_folder/csv/machine_results/` directory.
 
-> Note: If you tick **all** three behaviors in the example above (Attack, Sniffing AND Rearing), then SimBA will correct classifications in frames where all three behaviors are co-occuring. Thus, SimBA will correct behaviors according to the rule in frames when all the behaviors that are ticked are co-occuring.
+> Note: In the workflow for this method, SimBA will first slice the data and retain any frames where all the selected classifiers shows a `1` in the classification column. In the example above, SimBA will find all rows where `Attack` and `Sniffing` has the value `1`. Next, SimBA will look in the `Probability_Attack` and 'Probability_Sniffing` columns for those sliced rows and find the column with the lesser value for each row. Finally, SimBA will update the `Attack` and `Sniffing` columns, changing `1` to `0` where the reprective probability column has the lesser value. Where `Probability_Attack` and 'Probability_Sniffing` columns are equal, the tie-break or the skip rule will be applied. Importantly, in the rule example above, SimBA will ignore any classified `Rear` events and the mutual exlusivity rule leave classified `Rear` events intact.
 
 ### Scenario 2: When several mutually exclusive classifications are occuring in a given frame, set a defined classifier to present and the others to absent (regardless of classification probabilities).
 
 Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `WINNER` dropdown and `THRESHOLD` entry-box available, and `TIE BREAK` and `SKIP ON EQUAL` unavailable). Next, tick the checkboxes for the classifiers which are mutually exclusive. Next, use the dropdown under the `WINNER` header to select the classifier that
-should **WIN** when the chosen classifiers are occuring at the same time. **Leave the threshold value set to 0.00** (see more info below on this setting). For example, if I want to set `Attack` to present and `Sniffing` to absent when both `Attack` and `Sniffing` is classified as present, I tick the checkboxes for `Attack` and `Sniffing`, (ii) select `Attack` in the `WINNER` dropdown and leave the `THRESHOLD` at 0.00.
+should **WIN** when the chosen classifiers are occuring at the same time. **Leave the threshold value set to 0.00** (see more info below on this setting). For example, if I want to set `Attack` to present, and `Sniffing` to absent, when both `Attack` and `Sniffing` is classified as present, I first tick the checkboxes for `Attack` and `Sniffing`, and then select `Attack` in the `WINNER` dropdown and leave the `THRESHOLD` at 0.00.
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/mutual_exclusivity_3.png" />
@@ -44,11 +44,13 @@ should **WIN** when the chosen classifiers are occuring at the same time. **Leav
 
 Once complete, click `RUN`. SimBA will copy the files prior to applying to rules into the `project_folder/csv/machine_results/Prior_to_mutual_exclusivity_datetime_stamp` sub-directory. The new files, with the corrected classifications, are saved in the  `project_folder/csv/machine_results/` directory.
 
+> Note: In the workflow for this method, SimBA will first slice the detected data, and retain the rows where `Attack` and `Sniffing` columns has value `1` and the `Probability_Attack` columns shows a value above the threshold. Next, SimBA will change the values in the columns for the checked classifiers that is **not** the "WINNER" to `0`. Thus, in this example above, SimBA will ignore any `Rear` events and the mutual exlusivity rule will leave `Rear` classifications intact.
+
 ### Scenario 3: When several mutually exclusive classifications are occuring in a given frame, set a defined classifier to present and the others to  absent only when the defined classifier is above a certain threshold.
 
 Begin by **un-ticking** the `HIGHEST PROBABILITY` checkbox (this will make the `WINNER` and `THRESHOLD` available options available, and `TIE BREAK` and `SKIP ON EQUAL` unavailable). Next, tick the checkboxes for the classifiers that are mutually exclusive. Next, use the dropdown under the `WINNER` header to select the classifier that should **WIN** when the chosen classifiers are occuring at the same time. 
 
-Lastly, set the threshold for the `WINNER` classifier. For example, if I want to set `Attack` to present and `Rear` to absent when both `Attack` and `Rear` is classified as present **AND** the `Attack` classification probability is equal or above 0.6, then
+Lastly, set the threshold for the `WINNER` classifier. For example, if I want to set `Attack` to present and `Rear` to absent when both `Attack` and `Rear` is classified as present **AND** the `Attack` classification probability is above 0.6, then
 I tick the checkboxes for `Attack` and `Rear`, (ii) select `Attack` in the `WINNER` dropdown, (iii) set the `THRESHOLD` to `0.6` and click `Run`. 
 
 <p align="center">
