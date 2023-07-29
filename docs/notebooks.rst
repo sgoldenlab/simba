@@ -11,6 +11,7 @@ General processing
    nb/shap_example_1
    nb/outlier_correction
    nb/third_party_append
+   nb/advanced_smoothing_interpolation
 
 
 Visualizations
