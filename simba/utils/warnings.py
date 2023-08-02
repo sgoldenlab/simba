@@ -173,18 +173,22 @@ def PythonVersionWarning(msg: str):
 def BorisPointEventsWarning(msg: str):
     stdout_warning(msg=f"SIMBA BORIS POINT EVENT WARNING: {msg}")
 
+
 def FFMpegCodecWarning(msg: str):
     stdout_warning(msg=f"SIMBA FFMPEG CODEC WARNING: {msg}")
+
 
 def FFMpegNotFoundWarning(msg: str):
     stdout_warning(msg=f"SIMBA FFMPEG NOT FOUND WARNING: {msg}")
 
+
 def SkippingFileWarning(msg: str):
-    stdout_warning(msg=f'SIMBA SKIPPING FILE WARNING: {msg}')
+    stdout_warning(msg=f"SIMBA SKIPPING FILE WARNING: {msg}")
+
 
 def SkippingRuleWarning(msg: str):
-    stdout_warning(msg=f'SIMBA SKIPPING RULE WARNING: {msg}')
+    stdout_warning(msg=f"SIMBA SKIPPING RULE WARNING: {msg}")
+
 
 def IdenticalInputWarning(msg: str):
-    stdout_warning(msg=f'SIMBA IDENTICAL WARNING: {msg}')
-
+    stdout_warning(msg=f"SIMBA IDENTICAL WARNING: {msg}")
