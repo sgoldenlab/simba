@@ -16,6 +16,15 @@ Feature extraction methods
    :members:
    :show-inheritance:
 
+
+Feature extraction supplement methods
+----------------------------------------------
+
+.. automodule:: simba.mixins.feature_extraction_supplement_mixin
+   :members:
+   :show-inheritance:
+
+
 Plotting methods
 -----------------------------------
 
