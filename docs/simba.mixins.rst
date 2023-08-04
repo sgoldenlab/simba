@@ -25,6 +25,14 @@ Feature extraction supplement methods
    :show-inheritance:
 
 
+Circular feature extraction methods
+----------------------------------------------
+
+.. automodule:: simba.mixins.feature_extraction_circular_mixin
+   :members:
+   :show-inheritance:
+
+
 Plotting methods
 -----------------------------------
 
