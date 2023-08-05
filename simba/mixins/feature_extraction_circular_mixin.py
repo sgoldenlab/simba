@@ -37,6 +37,10 @@ class FeatureExtractionCircularMixin(object):
         :parameter int fps: fps of the recorded video
         :returns np.ndarray: Size data.shape[0] x time_windows.shape[0] array
 
+        .. image:: _static/img/mean_rolling_timeseries_angle.png
+           :width: 1000
+           :align: center
+
         .. attention::
            The returned values represents the angular mean dispersion in the time-window ``[current_frame-time_window->current_frame]``.
            `-1` is returned when ``current_frame-time_window`` is less than 0.
