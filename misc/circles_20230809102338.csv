@@ -1,0 +1,2 @@
+,Video,Shape_type,Name,Color name,Color BGR,Thickness,centerX,centerY,radius,Tags,Ear_tag_size
+0,Together_1,Circle,asdasd,Red,"(0, 0, 255)",5,830,294,159,"{'Center tag': (830, 294), 'Border tag': (671, 294)}",10
