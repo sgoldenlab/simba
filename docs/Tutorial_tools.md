@@ -521,6 +521,22 @@ Use this tool to get the model information (e.g., number of features, number of 
 
 This information tells you how many trees the classifier uses, how many features the classifier expects, further model hyperparameter settings, and when the file was created etc. 
 
+### Extract ROI definitions to human-readable format
+
+Your drawn ROI definitions (their locations, sizes, vertices, colors etc.) are saved inside the `project_folder/logs/measures/ROI_definitions.h5` file in your SimBA project. Sometimes, we may want to extract this data into human-readable format. To do this, click the `Convert ROI definitions` in the tools menu:
+
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_definitions_tools.png" width="900" />
+
+* In the `ROI DEFINITIONS PATH (H5)` file-selection box, click `Browse` and select the path to the `project_folder/logs/measures/ROI_definitions.h5` for which you want to extract the.
+* In the `SAVE DIRECTORY` folder-select box, select the directory where you want to store the output files.
+* Once filled in, click `RUN`.
+
+Once complete, check the `SAVE DIRECTORY` for files with the names formatted as `polygons_datetimestamp.csv`, `rectangles_datetimestamp.csv`, and `circles_datetimestamp.csv`. If no circles, rectangles, or polygons exist in the `ROI_definitions.h5`, the respective CSV file will not be created. 
+
+For some examples of expected outputs, check [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/polygons_20230809094913.csv) file for polygons, [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/rectangles_20230809094913.csv) file for rectangles, and [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/circles_20230809102338.csv) file for circles.
+
+
+
 
 ##
 Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
