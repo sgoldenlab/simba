@@ -42,7 +42,6 @@ For support, see `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-Reso
 
    walkthroughs
 
-
 .. toctree::
    :maxdepth: 1
    :caption: LABELLING TUTORIALS:
@@ -60,3 +59,13 @@ For support, see `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-Reso
    :caption: DOCS:
 
    docs/workflow
+
+.. toctree::
+   :maxdepth: 2
+   :caption: ABOUT:
+
+   credits
+   links
+   
+
+
