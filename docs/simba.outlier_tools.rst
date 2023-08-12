@@ -15,6 +15,22 @@ Movement outlier methods
    :members:
    :show-inheritance:
 
+Advanced movement outlier correction
+--------------------------------------------------------
+
+.. automodule:: simba.outlier_tools.outlier_corrector_movement_advanced
+   :members:
+   :show-inheritance:
+
+
+Advanced location outlier correction
+--------------------------------------------------------
+
+.. automodule:: simba.outlier_tools.outlier_corrector_location_advanced
+   :members:
+   :show-inheritance:
+
+
 Skipping outlier correction
 -----------------------------------------------------
 
