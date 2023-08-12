@@ -19,4 +19,5 @@ API Reference
    simba.ui
    simba.unsupervised
    simba.utils
+   simba.utils.cli
    simba.video_processors
