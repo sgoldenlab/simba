@@ -1,23 +1,27 @@
 import os
-from typing import Union, Optional
+from typing import Optional, Union
+
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.pyplot import figure, cm
+from matplotlib.pyplot import cm, figure
+
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.printing import stdout_success
 
-class CircularPlotting(PlottingMixin):
 
+class CircularPlotting(PlottingMixin):
     def __init__(self):
         PlottingMixin.__init__(self)
 
-    def diffusion_plot(self,
-                       data: np.ndarray,
-                       fps: int,
-                       degree_width: int,
-                       palette: str,
-                       title: Optional[str] = None,
-                       save_path: Optional[Union[str, os.PathLike]] = None) -> plt.figure:
+    def diffusion_plot(
+        self,
+        data: np.ndarray,
+        fps: int,
+        degree_width: int,
+        palette: str,
+        title: Optional[str] = None,
+        save_path: Optional[Union[str, os.PathLike]] = None,
+    ) -> plt.figure:
         """
         Create polar plot representing the angular diffusion within a video.
 
@@ -38,44 +42,50 @@ class CircularPlotting(PlottingMixin):
         """
 
         max_seconds = int(data.shape[0] / fps)
-        second_bin =  int(max_seconds / 5)
-        if second_bin > 1: second_bin = 1
+        second_bin = int(max_seconds / 5)
+        if second_bin > 1:
+            second_bin = 1
         data_rad = [x * 2 * np.pi / 360 for x in data]
         angle_bin_starts = np.arange(0.0, 2 * np.pi, 2 * np.pi * (degree_width / 360))
         n_length_bins = int(max_seconds / second_bin)
         bin_width = 2 * np.pi * (degree_width / 360)
         counts, bin_edges = np.histogram(data_rad, bins=angle_bin_starts)
-        colors = self.create_single_color_lst(pallete_name=palette, increments=bin_edges.shape[0], as_rgb_ratio=True)
+        colors = self.create_single_color_lst(
+            pallete_name=palette, increments=bin_edges.shape[0], as_rgb_ratio=True
+        )
         norm_counts = counts / (fps * second_bin)
         bin_numbers = [np.round(norm_counts * n_length_bins / max_seconds, 0)]
         bin_lengths = [x / degree_width for x in bin_numbers]
 
         plt.figure().clear()
         plt.close()
-        fig = figure(figsize=(8,8))
+        fig = figure(figsize=(8, 8))
         ax = fig.add_axes([0.1, 0.1, 0.8, 0.8], polar=True)
-        bars = ax.bar(angle_bin_starts[:-1], bin_lengths[0], width=bin_width, bottom=0.0)
-        ax.set_theta_zero_location('N')
+        bars = ax.bar(
+            angle_bin_starts[:-1], bin_lengths[0], width=bin_width, bottom=0.0
+        )
+        ax.set_theta_zero_location("N")
         ax.set_theta_direction(-1)
         ax.set_yticklabels([])
         for cnt, (r, bar) in enumerate(zip(bin_lengths[0], bars)):
-           bar.set_facecolor(colors[cnt])
+            bar.set_facecolor(colors[cnt])
         if title is not None:
             plt.title(title)
         if save_path is not None:
             plt.savefig(save_path)
-            stdout_success(msg=f'Diffusion plot {save_path} created!')
+            stdout_success(msg=f"Diffusion plot {save_path} created!")
 
         return ax
 
-    def diffusion_time_bin_plot(self,
-                                data: np.ndarray,
-                                fps: int,
-                                time_bin: int,
-                                degree_width: int,
-                                palette: str,
-                                save_path: Union[str, os.PathLike]):
-
+    def diffusion_time_bin_plot(
+        self,
+        data: np.ndarray,
+        fps: int,
+        time_bin: int,
+        degree_width: int,
+        palette: str,
+        save_path: Union[str, os.PathLike],
+    ):
         """
         Create polar plots representing angular diffusion within each N second time-bin of the video.
 
@@ -97,16 +107,22 @@ class CircularPlotting(PlottingMixin):
         """
         time_bin_frame_size = time_bin * fps
         split_data = np.array_split(data, data.shape[0] / time_bin_frame_size)
-        if not os.path.isdir(save_path): os.makedirs(save_path)
+        if not os.path.isdir(save_path):
+            os.makedirs(save_path)
         for bin_cnt, time_bin_data in enumerate(split_data):
-            time_plot = self.diffusion_plot(data=time_bin_data, fps=fps, degree_width=degree_width, palette=palette, title=f'Time bin {bin_cnt+1}')
-            fig_save_path = os.path.join(save_path, f'Time_bin_{bin_cnt+1}.png')
+            time_plot = self.diffusion_plot(
+                data=time_bin_data,
+                fps=fps,
+                degree_width=degree_width,
+                palette=palette,
+                title=f"Time bin {bin_cnt+1}",
+            )
+            fig_save_path = os.path.join(save_path, f"Time_bin_{bin_cnt+1}.png")
             time_plot.figure.savefig(fig_save_path)
             plt.figure().clear()
             plt.close()
             plt.clf()
-            stdout_success(msg=f'Diffusion plot {save_path} created!')
-
+            stdout_success(msg=f"Diffusion plot {save_path} created!")
 
 
 #
