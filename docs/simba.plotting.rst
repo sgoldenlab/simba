@@ -4,14 +4,14 @@ Plotting / visualization
 Direction between animals
 ----------------------------------------------------
 
-.. automodule:: simba.plotting.Directing_animals_visualizer
+.. automodule:: simba.plotting.directing_animals_visualizer
    :members:
    :show-inheritance:
 
 Direction between animals - multiprocess
 --------------------------------------------------------
 
-.. automodule:: simba.plotting.Directing_animals_visualizer_mp
+.. automodule:: simba.plotting.directing_animals_visualizer_mp
    :members:
    :show-inheritance:
 
