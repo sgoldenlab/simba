@@ -43,6 +43,21 @@ ROI visualizer - multiprocess
    :members:
    :show-inheritance:
 
+
+Circular base feature plotter
+------------------------------------
+
+.. automodule:: simba.plotting.circular_feature_overlay_plotter
+   :members:
+   :show-inheritance:
+
+Circular diffusion plotting
+------------------------------------
+
+.. automodule:: simba.plotting.circular_plotting
+   :members:
+   :show-inheritance:
+
 Classifier validation
 ------------------------------------
 
