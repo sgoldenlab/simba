@@ -233,7 +233,7 @@ On the left of the `Visualization` menu, a button named `VISUALIZE PROBABILITIES
 SimBA can create path plots depicting the location of the animal(s), their paths, as well the locations of the classified behaviors. In the [Visualizations] tab, click the [VISUALIZE PATHS] button, which brings up the below pop-up menu. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/clf_viz_4.png" height="700"/>
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/create_path_plots_0823.png" height="700"/>
 </p>
 
 <p align="center">
@@ -249,6 +249,13 @@ SimBA can create path plots depicting the location of the animal(s), their paths
   - **FONT THICKNESS**: The thickness (boldness) of the font text of the animals name. `E.g., 2`.
   - **BACKGROUND COLOR**: The background color of the path plots. E.g., `White`.
 
+* **SEGMENTS**: Use this menu to create path plots for a specific segment of the videos rather than the entire videos.
+  - **START TIME**: Fill in the time where the path plot video should start. E.g., if I want to discard the first 4 minutes of the video in the path plot, set `Start time` to 00:04:00.
+   - **END TIME**: Fill in the time where the path plot video should end. E.g., if I want to end my path plot at the 8 minute mark, set `End time` to 00:08:00.
+
+> Note: Say you have a 10 minute video, but you want the path plots to represent movements between minutes 4-8 (and thus discard the first 4 and last 2 minutes from the path plot) set the start time to 00:04:00 and end time to 00:08:00.
+
+
 * **CHOOSE CLASSIFICATION VISUALIZATION**: Use this menu to specify if and how the location of classified events are printed on the path plots.
   - **INCLUDE CLASSIFICATION LOCATIONS**: Check this box to include the location of classified events in the path plot.
   
@@ -259,7 +266,14 @@ SimBA can create path plots depicting the location of the animal(s), their paths
 * **CHOOSE BODY-PARTS**: Use this menu to specify which body-parts of the animals will represent their location.
   - **# ANIMALS**: Use this drop-down to specify how many animals you want to visualize paths for.
   
-  - You should see a row for each animal, and two drop-down menues per. In the example screengrab above, I have two animals. In the first drop-down, select the body-part which you want to represent the path. In the second drop-down, select which **color** the circles and lines depicting the location of the animal should have. 
+  - You should see a row for each animal, and two drop-down menues per. In the example screengrab above, I have two animals. In the first drop-down, select the body-part which you want to represent the path. In the second drop-down, select which **color** the circles and lines depicting the location of the animal should have.
+ 
+* **VISUALIZATION SETTINGS**:
+  - **Create video**: Tick the `Create video` checkbox to generate `.mp4` video path plots.
+  - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with path plots (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
+  - **Create last frame**: Create a single `.png` image representing the path plot at the end of each video.
+  - **Include animal names**: Print the animal name at the current location of each animal in each frame. If unchecked, the animal name as text will not be shown.
+   - **Multiprocess videos (faster)**: Creating heatmaps is computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this in part by using multiprocessing over the multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your visualizations. 
 
 * **RUN**:
   - **SINGLE VIDEO**: Use this menu to create a *single* path visualization video. The `Video` drop-down will contain all the videos in your `project_folder/machine_results` directory. Choose which video you want to create a path visualization for. Once choosen, click the `Create single video` button. You can follow the progress in the main SimBA terminal window. Once complete, a new video and/or frames will be saved in the `project_folder/frames/output/path_plots` directory. 
