@@ -309,6 +309,9 @@ Somtimes we may want to delete all ROI definitions in a SimBA project and start 
 ## Next steps
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 
+
+* SimBA saves your drawn ROI definitions (the ROI locations, colors, shapes, sizes with their associated video file names etc) in a single compressed `.H5` file in that you can find at `project_folder/logs/measures/ROI_definitions.h5`. If you want to extract this H5 information, to a human-readable CSV format, use [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-roi-definitions-to-human-readable-format) tool. 
+
 * If you want to analyze descriptive statistics of movements in relation to your defined ROIs, use the `Analyze ROI data` button as detailed in `Step 2` in [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data).
 
 * If you want to create machine learning features using your ROI definitions, use the `Append ROI data to features` in the `Extract features` tab as detailed in [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data)
