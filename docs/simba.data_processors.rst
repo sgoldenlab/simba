@@ -95,3 +95,10 @@ Mutual exclusivity refactorer
 .. automodule:: simba.data_processors.mutual_exclusivity_corrector
    :members:
    :show-inheritance:
+
+Gibbs sampling
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.gibbs_sampler
+   :members:
+   :show-inheritance:
