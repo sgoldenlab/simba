@@ -20,6 +20,10 @@ We are are no longer supporting the legacy SimBAxTF branch, which required Tenso
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/SimBA_logo_4.jpg" />
 </p>
 
+## Apr-16-2023: API Reference
+
+See SimBA on [readthedocs](https://simba-uw-tf-dev.readthedocs.io/) for [API reference](https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html) and [example notebooks](https://simba-uw-tf-dev.readthedocs.io/en/latest/notebooks.html) when you prefer to run methods available in SimBA through the command line over the GUI. If you find that notebook examples are lacking, please reach out to us [Gitter](https://gitter.im/SimBA-Resource/community) or by opening an issue and let's chat about typing up further examples!
+
 ## Apr-04-2023: SimBA version 1.55 release
 
 Although core methods remain, the SimBA code and documentation has sprawled significantly. If you are curious about the methods in the GUI, try clicking the header icons which should take you to the relevant documentation.
