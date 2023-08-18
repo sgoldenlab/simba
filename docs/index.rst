@@ -20,7 +20,7 @@ For support, see `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-Reso
     pip install simba-uw-tf-dev
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
    :caption: API REFERENCE:
 
    api
