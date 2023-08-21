@@ -1,47 +1,50 @@
 __author__ = "Simon Nilsson"
 
-import ast
-import configparser
 import glob
 import os
-from copy import deepcopy
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Union
 
-import h5py
 import numpy as np
 import pandas as pd
-from numba import jit
-from pylab import *
-from scipy import stats
+from copy import deepcopy
+import configparser
+from numba import jit, prange
+from pathlib import Path
+import ast
 from scipy.signal import savgol_filter
+from pylab import *
+import h5py
+from datetime import datetime
+from typing import List, Optional, Union, Dict
+from scipy import stats
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists,
-                                check_if_string_value_is_valid_video_timestamp,
-                                check_int,
-                                check_that_hhmmss_start_is_before_end)
-from simba.utils.enums import ConfigKey, Dtypes
-from simba.utils.errors import (CountError, DataHeaderError,
-                                InvalidFileTypeError, NoFilesFoundError)
-from simba.utils.lookups import get_bp_config_code_class_pairs
-from simba.utils.printing import stdout_success, stdout_warning
-from simba.utils.read_write import (find_video_of_file, get_fn_ext,
-                                    get_video_meta_data, read_config_entry,
-                                    read_config_file, read_df,
+from simba.utils.read_write import (get_fn_ext,
                                     read_project_path_and_file_type,
-                                    read_roi_data, write_df)
+                                    find_video_of_file,
+                                    read_df,
+                                    write_df,
+                                    read_config_file,
+                                    read_config_entry,
+                                    get_video_meta_data,
+                                    read_roi_data)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_int,
+                                check_if_string_value_is_valid_video_timestamp,
+                                check_that_hhmmss_start_is_before_end,
+                                check_if_dir_exists)
+from simba.utils.errors import NoFilesFoundError,InvalidFileTypeError, CountError, DataHeaderError
+from simba.utils.printing import stdout_warning, stdout_success
+from simba.utils.enums import ConfigKey, Dtypes
+from simba.utils.lookups import get_bp_config_code_class_pairs
 
 
-def detect_bouts(
-    data_df: pd.DataFrame, target_lst: List[str], fps: int
-) -> pd.DataFrame:
+def detect_bouts(data_df: pd.DataFrame,
+                 target_lst: List[str],
+                 fps: int) -> pd.DataFrame:
     """
     Detect behavior "bouts" (e.g., continous sequence of classified behavior-present frames) for specified classifiers.
 
@@ -62,24 +65,15 @@ def detect_bouts(
     >>> 2  'Sniffing'   3.47          3.83          104        114            0.37
     """
 
-    boutsList, nameList, startTimeList, endTimeList, startFrameLst, endFrameList = (
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-    )
+    boutsList, nameList, startTimeList, endTimeList, startFrameLst, endFrameList = [], [], [], [], [], []
     for target_name in target_lst:
         groupDf = pd.DataFrame()
         v = (data_df[target_name] != data_df[target_name].shift()).cumsum()
-        u = data_df.groupby(v)[target_name].agg(["all", "count"])
-        m = u["all"] & u["count"].ge(1)
-        groupDf["groups"] = data_df.groupby(v).apply(
-            lambda x: (x.index[0], x.index[-1])
-        )[m]
+        u = data_df.groupby(v)[target_name].agg(['all', 'count'])
+        m = u['all'] & u['count'].ge(1)
+        groupDf['groups'] = data_df.groupby(v).apply(lambda x: (x.index[0], x.index[-1]))[m]
         for _, row in groupDf.iterrows():
-            bout = list(row["groups"])
+            bout = list(row['groups'])
             bout_time = ((bout[-1] - bout[0]) + 1) / fps
             bout_start = (bout[0]) / fps
             bout_end = (bout[1] + 1) / fps
@@ -92,32 +86,15 @@ def detect_bouts(
             endFrameList.append(endFrame)
             startFrameLst.append(bout_start_frm)
 
-    startFrameLst = [x - 1 for x in startFrameLst]
-    return pd.DataFrame(
-        list(
-            zip(
-                nameList,
-                startTimeList,
-                endTimeList,
-                startFrameLst,
-                endFrameList,
-                boutsList,
-            )
-        ),
-        columns=[
-            "Event",
-            "Start_time",
-            "End Time",
-            "Start_frame",
-            "End_frame",
-            "Bout_time",
-        ],
-    )
+    startFrameLst = [x-1 for x in startFrameLst]
+    return pd.DataFrame(list(zip(nameList, startTimeList, endTimeList, startFrameLst, endFrameList, boutsList)),
+                        columns=['Event', 'Start_time', 'End Time', 'Start_frame', 'End_frame', 'Bout_time'])
 
 
-def plug_holes_shortest_bout(
-    data_df: pd.DataFrame, clf_name: str, fps: int, shortest_bout: int
-) -> pd.DataFrame:
+def plug_holes_shortest_bout(data_df: pd.DataFrame,
+                             clf_name: str,
+                             fps: int,
+                             shortest_bout: int) -> pd.DataFrame:
     """
     Removes behavior "bouts" that are shorter than the minimum user-specified length within a dataframe.
 
@@ -157,36 +134,33 @@ def plug_holes_shortest_bout(
 
     for currPattern in fill_patterns:
         n_obs = len(currPattern)
-        data_df["rolling_match"] = (
-            data_df[clf_name]
-            .rolling(window=n_obs, min_periods=n_obs)
-            .apply(lambda x: (x == currPattern).all())
-            .mask(lambda x: x == 0)
-            .bfill(limit=n_obs - 1)
-            .fillna(0)
-            .astype(bool)
-        )
-        data_df.loc[data_df["rolling_match"] == True, clf_name] = 1
-        data_df = data_df.drop(["rolling_match"], axis=1)
+        data_df['rolling_match'] = (data_df[clf_name].rolling(window=n_obs, min_periods=n_obs)
+                                    .apply(lambda x: (x == currPattern).all())
+                                    .mask(lambda x: x == 0)
+                                    .bfill(limit=n_obs - 1)
+                                    .fillna(0)
+                                    .astype(bool)
+                                    )
+        data_df.loc[data_df['rolling_match'] == True, clf_name] = 1
+        data_df = data_df.drop(['rolling_match'], axis=1)
 
     for currPattern in remove_patterns:
         n_obs = len(currPattern)
-        data_df["rolling_match"] = (
-            data_df[clf_name]
-            .rolling(window=n_obs, min_periods=n_obs)
-            .apply(lambda x: (x == currPattern).all())
-            .mask(lambda x: x == 0)
-            .bfill(limit=n_obs - 1)
-            .fillna(0)
-            .astype(bool)
-        )
-        data_df.loc[data_df["rolling_match"] == True, clf_name] = 0
-        data_df = data_df.drop(["rolling_match"], axis=1)
+        data_df['rolling_match'] = (data_df[clf_name].rolling(window=n_obs, min_periods=n_obs)
+                                    .apply(lambda x: (x == currPattern).all())
+                                    .mask(lambda x: x == 0)
+                                    .bfill(limit=n_obs - 1)
+                                    .fillna(0)
+                                    .astype(bool)
+                                    )
+        data_df.loc[data_df['rolling_match'] == True, clf_name] = 0
+        data_df = data_df.drop(['rolling_match'], axis=1)
 
     return data_df
 
 
-def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
+def create_color_palettes(no_animals: int,
+                          map_size: int) -> List[List[int]]:
     """
     Create list of lists of bgr colors, one for each animal. Each list is pulled from a different palette
     matplotlib color map.
@@ -200,19 +174,17 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
     >>> [[[255.0, 0.0, 255.0], [0.0, 255.0, 255.0]], [[102.0, 127.5, 0.0], [102.0, 255.0, 255.0]]]
     """
     colorListofList = []
-    cmaps = [
-        "spring",
-        "summer",
-        "autumn",
-        "cool",
-        "Wistia",
-        "Pastel1",
-        "Set1",
-        "winter",
-        "afmhot",
-        "gist_heat",
-        "copper",
-    ]
+    cmaps = ['spring',
+            'summer',
+            'autumn',
+            'cool',
+            'Wistia',
+            'Pastel1',
+            'Set1',
+            'winter',
+            'afmhot',
+            'gist_heat',
+            'copper']
     for colormap in range(no_animals):
         currColorMap = cm.get_cmap(cmaps[colormap], map_size)
         currColorList = []
@@ -225,12 +197,11 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
     return colorListofList
 
 
-def create_color_palette(
-    pallete_name: str,
-    increments: int,
-    as_rgb_ratio: Optional[bool] = False,
-    as_hex: Optional[bool] = False,
-) -> list:
+
+def create_color_palette(pallete_name: str,
+                         increments: int,
+                         as_rgb_ratio: Optional[bool] = False,
+                         as_hex: Optional[bool] = False) -> list:
     """
     Create a list of colors in RGB from specified color palette.
 
@@ -267,12 +238,11 @@ def create_color_palette(
     return color_lst
 
 
-def smooth_data_savitzky_golay(
-    config: configparser.ConfigParser,
-    file_path: Union[str, os.PathLike],
-    time_window_parameter: int,
-    overwrite: Optional[bool] = True,
-) -> None:
+
+def smooth_data_savitzky_golay(config: configparser.ConfigParser,
+                               file_path: Union[str, os.PathLike],
+                               time_window_parameter: int,
+                               overwrite: Optional[bool] = True) -> None:
     """
     Perform Savitzky-Golay smoothing of pose-estimation data within a file.
 
@@ -289,20 +259,18 @@ def smooth_data_savitzky_golay(
     >>> smooth_data_savitzky_golay(config=config, file_path='Tests_022023/project_folder/csv/input_csv/Together_1.csv', time_window_parameter=500)
     """
 
-    check_int(name="Savitzky-Golay time window", value=time_window_parameter)
+    check_int(name='Savitzky-Golay time window', value=time_window_parameter)
     check_file_exist_and_readable(file_path)
     _, filename, _ = get_fn_ext(file_path)
     project_dir, file_format = read_project_path_and_file_type(config=config)
-    video_dir = os.path.join(project_dir, "videos")
+    video_dir = os.path.join(project_dir, 'videos')
     video_file_path = find_video_of_file(video_dir, filename)
     if not video_file_path:
-        raise NoFilesFoundError(
-            msg=f"SIMBA ERROR: Import video for {filename} to perform Savitzky-Golay smoothing"
-        )
+        raise NoFilesFoundError(msg=f'SIMBA ERROR: Import video for {filename} to perform Savitzky-Golay smoothing')
     video_meta_data = get_video_meta_data(video_path=video_file_path)
     pose_df = read_df(file_path=file_path, file_type=file_format, check_multiindex=True)
-    idx_names = ["scorer", "bodyparts", "coords"]
-    frames_in_time_window = int(time_window_parameter / (1000 / video_meta_data["fps"]))
+    idx_names = ['scorer', 'bodyparts', 'coords']
+    frames_in_time_window = int(time_window_parameter / (1000 / video_meta_data['fps']))
     if (frames_in_time_window % 2) == 0:
         frames_in_time_window = frames_in_time_window - 1
     if (frames_in_time_window % 2) <= 3:
@@ -311,23 +279,19 @@ def smooth_data_savitzky_golay(
     new_df.columns.names = idx_names
 
     for c in new_df:
-        new_df[c] = savgol_filter(
-            x=new_df[c].to_numpy(),
-            window_length=frames_in_time_window,
-            polyorder=3,
-            mode="nearest",
-        )
+        new_df[c] = savgol_filter(x=new_df[c].to_numpy(), window_length=frames_in_time_window, polyorder=3, mode='nearest')
         new_df[c] = new_df[c].abs()
-    print(f"Savitzky-Golay smoothing complete for {filename}...")
+    print(f'Savitzky-Golay smoothing complete for {filename}...')
     if overwrite:
         write_df(df=new_df, file_type=file_format, save_path=file_path)
     else:
         return new_df
 
 
-def smooth_data_gaussian(
-    config: configparser.ConfigParser, file_path: str, time_window_parameter: int
-) -> None:
+
+def smooth_data_gaussian(config: configparser.ConfigParser,
+                         file_path: str,
+                         time_window_parameter: int) -> None:
     """
     Perform Gaussian smoothing of pose-estimation data.
 
@@ -344,39 +308,23 @@ def smooth_data_gaussian(
     >>> smooth_data_gaussian(config=config, file_path='/Users/simon/Desktop/envs/troubleshooting/Tests_022023/project_folder/csv/input_csv/Together_1.csv', time_window_parameter=500)
     """
 
-    check_int(name="Gaussian time window", value=time_window_parameter)
+    check_int(name='Gaussian time window', value=time_window_parameter)
     _, filename, _ = get_fn_ext(file_path)
-    project_dir = config.get(
-        ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value
-    )
-    video_dir = os.path.join(project_dir, "videos")
+    project_dir = config.get(ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value)
+    video_dir = os.path.join(project_dir, 'videos')
     video_file_path = find_video_of_file(video_dir, filename)
-    file_format = read_config_entry(
-        config=config,
-        section=ConfigKey.GENERAL_SETTINGS.value,
-        option=ConfigKey.FILE_TYPE.value,
-        data_type=Dtypes.STR.value,
-        default_value="csv",
-    )
+    file_format = read_config_entry(config=config, section=ConfigKey.GENERAL_SETTINGS.value, option=ConfigKey.FILE_TYPE.value, data_type=Dtypes.STR.value, default_value='csv')
     video_meta_data = get_video_meta_data(video_path=video_file_path)
     pose_df = read_df(file_path=file_path, file_type=file_format, check_multiindex=True)
-    idx_names = ["scorer", "bodyparts", "coords"]
-    frames_in_time_window = int(time_window_parameter / (1000 / video_meta_data["fps"]))
+    idx_names = ['scorer', 'bodyparts', 'coords']
+    frames_in_time_window = int(time_window_parameter / (1000 / video_meta_data['fps']))
     new_df = deepcopy(pose_df)
     new_df.columns.names = idx_names
 
     for c in new_df:
-        new_df[c] = (
-            new_df[c]
-            .rolling(
-                window=int(frames_in_time_window), win_type="gaussian", center=True
-            )
-            .mean(std=5)
-            .fillna(new_df[c])
-            .abs()
-        )
+        new_df[c] = new_df[c].rolling(window=int(frames_in_time_window), win_type='gaussian', center=True).mean(std=5).fillna(new_df[c]).abs()
     write_df(df=new_df, file_type=file_format, save_path=file_path)
-    print(f"Gaussian smoothing complete for file {filename}...")
+    print(f'Gaussian smoothing complete for file {filename}...')
 
 
 def add_missing_ROI_cols(shape_df: pd.DataFrame) -> pd.DataFrame:
@@ -388,22 +336,20 @@ def add_missing_ROI_cols(shape_df: pd.DataFrame) -> pd.DataFrame:
     :returns DataFrame
     """
 
-    if not "Color BGR" in shape_df.columns:
-        shape_df["Color BGR"] = [(255, 255, 255)] * len(shape_df)
-    if not "Thickness" in shape_df.columns:
-        shape_df["Thickness"] = [5] * len(shape_df)
-    if not "Color name" in shape_df.columns:
-        shape_df["Color name"] = "White"
+    if not 'Color BGR' in shape_df.columns:
+        shape_df['Color BGR'] = [(255, 255, 255)] * len(shape_df)
+    if not 'Thickness' in shape_df.columns:
+        shape_df['Thickness'] = [5] * len(shape_df)
+    if not 'Color name' in shape_df.columns:
+        shape_df['Color name'] = 'White'
 
     return shape_df
 
+def find_bins(data: Dict[str, List[int]],
+              bracket_type: Literal['QUANTILE', 'QUANTIZE'],
+              bracket_cnt: int,
+              normalization_method: Literal['ALL VIDEOS', 'BY VIDEO']) -> Dict[str, np.ndarray]:
 
-def find_bins(
-    data: Dict[str, List[int]],
-    bracket_type: Literal["QUANTILE", "QUANTIZE"],
-    bracket_cnt: int,
-    normalization_method: Literal["ALL VIDEOS", "BY VIDEO"],
-) -> Dict[str, np.ndarray]:
     """
     Helper to find bin cut-off points.
 
@@ -414,22 +360,15 @@ def find_bins(
     :returns dict: The videos as keys and bin cut off points as array of size len(bracket_cnt) x 2.
     """
 
-    print("Finding bracket cut off points...")
+    print('Finding bracket cut off points...')
     video_bins_info = {}
-    if normalization_method == "ALL VIDEOS":
+    if normalization_method == 'ALL VIDEOS':
         m = []
         [m.extend((d.tolist())) for d in data.values()]
-        if bracket_type == "QUANTILE":
-            _, bins = pd.qcut(
-                x=m, q=bracket_cnt, labels=list(range(1, bracket_cnt + 1)), retbins=True
-            )
+        if bracket_type == 'QUANTILE':
+            _, bins = pd.qcut(x=m, q=bracket_cnt, labels=list(range(1, bracket_cnt + 1)), retbins=True)
         else:
-            _, bins = pd.cut(
-                x=m,
-                bins=bracket_cnt,
-                labels=list(range(1, bracket_cnt + 1)),
-                retbins=True,
-            )
+            _, bins = pd.cut(x=m, bins=bracket_cnt, labels=list(range(1, bracket_cnt + 1)), retbins=True)
         bins = bins.clip(min=0)
         for video_name, video_movements in data.items():
             bin_array = np.full((len(bins) - 1, 2), np.nan)
@@ -438,20 +377,12 @@ def find_bins(
             video_bins_info[video_name] = bin_array
     else:
         for video_name, video_movements in data.items():
-            if bracket_type == "QUANTILE":
-                _, bins = pd.qcut(
-                    x=video_movements,
-                    q=bracket_cnt,
-                    labels=list(range(1, bracket_cnt + 1)),
-                    retbins=True,
-                )
+            if bracket_type == 'QUANTILE':
+                _, bins = pd.qcut(x=video_movements, q=bracket_cnt, labels=list(range(1, bracket_cnt + 1)),
+                                  retbins=True)
             else:
-                _, bins = pd.cut(
-                    x=video_movements,
-                    bins=bracket_cnt,
-                    labels=list(range(1, bracket_cnt + 1)),
-                    retbins=True,
-                )
+                _, bins = pd.cut(x=video_movements, bins=bracket_cnt, labels=list(range(1, bracket_cnt + 1)),
+                                 retbins=True)
             bins = bins.clip(min=0)
             bin_array = np.full((len(bins) - 1, 2), np.nan)
             for i in range(len(bins) - 1):
@@ -460,10 +391,7 @@ def find_bins(
 
     return video_bins_info
 
-
-def find_frame_numbers_from_time_stamp(
-    start_time: str, end_time: str, fps: int
-) -> List[int]:
+def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int) -> List[int]:
     """
     Given start and end timestamps in HH:MM:SS formats and the fps, return the frame numbers representing
     the time period.
@@ -477,21 +405,18 @@ def find_frame_numbers_from_time_stamp(
     >>> find_frame_numbers_from_time_stamp(start_time='00:00:00', end_time='00:00:01', fps=10)
     >>> [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     """
-    check_if_string_value_is_valid_video_timestamp(value=start_time, name="Start time")
-    check_if_string_value_is_valid_video_timestamp(value=start_time, name="End time")
-    check_that_hhmmss_start_is_before_end(
-        start_time=start_time, end_time=end_time, name="Time period"
-    )
-    start_h, start_m, start_s = start_time.split(":")
-    end_h, end_m, end_s = end_time.split(":")
+    check_if_string_value_is_valid_video_timestamp(value=start_time, name='Start time')
+    check_if_string_value_is_valid_video_timestamp(value=start_time, name='End time')
+    check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name='Time period')
+    start_h, start_m, start_s = start_time.split(':')
+    end_h, end_m, end_s = end_time.split(':')
     start_in_s = int(start_h) * 3600 + int(start_m) * 60 + int(start_s)
     end_in_s = int(end_h) * 3600 + int(end_m) * 60 + int(end_s)
     return list(range(int(start_in_s * fps), int(end_in_s * fps)))
 
 
-def run_user_defined_feature_extraction_class(
-    file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]
-) -> None:
+def run_user_defined_feature_extraction_class(file_path: Union[str, os.PathLike],
+                                              config_path: Union[str, os.PathLike]) -> None:
     """
     Loads and executes user-defined feature extraction class.
 
@@ -506,39 +431,33 @@ def run_user_defined_feature_extraction_class(
 
     check_file_exist_and_readable(file_path=file_path)
     file_dir, file_name, file_extension = get_fn_ext(filepath=file_path)
-    if file_extension != ".py":
-        raise InvalidFileTypeError(
-            msg=f"The user-defined feature extraction file ({file_path}) is not a .py file-extension"
-        )
+    if file_extension != '.py':
+        raise InvalidFileTypeError(msg=f'The user-defined feature extraction file ({file_path}) is not a .py file-extension')
     parsed = ast.parse(Path(file_path).read_text())
     classes = [n for n in parsed.body if isinstance(n, ast.ClassDef)]
     class_name = [x.name for x in classes]
     if len(class_name) < 1:
-        raise CountError(
-            msg=f"The user-defined feature extraction file ({file_path}) contains no python classes"
-        )
+        raise CountError(msg=f'The user-defined feature extraction file ({file_path}) contains no python classes')
     if len(class_name) > 1:
-        stdout_warning(
-            msg=f"The user-defined feature extraction file ({file_path}) contains more than 1 python class. SimBA will use the first python class: {class_name[0]}."
-        )
+        stdout_warning(msg=f'The user-defined feature extraction file ({file_path}) contains more than 1 python class. SimBA will use the first python class: {class_name[0]}.')
     class_name = class_name[0]
     spec = importlib.util.spec_from_file_location(class_name, file_path)
     user_module = importlib.util.module_from_spec(spec)
     sys.modules[class_name] = user_module
     spec.loader.exec_module(user_module)
     user_class = getattr(user_module, class_name)
-    print(f"Running user-defined {class_name} feature extraction file...")
+    print(f'Running user-defined {class_name} feature extraction file...')
     user_class(config_path=config_path)
 
-
-def slp_to_df_convert(
-    file_path: Union[str, os.PathLike],
-    headers: List[str],
-    joined_tracks: Optional[bool] = False,
-    multi_index: Optional[bool] = True,
-) -> pd.DataFrame:
+def slp_to_df_convert(file_path: Union[str, os.PathLike],
+                      headers: List[str],
+                      joined_tracks: Optional[bool] = False,
+                      multi_index: Optional[bool] = True) -> pd.DataFrame:
     """
     Helper to convert .slp pose-estimation data to pandas dataframe.
+
+    .. note::
+       Written by Toshea111 - `see jupyter notebook <https://colab.research.google.com/drive/1EpyTKFHVMCqcb9Lj9vjMrriyaG9SvrPO?usp=sharing>`__.
 
     :param Union[str, os.PathLike] file_path: Path to .slp file on disk.
     :param List[str] headers: List of strings representing output dataframe headers.
@@ -547,7 +466,7 @@ def slp_to_df_convert(
     :raises InvalidFileTypeError: If ``file_path`` is not a valid SLEAP H5 pose-estimation file.
     :raises DataHeaderError: If sleap file contains more or less body-parts than suggested by len(headers)
 
-    :return pd.DataFrame.
+    :return pd.DataFrame: With animal ID, Track ID and body-part names as colums.
     """
 
     try:
@@ -559,7 +478,7 @@ def slp_to_df_convert(
             data["track_occupancy"] = data["track_occupancy"].astype(bool)
     except OSError as e:
         print(e.args)
-        raise InvalidFileTypeError(msg=f"{file_path} is not a valid SLEAP H5 file")
+        raise InvalidFileTypeError(msg=f'{file_path} is not a valid SLEAP H5 file')
     valid_frame_idxs = np.argwhere(data["track_occupancy"].any(axis=1)).flatten()
     tracks = []
     for frame_idx in valid_frame_idxs:
@@ -574,39 +493,25 @@ def slp_to_df_convert(
                 detection[f"{node_name}.y"] = y
             tracks.append(detection)
     if joined_tracks:
-        df = (
-            pd.DataFrame(tracks)
-            .set_index("frame_idx")
-            .groupby(level=0)
-            .sum()
-            .astype(int)
-            .reset_index(drop=True)
-        )
+        df = pd.DataFrame(tracks).set_index('frame_idx').groupby(level=0).sum().astype(int).reset_index(drop=True)
     else:
         df = pd.DataFrame(tracks).fillna(0)
     df.columns = list(range(0, len(df.columns)))
     p_df = pd.DataFrame(1, index=df.index, columns=df.columns[1::2] + 0.5)
     df = pd.concat([df, p_df], axis=1).sort_index(axis=1)
     if len(headers) != len(df.columns):
-        raise DataHeaderError(
-            msg=f"The SimBA project suggest the data should have {len(headers)} columns, but the input data has {len(df.columns)} columns"
-        )
+        raise DataHeaderError(msg=f'The SimBA project suggest the data should have {len(headers)} columns, but the input data has {len(df.columns)} columns')
     df.columns = headers
     if multi_index:
         multi_idx_cols = []
         for col_idx in range(len(df.columns)):
-            multi_idx_cols.append(
-                tuple(("IMPORTED_POSE", "IMPORTED_POSE", df.columns[col_idx]))
-            )
-        df.columns = pd.MultiIndex.from_tuples(
-            multi_idx_cols, names=("scorer", "bodypart", "coords")
-        )
+            multi_idx_cols.append(tuple(('IMPORTED_POSE', 'IMPORTED_POSE', df.columns[col_idx])))
+        df.columns = pd.MultiIndex.from_tuples(multi_idx_cols, names=('scorer', 'bodypart', 'coords'))
     return df
 
+def convert_roi_definitions(roi_definitions_path: Union[str, os.PathLike],
+                            save_dir: Union[str, os.PathLike]) -> None:
 
-def convert_roi_definitions(
-    roi_definitions_path: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]
-) -> None:
     """
     Helper to convert SimBA `ROI_definitions.h5` file into human-readable format.
 
@@ -614,20 +519,20 @@ def convert_roi_definitions(
     :param Union[str, os.PathLike] save_dir: Directory location where the output data should be stored
     """
 
-    datetime_str = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    datetime_str = datetime.now().strftime('%Y%m%d%H%M%S')
     check_file_exist_and_readable(file_path=roi_definitions_path)
     check_if_dir_exists(in_dir=save_dir)
     rectangle_df, circle_df, polygon_df = read_roi_data(roi_path=roi_definitions_path)
-    for df, shape_name in zip(
-        [rectangle_df, circle_df, polygon_df], ["rectangles", "circles", "polygons"]
-    ):
+    for (df, shape_name) in zip([rectangle_df, circle_df, polygon_df], ['rectangles', 'circles', 'polygons']):
         if len(df) > 0:
-            file_save_path = os.path.join(save_dir, f"{shape_name}_{datetime_str}.csv")
+            file_save_path = os.path.join(save_dir, f'{shape_name}_{datetime_str}.csv')
             df.to_csv(file_save_path)
-            stdout_success(msg=f"SIMBA COMPLETE: {file_save_path} successfully saved!")
+            stdout_success(msg=f'SIMBA COMPLETE: {file_save_path} successfully saved!')
 
 
 def freedman_diaconis(data: np.array) -> (float, int):
+
     """
     Use Freedman-Diaconis rule to compute optimal count of histogram bins and their width.
 
@@ -641,18 +546,17 @@ def freedman_diaconis(data: np.array) -> (float, int):
     bin_count = int((np.max(data) - np.min(data) / bin_width) + 1)
     return bin_width, bin_count
 
-
 @jit(nopython=True)
-def hist_1d(data: np.ndarray, bins: int, range: np.ndarray):
+def hist_1d(data: np.ndarray,
+           bins: int,
+           range: np.ndarray):
+
     return np.histogram(data, bins, (range[0], range[1]))[0]
 
 
-def bucket_data(
-    data: np.array,
-    method: Literal[
-        "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
-    ] = "auto",
-):
+def bucket_data(data: np.array,
+                method: Literal['fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'] = 'auto'):
+
     """
     Use Freedman-Diaconis, Doane, Acott, Stone, Rice, Sturges or sqrt to compute the optimal bin count.
     'auto' represents the maximum of the Sturges and Freedman-Diaconis estimators.
@@ -670,3 +574,78 @@ def bucket_data(
     bin_width = bin_edges[1] - bin_edges[0]
 
     return bin_width, bin_counts
+
+@jit(nopython=True)
+def fast_minimum_rank(data: np.ndarray,
+                      descending: bool = True):
+
+    """
+    Jitted helper to rank values in 1D array using ``minimum`` method.
+
+    :param np.ndarray data: 1D array of feature values.
+    :param bool descending: If True, ranks returned where low values get a high rank. If False, low values get a low rank. Default: True.
+
+    :references:
+        `Jérôme Richard on StackOverflow <https://stackoverflow.com/a/69869255>`__.
+
+    :example:
+    >>> data = np.array([1, 1, 3, 4, 5, 6, 7, 8, 9, 10])
+    >>> fast_rank(data=data, descending=True)
+    >>> [9, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+    >>> fast_rank(data=data, descending=False)
+    >>> [ 1,  1,  3,  4,  5,  6,  7,  8,  9, 10]
+    """
+
+    result = np.empty((data.shape[0]), dtype=np.int32)
+    if descending:
+        order = np.argsort(-data)
+    else:
+        order = np.argsort(data)
+    previous_value, previous_rank, result[order[0]] = data[order[0]], 1, 1
+    for idx in prange(1, data.shape[0]):
+        current_value = data[order[idx]]
+        if current_value == previous_value:
+            result[order[idx]] = previous_rank
+        else:
+            result[order[idx]] = idx + 1
+            previous_value = current_value
+            previous_rank = idx + 1
+    return result
+
+
+
+@jit(nopython=True)
+def fast_mean_rank(data: np.ndarray,
+                   descending: bool = True):
+
+    """
+    Jitted helper to rank values in 1D array using ``mean`` method.
+
+    :param np.ndarray data: 1D array of feature values.
+    :param bool descending: If True, ranks returned where low values get a high rank. If False, low values get a low rank. Default: True.
+
+    :references:
+        `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
+
+    :example:
+    >>>data = np.array([1, 1, 3, 4, 5, 6, 7, 8, 9, 10])
+    >>> fast_mean_rank(data=data, descending=True)
+    >>> [9.5, 9.5, 8. , 7. , 6. , 5. , 4. , 3. , 2. , 1. ]
+    """
+
+    if descending:
+        sorter = np.argsort(-data)
+    else:
+        sorter = np.argsort(data)
+    data = data[sorter]
+    obs = np.concatenate((np.array([True]), data[1:] != data[:-1]))
+    dense = np.empty(obs.size, dtype=np.int64)
+    dense[sorter] = obs.cumsum()
+    count = np.concatenate((np.nonzero(obs)[0], np.array([len(obs)])))
+    results = 0.5 * (count[dense] + count[dense - 1] + 1)
+
+    return results
+
+
+data = np.array([1, 1, 3, 4, 5, 6, 7, 8, 9, 10])
+fast_mean_rank(data=data, descending=True)
