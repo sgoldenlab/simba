@@ -24,6 +24,12 @@ Feature extraction supplement methods
    :members:
    :show-inheritance:
 
+Statistics methods
+----------------------------------------------
+
+.. automodule:: simba.mixins.statistics_mixin
+   :members:
+   :show-inheritance:
 
 Circular feature extraction methods
 ----------------------------------------------
