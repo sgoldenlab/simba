@@ -525,10 +525,10 @@ class FeatureExtractionCircularMixin(object):
 # results = FeatureExtractionCircularMixin().degrees_to_compass_cardinal(degree_angles=data)
 
 
-data = np.array(list(range(0, 405, 45)))
-results = FeatureExtractionCircularMixin().degrees_to_compass_cardinal(
-    degree_angles=data
-)
+# data = np.array(list(range(0, 405, 45)))
+# results = FeatureExtractionCircularMixin().degrees_to_compass_cardinal(
+#     degree_angles=data
+# )
 
 
 # def direction_two_bps(bp_x: np.ndarray,
