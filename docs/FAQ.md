@@ -364,7 +364,7 @@ Try to install `shapely` with "pip install shapely` or `conda install shapely` r
   <summary>Show solutions!</summary>
 <br/><br/>
 
-When you create the features, SimBA will try to count how many frames represents different time windows, ranging from half-a-second at the largest window to 1/15th of a second (66ms) being the smallest time window. However, say that the video in your project with the lowest  frames-per-second is 2. In this situation it is not possible to get the number of frames that represent 66ms, because a single frame represents 250ms. SimBA will then discard this time window calculation, and do not calculate any features in the 66ms time window. 
+When you create the features, SimBA will try to count how many frames represents different time windows, ranging from half-a-second at the largest window to 1/15th of a second (66ms) being the smallest time window. However, say that the video in your project with the lowest  frames-per-second is 2. In this situation it is not possible to get the number of frames that represent 66ms, because a single frame represents 500ms. SimBA will then discard this time window calculation, and do not calculate any features in the 66ms time window. 
 
 Say you created your classifier where the lowest FPS was 15 or higher. SimBA will then create all features in all time windows. Next, when you create the features for the new data, the lowest FPS is 5. SimBA will then omit calculating the 66ms features, and you end up with fewer features then what you used to create the model.
 
