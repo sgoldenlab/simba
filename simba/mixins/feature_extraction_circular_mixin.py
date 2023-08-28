@@ -1,9 +1,7 @@
-from typing import List
-
 import numpy as np
-from numba import jit, prange, typed
 from scipy import stats
-
+from numba import jit, prange, typed
+from typing import List
 
 class FeatureExtractionCircularMixin(object):
 
@@ -32,9 +30,10 @@ class FeatureExtractionCircularMixin(object):
         pass
 
     @staticmethod
-    def rolling_mean_dispersion(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def rolling_mean_dispersion(data: np.ndarray,
+                                time_windows: np.ndarray,
+                                fps: int) -> np.ndarray:
+
         """
         Compute the angular mean dispersion (circular mean) in degrees within rolling temporal windows.
 
@@ -57,14 +56,12 @@ class FeatureExtractionCircularMixin(object):
         >>> [ [-1],[-1],[-1],[-1], [-1],[44],[44],[43],[44],[44],[44],[44],[44],[44],[44],[45],[45],[45],[45],[45]])
         """
 
-        results = np.full((data.shape[0], time_windows.shape[0]), -1)
+        results = np.full((data.shape[0], time_windows.shape[0]),-1)
         for time_window in prange(time_windows.shape[0]):
             jump_frms = int(time_windows[time_window] * fps)
-            for current_frm in prange(jump_frms, results.shape[0] + 1):
-                data_window = np.deg2rad(data[current_frm - jump_frms : current_frm])
-                results[current_frm - 1][time_window] = np.rad2deg(
-                    stats.circmean(data_window)
-                ).astype(int)
+            for current_frm in prange(jump_frms, results.shape[0]+1):
+                data_window = np.deg2rad(data[current_frm-jump_frms:current_frm])
+                results[current_frm-1][time_window] = np.rad2deg(stats.circmean(data_window)).astype(int)
         return results
 
     @staticmethod
@@ -85,19 +82,20 @@ class FeatureExtractionCircularMixin(object):
         >>> FeatureExtractionCircularMixin().degrees_to_compass_cardinal(degree_angles=data)
         >>> ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N']
         """
-        results = typed.List(["str"])
-        DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+        results = typed.List(['str'])
+        DIRECTIONS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
         for i in prange(degree_angles.shape[0]):
-            ix = round(degree_angles[i] / (360.0 / len(DIRECTIONS)))
+            ix = round(degree_angles[i] / (360. / len(DIRECTIONS)))
             direction = DIRECTIONS[ix % len(DIRECTIONS)]
             results.append(direction)
         return results[1:]
 
     @staticmethod
     @jit(nopython=True)
-    def direction_three_bps(
-        nose_loc: np.ndarray, left_ear_loc: np.ndarray, right_ear_loc: np.ndarray
-    ) -> np.ndarray:
+    def direction_three_bps(nose_loc: np.ndarray,
+                            left_ear_loc: np.ndarray,
+                            right_ear_loc: np.ndarray) -> np.ndarray:
+
         """
         Jitted helper to compute the degree angle from three body-parts. Computes the angle in degrees left_ear <-> nose
         and right_ear_nose and returns the midpoint.
@@ -120,24 +118,15 @@ class FeatureExtractionCircularMixin(object):
 
         results = np.full((nose_loc.shape[0]), np.nan)
         for i in prange(nose_loc.shape[0]):
-            left_ear_to_nose = np.degrees(
-                np.arctan2(
-                    left_ear_loc[i][0] - nose_loc[i][1],
-                    left_ear_loc[i][1] - nose_loc[i][0],
-                )
-            )
-            right_ear_nose = np.degrees(
-                np.arctan2(
-                    right_ear_loc[i][0] - nose_loc[i][1],
-                    right_ear_loc[i][1] - nose_loc[i][0],
-                )
-            )
+            left_ear_to_nose = np.degrees(np.arctan2(left_ear_loc[i][0] - nose_loc[i][1], left_ear_loc[i][1] - nose_loc[i][0]))
+            right_ear_nose = np.degrees(np.arctan2(right_ear_loc[i][0] - nose_loc[i][1], right_ear_loc[i][1] - nose_loc[i][0]))
             results[i] = ((left_ear_to_nose + right_ear_nose) % 360) / 2
         return results
 
     @staticmethod
     @jit(nopython=True)
-    def direction_two_bps(bp_x: np.ndarray, bp_y: np.ndarray) -> np.ndarray:
+    def direction_two_bps(bp_x: np.ndarray,
+                          bp_y: np.ndarray) -> np.ndarray:
         """
         Jitted method computing degree directionality from two body-parts. E.g., ``nape`` and ``nose``,
         or ``swim_bladder`` and ``tail``.
@@ -158,18 +147,19 @@ class FeatureExtractionCircularMixin(object):
 
         results = np.full((bp_x.shape[0]), np.nan)
         for i in prange(bp_x.shape[0]):
-            angle_degrees = np.degrees(
-                np.arctan2(bp_x[i][0] - bp_y[i][0], bp_y[i][1] - bp_x[i][1])
-            )
+            angle_degrees = np.degrees(np.arctan2(bp_x[i][0] - bp_y[i][0], bp_y[i][1] - bp_x[i][1]))
             angle_degrees = angle_degrees + 360 if angle_degrees < 0 else angle_degrees
             results[i] = angle_degrees
         return results
 
+
+
     @staticmethod
     @jit(nopython=True)
-    def rolling_resultant_vector_length(
-        data: np.ndarray, fps: int, time_windows: np.ndarray = np.array([1.0])
-    ) -> np.ndarray:
+    def rolling_resultant_vector_length(data: np.ndarray,
+                                        fps: int,
+                                        time_windows: np.ndarray = np.array([1.0])) -> np.ndarray:
+
         """
         Jitted helper computing the mean resultant vector within rolling time window.
 
@@ -196,12 +186,13 @@ class FeatureExtractionCircularMixin(object):
         results = np.full((data.shape[0], time_windows.shape[0]), -1.0)
         for time_window_cnt in prange(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
-            for window_end in prange(window_size, data.shape[0] + 1, 1):
-                window_data = data[window_end - window_size : window_end]
+            for window_end in prange(window_size, data.shape[0]+1, 1):
+                window_data = data[window_end - window_size:window_end]
                 w = np.ones(window_data.shape[0])
                 r = np.nansum(np.multiply(w, np.exp(1j * window_data)))
-                results[window_end - 1][time_window_cnt] = np.abs(r) / np.nansum(w)
+                results[window_end-1][time_window_cnt] = np.abs(r) / np.nansum(w)
         return results
+
 
     @staticmethod
     @jit(nopython=True)
@@ -209,16 +200,14 @@ class FeatureExtractionCircularMixin(object):
         results = np.full((data.shape[0], 2), np.nan)
         for i in range(data.shape[0]):
             r = window_size * data[i]
-            results[i][0] = (r**2) / window_size
-            results[i][1] = np.exp(
-                np.sqrt(1 + 4 * window_size + 4 * (window_size**2 - r**2))
-                - (1 + 2 * window_size)
-            )
+            results[i][0] = (r ** 2) / window_size
+            results[i][1] = np.exp(np.sqrt(1 + 4 * window_size + 4 * (window_size**2 - r**2)) - (1 + 2 * window_size))
         return results
 
-    def rolling_rayleigh_z(
-        self, data: np.ndarray, fps: int, time_window: float = 1.0
-    ) -> np.array:
+    def rolling_rayleigh_z(self,
+                           data: np.ndarray,
+                           fps: int,
+                           time_window: float = 1.0) -> np.array:
         """
         Compute Rayleigh Z (test of non-uniformity) of circular data within rolling time-window.
 
@@ -231,26 +220,17 @@ class FeatureExtractionCircularMixin(object):
         :returns np.ndarray: Size data.shape[0] x 2 with Rayleigh Z statistics in first column and associated p_values in second column
         """
 
-        results, window_size = np.full((data.shape[0], 2), np.nan), int(
-            time_window * fps
-        )
-        resultant_vector_lengths = (
-            FeatureExtractionCircularMixin().rolling_resultant_vector_length(
-                data=data, fps=fps, time_window=time_window
-            )
-        )
-        return np.nan_to_num(
-            self._helper_rayleigh_z(
-                data=resultant_vector_lengths, window_size=window_size
-            ),
-            nan=-1.0,
-        )
+        results, window_size = np.full((data.shape[0], 2), np.nan), int(time_window * fps)
+        resultant_vector_lengths = FeatureExtractionCircularMixin().rolling_resultant_vector_length(data=data, fps=fps, time_window=time_window)
+        return np.nan_to_num(self._helper_rayleigh_z(data=resultant_vector_lengths, window_size=window_size), nan=-1.0)
 
     @staticmethod
     @jit(nopython=True)
-    def rolling_circular_correlation(
-        data_x: np.ndarray, data_y: np.ndarray, fps: int, time_window: float = 1.0
-    ) -> np.ndarray:
+    def rolling_circular_correlation(data_x: np.ndarray,
+                                     data_y: np.ndarray,
+                                     fps: int,
+                                     time_window: float = 1.0) -> np.ndarray:
+
         """
         Compute correlations between two angular distributions in rolling time-windows.
 
@@ -268,32 +248,22 @@ class FeatureExtractionCircularMixin(object):
         data_x, data_y = np.deg2rad(data_x), np.deg2rad(data_y)
         results = np.full((data_x.shape[0]), np.nan)
         window_size = int(time_window * fps)
-        for window_start in prange(0, data_x.shape[0] - window_size + 1):
-            data_x_window = data_x[window_start : window_start + window_size]
-            data_y_window = data_y[window_start : window_start + window_size]
-            x_sin = np.sin(
-                data_x_window
-                - np.angle(np.nansum(np.multiply(1, np.exp(1j * data_x_window))))
-            )
-            y_sin = np.sin(
-                data_y_window
-                - np.angle(np.nansum(np.multiply(1, np.exp(1j * data_y_window))))
-            )
-            r = np.sum(x_sin * y_sin) / np.sqrt(np.sum(x_sin**2) * np.sum(y_sin**2))
-            results[window_start + window_size] = (
-                np.sqrt(
-                    (data_x_window.shape[0] * (x_sin**2).mean() * (y_sin**2).mean())
-                    / np.mean(x_sin**2 * y_sin**2)
-                )
-                * r
-            )
+        for window_start in prange(0, data_x.shape[0]-window_size+1):
+            data_x_window = data_x[window_start:window_start+window_size]
+            data_y_window = data_y[window_start:window_start+window_size]
+            x_sin = np.sin(data_x_window - np.angle(np.nansum(np.multiply(1, np.exp(1j * data_x_window)))))
+            y_sin = np.sin(data_y_window - np.angle(np.nansum(np.multiply(1, np.exp(1j * data_y_window)))))
+            r = np.sum(x_sin * y_sin) / np.sqrt(np.sum(x_sin ** 2) * np.sum(y_sin ** 2))
+            results[window_start+window_size] = (np.sqrt((data_x_window.shape[0] * (x_sin ** 2).mean() * (y_sin ** 2).mean()) / np.mean(x_sin ** 2 * y_sin ** 2)) * r)
 
         return results
 
+
     @staticmethod
-    def rolling_circular_stdev(
-        data: np.ndarray, fps: int, time_windows: np.ndarray
-    ) -> np.ndarray:
+    def rolling_circular_stdev(data: np.ndarray,
+                               fps: int,
+                               time_windows: np.ndarray) -> np.ndarray:
+
         """
         Compute standard deviation of angular data in rolling time windows.
 
@@ -316,16 +286,17 @@ class FeatureExtractionCircularMixin(object):
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for time_window_cnt in prange(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
-            for window_end in prange(window_size, data.shape[0] + 1, 1):
-                window_data = data[window_end - window_size : window_end]
-                results[window_end - 1][time_window_cnt] = stats.circvar(window_data)
+            for window_end in prange(window_size, data.shape[0]+1, 1):
+                window_data = data[window_end - window_size:window_end]
+                results[window_end-1][time_window_cnt] = stats.circvar(window_data)
         return np.round(results, 4)
 
     @staticmethod
     @jit(nopython=True)
-    def rolling_angular_difference(
-        data: np.ndarray, fps: int, time_windows: np.ndarray
-    ):
+    def rolling_angular_difference(data: np.ndarray,
+                                   fps: int,
+                                   time_windows: np.ndarray):
+
         """
         Computes the angular difference in the current frame versus N seconds previously.
         For example, if the current angle is 45 degrees, and the angle N seconds previously was 350 degrees, then the difference
@@ -349,18 +320,21 @@ class FeatureExtractionCircularMixin(object):
         for time_window_cnt in prange(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
             for window_end in prange(window_size, data.shape[0], 1):
-                point_one, point_two = data[window_end - window_size], data[window_end]
+                point_one, point_two = data[window_end-window_size], data[window_end]
                 print(point_one, point_two)
                 distance = np.pi - np.abs(np.pi - np.abs(point_one - point_two))
                 results[window_end][time_window_cnt] = np.rad2deg(distance)
 
         return results
 
+
+
     @staticmethod
     @jit(nopython=True)
-    def agg_angular_difference_timebins(
-        data: np.ndarray, fps: int, time_windows: np.ndarray
-    ):
+    def agg_angular_difference_timebins(data: np.ndarray,
+                                        fps: int,
+                                        time_windows: np.ndarray):
+
         """
         Compute the difference between the median angle in the current time-window versus the previous time window.
         For example, computes the difference between the mean angle in the first 1s of the video versus
@@ -384,27 +358,24 @@ class FeatureExtractionCircularMixin(object):
         for time_window_cnt in prange(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
             prior_window = [0, window_size]
-            for win_cnt, window_end in enumerate(
-                prange(int(window_size * 2), data.shape[0] + 1, window_size)
-            ):
+            for win_cnt, window_end in enumerate(prange(int(window_size*2), data.shape[0]+1, window_size)):
                 window_start = (window_end - window_size) - 1
                 current_data = data[window_start:window_end]
-                prior_data = data[prior_window[0] : prior_window[1]]
-                prior_median = np.arctan2(
-                    np.median(np.cos(prior_data)), np.median(np.sin(prior_data))
-                )
-                current_median = np.arctan2(
-                    np.median(np.cos(current_data)), np.median(np.sin(current_data))
-                )
+                prior_data = data[prior_window[0]: prior_window[1]]
+                prior_median = np.arctan2(np.median(np.cos(prior_data)), np.median(np.sin(prior_data)))
+                current_median = np.arctan2(np.median(np.cos(current_data)), np.median(np.sin(current_data)))
                 distance = np.pi - np.abs(np.pi - np.abs(prior_median - current_median))
                 results[window_start:window_end, win_cnt] = np.rad2deg(distance)
                 prior_window = [window_start, window_end]
 
         return results
 
+
     @staticmethod
     @jit(nopython=True)
-    def instantaneous_angular_velocity(data: np.ndarray, bin_size: int = 1):
+    def instantaneous_angular_velocity(data: np.ndarray,
+                                       bin_size: int = 1):
+
         """
         Jitted compute of absolute angular change in the smallest possible time bin.
 
@@ -430,17 +401,15 @@ class FeatureExtractionCircularMixin(object):
         data = np.deg2rad(data)
         results = np.full((data.shape[0]), 0.0)
         left_idx, right_idx = 0, bin_size
-        for end_idx in prange(right_idx, data.shape[0] + 1, 1):
-            results[end_idx] = np.rad2deg(
-                np.pi - np.abs(np.pi - np.abs(data[left_idx] - data[end_idx]))
-            )
+        for end_idx in prange(right_idx, data.shape[0]+1, 1):
+            results[end_idx] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(data[left_idx] - data[end_idx])))
             left_idx += 1
         return results
 
     @staticmethod
-    def sliding_rao_spacing(
-        data: np.ndarray, time_window: float, fps: int
-    ) -> np.ndarray:
+    def sliding_rao_spacing(data: np.ndarray,
+                            time_window: float,
+                            fps: int) -> np.ndarray:
         """
         Compute the uniformity of a circular dataset in sliding window of size ``time_window``.
 
@@ -448,6 +417,10 @@ class FeatureExtractionCircularMixin(object):
         :parameter np.ndarray time_window: Rolling time-window as float in seconds.
         :parameter int fps: fps of the recorded video
         :return np.ndarray: representing rao-spacing U in every sliding windows [-window:n]
+
+        .. image:: _static/img/raospacing.png
+           :width: 800
+           :align: center
 
         :references:
         .. [1] `UCSB <https://jammalam.faculty.pstat.ucsb.edu/html/favorite/test.htm>`__.
@@ -460,36 +433,25 @@ class FeatureExtractionCircularMixin(object):
         results = np.full((data.shape[0]), -1.0)
         window_size = int(time_window * fps)
         for i in range(window_size, data.shape[0]):
-            w_data = np.sort(data[i - window_size : i])
-            Ti, TiL = np.full((w_data.shape[0]), np.nan), np.full(
-                (w_data.shape[0]), np.nan
-            )
+            w_data = np.sort(data[i-window_size: i])
+            Ti, TiL = np.full((w_data.shape[0]), np.nan), np.full((w_data.shape[0]), np.nan)
             l = 360 / len(w_data)
-            Ti[-1] = np.rad2deg(
-                np.pi
-                - np.abs(np.pi - np.abs(np.deg2rad(w_data[0]) - np.deg2rad(w_data[-1])))
-            )
-            for j in prange(w_data.shape[0] - 1, -1, -1):
-                Ti[j] = np.rad2deg(
-                    np.pi
-                    - np.abs(
-                        np.pi
-                        - np.abs(np.deg2rad(w_data[j]) - np.deg2rad(w_data[j - 1]))
-                    )
-                )
+            Ti[-1] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(w_data[0]) - np.deg2rad(w_data[-1]))))
+            for j in prange(w_data.shape[0]-1, -1, -1):
+                Ti[j] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(w_data[j]) - np.deg2rad(w_data[j-1]))))
             for k in prange(Ti.shape[0]):
-                TiL[k] = np.max((l, Ti[k])) - np.min((l, Ti[k]))
+                TiL[k] =  np.max((l, Ti[k])) - np.min((l, Ti[k]))
             S = np.sum(TiL)
             U = int(S / 2)
             results[i] = U
         return results
 
 
-# data = np.random.normal(loc=90, scale=360, size=500)
+#data = np.random.normal(loc=90, scale=360, size=500)
 # data = np.random.randint(low=0, high=360, size=(500,))
 # result = FeatureExtractionCircularMixin().sliding_rao_spacing(data=data, time_window=0.5, fps=10)
 # print(result)
-# raospacing(np.deg2rad(data[-6:-1]), axis=0)
+#raospacing(np.deg2rad(data[-6:-1]), axis=0)
 
 # #data = np.random.normal(loc=90, scale=2, size=20)
 # data = np.array([350, 355, 356, 357])
@@ -500,6 +462,7 @@ class FeatureExtractionCircularMixin(object):
 
 # data = np.random.normal(loc=45, scale=3, size=20)
 # FeatureExtractionCircularMixin().agg_angular_difference_timebins(data=data,time_windows=np.array([1]), fps=5)
+
 
 
 # nose_loc = np.random.randint(low=0, high=500, size=(200, 2)).astype('float32')
@@ -521,18 +484,20 @@ class FeatureExtractionCircularMixin(object):
 # FeatureExtractionCircularMixin().rolling_mean_dispersion(data=data,time_windows=np.array([0.5]), fps=10)
 
 
+
 # data = np.array(list(range(0, 405, 45)))
 # results = FeatureExtractionCircularMixin().degrees_to_compass_cardinal(degree_angles=data)
 
 
-# data = np.array(list(range(0, 405, 45)))
-# results = FeatureExtractionCircularMixin().degrees_to_compass_cardinal(
-#     degree_angles=data
-# )
+data = np.array(list(range(0, 405, 45)))
+results = FeatureExtractionCircularMixin().degrees_to_compass_cardinal(degree_angles=data)
+
 
 
 # def direction_two_bps(bp_x: np.ndarray,
 #                       bp_y: np.ndarray) -> np.ndarray:
+
+
 
 
 # right_ear_loc = np.random.randint(low=0, high=500, size=(200, 2)).astype('float32')
