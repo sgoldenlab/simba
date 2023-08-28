@@ -63,13 +63,18 @@ Similarly, let say I want to downsample all my videos to a 1200x800 resolution. 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/quick_downsample.gif" />
 </p>
 
->Note: As of 07/2023, `QUICK SETTINGS` menu includes a frame named `GPU`, as in the screensgrab below. If this is checked, then SimBA will run the video editing using FFMpeg *GPU* codecs instead of FFMpeg *CPU* codecs. Using the GPU potentially means a lot faster processing. For an indication of the potential time-savings when this checkbox is checked, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md) table. As of 07/2023, this function requires an NVIDEA GPU.
+
+As of 07/2023, `QUICK SETTINGS` menu includes a frame named `GPU`, as in the screensgrab below. If this is checked, then SimBA will run the video editing using FFMpeg *GPU* codecs instead of FFMpeg *CPU* codecs. Using the GPU potentially means a lot faster processing. For an indication of the potential time-savings when this checkbox is checked, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md) table. As of 07/2023, this function requires an NVIDEA GPU.
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/batch_preprocess_gpu_option.png" />
 </p>
 
+As of 08/2023, `QUICK SETTINGS` menu includes a frame named `Output Video Quality`, as in the screensgrab below. that allows you to control the quality of the output video. Higher values creates better quality videos with larger file-sizes. Lower values creates lower quality videos with smaller file-sizes. If `Use GPU (reduced runtime)` is **un-checked**, there are 10 alternatives running from 100% to 10% with 100% being default. If `Use GPU (reduced runtime)` is **checked**, there are 3 alternatives - high, medium, and low - with high being the default. If you want to set different output qualities for different videos, see the `VIDEOS TABLE` below. 
 
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/batch_processing_quality_quicksetting.png" />
+</p>
 
 ### VIDEOS TABLE
 
@@ -84,6 +89,14 @@ Next, it might be that you want to crop some of the videos listes in the VIDEOS 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/crop_fast.gif" />
 </p>
+
+The final column in the `VIDEO TABLE` is named `Quality %` and allows you to control balance of quality versus file-size of each of the videos individually (to quick set all of the videos to a particular quality, see the quick settings menu above). 
+If `Use GPU (reduced runtime)` is **un-checked**, there are 10 alternatives running from 100% to 10% with 100% being default. Lower percentages produce lower quality videos with reduced file-sizes. If `Use GPU (reduced runtime)` is **checked**, there are 3 alternatives - high, medium, and low - with high being the default. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/batch_processing_quality.png" />
+</p>
+
 
 Chose with types of manipulation you which to perform on each video. Once done, head to the **EXECUTE** section. To learn more about each individual manipulation, check out their descriptions in the [SimBA TOOLS Guide](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md).
 
