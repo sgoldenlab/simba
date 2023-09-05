@@ -34,7 +34,7 @@ Statistics methods
 Circular feature extraction methods
 ----------------------------------------------
 
-.. automodule:: simba.mixins.feature_extraction_circular_mixin
+.. automodule:: simba.mixins.circular_statistics
    :members:
    :show-inheritance:
 
