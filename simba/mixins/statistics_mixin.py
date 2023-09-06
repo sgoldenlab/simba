@@ -1287,6 +1287,53 @@ class Statistics(FeatureExtractionMixin):
         return results
 
 
+    @staticmethod
+    def dominant_frequencies(data: np.ndarray,
+                             fps: float,
+                             k: int,
+                             window_function: Literal['Hann', 'Hamming', 'Blackman'] = None) -> np.ndarray:
+
+        """ Find the K dominant frequencies within a feature vector """
+
+        if window_function == 'Hann':
+            data = data * np.hanning(len(data))
+        elif window_function == 'Hamming':
+            data = data * np.hamming(len(data))
+        elif window_function == 'Blackman':
+            data = data * np.blackman(len(data))
+        fft_result = np.fft.fft(data)
+        frequencies = np.fft.fftfreq(data.shape[0], 1 / fps)
+        magnitude = np.abs(fft_result)
+        return frequencies[np.argsort(magnitude)[-(k + 1):-1]]
+
+    @staticmethod
+    def sliding_dominant_frequencies(data: np.ndarray,
+                                     fps: float,
+                                     k: int,
+                                     time_windows: np.ndarray,
+                                     window_function: Literal['Hann', 'Hamming', 'Blackman'] = None) -> np.ndarray :
+
+        """ Find the K dominant frequencies within a feature vector using sliding windows """
+        
+        
+        results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
+        for time_window_cnt in range(time_windows.shape[0]):
+            window_size = int(time_windows[time_window_cnt] * fps)
+            for left, right in zip(range(0, data.shape[0] + 1), range(window_size, data.shape[0] + 1)):
+                window_data = data[left:right]
+                if window_function == 'Hann':
+                    window_data = window_data * np.hanning(len(window_data))
+                elif window_function == 'Hamming':
+                    window_data = window_data * np.hamming(len(window_data))
+                elif window_function == 'Blackman':
+                    window_data = window_data * np.blackman(len(window_data))
+                fft_result = np.fft.fft(window_data)
+                frequencies = np.fft.fftfreq(window_data.shape[0], 1 / fps)
+                magnitude = np.abs(fft_result)
+                top_k_frequency = frequencies[np.argsort(magnitude)[-(k + 1):-1]]
+                results[right-1][time_window_cnt] = top_k_frequency[0]
+        return results
+
 # data = np.array([11,12,15,19,21,26,19,20,22,19,21,26,23,19,11]).astype(np.float32)
 #
 #
