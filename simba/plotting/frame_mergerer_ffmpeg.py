@@ -25,7 +25,7 @@ class FrameMergererFFmpeg(ConfigReader):
     """
     Merge separate visualizations of classifications, descriptive statistics etc., into  single video mosaic.
 
-    .. note:
+    .. note::
        `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-12-merge-frames>`_.
 
         .. image:: _static/img/mosaic_videos.gif
