@@ -176,7 +176,7 @@ def get_emojis() -> dict:
             ),
         }
 
-    if python_version == "3.10":
+    if python_version == "3.10" or python_version =="3.9":
         return {
             "thank_you": "\U0001f64f".encode("utf-8", "replace").decode(),
             "relaxed": "\U0001F600".encode("utf-8", "replace").decode(),

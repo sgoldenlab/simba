@@ -333,7 +333,7 @@ class Defaults(Enum):
     MAX_TASK_PER_CHILD = 10
     CHUNK_SIZE = 1
     SPLASH_TIME = 2500
-    WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v.{pkg_resources.get_distribution("simba-uw-tf-dev").version} \n '
+    WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v.local-dev \n '
     BROWSE_FOLDER_BTN_TEXT = "Browse Folder"
     BROWSE_FILE_BTN_TEXT = "Browse File"
     NO_FILE_SELECTED_TEXT = "No file selected"
@@ -347,6 +347,7 @@ class TagNames(Enum):
     ERROR = "error"
     TRASH = "trash"
     STANDARD = "standard"
+    CLASS_INIT = "CLASS_INIT"
 
 
 class DirNames(Enum):
