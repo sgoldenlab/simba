@@ -180,7 +180,7 @@ Classification plotter - multiprocess
 Pose-estimation plotter
 -----------------------------------------
 
-.. automodule:: simba.plotting.plot_pose_in_dir
+.. automodule:: simba.plotting.pose_plotter_mp
    :members:
    :show-inheritance:
 
