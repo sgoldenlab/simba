@@ -754,7 +754,7 @@ class CircularStatisticsMixin(object):
 # data = np.array([350, 100, 110, 105, 1, 45, 301, 206, 180, 45]).astype(np.float32)
 #CircularStatisticsMixin().sliding_angular_diff(
 #    data=data, time_windows=np.array([0.5]), fps=10
-)
+#)
 
 # CircularStatisticsMixin().sliding_mean_resultant_vector_length(data=data.astype(np.float32),time_windows=np.array([0.5]), fps=10)
 
