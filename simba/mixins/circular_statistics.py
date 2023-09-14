@@ -846,7 +846,7 @@ class CircularStatisticsMixin(object):
         :parameter ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive..
         :return np.ndarray: 1D array containing the proportion of data points that fall within each specified circular bin.
 
-        .. image:: _static/img/sliding_circular_range.png
+        .. image:: _static/img/circular_hotspots.png
            :width: 600
            :align: center
 
