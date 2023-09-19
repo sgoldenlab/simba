@@ -9,6 +9,7 @@ from numba import jit, prange
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 
+
 class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     """
@@ -21,9 +22,9 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def _helper_euclidean_distance_timeseries_change(distances: np.ndarray,
-                                                     time_windows: np.ndarray,
-                                                     fps: int):
+    def _helper_euclidean_distance_timeseries_change(
+        distances: np.ndarray, time_windows: np.ndarray, fps: int
+    ):
         """
         Private jitted helper called by ``simba.mixins.feature_extraction_supplemental_mixin.FeatureExtractionSupplemental.euclidean_distance_timeseries_change``
         """
@@ -33,18 +34,21 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             shifted_distances = np.copy(distances)
             shifted_distances[0:frms] = np.nan
             shifted_distances[frms:] = distances[:-frms]
-            shifted_distances[np.isnan(shifted_distances)] = distances[np.isnan(shifted_distances)]
+            shifted_distances[np.isnan(shifted_distances)] = distances[
+                np.isnan(shifted_distances)
+            ]
             results[:, window_cnt] = distances - shifted_distances
 
         return results
 
-
-    def euclidean_distance_timeseries_change(self,
-                                             location_1: np.ndarray,
-                                             location_2: np.ndarray,
-                                             fps: int,
-                                             px_per_mm: float,
-                                             time_windows: np.ndarray = np.array([0.2, 0.4, 0.8, 1.6])) -> np.ndarray:
+    def euclidean_distance_timeseries_change(
+        self,
+        location_1: np.ndarray,
+        location_2: np.ndarray,
+        fps: int,
+        px_per_mm: float,
+        time_windows: np.ndarray = np.array([0.2, 0.4, 0.8, 1.6]),
+    ) -> np.ndarray:
         """
         Compute the difference in distance between two points in the current frame versus N.N seconds ago. E.g.,
         computes if two points are traveling away from each other (positive output values) or towards each other
@@ -66,14 +70,16 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> location_2 = np.random.randint(low=0, high=100, size=(2000, 2)).astype('float32')
         >>> distances = self.euclidean_distance_timeseries_change(location_1=location_1, location_2=location_2, fps=10, px_per_mm=4.33, time_windows=np.array([0.2, 0.4, 0.8, 1.6]))
         """
-        distances = self.framewise_euclidean_distance(location_1=location_1, location_2=location_2, px_per_mm=px_per_mm)
-        return self._helper_euclidean_distance_timeseries_change(distances=distances, fps=fps, time_windows=time_windows).astype(int)
+        distances = self.framewise_euclidean_distance(
+            location_1=location_1, location_2=location_2, px_per_mm=px_per_mm
+        )
+        return self._helper_euclidean_distance_timeseries_change(
+            distances=distances, fps=fps, time_windows=time_windows
+        ).astype(int)
 
     @staticmethod
     @jit(nopython=True)
-    def peak_ratio(data: np.ndarray,
-                   bin_size_s: int,
-                   fps: int):
+    def peak_ratio(data: np.ndarray, bin_size_s: int, fps: int):
         """
         Compute the ratio of peak values relative to number of values within each seqential
         time-period represented of ``bin_size_s`` seconds. Peak is defined as value is higher than
@@ -102,43 +108,43 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         start, end = 0, data[0].shape[0]
         for i in prange(len(data)):
             peak_cnt = 0
-            if data[i][0] > data[i][1]: peak_cnt +=1
-            if data[i][-1] > data[i][-2]: peak_cnt += 1
-            for j in prange(1, len(data[i])-1):
-                if data[i][j] > data[i][j-1]: peak_cnt += 1
+            if data[i][0] > data[i][1]:
+                peak_cnt += 1
+            if data[i][-1] > data[i][-2]:
+                peak_cnt += 1
+            for j in prange(1, len(data[i]) - 1):
+                if data[i][j] > data[i][j - 1]:
+                    peak_cnt += 1
             peak_ratio = peak_cnt / data[i].shape[0]
             results[start:end] = peak_ratio
             start, end = start + len(data[i]), end + len(data[i])
         return results
 
-
     @staticmethod
     @jit(nopython=True)
-    def rolling_peak_count_ratio(data: np.ndarray,
-                                  time_windows: np.ndarray,
-                                  fps: int):
-
+    def rolling_peak_count_ratio(data: np.ndarray, time_windows: np.ndarray, fps: int):
         results = np.full((data.shape[0], time_windows.shape[0]), -1.0)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * fps)
             for j in prange(window_size, data.shape[0]):
-                window_data = data[j-window_size:j]
+                window_data = data[j - window_size : j]
                 peak_cnt = 0
-                if window_data[0] > window_data[1]: peak_cnt += 1
-                if window_data[-1] > window_data[-2]: peak_cnt += 1
+                if window_data[0] > window_data[1]:
+                    peak_cnt += 1
+                if window_data[-1] > window_data[-2]:
+                    peak_cnt += 1
                 for k in prange(1, len(window_data) - 1):
-                    if window_data[j] > window_data[j - 1]: peak_cnt += 1
+                    if window_data[j] > window_data[j - 1]:
+                        peak_cnt += 1
                 peak_ratio = peak_cnt / window_data.shape[0]
                 results[j, i] = peak_ratio
         print(results)
 
-
     @staticmethod
     @jit(nopython=True)
-    def rolling_categorical_switches_ratio(data: np.ndarray,
-                                           time_windows: np.ndarray,
-                                           fps: int) -> np.ndarray:
-
+    def rolling_categorical_switches_ratio(
+        data: np.ndarray, time_windows: np.ndarray, fps: int
+    ) -> np.ndarray:
         """
         Compute the ratio of in categorical feature switches within rolling windows.
 
@@ -166,21 +172,20 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         results = np.full((data.shape[0], time_windows.shape[0]), -1.0)
         for time_window in prange(time_windows.shape[0]):
             jump_frms = int(time_windows[time_window] * fps)
-            for current_frm in prange(jump_frms, data.shape[0]+1):
-                time_slice = data[current_frm-jump_frms: current_frm]
+            for current_frm in prange(jump_frms, data.shape[0] + 1):
+                time_slice = data[current_frm - jump_frms : current_frm]
                 current_value, unique_cnt = time_slice[0], 0
                 for i in prange(1, time_slice.shape[0]):
                     if time_slice[i] != current_value:
                         unique_cnt += 1
                     current_value = time_slice[i]
                 print(unique_cnt, time_slice.shape[0])
-                results[current_frm-1][time_window] = unique_cnt / time_slice.shape[0]
+                results[current_frm - 1][time_window] = unique_cnt / time_slice.shape[0]
         return results
 
     @staticmethod
     @jit(nopython=True)
-    def consecutive_time_series_categories_count(data: np.ndarray,
-                                                 fps: int):
+    def consecutive_time_series_categories_count(data: np.ndarray, fps: int):
         """
         Compute the count of consecutive milliseconds the feature value has remained static. For example,
         compute for how long in milleseconds the animal has remained in the current cardinal direction or the
@@ -205,21 +210,18 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         results = np.full((data.shape[0]), 0.0)
         results[0] = 1
         for i in prange(1, data.shape[0]):
-            if data[i] == data[i-1]:
-                results[i] = results[i-1]+1
+            if data[i] == data[i - 1]:
+                results[i] = results[i - 1] + 1
             else:
                 results[i] = 1
 
         return results / fps
 
-
     @staticmethod
     @jit(nopython=True)
-    def rolling_horizontal_vs_vertical_movement(data: np.ndarray,
-                                                pixels_per_mm: float,
-                                                time_windows: np.ndarray,
-                                                fps: int) -> np.ndarray:
-
+    def rolling_horizontal_vs_vertical_movement(
+        data: np.ndarray, pixels_per_mm: float, time_windows: np.ndarray, fps: int
+    ) -> np.ndarray:
         """
         Compute the movement along the x-axis relative to the y-axis in rolling time bins.
 
@@ -246,21 +248,36 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         results = np.full((data.shape[0], time_windows.shape[0]), 0)
         for time_window in prange(time_windows.shape[0]):
             jump_frms = int(time_windows[time_window] * fps)
-            for current_frm in prange(jump_frms, results.shape[0]+1):
-                x_movement = np.sum(np.abs(np.ediff1d(data[current_frm-jump_frms: current_frm, 0]))) / pixels_per_mm
-                y_movement = np.sum(np.abs(np.ediff1d(data[current_frm-jump_frms: current_frm, 1]))) / pixels_per_mm
-                results[current_frm-1][time_window] = x_movement - y_movement
+            for current_frm in prange(jump_frms, results.shape[0] + 1):
+                x_movement = (
+                    np.sum(
+                        np.abs(
+                            np.ediff1d(data[current_frm - jump_frms : current_frm, 0])
+                        )
+                    )
+                    / pixels_per_mm
+                )
+                y_movement = (
+                    np.sum(
+                        np.abs(
+                            np.ediff1d(data[current_frm - jump_frms : current_frm, 1])
+                        )
+                    )
+                    / pixels_per_mm
+                )
+                results[current_frm - 1][time_window] = x_movement - y_movement
 
         return results
 
     @staticmethod
     @jit(nopython=True)
-    def border_distances(data: np.ndarray,
-                         pixels_per_mm: float,
-                         img_resolution: np.ndarray,
-                         time_window: float,
-                         fps: int):
-
+    def border_distances(
+        data: np.ndarray,
+        pixels_per_mm: float,
+        img_resolution: np.ndarray,
+        time_window: float,
+        fps: int,
+    ):
         """
         Compute the mean distance of key-point to the left, right, top, and bottom sides of the image in
         rolling time-windows. Uses a straight line.
@@ -288,25 +305,30 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         results = np.full((data.shape[0], 4), -1.0)
         window_size = int(time_window * fps)
-        for current_frm in prange(window_size, results.shape[0]+1):
+        for current_frm in prange(window_size, results.shape[0] + 1):
             distances = np.full((4, window_size, 1), np.nan)
-            windowed_locs = data[current_frm - window_size: current_frm]
+            windowed_locs = data[current_frm - window_size : current_frm]
             for bp_cnt, bp_loc in enumerate(windowed_locs):
-                distances[0, bp_cnt] = np.linalg.norm(np.array([0, bp_loc[1]]) - bp_loc)  #left
-                distances[1, bp_cnt] = np.linalg.norm(np.array([img_resolution[0], bp_loc[1]]) - bp_loc) #right
-                distances[2, bp_cnt] = np.linalg.norm(np.array([bp_loc[0], 0]) - bp_loc) #top
-                distances[3, bp_cnt] = np.linalg.norm(np.array([bp_loc[0], img_resolution[1]]) - bp_loc) #bottpm
+                distances[0, bp_cnt] = np.linalg.norm(
+                    np.array([0, bp_loc[1]]) - bp_loc
+                )  # left
+                distances[1, bp_cnt] = np.linalg.norm(
+                    np.array([img_resolution[0], bp_loc[1]]) - bp_loc
+                )  # right
+                distances[2, bp_cnt] = np.linalg.norm(
+                    np.array([bp_loc[0], 0]) - bp_loc
+                )  # top
+                distances[3, bp_cnt] = np.linalg.norm(
+                    np.array([bp_loc[0], img_resolution[1]]) - bp_loc
+                )  # bottpm
             for i in prange(4):
-                results[current_frm-1][i] = np.mean(distances[i]) / pixels_per_mm
+                results[current_frm - 1][i] = np.mean(distances[i]) / pixels_per_mm
 
         return results.astype(np.int32)
 
     @staticmethod
     @jit(nopython=True)
-    def acceleration(data: np.ndarray,
-                     pixels_per_mm: float,
-                     fps: int):
-
+    def acceleration(data: np.ndarray, pixels_per_mm: float, fps: int):
         """
         Compute acceleration.
 
@@ -329,11 +351,12 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         for i in prange(fps, shifted_loc.shape[0]):
             velocity[i] = np.linalg.norm(shifted_loc[i] - data[i]) / pixels_per_mm
         for current_frm in prange(fps, velocity.shape[0], fps):
-            print(current_frm-fps, current_frm, current_frm, current_frm+fps)
-            prior_window = np.mean(velocity[current_frm-fps: current_frm])
-            current_window = np.mean(velocity[current_frm: current_frm+fps])
-            results[current_frm:current_frm+fps] = current_window - prior_window
+            print(current_frm - fps, current_frm, current_frm, current_frm + fps)
+            prior_window = np.mean(velocity[current_frm - fps : current_frm])
+            current_window = np.mean(velocity[current_frm : current_frm + fps])
+            results[current_frm : current_frm + fps] = current_window - prior_window
         return results
+
 
 # import time
 #
