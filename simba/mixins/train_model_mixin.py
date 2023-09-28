@@ -700,7 +700,6 @@ class TrainModelMixin(object):
         :parameter List[str] class_names: List of class names. E.g., ['Attack absent', 'Attack present']
         :parameter str save_dir: Directory where to save output in csv file format.
         """
-
         clf = tree.DecisionTreeClassifier(max_depth=5, random_state=666)
         clf.fit(x_train, y_train)
         try:
@@ -1243,14 +1242,14 @@ class TrainModelMixin(object):
         :raises FeatureNumberMismatchError: If shape of x_df and clf.n_features_ show mismatch
         """
 
-        if len(x_df.columns) != clf.n_features_:
+        if len(x_df.columns) != clf.n_features_in_:
             if model_name and data_path:
                 raise FeatureNumberMismatchError(
-                    f"Mismatch in the number of features in input file {data_path}, and what is expected by the model {model_name}. The model expects {str(clf.n_features_)} features. The data contains {len(x_df.columns)} features."
+                    f"Mismatch in the number of features in input file {data_path}, and what is expected by the model {model_name}. The model expects {str(clf.n_features_in_)} features. The data contains {len(x_df.columns)} features."
                 )
             else:
                 raise FeatureNumberMismatchError(
-                    f"The model expects {str(clf.n_features_)} features. The data contains {len(x_df.columns)} features."
+                    f"The model expects {str(clf.n_features_in_)} features. The data contains {len(x_df.columns)} features."
                 )
         p_vals = clf.predict_proba(x_df)
         if p_vals.shape[1] != 2:

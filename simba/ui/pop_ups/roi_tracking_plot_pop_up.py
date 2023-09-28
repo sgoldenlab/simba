@@ -183,7 +183,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
                     style_attr=style_attr,
                 )
                 roi_plotter.insert_data()
-                roi_plotter.visualize_ROI_data()
+                roi_plotter.run()
 
         stdout_success(
             msg="All ROI videos created and saved in project_folder/frames/output/ROI_analysis directory"

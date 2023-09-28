@@ -136,7 +136,13 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
             settings["styles"]["circle size"] = int(self.circle_size.entry_get)
             settings["styles"]["font size"] = self.font_size_eb.entry_get
             settings["styles"]["space_scale"] = int(self.spacing_eb.entry_get)
-        check_float(name="MINIMUM BOUT LENGTH", value=self.shortest_bout)
+        try:
+            self.shortest_bout = int(self.shortest_bout)
+        except ValueError as e:
+            print(e.args[1])
+            return
+
+        # check_float(name="MINIMUM BOUT LENGTH", value=self.shortest_bout)
         check_float(
             name="DISCRIMINATION THRESHOLD", value=self.discrimination_threshold
         )

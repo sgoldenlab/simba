@@ -9,7 +9,7 @@ from simba.utils.printing import log_event, stdout_warning
 def log_warning(func):
     def wrapper(**kwargs):
         log_event(
-            logger_name=f'{kwargs["source"]}.{func.__name__}',
+            logger_name=f'{kwargs["source"] if "source" in kwargs.keys() else ""}.{func.__name__}',
             log_type=TagNames.WARNING.value,
             msg=kwargs["msg"],
         )

@@ -7,6 +7,7 @@ from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import (NoChoosenClassifierError,
                                 NoChoosenMeasurementError)
+from simba.utils.read_write import get_video_meta_data
 
 
 class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
@@ -60,10 +61,13 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
             raise NoChoosenMeasurementError()
         if len(clf_list) == 0:
             raise NoChoosenClassifierError()
+        #ConfigReader.
+        #video_meta_data = get_video_meta_data(self.video_path)
         data_log_analyzer = AggregateClfCalculator(
             config_path=self.config_path,
             data_measures=measurement_lst,
             classifiers=clf_list,
+            video_meta_data=self.video_info_df
         )
         data_log_analyzer.run()
         data_log_analyzer.save()

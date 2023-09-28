@@ -64,7 +64,7 @@ class LabellingInterface(ConfigReader):
         self.frm_no, self.threshold_dict = 0, threshold_dict
         self.setting = setting
         self.play_video_script_path = os.path.join(
-            os.path.dirname(simba.__file__), "play_annotation_video.py"
+            os.path.dirname(simba.__file__), "labelling/play_annotation_video.py"
         )
         _, self.video_name, _ = get_fn_ext(filepath=file_path)
         self.features_extracted_file_path = os.path.join(
@@ -394,7 +394,7 @@ class LabellingInterface(ConfigReader):
         _, self.current_frm_npy = self.cap.read()
         self.current_frm_npy = cv2.cvtColor(self.current_frm_npy, cv2.COLOR_RGB2BGR)
         self.current_frm_pil = Image.fromarray(self.current_frm_npy)
-        self.current_frm_pil.thumbnail(self.max_frm_size, Image.ANTIALIAS)
+        self.current_frm_pil.thumbnail(self.max_frm_size, Image.LANCZOS)
         self.current_frm_pil = ImageTk.PhotoImage(
             master=self.main_window, image=self.current_frm_pil
         )
