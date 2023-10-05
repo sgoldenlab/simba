@@ -144,33 +144,35 @@ currentPlatform = platform.system()
 
 class LoadProjectPopUp(object):
     def __init__(self):
-        main_frm = Toplevel()
-        main_frm.minsize(300, 200)
-        main_frm.wm_title("Load SimBA project (project_config.ini file)")
+        self.main_frm = Toplevel()
+        self.main_frm.minsize(300, 200)
+        self.main_frm.wm_title("Load SimBA project (project_config.ini file)")
 
-        load_project_frm = CreateLabelFrameWithIcon(
-            parent=main_frm,
+        self.load_project_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
             header="LOAD SIMBA PROJECT_CONFIG.INI",
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.LOAD_PROJECT.value,
         )
         self.selected_file = FileSelect(
-            load_project_frm, "Select file: ", title="Select project_config.ini file"
+            self.load_project_frm, "Select file: ", title="Select project_config.ini file"
         )
-        load_project_btn = Button(
-            load_project_frm,
+        self.load_project_btn = Button(
+            self.load_project_frm,
             text="LOAD PROJECT",
             fg="blue",
             command=lambda: self.launch_project(),
         )
 
-        load_project_frm.grid(row=0, sticky=NW)
+        self.load_project_frm.grid(row=0, sticky=NW)
         self.selected_file.grid(row=0, sticky=NW)
-        load_project_btn.grid(row=1, pady=10, sticky=NW)
+        self.load_project_btn.grid(row=1, pady=10, sticky=NW)
 
     def launch_project(self):
         check_file_exist_and_readable(file_path=self.selected_file.file_path)
         _ = SimbaProjectPopUp(config_path=self.selected_file.file_path)
+        self.load_project_frm.destroy()
+        self.main_frm.destroy()
 
 
 def wait_for_internet_connection(url):
