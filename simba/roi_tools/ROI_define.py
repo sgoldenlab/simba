@@ -1,6 +1,7 @@
 import copy
 import glob
 import os
+import time
 from tkinter import *
 
 import cv2
@@ -14,7 +15,6 @@ from simba.roi_tools.ROI_size_calculations import (circle_size_calc,
                                                    polygon_size_calc,
                                                    rectangle_size_calc)
 from simba.ui.tkinter_functions import hxtScrollbar
-from simba.utils.lookups import get_color_dict
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
@@ -41,7 +41,7 @@ class ROI_definitions(ConfigReader):
 
     """
 
-    def __init__(self, config_path: str, video_path: str):
+    def __init__(self, config_path: str, video_path: str,image_data : ROI_image_class):
         ConfigReader.__init__(self, config_path=config_path)
         self.video_path = video_path
         _, self.file_name, self.file_ext = get_fn_ext(self.video_path)
@@ -55,21 +55,21 @@ class ROI_definitions(ConfigReader):
         self.other_video_file_names = []
         for video in self.other_video_paths:
             self.other_video_file_names.append(os.path.basename(video))
-        self.master_win_h, self.master_win_w = 800, 750
+        self.master_win_h, self.master_win_w = 1080, 750
         self.video_info, self.curr_px_mm, self.curr_fps = self.read_video_info(
             video_name=self.file_name
         )
-        self.master = Tk()
-        self.master.minsize(self.master_win_w, self.master_win_h)
-        self.screen_width = self.master.winfo_screenwidth()
-        self.screen_height = self.master.winfo_screenheight()
+        self.root = Tk()
+        self.root.minsize(self.master_win_w, self.master_win_h)
+        self.screen_width = self.root.winfo_screenwidth()
+        self.screen_height = self.root.winfo_screenheight()
         self.default_top_left_x = self.screen_width - self.master_win_w
-        self.master.geometry(
+        self.root.geometry(
             "%dx%d+%d+%d"
             % (self.master_win_w, self.master_win_h, self.default_top_left_x, 0)
         )
-        self.master.wm_title("Region of Interest Settings")
-
+        self.root.wm_title("Region of Interest Settings")
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         self.shape_thickness_list = list(range(1, 26))
         self.ear_tag_size_list = list(range(1, 26))
         self.select_color = "red"
@@ -79,15 +79,12 @@ class ROI_definitions(ConfigReader):
         self.stored_interact = None
         self.stored_shape = None
         self.img_no = 1
-        self.duplicate_jump_size = 20
-        self.click_sens = 10
-        self.text_size = 5
-        self.text_thickness = 3
-        self.line_type = -1
-        self.named_shape_colors = get_color_dict()
+        self.image_data = image_data
+
+        self.named_shape_colors = self.image_data.colors
         self.window_menus()
-        self.master.lift()
-        self.master = Canvas(hxtScrollbar(self.master))
+        self.root.lift()
+        self.master = Canvas(hxtScrollbar(self.root))
         self.master.pack(fill="both", expand=True)
         self.show_video_info()
         self.select_img()
@@ -98,26 +95,21 @@ class ROI_definitions(ConfigReader):
         self.interact_menus()
         self.draw_menu()
         self.save_menu()
-        self.image_data = ROI_image_class(
-            self.config_path,
-            self.video_path,
-            self.img_no,
-            self.named_shape_colors,
-            self.default_top_left_x,
-            self.duplicate_jump_size,
-            self.line_type,
-            self.click_sens,
-            self.text_size,
-            self.text_thickness,
-            self.master_win_h,
-            self.master_win_w,
-        )
-        self.video_frame_count = int(self.image_data.video_frame_count)
+        self.cap = cv2.VideoCapture(self.video_path)
+        self.image_data.update_working_frame(self.cap, True, self.file_name)
+        self.video_frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.get_all_ROI_names()
         if len(self.video_ROIs) > 0:
             self.update_delete_ROI_menu()
 
         self.master.mainloop()
+
+    def on_close(self):
+        self.cap.release()
+        self.image_data.reset()
+        self.master.destroy()
+        self.root.destroy()
+
 
     def show_video_info(self):
         self.video_info_frame = LabelFrame(
@@ -320,7 +312,8 @@ class ROI_definitions(ConfigReader):
             command=lambda: self.apply_rois_from_other_video(),
         )
         self.apply_from_other_video.grid(row=7, sticky=W)
-        self.video_dropdown.grid(row=1, column=1, sticky=W, pady=10)
+        self.video_dropdown.config(direction=RIGHT)
+        self.video_dropdown.grid(row=1, column=1,sticky="ew", pady=20)
         self.apply_button.grid(row=1, column=3, sticky=W, pady=10)
 
     def select_shape(self):
@@ -552,10 +545,10 @@ class ROI_definitions(ConfigReader):
 
     def show_shape_information(self):
         if (
-            len(self.image_data.out_rectangles)
-            + len(self.image_data.out_circles)
-            + len(self.image_data.out_polygon)
-            == 0
+                len(self.image_data.out_rectangles)
+                + len(self.image_data.out_circles)
+                + len(self.image_data.out_polygon)
+                == 0
         ):
             print("No shapes to print info for.")
 
@@ -698,10 +691,10 @@ class ROI_definitions(ConfigReader):
     def call_delete_all_rois(self):
         self.shape_info_btn.configure(text="Show shape info.")
         if (
-            len(self.image_data.out_rectangles)
-            + len(self.image_data.out_circles)
-            + len(self.image_data.out_polygon)
-            == 0
+                len(self.image_data.out_rectangles)
+                + len(self.image_data.out_circles)
+                + len(self.image_data.out_polygon)
+                == 0
         ):
             NoDataFoundWarning(msg="SimBA finds no ROIs to delete.")
         else:
@@ -721,7 +714,7 @@ class ROI_definitions(ConfigReader):
                 c_no += 1
             else:
                 self.new_shape_data["Name"] = (
-                    str(self.shape_type) + ": " + self.new_name
+                        str(self.shape_type) + ": " + self.new_name
                 )
                 break
 
@@ -735,7 +728,7 @@ class ROI_definitions(ConfigReader):
             )
             for shape in self.image_data.out_rectangles:
                 if (shape["topLeftX"] == self.new_shape_x) and (
-                    shape["topLeftY"] == self.new_shape_y
+                        shape["topLeftY"] == self.new_shape_y
                 ):
                     self.new_shape_x += self.duplicate_jump_size
                     self.new_shape_y += self.duplicate_jump_size
@@ -748,7 +741,7 @@ class ROI_definitions(ConfigReader):
             )
             for shape in self.image_data.out_circles:
                 if (shape["centerY"] == self.new_shape_x) and (
-                    shape["centerY"] == self.new_shape_y
+                        shape["centerY"] == self.new_shape_y
                 ):
                     self.new_shape_x += self.duplicate_jump_size
                     self.new_shape_y += self.duplicate_jump_size
@@ -761,7 +754,7 @@ class ROI_definitions(ConfigReader):
             )
             for shape in self.image_data.out_polygon:
                 if (shape["Center_X"] == self.new_shape_x) and (
-                    shape["centerY"] == self.new_shape_y
+                        shape["centerY"] == self.new_shape_y
                 ):
                     self.new_shape_x += self.duplicate_jump_size
                     self.new_shape_y += self.duplicate_jump_size
@@ -771,9 +764,9 @@ class ROI_definitions(ConfigReader):
         self.shape_info_btn.configure(text="Show shape info.")
         if shape_name[0] != "None":
             all_roi_list = (
-                self.image_data.out_rectangles
-                + self.image_data.out_circles
-                + self.image_data.out_polygon
+                    self.image_data.out_rectangles
+                    + self.image_data.out_circles
+                    + self.image_data.out_polygon
             )
             self.shape_type, shape_name = shape_name[0], shape_name[1]
             self.current_shape_data = [
@@ -856,11 +849,11 @@ class ROI_definitions(ConfigReader):
             polygons_found = pd.read_hdf(self.roi_coordinates_path, key="polygons")
             other_vid_rectangles = rectangles_found[
                 rectangles_found["Video"] != self.file_name
-            ]
+                ]
             other_vid_circles = circles_found[circles_found["Video"] != self.file_name]
             other_vid_polygons = polygons_found[
                 polygons_found["Video"] != self.file_name
-            ]
+                ]
 
             new_rectangles = pd.DataFrame.from_dict(self.image_data.out_rectangles)
             new_circles = pd.DataFrame.from_dict(self.image_data.out_circles)
@@ -923,9 +916,9 @@ class ROI_definitions(ConfigReader):
             shape_name = shape_data.selected_video.get().split(": ")
             if shape_name[0] != "None":
                 self.all_roi_list = (
-                    shape_data.image_data.out_rectangles
-                    + shape_data.image_data.out_circles
-                    + shape_data.image_data.out_polygon
+                        shape_data.image_data.out_rectangles
+                        + shape_data.image_data.out_circles
+                        + shape_data.image_data.out_polygon
                 )
                 self.shape_type, self.shape_name = shape_name[0], shape_name[1]
                 current_shape_data = [
@@ -1040,7 +1033,7 @@ class ROI_definitions(ConfigReader):
     #
     #
     def window_menus(self):
-        menu = Menu(self.master)
+        menu = Menu(self.root)
         file_menu = Menu(menu)
         menu.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(
@@ -1048,12 +1041,11 @@ class ROI_definitions(ConfigReader):
         )
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.Exit)
-        self.master.config(menu=menu)
+        self.root.config(menu=menu)
 
     def Exit(self):
-        cv2.destroyAllWindows()
         self.image_data.destroy_windows()
-        self.master.destroy()
+        self.root.destroy()
 
 
 class PreferenceMenu:
@@ -1126,7 +1118,6 @@ class PreferenceMenu:
         image_data.line_type = self.line_type.get()
         image_data.duplicate_jump_size = self.duplicate_jump_size.get()
         stdout_success(msg="Saved ROI preference settings.")
-
 
 #
 # test = ROI_definitions(config_path='/Users/simon/Desktop/envs/simba_dev/tests/test_data/mouse_open_field/project_folder/project_config.ini',

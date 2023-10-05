@@ -1,8 +1,11 @@
 import itertools
 import os
 import re
+import threading
+import time
 from configparser import ConfigParser
 from copy import deepcopy
+from threading import Thread
 
 import cv2
 import numpy as np
@@ -16,20 +19,19 @@ from simba.utils.read_write import get_fn_ext
 
 
 class ROI_image_class:
+    def __del__(self):
+        self.stop_display_image = True
+        self.display_image_thread.join()
+
     def __init__(
-        self,
-        config_path,
-        video_path,
-        img_no,
-        colors_dict,
-        master_top_left_x,
-        duplicate_jump_size,
-        line_type,
-        click_sens,
-        text_size,
-        text_thickness,
-        master_win_h,
-        master_win_w,
+            self,
+            config_path,
+            colors_dict,
+            duplicate_jump_size,
+            line_type,
+            click_sens,
+            text_size,
+            text_thickness,
     ):
         config = ConfigParser()
         configFile = str(config_path)
@@ -37,7 +39,6 @@ class ROI_image_class:
         self.project_path = config.get(
             ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value
         )
-        _, self.curr_vid_name, ext = get_fn_ext(video_path)
         (
             self.duplicate_jump_size,
             self.line_type,
@@ -45,28 +46,53 @@ class ROI_image_class:
             self.text_size,
             self.text_thickness,
         ) = (duplicate_jump_size, line_type, click_sens, text_size, text_thickness)
-        self.cap = cv2.VideoCapture(video_path)
-        self.video_frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        self.cap.set(1, img_no)
         self.colors = colors_dict
         self.select_color = (128, 128, 128)
-        _, self.orig_frame = self.cap.read()
-        self.frame_width, self.frame_height = (
-            self.orig_frame.shape[0],
-            self.orig_frame.shape[1],
-        )
-        self.frame_default_loc = (int(master_top_left_x - self.frame_width), 0)
-        self.zoomed_img = deepcopy(self.orig_frame)
         self.zoomed_img_ratio = 1
         self.no_shapes = 0
         self.current_zoom = 100
-        self.working_frame = deepcopy(self.orig_frame)
-        cv2.namedWindow("Define shape", cv2.WINDOW_NORMAL)
-        cv2.imshow("Define shape", self.working_frame)
         self.out_rectangles = []
         self.out_circles = []
         self.out_polygon = []
-        self.check_if_ROIs_exist()
+        self.keyWaitTime = 100
+        self.keyWaitChar = -1
+        self.cap = None
+        self.circle_info = None
+        self.window_name = ""
+        self.working_frame = None
+        self.orig_frame = None
+        self.stop_display_image = False
+        self.draw_rectangle_roi = False
+        self.user_rectangle_roi = []
+        self.lock = threading.Lock()
+        self.display_image_imshow_callback = self.get_x_y_callback
+        self.display_image_thread = Thread(target=self.display_image)
+        self.display_image_thread.start()
+
+    def reset(self):
+        self.stop_display_image = True
+
+    def update_working_frame(self, cap, start_running, new_video_name):
+        with self.lock:
+            self.cap = deepcopy(self.cap)
+            _, new_frame = cap.read()
+            self.working_frame = deepcopy(new_frame)
+            self.orig_frame = deepcopy(new_frame)
+            if new_video_name:
+                self.curr_vid_name = new_video_name
+                self.window_name = "Define shape for " + new_video_name
+                self.select_color = (128, 128, 128)
+                self.zoomed_img_ratio = 1
+                self.no_shapes = 0
+                self.current_zoom = 100
+                self.out_rectangles = []
+                self.out_circles = []
+                self.out_polygon = []
+                self.check_if_ROIs_exist()
+                self.keyWaitTime = 100
+                self.keyWaitChar = -1
+        self.stop_display_image = not start_running
+        self.display_image_imshow_callback = self.get_x_y_callback
 
     def check_if_ROIs_exist(self):
         roi_measurement_path = os.path.join(
@@ -87,21 +113,21 @@ class ROI_image_class:
             if len(rectangles_found) > 0:
                 rectangles_found = rectangles_found[
                     rectangles_found["Video"] == self.curr_vid_name
-                ]
+                    ]
                 rectangles_found = add_missing_ROI_cols(rectangles_found)
                 self.out_rectangles = rectangles_found.to_dict(orient="records")
 
             if len(circles_found) > 0:
                 circles_found = circles_found[
                     circles_found["Video"] == self.curr_vid_name
-                ]
+                    ]
                 circles_found = add_missing_ROI_cols(circles_found)
                 self.out_circles = circles_found.to_dict(orient="records")
 
             if len(polygons_found) > 0:
                 polygons_found = polygons_found[
                     polygons_found["Video"] == self.curr_vid_name
-                ]
+                    ]
                 polygons_found = add_missing_ROI_cols(polygons_found)
                 self.out_polygon = polygons_found.to_dict(orient="records")
 
@@ -113,7 +139,10 @@ class ROI_image_class:
         self.insert_all_ROIs_into_image(change_frame_no=True)
 
     def draw_rectangle(self, rectangle_info):
-        ROI = cv2.selectROI("Define shape", self.working_frame)
+        self.draw_rectangle_roi = True
+        while len(self.user_rectangle_roi) ==0:
+            time.sleep(1)
+        ROI = self.user_rectangle_roi
         top_left_x, top_left_y = ROI[0], ROI[1]
         width = abs(ROI[0] - (ROI[2] + ROI[0]))
         height = abs(ROI[2] - (ROI[3] + ROI[2]))
@@ -157,92 +186,89 @@ class ROI_image_class:
         )
 
         self.insert_all_ROIs_into_image()
+        self.user_rectangle_roi = []
 
-    def draw_circle(self, circle_info):
-        self.center_status = False
-        self.not_done = True
-
-        def draw_circle_callback(event, x, y, flags, param):
-            if event == 1:
-                if not self.center_status:
-                    self.center_X, self.center_Y = int(x), int(y)
-                    cv2.circle(
-                        self.working_frame,
-                        (self.center_X, self.center_Y),
-                        int(circle_info["Shape_ear_tag_size"]),
-                        circle_info["Shape_color_BGR"],
-                        -1,
-                    )
-                    self.center_status = True
-                    cv2.imshow("Define shape", self.working_frame)
-                    cv2.waitKey(1000)
-                else:
-                    self.border_x, self.border_y = int(x), int(y)
-                    self.radius = int(
-                        (
-                            np.sqrt(
-                                (self.center_X - self.border_x) ** 2
-                                + (self.center_Y - self.border_y) ** 2
-                            )
+    def draw_circle_callback(self, event, x, y, flags, param):
+        if event == 1:
+            if not self.center_status:
+                self.center_X, self.center_Y = int(x), int(y)
+                cv2.circle(
+                    self.working_frame,
+                    (self.center_X, self.center_Y),
+                    int(self.circle_info["Shape_ear_tag_size"]),
+                    self.circle_info["Shape_color_BGR"],
+                    -1,
+                )
+                self.center_status = True
+            else:
+                self.border_x, self.border_y = int(x), int(y)
+                self.radius = int(
+                    (
+                        np.sqrt(
+                            (self.center_X - self.border_x) ** 2
+                            + (self.center_Y - self.border_y) ** 2
                         )
                     )
-                    border_tag = (int(self.center_X - self.radius), self.center_Y)
-                    self.out_circles.append(
-                        {
-                            "Video": circle_info["Video_name"],
-                            "Shape_type": "Circle",
-                            "Name": circle_info["Name"],
-                            "Color name": circle_info["Shape_color_name"],
-                            "Color BGR": circle_info["Shape_color_BGR"],
-                            "Thickness": circle_info["Shape_thickness"],
-                            "centerX": self.center_X,
-                            "centerY": self.center_Y,
-                            "radius": self.radius,
-                            "Tags": {
-                                "Center tag": (self.center_X, self.center_Y),
-                                "Border tag": border_tag,
-                            },
-                            "Ear_tag_size": int(circle_info["Shape_ear_tag_size"]),
-                        }
-                    )
-                    self.insert_all_ROIs_into_image()
-                    self.not_done = False
-                    cv2.waitKey(33)
+                )
+                border_tag = (int(self.center_X - self.radius), self.center_Y)
+                self.out_circles.append(
+                    {
+                        "Video": self.circle_info["Video_name"],
+                        "Shape_type": "Circle",
+                        "Name": self.circle_info["Name"],
+                        "Color name": self.circle_info["Shape_color_name"],
+                        "Color BGR": self.circle_info["Shape_color_BGR"],
+                        "Thickness": self.circle_info["Shape_thickness"],
+                        "centerX": self.center_X,
+                        "centerY": self.center_Y,
+                        "radius": self.radius,
+                        "Tags": {
+                            "Center tag": (self.center_X, self.center_Y),
+                            "Border tag": border_tag,
+                        },
+                        "Ear_tag_size": int(self.circle_info["Shape_ear_tag_size"]),
+                    }
+                )
+                self.insert_all_ROIs_into_image()
+                self.not_done = False
 
-        while True:
-            cv2.setMouseCallback("Define shape", draw_circle_callback)
-            cv2.waitKey(800)
-            if self.not_done == False:
+    def draw_circle(self, circle_info):
+        self.circle_info = circle_info
+        self.center_status = False
+        self.not_done = True
+        self.keyWaitTime = 800
+        self.display_image_imshow_callback = self.draw_circle_callback
+        while True and not self.stop_display_image:
+            if self.keyWaitChar == 27:
                 break
+            time.sleep(0.1)
+
+    def polygon_x_y_callback(self, event, x, y, flags, param):
+        if event == 1:
+            if isinstance(self.polygon_pts, np.ndarray):
+                print("please press draw again")
+                return
+            self.click_loc = (int(x), int(y))
+            cv2.circle(
+                self.working_frame,
+                (self.click_loc[0], self.click_loc[1]),
+                self.draw_info["Shape_thickness"],
+                self.draw_info["Shape_color_BGR"],
+                -1,
+            )
+            self.polygon_pts.append([int(x), int(y)])
 
     def draw_polygon(self):
         self.polygon_pts = []
-
-        def polygon_x_y_callback(event, x, y, flags, param):
-            if event == 1:
-                self.click_loc = (int(x), int(y))
-                cv2.circle(
-                    self.working_frame,
-                    (self.click_loc[0], self.click_loc[1]),
-                    self.draw_info["Shape_thickness"],
-                    self.draw_info["Shape_color_BGR"],
-                    -1,
-                )
-                self.polygon_pts.append([int(x), int(y)])
-                cv2.imshow("Define shape", self.working_frame)
-                cv2.waitKey(800)
-
-        def initiate_x_y_callback():
-            while True:
-                cv2.setMouseCallback("Define shape", polygon_x_y_callback)
-                k = cv2.waitKey(20)
-                if k == 27:
-                    break
-
-        initiate_x_y_callback()
+        self.display_image_imshow_callback = self.polygon_x_y_callback
+        while True and not self.stop_display_image:
+            if self.keyWaitChar == 27:
+                break
+            time.sleep(0.1)
         self.polygon_pts = list(
             k for k, _ in itertools.groupby(self.polygon_pts)
         )  # REMOVES DUPLICATES
+
         self.polygon_pts = np.array(self.polygon_pts).astype("int32")
         self.poly_center = self.polygon_pts.mean(axis=0)
         self.polygon_pts_dict = {}
@@ -273,6 +299,7 @@ class ROI_image_class:
         self.insert_all_ROIs_into_image()
 
     def initiate_draw(self, draw_dict):
+        self.keyWaitChar = -1
         self.draw_info = draw_dict
         if self.draw_info["Shape_type"] is "rectangle":
             self.draw_rectangle(self.draw_info)
@@ -293,20 +320,13 @@ class ROI_image_class:
 
         return self.all_shape_names
 
+    def get_x_y_callback(self, event, x, y, flags, param):
+        if event == 1:
+            self.click_loc = (int(x), int(y))
+            self.not_done = False
+
     def interact_functions(self, interact_method, zoom_val=None):
         self.not_done = True
-
-        def get_x_y_callback(event, x, y, flags, param):
-            if event == 1:
-                self.click_loc = (int(x), int(y))
-                self.not_done = False
-
-        def initiate_x_y_callback():
-            while True:
-                cv2.setMouseCallback("Define shape", get_x_y_callback)
-                cv2.waitKey(20)
-                if self.not_done == False:
-                    break
 
         def recolor_roi_tags():
             self.not_done = True
@@ -323,9 +343,9 @@ class ROI_image_class:
                         self.closest_roi["Thickness"],
                     )
                 if (
-                    (self.closest_tag == "Top tag")
-                    or (self.closest_tag == "Top left tag")
-                    or (self.closest_tag == "Top right tag")
+                        (self.closest_tag == "Top tag")
+                        or (self.closest_tag == "Top left tag")
+                        or (self.closest_tag == "Top right tag")
                 ):
                     cv2.line(
                         self.working_frame,
@@ -338,9 +358,9 @@ class ROI_image_class:
                         self.closest_roi["Thickness"],
                     )
                 if (
-                    (self.closest_tag == "Bottom tag")
-                    or (self.closest_tag == "Bottom left tag")
-                    or (self.closest_tag == "Bottom right tag")
+                        (self.closest_tag == "Bottom tag")
+                        or (self.closest_tag == "Bottom left tag")
+                        or (self.closest_tag == "Bottom right tag")
                 ):
                     cv2.line(
                         self.working_frame,
@@ -350,9 +370,9 @@ class ROI_image_class:
                         self.closest_roi["Thickness"],
                     )
                 if (
-                    (self.closest_tag == "Left tag")
-                    or (self.closest_tag == "Bottom left tag")
-                    or (self.closest_tag == "Top left tag")
+                        (self.closest_tag == "Left tag")
+                        or (self.closest_tag == "Bottom left tag")
+                        or (self.closest_tag == "Top left tag")
                 ):
                     cv2.line(
                         self.working_frame,
@@ -362,9 +382,9 @@ class ROI_image_class:
                         self.closest_roi["Thickness"],
                     )
                 if (
-                    (self.closest_tag == "Right tag")
-                    or (self.closest_tag == "Top right tag")
-                    or (self.closest_tag == "Bottom right tag")
+                        (self.closest_tag == "Right tag")
+                        or (self.closest_tag == "Top right tag")
+                        or (self.closest_tag == "Bottom right tag")
                 ):
                     cv2.line(
                         self.working_frame,
@@ -431,7 +451,6 @@ class ROI_image_class:
                 self.select_color,
                 self.closest_roi["Thickness"],
             )
-            cv2.imshow("Define shape", self.working_frame)
 
         def find_closest_ROI_tag():
             self.closest_roi, self.closest_tag, self.closest_dist = {}, {}, np.inf
@@ -447,7 +466,7 @@ class ROI_image_class:
                         )
                     )
                     if ((not self.closest_roi) and (dist < self.click_sens)) or (
-                        dist < self.closest_dist
+                            dist < self.closest_dist
                     ):
                         self.closest_roi, self.closest_tag, self.closest_dist = (
                             s,
@@ -474,7 +493,7 @@ class ROI_image_class:
                         )
                     )
                     if ((not self.click_roi) and (distance < self.click_sens)) or (
-                        distance < self.click_dist
+                            distance < self.click_dist
                     ):
                         self.click_roi, self.click_tag, self.closest_dist = (
                             shape,
@@ -483,16 +502,14 @@ class ROI_image_class:
                         )
 
         if interact_method == "zoom_home":
-            cv2.destroyAllWindows()
             self.zoomed_img = self.orig_frame
             self.current_zoom = 100
-            cv2.imshow("Define shape", self.orig_frame)
 
         if interact_method == "move_shape":
             self.insert_all_ROIs_into_image(ROI_ear_tags=True)
-            initiate_x_y_callback()  # get x y loc ROI tag
+            # initiate_x_y_callback()  # get x y loc ROI tag
             find_closest_ROI_tag()  # find closest ROI tag to x y loc
-            initiate_x_y_callback()  # get x y loc for new x y loc
+            # initiate_x_y_callback()  # get x y loc for new x y loc
             check_if_click_is_tag()
             if self.click_roi:
                 move_edge_align(
@@ -527,13 +544,12 @@ class ROI_image_class:
         self.insert_all_ROIs_into_image()
 
     def insert_all_ROIs_into_image(
-        self,
-        ROI_ear_tags=False,
-        change_frame_no=False,
-        show_zoomed_img=False,
-        show_size_info=False,
+            self,
+            ROI_ear_tags=False,
+            change_frame_no=False,
+            show_zoomed_img=False,
+            show_size_info=False,
     ):
-        cv2.destroyAllWindows()
         self.no_shapes = 0
         if (change_frame_no is False) and (show_zoomed_img is False):
             self.working_frame = deepcopy(self.orig_frame)
@@ -675,8 +691,24 @@ class ROI_image_class:
                     lineType=self.line_type,
                 )
 
-        cv2.namedWindow("Define shape", cv2.WINDOW_NORMAL)
-        cv2.imshow("Define shape", self.working_frame)
-
     def destroy_windows(self):
-        cv2.destroyAllWindows()
+        cv2.destroyWindow(self.window_name)
+
+    def display_image(self):
+        self.stop_display_image = False
+        while True:
+            if self.stop_display_image:
+                cv2.destroyAllWindows()
+            else:
+                if self.working_frame is None:
+                    time.sleep(1)
+                    continue
+                with self.lock:
+                    if self.draw_rectangle_roi:
+                        self.user_rectangle_roi = cv2.selectROI(self.window_name, self.working_frame)
+                    else:
+                        cv2.imshow(self.window_name, self.working_frame)
+                cv2.setMouseCallback(self.window_name, self.display_image_imshow_callback)
+                c = cv2.waitKey(self.keyWaitTime)
+                if c != -1:
+                    self.keyWaitChar = c

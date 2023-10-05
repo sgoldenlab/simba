@@ -3,12 +3,16 @@ import platform
 from configparser import ConfigParser
 from tkinter import *
 
+from simba.roi_tools import ROI_image
 from simba.roi_tools.ROI_define import ROI_definitions
+from simba.roi_tools.ROI_image import ROI_image_class
 from simba.roi_tools.ROI_multiply import multiply_ROIs
 from simba.roi_tools.ROI_reset import reset_video_ROIs
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.errors import NoFilesFoundError
+
+from simba.utils.lookups import get_color_dict
 
 
 class ROI_menu:
@@ -21,6 +25,12 @@ class ROI_menu:
         )
         self.measures_dir = os.path.join(self.project_path, "logs", "measures")
         self.video_dir = os.path.join(self.project_path, "videos")
+        self.duplicate_jump_size = 20
+        self.click_sens = 10
+        self.text_size = 5
+        self.text_thickness = 3
+        self.line_type = -1
+        self.named_shape_colors = get_color_dict()
         self.roi_table_menu()
 
     def roi_table_menu(self):
@@ -49,9 +59,19 @@ class ROI_menu:
         )
         # tableframe = LabelFrame(self.scroll_window, text='Video Name', labelanchor=NW)
 
+        self.image_data = ROI_image_class(
+            self.config_path,
+            self.named_shape_colors,
+            self.duplicate_jump_size,
+            self.line_type,
+            self.click_sens,
+            self.text_size,
+            self.text_thickness,
+        )
         for i in range(len(self.filesFound)):
             self.row.append(
                 roitableRow(
+                    self.image_data,
                     tableframe,
                     self.video_dir,
                     str(self.filesFound[i]),
@@ -66,8 +86,9 @@ class ROI_menu:
 
 class roitableRow(Frame):
     def __init__(
-        self, parent=None, dirname="", filename="", widths="", indexs="", projectini=""
+            self, image_data: ROI_image, parent=None, dirname="", filename="", widths="", indexs="", projectini=""
     ):
+        self.image_data = image_data
         self.projectini = projectini
         self.filename = os.path.join(dirname, filename)
         Frame.__init__(self, master=parent)
@@ -85,7 +106,7 @@ class roitableRow(Frame):
         self.btnapplyall.grid(row=0, column=4)
 
     def draw(self):
-        ROI_definitions(self.projectini, self.filename)
+        ROI_definitions(self.projectini, self.filename, self.image_data)
 
     def reset(self):
         reset_video_ROIs(self.projectini, self.filename)
