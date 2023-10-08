@@ -96,6 +96,15 @@ Mutual exclusivity refactorer
    :members:
    :show-inheritance:
 
+
+Boolean conditional calculator
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.boolean_conditional_calculator
+   :members:
+   :show-inheritance:
+
+
 Gibbs sampling
 ------------------------------------------------------------
 
