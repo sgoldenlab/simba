@@ -766,15 +766,15 @@ class TrainModelMixin(object):
            .. image:: _static/img/shap.png
               :width: 400
               :align: center
+           
+           .. math::
+           \phi_i(f, x) = \\sum_{S \\subseteq F \\setminus {i}} \\frac{|S|!(|F| - |S| - 1)!}{|F|!} (f_{S \cup {i}}(x_{S \\cup {i}}) - f_S(x_S))
+
 
         .. note::
            For improved run-times, use multiprocessing through :meth:`simba.mixins.train_model_mixins.TrainModelMixin.create_shap_log_mp`
 
 
-        .. math::
-           :align: center
-
-           \phi_i(f, x) = \\sum_{S \\subseteq F \\setminus {i}} \\frac{|S|!(|F| - |S| - 1)!}{|F|!} (f_{S \cup {i}}(x_{S \\cup {i}}) - f_S(x_S))
 
         :param str ini_file_path: Path to the SimBA project_config.ini
         :param RandomForestClassifier rf_clf: sklearn random forest classifier
