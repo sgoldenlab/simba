@@ -1,5 +1,6 @@
-from numba import njit, prange
 import numpy as np
+from numba import njit, prange
+
 
 class TimeseriesFeatureMixin(object):
 
@@ -11,7 +12,7 @@ class TimeseriesFeatureMixin(object):
         pass
 
     @staticmethod
-    @njit('(float32[:],)')
+    @njit("(float32[:],)")
     def hjort_parameters(data: np.ndarray):
         """
         Jitted compute of Hjorth parameters for a given time series data. Hjorth parameters describe
@@ -51,7 +52,7 @@ class TimeseriesFeatureMixin(object):
         return activity, mobility, complexity
 
     @staticmethod
-    @njit('(float32[:], boolean)')
+    @njit("(float32[:], boolean)")
     def local_maxima_minima(data: np.ndarray, maxima: bool) -> np.ndarray:
         """
         Jitted compute of the local maxima or minima defined as values which are higher or lower than immediately preceding and proceeding time-series neighbors, repectively.
@@ -97,7 +98,7 @@ class TimeseriesFeatureMixin(object):
         return results[np.argwhere(results[:, 0].T != -1).flatten()]
 
     @staticmethod
-    @njit('(float32[:], float64)')
+    @njit("(float32[:], float64)")
     def crossings(data: np.ndarray, val: float) -> int:
         """
         Jitted compute of the count in time-series where sequential values crosses a defined value.
@@ -130,8 +131,10 @@ class TimeseriesFeatureMixin(object):
         return cnt
 
     @staticmethod
-    @njit('(float32[:], int64, int64, )', cache=True, fastmath=True)
-    def percentile_difference(data: np.ndarray, upper_pct: int, lower_pct: int) -> float:
+    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
+    def percentile_difference(
+        data: np.ndarray, upper_pct: int, lower_pct: int
+    ) -> float:
         """
         Jitted compute of the difference between the ``upper`` and ``lower`` percentiles of the data as
         a percentage of the median value.
@@ -155,11 +158,13 @@ class TimeseriesFeatureMixin(object):
 
         """
 
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
+            data, lower_pct
+        )
         return np.abs(upper_val - lower_val) / np.median(data)
 
     @staticmethod
-    @njit('(float32[:], float64,)', cache=True, fastmath=True)
+    @njit("(float32[:], float64,)", cache=True, fastmath=True)
     def percent_beyond_n_std(data: np.ndarray, n: float) -> float:
         """
         Jitted compute of the ratio of values in time-series more than N standard deviations from the mean of the time-series.
@@ -187,7 +192,7 @@ class TimeseriesFeatureMixin(object):
         return np.argwhere(np.abs(data) > target).shape[0] / data.shape[0]
 
     @staticmethod
-    @njit('(float32[:], int64, int64, )', cache=True, fastmath=True)
+    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
     def percent_in_percentile_window(data: np.ndarray, upper_pct: int, lower_pct: int):
         """
         Jitted compute of the ratio of values in time-series that fall between the ``upper`` and ``lower`` percentile.
@@ -211,5 +216,10 @@ class TimeseriesFeatureMixin(object):
            :align: center
         """
 
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
-        return np.argwhere((data <= upper_val) & (data >= lower_val)).flatten().shape[0] / data.shape[0]
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
+            data, lower_pct
+        )
+        return (
+            np.argwhere((data <= upper_val) & (data >= lower_val)).flatten().shape[0]
+            / data.shape[0]
+        )
