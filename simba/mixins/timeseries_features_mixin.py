@@ -35,7 +35,7 @@ class TimeseriesFeatureMixin(object):
 
         :math:`mobility = \sqrt{\\frac{dx_{var}}{x_{var}}}`
 
-        :math:`complexity = \sqrt{\\frac{ddx_{var}}{dx_{var}} / mobility}
+        :math:`complexity = \sqrt{\\frac{ddx_{var}}{dx_{var}} / mobility}`
         """
 
         def diff(x):
