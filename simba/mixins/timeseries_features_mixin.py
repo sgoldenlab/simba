@@ -1,6 +1,5 @@
-import numpy as np
 from numba import njit, prange
-
+import numpy as np
 
 class TimeseriesFeatureMixin(object):
 
@@ -12,7 +11,7 @@ class TimeseriesFeatureMixin(object):
         pass
 
     @staticmethod
-    @njit("(float32[:],)")
+    @njit('(float32[:],)')
     def hjort_parameters(data: np.ndarray):
         """
         Jitted compute of Hjorth parameters for a given time series data. Hjorth parameters describe
@@ -53,7 +52,7 @@ class TimeseriesFeatureMixin(object):
         return activity, mobility, complexity
 
     @staticmethod
-    @njit("(float32[:], boolean)")
+    @njit('(float32[:], boolean)')
     def local_maxima_minima(data: np.ndarray, maxima: bool) -> np.ndarray:
         """
         Jitted compute of the local maxima or minima defined as values which are higher or lower than immediately preceding and proceeding time-series neighbors, repectively.
@@ -99,7 +98,7 @@ class TimeseriesFeatureMixin(object):
         return results[np.argwhere(results[:, 0].T != -1).flatten()]
 
     @staticmethod
-    @njit("(float32[:], float64)")
+    @njit('(float32[:], float64)')
     def crossings(data: np.ndarray, val: float) -> int:
         """
         Jitted compute of the count in time-series where sequential values crosses a defined value.
@@ -132,10 +131,8 @@ class TimeseriesFeatureMixin(object):
         return cnt
 
     @staticmethod
-    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
-    def percentile_difference(
-        data: np.ndarray, upper_pct: int, lower_pct: int
-    ) -> float:
+    @njit('(float32[:], int64, int64, )', cache=True, fastmath=True)
+    def percentile_difference(data: np.ndarray, upper_pct: int, lower_pct: int) -> float:
         """
         Jitted compute of the difference between the ``upper`` and ``lower`` percentiles of the data as
         a percentage of the median value.
@@ -159,13 +156,11 @@ class TimeseriesFeatureMixin(object):
 
         """
 
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
-            data, lower_pct
-        )
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
         return np.abs(upper_val - lower_val) / np.median(data)
 
     @staticmethod
-    @njit("(float32[:], float64,)", cache=True, fastmath=True)
+    @njit('(float32[:], float64,)', cache=True, fastmath=True)
     def percent_beyond_n_std(data: np.ndarray, n: float) -> float:
         """
         Jitted compute of the ratio of values in time-series more than N standard deviations from the mean of the time-series.
@@ -193,7 +188,7 @@ class TimeseriesFeatureMixin(object):
         return np.argwhere(np.abs(data) > target).shape[0] / data.shape[0]
 
     @staticmethod
-    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
+    @njit('(float32[:], int64, int64, )', cache=True, fastmath=True)
     def percent_in_percentile_window(data: np.ndarray, upper_pct: int, lower_pct: int):
         """
         Jitted compute of the ratio of values in time-series that fall between the ``upper`` and ``lower`` percentile.
@@ -217,10 +212,89 @@ class TimeseriesFeatureMixin(object):
            :align: center
         """
 
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
-            data, lower_pct
-        )
-        return (
-            np.argwhere((data <= upper_val) & (data >= lower_val)).flatten().shape[0]
-            / data.shape[0]
-        )
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
+        return np.argwhere((data <= upper_val) & (data >= lower_val)).flatten().shape[0] / data.shape[0]
+
+    @staticmethod
+    @njit('(float32[:],)', fastmath=True, cache=True)
+    def petrosian_fractal_dimension(data: np.ndarray) -> float:
+        """
+        Calculate the Petrosian Fractal Dimension (PFD) of a given time series data. The PFD is a measure of the
+        irregularity or self-similarity of a time series. Larger values indicate higher complexity. Lower values indicate lower complexity.
+
+        :parameter np.ndarray data: A 1-dimensional numpy array containing the time series data.
+        :returns float: The Petrosian Fractal Dimension of the input time series.
+
+        .. note::
+           - The PFD is computed based on the number of sign changes in the first derivative of the time series.
+           - If the input data is empty or no sign changes are found, the PFD is returned as -1.0.
+           - Adapted from `eeglib <https://github.com/Xiul109/eeglib/>`_.
+
+        .. math::
+           PFD = \\frac{\\log_{10}(N)}{\\log_{10}(N) + \\log_{10}\\left(\\frac{N}{N + 0.4 \\cdot zC}\\right)}
+
+        :examples:
+        >>> t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
+        >>> sine_wave = 1.0 * np.sin(2 * np.pi * 1.0 * t).astype(np.float32)
+        >>> TimeseriesFeatureMixin().petrosian_fractal_dimension(data=sine_wave)
+        >>> 1.0000398187022719
+        >>> np.random.shuffle(sine_wave)
+        >>> TimeseriesFeatureMixin().petrosian_fractal_dimension(data=sine_wave)
+        >>> 1.0211625348743218
+        """
+
+        data = (data - np.min(data)) / (np.max(data) - np.min(data))
+        derivative = data[1:] - data[:-1]
+        zC = TimeseriesFeatureMixin().crossings(data=derivative, val=0.0)
+        if data.shape[0] == 0 or zC == 0:
+            return -1.0
+
+        return np.log10(data.shape[0]) / (
+                    np.log10(data.shape[0]) + np.log10(data.shape[0] / (data.shape[0] + 0.4 * zC)))
+
+    @staticmethod
+    @njit('(float32[:], int64)')
+    def higuchi_fractal_dimension(data: np.ndarray, kmax: int = 10):
+        """
+        Jitted compute of the Higuchi Fractal Dimension of a given time series data. The Higuchi Fractal Dimension provides a measure of the fractal
+        complexity of a time series.
+
+        The maximum value of k used in the calculation. Increasing kmax considers longer sequences
+            of data, providing a more detailed analysis of fractal complexity. Default is 10.
+
+        :parameter np.ndarray data: A 1-dimensional numpy array containing the time series data.
+        :parameter int kmax: The maximum value of k used in the calculation. Increasing kmax considers longer sequences of data, providing a more detailed analysis of fractal complexity. Default is 10.
+        :returns float: The Higuchi Fractal Dimension of the input time series.
+
+        .. note::
+           - Adapted from `eeglib <https://github.com/Xiul109/eeglib/>`_.
+
+        .. math::
+           HFD = \\frac{\\log(N)}{\\log(N) + \\log\\left(\\frac{N}{N + 0.4 \\cdot zC}\\right)}
+
+        :example:
+        >>> t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
+        >>> sine_wave = 1.0 * np.sin(2 * np.pi * 1.0 * t).astype(np.float32)
+        >>> sine_wave = (sine_wave - np.min(sine_wave)) / (np.max(sine_wave) - np.min(sine_wave))
+        >>> TimeseriesFeatureMixin().higuchi_fractal_dimension(data=data, kmax=10)
+        >>> 1.0001506805419922
+        >>> np.random.shuffle(sine_wave)
+        >>> TimeseriesFeatureMixin().higuchi_fractal_dimension(data=data, kmax=10)
+        >>> 1.9996402263641357
+        """
+
+        L, N = np.zeros(kmax - 1), len(data)
+        x = np.hstack((-np.log(np.arange(2, kmax + 1)).reshape(-1, 1).astype(np.float32),
+                       np.ones(kmax - 1).reshape(-1, 1).astype(np.float32)))
+        for k in prange(2, kmax + 1):
+            Lk = np.zeros(k)
+            for m in range(0, k):
+                Lmk = 0
+                for i in range(1, (N - m) // k):
+                    Lmk += abs(data[m + i * k] - data[m + i * k - k])
+                Lk[m] = Lmk * (N - 1) / (((N - m) // k) * k * k)
+            Laux = np.mean(Lk)
+            Laux = 0.01 / k if Laux == 0 else Laux
+            L[k - 2] = np.log(Laux)
+
+        return np.linalg.lstsq(x, L.astype(np.float32))[0][0]
