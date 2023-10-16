@@ -1,10 +1,12 @@
-from numba import njit, prange, types, typed
-from numba.typed import List
 import numpy as np
+from numba import njit, prange, typed, types
+from numba.typed import List
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 
 class TimeseriesFeatureMixin(object):
 
@@ -27,7 +29,7 @@ class TimeseriesFeatureMixin(object):
         pass
 
     @staticmethod
-    @njit('(float32[:],)')
+    @njit("(float32[:],)")
     def hjort_parameters(data: np.ndarray):
         """
         Jitted compute of Hjorth parameters for a given time series data. Hjorth parameters describe
@@ -68,10 +70,10 @@ class TimeseriesFeatureMixin(object):
         return activity, mobility, complexity
 
     @staticmethod
-    @njit('(float32[:], float64[:], int64)')
-    def sliding_hjort_parameters(data: np.ndarray,
-                                 window_sizes: np.ndarray,
-                                 sample_rate: int) -> np.ndarray:
+    @njit("(float32[:], float64[:], int64)")
+    def sliding_hjort_parameters(
+        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
         """
         Jitted compute of Hjorth parameters, including mobility, complexity, and activity, for
         sliding windows of varying sizes applied to the input data array.
@@ -88,7 +90,9 @@ class TimeseriesFeatureMixin(object):
         results = np.full((3, data.shape[0], window_sizes.shape[0]), -1.0)
         for i in range(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+            for l, r in zip(
+                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+            ):
                 sample = data[l:r]
                 dx = sample[1:] - sample[:-1]
                 ddx = dx[1:] - dx[:-1]
@@ -104,7 +108,7 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit('(float32[:], boolean)')
+    @njit("(float32[:], boolean)")
     def local_maxima_minima(data: np.ndarray, maxima: bool) -> np.ndarray:
         """
         Jitted compute of the local maxima or minima defined as values which are higher or lower than immediately preceding and proceeding time-series neighbors, repectively.
@@ -149,7 +153,7 @@ class TimeseriesFeatureMixin(object):
         return results[np.argwhere(results[:, 0].T != -1).flatten()]
 
     @staticmethod
-    @njit('(float32[:], float64)')
+    @njit("(float32[:], float64)")
     def crossings(data: np.ndarray, val: float) -> int:
         """
         Jitted compute of the count in time-series where sequential values crosses a defined value.
@@ -182,11 +186,10 @@ class TimeseriesFeatureMixin(object):
         return cnt
 
     @staticmethod
-    @njit('(float32[:], float64,  float64[:], int64,)')
-    def sliding_crossings(data: np.ndarray,
-                          val: float,
-                          window_sizes: np.ndarray,
-                          sample_rate: int) -> np.ndarray:
+    @njit("(float32[:], float64,  float64[:], int64,)")
+    def sliding_crossings(
+        data: np.ndarray, val: float, window_sizes: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
         """
         Compute the number of crossings over sliding windows in a data array.
 
@@ -203,7 +206,9 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+            for l, r in zip(
+                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+            ):
                 sample = data[l:r]
                 cnt, last_val = 0, -1
                 if sample[0] > val:
@@ -220,8 +225,10 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.int32)
 
     @staticmethod
-    @njit('(float32[:], int64, int64, )', cache=True, fastmath=True)
-    def percentile_difference(data: np.ndarray, upper_pct: int, lower_pct: int) -> float:
+    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
+    def percentile_difference(
+        data: np.ndarray, upper_pct: int, lower_pct: int
+    ) -> float:
         """
         Jitted compute of the difference between the ``upper`` and ``lower`` percentiles of the data as
         a percentage of the median value.
@@ -245,16 +252,20 @@ class TimeseriesFeatureMixin(object):
 
         """
 
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
+            data, lower_pct
+        )
         return np.abs(upper_val - lower_val) / np.median(data)
 
     @staticmethod
-    @njit('(float32[:], int64, int64, float64[:], int64, )', cache=True, fastmath=True)
-    def sliding_percentile_difference(data: np.ndarray,
-                                      upper_pct: int,
-                                      lower_pct: int,
-                                      window_sizes: np.ndarray,
-                                      sample_rate: int) -> np.ndarray:
+    @njit("(float32[:], int64, int64, float64[:], int64, )", cache=True, fastmath=True)
+    def sliding_percentile_difference(
+        data: np.ndarray,
+        upper_pct: int,
+        lower_pct: int,
+        window_sizes: np.ndarray,
+        sample_rate: int,
+    ) -> np.ndarray:
         """
         Jitted computes the difference between the upper and lower percentiles within a sliding window for each position
         in the time series using various window sizes. It returns a 2D array where each row corresponds to a position in the time series,
@@ -271,9 +282,13 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+            for l, r in zip(
+                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+            ):
                 sample = data[l:r]
-                upper_val, lower_val = np.percentile(sample, upper_pct), np.percentile(sample, lower_pct)
+                upper_val, lower_val = np.percentile(sample, upper_pct), np.percentile(
+                    sample, lower_pct
+                )
                 median = np.median(sample)
                 if median != 0:
                     results[r - 1, i] = np.abs(upper_val - lower_val) / median
@@ -283,7 +298,7 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit('(float32[:], float64,)', cache=True, fastmath=True)
+    @njit("(float32[:], float64,)", cache=True, fastmath=True)
     def percent_beyond_n_std(data: np.ndarray, n: float) -> float:
         """
         Jitted compute of the ratio of values in time-series more than N standard deviations from the mean of the time-series.
@@ -310,12 +325,10 @@ class TimeseriesFeatureMixin(object):
         return np.argwhere(np.abs(data) > target).shape[0] / data.shape[0]
 
     @staticmethod
-    @njit('(float32[:], float64, float64[:], int64,)', cache=True, fastmath=True)
-    def sliding_percent_beyond_n_std(data: np.ndarray,
-                                     n: float,
-                                     window_sizes: np.ndarray,
-                                     sample_rate: int) -> np.ndarray:
-
+    @njit("(float32[:], float64, float64[:], int64,)", cache=True, fastmath=True)
+    def sliding_percent_beyond_n_std(
+        data: np.ndarray, n: float, window_sizes: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
         """
         Computed the percentage of data points that exceed 'n' standard deviations from the mean for each position in
         the time series using various window sizes. It returns a 2D array where each row corresponds to a position in the time series,
@@ -332,14 +345,18 @@ class TimeseriesFeatureMixin(object):
         target = (np.std(data) * n) + np.mean(data)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+            for l, r in zip(
+                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+            ):
                 sample = data[l:r]
-                results[r - 1, i] = np.argwhere(np.abs(sample) > target).shape[0] / sample.shape[0]
+                results[r - 1, i] = (
+                    np.argwhere(np.abs(sample) > target).shape[0] / sample.shape[0]
+                )
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit('(float32[:], int64, int64, )', cache=True, fastmath=True)
+    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
     def percent_in_percentile_window(data: np.ndarray, upper_pct: int, lower_pct: int):
         """
         Jitted compute of the ratio of values in time-series that fall between the ``upper`` and ``lower`` percentile.
@@ -363,16 +380,23 @@ class TimeseriesFeatureMixin(object):
            :align: center
         """
 
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
-        return np.argwhere((data <= upper_val) & (data >= lower_val)).flatten().shape[0] / data.shape[0]
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
+            data, lower_pct
+        )
+        return (
+            np.argwhere((data <= upper_val) & (data >= lower_val)).flatten().shape[0]
+            / data.shape[0]
+        )
 
     @staticmethod
-    @njit('(float32[:], int64, int64, float64[:], int64)', cache=True, fastmath=True)
-    def sliding_percent_in_percentile_window(data: np.ndarray,
-                                             upper_pct: int,
-                                             lower_pct: int,
-                                             window_sizes: np.ndarray,
-                                             sample_rate: int):
+    @njit("(float32[:], int64, int64, float64[:], int64)", cache=True, fastmath=True)
+    def sliding_percent_in_percentile_window(
+        data: np.ndarray,
+        upper_pct: int,
+        lower_pct: int,
+        window_sizes: np.ndarray,
+        sample_rate: int,
+    ):
         """
         Jitted compute of the percentage of data points falling within a percentile window in a sliding manner.
 
@@ -389,17 +413,26 @@ class TimeseriesFeatureMixin(object):
 
         """
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
+            data, lower_pct
+        )
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+            for l, r in zip(
+                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+            ):
                 sample = data[l:r]
-                results[r - 1, i] = np.argwhere((sample <= upper_val) & (sample >= lower_val)).flatten().shape[0] / sample.shape[0]
+                results[r - 1, i] = (
+                    np.argwhere((sample <= upper_val) & (sample >= lower_val))
+                    .flatten()
+                    .shape[0]
+                    / sample.shape[0]
+                )
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit('(float32[:],)', fastmath=True, cache=True)
+    @njit("(float32[:],)", fastmath=True, cache=True)
     def petrosian_fractal_dimension(data: np.ndarray) -> float:
         """
         Calculate the Petrosian Fractal Dimension (PFD) of a given time series data. The PFD is a measure of the
@@ -443,13 +476,16 @@ class TimeseriesFeatureMixin(object):
         if zC == 0:
             return -1.0
 
-        return np.log10(data.shape[0]) / (np.log10(data.shape[0]) + np.log10(data.shape[0] / (data.shape[0] + 0.4 * zC)))
+        return np.log10(data.shape[0]) / (
+            np.log10(data.shape[0])
+            + np.log10(data.shape[0] / (data.shape[0] + 0.4 * zC))
+        )
 
     @staticmethod
-    @njit('(float32[:], float64[:], int64)', fastmath=True, cache=True)
-    def sliding_petrosian_fractal_dimension(data: np.ndarray,
-                                            window_sizes: np.ndarray,
-                                            sample_rate: int) -> np.ndarray:
+    @njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
+    def sliding_petrosian_fractal_dimension(
+        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
         """
         Jitted compute of Petrosian Fractal Dimension over sliding windows in a data array.
 
@@ -467,8 +503,12 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
-                sample = (data[l:r] - np.min(data[l:r])) / (np.max(data[l:r]) - np.min(data[l:r]))
+            for l, r in zip(
+                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+            ):
+                sample = (data[l:r] - np.min(data[l:r])) / (
+                    np.max(data[l:r]) - np.min(data[l:r])
+                )
                 derivative = sample[1:] - sample[:-1]
                 if derivative.shape[0] == 0:
                     results[r - 1, i] = -1.0
@@ -486,13 +526,15 @@ class TimeseriesFeatureMixin(object):
                     if zC == 0:
                         results[r - 1, i] = -1.0
                     else:
-                        results[r - 1, i] = np.log10(sample.shape[0]) / (np.log10(sample.shape[0]) + np.log10(
-                            sample.shape[0] / (sample.shape[0] + 0.4 * zC)))
+                        results[r - 1, i] = np.log10(sample.shape[0]) / (
+                            np.log10(sample.shape[0])
+                            + np.log10(sample.shape[0] / (sample.shape[0] + 0.4 * zC))
+                        )
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit('(float32[:], int64)')
+    @njit("(float32[:], int64)")
     def higuchi_fractal_dimension(data: np.ndarray, kmax: int = 10):
         """
         Jitted compute of the Higuchi Fractal Dimension of a given time series data. The Higuchi Fractal Dimension provides a measure of the fractal
@@ -523,8 +565,12 @@ class TimeseriesFeatureMixin(object):
         """
 
         L, N = np.zeros(kmax - 1), len(data)
-        x = np.hstack((-np.log(np.arange(2, kmax + 1)).reshape(-1, 1).astype(np.float32),
-                       np.ones(kmax - 1).reshape(-1, 1).astype(np.float32)))
+        x = np.hstack(
+            (
+                -np.log(np.arange(2, kmax + 1)).reshape(-1, 1).astype(np.float32),
+                np.ones(kmax - 1).reshape(-1, 1).astype(np.float32),
+            )
+        )
         for k in prange(2, kmax + 1):
             Lk = np.zeros(k)
             for m in range(0, k):
@@ -539,9 +585,8 @@ class TimeseriesFeatureMixin(object):
         return np.linalg.lstsq(x, L.astype(np.float32))[0][0]
 
     @staticmethod
-    @njit('(float32[:], int64, int64,)', fastmath=True)
+    @njit("(float32[:], int64, int64,)", fastmath=True)
     def permutation_entropy(data: np.ndarray, dimension: int, delay: int) -> float:
-
         """
         Calculate the permutation entropy of a time series.
 
@@ -603,7 +648,7 @@ class TimeseriesFeatureMixin(object):
         return -np.sum(probs * np.log(probs))
 
     @staticmethod
-    @njit('(float32[:],)', fastmath=True)
+    @njit("(float32[:],)", fastmath=True)
     def line_length(data: np.ndarray) -> float:
         """
         Calculate the line length of a 1D array.
@@ -639,11 +684,10 @@ class TimeseriesFeatureMixin(object):
         return np.sum(diff[1:])
 
     @staticmethod
-    @njit('(float32[:], float64[:], int64)', fastmath=True)
-    def sliding_line_length(data: np.ndarray,
-                            window_sizes: np.ndarray,
-                            sample_rate: int) -> np.ndarray:
-
+    @njit("(float32[:], float64[:], int64)", fastmath=True)
+    def sliding_line_length(
+        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
         """
         Jitted compute of  sliding line length for a given time series using different window sizes.
 
@@ -668,16 +712,16 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+            for l, r in zip(
+                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+            ):
                 sample = data[l:r]
                 results[r - 1, i] = np.sum(np.abs(np.diff(sample.astype(np.float64))))
         return results.astype(np.float32)
-    
+
     @staticmethod
-    @njit('(float32[:], float64[:], int64)', fastmath=True, cache=True)
-    def sliding_variance(data: np.ndarray,
-                         window_sizes: np.ndarray,
-                         sample_rate: int):
+    @njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
+    def sliding_variance(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int):
         """
         Jitted compute of the variance of data within sliding windows of varying sizes applied to
         the input data array. Variance is a measure of data dispersion or spread.
@@ -691,19 +735,28 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
-                sample = (data[l:r] - np.min(data[l:r])) / (np.max(data[l:r]) - np.min(data[l:r]))
+            for l, r in zip(
+                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+            ):
+                sample = (data[l:r] - np.min(data[l:r])) / (
+                    np.max(data[l:r]) - np.min(data[l:r])
+                )
                 results[r - 1, i] = np.var(sample)
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit('(float32[:], float64[:], int64, types.ListType(types.unicode_type))', fastmath=True, cache=True)
-    def sliding_descriptive_statistics(data: np.ndarray,
-                                       window_sizes: np.ndarray,
-                                       sample_rate: int,
-                                       statistics: Literal['var', 'max', 'min', 'std', 'median', 'mean', 'mad']):
-
+    @njit(
+        "(float32[:], float64[:], int64, types.ListType(types.unicode_type))",
+        fastmath=True,
+        cache=True,
+    )
+    def sliding_descriptive_statistics(
+        data: np.ndarray,
+        window_sizes: np.ndarray,
+        sample_rate: int,
+        statistics: Literal["var", "max", "min", "std", "median", "mean", "mad"],
+    ):
         """
         Jitted compute of descriptive statistics over sliding windows in 1D data array.
 
@@ -732,44 +785,50 @@ class TimeseriesFeatureMixin(object):
         for j in prange(len(statistics)):
             for i in prange(window_sizes.shape[0]):
                 window_size = int(window_sizes[i] * sample_rate)
-                for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+                for l, r in zip(
+                    prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
+                ):
                     sample = data[l:r]
-                    if statistics[j] == 'var':
+                    if statistics[j] == "var":
                         results[j, r - 1, i] = np.var(sample)
-                    elif statistics[j] == 'max':
+                    elif statistics[j] == "max":
                         results[j, r - 1, i] = np.max(sample)
-                    elif statistics[j] == 'min':
+                    elif statistics[j] == "min":
                         results[j, r - 1, i] = np.min(sample)
-                    elif statistics[j] == 'std':
+                    elif statistics[j] == "std":
                         results[j, r - 1, i] = np.std(sample)
-                    elif statistics[j] == 'median':
+                    elif statistics[j] == "median":
                         results[j, r - 1, i] = np.median(sample)
-                    elif statistics[j] == 'mean':
+                    elif statistics[j] == "mean":
                         results[j, r - 1, i] = np.mean(sample)
-                    elif statistics[j] == 'mad':
-                        results[j, r - 1, i] = np.median(np.abs(sample - np.median(sample)))
+                    elif statistics[j] == "mad":
+                        results[j, r - 1, i] = np.median(
+                            np.abs(sample - np.median(sample))
+                        )
 
         return results.astype(np.float32)
 
     @staticmethod
-    def dominant_frequencies(data: np.ndarray,
-                             fps: float,
-                             k: int,
-                             window_function: Literal['Hann', 'Hamming', 'Blackman'] = None):
+    def dominant_frequencies(
+        data: np.ndarray,
+        fps: float,
+        k: int,
+        window_function: Literal["Hann", "Hamming", "Blackman"] = None,
+    ):
+        """Find the K dominant frequencies within a feature vector"""
 
-        """ Find the K dominant frequencies within a feature vector """
-
-        if window_function == 'Hann':
+        if window_function == "Hann":
             data = data * np.hanning(len(data))
-        elif window_function == 'Hamming':
+        elif window_function == "Hamming":
             data = data * np.hamming(len(data))
-        elif window_function == 'Blackman':
+        elif window_function == "Blackman":
             data = data * np.blackman(len(data))
         fft_result = np.fft.fft(data)
         frequencies = np.fft.fftfreq(data.shape[0], 1 / fps)
         magnitude = np.abs(fft_result)
 
-        return frequencies[np.argsort(magnitude)[-(k + 1):-1]]
+        return frequencies[np.argsort(magnitude)[-(k + 1) : -1]]
+
 
 # t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
 # sine_wave = 1.0 * np.sin(2 * np.pi * 1.0 * t).astype(np.float32)
