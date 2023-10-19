@@ -1,14 +1,12 @@
 __author__ = "Simon Nilsson"
 
+from numba import njit, prange, types, typed, jit
+from numba.typed import List, Dict
 import numpy as np
-from numba import njit, prange, typed, types
-from numba.typed import List
-
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-
 
 class TimeseriesFeatureMixin(object):
 
@@ -33,7 +31,7 @@ class TimeseriesFeatureMixin(object):
         pass
 
     @staticmethod
-    @njit("(float32[:],)")
+    @njit('(float32[:],)')
     def hjort_parameters(data: np.ndarray):
         """
         Jitted compute of Hjorth parameters for a given time series data. Hjorth parameters describe
@@ -74,10 +72,10 @@ class TimeseriesFeatureMixin(object):
         return activity, mobility, complexity
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)")
-    def sliding_hjort_parameters(
-        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    @njit('(float32[:], float64[:], int64)')
+    def sliding_hjort_parameters(data: np.ndarray,
+                                 window_sizes: np.ndarray,
+                                 sample_rate: int) -> np.ndarray:
         """
         Jitted compute of Hjorth parameters, including mobility, complexity, and activity, for
         sliding windows of varying sizes applied to the input data array.
@@ -94,9 +92,7 @@ class TimeseriesFeatureMixin(object):
         results = np.full((3, data.shape[0], window_sizes.shape[0]), -1.0)
         for i in range(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l:r]
                 dx = sample[1:] - sample[:-1]
                 ddx = dx[1:] - dx[:-1]
@@ -112,7 +108,7 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], boolean)")
+    @njit('(float32[:], boolean)')
     def local_maxima_minima(data: np.ndarray, maxima: bool) -> np.ndarray:
         """
         Jitted compute of the local maxima or minima defined as values which are higher or lower than immediately preceding and proceeding time-series neighbors, repectively.
@@ -157,7 +153,7 @@ class TimeseriesFeatureMixin(object):
         return results[np.argwhere(results[:, 0].T != -1).flatten()]
 
     @staticmethod
-    @njit("(float32[:], float64)")
+    @njit('(float32[:], float64)')
     def crossings(data: np.ndarray, val: float) -> int:
         """
         Jitted compute of the count in time-series where sequential values crosses a defined value.
@@ -190,10 +186,11 @@ class TimeseriesFeatureMixin(object):
         return cnt
 
     @staticmethod
-    @njit("(float32[:], float64,  float64[:], int64,)")
-    def sliding_crossings(
-        data: np.ndarray, val: float, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    @njit('(float32[:], float64,  float64[:], int64,)')
+    def sliding_crossings(data: np.ndarray,
+                          val: float,
+                          window_sizes: np.ndarray,
+                          sample_rate: int) -> np.ndarray:
         """
         Compute the number of crossings over sliding windows in a data array.
 
@@ -210,9 +207,7 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l:r]
                 cnt, last_val = 0, -1
                 if sample[0] > val:
@@ -229,10 +224,8 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.int32)
 
     @staticmethod
-    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
-    def percentile_difference(
-        data: np.ndarray, upper_pct: int, lower_pct: int
-    ) -> float:
+    @njit('(float32[:], int64, int64, )', cache=True, fastmath=True)
+    def percentile_difference(data: np.ndarray, upper_pct: int, lower_pct: int) -> float:
         """
         Jitted compute of the difference between the ``upper`` and ``lower`` percentiles of the data as
         a percentage of the median value.
@@ -256,20 +249,16 @@ class TimeseriesFeatureMixin(object):
 
         """
 
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
-            data, lower_pct
-        )
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
         return np.abs(upper_val - lower_val) / np.median(data)
 
     @staticmethod
-    @njit("(float32[:], int64, int64, float64[:], int64, )", cache=True, fastmath=True)
-    def sliding_percentile_difference(
-        data: np.ndarray,
-        upper_pct: int,
-        lower_pct: int,
-        window_sizes: np.ndarray,
-        sample_rate: int,
-    ) -> np.ndarray:
+    @njit('(float32[:], int64, int64, float64[:], int64, )', cache=True, fastmath=True)
+    def sliding_percentile_difference(data: np.ndarray,
+                                      upper_pct: int,
+                                      lower_pct: int,
+                                      window_sizes: np.ndarray,
+                                      sample_rate: int) -> np.ndarray:
         """
         Jitted computes the difference between the upper and lower percentiles within a sliding window for each position
         in the time series using various window sizes. It returns a 2D array where each row corresponds to a position in the time series,
@@ -286,13 +275,9 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l:r]
-                upper_val, lower_val = np.percentile(sample, upper_pct), np.percentile(
-                    sample, lower_pct
-                )
+                upper_val, lower_val = np.percentile(sample, upper_pct), np.percentile(sample, lower_pct)
                 median = np.median(sample)
                 if median != 0:
                     results[r - 1, i] = np.abs(upper_val - lower_val) / median
@@ -302,7 +287,7 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], float64,)", cache=True, fastmath=True)
+    @njit('(float32[:], float64,)', cache=True, fastmath=True)
     def percent_beyond_n_std(data: np.ndarray, n: float) -> float:
         """
         Jitted compute of the ratio of values in time-series more than N standard deviations from the mean of the time-series.
@@ -329,10 +314,12 @@ class TimeseriesFeatureMixin(object):
         return np.argwhere(np.abs(data) > target).shape[0] / data.shape[0]
 
     @staticmethod
-    @njit("(float32[:], float64, float64[:], int64,)", cache=True, fastmath=True)
-    def sliding_percent_beyond_n_std(
-        data: np.ndarray, n: float, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    @njit('(float32[:], float64, float64[:], int64,)', cache=True, fastmath=True)
+    def sliding_percent_beyond_n_std(data: np.ndarray,
+                                     n: float,
+                                     window_sizes: np.ndarray,
+                                     sample_rate: int) -> np.ndarray:
+
         """
         Computed the percentage of data points that exceed 'n' standard deviations from the mean for each position in
         the time series using various window sizes. It returns a 2D array where each row corresponds to a position in the time series,
@@ -349,18 +336,14 @@ class TimeseriesFeatureMixin(object):
         target = (np.std(data) * n) + np.mean(data)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l:r]
-                results[r - 1, i] = (
-                    np.argwhere(np.abs(sample) > target).shape[0] / sample.shape[0]
-                )
+                results[r - 1, i] = np.argwhere(np.abs(sample) > target).shape[0] / sample.shape[0]
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
+    @njit('(float32[:], int64, int64, )', cache=True, fastmath=True)
     def percent_in_percentile_window(data: np.ndarray, upper_pct: int, lower_pct: int):
         """
         Jitted compute of the ratio of values in time-series that fall between the ``upper`` and ``lower`` percentile.
@@ -384,23 +367,16 @@ class TimeseriesFeatureMixin(object):
            :align: center
         """
 
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
-            data, lower_pct
-        )
-        return (
-            np.argwhere((data <= upper_val) & (data >= lower_val)).flatten().shape[0]
-            / data.shape[0]
-        )
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
+        return np.argwhere((data <= upper_val) & (data >= lower_val)).flatten().shape[0] / data.shape[0]
 
     @staticmethod
-    @njit("(float32[:], int64, int64, float64[:], int64)", cache=True, fastmath=True)
-    def sliding_percent_in_percentile_window(
-        data: np.ndarray,
-        upper_pct: int,
-        lower_pct: int,
-        window_sizes: np.ndarray,
-        sample_rate: int,
-    ):
+    @njit('(float32[:], int64, int64, float64[:], int64)', cache=True, fastmath=True)
+    def sliding_percent_in_percentile_window(data: np.ndarray,
+                                             upper_pct: int,
+                                             lower_pct: int,
+                                             window_sizes: np.ndarray,
+                                             sample_rate: int):
         """
         Jitted compute of the percentage of data points falling within a percentile window in a sliding manner.
 
@@ -417,26 +393,17 @@ class TimeseriesFeatureMixin(object):
 
         """
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
-            data, lower_pct
-        )
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l:r]
-                results[r - 1, i] = (
-                    np.argwhere((sample <= upper_val) & (sample >= lower_val))
-                    .flatten()
-                    .shape[0]
-                    / sample.shape[0]
-                )
+                results[r - 1, i] = np.argwhere((sample <= upper_val) & (sample >= lower_val)).flatten().shape[0] / sample.shape[0]
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:],)", fastmath=True, cache=True)
+    @njit('(float32[:],)', fastmath=True, cache=True)
     def petrosian_fractal_dimension(data: np.ndarray) -> float:
         """
         Calculate the Petrosian Fractal Dimension (PFD) of a given time series data. The PFD is a measure of the
@@ -480,16 +447,13 @@ class TimeseriesFeatureMixin(object):
         if zC == 0:
             return -1.0
 
-        return np.log10(data.shape[0]) / (
-            np.log10(data.shape[0])
-            + np.log10(data.shape[0] / (data.shape[0] + 0.4 * zC))
-        )
+        return np.log10(data.shape[0]) / (np.log10(data.shape[0]) + np.log10(data.shape[0] / (data.shape[0] + 0.4 * zC)))
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
-    def sliding_petrosian_fractal_dimension(
-        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    @njit('(float32[:], float64[:], int64)', fastmath=True, cache=True)
+    def sliding_petrosian_fractal_dimension(data: np.ndarray,
+                                            window_sizes: np.ndarray,
+                                            sample_rate: int) -> np.ndarray:
         """
         Jitted compute of Petrosian Fractal Dimension over sliding windows in a data array.
 
@@ -507,12 +471,8 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
-                sample = (data[l:r] - np.min(data[l:r])) / (
-                    np.max(data[l:r]) - np.min(data[l:r])
-                )
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+                sample = (data[l:r] - np.min(data[l:r])) / (np.max(data[l:r]) - np.min(data[l:r]))
                 derivative = sample[1:] - sample[:-1]
                 if derivative.shape[0] == 0:
                     results[r - 1, i] = -1.0
@@ -530,15 +490,13 @@ class TimeseriesFeatureMixin(object):
                     if zC == 0:
                         results[r - 1, i] = -1.0
                     else:
-                        results[r - 1, i] = np.log10(sample.shape[0]) / (
-                            np.log10(sample.shape[0])
-                            + np.log10(sample.shape[0] / (sample.shape[0] + 0.4 * zC))
-                        )
+                        results[r - 1, i] = np.log10(sample.shape[0]) / (np.log10(sample.shape[0]) + np.log10(
+                            sample.shape[0] / (sample.shape[0] + 0.4 * zC)))
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], int64)")
+    @njit('(float32[:], int64)')
     def higuchi_fractal_dimension(data: np.ndarray, kmax: int = 10):
         """
         Jitted compute of the Higuchi Fractal Dimension of a given time series data. The Higuchi Fractal Dimension provides a measure of the fractal
@@ -569,12 +527,8 @@ class TimeseriesFeatureMixin(object):
         """
 
         L, N = np.zeros(kmax - 1), len(data)
-        x = np.hstack(
-            (
-                -np.log(np.arange(2, kmax + 1)).reshape(-1, 1).astype(np.float32),
-                np.ones(kmax - 1).reshape(-1, 1).astype(np.float32),
-            )
-        )
+        x = np.hstack((-np.log(np.arange(2, kmax + 1)).reshape(-1, 1).astype(np.float32),
+                       np.ones(kmax - 1).reshape(-1, 1).astype(np.float32)))
         for k in prange(2, kmax + 1):
             Lk = np.zeros(k)
             for m in range(0, k):
@@ -589,8 +543,9 @@ class TimeseriesFeatureMixin(object):
         return np.linalg.lstsq(x, L.astype(np.float32))[0][0]
 
     @staticmethod
-    @njit("(float32[:], int64, int64,)", fastmath=True)
+    @njit('(float32[:], int64, int64,)', fastmath=True)
     def permutation_entropy(data: np.ndarray, dimension: int, delay: int) -> float:
+
         """
         Calculate the permutation entropy of a time series.
 
@@ -652,7 +607,7 @@ class TimeseriesFeatureMixin(object):
         return -np.sum(probs * np.log(probs))
 
     @staticmethod
-    @njit("(float32[:],)", fastmath=True)
+    @njit('(float32[:],)', fastmath=True)
     def line_length(data: np.ndarray) -> float:
         """
         Calculate the line length of a 1D array.
@@ -688,10 +643,11 @@ class TimeseriesFeatureMixin(object):
         return np.sum(diff[1:])
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)", fastmath=True)
-    def sliding_line_length(
-        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    @njit('(float32[:], float64[:], int64)', fastmath=True)
+    def sliding_line_length(data: np.ndarray,
+                            window_sizes: np.ndarray,
+                            sample_rate: int) -> np.ndarray:
+
         """
         Jitted compute of  sliding line length for a given time series using different window sizes.
 
@@ -716,16 +672,16 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l:r]
                 results[r - 1, i] = np.sum(np.abs(np.diff(sample.astype(np.float64))))
         return results.astype(np.float32)
-
+    
     @staticmethod
-    @njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
-    def sliding_variance(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int):
+    @njit('(float32[:], float64[:], int64)', fastmath=True, cache=True)
+    def sliding_variance(data: np.ndarray,
+                         window_sizes: np.ndarray,
+                         sample_rate: int):
         """
         Jitted compute of the variance of data within sliding windows of varying sizes applied to
         the input data array. Variance is a measure of data dispersion or spread.
@@ -739,40 +695,19 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
-                sample = (data[l:r] - np.min(data[l:r])) / (
-                    np.max(data[l:r]) - np.min(data[l:r])
-                )
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+                sample = (data[l:r] - np.min(data[l:r])) / (np.max(data[l:r]) - np.min(data[l:r]))
                 results[r - 1, i] = np.var(sample)
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit(
-        "(float32[:], float64[:], int64, types.ListType(types.unicode_type))",
-        fastmath=True,
-        cache=True,
-    )
-    def sliding_descriptive_statistics(
-        data: np.ndarray,
-        window_sizes: np.ndarray,
-        sample_rate: int,
-        statistics: Literal[
-            "var",
-            "max",
-            "min",
-            "std",
-            "median",
-            "mean",
-            "mad",
-            "sum",
-            "mac",
-            "rms",
-            "abs_energy",
-        ],
-    ):
+    @njit('(float32[:], float64[:], int64, types.ListType(types.unicode_type))', fastmath=True, cache=True)
+    def sliding_descriptive_statistics(data: np.ndarray,
+                                       window_sizes: np.ndarray,
+                                       sample_rate: int,
+                                       statistics: Literal['var', 'max', 'min', 'std', 'median', 'mean', 'mad', 'sum', 'mac', 'rms', 'abs_energy']):
+
         """
         Jitted compute of descriptive statistics over sliding windows in 1D data array.
 
@@ -802,61 +737,59 @@ class TimeseriesFeatureMixin(object):
         for j in prange(len(statistics)):
             for i in prange(window_sizes.shape[0]):
                 window_size = int(window_sizes[i] * sample_rate)
-                for l, r in zip(
-                    prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-                ):
+                for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                     sample = data[l:r]
-                    if statistics[j] == "var":
+                    if statistics[j] == 'var':
                         results[j, r - 1, i] = np.var(sample)
-                    elif statistics[j] == "max":
+                    elif statistics[j] == 'max':
                         results[j, r - 1, i] = np.max(sample)
-                    elif statistics[j] == "min":
+                    elif statistics[j] == 'min':
                         results[j, r - 1, i] = np.min(sample)
-                    elif statistics[j] == "std":
+                    elif statistics[j] == 'std':
                         results[j, r - 1, i] = np.std(sample)
-                    elif statistics[j] == "median":
+                    elif statistics[j] == 'median':
                         results[j, r - 1, i] = np.median(sample)
-                    elif statistics[j] == "mean":
+                    elif statistics[j] == 'mean':
                         results[j, r - 1, i] = np.mean(sample)
-                    elif statistics[j] == "mad":
-                        results[j, r - 1, i] = np.median(
-                            np.abs(sample - np.median(sample))
-                        )
-                    elif statistics[j] == "sum":
+                    elif statistics[j] == 'mad':
+                        results[j, r - 1, i] = np.median(np.abs(sample - np.median(sample)))
+                    elif statistics[j] == 'sum':
                         results[j, r - 1, i] = np.sum(sample)
-                    elif statistics[j] == "mac":
+                    elif statistics[j] == 'mac':
                         results[j, r - 1, i] = np.mean(np.abs(sample[1:] - sample[:-1]))
-                    elif statistics[j] == "rms":
-                        results[j, r - 1, i] = np.sqrt(np.mean(sample**2))
-                    elif statistics[j] == "abs_energy":
-                        results[j, r - 1, i] = np.sqrt(np.sum(sample**2))
+                    elif statistics[j] == 'rms':
+                        results[j, r - 1, i] = np.sqrt(np.mean(sample ** 2))
+                    elif statistics[j] == 'abs_energy':
+                        results[j, r - 1, i] = np.sqrt(np.sum(sample ** 2))
 
         return results.astype(np.float32)
 
     @staticmethod
-    def dominant_frequencies(
-        data: np.ndarray,
-        fps: float,
-        k: int,
-        window_function: Literal["Hann", "Hamming", "Blackman"] = None,
-    ):
-        """Find the K dominant frequencies within a feature vector"""
+    def dominant_frequencies(data: np.ndarray,
+                             fps: float,
+                             k: int,
+                             window_function: Literal['Hann', 'Hamming', 'Blackman'] = None):
 
-        if window_function == "Hann":
+        """ Find the K dominant frequencies within a feature vector """
+
+        if window_function == 'Hann':
             data = data * np.hanning(len(data))
-        elif window_function == "Hamming":
+        elif window_function == 'Hamming':
             data = data * np.hamming(len(data))
-        elif window_function == "Blackman":
+        elif window_function == 'Blackman':
             data = data * np.blackman(len(data))
         fft_result = np.fft.fft(data)
         frequencies = np.fft.fftfreq(data.shape[0], 1 / fps)
         magnitude = np.abs(fft_result)
 
-        return frequencies[np.argsort(magnitude)[-(k + 1) : -1]]
+        return frequencies[np.argsort(magnitude)[-(k + 1):-1]]
 
     @staticmethod
-    @njit("(float32[:], float64, boolean,)")
-    def longest_strike(data: np.ndarray, threshold: float, above: bool):
+    @njit('(float32[:], float64, boolean,)')
+    def longest_strike(data: np.ndarray,
+                       threshold: float,
+                       above: bool):
+
         """
         Jitted compute of the length of the longest consecutive sequence of values in the input data that either exceed
         or fall below a specified threshold.
@@ -888,22 +821,20 @@ class TimeseriesFeatureMixin(object):
                         cnt, r = cnt + 1, r + 1
 
             l += 1
-            if cnt > result:
-                result = cnt
+            if cnt > result: result = cnt
             if data.shape[0] - l < result:
                 break
             r, cnt = l, 0
         return result
 
     @staticmethod
-    @njit("(float32[:], float64, float64[:], int64, boolean,)")
-    def sliding_longest_strike(
-        data: np.ndarray,
-        threshold: float,
-        time_windows: np.ndarray,
-        sample_rate: int,
-        above: bool,
-    ) -> np.ndarray:
+    @njit('(float32[:], float64, float64[:], int64, boolean,)')
+    def sliding_longest_strike(data: np.ndarray,
+                               threshold: float,
+                               time_windows: np.ndarray,
+                               sample_rate: int,
+                               above: bool) -> np.ndarray:
+
         """
         Jitted compute of the length of the longest strike of values within sliding time windows that satisfy a given condition.
 
@@ -931,9 +862,7 @@ class TimeseriesFeatureMixin(object):
 
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * sample_rate)
-            for l1, r1 in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l1, r1 in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l1:r1]
                 result, l, r, cnt = -np.inf, 0, 0, 0
 
@@ -950,8 +879,7 @@ class TimeseriesFeatureMixin(object):
                                 cnt, r = cnt + 1, r + 1
 
                     l += 1
-                    if cnt > result:
-                        result = cnt
+                    if cnt > result: result = cnt
                     if data.shape[0] - l < result:
                         results[r - 1, i] = result
                         break
@@ -962,10 +890,11 @@ class TimeseriesFeatureMixin(object):
             return results
 
     @staticmethod
-    @njit("(float32[:], float64, int64, boolean,)")
-    def time_since_previous(
-        data: np.ndarray, threshold: float, sample_rate: int, above: bool
-    ) -> np.ndarray:
+    @njit('(float32[:], float64, int64, boolean,)')
+    def time_since_previous(data: np.ndarray,
+                            threshold: float,
+                            sample_rate: int,
+                            above: bool) -> np.ndarray:
         """
         Jitted compute of the time (in seconds) that has elapsed since the last occurrence of a value above (or below)
         a specified threshold in a time series. The time series is assumed to have a constant sample rate.
@@ -1006,7 +935,7 @@ class TimeseriesFeatureMixin(object):
         return results
 
     @staticmethod
-    @njit("(float32[:],)")
+    @njit('(float32[:],)')
     def benford_correlation(data: np.ndarray) -> float:
         """
         Jitted compute of the correlation between the Benford's Law distribution and the first-digit distribution of given data.
@@ -1014,6 +943,10 @@ class TimeseriesFeatureMixin(object):
         Benford's Law describes the expected distribution of leading (first) digits in many real-life datasets. This function
         calculates the correlation between the expected Benford's Law distribution and the actual distribution of the
         first digits in the provided data.
+
+        .. image:: _static/img/benford_correlation.png
+           :width: 600
+           :align: center
 
         .. note::
            Adapted from `tsfresh <https://tsfresh.readthedocs.io/en/latest/_modules/tsfresh/feature_extraction/feature_calculators.html#benford_correlation>`_.
@@ -1033,7 +966,7 @@ class TimeseriesFeatureMixin(object):
         benford_distribution = np.array([np.log10(1 + 1 / n) for n in range(1, 10)])
         first_vals, digit_ratio = np.full((data.shape[0]), np.nan), np.full(9, np.nan)
         for i in prange(data.shape[0]):
-            first_vals[i] = data[i] // 10 ** (int(np.log10(data[i])) - 1 + 1)
+            first_vals[i] = (data[i] // 10 ** (int(np.log10(data[i])) - 1 + 1))
 
         for i in range(1, 10):
             digit_ratio[i - 1] = np.argwhere(first_vals == i).shape[0] / data.shape[0]
@@ -1041,10 +974,10 @@ class TimeseriesFeatureMixin(object):
         return np.corrcoef(benford_distribution, digit_ratio)[0, 1]
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)")
-    def sliding_benford_correlation(
-        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    @njit('(float32[:], float64[:], int64)')
+    def sliding_benford_correlation(data: np.ndarray,
+                                    time_windows: np.ndarray,
+                                    sample_rate: int) -> np.ndarray:
         """
         Calculate the sliding Benford's Law correlation coefficient for a given dataset within
         specified time windows.
@@ -1081,28 +1014,175 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
-                first_vals, digit_ratio = np.full((data.shape[0]), np.nan), np.full(
-                    9, np.nan
-                )
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
+                first_vals, digit_ratio = np.full((data.shape[0]), np.nan), np.full(9, np.nan)
                 sample = data[l:r]
                 for k in range(sample.shape[0]):
-                    first_vals[k] = sample[k] // 10 ** (
-                        int(np.log10(sample[k])) - 1 + 1
-                    )
+                    first_vals[k] = (sample[k] // 10 ** (int(np.log10(sample[k])) - 1 + 1))
                 for k in range(1, 10):
-                    digit_ratio[k - 1] = (
-                        np.argwhere(first_vals == k).shape[0] / sample.shape[0]
-                    )
+                    digit_ratio[k - 1] = np.argwhere(first_vals == k).shape[0] / sample.shape[0]
                 results[r - 1, i] = np.corrcoef(benford_distribution, digit_ratio)[0, 1]
 
         return results.astype(np.float32)
 
+    @staticmethod
+    @njit('(float32[:], float64, float64, float64, float64, float64)', fastmath=True)
+    def spike_finder(data: np.ndarray,
+                     sample_rate: int,
+                     baseline: float,
+                     min_spike_amplitude: float,
+                     min_fwhm: float = -np.inf,
+                     min_half_width: float = -np.inf) -> float:
+
+        """
+        Identify and characterize spikes in a given time-series data sequence. This method identifies spikes in the input data based on the specified criteria and characterizes
+        each detected spike by computing its amplitude, full-width at half maximum (FWHM), and half-width.
+
+        :param np.ndarray data: A 1D array containing the input data sequence to analyze.
+        :param int sample_rate: The sample rate, indicating how many data points are collected per second.
+        :param float baseline: The baseline value used to identify spikes. Any data point above (baseline + min_spike_amplitude) is considered part of a spike.
+        :param float min_spike_amplitude: The minimum amplitude (above baseline) required for a spike to be considered.
+        :param Optional[float] min_fwhm: The minimum full-width at half maximum (FWHM) for a spike to be included. If not specified, it defaults to negative infinity, meaning it is not considered for filtering.
+        :param Optional[float] min_half_width: The minimum half-width required for a spike to be included. If not specified, it defaults to negative infinity, meaning it is not considered for filtering.
+        :return tuple: A tuple containing three elements:
+            - spike_idx (List[np.ndarray]): A list of 1D arrays, each representing the indices of the data points belonging to a detected spike.
+            - spike_vals (List[np.ndarray]): A list of 1D arrays, each containing the values of the data points within a detected spike.
+            - spike_dict (Dict[int, Dict[str, float]]): A dictionary where the keys are spike indices, and the values are dictionaries containing spike characteristics including 'amplitude' (spike amplitude), 'fwhm' (FWHM), and 'half_width' (half-width).
+
+        .. notes::
+           - The function uses the Numba JIT (Just-In-Time) compilation for optimized performance. Without fastmath=True there is no runtime improvement over standard numpy.
+
+        :example:
+        >>> data = np.array([0.1, 0.1, 0.3, 0.1, 10, 10, 8, 0.1, 0.1, 0.1, 10, 10, 8, 99, 0.1, 99, 99, 0.1]).astype(np.float32)
+        >>> spike_idx, spike_vals, spike_stats = spike_finder(data=data, baseline=1, min_spike_amplitude=5, sample_rate=2, min_fwhm=-np.inf, min_half_width=0.0002)
+        """
+
+        spike_idxs = np.argwhere(data >= baseline + min_spike_amplitude).flatten()
+        spike_idx = np.split(spike_idxs, np.argwhere(spike_idxs[1:] - spike_idxs[:-1] != 1).flatten() + 1)
+        spike_dict = Dict.empty(key_type=types.int64,
+                                value_type=Dict.empty(key_type=types.unicode_type, value_type=types.float64))
+        spike_vals = []
+        for i in prange(len(spike_idx)):
+            spike_data = data[spike_idx[i]]
+            spike_amplitude = np.max(spike_data) - baseline
+            half_width_idx = np.argwhere(spike_data > spike_amplitude / 2).flatten()
+            spike_dict[i] = {'amplitude': np.max(spike_data) - baseline,
+                             'fwhm': (half_width_idx[-1] - half_width_idx[0]) / sample_rate,
+                             'half_width': half_width_idx.shape[0] / sample_rate}
+            spike_vals.append(spike_data)
+
+        remove_idx = []
+        for k, v in spike_dict.items():
+            if (v['fwhm'] < min_fwhm) or (v['half_width'] < min_half_width):
+                remove_idx.append(k)
+        for idx in remove_idx: spike_dict.pop(idx)
+        spike_idx = [i for j, i in enumerate(spike_idx) if j not in remove_idx]
+        spike_vals = [i for j, i in enumerate(spike_vals) if j not in remove_idx]
+
+        return spike_idx, spike_vals, spike_dict
+
+    # @njit("(float32[:], types.List(types.Array(types.int64, 1, 'C')), int64, float64, float64)", fastmath=True)
+    @staticmethod
+    @jit(nopython=True, fastmath=True)
+    def spike_train_finder(data: np.ndarray,
+                           spike_idx: list,
+                           sample_rate: float,
+                           min_spike_train_length: float = np.inf,
+                           max_spike_train_separation: float = np.inf):
+        """
+        Identify and analyze spike trains from a list of spike indices.
+
+        This function takes spike indices and additional information, such as the data, sample rate,
+        minimum spike train length, and maximum spike train separation, to identify and analyze
+        spike trains in the data.
+
+        :param np.ndarray data: The data from which spike trains are extracted.
+        :param types.List(types.Array(types.int64, 1, 'C')) data: A list of spike indices, typically as integer timestamps.
+        :param float sample_rate: The sample rate of the data.
+        :param Optional[float] min_spike_train_length: The minimum length a spike train must have to be considered. Default is set to positive infinity, meaning no minimum length is enforced.
+        :param Optional[float] max_spike_train_separation: The maximum allowable separation between spikes in the same train. Default is set to positive infinity, meaning no maximum separation is enforced.
+        :return DictType[int64,DictType[unicode_type,float64]]: A dictionary containing information about identified spike trains.
+        Each entry in the dictionary is indexed by an integer and contains the following information:
+            - 'train_start_time': Start time of the spike train in seconds.
+            - 'train_end_time': End time of the spike train in seconds.
+            - 'train_start_obs': Start time index in observations.
+            - 'train_end_obs': End time index in observations.
+            - 'spike_cnt': Number of spikes in the spike train.
+            - 'train_length_obs_cnt': Length of the spike train in observations.
+            - 'train_length_obs_s': Length of the spike train in seconds.
+            - 'train_spike_mean_lengths_s': Mean length of individual spikes in seconds.
+            - 'train_spike_std_length_obs': Standard deviation of spike lengths in observations.
+            - 'train_spike_std_length_s': Standard deviation of spike lengths in seconds.
+            - 'train_spike_max_length_obs': Maximum spike length in observations.
+            - 'train_spike_max_length_s': Maximum spike length in seconds.
+            - 'train_spike_min_length_obs': Minimum spike length in observations.
+            - 'train_spike_min_length_s': Minimum spike length in seconds.
+            - 'train_mean_amplitude': Mean amplitude of the spike train.
+            - 'train_std_amplitude': Standard deviation of spike amplitudes.
+            - 'train_min_amplitude': Minimum spike amplitude.
+            - 'train_max_amplitude': Maximum spike amplitude.
+
+
+        .. note::
+           - The function may return an empty dictionary if no spike trains meet the criteria.
+           - ``spike_idx`` is returned by ``spike_finder``.
+
+
+        :example:
+        >>> data = np.array([0.1, 0.1, 0.3, 0.1, 10, 10, 8, 0.1, 0.1, 0.1, 10, 10, 8, 99, 0.1, 99, 99, 0.1]).astype(np.float32)
+        >>> spike_idx, _, _ = TimeseriesFeatureMixin().spike_finder(data=data, baseline=0.3, min_spike_amplitude=0.2, sample_rate=2, min_fwhm=-np.inf, min_half_width=-np.inf)
+        >>> results = TimeseriesFeatureMixin().spike_train_finder(data=data, spike_idx=typed.List(spike_idx), sample_rate=2.0, min_spike_train_length=2.0, max_spike_train_separation=2.0)
+        """
+
+        l, r, = 0, 1
+        train_data_idx = []
+        train_spikes_idx = []
+        max_spike_train_separation = int(max_spike_train_separation * sample_rate)
+        min_spike_train_length = int(min_spike_train_length * sample_rate)
+        while l < len(spike_idx):
+            current_train, current_spike_idx = spike_idx[l], [l]
+            while r < len(spike_idx) and ((spike_idx[r][0] - current_train[-1]) <= max_spike_train_separation):
+                current_train = np.hstack((current_train, spike_idx[r]))
+                current_spike_idx.append(r)
+                r += 1
+            l, r = r, r + 1
+            train_data_idx.append(current_train)
+            train_spikes_idx.append(current_spike_idx)
+
+        spike_dict = Dict.empty(key_type=types.int64,
+                                value_type=Dict.empty(key_type=types.unicode_type, value_type=types.float64))
+        for i in prange(len(train_data_idx)):
+            if train_data_idx[i].shape[0] >= min_spike_train_length:
+                spike_train_amps = data[train_data_idx[i]]
+                spike_train_idx = [k for j, k in enumerate(spike_idx) if j in train_spikes_idx[i]]
+                train_spike_lengths = np.array(([len(j) for j in spike_train_idx]))
+                spike_dict[int(i)] = {'train_start_time': float(train_data_idx[i][0] * sample_rate),
+                                      'train_end_time': train_data_idx[i][-1] * sample_rate,
+                                      'train_start_obs': train_data_idx[i][0],
+                                      'train_end_obs': train_data_idx[i][-1],
+                                      'spike_cnt': len(train_spikes_idx[i]),
+                                      'train_length_obs_cnt': len(spike_train_amps),
+                                      'train_length_obs_s': len(spike_train_amps) / sample_rate,
+                                      'train_spike_mean_lengths_s': np.mean(train_spike_lengths) * sample_rate,
+                                      'train_spike_std_length_obs': np.mean(train_spike_lengths),
+                                      'train_spike_std_length_s': np.mean(train_spike_lengths) * sample_rate,
+                                      'train_spike_max_length_obs': np.max(train_spike_lengths),
+                                      'train_spike_max_length_s': np.max(train_spike_lengths) * sample_rate,
+                                      'train_spike_min_length_obs': np.min(train_spike_lengths),
+                                      'train_spike_min_length_s': np.min(train_spike_lengths) * sample_rate,
+                                      'train_mean_amplitude': np.mean(spike_train_amps),
+                                      'train_std_amplitude': np.std(spike_train_amps),
+                                      'train_min_amplitude': np.min(spike_train_amps),
+                                      'train_max_amplitude': np.max(spike_train_amps)}
+
+        return spike_dict
 
 # data = np.array([1, 4, 2, 3, 5, 6, 8, 7, 9, 10]).astype(np.float32)
 # results = sliding_descriptive_statistics(data=data, window_sizes=np.array([1.0, 5.0]), sample_rate=2, statistics=typed.List(['mac']))
+
+
+
+
 
 
 # t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
