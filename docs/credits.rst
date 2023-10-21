@@ -16,9 +16,10 @@ was also written by `Sophia Hwang <https://github.com/sophihwang26>`_ and `Aasiy
 The code written in the Sam Golden lab is no longer maintained or supported by any individuals, documentation, or repository.
 The code written in the Sam Golden lab is not object-oriented and modular. If needed, the code be found by installing `simba-uw-tf-dev` version prior to `0.77.0` through pypi.
 
-`Simon <https://github.com/sronilsson>`_ left the Golden lab in 2020 - and since then - he maintains SimBA in his spare time.
+`Simon Nilsson <https://github.com/sronilsson>`_ left the Golden lab in 2020 - and since then - he maintains SimBA in his spare time.
 As of October 2020, the SimBA codebase, SimBA Github repository, SimBA pip package, SimBA API, SimBA documentation, and SimBA supports channels, are maintained
-and developed exclusively by Simon, without grants, hardware or other support. Simon would like to give a big thank you to all users who with their expert feedback and suggestions keeps making SimBA better!
+and developed exclusively by Simon, without grants, hardware or other support. This development would not be possible without the
+collaborative and friendly open-source community with their expert feedback and suggestions!
 
 
 
