@@ -1290,7 +1290,8 @@ class TrainModelMixin(object):
             else:
                 raise FeatureNumberMismatchError(
                     f"The model expects {clf_n_features} features. The data contains {len(x_df.columns)} features.",
-                    source=self.__class__.__name__)
+                    source=self.__class__.__name__,
+                )
         p_vals = clf.predict_proba(x_df)
         if p_vals.shape[1] != 2:
             raise ClassifierInferenceError(

@@ -11,7 +11,6 @@ from simba.roi_tools.ROI_reset import reset_video_ROIs
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.errors import NoFilesFoundError
-
 from simba.utils.lookups import get_color_dict
 
 
@@ -86,7 +85,14 @@ class ROI_menu:
 
 class roitableRow(Frame):
     def __init__(
-            self, image_data: ROI_image, parent=None, dirname="", filename="", widths="", indexs="", projectini=""
+        self,
+        image_data: ROI_image,
+        parent=None,
+        dirname="",
+        filename="",
+        widths="",
+        indexs="",
+        projectini="",
     ):
         self.image_data = image_data
         self.projectini = projectini

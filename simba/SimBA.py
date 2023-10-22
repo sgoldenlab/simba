@@ -85,14 +85,14 @@ from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp
 from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
     MovementAnalysisTimeBinsPopUp
-#from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
+# from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
 from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
 from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
 from simba.ui.pop_ups.pose_bp_drop_pop_up import DropTrackingDataPopUp
 from simba.ui.pop_ups.pose_reorganizer_pop_up import PoseReorganizerPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
-#from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
+# from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
 from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp
 from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
     ROIAnalysisTimeBinsPopUp
@@ -114,10 +114,9 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
     ConvertVideoPopUp, CreateGIFPopUP, CropVideoPopUp, DownsampleVideoPopUp,
     ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
-    ExtractSpecificFramesPopUp,
-    ImportFrameDirectoryPopUp, MergeFrames2VideoPopUp, MultiCropPopUp,
-    MultiShortenPopUp, VideoRotatorPopUp,
-    VideoTemporalJoinPopUp)
+    ExtractSpecificFramesPopUp, ImportFrameDirectoryPopUp,
+    MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
+    VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -138,7 +137,7 @@ from simba.video_processors.video_processing import (
 
 # from simba.unsupervised.unsupervised_ui import UnsupervisedGUI
 
-sys.setrecursionlimit(10 ** 6)
+sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 
 
@@ -155,7 +154,9 @@ class LoadProjectPopUp(object):
             icon_link=Links.LOAD_PROJECT.value,
         )
         self.selected_file = FileSelect(
-            self.load_project_frm, "Select file: ", title="Select project_config.ini file"
+            self.load_project_frm,
+            "Select file: ",
+            title="Select project_config.ini file",
         )
         self.load_project_btn = Button(
             self.load_project_frm,
@@ -1128,7 +1129,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         roi_feature_frm.grid(row=1, column=0, sticky=NW)
         append_roi_features_by_animal.grid(row=0, column=0, sticky=NW)
         append_roi_features_by_body_part.grid(row=1, column=0, sticky=NW)
-        #remove_roi_features_from_feature_set.grid(row=2, column=0, sticky=NW)
+        # remove_roi_features_from_feature_set.grid(row=2, column=0, sticky=NW)
 
         feature_tools_frm.grid(row=2, column=0, sticky=NW)
         compute_feature_subset_btn.grid(row=0, column=0, sticky=NW)
@@ -1162,7 +1163,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         lbl_tools_frm.grid(row=9, column=0, sticky=NW)
         visualize_annotation_img_btn.grid(row=0, column=0, sticky=NW)
         third_party_annotations_btn.grid(row=1, column=0, sticky=NW)
-        #remove_roi_features_from_annotation_set.grid(row=2, column=0, sticky=NW)
+        # remove_roi_features_from_annotation_set.grid(row=2, column=0, sticky=NW)
 
         label_trainmachinemodel.grid(row=6, sticky=W)
         button_trainmachinesettings.grid(row=0, column=0, sticky=NW, padx=5)
@@ -1183,7 +1184,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_runmachinemodel.grid(row=1, sticky=NW)
         kleinberg_button.grid(row=2, sticky=NW)
         fsttc_button.grid(row=3, sticky=NW)
-        #mutual_exclusivity.grid(row=4, sticky=NW)
+        # mutual_exclusivity.grid(row=4, sticky=NW)
 
         label_machineresults.grid(row=9, sticky=W, pady=5)
         button_process_datalog.grid(row=2, column=0, sticky=W, padx=3)
@@ -1831,13 +1832,13 @@ class App(object):
         if OS.PYTHON_VER.value != "3.6":
             PythonVersionWarning(
                 msg=f"SimBA is not extensively tested beyond python 3.6. You are using python {OS.PYTHON_VER.value}. If you encounter errors in python>3.6, please report them on GitHub or Gitter and we will fix! (links in the help toolbar)",
-                source="python different than 3.6"
+                source="python different than 3.6",
             )
 
         if not check_ffmpeg_available():
             FFMpegNotFoundWarning(
                 msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer',
-                source="ffmpeg checker"
+                source="ffmpeg checker",
             )
 
     def restart(self):

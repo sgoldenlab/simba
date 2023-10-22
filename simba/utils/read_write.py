@@ -564,7 +564,10 @@ def find_all_videos_in_directory(
             video_lst.append(i)
     if not video_lst:
         video_lst.append("No videos found")
-        NoFileFoundWarning(msg=f"No videos found in directory ({directory})",source='find_all_videos_in_directory')
+        NoFileFoundWarning(
+            msg=f"No videos found in directory ({directory})",
+            source="find_all_videos_in_directory",
+        )
 
     if video_lst and as_dict:
         video_dict = {}
@@ -1136,7 +1139,7 @@ def copy_multiple_videos_to_project(
         if os.path.isfile(dest1):
             FileExistWarning(
                 msg=f"{filebasename} already exist in SimBA project. Skipping video...",
-                source="copy_multiple_videos_to_project"
+                source="copy_multiple_videos_to_project",
             )
         else:
             if not symlink:
