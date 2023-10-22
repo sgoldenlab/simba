@@ -87,7 +87,9 @@ Once the classifications have been generated, we may want to analyze descriptive
   
 - We may want to create a summary CSV file that contains the exact start times, end times, and duration of each classified event for the behaviors selected in the `CLASSIFIERS` frame. To do this, check the `Detailed bout data` checkbutton. For an example of expected summary file, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/detailed_bout_data_summary_20231011091832.csv).
 
-- At times, we may want also want to output a reference to the video meta data (e.g., the number of frames or the length of the video) we can help us compute proportions. To add such data to the output, tick the relevant boxes in the `METADATA` frame. 
+- At times, we may want also want to output a reference to the video meta data (e.g., the number of frames or the length of the video) we can help us compute proportions. To add such data to the output, tick the relevant boxes in the `METADATA` frame.
+
+- Be default, SimBA outputs a CSV file, where every unique classifier measurement in each video is represented by a row. Some prefers the data to be transposed so that every unique classifier measurement is represented by a column and each video as rows. If you prefer the latter output, then tick the `Transpose output` checkbox. 
 
 Next, clicking `RUN` executes the selected desciptive statistics on all the files in `project_folder/csv/machine_results` directory. A date-time stamped output csv file with the data is saved within the `/project_folder/log` folder. Check the main SimBA terminal window for the exact output filename and file path. 
 
