@@ -77,7 +77,7 @@ Once the classifications have been generated, we may want to analyze descriptive
 1. `ANALYZE MACHINE PREDICTIONS: AGGREGATES`: This button generates descriptive statistics for each predictive classifier in the project, including the total time, the number of frames, total number of ‘bouts’, mean and median bout interval, time to first occurrence, and mean and median interval between each bout. Clicking the button will display a pop up window with tick-boxes for the different metric options, and the user ticks the metrics that the output file should contain. The pop-up window should look like this:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/agg_descriptive_stats_clf" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/agg_descriptive_stats_clf.png" />
 </p>
 
 
