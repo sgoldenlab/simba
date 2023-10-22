@@ -157,7 +157,7 @@ class AggregateClfCalculator(ConfigReader):
         self.results_df = (
             self.results_df[
                 self.results_df["Measure"].isin(
-                    self.chosen_measures + self.video_meta_data
+                    self.chosen_measures# + self.video_meta_data
                 )
             ]
             .sort_values(by=["Video", "Classifier", "Measure"])

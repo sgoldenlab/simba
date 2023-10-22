@@ -48,11 +48,11 @@ class PopUpMixin(object):
         config_path: Optional[str] = None,
         size: Tuple[int, int] = (400, 400),
     ):
-        self.main_frm = Toplevel()
-        self.main_frm.minsize(size[0], size[1])
-        self.main_frm.wm_title(title)
-        self.main_frm.lift()
-        self.main_frm = Canvas(hxtScrollbar(self.main_frm))
+        self.root = Toplevel()
+        self.root.minsize(size[0], size[1])
+        self.root.wm_title(title)
+        self.root.lift()
+        self.main_frm = Canvas(hxtScrollbar(self.root))
         self.main_frm.pack(fill="both", expand=True)
 
         self.palette_options = Options.PALETTE_OPTIONS.value

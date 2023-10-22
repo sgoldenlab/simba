@@ -154,7 +154,7 @@ def get_emojis() -> dict:
     Helper to get dictionary of emojis with names as keys and emojis as values.
     """
     python_version = str(f"{sys.version_info.major}.{sys.version_info.minor}")
-    if python_version == "3.6":
+    if python_version == "3.6" or python_version == "3.7":
         return {
             "thank_you": "".join(
                 chr(x) for x in struct.unpack(">2H", "\U0001f64f".encode("utf-16be"))
@@ -176,37 +176,17 @@ def get_emojis() -> dict:
             ),
         }
 
-    if python_version == "3.10":
+    else:
         return {
-            "thank_you": "\U0001f64f".encode("utf-8", "replace").decode(),
-            "relaxed": "\U0001F600".encode("utf-8", "replace").decode(),
-            "warning": "\u2757\uFE0F".encode("utf-8", "replace").decode(),
-            "error": "\U0001F6A8".encode("utf-8", "replace").decode(),
-            "complete": "\U0001F680".encode("utf-8", "replace").decode(),
-            "trash": "\U0001F5D1".encode("utf-8", "replace").decode(),
+            "thank_you": "\U0001f64f",
+            "relaxed": "\U0001F600",
+            "warning": "\u2757\uFE0F",
+            "error": "\U0001F6A8",
+            "complete": "\U0001F680",
+            "trash": "\U0001F5D1",
         }
 
-    if python_version == "3.7":
-        return {
-            "thank_you": "\U0001f64f".encode("utf16", errors="surrogatepass").decode(
-                "utf16"
-            ),
-            "relaxed": "\U0001F600".encode("utf16", errors="surrogatepass").decode(
-                "utf16"
-            ),
-            "error": "\U0001F6A8".encode("utf16", errors="surrogatepass").decode(
-                "utf16"
-            ),
-            "complete": "\U0001F680".encode("utf16", errors="surrogatepass").decode(
-                "utf16"
-            ),
-            "warning": "\u2757\uFE0F".encode("utf16", errors="surrogatepass").decode(
-                "utf16"
-            ),
-            "trash": "\U0001F5D1F".encode("utf16", errors="surrogatepass").decode(
-                "utf16"
-            ),
-        }
+
 
 
 def get_meta_data_file_headers() -> List[str]:

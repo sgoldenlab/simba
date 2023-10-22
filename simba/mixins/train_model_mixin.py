@@ -705,7 +705,6 @@ class TrainModelMixin(object):
         :parameter List[str] class_names: List of class names. E.g., ['Attack absent', 'Attack present']
         :parameter str save_dir: Directory where to save output in csv file format.
         """
-
         clf = tree.DecisionTreeClassifier(max_depth=5, random_state=666)
         clf.fit(x_train, y_train)
         try:
@@ -1291,8 +1290,7 @@ class TrainModelMixin(object):
             else:
                 raise FeatureNumberMismatchError(
                     f"The model expects {clf_n_features} features. The data contains {len(x_df.columns)} features.",
-                    source=self.__class__.__name__,
-                )
+                    source=self.__class__.__name__)
         p_vals = clf.predict_proba(x_df)
         if p_vals.shape[1] != 2:
             raise ClassifierInferenceError(

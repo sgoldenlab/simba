@@ -150,10 +150,10 @@ def plug_holes_shortest_bout(
         currListNeg = [0]
         currListNeg.extend(oneInlist)
         currListNeg.extend([0])
-        patternListofLists.append(currList)
-        negPatternListofList.append(currListNeg)
-    fill_patterns = np.asarray(patternListofLists)
-    remove_patterns = np.asarray(negPatternListofList)
+        patternListofLists.append(np.array(currList))
+        negPatternListofList.append(np.array(currListNeg))
+    fill_patterns = patternListofLists#np.asarray(patternListofLists)
+    remove_patterns = negPatternListofList#np.asarray(negPatternListofList)
 
     for currPattern in fill_patterns:
         n_obs = len(currPattern)
