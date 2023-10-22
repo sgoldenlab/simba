@@ -16,9 +16,9 @@ from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int)
 from simba.utils.data import create_color_palette
-from simba.utils.enums import ConfigKey, Dtypes, Formats
+from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
                                     read_df)
@@ -176,6 +176,15 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     Plot classification results on videos. Results are stored in the
     `project_folder/frames/output/sklearn_results` directory of the SimBA project.
 
+    .. seelalso::
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
+        For non-multiptocess class, see :meth:`simba.plotting.plot_clf_results.PlotSklearnResultsSingleCore`.
+
+    .. image:: _static/img/sklearn_visualization.gif
+       :width: 600
+       :align: center
+
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param bool rotate: If True, the output video will be rotated 90 degrees from the input.
     :param bool video_setting: If True, SimBA will create compressed videos.
@@ -183,8 +192,6 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     :param str video_file_path: path to video file to create classification visualizations for.
     :param int cores: Number of cores to use
 
-    .. note:
-       `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
 
     Examples
     ----------
@@ -197,21 +204,28 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         config_path: str,
         video_setting: bool,
         frame_setting: bool,
-        text_settings: Union[Dict[str, float], bool],
         cores: int,
         video_file_path: Optional[str] = None,
-        rotate: bool = False,
-        print_timers: bool = True,
+        text_settings: Optional[Union[Dict[str, float], bool]] = False,
+        rotate: Optional[bool] = False,
+        print_timers: Optional[bool] = True,
     ):
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
         PlottingMixin.__init__(self)
+        log_event(
+            logger_name=str(__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
+
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
 
         if (not video_setting) and (not frame_setting):
             raise NoSpecifiedOutputError(
-                msg="SIMBA ERROR: Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames"
+                msg="SIMBA ERROR: Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames",
+                source=self.__class__.__name__,
             )
         self.video_file_path, self.print_timers, self.text_settings = (
             video_file_path,
@@ -283,8 +297,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         return data
 
     def create_visualizations(self):
-        video_timer = SimbaTimer()
-        video_timer.start_timer()
+        video_timer = SimbaTimer(start=True)
         _, self.video_name, _ = get_fn_ext(self.file_path)
         self.data_df = read_df(self.file_path, self.file_type).reset_index(drop=True)
         self.video_settings, _, self.fps = self.read_video_info(
@@ -394,33 +407,15 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             stdout_success(
                 msg=f"{len(self.files_found)} videos saved in project_folder/frames/output/sklearn_results directory",
                 elapsed_time=self.timer.elapsed_time_str,
+                source=self.__class__.__name__,
             )
         if self.frame_setting:
             stdout_success(
                 f"Frames for {len(self.files_found)} videos saved in sub-folders within project_folder/frames/output/sklearn_results directory",
                 elapsed_time=self.timer.elapsed_time_str,
+                source=self.__class__.__name__,
             )
 
 
-# style_attr = {'width': 'As input',
-#               'height': 'As input',
-#               'line width': 5,
-#               'font size': 5,
-#               'font thickness': 2,
-#               'circle size': 5,
-#               'bg color': 'White',
-#               'max lines': 10000}
-#
-# animal_attr = {0: ['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
-# clf_attr = {0: ['Attack', 'Black', 'Size: 30'], 1: ['Sniffing', 'Black', 'Size: 30']}
-#
-# test = PathPlotterSingleCore(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                             frame_setting=False,
-#                             video_setting=True,
-#                              last_frame=True,
-#                             input_style_attr=style_attr,
-#                    animal_attr=animal_attr,
-#                              input_clf_attr=clf_attr,
-#                     files_found=['/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv',
-#                                  '/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'])
-# test.run()
+# clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini', video_setting=True, frame_setting=False, rotate=False, video_file_path='Together_1.avi', cores=5)
+# clf_plotter.run()

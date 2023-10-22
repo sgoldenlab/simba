@@ -17,9 +17,9 @@ except ImportError:
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_if_filepath_list_is_empty,
                                 check_if_valid_input, check_that_column_exist)
-from simba.utils.enums import Methods
+from simba.utils.enums import Methods, TagNames
 from simba.utils.errors import DataHeaderError, NoFilesFoundError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_df, write_df)
@@ -63,6 +63,11 @@ class Interpolate(ConfigReader):
         initial_import_multi_index: bool = False,
     ) -> None:
         super().__init__(config_path=config_path, read_video_info=False)
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
         self.interpolation_type, self.interpolation_method = (
             method.split(":")[0],
             method.split(":")[1].replace(" ", "").lower(),
@@ -93,6 +98,7 @@ class Interpolate(ConfigReader):
         stdout_success(
             msg=f"{str(len(self.files_found))} data file(s) interpolated)",
             elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
     def animal_interpolator(self):
@@ -226,8 +232,15 @@ class Smooth(ConfigReader):
     .. note::
         `Smoothing tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
 
-    Examples
-    -----
+    .. image:: _static/img/smoothing.gif
+       :width: 600
+       :align: center
+
+    :references:
+        .. [1] `Video expected putput <https://www.youtube.com/watch?v=d9-Bi4_HyfQ>`__.
+
+
+    :examples:
     >>> _ = Smooth(input_path=data_path, config_path=SimBaProjectConfigPath, smoothing_method='Savitzky-Golay', time_window=300)
     """
 
@@ -240,6 +253,11 @@ class Smooth(ConfigReader):
         initial_import_multi_index: bool = False,
     ):
         super().__init__(config_path=config_path, read_video_info=False)
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=f"input_path: {input_path}, time_window: {time_window}, smoothing_method: {smoothing_method}, initial_import_multi_index: {initial_import_multi_index}",
+        )
         if os.path.isdir(input_path):
             self.files_found = glob.glob(input_path + "/*" + self.file_type)
             self.input_dir = input_path
@@ -268,6 +286,7 @@ class Smooth(ConfigReader):
         stdout_success(
             msg=f"{str(len(self.files_found))} data file(s) smoothened",
             elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
     def savgol_smoother(self):
@@ -292,7 +311,8 @@ class Smooth(ConfigReader):
                     video_meta_data["fps"] = fps
                 except:
                     raise NoFilesFoundError(
-                        msg=f"No video for file {video_name} found in SimBA project. Import the video before doing smoothing. To perform smoothing, SimBA needs the video fps from the video itself or the logs/video_info.csv file in order to read the video FPS."
+                        msg=f"No video for file {video_name} found in SimBA project. Import the video before doing smoothing. To perform smoothing, SimBA needs the video fps from the video itself or the logs/video_info.csv file in order to read the video FPS.",
+                        source=self.__class__.__name__,
                     )
             else:
                 video_meta_data = get_video_meta_data(video_path=video_path)
@@ -349,7 +369,8 @@ class Smooth(ConfigReader):
             )
             if not video_path:
                 raise NoFilesFoundError(
-                    msg=f"No video for file {video_name} found in SimBA project. Import the video before doing Gaussian smoothing. To perform smoothing, SimBA needs the video in order to read the video FPS."
+                    msg=f"No video for file {video_name} found in SimBA project. Import the video before doing Gaussian smoothing. To perform smoothing, SimBA needs the video in order to read the video FPS.",
+                    source=self.__class__.__name__,
                 )
             video_meta_data = get_video_meta_data(video_path=video_path)
             frames_in_time_window = int(
@@ -423,6 +444,11 @@ class AdvancedInterpolator(ConfigReader):
         overwrite: Optional[bool] = True,
     ):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=f"data dir: {data_dir}, type: {type}, settings: {settings}, initial_import_multi_index: {initial_import_multi_index}, overwrite: {overwrite}",
+        )
         self.file_paths = find_files_of_filetypes_in_directory(
             directory=data_dir,
             extensions=[f".{self.file_type}"],
@@ -473,7 +499,8 @@ class AdvancedInterpolator(ConfigReader):
             if self.initial_import_multi_index:
                 if len(df.columns) != len(self.bp_col_names):
                     raise DataHeaderError(
-                        msg=f"The SimBA project suggest the data should have {len(self.bp_col_names)} columns, but the input data has {len(df.columns)} columns"
+                        msg=f"The SimBA project suggest the data should have {len(self.bp_col_names)} columns, but the input data has {len(df.columns)} columns",
+                        source=self.__class__.__name__,
                     )
                 df.columns = self.bp_headers
             df[df < 0] = 0
@@ -521,7 +548,9 @@ class AdvancedInterpolator(ConfigReader):
             )
         self.timer.stop_timer()
         stdout_success(
-            msg="Interpolation complete!", elapsed_time=self.timer.elapsed_time_str
+            msg="Interpolation complete!",
+            elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
 
@@ -559,6 +588,11 @@ class AdvancedSmoother(ConfigReader):
         overwrite: Optional[bool] = True,
     ):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=f"data_dir: {data_dir}, type: {type}, settings: {settings}, initial_import_multi_index: {initial_import_multi_index}, overwrite: {overwrite}",
+        )
         self.file_paths = find_files_of_filetypes_in_directory(
             directory=data_dir,
             extensions=[f".{self.file_type}"],
@@ -610,7 +644,8 @@ class AdvancedSmoother(ConfigReader):
             if self.initial_import_multi_index:
                 if len(df.columns) != len(self.bp_col_names):
                     raise DataHeaderError(
-                        msg=f"The SimBA project suggest the data should have {len(self.bp_col_names)} columns, but the input data has {len(df.columns)} columns"
+                        msg=f"The SimBA project suggest the data should have {len(self.bp_col_names)} columns, but the input data has {len(df.columns)} columns",
+                        source=self.__class__.__name__,
                     )
                 df.columns = self.bp_headers
             df[df < 0] = 0
@@ -627,7 +662,8 @@ class AdvancedSmoother(ConfigReader):
                     video_meta_data["fps"] = fps
                 except:
                     raise NoFilesFoundError(
-                        msg=f"No video for file {video_name} found in SimBA project. Import the video before doing smoothing. To perform smoothing, SimBA needs the video fps from the video itself OR the logs/video_info.csv file in order to read the video FPS."
+                        msg=f"No video for file {video_name} found in SimBA project. Import the video before doing smoothing. To perform smoothing, SimBA needs the video fps from the video itself OR the logs/video_info.csv file in order to read the video FPS.",
+                        source=self.__class__.__name__,
                     )
             else:
                 video_meta_data = get_video_meta_data(video_path=video_path)
@@ -694,30 +730,26 @@ class AdvancedSmoother(ConfigReader):
 
         self.timer.stop_timer()
         stdout_success(
-            msg="Smoothing complete complete!", elapsed_time=self.timer.elapsed_time_str
+            msg="Smoothing complete complete!",
+            elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
 
-SMOOTHING_SETTING = {
-    "Simon": {
-        "Ear_left_1": {"method": "Savitzky Golay", "time_window": 3500},
-        "Ear_right_1": {"method": "Gaussian", "time_window": 500},
-        "Nose_1": {"method": "Savitzky Golay", "time_window": 2000},
-        "Lat_left_1": {"method": "Savitzky Golay", "time_window": 2000},
-        "Lat_right_1": {"method": "Gaussian", "time_window": 2000},
-        "Center_1": {"method": "Savitzky Golay", "time_window": 2000},
-        "Tail_base_1": {"method": "Gaussian", "time_window": 500},
-    },
-    "JJ": {
-        "Ear_left_2": {"method": "Savitzky Golay", "time_window": 2000},
-        "Ear_right_2": {"method": "Savitzky Golay", "time_window": 500},
-        "Nose_2": {"method": "Gaussian", "time_window": 3500},
-        "Lat_left_2": {"method": "Savitzky Golay", "time_window": 500},
-        "Lat_right_2": {"method": "Gaussian", "time_window": 3500},
-        "Center_2": {"method": "Gaussian", "time_window": 2000},
-        "Tail_base_2": {"method": "Savitzky Golay", "time_window": 3500},
-    },
-}
+# SMOOTHING_SETTING = {'Simon': {'Ear_left_1': {'method': 'Savitzky Golay', 'time_window': 3500},
+#                                'Ear_right_1': {'method': 'Gaussian', 'time_window': 500},
+#                                'Nose_1': {'method': 'Savitzky Golay', 'time_window': 2000},
+#                                'Lat_left_1': {'method': 'Savitzky Golay', 'time_window': 2000},
+#                                'Lat_right_1': {'method': 'Gaussian', 'time_window': 2000},
+#                                'Center_1': {'method': 'Savitzky Golay', 'time_window': 2000},
+#                                'Tail_base_1': {'method': 'Gaussian', 'time_window': 500}},
+#                         'JJ': {'Ear_left_2': {'method': 'Savitzky Golay', 'time_window': 2000},
+#                                'Ear_right_2': {'method': 'Savitzky Golay', 'time_window': 500},
+#                                'Nose_2': {'method': 'Gaussian', 'time_window': 3500},
+#                                'Lat_left_2': {'method': 'Savitzky Golay', 'time_window': 500},
+#                                'Lat_right_2': {'method': 'Gaussian', 'time_window': 3500},
+#                                'Center_2': {'method': 'Gaussian', 'time_window': 2000},
+#                                'Tail_base_2': {'method': 'Savitzky Golay', 'time_window': 3500}}}
 
 # smoother = AdvancedSmoother(data_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',
 #                             config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',

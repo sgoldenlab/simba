@@ -16,9 +16,9 @@ from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int)
 from simba.utils.data import create_color_palette
-from simba.utils.enums import ConfigKey, Dtypes, Formats
+from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
-from simba.utils.printing import stdout_success
+from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
                                     read_config_entry, read_df)
 
@@ -31,6 +31,11 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
     .. note::
        For improved run-time, see :meth:`simba.plotting.plot_clf_results_mp.PlotSklearnResultsMultiProcess` for multiprocess class.
        Scikit visualization documentation <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
+
+    .. image:: _static/img/sklearn_visualization.gif
+       :width: 600
+       :align: center
+
 
     :param str config_path: path to SimBA project config file in Configparser format
     :param bool rotate: If True, the output video will be rotated 90 degrees from the input.
@@ -58,10 +63,16 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
         PlottingMixin.__init__(self)
+        log_event(
+            logger_name=str(__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
 
         if (not video_setting) and (not frame_setting):
             raise NoSpecifiedOutputError(
-                msg="Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames"
+                msg="Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames",
+                source=self.__class__.__name__,
             )
         self.video_file_path, self.print_timers, self.text_settings = (
             video_file_path,
@@ -339,6 +350,7 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
         stdout_success(
             msg="All visualizations created in project_folder/frames/output/sklearn_results directory",
             elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
 

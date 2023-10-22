@@ -85,6 +85,14 @@ ROI size calculators
    :members:
    :show-inheritance:
 
+
+ROI size standardizer through pixels by millimeter
+--------------------------------------------
+
+.. automodule:: simba.roi_tools.ROI_size_standardizer
+   :members:
+   :show-inheritance:
+
 ROI time-bin calculator
 --------------------------------------------------
 

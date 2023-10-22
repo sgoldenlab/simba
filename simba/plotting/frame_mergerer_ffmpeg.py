@@ -13,9 +13,9 @@ except ImportError:
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_nvidea_gpu_available
-from simba.utils.enums import Paths
+from simba.utils.enums import Paths, TagNames
 from simba.utils.errors import FFMPEGCodecGPUError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
                                     read_config_entry, read_config_file,
                                     remove_a_folder)
@@ -25,11 +25,11 @@ class FrameMergererFFmpeg(ConfigReader):
     """
     Merge separate visualizations of classifications, descriptive statistics etc., into  single video mosaic.
 
-    .. note:
+    .. note::
        `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-12-merge-frames>`_.
 
-        .. image:: _static/img/mosaic.png
-          :width: 300
+        .. image:: _static/img/mosaic_videos.gif
+          :width: 600
           :align: center
 
     :parameter str config_path: path to SimBA project config file in Configparser format
@@ -57,12 +57,18 @@ class FrameMergererFFmpeg(ConfigReader):
     ):
         if gpu and not check_nvidea_gpu_available():
             raise FFMPEGCodecGPUError(
-                msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None"
+                msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+                source=self.__class__.__name__,
             )
         self.timer = SimbaTimer(start=True)
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path)
+            log_event(
+                logger_name=str(__class__.__name__),
+                log_type=TagNames.CLASS_INIT.value,
+                msg=self.create_log_msg_from_init_args(locals=locals()),
+            )
             self.output_dir = os.path.join(
                 self.project_path, Paths.CONCAT_VIDEOS_DIR.value
             )
@@ -216,6 +222,7 @@ class FrameMergererFFmpeg(ConfigReader):
             stdout_success(
                 msg=f"Merged video saved at {out_path}",
                 elapsed_time=self.timer.elapsed_time_str,
+                source=self.__class__.__name__,
             )
 
     def __vertical_concatenator(
@@ -247,6 +254,7 @@ class FrameMergererFFmpeg(ConfigReader):
             stdout_success(
                 msg=f"Merged video saved at {out_path}",
                 elapsed_time=self.timer.elapsed_time_str,
+                source=self.__class__.__name__,
             )
 
     def __mosaic_concatenator(

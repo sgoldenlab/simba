@@ -1,7 +1,8 @@
 __author__ = "Simon Nilsson"
 
-import time
 from typing import Optional, Tuple, Union
+
+from sklearn.neighbors import LocalOutlierFactor
 
 try:
     from typing import Literal
@@ -9,7 +10,7 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import jit, njit, optional, prange
+from numba import jit, njit, objmode, optional, prange, typed, types
 from scipy import stats
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
@@ -20,6 +21,18 @@ class Statistics(FeatureExtractionMixin):
 
     """
     Primarily frequentist statistics methods used for feature extraction or drift assessment.
+
+    .. note::
+
+       Most methods implemented using `numba parallelization <https://numba.pydata.org/>`_ for improved run-times. See
+       `line graph <https://github.com/sgoldenlab/simba/blob/master/docs/_static/img/statistics_runtimes.png>`_ below for expected run-times for a few methods included in this class.
+
+       Most method has numba typed `signatures <https://numba.pydata.org/numba-doc/latest/reference/types.html>`_ to decrease
+       compilation time. Make sure to pass the correct dtypes as indicated by signature decorators.
+
+    .. image:: _static/img/statistics_runtimes.png
+       :width: 1200
+       :align: center
 
     """
 
@@ -203,11 +216,13 @@ class Statistics(FeatureExtractionMixin):
                 results[window_start:window_end, i] = d
         return results
 
+    @staticmethod
+    @njit("(float32[:], float64, float64)")
     def rolling_two_sample_ks(
-        self, data: np.ndarray, time_window: float, fps: float
+        data: np.ndarray, time_window: float, fps: float
     ) -> np.ndarray:
         """
-        Compute Kolmogorov two-sample statistics for sequentially binned values in a time-series.
+        Jitted compute Kolmogorov two-sample statistics for sequentially binned values in a time-series.
         E.g., compute KS statistics when comparing ``Feature N`` in the current 1s time-window, versus ``Feature N`` in the previous 1s time-window.
 
         :parameter ndarray data: 1D array of size len(frames) representing feature values.
@@ -217,7 +232,7 @@ class Statistics(FeatureExtractionMixin):
 
         :example:
         >>> data = np.random.randint(low=0, high=100, size=(200)).astype('float32')
-        >>> results = self.rolling_two_sample_ks(data=data, group_size_s=1, fps=30)
+        >>> results = Statistics().rolling_two_sample_ks(data=data, time_window=1, fps=30)
         """
 
         window_size, results = int(time_window * fps), np.full((data.shape[0]), -1.0)
@@ -226,7 +241,7 @@ class Statistics(FeatureExtractionMixin):
             start, end = int((cnt + 1) * window_size), int(
                 ((cnt + 1) * window_size) + window_size
             )
-            sample_1, sample_2 = data[i - 1], data2 = data[i]
+            sample_1, sample_2 = data[i - 1], data[i]
             combined_samples = np.sort(np.concatenate((sample_1, sample_2)))
             ecdf_sample_1 = np.searchsorted(
                 sample_1, combined_samples, side="right"
@@ -563,10 +578,15 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute Wasserstein distance between two distributions.
 
+        .. note::
+           Uses ``stats.wasserstein_distance``. I have tried to move ``stats.wasserstein_distance`` to jitted method extensively,
+           but this doesn't give significant runtime improvement. Rate-limiter appears to be the _hist_1d.
+
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
         :parameter Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
         :returns float: Wasserstein distance between ``sample_1`` and ``sample_2``
+
         :example:
 
         >>> sample_1 = np.random.normal(loc=10, scale=2, size=10)
@@ -748,35 +768,8 @@ class Statistics(FeatureExtractionMixin):
 
         return results
 
-    def shapiro_wilks(
-        self, data: np.ndarray, time_window: float, fps: int
-    ) -> np.ndarray:
-        """
-        Compute Shapiro-Wilks normality statistics for sequentially binned values in a time-series. E.g., compute
-        the normality statistics of ``Feature N`` in each window of ``time_window`` seconds.
-
-        :parameter ndarray data: 1D array of size len(frames) representing feature values.
-        :parameter int time_window: The size of the buckets in seconds.
-        :parameter int fps: Frame-rate of recorded video.
-        :return np.ndarray: Array of size data.shape[0] with Shapiro-Wilks normality statistics
-
-        :example:
-        >>> data = np.random.randint(low=0, high=100, size=(200)).astype('float32')
-        >>> results = self.shapiro_wilks(data=data, time_window=1, fps=30)
-        """
-
-        window_size, results = int(time_window * fps), np.full((data.shape[0]), -1.0)
-        data = np.split(data, list(range(window_size, data.shape[0], window_size)))
-        for cnt, i in enumerate(prange(1, len(data))):
-            start, end = int((cnt + 1) * window_size), int(
-                ((cnt + 1) * window_size) + window_size
-            )
-            results[start:end] = stats.shapiro(data[i])[0]
-        return results
-
     @staticmethod
     @njit("(float64[:], float64[:])", cache=True)
-    # @jit(nopython=True)
     def kruskal_wallis(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
         Jitted compute of Kruskal-Wallis H between two distributions.
@@ -963,7 +956,7 @@ class Statistics(FeatureExtractionMixin):
         return -wbfn
 
     @staticmethod
-    @jit(nopython=True)
+    @njit("(float32[:], float64[:], float64)", cache=True)
     def rolling_barletts_test(data: np.ndarray, time_windows: np.ndarray, fps: float):
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
@@ -1068,8 +1061,11 @@ class Statistics(FeatureExtractionMixin):
                 m1, m2 = np.mean(s1), np.mean(s2)
                 numerator = np.sum((s1 - m1) * (s2 - m2))
                 denominator = np.sqrt(np.sum((s1 - m1) ** 2) * np.sum((s2 - m2) ** 2))
-                r = numerator / denominator
-                results[right - 1, i] = r
+                if denominator != 0:
+                    r = numerator / denominator
+                    results[right - 1, i] = r
+                else:
+                    results[right - 1, i] = -1.0
 
         return results
 
@@ -1278,7 +1274,6 @@ class Statistics(FeatureExtractionMixin):
                 prange(window_size, sample_1.shape[0] + 1),
             ):
                 s1, s2 = sample_1[left:right], sample_2[left:right]
-                print(s1, s2)
                 rank_x, rank_y = np.argsort(np.argsort(s1)), np.argsort(np.argsort(s2))
                 d_squared = np.sum((rank_x - rank_y) ** 2)
                 s = 1 - (6 * d_squared) / (len(s1) * (len(s2) ** 2 - 1))
@@ -1286,8 +1281,350 @@ class Statistics(FeatureExtractionMixin):
 
         return results
 
+    @staticmethod
+    @njit("(float32[:], float64, float64, float64)")
+    def sliding_autocorrelation(
+        data: np.ndarray, max_lag: float, time_window: float, fps: float
+    ):
+        """
+        Jitted compute of sliding auto-correlations (the correlation of a feature with itself using lagged windows).
 
-# data = np.array([11,12,15,19,21,26,19,20,22,19,21,26,23,19,11]).astype(np.float32)
+        :example:
+        >>> data = np.array([0,1,2,3,4, 5,6,7,8,1,10,11,12,13,14]).astype(np.float32)
+        >>> Statistics().sliding_autocorrelation(data=data, max_lag=0.5, time_window=1.0, fps=10)
+        >>> [ 0., 0., 0.,  0.,  0., 0., 0.,  0. ,  0., -3.686, -2.029, -1.323, -1.753, -3.807, -4.634]
+        """
+
+        max_frm_lag, time_window_frms = int(max_lag * fps), int(time_window * fps)
+        results = np.full((data.shape[0]), 0.0)
+        for right in prange(time_window_frms - 1, data.shape[0]):
+            left = right - time_window_frms + 1
+            w_data = data[left : right + 1]
+            corrcfs = np.full((max_frm_lag), np.nan)
+            corrcfs[0] = 1
+            for shift in range(1, max_frm_lag):
+                corrcfs[shift] = np.corrcoef(w_data[:-shift], w_data[shift:])[0][1]
+            mat_ = np.zeros(shape=(corrcfs.shape[0], 2))
+            const = np.ones_like(corrcfs)
+            mat_[:, 0] = const
+            mat_[:, 1] = corrcfs
+            det_ = np.linalg.lstsq(
+                mat_.astype(np.float32), np.arange(0, max_frm_lag).astype(np.float32)
+            )[0]
+            results[right] = det_[::-1][0]
+        return results
+
+    @staticmethod
+    def sliding_dominant_frequencies(
+        data: np.ndarray,
+        fps: float,
+        k: int,
+        time_windows: np.ndarray,
+        window_function: Literal["Hann", "Hamming", "Blackman"] = None,
+    ):
+        """Find the K dominant frequencies within a feature vector using sliding windows"""
+
+        results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
+        for time_window_cnt in range(time_windows.shape[0]):
+            window_size = int(time_windows[time_window_cnt] * fps)
+            for left, right in zip(
+                range(0, data.shape[0] + 1), range(window_size, data.shape[0] + 1)
+            ):
+                window_data = data[left:right]
+                if window_function == "Hann":
+                    window_data = window_data * np.hanning(len(window_data))
+                elif window_function == "Hamming":
+                    window_data = window_data * np.hamming(len(window_data))
+                elif window_function == "Blackman":
+                    window_data = window_data * np.blackman(len(window_data))
+                fft_result = np.fft.fft(window_data)
+                frequencies = np.fft.fftfreq(window_data.shape[0], 1 / fps)
+                magnitude = np.abs(fft_result)
+                top_k_frequency = frequencies[np.argsort(magnitude)[-(k + 1) : -1]]
+                results[right - 1][time_window_cnt] = top_k_frequency[0]
+        return results
+
+    @staticmethod
+    @njit("(float32[:], float32[:])")
+    def kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray) -> Tuple[float, float]:
+        """
+        Jitted Kendall Tau (rank correlation coefficient). Non-parametric method for computing correlation
+        between two time-series features. Returns tau and associated z-score.
+
+        :parameter ndarray sample_1: First 1D array with feature values.
+        :parameter ndarray sample_1: Second 1D array with feature values.
+        :returns Tuple[float, float]: Kendall Tau and associated z-score.
+
+        :examples:
+        >>> sample_1 = np.array([4, 2, 3, 4, 5, 7]).astype(np.float32)
+        >>> sample_2 = np.array([1, 2, 3, 4, 5, 7]).astype(np.float32)
+        >>> Statistics().kendall_tau(sample_1=sample_1, sample_2=sample_2)
+        >>> (0.7333333333333333, 2.0665401605809928)
+
+        References
+        ----------
+        .. [1] `Stephanie Glen, "Kendall’s Tau (Kendall Rank Correlation Coefficient)"  <https://github.com/sgoldenlab/simba/blob/master/docs/FSTTC.md>`__.
+        """
+
+        rnks = np.argsort(sample_1)
+        s1_rnk, s2_rnk = sample_1[rnks], sample_2[rnks]
+        cncrdnt_cnts, dscrdnt_cnts = np.full((s1_rnk.shape[0] - 1), np.nan), np.full(
+            (s1_rnk.shape[0] - 1), np.nan
+        )
+        for i in range(s2_rnk.shape[0] - 1):
+            cncrdnt_cnts[i] = (
+                np.argwhere(s2_rnk[i + 1 :] > s2_rnk[i]).flatten().shape[0]
+            )
+            dscrdnt_cnts[i] = (
+                np.argwhere(s2_rnk[i + 1 :] < s2_rnk[i]).flatten().shape[0]
+            )
+        t = (np.sum(cncrdnt_cnts) - np.sum(dscrdnt_cnts)) / (
+            np.sum(cncrdnt_cnts) + np.sum(dscrdnt_cnts)
+        )
+        z = (
+            3
+            * t
+            * (np.sqrt(s1_rnk.shape[0] * (s1_rnk.shape[0] - 1)))
+            / np.sqrt(2 * ((2 * s1_rnk.shape[0]) + 5))
+        )
+
+        return t, z
+
+    @staticmethod
+    @njit("(float32[:], float32[:], float64[:], int64)")
+    def sliding_kendall_tau(
+        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float
+    ) -> np.ndarray:
+        results = np.full((sample_1.shape[0], time_windows.shape[0]), 0.0)
+        for time_window_cnt in range(time_windows.shape[0]):
+            window_size = int(time_windows[time_window_cnt] * fps)
+            for left, right in zip(
+                range(0, sample_1.shape[0] + 1),
+                range(window_size, sample_1.shape[0] + 1),
+            ):
+                sliced_sample_1, sliced_sample_2 = (
+                    sample_1[left:right],
+                    sample_2[left:right],
+                )
+                rnks = np.argsort(sliced_sample_1)
+                s1_rnk, s2_rnk = sliced_sample_1[rnks], sliced_sample_2[rnks]
+                cncrdnt_cnts, dscrdnt_cnts = np.full(
+                    (s1_rnk.shape[0] - 1), np.nan
+                ), np.full((s1_rnk.shape[0] - 1), np.nan)
+                for i in range(s2_rnk.shape[0] - 1):
+                    cncrdnt_cnts[i] = (
+                        np.argwhere(s2_rnk[i + 1 :] > s2_rnk[i]).flatten().shape[0]
+                    )
+                    dscrdnt_cnts[i] = (
+                        np.argwhere(s2_rnk[i + 1 :] < s2_rnk[i]).flatten().shape[0]
+                    )
+                results[right][time_window_cnt] = (
+                    np.sum(cncrdnt_cnts) - np.sum(dscrdnt_cnts)
+                ) / (np.sum(cncrdnt_cnts) + np.sum(dscrdnt_cnts))
+
+        return results
+
+    @staticmethod
+    def local_outlier_factor(
+        data: np.ndarray, k: Union[int, float] = 5, contamination: float = 1e-10
+    ) -> np.ndarray:
+        """
+        Compute the local outlier factor of each observation.
+
+        .. note::
+           Method calls ``sklearn.neighbors.LocalOutlierFactor`` directly. Previously called using own implementation JIT'ed method,
+           but runtime was 3x-ish slower than ``sklearn.neighbors.LocalOutlierFactor``.
+
+        :parameter ndarray data: 2D array with feature values where rows represent frames and columns represent features.
+        :parameter Union[int, float] sample_1: Number of neighbors to evaluate for each observation. If float, then interpreted as the ratio of data.shape[0].
+        :parameter float contamination: Small pseudonumber to avoid DivisionByZero error.
+        :returns np.ndarray: Array of size data.shape[0] with local outlier scores.
+
+        :example:
+        >>> data = np.random.normal(loc=45, scale=1, size=100).astype(np.float32)
+        >>> for i in range(5): data = np.vstack([data, np.random.normal(loc=45, scale=1, size=100).astype(np.float32)])
+        >>> for i in range(2): data = np.vstack([data, np.random.normal(loc=90, scale=1, size=100).astype(np.float32)])
+        >>> Statistics().local_outlier_factor(data=data, k=5).astype(np.float32)
+        >>> [1.004, 1.007, 0.986, 1.018, 0.986, 0.996, 24.067, 24.057]
+        """
+
+        if isinstance(k, float):
+            k = int(data.shape[0] * k)
+        lof_model = LocalOutlierFactor(n_neighbors=k, contamination=contamination)
+        _ = lof_model.fit_predict(data)
+        return -lof_model.negative_outlier_factor_
+
+    @staticmethod
+    @jit(nopython=True)
+    def _hbos_compute(
+        data: np.ndarray, histograms: typed.Dict, histogram_edges: typed.Dict
+    ) -> np.ndarray:
+        """
+        Jitted helper to compute Histogram-based Outlier Score (HBOS) called by ``simba.mixins.statistics_mixin.Statistics.hbos``.
+
+        :parameter np.ndarray data: 2d array with frames represented by rows and columns representing feature values.
+        :parameter typed.Dict histograms: Numba typed.Dict with integer keys (representing order of feature) and 1d arrays as values representing observation bin counts.
+        :parameter: typed.Dict histogram_edges: Numba typed.Dict with integer keys (representing order of feature) and 1d arrays as values representing bin edges.
+        :return np.ndarray: Array of size data.shape[0] representing outlier scores, with higher values representing greater outliers.
+        """
+        results = np.full((data.shape[0]), np.nan)
+        data = data.astype(np.float32)
+        for i in prange(data.shape[0]):
+            score = 0.0
+            for j in prange(data.shape[1]):
+                value, bin_idx = data[i][j], np.nan
+                for k in np.arange(histogram_edges[j].shape[0], 0, -1):
+                    bin_max, bin_min = histogram_edges[j][k], histogram_edges[j][k - 1]
+                    if (value <= bin_max) and (value > bin_min):
+                        bin_idx = k
+                        continue
+                if np.isnan(bin_idx):
+                    bin_idx = 0
+                score += -np.log(histograms[j][int(bin_idx) - 1] + 1e-10)
+            results[i] = score
+        return results
+
+    def hbos(
+        self,
+        data: np.ndarray,
+        bucket_method: Literal[
+            "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
+        ] = "auto",
+    ):
+        """
+        Jitted compute of Histogram-based Outlier Scores (HBOS). HBOS quantifies the abnormality of data points based on the densities of their feature values
+        within their respective buckets over all feature values.
+
+        :parameter np.ndarray data: 2d array with frames represented by rows and columns representing feature values.
+        :parameter Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators.
+        :return np.ndarray: Array of size data.shape[0] representing outlier scores, with higher values representing greater outliers.
+
+        .. image:: _static/img/hbos.png
+           :width: 800
+           :align: center
+
+        :example:
+        >>> sample_1 = np.random.random_integers(low=1, high=2, size=(10, 50)).astype(np.float64)
+        >>> sample_2 = np.random.random_integers(low=7, high=20, size=(2, 50)).astype(np.float64)
+        >>> data = np.vstack([sample_1, sample_2])
+        >>> Statistics().hbos(data=data)
+        """
+
+        min_vals, max_vals = np.min(data, axis=0), np.max(data, axis=0)
+        data = (data - min_vals) / (max_vals - min_vals) * (1 - 0) + 0
+        histogram_edges = typed.Dict.empty(
+            key_type=types.int64, value_type=types.float64[:]
+        )
+        histograms = typed.Dict.empty(key_type=types.int64, value_type=types.int64[:])
+        for i in range(data.shape[1]):
+            bin_width, bin_count = bucket_data(data=data, method=bucket_method)
+            histograms[i] = self._hist_1d(
+                data=data,
+                bin_count=bin_count,
+                range=np.array([0, int(bin_width * bin_count)]),
+            )
+            histogram_edges[i] = np.arange(0, 1 + bin_width, bin_width).astype(
+                np.float64
+            )
+
+        results = self._hbos_compute(
+            data=data, histograms=histograms, histogram_edges=histogram_edges
+        )
+        return results
+
+    def rolling_shapiro_wilks(
+        self, data: np.ndarray, time_window: float, fps: int
+    ) -> np.ndarray:
+        """
+        Compute Shapiro-Wilks normality statistics for sequentially binned values in a time-series. E.g., compute
+        the normality statistics of ``Feature N`` in each window of ``time_window`` seconds.
+
+        :parameter ndarray data: 1D array of size len(frames) representing feature values.
+        :parameter int time_window: The size of the buckets in seconds.
+        :parameter int fps: Frame-rate of recorded video.
+        :return np.ndarray: Array of size data.shape[0] with Shapiro-Wilks normality statistics
+
+        :example:
+        >>> data = np.random.randint(low=0, high=100, size=(200)).astype('float32')
+        >>> results = self.rolling_shapiro_wilks(data=data, time_window=1, fps=30)
+        """
+
+        window_size, results = int(time_window * fps), np.full((data.shape[0]), -1.0)
+        data = np.split(data, list(range(window_size, data.shape[0], window_size)))
+        for cnt, i in enumerate(prange(1, len(data))):
+            start, end = int((cnt + 1) * window_size), int(
+                ((cnt + 1) * window_size) + window_size
+            )
+            results[start:end] = stats.shapiro(data[i])[0]
+        return results
+
+
+# data_sizes = [5, 10, 100, 1000, 10000]
+# runs = 4
+#
+# # data_sizes = [1]
+# # runs = 1
+# import pickle
+# for i in range(1, runs+1):
+#     print(i)
+#     for j in data_sizes:
+#         data = np.random.random_integers(0, 100, (j, 400))
+#         start = time.time()
+#         results = Statistics().hbos(data=data)
+#         print(time.time() - start)
+#
+#
+
+
+# for i in data_sizes:
+#
+# data = np.hstack([data_1, data_2])
+
+
+#
+
+
+# sample_1 = np.random.random_integers(low=1, high=2, size=(10, 50)).astype(np.float64)
+# sample_2 = np.random.random_integers(low=7, high=20, size=(2, 50)).astype(np.float64)
+# data = np.vstack([sample_1, sample_2])
+# Statistics().hbos(data=data)
+
+# @staticmethod
+# def polyfit(data:np.ndarray,
+#             deg: int):
+#
+#     time = np.arange(0, len(data))
+#
+#
+# data = np.ndarray([100, 200, 250, 309, 402, 490, 510, 555, 690])
+# y =  Statistics().polyfit(data=data, deg=1)
+
+
+# # @jit(nopython=True)
+# # def fft(data: np.ndarray):
+# #     y = np.full(1, dtype=np.complex128, fill_value=np.nan)
+# #     with objmode(y='float32[:]'):
+# #         y = np.fft.fft(data)
+#
+#
+#
+#
+#
+# #
+# # start = time.time()
+# # for i in range(1000):
+# #     x = autocorrelation(data=data, max_lag=0.5, time_window=1.0, fps=10)
+# # print(time.time() - start)
+#
+# data = np.arange(0, 100, 6).astype(np.float32)
+#
+# data = np.array([0,1,2,3,4, 5,6,7,8,1,10,11,12,13,14]).astype(np.float32)
+# start = time.time()
+# for i in range(1000):
+#     y =  Statistics().sliding_autocorrelation(data=data, max_lag=0.5, time_window=1.0, fps=10)
+# print(time.time() - start)
+
+
 #
 #
 # Statistics().rolling_one_way_anova(data=data, time_windows=np.array([0.5]), fps=10)

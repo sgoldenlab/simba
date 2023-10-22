@@ -313,6 +313,37 @@ To analyze and visualize how animals are directing towards each other, rather th
 </p>
 
 
+## Compute aggregate conditional statistics from boolean fields
+
+Sometimes we may want to compute conditional aggregate statistics from boolean fields (fields which contains `1` and `0` values). Boolean fields created from ROI analysis include fields such as if animals are inside (`1`) or outside (`0`) user-defined ROIs, and if animals are directing towards (`1`) or away from (`0`) user-defined ROIs. These computations allows us to answer questions such as:
+
+* **For how much time, and for how many frames, in each video, was Animal 1 inside my shape called Rectangle_1 while also facing my shape names Polygon_1, while at the same time Animal_2 was outside the shape names Rectangle_1, and directed towards my shape called Polygon_1**
+
+To compute these statistics, begin by extrating ROI features as described [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data). 
+
+Once done, click the <kbd>AGGREGATE BOOLEN CONDITIONAL STATISTICS</kbd> button in the `ROI` tab, shown on the right in the screengrab below:
+
+>Note: Your SimBA project needs to have files inside the `project_folder/csv/features_extracted` directory **AND** these files needs to contain at least 2 fields with Boolean variables for this to work. If these two conditions arre not fullfilled, you will be shown an error when clicking the <kbd>AGGREGATE BOOLEN CONDITIONAL STATISTICS</kbd> button.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/aggregate_boolean_conditional_stats.png" />
+</p>
+
+Once clicked, you should see the pop up menu to the right in the screengrab above. 
+
+* In the `CONDITINAL RULES` window and #RULES drop-down, select the number of rules that you wish to use to calculate your doncitional statistics. In my example above, I have selected 4 rules. Once you have selected the number of rules, the lower frame is populated with the number of rows that you selected in the `# RULES` dropdown.
+
+* Each row contains one dropdown menu in the `BEHAVIOR` column, and a second dropdown in the `STATUS` column. The dropdowns in the  `BEHAVIOR` column contains options for all the Boolean fields present in your data in the `project_folder/csv/features_extracted` directory. The dropdowns in the `STATUS` column contains the options `TRUE` and `FALSE`.
+
+* In the `BEHAVIOR` column, select the behaviors that you wish to use in your conditional statistics. In the `STATUS` column, select if the behavior should be present (TRUE) or absent (TRUE). Note that a behavior selected in the dropdown in the `BEHAVIOR` column can not feature in several rows. In my screengrab above, for example, I will calculate when an animal called Simon is inside the shape called Rectangle_1 while Simon also faces the shape Polygon_1, while at the same time an animal called JJ is outside the shape Rectangle_1 and directing towards the shape Polygon_1.
+
+* Once completed, click the run button. You can follow the progress in the main SimBA terminal window. When complete, SimBA will save a CSV file in the logs directory of your SimBA project names something like `Conditional_aggregate_statistics_{self.datetime}.csv`. This file contains one row per video in your project, where the first column represents the video name and the following columns represents the conditional rules you applied (with values TRUE or FALSE). The last two columns represents the TIME and the number of frames your conditional rule was found to be happening. See the screengrab below or click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/Conditional_aggregate_statistics_20231004130314.csv) for an example of expected output for two videos.  
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/aggregate_boolean_stats_table.png" />
+</p>
+
+
 ##
 Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
 

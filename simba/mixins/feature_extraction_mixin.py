@@ -10,7 +10,7 @@ from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-from numba import jit, prange
+from numba import jit, njit, prange
 from scipy import stats
 from scipy.signal import find_peaks, savgol_filter
 from scipy.spatial import ConvexHull
@@ -411,7 +411,13 @@ class FeatureExtractionMixin(object):
     @jit(nopython=True, cache=True)
     def cdist(array_1: np.ndarray, array_2: np.ndarray) -> np.ndarray:
         """
-        Jitted analogue of meth:`scipy.cdist` for two 2D arrays.
+        Jitted analogue of meth:`scipy.cdist` for two 2D arrays. Use to calculate Euclidean distances between
+        all coordinates in one array and all coordinates in a second array. E.g., computes the distances between
+        all body-parts of one animal and all body-parts of a second animal.
+
+        .. image:: _static/img/cdist.png
+           :width: 600
+           :align: center
 
         :parameter np.ndarray array_1: 2D array of body-part coordinates
         :parameter np.ndarray array_2: 2D array of body-part coordinates
@@ -435,7 +441,8 @@ class FeatureExtractionMixin(object):
     @jit(nopython=True)
     def cdist_3d(data: np.ndarray) -> np.ndarray:
         """
-        Jitted analogue of meth:`scipy.cdist` for 3D array.
+        Jitted analogue of meth:`scipy.cdist` for 3D array. Use to calculate Euclidean distances between
+        all coordinates in of one array and itself.
 
         :parameter np.ndarray data: 3D array of body-part coordinates of size len(frames) x -1 x 2.
         :return np.ndarray: 3D array of size data.shape[0], data.shape[1], data.shape[1].
@@ -448,6 +455,24 @@ class FeatureExtractionMixin(object):
                     results[i][j][k] = np.linalg.norm(data[i][j] - data[i][k])
 
         return results
+
+    @staticmethod
+    # @njit('(float32[:],)')
+    def cosine_similarity(data: np.ndarray) -> np.ndarray:
+        """
+        Jitted analogue of sklearn.metrics.pairwise import cosine_similarity. Similar to scipy.cdist.
+        calculates the cosine similarity between all pairs in 2D array.
+
+        :example:
+        >>> data = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).astype(np.float32)
+        >>> FeatureExtractionMixin().cosine_similarity(data=data)
+        >>> [[1.0, 0.974, 0.959][0.974,  1.0, 0.998] [0.959, 0.998, 1.0]
+        """
+
+        dot_product = np.dot(data, data.T)
+        norms = np.linalg.norm(data, axis=1).reshape(-1, 1)
+        similarity = dot_product / (norms * norms.T)
+        return similarity
 
     @staticmethod
     def create_shifted_df(df: pd.DataFrame, periods: int = 1) -> pd.DataFrame:
@@ -911,7 +936,8 @@ class FeatureExtractionMixin(object):
             raise CountError(
                 f"Your SimBA project is set to using the default {pose_config} pose-configuration. "
                 f"SimBA therefore expects {str(len(headers))} columns of data inside the files within the project_folder. However, "
-                f"within file {filename} file, SimBA found {str(len(df.columns))} columns."
+                f"within file {filename} file, SimBA found {str(len(df.columns))} columns.",
+                source=self.__class__.__name__,
             )
         else:
             df.columns = headers
@@ -958,6 +984,19 @@ class FeatureExtractionMixin(object):
             return True, coord
         else:
             return False, coord
+
+
+# cdist_3d
+
+#
+# array_1 = np.array([[[100, 200], [301, 198], [234, 512]],
+#                     [[102, 209], [298, 175], [240, 514]]]).astype(np.float32)
+#
+# array_2 = np.array([[[450, 901], [309, 892], [447, 896]],
+#                     [[449, 903], [303, 879], [451, 899]]]).astype(np.float32)
+#
+# FeatureExtractionMixin.cdist_3d(array_1=array_1, array_2=array_2)
+#
 
 
 #

@@ -13,7 +13,7 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     """
-    Additional feature extraction method not called by default feature extraction classes.
+    Additional feature extraction method not called by default feature extraction classes from ``simba.feature_extractors``.
 
     """
 
