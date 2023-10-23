@@ -31,7 +31,7 @@ jobs:
         pip install --upgrade setuptools
         pip install flake8 pytest black pytest-cov
         pip install pandas
-        if [ -f requirements.txt ]; then cat -r requirements.txt | xargs -n 1 pip install; fi
+        if [ -f requirements.txt ]; then cat requirements.txt | xargs -n 1 pip install; fi
         pip install simba-uw-tf-dev --no-deps
     # - name: Install ffmpeg
     #   id: setup-ffmpeg
