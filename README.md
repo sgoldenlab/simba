@@ -1,7 +1,7 @@
 # SimBA (Simple Behavioral Analysis)
 
 [![pypi](https://img.shields.io/pypi/v/simba-uw-tf-dev.svg)]([https://pepy.tech/project/simba-uw-tf-dev](https://pypi.org/project/Simba-UW-tf-dev/))
-[![py3.6 tests](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml/badge.svg)](https://github.com/sgoldenlab/simba/actions/workflows/test_py36.yml)
+[![py3.6 tests](https://github.com/sgoldenlab/simba/actions/workflows/tests.yml/badge.svg)](https://github.com/sgoldenlab/simba/actions/workflows/tests_py36.yml)
 ![Docs](https://readthedocs.org/projects/simba-uw-tf-dev/badge/?version=latest&style=flat)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Gitter chat](https://badges.gitter.im/USER/REPO.png)](https://gitter.im/SimBA-Resource/community)
