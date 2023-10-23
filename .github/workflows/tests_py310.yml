@@ -31,7 +31,7 @@ jobs:
         pip install --upgrade setuptools
         pip install flake8 pytest black pytest-cov
         pip install pandas
-        if [ -f requirements.txt ]; then pip install $(grep -ivE "pandas==" -r requirements.txt); fi
+        if [ -f requirements.txt ]; then pip install $(grep -ivE "pandas==0.25.3" -r requirements.txt); fi
         pip install simba-uw-tf-dev --no-deps
     # - name: Install ffmpeg
     #   id: setup-ffmpeg
