@@ -41,7 +41,7 @@ class ROI_definitions(ConfigReader):
 
     """
 
-    def __init__(self, config_path: str, video_path: str,image_data : ROI_image_class):
+    def __init__(self, config_path: str, video_path: str, image_data: ROI_image_class):
         ConfigReader.__init__(self, config_path=config_path)
         self.video_path = video_path
         _, self.file_name, self.file_ext = get_fn_ext(self.video_path)
@@ -112,7 +112,6 @@ class ROI_definitions(ConfigReader):
         self.image_data.reset()
         self.master.destroy()
         self.root.destroy()
-
 
     def show_video_info(self):
         self.video_info_frame = LabelFrame(
@@ -316,7 +315,7 @@ class ROI_definitions(ConfigReader):
         )
         self.apply_from_other_video.grid(row=7, sticky=W)
         self.video_dropdown.config(direction=RIGHT)
-        self.video_dropdown.grid(row=1, column=1,sticky="ew", pady=20)
+        self.video_dropdown.grid(row=1, column=1, sticky="ew", pady=20)
         self.apply_button.grid(row=1, column=3, sticky=W, pady=10)
 
     def select_shape(self):
@@ -548,10 +547,10 @@ class ROI_definitions(ConfigReader):
 
     def show_shape_information(self):
         if (
-                len(self.image_data.out_rectangles)
-                + len(self.image_data.out_circles)
-                + len(self.image_data.out_polygon)
-                == 0
+            len(self.image_data.out_rectangles)
+            + len(self.image_data.out_circles)
+            + len(self.image_data.out_polygon)
+            == 0
         ):
             print("No shapes to print info for.")
 
@@ -694,10 +693,10 @@ class ROI_definitions(ConfigReader):
     def call_delete_all_rois(self):
         self.shape_info_btn.configure(text="Show shape info.")
         if (
-                len(self.image_data.out_rectangles)
-                + len(self.image_data.out_circles)
-                + len(self.image_data.out_polygon)
-                == 0
+            len(self.image_data.out_rectangles)
+            + len(self.image_data.out_circles)
+            + len(self.image_data.out_polygon)
+            == 0
         ):
             NoDataFoundWarning(msg="SimBA finds no ROIs to delete.")
         else:
@@ -717,7 +716,7 @@ class ROI_definitions(ConfigReader):
                 c_no += 1
             else:
                 self.new_shape_data["Name"] = (
-                        str(self.shape_type) + ": " + self.new_name
+                    str(self.shape_type) + ": " + self.new_name
                 )
                 break
 
@@ -731,7 +730,7 @@ class ROI_definitions(ConfigReader):
             )
             for shape in self.image_data.out_rectangles:
                 if (shape["topLeftX"] == self.new_shape_x) and (
-                        shape["topLeftY"] == self.new_shape_y
+                    shape["topLeftY"] == self.new_shape_y
                 ):
                     self.new_shape_x += self.duplicate_jump_size
                     self.new_shape_y += self.duplicate_jump_size
@@ -744,7 +743,7 @@ class ROI_definitions(ConfigReader):
             )
             for shape in self.image_data.out_circles:
                 if (shape["centerY"] == self.new_shape_x) and (
-                        shape["centerY"] == self.new_shape_y
+                    shape["centerY"] == self.new_shape_y
                 ):
                     self.new_shape_x += self.duplicate_jump_size
                     self.new_shape_y += self.duplicate_jump_size
@@ -757,7 +756,7 @@ class ROI_definitions(ConfigReader):
             )
             for shape in self.image_data.out_polygon:
                 if (shape["Center_X"] == self.new_shape_x) and (
-                        shape["centerY"] == self.new_shape_y
+                    shape["centerY"] == self.new_shape_y
                 ):
                     self.new_shape_x += self.duplicate_jump_size
                     self.new_shape_y += self.duplicate_jump_size
@@ -767,9 +766,9 @@ class ROI_definitions(ConfigReader):
         self.shape_info_btn.configure(text="Show shape info.")
         if shape_name[0] != "None":
             all_roi_list = (
-                    self.image_data.out_rectangles
-                    + self.image_data.out_circles
-                    + self.image_data.out_polygon
+                self.image_data.out_rectangles
+                + self.image_data.out_circles
+                + self.image_data.out_polygon
             )
             self.shape_type, shape_name = shape_name[0], shape_name[1]
             self.current_shape_data = [
@@ -852,11 +851,11 @@ class ROI_definitions(ConfigReader):
             polygons_found = pd.read_hdf(self.roi_coordinates_path, key="polygons")
             other_vid_rectangles = rectangles_found[
                 rectangles_found["Video"] != self.file_name
-                ]
+            ]
             other_vid_circles = circles_found[circles_found["Video"] != self.file_name]
             other_vid_polygons = polygons_found[
                 polygons_found["Video"] != self.file_name
-                ]
+            ]
 
             new_rectangles = pd.DataFrame.from_dict(self.image_data.out_rectangles)
             new_circles = pd.DataFrame.from_dict(self.image_data.out_circles)
@@ -919,9 +918,9 @@ class ROI_definitions(ConfigReader):
             shape_name = shape_data.selected_video.get().split(": ")
             if shape_name[0] != "None":
                 self.all_roi_list = (
-                        shape_data.image_data.out_rectangles
-                        + shape_data.image_data.out_circles
-                        + shape_data.image_data.out_polygon
+                    shape_data.image_data.out_rectangles
+                    + shape_data.image_data.out_circles
+                    + shape_data.image_data.out_polygon
                 )
                 self.shape_type, self.shape_name = shape_name[0], shape_name[1]
                 current_shape_data = [
@@ -1121,6 +1120,7 @@ class PreferenceMenu:
         image_data.line_type = self.line_type.get()
         image_data.duplicate_jump_size = self.duplicate_jump_size.get()
         stdout_success(msg="Saved ROI preference settings.")
+
 
 #
 # test = ROI_definitions(config_path='/Users/simon/Desktop/envs/simba_dev/tests/test_data/mouse_open_field/project_folder/project_config.ini',

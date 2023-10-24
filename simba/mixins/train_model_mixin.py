@@ -117,11 +117,13 @@ class TrainModelMixin(object):
                 for clf_name in classifier_names:
                     if not clf_name in df.columns:
                         raise MissingColumnsError(
-                            msg=f"Data for video {vid_name} does not contain any annotations for behavior {clf_name}. Delete classifier {clf_name} from the SimBA project, or add annotations for behavior {clf_name} to the video {vid_name}"
+                            msg=f"Data for video {vid_name} does not contain any annotations for behavior {clf_name}. Delete classifier {clf_name} from the SimBA project, or add annotations for behavior {clf_name} to the video {vid_name}",
+                            source=self.__class__.__name__,
                         )
                     elif len(set(df[clf_name].unique()) - {0, 1}) > 0:
                         raise InvalidInputError(
-                            msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}."
+                            msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.",
+                            source=self.__class__.__name__,
                         )
                     else:
                         df_concat = pd.concat([df_concat, df], axis=0)
@@ -133,7 +135,8 @@ class TrainModelMixin(object):
             pass
         if len(df_concat) == 0:
             raise NoDataError(
-                msg="SimBA found 0 annotated frames in the project_folder/csv/targets_inserted directory"
+                msg="SimBA found 0 annotated frames in the project_folder/csv/targets_inserted directory",
+                source=self.__class__.__name__,
             )
         df_concat = df_concat.loc[
             :, ~df_concat.columns.str.contains("^Unnamed")
@@ -240,7 +243,8 @@ class TrainModelMixin(object):
         ratio_n = int(len(present_df) * sample_ratio)
         if len(absent_df) < ratio_n:
             raise SamplingError(
-                msg=f"SIMBA UNDER SAMPLING ERROR: The under-sample ratio of {str(sample_ratio)} in classifier {y_train.name} demands {str(ratio_n)} behavior-absent annotations. This is more than the number of behavior-absent annotations in the entire dataset {str(len(absent_df))}. Please annotate more images or decrease the under-sample ratio."
+                msg=f"SIMBA UNDER SAMPLING ERROR: The under-sample ratio of {str(sample_ratio)} in classifier {y_train.name} demands {str(ratio_n)} behavior-absent annotations. This is more than the number of behavior-absent annotations in the entire dataset {str(len(absent_df))}. Please annotate more images or decrease the under-sample ratio.",
+                source=self.__class__.__name__,
             )
         data_df = pd.concat(
             [present_df, absent_df.sample(n=ratio_n, replace=False)], axis=0
@@ -579,7 +583,8 @@ class TrainModelMixin(object):
             visualizer.poof(outpath=save_path, clear_figure=True)
         except KeyError as e:
             NotEnoughDataWarning(
-                msg=f"Not enough data to create classification report: {class_names[1]}"
+                msg=f"Not enough data to create classification report: {class_names[1]}",
+                source=self.__class__.__name__,
             )
 
     def create_x_importance_log(
@@ -724,7 +729,8 @@ class TrainModelMixin(object):
             svg_tree.save(save_path)
         except:
             NoModuleWarning(
-                msg='Skipping dtreeviz example decision tree visualization. Make sure "graphviz" is installed.'
+                msg='Skipping dtreeviz example decision tree visualization. Make sure "graphviz" is installed.',
+                source=self.__class__.__name__,
             )
 
     @staticmethod
@@ -757,7 +763,9 @@ class TrainModelMixin(object):
         save_file_no: Optional[int] = None,
     ) -> None:
         """
-        Helper to compute SHAP values.
+        Compute SHAP values for a random forest classifier.
+
+        This method computes SHAP (SHapley Additive exPlanations) values for a given random forest classifier.
 
         .. seealso::
            `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
@@ -768,6 +776,13 @@ class TrainModelMixin(object):
 
         .. note::
            For improved run-times, use multiprocessing through :meth:`simba.mixins.train_model_mixins.TrainModelMixin.create_shap_log_mp`
+           Uses TreeSHAP `Documentation <https://shap.readthedocs.io/en/latest/index.html>`_
+
+        The SHAP value for feature 'i' in the context of a prediction 'f' and input 'x' is calculated using the following formula:
+
+        .. math::
+
+           \phi_i(f, x) = \\sum_{S \\subseteq F \\setminus {i}} \\frac{|S|!(|F| - |S| - 1)!}{|F|!} (f_{S \cup {i}}(x_{S \\cup {i}}) - f_S(x_S))
 
         :param str ini_file_path: Path to the SimBA project_config.ini
         :param RandomForestClassifier rf_clf: sklearn random forest classifier
@@ -807,12 +822,14 @@ class TrainModelMixin(object):
         )
         if len(target_df) < cnt_present:
             NotEnoughDataWarning(
-                msg=f"Train data contains {str(len(target_df))} behavior-present annotations. This is less the number of frames you specified to calculate shap values for {str(cnt_present)}. SimBA will calculate shap scores for the {str(len(target_df))} behavior-present frames available"
+                msg=f"Train data contains {str(len(target_df))} behavior-present annotations. This is less the number of frames you specified to calculate shap values for {str(cnt_present)}. SimBA will calculate shap scores for the {str(len(target_df))} behavior-present frames available",
+                source=self.__class__.__name__,
             )
             cnt_present = len(target_df)
         if len(nontarget_df) < cnt_absent:
             NotEnoughDataWarning(
-                msg=f"Train data contains {str(len(nontarget_df))} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for {str(cnt_absent)}. SimBA will calculate shap scores for the {str(len(target_df))} behavior-absent frames available"
+                msg=f"Train data contains {str(len(nontarget_df))} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for {str(cnt_absent)}. SimBA will calculate shap scores for the {str(len(target_df))} behavior-absent frames available",
+                source=self.__class__.__name__,
             )
             cnt_absent = len(nontarget_df)
         non_target_for_shap = nontarget_df.sample(cnt_absent, replace=False)
@@ -859,7 +876,9 @@ class TrainModelMixin(object):
 
         shap_timer.stop_timer()
         stdout_success(
-            msg="SHAP calculations complete", elapsed_time=shap_timer.elapsed_time_str
+            msg="SHAP calculations complete",
+            elapsed_time=shap_timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
         _ = ShapAggregateStatisticsVisualizer(
             config_path=ini_file_path,
@@ -959,7 +978,8 @@ class TrainModelMixin(object):
                 model_dict[n] = {}
                 if config.get("SML settings", "model_path_" + str(n + 1)) == "":
                     MissingUserInputWarning(
-                        msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: no path set to model file'
+                        msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: no path set to model file',
+                        source=self.__class__.__name__,
                     )
                     continue
                 if (
@@ -967,7 +987,8 @@ class TrainModelMixin(object):
                     == "No file selected"
                 ):
                     MissingUserInputWarning(
-                        msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: The classifier path is set to "No file selected'
+                        msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: The classifier path is set to "No file selected',
+                        source=self.__class__.__name__,
                     )
                     continue
                 model_dict[n]["model_path"] = config.get(
@@ -992,12 +1013,14 @@ class TrainModelMixin(object):
                 check_int("minimum_bout_length", model_dict[n]["minimum_bout_length"])
             except ValueError:
                 MissingUserInputWarning(
-                    msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: missing information (e.g., no discrimination threshold and/or minimum bout set in the project_config.ini'
+                    msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: missing information (e.g., no discrimination threshold and/or minimum bout set in the project_config.ini',
+                    source=self.__class__.__name__,
                 )
 
         if len(model_dict.keys()) == 0:
             raise NoDataError(
-                msg=f"There are no models with accurate data specified in the RUN MODELS menu. Specify the model information to SimBA RUN MODELS menu to use them to analyze videos"
+                msg=f"There are no models with accurate data specified in the RUN MODELS menu. Specify the model information to SimBA RUN MODELS menu to use them to analyze videos",
+                source=self.get_model_info.__name__,
             )
         else:
             return model_dict
@@ -1049,11 +1072,13 @@ class TrainModelMixin(object):
             bp_missing = int(abs(difference) / 3)
             if difference < 0:
                 raise DataHeaderError(
-                    msg=f"SimBA expects {len(new_headers)} columns of data inside the files within project_folder/csv/input_csv directory. However, within file {filepath} file, SimBA found {len(data_df.columns)} columns. Thus, there is {abs(difference)} missing data columns in the imported data, which may represent {int(bp_missing)} bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {str(bp_missing)} less body-part, or include {bp_missing} more body-part in the imported data"
+                    msg=f"SimBA expects {len(new_headers)} columns of data inside the files within project_folder/csv/input_csv directory. However, within file {filepath} file, SimBA found {len(data_df.columns)} columns. Thus, there is {abs(difference)} missing data columns in the imported data, which may represent {int(bp_missing)} bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {str(bp_missing)} less body-part, or include {bp_missing} more body-part in the imported data",
+                    source=self.__class__.__name__,
                 )
             else:
                 raise DataHeaderError(
-                    msg=f"SimBA expects {len(new_headers)} columns of data inside the files within project_folder/csv/input_csv directory. However, within file {filepath} file, SimBA found {len(data_df.columns)} columns. Thus, there is {abs(difference)} more data columns in the imported data than anticipated, which may represent {int(bp_missing)} bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {str(bp_missing)} more body-part, or include {bp_missing} less body-part in the imported data"
+                    msg=f"SimBA expects {len(new_headers)} columns of data inside the files within project_folder/csv/input_csv directory. However, within file {filepath} file, SimBA found {len(data_df.columns)} columns. Thus, there is {abs(difference)} more data columns in the imported data than anticipated, which may represent {int(bp_missing)} bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {str(bp_missing)} more body-part, or include {bp_missing} less body-part in the imported data",
+                    source=self.__class__.__name__,
                 )
         else:
             data_df.columns = new_headers
@@ -1072,7 +1097,8 @@ class TrainModelMixin(object):
             clf = pickle.load(open(file_path, "rb"))
         except pickle.UnpicklingError:
             raise CorruptedFileError(
-                msg=f"Can not read {file_path} as a classifier file (pickle)."
+                msg=f"Can not read {file_path} as a classifier file (pickle).",
+                source=self.__class__.__name__,
             )
         return clf
 
@@ -1164,23 +1190,27 @@ class TrainModelMixin(object):
                 raise FaultyTrainingSetError(
                     msg=f"{str(len(x_nan_cnt))} feature column(s) exist in some files within the project_folder/csv/targets_inserted directory, but missing in others. "
                     f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the "
-                    f"column names with mismatches are: {list(x_nan_cnt.index)}"
+                    f"column names with mismatches are: {list(x_nan_cnt.index)}",
+                    source=self.__class__.__name__,
                 )
             else:
                 raise FaultyTrainingSetError(
                     msg=f"{str(len(x_nan_cnt))} feature columns exist in some files, but missing in others. The feature files are found in the project_folder/csv/targets_inserted directory. "
                     f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
-                    f"column names with mismatches are: {list(x_nan_cnt.index)[0:9]}"
+                    f"column names with mismatches are: {list(x_nan_cnt.index)[0:9]}",
+                    source=self.__class__.__name__,
                 )
 
         if len(y_df.unique()) == 1:
             if y_df.unique()[0] == 0:
                 raise FaultyTrainingSetError(
-                    msg=f"All training annotations for classifier {str(y_df.name)} is labelled as ABSENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS."
+                    msg=f"All training annotations for classifier {str(y_df.name)} is labelled as ABSENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.",
+                    source=self.__class__.__name__,
                 )
             if y_df.unique()[0] == 1:
                 raise FaultyTrainingSetError(
-                    msg=f"All training annotations for classifier {str(y_df.name)} is labelled as PRESENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS."
+                    msg=f"All training annotations for classifier {str(y_df.name)} is labelled as PRESENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.",
+                    source=self.__class__.__name__,
                 )
 
     def partial_dependence_calculator(
@@ -1242,19 +1272,31 @@ class TrainModelMixin(object):
         :raises FeatureNumberMismatchError: If shape of x_df and clf.n_features_ show mismatch
         """
 
-        if len(x_df.columns) != clf.n_features_in_:
+        if hasattr(clf, "n_features_"):
+            clf_n_features = clf.n_features_
+        elif hasattr(clf, "n_features_in_"):
+            clf_n_features = clf.n_features_in_
+        else:
+            raise InvalidInputError(
+                msg=f"Could not determine the number of features in the classifier {model_name}",
+                source=self.__class__.__name__,
+            )
+        if len(x_df.columns) != clf_n_features:
             if model_name and data_path:
                 raise FeatureNumberMismatchError(
-                    f"Mismatch in the number of features in input file {data_path}, and what is expected by the model {model_name}. The model expects {str(clf.n_features_in_)} features. The data contains {len(x_df.columns)} features."
+                    f"Mismatch in the number of features in input file {data_path}, and what is expected by the model {model_name}. The model expects {clf_n_features} features. The data contains {len(x_df.columns)} features.",
+                    source=self.__class__.__name__,
                 )
             else:
                 raise FeatureNumberMismatchError(
-                    f"The model expects {str(clf.n_features_in_)} features. The data contains {len(x_df.columns)} features."
+                    f"The model expects {clf_n_features} features. The data contains {len(x_df.columns)} features.",
+                    source=self.__class__.__name__,
                 )
         p_vals = clf.predict_proba(x_df)
         if p_vals.shape[1] != 2:
             raise ClassifierInferenceError(
-                msg=f"The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes."
+                msg=f"The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes. The classifier is not a binary classifier and does not predict two targets (absence and presence of behavior)",
+                source=self.__class__.__name__,
             )
         return p_vals[:, 1]
 
@@ -1273,11 +1315,13 @@ class TrainModelMixin(object):
         nan_target = y_df.loc[pd.to_numeric(y_df).isna()]
         if len(nan_features) > 0:
             raise FaultyTrainingSetError(
-                msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values"
+                msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values",
+                source=self.__class__.__name__,
             )
         if len(nan_target) > 0:
             raise FaultyTrainingSetError(
-                msg=f"{len(nan_target)} frame(s) in your project_folder/csv/targets_inserted directory contains ANNOTATIONS with non-numerical values"
+                msg=f"{len(nan_target)} frame(s) in your project_folder/csv/targets_inserted directory contains ANNOTATIONS with non-numerical values",
+                source=self.__class__.__name__,
             )
         return clf.fit(x_df, y_df)
 
@@ -1295,10 +1339,15 @@ class TrainModelMixin(object):
         if clf_names != None:
             for clf_name in clf_names:
                 if not clf_name in df.columns:
-                    raise ColumnNotFoundError(column_name=clf_name, file_name=file_path)
+                    raise ColumnNotFoundError(
+                        column_name=clf_name,
+                        file_name=file_path,
+                        source=self.__class__.__name__,
+                    )
                 elif len(set(df[clf_name].unique()) - {0, 1}) > 0:
                     raise InvalidInputError(
-                        msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}."
+                        msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.",
+                        source=self.__class__.__name__,
                     )
         timer.stop_timer()
         print(
@@ -1346,7 +1395,8 @@ class TrainModelMixin(object):
                 df_concat = df_concat.drop(["scorer"], axis=1)
             if len(df_concat) == 0:
                 raise NoDataError(
-                    msg="SimBA found 0 observations (frames) in the project_folder/csv/targets_inserted directory"
+                    msg="SimBA found 0 observations (frames) in the project_folder/csv/targets_inserted directory",
+                    source=self.read_all_files_in_folder_mp.__name__,
                 )
             df_concat = df_concat.loc[
                 :, ~df_concat.columns.str.contains("^Unnamed")
@@ -1359,7 +1409,8 @@ class TrainModelMixin(object):
 
         except BrokenProcessPool or AttributeError:
             MultiProcessingFailedWarning(
-                msg="Multi-processing file read failed, reverting to single core (increased run-time)."
+                msg="Multi-processing file read failed, reverting to single core (increased run-time).",
+                source=self.__class__.__name__,
             )
             return self.read_all_files_in_folder(
                 file_paths=file_paths,
@@ -1439,11 +1490,8 @@ class TrainModelMixin(object):
             df_concat = pd.concat(df_lst, axis=0).round(4)
             if "scorer" in df_concat.columns:
                 df_concat = df_concat.drop(["scorer"], axis=1)
-            memory_size = get_memory_usage_of_df(df=df_concat)
-            print(
-                f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB'
-            )
             return df_concat
+
         except:
             MultiProcessingFailedWarning(
                 msg="Multi-processing file read failed, reverting to single core (increased run-time on large datasets)."
@@ -1493,7 +1541,8 @@ class TrainModelMixin(object):
             raise FaultyTrainingSetError(
                 msg=f"{len(nan_cols)} feature columns exist in some files, but missing in others. The feature files are found in the project_folder/csv/targets_inserted directory. "
                 f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
-                f"column names with mismatches are: {nan_cols[0:9]}. For a log of the files that contain, and not contain, the mis-matched columns, see {save_log_path}"
+                f"column names with mismatches are: {nan_cols[0:9]}. For a log of the files that contain, and not contain, the mis-matched columns, see {save_log_path}",
+                source=self.__class__.__name__,
             )
 
     @staticmethod
@@ -1593,12 +1642,14 @@ class TrainModelMixin(object):
         )
         if len(target_df) < cnt_present:
             NotEnoughDataWarning(
-                msg=f"Train data contains {str(len(target_df))} behavior-present annotations. This is less the number of frames you specified to calculate shap values for {str(cnt_present)}. SimBA will calculate shap scores for the {str(len(target_df))} behavior-present frames available"
+                msg=f"Train data contains {str(len(target_df))} behavior-present annotations. This is less the number of frames you specified to calculate shap values for {str(cnt_present)}. SimBA will calculate shap scores for the {str(len(target_df))} behavior-present frames available",
+                source=self.__class__.__name__,
             )
             cnt_present = len(target_df)
         if len(nontarget_df) < cnt_absent:
             NotEnoughDataWarning(
-                msg=f"Train data contains {str(len(nontarget_df))} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for {str(cnt_absent)}. SimBA will calculate shap scores for the {str(len(target_df))} behavior-absent frames available"
+                msg=f"Train data contains {str(len(nontarget_df))} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for {str(cnt_absent)}. SimBA will calculate shap scores for the {str(len(target_df))} behavior-absent frames available",
+                source=self.__class__.__name__,
             )
             cnt_absent = len(nontarget_df)
         non_target_for_shap = nontarget_df.sample(cnt_absent, replace=False)
@@ -1666,6 +1717,7 @@ class TrainModelMixin(object):
             stdout_success(
                 msg="SHAP calculations complete",
                 elapsed_time=shap_timer.elapsed_time_str,
+                source=self.__class__.__name__,
             )
             _ = ShapAggregateStatisticsVisualizer(
                 config_path=ini_file_path,
@@ -1676,7 +1728,8 @@ class TrainModelMixin(object):
             )
         except:
             ShapWarning(
-                msg="Multiprocessing SHAP values failed. Revert to single core. This will negatively affect run-time. "
+                msg="Multiprocessing SHAP values failed. Revert to single core. This will negatively affect run-time. ",
+                source=self.__class__.__name__,
             )
             self.create_shap_log(
                 ini_file_path=ini_file_path,
@@ -1706,12 +1759,12 @@ class TrainModelMixin(object):
         x_nan_cnt = x_nan_cnt[x_nan_cnt > 0]
         if 0 < len(x_nan_cnt) <= 10:
             msg = f"{len(x_nan_cnt)} feature column(s) exist in {file_name} with non-numerical values. The columns with non-numerical values are: {list(x_nan_cnt.index)}"
-            raise NoDataError(msg=msg)
+            raise NoDataError(msg=msg, source=self.check_df_dataset_integrity.__name__)
         elif len(x_nan_cnt) > 10:
             logs_path = os.path.join(logs_path, f"corrupt_columns_{file_name}.csv")
             msg = f"{len(x_nan_cnt)} feature column(s) exist in {file_name} with non-numerical values. The first 10 columns with non-numerical values are: {list(x_nan_cnt.index)[0:10]}. For a full list of columns with missing values, see {logs_path}"
             x_nan_cnt.to_csv(logs_path)
-            raise NoDataError(msg=msg)
+            raise NoDataError(msg=msg, source=self.check_df_dataset_integrity.__name__)
         else:
             pass
 

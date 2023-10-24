@@ -187,8 +187,6 @@ def get_emojis() -> dict:
         }
 
 
-
-
 def get_meta_data_file_headers() -> List[str]:
     """
     Get List of headers for SimBA classifier metadata output.

@@ -1,4 +1,8 @@
-### Extract ROI definitions to human readable format
+### Standardize ROI sizes across videos with different pixels per millimeter
 
+In this scenario, we have drawn [regions-of-interest (ROIs)](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md) onto a single video imported into SimBA. We have also duplicated the ROIs from this single video to **all** of the videos in our SimBA project by clicking the `Apply to all` button described [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#part-1-defining-rois-in-simba). 
 
-Your drawn ROI definitions (their locations, sizes, vertices, colors etc.) are saved inside the `project_folder/logs/measures/ROI_definitions.h5` file in your SimBA project. Sometimes, we may want to 
+When we click `Apply to all`, the ROIs from the first video - with their exact vertice coordinates - also become associated with the rest of the videos in our project. In use-cases where the camera shifts location across recordings (closer or further away from the animal arena), these ROI vertice locations from the first video may not be exactly accurate, forcing us to go into each video and [modify](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#part-1-defining-rois-in-simba) the size of the duplicated ROIs.
+
+To speed up this process, we can correct the area of the ROIs in our videos according to the pixels per millimeter of those videos in reference to a "baseline" video. For example, say that we drew our ROIs on a "baseline" videos that has a pixel per millimeter of 10. Say that there are a further two videos in the project with ROIs (Video_2 and Video_3), and these videos have pixels per millimeter of 9 and 11, repectively. We have duplicated our ROIs from the "baseline" video onto Video_2 and Video_3. Now we want to resize our rectangles, circles and polygons in the two additional videos (Video_2 and Video_3) to get their ROI areas increased/decreased with 10% while the baseline video ROI areas should remain unchanged.
+

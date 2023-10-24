@@ -24,14 +24,14 @@ class ROI_image_class:
         self.display_image_thread.join()
 
     def __init__(
-            self,
-            config_path,
-            colors_dict,
-            duplicate_jump_size,
-            line_type,
-            click_sens,
-            text_size,
-            text_thickness,
+        self,
+        config_path,
+        colors_dict,
+        duplicate_jump_size,
+        line_type,
+        click_sens,
+        text_size,
+        text_thickness,
     ):
         config = ConfigParser()
         configFile = str(config_path)
@@ -113,21 +113,21 @@ class ROI_image_class:
             if len(rectangles_found) > 0:
                 rectangles_found = rectangles_found[
                     rectangles_found["Video"] == self.curr_vid_name
-                    ]
+                ]
                 rectangles_found = add_missing_ROI_cols(rectangles_found)
                 self.out_rectangles = rectangles_found.to_dict(orient="records")
 
             if len(circles_found) > 0:
                 circles_found = circles_found[
                     circles_found["Video"] == self.curr_vid_name
-                    ]
+                ]
                 circles_found = add_missing_ROI_cols(circles_found)
                 self.out_circles = circles_found.to_dict(orient="records")
 
             if len(polygons_found) > 0:
                 polygons_found = polygons_found[
                     polygons_found["Video"] == self.curr_vid_name
-                    ]
+                ]
                 polygons_found = add_missing_ROI_cols(polygons_found)
                 self.out_polygon = polygons_found.to_dict(orient="records")
 
@@ -140,7 +140,7 @@ class ROI_image_class:
 
     def draw_rectangle(self, rectangle_info):
         self.draw_rectangle_roi = True
-        while len(self.user_rectangle_roi) ==0:
+        while len(self.user_rectangle_roi) == 0:
             time.sleep(1)
         ROI = self.user_rectangle_roi
         top_left_x, top_left_y = ROI[0], ROI[1]
@@ -343,9 +343,9 @@ class ROI_image_class:
                         self.closest_roi["Thickness"],
                     )
                 if (
-                        (self.closest_tag == "Top tag")
-                        or (self.closest_tag == "Top left tag")
-                        or (self.closest_tag == "Top right tag")
+                    (self.closest_tag == "Top tag")
+                    or (self.closest_tag == "Top left tag")
+                    or (self.closest_tag == "Top right tag")
                 ):
                     cv2.line(
                         self.working_frame,
@@ -358,9 +358,9 @@ class ROI_image_class:
                         self.closest_roi["Thickness"],
                     )
                 if (
-                        (self.closest_tag == "Bottom tag")
-                        or (self.closest_tag == "Bottom left tag")
-                        or (self.closest_tag == "Bottom right tag")
+                    (self.closest_tag == "Bottom tag")
+                    or (self.closest_tag == "Bottom left tag")
+                    or (self.closest_tag == "Bottom right tag")
                 ):
                     cv2.line(
                         self.working_frame,
@@ -370,9 +370,9 @@ class ROI_image_class:
                         self.closest_roi["Thickness"],
                     )
                 if (
-                        (self.closest_tag == "Left tag")
-                        or (self.closest_tag == "Bottom left tag")
-                        or (self.closest_tag == "Top left tag")
+                    (self.closest_tag == "Left tag")
+                    or (self.closest_tag == "Bottom left tag")
+                    or (self.closest_tag == "Top left tag")
                 ):
                     cv2.line(
                         self.working_frame,
@@ -382,9 +382,9 @@ class ROI_image_class:
                         self.closest_roi["Thickness"],
                     )
                 if (
-                        (self.closest_tag == "Right tag")
-                        or (self.closest_tag == "Top right tag")
-                        or (self.closest_tag == "Bottom right tag")
+                    (self.closest_tag == "Right tag")
+                    or (self.closest_tag == "Top right tag")
+                    or (self.closest_tag == "Bottom right tag")
                 ):
                     cv2.line(
                         self.working_frame,
@@ -466,7 +466,7 @@ class ROI_image_class:
                         )
                     )
                     if ((not self.closest_roi) and (dist < self.click_sens)) or (
-                            dist < self.closest_dist
+                        dist < self.closest_dist
                     ):
                         self.closest_roi, self.closest_tag, self.closest_dist = (
                             s,
@@ -493,7 +493,7 @@ class ROI_image_class:
                         )
                     )
                     if ((not self.click_roi) and (distance < self.click_sens)) or (
-                            distance < self.click_dist
+                        distance < self.click_dist
                     ):
                         self.click_roi, self.click_tag, self.closest_dist = (
                             shape,
@@ -544,11 +544,11 @@ class ROI_image_class:
         self.insert_all_ROIs_into_image()
 
     def insert_all_ROIs_into_image(
-            self,
-            ROI_ear_tags=False,
-            change_frame_no=False,
-            show_zoomed_img=False,
-            show_size_info=False,
+        self,
+        ROI_ear_tags=False,
+        change_frame_no=False,
+        show_zoomed_img=False,
+        show_size_info=False,
     ):
         self.no_shapes = 0
         if (change_frame_no is False) and (show_zoomed_img is False):
@@ -705,10 +705,14 @@ class ROI_image_class:
                     continue
                 with self.lock:
                     if self.draw_rectangle_roi:
-                        self.user_rectangle_roi = cv2.selectROI(self.window_name, self.working_frame)
+                        self.user_rectangle_roi = cv2.selectROI(
+                            self.window_name, self.working_frame
+                        )
                     else:
                         cv2.imshow(self.window_name, self.working_frame)
-                cv2.setMouseCallback(self.window_name, self.display_image_imshow_callback)
+                cv2.setMouseCallback(
+                    self.window_name, self.display_image_imshow_callback
+                )
                 c = cv2.waitKey(self.keyWaitTime)
                 if c != -1:
                     self.keyWaitChar = c

@@ -10,7 +10,8 @@ imutils == 0.5.2
 matplotlib >= 3.0.3
 numpy
 opencv-python == 3.4.16.59
-pandas
+pandas==0.25.3;python_version=="3.6"
+pandas;python_version>="3.9"
 scikit-image
 scipy
 seaborn == 0.9.0

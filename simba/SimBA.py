@@ -117,10 +117,9 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
     ConvertVideoPopUp, CreateGIFPopUP, CropVideoPopUp, DownsampleVideoPopUp,
     ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
-    ExtractSpecificFramesPopUp,
-    ImportFrameDirectoryPopUp, MergeFrames2VideoPopUp, MultiCropPopUp,
-    MultiShortenPopUp, VideoRotatorPopUp,
-    VideoTemporalJoinPopUp)
+    ExtractSpecificFramesPopUp, ImportFrameDirectoryPopUp,
+    MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
+    VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -141,7 +140,7 @@ from simba.video_processors.video_processing import (
 
 # from simba.unsupervised.unsupervised_ui import UnsupervisedGUI
 
-sys.setrecursionlimit(10 ** 6)
+sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 
 
@@ -158,7 +157,9 @@ class LoadProjectPopUp(object):
             icon_link=Links.LOAD_PROJECT.value,
         )
         self.selected_file = FileSelect(
-            self.load_project_frm, "Select file: ", title="Select project_config.ini file"
+            self.load_project_frm,
+            "Select file: ",
+            title="Select project_config.ini file",
         )
         self.load_project_btn = Button(
             self.load_project_frm,
@@ -1854,13 +1855,13 @@ class App(object):
         if OS.PYTHON_VER.value != "3.6":
             PythonVersionWarning(
                 msg=f"SimBA is not extensively tested beyond python 3.6. You are using python {OS.PYTHON_VER.value}. If you encounter errors in python>3.6, please report them on GitHub or Gitter and we will fix! (links in the help toolbar)",
-                source="python different than 3.6"
+                source="python different than 3.6",
             )
 
         if not check_ffmpeg_available():
             FFMpegNotFoundWarning(
                 msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer',
-                source="ffmpeg checker"
+                source="ffmpeg checker",
             )
 
     def restart(self):

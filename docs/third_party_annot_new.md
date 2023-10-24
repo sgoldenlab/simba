@@ -111,6 +111,10 @@ If this dropdown is set to **WARNING**, then SimBA will show you a warning and s
 - SOLOMON CODER: The annotation file filename.
 
 
+### SUBJECTS IN BORIS
+If you look at the SimBA expected BORIS example files [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv) or [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/boris_new_example.csv), you'll see that the `Subjects` column is empty. Sometimes, however, you're `Subject` column might  be populated with animal names, and these names determine which animal is performing the behavior specified in the `Behavior` column. If this is the case, we need to re-organize the BORIS annotation files before feeding them into SimBA, so that SimBA doesn't need to look in the `Subjects` columns. A way to solve it would be to restructure the BORIS files, to include the animal names in the behavior names. So for example, “My_Behavior” in the `Behavior` columns would become “Animal_1_My_Behavior” or “Animal_2_My_Behavior” depending on which animal performs “My_Behavior”. You would have two classifiers defined in your SimBA project: “Animal_1_My_Behavior” and “Animal_2_My_Behavior”. To do this, see the [BORIS source cleaner](https://github.com/sgoldenlab/simba/blob/master/simba/third_party_label_appenders/boris_source_cleaner.py). This code is **not** accessable through the GUI, but detailed instructions are included at the top of the file. If you have any questions, issues, or need help, please let us know on [Gitter](gitter.im/SimBA-Resource/community) or open an issue here on [Github](https://github.com/sgoldenlab/simba/issues) and we'll solve it together!
+
+
 
 
 
