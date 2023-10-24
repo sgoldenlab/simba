@@ -58,6 +58,7 @@ class AppendROIFeaturesByAnimalPopUp(ConfigReader, PopUpMixin):
         roi_feature_creator = ROIFeatureCreator(config_path=self.config_path)
         roi_feature_creator.run()
         roi_feature_creator.save()
+        self.root.destroy()
 
 
 # AppendROIFeaturesByAnimalPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/locomotion/project_folder/project_config.ini')

@@ -29,6 +29,8 @@ class ConfigKey(Enum):
     DISTANCE_PLOT_SETTINGS = "Distance plot"
     HEATMAP_SETTINGS = "Heatmap settings"
     ROI_SETTINGS = "ROI settings"
+    DIRECTIONALITY_SETTINGS = "Directionality settings"
+    BODYPART_DIRECTION_VALUE = "bodypart_direction"
     PROBABILITY_THRESHOLD = "probability_threshold"
     PROCESS_MOVEMENT_SETTINGS = "process movements"
     CREATE_ENSEMBLE_SETTINGS = "create ensemble settings"
@@ -98,8 +100,10 @@ class Paths(Enum):
     ROI_ANALYSIS = Path("frames/output/ROI_analysis/")
     ANNOTATED_FRAMES_DIR = Path("frames/output/annotated_frames/")
     DIRECTIONALITY_DF_DIR = Path("logs/directionality_dataframes/")
+    BODY_PART_DIRECTIONALITY_DF_DIR = Path("logs/body_part_directionality_dataframes/")
     DIRECTING_ANIMALS_OUTPUT_PATH = Path("frames/output/ROI_directionality_visualize/")
     DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH = Path("frames/output/Directing_animals/")
+    DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH = Path("frames/output/Body_part_directing_animals/")
     BP_NAMES = Path("logs/measures/pose_configs/bp_names/project_bp_names.csv")
     SIMBA_BP_CONFIG_PATH = Path("pose_configurations/bp_names/bp_names.csv")
     SIMBA_SHAP_CATEGORIES_PATH = Path(

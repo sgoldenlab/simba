@@ -5,6 +5,8 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import DirectionAnimalToBodyPartSettingsPopUp
+
 import atexit
 import subprocess
 import sys
@@ -75,6 +77,7 @@ from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
 from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
 from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
     DirectingOtherAnimalsVisualizerPopUp
+from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import DirectingAnimalToBodyPartVisualizerPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
@@ -85,14 +88,14 @@ from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp
 from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
     MovementAnalysisTimeBinsPopUp
-#from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
+# from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
 from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
 from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
 from simba.ui.pop_ups.pose_bp_drop_pop_up import DropTrackingDataPopUp
 from simba.ui.pop_ups.pose_reorganizer_pop_up import PoseReorganizerPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
-#from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
+# from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
 from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp
 from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
     ROIAnalysisTimeBinsPopUp
@@ -487,7 +490,18 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             fg="brown",
             command=lambda: self.directing_other_animals_visualizer(),
         )
-
+        button_analyzeDirection_bp = Button(
+            processmovementdupLabel,
+            text="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS",
+            fg="purple",
+            command=lambda: self.directing_animal_to_bp_analysis(),
+        )
+        button_visualizeDirection_bp = Button(
+            processmovementdupLabel,
+            text="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS",
+            fg="black",
+            command=lambda: self.directing_animal_to_body_part_visualizer(),
+        )
         # organize
         processmovementdupLabel.grid(row=0, column=3, sticky=NW)
         analyze_distances_velocity_btn.grid(row=0, sticky=NW)
@@ -496,6 +510,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_lineplot.grid(row=3, sticky=NW)
         button_analyzeDirection.grid(row=4, sticky=NW)
         button_visualizeDirection.grid(row=5, sticky=NW)
+        button_analyzeDirection_bp.grid(row=6, sticky=NW)
+        button_visualizeDirection_bp.grid(row=7, sticky=NW)
 
         label_outliercorrection = CreateLabelFrameWithIcon(
             parent=tab4,
@@ -1128,7 +1144,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         roi_feature_frm.grid(row=1, column=0, sticky=NW)
         append_roi_features_by_animal.grid(row=0, column=0, sticky=NW)
         append_roi_features_by_body_part.grid(row=1, column=0, sticky=NW)
-        #remove_roi_features_from_feature_set.grid(row=2, column=0, sticky=NW)
+        # remove_roi_features_from_feature_set.grid(row=2, column=0, sticky=NW)
 
         feature_tools_frm.grid(row=2, column=0, sticky=NW)
         compute_feature_subset_btn.grid(row=0, column=0, sticky=NW)
@@ -1162,7 +1178,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         lbl_tools_frm.grid(row=9, column=0, sticky=NW)
         visualize_annotation_img_btn.grid(row=0, column=0, sticky=NW)
         third_party_annotations_btn.grid(row=1, column=0, sticky=NW)
-        #remove_roi_features_from_annotation_set.grid(row=2, column=0, sticky=NW)
+        # remove_roi_features_from_annotation_set.grid(row=2, column=0, sticky=NW)
 
         label_trainmachinemodel.grid(row=6, sticky=W)
         button_trainmachinesettings.grid(row=0, column=0, sticky=NW, padx=5)
@@ -1183,7 +1199,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_runmachinemodel.grid(row=1, sticky=NW)
         kleinberg_button.grid(row=2, sticky=NW)
         fsttc_button.grid(row=3, sticky=NW)
-        #mutual_exclusivity.grid(row=4, sticky=NW)
+        # mutual_exclusivity.grid(row=4, sticky=NW)
 
         label_machineresults.grid(row=9, sticky=W, pady=5)
         button_process_datalog.grid(row=2, column=0, sticky=W, padx=3)
@@ -1235,8 +1251,15 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         directing_animals_analyzer.save_directionality_dfs()
         directing_animals_analyzer.summary_statistics()
 
+    def directing_animal_to_bp_analysis(self):
+        _ = DirectionAnimalToBodyPartSettingsPopUp(config_path=self.config_path)
+
+
     def directing_other_animals_visualizer(self):
         _ = DirectingOtherAnimalsVisualizerPopUp(config_path=self.config_path)
+
+    def directing_animal_to_body_part_visualizer(self):
+        _ = DirectingAnimalToBodyPartVisualizerPopUp(config_path=self.config_path)
 
     def train_single_model(self, config_path=None):
         model_trainer = TrainRandomForestClassifier(config_path=config_path)

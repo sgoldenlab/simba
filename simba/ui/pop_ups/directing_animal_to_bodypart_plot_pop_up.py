@@ -1,10 +1,11 @@
-__author__ = "Simon Nilsson"
+__author__ = "Tzuk Polinsky"
 
 import os
 from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.plotting.directing_animals_to_bodypart_visualizer import DirectingAnimalsToBodyPartVisualizer
 from simba.plotting.directing_animals_visualizer import \
     DirectingOtherAnimalsVisualizer
 from simba.plotting.directing_animals_visualizer_mp import \
@@ -15,14 +16,10 @@ from simba.utils.errors import AnimalNumberError
 from simba.utils.read_write import get_file_name_info_in_directory
 
 
-class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
+class DirectingAnimalToBodyPartVisualizerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path)
-        if self.animal_cnt == 1:
-            raise AnimalNumberError(
-                msg="Cannot visualize directionality between animals in a 1 animal project."
-            )
-        PopUpMixin.__init__(self, title="CREATE ANIMAL DIRECTION VIDEOS")
+        PopUpMixin.__init__(self, title="CREATE ANIMAL DIRECTION TO BODY PART VIDEOS")
         self.color_lst = list(self.colors_dict.keys())
         self.color_lst.insert(0, "Random")
         self.size_lst = list(range(1, 11))
@@ -32,7 +29,6 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
         )
 
         self.show_pose_var = BooleanVar(value=True)
-        self.highlight_direction_endpoints_var = BooleanVar(value=True)
         self.merge_directionality_lines_var = BooleanVar(value=False)
         self.multiprocess_var = BooleanVar(value=False)
 
@@ -46,11 +42,6 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
             self.style_settings_frm,
             text="Show pose-estimated body-parts",
             variable=self.show_pose_var,
-        )
-        self.highlight_direction_endpoints_cb = Checkbutton(
-            self.style_settings_frm,
-            text="Highlight direction end-points",
-            variable=self.highlight_direction_endpoints_var,
         )
         self.merge_directionality_lines_cb = Checkbutton(
             self.style_settings_frm,
@@ -69,20 +60,20 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
         self.line_thickness.setChoices(choice=4)
         self.pose_size_dropdown.setChoices(choice=3)
         self.direction_clr_dropdown.setChoices(choice="Random")
-        multiprocess_cb = Checkbutton(
-            self.style_settings_frm,
-            text="Multi-process (faster)",
-            variable=self.multiprocess_var,
-            command=lambda: self.enable_dropdown_from_checkbox(
-                check_box_var=self.multiprocess_var,
-                dropdown_menus=[self.multiprocess_dropdown],
-            ),
-        )
-        self.multiprocess_dropdown = DropDownMenu(
-            self.style_settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12"
-        )
-        self.multiprocess_dropdown.setChoices(2)
-        self.multiprocess_dropdown.disable()
+        # multiprocess_cb = Checkbutton(
+        #     self.style_settings_frm,
+        #     text="Multi-process (faster)",
+        #     variable=self.multiprocess_var,
+        #     command=lambda: self.enable_dropdown_from_checkbox(
+        #         check_box_var=self.multiprocess_var,
+        #         dropdown_menus=[self.multiprocess_dropdown],
+        #     ),
+        # )
+        # self.multiprocess_dropdown = DropDownMenu(
+        #     self.style_settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12"
+        # )
+        # self.multiprocess_dropdown.setChoices(2)
+        # self.multiprocess_dropdown.disable()
 
         self.run_frm = LabelFrame(
             self.main_frm,
@@ -132,13 +123,12 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
 
         self.style_settings_frm.grid(row=0, column=0, sticky=NW)
         self.show_pose_cb.grid(row=0, column=0, sticky=NW)
-        self.highlight_direction_endpoints_cb.grid(row=1, column=0, sticky=NW)
         self.merge_directionality_lines_cb.grid(row=2, column=0, sticky=NW)
         self.direction_clr_dropdown.grid(row=3, column=0, sticky=NW)
         self.pose_size_dropdown.grid(row=4, column=0, sticky=NW)
         self.line_thickness.grid(row=5, column=0, sticky=NW)
-        multiprocess_cb.grid(row=6, column=0, sticky=NW)
-        self.multiprocess_dropdown.grid(row=6, column=1, sticky=NW)
+        # multiprocess_cb.grid(row=6, column=0, sticky=NW)
+        # self.multiprocess_dropdown.grid(row=6, column=1, sticky=NW)
 
         self.run_frm.grid(row=1, column=0, sticky=NW)
         self.run_single_video_frm.grid(row=0, column=0, sticky=NW)
@@ -160,27 +150,23 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
             "Pose_circle_size": int(self.pose_size_dropdown.getChoices()),
             "Direction_color": self.direction_clr_dropdown.getChoices(),
             "Direction_thickness": int(self.line_thickness.getChoices()),
-            "Highlight_endpoints": self.highlight_direction_endpoints_var.get(),
             "Polyfill": self.merge_directionality_lines_var.get(),
         }
 
         for data_path in data_paths:
-            if not self.multiprocess_var.get():
-                directing_other_animal_visualizer = DirectingOtherAnimalsVisualizer(
-                    config_path=self.config_path,
-                    data_path=data_path,
-                    style_attr=style_attr,
-                )
-            else:
-                directing_other_animal_visualizer = (
-                    DirectingOtherAnimalsVisualizerMultiprocess(
-                        config_path=self.config_path,
-                        data_path=data_path,
-                        style_attr=style_attr,
-                        core_cnt=int(self.multiprocess_dropdown.getChoices()),
-                    )
-                )
+            #if not self.multiprocess_var.get():
+            directing_other_animal_visualizer = DirectingAnimalsToBodyPartVisualizer(
+                config_path=self.config_path,
+                data_path=data_path,
+                style_attr=style_attr,
+            )
+            # else:
+            #     directing_other_animal_visualizer = (
+            #         DirectingOtherAnimalsVisualizerMultiprocess(
+            #             config_path=self.config_path,
+            #             data_path=data_path,
+            #             style_attr=style_attr,
+            #             core_cnt=int(self.multiprocess_dropdown.getChoices()),
+            #         )
+            #     )
             directing_other_animal_visualizer.run()
-
-
-# _ = DirectingOtherAnimalsVisualizerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')

@@ -46,11 +46,10 @@ class ROI_menu:
 
         maxname = max(self.filesFound, key=len)
         self.roimenu = Toplevel()
-        self.roimenu.minsize(500, 400)
+        self.roimenu.minsize(720, 960)
         self.roimenu.wm_title("ROI Table")
 
         self.scroll_window = hxtScrollbar(self.roimenu)
-
         tableframe = CreateLabelFrameWithIcon(
             parent=self.scroll_window,
             header="Video Name",
@@ -75,7 +74,7 @@ class ROI_menu:
                     tableframe,
                     self.video_dir,
                     str(self.filesFound[i]),
-                    str(len(maxname)),
+                    str(len(maxname) + 20),
                     str(i + 1) + ".",
                     projectini=self.config_path,
                 )
@@ -92,18 +91,23 @@ class roitableRow(Frame):
         self.projectini = projectini
         self.filename = os.path.join(dirname, filename)
         Frame.__init__(self, master=parent)
+        if not os.path.exists(self.filename):
+            if os.path.islink(self.filename):
+                filename += " symlink"
+            filename += " path not exists"
         var = StringVar()
         self.index = Entry(self, textvariable=var, width=4)
         var.set(indexs)
         self.index.grid(row=0, column=0)
         self.lblName = Label(self, text=filename, width=widths, anchor=W)
         self.lblName.grid(row=0, column=1, sticky=W)
-        self.btnset = Button(self, text="Draw", command=self.draw)
-        self.btnset.grid(row=0, column=2)
-        self.btnreset = Button(self, text="Reset", command=self.reset)
-        self.btnreset.grid(row=0, column=3)
-        self.btnapplyall = Button(self, text="Apply to all", command=self.applyall)
-        self.btnapplyall.grid(row=0, column=4)
+        if os.path.exists(self.filename):
+            self.btnset = Button(self, text="Draw", command=self.draw)
+            self.btnset.grid(row=0, column=2)
+            self.btnreset = Button(self, text="Reset", command=self.reset)
+            self.btnreset.grid(row=0, column=3)
+            self.btnapplyall = Button(self, text="Apply to all", command=self.applyall)
+            self.btnapplyall.grid(row=0, column=4)
 
     def draw(self):
         ROI_definitions(self.projectini, self.filename, self.image_data)
@@ -151,19 +155,19 @@ def hxtScrollbar(master):
 
     bg = master.cget("background")
     acanvas = Canvas(master, borderwidth=0, background=bg)
-    frame = Frame(acanvas, background=bg)
     vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
     vsb2 = Scrollbar(master, orient="horizontal", command=acanvas.xview)
     acanvas.configure(yscrollcommand=vsb.set)
     acanvas.configure(xscrollcommand=vsb2.set)
-    vsb.pack(side="right", fill="y")
-    vsb2.pack(side="bottom", fill="x")
+    vsb.pack(side=RIGHT, fill="y")
+    vsb2.pack(side=BOTTOM, fill="x")
     acanvas.pack(side="left", fill="both", expand=True)
-
-    acanvas.create_window((10, 10), window=frame, anchor="nw")
 
     # bind the frame to the canvas
     acanvas.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
     acanvas.bind("<Enter>", lambda event: bindToMousewheel(event, acanvas))
     acanvas.bind("<Leave>", lambda event: unbindToMousewheel(event, acanvas))
+    frame = Frame(acanvas, background=bg)
+    acanvas.create_window((10, 10), window=frame, anchor="nw")
+
     return frame

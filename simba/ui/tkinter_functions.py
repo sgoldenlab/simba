@@ -48,15 +48,15 @@ def hxtScrollbar(master):
     Bind the frame to the canvas
     """
     bg = master.cget("background")
-    acanvas = Canvas(master, borderwidth=0, background=bg)
+    acanvas = Canvas(master, borderwidth=0, background=bg,width=master.winfo_width())
     frame = Frame(acanvas, background=bg)
     vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
     vsb2 = Scrollbar(master, orient="horizontal", command=acanvas.xview)
     acanvas.configure(yscrollcommand=vsb.set)
     acanvas.configure(xscrollcommand=vsb2.set)
-    vsb.pack(side="right", fill="y")
-    vsb2.pack(side="bottom", fill="x")
-    acanvas.pack(side="left", fill="both", expand=True)
+    vsb.pack(side=RIGHT, fill="y")
+    vsb2.pack(side=BOTTOM, fill="x")
+    acanvas.pack(side=LEFT, fill=BOTH, expand=True)
 
     acanvas.create_window((10, 10), window=frame, anchor="nw")
 
@@ -64,6 +64,7 @@ def hxtScrollbar(master):
     acanvas.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
     acanvas.bind("<Enter>", lambda event: bindToMousewheel(event, acanvas))
     acanvas.bind("<Leave>", lambda event: unbindToMousewheel(event, acanvas))
+    acanvas.update()
     return frame
 
 
