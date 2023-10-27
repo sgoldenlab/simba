@@ -46,7 +46,7 @@ class PopUpMixin(object):
         self,
         title: str,
         config_path: Optional[str] = None,
-        size: Tuple[int, int] = (960,720),
+        size: Tuple[int, int] = (960, 720),
     ):
         self.root = Toplevel()
         self.root.minsize(size[0], size[1])

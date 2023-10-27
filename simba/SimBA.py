@@ -5,8 +5,6 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import DirectionAnimalToBodyPartSettingsPopUp
-
 import atexit
 import subprocess
 import sys
@@ -75,9 +73,12 @@ from simba.ui.pop_ups.clf_validation_plot_pop_up import \
 from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
                                                    Parquet2CsvPopUp)
 from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
+from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import \
+    DirectingAnimalToBodyPartVisualizerPopUp
 from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
     DirectingOtherAnimalsVisualizerPopUp
-from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import DirectingAnimalToBodyPartVisualizerPopUp
+from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
+    DirectionAnimalToBodyPartSettingsPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
@@ -1254,7 +1255,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
     def directing_animal_to_bp_analysis(self):
         _ = DirectionAnimalToBodyPartSettingsPopUp(config_path=self.config_path)
-
 
     def directing_other_animals_visualizer(self):
         _ = DirectingOtherAnimalsVisualizerPopUp(config_path=self.config_path)

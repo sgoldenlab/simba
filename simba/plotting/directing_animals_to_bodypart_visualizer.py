@@ -68,11 +68,12 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
                 self.animal_cnt, int(len(self.x_cols) + 1)
             )
         if self.style_attr["Direction_color"] == "Random":
-            self.direction_colors = create_color_palettes(1, int(self.animal_cnt ** 2))
+            self.direction_colors = create_color_palettes(1, int(self.animal_cnt**2))
         else:
             self.direction_colors = [self.colors[self.style_attr["Direction_color"]]]
         self.video_path = self.find_video_of_file(
-            video_dir=self.video_dir, filename=self.video_name)
+            video_dir=self.video_dir, filename=self.video_name
+        )
         if not os.path.exists(self.directing_body_part_animal_video_output_path):
             os.makedirs(self.directing_body_part_animal_video_output_path)
         print(f"Processing video {self.video_name}...")
@@ -105,8 +106,8 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
 
     def __draw_individual_lines(self, animal_img_data: pd.DataFrame, img: np.array):
         color = self.direction_colors[0]
-        bp_x_name = "Animal_"+self.bodypart_direction+"_x"
-        bp_y_name = "Animal_"+self.bodypart_direction+"_y"
+        bp_x_name = "Animal_" + self.bodypart_direction + "_x"
+        bp_y_name = "Animal_" + self.bodypart_direction + "_y"
         for cnt, (i, r) in enumerate(animal_img_data.iterrows()):
             if self.style_attr["Direction_color"] == "Random":
                 color = random.sample(self.direction_colors[0], 1)[0]
@@ -135,7 +136,7 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
                     if self.style_attr["Show_pose"]:
                         bp_data = self.data_df.iloc[img_cnt]
                         for cnt, (animal_name, animal_bps) in enumerate(
-                                self.animal_bp_dict.items()
+                            self.animal_bp_dict.items()
                         ):
                             for bp in zip(animal_bps["X_bps"], animal_bps["Y_bps"]):
                                 x_bp, y_bp = bp_data[bp[0]], bp_data[bp[1]]
@@ -150,7 +151,7 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
                     if img_cnt in frames_index:
                         img_data = self.video_data[
                             self.video_data["Frame_#"] == img_cnt
-                            ]
+                        ]
                         if self.style_attr["Polyfill"]:
                             convex_hull_arr = img_data.loc[
                                 0, ["Eye_x", "Eye_y"]

@@ -103,7 +103,9 @@ class Paths(Enum):
     BODY_PART_DIRECTIONALITY_DF_DIR = Path("logs/body_part_directionality_dataframes/")
     DIRECTING_ANIMALS_OUTPUT_PATH = Path("frames/output/ROI_directionality_visualize/")
     DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH = Path("frames/output/Directing_animals/")
-    DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH = Path("frames/output/Body_part_directing_animals/")
+    DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH = Path(
+        "frames/output/Body_part_directing_animals/"
+    )
     BP_NAMES = Path("logs/measures/pose_configs/bp_names/project_bp_names.csv")
     SIMBA_BP_CONFIG_PATH = Path("pose_configurations/bp_names/bp_names.csv")
     SIMBA_SHAP_CATEGORIES_PATH = Path(
