@@ -43,7 +43,7 @@ class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):
         self.img_path_file_select.grid(row=3, sticky=W, pady=2)
         self.confirm_btn.grid(row=4, pady=5)
         self.save_btn.grid(row=6, pady=5)
-        self.main_frm.lift()
+        self.root.lift()
 
     def create_bodypart_table(self):
         if hasattr(self, "bp_table_frm"):
@@ -121,3 +121,4 @@ class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):
         self.main_frm.winfo_toplevel().destroy()
         self.master.winfo_toplevel().destroy()
         self.project_config_class()
+        self.root.destroy()

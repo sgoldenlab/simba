@@ -96,3 +96,4 @@ class ROIAnalysisPopUp(ConfigReader, PopUpMixin):
         )
         roi_analyzer.run()
         roi_analyzer.save()
+        self.root.destroy()

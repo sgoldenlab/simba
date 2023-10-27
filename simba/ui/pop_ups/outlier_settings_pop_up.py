@@ -179,6 +179,7 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
         stdout_success(
             msg="Outlier correction settings updated in the project_config.ini"
         )
+        self.root.destroy()
 
 
 # _ = OutlierSettingsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')

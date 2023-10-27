@@ -183,6 +183,7 @@ class ProjectConfigCreator(object):
         self.config.add_section(ConfigKey.LINE_PLOT_SETTINGS.value)
         self.config.add_section(ConfigKey.PATH_PLOT_SETTINGS.value)
         self.config.add_section(ConfigKey.ROI_SETTINGS.value)
+        self.config.add_section(ConfigKey.DIRECTIONALITY_SETTINGS.value)
         self.config.add_section(ConfigKey.PROCESS_MOVEMENT_SETTINGS.value)
 
         self.config.add_section(ConfigKey.CREATE_ENSEMBLE_SETTINGS.value)

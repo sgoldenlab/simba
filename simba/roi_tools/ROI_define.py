@@ -96,6 +96,9 @@ class ROI_definitions(ConfigReader):
         self.draw_menu()
         self.save_menu()
         self.cap = cv2.VideoCapture(self.video_path)
+        if not self.cap.isOpened():
+            print("cant open video")
+            return
         self.image_data.update_working_frame(self.cap, True, self.file_name)
         self.video_frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.get_all_ROI_names()

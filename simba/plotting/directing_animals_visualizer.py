@@ -78,7 +78,7 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
             self.direction_colors = [self.colors[self.style_attr["Direction_color"]]]
         self.data_dict = self.direction_analyzer.directionality_df_dict
         self.video_path = self.find_video_of_file(
-            video_dir=self.video_dir, filename=self.video_name, raise_error=True
+            video_dir=self.video_dir, filename=self.video_name
         )
         if not os.path.exists(self.directing_animals_video_output_path):
             os.makedirs(self.directing_animals_video_output_path)

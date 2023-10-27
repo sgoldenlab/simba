@@ -1,6 +1,5 @@
 __author__ = "Simon Nilsson"
 
-
 import glob
 import itertools
 import logging
@@ -67,6 +66,9 @@ class ConfigReader(object):
         self.directionality_df_dir = os.path.join(
             self.project_path, Paths.DIRECTIONALITY_DF_DIR.value
         )
+        self.body_part_directionality_df_dir = os.path.join(
+            self.project_path, Paths.BODY_PART_DIRECTIONALITY_DF_DIR.value
+        )
         self.outlier_corrected_dir = os.path.join(
             self.project_path, Paths.OUTLIER_CORRECTED.value
         )
@@ -103,6 +105,9 @@ class ConfigReader(object):
         self.directing_animals_video_output_path = os.path.join(
             self.project_path, Paths.DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH.value
         )
+        self.directing_body_part_animal_video_output_path = os.path.join(
+            self.project_path, Paths.DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH.value
+        )
         self.animal_cnt = self.read_config_entry(
             config=self.config,
             section=ConfigKey.GENERAL_SETTINGS.value,
@@ -119,6 +124,9 @@ class ConfigReader(object):
         self.feature_file_paths = glob.glob(self.features_dir + "/*." + self.file_type)
         self.target_file_paths = glob.glob(self.targets_folder + "/*." + self.file_type)
         self.input_csv_paths = glob.glob(self.input_csv_dir + "/*." + self.file_type)
+        self.body_part_directionality_paths = glob.glob(
+            self.body_part_directionality_df_dir + "/*." + self.file_type
+        )
         self.outlier_corrected_paths = glob.glob(
             self.outlier_corrected_dir + "/*." + self.file_type
         )
@@ -177,6 +185,9 @@ class ConfigReader(object):
             self.p_cols,
             self.clr_lst,
         )
+        self.bodypart_direction = self.read_config_entry(self.config, section=ConfigKey.DIRECTIONALITY_SETTINGS.value,
+                                                         option=ConfigKey.BODYPART_DIRECTION_VALUE.value,
+                                                         data_type=Dtypes.STR.value)
         self.project_bps = list(set([x[:-2] for x in self.bp_headers]))
         self.color_dict = get_color_dict()
         self.emojis = get_emojis()
@@ -239,20 +250,20 @@ class ConfigReader(object):
                     self.roi_dict[Keys.ROI_RECTANGLES.value][
                         "Center_X"
                     ] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_X"] - (
-                        (
-                            self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_X"]
-                            - self.roi_dict[Keys.ROI_RECTANGLES.value]["width"]
-                        )
-                        / 2
+                            (
+                                    self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_X"]
+                                    - self.roi_dict[Keys.ROI_RECTANGLES.value]["width"]
+                            )
+                            / 2
                     )
                     self.roi_dict[Keys.ROI_RECTANGLES.value][
                         "Center_Y"
                     ] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_Y"] - (
-                        (
-                            self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_Y"]
-                            - self.roi_dict[Keys.ROI_RECTANGLES.value]["height"]
-                        )
-                        / 2
+                            (
+                                    self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_Y"]
+                                    - self.roi_dict[Keys.ROI_RECTANGLES.value]["height"]
+                            )
+                            / 2
                     )
                 elif shape_type == Keys.ROI_POLYGONS.value:
                     self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"] = self.roi_dict[
@@ -283,7 +294,7 @@ class ConfigReader(object):
         return model_names
 
     def insert_column_headers_for_outlier_correction(
-        self, data_df: pd.DataFrame, new_headers: List[str], filepath: str
+            self, data_df: pd.DataFrame, new_headers: List[str], filepath: str
     ) -> pd.DataFrame:
         """
         Helper to insert new column headers onto a dataframe.
@@ -338,7 +349,7 @@ class ConfigReader(object):
         raise DataHeaderError(msg="Could find the count of header columns in dataframe")
 
     def find_video_of_file(
-        self, video_dir: Union[str, os.PathLike], filename: str
+            self, video_dir: Union[str, os.PathLike], filename: str
     ) -> Union[str, os.PathLike]:
         """
         Helper to find the video file representing a known data file basename.
@@ -365,7 +376,7 @@ class ConfigReader(object):
         for file_path in all_files_in_video_folder:
             _, video_filename, ext = get_fn_ext(file_path)
             if (video_filename == filename) and (
-                (ext.lower() == ".mp4") or (ext.lower() == ".avi")
+                    (ext.lower() == ".mp4") or (ext.lower() == ".avi")
             ):
                 return_path = file_path
 
@@ -429,14 +440,14 @@ class ConfigReader(object):
         logger.addHandler(handler)
 
     def create_body_part_dictionary(
-        self,
-        multi_animal_status: bool,
-        animal_id_lst: list,
-        animal_cnt: int,
-        x_cols: List[str],
-        y_cols: List[str],
-        p_cols: Optional[List[str]] = None,
-        colors: Optional[List[List[Tuple[int, int, int]]]] = None,
+            self,
+            multi_animal_status: bool,
+            animal_id_lst: list,
+            animal_cnt: int,
+            x_cols: List[str],
+            y_cols: List[str],
+            p_cols: Optional[List[str]] = None,
+            colors: Optional[List[List[Tuple[int, int, int]]]] = None,
     ) -> Dict[str, Union[List[str], List[Tuple]]]:
         """
         Helper to create dict of dict lookup of body-parts where the keys are animal names, and
@@ -561,13 +572,13 @@ class ConfigReader(object):
             self.bp_headers.extend((c1, c2, c3))
 
     def read_config_entry(
-        self,
-        config: ConfigParser,
-        section: str,
-        option: str,
-        data_type: Literal["str", "int", "float", "folder_path"],
-        default_value: Optional[Any] = None,
-        options: Optional[List[Any]] = None,
+            self,
+            config: ConfigParser,
+            section: str,
+            option: str,
+            data_type: Literal["str", "int", "float", "folder_path"],
+            default_value: Optional[Any] = None,
+            options: Optional[List[Any]] = None,
     ) -> Union[str, int, float]:
         """
         Helper to read entry from a configparser.ConfigParser object
@@ -671,7 +682,7 @@ class ConfigReader(object):
         return info_df
 
     def read_video_info(
-        self, video_name: str, raise_error: Optional[bool] = True
+            self, video_name: str, raise_error: Optional[bool] = True
     ) -> (pd.DataFrame, float, float):
         """
         Helper to read the meta-data (pixels per mm, resolution, fps) from the video_info.csv for a single input file.
@@ -685,7 +696,7 @@ class ConfigReader(object):
 
         video_settings = self.video_info_df.loc[
             self.video_info_df["Video"] == video_name
-        ]
+            ]
         if len(video_settings) > 1:
             raise DuplicationError(
                 msg=f"SimBA found multiple rows in the project_folder/logs/video_info.csv named {str(video_name)}. Please make sure that each video name is represented ONCE in the video_info.csv"
@@ -799,7 +810,6 @@ class ConfigReader(object):
         )
 
         # x = [x for x in self.shape_names if any(x in y or y in x for y in df.colum)]
-
 
 # config = ConfigReader(config_path='/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/two_c57/project_folder/project_config.ini', read_video_info=False)
 # config.read_roi_data()

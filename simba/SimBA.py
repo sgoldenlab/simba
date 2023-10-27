@@ -5,6 +5,8 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import DirectionAnimalToBodyPartSettingsPopUp
+
 import atexit
 import subprocess
 import sys
@@ -75,6 +77,7 @@ from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
 from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
 from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
     DirectingOtherAnimalsVisualizerPopUp
+from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import DirectingAnimalToBodyPartVisualizerPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
@@ -488,7 +491,18 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             fg="brown",
             command=lambda: self.directing_other_animals_visualizer(),
         )
-
+        button_analyzeDirection_bp = Button(
+            processmovementdupLabel,
+            text="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS",
+            fg="purple",
+            command=lambda: self.directing_animal_to_bp_analysis(),
+        )
+        button_visualizeDirection_bp = Button(
+            processmovementdupLabel,
+            text="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS",
+            fg="black",
+            command=lambda: self.directing_animal_to_body_part_visualizer(),
+        )
         # organize
         processmovementdupLabel.grid(row=0, column=3, sticky=NW)
         analyze_distances_velocity_btn.grid(row=0, sticky=NW)
@@ -497,6 +511,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_lineplot.grid(row=3, sticky=NW)
         button_analyzeDirection.grid(row=4, sticky=NW)
         button_visualizeDirection.grid(row=5, sticky=NW)
+        button_analyzeDirection_bp.grid(row=6, sticky=NW)
+        button_visualizeDirection_bp.grid(row=7, sticky=NW)
 
         label_outliercorrection = CreateLabelFrameWithIcon(
             parent=tab4,
@@ -1236,8 +1252,15 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         directing_animals_analyzer.save_directionality_dfs()
         directing_animals_analyzer.summary_statistics()
 
+    def directing_animal_to_bp_analysis(self):
+        _ = DirectionAnimalToBodyPartSettingsPopUp(config_path=self.config_path)
+
+
     def directing_other_animals_visualizer(self):
         _ = DirectingOtherAnimalsVisualizerPopUp(config_path=self.config_path)
+
+    def directing_animal_to_body_part_visualizer(self):
+        _ = DirectingAnimalToBodyPartVisualizerPopUp(config_path=self.config_path)
 
     def train_single_model(self, config_path=None):
         model_trainer = TrainRandomForestClassifier(config_path=config_path)

@@ -19,7 +19,7 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
 
 class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="VISUALIZE ROI FEATURES")
+        PopUpMixin.__init__(self, title="VISUALIZE ROI FEATURES",config_path=config_path,size=(960,720))
         ConfigReader.__init__(self, config_path=config_path)
         self.video_list = []
         video_file_paths = find_files_of_filetypes_in_directory(
@@ -219,6 +219,6 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
                         target=roi_feature_visualizer.run()
                     )
                     roi_feature_visualizer_mp.start()
-
+        self.root.destroy()
 
 # _ = VisualizeROIFeaturesPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
