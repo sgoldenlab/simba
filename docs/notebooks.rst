@@ -12,7 +12,6 @@ General processing
    nb/outlier_correction
    nb/third_party_append
    nb/advanced_smoothing_interpolation
-   nb/advanced_outlier_correction
 
 
 Visualizations
@@ -37,5 +36,6 @@ Miscellaneous
    :maxdepth: 1
 
    nb/import_sleap_h5
+   nb/multiclass
 
 
