@@ -43,10 +43,10 @@ class PopUpMixin(object):
     """
 
     def __init__(
-        self,
-        title: str,
-        config_path: Optional[str] = None,
-        size: Tuple[int, int] = (960,720),
+            self,
+            title: str,
+            config_path: Optional[str] = None,
+            size: Tuple[int, int] = (960, 720),
     ):
         self.root = Toplevel()
         self.root.minsize(size[0], size[1])
@@ -92,7 +92,7 @@ class PopUpMixin(object):
         self.choose_clf_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 
     def create_cb_frame(
-        self, main_frm: Frame, cb_titles: List[str], frm_title: str
+            self, main_frm: Frame, cb_titles: List[str], frm_title: str
     ) -> Dict[str, BooleanVar]:
         cb_frm = LabelFrame(
             main_frm, text=frm_title, font=Formats.LABELFRAME_HEADER_FORMAT.value
@@ -106,11 +106,11 @@ class PopUpMixin(object):
         return cb_dict
 
     def create_dropdown_frame(
-        self,
-        main_frm: Frame,
-        drop_down_titles: List[str],
-        drop_down_options: List[str],
-        frm_title: str,
+            self,
+            main_frm: Frame,
+            drop_down_titles: List[str],
+            drop_down_options: List[str],
+            frm_title: str,
     ):
         dropdown_frm = LabelFrame(
             main_frm, text=frm_title, font=Formats.LABELFRAME_HEADER_FORMAT.value
@@ -209,8 +209,33 @@ class PopUpMixin(object):
         self.run_frm.grid(row=self.children_cnt_main() + 1, column=0, sticky=NW)
         self.run_btn.grid(row=0, column=0, sticky=NW)
 
+    def create_choose_number_of_body_parts_directionality_frm(
+            self, path_to_directionality_dir: str, run_function: object
+    ):
+        self.bp_cnt_frm = LabelFrame(
+            self.main_frm,
+            text="SELECT DIR",
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+        )
+        root, types_of_directionality, files = list(os.walk(path_to_directionality_dir))[0]
+        self.bp_cnt_dropdown = DropDownMenu(
+            self.bp_cnt_frm,
+            "# of body-parts directionality",
+            list(types_of_directionality),
+            "20",
+        )
+        self.bp_cnt_dropdown.setChoices(types_of_directionality[0])
+        self.bp_cnt_confirm_btn = Button(
+            self.bp_cnt_frm,
+            text="Confirm",
+            command=lambda: run_function,
+        )
+        self.bp_cnt_frm.grid(row=0, sticky=NW)
+        self.bp_cnt_dropdown.grid(row=0, column=0, sticky=NW)
+        self.bp_cnt_confirm_btn.grid(row=0, column=1, sticky=NW)
+
     def create_choose_number_of_body_parts_frm(
-        self, project_body_parts: List[str], run_function: object
+            self, project_body_parts: List[str], run_function: object
     ):
         self.bp_cnt_frm = LabelFrame(
             self.main_frm,
@@ -244,7 +269,7 @@ class PopUpMixin(object):
         list_box.insert(0, value)
 
     def add_values_to_several_listboxes(
-        self, list_boxes: List[Listbox], values: List[float]
+            self, list_boxes: List[Listbox], values: List[float]
     ):
         if len(list_boxes) != len(values):
             raise CountError(msg="Value count and listboxes count are not equal")
@@ -270,7 +295,7 @@ class PopUpMixin(object):
         for bp_cnt in range(int(self.bp_cnt_dropdown.getChoices())):
             self.body_parts_dropdowns[bp_cnt] = DropDownMenu(
                 self.body_part_frm,
-                f"Body-part {str(bp_cnt+1)}:",
+                f"Body-part {str(bp_cnt + 1)}:",
                 project_body_parts,
                 "25",
             )
@@ -326,7 +351,7 @@ class PopUpMixin(object):
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
     def enable_dropdown_from_checkbox(
-        self, check_box_var: BooleanVar, dropdown_menus: List[DropDownMenu]
+            self, check_box_var: BooleanVar, dropdown_menus: List[DropDownMenu]
     ):
         if check_box_var.get():
             for menu in dropdown_menus:
@@ -336,13 +361,13 @@ class PopUpMixin(object):
                 menu.disable()
 
     def create_entry_boxes_from_entrybox(
-        self, count: int, parent: Frame, current_entries: list
+            self, count: int, parent: Frame, current_entries: list
     ):
         check_int(name="CLASSIFIER COUNT", value=count, min_value=1)
         for entry in current_entries:
             entry.destroy()
         for clf_cnt in range(int(count)):
-            entry = Entry_Box(parent, f"Classifier {str(clf_cnt+1)}:", labelwidth=15)
+            entry = Entry_Box(parent, f"Classifier {str(clf_cnt + 1)}:", labelwidth=15)
             current_entries.append(entry)
             entry.grid(row=clf_cnt + 2, column=0, sticky=NW)
 
@@ -353,12 +378,12 @@ class PopUpMixin(object):
         if not hasattr(self, "multi_animal_id_list"):
             self.multi_animal_id_list = []
             for i in range(int(animal_cnt)):
-                self.multi_animal_id_list.append(f"Animal {i+1}")
+                self.multi_animal_id_list.append(f"Animal {i + 1}")
         self.animal_names_frm = Frame(self.animal_settings_frm, pady=5, padx=5)
         self.animal_name_entry_boxes = {}
         for i in range(int(animal_cnt)):
             self.animal_name_entry_boxes[i + 1] = Entry_Box(
-                self.animal_names_frm, f"Animal {str(i+1)} name: ", "25"
+                self.animal_names_frm, f"Animal {str(i + 1)} name: ", "25"
             )
             if i <= len(self.multi_animal_id_list) - 1:
                 self.animal_name_entry_boxes[i + 1].entry_set(
@@ -369,10 +394,10 @@ class PopUpMixin(object):
         self.animal_names_frm.grid(row=1, column=0, sticky=NW)
 
     def enable_entrybox_from_checkbox(
-        self,
-        check_box_var: BooleanVar,
-        entry_boxes: List[Entry_Box],
-        reverse: bool = False,
+            self,
+            check_box_var: BooleanVar,
+            entry_boxes: List[Entry_Box],
+            reverse: bool = False,
     ):
         if reverse:
             if check_box_var.get():
@@ -390,16 +415,16 @@ class PopUpMixin(object):
                     box.set_state("disable")
 
     def create_import_pose_menu(
-        self, parent_frm: Frame, idx_row: int = 0, idx_column: int = 0
+            self, parent_frm: Frame, idx_row: int = 0, idx_column: int = 0
     ):
         def run_call(
-            data_type: str,
-            interpolation: str,
-            smoothing: str,
-            smoothing_window: str,
-            animal_names: dict,
-            data_path: str,
-            tracking_data_type: str or None = None,
+                data_type: str,
+                interpolation: str,
+                smoothing: str,
+                smoothing_window: str,
+                animal_names: dict,
+                data_path: str,
+                tracking_data_type: str or None = None,
         ):
             smooth_settings = {}
             smooth_settings["Method"] = smoothing
@@ -880,7 +905,7 @@ class PopUpMixin(object):
             self.data_type_dropdown.grid(row=0, column=0, sticky=NW)
 
     def create_import_videos_menu(
-        self, parent_frm: Frame, idx_row: int = 0, idx_column: int = 0
+            self, parent_frm: Frame, idx_row: int = 0, idx_column: int = 0
     ):
         def run_import(multiple_videos: bool):
             if multiple_videos:
@@ -990,7 +1015,6 @@ class PopUpMixin(object):
     #     #print(f'+{e.x_root}x{e.y_root}')
     #     #self.main_frm.config(width=e.x_root, height=e.y_root)
     #     #self.main_frm.update()
-
 
 # test = PopUpMixin(config_path='/Users/simon/Desktop/envs/troubleshooting/two_animals_16bp_032023/project_folder/project_config.ini',
 #                   title='ss')
