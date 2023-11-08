@@ -58,13 +58,13 @@ class DirectionAnimalToBodyPartSettingsPopUp(PopUpMixin, ConfigReader):
         for animal_cnt, animal_name in enumerate(self.animal_bp_dict.keys()):
             try:
                 self.config.set(ConfigKey.DIRECTIONALITY_SETTINGS.value,
-                                "bodypart_direction",
+                                ConfigKey.BODYPART_DIRECTION_VALUE.value,
                                 self.criterion_dropdowns[animal_name]["bp"].getChoices(),
                                 )
             except configparser.NoSectionError as e:
                 self.config.add_section(ConfigKey.DIRECTIONALITY_SETTINGS.value)
                 self.config.set(ConfigKey.DIRECTIONALITY_SETTINGS.value,
-                                "bodypart_direction",
+                                ConfigKey.BODYPART_DIRECTION_VALUE.value,
                                 self.criterion_dropdowns[animal_name]["bp"].getChoices(),
                                 )
         with open(self.config_path, "w") as f:
