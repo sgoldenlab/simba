@@ -146,7 +146,7 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
             for animal_permutation, permutation_data in video_data.items():
                 for bp_name, bp_data in permutation_data.items():
                     directing_df = (
-                        bp_data#[bp_data["Directing_BOOL"] == 1]
+                        bp_data  # [bp_data["Directing_BOOL"] == 1]
                         .reset_index()
                         .rename(
                             columns={
@@ -194,14 +194,15 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
         -------
         None
         """
-        if not os.path.exists(self.body_part_directionality_df_dir):
-            os.makedirs(self.body_part_directionality_df_dir)
+        output_dir = os.path.join(self.body_part_directionality_df_dir, self.bodypart_direction)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         for video_name, video_data in self.directionality_df_dict.items():
-            save_name = os.path.join(self.body_part_directionality_df_dir, video_name + ".csv")
+            save_name = os.path.join(output_dir, video_name + ".csv")
             video_data.to_csv(save_name)
             print(f"Detailed directional data saved for video {video_name}...")
         stdout_success(
-            msg=f"All detailed directional data saved in the {self.body_part_directionality_df_dir} directory"
+            msg=f"All detailed directional data saved in the {output_dir} directory"
 
         )
 
@@ -238,7 +239,7 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
             .set_index("Video")
         )
         self.save_path = os.path.join(
-            self.logs_path, "Body_part_directions_data_{}.csv".format(str(self.datetime))
+            self.logs_path, "Body_part_directions_data_{}_{}.csv".format(str(self.bodypart_direction, self.datetime))
         )
         self.summary_df.to_csv(self.save_path)
         self.timer.stop_timer()

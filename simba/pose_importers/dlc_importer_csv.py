@@ -70,12 +70,13 @@ def import_dlc_csv(config_path: Union[str, os.PathLike], source: str) -> List[st
         new_file_name_wo_ext = new_file_name.split(".")[0]
         video_basename = os.path.basename(file_path)
         print(f"Importing {video_name} to SimBA project...")
-        if new_file_name_wo_ext in imported_file_names:
-            raise FileExistError(
-                "SIMBA IMPORT ERROR: {} already exist in project. Remove file from project or rename imported video file name before importing.".format(
-                    new_file_name
-                )
-            )
+        #if new_file_name_wo_ext in imported_file_names:
+            # raise FileExistError(
+            #     "SIMBA IMPORT ERROR: {} already exist in project. Remove file from project or rename imported video file name before importing.".format(
+            #         new_file_name
+            #     )
+            # )
+
         shutil.copy(file_path, input_csv_dir)
         shutil.copy(file_path, original_file_name_dir)
         os.rename(

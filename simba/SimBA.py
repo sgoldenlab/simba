@@ -3,6 +3,8 @@ __author__ = "Simon Nilsson"
 import os.path
 import warnings
 
+from simba.ui.pop_ups.append_bodypart_directionality_features_pop_up import AppendBodyPartDirectionalityFeaturesPopUp
+
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import DirectionAnimalToBodyPartSettingsPopUp
@@ -140,7 +142,7 @@ from simba.video_processors.video_processing import (
 
 # from simba.unsupervised.unsupervised_ui import UnsupervisedGUI
 
-sys.setrecursionlimit(10**6)
+sys.setrecursionlimit(10 ** 6)
 currentPlatform = platform.system()
 
 
@@ -594,6 +596,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             text="APPEND ROI DATA TO FEATURES: BY BODY-PARTS (CAUTION)",
             fg="orange",
             command=lambda: AppendROIFeaturesByBodyPartPopUp(
+                config_path=self.config_path
+            ),
+        )
+        append_body_part_directionality_features = Button(
+            roi_feature_frm,
+            text="APPEND BODY PART DIRECTIONALITY DATA TO FEATURES (CAUTION)",
+            fg="green",
+            command=lambda: AppendBodyPartDirectionalityFeaturesPopUp(
                 config_path=self.config_path
             ),
         )
@@ -1145,6 +1155,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         roi_feature_frm.grid(row=1, column=0, sticky=NW)
         append_roi_features_by_animal.grid(row=0, column=0, sticky=NW)
         append_roi_features_by_body_part.grid(row=1, column=0, sticky=NW)
+        append_body_part_directionality_features.grid(row=2, column=0, sticky=NW)
         # remove_roi_features_from_feature_set.grid(row=2, column=0, sticky=NW)
 
         feature_tools_frm.grid(row=2, column=0, sticky=NW)
@@ -1254,7 +1265,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
     def directing_animal_to_bp_analysis(self):
         _ = DirectionAnimalToBodyPartSettingsPopUp(config_path=self.config_path)
-
 
     def directing_other_animals_visualizer(self):
         _ = DirectingOtherAnimalsVisualizerPopUp(config_path=self.config_path)
