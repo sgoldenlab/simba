@@ -167,14 +167,18 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
 
     def read_directionality_dfs(self):
         results = {}
+        body_parts_directionality = []
         for file_cnt, file_path in enumerate(self.body_part_directionality_paths):
             video_timer = SimbaTimer(start=True)
-            _, file_name, _ = get_fn_ext(file_path)
-            results[file_name] = read_df(file_path, self.file_type)
+            dir_name, file_name, _ = get_fn_ext(file_path)
+            bp_name = os.path.basename(dir_name)
+            body_parts_directionality.append(bp_name)
+            key = file_name+"_"+bp_name
+            results[key] = read_df(file_path, self.file_type)
             video_timer.stop_timer()
             print(
                 "read body part directionality data completed for video {} ({}/{}, elapsed time: {}s)...".format(
-                    file_name,
+                    key,
                     str(file_cnt + 1),
                     str(len(self.outlier_corrected_paths)),
                     video_timer.elapsed_time_str,
@@ -183,7 +187,7 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
         stdout_success(
             msg='reading body part directionality data completed'
         )
-        return results
+        return results,body_parts_directionality
 
     def save_directionality_dfs(self):
         """
@@ -239,7 +243,7 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
             .set_index("Video")
         )
         self.save_path = os.path.join(
-            self.logs_path, "Body_part_directions_data_{}_{}.csv".format(str(self.bodypart_direction, self.datetime))
+            self.logs_path, "Body_part_directions_data_{}_{}.csv".format(self.bodypart_direction,str( self.datetime))
         )
         self.summary_df.to_csv(self.save_path)
         self.timer.stop_timer()
