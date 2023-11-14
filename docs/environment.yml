@@ -10,7 +10,8 @@ dependencies:
   - hdbscan==0.8.27
   - pip:
       - pip==21.2.2
-      - sphinx-autodoc-typehints 
+      - sphinx-autodoc-typehints
+      - sphinx-togglebutton==0.3.2
       - sphinx_rtd_theme
       - simba-uw-tf-dev
       - nbsphinx
