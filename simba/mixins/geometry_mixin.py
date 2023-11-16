@@ -166,7 +166,7 @@ class GeometryMixin(object):
 
         """
         .. image:: _static/img/bodyparts_to_line.png
-           :width: 700
+           :width: 500
            :align: center
 
         :example:
@@ -182,7 +182,7 @@ class GeometryMixin(object):
     def get_center(shape: Union[LineString, Polygon]) -> np.ndarray:
         """
         .. image:: _static/img/get_center.png
-           :width: 700
+           :width: 500
            :align: center
         """
         check_instance(source=GeometryMixin.get_center.__name__, instance=shape, accepted_types=(LineString, Polygon))
