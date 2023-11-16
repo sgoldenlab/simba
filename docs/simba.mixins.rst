@@ -16,6 +16,12 @@ Feature extraction methods
    :members:
    :show-inheritance:
 
+Geometry transformation methods
+----------------------------------------------
+
+.. automodule:: simba.mixins.geometry_mixin
+   :members:
+   :show-inheritance:
 
 Feature extraction supplement methods
 ----------------------------------------------
@@ -71,7 +77,7 @@ Modelling methods
 Time-series feature methods
 ---------------------------------------
 
-.. automodule:: simba.mixins.timeseries_features_mixin
+.. automodule:: simba.mixins.timeseries_features.mixin
    :members:
    :show-inheritance:
 
