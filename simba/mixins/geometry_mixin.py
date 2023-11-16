@@ -1,18 +1,20 @@
-import numpy as np
-from typing import Optional, List, Union
-from typing_extensions import Literal
-import pandas as pd
-from shapely.geometry import Polygon, LineString, Point
-from simba.utils.errors import InvalidInputError
-from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.read_write import find_core_cnt
-from simba.utils.checks import check_int
-import multiprocessing
 import functools
 import itertools
-from simba.utils.checks import check_instance, check_if_valid_input
+import multiprocessing
+from typing import List, Optional, Union
 
-CAP_STYLE_MAP = {'round': 1, 'square': 2, 'flat': 3}
+import numpy as np
+import pandas as pd
+from shapely.geometry import LineString, Point, Polygon
+from typing_extensions import Literal
+
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.checks import check_if_valid_input, check_instance, check_int
+from simba.utils.errors import InvalidInputError
+from simba.utils.read_write import find_core_cnt
+
+CAP_STYLE_MAP = {"round": 1, "square": 2, "flat": 3}
+
 
 class GeometryMixin(object):
 
@@ -25,11 +27,13 @@ class GeometryMixin(object):
         pass
 
     @staticmethod
-    def bodyparts_to_polygon(data: np.ndarray,
-                             cap_style: Literal['round', 'square', 'flat'] = 'round',
-                             parallel_offset: int = 1,
-                             simplify_tolerance: float = 2,
-                             preserve_topology: bool = True) -> Polygon:
+    def bodyparts_to_polygon(
+        data: np.ndarray,
+        cap_style: Literal["round", "square", "flat"] = "round",
+        parallel_offset: int = 1,
+        simplify_tolerance: float = 2,
+        preserve_topology: bool = True,
+    ) -> Polygon:
         """
         .. image:: _static/img/bodyparts_to_polygon.png
            :width: 500
@@ -40,16 +44,15 @@ class GeometryMixin(object):
         >>> GeometryMixin().bodyparts_to_polygon(data=data)
         """
 
-        polygon = LineString(data.tolist()).buffer(distance=parallel_offset,
-                                                   cap_style=CAP_STYLE_MAP[cap_style]).simplify(tolerance=simplify_tolerance,
-                                                                                                preserve_topology=preserve_topology)
+        polygon = (
+            LineString(data.tolist())
+            .buffer(distance=parallel_offset, cap_style=CAP_STYLE_MAP[cap_style])
+            .simplify(tolerance=simplify_tolerance, preserve_topology=preserve_topology)
+        )
         return polygon
 
-
     @staticmethod
-    def bodyparts_to_circle(data: np.ndarray,
-                            parallel_offset: int = 1) -> Polygon:
-
+    def bodyparts_to_circle(data: np.ndarray, parallel_offset: int = 1) -> Polygon:
         """
         .. image:: _static/img/bodyparts_to_circle.png
            :width: 500
@@ -61,17 +64,20 @@ class GeometryMixin(object):
         """
 
         if data.shape != (2,):
-            raise InvalidInputError(msg=f'Cannot create circle data is not a (2,) array: '
-                                        f'{data.shape}', source=GeometryMixin.bodyparts_to_circle.__name__)
+            raise InvalidInputError(
+                msg=f"Cannot create circle data is not a (2,) array: " f"{data.shape}",
+                source=GeometryMixin.bodyparts_to_circle.__name__,
+            )
 
         return Point(data).buffer(parallel_offset)
 
     @staticmethod
-    def buffer_shape(shape: Polygon,
-                     size_mm: int,
-                     pixels_per_mm: float,
-                     cap_style: Literal['round', 'square', 'flat'] = 'round') -> Polygon:
-
+    def buffer_shape(
+        shape: Polygon,
+        size_mm: int,
+        pixels_per_mm: float,
+        cap_style: Literal["round", "square", "flat"] = "round",
+    ) -> Polygon:
         """
 
         .. image:: _static/img/buffer_shape.png
@@ -80,12 +86,17 @@ class GeometryMixin(object):
 
         """
 
-        check_instance(source=GeometryMixin.buffer_shape.__name__, instance=shape, accepted_types=(LineString, Polygon))
-        return shape.buffer(distance=int(size_mm / pixels_per_mm), cap_style=CAP_STYLE_MAP[cap_style])
+        check_instance(
+            source=GeometryMixin.buffer_shape.__name__,
+            instance=shape,
+            accepted_types=(LineString, Polygon),
+        )
+        return shape.buffer(
+            distance=int(size_mm / pixels_per_mm), cap_style=CAP_STYLE_MAP[cap_style]
+        )
 
     @staticmethod
     def compute_pct_shape_overlap(shapes: List[Polygon]) -> float:
-
         """
 
         .. image:: _static/img/compute_pct_shape_overlap.png
@@ -100,10 +111,21 @@ class GeometryMixin(object):
         """
 
         for shape in shapes:
-            check_instance(source=GeometryMixin.compute_pct_shape_overlap.__name__, instance=shape, accepted_types=(LineString, Polygon))
+            check_instance(
+                source=GeometryMixin.compute_pct_shape_overlap.__name__,
+                instance=shape,
+                accepted_types=(LineString, Polygon),
+            )
         if shapes[0].intersects(shapes[1]):
             intersection = shapes[0].intersection(shapes[1])
-            return round((intersection.area / ((shapes[0].area + shapes[1].area) - intersection.area) * 100), 2)
+            return round(
+                (
+                    intersection.area
+                    / ((shapes[0].area + shapes[1].area) - intersection.area)
+                    * 100
+                ),
+                2,
+            )
         else:
             return 0.0
 
@@ -117,7 +139,11 @@ class GeometryMixin(object):
            TODO: multiframe method
         """
         for line in lines:
-            check_instance(source=GeometryMixin.compute_pct_shape_overlap.__name__, instance=line, accepted_types=LineString)
+            check_instance(
+                source=GeometryMixin.compute_pct_shape_overlap.__name__,
+                instance=line,
+                accepted_types=LineString,
+            )
 
         return lines[0].crosses(lines[1])
 
@@ -133,9 +159,11 @@ class GeometryMixin(object):
         pass
 
     @staticmethod
-    def shape_distance(shapes: List[Union[LineString, Polygon]],
-                       pixels_per_mm: float,
-                       unit: Literal['mm', 'cm', 'dm', 'm'] = 'mm') -> float:
+    def shape_distance(
+        shapes: List[Union[LineString, Polygon]],
+        pixels_per_mm: float,
+        unit: Literal["mm", "cm", "dm", "m"] = "mm",
+    ) -> float:
         """
         .. image:: _static/img/shape_distance.png
            :width: 500
@@ -148,22 +176,24 @@ class GeometryMixin(object):
         >>> 10
         TODO: multiframe
         """
-        check_if_valid_input(name='UNIT', input=unit, options=['mm', 'cm', 'dm', 'm'])
+        check_if_valid_input(name="UNIT", input=unit, options=["mm", "cm", "dm", "m"])
         for shape in shapes:
-            check_instance(source=GeometryMixin.compute_pct_shape_overlap.__name__, instance=shape, accepted_types=(LineString, Polygon))
+            check_instance(
+                source=GeometryMixin.compute_pct_shape_overlap.__name__,
+                instance=shape,
+                accepted_types=(LineString, Polygon),
+            )
         D = shapes[0].distance(shapes[1]) / pixels_per_mm
-        if unit == 'cm':
+        if unit == "cm":
             D = D / 10
-        elif unit == 'dm':
+        elif unit == "dm":
             D = D / 100
-        elif unit == 'm':
+        elif unit == "m":
             D = D / 1000
         return D
 
-
     @staticmethod
     def bodyparts_to_line(data: np.ndarray):
-
         """
         .. image:: _static/img/bodyparts_to_line.png
            :width: 500
@@ -175,7 +205,10 @@ class GeometryMixin(object):
         """
 
         if data.ndim != 2:
-            raise InvalidInputError(msg=f'Body-parts to linestring expects a 2D array, got {data.ndim}', source=GeometryMixin.bodyparts_to_line.__name__)
+            raise InvalidInputError(
+                msg=f"Body-parts to linestring expects a 2D array, got {data.ndim}",
+                source=GeometryMixin.bodyparts_to_line.__name__,
+            )
         return LineString(data.tolist())
 
     @staticmethod
@@ -185,100 +218,151 @@ class GeometryMixin(object):
            :width: 500
            :align: center
         """
-        check_instance(source=GeometryMixin.get_center.__name__, instance=shape, accepted_types=(LineString, Polygon))
+        check_instance(
+            source=GeometryMixin.get_center.__name__,
+            instance=shape,
+            accepted_types=(LineString, Polygon),
+        )
         return np.array(shape.centroid)
 
-    def multiframe_bodyparts_to_polygon(self,
-                                        data: np.ndarray,
-                                        cap_style: Literal['round', 'square', 'flat'] = 'round',
-                                        parallel_offset: int = 1,
-                                        simplify_tolerance: float = 2,
-                                        preserve_topology: bool = True,
-                                        core_cnt: int = -1) -> List[Polygon]:
+    def multiframe_bodyparts_to_polygon(
+        self,
+        data: np.ndarray,
+        cap_style: Literal["round", "square", "flat"] = "round",
+        parallel_offset: int = 1,
+        simplify_tolerance: float = 2,
+        preserve_topology: bool = True,
+        core_cnt: int = -1,
+    ) -> List[Polygon]:
         """
         :example:
         >>> data = np.array([[[364, 308], [383, 323], [403, 335], [423, 351]],[[356, 307], [376, 319], [396, 331], [419, 347]]])
         >>> GeometryMixin().multiframe_bodyparts_to_polygon(data=data)
         """
 
-        check_int(name='CORE COUNT', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        check_int(
+            name="CORE COUNT",
+            value=core_cnt,
+            min_value=-1,
+            max_value=find_core_cnt()[0],
+            raise_error=True,
+        )
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         results = []
         with multiprocessing.Pool(core_cnt, maxtasksperchild=10) as pool:
-            constants = functools.partial(GeometryMixin.bodyparts_to_polygon,
-                                          parallel_offset=parallel_offset,
-                                          cap_style=cap_style,
-                                          simplify_tolerance=simplify_tolerance,
-                                          preserve_topology=preserve_topology)
+            constants = functools.partial(
+                GeometryMixin.bodyparts_to_polygon,
+                parallel_offset=parallel_offset,
+                cap_style=cap_style,
+                simplify_tolerance=simplify_tolerance,
+                preserve_topology=preserve_topology,
+            )
             for cnt, mp_return in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(mp_return)
 
-        pool.join(); pool.terminate()
+        pool.join()
+        pool.terminate()
         return results
 
-    def multiframe_bodyparts_to_circle(self,
-                                       data: np.ndarray,
-                                       parallel_offset: int = 1,
-                                       core_cnt: int = -1) -> List[Polygon]:
+    def multiframe_bodyparts_to_circle(
+        self, data: np.ndarray, parallel_offset: int = 1, core_cnt: int = -1
+    ) -> List[Polygon]:
         """
         :example:
         >>> data = np.random.randint(0, 100, (100, 2))
         >>> circles = GeometryMixin().multiframe_bodyparts_to_circle(data=data)
         """
 
-        check_int(name='CORE COUNT', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        check_int(
+            name="CORE COUNT",
+            value=core_cnt,
+            min_value=-1,
+            max_value=find_core_cnt()[0],
+            raise_error=True,
+        )
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         results = []
         with multiprocessing.Pool(core_cnt, maxtasksperchild=10) as pool:
-            constants = functools.partial(GeometryMixin.bodyparts_to_circle,
-                                          parallel_offset=parallel_offset)
+            constants = functools.partial(
+                GeometryMixin.bodyparts_to_circle, parallel_offset=parallel_offset
+            )
             for cnt, mp_return in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(mp_return)
 
-        pool.join(); pool.terminate()
+        pool.join()
+        pool.terminate()
         return results
 
-    def multiframe_bodyparts_to_line(self,
-                                     data: np.ndarray,
-                                     core_cnt: int = -1) -> List[LineString]:
-        """
-        """
+    def multiframe_bodyparts_to_line(
+        self, data: np.ndarray, core_cnt: int = -1
+    ) -> List[LineString]:
+        """ """
 
-        check_int(name='CORE COUNT', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        check_int(
+            name="CORE COUNT",
+            value=core_cnt,
+            min_value=-1,
+            max_value=find_core_cnt()[0],
+            raise_error=True,
+        )
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         if data.ndim != 3:
-            raise InvalidInputError(msg=f'Multiframe body-parts to linestring expects a 3D array, got {data.ndim}', source=GeometryMixin.bodyparts_to_line.__name__)
+            raise InvalidInputError(
+                msg=f"Multiframe body-parts to linestring expects a 3D array, got {data.ndim}",
+                source=GeometryMixin.bodyparts_to_line.__name__,
+            )
         results = []
         with multiprocessing.Pool(core_cnt, maxtasksperchild=10) as pool:
-            for cnt, result in enumerate(pool.imap(GeometryMixin.bodyparts_to_line, data, chunksize=1)):
+            for cnt, result in enumerate(
+                pool.imap(GeometryMixin.bodyparts_to_line, data, chunksize=1)
+            ):
                 results.append(result)
 
         return results
 
-    def multifrm_compute_pct_shape_overlap(self,
-                                          shape_1: List[Polygon],
-                                          shape_2: List[Polygon],
-                                          core_cnt = -1) -> List[float]:
-
-        check_int(name='CORE COUNT', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+    def multifrm_compute_pct_shape_overlap(
+        self, shape_1: List[Polygon], shape_2: List[Polygon], core_cnt=-1
+    ) -> List[float]:
+        check_int(
+            name="CORE COUNT",
+            value=core_cnt,
+            min_value=-1,
+            max_value=find_core_cnt()[0],
+            raise_error=True,
+        )
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         if len(shape_1) != len(shape_2):
-            raise InvalidInputError(msg=f'shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}', source=GeometryMixin.multifrm_compute_pct_shape_overlap.__name__)
-        input_dtypes = list(set([type(x) for x in shape_1] + [type(x) for x in shape_2]))
+            raise InvalidInputError(
+                msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}",
+                source=GeometryMixin.multifrm_compute_pct_shape_overlap.__name__,
+            )
+        input_dtypes = list(
+            set([type(x) for x in shape_1] + [type(x) for x in shape_2])
+        )
         if len(input_dtypes) > 1:
-            raise InvalidInputError(msg=f'shape_1 and shape_2 contains more than 1 dtype {input_dtypes}', source=GeometryMixin.multifrm_compute_pct_shape_overlap.__name__)
-        check_instance(source=GeometryMixin.multifrm_compute_pct_shape_overlap.__name__, instance=shape_1[0], accepted_types=(LineString, Polygon))
+            raise InvalidInputError(
+                msg=f"shape_1 and shape_2 contains more than 1 dtype {input_dtypes}",
+                source=GeometryMixin.multifrm_compute_pct_shape_overlap.__name__,
+            )
+        check_instance(
+            source=GeometryMixin.multifrm_compute_pct_shape_overlap.__name__,
+            instance=shape_1[0],
+            accepted_types=(LineString, Polygon),
+        )
         data, results = np.column_stack((shape_1, shape_2)), []
         with multiprocessing.Pool(core_cnt, maxtasksperchild=10) as pool:
-            for cnt, result in enumerate(pool.imap(GeometryMixin.compute_pct_shape_overlap, data, chunksize=1)):
+            for cnt, result in enumerate(
+                pool.imap(GeometryMixin.compute_pct_shape_overlap, data, chunksize=1)
+            ):
                 results.append(result)
 
-        pool.join(); pool.terminate()
+        pool.join()
+        pool.terminate()
         return results
-
-
-
-
 
 
 # from shapely.geometry import Polygon, LineString, Point
@@ -312,14 +396,9 @@ class GeometryMixin(object):
 # print(distance)
 
 
-
-
-
 # test = GeometryMixin()
 # data = np.array([[[364, 308], [383, 323], [403, 335], [423, 351]],[[356, 307], [376, 319], [396, 331], [419, 347]]])
 # test.multiframe_bodyparts_to_line(data=data)
-
-
 
 
 # polygon_1 = BoundingBoxMixin().bodyparts_to_polygon(np.array([[364, 308],[383, 323],[403, 335],[423, 351]]))
@@ -367,18 +446,15 @@ class GeometryMixin(object):
 # polygon_1 = test.bodyparts_to_polygon(data=data_1)
 # polygon_2 = test.bodyparts_to_polygon(data=data_2)
 
-#test.compute_pct_pylygon_overlap(shape_1=polygon_1, shape_2=polygon_2)
+# test.compute_pct_pylygon_overlap(shape_1=polygon_1, shape_2=polygon_2)
 
-#polygon_1 = LineString([[364, 100],[383, 800],[403, 335],[423, 351]])
-#polygon_2 = LineString([[364, 308],[383, 323],[403, 600],[423, 1]])
-#test.compute_pct_pylygon_overlap(shape_1=polygon_1, shape_2=polygon_2)
+# polygon_1 = LineString([[364, 100],[383, 800],[403, 335],[423, 351]])
+# polygon_2 = LineString([[364, 308],[383, 323],[403, 600],[423, 1]])
+# test.compute_pct_pylygon_overlap(shape_1=polygon_1, shape_2=polygon_2)
 
-#circle = test.bodyparts_to_circle(data=data[0])
+# circle = test.bodyparts_to_circle(data=data[0])
 
-#test.multiframe_bodyparts_to_polygon(data=data)
-
-
-
-#.values.reshape(-1, 2)
+# test.multiframe_bodyparts_to_polygon(data=data)
 
 
+# .values.reshape(-1, 2)
