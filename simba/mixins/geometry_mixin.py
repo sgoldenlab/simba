@@ -191,6 +191,7 @@ class GeometryMixin(object):
 
     @staticmethod
     def is_touching(self):
+        pass
 
     def multiframe_bodyparts_to_polygon(self,
                                         data: np.ndarray,
