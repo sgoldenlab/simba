@@ -77,7 +77,7 @@ Modelling methods
 Time-series feature methods
 ---------------------------------------
 
-.. automodule:: simba.mixins.timeseries_features.mixin
+.. automodule:: simba.mixins.timeseries_features_mixin
    :members:
    :show-inheritance:
 
