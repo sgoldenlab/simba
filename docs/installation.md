@@ -36,6 +36,11 @@ simba
 ``` 
 python -m venv venv
 ```
+or
+```
+py -3.6 -m venv venv
+```
+
 2. Then activate virtual environment by 
 ```
 venv\Scripts\activate
