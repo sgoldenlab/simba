@@ -36,7 +36,7 @@ simba
 ``` 
 python -m venv venv
 ```
-or
+or (to make sure your virtuall environment is python 3.6 if you have multiple python versions in your machine)
 ```
 py -3.6 -m venv venv
 ```
@@ -55,11 +55,7 @@ pip install setuptools
 ```
 pip install simba-uw-tf-dev
 ```
-or if you have different versions of python in your machine, make sure to use python 3.6
 
-```
-py -3.6 -m pip install simba-uw-tf-dev
-```
 5. Fix some package version
 ```
 pip3 uninstall pyparsing
