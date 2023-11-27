@@ -23,6 +23,13 @@ Geometry transformation methods
    :members:
    :show-inheritance:
 
+
+Network (Graph) methods
+----------------------------------------------
+.. automodule:: simba.mixins.network_mixin
+   :members:
+   :show-inheritance:
+
 Feature extraction supplement methods
 ----------------------------------------------
 
@@ -59,7 +66,7 @@ GUI pop-up methods
    :members:
    :show-inheritance:
 
-Pose imporing methods
+Pose importing methods
 -----------------------------------------
 
 .. automodule:: simba.mixins.pose_importer_mixin
