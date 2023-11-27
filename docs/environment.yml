@@ -16,4 +16,5 @@ dependencies:
       - simba-uw-tf-dev
       - nbsphinx
       - umap-learn==0.5.2
+      - pyvis==0.3.2
 prefix: /Users/simon/.conda/envs/simba_dev
