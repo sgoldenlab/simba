@@ -325,9 +325,10 @@ class NetworkMixin(object):
         """
         Visualizes a network graph using the vis.js library and saves the result as an HTML file.
 
-
         .. raw:: html
-                 :file: ../docs/_static/img/network_ex.html
+        
+            <iframe src="_static/img/network_ex.html" width="600" height="400"></iframe>
+
 
 
 
