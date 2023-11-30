@@ -326,7 +326,7 @@ class NetworkMixin(object):
         Visualizes a network graph using the vis.js library and saves the result as an HTML file.
 
         .. raw:: html
-        
+
            <div style="text-align: center;">
            <iframe src="_static/img/network_ex.html" width="500" height="500"></iframe>
            </div>
