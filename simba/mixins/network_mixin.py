@@ -327,7 +327,7 @@ class NetworkMixin(object):
 
 
         .. raw:: html
-               :file: _static/img/network_ex.html
+	         :file: /docs/_static/img/network_ex.html
 
         .. note::
            Multi-networks created by ``simba.mixins.network_mixin.create_multigraph`` can be a little messy to look at. Instead,
