@@ -1,18 +1,16 @@
+import itertools
 import os
+from typing import Dict, List, Optional, Tuple, Union
 
 import networkx as nx
 from pyvis.network import Network
-from typing import Dict, Tuple, Optional, List, Union
-import itertools
 
-from simba.utils.checks import (check_instance,
-                                check_iterable_length,
-                                check_float,
-                                check_int,
-                                check_str,
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_iterable_length, check_str,
                                 check_valid_hex_color)
-from simba.utils.errors import InvalidInputError
 from simba.utils.data import create_color_palette, find_ranked_colors
+from simba.utils.errors import InvalidInputError
+
 
 class NetworkMixin(object):
 
@@ -42,7 +40,6 @@ class NetworkMixin(object):
     def __init__(self):
         pass
 
-
     @staticmethod
     def create_graph(data: Dict[Tuple[str, str], float]) -> nx.Graph():
         """
@@ -56,22 +53,38 @@ class NetworkMixin(object):
         >>> graph = NetworkMixin.create_graph(data=data)
         """
 
-        check_instance(source=NetworkMixin.create_graph.__name__, instance=data, accepted_types=dict)
+        check_instance(
+            source=NetworkMixin.create_graph.__name__,
+            instance=data,
+            accepted_types=dict,
+        )
         for k, v in data.items():
-            check_instance(source=NetworkMixin.create_graph.__name__, instance=k, accepted_types=tuple)
-            check_iterable_length(source=f'{NetworkMixin.create_graph.__name__} {k}', val=len(k), exact_accepted_length=2)
-            check_instance(source=f'{NetworkMixin.create_graph.__name__} {v}', instance=v, accepted_types=(float, int))
+            check_instance(
+                source=NetworkMixin.create_graph.__name__,
+                instance=k,
+                accepted_types=tuple,
+            )
+            check_iterable_length(
+                source=f"{NetworkMixin.create_graph.__name__} {k}",
+                val=len(k),
+                exact_accepted_length=2,
+            )
+            check_instance(
+                source=f"{NetworkMixin.create_graph.__name__} {v}",
+                instance=v,
+                accepted_types=(float, int),
+            )
 
         G = nx.Graph()
         for node_names in data.keys():
-            G.add_node(node_names[0]); G.add_node(node_names[1])
+            G.add_node(node_names[0])
+            G.add_node(node_names[1])
         for node_names, edge_weight in data.items():
             G.add_edge(node_names[0], node_names[1], weight=edge_weight)
         return G
 
     @staticmethod
     def create_multigraph(data: Dict[Tuple[str, str], List[float]]) -> nx.MultiGraph:
-
         """
         Create a multi-graph from a dictionary of node pairs and associated edge weights.
 
@@ -86,26 +99,49 @@ class NetworkMixin(object):
         >>> NetworkMixin().create_multigraph(data=data)
         """
 
-        check_instance(source=NetworkMixin.create_multigraph.__name__, instance=data, accepted_types=dict)
+        check_instance(
+            source=NetworkMixin.create_multigraph.__name__,
+            instance=data,
+            accepted_types=dict,
+        )
         results, dict_data, G = {}, [], nx.MultiGraph()
         for k, v in data.items():
-            check_instance(source=NetworkMixin.create_multigraph.__name__, instance=k, accepted_types=tuple)
-            check_instance(source=f'{NetworkMixin.create_multigraph.__name__} {v}', instance=v, accepted_types=list)
+            check_instance(
+                source=NetworkMixin.create_multigraph.__name__,
+                instance=k,
+                accepted_types=tuple,
+            )
+            check_instance(
+                source=f"{NetworkMixin.create_multigraph.__name__} {v}",
+                instance=v,
+                accepted_types=list,
+            )
             dict_data.append(len(v))
-        check_iterable_length(source=f'{NetworkMixin.create_multigraph.__name__} data', val=len(list(set([x for x in dict_data]))), exact_accepted_length=1)
+        check_iterable_length(
+            source=f"{NetworkMixin.create_multigraph.__name__} data",
+            val=len(list(set([x for x in dict_data]))),
+            exact_accepted_length=1,
+        )
         for node_names in data.keys():
-            G.add_node(node_names[0]); G.add_node(node_names[1])
+            G.add_node(node_names[0])
+            G.add_node(node_names[1])
         for node_names, edge_weights in data.items():
             for edge_cnt, edge_weight in enumerate(edge_weights):
-                G.add_edge(node_names[0], node_names[1], weight=edge_weight, label=f'edge_{edge_cnt}')
+                G.add_edge(
+                    node_names[0],
+                    node_names[1],
+                    weight=edge_weight,
+                    label=f"edge_{edge_cnt}",
+                )
         return G
 
     @staticmethod
-    def graph_page_rank(graph: nx.Graph,
-                        weights: Optional[str] = 'weight',
-                        alpha: Optional[float] = 0.85,
-                        max_iter: Optional[int] = 100) -> Dict[str, float]:
-
+    def graph_page_rank(
+        graph: nx.Graph,
+        weights: Optional[str] = "weight",
+        alpha: Optional[float] = 0.85,
+        max_iter: Optional[int] = 100,
+    ) -> Dict[str, float]:
         """
         Calculate the PageRank of nodes in a graph.
 
@@ -114,36 +150,76 @@ class NetworkMixin(object):
         >>> NetworkMixin().graph_page_rank(graph=graph)
         """
 
-        check_instance(source=NetworkMixin.graph_page_rank.__name__, instance=graph, accepted_types=nx.Graph)
-        check_str(name=f'{NetworkMixin.graph_page_rank.__name__} weights', value=weights)
-        check_float(name=f'{NetworkMixin.graph_page_rank.__name__} alpha', value=alpha)
-        check_int(name=f'{NetworkMixin.graph_page_rank.__name__} max_iter', value=max_iter, min_value=1)
-        edge_weights = tuple(set(itertools.chain.from_iterable(d.keys() for *_, d in graph.edges(data=True))))
-        check_str(name=f'{NetworkMixin.graph_page_rank.__name__} weights', value=weights, options=edge_weights)
+        check_instance(
+            source=NetworkMixin.graph_page_rank.__name__,
+            instance=graph,
+            accepted_types=nx.Graph,
+        )
+        check_str(
+            name=f"{NetworkMixin.graph_page_rank.__name__} weights", value=weights
+        )
+        check_float(name=f"{NetworkMixin.graph_page_rank.__name__} alpha", value=alpha)
+        check_int(
+            name=f"{NetworkMixin.graph_page_rank.__name__} max_iter",
+            value=max_iter,
+            min_value=1,
+        )
+        edge_weights = tuple(
+            set(
+                itertools.chain.from_iterable(
+                    d.keys() for *_, d in graph.edges(data=True)
+                )
+            )
+        )
+        check_str(
+            name=f"{NetworkMixin.graph_page_rank.__name__} weights",
+            value=weights,
+            options=edge_weights,
+        )
 
         return nx.pagerank(graph, alpha=alpha, max_iter=max_iter, weight=weights)
 
     @staticmethod
-    def graph_katz_centrality(graph: nx.Graph,
-                              weights: Optional[str] = 'weight',
-                              alpha: Optional[float] = 0.85):
+    def graph_katz_centrality(
+        graph: nx.Graph,
+        weights: Optional[str] = "weight",
+        alpha: Optional[float] = 0.85,
+    ):
         """
         :example:
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> NetworkMixin().graph_katz_centrality(graph=graph)
         """
-        check_instance(source=NetworkMixin.graph_katz_centrality.__name__, instance=graph, accepted_types=nx.Graph)
-        check_str(name=f'{NetworkMixin.graph_katz_centrality.__name__} weights', value=weights)
-        check_float(name=f'{NetworkMixin.graph_katz_centrality.__name__} alpha', value=alpha)
-        edge_weights = tuple(set(itertools.chain.from_iterable(d.keys() for *_, d in graph.edges(data=True))))
-        check_str(name=f'{NetworkMixin.graph_katz_centrality.__name__} weights', value=weights, options=edge_weights)
+        check_instance(
+            source=NetworkMixin.graph_katz_centrality.__name__,
+            instance=graph,
+            accepted_types=nx.Graph,
+        )
+        check_str(
+            name=f"{NetworkMixin.graph_katz_centrality.__name__} weights", value=weights
+        )
+        check_float(
+            name=f"{NetworkMixin.graph_katz_centrality.__name__} alpha", value=alpha
+        )
+        edge_weights = tuple(
+            set(
+                itertools.chain.from_iterable(
+                    d.keys() for *_, d in graph.edges(data=True)
+                )
+            )
+        )
+        check_str(
+            name=f"{NetworkMixin.graph_katz_centrality.__name__} weights",
+            value=weights,
+            options=edge_weights,
+        )
 
         return nx.katz_centrality_numpy(graph, alpha=alpha, weight=weights)
 
     @staticmethod
-    def graph_current_flow_closeness_centrality(graph: nx.Graph,
-                                                weights: Optional[str] = 'weight'):
-
+    def graph_current_flow_closeness_centrality(
+        graph: nx.Graph, weights: Optional[str] = "weight"
+    ):
         """
 
         :example:
@@ -151,18 +227,38 @@ class NetworkMixin(object):
         >>> NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)
         """
 
-        check_instance(source=NetworkMixin.graph_current_flow_closeness_centrality.__name__, instance=graph, accepted_types=nx.Graph)
-        check_str(name=f'{NetworkMixin.graph_current_flow_closeness_centrality.__name__} weights', value=weights)
-        edge_weights = tuple(set(itertools.chain.from_iterable(d.keys() for *_, d in graph.edges(data=True))))
-        check_str(name=f'{NetworkMixin.graph_current_flow_closeness_centrality.__name__} weights', value=weights, options=edge_weights)
-        return nx.current_flow_closeness_centrality(graph, weight=weights, solver='full')
+        check_instance(
+            source=NetworkMixin.graph_current_flow_closeness_centrality.__name__,
+            instance=graph,
+            accepted_types=nx.Graph,
+        )
+        check_str(
+            name=f"{NetworkMixin.graph_current_flow_closeness_centrality.__name__} weights",
+            value=weights,
+        )
+        edge_weights = tuple(
+            set(
+                itertools.chain.from_iterable(
+                    d.keys() for *_, d in graph.edges(data=True)
+                )
+            )
+        )
+        check_str(
+            name=f"{NetworkMixin.graph_current_flow_closeness_centrality.__name__} weights",
+            value=weights,
+            options=edge_weights,
+        )
+        return nx.current_flow_closeness_centrality(
+            graph, weight=weights, solver="full"
+        )
 
     @staticmethod
-    def multigraph_page_rank(graph: nx.MultiGraph,
-                             weights: Optional[str] = 'weight',
-                             alpha: Optional[float] = 0.85,
-                             max_iter: Optional[int] = 100) -> Dict[str, List[float]]:
-
+    def multigraph_page_rank(
+        graph: nx.MultiGraph,
+        weights: Optional[str] = "weight",
+        alpha: Optional[float] = 0.85,
+        max_iter: Optional[int] = 100,
+    ) -> Dict[str, List[float]]:
         """
         Calculate multi-graph PageRank scores for each node in a MultiGraph.
 
@@ -176,26 +272,51 @@ class NetworkMixin(object):
         >>> {'Animal_1': [0.06122524589028524, 0.06122524589028524, 0.06122524589028524, 0.32739635847890775], 'Animal_2': [0.06122524589028524, 0.40816213116457223, 0.06122524589028524, 0.442259400816002], 'Animal_3': [0.40816213116457223, 0.06122524589028524, 0.40816213116457223, 0.04545454545454547], 'Animal_4': [0.06122524589028524, 0.40816213116457223, 0.06122524589028524, 0.13943514979599955], 'Animal_5': [0.40816213116457223, 0.06122524589028524, 0.40816213116457223, 0.04545454545454547]}
         """
 
-        check_instance(source=NetworkMixin.multigraph_page_rank.__name__, instance=graph, accepted_types=nx.MultiGraph)
-        edge_labels = list(set(data['label'] for _, _, data in graph.edges(data=True)))
-        check_iterable_length(source=f'{NetworkMixin.multigraph_page_rank.__name__} edge_labels', val=len(edge_labels), min=1)
-        check_str(name=f'{NetworkMixin.graph_page_rank.__name__} weights', value=weights)
-        check_float(name=f'{NetworkMixin.graph_page_rank.__name__} alpha', value=alpha)
-        check_int(name=f'{NetworkMixin.graph_page_rank.__name__} max_iter', value=max_iter, min_value=1)
+        check_instance(
+            source=NetworkMixin.multigraph_page_rank.__name__,
+            instance=graph,
+            accepted_types=nx.MultiGraph,
+        )
+        edge_labels = list(set(data["label"] for _, _, data in graph.edges(data=True)))
+        check_iterable_length(
+            source=f"{NetworkMixin.multigraph_page_rank.__name__} edge_labels",
+            val=len(edge_labels),
+            min=1,
+        )
+        check_str(
+            name=f"{NetworkMixin.graph_page_rank.__name__} weights", value=weights
+        )
+        check_float(name=f"{NetworkMixin.graph_page_rank.__name__} alpha", value=alpha)
+        check_int(
+            name=f"{NetworkMixin.graph_page_rank.__name__} max_iter",
+            value=max_iter,
+            min_value=1,
+        )
         results = {x: [] for x in list(graph.nodes())}
         for edge_label in edge_labels:
-            filtered_graph = nx.Graph(graph.edge_subgraph([(u, v, k) for u, v, k, data in graph.edges(keys=True, data=True) if data.get('label') == edge_label]))
-            page_ranks = NetworkMixin().graph_page_rank(graph=filtered_graph, weights=weights, alpha=alpha, max_iter=max_iter)
+            filtered_graph = nx.Graph(
+                graph.edge_subgraph(
+                    [
+                        (u, v, k)
+                        for u, v, k, data in graph.edges(keys=True, data=True)
+                        if data.get("label") == edge_label
+                    ]
+                )
+            )
+            page_ranks = NetworkMixin().graph_page_rank(
+                graph=filtered_graph, weights=weights, alpha=alpha, max_iter=max_iter
+            )
             for k, v in page_ranks.items():
                 results[k].append(v)
 
     @staticmethod
-    def visualize(graph: Union[nx.Graph, nx.MultiGraph],
-                  save_path: Optional[Union[str, os.PathLike]] = None,
-                  node_size: Optional[Union[float, Dict[str, float]]] = 25.0,
-                  palette: Optional[Union[str, Dict[str, str]]] = 'magma',
-                  img_size: Optional[Tuple[int, int]] = (500, 500)) -> Union[None, Network]:
-
+    def visualize(
+        graph: Union[nx.Graph, nx.MultiGraph],
+        save_path: Optional[Union[str, os.PathLike]] = None,
+        node_size: Optional[Union[float, Dict[str, float]]] = 25.0,
+        palette: Optional[Union[str, Dict[str, str]]] = "magma",
+        img_size: Optional[Tuple[int, int]] = (500, 500),
+    ) -> Union[None, Network]:
         """
         Visualizes a network graph using the vis.js library and saves the result as an HTML file.
 
@@ -214,31 +335,64 @@ class NetworkMixin(object):
         >>> graph_pg = NetworkMixin().graph_page_rank(graph=graph)
         """
 
-        check_instance(source=NetworkMixin.visualize.__name__, instance=graph, accepted_types=(nx.MultiGraph, nx.Graph))
-        check_instance(source=NetworkMixin.visualize.__name__, instance=node_size, accepted_types=(int, float, dict))
+        check_instance(
+            source=NetworkMixin.visualize.__name__,
+            instance=graph,
+            accepted_types=(nx.MultiGraph, nx.Graph),
+        )
+        check_instance(
+            source=NetworkMixin.visualize.__name__,
+            instance=node_size,
+            accepted_types=(int, float, dict),
+        )
         multi_graph = False
         if graph.is_multigraph() and save_path is not None:
-            if not os.path.isdir(save_path): os.makedirs(save_path)
+            if not os.path.isdir(save_path):
+                os.makedirs(save_path)
             multi_graph = True
-        check_instance(source=NetworkMixin.visualize.__name__, instance=img_size, accepted_types=tuple)
-        for i in img_size: check_int(name=f'{NetworkMixin.visualize.__name__} img_size', value=i, min_value=100)
+        check_instance(
+            source=NetworkMixin.visualize.__name__,
+            instance=img_size,
+            accepted_types=tuple,
+        )
+        for i in img_size:
+            check_int(
+                name=f"{NetworkMixin.visualize.__name__} img_size",
+                value=i,
+                min_value=100,
+            )
         if isinstance(node_size, dict):
             if sorted(graph.nodes) != sorted(list(node_size.keys())):
-                raise InvalidInputError(msg=f'node_size keys do not match graph node names: {sorted(graph.nodes)} != {sorted(list(node_size.keys()))}')
-            for v in node_size.values: check_float(name=f'{NetworkMixin.visualize.__name__} node_size', value=v, min_value=0)
+                raise InvalidInputError(
+                    msg=f"node_size keys do not match graph node names: {sorted(graph.nodes)} != {sorted(list(node_size.keys()))}"
+                )
+            for v in node_size.values:
+                check_float(
+                    name=f"{NetworkMixin.visualize.__name__} node_size",
+                    value=v,
+                    min_value=0,
+                )
         else:
-            check_int(name=f'{NetworkMixin.visualize.__name__} node size', value=node_size, min_value=1)
+            check_int(
+                name=f"{NetworkMixin.visualize.__name__} node size",
+                value=node_size,
+                min_value=1,
+            )
         if isinstance(palette, dict):
             if sorted(graph.nodes) != sorted(list(palette.keys())):
-                raise InvalidInputError(msg=f'palette keys do not match graph node names: {sorted(graph.nodes)} != {sorted(list(node_size.keys()))}')
+                raise InvalidInputError(
+                    msg=f"palette keys do not match graph node names: {sorted(graph.nodes)} != {sorted(list(node_size.keys()))}"
+                )
             for v in palette.values():
                 check_valid_hex_color(color_hex=str(v))
         else:
-            clrs = create_color_palette(pallete_name=palette, as_hex=True, increments=len(list(graph.nodes())))
+            clrs = create_color_palette(
+                pallete_name=palette, as_hex=True, increments=len(list(graph.nodes()))
+            )
 
         if not multi_graph:
-            network_graph = Network(f'{img_size[0]}px', f'{img_size[1]}px')
-            network_graph.set_edge_smooth('dynamic')
+            network_graph = Network(f"{img_size[0]}px", f"{img_size[1]}px")
+            network_graph.set_edge_smooth("dynamic")
             for node_cnt, node_name in enumerate(graph):
                 if isinstance(node_size, dict):
                     node_node_size = node_size[node_name]
@@ -248,22 +402,38 @@ class NetworkMixin(object):
                     node_clr = palette[node_name]
                 else:
                     node_clr = clrs[node_cnt]
-                network_graph.add_node(n_id=node_name, shape='dot', color=node_clr, size=node_node_size)
+                network_graph.add_node(
+                    n_id=node_name, shape="dot", color=node_clr, size=node_node_size
+                )
             for source, target, edge_attrs in graph.edges(data=True):
-                network_graph.add_edge(source, target, value=edge_attrs['weight'])
+                network_graph.add_edge(source, target, value=edge_attrs["weight"])
             if save_path is not None:
                 network_graph.save_graph(save_path)
 
             return network_graph
 
         else:
-            edge_labels = list(set(data['label'] for _, _, data in graph.edges(data=True)))
-            check_iterable_length(source=f'{NetworkMixin.multigraph_page_rank.__name__} edge_labels', val=len(edge_labels), min=1)
+            edge_labels = list(
+                set(data["label"] for _, _, data in graph.edges(data=True))
+            )
+            check_iterable_length(
+                source=f"{NetworkMixin.multigraph_page_rank.__name__} edge_labels",
+                val=len(edge_labels),
+                min=1,
+            )
             for edge_label in edge_labels:
-                network_graph = Network(f'{img_size[0]}px', f'{img_size[1]}px')
-                network_graph.set_edge_smooth('dynamic')
-                graph_save_path = os.path.join(save_path, f'{edge_label}.html')
-                filtered_graph = nx.Graph(graph.edge_subgraph([(u, v, k) for u, v, k, data in graph.edges(keys=True, data=True) if data.get('label') == edge_label]))
+                network_graph = Network(f"{img_size[0]}px", f"{img_size[1]}px")
+                network_graph.set_edge_smooth("dynamic")
+                graph_save_path = os.path.join(save_path, f"{edge_label}.html")
+                filtered_graph = nx.Graph(
+                    graph.edge_subgraph(
+                        [
+                            (u, v, k)
+                            for u, v, k, data in graph.edges(keys=True, data=True)
+                            if data.get("label") == edge_label
+                        ]
+                    )
+                )
                 for node_cnt, node_name in enumerate(filtered_graph):
                     if isinstance(node_size, dict):
                         node_node_size = node_size[node_name]
@@ -273,18 +443,16 @@ class NetworkMixin(object):
                         node_clr = palette[node_name]
                     else:
                         node_clr = palette[node_cnt]
-                    network_graph.add_node(n_id=node_name, shape='dot', color=node_clr, size=node_node_size)
+                    network_graph.add_node(
+                        n_id=node_name, shape="dot", color=node_clr, size=node_node_size
+                    )
                 for source, target, edge_attrs in filtered_graph.edges(data=True):
-                    network_graph.add_edge(source, target, value=edge_attrs['weight'])
+                    network_graph.add_edge(source, target, value=edge_attrs["weight"])
                 if save_path is not None:
                     network_graph.save_graph(graph_save_path)
 
 
-
-
-
-
-#graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
+# graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
 
 
 # multigraph = NetworkMixin().create_multigraph(data={('Animal_1', 'Animal_2'): [0, 0, 0, 6], ('Animal_1', 'Animal_3'): [0, 0, 0, 0], ('Animal_1', 'Animal_4'): [0, 0, 0, 0], ('Animal_1', 'Animal_5'): [0, 0, 0, 0], ('Animal_2', 'Animal_3'): [0, 0, 0, 0], ('Animal_2', 'Animal_4'): [5, 0, 0, 2], ('Animal_2', 'Animal_5'): [0, 0, 0, 0], ('Animal_3', 'Animal_4'): [0, 0, 0, 0], ('Animal_3', 'Animal_5'): [0, 2, 22, 0], ('Animal_4', 'Animal_5'): [0, 0, 0, 0]})
@@ -298,16 +466,8 @@ class NetworkMixin(object):
 #                          palette=graph_clrs)
 
 
-
-#multigraph = NetworkMixin().create_multigraph(data={('Animal_1', 'Animal_2'): [0, 0, 0, 6], ('Animal_1', 'Animal_3'): [0, 0, 0, 0], ('Animal_1', 'Animal_4'): [0, 0, 0, 0], ('Animal_1', 'Animal_5'): [0, 0, 0, 0], ('Animal_2', 'Animal_3'): [0, 0, 0, 0], ('Animal_2', 'Animal_4'): [5, 0, 0, 2], ('Animal_2', 'Animal_5'): [0, 0, 0, 0], ('Animal_3', 'Animal_4'): [0, 0, 0, 0], ('Animal_3', 'Animal_5'): [0, 2, 22, 0], ('Animal_4', 'Animal_5'): [0, 0, 0, 0]})
-#NetworkMixin().visualize(graph=multigraph, save_path='/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html')
-
-
-
-
-
-
-
+# multigraph = NetworkMixin().create_multigraph(data={('Animal_1', 'Animal_2'): [0, 0, 0, 6], ('Animal_1', 'Animal_3'): [0, 0, 0, 0], ('Animal_1', 'Animal_4'): [0, 0, 0, 0], ('Animal_1', 'Animal_5'): [0, 0, 0, 0], ('Animal_2', 'Animal_3'): [0, 0, 0, 0], ('Animal_2', 'Animal_4'): [5, 0, 0, 2], ('Animal_2', 'Animal_5'): [0, 0, 0, 0], ('Animal_3', 'Animal_4'): [0, 0, 0, 0], ('Animal_3', 'Animal_5'): [0, 2, 22, 0], ('Animal_4', 'Animal_5'): [0, 0, 0, 0]})
+# NetworkMixin().visualize(graph=multigraph, save_path='/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html')
 
 
 # graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
@@ -322,27 +482,24 @@ class NetworkMixin(object):
 # NetworkMixin().visualize(graph=multigraph, save_dir='/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html')
 
 
-
-
-        #
-        # for video_name, G in self.graphs.items():
-        #     if node_colors is not None:
-        #         clrs = create_single_color_lst(pallete_name='magma', increments=len(self.animal_names), as_hex=True)
-        #         node_colors = {k: v for k, v in sorted(node_colors.items(), key=lambda item: item[1], reverse=True)}
-        #         for node_cnt, node_name in enumerate(node_colors.keys()):
-        #             node_colors[node_name] = clrs[node_cnt]
-        #
-        #     network_graph = Network(style_attr['size'][0], style_attr['size'][1])
-        #     for node_name, node_attrs in G.nodes(data=True):
-        #         network_graph.add_node(node_name, color=node_colors[node_name])
-        #
-        #     for source, target, edge_attrs in G.edges(data=True):
-        #         edge_attrs['value'] = edge_attrs['weight']
-        #         network_graph.add_edge(str(source), str(target), **edge_attrs)
-        #
-        #     network_graph.save_graph('nx.html')
-        #
-
+#
+# for video_name, G in self.graphs.items():
+#     if node_colors is not None:
+#         clrs = create_single_color_lst(pallete_name='magma', increments=len(self.animal_names), as_hex=True)
+#         node_colors = {k: v for k, v in sorted(node_colors.items(), key=lambda item: item[1], reverse=True)}
+#         for node_cnt, node_name in enumerate(node_colors.keys()):
+#             node_colors[node_name] = clrs[node_cnt]
+#
+#     network_graph = Network(style_attr['size'][0], style_attr['size'][1])
+#     for node_name, node_attrs in G.nodes(data=True):
+#         network_graph.add_node(node_name, color=node_colors[node_name])
+#
+#     for source, target, edge_attrs in G.edges(data=True):
+#         edge_attrs['value'] = edge_attrs['weight']
+#         network_graph.add_edge(str(source), str(target), **edge_attrs)
+#
+#     network_graph.save_graph('nx.html')
+#
 
 
 #
@@ -356,7 +513,6 @@ class NetworkMixin(object):
 # graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
 # NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)
 #
-
 
 
 #
@@ -382,10 +538,9 @@ class NetworkMixin(object):
 # NetworkMixin().visualize(graph=multigraph, save_dir='/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html')
 
 
-#NetworkMixin().multigraph_page_rank(graph=multigraph)
+# NetworkMixin().multigraph_page_rank(graph=multigraph)
 
 
-
-#NetworkMixin.page_rank(graph=graph)
-#NetworkMixin.katz_centrality(graph=graph)
-#NetworkMixin.current_flow_closeness_centrality(graph=graph)
+# NetworkMixin.page_rank(graph=graph)
+# NetworkMixin.katz_centrality(graph=graph)
+# NetworkMixin.current_flow_closeness_centrality(graph=graph)
