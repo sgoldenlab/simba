@@ -8,25 +8,20 @@ import numpy as np
 
 
 import os
-import trafaret as t
-import pandas as pd
-from typing import Any, Optional, Tuple, List, Union
-import subprocess
 import re
+import subprocess
 from pathlib import Path
+from typing import Any, List, Optional, Tuple, Union
 
-from simba.utils.errors import (NoFilesFoundError,
-                                CorruptedFileError,
-                                IntegerError,
-                                FloatError,
-                                StringError,
-                                NotDirectoryError,
-                                ColumnNotFoundError,
-                                InvalidInputError,
-                                ParametersFileError,
-                                InvalidFilepathError,
-                                CountError,
-                                NoDataError)
+import pandas as pd
+import trafaret as t
+
+from simba.utils.errors import (ColumnNotFoundError, CorruptedFileError,
+                                CountError, FloatError, IntegerError,
+                                InvalidFilepathError, InvalidInputError,
+                                NoDataError, NoFilesFoundError,
+                                NotDirectoryError, ParametersFileError,
+                                StringError)
 from simba.utils.warnings import NoDataFoundWarning
 
 
@@ -39,19 +34,31 @@ def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
     :raise CorruptedFileError: The file can not be read or is zero byte size.
     """
     if not os.path.isfile(file_path):
-        raise NoFilesFoundError(msg=f'{file_path} is not a valid file path', source=check_file_exist_and_readable.__name__)
+        raise NoFilesFoundError(
+            msg=f"{file_path} is not a valid file path",
+            source=check_file_exist_and_readable.__name__,
+        )
     elif not os.access(file_path, os.R_OK):
-        raise CorruptedFileError(msg=f'{file_path} is not readable', source=check_file_exist_and_readable.__name__)
+        raise CorruptedFileError(
+            msg=f"{file_path} is not readable",
+            source=check_file_exist_and_readable.__name__,
+        )
     elif os.stat(file_path).st_size == 0:
-        raise CorruptedFileError(msg=f'{file_path} is 0 bytes and contains no data.', source=check_file_exist_and_readable.__name__)
+        raise CorruptedFileError(
+            msg=f"{file_path} is 0 bytes and contains no data.",
+            source=check_file_exist_and_readable.__name__,
+        )
     else:
         pass
 
-def check_int(name: str,
-              value: Any,
-              max_value: Optional[int] = None,
-              min_value: Optional[int] = None,
-              raise_error: Optional[bool] = True) -> (bool, str):
+
+def check_int(
+    name: str,
+    value: Any,
+    max_value: Optional[int] = None,
+    min_value: Optional[int] = None,
+    raise_error: Optional[bool] = True,
+) -> (bool, str):
     """
     Check if variable is a valid integer.
 
@@ -67,25 +74,25 @@ def check_int(name: str,
     :examples:
     >>> check_int(name='My_fps', input=25, min_value=1)
     """
-    msg = ''
+    msg = ""
     try:
         t.Int().check(value)
     except t.DataError as e:
-        msg=f'{name} should be an integer number in SimBA, but is set to {str(value)}'
+        msg = f"{name} should be an integer number in SimBA, but is set to {str(value)}"
         if raise_error:
             raise IntegerError(msg=msg, source=check_int.__name__)
         else:
             return False, msg
-    if (min_value != None):
+    if min_value != None:
         if int(value) < min_value:
-            msg = f'{name} should be MORE THAN OR EQUAL to {str(min_value)}. It is set to {str(value)}'
+            msg = f"{name} should be MORE THAN OR EQUAL to {str(min_value)}. It is set to {str(value)}"
             if raise_error:
                 raise IntegerError(msg=msg, source=check_int.__name__)
             else:
                 return False, msg
-    if (max_value != None):
+    if max_value != None:
         if int(value) > max_value:
-            msg = f'{name} should be LESS THAN OR EQUAL to {str(max_value)}. It is set to {str(value)}'
+            msg = f"{name} should be LESS THAN OR EQUAL to {str(max_value)}. It is set to {str(value)}"
             if raise_error:
                 raise IntegerError(msg=msg, source=check_int.__name__)
             else:
@@ -93,11 +100,13 @@ def check_int(name: str,
     return True, msg
 
 
-def check_str(name: str,
-              value: Any,
-              options: Optional[Tuple[Any]] = (),
-              allow_blank: bool = False,
-              raise_error: bool = True) -> (bool, str):
+def check_str(
+    name: str,
+    value: Any,
+    options: Optional[Tuple[Any]] = (),
+    allow_blank: bool = False,
+    raise_error: bool = True,
+) -> (bool, str):
     """
     Check if variable is a valid string.
 
@@ -114,18 +123,18 @@ def check_str(name: str,
     >>> check_str(name='split_eval', input='gini', options=['entropy', 'gini'])
     """
 
-    msg = ''
+    msg = ""
     try:
         t.String(allow_blank=allow_blank).check(value)
     except t.DataError as e:
-        msg = f'{name} should be an string in SimBA, but is set to {str(value)}'
+        msg = f"{name} should be an string in SimBA, but is set to {str(value)}"
         if raise_error:
             raise StringError(msg=msg, source=check_str.__name__)
         else:
             return False, msg
     if len(options) > 0:
         if value not in options:
-            msg = f'{name} is set to {str(value)} in SimBA, but this is not a valid option: {options}'
+            msg = f"{name} is set to {str(value)} in SimBA, but this is not a valid option: {options}"
             if raise_error:
                 raise StringError(msg=msg, source=check_str.__name__)
             else:
@@ -136,11 +145,13 @@ def check_str(name: str,
         return True, msg
 
 
-def check_float(name: str,
-                value: Any,
-                max_value: Optional[float] = None,
-                min_value: Optional[float] = None,
-                raise_error: bool = True) -> (bool, str):
+def check_float(
+    name: str,
+    value: Any,
+    max_value: Optional[float] = None,
+    min_value: Optional[float] = None,
+    raise_error: bool = True,
+) -> (bool, str):
     """
     Check if variable is a valid float.
 
@@ -157,26 +168,25 @@ def check_float(name: str,
     >>> check_float(name='My_float', value=0.5, max_value=1.0, min_value=0.0)
     """
 
-
-    msg = ''
+    msg = ""
     try:
         t.Float().check(value)
     except t.DataError as e:
-        msg = f'{name} should be a float number in SimBA, but is set to {str(value)}'
+        msg = f"{name} should be a float number in SimBA, but is set to {str(value)}"
         if raise_error:
             raise FloatError(msg=msg, source=check_float.__name__)
         else:
             return False, msg
-    if (min_value != None):
+    if min_value != None:
         if float(value) < min_value:
-            msg = f'{name} should be MORE THAN OR EQUAL to {str(min_value)}. It is set to {str(value)}'
+            msg = f"{name} should be MORE THAN OR EQUAL to {str(min_value)}. It is set to {str(value)}"
             if raise_error:
                 raise FloatError(msg=msg, source=check_float.__name__)
             else:
                 return False, msg
-    if (max_value != None):
+    if max_value != None:
         if float(value) > max_value:
-            msg = f'{name} should be LESS THAN OR EQUAL to {str(max_value)}. It is set to {str(value)}'
+            msg = f"{name} should be LESS THAN OR EQUAL to {str(max_value)}. It is set to {str(value)}"
             if raise_error:
                 raise FloatError(msg=msg, source=check_float.__name__)
             else:
@@ -184,27 +194,35 @@ def check_float(name: str,
     return True, msg
 
 
-
-def check_iterable_length(source: str,
-                          val: int,
-                          exact_accepted_length: Optional[int] = None,
-                          max: Optional[int] = np.inf,
-                          min: int = 1) -> None:
-
+def check_iterable_length(
+    source: str,
+    val: int,
+    exact_accepted_length: Optional[int] = None,
+    max: Optional[int] = np.inf,
+    min: int = 1,
+) -> None:
     if (not exact_accepted_length) and (not max) and (not min):
-        raise InvalidInputError(msg=f'Provide exact_accepted_length or max and min values for {source}', source=check_iterable_length.__name__)
+        raise InvalidInputError(
+            msg=f"Provide exact_accepted_length or max and min values for {source}",
+            source=check_iterable_length.__name__,
+        )
     if exact_accepted_length:
         if val != exact_accepted_length:
-            raise InvalidInputError(msg=f'{source} length is {val}, expected {exact_accepted_length}', source=check_iterable_length.__name__)
+            raise InvalidInputError(
+                msg=f"{source} length is {val}, expected {exact_accepted_length}",
+                source=check_iterable_length.__name__,
+            )
 
     elif (val > max) or (val < min):
-        raise InvalidInputError(msg=f'{source} value {val} does not full-fill criterion: min {min}, max{max} ', source=check_iterable_length.__name__)
+        raise InvalidInputError(
+            msg=f"{source} value {val} does not full-fill criterion: min {min}, max{max} ",
+            source=check_iterable_length.__name__,
+        )
 
 
-def check_instance(source: str,
-                   instance: object,
-                   accepted_types: Union[Tuple[object], object]) -> None:
-
+def check_instance(
+    source: str, instance: object, accepted_types: Union[Tuple[object], object]
+) -> None:
     """
     Check if an instance is an acceptable type.
 
@@ -214,7 +232,10 @@ def check_instance(source: str,
     """
 
     if not isinstance(instance, accepted_types):
-        raise InvalidInputError(msg=f'{source} requires {accepted_types}, got {type(instance)}', source=source)
+        raise InvalidInputError(
+            msg=f"{source} requires {accepted_types}, got {type(instance)}",
+            source=source,
+        )
 
 
 def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
@@ -234,12 +255,14 @@ def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
     try:
         file_name = os.path.basename(filepath.rsplit(file_extension, 1)[0])
     except ValueError:
-        raise InvalidFilepathError(msg=f'{filepath} is not a valid filepath', source=get_fn_ext.__name__)
+        raise InvalidFilepathError(
+            msg=f"{filepath} is not a valid filepath", source=get_fn_ext.__name__
+        )
     dir_name = os.path.dirname(filepath)
     return dir_name, file_name, file_extension
 
-def check_if_filepath_list_is_empty(filepaths: List[str],
-                                    error_msg: str) -> None:
+
+def check_if_filepath_list_is_empty(filepaths: List[str], error_msg: str) -> None:
     """
     Check if a list is empty
 
@@ -247,15 +270,17 @@ def check_if_filepath_list_is_empty(filepaths: List[str],
     :raise NoFilesFoundError: The list is empty.
     """
 
-
     if len(filepaths) == 0:
-        raise NoFilesFoundError(msg=error_msg, source=check_if_filepath_list_is_empty.__name__)
+        raise NoFilesFoundError(
+            msg=error_msg, source=check_if_filepath_list_is_empty.__name__
+        )
     else:
         pass
 
 
-def check_all_file_names_are_represented_in_video_log(video_info_df: pd.DataFrame,
-                                                      data_paths: List[Union[str, os.PathLike]]) -> None:
+def check_all_file_names_are_represented_in_video_log(
+    video_info_df: pd.DataFrame, data_paths: List[Union[str, os.PathLike]]
+) -> None:
     """
     Helper to check that all files are represented in a dataframe of the SimBA `project_folder/logs/video_info.csv`
     file.
@@ -268,11 +293,12 @@ def check_all_file_names_are_represented_in_video_log(video_info_df: pd.DataFram
     missing_videos = []
     for file_path in data_paths:
         video_name = get_fn_ext(file_path)[1]
-        if video_name not in list(video_info_df['Video']):
+        if video_name not in list(video_info_df["Video"]):
             missing_videos.append(video_name)
     if len(missing_videos) > 0:
-        raise ParametersFileError(msg=f'SimBA could not find {len(missing_videos)} video(s) in the video_info.csv file. Make sure all videos analyzed are represented in the project_folder/logs/video_info.csv file. MISSING VIDEOS: {missing_videos}')
-
+        raise ParametersFileError(
+            msg=f"SimBA could not find {len(missing_videos)} video(s) in the video_info.csv file. Make sure all videos analyzed are represented in the project_folder/logs/video_info.csv file. MISSING VIDEOS: {missing_videos}"
+        )
 
 
 def check_if_dir_exists(in_dir: Union[str, os.PathLike]) -> None:
@@ -283,11 +309,15 @@ def check_if_dir_exists(in_dir: Union[str, os.PathLike]) -> None:
     :raise NotDirectoryError: The directory does not exist.
     """
     if not os.path.isdir(in_dir):
-        raise NotDirectoryError(msg=f'{in_dir} is not a valid directory', source=check_if_dir_exists.__name__)
+        raise NotDirectoryError(
+            msg=f"{in_dir} is not a valid directory",
+            source=check_if_dir_exists.__name__,
+        )
 
-def check_that_column_exist(df: pd.DataFrame,
-                            column_name: Union[str, os.PathLike, List[str]],
-                            file_name: str) -> None:
+
+def check_that_column_exist(
+    df: pd.DataFrame, column_name: Union[str, os.PathLike, List[str]], file_name: str
+) -> None:
     """
     Check if single named field or a list of fields exist within a dataframe.
 
@@ -301,12 +331,16 @@ def check_that_column_exist(df: pd.DataFrame,
         column_name = [column_name]
     for column in column_name:
         if column not in df.columns:
-            raise ColumnNotFoundError(column_name=column, file_name=file_name, source=check_that_column_exist.__name__)
+            raise ColumnNotFoundError(
+                column_name=column,
+                file_name=file_name,
+                source=check_that_column_exist.__name__,
+            )
 
-def check_if_valid_input(name: str,
-                         input: str,
-                         options: List[str],
-                         raise_error: bool = True) -> (bool, str):
+
+def check_if_valid_input(
+    name: str, input: str, options: List[str], raise_error: bool = True
+) -> (bool, str):
     """
     Check if string variable is valid option
 
@@ -323,9 +357,9 @@ def check_if_valid_input(name: str,
     >>> (True, '')
     """
 
-    msg = ''
+    msg = ""
     if input not in options:
-        msg = f'{name} is set to {str(input)}, which is an invalid setting. OPTIONS {options}'
+        msg = f"{name} is set to {str(input)}, which is an invalid setting. OPTIONS {options}"
         if raise_error:
             raise InvalidInputError(msg=msg, source=check_if_valid_input.__name__)
         else:
@@ -334,10 +368,9 @@ def check_if_valid_input(name: str,
         return True, msg
 
 
-
-def check_minimum_roll_windows(roll_windows_values: List[int],
-                               minimum_fps: float) -> List[int]:
-
+def check_minimum_roll_windows(
+    roll_windows_values: List[int], minimum_fps: float
+) -> List[int]:
     """
     Remove any rolling temporal window that are shorter than a single frame in
     any of the videos within the project.
@@ -380,6 +413,7 @@ def check_same_number_of_rows_in_dfs(dfs: List[pd.DataFrame]) -> bool:
                 return False
     return True
 
+
 def check_if_headers_in_dfs_are_unique(dfs: List[pd.DataFrame]) -> List[str]:
     """
     Helper to check heaaders in multiple dataframes are unique.
@@ -398,6 +432,7 @@ def check_if_headers_in_dfs_are_unique(dfs: List[pd.DataFrame]) -> List[str]:
     duplicates = list(set([x for x in seen_headers if seen_headers.count(x) > 1]))
     return duplicates
 
+
 def check_if_string_value_is_valid_video_timestamp(value: str, name: str) -> None:
     """
     Helper to check if a string is in a valid HH:MM:SS format
@@ -410,13 +445,17 @@ def check_if_string_value_is_valid_video_timestamp(value: str, name: str) -> Non
     >>> check_if_string_value_is_valid_video_timestamp(value='00:0b:10', name='My time stamp')
     >>> "InvalidInputError: My time stamp is should be in the format XX:XX:XX where X is an integer between 0-9"
     """
-    r = re.compile('.{2}:.{2}:.{2}')
-    if (len(value) != 8) or (not r.match(value)) or (re.search('[a-zA-Z]', value)):
-        raise InvalidInputError(msg=f'{name} is should be in the format XX:XX:XX where X is an integer between 0-9', source=check_if_string_value_is_valid_video_timestamp.__name__)
+    r = re.compile(".{2}:.{2}:.{2}")
+    if (len(value) != 8) or (not r.match(value)) or (re.search("[a-zA-Z]", value)):
+        raise InvalidInputError(
+            msg=f"{name} is should be in the format XX:XX:XX where X is an integer between 0-9",
+            source=check_if_string_value_is_valid_video_timestamp.__name__,
+        )
 
-def check_that_hhmmss_start_is_before_end(start_time: str,
-                                          end_time: str,
-                                          name: str) -> None:
+
+def check_that_hhmmss_start_is_before_end(
+    start_time: str, end_time: str, name: str
+) -> None:
     """
     Helper to check that a start time in HH:MM:SS format is before an end time in HH:MM:SS format
 
@@ -430,12 +469,16 @@ def check_that_hhmmss_start_is_before_end(start_time: str,
     >>> "InvalidInputError: My time period has an end-time which is before the start-time"
     >>> check_that_hhmmss_start_is_before_end(start_time='00:00:01', end_time='00:00:05')
     """
-    start_h, start_m, start_s = start_time.split(':')
-    end_h, end_m, end_s = end_time.split(':')
+    start_h, start_m, start_s = start_time.split(":")
+    end_h, end_m, end_s = end_time.split(":")
     start_in_s = int(start_h) * 3600 + int(start_m) * 60 + int(start_s)
     end_in_s = int(end_h) * 3600 + int(end_m) * 60 + int(end_s)
     if end_in_s < start_in_s:
-        raise InvalidInputError(f'{name} has an end-time which is before the start-time.', source=check_that_hhmmss_start_is_before_end.__name__)
+        raise InvalidInputError(
+            f"{name} has an end-time which is before the start-time.",
+            source=check_that_hhmmss_start_is_before_end.__name__,
+        )
+
 
 def check_nvidea_gpu_available() -> bool:
     """
@@ -443,10 +486,11 @@ def check_nvidea_gpu_available() -> bool:
     returns bool: True if nvidia-smi returns not None. Else False.
     """
     try:
-        subprocess.check_output('nvidia-smi')
+        subprocess.check_output("nvidia-smi")
         return True
     except Exception:
         return False
+
 
 def check_ffmpeg_available() -> bool:
     """
@@ -455,15 +499,18 @@ def check_ffmpeg_available() -> bool:
     returns bool: True if ``ffmpeg`` returns not None. Else False.
     """
     try:
-        subprocess.call('ffmpeg', stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+        subprocess.call("ffmpeg", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         return True
     except Exception:
         return False
 
-def check_if_valid_rgb_str(input: str,
-                           delimiter: str = ',',
-                           return_cleaned_rgb_tuple: bool = True,
-                           reverse_returned: bool = True):
+
+def check_if_valid_rgb_str(
+    input: str,
+    delimiter: str = ",",
+    return_cleaned_rgb_tuple: bool = True,
+    reverse_returned: bool = True,
+):
     """
     Helper to check if a string is a valid representation of an RGB color.
 
@@ -479,12 +526,14 @@ def check_if_valid_rgb_str(input: str,
 
     input = input.replace(" ", "")
     if input.count(delimiter) != 2:
-        raise InvalidInputError(msg=f'{input} in not a valid RGB color')
-    values = input.split(',')
+        raise InvalidInputError(msg=f"{input} in not a valid RGB color")
+    values = input.split(",")
     rgb = []
     for value in values:
-        val = ''.join(c for c in value if c.isdigit())
-        check_int(name='RGB value', value=val, max_value=255, min_value=0, raise_error=True)
+        val = "".join(c for c in value if c.isdigit())
+        check_int(
+            name="RGB value", value=val, max_value=255, min_value=0, raise_error=True
+        )
         rgb.append(val)
     rgb = tuple([int(x) for x in rgb])
 
@@ -494,11 +543,12 @@ def check_if_valid_rgb_str(input: str,
         return rgb
 
 
-def check_if_list_contains_values(data: List[Union[float, int, str]],
-                                  values: List[Union[float, int, str]],
-                                  name: str,
-                                  raise_error: bool = True) -> None:
-
+def check_if_list_contains_values(
+    data: List[Union[float, int, str]],
+    values: List[Union[float, int, str]],
+    name: str,
+    raise_error: bool = True,
+) -> None:
     """
     Helper to check if values are represeted in a list. E.g., make sure annotatations of behvaior absent and present are represented in annitation column
 
@@ -517,14 +567,19 @@ def check_if_list_contains_values(data: List[Union[float, int, str]],
             missing_values.append(value)
 
     if len(missing_values) > 0 and raise_error:
-        raise NoDataError(msg=f'{name} does not contain the following expected values: {missing_values}', source=check_if_list_contains_values.__name__)
+        raise NoDataError(
+            msg=f"{name} does not contain the following expected values: {missing_values}",
+            source=check_if_list_contains_values.__name__,
+        )
 
     elif len(missing_values) > 0 and not raise_error:
-        NoDataFoundWarning(msg=f'{name} does not contain the following expected values: {missing_values}', source=check_if_list_contains_values.__name__)
+        NoDataFoundWarning(
+            msg=f"{name} does not contain the following expected values: {missing_values}",
+            source=check_if_list_contains_values.__name__,
+        )
 
 
-def check_valid_hex_color(color_hex: str,
-                          raise_error: Optional[bool] = True) -> bool:
+def check_valid_hex_color(color_hex: str, raise_error: Optional[bool] = True) -> bool:
     """
     Check if given string represents a valid hexadecimal color code.
 
@@ -534,10 +589,13 @@ def check_valid_hex_color(color_hex: str,
     :raises IntegerError: If the color_hex is an invalid hexadecimal color code and raise_error is True.
     """
 
-    hex_regex = re.compile(r'^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$')
+    hex_regex = re.compile(r"^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$")
     match = hex_regex.match(color_hex)
     if match is None and raise_error:
-        raise IntegerError(msg=f'{color_hex} is an invalid hex color', source=check_valid_hex_color.__name__)
+        raise IntegerError(
+            msg=f"{color_hex} is an invalid hex color",
+            source=check_valid_hex_color.__name__,
+        )
     elif match is None and not raise_error:
         return False
     else:
@@ -557,7 +615,10 @@ def check_if_2d_array_has_min_unique_values(data: np.ndarray, min: int) -> bool:
     """
 
     if len(data.shape) != 2:
-        raise CountError(msg=f'Requires input array of two dimensions, found {data.size}', source=check_if_2d_array_has_min_unique_values.__name__)
+        raise CountError(
+            msg=f"Requires input array of two dimensions, found {data.size}",
+            source=check_if_2d_array_has_min_unique_values.__name__,
+        )
     sliced_data = np.unique(data, axis=0)
     if sliced_data.shape[0] < min:
         return False
@@ -565,10 +626,5 @@ def check_if_2d_array_has_min_unique_values(data: np.ndarray, min: int) -> bool:
         return True
 
 
-
-data = np.array([[0, 0],
-                 [0, 0],
-                 [0, 0],
-                 [0, 1]])
+data = np.array([[0, 0], [0, 0], [0, 0], [0, 1]])
 check_if_2d_array_has_min_unique_values(data=data, min=2)
-
