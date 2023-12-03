@@ -559,6 +559,7 @@ class ConfigReader(object):
             BodypartColumnNotFoundWarning(
                 msg=f"SimBA could not drop body-part coordinates, some body-part names are missing in dataframe. SimBA expected the following body-parts, that could not be found inside the file: {missing_body_part_fields}"
             )
+            return df
         else:
             return df.drop(self.bp_col_names, axis=1)
 

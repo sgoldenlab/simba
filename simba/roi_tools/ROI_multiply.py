@@ -113,9 +113,9 @@ def multiply_ROIs(config_path, filename):
                 vid_name,
                 vid_name,
             )
-            r_df = r_df.append(duplicatedRec, ignore_index=True)
-            c_df = c_df.append(duplicatedCirc, ignore_index=True)
-            p_df = p_df.append(duplicatedPoly, ignore_index=True)
+            r_df =pd.concat([r_df,duplicatedRec],axis=0) #r_df.append(duplicatedRec, ignore_index=True)
+            c_df = pd.concat([c_df,duplicatedCirc],axis=0)#c_df.append(duplicatedCirc, ignore_index=True)
+            p_df = pd.concat([p_df,duplicatedPoly],axis=0)#p_df.append(duplicatedPoly, ignore_index=True)
         r_df = r_df.drop_duplicates(subset=["Video", "Name"], keep="first")
         c_df = c_df.drop_duplicates(subset=["Video", "Name"], keep="first")
         p_df = p_df.drop_duplicates(subset=["Video", "Name"], keep="first")

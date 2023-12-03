@@ -172,3 +172,4 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                 create_gantt=self.gantt_dropdown.getChoices(),
             )
         validation_video_creator.run()
+        self.root.destroy()

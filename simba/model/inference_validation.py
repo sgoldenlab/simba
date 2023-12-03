@@ -51,6 +51,8 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
         data_df = read_df(input_file_path, self.file_type)
         output_df = deepcopy(data_df)
         data_df = self.drop_bp_cords(df=data_df)
+        if data_df is None:
+            data_df = deepcopy(output_df)
         clf = self.read_pickle(file_path=clf_path)
         probability_col_name = f"Probability_{classifier_name}"
         output_df[probability_col_name] = self.clf_predict_proba(

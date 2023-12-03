@@ -110,7 +110,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         else:
             self.under_sample_ratio = Dtypes.NAN.value
         if (self.over_sample_setting == Methods.SMOTEENN.value.lower()) or (
-            self.over_sample_setting == Methods.SMOTE.value.lower()
+                self.over_sample_setting == Methods.SMOTE.value.lower()
         ):
             self.over_sample_ratio = read_config_entry(
                 self.config,
@@ -132,21 +132,23 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         print(
             "Reading in {} annotated files...".format(str(len(self.target_file_paths)))
         )
-        self.data_df = self.read_all_files_in_folder_mp_futures(
-            self.target_file_paths, self.file_type, [self.clf_name]
+        self.data_df = self.read_and_concatenate_all_files_in_folder_mp_futures(
+            self.target_file_paths, self.features_dir, self.file_type, [self.clf_name]
         )
-        self.data_df = self.check_raw_dataset_integrity(
-            df=self.data_df, logs_path=self.logs_path
-        )
+        # self.data_df = self.check_raw_dataset_integrity(
+        #     df=self.data_df, logs_path=self.logs_path
+        # )
         self.data_df_wo_cords = self.drop_bp_cords(df=self.data_df)
-        annotation_cols_to_remove = self.read_in_all_model_names_to_remove(
-            self.config, self.clf_cnt, self.clf_name
-        )
-        self.x_y_df = self.delete_other_annotation_columns(
-            self.data_df_wo_cords, list(annotation_cols_to_remove)
-        )
+        if self.data_df_wo_cords is None:
+            self.data_df_wo_cords = self.data_df
+        # annotation_cols_to_remove = self.read_in_all_model_names_to_remove(
+        #     self.config, self.clf_cnt, self.clf_name
+        # )
+        # self.x_y_df = self.delete_other_annotation_columns(
+        #     self.data_df_wo_cords, list(annotation_cols_to_remove)
+        # )
         self.class_names = ["Not_" + self.clf_name, self.clf_name]
-        self.x_df, self.y_df = self.split_df_to_x_y(self.x_y_df, self.clf_name)
+        self.x_df, self.y_df = self.split_df_to_x_y(self.data_df_wo_cords, self.clf_name)
         self.feature_names = self.x_df.columns
         self.check_sampled_dataset_integrity(x_df=self.x_df, y_df=self.y_df)
         print("Number of features in dataset: " + str(len(self.x_df.columns)))
@@ -305,7 +307,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             )
 
             if self.config.has_option(
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, ConfigKey.CLASS_WEIGHTS.value
+                    ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, ConfigKey.CLASS_WEIGHTS.value
             ):
                 class_weights = read_config_entry(
                     self.config,
@@ -554,7 +556,6 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         stdout_success(
             msg=f"Evaluation files are in models/generated_models/model_evaluations folders"
         )
-
 
 # test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.perform_sampling()

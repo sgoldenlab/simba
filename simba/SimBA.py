@@ -1147,8 +1147,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_skipOC.grid(row=2, sticky=W, pady=5)
 
         label_extractfeatures.grid(row=0, column=0, sticky=NW)
-        button_extractfeatures.grid(row=0, column=0, sticky=NW)
-        labelframe_usrdef.grid(row=1, column=0, sticky=NW, pady=5)
+        button_extractfeatures.grid(row=1, column=0, sticky=NW)
+        labelframe_usrdef.grid(row=0, column=0, sticky=NW, pady=15)
         userscript.grid(row=1, column=0, sticky=NW)
         self.scriptfile.grid(row=2, column=0, sticky=NW)
 

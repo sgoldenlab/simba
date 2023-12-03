@@ -528,7 +528,7 @@ def run_user_defined_feature_extraction_class(
     spec.loader.exec_module(user_module)
     user_class = getattr(user_module, class_name)
     print(f"Running user-defined {class_name} feature extraction file...")
-    user_class(config_path=config_path)
+    user_class(config_path=config_path).run()
 
 
 def slp_to_df_convert(
