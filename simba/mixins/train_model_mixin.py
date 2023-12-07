@@ -1,5 +1,7 @@
 __author__ = "Simon Nilsson"
 
+import shutil
+import subprocess
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -195,7 +197,7 @@ class TrainModelMixin(object):
         return df
 
     def split_df_to_x_y(
-            self, df: pd.DataFrame, clf_name: str
+            self, df: pd.DataFrame, col_names: [str]
     ) -> (pd.DataFrame, pd.DataFrame):
         """
         Helper to split dataframe into features and target.
@@ -207,12 +209,16 @@ class TrainModelMixin(object):
         :return pd.DataFrame: target
 
         :examples:
-        >>> self.split_df_to_x_y(df=df, clf_name='Attack')
+        >>> self.split_df_to_x_y(df=df, col_names='Attack')
         """
 
         df = deepcopy(df)
-        y = df.pop(clf_name)
-        return df, y
+        ys = np.array([0]*len(df.index))
+        for i,col_name in enumerate(col_names):
+            y = df.pop(col_name)
+            ys[y == 1] = i+1
+
+        return df, pd.DataFrame(ys)
 
     def random_undersampler(
             self, x_train: np.ndarray, y_train: np.ndarray, sample_ratio: float
@@ -248,7 +254,7 @@ class TrainModelMixin(object):
         data_df = pd.concat(
             [present_df, absent_df.sample(n=ratio_n, replace=False)], axis=0
         )
-        return self.split_df_to_x_y(data_df, y_train.name)
+        return self.split_df_to_x_y(data_df, [y_train.name])
 
     def smoteen_oversampler(
             self, x_train: pd.DataFrame, y_train: pd.DataFrame, sample_ratio: float
@@ -385,7 +391,7 @@ class TrainModelMixin(object):
 
         print("Calculating learning curves...")
         timer = SimbaTimer(start=True)
-        x_df, y_df = self.split_df_to_x_y(x_y_df, clf_name)
+        x_df, y_df = self.split_df_to_x_y(x_y_df, [clf_name])
         cv = ShuffleSplit(n_splits=shuffle_splits, test_size=tt_size)
         if platform.system() == "Darwin":
             with parallel_backend("threading", n_jobs=-2):
@@ -510,8 +516,11 @@ class TrainModelMixin(object):
         :parameter Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not
             part of a grid search.
         """
-
-        print("Visualizing example decision tree using graphviz...")
+        dot_path = self.find_graphviz_dot()
+        if not dot_path:
+            print("please install graphviz using the following link: https://graphviz.org/download/")
+            return
+        print(f"Visualizing example decision tree using graphviz using {dot_path}")
         estimator = rf_clf.estimators_[3]
         if save_file_no != None:
             dot_name = os.path.join(
@@ -522,7 +531,7 @@ class TrainModelMixin(object):
             )
         else:
             dot_name = os.path.join(save_dir, str(clf_name) + "_tree.dot")
-            file_name = os.path.join(save_dir, str(clf_name) + "_tree.pdf")
+            file_name = os.path.join(save_dir, str(clf_name) + "_tree.png")
         export_graphviz(
             estimator,
             out_file=dot_name,
@@ -533,8 +542,24 @@ class TrainModelMixin(object):
             class_names=class_names,
             feature_names=feature_names,
         )
-        command = "dot " + str(dot_name) + " -T pdf -o " + str(file_name) + " -Gdpi=600"
-        call(command, shell=True)
+        subprocess.run([dot_path, '-Tpng', dot_name, '-o', file_name])
+
+    def find_graphviz_dot(self):
+        # Check if dot is in PATH
+        dot_path = shutil.which("dot")
+        if dot_path:
+            return dot_path
+
+        common_paths = [
+            r"C:\Program Files\Graphviz\bin\dot.exe",
+            r"C:\Program Files (x86)\Graphviz\bin\dot.exe"
+        ]
+
+        # Check common paths
+        for path in common_paths:
+            if os.path.isfile(path):
+                return path
+        return None
 
     def create_clf_report(
             self,
@@ -1199,14 +1224,14 @@ class TrainModelMixin(object):
                         f"column names with mismatches are: {list(x_nan_cnt.index)[0:9]}",
                     source=self.__class__.__name__,
                 )
-
-        if len(y_df.unique()) == 1:
-            if y_df.unique()[0] == 0:
+        labels = np.unique(y_df)
+        if len(labels)== 1:
+            if labels[0] == 0:
                 raise FaultyTrainingSetError(
                     msg=f"All training annotations for classifier {str(y_df.name)} is labelled as ABSENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.",
                     source=self.__class__.__name__,
                 )
-            if y_df.unique()[0] == 1:
+            if labels[0] == 1:
                 raise FaultyTrainingSetError(
                     msg=f"All training annotations for classifier {str(y_df.name)} is labelled as PRESENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.",
                     source=self.__class__.__name__,
@@ -1292,11 +1317,11 @@ class TrainModelMixin(object):
                     source=self.__class__.__name__,
                 )
         p_vals = clf.predict_proba(x_df)
-        if p_vals.shape[1] != 2:
-            raise ClassifierInferenceError(
-                msg=f"The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes. The classifier is not a binary classifier and does not predict two targets (absence and presence of behavior)",
-                source=self.__class__.__name__,
-            )
+        # if p_vals.shape[1] != 2:
+        #     raise ClassifierInferenceError(
+        #         msg=f"The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes. The classifier is not a binary classifier and does not predict two targets (absence and presence of behavior)",
+        #         source=self.__class__.__name__,
+        #     )
         return p_vals[:, 1]
 
     def clf_fit(
@@ -1311,7 +1336,7 @@ class TrainModelMixin(object):
         :return RandomForestClassifier: Fitted random forest classifier object
         """
         nan_features = x_df[~x_df.applymap(np.isreal).all(1)]
-        nan_target = y_df.loc[pd.to_numeric(y_df).isna()]
+        nan_target = y_df[y_df.isna().to_numpy()]
         if len(nan_features) > 0:
             raise FaultyTrainingSetError(
                 msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values",

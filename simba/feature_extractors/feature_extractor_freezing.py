@@ -48,7 +48,8 @@ class MiceFreezingFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     def calculate_direction_vector(self, from_point, to_point):
         return np.array(to_point) - np.array(from_point)
 
-    def extract_features(self, input_file_path: str, window_size: int, video_center: [int, int], pixel_mm: float,directionality_data:pd.DataFrame):
+    def extract_features(self, input_file_path: str, window_size: int, video_center: [int, int], pixel_mm: float,
+                         directionality_data: pd.DataFrame):
         print("Calculating freezing features ...")
 
         input_data = pd.read_csv(input_file_path)
@@ -59,16 +60,25 @@ class MiceFreezingFeatureExtractor(ConfigReader, FeatureExtractionMixin):
         without_bug = input_data.drop(columns_to_drop, axis=1)
 
         body_parts_diffs = without_bug.diff(axis=0)
-        body_parts_diffs["nose_x"]*=5
-        body_parts_diffs["nose_y"]*=5
-
         time_point_diff = body_parts_diffs.sum(axis=1)
+        #second_time_point_diff = time_point_diff.diff()
         rolling_windows = time_point_diff.rolling(window=window_size, min_periods=1).sum()
-        output_data["activity"] = rolling_windows.abs().fillna(0)
+        output_data["activity"] = rolling_windows.abs().fillna(500)
+        bug_cols = [colName for colName in input_data.columns if ("bug" in colName) and ("_p") not in colName]
         center_cols = [colName for colName in without_bug.columns if ("center" in colName) and ("_p") not in colName]
+        #tails_cols = [colName for colName in without_bug.columns if ("tail" in colName) and ("_p") not in colName]
         nose_cols = [colName for colName in without_bug.columns if ("nose" in colName) and ("_p") not in colName]
         centers = without_bug[center_cols].to_numpy()
+        #tails = without_bug[tails_cols].to_numpy()
         noses = without_bug[nose_cols].to_numpy()
+        bug = input_data[bug_cols].to_numpy()
+        distances_from_bug = np.linalg.norm(bug - noses,axis=1)
+        video_centers = np.array([video_center]*len(centers))
+        distances_from_center = np.linalg.norm(video_centers - noses,axis=1)
+        #body_size = np.insert(np.diff(np.linalg.norm(tails - noses,axis=1), axis=0),0,0)
+        output_data["distances_from_bug"] = pd.DataFrame(distances_from_bug).rolling(window=window_size, min_periods=1).mean().fillna(100).to_numpy()
+        output_data["distances_from_center"] = pd.DataFrame(distances_from_center).rolling(window=window_size, min_periods=1).mean().fillna(100).to_numpy()
+        #output_data["body_size"] = pd.DataFrame(body_size).rolling(window=window_size, min_periods=1).sum().abs().fillna(100).to_numpy()
         angles = []
         for i, center in enumerate(centers):
             nose = noses[i]
@@ -77,19 +87,19 @@ class MiceFreezingFeatureExtractor(ConfigReader, FeatureExtractionMixin):
             angles.append(self.angle_between_vectors(vector_center_to_nose, vector_fixed_to_center))
         # output_data["nose_direction"] = angles
         angles_df = pd.DataFrame(angles)
-        # angles_diff = angles_df.diff()
-        # angles_diff_sum = angles_diff.rolling(window=window_size, min_periods=1).sum()
-        # output_data["nose_direction_sum_of_diffs"] = angles_diff_sum.abs().fillna(0)
-        output_data["nose_direction_avg"] = angles_df.rolling(window=window_size, min_periods=1).mean().fillna(0)
-        # directionality_rolling = directionality_data.rolling(window=window_size, min_periods=1)
-        # output_data["amount_of_looking_at_bug"] = directionality_rolling.sum()
-        # onsets = [-1] * len(output_data["amount_of_looking_at_bug"])
-        # for j, rol in enumerate(directionality_rolling):
-        #     for i, r in enumerate(rol):
-        #         if r:
-        #             onsets[j] = i
-        #             break
-        # output_data["looking_at_bug_onset"] = onsets
+        angles_diff = angles_df.diff()
+        angles_diff_sum = angles_diff.rolling(window=window_size, min_periods=1).sum()
+        output_data["nose_direction_sum_of_diffs"] = angles_diff_sum.abs().fillna(0)
+        # output_data["nose_direction_avg"] = angles_df.rolling(window=window_size, min_periods=1).mean().fillna(0)
+        directionality_rolling = directionality_data.rolling(window=window_size, min_periods=1)
+        output_data["amount_of_looking_at_bug"] = directionality_rolling.sum().fillna(0)
+        onsets = [-1] * len(output_data["amount_of_looking_at_bug"])
+        for j, rol in enumerate(directionality_rolling):
+            for i, r in enumerate(rol):
+                if r:
+                    onsets[j] = i
+                    break
+        output_data["looking_at_bug_onset"] = onsets
         return output_data
 
     def run(self):
@@ -121,9 +131,9 @@ class MiceFreezingFeatureExtractor(ConfigReader, FeatureExtractionMixin):
             video_settings, self.px_per_mm, fps = self.read_video_info(
                 video_name=file_name
             )
-            self.data_df = self.extract_features(file_path, 50, (
+            self.data_df = self.extract_features(file_path, 25, (
                 current_polygon["Center_X"].values[0], current_polygon["Center_Y"].values[0]),
-                                                 video_settings["pixels/mm"].values[0],directionality_data)
+                                                 video_settings["pixels/mm"].values[0], directionality_data)
             save_path = os.path.join(self.save_dir, file_name + "." + self.file_type)
             self.data_df = self.data_df.reset_index(drop=True).fillna(0)
             write_df(df=self.data_df, file_type=self.file_type, save_path=save_path)

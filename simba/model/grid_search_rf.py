@@ -416,7 +416,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                 self.data_df, annotation_cols_to_remove
             )
             self.x_df, self.y_df = self.split_df_to_x_y(
-                self.x_y_df, meta_dict[MetaKeys.CLF_NAME.value]
+                self.x_y_df, [meta_dict[MetaKeys.CLF_NAME.value]]
             )
             self.feature_names = self.x_df.columns
             self.check_sampled_dataset_integrity(x_df=self.x_df, y_df=self.y_df)

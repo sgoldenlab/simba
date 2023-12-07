@@ -841,7 +841,26 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                 )
             ).start(),
         )
-
+        label_run_model_on_all = label_model_validation = CreateLabelFrameWithIcon(
+            parent=tab9,
+            header="Run model on all the data",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value,
+        )
+        button_run_model_on_all = Button(
+            label_run_model_on_all,
+            text="RUN",
+            fg="red",
+            command=lambda: self.validate_model_first_step(),
+        )
+        button_create_video_for_all = Button(
+            label_run_model_on_all,
+            text="CREATE VALIDATION VIDEOS",
+            fg="blue",
+            command=lambda: ValidationVideoPopUp(
+                config_path=config_path, simba_main_frm=self, run_on_all=True
+            ),
+        )
         label_model_validation = CreateLabelFrameWithIcon(
             parent=tab9,
             header="VALIDATE MODEL ON SINGLE VIDEO",
@@ -885,7 +904,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             text="CREATE VALIDATION VIDEO",
             fg="blue",
             command=lambda: ValidationVideoPopUp(
-                config_path=config_path, simba_main_frm=self
+                config_path=config_path, simba_main_frm=self,run_on_all=False
             ),
         )
 
@@ -1196,15 +1215,17 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_trainmachinesettings.grid(row=0, column=0, sticky=NW, padx=5)
         button_trainmachinemodel.grid(row=1, column=0, sticky=NW, padx=5)
         button_train_multimodel.grid(row=2, column=0, sticky=NW, padx=5)
-
-        label_model_validation.grid(row=7, sticky=W, pady=5)
-        self.csvfile.grid(row=0, sticky=W)
-        self.modelfile.grid(row=1, sticky=W)
-        button_runvalidmodel.grid(row=2, sticky=W)
-        button_generateplot.grid(row=3, sticky=W)
-        self.dis_threshold.grid(row=4, sticky=W)
-        self.min_behaviorbout.grid(row=5, sticky=W)
-        button_validate_model.grid(row=6, sticky=W)
+        label_run_model_on_all.grid(row=0,sticky=W)
+        button_run_model_on_all.grid(row=0,column=0,sticky=W)
+        button_create_video_for_all.grid(row=0,column=1,sticky=W)
+        label_model_validation.grid(row=1, sticky=W, pady=5)
+        self.csvfile.grid(row=1, sticky=W)
+        self.modelfile.grid(row=2, sticky=W)
+        button_runvalidmodel.grid(row=3, sticky=W)
+        button_generateplot.grid(row=4, sticky=W)
+        self.dis_threshold.grid(row=5, sticky=W)
+        self.min_behaviorbout.grid(row=6, sticky=W)
+        button_validate_model.grid(row=7, sticky=W)
 
         label_runmachinemodel.grid(row=8, sticky=NW)
         button_run_rfmodelsettings.grid(row=0, sticky=NW)

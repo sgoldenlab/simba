@@ -33,10 +33,10 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
     """
 
     def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        input_file_path: Union[str, os.PathLike],
-        clf_path: Union[str, os.PathLike],
+            self,
+            config_path: Union[str, os.PathLike],
+            input_file_path: Union[str, os.PathLike],
+            clf_path: Union[str, os.PathLike],
     ):
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
@@ -63,13 +63,12 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
 
         self.timer.stop_timer()
         stdout_success(
-            msg=f'Validation predictions generated for "{file_name}" within the project_folder/csv/validation directory',
+            msg=f'Validation predictions generated for "{file_name}" saved in {save_filename}',
             elapsed_time=self.timer.elapsed_time_str,
         )
         print(
             'Click on "Interactive probability plot" to inspect classifier probability thresholds. If satisfactory proceed to specify threshold and minimum bout length and click on "Validate" to create video.'
         )
-
 
 #
 # ValidateModelRunClf(config_path=r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini",
