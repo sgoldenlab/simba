@@ -33,7 +33,7 @@ numexpr == 2.6.9
 plotly == 4.9.0
 statsmodels == 0.12.0
 cefpython3 == 66.0
-pyarrow == 6.0.1
+pyarrow == 14.0.1
 h5py==2.9.0
 tables==3.6.1
 xlrd==1.2.0
