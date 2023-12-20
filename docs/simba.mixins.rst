@@ -94,3 +94,11 @@ Unsupervised methods
 .. automodule:: simba.mixins.unsupervised_mixin
    :members:
    :show-inheritance:
+
+
+Annotation GUI methods
+---------------------------------------
+
+.. automodule:: simba.mixins.annotator_mixin
+   :members:
+   :show-inheritance:
