@@ -11,7 +11,7 @@ from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 from simba.utils.checks import (check_float, check_if_filepath_list_is_empty,
                                 check_if_valid_input, check_int, check_str)
-from simba.utils.enums import ConfigKey, Dtypes, MetaKeys, Methods, Options
+from simba.utils.enums import ConfigKey, Dtypes, MachineLearningMetaKeys, Methods, Options
 from simba.utils.errors import InvalidInputError, NoDataError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import (get_fn_ext, read_config_entry,
@@ -68,14 +68,14 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
 
     def perform_sampling(self, meta_dict: dict):
         if (
-            meta_dict[MetaKeys.TRAIN_TEST_SPLIT_TYPE.value]
+            meta_dict[MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value]
             == Methods.SPLIT_TYPE_FRAMES.value
         ):
             self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
                 self.x_df, self.y_df, test_size=meta_dict["train_test_size"]
             )
         elif (
-            meta_dict[MetaKeys.TRAIN_TEST_SPLIT_TYPE.value]
+            meta_dict[MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value]
             == Methods.SPLIT_TYPE_BOUTS.value
         ):
             (
@@ -88,27 +88,27 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             )
         else:
             raise InvalidInputError(
-                msg=f"{meta_dict[MetaKeys.TRAIN_TEST_SPLIT_TYPE.value]} is not recognized as a valid SPLIT TYPE (OPTIONS: FRAMES, BOUTS"
+                msg=f"{meta_dict[MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value]} is not recognized as a valid SPLIT TYPE (OPTIONS: FRAMES, BOUTS"
             )
         if (
-            meta_dict[ConfigKey.UNDERSAMPLE_SETTING.value].lower()
+            meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value].lower()
             == Methods.RANDOM_UNDERSAMPLE.value
         ):
             self.x_train, self.y_train = self.random_undersampler(
-                self.x_train, self.y_train, meta_dict[ConfigKey.UNDERSAMPLE_RATIO.value]
+                self.x_train, self.y_train, meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value]
             )
         if (
-            meta_dict[ConfigKey.OVERSAMPLE_SETTING.value].lower()
+            meta_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value].lower()
             == Methods.SMOTEENN.value
         ):
             self.x_train, self.y_train = self.smoteen_oversampler(
-                self.x_train, self.y_train, meta_dict[ConfigKey.OVERSAMPLE_RATIO.value]
+                self.x_train, self.y_train, meta_dict[MachineLearningMetaKeys.OVERSAMPLE_RATIO.value]
             )
         elif (
-            meta_dict[ConfigKey.OVERSAMPLE_SETTING.value].lower() == Methods.SMOTE.value
+            meta_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value].lower() == Methods.SMOTE.value
         ):
             self.x_train, self.y_train = self.smote_oversampler(
-                self.x_train, self.y_train, meta_dict[ConfigKey.OVERSAMPLE_RATIO.value]
+                self.x_train, self.y_train, meta_dict[MachineLearningMetaKeys.OVERSAMPLE_RATIO.value]
             )
 
     def __check_validity_of_meta_files(self, meta_file_paths: list):
@@ -120,48 +120,48 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             meta_dict = {k.lower(): v for k, v in meta_dict.items()}
             errors.append(
                 check_str(
-                    name=meta_dict[MetaKeys.CLF_NAME.value],
-                    value=meta_dict[MetaKeys.CLF_NAME.value],
+                    name=meta_dict[MachineLearningMetaKeys.CLASSIFIER.value],
+                    value=meta_dict[MachineLearningMetaKeys.CLASSIFIER.value],
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_str(
-                    name=MetaKeys.CRITERION.value,
-                    value=meta_dict[MetaKeys.CRITERION.value],
+                    name=MachineLearningMetaKeys.RF_CRITERION.value,
+                    value=meta_dict[MachineLearningMetaKeys.RF_CRITERION.value],
                     options=Options.CLF_CRITERION.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_str(
-                    name=MetaKeys.RF_MAX_FEATURES.value,
-                    value=meta_dict[MetaKeys.RF_MAX_FEATURES.value],
+                    name=MachineLearningMetaKeys.RF_MAX_FEATURES.value,
+                    value=meta_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value],
                     options=Options.CLF_MAX_FEATURES.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_str(
-                    ConfigKey.UNDERSAMPLE_SETTING.value,
-                    meta_dict[ConfigKey.UNDERSAMPLE_SETTING.value].lower(),
+                    MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value,
+                    meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value].lower(),
                     options=[x.lower() for x in Options.UNDERSAMPLE_OPTIONS.value],
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_str(
-                    ConfigKey.OVERSAMPLE_SETTING.value,
-                    meta_dict[ConfigKey.OVERSAMPLE_SETTING.value].lower(),
+                    MachineLearningMetaKeys.OVERSAMPLE_SETTING.value,
+                    meta_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value].lower(),
                     options=[x.lower() for x in Options.OVERSAMPLE_OPTIONS.value],
                     raise_error=False,
                 )[1]
             )
-            if MetaKeys.TRAIN_TEST_SPLIT_TYPE.value in meta_dict.keys():
+            if MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value in meta_dict.keys():
                 errors.append(
                     check_str(
-                        name=meta_dict[MetaKeys.TRAIN_TEST_SPLIT_TYPE.value],
-                        value=meta_dict[MetaKeys.TRAIN_TEST_SPLIT_TYPE.value],
+                        name=meta_dict[MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value],
+                        value=meta_dict[MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value],
                         options=Options.TRAIN_TEST_SPLIT.value,
                         raise_error=False,
                     )[1]
@@ -169,212 +169,212 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
 
             errors.append(
                 check_int(
-                    name=MetaKeys.RF_ESTIMATORS.value,
-                    value=meta_dict[MetaKeys.RF_ESTIMATORS.value],
+                    name=MachineLearningMetaKeys.RF_ESTIMATORS.value,
+                    value=meta_dict[MachineLearningMetaKeys.RF_ESTIMATORS.value],
                     min_value=1,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_int(
-                    name=MetaKeys.MIN_LEAF.value,
-                    value=meta_dict[MetaKeys.MIN_LEAF.value],
+                    name=MachineLearningMetaKeys.MIN_LEAF.value,
+                    value=meta_dict[MachineLearningMetaKeys.MIN_LEAF.value],
                     raise_error=False,
                 )[1]
             )
-            if meta_dict[MetaKeys.LEARNING_CURVE.value] in Options.PERFORM_FLAGS.value:
+            if meta_dict[MachineLearningMetaKeys.LEARNING_CURVE.value] in Options.PERFORM_FLAGS.value:
                 errors.append(
                     check_int(
-                        name=MetaKeys.LEARNING_CURVE_K_SPLITS.value,
-                        value=meta_dict[MetaKeys.LEARNING_CURVE_K_SPLITS.value],
+                        name=MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value,
+                        value=meta_dict[MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value],
                         raise_error=False,
                     )[1]
                 )
                 errors.append(
                     check_int(
-                        name=MetaKeys.LEARNING_CURVE_DATA_SPLITS.value,
-                        value=meta_dict[MetaKeys.LEARNING_CURVE_DATA_SPLITS.value],
+                        name=MachineLearningMetaKeys.LEARNING_CURVE_DATA_SPLITS.value,
+                        value=meta_dict[MachineLearningMetaKeys.LEARNING_CURVE_DATA_SPLITS.value],
                         raise_error=False,
                     )[1]
                 )
             if (
-                meta_dict[MetaKeys.IMPORTANCE_BAR_CHART.value]
+                meta_dict[MachineLearningMetaKeys.IMPORTANCE_BAR_CHART.value]
                 in Options.PERFORM_FLAGS.value
             ):
                 errors.append(
                     check_int(
-                        name=MetaKeys.N_FEATURE_IMPORTANCE_BARS.value,
-                        value=meta_dict[MetaKeys.N_FEATURE_IMPORTANCE_BARS.value],
+                        name=MachineLearningMetaKeys.N_FEATURE_IMPORTANCE_BARS.value,
+                        value=meta_dict[MachineLearningMetaKeys.N_FEATURE_IMPORTANCE_BARS.value],
                         raise_error=False,
                     )[1]
                 )
-            if MetaKeys.SHAP_SCORES.value in meta_dict.keys():
-                if meta_dict[MetaKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value:
+            if MachineLearningMetaKeys.SHAP_SCORES.value in meta_dict.keys():
+                if meta_dict[MachineLearningMetaKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value:
                     errors.append(
                         check_int(
-                            name=MetaKeys.SHAP_PRESENT.value,
-                            value=meta_dict[MetaKeys.SHAP_PRESENT.value],
+                            name=MachineLearningMetaKeys.SHAP_PRESENT.value,
+                            value=meta_dict[MachineLearningMetaKeys.SHAP_PRESENT.value],
                             raise_error=False,
                         )[1]
                     )
                     errors.append(
                         check_int(
-                            name=MetaKeys.SHAP_ABSENT.value,
-                            value=meta_dict[MetaKeys.SHAP_ABSENT.value],
+                            name=MachineLearningMetaKeys.SHAP_ABSENT.value,
+                            value=meta_dict[MachineLearningMetaKeys.SHAP_ABSENT.value],
                             raise_error=False,
                         )[1]
                     )
 
             errors.append(
                 check_float(
-                    name=MetaKeys.TT_SIZE.value,
-                    value=meta_dict[MetaKeys.TT_SIZE.value],
+                    name=MachineLearningMetaKeys.TT_SIZE.value,
+                    value=meta_dict[MachineLearningMetaKeys.TT_SIZE.value],
                     raise_error=False,
                 )[1]
             )
             if (
-                meta_dict[ConfigKey.UNDERSAMPLE_SETTING.value].lower()
+                meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value].lower()
                 == Methods.RANDOM_UNDERSAMPLE.value
             ):
                 errors.append(
                     check_float(
-                        name=ConfigKey.UNDERSAMPLE_RATIO.value,
-                        value=meta_dict[ConfigKey.UNDERSAMPLE_RATIO.value],
+                        name=MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value,
+                        value=meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value],
                         raise_error=False,
                     )[1]
                 )
                 try:
                     present_len, absent_len = len(
                         self.data_df[
-                            self.data_df[meta_dict[MetaKeys.CLF_NAME.value]] == 1
-                        ]
+                            self.data_df[meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]] == 1
+                            ]
                     ), len(
                         self.data_df[
-                            self.data_df[meta_dict[MetaKeys.CLF_NAME.value]] == 0
-                        ]
+                            self.data_df[meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]] == 0
+                            ]
                     )
                     ratio_n = int(
-                        present_len * meta_dict[ConfigKey.UNDERSAMPLE_RATIO.value]
+                        present_len * meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value]
                     )
                     if absent_len < ratio_n:
                         errors.append(
-                            f"The under-sample ratio of {meta_dict[ConfigKey.UNDERSAMPLE_RATIO.value]} in \n classifier {meta_dict[MetaKeys.CLF_NAME.value]} demands {ratio_n} behavior-absent annotations."
+                            f"The under-sample ratio of {meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value]} in \n classifier {meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]} demands {ratio_n} behavior-absent annotations."
                         )
                 except:
                     pass
 
             if (
-                meta_dict[ConfigKey.OVERSAMPLE_SETTING.value].lower()
+                meta_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value].lower()
                 == Methods.SMOTEENN.value.lower()
             ) or (
-                meta_dict[ConfigKey.OVERSAMPLE_SETTING.value].lower()
+                meta_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value].lower()
                 == Methods.SMOTE.value.lower()
             ):
                 errors.append(
                     check_float(
-                        name=ConfigKey.OVERSAMPLE_RATIO.value,
-                        value=meta_dict[ConfigKey.OVERSAMPLE_RATIO.value],
+                        name=MachineLearningMetaKeys.OVERSAMPLE_RATIO.value,
+                        value=meta_dict[MachineLearningMetaKeys.OVERSAMPLE_RATIO.value],
                         raise_error=False,
                     )[1]
                 )
 
             errors.append(
                 check_if_valid_input(
-                    name=MetaKeys.META_FILE.value,
-                    input=meta_dict[MetaKeys.META_FILE.value],
+                    name=MachineLearningMetaKeys.RF_METADATA.value,
+                    input=meta_dict[MachineLearningMetaKeys.RF_METADATA.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.EX_DECISION_TREE.value,
-                    input=meta_dict[MetaKeys.EX_DECISION_TREE.value],
+                    MachineLearningMetaKeys.EX_DECISION_TREE.value,
+                    input=meta_dict[MachineLearningMetaKeys.EX_DECISION_TREE.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.CLF_REPORT.value,
-                    input=meta_dict[MetaKeys.CLF_REPORT.value],
+                    MachineLearningMetaKeys.CLF_REPORT.value,
+                    input=meta_dict[MachineLearningMetaKeys.CLF_REPORT.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.IMPORTANCE_LOG.value,
-                    input=meta_dict[MetaKeys.IMPORTANCE_LOG.value],
+                    MachineLearningMetaKeys.IMPORTANCE_LOG.value,
+                    input=meta_dict[MachineLearningMetaKeys.IMPORTANCE_LOG.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.IMPORTANCE_BAR_CHART.value,
-                    input=meta_dict[MetaKeys.IMPORTANCE_BAR_CHART.value],
+                    MachineLearningMetaKeys.IMPORTANCE_BAR_CHART.value,
+                    input=meta_dict[MachineLearningMetaKeys.IMPORTANCE_BAR_CHART.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.PERMUTATION_IMPORTANCE.value,
-                    input=meta_dict[MetaKeys.PERMUTATION_IMPORTANCE.value],
+                    MachineLearningMetaKeys.PERMUTATION_IMPORTANCE.value,
+                    input=meta_dict[MachineLearningMetaKeys.PERMUTATION_IMPORTANCE.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.LEARNING_CURVE.value,
-                    input=meta_dict[MetaKeys.LEARNING_CURVE.value],
+                    MachineLearningMetaKeys.LEARNING_CURVE.value,
+                    input=meta_dict[MachineLearningMetaKeys.LEARNING_CURVE.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.PRECISION_RECALL.value,
-                    input=meta_dict[MetaKeys.PRECISION_RECALL.value],
+                    MachineLearningMetaKeys.PRECISION_RECALL.value,
+                    input=meta_dict[MachineLearningMetaKeys.PRECISION_RECALL.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
-            if MetaKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
+            if MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
                 errors.append(
                     check_if_valid_input(
-                        MetaKeys.PARTIAL_DEPENDENCY.value,
-                        input=meta_dict[MetaKeys.PARTIAL_DEPENDENCY.value],
+                        MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value,
+                        input=meta_dict[MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value],
                         options=Options.RUN_OPTIONS_FLAGS.value,
                         raise_error=False,
                     )[1]
                 )
 
-            if meta_dict[MetaKeys.RF_MAX_FEATURES.value] == Dtypes.NONE.value:
-                meta_dict[MetaKeys.RF_MAX_FEATURES.value] = None
-            if MetaKeys.TRAIN_TEST_SPLIT_TYPE.value not in meta_dict.keys():
+            if meta_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value] == Dtypes.NONE.value:
+                meta_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value] = None
+            if MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value not in meta_dict.keys():
                 meta_dict[
-                    MetaKeys.TRAIN_TEST_SPLIT_TYPE.value
+                    MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value
                 ] = Methods.SPLIT_TYPE_FRAMES.value
 
-            if ConfigKey.CLASS_WEIGHTS.value in meta_dict.keys():
+            if MachineLearningMetaKeys.CLASS_WEIGHTS.value in meta_dict.keys():
                 if (
-                    meta_dict[ConfigKey.CLASS_WEIGHTS.value]
+                    meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value]
                     not in Options.CLASS_WEIGHT_OPTIONS.value
                 ):
-                    meta_dict[ConfigKey.CLASS_WEIGHTS.value] = None
-                if meta_dict[ConfigKey.CLASS_WEIGHTS.value] == "custom":
-                    meta_dict[ConfigKey.CLASS_WEIGHTS.value] = literal_eval(
+                    meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] = None
+                if meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] == "custom":
+                    meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] = literal_eval(
                         meta_dict["class_custom_weights"]
                     )
-                    for k, v in meta_dict[ConfigKey.CLASS_WEIGHTS.value].items():
-                        meta_dict[ConfigKey.CLASS_WEIGHTS.value][k] = int(v)
-                if meta_dict[ConfigKey.CLASS_WEIGHTS.value] == Dtypes.NONE.value:
-                    meta_dict[ConfigKey.CLASS_WEIGHTS.value] = None
+                    for k, v in meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value].items():
+                        meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value][k] = int(v)
+                if meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] == Dtypes.NONE.value:
+                    meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] = None
             else:
-                meta_dict[ConfigKey.CLASS_WEIGHTS.value] = None
+                meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] = None
 
             errors = [x for x in errors if x != ""]
             if errors:
@@ -401,22 +401,22 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
         if len(self.meta_dicts.keys()) == 0:
             raise NoDataError(msg="No valid hyper-parameter config files")
         for config_cnt, meta_dict in self.meta_dicts.items():
-            self.clf_name = meta_dict[MetaKeys.CLF_NAME.value]
+            self.clf_name = meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]
             print(
-                f"Training model {config_cnt+1}/{len(self.meta_dicts.keys())} ({meta_dict[MetaKeys.CLF_NAME.value]})..."
+                f"Training model {config_cnt+1}/{len(self.meta_dicts.keys())} ({meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]})..."
             )
             self.class_names = [
-                f"Not_{meta_dict[MetaKeys.CLF_NAME.value]}",
-                meta_dict[MetaKeys.CLF_NAME.value],
+                f"Not_{meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]}",
+                meta_dict[MachineLearningMetaKeys.CLASSIFIER.value],
             ]
             annotation_cols_to_remove = self.read_in_all_model_names_to_remove(
-                self.config, self.clf_cnt, meta_dict[MetaKeys.CLF_NAME.value]
+                self.config, self.clf_cnt, meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]
             )
             self.x_y_df = self.delete_other_annotation_columns(
                 self.data_df, annotation_cols_to_remove
             )
             self.x_df, self.y_df = self.split_df_to_x_y(
-                self.x_y_df, [meta_dict[MetaKeys.CLF_NAME.value]]
+                self.x_y_df, [meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]]
             )
             self.feature_names = self.x_df.columns
             self.check_sampled_dataset_integrity(x_df=self.x_df, y_df=self.y_df)
@@ -425,14 +425,14 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             self.print_machine_model_information(meta_dict)
             print("# {} features.".format(len(self.feature_names)))
             self.rf_clf = RandomForestClassifier(
-                n_estimators=meta_dict[MetaKeys.RF_ESTIMATORS.value],
-                max_features=meta_dict[MetaKeys.RF_MAX_FEATURES.value],
+                n_estimators=meta_dict[MachineLearningMetaKeys.RF_ESTIMATORS.value],
+                max_features=meta_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value],
                 n_jobs=-1,
-                criterion=meta_dict[MetaKeys.CRITERION.value],
-                min_samples_leaf=meta_dict[MetaKeys.MIN_LEAF.value],
+                criterion=meta_dict[MachineLearningMetaKeys.RF_CRITERION.value],
+                min_samples_leaf=meta_dict[MachineLearningMetaKeys.MIN_LEAF.value],
                 bootstrap=True,
                 verbose=1,
-                class_weight=meta_dict[ConfigKey.CLASS_WEIGHTS.value],
+                class_weight=meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value],
             )
 
             print(f"Fitting {self.clf_name} model...")
@@ -440,7 +440,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                 clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train
             )
             if (
-                meta_dict[MetaKeys.PERMUTATION_IMPORTANCE.value]
+                meta_dict[MachineLearningMetaKeys.PERMUTATION_IMPORTANCE.value]
                 in Options.PERFORM_FLAGS.value
             ):
                 self.calc_permutation_importance(
@@ -452,19 +452,19 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                     self.model_dir_out,
                     save_file_no=config_cnt,
                 )
-            if meta_dict[MetaKeys.LEARNING_CURVE.value] in Options.PERFORM_FLAGS.value:
+            if meta_dict[MachineLearningMetaKeys.LEARNING_CURVE.value] in Options.PERFORM_FLAGS.value:
                 self.calc_learning_curve(
                     self.x_y_df,
                     self.clf_name,
-                    meta_dict[MetaKeys.LEARNING_CURVE_K_SPLITS.value],
-                    meta_dict[MetaKeys.LEARNING_CURVE_DATA_SPLITS.value],
-                    meta_dict[MetaKeys.TT_SIZE.value],
+                    meta_dict[MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value],
+                    meta_dict[MachineLearningMetaKeys.LEARNING_CURVE_DATA_SPLITS.value],
+                    meta_dict[MachineLearningMetaKeys.TT_SIZE.value],
                     self.rf_clf,
                     self.model_dir_out,
                     save_file_no=config_cnt,
                 )
             if (
-                meta_dict[MetaKeys.PRECISION_RECALL.value]
+                meta_dict[MachineLearningMetaKeys.PRECISION_RECALL.value]
                 in Options.PERFORM_FLAGS.value
             ):
                 self.calc_pr_curve(
@@ -476,7 +476,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                     save_file_no=config_cnt,
                 )
             if (
-                meta_dict[MetaKeys.EX_DECISION_TREE.value]
+                meta_dict[MachineLearningMetaKeys.EX_DECISION_TREE.value]
                 in Options.PERFORM_FLAGS.value
             ):
                 self.create_example_dt(
@@ -487,7 +487,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                     self.model_dir_out,
                     save_file_no=config_cnt,
                 )
-            if meta_dict[MetaKeys.CLF_REPORT.value] in Options.PERFORM_FLAGS.value:
+            if meta_dict[MachineLearningMetaKeys.CLF_REPORT.value] in Options.PERFORM_FLAGS.value:
                 self.create_clf_report(
                     self.rf_clf,
                     self.x_test,
@@ -496,7 +496,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                     self.model_dir_out,
                     save_file_no=config_cnt,
                 )
-            if meta_dict[MetaKeys.IMPORTANCE_LOG.value] in Options.PERFORM_FLAGS.value:
+            if meta_dict[MachineLearningMetaKeys.IMPORTANCE_LOG.value] in Options.PERFORM_FLAGS.value:
                 self.create_x_importance_log(
                     self.rf_clf,
                     self.feature_names,
@@ -505,7 +505,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                     save_file_no=config_cnt,
                 )
             if (
-                meta_dict[MetaKeys.IMPORTANCE_BAR_CHART.value]
+                meta_dict[MachineLearningMetaKeys.IMPORTANCE_BAR_CHART.value]
                 in Options.PERFORM_FLAGS.value
             ):
                 self.create_x_importance_bar_chart(
@@ -513,23 +513,23 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                     self.feature_names,
                     self.clf_name,
                     self.model_dir_out,
-                    meta_dict[MetaKeys.N_FEATURE_IMPORTANCE_BARS.value],
+                    meta_dict[MachineLearningMetaKeys.N_FEATURE_IMPORTANCE_BARS.value],
                     save_file_no=config_cnt,
                 )
-            if MetaKeys.SHAP_SCORES.value in meta_dict.keys():
+            if MachineLearningMetaKeys.SHAP_SCORES.value in meta_dict.keys():
                 save_n = (
-                    meta_dict[MetaKeys.SHAP_PRESENT.value]
-                    + meta_dict[MetaKeys.SHAP_ABSENT.value]
+                    meta_dict[MachineLearningMetaKeys.SHAP_PRESENT.value]
+                    + meta_dict[MachineLearningMetaKeys.SHAP_ABSENT.value]
                 )
-                if MetaKeys.SHAP_SAVE_ITERATION.value in meta_dict.keys():
+                if MachineLearningMetaKeys.SHAP_SAVE_ITERATION.value in meta_dict.keys():
                     try:
-                        save_n = int(meta_dict[MetaKeys.SHAP_SAVE_ITERATION.value])
+                        save_n = int(meta_dict[MachineLearningMetaKeys.SHAP_SAVE_ITERATION.value])
                     except ValueError:
                         save_n = (
-                            meta_dict[MetaKeys.SHAP_PRESENT.value]
-                            + meta_dict[MetaKeys.SHAP_ABSENT.value]
+                            meta_dict[MachineLearningMetaKeys.SHAP_PRESENT.value]
+                            + meta_dict[MachineLearningMetaKeys.SHAP_ABSENT.value]
                         )
-                if meta_dict[MetaKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value:
+                if meta_dict[MachineLearningMetaKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value:
                     self.create_shap_log_mp(
                         self.config_path,
                         self.rf_clf,
@@ -537,15 +537,15 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                         self.y_train,
                         self.feature_names,
                         self.clf_name,
-                        meta_dict[MetaKeys.SHAP_PRESENT.value],
-                        meta_dict[MetaKeys.SHAP_ABSENT.value],
+                        meta_dict[MachineLearningMetaKeys.SHAP_PRESENT.value],
+                        meta_dict[MachineLearningMetaKeys.SHAP_ABSENT.value],
                         self.model_dir_out,
                         save_it=save_n,
                         save_file_no=config_cnt,
                     )
-            if MetaKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
+            if MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
                 if (
-                    meta_dict[MetaKeys.PARTIAL_DEPENDENCY.value]
+                    meta_dict[MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value]
                     in Options.PERFORM_FLAGS.value
                 ):
                     self.partial_dependence_calculator(

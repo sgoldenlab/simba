@@ -11,7 +11,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_float, check_if_filepath_list_is_empty,
                                 check_int)
-from simba.utils.enums import ConfigKey, Dtypes, Methods, Options
+from simba.utils.enums import ConfigKey, Dtypes, Methods, Options, MachineLearningMetaKeys
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import read_config_entry
 from imblearn.ensemble import BalancedRandomForestClassifier
@@ -54,25 +54,25 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         self.clf_name = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.CLASSIFIER.value,
+            MachineLearningMetaKeys.CLASSIFIER.value,
             data_type=Dtypes.STR.value,
         )
         self.tt_size = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.TT_SIZE.value,
+            MachineLearningMetaKeys.TT_SIZE.value,
             data_type=Dtypes.FLOAT.value,
         )
         self.algo = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.MODEL_TO_RUN.value,
+            MachineLearningMetaKeys.MODEL_TO_RUN.value,
             data_type=Dtypes.STR.value,
         )
         self.split_type = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.SPLIT_TYPE.value,
+            MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value,
             data_type=Dtypes.STR.value,
             options=Options.TRAIN_TEST_SPLIT.value,
             default_value=Methods.SPLIT_TYPE_FRAMES.value,
@@ -81,7 +81,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.UNDERSAMPLE_SETTING.value,
+                MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value,
                 data_type=Dtypes.STR.value,
             )
             .lower()
@@ -91,7 +91,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.OVERSAMPLE_SETTING.value,
+                MachineLearningMetaKeys.OVERSAMPLE_SETTING.value,
                 data_type=Dtypes.STR.value,
             )
             .lower()
@@ -101,12 +101,12 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             self.under_sample_ratio = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.UNDERSAMPLE_RATIO.value,
+                MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value,
                 data_type=Dtypes.FLOAT.value,
                 default_value=Dtypes.NAN.value,
             )
             check_float(
-                name=ConfigKey.UNDERSAMPLE_RATIO.value, value=self.under_sample_ratio
+                name=MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value, value=self.under_sample_ratio
             )
         else:
             self.under_sample_ratio = Dtypes.NAN.value
@@ -116,12 +116,12 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             self.over_sample_ratio = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.OVERSAMPLE_RATIO.value,
+                MachineLearningMetaKeys.OVERSAMPLE_RATIO.value,
                 data_type=Dtypes.FLOAT.value,
                 default_value=Dtypes.NAN.value,
             )
             check_float(
-                name=ConfigKey.OVERSAMPLE_RATIO.value, value=self.over_sample_ratio
+                name=MachineLearningMetaKeys.OVERSAMPLE_RATIO.value, value=self.over_sample_ratio
             )
         else:
             self.over_sample_ratio = Dtypes.NAN.value
@@ -156,8 +156,9 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         print(
             "Number of {} frames in dataset: {} ({}%)".format(
                 self.clf_name,
-                str(self.y_df[self.y_df == (cls.index(self.clf_name)+1)].sum()),
-                str(round(self.y_df[self.y_df == (cls.index(self.clf_name)+1)].sum() / len(self.y_df[self.y_df == (cls.index(self.clf_name)+1)]), 4) * 100),
+                str(self.y_df[self.y_df == (cls.index(self.clf_name) + 1)].sum()),
+                str(round(self.y_df[self.y_df == (cls.index(self.clf_name) + 1)].sum() / len(
+                    self.y_df[self.y_df == (cls.index(self.clf_name) + 1)]), 4) * 100),
             )
         )
         print("Training and evaluating model...")
@@ -203,13 +204,19 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         n_estimators = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.RF_ESTIMATORS.value,
+            MachineLearningMetaKeys.RF_ESTIMATORS.value,
             data_type=Dtypes.INT.value,
         )
         max_features = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.RF_MAX_FEATURES.value,
+            MachineLearningMetaKeys.RF_MAX_FEATURES.value,
+            data_type=Dtypes.STR.value,
+        )
+        max_depth = read_config_entry(
+            self.config,
+            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+            MachineLearningMetaKeys.RF_MAX_DEPTH.value,
             data_type=Dtypes.STR.value,
         )
         if max_features == "None":
@@ -217,83 +224,83 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         criterion = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.RF_CRITERION.value,
+            MachineLearningMetaKeys.RF_CRITERION.value,
             data_type=Dtypes.STR.value,
             options=Options.CLF_CRITERION.value,
         )
         min_sample_leaf = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.MIN_LEAF.value,
+            MachineLearningMetaKeys.MIN_LEAF.value,
             data_type=Dtypes.INT.value,
         )
         compute_permutation_importance = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.PERMUTATION_IMPORTANCE.value,
+            MachineLearningMetaKeys.PERMUTATION_IMPORTANCE.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         generate_learning_curve = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.LEARNING_CURVE.value,
+            MachineLearningMetaKeys.LEARNING_CURVE.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         generate_precision_recall_curve = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.PRECISION_RECALL.value,
+            MachineLearningMetaKeys.PRECISION_RECALL.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         generate_example_decision_tree = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.EX_DECISION_TREE.value,
+            MachineLearningMetaKeys.EX_DECISION_TREE.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         generate_classification_report = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.CLF_REPORT.value,
+            MachineLearningMetaKeys.CLF_REPORT.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         generate_features_importance_log = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.IMPORTANCE_LOG.value,
+            MachineLearningMetaKeys.IMPORTANCE_LOG.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         generate_features_importance_bar_graph = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.IMPORTANCE_LOG.value,
+            MachineLearningMetaKeys.IMPORTANCE_LOG.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         generate_example_decision_tree_fancy = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.EX_DECISION_TREE_FANCY.value,
+            MachineLearningMetaKeys.EX_DECISION_TREE_FANCY.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         generate_shap_scores = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.SHAP_SCORES.value,
+            MachineLearningMetaKeys.SHAP_SCORES.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         save_meta_data = read_config_entry(
             self.config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.RF_METADATA.value,
+            MachineLearningMetaKeys.RF_METADATA.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
@@ -306,12 +313,12 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         )
 
         if self.config.has_option(
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, ConfigKey.CLASS_WEIGHTS.value
+                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MachineLearningMetaKeys.CLASS_WEIGHTS.value
         ):
             class_weights = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.CLASS_WEIGHTS.value,
+                MachineLearningMetaKeys.CLASS_WEIGHTS.value,
                 data_type=Dtypes.STR.value,
                 default_value=Dtypes.NONE.value,
             )
@@ -320,7 +327,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                     read_config_entry(
                         self.config,
                         ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                        ConfigKey.CUSTOM_WEIGHTS.value,
+                        MachineLearningMetaKeys.CLASS_CUSTOM_WEIGHTS.value,
                         data_type=Dtypes.STR.value,
                     )
                 )
@@ -335,22 +342,22 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             shuffle_splits = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.LEARNING_CURVE_K_SPLITS.value,
+                MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value,
                 data_type=Dtypes.INT.value,
                 default_value=Dtypes.NAN.value,
             )
             dataset_splits = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.LEARNING_DATA_SPLITS.value,
+                MachineLearningMetaKeys.LEARNING_DATA_SPLITS.value,
                 data_type=Dtypes.INT.value,
                 default_value=Dtypes.NAN.value,
             )
             check_int(
-                name=ConfigKey.LEARNING_CURVE_K_SPLITS.value, value=shuffle_splits
+                name=MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value, value=shuffle_splits
             )
             check_int(
-                name=ConfigKey.LEARNING_DATA_SPLITS.value, value=dataset_splits
+                name=MachineLearningMetaKeys.LEARNING_DATA_SPLITS.value, value=dataset_splits
             )
         else:
             shuffle_splits, dataset_splits = Dtypes.NAN.value, Dtypes.NAN.value
@@ -358,12 +365,12 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             feature_importance_bars = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.IMPORTANCE_BARS_N.value,
+                MachineLearningMetaKeys.IMPORTANCE_BARS_N.value,
                 Dtypes.INT.value,
                 Dtypes.NAN.value,
             )
             check_int(
-                name=ConfigKey.IMPORTANCE_BARS_N.value,
+                name=MachineLearningMetaKeys.IMPORTANCE_BARS_N.value,
                 value=feature_importance_bars,
                 min_value=1,
             )
@@ -378,21 +385,21 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             shap_target_present_cnt = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.SHAP_PRESENT.value,
+                MachineLearningMetaKeys.SHAP_PRESENT.value,
                 data_type=Dtypes.INT.value,
                 default_value=0,
             )
             shap_target_absent_cnt = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.SHAP_ABSENT.value,
+                MachineLearningMetaKeys.SHAP_ABSENT.value,
                 data_type=Dtypes.INT.value,
                 default_value=0,
             )
             shap_save_n = read_config_entry(
                 self.config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.SHAP_SAVE_ITERATION.value,
+                MachineLearningMetaKeys.SHAP_SAVE_ITERATION.value,
                 data_type=Dtypes.STR.value,
                 default_value=Dtypes.NONE.value,
             )
@@ -401,10 +408,10 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             except ValueError:
                 shap_save_n = shap_target_present_cnt + shap_target_absent_cnt
             check_int(
-                name=ConfigKey.SHAP_PRESENT.value, value=shap_target_present_cnt
+                name=MachineLearningMetaKeys.SHAP_PRESENT.value, value=shap_target_present_cnt
             )
             check_int(
-                name=ConfigKey.SHAP_ABSENT.value, value=shap_target_absent_cnt
+                name=MachineLearningMetaKeys.SHAP_ABSENT.value, value=shap_target_absent_cnt
             )
         print(f"Fitting {self.clf_name} model...")
         if self.algo == "RF":
@@ -412,6 +419,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                 n_estimators=n_estimators,
                 max_features=max_features,
                 n_jobs=-1,
+                max_depth=max_depth,
                 criterion=criterion,
                 min_samples_leaf=min_sample_leaf,
                 bootstrap=True,
@@ -426,7 +434,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             self.rf_clf = BalancedRandomForestClassifier(
                 n_estimators=n_estimators,
                 max_features=max_features,
-                max_depth=7,
+                max_depth=max_depth,
                 n_jobs=-1,
                 criterion=criterion,
                 min_samples_leaf=min_sample_leaf,

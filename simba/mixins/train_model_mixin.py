@@ -53,7 +53,7 @@ from simba.plotting.shap_agg_stats_visualizer import \
 from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
                                 check_str)
 from simba.utils.data import create_color_palette, detect_bouts
-from simba.utils.enums import ConfigKey, Defaults, Dtypes, MetaKeys
+from simba.utils.enums import ConfigKey, Defaults, Dtypes, MachineLearningMetaKeys
 from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
                                 CorruptedFileError, DataHeaderError,
                                 FaultyTrainingSetError,
@@ -921,16 +921,16 @@ class TrainModelMixin(object):
         """
 
         table_view = [
-            ["Model name", model_dict[MetaKeys.CLF_NAME.value]],
+            ["Model name", model_dict[MachineLearningMetaKeys.CLASSIFIER.value]],
             ["Ensemble method", "RF"],
-            ["Estimators (trees)", model_dict[MetaKeys.RF_ESTIMATORS.value]],
-            ["Max features", model_dict[MetaKeys.RF_MAX_FEATURES.value]],
-            ["Under sampling setting", model_dict[ConfigKey.UNDERSAMPLE_SETTING.value]],
-            ["Under sampling ratio", model_dict[ConfigKey.UNDERSAMPLE_RATIO.value]],
-            ["Over sampling setting", model_dict[ConfigKey.OVERSAMPLE_SETTING.value]],
-            ["Over sampling ratio", model_dict[ConfigKey.OVERSAMPLE_RATIO.value]],
-            ["criterion", model_dict[MetaKeys.CRITERION.value]],
-            ["Min sample leaf", model_dict[MetaKeys.MIN_LEAF.value]],
+            ["Estimators (trees)", model_dict[MachineLearningMetaKeys.RF_ESTIMATORS.value]],
+            ["Max features", model_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value]],
+            ["Under sampling setting", model_dict[MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value]],
+            ["Under sampling ratio", model_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value]],
+            ["Over sampling setting", model_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value]],
+            ["Over sampling ratio", model_dict[MachineLearningMetaKeys.OVERSAMPLE_RATIO.value]],
+            ["criterion", model_dict[MachineLearningMetaKeys.RF_CRITERION.value]],
+            ["Min sample leaf", model_dict[MachineLearningMetaKeys.MIN_LEAF.value]],
         ]
         table = tabulate(table_view, ["Setting", "value"], tablefmt="grid")
         print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")

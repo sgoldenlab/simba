@@ -13,11 +13,11 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, FileSelect, hxtScrollbar)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int)
-from simba.utils.enums import Formats, Keys, Links, Options
+from simba.utils.enums import Formats, Keys, Links, Options, ConfigKey, Dtypes, MachineLearningMetaKeys
 from simba.utils.errors import InvalidHyperparametersFileError
 from simba.utils.printing import stdout_success, stdout_trash, stdout_warning
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext)
+                                    get_fn_ext, read_config_entry)
 
 
 class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
@@ -90,30 +90,78 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             "25",
             validation="numeric",
         )
-        self.estimators_entrybox.entry_set(val=2000)
+        n_estimators = read_config_entry(
+            self.config,
+            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+            MachineLearningMetaKeys.RF_ESTIMATORS.value,
+            data_type=Dtypes.INT.value,
+        )
+
+        self.estimators_entrybox.entry_set(val=n_estimators)
+        max_features = read_config_entry(
+            self.config,
+            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+            MachineLearningMetaKeys.RF_MAX_FEATURES.value,
+            data_type=Dtypes.STR.value,
+        )
+
         self.max_features_dropdown = DropDownMenu(
             self.hyperparameters_frm, "Max features: ", self.max_features_options, "25"
         )
-        self.max_features_dropdown.setChoices(self.max_features_options[0])
+        self.max_features_dropdown.setChoices(max_features)
         self.criterion_dropdown = DropDownMenu(
             self.hyperparameters_frm, "Criterion: ", self.criterion_options, "25"
         )
         self.criterion_dropdown.setChoices(self.criterion_options[0])
+        train_test_size = read_config_entry(
+            self.config,
+            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+            MachineLearningMetaKeys.TT_SIZE.value,
+            data_type=Dtypes.STR.value,
+        )
         self.train_test_size_dropdown = DropDownMenu(
             self.hyperparameters_frm, "Test Size: ", self.train_test_sizes_options, "25"
         )
-        self.train_test_size_dropdown.setChoices("0.2")
+        self.train_test_size_dropdown.setChoices(str(train_test_size))
+        train_test_split_type = read_config_entry(
+            self.config,
+            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+            MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value,
+            data_type=Dtypes.STR.value,
+        )
         self.train_test_type_dropdown = DropDownMenu(
             self.hyperparameters_frm,
             "Train-test Split Type: ",
             Options.TRAIN_TEST_SPLIT.value,
             "25",
         )
-        self.train_test_type_dropdown.setChoices(Options.TRAIN_TEST_SPLIT.value[0])
+        self.train_test_type_dropdown.setChoices(str(train_test_split_type))
+        max_depth = read_config_entry(
+            self.config,
+            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+            MachineLearningMetaKeys.RF_MAX_DEPTH.value,
+            data_type=Dtypes.STR.value,
+        )
+        self.max_depth_eb = Entry_Box(
+            self.hyperparameters_frm, "Max Depth: ", "25", validation="numeric"
+        )
+        self.max_depth_eb.entry_set(val=max_depth)
+        min_sample_leaf = read_config_entry(
+            self.config,
+            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+            MachineLearningMetaKeys.MIN_LEAF.value,
+            data_type=Dtypes.INT.value,
+        )
         self.min_sample_leaf_eb = Entry_Box(
             self.hyperparameters_frm, "Minimum sample leaf", "25", validation="numeric"
         )
-        self.min_sample_leaf_eb.entry_set(val=1)
+        self.min_sample_leaf_eb.entry_set(val=min_sample_leaf)
+        undersample_settings = read_config_entry(
+            self.config,
+            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+            MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value,
+            data_type=Dtypes.STR.value,
+        )
         self.under_sample_ratio_entrybox = Entry_Box(
             self.hyperparameters_frm, "UNDER-sample ratio: ", "25", status=DISABLED
         )
@@ -126,7 +174,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
                 self.under_sample_ratio_entrybox, self.undersample_settings_dropdown
             ),
         )
-        self.undersample_settings_dropdown.setChoices("None")
+        self.undersample_settings_dropdown.setChoices(undersample_settings)
         self.over_sample_ratio_entrybox = Entry_Box(
             self.hyperparameters_frm, "OVER-sample ratio: ", "25", status=DISABLED
         )
@@ -317,16 +365,17 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
 
         self.hyperparameters_frm.grid(row=3, column=0, sticky=NW)
         self.estimators_entrybox.grid(row=0, column=0, sticky=NW)
-        self.max_features_dropdown.grid(row=1, column=0, sticky=NW)
-        self.criterion_dropdown.grid(row=2, column=0, sticky=NW)
-        self.train_test_size_dropdown.grid(row=3, column=0, sticky=NW)
-        self.train_test_type_dropdown.grid(row=4, column=0, sticky=NW)
-        self.min_sample_leaf_eb.grid(row=5, column=0, sticky=NW)
-        self.undersample_settings_dropdown.grid(row=6, column=0, sticky=NW)
-        self.under_sample_ratio_entrybox.grid(row=7, column=0, sticky=NW)
-        self.oversample_settings_dropdown.grid(row=8, column=0, sticky=NW)
-        self.over_sample_ratio_entrybox.grid(row=9, column=0, sticky=NW)
-        self.class_weights_dropdown.grid(row=10, column=0, sticky=NW)
+        self.max_depth_eb.grid(row=1, column=0, sticky=NW)
+        self.max_features_dropdown.grid(row=2, column=0, sticky=NW)
+        self.criterion_dropdown.grid(row=3, column=0, sticky=NW)
+        self.train_test_size_dropdown.grid(row=4, column=0, sticky=NW)
+        self.train_test_type_dropdown.grid(row=5, column=0, sticky=NW)
+        self.min_sample_leaf_eb.grid(row=6, column=0, sticky=NW)
+        self.undersample_settings_dropdown.grid(row=7, column=0, sticky=NW)
+        self.under_sample_ratio_entrybox.grid(row=8, column=0, sticky=NW)
+        self.oversample_settings_dropdown.grid(row=9, column=0, sticky=NW)
+        self.over_sample_ratio_entrybox.grid(row=10, column=0, sticky=NW)
+        self.class_weights_dropdown.grid(row=11, column=0, sticky=NW)
 
         self.evaluations_frm.grid(row=4, column=0, sticky=NW)
         self.meta_data_file_cb.grid(row=0, column=0, sticky=NW)
@@ -669,7 +718,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         save_path = os.path.join(self.configs_meta_dir, file_name)
         meta_df.to_csv(save_path, index=FALSE)
         stdout_success(
-            msg=f"Hyper-parameter config saved ({str(len(self.total_meta_files)+1)} saved in project_folder/configs folder)."
+            msg=f"Hyper-parameter config saved ({str(len(self.total_meta_files) + 1)} saved in project_folder/configs folder)."
         )
 
     def clear_cache(self):
@@ -682,7 +731,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
 
     def check_meta_data_integrity(self):
         self.meta = {k.lower(): v for k, v in self.meta.items()}
-        for i in self.expected_meta_dict_entries:
+        for i in MachineLearningMetaKeys:
             if i not in self.meta.keys():
                 stdout_warning(
                     msg=f"The file does not contain an expected entry for {i} parameter"
@@ -708,88 +757,84 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.meta = {}
         for m in meta_df.columns:
             self.meta[m] = meta_df[m][0]
-        self.get_expected_meta_dict_entry_keys()
         self.check_meta_data_integrity()
-        self.behavior_name_dropdown.setChoices(self.meta["classifier_name"])
-        self.estimators_entrybox.entry_set(val=self.meta["rf_n_estimators"])
-        self.max_features_dropdown.setChoices(self.meta["rf_max_features"])
-        self.criterion_dropdown.setChoices(self.meta["rf_criterion"])
-        self.train_test_size_dropdown.setChoices(self.meta["train_test_size"])
-        self.min_sample_leaf_eb.entry_set(val=self.meta["rf_min_sample_leaf"])
-        self.undersample_settings_dropdown.setChoices(self.meta["under_sample_setting"])
+        self.behavior_name_dropdown.setChoices(self.meta[MachineLearningMetaKeys.CLASSIFIER])
+        self.estimators_entrybox.entry_set(val=self.meta[MachineLearningMetaKeys.RF_ESTIMATORS])
+        self.max_features_dropdown.setChoices(self.meta[MachineLearningMetaKeys.RF_MAX_FEATURES])
+        self.criterion_dropdown.setChoices(self.meta[MachineLearningMetaKeys.RF_CRITERION])
+        self.train_test_size_dropdown.setChoices(self.meta[MachineLearningMetaKeys.TT_SIZE])
+        self.min_sample_leaf_eb.entry_set(val=self.meta[MachineLearningMetaKeys.MIN_LEAF])
+        self.max_depth_eb.entry_set(val=self.meta[MachineLearningMetaKeys.RF_MAX_DEPTH])
+        self.undersample_settings_dropdown.setChoices(self.meta[MachineLearningMetaKeys.UNDER_SAMPLE_SETTING])
         if self.undersample_settings_dropdown.getChoices() != "None":
             self.under_sample_ratio_entrybox.entry_set(
-                val=self.meta["under_sample_ratio"]
+                val=self.meta[MachineLearningMetaKeys.UNDER_SAMPLE_RATIO]
             )
             self.under_sample_ratio_entrybox.set_state(NORMAL)
         else:
             self.under_sample_ratio_entrybox.set_state(DISABLED)
-        self.oversample_settings_dropdown.setChoices(self.meta["over_sample_setting"])
+        self.oversample_settings_dropdown.setChoices(self.meta[MachineLearningMetaKeys.OVER_SAMPLE_SETTING])
         if self.oversample_settings_dropdown.getChoices() != "None":
             self.over_sample_ratio_entrybox.entry_set(
-                val=self.meta["over_sample_ratio"]
+                val=self.meta[MachineLearningMetaKeys.OVER_SAMPLE_RATIO]
             )
             self.over_sample_ratio_entrybox.set_state(NORMAL)
         else:
             self.over_sample_ratio_entrybox.set_state(DISABLED)
 
-        if self.meta["generate_rf_model_meta_data_file"]:
+        if self.meta[MachineLearningMetaKeys.RF_METADATA]:
             self.create_meta_data_file_var.set(value=True)
         else:
             self.create_meta_data_file_var.set(value=False)
-        if self.meta["generate_example_decision_tree"]:
+        if self.meta[MachineLearningMetaKeys.EX_DECISION_TREE]:
             self.create_example_decision_tree_graphviz_var.set(value=True)
         else:
             self.create_example_decision_tree_graphviz_var.set(value=False)
-        if self.meta["generate_example_decision_tree"]:
-            self.create_example_decision_tree_graphviz_var.set(value=True)
-        else:
-            self.create_example_decision_tree_graphviz_var.set(value=False)
-        if self.meta["generate_classification_report"]:
+        if self.meta[MachineLearningMetaKeys.CLF_REPORT]:
             self.create_clf_report_var.set(value=True)
         else:
             self.create_clf_report_var.set(value=False)
         if (
-            self.meta["generate_features_importance_log"]
-            or self.meta["generate_features_importance_bar_graph"]
+                self.meta[MachineLearningMetaKeys.IMPORTANCE_LOG]
+                or self.meta[MachineLearningMetaKeys.IMPORTANCE_BAR_CHART]
         ):
             self.create_clf_importance_bars_var.set(value=True)
             self.n_features_bars_entry_box.set_state(NORMAL)
             self.n_features_bars_entry_box.entry_set(
-                val=self.meta["n_feature_importance_bars"]
+                val=self.meta[MachineLearningMetaKeys.N_FEATURE_IMPORTANCE_BARS]
             )
         else:
             self.create_clf_importance_bars_var.set(value=False)
             self.n_features_bars_entry_box.set_state(DISABLED)
 
-        if self.meta["compute_feature_permutation_importance"]:
+        if self.meta[MachineLearningMetaKeys.PERMUTATION_IMPORTANCE]:
             self.feature_permutation_importance_var.set(value=True)
 
-        if self.meta["generate_sklearn_learning_curves"]:
+        if self.meta[MachineLearningMetaKeys.LEARNING_CURVE]:
             self.learning_curve_var.set(value=True)
             self.learning_curve_k_splits_entry_box.set_state(NORMAL)
             self.learning_curve_data_splits_entry_box.set_state(NORMAL)
             self.learning_curve_k_splits_entry_box.entry_set(
-                val=self.meta["learning_curve_k_splits"]
+                val=self.meta[MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS]
             )
             self.learning_curve_data_splits_entry_box.entry_set(
-                val=self.meta["learning_curve_data_splits"]
+                val=self.meta[MachineLearningMetaKeys.LEARNING_CURVE_DATA_SPLITS]
             )
         else:
             self.learning_curve_var.set(value=False)
             self.learning_curve_k_splits_entry_box.set_state(DISABLED)
             self.learning_curve_data_splits_entry_box.set_state(DISABLED)
 
-        if self.meta["generate_shap_scores"]:
+        if self.meta[MachineLearningMetaKeys.SHAP_SCORES]:
             self.calc_shap_scores_var.set(value=True)
             self.shap_present.set_state(NORMAL)
             self.shap_absent.set_state(NORMAL)
             self.shap_absent.set_state(NORMAL)
             self.shap_save_it_dropdown.enable()
-            self.shap_present.entry_set(val=self.meta["shap_target_present_no"])
-            self.shap_absent.entry_set(val=self.meta["shap_target_absent_no"])
+            self.shap_present.entry_set(val=self.meta[MachineLearningMetaKeys.SHAP_PRESENT])
+            self.shap_absent.entry_set(val=self.meta[MachineLearningMetaKeys.SHAP_ABSENT])
             if "shap_save_iteration" in self.meta.keys():
-                self.shap_save_it_dropdown.setChoices(self.meta["shap_save_iteration"])
+                self.shap_save_it_dropdown.setChoices(self.meta[MachineLearningMetaKeys.SHAP_SAVE_ITERATION])
             else:
                 self.shap_save_it_dropdown.setChoices("ALL FRAMES")
         else:
@@ -798,24 +843,22 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             self.shap_absent.set_state(DISABLED)
             self.shap_save_it_dropdown.enable()
 
-        if "train_test_split_type" in self.meta.keys():
-            self.train_test_type_dropdown.setChoices(self.meta["train_test_split_type"])
+        if MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE in self.meta.keys():
+            self.train_test_type_dropdown.setChoices(self.meta[MachineLearningMetaKeys.TT_SIZE])
         else:
             self.train_test_type_dropdown.setChoices(Options.TRAIN_TEST_SPLIT.value[0])
-        if "shap_save_iteration" in self.meta.keys():
-            self.shap_save_it_dropdown.setChoices(self.meta["shap_save_iteration"])
-        if "partial_dependency" in self.meta.keys():
-            if self.meta["partial_dependency"] in Options.RUN_OPTIONS_FLAGS.value:
+        if MachineLearningMetaKeys.PARTIAL_DEPENDENCY in self.meta.keys():
+            if self.meta[MachineLearningMetaKeys.PARTIAL_DEPENDENCY] in Options.RUN_OPTIONS_FLAGS.value:
                 self.partial_dependency_var.set(value=True)
         else:
             self.shap_save_it_dropdown.setChoices("None")
-        if "class_weights" in self.meta.keys():
-            if self.meta["class_weights"] not in Options.CLASS_WEIGHT_OPTIONS.value:
-                self.meta["class_weights"] = "None"
-            self.class_weights_dropdown.setChoices(self.meta["class_weights"])
-            if self.meta["class_weights"] == "custom":
+        if MachineLearningMetaKeys.CLASS_WEIGHTS in self.meta.keys():
+            if self.meta[MachineLearningMetaKeys.CLASS_WEIGHTS] not in Options.CLASS_WEIGHT_OPTIONS.value:
+                self.meta[MachineLearningMetaKeys.CLASS_WEIGHTS] = "None"
+            self.class_weights_dropdown.setChoices(self.meta[MachineLearningMetaKeys.CLASS_WEIGHTS])
+            if self.meta[MachineLearningMetaKeys.CLASS_WEIGHTS] == "custom":
                 self.create_class_weight_table()
-                weights = ast.literal_eval(self.meta["class_custom_weights"])
+                weights = ast.literal_eval(self.meta[MachineLearningMetaKeys.CLASS_CUSTOM_WEIGHTS])
 
                 self.weight_present.setChoices(weights[1])
                 self.weight_absent.setChoices(weights[0])
@@ -857,6 +900,5 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             "class_weights",
             "class_custom_weights",
         ]
-
 
 # _ = MachineModelSettingsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
