@@ -15,8 +15,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Keys, Links, Options
-from simba.utils.errors import (FFMPEGCodecGPUError, IntegerError,
-                                InvalidInputError, NoFilesFoundError)
+from simba.utils.errors import FFMPEGCodecGPUError, NoFilesFoundError
 from simba.utils.lookups import (percent_to_crf_lookup,
                                  video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -25,6 +24,7 @@ from simba.utils.read_write import (
     get_video_meta_data)
 from simba.video_processors.batch_process_create_ffmpeg_commands import \
     FFMPEGCommandCreator
+from simba.video_processors.roi_selector import ROISelector
 
 
 class BatchProcessFrame(PopUpMixin):
@@ -62,10 +62,13 @@ class BatchProcessFrame(PopUpMixin):
         self.videos_in_dir_dict, self.crop_dict = {}, {}
         self.get_input_files()
         self.percent_to_crf_lookup = percent_to_crf_lookup()
+        self.cpu_video_quality = list(range(10, 110, 10))
+        self.cpu_video_quality = [str(x) for x in self.cpu_video_quality]
         self.video_quality_to_preset_lookup = video_quality_to_preset_lookup()
         if len(list(self.videos_in_dir_dict.keys())) == 0:
             raise NoFilesFoundError(
-                msg=f"The input directory {self.input_dir} contains ZERO video files in either .avi, .mp4, .mov, .flv, or m4v format"
+                msg=f"The input directory {self.input_dir} contains ZERO video files in either .avi, .mp4, .mov, .flv, or m4v format",
+                source=self.__class__.__name__,
             )
         self.max_char_vid_name = len(max(list(self.videos_in_dir_dict.keys()), key=len))
 
@@ -172,7 +175,7 @@ class BatchProcessFrame(PopUpMixin):
             self.quick_settings_frm, text="Output Video Quality", padx=5, pady=5
         )
         self.quick_set_quality_dropdown = DropDownMenu(
-            self.quick_set_quality, "Video Quality % ", list(range(10, 110, 10)), "14"
+            self.quick_set_quality, "Video Quality % ", self.cpu_video_quality, "14"
         )
         self.quick_set_quality_dropdown.setChoices(100)
         self.quick_set_qualitys_empty_row = Label(self.quick_set_quality, text=" ")
@@ -232,10 +235,7 @@ class BatchProcessFrame(PopUpMixin):
         self.quick_set_quality_dropdown.destroy()
         if not self.use_gpu_var.get():
             self.quick_set_quality_dropdown = DropDownMenu(
-                self.quick_set_quality,
-                "Video Quality % ",
-                list(range(10, 110, 10)),
-                "14",
+                self.quick_set_quality, "Video Quality % ", self.cpu_video_quality, "14"
             )
             self.quick_set_quality_dropdown.setChoices(100)
         else:
@@ -252,7 +252,7 @@ class BatchProcessFrame(PopUpMixin):
             self.videos[video_name]["video_quality_dropdown"].destroy()
             if not self.use_gpu_var.get():
                 self.videos[video_name]["video_quality_dropdown"] = DropDownMenu(
-                    self.videos_frm, "", list(range(10, 110, 10)), "5"
+                    self.videos_frm, "", self.cpu_video_quality, "5"
                 )
                 self.videos[video_name]["video_quality_dropdown"].setChoices(100)
             else:
@@ -422,6 +422,9 @@ class BatchProcessFrame(PopUpMixin):
 
     def create_video_rows(self):
         self.videos = {}
+        for w in self.videos_frm.grid_slaves():
+            if w.grid_info()["column"] == 14 and w.grid_info()["row"] > 0:
+                w.grid_remove()
         for video_cnt, (name, data) in enumerate(self.videos_in_dir_dict.items()):
             self.videos[name] = {}
             row = video_cnt + 1
@@ -496,7 +499,7 @@ class BatchProcessFrame(PopUpMixin):
                 command=None,
             )
             self.videos[name]["video_quality_dropdown"] = DropDownMenu(
-                self.videos_frm, "", list(range(10, 110, 10)), "5"
+                self.videos_frm, "", self.cpu_video_quality, "5"
             )
             self.videos[name]["video_quality_dropdown"].setChoices(100)
 
@@ -521,6 +524,12 @@ class BatchProcessFrame(PopUpMixin):
             self.videos[name]["apply_clahe_cbox"].grid(
                 row=row, column=13, sticky=W, padx=5
             )
+            try:
+                self.videos[name]["video_quality_dropdown"].grid_remove(
+                    row=row, column=14, sticky=NW
+                )
+            except:
+                pass
             self.videos[name]["video_quality_dropdown"].grid(
                 row=row, column=14, sticky=NW
             )
@@ -561,25 +570,18 @@ class BatchProcessFrame(PopUpMixin):
 
     def batch_process_crop_function(self, video_name):
         check_file_exist_and_readable(self.videos_in_dir_dict[video_name]["file_path"])
-        self.cap = cv2.VideoCapture(self.videos_in_dir_dict[video_name]["file_path"])
-        self.cap.set(1, 0)
-        _, self.frame = self.cap.read()
-        cv2.namedWindow("CROP {}".format(video_name), cv2.WINDOW_NORMAL)
-        cv2.imshow("CROP {}".format(video_name), self.frame)
-        ROI = cv2.selectROI("CROP {}".format(video_name), self.frame)
+        roi_selector = ROISelector(
+            path=self.videos_in_dir_dict[video_name]["file_path"],
+            title=f"CROP {video_name} - Press ESC when ROI drawn",
+        )
+        roi_selector.run()
         self.crop_dict[video_name] = {}
-        self.crop_dict[video_name]["top_left_x"] = ROI[0]
-        self.crop_dict[video_name]["top_left_y"] = ROI[1]
-        self.crop_dict[video_name]["width"] = abs(ROI[0] - (ROI[2] + ROI[0]))
-        self.crop_dict[video_name]["height"] = abs(ROI[2] - (ROI[3] + ROI[2]))
-        self.crop_dict[video_name]["bottom_right_x"] = (
-            self.crop_dict[video_name]["top_left_x"]
-            + self.crop_dict[video_name]["width"]
-        )
-        self.crop_dict[video_name]["bottom_right_y"] = (
-            self.crop_dict[video_name]["top_left_y"]
-            + self.crop_dict[video_name]["height"]
-        )
+        self.crop_dict[video_name]["top_left_x"] = roi_selector.top_left[0]
+        self.crop_dict[video_name]["top_left_y"] = roi_selector.top_left[1]
+        self.crop_dict[video_name]["width"] = roi_selector.width
+        self.crop_dict[video_name]["height"] = roi_selector.height
+        self.crop_dict[video_name]["bottom_right_x"] = roi_selector.bottom_right[0]
+        self.crop_dict[video_name]["bottom_right_y"] = roi_selector.bottom_right[1]
         k = cv2.waitKey(20) & 0xFF
         cv2.destroyAllWindows()
         self.videos[video_name]["crop_btn"].configure(fg="red")
@@ -593,7 +595,8 @@ class BatchProcessFrame(PopUpMixin):
         out_video_dict["meta_data"]["gpu"] = self.use_gpu_var.get()
         if self.use_gpu_var.get() and not check_nvidea_gpu_available():
             raise FFMPEGCodecGPUError(
-                msg="No GPU found (as evaluated by nvidea-smi returning None)"
+                msg="No GPU found (as evaluated by nvidea-smi returning None)",
+                source=self.__class__.__name__,
             )
         for video_cnt, (name, data) in enumerate(self.videos_in_dir_dict.items()):
             out_video_dict["video_data"][name] = {}
@@ -604,7 +607,7 @@ class BatchProcessFrame(PopUpMixin):
                 out_video_dict["video_data"][name][
                     "output_quality"
                 ] = self.percent_to_crf_lookup[
-                    int(self.videos[name]["video_quality_dropdown"].getChoices())
+                    self.videos[name]["video_quality_dropdown"].getChoices()
                 ]
             else:
                 out_video_dict["video_data"][name][
@@ -740,10 +743,14 @@ class BatchProcessFrame(PopUpMixin):
         ffmpeg_runner.apply_clahe()
         ffmpeg_runner.move_all_processed_files_to_output_folder()
         timer.stop_timer()
-        stdout_success(msg=f"SimBA batch pre-process JSON saved at {self.save_path}")
+        stdout_success(
+            msg=f"SimBA batch pre-process JSON saved at {self.save_path}",
+            source=self.__class__.__name__,
+        )
         stdout_success(
             msg=f"Video batch pre-processing complete, new videos stored in {self.output_dir}",
             elapsed_time=timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
 

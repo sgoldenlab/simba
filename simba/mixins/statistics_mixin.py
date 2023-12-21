@@ -28,7 +28,9 @@ class Statistics(FeatureExtractionMixin):
        `line graph <https://github.com/sgoldenlab/simba/blob/master/docs/_static/img/statistics_runtimes.png>`_ below for expected run-times for a few methods included in this class.
 
        Most method has numba typed `signatures <https://numba.pydata.org/numba-doc/latest/reference/types.html>`_ to decrease
-       compilation time. Make sure to pass the correct dtypes as indicated by signature decorators.
+       compilation time. Make sure to pass the correct dtypes as indicated by signature decorators. If dtype is not specified at
+       array creation, it will typically be ``float64`` or ``int64``. As most methods here use ``float32`` for the input data argument,
+       make sure to downcast.
 
     .. image:: _static/img/statistics_runtimes.png
        :width: 1200
@@ -992,6 +994,13 @@ class Statistics(FeatureExtractionMixin):
     @njit("(float32[:], float32[:])")
     def pearsons_r(sample_1: np.ndarray, sample_2: np.ndarray):
         """
+        Calculate the Pearson correlation coefficient (Pearson's r) between two numeric samples.
+
+        Pearson's r is a measure of the linear correlation between two sets of data points. It quantifies the strength and
+        direction of the linear relationship between the two variables. The coefficient varies between -1 and 1, with
+        -1 indicating a perfect negative linear relationship, 1 indicating a perfect positive linear relationship, and 0
+        indicating no linear relationship.
+
         :example:
         >>> sample_1 = np.array([7, 2, 9, 4, 5, 6, 7, 8, 9]).astype(np.float32)
         >>> sample_2 = np.array([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]).astype(np.float32)
@@ -1556,6 +1565,238 @@ class Statistics(FeatureExtractionMixin):
                 ((cnt + 1) * window_size) + window_size
             )
             results[start:end] = stats.shapiro(data[i])[0]
+        return results
+
+    @staticmethod
+    @njit("(float32[:], float64[:], int64,)")
+    def sliding_z_scores(
+        data: np.ndarray, time_windows: np.ndarray, fps: int
+    ) -> np.ndarray:
+        """
+        Calculate sliding Z-scores for a given data array over specified time windows.
+
+        This function computes sliding Z-scores for a 1D data array over different time windows. The sliding Z-score
+        is a measure of how many standard deviations a data point is from the mean of the surrounding data within
+        the specified time window. This can be useful for detecting anomalies or variations in time-series data.
+
+        :parameter ndarray data: 1D NumPy array containing the time-series data.
+        :parameter ndarray time_windows: 1D NumPy array specifying the time windows in seconds over which to calculate the Z-scores.
+        :parameter int time_windows: Frames per second, used to convert time windows from seconds to the corresponding number of data points.
+        :returns np.ndarray: A 2D NumPy array containing the calculated Z-scores. Each row corresponds to the Z-scores calculated for a specific time window. The time windows are represented by the columns.
+
+        :example:
+        >>> data = np.random.randint(0, 100, (1000,)).astype(np.float32)
+        >>> z_scores = Statistics().sliding_z_scores(data=data, time_windows=np.array([1.0, 2.5]), fps=10)
+        """
+
+        results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
+        for i in range(time_windows.shape[0]):
+            window_size = int(time_windows[i] * fps)
+            for right in range(window_size - 1, data.shape[0]):
+                left = right - window_size + 1
+                sample_data = data[left : right + 1]
+                m, s = np.mean(sample_data), np.std(sample_data)
+                vals = (sample_data - m) / s
+                results[left : right + 1, i] = vals
+        return results
+
+    @staticmethod
+    @njit("(int64[:, :],)")
+    def phi_coefficient(data: np.ndarray) -> float:
+        """
+        Compute the phi coefficient for a 2x2 contingency table derived from binary data.
+
+        The phi coefficient is a measure of association for binary data in a 2x2 contingency table. It quantifies the
+        degree of association or correlation between two binary variables (e.g., binary classification targets).
+
+        :param np.ndarray data: A NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables. Columns represent two features or two binary classification results.
+        :param float: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
+
+
+        :example:
+        >>> data = np.array([[0, 1], [1, 0], [1, 0], [1, 1]]).astype(np.int64)
+        >>> Statistics().phi_coefficient(data=data)
+        >>> 0.8164965809277261
+        """
+        cnt_0_0 = len(np.argwhere((data[:, 0] == 0) & (data[:, 1] == 0)).flatten())
+        cnt_0_1 = len(np.argwhere((data[:, 0] == 0) & (data[:, 1] == 1)).flatten())
+        cnt_1_0 = len(np.argwhere((data[:, 0] == 1) & (data[:, 1] == 0)).flatten())
+        cnt_1_1 = len(np.argwhere((data[:, 0] == 1) & (data[:, 1] == 1)).flatten())
+
+        BC, AD = cnt_1_1 * cnt_0_0, cnt_1_0 * cnt_0_1
+        nominator = BC - AD
+        denominator = np.sqrt(
+            (cnt_1_0 + cnt_1_1)
+            * (cnt_0_0 + cnt_0_1)
+            * (cnt_1_0 + cnt_0_0)
+            * (cnt_1_1 * cnt_0_1)
+        )
+        if nominator == 0 or denominator == 0:
+            return 1.0
+        else:
+            return np.abs(
+                (BC - AD)
+                / np.sqrt(
+                    (cnt_1_0 + cnt_1_1)
+                    * (cnt_0_0 + cnt_0_1)
+                    * (cnt_1_0 + cnt_0_0)
+                    * (cnt_1_1 * cnt_0_1)
+                )
+            )
+
+    @staticmethod
+    @njit("(int32[:, :], float64[:], int64)")
+    def sliding_phi_coefficient(
+        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
+        """
+        Calculate sliding phi coefficients for a 2x2 contingency table derived from binary data.
+
+        Computes sliding phi coefficients for a 2x2 contingency table derived from binary data over different
+        time windows. The phi coefficient is a measure of association between two binary variables, and sliding phi
+        coefficients can reveal changes in association over time.
+
+        :param np.ndarray data: A 2D NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables.
+        :param np.ndarray window_sizes: 1D NumPy array specifying the time windows (in seconds) over which to calculate the sliding phi coefficients.
+        :param int sample_rate: The sampling rate or time interval (in samples per second, e.g., fps) at which data points were collected.
+        :returns np.ndarray: A 2D NumPy array containing the calculated sliding phi coefficients. Each row corresponds to the phi coefficients calculated for a specific time point, the columns correspond to time-windows.
+
+        :example:
+        >>> data = np.random.randint(0, 2, (200, 2))
+        >>> Statistics().sliding_phi_coefficient(data=data, window_sizes=np.array([1.0, 4.0]), sample_rate=10)
+        """
+
+        results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
+        for i in prange(window_sizes.shape[0]):
+            window_size = int(window_sizes[i] * sample_rate)
+            for l, r in zip(
+                range(0, data.shape[0] + 1), range(window_size, data.shape[0] + 1)
+            ):
+                sample = data[l:r, :]
+                cnt_0_0 = len(
+                    np.argwhere((sample[:, 0] == 0) & (sample[:, 1] == 0)).flatten()
+                )
+                cnt_0_1 = len(
+                    np.argwhere((sample[:, 0] == 0) & (sample[:, 1] == 1)).flatten()
+                )
+                cnt_1_0 = len(
+                    np.argwhere((sample[:, 0] == 1) & (sample[:, 1] == 0)).flatten()
+                )
+                cnt_1_1 = len(
+                    np.argwhere((sample[:, 0] == 1) & (sample[:, 1] == 1)).flatten()
+                )
+                BC, AD = cnt_1_1 * cnt_0_0, cnt_1_0 * cnt_0_1
+                nominator = BC - AD
+                denominator = np.sqrt(
+                    (cnt_1_0 + cnt_1_1)
+                    * (cnt_0_0 + cnt_0_1)
+                    * (cnt_1_0 + cnt_0_0)
+                    * (cnt_1_1 * cnt_0_1)
+                )
+                if nominator == 0 or denominator == 0:
+                    results[r - 1, i] = 0.0
+                else:
+                    results[r - 1, i] = np.abs(
+                        (BC - AD)
+                        / np.sqrt(
+                            (cnt_1_0 + cnt_1_1)
+                            * (cnt_0_0 + cnt_0_1)
+                            * (cnt_1_0 + cnt_0_0)
+                            * (cnt_1_1 * cnt_0_1)
+                        )
+                    )
+
+        return results.astype(np.float32)
+
+    @staticmethod
+    @njit("int64[:], int64[:],")
+    def cohens_h(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
+        """
+        Jitted compute Cohen's h effect size for two samples of binary [0, 1] values. Cohen's h is a measure of effect size
+        for comparing two independent samples based on the differences in proportions of the two samples.
+
+        :param np.ndarray sample_1: 1D array with binary [0, 1] values (e.g., first classifier inference values).
+        :param np.ndarray sample_2: 1D array with binary [0, 1] values (e.g., second classifier inference values).
+        :return float: Cohen's h effect size.
+
+        ... note:
+           Modified from `DABEST <https://github.com/ACCLAB/DABEST-python/blob/fa7df50d20ab1c9cc687c66dd8bddf55d9a9dce3/dabest/_stats_tools/effsize.py#L216>`_
+           `Cohen's h wiki <https://en.wikipedia.org/wiki/Cohen%27s_h>`_
+
+        .. math::
+
+           \\text{Cohen's h} = 2 \\arcsin\\left(\\sqrt{\\frac{\\sum{sample_1}}{N_1}}\\right)
+                            - 2 \\arcsin\left(\\sqrt{\frac{\\sum{sample_2}}{N_2}}\\right)
+
+        Where N_1 and N_2 are the sample sizes of sample_1 and sample_2, respectively.
+
+
+        :example:
+        >>> sample_1 = np.array([1, 0, 0, 1])
+        >>> sample_2 = np.array([1, 1, 1, 0])
+        >>> Statistics().cohens_h(sample_1=sample_1, sample_2=sample_2)
+        >>> -0.5235987755982985
+        """
+
+        sample_1_proportion = np.sum(sample_1) / sample_1.shape[0]
+        sample_2_proportion = np.sum(sample_2) / sample_2.shape[0]
+        phi_sample_1 = 2 * np.arcsin(np.sqrt(sample_1_proportion))
+        phi_sample_2 = 2 * np.arcsin(np.sqrt(sample_2_proportion))
+
+        return phi_sample_1 - phi_sample_2
+
+    @staticmethod
+    @jit("(float32[:], float64[:], int64,)")
+    def sliding_skew(
+        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
+        """
+        Compute the skewness of a 1D array within sliding time windows.
+
+        :param np.ndarray data: Input data array.
+        :param np.ndarray data: 1D array of time window durations in seconds.
+        :param np.ndarray data: Sampling rate of the data in samples per second.
+        :return np.ndarray: 2D array of skewness`1 values with rows corresponding to data points and columns corresponding to time windows.
+
+        :example:
+        >>> data = np.random.randint(0, 100, (10,))
+        >>> skewness = Statistics().sliding_skew(data=data.astype(np.float32), time_windows=np.array([1.0, 2.0]), sample_rate=2)
+        """
+
+        results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
+        for i in prange(time_windows.shape[0]):
+            window_size = time_windows[i] * sample_rate
+            for j in range(window_size, data.shape[0] + 1):
+                sample = data[j - window_size : j]
+                mean, std = np.mean(sample), np.std(sample)
+                results[j - 1][i] = (1 / n) * np.sum(((data - mean) / std) ** 3)
+
+        return results
+
+    @staticmethod
+    @jit("(float32[:], float64[:], int64,)")
+    def sliding_kurtosis(
+        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
+        """
+        Compute the kurtosis of a 1D array within sliding time windows.
+
+        :param np.ndarray data: Input data array.
+        :param np.ndarray data: 1D array of time window durations in seconds.
+        :param np.ndarray data: Sampling rate of the data in samples per second.
+        :return np.ndarray: 2D array of skewness`1 values with rows corresponding to data points and columns corresponding to time windows.
+
+        :example:
+        >>> data = np.random.randint(0, 100, (10,))
+        >>> kurtosis = Statistics().sliding_kurtosis(data=data.astype(np.float32), time_windows=np.array([1.0, 2.0]), sample_rate=2)
+        """
+        results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
+        for i in prange(time_windows.shape[0]):
+            window_size = time_windows[i] * sample_rate
+            for j in range(window_size, data.shape[0] + 1):
+                sample = data[j - window_size : j]
+                mean, std = np.mean(sample), np.std(sample)
+                results[j - 1][i] = np.mean(((data - mean) / std) ** 4) - 3
         return results
 
 

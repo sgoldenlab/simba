@@ -16,6 +16,19 @@ Feature extraction methods
    :members:
    :show-inheritance:
 
+Geometry transformation methods
+----------------------------------------------
+
+.. automodule:: simba.mixins.geometry_mixin
+   :members:
+   :show-inheritance:
+
+
+Network (Graph) methods
+----------------------------------------------
+.. automodule:: simba.mixins.network_mixin
+   :members:
+   :show-inheritance:
 
 Feature extraction supplement methods
 ----------------------------------------------
@@ -53,7 +66,7 @@ GUI pop-up methods
    :members:
    :show-inheritance:
 
-Pose imporing methods
+Pose importing methods
 -----------------------------------------
 
 .. automodule:: simba.mixins.pose_importer_mixin
@@ -79,5 +92,13 @@ Unsupervised methods
 ---------------------------------------
 
 .. automodule:: simba.mixins.unsupervised_mixin
+   :members:
+   :show-inheritance:
+
+
+Annotation GUI methods
+---------------------------------------
+
+.. automodule:: simba.mixins.annotator_mixin
    :members:
    :show-inheritance:

@@ -3,9 +3,10 @@ __author__ = "Simon Nilsson"
 import glob
 import os
 import subprocess
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 import cv2
+import numpy as np
 import pandas as pd
 
 try:
@@ -17,41 +18,40 @@ from copy import deepcopy
 
 from simba.utils.checks import (check_if_filepath_list_is_empty, check_int,
                                 check_str)
-from simba.utils.enums import Formats
-from simba.utils.errors import CountError, InvalidVideoFileError
+from simba.utils.enums import Formats, Options, TextOptions
+from simba.utils.errors import (CountError, InvalidFileTypeError,
+                                InvalidVideoFileError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_fn_ext
+from simba.utils.read_write import get_fn_ext, get_video_meta_data
+from simba.video_processors.roi_selector import ROISelector
 
 
 class MultiCropper(object):
     """
-    Crop single video into multiple videos
 
-    Parameters
-    ----------
-    file_type: str
-        File type of input video files (e.g., 'mp4', 'avi')
-    input_folder: str
-        Folder path holding videos to be cropped.
-    output_folder: str
-        Folder where to store the results.
-    crop_cnt: int
-        Integer representing the number of videos to produce from every input video.
-
-    Notes
-    ----------
-    `Multi-crop tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos>`__.
+    Crop each video of a specific file format (e.g., mp4) in a directory into N smaller cropped videos.
 
 
-    Examples
-    ----------
-    >>> _ = MultiCropper(file_type='mp4', input_folder='InputDirectory', output_folder='OutputDirectory', crop_cnt=2)
+    .. note::
+       `Multi-crop tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos>`__.
+
+       `Expected GPU timesavings <https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md>`__.
+
+    .. image:: _static/img/multicrop.png
+       :width: 700
+       :align: center
+
+    :param Union[str, os.PathLike] input_folder: Folder path holding videos to be cropped.
+    :param Literal['avi', 'mp4', 'mov', 'flv', 'm4v'] file_type: File type of input video files inside the ``input_folder`` directory.
+    :param Union[str, os.PathLike] output_folder: Directory where to store the cropped videos.
+    :param int crop_cnt: The number of cropped videos to create from each input video. Minimum: 2.
+    :param bool gpu: If True, use GPU codecs, else CPU. Default CPU.
 
     """
 
     def __init__(
         self,
-        file_type: Literal["mp4", "avi"],
+        file_type: Literal["avi", "mp4", "mov", "flv", "m4v"],
         input_folder: Union[str, os.PathLike],
         output_folder: Union[str, os.PathLike],
         crop_cnt: int,
@@ -64,25 +64,22 @@ class MultiCropper(object):
         )
         check_int(name="CROP COUNT", value=self.crop_cnt, min_value=2)
         self.crop_cnt = int(crop_cnt)
-        if self.crop_cnt == 0:
-            raise CountError(
-                msg="The number of cropped output videos is set to ZERO. The number of crops has the be a value above 0."
-            )
         check_str(name="FILE TYPE", value=self.file_type)
         if self.file_type.__contains__("."):
             self.file_type.replace(".", "")
-        self.files_found = glob.glob(self.input_folder + "/*.{}".format(self.file_type))
+        if f".{file_type}" not in Options.ALL_VIDEO_FORMAT_OPTIONS.value:
+            raise InvalidFileTypeError(
+                msg=f"The filetype .{file_type} is invalid. Options: {Options.ALL_VIDEO_FORMAT_OPTIONS.value}"
+            )
+        self.files_found = glob.glob(self.input_folder + f"/*.{self.file_type}")
         check_if_filepath_list_is_empty(
             filepaths=self.files_found,
-            error_msg="SIMBA CROP ERROR: The input direct {} contains ZERO videos in {} format".format(
-                self.input_folder, self.file_type
-            ),
+            error_msg=f"SIMBA CROP ERROR: The input direct {self.input_folder} contains ZERO videos in {self.file_type} format",
         )
         if not os.path.exists(self.output_folder):
             os.makedirs(self.output_folder)
-        self.font_scale, self.space_scale, self.font = 0.02, 1.1, Formats.FONT.value
-        self.add_spacer = 2
-        self.__crop_videos()
+        self.add_spacer = TextOptions.FIRST_LINE_SPACING.value
+        self.font_thickness = TextOptions.TEXT_THICKNESS.value + 1
 
     def __test_crop_locations(self):
         for idx, row in self.crop_df.iterrows():
@@ -90,155 +87,182 @@ class MultiCropper(object):
             video_name = row["Video"]
             if all(v == 0 for v in lst):
                 raise CountError(
-                    msg="SIMBA ERROR: A crop for video {} has all crop coordinates set to zero. Did you click ESC, space or enter before defining the rectangle crop coordinates?!".format(
-                        video_name
-                    )
+                    msg=f"SIMBA ERROR: A crop for video {video_name} has all crop coordinates set to zero. Did you click ESC, space or enter before defining the rectangle crop coordinates?!",
+                    source=self.__class__.__name__,
                 )
             else:
                 pass
 
-    def __crop_videos(self):
-        for file_cnt, file_path in enumerate(self.files_found):
-            video_name = str(os.path.basename(file_path))
+    def draw_txt_w_bg(
+        self,
+        img: np.ndarray,
+        text: str,
+        pos: Tuple[int, int],
+        font_scale: float,
+        font_thickness: float,
+        text_color: Tuple[int, int, int],
+        text_color_bg: Tuple[int, int, int],
+        font=Formats.FONT.value,
+    ):
+        x, y = pos
+        text_size, _ = cv2.getTextSize(text, font, font_scale, font_thickness)
+        text_w, text_h = text_size
+        cv2.rectangle(img, pos, (x + text_w + 10, y + text_h + 10), text_color_bg, -1)
+        cv2.putText(
+            img,
+            text,
+            (x, y + text_h + font_scale - 1),
+            font,
+            font_scale,
+            text_color,
+            font_thickness,
+        )
 
+        return img
+
+    def run(self):
+        for file_cnt, file_path in enumerate(self.files_found):
+            video_meta_data = get_video_meta_data(video_path=file_path)
+            print(video_meta_data)
+            _, video_name, _ = get_fn_ext(filepath=file_path)
+            self.font_scale, self.space_scale, self.font = 0.02, 1.1, Formats.FONT.value
             cap = cv2.VideoCapture(file_path)
             cap.set(1, 0)
             ret, frame = cap.read()
-            original_frame = deepcopy(frame)
+            cap.release()
             if not ret:
                 raise InvalidVideoFileError(
-                    msg="The first frame of video {} could not be read".format(
-                        video_name
-                    )
+                    msg=f"The first frame of video {video_name} could not be read",
+                    source=self.__class__.__name__,
                 )
+            original_frame = deepcopy(frame)
             (height, width) = frame.shape[:2]
-            font_size = min(width, height) / (25 / self.font_scale)
-            space_size = int(min(width, height) / (25 / self.space_scale))
-            cv2.namedWindow("VIDEO IMAGE", cv2.WINDOW_NORMAL)
-            cv2.putText(
-                frame,
-                str(video_name),
-                (10, ((height - height) + space_size)),
-                cv2.FONT_HERSHEY_TRIPLEX,
-                font_size,
-                (180, 105, 255),
-                2,
-            )
-            cv2.putText(
-                frame,
-                "Define the rectangle bounderies of {} cropped videos".format(
-                    str(self.crop_cnt)
+            font_size = int(np.ceil(min(width, height) / (25 / self.font_scale)))
+            space_size = int(np.ceil(int(min(width, height) / (25 / self.space_scale))))
+
+            frame = self.draw_txt_w_bg(
+                img=frame,
+                text=video_name,
+                pos=(
+                    TextOptions.BORDER_BUFFER_X.value,
+                    int((height - height) + space_size),
                 ),
-                (10, ((height - height) + space_size * self.add_spacer)),
-                cv2.FONT_HERSHEY_TRIPLEX,
-                font_size,
-                (180, 105, 255),
-                2,
+                font_scale=font_size,
+                font_thickness=TextOptions.TEXT_THICKNESS.value,
+                text_color=TextOptions.COLOR.value,
+                text_color_bg=(0, 0, 0),
             )
-            cv2.putText(
-                frame,
-                "Press ESC to continue",
-                (10, ((height - height) + space_size * (self.add_spacer + 2))),
-                cv2.FONT_HERSHEY_TRIPLEX,
-                font_size,
-                (180, 105, 255),
-                2,
+            frame = self.draw_txt_w_bg(
+                img=frame,
+                text=f"Define the rectangle boundaries of {self.crop_cnt} cropped videos",
+                pos=(
+                    TextOptions.BORDER_BUFFER_X.value,
+                    int((height - height) + space_size * self.add_spacer),
+                ),
+                font_scale=font_size,
+                font_thickness=TextOptions.TEXT_THICKNESS.value,
+                text_color=TextOptions.COLOR.value,
+                text_color_bg=(0, 0, 0),
+            )
+            frame = self.draw_txt_w_bg(
+                img=frame,
+                text=f"Press ESC to continue",
+                pos=(
+                    TextOptions.BORDER_BUFFER_X.value,
+                    int((height - height) + space_size * (self.add_spacer + 2)),
+                ),
+                font_scale=font_size,
+                font_thickness=TextOptions.TEXT_THICKNESS.value,
+                text_color=TextOptions.COLOR.value,
+                text_color_bg=(0, 0, 0),
             )
 
-            while 1:
-                cv2.imshow("VIDEO IMAGE", frame)
-                k = cv2.waitKey(33)
+            cv2.namedWindow("VIDEO IMAGE", cv2.WINDOW_NORMAL)
+            cv2.imshow("VIDEO IMAGE", frame)
+            while True:
+                k = cv2.waitKey(1) & 0xFF
                 if k == 27:
                     cv2.destroyAllWindows()
-                    cv2.waitKey(3)
+                    cv2.waitKey(1)
                     break
 
             for box_cnt in range(self.crop_cnt):
-                cv2.namedWindow("VIDEO IMAGE", cv2.WINDOW_NORMAL)
                 frame = deepcopy(original_frame)
-                cv2.putText(
-                    frame,
-                    str(video_name),
-                    (10, ((height - height) + space_size)),
-                    self.font,
-                    font_size,
-                    (180, 105, 255),
-                    2,
-                )
-                cv2.putText(
-                    frame,
-                    str(
-                        "Define crop #{} coordinate bounderies and press enter".format(
-                            str(box_cnt + 1)
-                        )
+                frame = self.draw_txt_w_bg(
+                    img=frame,
+                    text=video_name,
+                    pos=(
+                        TextOptions.BORDER_BUFFER_X.value,
+                        int((height - height) + space_size),
                     ),
-                    (10, ((height - height) + space_size * self.add_spacer)),
-                    cv2.FONT_HERSHEY_TRIPLEX,
-                    font_size,
-                    (180, 105, 255),
-                    2,
+                    font_scale=font_size,
+                    font_thickness=TextOptions.TEXT_THICKNESS.value,
+                    text_color=TextOptions.COLOR.value,
+                    text_color_bg=(0, 0, 0),
                 )
-                ROI = cv2.selectROI("VIDEO IMAGE", frame)
-                width, height = (abs(ROI[0] - (ROI[2] + ROI[0]))), (
-                    abs(ROI[2] - (ROI[3] + ROI[2]))
+                frame = self.draw_txt_w_bg(
+                    img=frame,
+                    text=f"Draw crop #{box_cnt+1} boundaries and press ESC",
+                    pos=(
+                        TextOptions.BORDER_BUFFER_X.value,
+                        int((height - height) + space_size * self.add_spacer),
+                    ),
+                    font_scale=font_size,
+                    font_thickness=TextOptions.TEXT_THICKNESS.value,
+                    text_color=TextOptions.COLOR.value,
+                    text_color_bg=(0, 0, 0),
                 )
-                topLeftX, topLeftY = ROI[0], ROI[1]
-                k = cv2.waitKey(20) & 0xFF
+                roi_selector = ROISelector(
+                    path=frame,
+                    title=f"MULTI-CROP {video_name} into {self.crop_cnt} videos - press ESC when happy with a rectangle",
+                )
+                roi_selector.run()
                 cv2.destroyAllWindows()
                 self.crop_df.loc[len(self.crop_df)] = [
                     video_name,
-                    height,
-                    width,
-                    topLeftX,
-                    topLeftY,
+                    roi_selector.height,
+                    roi_selector.width,
+                    roi_selector.top_left[0],
+                    roi_selector.top_left[1],
                 ]
 
         self.__test_crop_locations()
         cv2.destroyAllWindows()
         cv2.waitKey(50)
 
-        self.timer = SimbaTimer()
-        self.timer.start_timer()
+        self.timer = SimbaTimer(start=True)
+        print("Starting video cropping...")
         for video_name in self.crop_df["Video"].unique():
             video_crops = self.crop_df[self.crop_df["Video"] == video_name].reset_index(
                 drop=True
             )
-            _, name, ext = get_fn_ext(video_name)
-            in_video_path = os.path.join(self.input_folder, video_name)
+            in_video_path = os.path.join(
+                self.input_folder, f"{video_name}.{self.file_type}"
+            )
             for cnt, (idx, row) in enumerate(video_crops.iterrows()):
+                print(f"Creating {video_name} crop clip {cnt+1}...")
+                crop_timer = SimbaTimer(start=True)
                 height, width = row["height"], row["width"]
                 topLeftX, topLeftY = row["topLeftX"], row["topLeftY"]
                 out_file_fn = os.path.join(
-                    self.output_folder,
-                    name + "_{}.".format(str(cnt + 1)) + self.file_type,
+                    self.output_folder, video_name + f"_{cnt+1}.{self.file_type}"
                 )
                 if self.gpu:
                     command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{in_video_path}" -vf "crop={width}:{height}:{topLeftX}:{topLeftY}" -c:v h264_nvenc -c:a copy "{out_file_fn}" -hide_banner -loglevel error'
                 else:
-                    command = (
-                        str("ffmpeg -y -i ")
-                        + str(in_video_path)
-                        + str(" -vf ")
-                        + str('"crop=')
-                        + str(width)
-                        + ":"
-                        + str(height)
-                        + ":"
-                        + str(topLeftX)
-                        + ":"
-                        + str(topLeftY)
-                        + '" '
-                        + str("-c:v libx264 -c:a copy ")
-                        + str(out_file_fn + " -hide_banner -loglevel error")
-                    )
+                    command = f'ffmpeg -y -i "{in_video_path}" -vf "crop={width}:{height}:{topLeftX}:{topLeftY}" -c:v libx264 -c:a copy "{out_file_fn}" -hide_banner -loglevel error'
                 subprocess.call(command, shell=True)
-                print("Video {} crop {} complete...".format(name, str(cnt + 1)))
-
+                crop_timer.stop_timer()
+                print(
+                    f"Video {video_name} crop {cnt+1} complete (elapsed time: {crop_timer.elapsed_time_str})..."
+                )
         self.timer.stop_timer()
         stdout_success(
             msg=f"{str(len(self.crop_df))} new cropped videos created from {str(len(self.files_found))} input videos. Cropped videos are saved in the {self.output_folder} directory",
             elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
 
-# test = MultiCropper(file_type='avi', input_folder='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/test', output_folder='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/test_2', crop_cnt=2)
+# cropper = MultiCropper(file_type='mp4', input_folder='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos', output_folder='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/edited', crop_cnt=2)
+# cropper.run()

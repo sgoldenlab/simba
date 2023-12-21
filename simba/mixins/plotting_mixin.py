@@ -14,8 +14,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import PIL
+import seaborn as sns
 from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from numba import njit
 
 try:
     from typing import Literal
@@ -23,10 +25,10 @@ except:
     from typing_extensions import Literal
 
 import simba
-from simba.utils.enums import Formats, Options
+from simba.utils.enums import Formats, Options, TextOptions
 from simba.utils.lookups import get_color_dict, get_named_colors
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_fn_ext
+from simba.utils.read_write import get_fn_ext, read_frm_of_video
 
 
 class PlottingMixin(object):
@@ -218,6 +220,7 @@ class PlottingMixin(object):
             stdout_success(
                 f"Final distance plot saved at {save_path}",
                 elapsed_time=timer.elapsed_time_str,
+                source=self.__class__.__name__,
             )
         else:
             return img
@@ -237,7 +240,7 @@ class PlottingMixin(object):
 
 
 
-        .. notes::
+        .. notes:
           `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-probabilities>`__.
 
         :example:
@@ -302,6 +305,7 @@ class PlottingMixin(object):
         stdout_success(
             msg=f"Final distance plot saved at {save_path}",
             elapsed_time=timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
     def make_path_plot(
@@ -312,6 +316,7 @@ class PlottingMixin(object):
         deque_dict: dict,
         clf_attr: dict,
         save_path: str,
+        print_animal_names: bool = True,
     ) -> None:
         """
         Helper to make a path plot.
@@ -327,20 +332,29 @@ class PlottingMixin(object):
         video_timer = SimbaTimer(start=True)
         for frm_cnt in range(len(data_df)):
             for animal_cnt, (animal_name, animal_data) in enumerate(deque_dict.items()):
-                bp_x = int(data_df.loc[frm_cnt, "{}_{}".format(animal_data["bp"], "x")])
-                bp_y = int(data_df.loc[frm_cnt, "{}_{}".format(animal_data["bp"], "y")])
+                bp_x = int(data_df.iloc[frm_cnt][f'{animal_data["bp"]}_{"x"}'])
+                bp_y = int(data_df.iloc[frm_cnt][f'{animal_data["bp"]}_{"y"}'])
                 deque_dict[animal_name]["deque"].appendleft((bp_x, bp_y))
 
         font = cv2.FONT_HERSHEY_COMPLEX
         color_dict = get_color_dict()
 
-        img = np.zeros(
-            (
-                int(video_info["Resolution_height"].values[0]),
-                int(video_info["Resolution_width"].values[0]),
-                3,
+        if not type(style_attr["bg color"]) == np.ndarray:
+            img = np.zeros(
+                (
+                    int(video_info["Resolution_height"].values[0]),
+                    int(video_info["Resolution_width"].values[0]),
+                    3,
+                )
             )
-        )
+        else:
+            img = np.zeros(
+                (
+                    int(style_attr["bg color"].shape[0]),
+                    int(style_attr["bg color"].shape[1]),
+                    3,
+                )
+            )
         img[:] = style_attr["bg color"]
 
         for animal_name, animal_data in deque_dict.items():
@@ -351,15 +365,16 @@ class PlottingMixin(object):
                 deque_dict[animal_name]["clr"],
                 style_attr["circle size"],
             )
-            cv2.putText(
-                img,
-                animal_name,
-                (deque_dict[animal_name]["deque"][0]),
-                font,
-                style_attr["font size"],
-                deque_dict[animal_name]["clr"],
-                style_attr["font thickness"],
-            )
+            if print_animal_names:
+                cv2.putText(
+                    img,
+                    animal_name,
+                    (deque_dict[animal_name]["deque"][0]),
+                    font,
+                    style_attr["font size"],
+                    deque_dict[animal_name]["clr"],
+                    style_attr["font thickness"],
+                )
 
         for animal_name, animal_data in deque_dict.items():
             for i in range(len(deque_dict[animal_name]["deque"]) - 1):
@@ -379,11 +394,10 @@ class PlottingMixin(object):
                 )
                 positions = (
                     clf_attr["positions"]
-                    .iloc[clf_sliced_idx]
+                    .loc[clf_sliced_idx]
                     .reset_index(drop=True)
                     .values
                 )
-
                 for i in range(positions.shape[0]):
                     cv2.circle(
                         img, (positions[i][0], positions[i][1]), 0, clf_clr, clf_size
@@ -395,6 +409,7 @@ class PlottingMixin(object):
         stdout_success(
             msg=f"Final path plot saved at {save_path}",
             elapsed_time=video_timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
     def make_gantt_plot(
@@ -448,10 +463,11 @@ class PlottingMixin(object):
         stdout_success(
             msg=f"Final gantt frame for video {video_name} saved at {save_path}",
             elapsed_time=video_timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
+    @staticmethod
     def make_clf_heatmap_plot(
-        self,
         frm_data: np.array,
         max_scale: float,
         palette: Literal[Options.PALETTE_OPTIONS],
@@ -488,7 +504,7 @@ class PlottingMixin(object):
                 ].values[0]
                 color_array[i, j] = value
         color_array = color_array * max_scale
-        fig = plt.figure()
+        fig = plt.figure(frameon=True)
         im_ratio = color_array.shape[0] / color_array.shape[1]
         plt.pcolormesh(
             color_array,
@@ -510,17 +526,18 @@ class PlottingMixin(object):
         cb.set_label("{} (seconds)".format(clf_name), rotation=270, labelpad=10)
         plt.tight_layout()
         plt.gca().set_aspect(aspect_ratio)
-        canvas = FigureCanvas(fig)
-        canvas.draw()
-        mat = np.array(canvas.renderer._renderer)
-        image = cv2.cvtColor(mat, cv2.COLOR_RGB2BGR)
-        image = cv2.resize(image, img_size)
-        image = np.uint8(image)
+        buffer_ = io.BytesIO()
+        plt.savefig(buffer_, format="png")
+        buffer_.seek(0)
+        image = PIL.Image.open(buffer_)
+        image = np.uint8(cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR))
+        buffer_.close()
         plt.close()
         if final_img:
             cv2.imwrite(file_name, image)
             stdout_success(
-                msg=f"Final classifier heatmap image saved at at {file_name}"
+                msg=f"Final classifier heatmap image saved at at {file_name}",
+                source="make_clf_heatmap_plot",
             )
         else:
             return image
@@ -593,7 +610,10 @@ class PlottingMixin(object):
         plt.close()
         if final_img:
             cv2.imwrite(file_name, image)
-            stdout_success(msg=f"Final location heatmap image saved at at {file_name}")
+            stdout_success(
+                msg=f"Final location heatmap image saved at at {file_name}",
+                source=self.__class__.__name__,
+            )
         else:
             return image
 
@@ -783,7 +803,7 @@ class PlottingMixin(object):
                         for tag_data in shape_info["Tags"].values():
                             cv2.circle(
                                 img,
-                                tag_data,
+                                tuple(tag_data),
                                 scalers["circle_size"],
                                 shape_info["Color BGR"],
                                 -1,
@@ -880,12 +900,10 @@ class PlottingMixin(object):
                     )
 
             img = __insert_shapes(img=img, shape_info=shape_info)
-
+            #
             for animal_name, shape_name in itertools.product(animal_names, shape_info):
-                in_zone_col_name = "{} {} {}".format(shape_name, animal_name, "in zone")
-                distance_col_name = "{} {} {}".format(
-                    shape_name, animal_name, "distance"
-                )
+                in_zone_col_name = f'{shape_name} {animal_name} {"in zone"}'
+                distance_col_name = f'{shape_name} {animal_name} {"distance"}'
                 in_zone_value = str(bool(data.loc[current_frm, in_zone_col_name]))
                 distance_value = str(round(data.loc[current_frm, distance_col_name], 2))
                 cv2.putText(
@@ -1255,9 +1273,11 @@ class PlottingMixin(object):
         roi_analyzer_data: object,
         colors: list,
         style_attr: dict,
+        animal_ids: list,
+        threshold: float,
     ):
         def __insert_texts(shape_df):
-            for animal_name in roi_analyzer_data.multi_animal_id_list:
+            for animal_name in animal_ids:
                 for _, shape in shape_df.iterrows():
                     shape_name, shape_color = shape["Name"], shape["Color BGR"]
                     cv2.putText(
@@ -1267,7 +1287,7 @@ class PlottingMixin(object):
                         font,
                         scalers["font_size"],
                         shape_color,
-                        1,
+                        TextOptions.TEXT_THICKNESS.value,
                     )
                     cv2.putText(
                         border_img,
@@ -1276,7 +1296,7 @@ class PlottingMixin(object):
                         font,
                         scalers["font_size"],
                         shape_color,
-                        1,
+                        TextOptions.TEXT_THICKNESS.value,
                     )
 
             return border_img
@@ -1323,10 +1343,10 @@ class PlottingMixin(object):
                 thickness, color = row["Thickness"], row["Color BGR"]
                 cv2.rectangle(
                     border_img,
-                    (top_left_x, top_left_y),
-                    (bottom_right_x, bottom_right_y),
+                    (int(top_left_x), int(top_left_y)),
+                    (int(bottom_right_x), int(bottom_right_y)),
                     color,
-                    thickness,
+                    int(thickness),
                 )
 
             for _, row in roi_analyzer_data.video_circs.iterrows():
@@ -1337,19 +1357,21 @@ class PlottingMixin(object):
                     row["Name"],
                 )
                 thickness, color = row["Thickness"], row["Color BGR"]
-                cv2.circle(border_img, (center_x, center_y), radius, color, thickness)
+                cv2.circle(
+                    border_img, (center_x, center_y), radius, color, int(thickness)
+                )
 
             for _, row in roi_analyzer_data.video_polys.iterrows():
                 vertices, shape_name = row["vertices"], row["Name"]
                 thickness, color = row["Thickness"], row["Color BGR"]
-                cv2.polylines(border_img, [vertices], True, color, thickness=thickness)
+                cv2.polylines(
+                    border_img, [vertices], True, color, thickness=int(thickness)
+                )
 
-            for animal_cnt, animal_name in enumerate(
-                roi_analyzer_data.multi_animal_id_list
-            ):
+            for animal_cnt, animal_name in enumerate(animal_ids):
                 if style_attr["Show_body_part"] or style_attr["Show_animal_name"]:
                     bp_data = data.loc[current_frm, body_part_dict[animal_name]].values
-                    if roi_analyzer_data.settings["threshold"] < bp_data[2]:
+                    if threshold < bp_data[2]:
                         if style_attr["Show_body_part"]:
                             cv2.circle(
                                 border_img,
@@ -1366,7 +1388,7 @@ class PlottingMixin(object):
                                 font,
                                 scalers["font_size"],
                                 colors[animal_cnt],
-                                1,
+                                TextOptions.TEXT_THICKNESS.value,
                             )
 
                 for shape_name in video_shape_names:
@@ -1388,7 +1410,7 @@ class PlottingMixin(object):
                         font,
                         scalers["font_size"],
                         shape_meta_data[shape_name]["Color BGR"],
-                        1,
+                        TextOptions.TEXT_THICKNESS.value,
                     )
                     cv2.putText(
                         border_img,
@@ -1397,7 +1419,7 @@ class PlottingMixin(object):
                         font,
                         scalers["font_size"],
                         shape_meta_data[shape_name]["Color BGR"],
-                        1,
+                        TextOptions.TEXT_THICKNESS.value,
                     )
 
             writer.write(border_img)
@@ -1676,10 +1698,13 @@ class PlottingMixin(object):
         video_name: str,
         frame_folder_dir: str,
         style_attr: dict,
+        print_animal_names: bool,
         animal_attr: dict,
         fps: int,
         video_info: pd.DataFrame,
         clf_attr: dict,
+        input_style_attr: dict,
+        video_path: Optional[Union[str, os.PathLike]] = None,
     ):
         group = int(data[0][0][0])
         color_dict = get_color_dict()
@@ -1697,7 +1722,6 @@ class PlottingMixin(object):
             frame_id = int(data[i, -1, 1] + 1)
             frame_data = data[i, :, 2:].astype(int)
             frame_data = np.split(frame_data, len(list(animal_attr.keys())), axis=1)
-
             img = np.zeros(
                 (
                     int(video_info["Resolution_height"].values[0]),
@@ -1705,6 +1729,14 @@ class PlottingMixin(object):
                     3,
                 )
             )
+            if (type(input_style_attr["bg color"]) == dict) and (
+                input_style_attr["bg color"]["type"]
+            ) == "moving":
+                style_attr["bg color"] = read_frm_of_video(
+                    video_path=video_path,
+                    opacity=input_style_attr["bg color"]["opacity"],
+                    frame_index=frame_id,
+                )
             img[:] = style_attr["bg color"]
             for animal_cnt, animal_data in enumerate(frame_data):
                 animal_clr = style_attr["animal clrs"][animal_cnt]
@@ -1723,15 +1755,16 @@ class PlottingMixin(object):
                     animal_clr,
                     style_attr["circle size"],
                 )
-                cv2.putText(
-                    img,
-                    style_attr["animal names"][animal_cnt],
-                    tuple(animal_data[-1]),
-                    cv2.FONT_HERSHEY_COMPLEX,
-                    style_attr["font size"],
-                    animal_clr,
-                    style_attr["font thickness"],
-                )
+                if print_animal_names:
+                    cv2.putText(
+                        img,
+                        style_attr["animal names"][animal_cnt],
+                        tuple(animal_data[-1]),
+                        cv2.FONT_HERSHEY_COMPLEX,
+                        style_attr["font size"],
+                        animal_clr,
+                        style_attr["font thickness"],
+                    )
 
             if clf_attr:
                 for clf_cnt, clf_name in enumerate(clf_attr["data"].columns):
@@ -1841,3 +1874,46 @@ class PlottingMixin(object):
             )
 
         return group
+
+    def violin_plot(
+        self,
+        data: pd.DataFrame,
+        x: str,
+        y: str,
+        save_path: Union[str, os.PathLike],
+        font_rotation: Optional[int] = 45,
+        font_size: Optional[int] = 10,
+        img_size: Optional[tuple] = (13.7, 8.27),
+        cut: Optional[int] = 0,
+        scale: Optional[Literal["area", "count", "width"]] = "area",
+    ):
+        named_colors = get_named_colors()
+        palette = {}
+        for cnt, violin in enumerate(sorted(list(data[x].unique()))):
+            palette[violin] = named_colors[cnt]
+        plt.figure()
+        order = data.groupby(by=[x])[y].median().sort_values().iloc[::-1].index
+        figure_FSCTT = sns.violinplot(
+            x=x, y=y, data=data, cut=cut, scale=scale, order=order, palette=palette
+        )
+        figure_FSCTT.set_xticklabels(
+            figure_FSCTT.get_xticklabels(), rotation=font_rotation, size=font_size
+        )
+        figure_FSCTT.figure.set_size_inches(img_size)
+        figure_FSCTT.figure.savefig(save_path, bbox_inches="tight")
+        stdout_success(
+            msg=f"Violin plot saved at {save_path}", source=self.__class__.__name__
+        )
+
+    @staticmethod
+    @njit("(uint8[:,:,:],)")
+    def rotate_img(img: np.ndarray):
+        """
+        Jitted helper to flip image 90 degrees.
+
+        :example:
+        >>> img = cv2.imread('/Users/simon/Desktop/sliding_line_length.png')
+        >>> rotated_img = PlottingMixin().rotate_img(img)
+        """
+        rotated_image = np.transpose(img, (1, 0, 2))
+        return np.ascontiguousarray(np.fliplr(rotated_image).astype(np.uint8))

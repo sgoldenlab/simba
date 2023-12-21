@@ -4,6 +4,7 @@ import os
 from subprocess import PIPE, Popen
 from tkinter import *
 from tkinter import filedialog
+from typing import Optional, Union
 
 import cv2
 import pandas as pd
@@ -13,9 +14,9 @@ from tabulate import tabulate
 import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_file_exist_and_readable, check_int
-from simba.utils.enums import Formats
+from simba.utils.enums import Formats, Options, TagNames
 from simba.utils.errors import AdvancedLabellingError, FrameRangeError
-from simba.utils.printing import stdout_success
+from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
                                     read_df, write_df)
@@ -43,6 +44,11 @@ class AdvancedLabellingInterface(ConfigReader):
 
     def __init__(self, config_path: str, file_path: str, continuing: bool):
         ConfigReader.__init__(self, config_path=config_path)
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
         self.padding, self.file_path = 5, file_path
         self.frm_no, self.video_path = 0, file_path
         self.continuing = continuing
@@ -362,7 +368,10 @@ class AdvancedLabellingInterface(ConfigReader):
             if len(frms) > 0:
                 frm = frms[0]
             else:
-                raise FrameRangeError("No forwards frames with annotation detected")
+                raise FrameRangeError(
+                    "No forwards frames with annotation detected",
+                    source=self.__class__.__name__,
+                )
         else:
             sliced = self.data_df_targets.loc[0 : self.current_frm_n.get() - 1,].sum(
                 axis=1
@@ -374,7 +383,10 @@ class AdvancedLabellingInterface(ConfigReader):
             if len(frms) > 0:
                 frm = frms[-1]
             else:
-                raise FrameRangeError("No backwards frames with annotation detected")
+                raise FrameRangeError(
+                    "No backwards frames with annotation detected",
+                    source=self.__class__.__name__,
+                )
 
         self.advance_frame(new_frm_number=frm, keep_prior_img_cb_status=False)
 
@@ -531,31 +543,36 @@ class AdvancedLabellingInterface(ConfigReader):
         check_int("END FRAME", int(end_frm), max_value=self.max_frm_no, min_value=0)
         if not self.range_on.get():
             raise FrameRangeError(
-                msg="TO SAVE RANGE OF FRAMES, TICK THE `Frame range` checkbox before clicking `Save Range`"
+                msg="TO SAVE RANGE OF FRAMES, TICK THE `Frame range` checkbox before clicking `Save Range`",
+                source=self.__class__.__name__,
             )
         elif start_frm < 0:
             raise FrameRangeError(
                 msg="FRAME RANGE ERROR: START FRAME {} IS LESS THAN ZERO AND CANNOT BE SHOWN".format(
                     str(start_frm)
-                )
+                ),
+                source=self.__class__.__name__,
             )
         elif end_frm > self.max_frm_no:
             raise FrameRangeError(
                 msg="FRAME RANGE ERROR: END FRAME {} IS MORE THAN THE MAX VIDEO FRAME ({}) AND CANNOT BE SHOWN".format(
                     str(end_frm), str(self.max_frm_no)
-                )
+                ),
+                source=self.__class__.__name__,
             )
         elif start_frm == end_frm:
             raise FrameRangeError(
                 msg="FRAME RANGE ERROR: START FRAME AND END FRAME IS SET TO THE SAME VALUE ({}) AND DOES NOT REPRESENT A RANGE".format(
                     str(end_frm)
-                )
+                ),
+                source=self.__class__.__name__,
             )
         elif start_frm > end_frm:
             raise FrameRangeError(
                 msg="FRAME RANGE ERROR: START FRAME ({}) IS LARGER THAB THE END FRAME ({}). PLEASE SPECIFY A RANGE OF FRAMES WHERE THE START FRAME PRECEDE THE END FRAME".format(
                     str(start_frm), str(end_frm)
-                )
+                ),
+                source=self.__class__.__name__,
             )
         else:
             for frm_no in range(int(start_frm), int(end_frm) + 1):
@@ -590,7 +607,8 @@ class AdvancedLabellingInterface(ConfigReader):
             print(e, "SIMBA ERROR: File for video {} could not be saved.")
             raise FileExistsError
         stdout_success(
-            msg=f"SAVED: Annotation file for video {self.video_name} saved within the project_folder/csv/targets_inserted directory."
+            msg=f"SAVED: Annotation file for video {self.video_name} saved within the project_folder/csv/targets_inserted directory.",
+            source=self.__class__.__name__,
         )
         if not self.config.has_section("Last annotated frames"):
             self.config.add_section("Last annotated frames")
@@ -616,6 +634,7 @@ class AdvancedLabellingInterface(ConfigReader):
                 frame=str(self.current_frm_n.get()),
                 lbl_lst=labelled_target_lst,
                 unlabel_lst=none_target_lst,
+                source=self.__class__.__name__,
             )
 
     def create_print_statements(
@@ -671,13 +690,16 @@ class AdvancedLabellingInterface(ConfigReader):
                     )
 
 
-def select_labelling_video_advanced(config_path: str = None, continuing: bool = False):
-    video_file_path = filedialog.askopenfilename()
+def select_labelling_video_advanced(
+    config_path: Union[str, os.PathLike], continuing: Optional[bool] = False
+):
+    video_file_path = filedialog.askopenfilename(
+        filetypes=[("Video files", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)]
+    )
     check_file_exist_and_readable(video_file_path)
     video_meta = get_video_meta_data(video_file_path)
     _, video_name, _ = get_fn_ext(video_file_path)
-    print("ANNOTATING VIDEO {}: ".format(video_name))
-    print("VIDEO INFO: {}".format(video_meta))
+    print(f"ANNOTATING VIDEO {video_name} \n VIDEO INFO: {video_meta}")
     _ = AdvancedLabellingInterface(
         config_path=config_path, file_path=video_file_path, continuing=continuing
     )

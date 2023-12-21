@@ -1,8 +1,10 @@
 __author__ = "Simon Nilsson"
 
+
 import glob
 import multiprocessing
 import os
+import platform
 import re
 import shutil
 import subprocess
@@ -25,12 +27,13 @@ except:
     from typing_extensions import Literal
 
 from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable,
+                                check_file_exist_and_readable, check_float,
+                                check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end)
-from simba.utils.enums import ConfigKey, Formats, Paths
+from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 FileExistError, InvalidFileTypeError,
@@ -44,6 +47,7 @@ from simba.utils.read_write import (
 from simba.utils.warnings import (FileExistWarning, InValidUserInputWarning,
                                   SameInputAndOutputWarning)
 from simba.video_processors.extract_frames import video_to_frames
+from simba.video_processors.roi_selector import ROISelector
 
 MAX_FRM_SIZE = 1080, 650
 
@@ -64,14 +68,16 @@ def change_img_format(
     """
     if not os.path.isdir(directory):
         raise NotDirectoryError(
-            "SIMBA ERROR: {} is not a valid directory".format(directory)
+            "SIMBA ERROR: {} is not a valid directory".format(directory),
+            source=change_img_format.__name__,
         )
     files_found = glob.glob(directory + "/*.{}".format(file_type_in))
     if len(files_found) < 1:
         raise NoFilesFoundError(
             "SIMBA ERROR: No {} files (with .{} file ending) found in the {} directory".format(
                 file_type_in, file_type_in, directory
-            )
+            ),
+            source=change_img_format.__name__,
         )
     print("{} image files found in {}...".format(str(len(files_found)), directory))
     for file_path in files_found:
@@ -80,7 +86,8 @@ def change_img_format(
         im.save(save_name)
         os.remove(file_path)
     stdout_success(
-        msg=f"SIMBA COMPLETE: Files in {directory} directory converted to {file_type_out}"
+        msg=f"SIMBA COMPLETE: Files in {directory} directory converted to {file_type_out}",
+        source=change_img_format.__name__,
     )
 
 
@@ -173,7 +180,8 @@ def extract_frame_range(
             )
         )
     stdout_success(
-        msg=f"{str(len(frame_range))} frames extracted for video {file_name}"
+        msg=f"{str(len(frame_range))} frames extracted for video {file_name}",
+        source=extract_frame_range.__name__,
     )
 
 
@@ -195,7 +203,8 @@ def change_single_video_fps(
     timer = SimbaTimer(start=True)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)"
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=change_single_video_fps.__name__,
         )
     check_file_exist_and_readable(file_path=file_path)
     check_int(name="New fps", value=fps)
@@ -203,13 +212,17 @@ def change_single_video_fps(
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
     if int(fps) == int(video_meta_data["fps"]):
         SameInputAndOutputWarning(
-            msg=f"The new fps is the same as the input fps for video {file_name} ({str(fps)})"
+            msg=f"The new fps is the same as the input fps for video {file_name} ({str(fps)})",
+            source=change_single_video_fps.__name__,
         )
     save_path = os.path.join(
         dir_name, file_name + "_fps_{}{}".format(str(fps), str(ext))
     )
     if os.path.isfile(save_path):
-        FileExistWarning(msg=f"Overwriting existing file at {save_path}")
+        FileExistWarning(
+            msg=f"Overwriting existing file at {save_path}...",
+            source=change_single_video_fps.__name__,
+        )
     if gpu:
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
     else:
@@ -230,6 +243,7 @@ def change_single_video_fps(
     stdout_success(
         msg=f'SIMBA COMPLETE: FPS of video {file_name} changed from {str(video_meta_data["fps"])} to {str(fps)} and saved in directory {save_path}',
         elapsed_time=timer.elapsed_time_str,
+        source=change_single_video_fps.__name__,
     )
 
 
@@ -251,11 +265,13 @@ def change_fps_of_multiple_videos(
     timer = SimbaTimer(start=True)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)"
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=change_fps_of_multiple_videos.__name__,
         )
     if not os.path.isdir(directory):
         raise NotDirectoryError(
-            msg="SIMBA ERROR: {} is not a valid directory".format(directory)
+            msg="SIMBA ERROR: {} is not a valid directory".format(directory),
+            source=change_fps_of_multiple_videos.__name__,
         )
     check_int(name="New fps", value=fps)
     video_paths = []
@@ -268,7 +284,8 @@ def change_fps_of_multiple_videos(
         raise NoFilesFoundError(
             msg="SIMBA ERROR: No files with .mp4, .avi, .mov, .flv file ending found in the {} directory".format(
                 directory
-            )
+            ),
+            source=change_fps_of_multiple_videos.__name__,
         )
     for file_cnt, file_path in enumerate(video_paths):
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
@@ -295,6 +312,7 @@ def change_fps_of_multiple_videos(
     stdout_success(
         msg=f"SIMBA COMPLETE: FPS of {str(len(video_paths))} video(s) changed to {str(fps)}",
         elapsed_time=timer.elapsed_time_str,
+        source=change_fps_of_multiple_videos.__name__,
     )
 
 
@@ -313,7 +331,8 @@ def convert_video_powerpoint_compatible_format(
     """
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)"
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=convert_video_powerpoint_compatible_format.__name__,
         )
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
@@ -321,7 +340,8 @@ def convert_video_powerpoint_compatible_format(
     save_name = os.path.join(dir, file_name + "_powerpointready.mp4")
     if os.path.isfile(save_name):
         raise FileExistError(
-            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name)
+            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
+            source=convert_video_powerpoint_compatible_format.__name__,
         )
     if gpu:
         command = 'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{}" -c:v h264_nvenc -preset slow -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf 22 -c:a aac "{}"'.format(
@@ -344,6 +364,7 @@ def convert_video_powerpoint_compatible_format(
     stdout_success(
         msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
+        source=convert_video_powerpoint_compatible_format.__name__,
     )
 
 
@@ -367,14 +388,16 @@ def convert_to_mp4(
     timer = SimbaTimer(start=True)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)"
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=convert_to_mp4.__name__,
         )
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
     save_name = os.path.join(dir, file_name + "_converted.mp4")
     if os.path.isfile(save_name):
         raise FileExistError(
-            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name)
+            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
+            source=convert_to_mp4.__name__,
         )
     if gpu:
         command = (
@@ -392,6 +415,7 @@ def convert_to_mp4(
     stdout_success(
         msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
+        source=convert_to_mp4.__name__,
     )
 
 
@@ -415,7 +439,8 @@ def video_to_greyscale(
     """
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)"
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=video_to_greyscale.__name__,
         )
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
@@ -423,7 +448,8 @@ def video_to_greyscale(
     save_name = os.path.join(dir, file_name + "_grayscale.mp4")
     if os.path.isfile(save_name):
         raise FileExistError(
-            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name)
+            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
+            source=video_to_greyscale.__name__,
         )
     if gpu:
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -c:a copy "{save_name}"'
@@ -444,6 +470,7 @@ def video_to_greyscale(
     stdout_success(
         msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
+        source=video_to_greyscale.__name__,
     )
 
 
@@ -463,58 +490,60 @@ def superimpose_frame_count(
     :example:
     >>> _ = superimpose_frame_count(file_path='project_folder/videos/Video_1.avi')
     """
-
+    simba_cw = os.path.dirname(simba.__file__)
+    simba_font_path = os.path.join(simba_cw, "assets", "UbuntuMono-Regular.ttf")
     timer = SimbaTimer(start=True)
-    if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)"
-        )
+    if not os.path.isfile(simba_font_path):
+        if platform.system() == OS.WINDOWS.value:
+            simba_font_path = "C:/Windows/fonts/arial.ttf"
+            if not os.path.isfile(simba_font_path):
+                simba_font_path = os.listdir(r"C:/Windows/fonts")[0]
+            simba_font_path = simba_font_path[2:].replace("\\", "/")
+        elif (platform.system() == OS.MAC.value) or (
+            platform.system() == OS.LINUX.value
+        ):
+            simba_font_path = "Arial.ttf"
+    else:
+        if platform.system() == OS.WINDOWS.value:
+            simba_font_path = str(simba_font_path[2:].replace("\\", "/"))
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
     save_name = os.path.join(dir, file_name + "_frame_no.mp4")
-    print("Superimposing frame numbers...... ")
+    print(f"Superimposing frame numbers using font path {simba_font_path}...... ")
     try:
         if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile=Arial.ttf:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy "{save_name}" -y'
+            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy "{save_name}" -y'
         else:
             command = (
                 str("ffmpeg -y -i ")
                 + '"'
                 + file_path
                 + '"'
-                + " -vf \"drawtext=fontfile=Arial.ttf: text='%{frame_num}': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5\" -c:a copy "
+                + ' -vf "drawtext=fontfile='
+                + simba_font_path
+                + ": text='%{frame_num}': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5\" -c:a copy "
                 + '"'
                 + save_name
                 + '" -y'
             )
+        print(f"Using font path {simba_font_path}...")
         subprocess.check_output(command, shell=True)
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     except subprocess.CalledProcessError as e:
-        simba_cw = os.path.dirname(simba.__file__)
-        simba_font_path = Path(simba_cw, "assets", "UbuntuMono-Regular.ttf")
         if gpu:
             command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontsize=24:fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy "{save_name}" -y'
         else:
-            command = (
-                "ffmpeg -y -i "
-                + file_path
-                + ' -vf "drawtext=fontfile={}:'.format(simba_font_path)
-                + "text='%{frame_num}': start_number=1: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5"
-                + '" '
-                + "-c:a copy "
-                + '"'
-                + save_name
-                + '" -y'
-            )
+            command = f'ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5" -c:a copy "{save_name}" -y'
+        print(f"Using font path {simba_font_path}...")
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(
-        msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
+        msg=f"Superimposed video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
     )
 
 
-# _ = superimpose_frame_count(file_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', gpu=True)
+# _ = superimpose_frame_count(file_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi', gpu=False)
 
 
 def remove_beginning_of_video(
@@ -539,12 +568,14 @@ def remove_beginning_of_video(
     save_name = os.path.join(dir, file_name + "_shorten.mp4")
     if os.path.isfile(save_name):
         raise FileExistError(
-            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name)
+            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
+            source=remove_beginning_of_video.__name__,
         )
     if gpu:
         if not check_nvidea_gpu_available():
             raise FFMPEGCodecGPUError(
-                msg="No GPU found (as evaluated by nvidea-smi returning None)"
+                msg="No GPU found (as evaluated by nvidea-smi returning None)",
+                source=remove_beginning_of_video.__name__,
             )
         command = 'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {} -i "{}" -c:v h264_nvenc -c:a aac "{}"'.format(
             int(time), file_path, save_name
@@ -568,6 +599,7 @@ def remove_beginning_of_video(
     stdout_success(
         msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
+        source=remove_beginning_of_video.__name__,
     )
 
 
@@ -578,6 +610,9 @@ def clip_video_in_range(
     file_path: Union[str, os.PathLike],
     start_time: str,
     end_time: str,
+    out_dir: Optional[Union[str, os.PathLike]] = None,
+    overwrite: Optional[bool] = False,
+    include_clip_time_in_filename: Optional[bool] = False,
     gpu: Optional[bool] = False,
 ) -> None:
     """
@@ -587,6 +622,9 @@ def clip_video_in_range(
     :parameter Union[str, os.PathLike] file_path: Path to video file
     :parameter str start_time: Start time in HH:MM:SS format.
     :parameter str end_time: End time in HH:MM:SS format.
+    :parameter Optional[Union[str, os.PathLike]] out_dir: If None, then the clip will be stored in the same dir as the input video. If directory, then the location of the output files.
+    :parameter Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
+    :parameter Optional[bool] overwrite: If True, the overwrite output file if path already exist. If False, then raise FileExistError.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
@@ -595,50 +633,45 @@ def clip_video_in_range(
 
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)"
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=clip_video_in_range.__name__,
         )
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
+    if out_dir is not None:
+        check_if_dir_exists(in_dir=out_dir)
+        dir = out_dir
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="START TIME")
     check_if_string_value_is_valid_video_timestamp(value=end_time, name="END TIME")
     check_that_hhmmss_start_is_before_end(
         start_time=start_time, end_time=end_time, name=f"{file_name} timestamps"
     )
-    save_name = os.path.join(dir, file_name + "_clipped.mp4")
-    if os.path.isfile(save_name):
+    if not include_clip_time_in_filename:
+        save_name = os.path.join(dir, file_name + "_clipped.mp4")
+    else:
+        save_name = os.path.join(
+            dir,
+            file_name
+            + f'_{start_time.replace(":", "-")}_{end_time.replace(":", "-")}.mp4',
+        )
+    if os.path.isfile(save_name) and (not overwrite):
         raise FileExistError(
-            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name)
+            msg=f"SIMBA ERROR: The outfile file already exist: {save_name}.",
+            source=clip_video_in_range.__name__,
         )
     if gpu:
-        command = 'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{}" -ss {} -to {} -async 1 "{}"'.format(
-            file_path, start_time, end_time, save_name
-        )
+        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -y'
     else:
-        command = (
-            str("ffmpeg -i ")
-            + '"'
-            + str(file_path)
-            + '"'
-            + " -ss "
-            + str(start_time)
-            + " -to "
-            + str(end_time)
-            + " -async 1 "
-            + '"'
-            + save_name
-            + '"'
-        )
-    print("Clipping video... ")
+        command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -y'
+    print(f"Clipping video {file_name}... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(
         msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
+        source=clip_video_in_range.__name__,
     )
-
-
-# clip_video_in_range(file_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', start_time='00:00:30', end_time='00:10:30', gpu=False)
 
 
 def downsample_video(
@@ -661,7 +694,8 @@ def downsample_video(
     """
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)"
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=downsample_video.__name__,
         )
     timer = SimbaTimer(start=True)
     check_int(name="Video height", value=video_height)
@@ -671,7 +705,8 @@ def downsample_video(
     save_name = os.path.join(dir, file_name + "_downsampled.mp4")
     if os.path.isfile(save_name):
         raise FileExistError(
-            "SIMBA ERROR: The outfile file already exist: {}.".format(save_name)
+            "SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
+            source=downsample_video.__name__,
         )
     if gpu:
         command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc "{save_name}"'
@@ -697,6 +732,7 @@ def downsample_video(
     stdout_success(
         msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
+        source=downsample_video.__name__,
     )
 
 
@@ -730,7 +766,8 @@ def gif_creator(
     timer = SimbaTimer(start=True)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None"
+            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+            source=gif_creator.__name__,
         )
     check_file_exist_and_readable(file_path=file_path)
     check_int(name="Start time", value=start_time)
@@ -741,7 +778,8 @@ def gif_creator(
     save_name = os.path.join(dir, file_name + ".gif")
     if os.path.isfile(save_name):
         raise FileExistError(
-            "SIMBA ERROR: The outfile file already exist: {}.".format(save_name)
+            "SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
+            source=gif_creator.__name__,
         )
     if gpu:
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {start_time} -i "{file_path}" -to {duration} -vf "fps=10,scale={width}:-1" -c:v gif -pix_fmt rgb24 -y "{save_name}" -y'
@@ -768,6 +806,7 @@ def gif_creator(
     stdout_success(
         msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
+        source=gif_creator.__name__,
     )
 
 
@@ -795,15 +834,18 @@ def batch_convert_video_format(
 
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None"
+            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+            source=batch_convert_video_format.__name__,
         )
     if input_format == output_format:
         raise InvalidFileTypeError(
-            msg=f"The input format ({input_format}) is the same as the output format ({output_format})"
+            msg=f"The input format ({input_format}) is the same as the output format ({output_format})",
+            source=batch_convert_video_format.__name__,
         )
     if not os.path.isdir(directory):
         raise NotDirectoryError(
-            msg="SIMBA ERROR: {} is not a valid directory".format(directory)
+            msg="SIMBA ERROR: {} is not a valid directory".format(directory),
+            source=batch_convert_video_format.__name__,
         )
     video_paths = []
     file_paths_in_folder = [f for f in glob.glob(directory + "/*") if os.path.isfile(f)]
@@ -815,7 +857,8 @@ def batch_convert_video_format(
         raise NoFilesFoundError(
             msg="SIMBA ERROR: No files with .{} file ending found in the {} directory".format(
                 input_format, directory
-            )
+            ),
+            source=batch_convert_video_format.__name__,
         )
     for file_cnt, file_path in enumerate(video_paths):
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
@@ -825,7 +868,10 @@ def batch_convert_video_format(
         )
         if os.path.isfile(save_path):
             raise FileExistError(
-                msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_path)
+                msg="SIMBA ERROR: The outfile file already exist: {}.".format(
+                    save_path
+                ),
+                source=batch_convert_video_format.__name__,
             )
         if gpu:
             command = 'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{}" -c:v h264_nvenc -cq 23 -preset:v medium -c:a copy "{}"'.format(
@@ -850,7 +896,8 @@ def batch_convert_video_format(
         )
 
     stdout_success(
-        msg=f"SIMBA COMPLETE: {str(len(video_paths))} videos converted in {directory} directory!"
+        msg=f"SIMBA COMPLETE: {str(len(video_paths))} videos converted in {directory} directory!",
+        source=batch_convert_video_format.__name__,
     )
 
 
@@ -867,7 +914,8 @@ def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
 
     if not os.path.isdir(directory):
         raise NotDirectoryError(
-            msg="SIMBA ERROR: {} is not a valid directory".format(directory)
+            msg="SIMBA ERROR: {} is not a valid directory".format(directory),
+            source=batch_create_frames.__name__,
         )
     video_paths = []
     file_paths_in_folder = [f for f in glob.glob(directory + "/*") if os.path.isfile(f)]
@@ -879,7 +927,8 @@ def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
         raise NoFilesFoundError(
             msg="SIMBA ERROR: No files with .mp4, .avi, .mov, .flv file ending found in the {} directory".format(
                 directory
-            )
+            ),
+            source=batch_create_frames.__name__,
         )
     for file_cnt, file_path in enumerate(video_paths):
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
@@ -894,13 +943,14 @@ def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
             )
         )
     stdout_success(
-        msg=f"{str(len(video_paths))} videos converted into frames in {directory} directory!"
+        msg=f"{str(len(video_paths))} videos converted into frames in {directory} directory!",
+        source=batch_create_frames.__name__,
     )
 
 
 def extract_frames_single_video(file_path: Union[str, os.PathLike]) -> None:
     """
-    Extract all frames for a single. Results are stored within a sub-directory in the same
+    Extract all frames for a single. Results are stored within a subdirectory in the same
     directory as the input file.
 
     :parameter str file_path: Path to video file.
@@ -909,6 +959,7 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike]) -> None:
     >>> _ = extract_frames_single_video(file_path='project_folder/videos/Video_1.mp4')
     """
 
+    timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
     _ = get_video_meta_data(file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
@@ -917,8 +968,11 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike]) -> None:
         os.makedirs(save_dir)
     print("Processing video {}...".format(file_name))
     video_to_frames(file_path, save_dir, overwrite=True, every=1, chunk_size=1000)
+    timer.stop_timer()
     stdout_success(
-        msg=f"Video {file_name} converted to images in {dir_name} directory!"
+        msg=f"Video {file_name} converted to images in {dir_name} directory!",
+        elapsed_time=timer.elapsed_time_str,
+        source=extract_frames_single_video.__name__,
     )
 
 
@@ -926,6 +980,8 @@ def multi_split_video(
     file_path: Union[str, os.PathLike],
     start_times: List[str],
     end_times: List[str],
+    out_dir: Optional[Union[str, os.PathLike]] = None,
+    include_clip_time_in_filename: Optional[bool] = False,
     gpu: Optional[bool] = False,
 ) -> None:
     """
@@ -934,6 +990,8 @@ def multi_split_video(
     :parameter str file_path: Path to input video file.
     :parameter List[str] start_times: Start times in HH:MM:SS format.
     :parameter List[str] end_times: End times in HH:MM:SS format.
+    :parameter Optional[Union[str, os.PathLike]] out_dir: If None, then the clips will be stored in the same dir as the input video. If directory, then the location of the output files.
+    :parameter Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
@@ -942,8 +1000,11 @@ def multi_split_video(
 
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
-    video_meta_data = get_video_meta_data(file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
+    if out_dir is not None:
+        if not os.path.isdir(out_dir):
+            os.makedirs(out_dir)
+        dir_name = out_dir
     for start_time_cnt, start_time in enumerate(start_times):
         check_if_string_value_is_valid_video_timestamp(
             value=start_time, name=f"Start time for clip {start_time_cnt+1}"
@@ -962,40 +1023,39 @@ def multi_split_video(
         check_if_hhmmss_timestamp_is_valid_part_of_video(
             timestamp=end_time, video_path=file_path
         )
-        save_path = os.path.join(
-            dir_name, file_name + "_{}".format(str(clip_cnt + 1)) + ".mp4"
-        )
+        if not include_clip_time_in_filename:
+            save_path = os.path.join(
+                dir_name, file_name + "_{}".format(str(clip_cnt + 1)) + ".mp4"
+            )
+        else:
+            save_path = os.path.join(
+                dir_name,
+                file_name
+                + f'_{start_time.replace(":", "-")}_{end_time.replace(":", "-")}.mp4',
+            )
         if os.path.isfile(save_path):
-            raise FileExistError(msg=f"The outfile file already exist: {save_path}.")
+            raise FileExistError(
+                msg=f"The outfile file already exist: {save_path}.",
+                source=multi_split_video.__name__,
+            )
         if gpu:
             if not check_nvidea_gpu_available():
                 raise FFMPEGCodecGPUError(
-                    msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None"
+                    msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+                    source=multi_split_video.__name__,
                 )
             command = 'ffmpeg -hwaccel auto -i "{}" -ss {} -to {} -c:v h264_nvenc -async 1 "{}"'.format(
                 file_path, start_time, end_time, save_path
             )
         else:
-            command = (
-                str("ffmpeg -i ")
-                + '"'
-                + file_path
-                + '"'
-                + " -ss "
-                + start_time
-                + " -to "
-                + end_time
-                + " -async 1 "
-                + '"'
-                + save_path
-                + '"'
-            )
+            command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_path}"'
         print("Processing video clip {}...".format(str(clip_cnt + 1)))
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(
         msg=f"Video {file_name} converted into {str(len(start_times))} clips in directory {dir_name}!",
         elapsed_time=timer.elapsed_time_str,
+        source=multi_split_video.__name__,
     )
 
 
@@ -1006,7 +1066,7 @@ def crop_single_video(
     file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
 ) -> None:
     """
-    Crop a single video using cv2.selectROI interface. Results is saved in the same directory as input video with the
+    Crop a single video using ``simba.video_processors.roi_selector.ROISelector`` interface. Results is saved in the same directory as input video with the
     ``_cropped.mp4`` suffix`.
 
     :parameter str file_path: Path to video file.
@@ -1016,65 +1076,49 @@ def crop_single_video(
     >>> _ = crop_single_video(file_path='project_folder/videos/Video_1.mp4')
     """
 
-    if not check_nvidea_gpu_available():
+    if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None"
+            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+            source=crop_single_video.__name__,
         )
     check_file_exist_and_readable(file_path=file_path)
     _ = get_video_meta_data(video_path=file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
-    cap = cv2.VideoCapture(file_path)
-    cap.set(1, 0)
-    ret, frame = cap.read()
-    cv2.namedWindow("Select cropping ROI", cv2.WINDOW_NORMAL)
-    ROI = cv2.selectROI("Select cropping ROI", frame)
-    width = int(abs(ROI[0] - (ROI[2] + ROI[0])))
-    height = int(abs(ROI[2] - (ROI[3] + ROI[2])))
-    top_lext_x, top_left_y = int(ROI[0]), int(ROI[1])
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    if (width == 0 and height == 0) or (width + height + top_lext_x + top_left_y == 0):
+    roi_selector = ROISelector(path=file_path)
+    roi_selector.run()
+    if (
+        (roi_selector.top_left[0] < 0)
+        or (roi_selector.top_left[1] < 0)
+        or (roi_selector.bottom_right[0] < 0)
+        or (roi_selector.bottom_right[1] < 1)
+    ):
         raise CountError(
-            msg="CROP FAILED: Cropping height and width are both 0. Please try again."
+            msg="CROP FAILED: Cannot use negative crop coordinates.",
+            source=crop_multiple_videos.__name__,
         )
-    save_path = os.path.join(dir_name, file_name + "_cropped.mp4")
+    save_path = os.path.join(dir_name, f"{file_name}_cropped.mp4")
     if os.path.isfile(save_path):
         raise FileExistError(
-            msg="SIMBA ERROR: The out file file already exist: {}.".format(save_path)
+            msg=f"SIMBA ERROR: The out file  already exist: {save_path}.",
+            source=crop_single_video.__name__,
         )
     timer = SimbaTimer(start=True)
     if gpu:
-        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "crop={width}:{height}:{top_lext_x}:{top_left_y}" -c:v h264_nvenc -c:a copy "{save_path}"'
+        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "crop={roi_selector.width}:{roi_selector.height}:{roi_selector.top_left[0]}:{roi_selector.top_left[1]}" -c:v h264_nvenc -c:a copy "{save_path}"'
     else:
-        command = (
-            str("ffmpeg -y -i ")
-            + '"'
-            + str(file_path)
-            + '"'
-            + str(" -vf ")
-            + str('"crop=')
-            + str(width)
-            + ":"
-            + str(height)
-            + ":"
-            + str(top_lext_x)
-            + ":"
-            + str(top_left_y)
-            + '" '
-            + str("-c:v libx264 -crf 21 -c:a copy ")
-            + '"'
-            + str(save_path)
-            + '"'
-        )
+        command = f'ffmpeg -y -i "{file_path}" -vf "crop={roi_selector.width}:{roi_selector.height}:{roi_selector.top_left[0]}:{roi_selector.top_left[1]}" -c:v libx264 -crf 17 -c:a copy "{save_path}"'
     subprocess.call(command, shell=True)
     timer.stop_timer()
     stdout_success(
         f"Video {file_name} cropped and saved at {save_path}",
         elapsed_time=timer.elapsed_time_str,
+        source=crop_single_video.__name__,
     )
 
 
-# crop_single_video(file_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', gpu=True)
+# _ = crop_single_video(file_path='/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test 1/Termite Test 1.mp4')
+
+# crop_single_video(file_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', gpu=False)
 
 
 def crop_multiple_videos(
@@ -1083,7 +1127,7 @@ def crop_multiple_videos(
     gpu: Optional[bool] = False,
 ) -> None:
     """
-    Crop multiple videos in a folder according to crop-coordinates defines in the **first** video.
+    Crop multiple videos in a folder according to crop-coordinates defined in the **first** video.
 
     :parameter str directory_path: Directory containing input videos.
     :parameter str output_path: Directory where to save the cropped videos.
@@ -1095,11 +1139,13 @@ def crop_multiple_videos(
 
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None"
+            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+            source=crop_multiple_videos.__name__,
         )
     if not os.path.isdir(directory_path):
         raise NotDirectoryError(
-            msg="SIMBA ERROR: {} is not a valid directory".format(directory_path)
+            msg="SIMBA ERROR: {} is not a valid directory".format(directory_path),
+            source=crop_multiple_videos.__name__,
         )
     video_paths = []
     file_paths_in_folder = [
@@ -1107,68 +1153,70 @@ def crop_multiple_videos(
     ]
     for file_path in file_paths_in_folder:
         _, _, ext = get_fn_ext(filepath=file_path)
-        if ext.lower() in [".avi", ".mp4", ".mov", ".flv"]:
+        if ext.lower() in Options.ALL_VIDEO_FORMAT_OPTIONS.value:
             video_paths.append(file_path)
     if len(video_paths) < 1:
         raise NoFilesFoundError(
             msg="SIMBA ERROR: No files with .mp4, .avi, .mov, .flv file ending found in the {} directory".format(
                 directory_path
-            )
+            ),
+            source=crop_multiple_videos.__name__,
         )
-    cap = cv2.VideoCapture(file_paths_in_folder[0])
-    cap.set(1, 0)
-    ret, frame = cap.read()
-    cv2.namedWindow("Select cropping ROI", cv2.WINDOW_NORMAL)
-    ROI = cv2.selectROI("Select cropping ROI", frame)
-    width = int(abs(ROI[0] - (ROI[2] + ROI[0])))
-    height = int(abs(ROI[2] - (ROI[3] + ROI[2])))
-    top_lext_x, top_left_y = int(ROI[0]), int(ROI[1])
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    if (width == 0 and height == 0) or (width + height + top_lext_x + top_left_y == 0):
+    roi_selector = ROISelector(path=file_paths_in_folder[0])
+    roi_selector.run()
+    if (roi_selector.width == 0 and roi_selector.height == 0) or (
+        roi_selector.width
+        + roi_selector.height
+        + roi_selector.top_left[0]
+        + roi_selector.top_left[1]
+        == 0
+    ):
         raise CountError(
-            msg="CROP FAILED: Cropping height and width are both 0. Please try again."
+            msg="CROP FAILED: Cropping height and width are both 0. Please try again.",
+            source=crop_multiple_videos.__name__,
+        )
+    if (
+        (roi_selector.top_left[0] < 0)
+        or (roi_selector.top_left[1] < 0)
+        or (roi_selector.bottom_right[0] < 0)
+        or (roi_selector.bottom_right[1] < 1)
+    ):
+        raise CountError(
+            msg="CROP FAILED: Cannot use negative crop coordinates.",
+            source=crop_multiple_videos.__name__,
         )
     timer = SimbaTimer(start=True)
     for file_cnt, file_path in enumerate(video_paths):
+        video_timer = SimbaTimer(start=True)
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
-        print("Cropping video {}...".format(file_name))
-        _ = get_video_meta_data(file_path)
+        print(f"Cropping video {file_name}...")
+        video_meta_data = get_video_meta_data(file_path)
+        if (roi_selector.bottom_right[0] > video_meta_data["width"]) or (
+            roi_selector.bottom_right[1] > video_meta_data["height"]
+        ):
+            raise InvalidInputError(
+                msg=f'Cannot crop video {file_name} of size {video_meta_data["resolution_str"]} at location top left: {roi_selector.top_left}, bottom right: {roi_selector.bottom_right}',
+                source=crop_multiple_videos.__name__,
+            )
         save_path = os.path.join(output_path, file_name + "_cropped.mp4")
         if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "crop={width}:{height}:{top_lext_x}:{top_left_y}" -c:v h264_nvenc -c:a copy "{save_path}"'
+            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "crop={roi_selector.width}:{roi_selector.height}:{roi_selector.top_left[0]}:{roi_selector.top_left[1]}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
         else:
-            command = (
-                str("ffmpeg -i ")
-                + '"'
-                + file_path
-                + '"'
-                + str(" -vf ")
-                + str('"crop=')
-                + str(width)
-                + ":"
-                + str(height)
-                + ":"
-                + str(top_lext_x)
-                + ":"
-                + str(top_left_y)
-                + '" '
-                + str("-c:v libx264 -crf 21 -c:a copy ")
-                + '"'
-                + str(save_path)
-                + '"'
-            )
+            command = f'ffmpeg -i "{file_path}" -vf "crop={roi_selector.width}:{roi_selector.height}:{roi_selector.top_left[0]}:{roi_selector.top_left[1]}" -c:v libx264 -crf 17 -c:a copy "{save_path}" -y'
         subprocess.call(command, shell=True)
+        video_timer.stop_timer()
         print(
-            "Video {} cropped (Video {}/{})".format(
-                file_name, str(file_cnt + 1), str(len(video_paths))
-            )
+            f"Video {file_name} cropped (Video {file_cnt+1}/{len(video_paths)}, elapsed time: {video_timer.elapsed_time_str})"
         )
     timer.stop_timer()
     stdout_success(
         msg=f"{str(len(video_paths))} videos cropped and saved in {directory_path} directory",
         elapsed_time=timer.elapsed_time_str,
+        source=crop_multiple_videos.__name__,
     )
+
+
+# _ = crop_multiple_videos(directory_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos', output_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/test/test')
 
 
 def frames_to_movie(
@@ -1197,11 +1245,13 @@ def frames_to_movie(
 
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None"
+            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+            source=frames_to_movie.__name__,
         )
     if not os.path.isdir(directory):
         raise NotDirectoryError(
-            msg="SIMBA ERROR: {} is not a valid directory".format(directory)
+            msg="SIMBA ERROR: {} is not a valid directory".format(directory),
+            source=frames_to_movie.__name__,
         )
     check_int(name="FPS", value=fps)
     check_int(name="BITRATE", value=bitrate)
@@ -1213,7 +1263,8 @@ def frames_to_movie(
         raise NoFilesFoundError(
             msg="SIMBA ERROR: Zero images of file-type {} found in {} directory".format(
                 img_format, directory
-            )
+            ),
+            source=frames_to_movie.__name__,
         )
     img = cv2.imread(img_paths_in_folder[0])
     img_h, img_w = int(img.shape[0]), int(img.shape[1])
@@ -1251,7 +1302,7 @@ def frames_to_movie(
         )
     )
     subprocess.call(command, shell=True)
-    stdout_success(msg=f"Video created at {save_path}")
+    stdout_success(msg=f"Video created at {save_path}", source=frames_to_movie.__name__)
 
 
 def video_concatenator(
@@ -1276,7 +1327,13 @@ def video_concatenator(
 
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None"
+            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+            source=video_concatenator.__name__,
+        )
+    if not check_ffmpeg_available():
+        raise FFMPEGNotFoundError(
+            msg="FFMPEG not found on the computer. Install FFMPEG to use the concatenation method.",
+            source=video_concatenator.__name__,
         )
     timer = SimbaTimer(start=True)
     for file_path in [video_one_path, video_two_path]:
@@ -1317,11 +1374,13 @@ def video_concatenator(
         if process.returncode != 0:
             if "Unknown decoder" in str(error.split(b"\n")[-2]):
                 raise FFMPEGCodecGPUError(
-                    msg="GPU codec not found: reverting to CPU. Properly configure FFMpeg and ensure you have GPU available or use CPU."
+                    msg="GPU codec not found: reverting to CPU. Properly configure FFMpeg and ensure you have GPU available or use CPU.",
+                    source=video_concatenator.__name__,
                 )
             else:
                 raise FFMPEGCodecGPUError(
-                    msg="GPU error. Properly configure FFMpeg and ensure you have GPU available, or use CPU."
+                    msg="GPU error. Properly configure FFMpeg and ensure you have GPU available, or use CPU.",
+                    source=video_concatenator.__name__,
                 )
         else:
             pass
@@ -1331,10 +1390,14 @@ def video_concatenator(
     stdout_success(
         msg=f"Videos concatenated and saved at {save_path}",
         elapsed_time=timer.elapsed_time_str,
+        source=video_concatenator.__name__,
     )
 
 
-# video_concatenator(video_one_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', video_two_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', resolution='Video_1', horizontal=True, gpu=True)
+# video_concatenator(video_one_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi',
+#                    video_two_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_2.avi', resolution='Video_1',
+#                    horizontal=False,
+#                    gpu=False)
 
 
 class VideoRotator(ConfigReader):
@@ -1359,11 +1422,13 @@ class VideoRotator(ConfigReader):
     ) -> None:
         if gpu and not check_nvidea_gpu_available():
             raise FFMPEGCodecGPUError(
-                msg="No GPU found (as evaluated by nvidea-smi returning None)"
+                msg="No GPU found (as evaluated by nvidea-smi returning None)",
+                source=self.__class__.__name__,
             )
         if ffmpeg and not check_ffmpeg_available():
             raise FFMPEGNotFoundError(
-                msg='FFMPEG not found on the computer (as evaluated by "ffmpeg" returning None)'
+                msg='FFMPEG not found on the computer (as evaluated by "ffmpeg" returning None)',
+                source=self.__class__.__name__,
             )
         _, self.cpu_cnt = find_core_cnt()
         self.gpu, self.ffmpeg = gpu, ffmpeg
@@ -1461,6 +1526,7 @@ class VideoRotator(ConfigReader):
         stdout_success(
             msg=f"All videos rotated and saved in {self.save_dir}",
             elapsed_time=str(round((time.time() - start), 2)),
+            source=self.__class__.__name__,
         )
 
     def __save(self):
@@ -1543,7 +1609,8 @@ def extract_frames_from_all_videos_in_directory(
         raise NoFilesFoundError(
             msg="SIMBA ERROR: 0 video files in mp4 or avi format found in {}".format(
                 directory
-            )
+            ),
+            source=extract_frames_from_all_videos_in_directory.__name__,
         )
     config = read_config_file(config_path)
     project_path = read_config_entry(
@@ -1569,6 +1636,7 @@ def extract_frames_from_all_videos_in_directory(
     stdout_success(
         f"Frames created for {str(len(video_paths))} videos",
         elapsed_time=timer.elapsed_time_str,
+        source=extract_frames_from_all_videos_in_directory.__name__,
     )
 
 
@@ -1587,10 +1655,14 @@ def copy_img_folder(
     """
     timer = SimbaTimer(start=True)
     if not os.path.isdir(source):
-        raise NotDirectoryError(msg=f"SIMBA ERROR: source {source} is not a directory.")
+        raise NotDirectoryError(
+            msg=f"SIMBA ERROR: source {source} is not a directory.",
+            source=copy_img_folder.__name__,
+        )
     if len(glob.glob(source + "/*.png")) == 0:
         raise NoFilesFoundError(
-            msg=f"SIMBA ERROR: source {source} does not contain any .png files."
+            msg=f"SIMBA ERROR: source {source} does not contain any .png files.",
+            source=copy_img_folder.__name__,
         )
     input_basename = os.path.basename(source)
     config = read_config_file(config_path)
@@ -1604,7 +1676,8 @@ def copy_img_folder(
     destination = os.path.join(input_frames_dir, input_basename)
     if os.path.isdir(destination):
         raise DirectoryExistError(
-            msg=f"SIMBA ERROR: {destination} already exist in SimBA project."
+            msg=f"SIMBA ERROR: {destination} already exist in SimBA project.",
+            source=copy_img_folder.__name__,
         )
     print(f"Importing image files for {input_basename}...")
     shutil.copytree(source, destination)
@@ -1612,6 +1685,7 @@ def copy_img_folder(
     stdout_success(
         msg=f"{destination} imported to SimBA project",
         elapsed_time=timer.elapsed_time_str,
+        source=copy_img_folder.__name__,
     )
 
 
@@ -1634,13 +1708,13 @@ def append_audio(
 
     if not check_ffmpeg_available():
         raise FFMPEGNotFoundError(
-            msg="FFMpeg not found on computer. See SimBA docs for install instructions."
+            msg="FFMpeg not found on computer. See SimBA docs for install instructions.",
+            source=append_audio.__name__,
         )
     check_file_exist_and_readable(file_path=video_path)
     check_file_exist_and_readable(file_path=audio_path)
     video_meta_data = get_video_meta_data(video_path=video_path)
     audio_src_meta_data = get_video_meta_data(video_path=audio_path)
-
     save_path = os.path.join(
         os.path.dirname(video_path), get_fn_ext(filepath=video_path)[1] + "_w_audio.mp4"
     )
@@ -1663,11 +1737,15 @@ def append_audio(
             .strip()
         )
     except subprocess.CalledProcessError:
-        raise NoDataError(msg=f"No audio track found in file {audio_path}")
+        raise NoDataError(
+            msg=f"No audio track found in file {audio_path}",
+            source=append_audio.__name__,
+        )
 
     if video_meta_data["frame_count"] != audio_src_meta_data["frame_count"]:
         InValidUserInputWarning(
-            msg=f'The video ({video_meta_data["frame_count"]}) and audio source ({audio_src_meta_data["frame_count"]}) does not have an equal number of frames.'
+            msg=f'The video ({video_meta_data["frame_count"]}) and audio source ({audio_src_meta_data["frame_count"]}) does not have an equal number of frames.',
+            source=append_audio.__name__,
         )
 
     cmd = f'ffmpeg -i "{video_path}" -i "{audio_path}" -c:v copy -map 0:v:0 -map 1:a:0 "{save_path}" -y'
@@ -1677,7 +1755,14 @@ def append_audio(
     except subprocess.CalledProcessError as e:
         print("Error:", e)
 
-    stdout_success(msg=f"Audio merged successfully, file saved at {save_path}!")
+    stdout_success(
+        msg=f"Audio merged successfully, file saved at {save_path}!",
+        source=append_audio.__name__,
+    )
+
+
+# append_audio(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/merged_video_20230425201637.mp4',
+# audio_path="/Users/simon/Documents/Zoom/ddd/video1180732233.mp4")
 
 
 # r = VideoRotator(input_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Testing/Together_1_downsampled.mp4',

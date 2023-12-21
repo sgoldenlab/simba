@@ -3,11 +3,13 @@ __author__ = "Simon Nilsson"
 import ast
 import configparser
 import glob
+import io
 import os
+import subprocess
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import h5py
 import numpy as np
@@ -22,14 +24,19 @@ try:
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import (check_file_exist_and_readable,
+from numba import njit, typed
+
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
+                                check_if_module_has_import,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_int,
+                                check_instance, check_int, check_str,
                                 check_that_hhmmss_start_is_before_end)
-from simba.utils.enums import ConfigKey, Dtypes
-from simba.utils.errors import (CountError, DataHeaderError,
-                                InvalidFileTypeError, NoFilesFoundError)
+from simba.utils.enums import ConfigKey, Dtypes, Options
+from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
+                                DataHeaderError, FrameRangeError,
+                                InvalidFileTypeError, InvalidInputError,
+                                NoFilesFoundError)
 from simba.utils.lookups import get_bp_config_code_class_pairs
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import (find_video_of_file, get_fn_ext,
@@ -115,6 +122,68 @@ def detect_bouts(
     )
 
 
+def detect_bouts_multiclass(
+    data: pd.DataFrame, target: str, fps: int = 1, classifier_map: Dict[int, str] = None
+) -> pd.DataFrame:
+    """
+    Detect bouts in a multiclass time series dataset and return the bout event types, their start times, end times and duration.
+
+    :param pd.DataFrame data: A Pandas DataFrame containing multiclass time series data.
+    :param str target: Name of the target column in ``data``.
+    :param int fps: Frames per second of the video used to collect ``data``. Default is 1.
+    :param Dict[int, str] classifier_map: A dictionary mapping class labels to their names. Used to replace numeric labels with descriptive names. If None, then numeric event labels are kept.
+
+    :example:
+    >>> df = pd.DataFrame({'value': [0, 0, 0, 2, 2, 1, 1, 1, 3, 3]})
+    >>> detect_bouts_multiclass(data=df, target='value', fps=3, classifier_map={0: 'None', 1: 'sharp', 2: 'track', 3: 'sync'})
+    >>>    'Event'  'Start_time'  'End_time'  'Start_frame'  'End_frame'  'Bout_time'
+    >>> 0   'None'    0.000000  1.000000          0.0        2.0   1.000000
+    >>> 1   'sharp'   1.666667  2.666667          5.0        7.0   1.000000
+    >>> 2   'track'   1.000000  1.666667          3.0        4.0   0.666667
+    >>> 3   'sync '   2.666667  3.333333          8.0        9.0   0.666667
+    """
+
+    check_int(name="FPS", value=fps, min_value=1.0)
+    results = pd.DataFrame(
+        columns=[
+            "Event",
+            "Start_time",
+            "End_time",
+            "Start_frame",
+            "End_frame",
+            "Bout_time",
+        ]
+    )
+    data["is_new_bout"] = (data[target] != data[target].shift(1)).cumsum()
+    bouts = data.groupby([target, "is_new_bout"]).apply(
+        lambda x: (x.index[0], x.index[-1])
+    )
+    for start_idx, end_idx in bouts:
+        if start_idx != 0:
+            start_time = start_idx / fps
+        else:
+            start_time = 0
+        if end_idx != 0:
+            end_time = (end_idx + 1) / fps
+        else:
+            end_time = 0
+        bout_time = end_time - start_time
+        event = data.at[start_idx, target]
+        results.loc[len(results)] = [
+            event,
+            start_time,
+            end_time,
+            start_idx,
+            end_idx,
+            bout_time,
+        ]
+
+    if classifier_map:
+        results["Event"] = results["Event"].map(classifier_map)
+
+    return results
+
+
 def plug_holes_shortest_bout(
     data_df: pd.DataFrame, clf_name: str, fps: int, shortest_bout: int
 ) -> pd.DataFrame:
@@ -150,10 +219,10 @@ def plug_holes_shortest_bout(
         currListNeg = [0]
         currListNeg.extend(oneInlist)
         currListNeg.extend([0])
-        patternListofLists.append(np.array(currList))
-        negPatternListofList.append(np.array(currListNeg))
-    fill_patterns = patternListofLists  # np.asarray(patternListofLists)
-    remove_patterns = negPatternListofList  # np.asarray(negPatternListofList)
+        patternListofLists.append(currList)
+        negPatternListofList.append(currListNeg)
+    fill_patterns = np.asarray(patternListofLists)
+    remove_patterns = np.asarray(negPatternListofList)
 
     for currPattern in fill_patterns:
         n_obs = len(currPattern)
@@ -297,7 +366,8 @@ def smooth_data_savitzky_golay(
     video_file_path = find_video_of_file(video_dir, filename)
     if not video_file_path:
         raise NoFilesFoundError(
-            msg=f"SIMBA ERROR: Import video for {filename} to perform Savitzky-Golay smoothing"
+            msg=f"SIMBA ERROR: Import video for {filename} to perform Savitzky-Golay smoothing",
+            source=smooth_data_savitzky_golay.__name__,
         )
     video_meta_data = get_video_meta_data(video_path=video_file_path)
     pose_df = read_df(file_path=file_path, file_type=file_format, check_multiindex=True)
@@ -489,129 +559,66 @@ def find_frame_numbers_from_time_stamp(
     return list(range(int(start_in_s * fps), int(end_in_s * fps)))
 
 
-def run_user_defined_feature_extraction_class(
-    file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]
-) -> None:
-    """
-    Loads and executes user-defined feature extraction class.
-
-    :param file_path: Path to .py file holding user-defined feature extraction class
-    :param str config_path: Path to SimBA project config file.
-
-    .. note::
-       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/extractFeatures.md>`_.
-       If the ``file_path`` contains multiple classes, then the first class will be used.
-
-    """
-
-    check_file_exist_and_readable(file_path=file_path)
-    file_dir, file_name, file_extension = get_fn_ext(filepath=file_path)
-    if file_extension != ".py":
-        raise InvalidFileTypeError(
-            msg=f"The user-defined feature extraction file ({file_path}) is not a .py file-extension"
-        )
-    parsed = ast.parse(Path(file_path).read_text())
-    classes = [n for n in parsed.body if isinstance(n, ast.ClassDef)]
-    class_name = [x.name for x in classes]
-    if len(class_name) < 1:
-        raise CountError(
-            msg=f"The user-defined feature extraction file ({file_path}) contains no python classes"
-        )
-    if len(class_name) > 1:
-        stdout_warning(
-            msg=f"The user-defined feature extraction file ({file_path}) contains more than 1 python class. SimBA will use the first python class: {class_name[0]}."
-        )
-    class_name = class_name[0]
-    spec = importlib.util.spec_from_file_location(class_name, file_path)
-    user_module = importlib.util.module_from_spec(spec)
-    sys.modules[class_name] = user_module
-    spec.loader.exec_module(user_module)
-    user_class = getattr(user_module, class_name)
-    print(f"Running user-defined {class_name} feature extraction file...")
-    user_class(config_path=config_path).run()
-
-
-def slp_to_df_convert(
-    file_path: Union[str, os.PathLike],
-    headers: List[str],
-    joined_tracks: Optional[bool] = False,
-    multi_index: Optional[bool] = True,
-) -> pd.DataFrame:
-    """
-    Helper to convert .slp pose-estimation data to pandas dataframe.
-
-    .. note::
-       Written by Toshea111 - `see jupyter notebook <https://colab.research.google.com/drive/1EpyTKFHVMCqcb9Lj9vjMrriyaG9SvrPO?usp=sharing>`__.
-
-    :param Union[str, os.PathLike] file_path: Path to .slp file on disk.
-    :param List[str] headers: List of strings representing output dataframe headers.
-    :param bool joined_tracks: If True, the .slp file has been created by joining multiple .slp files.
-    :param bool multi_index: If True, inserts multi-index place-holders in the output dataframe (used in SimBA data import).
-    :raises InvalidFileTypeError: If ``file_path`` is not a valid SLEAP H5 pose-estimation file.
-    :raises DataHeaderError: If sleap file contains more or less body-parts than suggested by len(headers)
-
-    :return pd.DataFrame: With animal ID, Track ID and body-part names as colums.
-    """
-
-    try:
-        with h5py.File(file_path, "r") as sleap_dict:
-            data = {k: v[()] for k, v in sleap_dict.items()}
-            data["node_names"] = [s.decode() for s in data["node_names"].tolist()]
-            data["point_scores"] = np.transpose(data["point_scores"][0])
-            data["track_names"] = [s.decode() for s in data["track_names"].tolist()]
-            data["tracks"] = np.transpose(data["tracks"])
-            data["track_occupancy"] = data["track_occupancy"].astype(bool)
-    except OSError as e:
-        print(e.args)
-        raise InvalidFileTypeError(msg=f"{file_path} is not a valid SLEAP H5 file")
-    valid_frame_idxs = np.argwhere(data["track_occupancy"].any(axis=1)).flatten()
-    tracks = []
-    for frame_idx in valid_frame_idxs:
-        frame_tracks = data["tracks"][frame_idx]
-        for i in range(frame_tracks.shape[-1]):
-            pts = frame_tracks[..., i]
-            if np.isnan(pts).all():
-                continue
-            detection = {"track": data["track_names"][i], "frame_idx": frame_idx}
-            for node_name, (x, y) in zip(data["node_names"], pts):
-                detection[f"{node_name}.x"] = x
-                detection[f"{node_name}.y"] = y
-            tracks.append(detection)
-    if joined_tracks:
-        df = (
-            pd.DataFrame(tracks)
-            .set_index("frame_idx")
-            .groupby(level=0)
-            .sum()
-            .astype(int)
-            .reset_index(drop=True)
-        )
-    else:
-        df = pd.DataFrame(tracks).fillna(0)
-    df.columns = list(range(0, len(df.columns)))
-    p_df = (
-        pd.DataFrame(
-            data["point_scores"], index=df.index, columns=df.columns[1::2] + 0.5
-        )
-        .fillna(0)
-        .clip(0.0, 1.0)
-    )
-    df = pd.concat([df, p_df], axis=1).sort_index(axis=1)
-    if len(headers) != len(df.columns):
-        raise DataHeaderError(
-            msg=f"The SimBA project suggest the data should have {len(headers)} columns, but the input data has {len(df.columns)} columns"
-        )
-    df.columns = headers
-    if multi_index:
-        multi_idx_cols = []
-        for col_idx in range(len(df.columns)):
-            multi_idx_cols.append(
-                tuple(("IMPORTED_POSE", "IMPORTED_POSE", df.columns[col_idx]))
-            )
-        df.columns = pd.MultiIndex.from_tuples(
-            multi_idx_cols, names=("scorer", "bodypart", "coords")
-        )
-    return df
+# def slp_to_df_convert(file_path: Union[str, os.PathLike],
+#                       headers: List[str],
+#                       joined_tracks: Optional[bool] = False,
+#                       multi_index: Optional[bool] = True) -> pd.DataFrame:
+#     """
+#     Helper to convert .slp pose-estimation data to pandas dataframe.
+#
+#     .. note::
+#        Written by Toshea111 - `see jupyter notebook <https://colab.research.google.com/drive/1EpyTKFHVMCqcb9Lj9vjMrriyaG9SvrPO?usp=sharing>`__.
+#
+#     :param Union[str, os.PathLike] file_path: Path to .slp file on disk.
+#     :param List[str] headers: List of strings representing output dataframe headers.
+#     :param bool joined_tracks: If True, the .slp file has been created by joining multiple .slp files.
+#     :param bool multi_index: If True, inserts multi-index place-holders in the output dataframe (used in SimBA data import).
+#     :raises InvalidFileTypeError: If ``file_path`` is not a valid SLEAP H5 pose-estimation file.
+#     :raises DataHeaderError: If sleap file contains more or less body-parts than suggested by len(headers)
+#
+#     :return pd.DataFrame: With animal ID, Track ID and body-part names as colums.
+#     """
+#
+#     try:
+#         with h5py.File(file_path, "r") as sleap_dict:
+#             data = {k: v[()] for k, v in sleap_dict.items()}
+#             data["node_names"] = [s.decode() for s in data["node_names"].tolist()]
+#             data["point_scores"] = np.transpose(data["point_scores"][0])
+#             data["track_names"] = [s.decode() for s in data["track_names"].tolist()]
+#             data["tracks"] = np.transpose(data["tracks"])
+#             data["track_occupancy"] = data["track_occupancy"].astype(bool)
+#     except OSError as e:
+#         print(e.args)
+#         raise InvalidFileTypeError(msg=f'{file_path} is not a valid SLEAP H5 file', source=slp_to_df_convert.__name__)
+#     valid_frame_idxs = np.argwhere(data["track_occupancy"].any(axis=1)).flatten()
+#     tracks = []
+#     for frame_idx in valid_frame_idxs:
+#         frame_tracks = data["tracks"][frame_idx]
+#         for i in range(frame_tracks.shape[-1]):
+#             pts = frame_tracks[..., i]
+#             if np.isnan(pts).all():
+#                 continue
+#             detection = {"track": data["track_names"][i], "frame_idx": frame_idx}
+#             for node_name, (x, y) in zip(data["node_names"], pts):
+#                 detection[f"{node_name}.x"] = x
+#                 detection[f"{node_name}.y"] = y
+#             tracks.append(detection)
+#     if joined_tracks:
+#         df = pd.DataFrame(tracks).set_index('frame_idx').groupby(level=0).sum().astype(int).reset_index(drop=True)
+#     else:
+#         df = pd.DataFrame(tracks).fillna(0)
+#     df.columns = list(range(0, len(df.columns)))
+#     p_df = pd.DataFrame(data['point_scores'], index=df.index, columns=df.columns[1::2] + .5).fillna(0).clip(0.0, 1.0)
+#     df = pd.concat([df, p_df], axis=1).sort_index(axis=1)
+#     if len(headers) != len(df.columns):
+#         raise DataHeaderError(msg=f'The SimBA project suggest the data should have {len(headers)} columns, but the input data has {len(df.columns)} columns', source=slp_to_df_convert.__name__)
+#     df.columns = headers
+#     if multi_index:
+#         multi_idx_cols = []
+#         for col_idx in range(len(df.columns)):
+#             multi_idx_cols.append(tuple(('IMPORTED_POSE', 'IMPORTED_POSE', df.columns[col_idx])))
+#         df.columns = pd.MultiIndex.from_tuples(multi_idx_cols, names=('scorer', 'bodypart', 'coords'))
+#     return df
 
 
 def convert_roi_definitions(
@@ -634,7 +641,10 @@ def convert_roi_definitions(
         if len(df) > 0:
             file_save_path = os.path.join(save_dir, f"{shape_name}_{datetime_str}.csv")
             df.to_csv(file_save_path)
-            stdout_success(msg=f"SIMBA COMPLETE: {file_save_path} successfully saved!")
+            stdout_success(
+                msg=f"SIMBA COMPLETE: {file_save_path} successfully saved!",
+                source=convert_roi_definitions.__name__,
+            )
 
 
 def freedman_diaconis(data: np.array) -> (float, int):
@@ -695,9 +705,9 @@ def fast_minimum_rank(data: np.ndarray, descending: bool = True):
 
     :example:
     >>> data = np.array([1, 1, 3, 4, 5, 6, 7, 8, 9, 10])
-    >>> fast_rank(data=data, descending=True)
+    >>> fast_minimum_rank(data=data, descending=True)
     >>> [9, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-    >>> fast_rank(data=data, descending=False)
+    >>> fast_minimum_rank(data=data, descending=False)
     >>> [ 1,  1,  3,  4,  5,  6,  7,  8,  9, 10]
     """
 
@@ -745,9 +755,262 @@ def fast_mean_rank(data: np.ndarray, descending: bool = True):
     dense[sorter] = obs.cumsum()
     count = np.concatenate((np.nonzero(obs)[0], np.array([len(obs)])))
     results = 0.5 * (count[dense] + count[dense - 1] + 1)
+    return results
+
+
+def slp_to_df_convert(
+    file_path: Union[str, os.PathLike],
+    headers: List[str],
+    joined_tracks: Optional[bool] = False,
+    multi_index: Optional[bool] = True,
+    drop_body_parts: Optional[List[str]] = None,
+) -> pd.DataFrame:
+    """
+    Helper to convert .slp pose-estimation data in h5 format to pandas dataframe.
+
+    :param Union[str, os.PathLike] file_path: Path to SLEAP H5 file on disk.
+    :param List[str] headers: List of strings representing output dataframe headers.
+    :param bool joined_tracks: If True, the h5 file has been created by joining multiple .slp files.
+    :param bool multi_index: If True, inserts multi-index place-holders in the output dataframe (used in SimBA data import).
+    :param Optional[List[str]] drop_body_parts: Body-parts that should be removed from the SLEAP H5 dataset before import into SimBA. Use the body-part names as defined in SLEAP. Default: None.
+    :raises InvalidFileTypeError: If ``file_path`` is not a valid SLEAP H5 pose-estimation file.
+    :raises DataHeaderError: If sleap file contains more or less body-parts than suggested by len(headers)
+
+    :return pd.DataFrame: With animal ID, Track ID and body-part names as columns.
+
+    :example:
+    >>> headers = ['d_nose_1', 'd_neck_1', 'd_back_1', 'd_tail_1', 'nest_s_2', 'nest_cc_2', 'nest_cv_2', 'nest_cc_2', 'nest_csc_2', 'nest_cscd_2']
+    >>> new_headers = []
+    >>> for h in headers: new_headers.append(h + '_x'); new_headers.append(h + '_y'); new_headers.append(h + '_p')
+    >>> df = slp_to_df_convert(file_path='/Users/simon/Desktop/envs/troubleshooting/ryan/LBN4a_Ctrl_P05_1_2022-01-15_08-16-20c.h5', headers=new_headers, joined_tracks=True)
+    """
+
+    video_name = get_fn_ext(filepath=file_path)[1]
+    print(f"Importing {video_name}...")
+    with h5py.File(file_path, "r") as f:
+        missing_keys = [
+            x
+            for x in ["tracks", "point_scores", "node_names", "track_names"]
+            if not x in list(f.keys())
+        ]
+        if missing_keys:
+            raise InvalidFileTypeError(
+                msg=f"{file_path} is not a valid SLEAP H5 file. Missing keys: {missing_keys}",
+                source=slp_to_df_convert.__name__,
+            )
+        tracks = f["tracks"][:].T
+        point_scores = f["point_scores"][:].T
+        node_names = [n.decode() for n in f["node_names"][:].tolist()]
+        track_names = [n.decode() for n in f["track_names"][:].tolist()]
+
+    csv_rows = []
+    n_frames, n_nodes, _, n_tracks = tracks.shape
+
+    for frame_ind in range(n_frames):
+        csv_row = []
+        for track_ind in range(n_tracks):
+            for node_ind in range(n_nodes):
+                for xyp in range(3):
+                    if xyp == 0 or xyp == 1:
+                        data = tracks[frame_ind, node_ind, xyp, track_ind]
+                    else:
+                        data = point_scores[frame_ind, node_ind, track_ind]
+
+                    csv_row.append(f"{data:.3f}")
+        csv_rows.append(" ".join(csv_row))
+
+    sleap_header = []
+    sleap_header_unique = []
+    for track_ind in range(n_tracks):
+        for node_ind in range(n_nodes):
+            sleap_header_unique.append(f"{node_names[node_ind]}_{track_ind + 1}")
+            for suffix in ["x", "y", "p"]:
+                sleap_header.append(f"{node_names[node_ind]}_{track_ind + 1}_{suffix}")
+
+    csv_rows = "\n".join(csv_rows)
+    data_df = pd.read_csv(
+        io.StringIO(csv_rows), delim_whitespace=True, header=None
+    ).fillna(0)
+    if len(data_df.columns) != len(sleap_header):
+        raise BodypartColumnNotFoundError(
+            msg=f"The number of body-parts in data file {file_path} do not match the number of body-parts in your SimBA project. "
+            f"The number of of body-parts expected by your SimBA project is {int(len(sleap_header) / 3)}. "
+            f"The number of of body-parts contained in data file {file_path} is {int(len(sleap_header) / 3)}. "
+            f"Make sure you have specified the correct number of animals and body-parts in your project.",
+            source=slp_to_df_convert.__name__,
+        )
+
+    if len(drop_body_parts) > 0:
+        data_df.columns = sleap_header
+        headers_to_drop = []
+        for h in drop_body_parts:
+            headers_to_drop.append(h + "_x")
+            headers_to_drop.append(h + "_y")
+            headers_to_drop.append(h + "_p")
+        missing_headers = list(set(headers_to_drop) - set(list(data_df.columns)))
+        if len(missing_headers) > 0:
+            raise InvalidInputError(
+                msg=f"Some of the body-part data that you specified to remove does not exist (e.g., {missing_headers[0][:-2]}) in the dataset: {sleap_header_unique}"
+            )
+        data_df = data_df.drop(headers_to_drop, axis=1)
+
+    data_df.columns = headers
+    if multi_index:
+        multi_idx_cols = []
+        for col_idx in range(len(data_df.columns)):
+            multi_idx_cols.append(
+                tuple(("IMPORTED_POSE", "IMPORTED_POSE", data_df.columns[col_idx]))
+            )
+        data_df.columns = pd.MultiIndex.from_tuples(
+            multi_idx_cols, names=("scorer", "bodypart", "coords")
+        )
+
+    return data_df
+
+
+def find_ranked_colors(
+    data: Dict[str, float], palette: str, as_hex: Optional[bool] = False
+) -> Dict[str, Union[Tuple[int], str]]:
+    """
+    Find ranked colors for a given data dictionary values based on a specified color palette.
+
+    The key with the highest value in the data dictionary is assigned the most intense palette color, while
+    the key with the lowest value in the data dictionary is assigned the least intense palette color.
+
+    :param data: A dictionary where keys are labels and values are numerical scores.
+    :param palette: A string representing the name of the color palette to use (e.g., 'magma').
+    :param as_hex: If True, return colors in hexadecimal format; if False, return as RGB tuples. Default is False.
+    :return: A dictionary where keys are labels and values are corresponding colors based on ranking.
+
+    :examples:
+    >>> data = {'Animal_1': 0.34786870380536705, 'Animal_2': 0.4307923198152757, 'Animal_3': 0.221338976379357}
+    >>> find_ranked_colors(data=data, palette='magma', as_hex=True)
+    >>> {'Animal_2': '#040000', 'Animal_1': '#7937b7', 'Animal_3': '#bffdfc'}
+    """
+
+    if palette not in Options.PALETTE_OPTIONS.value:
+        raise InvalidInputError(
+            msg=f"{palette} is not a valid palette. Options {Options.PALETTE_OPTIONS.value}",
+            source=find_ranked_colors.__name__,
+        )
+    check_instance(
+        source=find_ranked_colors.__name__, instance=data, accepted_types=dict
+    )
+    for k, v in data.items():
+        check_str(name=k, value=k)
+        check_float(name=v, value=v)
+    clrs = create_color_palette(
+        pallete_name=palette, increments=len(list(data.keys())) - 1, as_hex=as_hex
+    )
+    ranks, results = deepcopy(data), {}
+    ranks = {
+        key: rank
+        for rank, key in enumerate(sorted(ranks, key=ranks.get, reverse=True), 1)
+    }
+    for k, v in ranks.items():
+        results[k] = clrs[int(v) - 1]
 
     return results
 
 
-# data = np.array([1, 1, 3, 4, 5, 6, 7, 8, 9, 10])
-# fast_mean_rank(data=data, descending=True)
+def run_user_defined_feature_extraction_class(
+    file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]
+) -> None:
+    """
+    Loads and executes user-defined feature extraction class within .py file.
+
+    :param file_path: Path to .py file holding user-defined feature extraction class.
+    :param str config_path: Path to SimBA project config file.
+
+
+    .. warning::
+
+       Legacy function. The GUI since 12/23 uses ``simba.utils.custom_feature_extractor.UserDefinedFeatureExtractor``.
+
+    .. note::
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/extractFeatures.md>`_.
+
+       If the ``file_path`` contains multiple classes, then the first class will be used.
+
+       The user defined class needs to contain a ``config_path`` init argument.
+
+       If the feature extraction class contains a ``if __name__ == "__main__":`` entry point and uses argparse,
+       then the custom feature extraction module will be executed through python subprocess.
+
+       Else, will be executed using ``sys``.
+
+       I recommend using the ``if __name__ == "__main__:`` and subprocess alternative, as the feature extraction clas will
+       be executed in a different thread and any multicore parallel processes within the user feature extraction class will not be
+       throttled by the graphical interface mainloop.
+
+    :example:
+    >>> run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini', file_path='/Users/simon/Desktop/fish_feature_extractor_2023_version_5.py')
+    >>> run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/piotr/project_folder/train-20231108-sh9-frames-with-p-lt-2_plus3-&3_best-f1.ini', file_path='/simba/misc/piotr.py')
+    """
+
+    check_file_exist_and_readable(file_path=file_path)
+    file_dir, file_name, file_extension = get_fn_ext(filepath=file_path)
+    if file_extension != ".py":
+        raise InvalidFileTypeError(
+            msg=f"The user-defined feature extraction file ({file_path}) is not a .py file-extension",
+            source=run_user_defined_feature_extraction_class.__name__,
+        )
+    parsed = ast.parse(Path(file_path).read_text())
+    classes = [n for n in parsed.body if isinstance(n, ast.ClassDef)]
+    class_name = [x.name for x in classes]
+    if len(class_name) < 1:
+        raise CountError(
+            msg=f"The user-defined feature extraction file ({file_path}) contains no python classes",
+            source=run_user_defined_feature_extraction_class.__name__,
+        )
+    if len(class_name) > 1:
+        stdout_warning(
+            msg=f"The user-defined feature extraction file ({file_path}) contains more than 1 python class. SimBA will use the first python class: {class_name[0]}."
+        )
+    class_name = class_name[0]
+    spec = importlib.util.spec_from_file_location(class_name, file_path)
+    user_module = importlib.util.module_from_spec(spec)
+    sys.modules[class_name] = user_module
+    spec.loader.exec_module(user_module)
+    user_class = getattr(user_module, class_name)
+    if "config_path" not in inspect.signature(user_class).parameters:
+        raise InvalidFileTypeError(
+            msg=f"The user-defined class {class_name} does not contain a {config_path} init argument",
+            source=run_user_defined_feature_extraction_class.__name__,
+        )
+    functions = [n for n in parsed.body if isinstance(n, ast.FunctionDef)]
+    function_names = [x.name for x in functions]
+    has_argparse = check_if_module_has_import(
+        parsed_file=parsed, import_name="argparse"
+    )
+    has_main = any(
+        isinstance(node, ast.If)
+        and isinstance(node.test, ast.Compare)
+        and isinstance(node.test.left, ast.Name)
+        and node.test.left.id == "__name__"
+        and isinstance(node.test.ops[0], ast.Eq)
+        and isinstance(node.test.comparators[0], ast.Str)
+        and node.test.comparators[0].s == "__main__"
+        for node in parsed.body
+    )
+
+    if "main" in function_names and has_main and has_argparse:
+        command = f'python "{file_path}" --config_path "{config_path}"'
+        subprocess.call(command, shell=True)
+
+    else:
+        user_class(config_path)
+
+
+# run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini', file_path='/Users/simon/Desktop/fish_feature_extractor_2023_version_5.py')
+
+
+# user_class(config_path=config_path)
+
+# run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/piotr/project_folder/train-20231108-sh9-frames-with-p-lt-2_plus3-&3_best-f1.ini',
+#                                           file_path='/Users/simon/Desktop/envs/simba_dev/simba/feature_extractors/misc/piotr.py')
+
+# data = {'Animal_1': 0.34786870380536705, 'Animal_2': 0.4307923198152757, 'Animal_3': 0.221338976379357}
+# find_ranked_colors(data=data, palette='magma', as_hex=True)
+# run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini',
+#                                           file_path='/Users/simon/Desktop/fish_feature_extractor_2023_version_5.py')

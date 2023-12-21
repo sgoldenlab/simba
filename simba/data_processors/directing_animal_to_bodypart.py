@@ -116,7 +116,9 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
                     direction_data,
                     columns=["Eye_x", "Eye_y", "Directing_BOOL", bp_x_name, bp_y_name],
                 )
-                bp_data = bp_data[["Eye_x", "Eye_y", bp_x_name, bp_y_name, "Directing_BOOL"]]
+                bp_data = bp_data[
+                    ["Eye_x", "Eye_y", bp_x_name, bp_y_name, "Directing_BOOL"]
+                ]
                 self.results_dict[video_name][result_key][bp_x_name[:-2]] = bp_data
             video_timer.stop_timer()
             print(
@@ -145,49 +147,37 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
             out_df_lst = []
             for animal_permutation, permutation_data in video_data.items():
                 for bp_name, bp_data in permutation_data.items():
-                    directing_df = (
-                        bp_data  # [bp_data["Directing_BOOL"] == 1]
-                        .reset_index()
-                        .rename(
-                            columns={
-                                "index": "Frame_#",
-                                bp_name + "_x": "Animal_{}_x".format(self.bodypart_direction),
-                                bp_name + "_y": "Animal_{}_y".format(self.bodypart_direction),
-                            }
-                        )
+                    directing_df = bp_data.reset_index().rename(  # [bp_data["Directing_BOOL"] == 1]
+                        columns={
+                            "index": "Frame_#",
+                            bp_name
+                            + "_x": "Animal_{}_x".format(self.bodypart_direction),
+                            bp_name
+                            + "_y": "Animal_{}_y".format(self.bodypart_direction),
+                        }
                     )
                     directing_df.insert(loc=0, column="Video", value=video_name)
                     out_df_lst.append(directing_df)
-            self.directionality_df_dict[video_name] = pd.concat(
-                out_df_lst, axis=0
-            )
-        stdout_success(
-            msg='Transposing body part directionality data completed'
-        )
+            self.directionality_df_dict[video_name] = pd.concat(out_df_lst, axis=0)
+        stdout_success(msg="Transposing body part directionality data completed")
 
     def read_directionality_dfs(self):
         results = {}
-        body_parts_directionality = []
         for file_cnt, file_path in enumerate(self.body_part_directionality_paths):
             video_timer = SimbaTimer(start=True)
-            dir_name, file_name, _ = get_fn_ext(file_path)
-            bp_name = os.path.basename(dir_name)
-            body_parts_directionality.append(bp_name)
-            key = file_name+"_"+bp_name
-            results[key] = read_df(file_path, self.file_type)
+            _, file_name, _ = get_fn_ext(file_path)
+            results[file_name] = read_df(file_path, self.file_type)
             video_timer.stop_timer()
             print(
                 "read body part directionality data completed for video {} ({}/{}, elapsed time: {}s)...".format(
-                    key,
+                    file_name,
                     str(file_cnt + 1),
                     str(len(self.outlier_corrected_paths)),
                     video_timer.elapsed_time_str,
                 )
             )
-        stdout_success(
-            msg='reading body part directionality data completed'
-        )
-        return results,body_parts_directionality
+        stdout_success(msg="reading body part directionality data completed")
+        return results
 
     def save_directionality_dfs(self):
         """
@@ -198,16 +188,16 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
         -------
         None
         """
-        output_dir = os.path.join(self.body_part_directionality_df_dir, self.bodypart_direction)
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if not os.path.exists(self.body_part_directionality_df_dir):
+            os.makedirs(self.body_part_directionality_df_dir)
         for video_name, video_data in self.directionality_df_dict.items():
-            save_name = os.path.join(output_dir, video_name + ".csv")
+            save_name = os.path.join(
+                self.body_part_directionality_df_dir, video_name + ".csv"
+            )
             video_data.to_csv(save_name)
             print(f"Detailed directional data saved for video {video_name}...")
         stdout_success(
-            msg=f"All detailed directional data saved in the {output_dir} directory"
-
+            msg=f"All detailed directional data saved in the {self.body_part_directionality_df_dir} directory"
         )
 
     def summary_statistics(self):
@@ -243,17 +233,19 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
             .set_index("Video")
         )
         self.save_path = os.path.join(
-            self.logs_path, "Body_part_directions_data_{}_{}.csv".format(self.bodypart_direction,str( self.datetime))
+            self.logs_path,
+            "Body_part_directions_data_{}.csv".format(str(self.datetime)),
         )
         self.summary_df.to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(
-            msg=f'Summary body part directional statistics saved at {self.save_path}'
+            msg=f"Summary body part directional statistics saved at {self.save_path}"
         )
         stdout_success(
             msg="All directional data saved in SimBA project",
             elapsed_time=self.timer.elapsed_time_str,
         )
+
 
 # test = DirectingOtherAnimalsAnalyzer(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.process_directionality()

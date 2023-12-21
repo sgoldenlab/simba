@@ -2,7 +2,6 @@ __author__ = "Simon Nilsson"
 
 import configparser
 import glob
-import itertools
 import multiprocessing
 import os
 import pickle
@@ -10,6 +9,7 @@ import platform
 import re
 import shutil
 from configparser import ConfigParser
+from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -19,12 +19,16 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 from pyarrow import csv
+from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
+                              Polygon)
 
-from simba.utils.checks import (check_file_exist_and_readable,
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_nvidea_gpu_available)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys
+                                check_instance, check_int,
+                                check_nvidea_gpu_available, check_str)
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
                                 FrameRangeError, InvalidFilepathError,
@@ -32,10 +36,10 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 InvalidVideoFileError,
                                 MissingProjectConfigEntryError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ParametersFileError)
+                                ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (FileExistWarning, InvalidValueWarning,
-                                  NoFileFoundWarning)
+                                  NoDataFoundWarning, NoFileFoundWarning)
 
 PARSE_OPTIONS = csv.ParseOptions(delimiter=",")
 READ_OPTIONS = csv.ReadOptions(encoding="utf8")
@@ -95,7 +99,8 @@ def read_df(
                         range(0, header_col_cnt)
                     ):
                         raise InvalidInputError(
-                            msg=f"The selected multi-header index column {multi_index_headers_to_keep} does not exist in the multi-index header columns: {list(range(0, header_col_cnt))}"
+                            msg=f"The selected multi-header index column {multi_index_headers_to_keep} does not exist in the multi-index header columns: {list(range(0, header_col_cnt))}",
+                            source=read_df.__name__,
                         )
                     else:
                         new_header = list(
@@ -123,7 +128,9 @@ def read_df(
 
         except Exception as e:
             print(e, e.args)
-            raise InvalidFileTypeError(msg=f"{file_path} is not a valid CSV file")
+            raise InvalidFileTypeError(
+                msg=f"{file_path} is not a valid CSV file", source=read_df.__name__
+            )
         if remove_columns:
             df = df[df.columns[~df.columns.isin(remove_columns)]]
         if usecols:
@@ -144,7 +151,8 @@ def read_df(
             df = pickle.load(fp)
     else:
         raise InvalidFileTypeError(
-            msg=f"{file_type} is not a valid filetype OPTIONS: [pickle, csv, parquet]"
+            msg=f"{file_type} is not a valid filetype OPTIONS: [pickle, csv, parquet]",
+            source=read_df.__name__,
         )
 
     return df
@@ -194,10 +202,13 @@ def write_df(
                 pickle.dump(df, f, protocol=pickle.HIGHEST_PROTOCOL)
         except Exception as e:
             print(e.args[0])
-            raise InvalidFileTypeError(msg="Data could not be saved as a pickle.")
+            raise InvalidFileTypeError(
+                msg="Data could not be saved as a pickle.", source=write_df.__name__
+            )
     else:
         raise InvalidFileTypeError(
-            msg=f"{file_type} is not a valid filetype OPTIONS: [csv, pickle, parquet]"
+            msg=f"{file_type} is not a valid filetype OPTIONS: [csv, pickle, parquet]",
+            source=write_df.__name__,
         )
 
 
@@ -218,7 +229,9 @@ def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
     try:
         file_name = os.path.basename(filepath.rsplit(file_extension, 1)[0])
     except ValueError:
-        raise InvalidFilepathError(msg="{} is not a valid filepath".format(filepath))
+        raise InvalidFilepathError(
+            msg=f"{filepath} is not a valid filepath", source=get_fn_ext.__name__
+        )
     dir_name = os.path.dirname(filepath)
     return dir_name, file_name, file_extension
 
@@ -259,12 +272,14 @@ def read_config_entry(
                 value = config.get(section, option).strip()
                 if not os.path.isdir(value):
                     raise NotDirectoryError(
-                        msg=f"The SimBA config file includes paths to a folder ({value}) that does not exist."
+                        msg=f"The SimBA config file includes paths to a folder ({value}) that does not exist.",
+                        source=read_config_entry.__name__,
                     )
             if options != None:
                 if value not in options:
                     raise InvalidInputError(
-                        msg=f"{option} is set to {str(value)} in SimBA, but this is not among the valid options: ({options})"
+                        msg=f"{option} is set to {str(value)} in SimBA, but this is not among the valid options: ({options})",
+                        source=read_config_entry.__name__,
                     )
                 else:
                     return value
@@ -274,14 +289,16 @@ def read_config_entry(
             return default_value
         else:
             raise MissingProjectConfigEntryError(
-                msg=f"SimBA could not find an entry for option {option} under section {section} in the project_config.ini. Please specify the settings in the settings menu."
+                msg=f"SimBA could not find an entry for option {option} under section {section} in the project_config.ini. Please specify the settings in the settings menu and make sure the path to your project config is correct",
+                source=read_config_entry.__name__,
             )
     except ValueError:
         if default_value != None:
             return default_value
         else:
             raise MissingProjectConfigEntryError(
-                msg=f"SimBA could not find an entry for option {option} under section {section} in the project_config.ini. Please specify the settings in the settings menu."
+                msg=f"SimBA could not find an entry for option {option} under section {section} in the project_config.ini. Please specify the settings in the settings menu.",
+                source=read_config_entry.__name__,
             )
 
 
@@ -309,7 +326,8 @@ def read_project_path_and_file_type(config: configparser.ConfigParser) -> (str, 
     ).strip()
     if not os.path.isdir(project_path):
         raise NotDirectoryError(
-            msg=f"The project config file {config} has project path {project_path} that does not exist"
+            msg=f"The project config file {config} has project path {project_path} that does not exist",
+            source=read_project_path_and_file_type.__name__,
         )
 
     return project_path, file_type
@@ -340,7 +358,8 @@ def read_video_info_csv(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
     ]:
         if c not in info_df.columns:
             raise ParametersFileError(
-                msg=f'The project "project_folder/logs/video_info.csv" does not not have an anticipated header ({c}). Please re-create the file and make sure each video has a {c} value'
+                msg=f'The project "project_folder/logs/video_info.csv" does not not have an anticipated header ({c}). Please re-create the file and make sure each video has a {c} value',
+                source=read_video_info_csv.__name__,
             )
     info_df["Video"] = info_df["Video"].astype(str)
     for c in [
@@ -354,11 +373,13 @@ def read_video_info_csv(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
             info_df[c] = info_df[c].astype(float)
         except:
             raise ParametersFileError(
-                msg=f'One or more values in the {c} column of the "project_folder/logs/video_info.csv" file could not be interpreted as a numeric value. Please re-create the file and make sure the entries in the {c} column are all numeric.'
+                msg=f'One or more values in the {c} column of the "project_folder/logs/video_info.csv" file could not be interpreted as a numeric value. Please re-create the file and make sure the entries in the {c} column are all numeric.',
+                source=read_video_info_csv.__name__,
             )
     if info_df["fps"].min() <= 1:
         InvalidValueWarning(
-            msg="Videos in your SimBA project have an FPS of 1 or less. Please use videos with more than one frame per second, or correct the inaccurate fps inside the `project_folder/logs/videos_info.csv` file"
+            msg="Videos in your SimBA project have an FPS of 1 or less. Please use videos with more than one frame per second, or correct the inaccurate fps inside the `project_folder/logs/videos_info.csv` file",
+            source=read_video_info_csv.__name__,
         )
     return info_df
 
@@ -381,16 +402,20 @@ def read_config_file(config_path: Union[str, os.PathLike]) -> configparser.Confi
     except Exception as e:
         print(e.args)
         raise MissingProjectConfigEntryError(
-            msg=f"{config_path} is not a valid project_config file. Please check the project_config.ini path."
+            msg=f"{config_path} is not a valid project_config file. Please check the project_config.ini path.",
+            source=read_config_entry.__name__,
         )
     return config
 
 
-def get_video_meta_data(video_path: Union[str, os.PathLike]) -> dict:
+def get_video_meta_data(
+    video_path: Union[str, os.PathLike], fps_as_int: bool = True
+) -> dict:
     """
     Read video metadata (fps, resolution, frame cnt etc.) from video file (e.g., mp4).
 
     :parameter str video_path: Path to a video file.
+    :parameter bool fps_as_int: If True, force video fps to int through floor rounding, else float. Default = True.
     :return dict: Video file meta data.
 
     :example:
@@ -402,14 +427,17 @@ def get_video_meta_data(video_path: Union[str, os.PathLike]) -> dict:
     video_data = {}
     cap = cv2.VideoCapture(video_path)
     _, video_data["video_name"], _ = get_fn_ext(video_path)
-    video_data["fps"] = int(cap.get(cv2.CAP_PROP_FPS))
+    video_data["fps"] = cap.get(cv2.CAP_PROP_FPS)
+    if fps_as_int:
+        video_data["fps"] = int(video_data["fps"])
     video_data["width"] = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     video_data["height"] = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     video_data["frame_count"] = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     for k, v in video_data.items():
         if v == 0:
             raise InvalidVideoFileError(
-                msg=f'Video {video_data["video_name"]} has {k} of {str(v)} (full error video path: {video_path}).'
+                msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).',
+                source=get_video_meta_data.__name__,
             )
     video_data["resolution_str"] = str(
         f'{video_data["width"]} x {video_data["height"]}'
@@ -444,7 +472,10 @@ def concatenate_videos_in_folder(
     """
 
     if not check_nvidea_gpu_available() and gpu:
-        raise FFMPEGCodecGPUError(msg="No FFMpeg GPU codec found.")
+        raise FFMPEGCodecGPUError(
+            msg="No FFMpeg GPU codec found.",
+            source=concatenate_videos_in_folder.__name__,
+        )
     timer = SimbaTimer(start=True)
     files = glob.glob(in_folder + "/*.{}".format(video_format))
     check_if_filepath_list_is_empty(
@@ -462,25 +493,26 @@ def concatenate_videos_in_folder(
         os.remove(save_path)
     if check_nvidea_gpu_available() and gpu:
         returned = os.system(
-            'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{}" -c copy -hide_banner -loglevel info "{}"'.format(
-                temp_txt_path, save_path
-            )
+            f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}"'
         )
     else:
         returned = os.system(
-            'ffmpeg -f concat -safe 0 -i "{}" "{}" -c copy -hide_banner -loglevel info'.format(
-                temp_txt_path, save_path
-            )
+            f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info'
         )
     while True:
         if returned != 0:
             pass
         else:
             if remove_splits:
-                remove_a_folder(folder_dir=in_folder)
+                print(in_folder, Path(in_folder).parents[0])
+                remove_a_folder(folder_dir=Path(in_folder).parents[0])
             break
     timer.stop_timer()
-    stdout_success(msg="Video concatenated", elapsed_time=timer.elapsed_time_str)
+    stdout_success(
+        msg="Video concatenated",
+        elapsed_time=timer.elapsed_time_str,
+        source=concatenate_videos_in_folder.__name__,
+    )
 
 
 def get_bp_headers(body_parts_lst: List[str]) -> list:
@@ -523,11 +555,13 @@ def read_video_info(
     video_settings = vid_info_df.loc[vid_info_df["Video"] == video_name]
     if len(video_settings) > 1:
         raise DuplicationError(
-            msg=f"SimBA found multiple rows in the project_folder/logs/video_info.csv named {str(video_name)}. Please make sure that each video name is represented ONCE in the video_info.csv"
+            msg=f"SimBA found multiple rows in the project_folder/logs/video_info.csv named {str(video_name)}. Please make sure that each video name is represented ONCE in the video_info.csv",
+            source=read_video_info.__name__,
         )
     elif len(video_settings) < 1:
         raise ParametersFileError(
-            msg=f" SimBA could not find {str(video_name)} in the video_info.csv file. Make sure all videos analyzed are represented in the project_folder/logs/video_info.csv file."
+            msg=f" SimBA could not find {str(video_name)} in the video_info.csv file. Make sure all videos analyzed are represented in the project_folder/logs/video_info.csv file.",
+            source=read_video_info.__name__,
         )
     else:
         try:
@@ -536,13 +570,15 @@ def read_video_info(
             return video_settings, px_per_mm, fps
         except TypeError:
             raise ParametersFileError(
-                msg=f"Make sure the videos that are going to be analyzed are represented with APPROPRIATE VALUES inside the project_folder/logs/video_info.csv file in your SimBA project. Could not interpret the fps, pixels per millimeter and/or fps as numerical values for video {video_name}"
+                msg=f"Make sure the videos that are going to be analyzed are represented with APPROPRIATE VALUES inside the project_folder/logs/video_info.csv file in your SimBA project. Could not interpret the fps, pixels per millimeter and/or fps as numerical values for video {video_name}",
+                source=read_video_info.__name__,
             )
 
 
 def find_all_videos_in_directory(
     directory: Union[str, os.PathLike],
     as_dict: Optional[bool] = False,
+    raise_error: bool = False,
     video_formats: Optional[Tuple[str]] = (".avi", ".mp4", ".mov", ".flv", ".m4v"),
 ) -> Union[dict, list]:
     """
@@ -550,9 +586,10 @@ def find_all_videos_in_directory(
 
     :param str directory: Directory to search for video files.
     :param bool as_dict: If True, returns dictionary with the video name as key and file path as value.
+    :param bool raise_error: If True, raise error if no videos are found. Else, NoFileFoundWarning.
     :param Tuple[str] video_formats: Acceptable video formats. Default: '.avi', '.mp4', '.mov', '.flv', '.m4v'.
-
     :return List[str] or Dict[str, str]
+    :raises NoFilesFoundError: If ``raise_error`` and ``directory`` has no files in formats ``video_formats``.
 
     :examples:
     >>> find_all_videos_in_directory(directory='project_folder/videos')
@@ -563,10 +600,14 @@ def find_all_videos_in_directory(
         if i.lower().endswith(video_formats):
             video_lst.append(i)
     if not video_lst:
+        if raise_error:
+            raise NoFilesFoundError(
+                f"No videos found in directory {directory} in formats {video_formats}."
+            )
         video_lst.append("No videos found")
         NoFileFoundWarning(
             msg=f"No videos found in directory ({directory})",
-            source="find_all_videos_in_directory",
+            source=find_all_videos_in_directory.__name__,
         )
 
     if video_lst and as_dict:
@@ -580,14 +621,82 @@ def find_all_videos_in_directory(
     return video_lst
 
 
+def read_frm_of_video(
+    video_path: Union[str, os.PathLike, cv2.VideoCapture],
+    frame_index: int = 0,
+    opacity: Optional[float] = None,
+    size: Optional[Tuple[int, int]] = None,
+):
+    """
+    Reads single image from video file.
+
+    :param Union[str, os.PathLike] video_path: Path to video file, or cv2.VideoCapture object.
+    :param int frame_index: The frame of video to return. Default: 1.
+    :param Optional[int] opacity: Value between 0 and 100 or None. If float, returns image with opacity. 100 fully opaque. 0.0 fully transparant.
+    :param Optional[Tuple[int, int]] size: If tuple, resizes the image to size. Else, returns original image size.
+    :return np.ndarray: Image as numpy array.
+    """
+
+    check_instance(
+        source=read_frm_of_video.__name__,
+        instance=video_path,
+        accepted_types=(str, cv2.VideoCapture),
+    )
+    if type(video_path) == str:
+        check_file_exist_and_readable(file_path=video_path)
+        video_meta_data = get_video_meta_data(video_path=video_path)
+    else:
+        video_meta_data = {"frame_count": int(video_path.get(cv2.CAP_PROP_FRAME_COUNT))}
+    if (frame_index > video_meta_data["frame_count"]) or (frame_index < 0):
+        raise FrameRangeError(
+            msg=f'Frame {frame_index} is out of range: The video {video_path} contains {video_meta_data["frame_count"]} frames.',
+            source=read_frm_of_video.__name__,
+        )
+    if type(video_path) == str:
+        capture = cv2.VideoCapture(video_path)
+    else:
+        capture = video_path
+    capture.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
+    ret, img = capture.read()
+    if ret:
+        if opacity:
+            opacity = float(opacity / 100)
+            check_float(
+                name="Opacity",
+                value=opacity,
+                min_value=0.00,
+                max_value=1.00,
+                raise_error=True,
+            )
+            opacity = 1 - opacity
+            h, w, clr = img.shape[:3]
+            opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
+            img = cv2.addWeighted(
+                img.astype(np.uint8),
+                1 - opacity,
+                opacity_image.astype(np.uint8),
+                opacity,
+                0,
+            )
+        if size:
+            img = cv2.resize(img, size, interpolation=cv2.INTER_LINEAR)
+    else:
+        NoDataFoundWarning(
+            msg=f"Frame {frame_index} for video {video_path} could not be read."
+        )
+
+    return img
+
+
 def find_video_of_file(
-    video_dir: Union[str, os.PathLike], filename: str
+    video_dir: Union[str, os.PathLike], filename: str, raise_error: bool = False
 ) -> Union[str, os.PathLike]:
     """
     Helper to find the video file with the SimBA project that represents a known data file path.
 
     :param str video_dir: Directory holding putative video file.
     :param str filename: Data file name, e.g., ``Video_1``.
+    :param bool raise_error: If True, raise error if no file can be found. Else, print warning. Default: False
     :return str: Video path.
     :raise NoFilesFoundError: No video file representing file found.
 
@@ -601,7 +710,10 @@ def find_video_of_file(
             f for f in next(os.walk(video_dir))[2] if not f[0] == "."
         ]
     except StopIteration:
-        raise NoFilesFoundError(msg=f"No files found in the {video_dir} directory")
+        raise NoFilesFoundError(
+            msg=f"No files found in the {video_dir} directory",
+            source=find_video_of_file.__name__,
+        )
     all_files_in_video_folder = [
         os.path.join(video_dir, x) for x in all_files_in_video_folder
     ]
@@ -613,9 +725,15 @@ def find_video_of_file(
         ):
             return_path = file_path
 
-    if return_path is None:
+    if return_path is None and raise_error:
+        raise NoFilesFoundError(
+            msg=f"SimBA could not find a video file representing {filename} in the project video directory",
+            source=find_video_of_file.__name__,
+        )
+    elif return_path is None:
         NoFileFoundWarning(
-            f"SimBA could not find a video file representing {filename} in the project video directory"
+            msg=f"SimBA could not find a video file representing {filename} in the project video directory",
+            source=find_video_of_file.__name__,
         )
     return return_path
 
@@ -646,7 +764,8 @@ def find_files_of_filetypes_in_directory(
     except StopIteration:
         if raise_warning:
             raise NoFilesFoundError(
-                msg=f"No files found in the {directory} directory with accepted extensions {str(extensions)}"
+                msg=f"No files found in the {directory} directory with accepted extensions {str(extensions)}",
+                source=find_files_of_filetypes_in_directory.__name__,
             )
         else:
             all_files_in_folder = []
@@ -659,11 +778,13 @@ def find_files_of_filetypes_in_directory(
             accepted_file_paths.append(file_path)
     if not accepted_file_paths and raise_warning:
         NoFileFoundWarning(
-            msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory"
+            msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory",
+            source=find_files_of_filetypes_in_directory.__name__,
         )
     if not accepted_file_paths and raise_error:
         raise NoDataError(
-            msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory"
+            msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory",
+            source=find_files_of_filetypes_in_directory.__name__,
         )
     return accepted_file_paths
 
@@ -681,14 +802,16 @@ def convert_parquet_to_csv(directory: str) -> None:
 
     if not os.path.isdir(directory):
         raise NotDirectoryError(
-            msg="SIMBA ERROR: {} is not a valid directory".format(directory)
+            msg="SIMBA ERROR: {} is not a valid directory".format(directory),
+            source=convert_parquet_to_csv.__name__,
         )
     files_found = glob.glob(directory + "/*.parquet")
     if len(files_found) < 1:
         raise NoFilesFoundError(
             "SIMBA ERROR: No parquet files (with .parquet file ending) found in the {} directory".format(
                 directory
-            )
+            ),
+            source=convert_parquet_to_csv.__name__,
         )
     for file_cnt, file_path in enumerate(files_found):
         print("Reading in {} ...".format(os.path.basename(file_path)))
@@ -701,7 +824,8 @@ def convert_parquet_to_csv(directory: str) -> None:
         df.to_csv(new_file_path)
         print("Saved {}...".format(new_file_path))
     stdout_success(
-        msg=f"{str(len(files_found))} parquet files in {directory} converted to csv"
+        msg=f"{str(len(files_found))} parquet files in {directory} converted to csv",
+        source=convert_parquet_to_csv.__name__,
     )
 
 
@@ -717,14 +841,16 @@ def convert_csv_to_parquet(directory: Union[str, os.PathLike]) -> None:
     """
     if not os.path.isdir(directory):
         raise NotDirectoryError(
-            msg="SIMBA ERROR: {} is not a valid directory".format(directory)
+            msg="SIMBA ERROR: {} is not a valid directory".format(directory),
+            source=convert_csv_to_parquet.__name__,
         )
     files_found = glob.glob(directory + "/*.csv")
     if len(files_found) < 1:
         raise NoFilesFoundError(
             msg="SIMBA ERROR: No parquet files (with .csv file ending) found in the {} directory".format(
                 directory
-            )
+            ),
+            source=convert_csv_to_parquet.__name__,
         )
     print("Converting {} files...".format(str(len(files_found))))
     for file_cnt, file_path in enumerate(files_found):
@@ -736,7 +862,8 @@ def convert_csv_to_parquet(directory: Union[str, os.PathLike]) -> None:
         df.to_parquet(new_file_path)
         print("Saved {}...".format(new_file_path))
     stdout_success(
-        msg=f"{str(len(files_found))} csv files in {directory} converted to parquet"
+        msg=f"{str(len(files_found))} csv files in {directory} converted to parquet",
+        source=convert_csv_to_parquet.__name__,
     )
 
 
@@ -818,7 +945,8 @@ def archive_processed_files(
         raise NoFilesFoundError(
             msg="SIMBA ERROR: No data files located in your project_folder/csv sub-directories in the worflow file format {}".format(
                 file_type
-            )
+            ),
+            source=archive_processed_files.__name__,
         )
 
     for file_path in file_lst:
@@ -845,7 +973,7 @@ def archive_processed_files(
     for video_file in videos_file_paths:
         save_video_path = os.path.join(video_archive_path, os.path.basename(video_file))
         shutil.move(video_file, save_video_path)
-    stdout_success(msg="Archiving completed")
+    stdout_success(msg="Archiving completed", source=archive_processed_files.__name__)
 
 
 def str_2_bool(input_str: str) -> bool:
@@ -872,7 +1000,10 @@ def tabulate_clf_info(clf_path: Union[str, os.PathLike]) -> None:
     try:
         clf_obj = pickle.load(open(clf_path, "rb"))
     except:
-        raise InvalidFilepathError(msg=f"The {clf_path} file is not a pickle file")
+        raise InvalidFilepathError(
+            msg=f"The {clf_path} file is not a pickle file",
+            source=tabulate_clf_info.__name__,
+        )
     try:
         clf_features_no = clf_obj.n_features_
         clf_criterion = clf_obj.criterion
@@ -886,7 +1017,8 @@ def tabulate_clf_info(clf_path: Union[str, os.PathLike]) -> None:
             clf_verbose = False
     except:
         raise InvalidFilepathError(
-            msg=f"The {clf_path} file is not an scikit-learn RF classifier"
+            msg=f"The {clf_path} file is not an scikit-learn RF classifier",
+            source=tabulate_clf_info.__name__,
         )
     creation_time = "Unknown"
     try:
@@ -969,11 +1101,12 @@ def read_meta_file(meta_file_path) -> dict:
     return pd.read_csv(meta_file_path, index_col=False).to_dict(orient="records")[0]
 
 
-def read_simba_meta_files(folder_path: str) -> List[str]:
+def read_simba_meta_files(folder_path: str, raise_error: bool = False) -> List[str]:
     """
-    Read in paths of SimBA model config meta files in directory.
+    Read in paths of SimBA model config files directory (`project_folder/configs'). Consider files that have `meta` suffix only.
 
     :param str folder_path: directory with SimBA model config meta files
+    :param bool raise_error: If True, raise error if no files are found with ``meta`` suffix. Else, print warning. Default: False.
     :return List[str]: List of paths to  SimBA model config meta files.
 
     :example:
@@ -988,10 +1121,17 @@ def read_simba_meta_files(folder_path: str) -> List[str]:
     for i in file_paths:
         if i.__contains__("meta"):
             meta_file_lst.append(os.path.join(folder_path, i))
-    if len(meta_file_lst) == 0:
+    if len(meta_file_lst) == 0 and not raise_error:
         NoFileFoundWarning(
-            msg=f'The training meta-files folder in your project ({folder_path}) does not have any meta files inside it (no files in this folder has the "meta" substring in the filename)'
+            msg=f'The training meta-files folder in your project ({folder_path}) does not have any meta files inside it (no files in this folder has the "meta" substring in the filename)',
+            source=read_simba_meta_files.__name__,
         )
+    elif len(meta_file_lst) == 0 and raise_error:
+        raise NoFilesFoundError(
+            msg=f'The training meta-files folder in your project ({folder_path}) does not have any meta files inside it (no files in this folder has the "meta" substring in the filename)',
+            source=read_simba_meta_files.__name__,
+        )
+
     return meta_file_lst
 
 
@@ -1029,7 +1169,10 @@ def get_number_of_header_columns_in_df(df: pd.DataFrame) -> int:
             return i
         except ValueError:
             pass
-    raise DataHeaderError(msg="Could find the count of header columns in dataframe")
+    raise DataHeaderError(
+        msg="Could find the count of header columns in dataframe, all rows appear non-numeric",
+        source=get_number_of_header_columns_in_df.__name__,
+    )
 
 
 def get_memory_usage_of_df(df: pd.DataFrame) -> Dict[str, float]:
@@ -1056,6 +1199,7 @@ def copy_single_video_to_project(
     source_path: Union[str, os.PathLike],
     symlink: bool = False,
     allowed_video_formats: Optional[Tuple[str]] = ("avi", "mp4"),
+    overwrite: Optional[bool] = False,
 ) -> None:
     """
     Import single video file to SimBA project
@@ -1064,6 +1208,7 @@ def copy_single_video_to_project(
     :param str source_path: Path to video file outside SimBA project.
     :param Optional[bool] symlink: If True, creates soft copy rather than hard copy. Default: False.
     :param Optional[Tuple[str]] allowed_video_formats: Allowed video formats. DEFAULT: avi or mp4
+    :param Optional[bool] overwrite: If True, overwrites existing video if exists. Else, raise FileExistError.
     """
 
     timer = SimbaTimer(start=True)
@@ -1072,29 +1217,40 @@ def copy_single_video_to_project(
     print("Copying video {} file...".format(file_name))
     if file_ext[1:].lower().strip() not in allowed_video_formats:
         raise InvalidFileTypeError(
-            msg="SimBA works best with avi and mp4 video-files. Or please convert your videos to mp4 or avi to continue before importing it."
+            msg="SimBA works best with avi and mp4 video-files. Or please convert your videos to mp4 or avi to continue before importing it.",
+            source=copy_single_video_to_project.__name__,
         )
     new_filename = os.path.join(file_name + file_ext)
     destination = os.path.join(os.path.dirname(simba_ini_path), "videos", new_filename)
-    if os.path.isfile(destination):
+    if os.path.isfile(destination) and not overwrite:
         raise FileExistError(
-            msg=f"{file_name} already exist in SimBA project. To import, delete this video file before importing the new video file with the same name."
+            msg=f"{file_name} already exist in SimBA project. To import, delete this video file before importing the new video file with the same name.",
+            source=copy_single_video_to_project.__name__,
         )
     else:
         if not symlink:
             shutil.copy(source_path, destination)
         else:
-            os.symlink(source_path, destination)
+            try:
+                if os.path.isfile(destination):
+                    os.remove(destination)
+                os.symlink(source_path, destination)
+            except OSError as e:
+                raise PermissionError(
+                    msg="Symbolic link privilege not held. Try running SimBA in terminal opened in admin mode"
+                )
         timer.stop_timer()
         if not symlink:
             stdout_success(
                 msg=f"Video {file_name} imported to SimBA project (project_folder/videos directory",
                 elapsed_time=timer.elapsed_time_str,
+                source=copy_single_video_to_project.__name__,
             )
         else:
             stdout_success(
                 msg=f"Video {file_name}  SYMLINK imported to SimBA project (project_folder/videos directory",
                 elapsed_time=timer.elapsed_time_str,
+                source=copy_single_video_to_project.__name__,
             )
 
 
@@ -1117,17 +1273,17 @@ def copy_multiple_videos_to_project(
 
     if file_type.lower().strip() not in allowed_video_formats:
         raise InvalidFileTypeError(
-            msg="SimBA only works with avi and mp4 videofiles (Please enter mp4 or avi in entrybox). Or convert your videos to mp4 or avi to continue."
+            msg="SimBA only works with avi and mp4 video files (Please enter mp4 or avi in entrybox). Or convert your videos to mp4 or avi to continue.",
+            source=copy_multiple_videos_to_project.__name__,
         )
     video_path_lst = find_all_videos_in_directory(
-        directory=source, video_formats=(file_type)
+        directory=source, video_formats=(file_type), raise_error=True
     )
     video_path_lst = [os.path.join(source, x) for x in video_path_lst]
     if len(video_path_lst) == 0:
         raise NoFilesFoundError(
-            msg="SIMBA ERROR: No videos found in {} directory in file-type {}".format(
-                source, file_type
-            )
+            msg=f"SIMBA ERROR: No videos found in {source} directory of file-type {file_type}",
+            source=copy_multiple_videos_to_project.__name__,
         )
     destination_dir = os.path.join(os.path.dirname(config_path), "videos")
     for file_cnt, file_path in enumerate(video_path_lst):
@@ -1139,13 +1295,18 @@ def copy_multiple_videos_to_project(
         if os.path.isfile(dest1):
             FileExistWarning(
                 msg=f"{filebasename} already exist in SimBA project. Skipping video...",
-                source="copy_multiple_videos_to_project",
+                source=copy_multiple_videos_to_project.__name__,
             )
         else:
             if not symlink:
                 shutil.copy(file_path, dest1)
             else:
-                os.symlink(file_path, dest1)
+                try:
+                    os.symlink(file_path, dest1)
+                except OSError:
+                    raise PermissionError(
+                        msg="Symbolic link privilege not held. Try running SimBA in terminal opened in admin mode"
+                    )
             timer.stop_timer()
             if not symlink:
                 print(
@@ -1165,7 +1326,10 @@ def copy_multiple_videos_to_project(
                         timer.elapsed_time_str,
                     )
                 )
-    stdout_success(msg=f"{str(len(video_path_lst))} videos copied to project.")
+    stdout_success(
+        msg=f"{str(len(video_path_lst))} videos copied to project.",
+        source=copy_multiple_videos_to_project.__name__,
+    )
 
 
 def find_all_videos_in_project(
@@ -1190,7 +1354,8 @@ def find_all_videos_in_project(
             _, file_name, file_ext = get_fn_ext(file_path)
         except ValueError:
             raise InvalidFilepathError(
-                msg="{} is not a valid filepath".format(file_path)
+                msg="{} is not a valid filepath".format(file_path),
+                source=find_all_videos_in_project.__name__,
             )
         if (file_ext.lower() == ".mp4") or (file_ext.lower() == ".avi"):
             if not basename:
@@ -1199,7 +1364,8 @@ def find_all_videos_in_project(
                 video_paths.append(file_name)
     if len(video_paths) == 0:
         raise NoFilesFoundError(
-            msg=f"No videos in mp4 or avi format found imported to SimBA project in the {videos_dir} directory"
+            msg=f"No videos in mp4 or avi format found imported to SimBA project in the {videos_dir} directory",
+            source=find_all_videos_in_project.__name__,
         )
     else:
         return video_paths
@@ -1228,8 +1394,49 @@ def check_if_hhmmss_timestamp_is_valid_part_of_video(
     if not video_meta_data["video_length_s"] >= time_stamp_in_seconds:
         video_length_str = timedelta(seconds=video_meta_data["video_length_s"])
         raise FrameRangeError(
-            msg=f'The timestamp {timestamp} does not occur in video {video_meta_data["video_name"]}, the video has length {video_length_str}'
+            msg=f'The timestamp {timestamp} does not occur in video {video_meta_data["video_name"]}, the video has length {video_length_str}',
+            source=check_if_hhmmss_timestamp_is_valid_part_of_video.__name__,
         )
+
+
+def find_time_stamp_from_frame_numbers(
+    start_frame: int, end_frame: int, fps: float
+) -> List[str]:
+    """
+    Given start and end frame numbers and frames per second (fps), return a list of formatted time stamps
+    corresponding to the frame range.
+
+    :param int start_frame: The starting frame index.
+    :param int end_frame: The ending frame index.
+    :param float fps: Frames per second.
+    :return List[str]: A list of time stamps in the format 'HH:MM:SS:MS'.
+
+    :example:
+    >>> find_time_stamp_from_frame_numbers(start_frame=11, end_frame=20, fps=3.4)
+    >>> ['00:00:03:235', '00:00:05:882']
+    """
+
+    def get_time(frame_index, fps):
+        total_seconds = frame_index / fps
+        milliseconds = int((total_seconds % 1) * 1000)
+        total_seconds = int(total_seconds)
+        seconds = total_seconds % 60
+        total_seconds //= 60
+        minutes = total_seconds % 60
+        hours = total_seconds // 60
+        return "{:02d}:{:02d}:{:02d}.{:03d}".format(
+            hours, minutes, seconds, milliseconds
+        )
+
+    check_int(name="start_frame", value=start_frame, min_value=0)
+    check_int(name="end_frame", value=end_frame, min_value=0)
+    check_float(name="FPS", value=fps, min_value=1)
+    if start_frame > end_frame:
+        raise FrameRangeError(
+            msg=f"Start frame ({start_frame}) cannot be before end frame ({end_frame})"
+        )
+
+    return [get_time(start_frame, fps), get_time(end_frame, fps)]
 
 
 def read_roi_data(
@@ -1247,10 +1454,136 @@ def read_roi_data(
         polygon_df = pd.read_hdf(roi_path, key=Keys.ROI_POLYGONS.value)
     except:
         raise InvalidFileTypeError(
-            msg=f"{roi_path} is not a valid SimBA ROI definitions file"
+            msg=f"{roi_path} is not a valid SimBA ROI definitions file",
+            source=read_roi_data.__name__,
         )
     if "Center_XCenter_Y" in polygon_df.columns:
         polygon_df = polygon_df.drop(["Center_XCenter_Y"], axis=1)
     polygon_df = polygon_df.dropna(how="any")
 
     return rectangles_df, circles_df, polygon_df
+
+
+def create_directory(path: Union[str, os.PathLike]):
+    if not os.path.exists(path):
+        os.makedirs(path)
+    else:
+        pass
+
+
+def find_max_vertices_coordinates(
+    shapes: List[Union[Polygon, LineString, MultiPolygon, Point]],
+    buffer: Optional[int] = None,
+) -> Tuple[int, int]:
+    """
+    Find the maximum x and y coordinates among the vertices of a list of Shapely geometries.
+
+    :param List[Union[Polygon, LineString, MultiPolygon, Point]] shapes: A list of Shapely geometries including Polygons, LineStrings, MultiPolygons, and Points.
+    :param Optional[int] buffer: If int, adds to maximum x and y.
+    :returns Tuple[int, int]: A tuple containing the maximum x and y coordinates found among the vertices.
+
+    :example:
+    >>> polygon = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
+    >>> line = LineString([(1, 1), (2, 2), (3, 1), (4, 0)])
+    >>> multi_polygon = MultiPolygon([Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]), Polygon([(1, 1), (2, 1), (2, 2), (1, 2)])])
+    >>> point = Point(3, 4)
+    >>> find_max_vertices_coordinates([polygon, line, multi_polygon, point])
+    >>> (4, 4)
+    """
+
+    for shape in shapes:
+        check_instance(
+            source=find_max_vertices_coordinates.__name__,
+            instance=shape,
+            accepted_types=(Polygon, LineString, MultiPolygon, Point, MultiLineString),
+        )
+
+    max_x, max_y = -np.inf, -np.inf
+    for shape in shapes:
+        if isinstance(shape, Polygon):
+            for vertex in shape.exterior.coords:
+                max_x, max_y = max(max_x, vertex[0]), max(max_y, vertex[1])
+
+        if isinstance(shape, MultiPolygon):
+            for polygon in shape.geoms:
+                for vertex in polygon.exterior.coords:
+                    max_x, max_y = max(max_x, vertex[0]), max(max_y, vertex[1])
+
+        if isinstance(shape, LineString):
+            for vertex in shape.coords:
+                max_x, max_y = max(max_x, vertex[0]), max(max_y, vertex[1])
+
+        if isinstance(shape, Point):
+            max_x, max_y = max(max_x, shape.coords[0][0]), max(
+                max_y, shape.coords[0][1]
+            )
+
+        if isinstance(shape, MultiLineString):
+            for line in shape.geoms:
+                for vertex in line.coords:
+                    max_x, max_y = max(max_x, vertex[0]), max(max_y, vertex[1])
+
+    if buffer:
+        check_int(name="Buffer", value=buffer, min_value=1)
+        max_x += buffer
+        max_y += buffer
+
+    return int(max_x), int(max_y)
+
+
+def clean_sleap_filename(filename: str) -> str:
+    """
+    Clean a SLEAP input filename by removing '.analysis' suffix and project name prefix to match orginal video name.
+
+     .. note::
+       Modified from `vtsai881 <https://github.com/vtsai881>`_.
+
+    :param str filename: The original filename to be cleaned to match video name.
+    :returns str: The cleaned filename.
+
+    :example:
+    >>> clean_sleap_csv_filename("projectname.v00x.00x_videoname.analysis.csv")
+    >>> 'videoname.csv'
+    >>> clean_sleap_csv_filename("projectname.v00x.00x_videoname.analysis.h5")
+    >>> 'videoname.h5'
+    """
+
+    SLEAP_CSV_SUBSTR = ".analysis"
+    if (SLEAP_CSV_SUBSTR in filename) and ("_" in filename):
+        return filename.replace(filename.split("_")[0] + "_", "").replace(
+            SLEAP_CSV_SUBSTR, ""
+        )
+    else:
+        return filename
+
+
+def clean_sleap_filenames_in_dir(dir: Union[str, os.PathLike]) -> None:
+    """
+    Clean up SLEAP input filenames in the specified directory by removing a prefix
+    and a suffix, and renaming the files to match the names of the original video files.
+
+    .. note::
+       Modified from `vtsai881 <https://github.com/vtsai881>`_.
+
+    :param Union[str, os.PathLike] dir: The directory path where the SLEAP CSV or H5 files are located.
+
+    :example:
+    >>> clean_sleap_csv_filenames_in_dir(dir='/Users/simon/Desktop/envs/troubleshooting/Hornet_SLEAP/import/')
+    """
+
+    SLEAP_CSV_SUBSTR = ".analysis"
+    check_if_dir_exists(in_dir=dir)
+    for file_path in glob.glob(
+        dir + f"/*.{Formats.CSV.value}" + f"/*.{Formats.H5.value}"
+    ):
+        file_name = os.path.basename(p=file_path)
+        if (SLEAP_CSV_SUBSTR in file_name) and ("_" in file_name):
+            new_name = os.path.join(
+                dir,
+                file_name.replace(file_name.split("_")[0] + "_", "").replace(
+                    SLEAP_CSV_SUBSTR, ""
+                ),
+            )
+            os.rename(file_path, new_name)
+        else:
+            pass

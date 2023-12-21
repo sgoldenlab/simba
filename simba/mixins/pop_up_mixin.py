@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson"
 import os
 from tkinter import *
 from tkinter import messagebox
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import PIL.Image
 from PIL import ImageTk
@@ -24,7 +24,7 @@ from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int, check_str)
 from simba.utils.enums import ConfigKey, Formats, Options
-from simba.utils.errors import CountError
+from simba.utils.errors import CountError, NoFilesFoundError
 from simba.utils.lookups import (get_color_dict, get_icons_paths,
                                  get_named_colors)
 from simba.utils.read_write import (copy_multiple_videos_to_project,
@@ -35,26 +35,36 @@ from simba.utils.read_write import (copy_multiple_videos_to_project,
 
 class PopUpMixin(object):
     """
-    Methods for pop-up windows in SimBA.
+    Methods for pop-up windows in SimBA. E.g., common methods for creating pop-up windows with drop-downs,
+    checkboxes, entry-boxes, listboxes etc.
 
     :param str title: Pop-up window title
-    :param Optional[configparser.Configparser] config_path: path to SimBA project_config.ini
-    :param tuple size: HxW of the pop-up window.
+    :param Optional[configparser.Configparser] config_path: path to SimBA project_config.ini. If path, the project config is read in. If None, the project config is not read in.
+    :param tuple size: HxW of the pop-up window. The size of the pop-up window in pixels.
+    :param bool main_scrollbar: If True, the pop-up window is scrollable.
     """
 
     def __init__(
-            self,
-            title: str,
-            config_path: Optional[str] = None,
-            size: Tuple[int, int] = (960, 720),
+        self,
+        title: str,
+        config_path: Optional[str] = None,
+        main_scrollbar: Optional[bool] = True,
+        size: Tuple[int, int] = (960, 720),
     ):
+        # self.main_frm = Toplevel()
+        # self.main_frm.minsize(size[0], size[1])
+        # self.main_frm.wm_title(title)
+        # self.main_frm.lift()
+        # self.main_frm = Canvas(hxtScrollbar(self.main_frm))
         self.root = Toplevel()
         self.root.minsize(size[0], size[1])
         self.root.wm_title(title)
         self.root.lift()
-        self.main_frm = Canvas(hxtScrollbar(self.root))
+        if main_scrollbar:
+            self.main_frm = Canvas(hxtScrollbar(self.root))
+        else:
+            self.main_frm = Canvas(self.root)
         self.main_frm.pack(fill="both", expand=True)
-
         self.palette_options = Options.PALETTE_OPTIONS.value
         self.resolutions = Options.RESOLUTION_OPTIONS.value
         self.shading_options = Options.HEATMAP_SHADING_OPTIONS.value
@@ -73,14 +83,24 @@ class PopUpMixin(object):
                 )
             )
         if config_path:
-            print(config_path)
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
 
-    def create_clf_checkboxes(self, main_frm: Frame, clfs: List[str]):
+    def create_clf_checkboxes(
+        self,
+        main_frm: Frame,
+        clfs: List[str],
+        title: str = "SELECT CLASSIFIER ANNOTATIONS",
+    ):
+        """
+        Creates a labelframe with one checkbox per classifier, and inserts the labelframe into the bottom of the pop-up window.
+
+        .. note::
+           Legacy. Use ``create_cb_frame`` instead.
+
+        """
+
         self.choose_clf_frm = LabelFrame(
-            self.main_frm,
-            text="SELECT CLASSIFIER ANNOTATIONS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            self.main_frm, text=title, font=Formats.LABELFRAME_HEADER_FORMAT.value
         )
         self.clf_selections = {}
         for clf_cnt, clf in enumerate(clfs):
@@ -92,26 +112,93 @@ class PopUpMixin(object):
         self.choose_clf_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 
     def create_cb_frame(
-            self, main_frm: Frame, cb_titles: List[str], frm_title: str
+        self,
+        main_frm: Frame,
+        cb_titles: List[str],
+        frm_title: str,
+        command: Optional[object] = None,
     ) -> Dict[str, BooleanVar]:
+        """
+        Creates a labelframe with one checkbox per classifier, and inserts the labelframe into the bottom of the pop-up window.
+
+        :param Frame main_frm: The tkinter pop-up window.
+        :param List[str] cb_titles: List of strings representing the names of the checkboxes.
+        :param str frm_title: Title of the frame.
+        :return Dict[str, BooleanVar]: Dictionary holding the ``cb_titles`` as keys and the BooleanVar representing if the checkbox is ticked or not.
+        """
+
         cb_frm = LabelFrame(
             main_frm, text=frm_title, font=Formats.LABELFRAME_HEADER_FORMAT.value
         )
         cb_dict = {}
         for cnt, title in enumerate(cb_titles):
             cb_dict[title] = BooleanVar(value=False)
-            cb = Checkbutton(cb_frm, text=title, variable=cb_dict[title])
+            if command is not None:
+                if isinstance(command, object):
+                    cb = Checkbutton(
+                        cb_frm,
+                        text=title,
+                        variable=cb_dict[title],
+                        command=lambda k=cb_titles[cnt]: command(k),
+                    )
+            else:
+                cb = Checkbutton(cb_frm, text=title, variable=cb_dict[title])
             cb.grid(row=cnt, column=0, sticky=NW)
         cb_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
         return cb_dict
 
-    def create_dropdown_frame(
-            self,
-            main_frm: Frame,
-            drop_down_titles: List[str],
-            drop_down_options: List[str],
-            frm_title: str,
+    def frame_of_radiobuttons(
+        self,
+        main_frm: Frame,
+        titles: List[str],
+        frm_title: str,
+        command: Optional[object] = None,
+        default_idx: Optional[int] = 0,
     ):
+        selection_var = StringVar()
+        radiobuttons_frm = LabelFrame(
+            main_frm, text=frm_title, font=Formats.LABELFRAME_HEADER_FORMAT.value
+        )
+        for cnt, title in enumerate(titles):
+            radio_button = Radiobutton(
+                main_frm,
+                text=titles[cnt],
+                variable=selection_var,
+                value=titles[cnt],
+                command=command,
+            )
+            radio_button.grid(row=cnt, column=0, sticky=NW)
+        radiobuttons_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
+        selection_var.set(value=titles[default_idx])
+        return selection_var
+
+    def place_frm_at_top_right(self, frm: Toplevel):
+        """
+        Place a TopLevel tkinter pop-up at the top right of the monitor. Note: call before putting scrollbars or converting to Canvas.
+        """
+        screen_width, screen_height = frm.winfo_screenwidth(), frm.winfo_screenheight()
+        window_width, window_height = frm.winfo_width(), frm.winfo_height()
+        x_position = screen_width - window_width
+        frm.geometry(f"{window_width}x{window_height}+{x_position}+{0}")
+
+    def create_dropdown_frame(
+        self,
+        main_frm: Frame,
+        drop_down_titles: List[str],
+        drop_down_options: List[str],
+        frm_title: str,
+    ) -> Dict[str, DropDownMenu]:
+        """
+        Creates a labelframe with dropdown menus and inserts it at the bottom of the pop-up window.
+
+        :param Frame main_frm: The tkinter pop-up window.
+        :param List[str] drop_down_titles: The dropdown menu names
+        :param List[str] drop_down_options: The options in each dropdown. All dropdowns must have the same options.
+        :param str frm_title: Title of the frame.
+        :return Dict[str, BooleanVar]: Dictionary holding the ``drop_down_titles`` and the drop-down menus as values.
+
+        """
+
         dropdown_frm = LabelFrame(
             main_frm, text=frm_title, font=Formats.LABELFRAME_HEADER_FORMAT.value
         )
@@ -193,7 +280,14 @@ class PopUpMixin(object):
         self.time_bin_entrybox.grid(row=0, column=0, sticky=NW)
         self.time_bin_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 
-    def create_run_frm(self, run_function: object, title: str = "RUN"):
+    def create_run_frm(self, run_function: object, title: str = "RUN") -> None:
+        """
+        Create a label frame with a single button with a specified callback.
+
+        :param object run_function: The function/method callback of the button.
+        :param str title: The title of the frame.
+        """
+
         if hasattr(self, "run_frm"):
             self.run_frm.destroy()
             self.run_btn.destroy()
@@ -209,34 +303,19 @@ class PopUpMixin(object):
         self.run_frm.grid(row=self.children_cnt_main() + 1, column=0, sticky=NW)
         self.run_btn.grid(row=0, column=0, sticky=NW)
 
-    def create_choose_number_of_body_parts_directionality_frm(
-            self, path_to_directionality_dir: str, run_function: object
-    ):
-        self.bp_cnt_frm = LabelFrame(
-            self.main_frm,
-            text="SELECT DIR",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-        )
-        root, types_of_directionality, files = list(os.walk(path_to_directionality_dir))[0]
-        self.bp_cnt_dropdown = DropDownMenu(
-            self.bp_cnt_frm,
-            "# of body-parts directionality",
-            list(types_of_directionality),
-            "20",
-        )
-        self.bp_cnt_dropdown.setChoices(types_of_directionality[0])
-        self.bp_cnt_confirm_btn = Button(
-            self.bp_cnt_frm,
-            text="Confirm",
-            command=lambda: run_function,
-        )
-        self.bp_cnt_frm.grid(row=0, sticky=NW)
-        self.bp_cnt_dropdown.grid(row=0, column=0, sticky=NW)
-        self.bp_cnt_confirm_btn.grid(row=0, column=1, sticky=NW)
-
     def create_choose_number_of_body_parts_frm(
-            self, project_body_parts: List[str], run_function: object
+        self, project_body_parts: List[str], run_function: object
     ):
+        """
+        Many menus depend on how many animals the user choose to compute metrics for. Thus, we need to populate the menus
+        dynamically. This function creates a single drop-down menu where the user select the number of animals the
+        user choose to compute metrics for. It inserts this drop-down iat the bottom of the pop-up window, and ties this dropdown menu
+        choice to a callback.
+
+        :param List[str] project_body_parts: Options of the dropdown menu.
+        :param object run_function: Function tied to the choice in the dropdown menu.
+        """
+
         self.bp_cnt_frm = LabelFrame(
             self.main_frm,
             text="SELECT NUMBER OF BODY-PARTS",
@@ -245,7 +324,7 @@ class PopUpMixin(object):
         self.bp_cnt_dropdown = DropDownMenu(
             self.bp_cnt_frm,
             "# of body-parts",
-            list(range(1, len(project_body_parts))),
+            list(range(1, len(project_body_parts) + 1)),
             "12",
         )
         self.bp_cnt_dropdown.setChoices(1)
@@ -259,6 +338,13 @@ class PopUpMixin(object):
         self.bp_cnt_confirm_btn.grid(row=0, column=1, sticky=NW)
 
     def add_to_listbox_from_entrybox(self, list_box: Listbox, entry_box: Entry_Box):
+        """
+        Add a value that populates a tkinter entry_box to a tkinter listbox.
+
+        :param Listbox list_box: The tkinter Listbox to add the value to.
+        :param Entry_Box entry_box: The tkinter Entry_Box containing the value that should be added to the list_box.
+        """
+
         value = entry_box.entry_get
         check_float(name="VALUE", value=value)
         list_box_content = [float(x) for x in list_box.get(0, END)]
@@ -266,20 +352,58 @@ class PopUpMixin(object):
             list_box.insert(0, value)
 
     def add_value_to_listbox(self, list_box: Listbox, value: float):
+        """
+        Add a float value to a tkinter listbox.
+
+        :param Listbox list_box: The tkinter Listbox to add the value to.
+        :param float value: Value to add to the listbox.
+        """
         list_box.insert(0, value)
 
     def add_values_to_several_listboxes(
-            self, list_boxes: List[Listbox], values: List[float]
+        self, list_boxes: List[Listbox], values: List[float]
     ):
+        """
+        Add N values to N listboxes. E.g., values[0] will be added to list_boxes[0].
+
+        :param List[Listbox] list_boxes: List of Listboxes that the values should be added to.
+        :param List[float] values: List of floats that will be added to the list_boxes.
+        """
+
         if len(list_boxes) != len(values):
-            raise CountError(msg="Value count and listboxes count are not equal")
+            raise CountError(
+                msg="Value count and list-boxes count are not equal",
+                source=self.__class__.__name__,
+            )
         for i in range(len(list_boxes)):
             list_boxes[i].insert(0, values[i])
 
     def remove_from_listbox(self, list_box: Listbox):
+        """
+        Remove the current selection in a listbox from a listbox.
+
+        :param Listbox list_box: The listbox that the current selection should be removed from.
+        """
+
         selection = list_box.curselection()
         if selection:
             list_box.delete(selection[0])
+
+    def update_file_select_box_from_dropdown(
+        self, filename: str, fileselectbox: FileSelect
+    ):
+        """
+        Updates the text inside a tkinter FileSelect entrybox with a new string.
+        """
+        fileselectbox.filePath.set(filename)
+
+    def check_if_selected_video_path_exist_in_project(
+        self, video_path: Union[str, os.PathLike]
+    ):
+        if not os.path.isfile(video_path):
+            raise NoFilesFoundError(
+                msg=f"Selected video {os.path.basename(video_path)} is not a video file in the SimBA project video directory."
+            )
 
     def create_choose_bp_frm(self, project_body_parts, run_function):
         if hasattr(self, "body_part_frm"):
@@ -295,7 +419,7 @@ class PopUpMixin(object):
         for bp_cnt in range(int(self.bp_cnt_dropdown.getChoices())):
             self.body_parts_dropdowns[bp_cnt] = DropDownMenu(
                 self.body_part_frm,
-                f"Body-part {str(bp_cnt + 1)}:",
+                f"Body-part {str(bp_cnt+1)}:",
                 project_body_parts,
                 "25",
             )
@@ -320,12 +444,23 @@ class PopUpMixin(object):
             self.body_parts_dropdowns[bp_cnt].setChoices(bp_options[bp_cnt])
 
     def children_cnt_main(self) -> int:
+        """
+        Find the number of children (e.g., labelframes) currently exist within a main pop-up window. Useful for finding the
+        row at which a new frame within the window should be inserted.
+        """
+
         return int(len(list(self.main_frm.children.keys())))
 
     def frame_children(self, frame: Frame) -> int:
+        """
+        Find the number of children (e.g., labelframes) currently exist within specified frame.Similar to ``children_cnt_main``,
+        but accepts a specific frame rather than the main frame beeing hardcoded.
+        """
+
         return int(len(list(frame.children.keys())))
 
     def update_config(self) -> None:
+        """Helper to update the SimBA project config file"""
         with open(self.config_path, "w") as f:
             self.config.write(f)
 
@@ -351,8 +486,16 @@ class PopUpMixin(object):
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
     def enable_dropdown_from_checkbox(
-            self, check_box_var: BooleanVar, dropdown_menus: List[DropDownMenu]
+        self, check_box_var: BooleanVar, dropdown_menus: List[DropDownMenu]
     ):
+        """
+        Given a single checkbox, enable a bunch of dropdowns if the checkbox is ticked, and disable the dropdowns if
+        the checkbox is un-ticked.
+
+        :param BooleanVar check_box_var: The checkbox associated tkinter BooleanVar.
+        :param List[DropDownMenu] dropdown_menus: List of dropdowns which status is controlled by the ``check_box_var``.
+        """
+
         if check_box_var.get():
             for menu in dropdown_menus:
                 menu.enable()
@@ -361,13 +504,13 @@ class PopUpMixin(object):
                 menu.disable()
 
     def create_entry_boxes_from_entrybox(
-            self, count: int, parent: Frame, current_entries: list
+        self, count: int, parent: Frame, current_entries: list
     ):
         check_int(name="CLASSIFIER COUNT", value=count, min_value=1)
         for entry in current_entries:
             entry.destroy()
         for clf_cnt in range(int(count)):
-            entry = Entry_Box(parent, f"Classifier {str(clf_cnt + 1)}:", labelwidth=15)
+            entry = Entry_Box(parent, f"Classifier {str(clf_cnt+1)}:", labelwidth=15)
             current_entries.append(entry)
             entry.grid(row=clf_cnt + 2, column=0, sticky=NW)
 
@@ -378,12 +521,12 @@ class PopUpMixin(object):
         if not hasattr(self, "multi_animal_id_list"):
             self.multi_animal_id_list = []
             for i in range(int(animal_cnt)):
-                self.multi_animal_id_list.append(f"Animal {i + 1}")
+                self.multi_animal_id_list.append(f"Animal {i+1}")
         self.animal_names_frm = Frame(self.animal_settings_frm, pady=5, padx=5)
         self.animal_name_entry_boxes = {}
         for i in range(int(animal_cnt)):
             self.animal_name_entry_boxes[i + 1] = Entry_Box(
-                self.animal_names_frm, f"Animal {str(i + 1)} name: ", "25"
+                self.animal_names_frm, f"Animal {str(i+1)} name: ", "25"
             )
             if i <= len(self.multi_animal_id_list) - 1:
                 self.animal_name_entry_boxes[i + 1].entry_set(
@@ -394,11 +537,19 @@ class PopUpMixin(object):
         self.animal_names_frm.grid(row=1, column=0, sticky=NW)
 
     def enable_entrybox_from_checkbox(
-            self,
-            check_box_var: BooleanVar,
-            entry_boxes: List[Entry_Box],
-            reverse: bool = False,
+        self,
+        check_box_var: BooleanVar,
+        entry_boxes: List[Entry_Box],
+        reverse: bool = False,
     ):
+        """
+        Given a single checkbox, enable or disable a bunch of entry-boxes based on the status of the checkbox.
+
+        :param BooleanVar check_box_var: The checkbox associated tkinter BooleanVar.
+        :param List[Entry_Box] entry_boxes: List of entry-boxes which status is controlled by the ``check_box_var``.
+        :param bool reverse: If False, the entry-boxes are enabled with the checkbox is ticked. Else, the entry-boxes are enabled if checkbox is unticked. Default: False.
+        """
+
         if reverse:
             if check_box_var.get():
                 for box in entry_boxes:
@@ -415,16 +566,16 @@ class PopUpMixin(object):
                     box.set_state("disable")
 
     def create_import_pose_menu(
-            self, parent_frm: Frame, idx_row: int = 0, idx_column: int = 0
+        self, parent_frm: Frame, idx_row: int = 0, idx_column: int = 0
     ):
         def run_call(
-                data_type: str,
-                interpolation: str,
-                smoothing: str,
-                smoothing_window: str,
-                animal_names: dict,
-                data_path: str,
-                tracking_data_type: str or None = None,
+            data_type: str,
+            interpolation: str,
+            smoothing: str,
+            smoothing_window: str,
+            animal_names: dict,
+            data_path: str,
+            tracking_data_type: str or None = None,
         ):
             smooth_settings = {}
             smooth_settings["Method"] = smoothing
@@ -438,7 +589,8 @@ class PopUpMixin(object):
 
             if self.animal_name_entry_boxes is None:
                 raise CountError(
-                    msg="Select animal number and animal names BEFORE importing data."
+                    msg="Select animal number and animal names BEFORE importing data.",
+                    source=self.__class__.__name__,
                 )
 
             animal_ids = []
@@ -583,7 +735,10 @@ class PopUpMixin(object):
                         self.choice_frm, text="IMPORT DLC CSV FILE", pady=5, padx=5
                     )
                     self.import_file_select = FileSelect(
-                        self.import_single_frm, "Input FILE:", lblwidth=25
+                        self.import_single_frm,
+                        "Input FILE:",
+                        lblwidth=25,
+                        file_types=[("CSV", "*.csv")],
                     )
                     self.import_file_btn = Button(
                         self.import_single_frm,
@@ -905,7 +1060,7 @@ class PopUpMixin(object):
             self.data_type_dropdown.grid(row=0, column=0, sticky=NW)
 
     def create_import_videos_menu(
-            self, parent_frm: Frame, idx_row: int = 0, idx_column: int = 0
+        self, parent_frm: Frame, idx_row: int = 0, idx_column: int = 0
     ):
         def run_import(multiple_videos: bool):
             if multiple_videos:
@@ -975,6 +1130,7 @@ class PopUpMixin(object):
                 "VIDEO PATH: ",
                 title="Select a video file",
                 lblwidth=25,
+                file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
             )
             import_single_btn = Button(
                 import_single_frm,
@@ -1015,6 +1171,7 @@ class PopUpMixin(object):
     #     #print(f'+{e.x_root}x{e.y_root}')
     #     #self.main_frm.config(width=e.x_root, height=e.y_root)
     #     #self.main_frm.update()
+
 
 # test = PopUpMixin(config_path='/Users/simon/Desktop/envs/troubleshooting/two_animals_16bp_032023/project_folder/project_config.ini',
 #                   title='ss')

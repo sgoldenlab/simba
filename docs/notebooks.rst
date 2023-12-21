@@ -37,5 +37,6 @@ Miscellaneous
    :maxdepth: 1
 
    nb/import_sleap_h5
+   nb/multiclass
 
 

@@ -80,4 +80,5 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         roi_time_bin_calculator.save()
         self.root.destroy()
 
+
 # ROIAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/locomotion/project_folder/project_config.ini')

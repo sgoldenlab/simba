@@ -3,12 +3,8 @@ __author__ = "Simon Nilsson"
 import os.path
 import warnings
 
-from simba.ui.pop_ups.append_bodypart_directionality_features_pop_up import AppendBodyPartDirectionalityFeaturesPopUp
-
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import DirectionAnimalToBodyPartSettingsPopUp
-
 import atexit
 import subprocess
 import sys
@@ -24,11 +20,11 @@ from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
-from simba.data_processors.directing_other_animals_calculator import \
-    DirectingOtherAnimalsAnalyzer
 from simba.labelling.labelling_advanced_interface import \
     select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
+from simba.labelling.targeted_annotations_clips import \
+    select_labelling_video_targeted_clips
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.grid_search_rf import GridSearchRandomForestClassifier
 from simba.model.inference_batch import InferenceBatch
@@ -57,12 +53,16 @@ from simba.third_party_label_appenders.solomon_importer import SolomonImporter
 from simba.ui.create_project_ui import ProjectCreatorPopUp
 from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
+from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
+    AnimalDirectingAnimalPopUp
 from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
     AppendROIFeaturesByAnimalPopUp
 from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
     AppendROIFeaturesByBodyPartPopUp
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
+from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
+    BooleanConditionalSlicerPopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
@@ -77,9 +77,12 @@ from simba.ui.pop_ups.clf_validation_plot_pop_up import \
 from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
                                                    Parquet2CsvPopUp)
 from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
+from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import \
+    DirectingAnimalToBodyPartVisualizerPopUp
 from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
     DirectingOtherAnimalsVisualizerPopUp
-from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import DirectingAnimalToBodyPartVisualizerPopUp
+from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
+    DirectionAnimalToBodyPartSettingsPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
@@ -90,18 +93,20 @@ from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp
 from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
     MovementAnalysisTimeBinsPopUp
-# from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
+from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
 from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
 from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
 from simba.ui.pop_ups.pose_bp_drop_pop_up import DropTrackingDataPopUp
 from simba.ui.pop_ups.pose_reorganizer_pop_up import PoseReorganizerPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
-# from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
+from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
 from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp
 from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
     ROIAnalysisTimeBinsPopUp
 from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
+from simba.ui.pop_ups.roi_size_standardizer_popup import \
+    ROISizeStandardizerPopUp
 from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
 from simba.ui.pop_ups.set_machine_model_parameters_pop_up import \
     SetMachineModelParameters
@@ -117,17 +122,20 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
     ChangeFpsSingleVideoPopUp, ChangeImageFormatPopUp, CLAHEPopUp,
     ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
-    ConvertVideoPopUp, CreateGIFPopUP, CropVideoPopUp, DownsampleVideoPopUp,
-    ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
-    ExtractSpecificFramesPopUp, ImportFrameDirectoryPopUp,
-    MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
-    VideoRotatorPopUp, VideoTemporalJoinPopUp)
+    ConvertROIDefinitionsPopUp, ConvertVideoPopUp, CreateGIFPopUP,
+    CropVideoPopUp, DownsampleVideoPopUp, ExtractAllFramesPopUp,
+    ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
+    ExtractSpecificFramesPopUp, GreyscaleSingleVideoPopUp,
+    ImportFrameDirectoryPopUp, MergeFrames2VideoPopUp, MultiCropPopUp,
+    MultiShortenPopUp, SuperImposeFrameCountPopUp, VideoRotatorPopUp,
+    VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
+from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.data import run_user_defined_feature_extraction_class
 from simba.utils.enums import OS, Defaults, Formats, TagNames
 from simba.utils.errors import InvalidInputError
@@ -140,9 +148,9 @@ from simba.video_processors.video_processing import (
     extract_frames_from_all_videos_in_directory, superimpose_frame_count,
     video_to_greyscale)
 
-# from simba.unsupervised.unsupervised_ui import UnsupervisedGUI
+# from simba.unsupervised.ui import UnsupervisedGUI
 
-sys.setrecursionlimit(10 ** 6)
+sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 
 
@@ -151,7 +159,6 @@ class LoadProjectPopUp(object):
         self.main_frm = Toplevel()
         self.main_frm.minsize(300, 200)
         self.main_frm.wm_title("Load SimBA project (project_config.ini file)")
-
         self.load_project_frm = CreateLabelFrameWithIcon(
             parent=self.main_frm,
             header="LOAD SIMBA PROJECT_CONFIG.INI",
@@ -162,8 +169,9 @@ class LoadProjectPopUp(object):
             self.load_project_frm,
             "Select file: ",
             title="Select project_config.ini file",
+            file_types=[("SimBA Project .ini", "*.ini")],
         )
-        self.load_project_btn = Button(
+        load_project_btn = Button(
             self.load_project_frm,
             text="LOAD PROJECT",
             fg="blue",
@@ -172,7 +180,7 @@ class LoadProjectPopUp(object):
 
         self.load_project_frm.grid(row=0, sticky=NW)
         self.selected_file.grid(row=0, sticky=NW)
-        self.load_project_btn.grid(row=1, pady=10, sticky=NW)
+        load_project_btn.grid(row=1, pady=10, sticky=NW)
 
     def launch_project(self):
         check_file_exist_and_readable(file_path=self.selected_file.file_path)
@@ -191,9 +199,13 @@ def wait_for_internet_connection(url):
 
 
 class SimbaProjectPopUp(ConfigReader, PopUpMixin):
+    """
+    Main entry to the SimBA loaded project pop-up.
+    """
+
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        stdout_success(f"Loaded project {config_path}")
+        stdout_success(f"Loaded project {config_path}", source=self.__class__.__name__)
         simongui = Toplevel()
         simongui.minsize(1300, 800)
         simongui.wm_title("LOAD PROJECT")
@@ -402,9 +414,20 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         )
         self.delete_all_ROIs.image = self.btn_icons["trash"]["img"]
 
+        self.standardize_roi_size_popup_btn = Button(
+            self.new_ROI_frm,
+            text="STANDARDIZE ROI SIZES",
+            fg="blue",
+            compound="left",
+            image=self.btn_icons["calipher"]["img"],
+            command=lambda: ROISizeStandardizerPopUp(config_path=self.config_path),
+        )
+        self.standardize_roi_size_popup_btn.image = self.btn_icons["calipher"]["img"]
+
         self.new_ROI_frm.grid(row=0, sticky=NW)
         self.start_new_ROI.grid(row=0, sticky=NW)
         self.delete_all_ROIs.grid(row=1, column=0, sticky=NW)
+        self.standardize_roi_size_popup_btn.grid(row=2, column=0, sticky=NW)
 
         self.roi_draw = LabelFrame(
             tab6, text="ANALYZE ROI DATA", font=Formats.LABELFRAME_HEADER_FORMAT.value
@@ -485,26 +508,39 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             processmovementdupLabel,
             text="ANALYZE DIRECTIONALITY BETWEEN ANIMALS",
             fg="pink",
-            command=lambda: self.directing_other_animals_analysis(),
+            command=lambda: AnimalDirectingAnimalPopUp(config_path=self.config_path),
         )
         button_visualizeDirection = Button(
             processmovementdupLabel,
             text="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS",
             fg="brown",
-            command=lambda: self.directing_other_animals_visualizer(),
+            command=lambda: DirectingOtherAnimalsVisualizerPopUp(
+                config_path=self.config_path
+            ),
         )
         button_analyzeDirection_bp = Button(
             processmovementdupLabel,
             text="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS",
             fg="purple",
-            command=lambda: self.directing_animal_to_bp_analysis(),
+            command=lambda: DirectionAnimalToBodyPartSettingsPopUp(
+                config_path=self.config_path
+            ),
         )
         button_visualizeDirection_bp = Button(
             processmovementdupLabel,
             text="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS",
             fg="black",
-            command=lambda: self.directing_animal_to_body_part_visualizer(),
+            command=lambda: DirectingAnimalToBodyPartVisualizerPopUp(
+                config_path=self.config_path
+            ),
         )
+        btn_agg_boolean_conditional_statistics = Button(
+            processmovementdupLabel,
+            text="AGGREGATE BOOLEAN CONDITIONAL STATISTICS",
+            fg="grey",
+            command=lambda: BooleanConditionalSlicerPopUp(config_path=self.config_path),
+        )
+
         # organize
         processmovementdupLabel.grid(row=0, column=3, sticky=NW)
         analyze_distances_velocity_btn.grid(row=0, sticky=NW)
@@ -515,6 +551,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_visualizeDirection.grid(row=5, sticky=NW)
         button_analyzeDirection_bp.grid(row=6, sticky=NW)
         button_visualizeDirection_bp.grid(row=7, sticky=NW)
+        btn_agg_boolean_conditional_statistics.grid(row=8, sticky=NW)
 
         label_outliercorrection = CreateLabelFrameWithIcon(
             parent=tab4,
@@ -533,13 +570,15 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             label_outliercorrection,
             text="RUN OUTLIER CORRECTION",
             fg="green",
-            command=lambda: self.correct_outlier(),
+            command=lambda: threading.Thread(target=self.correct_outlier).start(),
         )
         button_skipOC = Button(
             label_outliercorrection,
             text="SKIP OUTLIER CORRECTION (CAUTION)",
             fg="red",
-            command=lambda: self.initiate_skip_outlier_correction(),
+            command=lambda: threading.Thread(
+                target=self.initiate_skip_outlier_correction
+            ).start(),
         )
 
         # extract features
@@ -549,7 +588,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.EXTRACT_FEATURES.value,
         )
-        # label_extractfeatures = LabelFrame(tab5,text='EXTRACT FEATURES',font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5,padx=5,fg='black')
         button_extractfeatures = Button(
             label_extractfeatures,
             text="EXTRACT FEATURES",
@@ -567,7 +605,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                     entry.configure(state="normal")
 
         labelframe_usrdef = LabelFrame(label_extractfeatures)
-        self.scriptfile = FileSelect(labelframe_usrdef, "Script path")
+        self.scriptfile = FileSelect(
+            labelframe_usrdef, "Script path", file_types=[("Python .py file", "*.py")]
+        )
         self.scriptfile.btnFind.configure(state="disabled")
         self.user_defined_var = BooleanVar(value=False)
         userscript = Checkbutton(
@@ -599,22 +639,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                 config_path=self.config_path
             ),
         )
-        append_body_part_directionality_features = Button(
+        remove_roi_features_from_feature_set = Button(
             roi_feature_frm,
-            text="APPEND BODY PART DIRECTIONALITY DATA TO FEATURES (CAUTION)",
-            fg="green",
-            command=lambda: AppendBodyPartDirectionalityFeaturesPopUp(
-                config_path=self.config_path
+            text="REMOVE ROI FEATURES FROM FEATURE SET",
+            fg="darkred",
+            command=lambda: RemoveROIFeaturesPopUp(
+                config_path=self.config_path, dataset="features_extracted"
             ),
         )
-        # remove_roi_features_from_feature_set = Button(
-        #     roi_feature_frm,
-        #     text="REMOVE ROI FEATURES FROM FEATURE SET",
-        #     fg="darkred",
-        #     command=lambda: RemoveROIFeaturesPopUp(
-        #         config_path=self.config_path, dataset="features_extracted"
-        #     ),
-        # )
 
         feature_tools_frm = LabelFrame(
             tab5,
@@ -635,7 +667,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.LABEL_BEHAVIOR.value,
         )
-        # label_behavior_frm = LabelFrame(tab7,text='LABEL BEHAVIOR',font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5,padx=5,fg='black')
         select_video_btn_new = Button(
             label_behavior_frm,
             text="Select video (create new video annotation)",
@@ -662,7 +693,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.THIRD_PARTY_ANNOTATION.value,
         )
-        # label_thirdpartyann = LabelFrame(tab7,text='IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS',font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5,padx=5,fg='black')
         button_importmars = Button(
             label_thirdpartyann,
             text="Import MARS Annotation (select folder with .annot files)",
@@ -706,7 +736,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.PSEUDO_LBL.value,
         )
-        # label_pseudo = LabelFrame(tab7,text='PSEUDO-LABELLING',font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         pseudo_intructions_lbl_1 = Label(
             label_pseudo,
             text="Note that SimBA pseudo-labelling require initial machine predictions.",
@@ -750,7 +779,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.ADVANCED_LBL.value,
         )
-        # label_adv_label = LabelFrame(tab7,text='ADVANCED LABEL BEHAVIOR',font=Formats.LABELFRAME_HEADER_FORMAT.value, fg='black')
         label_adv_note_1 = Label(
             label_adv_label,
             text="Note that you will have to specify the presence of *both* behavior and non-behavior on your own.",
@@ -782,6 +810,24 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             ),
         )
 
+        targeted_clip_annotator_frm = CreateLabelFrameWithIcon(
+            parent=tab7,
+            header="TARGETED CLIP ANNOTATOR",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.ADVANCED_LBL.value,
+        )
+        targeted_clip_annotator_note = Label(
+            targeted_clip_annotator_frm,
+            text="A bout annotator that creates annotated clips from videos associated with ML results.",
+        )
+        targeted_clip_annotator_btn = Button(
+            targeted_clip_annotator_frm,
+            text="Select video",
+            command=lambda: select_labelling_video_targeted_clips(
+                config_path=self.config_path
+            ),
+        )
+
         lbl_tools_frm = LabelFrame(
             tab7,
             text="LABELLING TOOLS",
@@ -802,14 +848,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                 config_path=self.config_path
             ),
         )
-        # remove_roi_features_from_annotation_set = Button(
-        #     lbl_tools_frm,
-        #     text="Remove ROI features from label set",
-        #     fg="darkred",
-        #     command=lambda: RemoveROIFeaturesPopUp(
-        #         config_path=self.config_path, dataset="targets_inserted"
-        #     ),
-        # )
+        remove_roi_features_from_annotation_set = Button(
+            lbl_tools_frm,
+            text="Remove ROI features from label set",
+            fg="darkred",
+            command=lambda: RemoveROIFeaturesPopUp(
+                config_path=self.config_path, dataset="targets_inserted"
+            ),
+        )
 
         label_trainmachinemodel = CreateLabelFrameWithIcon(
             parent=tab8,
@@ -841,26 +887,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                 )
             ).start(),
         )
-        label_run_model_on_all = label_model_validation = CreateLabelFrameWithIcon(
-            parent=tab9,
-            header="Run model on all the data",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value,
-        )
-        button_run_model_on_all = Button(
-            label_run_model_on_all,
-            text="RUN",
-            fg="red",
-            command=lambda: self.validate_model_first_step(),
-        )
-        button_create_video_for_all = Button(
-            label_run_model_on_all,
-            text="CREATE VALIDATION VIDEOS",
-            fg="blue",
-            command=lambda: ValidationVideoPopUp(
-                config_path=config_path, simba_main_frm=self, run_on_all=True
-            ),
-        )
+
         label_model_validation = CreateLabelFrameWithIcon(
             parent=tab9,
             header="VALIDATE MODEL ON SINGLE VIDEO",
@@ -873,6 +900,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             "SELECT DATA FEATURE FILE",
             color="blue",
             lblwidth=30,
+            file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")],
         )
         self.modelfile = FileSelect(
             label_model_validation, "SELECT MODEL FILE", color="blue", lblwidth=30
@@ -881,7 +909,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             label_model_validation,
             text="RUN MODEL",
             fg="blue",
-            command=lambda: self.validate_model_first_step(),
+            command=lambda: threading.Thread(
+                target=self.validate_model_first_step
+            ).start(),
         )
 
         button_generateplot = Button(
@@ -904,7 +934,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             text="CREATE VALIDATION VIDEO",
             fg="blue",
             command=lambda: ValidationVideoPopUp(
-                config_path=config_path, simba_main_frm=self,run_on_all=False
+                config_path=config_path, simba_main_frm=self
             ),
         )
 
@@ -930,7 +960,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             fg="green",
             compound="left",
             image=self.btn_icons["clf"]["img"],
-            command=self.runrfmodel,
+            command=lambda: threading.Thread(target=self.runrfmodel).start(),
         )
         button_runmachinemodel.image = self.btn_icons["clf"]["img"]
 
@@ -946,12 +976,12 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             fg="green",
             command=lambda: FSTTCPopUp(config_path=self.config_path),
         )
-        # mutual_exclusivity = Button(
-        #     label_runmachinemodel,
-        #     text="MUTUAL EXCLUSIVITY CORRECTION",
-        #     fg="green",
-        #     command=lambda: MutualExclusivityPupUp(config_path=self.config_path),
-        # )
+        mutual_exclusivity = Button(
+            label_runmachinemodel,
+            text="MUTUAL EXCLUSIVITY CORRECTION",
+            fg="green",
+            command=lambda: MutualExclusivityPupUp(config_path=self.config_path),
+        )
 
         label_machineresults = CreateLabelFrameWithIcon(
             parent=tab9,
@@ -1174,8 +1204,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         roi_feature_frm.grid(row=1, column=0, sticky=NW)
         append_roi_features_by_animal.grid(row=0, column=0, sticky=NW)
         append_roi_features_by_body_part.grid(row=1, column=0, sticky=NW)
-        append_body_part_directionality_features.grid(row=2, column=0, sticky=NW)
-        # remove_roi_features_from_feature_set.grid(row=2, column=0, sticky=NW)
+        remove_roi_features_from_feature_set.grid(row=2, column=0, sticky=NW)
 
         feature_tools_frm.grid(row=2, column=0, sticky=NW)
         compute_feature_subset_btn.grid(row=0, column=0, sticky=NW)
@@ -1198,7 +1227,11 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         adv_label_btn_new.grid(row=3, column=0, sticky=NW)
         adv_label_btn_continue.grid(row=4, column=0, sticky=NW)
 
-        label_thirdpartyann.grid(row=8, sticky=W)
+        targeted_clip_annotator_frm.grid(row=8, column=0, sticky=NW)
+        targeted_clip_annotator_note.grid(row=0, column=0, sticky=NW)
+        targeted_clip_annotator_btn.grid(row=1, column=0, sticky=NW)
+
+        label_thirdpartyann.grid(row=9, sticky=W)
         button_importmars.grid(row=0, column=0, sticky=NW)
         button_importboris.grid(row=1, column=0, sticky=NW)
         button_importsolomon.grid(row=2, column=0, sticky=NW)
@@ -1206,33 +1239,31 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_importdeepethogram.grid(row=1, column=1, sticky=NW)
         import_observer_btn.grid(row=2, column=1, sticky=NW)
 
-        lbl_tools_frm.grid(row=9, column=0, sticky=NW)
+        lbl_tools_frm.grid(row=10, column=0, sticky=NW)
         visualize_annotation_img_btn.grid(row=0, column=0, sticky=NW)
         third_party_annotations_btn.grid(row=1, column=0, sticky=NW)
-        # remove_roi_features_from_annotation_set.grid(row=2, column=0, sticky=NW)
+        remove_roi_features_from_annotation_set.grid(row=2, column=0, sticky=NW)
 
         label_trainmachinemodel.grid(row=6, sticky=W)
         button_trainmachinesettings.grid(row=0, column=0, sticky=NW, padx=5)
         button_trainmachinemodel.grid(row=1, column=0, sticky=NW, padx=5)
         button_train_multimodel.grid(row=2, column=0, sticky=NW, padx=5)
-        label_run_model_on_all.grid(row=0,sticky=W)
-        button_run_model_on_all.grid(row=0,column=0,sticky=W)
-        button_create_video_for_all.grid(row=0,column=1,sticky=W)
-        label_model_validation.grid(row=1, sticky=W, pady=5)
-        self.csvfile.grid(row=1, sticky=W)
-        self.modelfile.grid(row=2, sticky=W)
-        button_runvalidmodel.grid(row=3, sticky=W)
-        button_generateplot.grid(row=4, sticky=W)
-        self.dis_threshold.grid(row=5, sticky=W)
-        self.min_behaviorbout.grid(row=6, sticky=W)
-        button_validate_model.grid(row=7, sticky=W)
+
+        label_model_validation.grid(row=7, sticky=W, pady=5)
+        self.csvfile.grid(row=0, sticky=W)
+        self.modelfile.grid(row=1, sticky=W)
+        button_runvalidmodel.grid(row=2, sticky=W)
+        button_generateplot.grid(row=3, sticky=W)
+        self.dis_threshold.grid(row=4, sticky=W)
+        self.min_behaviorbout.grid(row=5, sticky=W)
+        button_validate_model.grid(row=6, sticky=W)
 
         label_runmachinemodel.grid(row=8, sticky=NW)
         button_run_rfmodelsettings.grid(row=0, sticky=NW)
         button_runmachinemodel.grid(row=1, sticky=NW)
         kleinberg_button.grid(row=2, sticky=NW)
         fsttc_button.grid(row=3, sticky=NW)
-        # mutual_exclusivity.grid(row=4, sticky=NW)
+        mutual_exclusivity.grid(row=4, sticky=NW)
 
         label_machineresults.grid(row=9, sticky=W, pady=5)
         button_process_datalog.grid(row=2, column=0, sticky=W, padx=3)
@@ -1275,24 +1306,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             clf_path=self.modelfile.file_path,
         )
 
-    def directing_other_animals_analysis(self):
-        directing_animals_analyzer = DirectingOtherAnimalsAnalyzer(
-            config_path=self.config_path
-        )
-        directing_animals_analyzer.process_directionality()
-        directing_animals_analyzer.create_directionality_dfs()
-        directing_animals_analyzer.save_directionality_dfs()
-        directing_animals_analyzer.summary_statistics()
-
-    def directing_animal_to_bp_analysis(self):
-        _ = DirectionAnimalToBodyPartSettingsPopUp(config_path=self.config_path)
-
-    def directing_other_animals_visualizer(self):
-        _ = DirectingOtherAnimalsVisualizerPopUp(config_path=self.config_path)
-
-    def directing_animal_to_body_part_visualizer(self):
-        _ = DirectingAnimalToBodyPartVisualizerPopUp(config_path=self.config_path)
-
     def train_single_model(self, config_path=None):
         model_trainer = TrainRandomForestClassifier(config_path=config_path)
         model_trainer.perform_sampling()
@@ -1309,40 +1322,40 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             config_path=self.config_path, data_dir=ann_folder
         )
         boris_appender.create_boris_master_file()
-        boris_appender.run()
+        threading.Thread(target=boris_appender.run).start()
 
     def importSolomon(self):
         ann_folder = askdirectory()
         solomon_importer = SolomonImporter(
             config_path=self.config_path, data_dir=ann_folder
         )
-        solomon_importer.run()
+        threading.Thread(target=solomon_importer.run).start()
 
     def import_ethovision(self):
         ann_folder = askdirectory()
         ethovision_importer = ImportEthovision(
             config_path=self.config_path, data_dir=ann_folder
         )
-        ethovision_importer.run()
+        threading.Thread(target=ethovision_importer.run).start()
 
     def import_deepethogram(self):
         ann_folder = askdirectory()
         deepethogram_importer = DeepEthogramImporter(
             config_path=self.config_path, data_dir=ann_folder
         )
-        deepethogram_importer.run()
+        threading.Thread(target=deepethogram_importer.run).start()
 
     def import_noldus_observer(self):
         directory = askdirectory()
         noldus_observer_importer = NoldusObserverImporter(
             config_path=self.config_path, data_dir=directory
         )
-        noldus_observer_importer.run()
+        threading.Thread(target=noldus_observer_importer.run).start()
 
     def importMARS(self):
         bento_dir = askdirectory()
         bento_appender = BentoAppender(config_path=self.config_path, data_dir=bento_dir)
-        bento_appender.run()
+        threading.Thread(target=bento_appender.run).start()
 
     def choose_animal_bps(self):
         if hasattr(self, "path_plot_animal_bp_frm"):
@@ -1434,13 +1447,20 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         )
         feature_extractor_classes = get_bp_config_code_class_pairs()
         if self.user_defined_var.get():
-            _ = run_user_defined_feature_extraction_class(
-                file_path=self.scriptfile.file_path, config_path=self.config_path
+            custom_feature_extractor = CustomFeatureExtractor(
+                extractor_file_path=self.scriptfile.file_path,
+                config_path=self.config_path,
+            )
+            custom_feature_extractor.run()
+            stdout_success(
+                msg="Custom feature extraction complete!",
+                source=self.__class__.__name__,
             )
         else:
             if self.pose_setting not in feature_extractor_classes.keys():
                 raise InvalidInputError(
-                    msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}"
+                    msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}. Check the pose-estimation setting in the project_config.ini",
+                    source=self.__class__.__name__,
                 )
             if self.pose_setting == "8":
                 feature_extractor = feature_extractor_classes[self.pose_setting][
@@ -1474,7 +1494,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         )
         outlier_correcter_location.run()
         stdout_success(
-            msg='Outlier corrected files located in "project_folder/csv/outlier_corrected_movement_location" directory'
+            msg='Outlier corrected files located in "project_folder/csv/outlier_corrected_movement_location" directory',
+            source=self.__class__.__name__,
         )
 
     def callback(self, url):
@@ -1566,86 +1587,14 @@ class App(object):
         fps_menu.add_command(
             label="Change fps for multiple videos", command=ChangeFpsMultipleVideosPopUp
         )
+
         menu.add_cascade(label="Tools", menu=video_process_menu)
-        video_process_menu.add_command(
-            label="Clip videos",
-            compound="left",
-            image=self.menu_icons["clip"]["img"],
-            command=ClipVideoPopUp,
-        )
-        video_process_menu.add_command(
-            label="Clip video into multiple videos",
-            compound="left",
-            image=self.menu_icons["clip"]["img"],
-            command=MultiShortenPopUp,
-        )
-        video_process_menu.add_command(
-            label="Crop videos",
-            compound="left",
-            image=self.menu_icons["crop"]["img"],
-            command=CropVideoPopUp,
-        )
-        video_process_menu.add_command(
-            label="Multi-crop",
-            compound="left",
-            image=self.menu_icons["crop"]["img"],
-            command=MultiCropPopUp,
-        )
-        video_process_menu.add_command(
-            label="Down-sample videos",
-            compound="left",
-            image=self.menu_icons["sample"]["img"],
-            command=DownsampleVideoPopUp,
-        )
-        video_process_menu.add_command(
-            label="Get mm/ppx",
-            compound="left",
-            image=self.menu_icons["calipher"]["img"],
-            command=CalculatePixelsPerMMInVideoPopUp,
-        )
-        video_process_menu.add_command(
-            label="Create path plot",
-            compound="left",
-            image=self.menu_icons["path"]["img"],
-            command=MakePathPlotPopUp,
-        )
         video_process_menu.add_cascade(
             label="Change fps...",
             compound="left",
             image=self.menu_icons["fps"]["img"],
             menu=fps_menu,
         )
-        video_process_menu.add_cascade(
-            label="Concatenate two videos",
-            compound="left",
-            image=self.menu_icons["concat"]["img"],
-            command=ConcatenatingVideosPopUp,
-        )
-        video_process_menu.add_cascade(
-            label="Concatenate multiple videos",
-            compound="left",
-            image=self.menu_icons["concat"]["img"],
-            command=lambda: ConcatenatorPopUp(config_path=None),
-        )
-        video_process_menu.add_cascade(
-            label="Visualize pose-estimation in folder...",
-            compound="left",
-            image=self.menu_icons["visualize"]["img"],
-            command=VisualizePoseInFolderPopUp,
-        )
-        video_process_menu.add_cascade(
-            label="Reorganize Tracking Data",
-            compound="left",
-            image=self.menu_icons["reorganize"]["img"],
-            command=PoseReorganizerPopUp,
-        )
-        video_process_menu.add_cascade(
-            label="Drop body-parts from tracking data",
-            compound="left",
-            image=self.menu_icons["trash"]["img"],
-            command=DropTrackingDataPopUp,
-        )
-
         format_menu = Menu(video_process_menu)
         format_menu.add_command(
             label="Change image file formats", command=ChangeImageFormatPopUp
@@ -1659,56 +1608,87 @@ class App(object):
             image=self.menu_icons["convert"]["img"],
             menu=format_menu,
         )
-
         video_process_menu.add_command(
             label="CLAHE enhance video",
             compound="left",
             image=self.menu_icons["clahe"]["img"],
             command=CLAHEPopUp,
         )
-        # video_process_menu.add_command(
-        #     label="Superimpose frame numbers on video",
-        #     compound="left",
-        #     image=self.menu_icons["trash"]["img"],
-        #     command=lambda: SuperImposeFrameCountPopUp(),
-        # )
-        # video_process_menu.add_command(
-        #     label="Convert to grayscale",
-        #     compound="left",
-        #     image=self.menu_icons["grey"]["img"],
-        #     command=lambda: GreyscaleSingleVideoPopUp(),
-        # )
+
         video_process_menu.add_command(
-            label="Merge frames to video",
+            label="Clip videos",
             compound="left",
-            image=self.menu_icons["merge"]["img"],
-            command=MergeFrames2VideoPopUp,
+            image=self.menu_icons["clip"]["img"],
+            command=ClipVideoPopUp,
         )
         video_process_menu.add_command(
-            label="Generate gifs",
+            label="Clip video into multiple videos",
             compound="left",
-            image=self.menu_icons["gif"]["img"],
-            command=CreateGIFPopUP,
+            image=self.menu_icons["clip"]["img"],
+            command=MultiShortenPopUp,
+        )
+        video_process_menu.add_cascade(
+            label="Concatenate multiple videos",
+            compound="left",
+            image=self.menu_icons["concat"]["img"],
+            command=lambda: ConcatenatorPopUp(config_path=None),
+        )
+        video_process_menu.add_cascade(
+            label="Concatenate two videos",
+            compound="left",
+            image=self.menu_icons["concat"]["img"],
+            command=ConcatenatingVideosPopUp,
         )
         video_process_menu.add_command(
-            label="Rotate videos",
+            label="Convert to grayscale",
             compound="left",
-            image=self.menu_icons["rotate"]["img"],
-            command=VideoRotatorPopUp,
+            image=self.menu_icons["grey"]["img"],
+            command=lambda: GreyscaleSingleVideoPopUp(),
         )
         video_process_menu.add_command(
-            label="Temporal join videos",
+            label="Convert ROI definitions",
             compound="left",
-            image=self.menu_icons["stopwatch"]["img"],
-            command=VideoTemporalJoinPopUp,
+            image=self.menu_icons["roi"]["img"],
+            command=lambda: ConvertROIDefinitionsPopUp(),
         )
-        video_process_menu.add_command(
-            label="Print classifier info...",
+        convert_data_menu = Menu(video_process_menu)
+        convert_data_menu.add_command(
+            label="Convert CSV to parquet", command=Csv2ParquetPopUp
+        )
+        convert_data_menu.add_command(
+            label="Convert parquet o CSV", command=Parquet2CsvPopUp
+        )
+        video_process_menu.add_cascade(
+            label="Convert working file type...",
             compound="left",
-            image=self.menu_icons["print"]["img"],
-            command=PrintModelInfoPopUp,
+            image=self.menu_icons["change"]["img"],
+            menu=convert_data_menu,
         )
 
+        video_process_menu.add_command(
+            label="Create path plot",
+            compound="left",
+            image=self.menu_icons["path"]["img"],
+            command=MakePathPlotPopUp,
+        )
+        video_process_menu.add_command(
+            label="Crop videos",
+            compound="left",
+            image=self.menu_icons["crop"]["img"],
+            command=CropVideoPopUp,
+        )
+        video_process_menu.add_command(
+            label="Down-sample videos",
+            compound="left",
+            image=self.menu_icons["sample"]["img"],
+            command=DownsampleVideoPopUp,
+        )
+        video_process_menu.add_cascade(
+            label="Drop body-parts from tracking data",
+            compound="left",
+            image=self.menu_icons["trash"]["img"],
+            command=DropTrackingDataPopUp,
+        )
         extract_frames_menu = Menu(video_process_menu)
         extract_frames_menu.add_command(
             label="Extract defined frames", command=ExtractSpecificFramesPopUp
@@ -1726,18 +1706,69 @@ class App(object):
             menu=extract_frames_menu,
         )
 
-        convert_data_menu = Menu(video_process_menu)
-        convert_data_menu.add_command(
-            label="Convert CSV to parquet", command=Csv2ParquetPopUp
-        )
-        convert_data_menu.add_command(
-            label="Convert parquet o CSV", command=Parquet2CsvPopUp
-        )
-        video_process_menu.add_cascade(
-            label="Convert working file type...",
+        video_process_menu.add_command(
+            label="Generate gifs",
             compound="left",
-            image=self.menu_icons["change"]["img"],
-            menu=convert_data_menu,
+            image=self.menu_icons["gif"]["img"],
+            command=CreateGIFPopUP,
+        )
+
+        video_process_menu.add_command(
+            label="Get mm/ppx",
+            compound="left",
+            image=self.menu_icons["calipher"]["img"],
+            command=CalculatePixelsPerMMInVideoPopUp,
+        )
+        video_process_menu.add_command(
+            label="Merge frames to video",
+            compound="left",
+            image=self.menu_icons["merge"]["img"],
+            command=MergeFrames2VideoPopUp,
+        )
+        video_process_menu.add_command(
+            label="Multi-crop",
+            compound="left",
+            image=self.menu_icons["crop"]["img"],
+            command=MultiCropPopUp,
+        )
+        video_process_menu.add_command(
+            label="Print classifier info...",
+            compound="left",
+            image=self.menu_icons["print"]["img"],
+            command=PrintModelInfoPopUp,
+        )
+
+        video_process_menu.add_cascade(
+            label="Reorganize Tracking Data",
+            compound="left",
+            image=self.menu_icons["reorganize"]["img"],
+            command=PoseReorganizerPopUp,
+        )
+        video_process_menu.add_command(
+            label="Rotate videos",
+            compound="left",
+            image=self.menu_icons["rotate"]["img"],
+            command=VideoRotatorPopUp,
+        )
+
+        video_process_menu.add_command(
+            label="Superimpose frame numbers on video",
+            compound="left",
+            image=self.menu_icons["trash"]["img"],
+            command=lambda: SuperImposeFrameCountPopUp(),
+        )
+        video_process_menu.add_command(
+            label="Temporal join videos",
+            compound="left",
+            image=self.menu_icons["stopwatch"]["img"],
+            command=VideoTemporalJoinPopUp,
+        )
+
+        video_process_menu.add_cascade(
+            label="Visualize pose-estimation in folder...",
+            compound="left",
+            image=self.menu_icons["visualize"]["img"],
+            command=VisualizePoseInFolderPopUp,
         )
 
         help_menu = Menu(menu)
@@ -1886,13 +1917,13 @@ class App(object):
         if OS.PYTHON_VER.value != "3.6":
             PythonVersionWarning(
                 msg=f"SimBA is not extensively tested beyond python 3.6. You are using python {OS.PYTHON_VER.value}. If you encounter errors in python>3.6, please report them on GitHub or Gitter and we will fix! (links in the help toolbar)",
-                source="python different than 3.6",
+                source=self.__class__.__name__,
             )
 
         if not check_ffmpeg_available():
             FFMpegNotFoundWarning(
                 msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer',
-                source="ffmpeg checker",
+                source=self.__class__.__name__,
             )
 
     def restart(self):
@@ -1927,7 +1958,10 @@ class App(object):
         try:
             print(self.root.clipboard_get())
         except UnicodeDecodeError:
-            raise InvalidInputError(msg="Can only paste utf-8 compatible text")
+            raise InvalidInputError(
+                msg="Can only paste utf-8 compatible text",
+                source=self.__class__.__name__,
+            )
 
 
 class StdRedirector(object):
