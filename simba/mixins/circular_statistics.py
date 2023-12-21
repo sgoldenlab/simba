@@ -13,16 +13,16 @@ class CircularStatisticsMixin(object):
 
     """
     Mixin for circular statistics. Unlike linear data, circular data wrap around in a circular or periodic
-    manner such as measurements of e.g., 360 vs. 1 are more similar than measurements of 1 vs. 3. Thus, the
+    manner such as two measurements of e.g., 360 vs. 1 are more similar than two measurements of 1 vs. 3. Thus, the
     minimum and maximum values are connected, forming a closed loop, and we therefore need specialized
     statistical methods.
 
     These methods have support for multiple animals and base radial directions derived from two or three body-parts.
 
     Methods are adopted from the referenced packages below which are **far** more reliable. However,
-    runtime is prioritized  and typically multiple orders of magnitude faster than referenced libraries.
+    runtime on standard hardware (multicore CPU) is prioritized and typically orders of magnitude faster than referenced libraries.
 
-    See image below for example of expected run-times for an example of the methods included in this class.
+    See image below for example of expected run-times for a small set of method examples included in this class.
 
     .. note::
         Many method has numba typed `signatures <https://numba.pydata.org/numba-doc/latest/reference/types.html>`_ to decrease
@@ -59,6 +59,16 @@ class CircularStatisticsMixin(object):
         Jitted compute of the mean resultant vector length of a single sample. Captures the overall "pull" or "tendency" of the
         data points towards a central direction on the circle with a range between 0 and 1.
 
+        .. image:: _static/img/mean_resultant_vector.png
+           :width: 600
+           :align: center
+
+        .. math::
+
+            R = \\frac{{\\sqrt{{\\sum_{{i=1}}^N \\cos(\\theta_i - \\bar{\theta})^2 + \\sum_{{i=1}}^N \\sin(\theta_i - \\bar{\\theta})^2}}}}{{N}}
+
+        where \(N\) is the number of data points, \(\theta_i\) is the angle of the ith data point, and \(\bar{\theta}\) is the mean angle.
+
         :parameter np.ndarray data: 1D array of size len(frames) representing angles in degrees.
         :returns float: The mean resultant vector of the angles. 1 represents tendency towards a single point. 0 represents no central point.
 
@@ -87,7 +97,6 @@ class CircularStatisticsMixin(object):
         .. attention::
            The returned values represents resultant vector length in the time-window ``[(current_frame-time_window)->current_frame]``.
            `-1` is returned where ``current_frame-time_window`` is less than 0.
-
 
         .. image:: _static/img/sliding_mean_resultant_length.png
            :width: 600
@@ -196,6 +205,12 @@ class CircularStatisticsMixin(object):
         .. image:: _static/img/circular_std.png
            :width: 600
            :align: center
+
+        .. math::
+
+           \\sigma_{\\text{circular}} = \\text{rad2deg}\\left(\\sqrt{-2 \\cdot \\log\\left(|\text{mean}(\\exp(j \\cdot \\theta))|\\right)}\\right)
+
+        where \\(\\theta\\) represents the angles in radians
 
         :example:
         >>> data = np.array([180, 221, 32, 42, 212, 101, 139, 41, 69, 171, 149, 200]).astype(np.float32)
@@ -336,25 +351,24 @@ class CircularStatisticsMixin(object):
 
         results = np.full((nose_loc.shape[0]), np.nan)
         for i in prange(nose_loc.shape[0]):
-            left_ear_to_nose = np.degrees(
-                np.arctan2(
-                    left_ear_loc[i][0] - nose_loc[i][1],
-                    left_ear_loc[i][1] - nose_loc[i][0],
-                )
+            left_ear_to_nose = np.arctan2(
+                nose_loc[i][0] - left_ear_loc[i][0], left_ear_loc[i][1] - nose_loc[i][1]
             )
-            right_ear_nose = np.degrees(
-                np.arctan2(
-                    right_ear_loc[i][0] - nose_loc[i][1],
-                    right_ear_loc[i][1] - nose_loc[i][0],
-                )
+            right_ear_nose = np.arctan2(
+                nose_loc[i][0] - right_ear_loc[i][0],
+                right_ear_loc[i][1] - nose_loc[i][1],
             )
-            results[i] = ((left_ear_to_nose + right_ear_nose) % 360) / 2
+            mean_angle_rad = np.arctan2(
+                np.sin(left_ear_to_nose) + np.sin(right_ear_nose),
+                np.cos(left_ear_to_nose) + np.cos(right_ear_nose),
+            )
+            results[i] = (np.degrees(mean_angle_rad) + 360) % 360
         return results
 
     @staticmethod
     @njit("(float32[:, :], float32[:, :])")
     def direction_two_bps(
-        swim_bladder_loc: np.ndarray, tail_loc: np.ndarray
+        anterior_loc: np.ndarray, posterior_loc: np.ndarray
     ) -> np.ndarray:
         """
         Jitted method computing degree directionality from two body-parts. E.g., ``nape`` and ``nose``,
@@ -371,15 +385,15 @@ class CircularStatisticsMixin(object):
         :example:
         >>> swim_bladder_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
         >>> tail_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
-        >>> CircularStatisticsMixin().direction_two_bps(swim_bladder_loc=swim_bladder_loc, tail_loc=tail_loc)
+        >>> CircularStatisticsMixin().direction_two_bps(anterior_loc=swim_bladder_loc, posterior_loc=tail_loc)
         """
 
-        results = np.full((swim_bladder_loc.shape[0]), np.nan)
-        for i in prange(swim_bladder_loc.shape[0]):
+        results = np.full((anterior_loc.shape[0]), np.nan)
+        for i in prange(anterior_loc.shape[0]):
             angle_degrees = np.degrees(
                 np.arctan2(
-                    swim_bladder_loc[i][0] - tail_loc[i][0],
-                    tail_loc[i][1] - swim_bladder_loc[i][1],
+                    anterior_loc[i][0] - posterior_loc[i][0],
+                    posterior_loc[i][1] - anterior_loc[i][1],
                 )
             )
             angle_degrees = angle_degrees + 360 if angle_degrees < 0 else angle_degrees
@@ -394,6 +408,21 @@ class CircularStatisticsMixin(object):
 
         .. note:
            Adapted from ``pingouin.circular.circ_rayleigh`` and ``pycircstat.tests.rayleigh``.
+
+                The Rayleigh Z score is calculated as follows:
+
+        .. math::
+           Z = nR^2
+
+        where :math:`n` is the sample size and :math:`R` is the mean resultant length.
+
+        The associated p-value is calculated as follows:
+
+        .. math::
+           p = e^{\\sqrt{1 + 4n + 4(n^2 - R^2)} - (1 + 2n)}
+
+        :parameter ndarray data: 1D array of size len(frames) representing degrees.
+        :returns Tuple[float, float]: Tuple with Rayleigh Z score and associated probability value.
 
         >>> data = np.array([350, 360, 365, 360, 100, 109, 232, 123, 42, 3,4, 145]).astype(np.float32)
         >>> CircularStatisticsMixin().rayleigh(data=data)
@@ -416,7 +445,7 @@ class CircularStatisticsMixin(object):
         """
         Jitted compute of Rayleigh Z (test of non-uniformity) of circular data within sliding time-window.
 
-        .. note:
+        .. note::
            Adapted from ``pingouin.circular.circ_rayleigh`` and ``pycircstat.tests.rayleigh``.
 
         :parameter ndarray data: 1D array of size len(frames) representing degrees.
@@ -640,6 +669,14 @@ class CircularStatisticsMixin(object):
            :width: 800
            :align: center
 
+        The Rao's Spacing (:math:`U`) is calculated as follows:
+
+        .. math::
+
+           U = \\frac{1}{2} \\sum_{i=1}^{N} |l - T_i|
+
+        where :math:`N` is the number of data points in the sliding window, :math:`T_i` is the spacing between adjacent data points, and :math:`l` is the equal angular spacing.
+
         :references:
         .. [1] `UCSB <https://jammalam.faculty.pstat.ucsb.edu/html/favorite/test.htm>`__.
 
@@ -682,8 +719,16 @@ class CircularStatisticsMixin(object):
     @njit("(float32[:], float32[:])")
     def kuipers_two_sample_test(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
+        Compute the Kuiper's two-sample test statistic for circular distributions.
+
+        Kuiper's two-sample test is a non-parametric test used to determine if two samples are drawn from the same circular distribution. It is particularly useful for circular data, such as angles or directions.
+
         .. note::
            Adapted from `Kuiper <https://github.com/aarchiba/kuiper/tree/master>`__ by `Anne Archibald <https://github.com/aarchiba>`_.
+
+        :parameter ndarray data: The first circular sample array in degrees.
+        :parameter ndarray data: The second circular sample array in degrees.
+        :return float: Kuiper's test statistic.
 
         :example:
         >>> sample_1, sample_2 = np.random.normal(loc=45, scale=1, size=100).astype(np.float32), np.random.normal(loc=180, scale=20, size=100).astype(np.float32)
@@ -706,6 +751,14 @@ class CircularStatisticsMixin(object):
     ) -> np.ndarray:
         """
         Jitted compute of Kuipers two-sample test comparing two distributions with sliding time window.
+
+        This function calculates the Kuipers two-sample test statistic for each time window, sliding through the given circular data sequences.
+
+        :parameter np.ndarray data: The first circular sample array in degrees.
+        :parameter np.ndarray data: The second circular sample array in degrees.
+        :parameter np.ndarray time_windows: An array containing the time window sizes (in seconds) for which the Kuipers two-sample test will be computed.
+        :parameter int fps: The frames per second, representing the sampling rate of the data.
+        :returns np.ndarray: A 2D array containing the Kuipers two-sample test statistics for each time window and each time step.
 
         :examples:
         >>> data = np.random.randint(low=0, high=360, size=(100,)).astype(np.float64)
@@ -790,7 +843,7 @@ class CircularStatisticsMixin(object):
         :parameter ndarray data: 1D array of circular data measured in degrees
         :return np.ndarray: The circular range in degrees.
 
-        Example:
+        :example:
         >>> CircularStatisticsMixin().circular_range([350, 20, 60, 100])
         >>> 110.0
         >>> CircularStatisticsMixin().circular_range([110, 20, 60, 100])
@@ -851,8 +904,8 @@ class CircularStatisticsMixin(object):
         :parameter ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive..
         :return np.ndarray: 1D array containing the proportion of data points that fall within each specified circular bin.
 
-        .. image:: _static/img/sliding_circular_range.png
-           :width: 600
+        .. image:: _static/img/circular_hotspots.png
+           :width: 700
            :align: center
 
         :example:
@@ -893,7 +946,7 @@ class CircularStatisticsMixin(object):
                             within each bin at each time point. If a bin contains no data points in the window, the
                             corresponding value will be -1.0.
 
-        .. notes::
+        .. note::
            - The function utilizes the Numba JIT compiler for improved performance.
            - Circular bin definitions should follow the convention where angles are specified in degrees
              within the range [0, 360], and the bins are defined using start and end angles inclusive.
@@ -979,6 +1032,96 @@ class CircularStatisticsMixin(object):
                 result[i] = 2
             prior_angle = current_angle
         return result
+
+    @staticmethod
+    @njit("(int64[:, :, :], int64)")
+    def fit_circle(data: np.ndarray, max_iterations: int) -> np.ndarray:
+        """
+        Fit a circle to a dataset using the least squares method.
+
+        This function fits a circle to a dataset using the least squares method. The circle is defined
+        by the equation:
+
+        .. math::
+           X^2 + Y^2 = R^2
+
+        .. note::
+           Adapted to numba JIT from `circle-fit <https://github.com/AlliedToasters/circle-fit>`_ ``hyperLSQ`` method.
+
+        .. image:: _static/img/fit_circle.png
+           :width: 600
+           :align: center
+
+        References
+        ----------
+
+        .. [1] Kanatani, Rangarajan, Hyper least squares fitting of circles and ellipses, `Computational Statistics & Data Analysis`,
+               vol. 55, pp. 2197-2208, 2011.
+        .. [2] Lapp, Salazar, Champagne. Automated maternal behavior during early life in rodents (AMBER) pipeline, `Scientific Reports`,
+               13:18277, 2023.
+
+        :parameter np.ndarray data: A 3D NumPy array with shape (N, M, 2). N represent frames, M represents the number of body-parts, and 2 represents x and y coordinates.
+        :parameter int max_iterations: The maximum number of iterations for fitting the circle.
+        :returns np.ndarray: Array with shape (N, 3) with N representing frame and 3 representing (i) X-coordinate of the circle center, (ii) Y-coordinate of the circle center, and (iii) Radius of the circle
+
+        :example:
+        >>> data = np.array([[[5, 10], [10, 5], [15, 10], [10, 15]]])
+        >>> CircularStatisticsMixin().fit_circle(data=data, iter_max=88)
+        >>> [[10, 10, 5]]
+        """
+
+        results = np.full((data.shape[0], 3), np.nan)
+        for i in range(data.shape[0]):
+            frm_data = data[i]
+            x, y, n = frm_data[:, 0], frm_data[:, 1], frm_data.shape[0]
+
+            Xi, Yi = x - x.mean(), y - y.mean()
+            Zi = Xi * Xi + Yi * Yi
+            Mxx, Mxy, Mxz = (
+                (Xi * Xi).sum() / n,
+                (Xi * Yi).sum() / n,
+                (Xi * Zi).sum() / n,
+            )
+            Myy, Myz = (Yi * Yi).sum() / n, (Yi * Zi).sum() / n
+            Mzz = (Zi * Zi).sum() / n
+
+            Mz = Mxx + Myy
+            Var_z = Mzz - Mz * Mz
+            Cov_xy = Mxx * Myy - Mxy * Mxy
+
+            A2 = 4 * Cov_xy - 3 * Mz * Mz - Mzz
+            A1 = Var_z * Mz + 4.0 * Cov_xy * Mz - Mxz * Mxz - Myz * Myz
+            A0 = (
+                Mxz * (Mxz * Myy - Myz * Mxy)
+                + Myz * (Myz * Mxx - Mxz * Mxy)
+                - Var_z * Cov_xy
+            )
+            A22 = A2 + A2
+
+            Y, X = A0, 0.0
+            for j in range(max_iterations):
+                Dy = A1 + X * (A22 + 16.0 * (X**2))
+                xnew = X - Y / Dy
+                if xnew == X or not np.isfinite(xnew):
+                    break
+                ynew = A0 + xnew * (A1 + xnew * (A2 + 4.0 * xnew * xnew))
+                if abs(ynew) >= abs(Y):
+                    break
+                X, Y = xnew, ynew
+
+            det = X**2 - X * Mz + Cov_xy
+            Xcenter = (Mxz * (Myy - X) - Myz * Mxy) / det / 2.0
+            Ycenter = (Myz * (Mxx - X) - Mxz * Mxy) / det / 2.0
+
+            results[i, :] = np.array(
+                [
+                    Xcenter + x.mean(),
+                    Ycenter + y.mean(),
+                    np.sqrt(abs(Xcenter**2 + Ycenter**2 + Mz)),
+                ]
+            )
+
+        return results.astype(np.int64)
 
 
 # data_sizes = [1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000]

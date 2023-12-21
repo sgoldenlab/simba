@@ -7,8 +7,9 @@ import sys
 import cv2
 
 from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.lookups import get_color_dict
+from simba.utils.enums import TextOptions
 from simba.utils.read_write import get_video_meta_data
+from simba.utils.warnings import FrameRangeWarning
 
 
 def annotation_video_player():
@@ -25,24 +26,29 @@ def annotation_video_player():
         current_time = round((frame_number / video_info["fps"]), 2)
         cv2.putText(
             frame,
-            "F~ {}".format(str(frame_number)),
-            (10, int((video_info["height"] - spacing_scale))),
-            cv2.FONT_HERSHEY_SIMPLEX,
+            f"F~ {frame_number}",
+            (
+                TextOptions.BORDER_BUFFER_X.value,
+                int((video_info["height"] - spacing_scale)),
+            ),
+            TextOptions.FONT.value,
             font_size,
-            colors["Pink"],
-            2,
+            TextOptions.COLOR.value,
+            TextOptions.TEXT_THICKNESS.value + 1,
         )
         cv2.putText(
             frame,
-            "T~ {}".format(str(current_time)),
-            (10, int((video_info["height"] - spacing_scale * 2))),
-            cv2.FONT_HERSHEY_SIMPLEX,
+            f"T~ {current_time}",
+            (
+                TextOptions.BORDER_BUFFER_X.value,
+                int((video_info["height"] - spacing_scale * 2)),
+            ),
+            TextOptions.FONT.value,
             font_size,
-            colors["Pink"],
-            2,
+            TextOptions.COLOR.value,
+            TextOptions.TEXT_THICKNESS.value + 1,
         )
 
-    colors = get_color_dict()
     video_path = sys.stdin.readline().encode().decode()
     check_file_exist_and_readable(file_path=video_path)
     project_dir = os.path.dirname(os.path.dirname(video_path))
@@ -70,67 +76,111 @@ def annotation_video_player():
                 f.flush()
                 os.fsync(f.fileno())
                 if second_key == ord("t"):  ## BACK UP TWO FRAME
-                    cap.set(cv2.CAP_PROP_POS_FRAMES, (current_video_position - 2))
-                    ret, frame = cap.read()
-                    current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
-                    print_video_txt(
-                        frame_number=current_video_position, video_info=video_meta_data
-                    )
-                    cv2.imshow("Video", frame)
-                    labelling_log_writer(frame_number=current_video_position)
-                if second_key == ord("s"):  ### BACK UP TEN FRAME
-                    cap.set(cv2.CAP_PROP_POS_FRAMES, (current_video_position - 11))
-                    ret, frame = cap.read()
-                    current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
-                    print_video_txt(
-                        frame_number=current_video_position, video_info=video_meta_data
-                    )
-                    cv2.imshow("Video", frame)
-                    labelling_log_writer(frame_number=current_video_position)
-                if second_key == ord("x"):  ### BACK UP 1s
-                    cap.set(
-                        cv2.CAP_PROP_POS_FRAMES,
-                        (current_video_position - video_meta_data["fps"]),
-                    )
-                    ret, frame = cap.read()
-                    current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
-                    print_video_txt(
-                        frame_number=current_video_position, video_info=video_meta_data
-                    )
-                    cv2.imshow("Video", frame)
-                    labelling_log_writer(frame_number=current_video_position)
-                if second_key == ord("w"):  ### FORWARD 1s
-                    cap.set(
-                        cv2.CAP_PROP_POS_FRAMES,
-                        (current_video_position + video_meta_data["fps"]),
-                    )
-                    ret, frame = cap.read()
-                    current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
-                    print_video_txt(
-                        frame_number=current_video_position, video_info=video_meta_data
-                    )
-                    cv2.imshow("Video", frame)
-                    labelling_log_writer(frame_number=current_video_position)
-                if second_key == ord("o"):  ### FORWARD TWO FRAMES
-                    cap.set(cv2.CAP_PROP_POS_FRAMES, (current_video_position + 1))
-                    ret, frame = cap.read()
-                    current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
-                    print_video_txt(
-                        frame_number=current_video_position, video_info=video_meta_data
-                    )
-                    cv2.imshow("Video", frame)
-                    labelling_log_writer(frame_number=current_video_position)
+                    if (current_video_position - 2) < 0:
+                        FrameRangeWarning(
+                            msg=f"FRAME {current_video_position - 2} CANNOT BE SHOWN",
+                            source=annotation_video_player.__name__,
+                        )
+                    else:
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, (current_video_position - 2))
+                        ret, frame = cap.read()
+                        current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                        print_video_txt(
+                            frame_number=current_video_position,
+                            video_info=video_meta_data,
+                        )
+                        cv2.imshow("Video", frame)
+                        labelling_log_writer(frame_number=current_video_position)
+                elif second_key == ord("s"):  ### BACK UP TEN FRAME
+                    if (current_video_position - 11) < 0:
+                        FrameRangeWarning(
+                            msg=f"FRAME {current_video_position - 11} CANNOT BE SHOWN",
+                            source=annotation_video_player.__name__,
+                        )
+                    else:
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, (current_video_position - 11))
+                        ret, frame = cap.read()
+                        current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                        print_video_txt(
+                            frame_number=current_video_position,
+                            video_info=video_meta_data,
+                        )
+                        cv2.imshow("Video", frame)
+                        labelling_log_writer(frame_number=current_video_position)
+                elif second_key == ord("x"):  ### BACK UP 1s
+                    if (current_video_position - video_meta_data["fps"]) < 0:
+                        FrameRangeWarning(
+                            msg=f'FRAME {current_video_position - video_meta_data["fps"]} CANNOT BE SHOWN',
+                            source=annotation_video_player.__name__,
+                        )
+                    else:
+                        cap.set(
+                            cv2.CAP_PROP_POS_FRAMES,
+                            (current_video_position - video_meta_data["fps"]),
+                        )
+                        ret, frame = cap.read()
+                        current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                        print_video_txt(
+                            frame_number=current_video_position,
+                            video_info=video_meta_data,
+                        )
+                        cv2.imshow("Video", frame)
+                        labelling_log_writer(frame_number=current_video_position)
+                elif second_key == ord("w"):  ### FORWARD 1s
+                    if (
+                        current_video_position + video_meta_data["fps"]
+                    ) > video_meta_data["frame_count"]:
+                        FrameRangeWarning(
+                            msg=f'FRAME {current_video_position + video_meta_data["fps"]} CANNOT BE SHOWN',
+                            source=annotation_video_player.__name__,
+                        )
+                    else:
+                        cap.set(
+                            cv2.CAP_PROP_POS_FRAMES,
+                            (current_video_position + video_meta_data["fps"]),
+                        )
+                        ret, frame = cap.read()
+                        current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                        print_video_txt(
+                            frame_number=current_video_position,
+                            video_info=video_meta_data,
+                        )
+                        cv2.imshow("Video", frame)
+                        labelling_log_writer(frame_number=current_video_position)
+                elif second_key == ord("o"):  ### FORWARD TWO FRAMES
+                    if (current_video_position + 1) > video_meta_data["frame_count"]:
+                        FrameRangeWarning(
+                            msg=f"FRAME {current_video_position + 1} CANNOT BE SHOWN",
+                            source=annotation_video_player.__name__,
+                        )
+                    else:
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, (current_video_position + 1))
+                        ret, frame = cap.read()
+                        current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                        print_video_txt(
+                            frame_number=current_video_position,
+                            video_info=video_meta_data,
+                        )
+                        cv2.imshow("Video", frame)
+                        labelling_log_writer(frame_number=current_video_position)
 
-                if second_key == ord("e"):  ### FORWARD TEN FRAMES
-                    cap.set(cv2.CAP_PROP_POS_FRAMES, (current_video_position + 9))
-                    ret, frame = cap.read()
-                    current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
-                    print_video_txt(
-                        frame_number=current_video_position, video_info=video_meta_data
-                    )
-                    cv2.imshow("Video", frame)
-                    labelling_log_writer(frame_number=current_video_position)
-                if second_key == ord("p"):
+                elif second_key == ord("e"):  ### FORWARD TEN FRAMES
+                    if (current_video_position + 9) > video_meta_data["frame_count"]:
+                        FrameRangeWarning(
+                            msg=f"FRAME {current_video_position + 9} CANNOT BE SHOWN",
+                            source=annotation_video_player.__name__,
+                        )
+                    else:
+                        cap.set(cv2.CAP_PROP_POS_FRAMES, (current_video_position + 9))
+                        ret, frame = cap.read()
+                        current_video_position = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                        print_video_txt(
+                            frame_number=current_video_position,
+                            video_info=video_meta_data,
+                        )
+                        cv2.imshow("Video", frame)
+                        labelling_log_writer(frame_number=current_video_position)
+                elif second_key == ord("p"):
                     break
 
                 if (second_key == ord("q")) | (cv2.getWindowProperty("Video", 1) == -1):

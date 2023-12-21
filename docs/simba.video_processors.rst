@@ -51,3 +51,10 @@ Video processing tools
 .. automodule:: simba.video_processors.video_processing
    :members:
    :show-inheritance:
+
+Crop ROI selector
+------------------------------------------------
+
+.. automodule:: simba.video_processors.roi_selector
+   :members:
+   :show-inheritance:

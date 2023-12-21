@@ -26,10 +26,12 @@ dash_core_components == 1.10.2
 dash_colorscales == 0.0.4
 dash_html_components == 1.0.3
 h5py
-numba
+numba==0.52.0;python_version=="3.6"
+numba;python_version>="3.9"
 numexpr
 plotly == 4.9.0
-statsmodels
+statsmodels==0.12.0;python_version=="3.6"
+statsmodels;python_version>="3.9"
 cefpython3 == 66.0
 pyarrow == 6.0.1
 shap

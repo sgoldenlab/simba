@@ -9,6 +9,7 @@ from multiprocessing import Lock, Process, Value
 from typing import List
 
 import pandas as pd
+from matplotlib import cm
 
 import simba
 from simba.utils.checks import (check_file_exist_and_readable,
@@ -154,7 +155,7 @@ def get_emojis() -> dict:
     Helper to get dictionary of emojis with names as keys and emojis as values.
     """
     python_version = str(f"{sys.version_info.major}.{sys.version_info.minor}")
-    if python_version == "3.6" or python_version == "3.7":
+    if python_version == "3.6":
         return {
             "thank_you": "".join(
                 chr(x) for x in struct.unpack(">2H", "\U0001f64f".encode("utf-16be"))
@@ -176,11 +177,42 @@ def get_emojis() -> dict:
             ),
         }
 
+    elif python_version == "3.10" or python_version == "3.9":
+        return {
+            "thank_you": "\U0001f64f".encode("utf-8", "replace").decode(),
+            "relaxed": "\U0001F600".encode("utf-8", "replace").decode(),
+            "warning": "\u2757\uFE0F".encode("utf-8", "replace").decode(),
+            "error": "\U0001F6A8".encode("utf-8", "replace").decode(),
+            "complete": "\U0001F680".encode("utf-8", "replace").decode(),
+            "trash": "\U0001F5D1".encode("utf-8", "replace").decode(),
+        }
+
+    elif python_version == "3.7":
+        return {
+            "thank_you": "\U0001f64f".encode("utf16", errors="surrogatepass").decode(
+                "utf16"
+            ),
+            "relaxed": "\U0001F600".encode("utf16", errors="surrogatepass").decode(
+                "utf16"
+            ),
+            "error": "\U0001F6A8".encode("utf16", errors="surrogatepass").decode(
+                "utf16"
+            ),
+            "complete": "\U0001F680".encode("utf16", errors="surrogatepass").decode(
+                "utf16"
+            ),
+            "warning": "\u2757\uFE0F".encode("utf16", errors="surrogatepass").decode(
+                "utf16"
+            ),
+            "trash": "\U0001F5D1F".encode("utf16", errors="surrogatepass").decode(
+                "utf16"
+            ),
+        }
+
     else:
         return {
             "thank_you": "\U0001f64f",
             "relaxed": "\U0001F600",
-            "warning": "\u2757\uFE0F",
             "error": "\U0001F6A8",
             "complete": "\U0001F680",
             "trash": "\U0001F5D1",
@@ -309,6 +341,45 @@ def get_named_colors() -> List[str]:
     ]
 
 
+def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
+    """
+    Create list of lists of bgr colors, one for each animal. Each list is pulled from a different palette
+    matplotlib color map.
+
+    :param int no_animals: Number of different palette lists
+    :param int map_size: Number of colors in each created palette.
+    :return List[List[int]]:  BGR colors
+
+    :example:
+    >>> create_color_palettes(no_animals=2, map_size=2)
+    >>> [[[255.0, 0.0, 255.0], [0.0, 255.0, 255.0]], [[102.0, 127.5, 0.0], [102.0, 255.0, 255.0]]]
+    """
+    colorListofList = []
+    cmaps = [
+        "spring",
+        "summer",
+        "autumn",
+        "cool",
+        "Wistia",
+        "Pastel1",
+        "Set1",
+        "winter",
+        "afmhot",
+        "gist_heat",
+        "copper",
+    ]
+    for colormap in range(no_animals):
+        currColorMap = cm.get_cmap(cmaps[colormap], map_size)
+        currColorList = []
+        for i in range(currColorMap.N):
+            rgb = list((currColorMap(i)[:3]))
+            rgb = [i * 255 for i in rgb]
+            rgb.reverse()
+            currColorList.append(rgb)
+        colorListofList.append(currColorList)
+    return colorListofList
+
+
 def cardinality_to_integer_lookup():
     return {"N": 0, "NE": 1, "E": 2, "SE": 3, "S": 4, "SW": 5, "W": 6, "NW": 7}
 
@@ -319,18 +390,89 @@ def integer_to_cardinality_lookup():
 
 def percent_to_crf_lookup():
     return {
-        10: 45,
-        20: 42,
-        30: 38,
-        40: 34,
-        50: 31,
-        60: 29,
-        70: 26,
-        80: 23,
-        90: 20,
-        100: 17,
+        "10": 37,
+        "20": 34,
+        "30": 31,
+        "40": 28,
+        "50": 25,
+        "60": 22,
+        "70": 19,
+        "80": 16,
+        "90": 13,
+        "100": 10,
     }
 
 
 def video_quality_to_preset_lookup():
     return {"Low": "fast", "Medium": "medium", "High": "slow"}
+
+
+def get_log_config():
+    return {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "default": {
+                "format": "%(asctime)s|%(name)s||%(message)s",
+                "datefmt": "%Y-%m-%dT%H:%M:%SZ",
+                # "class": "pythonjsonlogger.jsonlogger.JsonFormatter",
+            }
+        },
+        "handlers": {
+            "file_handler": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "formatter": "default",
+                "mode": "a",
+                "backupCount": 5,
+                "maxBytes": 5000000,
+            }
+        },
+        "loggers": {"": {"level": "INFO", "handlers": ["file_handler"]}},
+    }
+
+
+#
+# def rao_spacing_critical_values():
+#     {4.0: 186.45,
+#      5.0: 183.44,
+#      6.0: 180.65,
+#      7.0: 177.83,
+#      8.0: 175.68,
+#      9.0: 173.68,
+#      10.0: 171.98,
+#      11.0: 170.45,
+#      12.0: 169.09,
+#      13.0: 167.87,
+#      14.0: 166.76,
+#      15.0: 165.75,
+#      16.0: 164.83,
+#      17.0: 163.98,
+#      18.0: 163.2,
+#      19.0: 162.47,
+#      20.0: 161.79,
+#      21.0: 161.16,
+#      22.0: 160.56,
+#      23.0: 160.01,
+#      24.0: 159.48,
+#      25.0: 158.99,
+#      26.0: 158.52,
+#      27.0: 158.07,
+#      28.0: 157.65,
+#      29.0: 157.25,
+#      30.0: 156.87,
+#      35.0: 155.19,
+#      40.0: 153.82,
+#      45.0: 152.68,
+#      50.0: 151.7,
+#      75.0: 148.34,
+#      100.0: 146.29,
+#      150.0: 143.83,
+#      200.0: 142.35,
+#      300.0: 140.57,
+#      400.0: 139.5,
+#      500.0: 138.77,
+#      600.0: 138.23,
+#      700.0: 137.8,
+#      800.0: 137.46,
+#      900.0: 137.18,
+#      1000.0: 136.94}

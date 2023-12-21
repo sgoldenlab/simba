@@ -58,10 +58,10 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             _, video_name, _ = get_fn_ext(filepath=i)
             self.video_names.append(video_name)
         self.video_basename_lst = []
-        self.max_char_vid_name = len(max(self.video_names,key=len))
+        self.max_char_vid_name = len(max(self.video_names, key=len))
 
     def __check_that_value_is_numeric(
-            self, value=None, value_name=None, video_name=None
+        self, value=None, value_name=None, video_name=None
     ):
         if str(value).isdigit():
             return int(value)
@@ -127,14 +127,14 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
                     pass
                 if prior_data is not None:
                     for value_name, set_name in zip(
-                            [
-                                "fps",
-                                "Resolution_width",
-                                "Resolution_height",
-                                "Distance_in_mm",
-                                "pixels/mm",
-                            ],
-                            ["fps_var", "width_var", "height_var", "distance", "px_mm"],
+                        [
+                            "fps",
+                            "Resolution_width",
+                            "Resolution_height",
+                            "Distance_in_mm",
+                            "pixels/mm",
+                        ],
+                        ["fps_var", "width_var", "height_var", "distance", "px_mm"],
                     ):
                         float_val = self.__check_that_value_is_numeric(
                             value=prior_data[value_name].values[0],
@@ -224,7 +224,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         ]
         self.col_widths = [
             "5",
-            self.max_char_vid_name+5,
+            self.max_char_vid_name + 5,
             "18",
             "18",
             "18",
@@ -234,7 +234,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         ]
         self.video_frm.grid(row=6, column=0)
         for cnt, (col_name, col_width) in enumerate(
-                zip(self.column_names, self.col_widths)
+            zip(self.column_names, self.col_widths)
         ):
             col_header_label = Label(
                 self.video_frm,
@@ -281,7 +281,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             )
             self.videos[name]["find_dist_btn"].grid(row=vid_cnt, column=6, padx=5)
             self.videos[name]["px_mm_entry"].grid(row=vid_cnt, column=7, padx=5)
-        #self.main_frm = hxtScrollbar(self.main_frm)
+        # self.main_frm = hxtScrollbar(self.main_frm)
 
     def __initiate_find_distance(self, k):
         video_name, distance = k[0], k[1].get()
@@ -344,6 +344,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
                 msg="SimBA tried to write to project_folder/logs/video_info.csv, but was not allowed. If this file is open in another program, tru closing it."
             )
         stdout_success(msg="Video info saved at project_folder/logs/video_info.csv")
+
 
 # test = VideoInfoTable(config_path='/Users/simon/Desktop/envs/troubleshooting/locomotion/project_folder/project_config.ini')
 # test.create_window()

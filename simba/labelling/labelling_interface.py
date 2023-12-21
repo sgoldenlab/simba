@@ -4,7 +4,7 @@ import os
 from subprocess import PIPE, Popen
 from tkinter import *
 from tkinter import filedialog
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 import cv2
 import pandas as pd
@@ -20,8 +20,9 @@ import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_that_column_exist)
+from simba.utils.enums import Options, TagNames
 from simba.utils.errors import FrameRangeError
-from simba.utils.printing import stdout_success
+from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
                                     read_df, write_df)
@@ -60,6 +61,11 @@ class LabellingInterface(ConfigReader):
         continuing: bool = False,
     ):
         ConfigReader.__init__(self, config_path=config_path)
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
         self.padding, self.file_path = 5, file_path
         self.frm_no, self.threshold_dict = 0, threshold_dict
         self.setting = setting
@@ -448,7 +454,8 @@ class LabellingInterface(ConfigReader):
     def __save_behavior_in_range(self, start_frm=None, end_frm=None):
         if not self.range_on.get():
             raise FrameRangeError(
-                "SAVE RANGE ERROR: TO SAVE RANGE OF FRAMES, TICK THE `Frame range` checkbox before clicking `Save Range`"
+                "SAVE RANGE ERROR: TO SAVE RANGE OF FRAMES, TICK THE `Frame range` checkbox before clicking `Save Range`",
+                source=self.__class__.__name__,
             )
         else:
             check_int(
@@ -484,7 +491,8 @@ class LabellingInterface(ConfigReader):
             )
             raise FileExistsError
         stdout_success(
-            msg=f"SAVED: Annotation file for video {self.video_name} saved within the project_folder/csv/targets_inserted directory."
+            msg=f"SAVED: Annotation file for video {self.video_name} saved within the project_folder/csv/targets_inserted directory.",
+            source=self.__class__.__name__,
         )
         if not self.config.has_section("Last saved frames"):
             self.config.add_section("Last saved frames")
@@ -530,14 +538,16 @@ class LabellingInterface(ConfigReader):
 
 
 def select_labelling_video(
-    config_path: str = None,
-    threshold_dict=None,
+    config_path: Union[str, os.PathLike],
+    threshold_dict: Optional[Dict[str, float]] = None,
     setting: str = None,
     continuing: bool = None,
-    video_file_path=None,
+    video_file_path=Union[str, os.PathLike],
 ):
     if setting is not "pseudo":
-        video_file_path = filedialog.askopenfilename()
+        video_file_path = filedialog.askopenfilename(
+            filetypes=[("Video files", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)]
+        )
     else:
         threshold_dict_values = {}
         for k, v in threshold_dict.items():
@@ -549,9 +559,7 @@ def select_labelling_video(
     video_meta = get_video_meta_data(video_file_path)
     _, video_name, _ = get_fn_ext(video_file_path)
 
-    print("ANNOTATING VIDEO {}: ".format(video_name))
-    print("VIDEO INFO")
-    print(video_meta)
+    print(f"ANNOTATING VIDEO {video_name} \n VIDEO INFO: {video_meta}")
     _ = LabellingInterface(
         config_path=config_path,
         file_path=video_file_path,

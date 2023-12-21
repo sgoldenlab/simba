@@ -236,3 +236,18 @@ def SkippingRuleWarning(msg: str, source: str = ""):
 @log_warning
 def IdenticalInputWarning(msg: str, source: str = ""):
     pass
+
+
+@log_warning
+def FrameRangeWarning(msg: str, source: str = ""):
+    pass
+
+
+@log_warning
+def SamplingWarning(msg: str, source: str = ""):
+    pass
+
+
+@log_warning
+def CropWarning(msg: str, source: str = ""):
+    pass

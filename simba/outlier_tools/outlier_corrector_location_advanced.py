@@ -11,8 +11,9 @@ from numba import jit, prange
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.enums import TagNames
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_df, write_df)
 
@@ -22,6 +23,9 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
     Performs location outlier correction that allows different heuristic outlier criteria for different animals or body-parts.
     For example, correct some outlier body-parts with a location heuristic criteria of 4x above the mean movement,
     and other body-parts with a heuristic critera of 2x above the mean movement.
+
+    .. note::
+       See `notebook <https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/advanced_outlier_correction.html>`__. for example use-case.
 
     .. image:: _static/img/location_outlier.png
        :width: 400
@@ -54,20 +58,28 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
     ):
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self)
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
         self.data_files = find_files_of_filetypes_in_directory(
             directory=input_dir, extensions=["." + self.file_type]
         )
         if len(self.data_files) == 0:
             raise NoFilesFoundError(
-                msg=f"No data of filetype {input_dir} for in directory {self.file_type}"
+                msg=f"No data of filetype {input_dir} for in directory {self.file_type}",
+                source=self.__class__.__name__,
             )
         if type not in ["animal", "body-parts"]:
             raise InvalidInputError(
-                msg=f"Type {type} not supported. Valid options: {['animal', 'body-parts']}"
+                msg=f"Type {type} not supported. Valid options: {['animal', 'body-parts']}",
+                source=self.__class__.__name__,
             )
         if agg_method not in ["mean", "median"]:
             raise InvalidInputError(
-                msg=f"Aggregation method {agg_method} not supported. Valid options: {['mean', 'median']}"
+                msg=f"Aggregation method {agg_method} not supported. Valid options: {['mean', 'median']}",
+                source=self.__class__.__name__,
             )
         self.settings, self.type, self.agg_method, self.criterion_body_parts = (
             settings,
@@ -79,10 +91,13 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
     def fix_settings_for_animal_input(self):
         new_settings = {}
         for animal_name, animal_bps in self.animal_bp_dict.items():
-            if animal_name not in new_settings.keys():
-                new_settings[animal_name] = {}
-            for body_part in animal_bps["X_bps"]:
-                new_settings[animal_name][body_part[:-2]] = self.settings[animal_name]
+            if animal_name in self.settings.keys():
+                if animal_name not in new_settings.keys():
+                    new_settings[animal_name] = {}
+                for body_part in animal_bps["X_bps"]:
+                    new_settings[animal_name][body_part[:-2]] = self.settings[
+                        animal_name
+                    ]
         self.settings = new_settings
 
     @staticmethod
@@ -120,12 +135,16 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
                         body_part_data["outlier_ratio"],
                     ]
         write_df(df=out, file_type="csv", save_path=save_path)
-        stdout_success(msg=f"Location outlier log saved at {save_path}")
+        stdout_success(
+            msg=f"Location outlier log saved at {save_path}",
+            source=self.__class__.__name__,
+        )
 
     def run(self):
         data_log = {}
         if self.type == "animal":
             self.fix_settings_for_animal_input()
+
         for file_cnt, file_path in enumerate(self.data_files):
             video_timer, video_log = SimbaTimer(start=True), {}
             _, self.video_name, _ = get_fn_ext(file_path)
@@ -142,24 +161,29 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
             self.data_df_combined = self.create_shifted_df(df=self.data_df)
             animal_movement_agg = {}
             for animal_name, animal_bps in self.animal_bp_dict.items():
-                animal_criterion_bps = self.criterion_body_parts[animal_name]
-                bp_1_headers = [
-                    animal_criterion_bps[0] + "_x",
-                    animal_criterion_bps[0] + "_y",
-                ]
-                bp_2_headers = [
-                    animal_criterion_bps[1] + "_x",
-                    animal_criterion_bps[1] + "_y",
-                ]
-                distances = self.framewise_euclidean_distance(
-                    location_1=self.data_df[bp_1_headers].values,
-                    location_2=self.data_df[bp_2_headers].values,
-                    px_per_mm=1,
-                )
-                if self.agg_method == "mean":
-                    animal_movement_agg[animal_name] = np.mean(distances).astype(int)
-                if self.agg_method == "median":
-                    animal_movement_agg[animal_name] = np.median(distances).astype(int)
+                if animal_name in self.criterion_body_parts.keys():
+                    animal_criterion_bps = self.criterion_body_parts[animal_name]
+                    bp_1_headers = [
+                        animal_criterion_bps[0] + "_x",
+                        animal_criterion_bps[0] + "_y",
+                    ]
+                    bp_2_headers = [
+                        animal_criterion_bps[1] + "_x",
+                        animal_criterion_bps[1] + "_y",
+                    ]
+                    distances = self.framewise_euclidean_distance(
+                        location_1=self.data_df[bp_1_headers].values,
+                        location_2=self.data_df[bp_2_headers].values,
+                        px_per_mm=1,
+                    )
+                    if self.agg_method == "mean":
+                        animal_movement_agg[animal_name] = np.mean(distances).astype(
+                            int
+                        )
+                    if self.agg_method == "median":
+                        animal_movement_agg[animal_name] = np.median(distances).astype(
+                            int
+                        )
 
             for animal_name, animal_bps in self.settings.items():
                 video_log[animal_name] = {}
@@ -196,17 +220,18 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
                 df["body_part"] = df["body_part"].map(animal_body_part_dict)
                 above_criterion_dict = {}
                 for bp, criterion_multiplier in animal_bps.items():
-                    bp_criterion = (
-                        animal_movement_agg[animal_name] * criterion_multiplier
-                    )
-                    bp_df = df[df["body_part"] == bp]
-                    bp_df["counts_above_criterion"] = self.count_values_in_range(
-                        data=bp_df.drop(["frame", "body_part"], axis=1).values,
-                        ranges=np.array([[bp_criterion, np.inf]]),
-                    )
-                    above_criterion_dict[bp] = list(
-                        bp_df["frame"][bp_df["counts_above_criterion"] > 1]
-                    )
+                    if animal_name in animal_movement_agg.keys():
+                        bp_criterion = (
+                            animal_movement_agg[animal_name] * criterion_multiplier
+                        )
+                        bp_df = df[df["body_part"] == bp]
+                        bp_df["counts_above_criterion"] = self.count_values_in_range(
+                            data=bp_df.drop(["frame", "body_part"], axis=1).values,
+                            ranges=np.array([[bp_criterion, np.inf]]),
+                        )
+                        above_criterion_dict[bp] = list(
+                            bp_df["frame"][bp_df["counts_above_criterion"] > 1]
+                        )
 
                 for (
                     bp,
@@ -232,18 +257,35 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
             stdout_success(
                 msg=f"Location outliers complete for video {self.video_name}.",
                 elapsed_time=video_timer.elapsed_time_str,
+                source=self.__class__.__name__,
             )
             data_log[self.video_name] = video_log
 
         self._save_data_log(data_log=data_log)
         stdout_success(
-            msg=f"{len(self.data_files)} video(s) corrected for location outliers. Saved in {self.outlier_corrected_dir}"
+            msg=f"{len(self.data_files)} video(s) corrected for location outliers. Saved in {self.outlier_corrected_dir}",
+            source=self.__class__.__name__,
         )
 
 
-#
-# settings = {'Simon': 2.1, 'JJ': 3.2}
-# criterion_body_parts = {'Simon': ['Nose_1', 'Tail_base_1'], 'JJ': ['Nose_2', 'Tail_base_2']}
+# settings = {'Simon': 2.5} #
+# # settings = {'Simon': {'Ear_left_1': 1.1,
+# #                       'Ear_right_1': 5.1,
+# #                       'Nose_1': 2.1,
+# #                       'Center_1': 1.5,
+# #                       'Lat_left_1': 3.1,
+# #                       'Lat_right_1': 1.9,
+# #                       'Tail_base_1': 2.3},
+# #                       #'Tail_end_1': 1.4},
+# #                'JJ': {'Ear_left_2': 1.2,
+# #                       'Ear_right_2': 1.2,
+# #                       'Nose_2': 2,
+# #                       'Center_2': 4.1,
+# #                       'Lat_left_2': 9,
+# #                       'Lat_right_2': 1.2,
+# #                       'Tail_base_2': 1.6,
+# #                       'Tail_end_2': 2.2}}
+# criterion_body_parts = {'Simon': ['Nose_1', 'Tail_base_1'], } #'JJ': ['Nose_2', 'Tail_base_2']
 # test = OutlierCorrecterLocationAdvanced(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                                         input_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',
 #                                         type='animal',

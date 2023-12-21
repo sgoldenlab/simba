@@ -241,9 +241,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
         )
         self.summary_df.to_csv(self.save_path)
         self.timer.stop_timer()
-        stdout_success(
-            msg=f'Summary directional statistics saved at {self.save_path}'
-        )
+        stdout_success(msg=f"Summary directional statistics saved at {self.save_path}")
         stdout_success(
             msg="All directional data saved in SimBA project",
             elapsed_time=self.timer.elapsed_time_str,

@@ -1,5 +1,6 @@
 __author__ = "Simon Nilsson"
 
+import os
 import sys
 from enum import Enum
 from pathlib import Path
@@ -7,6 +8,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pkg_resources
+
+import simba
 
 
 class ConfigKey(Enum):
@@ -38,6 +41,37 @@ class ConfigKey(Enum):
     MULTI_ANIMAL_ID_SETTING = "Multi animal IDs"
     MULTI_ANIMAL_IDS = "ID_list"
     OUTLIER_SETTINGS = "Outlier settings"
+    CLASS_WEIGHTS = "class_weights"
+    CUSTOM_WEIGHTS = "custom_weights"
+    CLASSIFIER = "classifier"
+    TT_SIZE = "train_test_size"
+    MODEL_TO_RUN = "model_to_run"
+    UNDERSAMPLE_SETTING = "under_sample_setting"
+    OVERSAMPLE_SETTING = "over_sample_setting"
+    UNDERSAMPLE_RATIO = "under_sample_ratio"
+    OVERSAMPLE_RATIO = "over_sample_ratio"
+    RF_ESTIMATORS = "RF_n_estimators"
+    RF_MAX_FEATURES = "RF_max_features"
+    RF_CRITERION = "RF_criterion"
+    MIN_LEAF = "RF_min_sample_leaf"
+    PERMUTATION_IMPORTANCE = "compute_permutation_importance"
+    LEARNING_CURVE = "generate_learning_curve"
+    PRECISION_RECALL = "generate_precision_recall_curve"
+    EX_DECISION_TREE = "generate_example_decision_tree"
+    EX_DECISION_TREE_FANCY = "generate_example_decision_tree_fancy"
+    CLF_REPORT = "generate_classification_report"
+    IMPORTANCE_LOG = "generate_features_importance_log"
+    PARTIAL_DEPENDENCY = "partial_dependency"
+    IMPORTANCE_BAR_CHART = "generate_features_importance_bar_graph"
+    SHAP_SCORES = "generate_shap_scores"
+    RF_METADATA = "RF_meta_data"
+    LEARNING_CURVE_K_SPLITS = "LearningCurve_shuffle_k_splits"
+    LEARNING_DATA_SPLITS = "LearningCurve_shuffle_data_splits"
+    IMPORTANCE_BARS_N = "N_feature_importance_bars"
+    SHAP_PRESENT = "shap_target_present_no"
+    SHAP_ABSENT = "shap_target_absent_no"
+    SHAP_SAVE_ITERATION = "shap_save_iteration"
+    SHAP_MULTIPROCESS = "shap_multiprocess"
     POSE_SETTING = "pose_estimation_body_parts"
     RF_JOBS = "RF_n_jobs"
     VALIDATION_VIDEO = "generate_validation_video"
@@ -46,6 +80,7 @@ class ConfigKey(Enum):
     ROI_ANIMAL_CNT = "no_of_animals"
     DISTANCE_MM = "distance_mm"
     SKLEARN_BP_PROB_THRESH = "bp_threshold_sklearn"
+    SPLIT_TYPE = "train_test_split_type"
 
 
 class Paths(Enum):
@@ -71,7 +106,9 @@ class Paths(Enum):
     BODY_PART_DIRECTIONALITY_DF_DIR = Path("logs/body_part_directionality_dataframes/")
     DIRECTING_ANIMALS_OUTPUT_PATH = Path("frames/output/ROI_directionality_visualize/")
     DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH = Path("frames/output/Directing_animals/")
-    DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH = Path("frames/output/Body_part_directing_animals/")
+    DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH = Path(
+        "frames/output/Body_part_directing_animals/"
+    )
     BP_NAMES = Path("logs/measures/pose_configs/bp_names/project_bp_names.csv")
     SIMBA_BP_CONFIG_PATH = Path("pose_configurations/bp_names/bp_names.csv")
     SIMBA_SHAP_CATEGORIES_PATH = Path(
@@ -90,6 +127,7 @@ class Paths(Enum):
     GANTT_PLOT_DIR = Path("frames/output/gantt_plots/")
     HEATMAP_CLF_LOCATION_DIR = Path("frames/output/heatmaps_classifier_locations/")
     HEATMAP_LOCATION_DIR = Path("frames/output/heatmaps_locations/")
+    FRAMES_OUTPUT_DIR = Path("frames/output/")
     FEATURES_EXTRACTED_DIR = Path("csv/features_extracted/")
     TARGETS_INSERTED_DIR = Path("csv/targets_inserted/")
     PATH_PLOT_DIR = Path("frames/output/path_plots")
@@ -110,6 +148,7 @@ class Paths(Enum):
 class Formats(Enum):
     MP4_CODEC = "mp4v"
     AVI_CODEC = "XVID"
+    BATCH_CODEC = "libx264"
     LABELFRAME_HEADER_FORMAT = ("Helvetica", 12, "bold")
     LABELFRAME_HEADER_CLICKABLE_FORMAT = ("Helvetica", 12, "bold", "underline")
     LABELFRAME_HEADER_CLICKABLE_COLOR = f"#{5:02x}{99:02x}{193:02x}"
@@ -138,10 +177,15 @@ class Formats(Enum):
 
 class Options(Enum):
     ROLLING_WINDOW_DIVISORS = [2, 5, 6, 7.5, 15]
-    CLF_MODELS = ["RF", "imbalanced_rf", "GBC", "XGBoost"]
+    CLF_MODELS = ["RF", "GBC", "XGBoost"]
     CLF_MAX_FEATURES = ["sqrt", "log", "None"]
     CLF_CRITERION = ["gini", "entropy"]
-    UNDERSAMPLE_OPTIONS = ["None", "random undersample"]
+    UNDERSAMPLE_OPTIONS = [
+        "None",
+        "random undersample",
+        "random undersample multiclass frames",
+        "random undersample multiclass bouts",
+    ]
     OVERSAMPLE_OPTIONS = ["None", "SMOTE", "SMOTEENN"]
     CLASS_WEIGHT_OPTIONS = ["None", "balanced", "balanced_subsample", "custom"]
     CLF_TEST_SIZE_OPTIONS = [
@@ -155,7 +199,16 @@ class Options(Enum):
         "0.8",
         "0.9",
     ]
-    PALETTE_OPTIONS = ["magma", "jet", "inferno", "plasma", "viridis", "gnuplot2"]
+    PALETTE_OPTIONS = [
+        "magma",
+        "jet",
+        "inferno",
+        "plasma",
+        "viridis",
+        "gnuplot2",
+        "RdBu",
+        "winter",
+    ]
     PALETTE_OPTIONS_CATEGORICAL = [
         "Pastel1",
         "Paired",
@@ -178,7 +231,7 @@ class Options(Enum):
     DPI_OPTIONS = [100, 200, 400, 800, 1600, 3200]
     SPEED_OPTIONS = [round(x, 1) for x in list(np.arange(0.1, 2.1, 0.1))]
     PERFORM_FLAGS = ["yes", True, "True"]
-    RUN_OPTIONS_FLAGS = ["yes", True, "True", "False", "no", False]
+    RUN_OPTIONS_FLAGS = ["yes", True, "True", "False", "no", False, "true", "false"]
     SCALER_NAMES = ["MIN-MAX", "STANDARD", "QUANTILE"]
     HEATMAP_SHADING_OPTIONS = ["gouraud", "flat"]
     HEATMAP_BIN_SIZE_OPTIONS = [
@@ -234,6 +287,8 @@ class Options(Enum):
     SMOOTHING_OPTIONS_W_NONE = ["None", "Gaussian", "Savitzky Golay"]
     VIDEO_FORMAT_OPTIONS = ["mp4", "avi"]
     ALL_VIDEO_FORMAT_OPTIONS = (".avi", ".mp4", ".mov", ".flv", ".m4v")
+    ALL_IMAGE_FORMAT_OPTIONS = (".bmp", ".png", ".jpeg", ".jpg")
+    ALL_VIDEO_FORMAT_STR_OPTIONS = ".avi .mp4 .mov .flv .m4v"
     WORKFLOW_FILE_TYPE_OPTIONS = ["csv", "parquet"]
     TRACKING_TYPE_OPTIONS = ["Classic tracking", "Multi tracking", "3D tracking"]
     UNSUPERVISED_FEATURE_OPTIONS = [
@@ -301,11 +356,32 @@ class Options(Enum):
     ]
 
 
+class TextOptions(Enum):
+    FIRST_LINE_SPACING = (
+        2  # DISTANCE MULTIPLIER BETWEEN FIRST PRINTED ROW AND THE TOP OF THE IMAGE.
+    )
+    LINE_SPACING = 1  # DISTANCE MULTIPLIER BETWEEN 2nd AND THIRD, THIRD AND FOURTH ETC. PRINTED ROWS.
+    BORDER_BUFFER_X = 5  # ADDITIONAL PIXEL BUFFER DISTANCE BETWEEN THE START OF THE IMAGE AND FIRST PRINTED CHARACTER ON X AXIS
+    BORDER_BUFFER_Y = 10  # ADDITIONAL PIXEL BUFFER DISTANCE BETWEEN THE START OF THE IMAGE AND FIRST PRINTED CHARACTER ON Y AXIS
+    FONT_SCALER = 0.8  # CONSTANT USED TO SCALE FONT ACCORDING TO RESOLUTION. INCREASING VALUE WILL RESULT IN LARGER TEXT.
+    RESOLUTION_SCALER = 1500  # CONSTANT USED TO SCALE SPACINGS, FONT, AND RADIUS OF CIRCLES. LARGER NUMBER WILL RESULT IN SMALLER SPACINGS, FONT, AND RADIUS OF CIRCLES.
+    RADIUS_SCALER = 10  # CONSTANT USED TO SCALE CIRCLES. INCREASING VALUE WILL RESULT IN LARGER CIRCLES.
+    SPACE_SCALER = 25  # CONSTANT USED TO SCALE SPACE BETWEEN PRINTED ROWS. INCREASING VALUE WILL RESULT IN LARGER PIXEL DISTANCES BETWEEN SEQUENTIAL ROWS.
+    TEXT_THICKNESS = 1  # THE THICKNESS OR "BOLDNESS" OF THE FONT IN PIXELS.
+    COLOR = (
+        147,
+        20,
+        255,
+    )  # THE COLOR OF THE TEXT IN BGR. (147, 20, 255)  REPRESENT DEEP PINK: TYPICALLY NOT A COLOR IN ANIMAL ARENA.
+    FONT = cv2.FONT_HERSHEY_SIMPLEX
+
+
 class Defaults(Enum):
     MAX_TASK_PER_CHILD = 10
+    LARGE_MAX_TASK_PER_CHILD = 1000
     CHUNK_SIZE = 1
     SPLASH_TIME = 2500
-    WELCOME_MSG = f"Welcome fellow scientists! \n SimBA v.local-dev \n "
+    WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v.{pkg_resources.get_distribution("simba-uw-tf-dev").version} \n '
     BROWSE_FOLDER_BTN_TEXT = "Browse Folder"
     BROWSE_FILE_BTN_TEXT = "Browse File"
     NO_FILE_SELECTED_TEXT = "No file selected"
@@ -348,6 +424,7 @@ class Keys(Enum):
     ROI_CIRCLES = "circleDf"
     ROI_POLYGONS = "polygons"
     DOCUMENTATION = "documentation"
+    FRAME_COUNT = "frame_count"
 
 
 class Dtypes(Enum):
@@ -391,13 +468,13 @@ class Methods(Enum):
     THIRD_PARTY_ANNOTATION_FILE_NOT_FOUND = "Annotations data file NOT FOUND"
 
 
-class MachineLearningMetaKeys(Enum):
-    CLASSIFIER = "classifier"
+class MetaKeys(Enum):
+    CLF_NAME = "classifier_name"
     RF_ESTIMATORS = "rf_n_estimators"
-    RF_CRITERION = "rf_criterion"
+    CRITERION = "rf_criterion"
     TT_SIZE = "train_test_size"
     MIN_LEAF = "rf_min_sample_leaf"
-    RF_METADATA = "generate_rf_model_meta_data_file"
+    META_FILE = "generate_rf_model_meta_data_file"
     EX_DECISION_TREE = "generate_example_decision_tree"
     CLF_REPORT = "generate_classification_report"
     IMPORTANCE_LOG = "generate_features_importance_log"
@@ -406,7 +483,6 @@ class MachineLearningMetaKeys(Enum):
     LEARNING_CURVE = "generate_sklearn_learning_curves"
     PRECISION_RECALL = "generate_precision_recall_curves"
     RF_MAX_FEATURES = "rf_max_features"
-    RF_MAX_DEPTH = "rf_max_depth"
     LEARNING_CURVE_K_SPLITS = "learning_curve_k_splits"
     LEARNING_CURVE_DATA_SPLITS = "learning_curve_data_splits"
     N_FEATURE_IMPORTANCE_BARS = "n_feature_importance_bars"
@@ -416,17 +492,7 @@ class MachineLearningMetaKeys(Enum):
     SHAP_SAVE_ITERATION = "shap_save_iteration"
     PARTIAL_DEPENDENCY = "partial_dependency"
     TRAIN_TEST_SPLIT_TYPE = "train_test_split_type"
-    UNDERSAMPLE_SETTING = "under_sample_setting"
-    UNDERSAMPLE_RATIO = "under_sample_ratio"
-    OVERSAMPLE_SETTING = "over_sample_setting"
-    OVERSAMPLE_RATIO = "over_sample_ratio"
-    CLASS_WEIGHTS = "class_weights"
-    CLASS_CUSTOM_WEIGHTS = "class_custom_weights"
-    EX_DECISION_TREE_FANCY = "generate_example_decision_tree_fancy"
-    IMPORTANCE_BARS_N = "N_feature_importance_bars"
-    LEARNING_DATA_SPLITS = "LearningCurve_shuffle_data_splits"
-    MODEL_TO_RUN = "model_to_run"
-
+    SAVE_TRAIN_TEST_FRM_IDX = "save_train_test_frm_idx"
 
 
 class OS(Enum):
@@ -506,3 +572,11 @@ class Links(Enum):
         "https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md"
     )
     ADDITIONAL_IMPORTS = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-optional-step--import-more-dlc-tracking-data-or-videos"
+    AGGREGATE_BOOL_STATS = "https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#compute-aggregate-conditional-statistics-from-boolean-fields"
+
+
+class Labelling(Enum):
+    PADDING = 5
+    PLAY_VIDEO_SCRIPT_PATH = os.path.join(
+        os.path.dirname(simba.__file__), "labelling", "play_annotation_video.py"
+    )

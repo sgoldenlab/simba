@@ -1,13 +1,24 @@
 __author__ = "Simon Nilsson"
 
+import multiprocessing
+
 import numpy as np
-from numba import jit, njit, prange, typed, types
+from numba import (boolean, float32, float64, int64, jit, njit, prange, typed,
+                   types)
 from numba.typed import Dict, List
+from numpy.lib.stride_tricks import as_strided
+from statsmodels.tsa.stattools import adfuller, kpss, zivot_andrews
+
+from simba.utils.errors import InvalidInputError
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
+from typing import get_type_hints
+
+from simba.utils.read_write import find_core_cnt
 
 
 class TimeseriesFeatureMixin(object):
@@ -16,12 +27,16 @@ class TimeseriesFeatureMixin(object):
     Time-series methods focused on signal complexity in sliding windows. Mainly in time-domain - fft methods (through e.g. scipy)
     I've found so far has not been fast enough for rolling windows in large datasets.
 
+    .. image:: _static/img/ts_runtimes.png
+       :width: 1200
+       :align: center
+
     .. note::
        Many method has numba typed `signatures <https://numba.pydata.org/numba-doc/latest/reference/types.html>`_ to decrease
        compilation time. Make sure to pass the correct dtypes as indicated by signature decorators.
 
     .. important::
-       See references for mature packages computing more extensive circular measurements
+       See references for mature packages computing more extensive timeseries measurements
 
        .. [1] `cesium <https://github.com/cesium-ml/cesium>`_.
        .. [2] `eeglib <https://github.com/Xiul109/eeglib>`_.
@@ -35,7 +50,7 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float32[:],)")
-    def hjort_parameters(data: np.ndarray):
+    def hjort_parameters(data: np.ndarray) -> (float, float, float):
         """
         Jitted compute of Hjorth parameters for a given time series data. Hjorth parameters describe
         mobility, complexity, and activity of a time series.
@@ -63,11 +78,12 @@ class TimeseriesFeatureMixin(object):
         def diff(x):
             return x[1:] - x[:-1]
 
-        dx = diff(data)
-        ddx = diff(dx)
+        dx = np.diff(np.ascontiguousarray(data))
+        ddx = np.diff(np.ascontiguousarray(dx))
         x_var, dx_var = np.var(data), np.var(dx)
+        if (x_var <= 0) or (dx_var <= 0):
+            return 0, 0, 0
         ddx_var = np.var(ddx)
-
         mobility = np.sqrt(dx_var / x_var)
         complexity = np.sqrt(ddx_var / dx_var) / mobility
         activity = np.var(data)
@@ -99,22 +115,27 @@ class TimeseriesFeatureMixin(object):
                 prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
             ):
                 sample = data[l:r]
-                dx = sample[1:] - sample[:-1]
-                ddx = dx[1:] - dx[:-1]
+                dx = np.diff(np.ascontiguousarray(sample))
+                ddx = np.diff(np.ascontiguousarray(dx))
                 x_var, dx_var = np.var(sample), np.var(dx)
-                ddx_var = np.var(ddx)
-                mobility = np.sqrt(dx_var / x_var)
-                complexity = np.sqrt(ddx_var / dx_var) / mobility
-                activity = np.var(sample)
-                results[0, r + 1, i] = mobility
-                results[1, r + 1, i] = complexity
-                results[2, r + 1, i] = activity
+                if (x_var <= 0) or (dx_var <= 0):
+                    results[0, r + 1, i] = 0
+                    results[1, r + 1, i] = 0
+                    results[2, r + 1, i] = 0
+                else:
+                    ddx_var = np.var(ddx)
+                    mobility = np.sqrt(dx_var / x_var)
+                    complexity = np.sqrt(ddx_var / dx_var) / mobility
+                    activity = np.var(sample)
+                    results[0, r + 1, i] = mobility
+                    results[1, r + 1, i] = complexity
+                    results[2, r + 1, i] = activity
 
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], boolean)")
-    def local_maxima_minima(data: np.ndarray, maxima: bool) -> np.ndarray:
+    @njit([(float32[:], boolean), (float32[:], types.misc.Omitted(True))])
+    def local_maxima_minima(data: np.ndarray, maxima: bool = True) -> np.ndarray:
         """
         Jitted compute of the local maxima or minima defined as values which are higher or lower than immediately preceding and proceeding time-series neighbors, repectively.
         Returns 2D np.ndarray with columns representing idx and values of local maxima.
@@ -163,6 +184,11 @@ class TimeseriesFeatureMixin(object):
         """
         Jitted compute of the count in time-series where sequential values crosses a defined value.
 
+
+        .. image:: _static/img/crossings.png
+           :width: 600
+           :align: center
+
         :param np.ndarray data: Time-series data.
         :param float val: Cross value. E.g., to count the number of zero-crossings, pass `0`.
         :return int: Count of events where sequential values crosses ``val``.
@@ -171,10 +197,6 @@ class TimeseriesFeatureMixin(object):
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().crossings(data=data, val=7)
         >>> 5
-
-        .. image:: _static/img/crossings.png
-           :width: 600
-           :align: center
         """
 
         cnt, last_val = 0, -1
@@ -200,7 +222,11 @@ class TimeseriesFeatureMixin(object):
 
         Computes the number of times a value in the data array crosses a given threshold
         value within sliding windows of varying sizes. The number of crossings is computed for each
-        window size and stored in the result array.
+        window size and stored in the result array where columns represents time windows.
+
+        .. image:: _static/img/sliding_crossings.png
+           :width: 1500
+           :align: center
 
         :param np.ndarray data: Input data array.
         :param float val: Threshold value for crossings.
@@ -208,6 +234,7 @@ class TimeseriesFeatureMixin(object):
         :param int sample_rate: Sampling rate of the data in samples per second.
         :return np.ndarray: An array containing the number of crossings for each window size and data point. The shape of the result array is (data.shape[0], window_sizes.shape[0]).
         """
+
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
@@ -238,22 +265,23 @@ class TimeseriesFeatureMixin(object):
         Jitted compute of the difference between the ``upper`` and ``lower`` percentiles of the data as
         a percentage of the median value.
 
+        .. note::
+           Adapted from `cesium <https://github.com/cesium-ml/cesium>`_.
+
+
+        .. image:: _static/img/percentile_difference.png
+           :width: 600
+           :align: center
+
         :parameter np.ndarray data: 1D array of representing time-series.
         :parameter int upper_pct: Upper-boundary percentile.
         :parameter int lower_pct: Lower-boundary percentile.
         :returns float: The difference between the ``upper`` and ``lower`` percentiles of the data as a percentage of the median value.
 
-        .. note::
-           Adapted from `cesium <https://github.com/cesium-ml/cesium>`_.
-
         :examples:
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().percentile_difference(data=data, upper_pct=95, lower_pct=5)
         >>> 0.7401574764125177
-
-        .. image:: _static/img/percentile_difference.png
-           :width: 600
-           :align: center
 
         """
 
@@ -315,14 +343,14 @@ class TimeseriesFeatureMixin(object):
         .. note::
            Adapted from `cesium <https://github.com/cesium-ml/cesium>`_.
 
+        .. image:: _static/img/percent_beyond_n_std.png
+           :width: 600
+           :align: center
+
         :examples:
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().percent_beyond_n_std(data=data, n=1)
         >>> 0.1
-
-        .. image:: _static/img/percent_beyond_n_std.png
-           :width: 600
-           :align: center
 
         """
 
@@ -374,15 +402,14 @@ class TimeseriesFeatureMixin(object):
         .. note::
            Adapted from `cesium <https://github.com/cesium-ml/cesium>`_.
 
+        .. image:: _static/img/percent_in_percentile_window.png
+           :width: 600
+           :align: center
+
         :example:
         >>> data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)
         >>> TimeseriesFeatureMixin().percent_in_percentile_window(data, upper_pct=70, lower_pct=30)
         >>> 0.4
-
-
-        .. image:: _static/img/percent_in_percentile_window.png
-           :width: 600
-           :align: center
         """
 
         upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
@@ -409,7 +436,7 @@ class TimeseriesFeatureMixin(object):
         using various window sizes. It returns a 2D array where each row corresponds to a position in the time series, and each column
         corresponds to a different window size. The results are given as a percentage of data points within the percentile window.
 
-        :param np.ndarray data : The input time series data.
+        :param np.ndarray data: The input time series data.
         :param int upper_pct: The upper percentile value for the window (e.g., 95 for the 95th percentile).
         :param int lower_pct: The lower percentile value for the window (e.g., 5 for the 5th percentile).
         :param np.ndarray window_sizes: An array of window sizes (in seconds) to use for the sliding calculation.
@@ -443,16 +470,14 @@ class TimeseriesFeatureMixin(object):
         Calculate the Petrosian Fractal Dimension (PFD) of a given time series data. The PFD is a measure of the
         irregularity or self-similarity of a time series. Larger values indicate higher complexity. Lower values indicate lower complexity.
 
-        :parameter np.ndarray data: A 1-dimensional numpy array containing the time series data.
-        :returns float: The Petrosian Fractal Dimension of the input time series.
-
         .. note::
-           - The PFD is computed based on the number of sign changes in the first derivative of the time series.
-           - If the input data is empty or no sign changes are found, the PFD is returned as -1.0.
-           - Adapted from `eeglib <https://github.com/Xiul109/eeglib/>`_.
+           The PFD is computed based on the number of sign changes in the first derivative of the time series. If the input data is empty or no sign changes are found, the PFD is returned as -1.0. Adapted from `eeglib <https://github.com/Xiul109/eeglib/>`_.
 
         .. math::
            PFD = \\frac{\\log_{10}(N)}{\\log_{10}(N) + \\log_{10}\\left(\\frac{N}{N + 0.4 \\cdot zC}\\right)}
+
+        :parameter np.ndarray data: A 1-dimensional numpy array containing the time series data.
+        :returns float: The Petrosian Fractal Dimension of the input time series.
 
         :examples:
         >>> t = np.linspace(0, 50, int(44100 * 2.0), endpoint=False)
@@ -582,6 +607,9 @@ class TimeseriesFeatureMixin(object):
                 Lmk = 0
                 for i in range(1, (N - m) // k):
                     Lmk += abs(data[m + i * k] - data[m + i * k - k])
+                denominator = ((N - m) // k) * k * k
+                if denominator == 0:
+                    return -1
                 Lk[m] = Lmk * (N - 1) / (((N - m) // k) * k * k)
             Laux = np.mean(Lk)
             Laux = 0.01 / k if Laux == 0 else Laux
@@ -609,7 +637,6 @@ class TimeseriesFeatureMixin(object):
         - p_i is the probability of each unique order pattern.
 
         :param numpy.ndarray data: The time series data for which permutation entropy is calculated.
-
         :param int dimension: It specifies the length of the order patterns to be considered.
         :param int delay: Time delay between elements in an order pattern.
         :return float: The permutation entropy of the time series, indicating its complexity and predictability. A higher permutation entropy value indicates higher complexity and unpredictability in the time series.
@@ -724,17 +751,27 @@ class TimeseriesFeatureMixin(object):
                 results[r - 1, i] = np.sum(np.abs(np.diff(sample.astype(np.float64))))
         return results.astype(np.float32)
 
-    @staticmethod
     @njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
-    def sliding_variance(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int):
+    def sliding_variance(
+        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
         """
         Jitted compute of the variance of data within sliding windows of varying sizes applied to
         the input data array. Variance is a measure of data dispersion or spread.
+
+        .. image:: _static/img/sliding_variance.png
+           :width: 600
+           :align: center
 
         :param data: 1d input data array.
         :param window_sizes: Array of window sizes (in seconds).
         :param sample_rate: Sampling rate of the data in samples per second.
         :return: Variance values for each window size and data point. The shape of the result array is (data.shape[0], window_sizes.shape[0]).
+
+        :example:
+        >>> data = np.array([1, 2, 3, 1, 2, 9, 17, 2, 10, 4]).astype(np.float32)
+        >>> TimeseriesFeatureMixin().sliding_variance(data=data, window_sizes=np.array([0.5]), sample_rate=10)
+        >>> [[-1.],[-1.],[-1.],[-1.],[ 0.56],[ 8.23],[35.84],[39.20],[34.15],[30.15]])
         """
 
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
@@ -743,12 +780,10 @@ class TimeseriesFeatureMixin(object):
             for l, r in zip(
                 prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
             ):
-                sample = (data[l:r] - np.min(data[l:r])) / (
-                    np.max(data[l:r]) - np.min(data[l:r])
-                )
+                sample = data[l:r]
                 results[r - 1, i] = np.var(sample)
 
-        return results.astype(np.float32)
+        return results
 
     @staticmethod
     @njit(
@@ -771,9 +806,9 @@ class TimeseriesFeatureMixin(object):
             "sum",
             "mac",
             "rms",
-            "abs_energy",
+            "absenergy",
         ],
-    ):
+    ) -> np.ndarray:
         """
         Jitted compute of descriptive statistics over sliding windows in 1D data array.
 
@@ -790,7 +825,7 @@ class TimeseriesFeatureMixin(object):
            - The `statistics` parameter should be a list containing one or more of the following statistics:
            'var' (variance), 'max' (maximum), 'min' (minimum), 'std' (standard deviation), 'median' (median),
            'mean' (mean), 'mad' (median absolute deviation), 'sum' (sum), 'mac' (mean absolute change),
-           'rms' (root mean square), 'abs_energy' (absolute energy).
+           'rms' (root mean square), 'absenergy' (absolute energy).
            - If the statistics list is ['var', 'max', 'mean'], the
            3rd dimension order in the result array will be: [variance, maximum, mean]
 
@@ -829,7 +864,7 @@ class TimeseriesFeatureMixin(object):
                         results[j, r - 1, i] = np.mean(np.abs(sample[1:] - sample[:-1]))
                     elif statistics[j] == "rms":
                         results[j, r - 1, i] = np.sqrt(np.mean(sample**2))
-                    elif statistics[j] == "abs_energy":
+                    elif statistics[j] == "absenergy":
                         results[j, r - 1, i] = np.sqrt(np.sum(sample**2))
 
         return results.astype(np.float32)
@@ -856,11 +891,20 @@ class TimeseriesFeatureMixin(object):
         return frequencies[np.argsort(magnitude)[-(k + 1) : -1]]
 
     @staticmethod
-    @njit("(float32[:], float64, boolean,)")
-    def longest_strike(data: np.ndarray, threshold: float, above: bool):
+    @njit(
+        [
+            (float32[:], float64, boolean),
+            (float32[:], float64, types.misc.Omitted(True)),
+        ]
+    )
+    def longest_strike(data: np.ndarray, threshold: float, above: bool = True) -> int:
         """
         Jitted compute of the length of the longest consecutive sequence of values in the input data that either exceed
         or fall below a specified threshold.
+
+        .. image:: _static/img/longest_strike.png
+           :width: 700
+           :align: center
 
         :param np.ndarray data: The input 1D NumPy array containing the values to be analyzed.
         :param float threshold: The threshold value used for the comparison.
@@ -897,7 +941,12 @@ class TimeseriesFeatureMixin(object):
         return result
 
     @staticmethod
-    @njit("(float32[:], float64, float64[:], int64, boolean,)")
+    @njit(
+        [
+            (float32[:], float64, float64[:], int64, boolean),
+            (float32[:], float64, float64[:], int64, types.misc.Omitted(True)),
+        ]
+    )
     def sliding_longest_strike(
         data: np.ndarray,
         threshold: float,
@@ -911,6 +960,10 @@ class TimeseriesFeatureMixin(object):
         Calculates the length of the longest consecutive sequence of values in a 1D NumPy array, where each
         sequence is determined by a sliding time window. The condition is specified by a threshold, and
         you can choose whether to look for values above or below the threshold.
+
+        .. image:: _static/img/sliding_longest_strike.png
+           :width: 700
+           :align: center
 
         :param np.ndarray data: The input 1D NumPy array containing the values to be analyzed.
         :param float threshold: The threshold value used for the comparison.
@@ -963,15 +1016,24 @@ class TimeseriesFeatureMixin(object):
             return results
 
     @staticmethod
-    @njit("(float32[:], float64, int64, boolean,)")
-    def time_since_previous(
+    @njit(
+        [
+            (float32[:], float64, int64, boolean),
+            (float32[:], float64, int64, types.misc.Omitted(True)),
+        ]
+    )
+    def time_since_previous_threshold(
         data: np.ndarray, threshold: float, sample_rate: int, above: bool
     ) -> np.ndarray:
         """
         Jitted compute of the time (in seconds) that has elapsed since the last occurrence of a value above (or below)
         a specified threshold in a time series. The time series is assumed to have a constant sample rate.
 
-        :param np.ndarray data : The input 1D array containing the time series data.
+        .. image:: _static/img/time_since_previous_threshold.png
+           :width: 600
+           :align: center
+
+        :param np.ndarray data: The input 1D array containing the time series data.
         :param int threshold: The threshold value used for the comparison.
         :param int sample_rate: The sample rate of the time series in samples per second.
         :param bool above: If True, the function looks for values above or equal to the threshold. If False, it looks for values below or equal to the threshold.
@@ -979,9 +1041,9 @@ class TimeseriesFeatureMixin(object):
 
         :examples:
         >>> data = np.array([1, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
-        >>> TimeseriesFeatureMixin().time_since_previous(data=data, threshold=7.0, above=True, sample_rate=2.0)
+        >>> TimeseriesFeatureMixin().time_since_previous_threshold(data=data, threshold=7.0, above=True, sample_rate=2.0)
         >>> [-1. ,  0. ,  0.5,  0. ,  0. ,  0.5,  0. ,  0.5,  1. ,  1.5]
-        >>> TimeseriesFeatureMixin().time_since_previous(data=data, threshold=7.0, above=False, sample_rate=2.0)
+        >>> TimeseriesFeatureMixin().time_since_previous_threshold(data=data, threshold=7.0, above=False, sample_rate=2.0)
         >>> [0. , 0.5, 0. , 0.5, 1. , 0. , 0.5, 0. , 0. , 0. ]
         """
 
@@ -997,13 +1059,62 @@ class TimeseriesFeatureMixin(object):
             elif not above and (data[i] < threshold):
                 results[i] = 0.0
             else:
-                if above:
-                    x = criterion_idx[np.argwhere(criterion_idx < i).flatten()]
-                else:
-                    x = criterion_idx[np.argwhere(criterion_idx < i).flatten()]
+                x = criterion_idx[np.argwhere(criterion_idx < i).flatten()]
                 if len(x) > 0:
                     results[i] = (i - x[-1]) / sample_rate
 
+        return results
+
+    @staticmethod
+    @njit(
+        [
+            (float32[:], float64, int64, boolean),
+            (float32[:], float64, int64, types.misc.Omitted(True)),
+        ]
+    )
+    def time_since_previous_target_value(
+        data: np.ndarray, value: float, sample_rate: int, inverse: bool = False
+    ) -> np.ndarray:
+        """
+        Calculate the time duration (in seconds) since the previous occurrence of a specific value in a data array.
+
+        Calculates the time duration, in seconds, between each data point and the previous occurrence
+        of a specific value within the data array.
+
+        .. image:: _static/img/time_since_previous_target_value.png
+           :width: 700
+           :align: center
+
+        :param np.ndarray data: The input 1D array containing the time series data.
+        :param float value: The specific value to search for in the data array.
+        :param int sample_rate: The sampling rate which data points were collected. It is used to calculate the time duration in seconds.
+        :param bool inverse: If True, the function calculates the time since the previous value that is NOT equal to the specified 'value'. If False, it calculates the time since the previous occurrence of the specified 'value'.
+        :returns np.ndarray: A 1D NumPy array containing the time duration (in seconds) since the previous occurrence of the specified 'value' for each data point.
+
+        :example:
+        >>> data = np.array([8, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
+        >>> TimeseriesFeatureMixin().time_since_previous_target_value(data=data, value=8.0, inverse=False, sample_rate=2.0)
+        >>> [0. , 0. , 0.5, 1. , 0. , 0.5, 0. , 0.5, 1. , 1.5])
+        >>> TimeseriesFeatureMixin().time_since_previous_target_value(data=data, value=8.0, inverse=True, sample_rate=2.0)
+        >>> [-1. , -1. ,  0. ,  0. ,  0.5,  0. ,  0.5,  0. ,  0. ,  0. ]
+        """
+
+        results = np.full((data.shape[0]), -1.0)
+        if not inverse:
+            criterion_idx = np.argwhere(data == value).flatten()
+        else:
+            criterion_idx = np.argwhere(data != value).flatten()
+        if criterion_idx.shape[0] == 0:
+            return np.full((data.shape[0]), -1.0)
+        for i in prange(data.shape[0]):
+            if not inverse and (data[i] == value):
+                results[i] = 0
+            elif inverse and (data[i] != value):
+                results[i] = 0
+            else:
+                x = criterion_idx[np.argwhere(criterion_idx < i).flatten()]
+                if len(x) > 0:
+                    results[i] = (i - x[-1]) / sample_rate
         return results
 
     @staticmethod
@@ -1288,6 +1399,198 @@ class TimeseriesFeatureMixin(object):
                 }
 
         return spike_dict
+
+    @staticmethod
+    def _adf_executor(data: np.ndarray) -> tuple:
+        """
+        Helper function to execute Augmented Dickey-Fuller (ADF) test on a data segment.
+        Called by :meth:`timeseries_features_mixin.TimeseriesFeatureMixin.sliding_stationary_test_test`.
+        """
+
+        adfuller_results = adfuller(data)
+        return adfuller_results[0], adfuller_results[1]
+
+    @staticmethod
+    def _kpss_executor(data: np.ndarray) -> tuple:
+        """
+        Helper function to execute Kwiatkowski–Phillips–Schmidt–Shin (KPSS) test on a data segment.
+        Called by :meth:`timeseries_features_mixin.TimeseriesFeatureMixin.sliding_stationary_test_test`.
+        """
+
+        kpss_results = kpss(data)
+        return kpss_results[0], kpss_results[1]
+
+    @staticmethod
+    def _zivotandrews_executor(data: np.ndarray) -> tuple:
+        """
+        Helper function to execute Zivot-Andrews structural-break unit-root test on a data segment.
+        Called by :meth:`timeseries_features_mixin.TimeseriesFeatureMixin.sliding_stationary_test_test`.
+        """
+        try:
+            za_results = zivot_andrews(data)
+            return za_results[0], za_results[1]
+        except (np.linalg.LinAlgError, ValueError):
+            return 0, 0
+
+    @staticmethod
+    def sliding_stationary(
+        data: np.ndarray,
+        time_windows: np.ndarray,
+        sample_rate: int,
+        test: Literal["ADF", "KPSS", "ZA"] = "adf",
+    ) -> (np.ndarray, np.ndarray):
+        """
+        Perform the Augmented Dickey-Fuller (ADF), Kwiatkowski-Phillips-Schmidt-Shin (KPSS), or Zivot-Andrews test on sliding windows of time series data.
+        Parallel processing using all available cores is used to accelerate computation.
+
+        .. note::
+           - ADF: A high p-value suggests non-stationarity, while a low p-value indicates stationarity.
+           - KPSS: A high p-value suggests stationarity, while a low p-value indicates non-stationarity.
+           - ZA: A high p-value suggests non-stationarity, while a low p-value indicates stationarity.
+
+        :param np.ndarray data: 1-D NumPy array containing the time series data to be tested.
+        :param np.ndarray time_windows: A 1-D NumPy array containing the time window sizes in seconds.
+        :param np.ndarray sample_rate: The sample rate of the time series data (samples per second).
+        :param Literal test: Test to perfrom: Options: 'ADF' (Augmented Dickey-Fuller), 'KPSS' (Kwiatkowski-Phillips-Schmidt-Shin), 'ZA' (Zivot-Andrews).
+        :return (np.ndarray, np.ndarray): A tuple of two 2-D NumPy arrays containing test statistics and p-values. - The first array (stat) contains the ADF test statistics. - The second array (p_vals) contains the corresponding p-values
+
+        :example:
+        >>> data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        >>> TimeseriesFeatureMixin().sliding_stationary(data=data, time_windows=np.array([2.0]), test='KPSS', sample_rate=2)
+        """
+
+        stat = np.full((data.shape[0], time_windows.shape[0]), -1.0)
+        p_vals = np.full((data.shape[0], time_windows.shape[0]), -1.0)
+        if test == "ADF":
+            test_func = TimeseriesFeatureMixin()._adf_executor
+        elif test == "KPSS":
+            test_func = TimeseriesFeatureMixin()._kpss_executor
+        elif test == "ZA":
+            test_func = TimeseriesFeatureMixin()._zivotandrews_executor
+        else:
+            type_hints = get_type_hints(TimeseriesFeatureMixin().sliding_stationary)
+            raise InvalidInputError(
+                msg=f'Test {test} not recognized. Options: {type_hints["test"]}'
+            )
+        for i in range(time_windows.shape[0]):
+            window_size = int(time_windows[i] * sample_rate)
+            strided_data = as_strided(
+                data,
+                shape=(data.shape[0] - window_size + 1, window_size),
+                strides=(data.strides[0] * 1, data.strides[0]),
+            )
+            with multiprocessing.Pool(find_core_cnt()[0], maxtasksperchild=10) as pool:
+                for cnt, result in enumerate(
+                    pool.imap(test_func, strided_data, chunksize=1)
+                ):
+                    stat[cnt + window_size - 1, i] = result[0]
+                    p_vals[cnt + window_size - 1, i] = result[1]
+
+        return stat, p_vals
+
+    @staticmethod
+    @njit(
+        [
+            "(float32[:], float64, int64, float64, types.unicode_type)",
+            '(float32[:], float64, int64, float64, types.misc.Omitted("mm"))',
+            "(float32[:], float64, int64, types.misc.Omitted(1), types.unicode_type)",
+            '(float32[:], float64, int64, types.misc.Omitted(1), types.misc.Omitted("mm"))',
+        ]
+    )
+    def acceleration(
+        data: np.ndarray,
+        pixels_per_mm: float,
+        fps: int,
+        time_window: float = 1,
+        unit: Literal["mm", "cm", "dm", "m"] = "mm",
+    ) -> np.ndarray:
+        """
+        Compute acceleration.
+
+        Computes acceleration from a sequence of body-part coordinates over time. It calculates the difference in velocity between consecutive frames and provides an array of accelerations.
+
+        The computation is based on the formula:
+
+        .. math::
+
+           \\text{{Acceleration}}(t) = \\frac{{\\text{{Norm}}(\\text{{Shift}}(\\text{{data}}[t], t, t-1) - \\text{{data}}[t])}}{{\\text{{pixels\\_per\\_mm}}}}
+
+        where :math:`\\text{{Norm}}` calculates the Euclidean norm, :math:`\\text{{Shift}}(\\text{{array}}, t, t-1)` shifts the array by :math:`t-1` frames, and :math:`\\text{{pixels\\_per\\_mm}}` is the conversion factor from pixels to millimeters.
+
+        .. note::
+           By default, acceleration is calculated as change in velocity at millimeters/s. To change the denomitator, modify the ``time_window`` argument. To change the nominator, modify the ``unit`` argument (accepted ``mm``, cm``, ``dm``, ``mm``)
+
+        .. image:: _static/img/acceleration.png
+           :width: 700
+           :align: center
+
+        :param np.ndarray data: 2D array of size len(frames) x 2 with body-part coordinates.
+        :param float pixels_per_mm: Pixels per millimeter of the recorded video.
+        :param int fps: Frames per second (FPS) of the recorded video.
+        :param float time_window: Rolling time window in seconds. Default is 1.0 representing 1 second.
+        :param Literal['mm', 'cm', 'dm', 'm'] unit:  If acceleration should be presented as millimeter, centimeters, decimeter, or meter. Default millimeters.
+        :return: Array of accelerations corresponding to each frame.
+
+        :example:
+        >>> data = np.array([1, 2, 3, 4, 5, 5, 5, 5, 5, 6]).astype(np.float32)
+        >>> TimeseriesFeatureMixin().acceleration(data=data, pixels_per_mm=1.0, fps=2, time_window=1.0)
+        >>> [ 0.,  0.,  0.,  0., -1., -1.,  0.,  0.,  1.,  1.]
+        """
+
+        results, velocity = np.full((data.shape[0]), 0.0), np.full((data.shape[0]), 0.0)
+        size, pv = int(time_window * fps), None
+        data_split = np.split(data, list(range(size, data.shape[0], size)))
+        for i in range(len(data_split)):
+            wS = int(size * i)
+            wE = int(wS + size)
+            v = np.diff(np.ascontiguousarray(data_split[i]))[0] / pixels_per_mm
+            if unit == "cm":
+                v = v / 10
+            elif unit == "dm":
+                v = v / 100
+            elif unit == "m":
+                v = v / 1000
+            if i == 0:
+                results[wS:wE] = 0
+            else:
+                results[wS:wE] = v - pv
+            pv = v
+        return results
+
+
+# data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+# TimeseriesFeatureMixin().sliding_stationary_test_test(data=data, time_windows=np.array([2.0]), test='BLAH', sample_rate=2)
+#
+
+
+# data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+# TimeseriesFeatureMixin().sliding_adf_test(data=data, time_windows=np.array([2.0]), sample_rate=2)
+
+
+# data_sizes = np.array([10, 100, 1000, 10000, 100000, 1000000, 10000000])
+# data_sizes = np.array([100000000])
+# import time
+#
+# for j in range(5):
+#     print('x')
+#     for i in data_sizes:
+#         data = np.random.randint(1, 1000, (i,)).astype(np.float32)
+#         start = time.time()
+#         blah, blah1, bls = TimeseriesFeatureMixin().sliding_hjort_parameters(data=data, window_sizes=np.array([2.0, 4.0]), sample_rate=30)
+#         print(time.time() - start)
+#
+# data_sizes = np.array([1, 10, 100, 1000, 10000, 100000])
+# # #data_sizes = np.array([1, 10, 100, 1000, 10000])
+# # # data_sizes = np.array([100000000])
+# import time
+#
+# for j in range(5):
+#     print('x')
+#     for i in data_sizes:
+#         data = np.random.randint(1, 1000, (i,)).astype(np.float32)
+#         start = time.time()
+#         TimeseriesFeatureMixin().sliding_benford_correlation(data=data, time_windows=np.array([1.0, 4.0]), sample_rate=30)
+#         print(time.time() - start)
 
 
 # data = np.array([1, 4, 2, 3, 5, 6, 8, 7, 9, 10]).astype(np.float32)

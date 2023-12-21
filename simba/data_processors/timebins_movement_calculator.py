@@ -10,11 +10,12 @@ import seaborn as sns
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_if_filepath_list_is_empty, check_int,
-                                check_that_column_exist)
-from simba.utils.enums import ConfigKey, Dtypes
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_if_filepath_list_is_empty, check_int)
+from simba.utils.enums import TagNames
+from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
 
 
 class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
@@ -28,11 +29,14 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
     .. note::
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 
+    .. image:: _static/img/TimeBinsMovementCalculator.png
+       :width: 500
+       :align: center
+
     Example
     ----------
-    >>> timebin_movement_analyzer = TimeBinsMovementCalculator(config_path='MyConfigPath', bin_length=15, plots=True)
+    >>> timebin_movement_analyzer = TimeBinsMovementCalculator(config_path='/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini', bin_length=60, plots=True, body_parts=['midpoint', 'mouth'])
     >>> timebin_movement_analyzer.run()
-
     """
 
     def __init__(
@@ -43,6 +47,11 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         plots: bool = False,
     ):
         ConfigReader.__init__(self, config_path=config_path)
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
         self.bin_length, self.plots = bin_length, plots
         check_int(name="TIME BIN", value=bin_length, min_value=1)
         self.col_headers, self.bp_dict = [], {}
@@ -75,14 +84,21 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                 (self.results["VIDEO"] == video_name)
                 & (self.results["MEASUREMENT"] == "Movement (cm)")
             ]
+            video_df["Time bin #"] = video_df["Time bin #"].astype(int)
             for body_part in video_df["BODY-PART"].unique():
                 body_part_df = (
                     video_df[video_df["BODY-PART"] == body_part]
                     .reset_index(drop=True)
                     .sort_values(by=["Time bin #"])
                 )
-                body_part_df["Time bin #"] = body_part_df["Time bin #"].astype(str)
-                line_plot = sns.lineplot(data=body_part_df, x="Time bin #", y="VALUE")
+                body_part_df[
+                    f"Time bin # (bin length {self.bin_length}s)"
+                ] = body_part_df["Time bin #"]
+                line_plot = sns.lineplot(
+                    data=body_part_df,
+                    x=f"Time bin # (bin length {self.bin_length}s)",
+                    y="VALUE",
+                )
                 plt.ylabel("Distance (cm)")
                 self.plot_save_path = os.path.join(
                     plots_dir, f"{video_name}_{body_part}.png"
@@ -93,17 +109,8 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         stdout_success(
             msg=f"Time bin movement plots saved in {plots_dir}",
             elapsed_time=timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
-
-        # self.video_df['Time bin #'] = self.video_df['Time bin #'].astype(str)
-
-        # for video_name in self.video_df.index.unique():
-        #     video_df = self.video_df[self.video_df.index == video_name].reset_index(drop=True)
-        #     video_movement_df = video_df[video_df['Measurement'].isin(list(self.movement_cols))]
-        #     line_plot = sns.lineplot(data=video_movement_df, x="Time bin #", y="Value", hue='Measurement')
-        #     line_plot.figure.savefig(os.path.join(plots_dir, f'{video_name}.png'))
-        #     plt.close()
-        # stdout_success(msg=f'Time bin movement plots saved in {plots_dir}...')
 
     def run(self):
         """
@@ -119,6 +126,9 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             self.project_path,
             "logs",
             "Time_bins_movement_results_" + self.datetime + ".csv",
+        )
+        check_all_file_names_are_represented_in_video_log(
+            video_info_df=self.video_info_df, data_paths=self.outlier_corrected_paths
         )
         for file_cnt, file_path in enumerate(self.outlier_corrected_paths):
             video_timer = SimbaTimer(start=True)
@@ -193,6 +203,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         stdout_success(
             msg=f"Movement time-bins results saved at {self.save_path}",
             elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
         if self.plots:
             self.__create_plots()

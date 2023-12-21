@@ -48,7 +48,7 @@ def hxtScrollbar(master):
     Bind the frame to the canvas
     """
     bg = master.cget("background")
-    acanvas = Canvas(master, borderwidth=0, background=bg,width=master.winfo_width())
+    acanvas = Canvas(master, borderwidth=0, background=bg, width=master.winfo_width())
     frame = Frame(acanvas, background=bg)
     vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
     vsb2 = Scrollbar(master, orient="horizontal", command=acanvas.xview)
