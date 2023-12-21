@@ -428,7 +428,6 @@ class MachineLearningMetaKeys(Enum):
     MODEL_TO_RUN = "model_to_run"
 
 
-
 class OS(Enum):
     WINDOWS = "Windows"
     LINUX = "Linux"
