@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson"
 
-
+import shutil
+import subprocess
 import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
@@ -52,7 +53,7 @@ from simba.plotting.shap_agg_stats_visualizer import \
 from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
                                 check_str)
 from simba.utils.data import create_color_palette, detect_bouts
-from simba.utils.enums import ConfigKey, Defaults, Dtypes, MetaKeys
+from simba.utils.enums import ConfigKey, Defaults, Dtypes, MachineLearningMetaKeys
 from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
                                 CorruptedFileError, DataHeaderError,
                                 FaultyTrainingSetError,
@@ -79,10 +80,10 @@ class TrainModelMixin(object):
         pass
 
     def read_all_files_in_folder(
-        self,
-        file_paths: List[str],
-        file_type: str,
-        classifier_names: Optional[List[str]] = None,
+            self,
+            file_paths: List[str],
+            file_type: str,
+            classifier_names: Optional[List[str]] = None,
     ) -> pd.DataFrame:
         """
         Read in all data files in a folder to a single pd.DataFrame for downstream ML algo.
@@ -139,8 +140,8 @@ class TrainModelMixin(object):
                 source=self.__class__.__name__,
             )
         df_concat = df_concat.loc[
-            :, ~df_concat.columns.str.contains("^Unnamed")
-        ].fillna(0)
+                    :, ~df_concat.columns.str.contains("^Unnamed")
+                    ].fillna(0)
         timer.stop_timer()
         memory_size = get_memory_usage_of_df(df=df_concat)
         print(
@@ -154,7 +155,7 @@ class TrainModelMixin(object):
         return df_concat.astype(np.float32)
 
     def read_in_all_model_names_to_remove(
-        self, config: configparser.ConfigParser, model_cnt: int, clf_name: str
+            self, config: configparser.ConfigParser, model_cnt: int, clf_name: str
     ) -> List[str]:
         """
         Helper to find all field names that are annotations but are not the target.
@@ -178,7 +179,7 @@ class TrainModelMixin(object):
         return annotation_cols_to_remove
 
     def delete_other_annotation_columns(
-        self, df: pd.DataFrame, annotations_lst: List[str]
+            self, df: pd.DataFrame, annotations_lst: List[str]
     ) -> pd.DataFrame:
         """
         Helper to drop fields that contain annotations which are not the target.
@@ -196,7 +197,7 @@ class TrainModelMixin(object):
         return df
 
     def split_df_to_x_y(
-        self, df: pd.DataFrame, clf_name: str
+            self, df: pd.DataFrame, col_names: [str]
     ) -> (pd.DataFrame, pd.DataFrame):
         """
         Helper to split dataframe into features and target.
@@ -208,15 +209,19 @@ class TrainModelMixin(object):
         :return pd.DataFrame: target
 
         :examples:
-        >>> self.split_df_to_x_y(df=df, clf_name='Attack')
+        >>> self.split_df_to_x_y(df=df, col_names='Attack')
         """
 
         df = deepcopy(df)
-        y = df.pop(clf_name)
-        return df, y
+        ys = np.array([0]*len(df.index))
+        for i,col_name in enumerate(col_names):
+            y = df.pop(col_name)
+            ys[y == 1] = i+1
+
+        return df, pd.DataFrame(ys)
 
     def random_undersampler(
-        self, x_train: np.ndarray, y_train: np.ndarray, sample_ratio: float
+            self, x_train: np.ndarray, y_train: np.ndarray, sample_ratio: float
     ) -> (pd.DataFrame, pd.DataFrame):
         """
         Helper to perform random under-sampling of behavior-absent frames in a dataframe.
@@ -249,10 +254,10 @@ class TrainModelMixin(object):
         data_df = pd.concat(
             [present_df, absent_df.sample(n=ratio_n, replace=False)], axis=0
         )
-        return self.split_df_to_x_y(data_df, y_train.name)
+        return self.split_df_to_x_y(data_df, [y_train.name])
 
     def smoteen_oversampler(
-        self, x_train: pd.DataFrame, y_train: pd.DataFrame, sample_ratio: float
+            self, x_train: pd.DataFrame, y_train: pd.DataFrame, sample_ratio: float
     ) -> (np.ndarray, np.ndarray):
         """
         Helper to perform SMOTEEN oversampling of behavior-present annotations.
@@ -272,10 +277,10 @@ class TrainModelMixin(object):
         return smt.fit_sample(x_train, y_train)
 
     def smote_oversampler(
-        self,
-        x_train: pd.DataFrame or np.array,
-        y_train: pd.DataFrame or np.array,
-        sample_ratio: float,
+            self,
+            x_train: pd.DataFrame or np.array,
+            y_train: pd.DataFrame or np.array,
+            sample_ratio: float,
     ) -> (np.ndarray, np.ndarray):
         """
         Helper to perform SMOTE oversampling of behavior-present annotations.
@@ -294,14 +299,14 @@ class TrainModelMixin(object):
         return smt.fit_sample(x_train, y_train)
 
     def calc_permutation_importance(
-        self,
-        x_test: np.ndarray,
-        y_test: np.ndarray,
-        clf: RandomForestClassifier,
-        feature_names: List[str],
-        clf_name: str,
-        save_dir: Union[str, os.PathLike],
-        save_file_no: Optional[int] = None,
+            self,
+            x_test: np.ndarray,
+            y_test: np.ndarray,
+            clf: RandomForestClassifier,
+            feature_names: List[str],
+            clf_name: str,
+            save_dir: Union[str, os.PathLike],
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to calculate feature permutation importance scores.
@@ -356,15 +361,15 @@ class TrainModelMixin(object):
         )
 
     def calc_learning_curve(
-        self,
-        x_y_df: pd.DataFrame,
-        clf_name: str,
-        shuffle_splits: int,
-        dataset_splits: int,
-        tt_size: float,
-        rf_clf: RandomForestClassifier,
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            x_y_df: pd.DataFrame,
+            clf_name: str,
+            shuffle_splits: int,
+            dataset_splits: int,
+            tt_size: float,
+            rf_clf: RandomForestClassifier,
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to compute random forest learning curves with cross-validation.
@@ -386,7 +391,7 @@ class TrainModelMixin(object):
 
         print("Calculating learning curves...")
         timer = SimbaTimer(start=True)
-        x_df, y_df = self.split_df_to_x_y(x_y_df, clf_name)
+        x_df, y_df = self.split_df_to_x_y(x_y_df, [clf_name])
         cv = ShuffleSplit(n_splits=shuffle_splits, test_size=tt_size)
         if platform.system() == "Darwin":
             with parallel_backend("threading", n_jobs=-2):
@@ -437,13 +442,13 @@ class TrainModelMixin(object):
         )
 
     def calc_pr_curve(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.DataFrame,
-        clf_name: str,
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            y_df: pd.DataFrame,
+            clf_name: str,
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to compute random forest precision-recall curve.
@@ -469,10 +474,10 @@ class TrainModelMixin(object):
         pr_df["PRECISION"] = precision
         pr_df["RECALL"] = recall
         pr_df["F1"] = (
-            2
-            * pr_df["RECALL"]
-            * pr_df["PRECISION"]
-            / (pr_df["RECALL"] + pr_df["PRECISION"])
+                2
+                * pr_df["RECALL"]
+                * pr_df["PRECISION"]
+                / (pr_df["RECALL"] + pr_df["PRECISION"])
         )
         thresholds = list(thresholds)
         thresholds.insert(0, 0.00)
@@ -492,13 +497,13 @@ class TrainModelMixin(object):
         )
 
     def create_example_dt(
-        self,
-        rf_clf: RandomForestClassifier,
-        clf_name: str,
-        feature_names: List[str],
-        class_names: List[str],
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            clf_name: str,
+            feature_names: List[str],
+            class_names: List[str],
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to produce visualization of random forest decision tree using graphviz.
@@ -511,8 +516,11 @@ class TrainModelMixin(object):
         :parameter Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not
             part of a grid search.
         """
-
-        print("Visualizing example decision tree using graphviz...")
+        dot_path = self.find_graphviz_dot()
+        if not dot_path:
+            print("please install graphviz using the following link: https://graphviz.org/download/")
+            return
+        print(f"Visualizing example decision tree using graphviz using {dot_path}")
         estimator = rf_clf.estimators_[3]
         if save_file_no != None:
             dot_name = os.path.join(
@@ -523,7 +531,7 @@ class TrainModelMixin(object):
             )
         else:
             dot_name = os.path.join(save_dir, str(clf_name) + "_tree.dot")
-            file_name = os.path.join(save_dir, str(clf_name) + "_tree.pdf")
+            file_name = os.path.join(save_dir, str(clf_name) + "_tree.png")
         export_graphviz(
             estimator,
             out_file=dot_name,
@@ -534,17 +542,33 @@ class TrainModelMixin(object):
             class_names=class_names,
             feature_names=feature_names,
         )
-        command = "dot " + str(dot_name) + " -T pdf -o " + str(file_name) + " -Gdpi=600"
-        call(command, shell=True)
+        subprocess.run([dot_path, '-Tpng', dot_name, '-o', file_name])
+
+    def find_graphviz_dot(self):
+        # Check if dot is in PATH
+        dot_path = shutil.which("dot")
+        if dot_path:
+            return dot_path
+
+        common_paths = [
+            r"C:\Program Files\Graphviz\bin\dot.exe",
+            r"C:\Program Files (x86)\Graphviz\bin\dot.exe"
+        ]
+
+        # Check common paths
+        for path in common_paths:
+            if os.path.isfile(path):
+                return path
+        return None
 
     def create_clf_report(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.DataFrame,
-        class_names: List[str],
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            y_df: pd.DataFrame,
+            class_names: List[str],
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to create classifier truth table report.
@@ -588,12 +612,12 @@ class TrainModelMixin(object):
             )
 
     def create_x_importance_log(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_names: List[str],
-        clf_name: str,
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            x_names: List[str],
+            clf_name: str,
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to save gini or entropy based feature importance scores.
@@ -627,13 +651,13 @@ class TrainModelMixin(object):
         df.to_csv(self.f_importance_save_path, index=False)
 
     def create_x_importance_bar_chart(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_names: list,
-        clf_name: str,
-        save_dir: str,
-        n_bars: int,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            x_names: list,
+            clf_name: str,
+            save_dir: str,
+            n_bars: int,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to create a bar chart displaying the top N gini or entropy feature importance scores.
@@ -689,12 +713,12 @@ class TrainModelMixin(object):
         plt.close("all")
 
     def dviz_classification_visualization(
-        self,
-        x_train: np.ndarray,
-        y_train: np.ndarray,
-        clf_name: str,
-        class_names: List[str],
-        save_dir: str,
+            self,
+            x_train: np.ndarray,
+            y_train: np.ndarray,
+            clf_name: str,
+            class_names: List[str],
+            save_dir: str,
     ) -> None:
         """
         Helper to create visualization of example decision tree using dtreeviz.
@@ -735,7 +759,7 @@ class TrainModelMixin(object):
 
     @staticmethod
     def split_and_group_df(
-        df: pd.DataFrame, splits: int, include_split_order: bool = True
+            df: pd.DataFrame, splits: int, include_split_order: bool = True
     ) -> (List[pd.DataFrame], int):
         """
         Helper to split a dataframe for multiprocessing. If include_split_order, then include the group number
@@ -749,18 +773,18 @@ class TrainModelMixin(object):
         return data_arr, obs_per_split
 
     def create_shap_log(
-        self,
-        ini_file_path: str,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.Series,
-        x_names: List[str],
-        clf_name: str,
-        cnt_present: int,
-        cnt_absent: int,
-        save_path: str,
-        save_it: int = 100,
-        save_file_no: Optional[int] = None,
+            self,
+            ini_file_path: str,
+            rf_clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            y_df: pd.Series,
+            x_names: List[str],
+            clf_name: str,
+            cnt_present: int,
+            cnt_absent: int,
+            save_path: str,
+            save_it: int = 100,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Compute SHAP values for a random forest classifier.
@@ -897,22 +921,22 @@ class TrainModelMixin(object):
         """
 
         table_view = [
-            ["Model name", model_dict[MetaKeys.CLF_NAME.value]],
+            ["Model name", model_dict[MachineLearningMetaKeys.CLASSIFIER.value]],
             ["Ensemble method", "RF"],
-            ["Estimators (trees)", model_dict[MetaKeys.RF_ESTIMATORS.value]],
-            ["Max features", model_dict[MetaKeys.RF_MAX_FEATURES.value]],
-            ["Under sampling setting", model_dict[ConfigKey.UNDERSAMPLE_SETTING.value]],
-            ["Under sampling ratio", model_dict[ConfigKey.UNDERSAMPLE_RATIO.value]],
-            ["Over sampling setting", model_dict[ConfigKey.OVERSAMPLE_SETTING.value]],
-            ["Over sampling ratio", model_dict[ConfigKey.OVERSAMPLE_RATIO.value]],
-            ["criterion", model_dict[MetaKeys.CRITERION.value]],
-            ["Min sample leaf", model_dict[MetaKeys.MIN_LEAF.value]],
+            ["Estimators (trees)", model_dict[MachineLearningMetaKeys.RF_ESTIMATORS.value]],
+            ["Max features", model_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value]],
+            ["Under sampling setting", model_dict[MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value]],
+            ["Under sampling ratio", model_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value]],
+            ["Over sampling setting", model_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value]],
+            ["Over sampling ratio", model_dict[MachineLearningMetaKeys.OVERSAMPLE_RATIO.value]],
+            ["criterion", model_dict[MachineLearningMetaKeys.RF_CRITERION.value]],
+            ["Min sample leaf", model_dict[MachineLearningMetaKeys.MIN_LEAF.value]],
         ]
         table = tabulate(table_view, ["Setting", "value"], tablefmt="grid")
         print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")
 
     def create_meta_data_csv_training_one_model(
-        self, meta_data_lst: list, clf_name: str, save_dir: Union[str, os.PathLike]
+            self, meta_data_lst: list, clf_name: str, save_dir: Union[str, os.PathLike]
     ) -> None:
         """
         Helper to save single model meta data (hyperparameters, sampling settings etc.) from list format into SimBA
@@ -930,7 +954,7 @@ class TrainModelMixin(object):
         out_df.to_csv(save_path)
 
     def create_meta_data_csv_training_multiple_models(
-        self, meta_data, clf_name, save_dir, save_file_no: Optional[int] = None
+            self, meta_data, clf_name, save_dir, save_file_no: Optional[int] = None
     ) -> None:
         print("Saving model meta data file...")
         save_path = os.path.join(save_dir, f"{clf_name}_{str(save_file_no)}_meta.csv")
@@ -938,11 +962,11 @@ class TrainModelMixin(object):
         out_df.to_csv(save_path)
 
     def save_rf_model(
-        self,
-        rf_clf: RandomForestClassifier,
-        clf_name: str,
-        save_dir: Union[str, os.PathLike],
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            clf_name: str,
+            save_dir: Union[str, os.PathLike],
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to save pickled classifier object to disk.
@@ -962,7 +986,7 @@ class TrainModelMixin(object):
         pickle.dump(rf_clf, open(save_path, "wb"))
 
     def get_model_info(
-        self, config: configparser.ConfigParser, model_cnt: int
+            self, config: configparser.ConfigParser, model_cnt: int
     ) -> Dict[int, Any]:
         """
         Helper to read in N SimBA random forest config meta files to python dict memory.
@@ -983,8 +1007,8 @@ class TrainModelMixin(object):
                     )
                     continue
                 if (
-                    config.get("SML settings", "model_path_" + str(n + 1))
-                    == "No file selected"
+                        config.get("SML settings", "model_path_" + str(n + 1))
+                        == "No file selected"
                 ):
                     MissingUserInputWarning(
                         msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: The classifier path is set to "No file selected',
@@ -1026,7 +1050,7 @@ class TrainModelMixin(object):
             return model_dict
 
     def get_all_clf_names(
-        self, config: configparser.ConfigParser, target_cnt: int
+            self, config: configparser.ConfigParser, target_cnt: int
     ) -> List[str]:
         """
         Helper to get all classifier names in a SimBA project.
@@ -1054,10 +1078,10 @@ class TrainModelMixin(object):
         return model_names
 
     def insert_column_headers_for_outlier_correction(
-        self,
-        data_df: pd.DataFrame,
-        new_headers: List[str],
-        filepath: Union[str, os.PathLike],
+            self,
+            data_df: pd.DataFrame,
+            new_headers: List[str],
+            filepath: Union[str, os.PathLike],
     ) -> pd.DataFrame:
         """
         Helper to insert new column headers onto a dataframe following outlier correction.
@@ -1103,7 +1127,7 @@ class TrainModelMixin(object):
         return clf
 
     def bout_train_test_splitter(
-        self, x_df: pd.DataFrame, y_df: pd.Series, test_size: float
+            self, x_df: pd.DataFrame, y_df: pd.Series, test_size: float
     ) -> (pd.DataFrame, pd.DataFrame, pd.Series, pd.Series):
         """
         Helper to split train and test based on annotated `bouts`.
@@ -1170,7 +1194,7 @@ class TrainModelMixin(object):
         return x_train, x_test, y_train, y_test
 
     def check_sampled_dataset_integrity(
-        self, x_df: pd.DataFrame, y_df: pd.DataFrame
+            self, x_df: pd.DataFrame, y_df: pd.DataFrame
     ) -> None:
         """
         Helper to check for non-numerical entries post data sampling
@@ -1189,37 +1213,37 @@ class TrainModelMixin(object):
             if len(x_nan_cnt) < 10:
                 raise FaultyTrainingSetError(
                     msg=f"{str(len(x_nan_cnt))} feature column(s) exist in some files within the project_folder/csv/targets_inserted directory, but missing in others. "
-                    f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the "
-                    f"column names with mismatches are: {list(x_nan_cnt.index)}",
+                        f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the "
+                        f"column names with mismatches are: {list(x_nan_cnt.index)}",
                     source=self.__class__.__name__,
                 )
             else:
                 raise FaultyTrainingSetError(
                     msg=f"{str(len(x_nan_cnt))} feature columns exist in some files, but missing in others. The feature files are found in the project_folder/csv/targets_inserted directory. "
-                    f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
-                    f"column names with mismatches are: {list(x_nan_cnt.index)[0:9]}",
+                        f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
+                        f"column names with mismatches are: {list(x_nan_cnt.index)[0:9]}",
                     source=self.__class__.__name__,
                 )
-
-        if len(y_df.unique()) == 1:
-            if y_df.unique()[0] == 0:
+        labels = np.unique(y_df)
+        if len(labels)== 1:
+            if labels[0] == 0:
                 raise FaultyTrainingSetError(
                     msg=f"All training annotations for classifier {str(y_df.name)} is labelled as ABSENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.",
                     source=self.__class__.__name__,
                 )
-            if y_df.unique()[0] == 1:
+            if labels[0] == 1:
                 raise FaultyTrainingSetError(
                     msg=f"All training annotations for classifier {str(y_df.name)} is labelled as PRESENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.",
                     source=self.__class__.__name__,
                 )
 
     def partial_dependence_calculator(
-        self,
-        clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        clf_name: str,
-        save_dir: Union[str, os.PathLike],
-        clf_cnt: Optional[int] = None,
+            self,
+            clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            clf_name: str,
+            save_dir: Union[str, os.PathLike],
+            clf_cnt: Optional[int] = None,
     ) -> None:
         """
         Compute feature partial dependencies for every feature in training set.
@@ -1256,11 +1280,11 @@ class TrainModelMixin(object):
             print(f"Partial dependencies for {feature_name} complete...")
 
     def clf_predict_proba(
-        self,
-        clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        model_name: Optional[str] = None,
-        data_path: Optional[Union[str, os.PathLike]] = None,
+            self,
+            clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            model_name: Optional[str] = None,
+            data_path: Optional[Union[str, os.PathLike]] = None,
     ) -> np.ndarray:
         """
 
@@ -1293,15 +1317,15 @@ class TrainModelMixin(object):
                     source=self.__class__.__name__,
                 )
         p_vals = clf.predict_proba(x_df)
-        if p_vals.shape[1] != 2:
-            raise ClassifierInferenceError(
-                msg=f"The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes. The classifier is not a binary classifier and does not predict two targets (absence and presence of behavior)",
-                source=self.__class__.__name__,
-            )
+        # if p_vals.shape[1] != 2:
+        #     raise ClassifierInferenceError(
+        #         msg=f"The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes. The classifier is not a binary classifier and does not predict two targets (absence and presence of behavior)",
+        #         source=self.__class__.__name__,
+        #     )
         return p_vals[:, 1]
 
     def clf_fit(
-        self, clf: RandomForestClassifier, x_df: pd.DataFrame, y_df: pd.DataFrame
+            self, clf: RandomForestClassifier, x_df: pd.DataFrame, y_df: pd.DataFrame
     ) -> RandomForestClassifier:
         """
         Helper to fit clf model
@@ -1312,7 +1336,7 @@ class TrainModelMixin(object):
         :return RandomForestClassifier: Fitted random forest classifier object
         """
         nan_features = x_df[~x_df.applymap(np.isreal).all(1)]
-        nan_target = y_df.loc[pd.to_numeric(y_df).isna()]
+        nan_target = y_df[y_df.isna().to_numpy()]
         if len(nan_features) > 0:
             raise FaultyTrainingSetError(
                 msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values",
@@ -1326,7 +1350,7 @@ class TrainModelMixin(object):
         return clf.fit(x_df, y_df)
 
     def _read_data_file_helper(
-        self, file_path: str, file_type: str, clf_names: Optional[List[str]] = None
+            self, file_path: str, file_type: str, clf_names: Optional[List[str]] = None
     ):
         """
         Private function called by :meth:`simba.train_model_functions.read_all_files_in_folder_mp`
@@ -1356,10 +1380,10 @@ class TrainModelMixin(object):
         return df
 
     def read_all_files_in_folder_mp(
-        self,
-        file_paths: List[str],
-        file_type: Literal["csv", "parquet", "pickle"],
-        classifier_names: Optional[List[str]] = None,
+            self,
+            file_paths: List[str],
+            file_type: Literal["csv", "parquet", "pickle"],
+            classifier_names: Optional[List[str]] = None,
     ) -> pd.DataFrame:
         """
 
@@ -1384,10 +1408,10 @@ class TrainModelMixin(object):
         try:
             with ProcessPoolExecutor(int(np.ceil(cpu_cnt / 2))) as pool:
                 for res in pool.map(
-                    self._read_data_file_helper,
-                    file_paths,
-                    repeat(file_type),
-                    repeat(classifier_names),
+                        self._read_data_file_helper,
+                        file_paths,
+                        repeat(file_type),
+                        repeat(classifier_names),
                 ):
                     df_lst.append(res)
             df_concat = pd.concat(df_lst, axis=0).round(4)
@@ -1399,8 +1423,8 @@ class TrainModelMixin(object):
                     source=self.read_all_files_in_folder_mp.__name__,
                 )
             df_concat = df_concat.loc[
-                :, ~df_concat.columns.str.contains("^Unnamed")
-            ].astype(np.float32)
+                        :, ~df_concat.columns.str.contains("^Unnamed")
+                        ].astype(np.float32)
             memory_size = get_memory_usage_of_df(df=df_concat)
             print(
                 f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB'
@@ -1420,32 +1444,39 @@ class TrainModelMixin(object):
 
     @staticmethod
     def _read_data_file_helper_futures(
-        file_path: str, file_type: str, clf_names: Optional[List[str]] = None
+            annotation_file_path: str, features_dir: str, file_type: str, clf_names: Optional[List[str]] = None
     ):
         """
         Private function called by :meth:`simba.train_model_functions.read_all_files_in_folder_mp_futures`
         """
 
         timer = SimbaTimer(start=True)
-        _, vid_name, _ = get_fn_ext(file_path)
-        df = read_df(file_path, file_type).dropna(axis=0, how="all").fillna(0)
-        df.index = [vid_name] * len(df)
+        _, vid_name, _ = get_fn_ext(annotation_file_path)
+        annotation_df = read_df(annotation_file_path, file_type).dropna(axis=0, how="all").fillna(0)
+        if features_dir != "":
+            features_file_path = os.path.join(features_dir, vid_name + ".csv")
+            features_df = read_df(features_file_path, file_type).dropna(axis=0, how="all").fillna(0)
+            features_df = pd.concat([features_df, annotation_df[clf_names]], axis=1)
+        else:
+            features_df = annotation_df
+        features_df.index = [vid_name] * len(features_df)
         if clf_names != None:
             for clf_name in clf_names:
-                if not clf_name in df.columns:
-                    raise ColumnNotFoundError(column_name=clf_name, file_name=file_path)
-                elif len(set(df[clf_name].unique()) - {0, 1}) > 0:
+                if not clf_name in annotation_df.columns:
+                    raise ColumnNotFoundError(column_name=clf_name, file_name=annotation_file_path)
+                elif len(set(annotation_df[clf_name].unique()) - {0, 1}) > 0:
                     raise InvalidInputError(
-                        msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}."
+                        msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {annotation_file_path} the {clf_name} field contains additional value(s): {list(set(annotation_df[clf_name].unique()) - {0, 1})}."
                     )
         timer.stop_timer()
-        return df, vid_name, timer.elapsed_time_str
+        return features_df, vid_name, timer.elapsed_time_str
 
-    def read_all_files_in_folder_mp_futures(
-        self,
-        file_paths: List[str],
-        file_type: Literal["csv", "parquet", "pickle"],
-        classifier_names: Optional[List[str]] = None,
+    def read_and_concatenate_all_files_in_folder_mp_futures(
+            self,
+            annotations_file_paths: List[str],
+            features_dir: str,
+            file_type: Literal["csv", "parquet", "pickle"],
+            classifier_names: Optional[List[str]] = None,
     ) -> pd.DataFrame:
         """
         Multiprocessing helper function to read in all data files in a folder to a single
@@ -1471,16 +1502,17 @@ class TrainModelMixin(object):
             cpu_cnt, _ = find_core_cnt()
             df_lst = []
             with concurrent.futures.ProcessPoolExecutor(
-                max_workers=cpu_cnt
+                    max_workers=cpu_cnt
             ) as executor:
                 results = [
                     executor.submit(
                         self._read_data_file_helper_futures,
-                        data,
+                        annotation_file_path,
+                        features_dir,
                         file_type,
                         classifier_names,
                     )
-                    for data in file_paths
+                    for annotation_file_path in annotations_file_paths
                 ]
                 for result in concurrent.futures.as_completed(results):
                     df_lst.append(result.result()[0])
@@ -1497,13 +1529,75 @@ class TrainModelMixin(object):
                 msg="Multi-processing file read failed, reverting to single core (increased run-time on large datasets)."
             )
             return self.read_all_files_in_folder(
-                file_paths=file_paths,
+                file_paths=annotations_file_paths,
+                file_type=file_type,
+                classifier_names=classifier_names,
+            )
+
+    def read_all_files_in_folder_mp_futures(
+            self,
+            annotations_file_paths: List[str],
+            file_type: Literal["csv", "parquet", "pickle"],
+            classifier_names: Optional[List[str]] = None,
+    ) -> pd.DataFrame:
+        """
+        Multiprocessing helper function to read in all data files in a folder to a single
+        pd.DataFrame for downstream ML through concurrent.Futures. Asserts that all classifiers
+        have annotation fields present in each dataframe.
+
+        .. note::
+           A ``concurrent.Futures`` alternative to :meth:`simba.mixins.train_model_mixin.read_all_files_in_folder_mp` which
+           has uses ``multiprocessing.ProcessPoolExecutor`` and reported unstable on Linux machines.
+
+           If multiprocess failure, reverts to :meth:`simba.mixins.train_model_mixin.read_all_files_in_folder`
+
+        :parameter List[str] file_paths: List of file-paths
+        :parameter List[str] file_paths: The filetype of ``file_paths`` OPTIONS: csv or parquet.
+        :parameter Optional[List[str]] classifier_names: List of classifier names representing fields of human annotations. If not None, then assert that classifier names
+            are present in each data file.
+        :return pd.DataFrame: Concatenated dataframe of all data in ``file_paths``.
+
+        """
+        try:
+            if platform.system() == "Darwin":
+                multiprocessing.set_start_method("spawn")
+            cpu_cnt, _ = find_core_cnt()
+            df_lst = []
+            with concurrent.futures.ProcessPoolExecutor(
+                    max_workers=cpu_cnt
+            ) as executor:
+                results = [
+                    executor.submit(
+                        self._read_data_file_helper_futures,
+                        annotation_file_path,
+                        "",
+                        file_type,
+                        classifier_names,
+                    )
+                    for annotation_file_path in annotations_file_paths
+                ]
+                for result in concurrent.futures.as_completed(results):
+                    df_lst.append(result.result()[0])
+                    print(
+                        f"Reading complete {result.result()[1]} (elapsed time: {result.result()[2]}s)..."
+                    )
+            df_concat = pd.concat(df_lst, axis=0).round(4)
+            if "scorer" in df_concat.columns:
+                df_concat = df_concat.drop(["scorer"], axis=1)
+            return df_concat
+
+        except:
+            MultiProcessingFailedWarning(
+                msg="Multi-processing file read failed, reverting to single core (increased run-time on large datasets)."
+            )
+            return self.read_all_files_in_folder(
+                file_paths=annotations_file_paths,
                 file_type=file_type,
                 classifier_names=classifier_names,
             )
 
     def check_raw_dataset_integrity(
-        self, df: pd.DataFrame, logs_path: Optional[Union[str, os.PathLike]]
+            self, df: pd.DataFrame, logs_path: Optional[Union[str, os.PathLike]]
     ) -> None:
         """
         Helper to check column-wise NaNs in raw input data for fitting model.
@@ -1540,18 +1634,18 @@ class TrainModelMixin(object):
             results.to_csv(save_log_path)
             raise FaultyTrainingSetError(
                 msg=f"{len(nan_cols)} feature columns exist in some files, but missing in others. The feature files are found in the project_folder/csv/targets_inserted directory. "
-                f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
-                f"column names with mismatches are: {nan_cols[0:9]}. For a log of the files that contain, and not contain, the mis-matched columns, see {save_log_path}",
+                    f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
+                    f"column names with mismatches are: {nan_cols[0:9]}. For a log of the files that contain, and not contain, the mis-matched columns, see {save_log_path}",
                 source=self.__class__.__name__,
             )
 
     @staticmethod
     def _create_shap_mp_helper(
-        data: pd.DataFrame,
-        explainer: shap.TreeExplainer,
-        clf_name: str,
-        rf_clf: RandomForestClassifier,
-        expected_value: float,
+            data: pd.DataFrame,
+            explainer: shap.TreeExplainer,
+            clf_name: str,
+            rf_clf: RandomForestClassifier,
+            expected_value: float,
     ):
         target = data.pop(clf_name).values.reshape(-1, 1)
         frame_batch_shap = explainer.shap_values(data.values, check_additivity=False)[1]
@@ -1570,7 +1664,7 @@ class TrainModelMixin(object):
 
     @staticmethod
     def _create_shap_mp_helper(
-        data: pd.DataFrame, explainer: shap.TreeExplainer, clf_name: str
+            data: pd.DataFrame, explainer: shap.TreeExplainer, clf_name: str
     ):
         target = data.pop(clf_name).values.reshape(-1, 1)
         group_cnt = data.pop("group").values[0]
@@ -1583,18 +1677,18 @@ class TrainModelMixin(object):
         return shap_vals, data.values, target
 
     def create_shap_log_mp(
-        self,
-        ini_file_path: str,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.DataFrame,
-        x_names: List[str],
-        clf_name: str,
-        cnt_present: int,
-        cnt_absent: int,
-        save_path: str,
-        batch_size: int = 10,
-        save_file_no: Optional[int] = None,
+            self,
+            ini_file_path: str,
+            rf_clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            y_df: pd.DataFrame,
+            x_names: List[str],
+            clf_name: str,
+            cnt_present: int,
+            cnt_absent: int,
+            save_path: str,
+            batch_size: int = 10,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to compute SHAP values using multiprocessing.
@@ -1680,10 +1774,10 @@ class TrainModelMixin(object):
                     self._create_shap_mp_helper, explainer=explainer, clf_name=clf_name
                 )
                 for cnt, result in enumerate(
-                    pool.imap_unordered(constants, shap_data, chunksize=1)
+                        pool.imap_unordered(constants, shap_data, chunksize=1)
                 ):
                     print(
-                        f"Concatenating multi-processed SHAP data (batch {cnt+1}/{len(shap_data)})"
+                        f"Concatenating multi-processed SHAP data (batch {cnt + 1}/{len(shap_data)})"
                     )
                     proba = rf_clf.predict_proba(result[1])[:, 1].reshape(-1, 1)
                     shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
@@ -1706,7 +1800,7 @@ class TrainModelMixin(object):
             shap_save_df = pd.DataFrame(
                 data=np.row_stack(shap_results),
                 columns=list(x_names)
-                + ["Expected_value", "Sum", "Prediction_probability", clf_name],
+                        + ["Expected_value", "Sum", "Prediction_probability", clf_name],
             )
             raw_save_df = pd.DataFrame(
                 data=np.row_stack(shap_raw), columns=list(x_names)
@@ -1746,7 +1840,7 @@ class TrainModelMixin(object):
             )
 
     def check_df_dataset_integrity(
-        self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]
+            self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]
     ) -> None:
         """
         Helper to check for non-numerical np.inf, -np.inf, NaN, None in a single dataframe.
@@ -1767,7 +1861,6 @@ class TrainModelMixin(object):
             raise NoDataError(msg=msg, source=self.check_df_dataset_integrity.__name__)
         else:
             pass
-
 
 # test = TrainModelMixin()
 # test.read_all_files_in_folder(file_paths=['/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437C_c3_2022-11-01_13-16-23_color.csv', '/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437D_c4_2022-11-01_13-16-39_color.csv'],

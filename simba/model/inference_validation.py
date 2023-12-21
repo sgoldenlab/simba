@@ -33,10 +33,10 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
     """
 
     def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        input_file_path: Union[str, os.PathLike],
-        clf_path: Union[str, os.PathLike],
+            self,
+            config_path: Union[str, os.PathLike],
+            input_file_path: Union[str, os.PathLike],
+            clf_path: Union[str, os.PathLike],
     ):
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
@@ -51,6 +51,8 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
         data_df = read_df(input_file_path, self.file_type)
         output_df = deepcopy(data_df)
         data_df = self.drop_bp_cords(df=data_df)
+        if data_df is None:
+            data_df = deepcopy(output_df)
         clf = self.read_pickle(file_path=clf_path)
         probability_col_name = f"Probability_{classifier_name}"
         output_df[probability_col_name] = self.clf_predict_proba(
@@ -61,13 +63,12 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
 
         self.timer.stop_timer()
         stdout_success(
-            msg=f'Validation predictions generated for "{file_name}" within the project_folder/csv/validation directory',
+            msg=f'Validation predictions generated for "{file_name}" saved in {save_filename}',
             elapsed_time=self.timer.elapsed_time_str,
         )
         print(
             'Click on "Interactive probability plot" to inspect classifier probability thresholds. If satisfactory proceed to specify threshold and minimum bout length and click on "Validate" to create video.'
         )
-
 
 #
 # ValidateModelRunClf(config_path=r"Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini",

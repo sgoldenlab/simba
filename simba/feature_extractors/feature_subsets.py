@@ -456,7 +456,7 @@ class FeatureSubsetsCalculator(ConfigReader, FeatureExtractionMixin, TrainModelM
                     self.features_extracted_temp_path + f"/*.{self.file_type}"
                 )
                 self.data_df = self.read_all_files_in_folder_mp_futures(
-                    file_paths=file_paths, file_type=self.file_type
+                    annotations_file_paths=file_paths, file_type=self.file_type
                 )
                 self.check_raw_dataset_integrity(
                     df=self.data_df, logs_path=self.logs_path
@@ -469,7 +469,7 @@ class FeatureSubsetsCalculator(ConfigReader, FeatureExtractionMixin, TrainModelM
                     self.targets_inserted_temp_path + f"/*.{self.file_type}"
                 )
                 self.data_df = self.read_all_files_in_folder_mp_futures(
-                    file_paths=file_paths, file_type=self.file_type
+                    annotations_file_paths=file_paths, file_type=self.file_type
                 )
                 self.check_raw_dataset_integrity(
                     df=self.data_df, logs_path=self.logs_path

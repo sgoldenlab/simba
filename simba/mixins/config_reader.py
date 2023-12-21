@@ -121,22 +121,25 @@ class ConfigReader(object):
             Dtypes.INT.value,
         )
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.clf_cnt)
-        self.feature_file_paths = glob.glob(self.features_dir + "/*." + self.file_type)
-        self.target_file_paths = glob.glob(self.targets_folder + "/*." + self.file_type)
-        self.input_csv_paths = glob.glob(self.input_csv_dir + "/*." + self.file_type)
-        self.body_part_directionality_paths = glob.glob(
-            self.body_part_directionality_df_dir + "/*." + self.file_type
-        )
-        self.outlier_corrected_paths = glob.glob(
-            self.outlier_corrected_dir + "/*." + self.file_type
-        )
-        self.outlier_corrected_movement_paths = glob.glob(
-            self.outlier_corrected_movement_dir + "/*." + self.file_type
-        )
+        self.feature_file_paths = glob.glob(os.path.join(self.features_dir , "*." + self.file_type))
+        self.target_file_paths = glob.glob(os.path.join(self.targets_folder ,"*." + self.file_type))
+        self.input_csv_paths = glob.glob(os.path.join(self.input_csv_dir , "*." + self.file_type))
+        self.body_part_directionality_paths = []
+        for root,dirs,files in os.walk(self.body_part_directionality_df_dir):
+            for d in dirs:
+                for root2,dirs2,files2 in os.walk(os.path.join(root,d)):
+                    for file in glob.glob(os.path.join(root2, "*." + self.file_type)):
+                        self.body_part_directionality_paths.append(file)
+        self.outlier_corrected_paths = glob.glob(os.path.join(
+            self.outlier_corrected_dir , "*." + self.file_type
+        ))
+        self.outlier_corrected_movement_paths = glob.glob(os.path.join(
+            self.outlier_corrected_movement_dir , "*." + self.file_type
+        ))
         self.cpu_cnt, self.cpu_to_use = find_core_cnt()
-        self.machine_results_paths = glob.glob(
-            self.machine_results_dir + "/*." + self.file_type
-        )
+        self.machine_results_paths = glob.glob(os.path.join(
+            self.machine_results_dir , "*." + self.file_type
+        ))
         self.logs_path = os.path.join(self.project_path, "logs")
         self.body_parts_path = os.path.join(self.project_path, Paths.BP_NAMES.value)
         check_file_exist_and_readable(file_path=self.body_parts_path)
@@ -556,6 +559,7 @@ class ConfigReader(object):
             BodypartColumnNotFoundWarning(
                 msg=f"SimBA could not drop body-part coordinates, some body-part names are missing in dataframe. SimBA expected the following body-parts, that could not be found inside the file: {missing_body_part_fields}"
             )
+            return df
         else:
             return df.drop(self.bp_col_names, axis=1)
 

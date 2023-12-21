@@ -38,37 +38,6 @@ class ConfigKey(Enum):
     MULTI_ANIMAL_ID_SETTING = "Multi animal IDs"
     MULTI_ANIMAL_IDS = "ID_list"
     OUTLIER_SETTINGS = "Outlier settings"
-    CLASS_WEIGHTS = "class_weights"
-    CUSTOM_WEIGHTS = "custom_weights"
-    CLASSIFIER = "classifier"
-    TT_SIZE = "train_test_size"
-    MODEL_TO_RUN = "model_to_run"
-    UNDERSAMPLE_SETTING = "under_sample_setting"
-    OVERSAMPLE_SETTING = "over_sample_setting"
-    UNDERSAMPLE_RATIO = "under_sample_ratio"
-    OVERSAMPLE_RATIO = "over_sample_ratio"
-    RF_ESTIMATORS = "RF_n_estimators"
-    RF_MAX_FEATURES = "RF_max_features"
-    RF_CRITERION = "RF_criterion"
-    MIN_LEAF = "RF_min_sample_leaf"
-    PERMUTATION_IMPORTANCE = "compute_permutation_importance"
-    LEARNING_CURVE = "generate_learning_curve"
-    PRECISION_RECALL = "generate_precision_recall_curve"
-    EX_DECISION_TREE = "generate_example_decision_tree"
-    EX_DECISION_TREE_FANCY = "generate_example_decision_tree_fancy"
-    CLF_REPORT = "generate_classification_report"
-    IMPORTANCE_LOG = "generate_features_importance_log"
-    PARTIAL_DEPENDENCY = "partial_dependency"
-    IMPORTANCE_BAR_CHART = "generate_features_importance_bar_graph"
-    SHAP_SCORES = "generate_shap_scores"
-    RF_METADATA = "RF_meta_data"
-    LEARNING_CURVE_K_SPLITS = "LearningCurve_shuffle_k_splits"
-    LEARNING_DATA_SPLITS = "LearningCurve_shuffle_data_splits"
-    IMPORTANCE_BARS_N = "N_feature_importance_bars"
-    SHAP_PRESENT = "shap_target_present_no"
-    SHAP_ABSENT = "shap_target_absent_no"
-    SHAP_SAVE_ITERATION = "shap_save_iteration"
-    SHAP_MULTIPROCESS = "shap_multiprocess"
     POSE_SETTING = "pose_estimation_body_parts"
     RF_JOBS = "RF_n_jobs"
     VALIDATION_VIDEO = "generate_validation_video"
@@ -77,7 +46,6 @@ class ConfigKey(Enum):
     ROI_ANIMAL_CNT = "no_of_animals"
     DISTANCE_MM = "distance_mm"
     SKLEARN_BP_PROB_THRESH = "bp_threshold_sklearn"
-    SPLIT_TYPE = "train_test_split_type"
 
 
 class Paths(Enum):
@@ -170,7 +138,7 @@ class Formats(Enum):
 
 class Options(Enum):
     ROLLING_WINDOW_DIVISORS = [2, 5, 6, 7.5, 15]
-    CLF_MODELS = ["RF", "GBC", "XGBoost"]
+    CLF_MODELS = ["RF", "imbalanced_rf", "GBC", "XGBoost"]
     CLF_MAX_FEATURES = ["sqrt", "log", "None"]
     CLF_CRITERION = ["gini", "entropy"]
     UNDERSAMPLE_OPTIONS = ["None", "random undersample"]
@@ -423,13 +391,13 @@ class Methods(Enum):
     THIRD_PARTY_ANNOTATION_FILE_NOT_FOUND = "Annotations data file NOT FOUND"
 
 
-class MetaKeys(Enum):
-    CLF_NAME = "classifier_name"
+class MachineLearningMetaKeys(Enum):
+    CLASSIFIER = "classifier"
     RF_ESTIMATORS = "rf_n_estimators"
-    CRITERION = "rf_criterion"
+    RF_CRITERION = "rf_criterion"
     TT_SIZE = "train_test_size"
     MIN_LEAF = "rf_min_sample_leaf"
-    META_FILE = "generate_rf_model_meta_data_file"
+    RF_METADATA = "generate_rf_model_meta_data_file"
     EX_DECISION_TREE = "generate_example_decision_tree"
     CLF_REPORT = "generate_classification_report"
     IMPORTANCE_LOG = "generate_features_importance_log"
@@ -438,6 +406,7 @@ class MetaKeys(Enum):
     LEARNING_CURVE = "generate_sklearn_learning_curves"
     PRECISION_RECALL = "generate_precision_recall_curves"
     RF_MAX_FEATURES = "rf_max_features"
+    RF_MAX_DEPTH = "rf_max_depth"
     LEARNING_CURVE_K_SPLITS = "learning_curve_k_splits"
     LEARNING_CURVE_DATA_SPLITS = "learning_curve_data_splits"
     N_FEATURE_IMPORTANCE_BARS = "n_feature_importance_bars"
@@ -447,6 +416,17 @@ class MetaKeys(Enum):
     SHAP_SAVE_ITERATION = "shap_save_iteration"
     PARTIAL_DEPENDENCY = "partial_dependency"
     TRAIN_TEST_SPLIT_TYPE = "train_test_split_type"
+    UNDERSAMPLE_SETTING = "under_sample_setting"
+    UNDERSAMPLE_RATIO = "under_sample_ratio"
+    OVERSAMPLE_SETTING = "over_sample_setting"
+    OVERSAMPLE_RATIO = "over_sample_ratio"
+    CLASS_WEIGHTS = "class_weights"
+    CLASS_CUSTOM_WEIGHTS = "class_custom_weights"
+    EX_DECISION_TREE_FANCY = "generate_example_decision_tree_fancy"
+    IMPORTANCE_BARS_N = "N_feature_importance_bars"
+    LEARNING_DATA_SPLITS = "LearningCurve_shuffle_data_splits"
+    MODEL_TO_RUN = "model_to_run"
+
 
 
 class OS(Enum):

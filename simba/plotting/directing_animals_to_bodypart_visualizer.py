@@ -59,7 +59,7 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
         self.direction_analyzer = DirectingAnimalsToBodyPartAnalyzer(
             config_path=config_path,
         )
-        self.data_dict = self.direction_analyzer.read_directionality_dfs()
+        self.data_dict, self.body_parts_directionality_names = self.direction_analyzer.read_directionality_dfs()
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         self.style_attr, self.pose_colors = style_attr, []
         self.colors = get_color_dict()
@@ -75,7 +75,6 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
             video_dir=self.video_dir, filename=self.video_name)
         if not os.path.exists(self.directing_body_part_animal_video_output_path):
             os.makedirs(self.directing_body_part_animal_video_output_path)
-        print(f"Processing video {self.video_name}...")
 
     def run(self):
         """
@@ -88,25 +87,29 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
         """
 
         self.data_df = read_df(self.data_path, file_type=self.file_type)
-        self.video_save_path = os.path.join(
-            self.directing_body_part_animal_video_output_path, self.video_name + ".mp4"
-        )
+
         self.cap = cv2.VideoCapture(self.video_path)
         self.video_meta_data = get_video_meta_data(self.video_path)
-        self.video_data = self.data_dict[self.video_name]
-        self.writer = cv2.VideoWriter(
-            self.video_save_path,
-            self.fourcc,
-            self.video_meta_data["fps"],
-            (self.video_meta_data["width"], self.video_meta_data["height"]),
-        )
-        self.__create_video()
-        self.timer.stop_timer()
+        for bp in self.body_parts_directionality_names:
+            key = self.video_name + "_" + bp
+            print(f"Processing video {key}...")
+
+            self.video_save_path = os.path.join(
+                self.directing_body_part_animal_video_output_path, self.video_name + "_" + bp + ".mp4"
+            )
+            self.video_data = self.data_dict[key]
+            self.writer = cv2.VideoWriter(
+                self.video_save_path,
+                self.fourcc,
+                self.video_meta_data["fps"],
+                (self.video_meta_data["width"], self.video_meta_data["height"]),
+            )
+            self.__create_video()
 
     def __draw_individual_lines(self, animal_img_data: pd.DataFrame, img: np.array):
         color = self.direction_colors[0]
-        bp_x_name = "Animal_"+self.bodypart_direction+"_x"
-        bp_y_name = "Animal_"+self.bodypart_direction+"_y"
+        bp_x_name = "Animal_" + self.bodypart_direction + "_x"
+        bp_y_name = "Animal_" + self.bodypart_direction + "_y"
         for cnt, (i, r) in enumerate(animal_img_data.iterrows()):
             if self.style_attr["Direction_color"] == "Random":
                 color = random.sample(self.direction_colors[0], 1)[0]
@@ -162,13 +165,13 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
 
                     img_cnt += 1
                     self.writer.write(np.uint8(img))
-                    # print(
-                    #     "Frame: {} / {}. Video: {}".format(
-                    #         str(img_cnt),
-                    #         str(self.video_meta_data["frame_count"]),
-                    #         self.video_name,
-                    #     )
-                    # )
+                    print(
+                        "Frame: {} / {}. Video: {}".format(
+                            str(img_cnt),
+                            str(self.video_meta_data["frame_count"]),
+                            self.video_name,
+                        )
+                    )
                 else:
                     self.cap.release()
                     self.writer.release()
