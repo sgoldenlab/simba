@@ -1,17 +1,22 @@
 #### MODIFIED FROM @Toshea111 - https://github.com/Toshea111/sleap/blob/develop/docs/notebooks/Convert_HDF5_to_CSV_updated.ipynb
+import io
+import os
+
+import h5py
 import numpy as np
 import pandas as pd
-import h5py
-import os
-import io
 
+from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.data_processors.interpolation_smoothing import Smooth, Interpolate
-from simba.utils.errors import BodypartColumnNotFoundError
-from simba.utils.read_write import get_video_meta_data, write_df, find_all_videos_in_project, clean_sleap_file_name, get_fn_ext
-from simba.utils.printing import stdout_warning, stdout_success, SimbaTimer, log_event
 from simba.utils.enums import Methods, TagNames
+from simba.utils.errors import BodypartColumnNotFoundError
+from simba.utils.printing import (SimbaTimer, log_event, stdout_success,
+                                  stdout_warning)
+from simba.utils.read_write import (clean_sleap_file_name,
+                                    find_all_videos_in_project, get_fn_ext,
+                                    get_video_meta_data, write_df)
+
 
 class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
     """
@@ -38,43 +43,84 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
     >>> sleap_h5_importer.run()
     """
 
-    def __init__(self,
-                 config_path: str,
-                 data_folder: str,
-                 id_lst: list,
-                 interpolation_settings: str,
-                 smoothing_settings: dict):
-
+    def __init__(
+        self,
+        config_path: str,
+        data_folder: str,
+        id_lst: list,
+        interpolation_settings: str,
+        smoothing_settings: dict,
+    ):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PoseImporterMixin.__init__(self)
-        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        self.interpolation_settings, self.smoothing_settings = interpolation_settings, smoothing_settings
+        log_event(
+            logger_name=str(__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
+        self.interpolation_settings, self.smoothing_settings = (
+            interpolation_settings,
+            smoothing_settings,
+        )
         self.data_folder, self.id_lst = data_folder, id_lst
-        self.import_log_path = os.path.join(self.logs_path, f'data_import_log_{self.datetime}.csv')
+        self.import_log_path = os.path.join(
+            self.logs_path, f"data_import_log_{self.datetime}.csv"
+        )
         self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
-        self.input_data_paths = self.find_data_files(dir=self.data_folder, extensions=['.h5'])
-        if (self.pose_setting is Methods.USER_DEFINED.value):
+        self.input_data_paths = self.find_data_files(
+            dir=self.data_folder, extensions=[".h5"]
+        )
+        if self.pose_setting is Methods.USER_DEFINED.value:
             self.__update_config_animal_cnt()
         if self.animal_cnt > 1:
-            self.data_and_videos_lk = self.link_video_paths_to_data_paths(data_paths=self.input_data_paths, video_paths=self.video_paths, filename_cleaning_func=clean_sleap_file_name)
+            self.data_and_videos_lk = self.link_video_paths_to_data_paths(
+                data_paths=self.input_data_paths,
+                video_paths=self.video_paths,
+                filename_cleaning_func=clean_sleap_file_name,
+            )
             self.check_multi_animal_status()
-            self.animal_bp_dict = self.create_body_part_dictionary(self.multi_animal_status, self.id_lst, self.animal_cnt, self.x_cols, self.y_cols, self.p_cols, self.clr_lst)
+            self.animal_bp_dict = self.create_body_part_dictionary(
+                self.multi_animal_status,
+                self.id_lst,
+                self.animal_cnt,
+                self.x_cols,
+                self.y_cols,
+                self.p_cols,
+                self.clr_lst,
+            )
             self.update_bp_headers_file()
         else:
-            self.data_and_videos_lk = dict([(get_fn_ext(file_path)[1], {'DATA': file_path, 'VIDEO': None}) for file_path in self.input_data_paths])
-        log_event(logger_name=str(self.__class__.__name__), log_type='info', msg=f'Importing data files: {self.input_data_paths}. Interpolation: {interpolation_settings}, Smoothing: {smoothing_settings}')
-        print(f'Importing {len(list(self.data_and_videos_lk.keys()))} file(s)...')
+            self.data_and_videos_lk = dict(
+                [
+                    (get_fn_ext(file_path)[1], {"DATA": file_path, "VIDEO": None})
+                    for file_path in self.input_data_paths
+                ]
+            )
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type="info",
+            msg=f"Importing data files: {self.input_data_paths}. Interpolation: {interpolation_settings}, Smoothing: {smoothing_settings}",
+        )
+        print(f"Importing {len(list(self.data_and_videos_lk.keys()))} file(s)...")
 
     def run(self):
-        for file_cnt, (video_name, video_data) in enumerate(self.data_and_videos_lk.items()):
+        for file_cnt, (video_name, video_data) in enumerate(
+            self.data_and_videos_lk.items()
+        ):
             self.output_filename = clean_sleap_file_name(filename=video_name)
-            print(f'Importing {self.output_filename}...')
+            print(f"Importing {self.output_filename}...")
             video_timer = SimbaTimer(start=True)
             self.video_name = self.output_filename
-            with h5py.File(video_data['DATA'], "r") as f:
-                missing_keys = [x for x in ['tracks', 'point_scores', 'node_names', 'track_names'] if not x in list(f.keys())]
+            with h5py.File(video_data["DATA"], "r") as f:
+                missing_keys = [
+                    x
+                    for x in ["tracks", "point_scores", "node_names", "track_names"]
+                    if not x in list(f.keys())
+                ]
                 if missing_keys:
-                    stdout_warning(msg=f'{video_data["DATA"]} is not a valid SLEAP H5 file. Missing keys {missing_keys} Skipping {self.output_filename}...')
+                    stdout_warning(
+                        msg=f'{video_data["DATA"]} is not a valid SLEAP H5 file. Missing keys {missing_keys} Skipping {self.output_filename}...'
+                    )
                     continue
                 tracks = f["tracks"][:].T
                 point_scores = f["point_scores"][:].T
@@ -94,46 +140,81 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
                             csv_row.append(f"{data:.3f}")
                 csv_rows.append(" ".join(csv_row))
             csv_rows = "\n".join(csv_rows)
-            self.data_df = pd.read_csv(io.StringIO(csv_rows), delim_whitespace=True, header=None).fillna(0)
+            self.data_df = pd.read_csv(
+                io.StringIO(csv_rows), delim_whitespace=True, header=None
+            ).fillna(0)
             if len(self.data_df.columns) != len(self.bp_headers):
                 raise BodypartColumnNotFoundError(
                     msg=f'The number of body-parts in data file {video_data["DATA"]} do not match the number of body-parts in your SimBA project. '
-                        f'The number of of body-parts expected by your SimBA project is {int(len(self.bp_headers) / 3)}. '
-                        f'The number of of body-parts contained in data file {video_data["DATA"]} is {int(len(self.data_df.columns) / 3)}. '
-                        f'Make sure you have specified the correct number of animals and body-parts in your project.', source=self.__class__.__name__)
+                    f"The number of of body-parts expected by your SimBA project is {int(len(self.bp_headers) / 3)}. "
+                    f'The number of of body-parts contained in data file {video_data["DATA"]} is {int(len(self.data_df.columns) / 3)}. '
+                    f"Make sure you have specified the correct number of animals and body-parts in your project.",
+                    source=self.__class__.__name__,
+                )
             self.data_df.columns = self.bp_headers
             if self.animal_cnt > 1:
-                self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict,
-                                                video_info=get_video_meta_data(video_data['VIDEO']),
-                                                data_df=self.data_df,
-                                                video_path=video_data['VIDEO'])
+                self.initialize_multi_animal_ui(
+                    animal_bp_dict=self.animal_bp_dict,
+                    video_info=get_video_meta_data(video_data["VIDEO"]),
+                    data_df=self.data_df,
+                    video_path=video_data["VIDEO"],
+                )
                 self.multianimal_identification()
 
             else:
                 self.out_df = self.insert_multi_idx_columns(df=self.data_df.fillna(0))
 
-            self.save_path = os.path.join(os.path.join(self.input_csv_dir, f'{self.output_filename}.{self.file_type}'))
-            write_df(df=self.out_df, file_type=self.file_type, save_path=self.save_path, multi_idx_header=True)
-            if self.interpolation_settings != 'None':
+            self.save_path = os.path.join(
+                os.path.join(
+                    self.input_csv_dir, f"{self.output_filename}.{self.file_type}"
+                )
+            )
+            write_df(
+                df=self.out_df,
+                file_type=self.file_type,
+                save_path=self.save_path,
+                multi_idx_header=True,
+            )
+            if self.interpolation_settings != "None":
                 self.__run_interpolation()
-            if self.smoothing_settings['Method'] != 'None':
+            if self.smoothing_settings["Method"] != "None":
                 self.__run_smoothing()
             video_timer.stop_timer()
-            stdout_success(msg=f'Video {self.output_filename} data imported...', elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+            stdout_success(
+                msg=f"Video {self.output_filename} data imported...",
+                elapsed_time=video_timer.elapsed_time_str,
+                source=self.__class__.__name__,
+            )
         self.timer.stop_timer()
-        stdout_success(msg='All SLEAP H5 data files imported', elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(
+            msg="All SLEAP H5 data files imported",
+            elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
+        )
 
     def __run_interpolation(self):
-        print(f'Interpolating missing values in video {self.output_filename} (Method: {self.interpolation_settings})...')
-        _ = Interpolate(input_path=self.save_path,config_path=self.config_path, method=self.interpolation_settings, initial_import_multi_index=True)
+        print(
+            f"Interpolating missing values in video {self.output_filename} (Method: {self.interpolation_settings})..."
+        )
+        _ = Interpolate(
+            input_path=self.save_path,
+            config_path=self.config_path,
+            method=self.interpolation_settings,
+            initial_import_multi_index=True,
+        )
 
     def __run_smoothing(self):
-        print(f'Performing {self.smoothing_settings["Method"]} smoothing on video {self.output_filename}...')
-        Smooth(config_path=self.config_path,
-               input_path=self.save_path,
-               time_window=int(self.smoothing_settings['Parameters']['Time_window']),
-               smoothing_method=self.smoothing_settings['Method'],
-               initial_import_multi_index=True)
+        print(
+            f'Performing {self.smoothing_settings["Method"]} smoothing on video {self.output_filename}...'
+        )
+        Smooth(
+            config_path=self.config_path,
+            input_path=self.save_path,
+            time_window=int(self.smoothing_settings["Parameters"]["Time_window"]),
+            smoothing_method=self.smoothing_settings["Method"],
+            initial_import_multi_index=True,
+        )
+
 
 # test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/troubleshooting/sleap_import/project_folder/project_config.ini",
 #                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/sleap_import/data_h5',
@@ -159,8 +240,6 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 # print('All SLEAP imports complete.')
 
 
-
-
 #
 # test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/troubleshooting/sleap_dropped_frms/project_folder/project_config.ini",
 #                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/sleap_dropped_frms/data',
@@ -170,12 +249,6 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 # test.run()
 
 
-
-
-
-
-
-
 # test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/troubleshooting/SLEAP_2_Animals_16_body_parts/project_folder/project_config.ini",
 #                    data_folder=r'/Users/simon/Desktop/envs/troubleshooting/SLEAP_2_Animals_16_body_parts/data/h5',
 #                    id_lst=['Simon', 'Nastacia'],
@@ -183,11 +256,6 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 #                    smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}})
 # test.run()
 # print('All SLEAP imports complete.')
-
-
-
-
-
 
 
 # test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini",
@@ -214,4 +282,3 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 #                    smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}})
 # test.import_sleap()
 # # print('All SLEAP imports complete.')
-
