@@ -13,7 +13,7 @@ from simba.utils.checks import check_that_column_exist
 from simba.utils.enums import Methods, TagNames
 from simba.utils.errors import CountError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (clean_sleap_csv_filename,
+from simba.utils.read_write import (clean_sleap_file_name,
                                     find_all_videos_in_project, get_fn_ext,
                                     get_video_meta_data, write_df)
 
@@ -79,7 +79,9 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
             self.__update_config_animal_cnt()
         if self.animal_cnt > 1:
             self.data_and_videos_lk = self.link_video_paths_to_data_paths(
-                data_paths=self.input_data_paths, video_paths=self.video_paths
+                data_paths=self.input_data_paths,
+                video_paths=self.video_paths,
+                filename_cleaning_func=clean_sleap_file_name,
             )
             self.check_multi_animal_status()
             self.animal_bp_dict = self.create_body_part_dictionary(
@@ -105,7 +107,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
         for file_cnt, (video_name, video_data) in enumerate(
             self.data_and_videos_lk.items()
         ):
-            output_filename = clean_sleap_csv_filename(filename=video_name)
+            output_filename = clean_sleap_file_name(filename=video_name)
             print(f"Analysing {output_filename}...")
             video_timer = SimbaTimer(start=True)
             self.video_name = video_name
@@ -131,8 +133,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 self.data_df = data_df.set_index([idx]).sort_index()
                 self.data_df.columns = np.arange(len(self.data_df.columns))
                 self.data_df = self.data_df.reindex(
-                    range(self.data_df.index[0], self.data_df.index[-1] + 1),
-                    fill_value=0,
+                    range(0, self.data_df.index[-1] + 1), fill_value=0
                 )
 
             if len(self.bp_headers) != len(self.data_df.columns):
@@ -200,9 +201,15 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
 #                  data_folder=r'/Users/simon/Desktop/envs/troubleshooting/Hornet_single_slp/import',
 #                  id_lst=['Hornet'],
 #                  interpolation_settings="Body-parts: Nearest",
-#                  smoothing_settings = {'Method': 'Savitzky Golay', 'Parameters': {'Time_window': '200'}})
+#                  smoothing_settings = {'Method': 'None', 'Parameters': {'Time_window': '200'}})
 # test.run()
 
+# test = SLEAPImporterCSV(config_path=r'/Users/simon/Desktop/envs/troubleshooting/Hornet/project_folder/project_config.ini',
+#                  data_folder=r'/Users/simon/Desktop/envs/troubleshooting/Hornet_single_slp/import',
+#                  id_lst=['Hornet'],
+#                  interpolation_settings="Body-parts: Nearest",
+#                  smoothing_settings = {'Method': 'None', 'Parameters': {'Time_window': '200'}})
+# test.run()
 
 # test = SLEAPImporterCSV(config_path=r'/Users/simon/Desktop/envs/troubleshooting/slp_1_animal_1_bp/project_folder',
 #                  data_folder='/Users/simon/Desktop/envs/troubleshooting/slp_1_animal_1_bp/import',

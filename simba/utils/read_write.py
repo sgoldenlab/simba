@@ -1531,7 +1531,7 @@ def find_max_vertices_coordinates(
     return int(max_x), int(max_y)
 
 
-def clean_sleap_filename(filename: str) -> str:
+def clean_sleap_file_name(filename: str) -> str:
     """
     Clean a SLEAP input filename by removing '.analysis' suffix and project name prefix to match orginal video name.
 
@@ -1542,9 +1542,9 @@ def clean_sleap_filename(filename: str) -> str:
     :returns str: The cleaned filename.
 
     :example:
-    >>> clean_sleap_csv_filename("projectname.v00x.00x_videoname.analysis.csv")
+    >>> clean_sleap_file_name("projectname.v00x.00x_videoname.analysis.csv")
     >>> 'videoname.csv'
-    >>> clean_sleap_csv_filename("projectname.v00x.00x_videoname.analysis.h5")
+    >>> clean_sleap_file_name("projectname.v00x.00x_videoname.analysis.h5")
     >>> 'videoname.h5'
     """
 
@@ -1557,7 +1557,7 @@ def clean_sleap_filename(filename: str) -> str:
         return filename
 
 
-def clean_sleap_filenames_in_dir(dir: Union[str, os.PathLike]) -> None:
+def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike]) -> None:
     """
     Clean up SLEAP input filenames in the specified directory by removing a prefix
     and a suffix, and renaming the files to match the names of the original video files.
@@ -1568,7 +1568,7 @@ def clean_sleap_filenames_in_dir(dir: Union[str, os.PathLike]) -> None:
     :param Union[str, os.PathLike] dir: The directory path where the SLEAP CSV or H5 files are located.
 
     :example:
-    >>> clean_sleap_csv_filenames_in_dir(dir='/Users/simon/Desktop/envs/troubleshooting/Hornet_SLEAP/import/')
+    >>> clean_sleap_filenames_in_directory(dir='/Users/simon/Desktop/envs/troubleshooting/Hornet_SLEAP/import/')
     """
 
     SLEAP_CSV_SUBSTR = ".analysis"
