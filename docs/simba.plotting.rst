@@ -219,10 +219,10 @@ Single video validation plotter - multiprocess
    :members:
    :show-inheritance:
 
-Generic Geometry plotter
+Geometry plotter (generic)
 ---------------------------------------------------------------
 
-.. automodule:: simba.mixins.geometry_plotter
+.. automodule:: simba.plotting.geometry_plotter
    :members:
    :show-inheritance:
 
