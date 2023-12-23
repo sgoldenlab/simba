@@ -1,10 +1,5 @@
 __author__ = "Simon Nilsson"
 
-
-import warnings
-
-warnings.simplefilter(action="ignore", category=FutureWarning)
-
 import ast
 import concurrent
 import configparser
@@ -55,7 +50,7 @@ from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_if_valid_input, check_int, check_str)
 from simba.utils.data import create_color_palette, detect_bouts
-from simba.utils.enums import (ConfigKey, Defaults, Dtypes, MetaKeys, Methods,
+from simba.utils.enums import (ConfigKey, Defaults, Dtypes, MachineLearningMetaKeys, Methods,
                                Options)
 from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
                                 CorruptedFileError, DataHeaderError,
@@ -73,6 +68,9 @@ from simba.utils.warnings import (MissingUserInputWarning,
                                   NoModuleWarning, NotEnoughDataWarning,
                                   SamplingWarning, ShapWarning)
 
+import warnings
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
 plt.switch_backend("agg")
 
 
@@ -83,11 +81,11 @@ class TrainModelMixin(object):
         pass
 
     def read_all_files_in_folder(
-        self,
-        file_paths: List[str],
-        file_type: str,
-        classifier_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
+            self,
+            file_paths: List[str],
+            file_type: str,
+            classifier_names: Optional[List[str]] = None,
+            raise_bool_clf_error: bool = True,
     ) -> pd.DataFrame:
         """
         Read in all data files in a folder to a single pd.DataFrame for downstream ML algo.
@@ -126,8 +124,8 @@ class TrainModelMixin(object):
                             source=self.__class__.__name__,
                         )
                     elif (
-                        len(set(df[clf_name].unique()) - {0, 1}) > 0
-                        and raise_bool_clf_error
+                            len(set(df[clf_name].unique()) - {0, 1}) > 0
+                            and raise_bool_clf_error
                     ):
                         raise InvalidInputError(
                             msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.",
@@ -147,8 +145,8 @@ class TrainModelMixin(object):
                 source=self.__class__.__name__,
             )
         df_concat = df_concat.loc[
-            :, ~df_concat.columns.str.contains("^Unnamed")
-        ].fillna(0)
+                    :, ~df_concat.columns.str.contains("^Unnamed")
+                    ].fillna(0)
         timer.stop_timer()
         memory_size = get_memory_usage_of_df(df=df_concat)
         print(
@@ -162,7 +160,7 @@ class TrainModelMixin(object):
         return df_concat.astype(np.float32)
 
     def read_in_all_model_names_to_remove(
-        self, config: configparser.ConfigParser, model_cnt: int, clf_name: str
+            self, config: configparser.ConfigParser, model_cnt: int, clf_name: str
     ) -> List[str]:
         """
         Helper to find all field names that are annotations but are not the target.
@@ -186,7 +184,7 @@ class TrainModelMixin(object):
         return annotation_cols_to_remove
 
     def delete_other_annotation_columns(
-        self, df: pd.DataFrame, annotations_lst: List[str], raise_error: bool = True
+            self, df: pd.DataFrame, annotations_lst: List[str], raise_error: bool = True
     ) -> pd.DataFrame:
         """
         Helper to drop fields that contain annotations which are not the target.
@@ -212,7 +210,7 @@ class TrainModelMixin(object):
         return df
 
     def split_df_to_x_y(
-        self, df: pd.DataFrame, clf_name: str
+            self, df: pd.DataFrame, clf_name: str
     ) -> (pd.DataFrame, pd.DataFrame):
         """
         Helper to split dataframe into features and target.
@@ -232,7 +230,7 @@ class TrainModelMixin(object):
         return df, y
 
     def random_undersampler(
-        self, x_train: np.ndarray, y_train: np.ndarray, sample_ratio: float
+            self, x_train: np.ndarray, y_train: np.ndarray, sample_ratio: float
     ) -> (pd.DataFrame, pd.DataFrame):
         """
         Helper to perform random under-sampling of behavior-absent frames in a dataframe.
@@ -268,7 +266,7 @@ class TrainModelMixin(object):
         return self.split_df_to_x_y(data_df, y_train.name)
 
     def smoteen_oversampler(
-        self, x_train: pd.DataFrame, y_train: pd.DataFrame, sample_ratio: float
+            self, x_train: pd.DataFrame, y_train: pd.DataFrame, sample_ratio: float
     ) -> (np.ndarray, np.ndarray):
         """
         Helper to perform SMOTEEN oversampling of behavior-present annotations.
@@ -288,10 +286,10 @@ class TrainModelMixin(object):
         return smt.fit_sample(x_train, y_train)
 
     def smote_oversampler(
-        self,
-        x_train: pd.DataFrame or np.array,
-        y_train: pd.DataFrame or np.array,
-        sample_ratio: float,
+            self,
+            x_train: pd.DataFrame or np.array,
+            y_train: pd.DataFrame or np.array,
+            sample_ratio: float,
     ) -> (np.ndarray, np.ndarray):
         """
         Helper to perform SMOTE oversampling of behavior-present annotations.
@@ -310,14 +308,14 @@ class TrainModelMixin(object):
         return smt.fit_sample(x_train, y_train)
 
     def calc_permutation_importance(
-        self,
-        x_test: np.ndarray,
-        y_test: np.ndarray,
-        clf: RandomForestClassifier,
-        feature_names: List[str],
-        clf_name: str,
-        save_dir: Union[str, os.PathLike],
-        save_file_no: Optional[int] = None,
+            self,
+            x_test: np.ndarray,
+            y_test: np.ndarray,
+            clf: RandomForestClassifier,
+            feature_names: List[str],
+            clf_name: str,
+            save_dir: Union[str, os.PathLike],
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to calculate feature permutation importance scores.
@@ -372,16 +370,16 @@ class TrainModelMixin(object):
         )
 
     def calc_learning_curve(
-        self,
-        x_y_df: pd.DataFrame,
-        clf_name: str,
-        shuffle_splits: int,
-        dataset_splits: int,
-        tt_size: float,
-        rf_clf: RandomForestClassifier,
-        save_dir: str,
-        save_file_no: Optional[int] = None,
-        multiclass: bool = False,
+            self,
+            x_y_df: pd.DataFrame,
+            clf_name: str,
+            shuffle_splits: int,
+            dataset_splits: int,
+            tt_size: float,
+            rf_clf: RandomForestClassifier,
+            save_dir: str,
+            save_file_no: Optional[int] = None,
+            multiclass: bool = False,
     ) -> None:
         """
         Helper to compute random forest learning curves with cross-validation.
@@ -457,13 +455,13 @@ class TrainModelMixin(object):
         )
 
     def calc_pr_curve(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.DataFrame,
-        clf_name: str,
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            y_df: pd.DataFrame,
+            clf_name: str,
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to compute random forest precision-recall curve.
@@ -488,10 +486,10 @@ class TrainModelMixin(object):
         pr_df["PRECISION"] = precision
         pr_df["RECALL"] = recall
         pr_df["F1"] = (
-            2
-            * pr_df["RECALL"]
-            * pr_df["PRECISION"]
-            / (pr_df["RECALL"] + pr_df["PRECISION"])
+                2
+                * pr_df["RECALL"]
+                * pr_df["PRECISION"]
+                / (pr_df["RECALL"] + pr_df["PRECISION"])
         )
         thresholds = list(thresholds)
         thresholds.insert(0, 0.00)
@@ -511,13 +509,13 @@ class TrainModelMixin(object):
         )
 
     def create_example_dt(
-        self,
-        rf_clf: RandomForestClassifier,
-        clf_name: str,
-        feature_names: List[str],
-        class_names: List[str],
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            clf_name: str,
+            feature_names: List[str],
+            class_names: List[str],
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to produce visualization of random forest decision tree using graphviz.
@@ -557,13 +555,13 @@ class TrainModelMixin(object):
         call(command, shell=True)
 
     def create_clf_report(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.DataFrame,
-        class_names: List[str],
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            y_df: pd.DataFrame,
+            class_names: List[str],
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to create classifier truth table report.
@@ -607,12 +605,12 @@ class TrainModelMixin(object):
             )
 
     def create_x_importance_log(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_names: List[str],
-        clf_name: str,
-        save_dir: str,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            x_names: List[str],
+            clf_name: str,
+            save_dir: str,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to save gini or entropy based feature importance scores.
@@ -646,13 +644,13 @@ class TrainModelMixin(object):
         df.to_csv(self.f_importance_save_path, index=False)
 
     def create_x_importance_bar_chart(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_names: list,
-        clf_name: str,
-        save_dir: str,
-        n_bars: int,
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            x_names: list,
+            clf_name: str,
+            save_dir: str,
+            n_bars: int,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to create a bar chart displaying the top N gini or entropy feature importance scores.
@@ -709,12 +707,12 @@ class TrainModelMixin(object):
         plt.close("all")
 
     def dviz_classification_visualization(
-        self,
-        x_train: np.ndarray,
-        y_train: np.ndarray,
-        clf_name: str,
-        class_names: List[str],
-        save_dir: str,
+            self,
+            x_train: np.ndarray,
+            y_train: np.ndarray,
+            clf_name: str,
+            class_names: List[str],
+            save_dir: str,
     ) -> None:
         """
         Helper to create visualization of example decision tree using dtreeviz.
@@ -756,7 +754,7 @@ class TrainModelMixin(object):
 
     @staticmethod
     def split_and_group_df(
-        df: pd.DataFrame, splits: int, include_split_order: bool = True
+            df: pd.DataFrame, splits: int, include_split_order: bool = True
     ) -> (List[pd.DataFrame], int):
         """
         Helper to split a dataframe for multiprocessing. If include_split_order, then include the group number
@@ -770,18 +768,18 @@ class TrainModelMixin(object):
         return data_arr, obs_per_split
 
     def create_shap_log(
-        self,
-        ini_file_path: str,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.Series,
-        x_names: List[str],
-        clf_name: str,
-        cnt_present: int,
-        cnt_absent: int,
-        save_path: str,
-        save_it: int = 100,
-        save_file_no: Optional[int] = None,
+            self,
+            ini_file_path: str,
+            rf_clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            y_df: pd.Series,
+            x_names: List[str],
+            clf_name: str,
+            cnt_present: int,
+            cnt_absent: int,
+            save_path: str,
+            save_it: int = 100,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Compute SHAP values for a random forest classifier.
@@ -918,22 +916,23 @@ class TrainModelMixin(object):
         """
 
         table_view = [
-            ["Model name", model_dict[MetaKeys.CLF_NAME.value]],
+            ["Model name", model_dict[MachineLearningMetaKeys.CLASSIFIER.value]],
             ["Ensemble method", "RF"],
-            ["Estimators (trees)", model_dict[MetaKeys.RF_ESTIMATORS.value]],
-            ["Max features", model_dict[MetaKeys.RF_MAX_FEATURES.value]],
-            ["Under sampling setting", model_dict[ConfigKey.UNDERSAMPLE_SETTING.value]],
-            ["Under sampling ratio", model_dict[ConfigKey.UNDERSAMPLE_RATIO.value]],
-            ["Over sampling setting", model_dict[ConfigKey.OVERSAMPLE_SETTING.value]],
-            ["Over sampling ratio", model_dict[ConfigKey.OVERSAMPLE_RATIO.value]],
-            ["criterion", model_dict[MetaKeys.CRITERION.value]],
-            ["Min sample leaf", model_dict[MetaKeys.MIN_LEAF.value]],
+            ["Estimators (trees)", model_dict[MachineLearningMetaKeys.RF_ESTIMATORS.value]],
+            ["Max depth", model_dict[MachineLearningMetaKeys.RF_MAX_DEPTH.value]],
+            ["Max features", model_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value]],
+            ["Under sampling setting", model_dict[MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value]],
+            ["Under sampling ratio", model_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value]],
+            ["Over sampling setting", model_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value]],
+            ["Over sampling ratio", model_dict[MachineLearningMetaKeys.OVERSAMPLE_RATIO.value]],
+            ["criterion", model_dict[MachineLearningMetaKeys.RF_CRITERION.value]],
+            ["Min sample leaf", model_dict[MachineLearningMetaKeys.MIN_LEAF.value]],
         ]
         table = tabulate(table_view, ["Setting", "value"], tablefmt="grid")
         print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")
 
     def create_meta_data_csv_training_one_model(
-        self, meta_data_lst: list, clf_name: str, save_dir: Union[str, os.PathLike]
+            self, meta_data_lst: list, clf_name: str, save_dir: Union[str, os.PathLike]
     ) -> None:
         """
         Helper to save single model meta data (hyperparameters, sampling settings etc.) from list format into SimBA
@@ -951,7 +950,7 @@ class TrainModelMixin(object):
         out_df.to_csv(save_path)
 
     def create_meta_data_csv_training_multiple_models(
-        self, meta_data, clf_name, save_dir, save_file_no: Optional[int] = None
+            self, meta_data, clf_name, save_dir, save_file_no: Optional[int] = None
     ) -> None:
         print("Saving model meta data file...")
         save_path = os.path.join(save_dir, f"{clf_name}_{str(save_file_no)}_meta.csv")
@@ -959,11 +958,11 @@ class TrainModelMixin(object):
         out_df.to_csv(save_path)
 
     def save_rf_model(
-        self,
-        rf_clf: RandomForestClassifier,
-        clf_name: str,
-        save_dir: Union[str, os.PathLike],
-        save_file_no: Optional[int] = None,
+            self,
+            rf_clf: RandomForestClassifier,
+            clf_name: str,
+            save_dir: Union[str, os.PathLike],
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to save pickled classifier object to disk.
@@ -983,7 +982,7 @@ class TrainModelMixin(object):
         pickle.dump(rf_clf, open(save_path, "wb"))
 
     def get_model_info(
-        self, config: configparser.ConfigParser, model_cnt: int
+            self, config: configparser.ConfigParser, model_cnt: int
     ) -> Dict[int, Any]:
         """
         Helper to read in N SimBA random forest config meta files to python dict memory.
@@ -1004,8 +1003,8 @@ class TrainModelMixin(object):
                     )
                     continue
                 if (
-                    config.get("SML settings", "model_path_" + str(n + 1))
-                    == "No file selected"
+                        config.get("SML settings", "model_path_" + str(n + 1))
+                        == "No file selected"
                 ):
                     MissingUserInputWarning(
                         msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: The classifier path is set to "No file selected',
@@ -1033,17 +1032,17 @@ class TrainModelMixin(object):
                 )
                 check_int("minimum_bout_length", model_dict[n]["minimum_bout_length"])
                 if config.has_option(
-                    ConfigKey.SML_SETTINGS.value, f"classifier_map_{n+1}"
+                        ConfigKey.SML_SETTINGS.value, f"classifier_map_{n + 1}"
                 ):
                     model_dict[n]["classifier_map"] = config.get(
-                        ConfigKey.SML_SETTINGS.value, f"classifier_map_{n+1}"
+                        ConfigKey.SML_SETTINGS.value, f"classifier_map_{n + 1}"
                     )
                     model_dict[n]["classifier_map"] = ast.literal_eval(
                         model_dict[n]["classifier_map"]
                     )
                     if type(model_dict[n]["classifier_map"]) != dict:
                         raise InvalidInputError(
-                            msg=f"SimBA found a classifier map for classifier {n+1} that could not be interpreted as a dictionary",
+                            msg=f"SimBA found a classifier map for classifier {n + 1} that could not be interpreted as a dictionary",
                             source=self.__class__.__name__,
                         )
 
@@ -1062,7 +1061,7 @@ class TrainModelMixin(object):
             return model_dict
 
     def get_all_clf_names(
-        self, config: configparser.ConfigParser, target_cnt: int
+            self, config: configparser.ConfigParser, target_cnt: int
     ) -> List[str]:
         """
         Helper to get all classifier names in a SimBA project.
@@ -1090,10 +1089,10 @@ class TrainModelMixin(object):
         return model_names
 
     def insert_column_headers_for_outlier_correction(
-        self,
-        data_df: pd.DataFrame,
-        new_headers: List[str],
-        filepath: Union[str, os.PathLike],
+            self,
+            data_df: pd.DataFrame,
+            new_headers: List[str],
+            filepath: Union[str, os.PathLike],
     ) -> pd.DataFrame:
         """
         Helper to insert new column headers onto a dataframe following outlier correction.
@@ -1139,7 +1138,7 @@ class TrainModelMixin(object):
         return clf
 
     def bout_train_test_splitter(
-        self, x_df: pd.DataFrame, y_df: pd.Series, test_size: float
+            self, x_df: pd.DataFrame, y_df: pd.Series, test_size: float
     ) -> (pd.DataFrame, pd.DataFrame, pd.Series, pd.Series):
         """
         Helper to split train and test based on annotated `bouts`.
@@ -1209,9 +1208,9 @@ class TrainModelMixin(object):
     @staticmethod
     @njit("(float32[:, :], float64, types.ListType(types.unicode_type))")
     def find_highly_correlated_fields(
-        data: np.ndarray,
-        threshold: float,
-        field_names: types.ListType(types.unicode_type),
+            data: np.ndarray,
+            threshold: float,
+            field_names: types.ListType(types.unicode_type),
     ) -> List[str]:
         """
         Find highly correlated fields in a dataset.
@@ -1251,7 +1250,7 @@ class TrainModelMixin(object):
         return [field_names[x] for x in remove_col_idx]
 
     def check_sampled_dataset_integrity(
-        self, x_df: pd.DataFrame, y_df: pd.DataFrame
+            self, x_df: pd.DataFrame, y_df: pd.DataFrame
     ) -> None:
         """
         Helper to check for non-numerical entries post data sampling
@@ -1270,15 +1269,15 @@ class TrainModelMixin(object):
             if len(x_nan_cnt) < 10:
                 raise FaultyTrainingSetError(
                     msg=f"{str(len(x_nan_cnt))} feature column(s) exist in some files within the project_folder/csv/targets_inserted directory, but missing in others. "
-                    f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the "
-                    f"column names with mismatches are: {list(x_nan_cnt.index)}",
+                        f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the "
+                        f"column names with mismatches are: {list(x_nan_cnt.index)}",
                     source=self.__class__.__name__,
                 )
             else:
                 raise FaultyTrainingSetError(
                     msg=f"{str(len(x_nan_cnt))} feature columns exist in some files, but missing in others. The feature files are found in the project_folder/csv/targets_inserted directory. "
-                    f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
-                    f"column names with mismatches are: {list(x_nan_cnt.index)[0:9]}",
+                        f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
+                        f"column names with mismatches are: {list(x_nan_cnt.index)[0:9]}",
                     source=self.__class__.__name__,
                 )
 
@@ -1295,12 +1294,12 @@ class TrainModelMixin(object):
                 )
 
     def partial_dependence_calculator(
-        self,
-        clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        clf_name: str,
-        save_dir: Union[str, os.PathLike],
-        clf_cnt: Optional[int] = None,
+            self,
+            clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            clf_name: str,
+            save_dir: Union[str, os.PathLike],
+            clf_cnt: Optional[int] = None,
     ) -> None:
         """
         Compute feature partial dependencies for every feature in training set.
@@ -1337,12 +1336,12 @@ class TrainModelMixin(object):
             print(f"Partial dependencies for {feature_name} complete...")
 
     def clf_predict_proba(
-        self,
-        clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        multiclass: bool = False,
-        model_name: Optional[str] = None,
-        data_path: Optional[Union[str, os.PathLike]] = None,
+            self,
+            clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            multiclass: bool = False,
+            model_name: Optional[str] = None,
+            data_path: Optional[Union[str, os.PathLike]] = None,
     ) -> np.ndarray:
         """
 
@@ -1392,7 +1391,7 @@ class TrainModelMixin(object):
             return p_vals
 
     def clf_fit(
-        self, clf: RandomForestClassifier, x_df: pd.DataFrame, y_df: pd.DataFrame
+            self, clf: RandomForestClassifier, x_df: pd.DataFrame, y_df: pd.DataFrame
     ) -> RandomForestClassifier:
         """
         Helper to fit clf model
@@ -1417,11 +1416,11 @@ class TrainModelMixin(object):
         return clf.fit(x_df, y_df)
 
     def _read_data_file_helper(
-        self,
-        file_path: str,
-        file_type: str,
-        clf_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
+            self,
+            file_path: str,
+            file_type: str,
+            clf_names: Optional[List[str]] = None,
+            raise_bool_clf_error: bool = True,
     ):
         """
         Private function called by :meth:`simba.train_model_functions.read_all_files_in_folder_mp`
@@ -1440,8 +1439,8 @@ class TrainModelMixin(object):
                         source=self.__class__.__name__,
                     )
                 elif (
-                    len(set(df[clf_name].unique()) - {0, 1}) > 0
-                    and raise_bool_clf_error
+                        len(set(df[clf_name].unique()) - {0, 1}) > 0
+                        and raise_bool_clf_error
                 ):
                     raise InvalidInputError(
                         msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.",
@@ -1454,11 +1453,11 @@ class TrainModelMixin(object):
         return df
 
     def read_all_files_in_folder_mp(
-        self,
-        file_paths: List[str],
-        file_type: Literal["csv", "parquet", "pickle"],
-        classifier_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
+            self,
+            file_paths: List[str],
+            file_type: Literal["csv", "parquet", "pickle"],
+            classifier_names: Optional[List[str]] = None,
+            raise_bool_clf_error: bool = True,
     ) -> pd.DataFrame:
         """
 
@@ -1483,11 +1482,11 @@ class TrainModelMixin(object):
         try:
             with ProcessPoolExecutor(int(np.ceil(cpu_cnt / 2))) as pool:
                 for res in pool.map(
-                    self._read_data_file_helper,
-                    file_paths,
-                    repeat(file_type),
-                    repeat(classifier_names),
-                    repeat(raise_bool_clf_error),
+                        self._read_data_file_helper,
+                        file_paths,
+                        repeat(file_type),
+                        repeat(classifier_names),
+                        repeat(raise_bool_clf_error),
                 ):
                     df_lst.append(res)
             df_concat = pd.concat(df_lst, axis=0).round(4)
@@ -1499,8 +1498,8 @@ class TrainModelMixin(object):
                     source=self.read_all_files_in_folder_mp.__name__,
                 )
             df_concat = df_concat.loc[
-                :, ~df_concat.columns.str.contains("^Unnamed")
-            ].astype(np.float32)
+                        :, ~df_concat.columns.str.contains("^Unnamed")
+                        ].astype(np.float32)
             memory_size = get_memory_usage_of_df(df=df_concat)
             print(
                 f'Dataset size: {memory_size["megabytes"]}MB / {memory_size["gigabytes"]}GB'
@@ -1521,10 +1520,10 @@ class TrainModelMixin(object):
 
     @staticmethod
     def _read_data_file_helper_futures(
-        file_path: str,
-        file_type: str,
-        clf_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
+            file_path: str,
+            file_type: str,
+            clf_names: Optional[List[str]] = None,
+            raise_bool_clf_error: bool = True,
     ):
         """
         Private function called by :meth:`simba.train_model_functions.read_all_files_in_folder_mp_futures`
@@ -1539,8 +1538,8 @@ class TrainModelMixin(object):
                 if not clf_name in df.columns:
                     raise ColumnNotFoundError(column_name=clf_name, file_name=file_path)
                 elif (
-                    len(set(df[clf_name].unique()) - {0, 1}) > 0
-                    and raise_bool_clf_error
+                        len(set(df[clf_name].unique()) - {0, 1}) > 0
+                        and raise_bool_clf_error
                 ):
                     raise InvalidInputError(
                         msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}."
@@ -1549,11 +1548,11 @@ class TrainModelMixin(object):
         return df, vid_name, timer.elapsed_time_str
 
     def read_all_files_in_folder_mp_futures(
-        self,
-        file_paths: List[str],
-        file_type: Literal["csv", "parquet", "pickle"],
-        classifier_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
+            self,
+            file_paths: List[str],
+            file_type: Literal["csv", "parquet", "pickle"],
+            classifier_names: Optional[List[str]] = None,
+            raise_bool_clf_error: bool = True,
     ) -> pd.DataFrame:
         """
         Multiprocessing helper function to read in all data files in a folder to a single
@@ -1579,7 +1578,7 @@ class TrainModelMixin(object):
             cpu_cnt, _ = find_core_cnt()
             df_lst = []
             with concurrent.futures.ProcessPoolExecutor(
-                max_workers=cpu_cnt
+                    max_workers=cpu_cnt
             ) as executor:
                 results = [
                     executor.submit(
@@ -1613,7 +1612,7 @@ class TrainModelMixin(object):
             )
 
     def check_raw_dataset_integrity(
-        self, df: pd.DataFrame, logs_path: Optional[Union[str, os.PathLike]]
+            self, df: pd.DataFrame, logs_path: Optional[Union[str, os.PathLike]]
     ) -> None:
         """
         Helper to check column-wise NaNs in raw input data for fitting model.
@@ -1650,18 +1649,18 @@ class TrainModelMixin(object):
             results.to_csv(save_log_path)
             raise FaultyTrainingSetError(
                 msg=f"{len(nan_cols)} feature columns exist in some files, but missing in others. The feature files are found in the project_folder/csv/targets_inserted directory. "
-                f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
-                f"column names with mismatches are: {nan_cols[0:9]}. For a log of the files that contain, and not contain, the mis-matched columns, see {save_log_path}",
+                    f"SimBA expects all files within the project_folder/csv/targets_inserted directory to have the same number of features: the first 10 "
+                    f"column names with mismatches are: {nan_cols[0:9]}. For a log of the files that contain, and not contain, the mis-matched columns, see {save_log_path}",
                 source=self.__class__.__name__,
             )
 
     @staticmethod
     def _create_shap_mp_helper(
-        data: pd.DataFrame,
-        explainer: shap.TreeExplainer,
-        clf_name: str,
-        rf_clf: RandomForestClassifier,
-        expected_value: float,
+            data: pd.DataFrame,
+            explainer: shap.TreeExplainer,
+            clf_name: str,
+            rf_clf: RandomForestClassifier,
+            expected_value: float,
     ):
         target = data.pop(clf_name).values.reshape(-1, 1)
         frame_batch_shap = explainer.shap_values(data.values, check_additivity=False)[1]
@@ -1680,7 +1679,7 @@ class TrainModelMixin(object):
 
     @staticmethod
     def _create_shap_mp_helper(
-        data: pd.DataFrame, explainer: shap.TreeExplainer, clf_name: str
+            data: pd.DataFrame, explainer: shap.TreeExplainer, clf_name: str
     ):
         target = data.pop(clf_name).values.reshape(-1, 1)
         group_cnt = data.pop("group").values[0]
@@ -1693,18 +1692,18 @@ class TrainModelMixin(object):
         return shap_vals, data.values, target
 
     def create_shap_log_mp(
-        self,
-        ini_file_path: str,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.DataFrame,
-        x_names: List[str],
-        clf_name: str,
-        cnt_present: int,
-        cnt_absent: int,
-        save_path: str,
-        batch_size: int = 10,
-        save_file_no: Optional[int] = None,
+            self,
+            ini_file_path: str,
+            rf_clf: RandomForestClassifier,
+            x_df: pd.DataFrame,
+            y_df: pd.DataFrame,
+            x_names: List[str],
+            clf_name: str,
+            cnt_present: int,
+            cnt_absent: int,
+            save_path: str,
+            batch_size: int = 10,
+            save_file_no: Optional[int] = None,
     ) -> None:
         """
         Helper to compute SHAP values using multiprocessing.
@@ -1790,10 +1789,10 @@ class TrainModelMixin(object):
                     self._create_shap_mp_helper, explainer=explainer, clf_name=clf_name
                 )
                 for cnt, result in enumerate(
-                    pool.imap_unordered(constants, shap_data, chunksize=1)
+                        pool.imap_unordered(constants, shap_data, chunksize=1)
                 ):
                     print(
-                        f"Concatenating multi-processed SHAP data (batch {cnt+1}/{len(shap_data)})"
+                        f"Concatenating multi-processed SHAP data (batch {cnt + 1}/{len(shap_data)})"
                     )
                     proba = rf_clf.predict_proba(result[1])[:, 1].reshape(-1, 1)
                     shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
@@ -1816,7 +1815,7 @@ class TrainModelMixin(object):
             shap_save_df = pd.DataFrame(
                 data=np.row_stack(shap_results),
                 columns=list(x_names)
-                + ["Expected_value", "Sum", "Prediction_probability", clf_name],
+                        + ["Expected_value", "Sum", "Prediction_probability", clf_name],
             )
             raw_save_df = pd.DataFrame(
                 data=np.row_stack(shap_raw), columns=list(x_names)
@@ -1856,7 +1855,7 @@ class TrainModelMixin(object):
             )
 
     def check_df_dataset_integrity(
-        self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]
+            self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]
     ) -> None:
         """
         Helper to check for non-numerical np.inf, -np.inf, NaN, None in a single dataframe.
@@ -1896,25 +1895,25 @@ class TrainModelMixin(object):
         self.clf_name = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.CLASSIFIER.value,
+            MachineLearningMetaKeys.CLASSIFIER.value,
             data_type=Dtypes.STR.value,
         )
         self.tt_size = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.TT_SIZE.value,
+            MachineLearningMetaKeys.TT_SIZE.value,
             data_type=Dtypes.FLOAT.value,
         )
         self.algo = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.MODEL_TO_RUN.value,
+            MachineLearningMetaKeys.MODEL_TO_RUN.value,
             data_type=Dtypes.STR.value,
         )
         self.split_type = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.SPLIT_TYPE.value,
+            MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value,
             data_type=Dtypes.STR.value,
             options=Options.TRAIN_TEST_SPLIT.value,
             default_value=Methods.SPLIT_TYPE_FRAMES.value,
@@ -1923,7 +1922,7 @@ class TrainModelMixin(object):
             read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.UNDERSAMPLE_SETTING.value,
+                MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value,
                 data_type=Dtypes.STR.value,
             )
             .lower()
@@ -1933,7 +1932,7 @@ class TrainModelMixin(object):
             read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.OVERSAMPLE_SETTING.value,
+                MachineLearningMetaKeys.OVERSAMPLE_SETTING.value,
                 data_type=Dtypes.STR.value,
             )
             .lower()
@@ -1942,102 +1941,102 @@ class TrainModelMixin(object):
         self.n_estimators = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.RF_ESTIMATORS.value,
+            MachineLearningMetaKeys.RF_ESTIMATORS.value,
             data_type=Dtypes.INT.value,
         )
         self.max_features = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.RF_MAX_FEATURES.value,
+            MachineLearningMetaKeys.RF_MAX_FEATURES.value,
             data_type=Dtypes.STR.value,
         )
         self.criterion = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.RF_CRITERION.value,
+            MachineLearningMetaKeys.RF_CRITERION.value,
             data_type=Dtypes.STR.value,
             options=Options.CLF_CRITERION.value,
         )
         self.min_sample_leaf = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.MIN_LEAF.value,
+            MachineLearningMetaKeys.MIN_LEAF.value,
             data_type=Dtypes.INT.value,
         )
         self.compute_permutation_importance = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.PERMUTATION_IMPORTANCE.value,
+            MachineLearningMetaKeys.PERMUTATION_IMPORTANCE.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.generate_learning_curve = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.LEARNING_CURVE.value,
+            MachineLearningMetaKeys.LEARNING_CURVE.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.generate_precision_recall_curve = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.PRECISION_RECALL.value,
+            MachineLearningMetaKeys.PRECISION_RECALL.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.generate_example_decision_tree = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.EX_DECISION_TREE.value,
+            MachineLearningMetaKeys.EX_DECISION_TREE.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.generate_classification_report = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.CLF_REPORT.value,
+            MachineLearningMetaKeys.CLF_REPORT.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.generate_features_importance_log = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.IMPORTANCE_LOG.value,
+            MachineLearningMetaKeys.IMPORTANCE_LOG.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.generate_features_importance_bar_graph = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.IMPORTANCE_LOG.value,
+            MachineLearningMetaKeys.IMPORTANCE_LOG.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.generate_example_decision_tree_fancy = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.EX_DECISION_TREE_FANCY.value,
+            MachineLearningMetaKeys.EX_DECISION_TREE_FANCY.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.generate_shap_scores = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.SHAP_SCORES.value,
+            MachineLearningMetaKeys.SHAP_SCORES.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.save_meta_data = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.RF_METADATA.value,
+            MachineLearningMetaKeys.RF_METADATA.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
         self.compute_partial_dependency = read_config_entry(
             config,
             ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            ConfigKey.PARTIAL_DEPENDENCY.value,
+            MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value,
             data_type=Dtypes.STR.value,
             default_value=False,
         )
@@ -2045,38 +2044,38 @@ class TrainModelMixin(object):
             self.under_sample_ratio = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.UNDERSAMPLE_RATIO.value,
+                MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value,
                 data_type=Dtypes.FLOAT.value,
                 default_value=Dtypes.NAN.value,
             )
             check_float(
-                name=ConfigKey.UNDERSAMPLE_RATIO.value, value=self.under_sample_ratio
+                name=MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value, value=self.under_sample_ratio
             )
         else:
             self.under_sample_ratio = Dtypes.NAN.value
         if (self.over_sample_setting == Methods.SMOTEENN.value.lower()) or (
-            self.over_sample_setting == Methods.SMOTE.value.lower()
+                self.over_sample_setting == Methods.SMOTE.value.lower()
         ):
             self.over_sample_ratio = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.OVERSAMPLE_RATIO.value,
+                MachineLearningMetaKeys.OVERSAMPLE_RATIO.value,
                 data_type=Dtypes.FLOAT.value,
                 default_value=Dtypes.NAN.value,
             )
             check_float(
-                name=ConfigKey.OVERSAMPLE_RATIO.value, value=self.over_sample_ratio
+                name=MachineLearningMetaKeys.OVERSAMPLE_RATIO.value, value=self.over_sample_ratio
             )
         else:
             self.over_sample_ratio = Dtypes.NAN.value
 
         if config.has_option(
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, ConfigKey.CLASS_WEIGHTS.value
+                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MachineLearningMetaKeys.CLASS_WEIGHTS.value
         ):
             self.class_weights = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.CLASS_WEIGHTS.value,
+                MachineLearningMetaKeys.CLASS_WEIGHTS.value,
                 data_type=Dtypes.STR.value,
                 default_value=Dtypes.NONE.value,
             )
@@ -2085,7 +2084,7 @@ class TrainModelMixin(object):
                     read_config_entry(
                         config,
                         ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                        ConfigKey.CUSTOM_WEIGHTS.value,
+                        MachineLearningMetaKeys.CLASS_CUSTOM_WEIGHTS.value,
                         data_type=Dtypes.STR.value,
                     )
                 )
@@ -2100,22 +2099,22 @@ class TrainModelMixin(object):
             self.shuffle_splits = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.LEARNING_CURVE_K_SPLITS.value,
+                MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value,
                 data_type=Dtypes.INT.value,
                 default_value=Dtypes.NAN.value,
             )
             self.dataset_splits = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.LEARNING_DATA_SPLITS.value,
+                MachineLearningMetaKeys.LEARNING_DATA_SPLITS.value,
                 data_type=Dtypes.INT.value,
                 default_value=Dtypes.NAN.value,
             )
             check_int(
-                name=ConfigKey.LEARNING_CURVE_K_SPLITS.value, value=self.shuffle_splits
+                name=MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value, value=self.shuffle_splits
             )
             check_int(
-                name=ConfigKey.LEARNING_DATA_SPLITS.value, value=self.dataset_splits
+                name=MachineLearningMetaKeys.LEARNING_DATA_SPLITS.value, value=self.dataset_splits
             )
         else:
             self.shuffle_splits, self.dataset_splits = (
@@ -2126,12 +2125,12 @@ class TrainModelMixin(object):
             self.feature_importance_bars = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.IMPORTANCE_BARS_N.value,
+                MachineLearningMetaKeys.IMPORTANCE_BARS_N.value,
                 Dtypes.INT.value,
                 Dtypes.NAN.value,
             )
             check_int(
-                name=ConfigKey.IMPORTANCE_BARS_N.value,
+                name=MachineLearningMetaKeys.IMPORTANCE_BARS_N.value,
                 value=self.feature_importance_bars,
                 min_value=1,
             )
@@ -2147,21 +2146,21 @@ class TrainModelMixin(object):
             self.shap_target_present_cnt = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.SHAP_PRESENT.value,
+                MachineLearningMetaKeys.SHAP_PRESENT.value,
                 data_type=Dtypes.INT.value,
                 default_value=0,
             )
             self.shap_target_absent_cnt = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.SHAP_ABSENT.value,
+                MachineLearningMetaKeys.SHAP_ABSENT.value,
                 data_type=Dtypes.INT.value,
                 default_value=0,
             )
             self.shap_save_n = read_config_entry(
                 config,
                 ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                ConfigKey.SHAP_SAVE_ITERATION.value,
+                MachineLearningMetaKeys.SHAP_SAVE_ITERATION.value,
                 data_type=Dtypes.STR.value,
                 default_value=Dtypes.NONE.value,
             )
@@ -2176,17 +2175,17 @@ class TrainModelMixin(object):
                 self.shap_save_n = int(self.shap_save_n)
             except ValueError or TypeError:
                 self.shap_save_n = (
-                    self.shap_target_present_cnt + self.shap_target_absent_cnt
+                        self.shap_target_present_cnt + self.shap_target_absent_cnt
                 )
             check_int(
-                name=ConfigKey.SHAP_PRESENT.value, value=self.shap_target_present_cnt
+                name=MachineLearningMetaKeys.SHAP_PRESENT.value, value=self.shap_target_present_cnt
             )
             check_int(
-                name=ConfigKey.SHAP_ABSENT.value, value=self.shap_target_absent_cnt
+                name=MachineLearningMetaKeys.SHAP_ABSENT.value, value=self.shap_target_absent_cnt
             )
 
     def check_validity_of_meta_files(
-        self, data_df: pd.DataFrame, meta_file_paths: List[Union[str, os.PathLike]]
+            self, data_df: pd.DataFrame, meta_file_paths: List[Union[str, os.PathLike]]
     ):
         meta_dicts, errors = {}, []
         for config_cnt, path in enumerate(meta_file_paths):
@@ -2195,48 +2194,48 @@ class TrainModelMixin(object):
             meta_dict = {k.lower(): v for k, v in meta_dict.items()}
             errors.append(
                 check_str(
-                    name=meta_dict[MetaKeys.CLF_NAME.value],
-                    value=meta_dict[MetaKeys.CLF_NAME.value],
+                    name=meta_dict[MachineLearningMetaKeys.CLASSIFIER.value],
+                    value=meta_dict[MachineLearningMetaKeys.CLASSIFIER.value],
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_str(
-                    name=MetaKeys.CRITERION.value,
-                    value=meta_dict[MetaKeys.CRITERION.value],
+                    name=MachineLearningMetaKeys.RF_CRITERION.value,
+                    value=meta_dict[MachineLearningMetaKeys.RF_CRITERION.value],
                     options=Options.CLF_CRITERION.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_str(
-                    name=MetaKeys.RF_MAX_FEATURES.value,
-                    value=meta_dict[MetaKeys.RF_MAX_FEATURES.value],
+                    name=MachineLearningMetaKeys.RF_MAX_FEATURES.value,
+                    value=meta_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value],
                     options=Options.CLF_MAX_FEATURES.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_str(
-                    ConfigKey.UNDERSAMPLE_SETTING.value,
-                    meta_dict[ConfigKey.UNDERSAMPLE_SETTING.value].lower(),
+                    MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value,
+                    meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value].lower(),
                     options=[x.lower() for x in Options.UNDERSAMPLE_OPTIONS.value],
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_str(
-                    ConfigKey.OVERSAMPLE_SETTING.value,
-                    meta_dict[ConfigKey.OVERSAMPLE_SETTING.value].lower(),
+                    MachineLearningMetaKeys.OVERSAMPLE_SETTING.value,
+                    meta_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value].lower(),
                     options=[x.lower() for x in Options.OVERSAMPLE_OPTIONS.value],
                     raise_error=False,
                 )[1]
             )
-            if MetaKeys.TRAIN_TEST_SPLIT_TYPE.value in meta_dict.keys():
+            if MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value in meta_dict.keys():
                 errors.append(
                     check_str(
-                        name=meta_dict[MetaKeys.TRAIN_TEST_SPLIT_TYPE.value],
-                        value=meta_dict[MetaKeys.TRAIN_TEST_SPLIT_TYPE.value],
+                        name=meta_dict[MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value],
+                        value=meta_dict[MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value],
                         options=Options.TRAIN_TEST_SPLIT.value,
                         raise_error=False,
                     )[1]
@@ -2244,178 +2243,178 @@ class TrainModelMixin(object):
 
             errors.append(
                 check_int(
-                    name=MetaKeys.RF_ESTIMATORS.value,
-                    value=meta_dict[MetaKeys.RF_ESTIMATORS.value],
+                    name=MachineLearningMetaKeys.RF_ESTIMATORS.value,
+                    value=meta_dict[MachineLearningMetaKeys.RF_ESTIMATORS.value],
                     min_value=1,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_int(
-                    name=MetaKeys.MIN_LEAF.value,
-                    value=meta_dict[MetaKeys.MIN_LEAF.value],
+                    name=MachineLearningMetaKeys.MIN_LEAF.value,
+                    value=meta_dict[MachineLearningMetaKeys.MIN_LEAF.value],
                     raise_error=False,
                 )[1]
             )
-            if meta_dict[MetaKeys.LEARNING_CURVE.value] in Options.PERFORM_FLAGS.value:
+            if meta_dict[MachineLearningMetaKeys.LEARNING_CURVE.value] in Options.PERFORM_FLAGS.value:
                 errors.append(
                     check_int(
-                        name=MetaKeys.LEARNING_CURVE_K_SPLITS.value,
-                        value=meta_dict[MetaKeys.LEARNING_CURVE_K_SPLITS.value],
+                        name=MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value,
+                        value=meta_dict[MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value],
                         raise_error=False,
                     )[1]
                 )
                 errors.append(
                     check_int(
-                        name=MetaKeys.LEARNING_CURVE_DATA_SPLITS.value,
-                        value=meta_dict[MetaKeys.LEARNING_CURVE_DATA_SPLITS.value],
+                        name=MachineLearningMetaKeys.LEARNING_CURVE_DATA_SPLITS.value,
+                        value=meta_dict[MachineLearningMetaKeys.LEARNING_CURVE_DATA_SPLITS.value],
                         raise_error=False,
                     )[1]
                 )
             if (
-                meta_dict[MetaKeys.IMPORTANCE_BAR_CHART.value]
-                in Options.PERFORM_FLAGS.value
+                    meta_dict[MachineLearningMetaKeys.IMPORTANCE_BAR_CHART.value]
+                    in Options.PERFORM_FLAGS.value
             ):
                 errors.append(
                     check_int(
-                        name=MetaKeys.N_FEATURE_IMPORTANCE_BARS.value,
-                        value=meta_dict[MetaKeys.N_FEATURE_IMPORTANCE_BARS.value],
+                        name=MachineLearningMetaKeys.N_FEATURE_IMPORTANCE_BARS.value,
+                        value=meta_dict[MachineLearningMetaKeys.N_FEATURE_IMPORTANCE_BARS.value],
                         raise_error=False,
                     )[1]
                 )
-            if MetaKeys.SHAP_SCORES.value in meta_dict.keys():
-                if meta_dict[MetaKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value:
+            if MachineLearningMetaKeys.SHAP_SCORES.value in meta_dict.keys():
+                if meta_dict[MachineLearningMetaKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value:
                     errors.append(
                         check_int(
-                            name=MetaKeys.SHAP_PRESENT.value,
-                            value=meta_dict[MetaKeys.SHAP_PRESENT.value],
+                            name=MachineLearningMetaKeys.SHAP_PRESENT.value,
+                            value=meta_dict[MachineLearningMetaKeys.SHAP_PRESENT.value],
                             raise_error=False,
                         )[1]
                     )
                     errors.append(
                         check_int(
-                            name=MetaKeys.SHAP_ABSENT.value,
-                            value=meta_dict[MetaKeys.SHAP_ABSENT.value],
+                            name=MachineLearningMetaKeys.SHAP_ABSENT.value,
+                            value=meta_dict[MachineLearningMetaKeys.SHAP_ABSENT.value],
                             raise_error=False,
                         )[1]
                     )
 
             errors.append(
                 check_float(
-                    name=MetaKeys.TT_SIZE.value,
-                    value=meta_dict[MetaKeys.TT_SIZE.value],
+                    name=MachineLearningMetaKeys.TT_SIZE.value,
+                    value=meta_dict[MachineLearningMetaKeys.TT_SIZE.value],
                     raise_error=False,
                 )[1]
             )
             if (
-                meta_dict[ConfigKey.UNDERSAMPLE_SETTING.value].lower()
-                == Methods.RANDOM_UNDERSAMPLE.value
+                    meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value].lower()
+                    == Methods.RANDOM_UNDERSAMPLE.value
             ):
                 errors.append(
                     check_float(
-                        name=ConfigKey.UNDERSAMPLE_RATIO.value,
-                        value=meta_dict[ConfigKey.UNDERSAMPLE_RATIO.value],
+                        name=MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value,
+                        value=meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value],
                         raise_error=False,
                     )[1]
                 )
                 try:
                     present_len, absent_len = len(
-                        data_df[data_df[meta_dict[MetaKeys.CLF_NAME.value]] == 1]
-                    ), len(data_df[data_df[meta_dict[MetaKeys.CLF_NAME.value]] == 0])
+                        data_df[data_df[meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]] == 1]
+                    ), len(data_df[data_df[meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]] == 0])
                     ratio_n = int(
-                        present_len * meta_dict[ConfigKey.UNDERSAMPLE_RATIO.value]
+                        present_len * meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value]
                     )
                     if absent_len < ratio_n:
                         errors.append(
-                            f"The under-sample ratio of {meta_dict[ConfigKey.UNDERSAMPLE_RATIO.value]} in \n classifier {meta_dict[MetaKeys.CLF_NAME.value]} demands {ratio_n} behavior-absent annotations."
+                            f"The under-sample ratio of {meta_dict[MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value]} in \n classifier {meta_dict[MachineLearningMetaKeys.CLASSIFIER.value]} demands {ratio_n} behavior-absent annotations."
                         )
                 except:
                     pass
 
             if (
-                meta_dict[ConfigKey.OVERSAMPLE_SETTING.value].lower()
-                == Methods.SMOTEENN.value.lower()
+                    meta_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value].lower()
+                    == Methods.SMOTEENN.value.lower()
             ) or (
-                meta_dict[ConfigKey.OVERSAMPLE_SETTING.value].lower()
-                == Methods.SMOTE.value.lower()
+                    meta_dict[MachineLearningMetaKeys.OVERSAMPLE_SETTING.value].lower()
+                    == Methods.SMOTE.value.lower()
             ):
                 errors.append(
                     check_float(
-                        name=ConfigKey.OVERSAMPLE_RATIO.value,
-                        value=meta_dict[ConfigKey.OVERSAMPLE_RATIO.value],
+                        name=MachineLearningMetaKeys.OVERSAMPLE_RATIO.value,
+                        value=meta_dict[MachineLearningMetaKeys.OVERSAMPLE_RATIO.value],
                         raise_error=False,
                     )[1]
                 )
 
             errors.append(
                 check_if_valid_input(
-                    name=MetaKeys.META_FILE.value,
-                    input=meta_dict[MetaKeys.META_FILE.value],
+                    name=MachineLearningMetaKeys.RF_METADATA.value,
+                    input=meta_dict[MachineLearningMetaKeys.RF_METADATA.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.EX_DECISION_TREE.value,
-                    input=meta_dict[MetaKeys.EX_DECISION_TREE.value],
+                    MachineLearningMetaKeys.EX_DECISION_TREE.value,
+                    input=meta_dict[MachineLearningMetaKeys.EX_DECISION_TREE.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.CLF_REPORT.value,
-                    input=meta_dict[MetaKeys.CLF_REPORT.value],
+                    MachineLearningMetaKeys.CLF_REPORT.value,
+                    input=meta_dict[MachineLearningMetaKeys.CLF_REPORT.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.IMPORTANCE_LOG.value,
-                    input=meta_dict[MetaKeys.IMPORTANCE_LOG.value],
+                    MachineLearningMetaKeys.IMPORTANCE_LOG.value,
+                    input=meta_dict[MachineLearningMetaKeys.IMPORTANCE_LOG.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.IMPORTANCE_BAR_CHART.value,
-                    input=meta_dict[MetaKeys.IMPORTANCE_BAR_CHART.value],
+                    MachineLearningMetaKeys.IMPORTANCE_BAR_CHART.value,
+                    input=meta_dict[MachineLearningMetaKeys.IMPORTANCE_BAR_CHART.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.PERMUTATION_IMPORTANCE.value,
-                    input=meta_dict[MetaKeys.PERMUTATION_IMPORTANCE.value],
+                    MachineLearningMetaKeys.PERMUTATION_IMPORTANCE.value,
+                    input=meta_dict[MachineLearningMetaKeys.PERMUTATION_IMPORTANCE.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.LEARNING_CURVE.value,
-                    input=meta_dict[MetaKeys.LEARNING_CURVE.value],
+                    MachineLearningMetaKeys.LEARNING_CURVE.value,
+                    input=meta_dict[MachineLearningMetaKeys.LEARNING_CURVE.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
             errors.append(
                 check_if_valid_input(
-                    MetaKeys.PRECISION_RECALL.value,
-                    input=meta_dict[MetaKeys.PRECISION_RECALL.value],
+                    MachineLearningMetaKeys.PRECISION_RECALL.value,
+                    input=meta_dict[MachineLearningMetaKeys.PRECISION_RECALL.value],
                     options=Options.RUN_OPTIONS_FLAGS.value,
                     raise_error=False,
                 )[1]
             )
-            if MetaKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
+            if MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
                 errors.append(
                     check_if_valid_input(
-                        MetaKeys.PARTIAL_DEPENDENCY.value,
-                        input=meta_dict[MetaKeys.PARTIAL_DEPENDENCY.value],
+                        MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value,
+                        input=meta_dict[MachineLearningMetaKeys.PARTIAL_DEPENDENCY.value],
                         options=Options.RUN_OPTIONS_FLAGS.value,
                         raise_error=False,
                     )[1]
@@ -2429,29 +2428,29 @@ class TrainModelMixin(object):
                         raise_error=False,
                     )[1]
                 )
-            if meta_dict[MetaKeys.RF_MAX_FEATURES.value] == Dtypes.NONE.value:
-                meta_dict[MetaKeys.RF_MAX_FEATURES.value] = None
-            if MetaKeys.TRAIN_TEST_SPLIT_TYPE.value not in meta_dict.keys():
+            if meta_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value] == Dtypes.NONE.value:
+                meta_dict[MachineLearningMetaKeys.RF_MAX_FEATURES.value] = None
+            if MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value not in meta_dict.keys():
                 meta_dict[
-                    MetaKeys.TRAIN_TEST_SPLIT_TYPE.value
+                    MachineLearningMetaKeys.TRAIN_TEST_SPLIT_TYPE.value
                 ] = Methods.SPLIT_TYPE_FRAMES.value
 
-            if ConfigKey.CLASS_WEIGHTS.value in meta_dict.keys():
+            if MachineLearningMetaKeys.CLASS_WEIGHTS.value in meta_dict.keys():
                 if (
-                    meta_dict[ConfigKey.CLASS_WEIGHTS.value]
-                    not in Options.CLASS_WEIGHT_OPTIONS.value
+                        meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value]
+                        not in Options.CLASS_WEIGHT_OPTIONS.value
                 ):
-                    meta_dict[ConfigKey.CLASS_WEIGHTS.value] = None
-                if meta_dict[ConfigKey.CLASS_WEIGHTS.value] == "custom":
-                    meta_dict[ConfigKey.CLASS_WEIGHTS.value] = ast.literal_eval(
-                        meta_dict["class_custom_weights"]
+                    meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] = None
+                if meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] == "custom":
+                    meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] = ast.literal_eval(
+                        meta_dict[MachineLearningMetaKeys.CLASS_CUSTOM_WEIGHTS]
                     )
-                    for k, v in meta_dict[ConfigKey.CLASS_WEIGHTS.value].items():
-                        meta_dict[ConfigKey.CLASS_WEIGHTS.value][k] = int(v)
-                if meta_dict[ConfigKey.CLASS_WEIGHTS.value] == Dtypes.NONE.value:
-                    meta_dict[ConfigKey.CLASS_WEIGHTS.value] = None
+                    for k, v in meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value].items():
+                        meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value][k] = int(v)
+                if meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] == Dtypes.NONE.value:
+                    meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] = None
             else:
-                meta_dict[ConfigKey.CLASS_WEIGHTS.value] = None
+                meta_dict[MachineLearningMetaKeys.CLASS_WEIGHTS.value] = None
 
             if "classifier_map" in meta_dict.keys():
                 meta_dict["classifier_map"] = ast.literal_eval(
@@ -2491,12 +2490,12 @@ class TrainModelMixin(object):
         return meta_dicts
 
     def random_multiclass_frm_undersampler(
-        self,
-        data_df: pd.DataFrame,
-        target_field: str,
-        target_var: int,
-        sampling_ratio: Union[float, Dict[int, float]],
-        raise_error: bool = False,
+            self,
+            data_df: pd.DataFrame,
+            target_field: str,
+            target_var: int,
+            sampling_ratio: Union[float, Dict[int, float]],
+            raise_error: bool = False,
     ):
         """
         Random multiclass undersampler.
@@ -2566,7 +2565,6 @@ class TrainModelMixin(object):
             results_df_lst.append(sample)
 
         return pd.concat(results_df_lst, axis=0)
-
 
 # test = TrainModelMixin()
 # test.read_all_files_in_folder(file_paths=['/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437C_c3_2022-11-01_13-16-23_color.csv', '/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437D_c4_2022-11-01_13-16-39_color.csv'],
