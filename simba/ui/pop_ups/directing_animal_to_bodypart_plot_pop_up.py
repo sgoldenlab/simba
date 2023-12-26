@@ -5,7 +5,8 @@ from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.directing_animals_to_bodypart_visualizer import DirectingAnimalsToBodyPartVisualizer
+from simba.plotting.directing_animals_to_bodypart_visualizer import \
+    DirectingAnimalsToBodyPartVisualizer
 from simba.plotting.directing_animals_visualizer import \
     DirectingOtherAnimalsVisualizer
 from simba.plotting.directing_animals_visualizer_mp import \
@@ -154,7 +155,7 @@ class DirectingAnimalToBodyPartVisualizerPopUp(PopUpMixin, ConfigReader):
         }
 
         for data_path in data_paths:
-            #if not self.multiprocess_var.get():
+            # if not self.multiprocess_var.get():
             directing_other_animal_visualizer = DirectingAnimalsToBodyPartVisualizer(
                 config_path=self.config_path,
                 data_path=data_path,
@@ -170,6 +171,3 @@ class DirectingAnimalToBodyPartVisualizerPopUp(PopUpMixin, ConfigReader):
             #         )
             #     )
             directing_other_animal_visualizer.run()
-
-
-            
