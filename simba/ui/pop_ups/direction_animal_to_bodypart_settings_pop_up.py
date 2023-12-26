@@ -4,14 +4,13 @@ import configparser
 import os
 from tkinter import *
 
-from simba.data_processors.directing_animal_to_bodypart import \
-    DirectingAnimalsToBodyPartAnalyzer
+from simba.data_processors.directing_animal_to_bodypart import DirectingAnimalsToBodyPartAnalyzer
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box)
 from simba.utils.checks import check_float
-from simba.utils.enums import ConfigKey, Formats, Keys, Links
+from simba.utils.enums import Formats, Keys, Links, ConfigKey
 from simba.utils.printing import stdout_success
 
 
@@ -58,18 +57,16 @@ class DirectionAnimalToBodyPartSettingsPopUp(PopUpMixin, ConfigReader):
     def run(self):
         for animal_cnt, animal_name in enumerate(self.animal_bp_dict.keys()):
             try:
-                self.config.set(
-                    ConfigKey.DIRECTIONALITY_SETTINGS.value,
-                    "bodypart_direction",
-                    self.criterion_dropdowns[animal_name]["bp"].getChoices(),
-                )
+                self.config.set(ConfigKey.DIRECTIONALITY_SETTINGS.value,
+                                "bodypart_direction",
+                                self.criterion_dropdowns[animal_name]["bp"].getChoices(),
+                                )
             except configparser.NoSectionError as e:
                 self.config.add_section(ConfigKey.DIRECTIONALITY_SETTINGS.value)
-                self.config.set(
-                    ConfigKey.DIRECTIONALITY_SETTINGS.value,
-                    "bodypart_direction",
-                    self.criterion_dropdowns[animal_name]["bp"].getChoices(),
-                )
+                self.config.set(ConfigKey.DIRECTIONALITY_SETTINGS.value,
+                                "bodypart_direction",
+                                self.criterion_dropdowns[animal_name]["bp"].getChoices(),
+                                )
         with open(self.config_path, "w") as f:
             self.config.write(f)
 
