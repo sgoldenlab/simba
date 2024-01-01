@@ -7,7 +7,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, Entry_Box
 from simba.utils.checks import check_int
-from simba.utils.enums import Keys, Links
+from simba.utils.enums import Defaults, Formats, Keys, Links
 from simba.utils.errors import CountError
 
 
@@ -15,63 +15,66 @@ class FSTTCPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, title="FORWARD SPIKE TIME TILING COEFFICIENTS")
         ConfigReader.__init__(self, config_path=config_path)
-        fsttc_settings_frm = CreateLabelFrameWithIcon(
+        settings_frm = CreateLabelFrameWithIcon(
             parent=self.main_frm,
-            header="FSTTC Settings",
+            header="SETTINGS",
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.FSTTC.value,
         )
-        graph_cb_var = BooleanVar()
+        self.time_delta_eb = Entry_Box(
+            settings_frm, "TIME-DELTA", "10", validation="numeric"
+        )
+        self.graph_cb_var = BooleanVar(value=False)
         graph_cb = Checkbutton(
-            fsttc_settings_frm, text="Create graph", variable=graph_cb_var
+            settings_frm, text="CREATE GRAPH", variable=self.graph_cb_var
         )
-        time_delta = Entry_Box(
-            fsttc_settings_frm, "Time Delta", "10", validation="numeric"
+        self.join_bouts_within_delta_var = BooleanVar(value=False)
+        join_bouts_within_delta_cb = Checkbutton(
+            settings_frm,
+            text="JOIN BOUTS WITHIN TIME-DELTA",
+            variable=self.join_bouts_within_delta_var,
         )
-        behaviors_frm = LabelFrame(fsttc_settings_frm, text="Behaviors")
-        clf_var_dict, clf_cb_dict = {}, {}
-        for clf_cnt, clf in enumerate(self.clf_names):
-            clf_var_dict[clf] = BooleanVar()
-            clf_cb_dict[clf] = Checkbutton(
-                behaviors_frm, text=clf, variable=clf_var_dict[clf]
-            )
-            clf_cb_dict[clf].grid(row=clf_cnt, sticky=NW)
-
-        fsttc_run_btn = Button(
-            self.main_frm,
-            text="Calculate FSTTC",
-            command=lambda: self.run_fsttc(
-                time_delta=time_delta.entry_get,
-                graph_var=graph_cb_var.get(),
-                behaviours_dict=clf_var_dict,
-            ),
+        self.time_delta_at_onset_var = BooleanVar(value=False)
+        time_delta_at_onset_cb = Checkbutton(
+            settings_frm,
+            text="TIME-DELTA AT BOUT START",
+            variable=self.time_delta_at_onset_var,
+        )
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.time_delta_eb.grid(row=0, column=0, sticky="NW")
+        join_bouts_within_delta_cb.grid(row=1, column=0, sticky="NW")
+        time_delta_at_onset_cb.grid(row=2, column=0, sticky="NW")
+        graph_cb.grid(row=3, column=0, sticky="NW")
+        self.clf_cb_dict = self.create_cb_frame(
+            main_frm=self.main_frm, cb_titles=self.clf_names, frm_title="BEHAVIORS"
         )
 
-        fsttc_settings_frm.grid(row=0, sticky=W, pady=5)
-        graph_cb.grid(row=0, sticky=W, pady=5)
-        time_delta.grid(row=1, sticky=W, pady=5)
-        behaviors_frm.grid(row=2, sticky=W, pady=5)
-        fsttc_run_btn.grid(row=3, pady=10)
+        self.create_run_frm(run_function=self.run, title="RUN")
 
-    def run_fsttc(self, graph_var: bool, behaviours_dict: dict, time_delta: int = None):
-        check_int("Time delta", value=time_delta)
+        self.main_frm.mainloop()
+
+    def run(self):
+        check_int("Time delta", value=self.time_delta_eb.entry_get)
         targets = []
-        for behaviour, behavior_val in behaviours_dict.items():
+        for behaviour, behavior_val in self.clf_cb_dict.items():
             if behavior_val.get():
                 targets.append(behaviour)
 
         if len(targets) < 2:
             raise CountError(
-                msg="FORWARD SPIKE TIME TILING COEFFICIENTS REQUIRE 2 OR MORE BEHAVIORS."
+                msg="FORWARD SPIKE TIME TILING COEFFICIENTS REQUIRE 2 OR MORE BEHAVIORS.",
+                source=self.__class__.__name__,
             )
 
         fsttc_calculator = FSTTCCalculator(
             config_path=self.config_path,
-            time_window=time_delta,
+            time_window=self.time_delta_eb.entry_get,
+            join_bouts_within_delta=self.join_bouts_within_delta_var.get(),
+            time_delta_at_onset=self.time_delta_at_onset_var.get(),
             behavior_lst=targets,
-            create_graphs=graph_var,
+            create_graphs=self.graph_cb_var.get(),
         )
         fsttc_calculator.run()
 
 
-# _ = FSTTCPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
+# _ = FSTTCPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

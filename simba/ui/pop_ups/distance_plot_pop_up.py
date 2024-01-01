@@ -164,7 +164,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
                 str(len(list(self.files_found_dict.keys())))
             ),
             fg="blue",
-            command=lambda: self.__create_distance_plots(multiple_videos=False),
+            command=lambda: self.__create_distance_plots(multiple_videos=True),
         )
 
         self.style_settings_frm.grid(row=0, sticky=NW)
@@ -192,7 +192,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
         self.run_multiple_videos.grid(row=1, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
 
-        # self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def __populate_distances_menu(self, choice):
         if hasattr(self, "bp_1"):
@@ -244,7 +244,8 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
         for cnt, (k, v) in enumerate(line_attr.items()):
             if v[0] == v[1]:
                 raise DuplicationError(
-                    msg=f"DISTANCE LINE {cnt+1} ERROR: The two body-parts cannot be the same body-part."
+                    msg=f"DISTANCE LINE {cnt+1} ERROR: The two body-parts cannot be the same body-part.",
+                    source=self.__class__.__name__,
                 )
 
         width = int(self.resolution_dropdown.getChoices().split("×")[0])
@@ -285,7 +286,8 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
                 core_cnt=int(self.multiprocess_dropdown.getChoices()),
             )
 
-        distance_plotter.create_distance_plot()
+        distance_plotter.run()
 
 
 # _ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# _ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini')

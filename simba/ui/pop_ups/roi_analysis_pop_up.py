@@ -47,20 +47,39 @@ class ROIAnalysisPopUp(ConfigReader, PopUpMixin):
         self.choose_bp_frm(parent=self.setting_frm, bp_options=self.body_parts_lst)
         self.choose_bp_threshold_frm(parent=self.setting_frm)
         self.calculate_distances_frm = LabelFrame(
-            self.setting_frm, text="CALCULATE DISTANCES"
+            self.setting_frm,
+            text="CALCULATE DISTANCES",
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
         )
         self.calculate_distance_moved_var = BooleanVar(value=False)
         self.calculate_distance_moved_cb = Checkbutton(
             self.calculate_distances_frm,
-            text="Calculate distance moved within ROI",
+            text="Compute distances moved within ROIs",
             variable=self.calculate_distance_moved_var,
         )
         self.calculate_distance_moved_cb.grid(row=0, column=0, sticky=NW)
+        self.detailed_roi_frm = LabelFrame(
+            self.setting_frm,
+            text="DETAILED ROI BOUT DATA",
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+        )
+        self.detailed_roi_var = BooleanVar(value=False)
+        self.detailed_roi_cb = Checkbutton(
+            self.detailed_roi_frm,
+            text="Save detailed ROI bout data",
+            variable=self.detailed_roi_var,
+        )
+        self.detailed_roi_cb.grid(row=1, column=0, sticky=NW)
         self.calculate_distances_frm.grid(
             row=self.frame_children(frame=self.setting_frm), column=0, sticky=NW
         )
+        self.detailed_roi_frm.grid(
+            row=self.frame_children(frame=self.setting_frm) + 1, column=0, sticky=NW
+        )
         self.setting_frm.grid(row=1, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
+
+        self.main_frm.mainloop()
 
     def run(self):
         settings = {}
@@ -92,8 +111,14 @@ class ROIAnalysisPopUp(ConfigReader, PopUpMixin):
             ini_path=self.config_path,
             data_path="outlier_corrected_movement_location",
             calculate_distances=self.calculate_distance_moved_var.get(),
+            detailed_bout_data=self.detailed_roi_var.get(),
             settings=settings,
         )
         roi_analyzer.run()
         roi_analyzer.save()
         self.root.destroy()
+
+
+# ROIAnalysisPopUp(config_path='/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/mouse_open_field/project_folder/project_config.ini')
+
+# ROIAnalysisPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini')

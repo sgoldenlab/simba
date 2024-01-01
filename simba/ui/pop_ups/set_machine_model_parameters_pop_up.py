@@ -110,7 +110,10 @@ class SetMachineModelParameters(PopUpMixin, ConfigReader):
         with open(self.config_path, "w") as f:
             self.config.write(f)
 
-        stdout_success(msg="Model paths/settings saved in project_config.ini")
+        stdout_success(
+            msg="Model paths/settings saved in project_config.ini",
+            source=self.__class__.__name__,
+        )
 
 
 # _ = SetMachineModelParameters(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')

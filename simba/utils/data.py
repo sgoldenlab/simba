@@ -554,9 +554,9 @@ def find_frame_numbers_from_time_stamp(
     )
     start_h, start_m, start_s = start_time.split(":")
     end_h, end_m, end_s = end_time.split(":")
-    start_in_s = int(start_h) * 3600 + int(start_m) * 60 + int(start_s)
-    end_in_s = int(end_h) * 3600 + int(end_m) * 60 + int(end_s)
-    return list(range(int(start_in_s * fps), int(end_in_s * fps)))
+    start_in_s = int(start_h) * 3600 + int(start_m) * 60 + float(start_s)
+    end_in_s = int(end_h) * 3600 + int(end_m) * 60 + float(end_s)
+    return list(range(int(start_in_s * fps), int(end_in_s * fps) + 2))
 
 
 # def slp_to_df_convert(file_path: Union[str, os.PathLike],

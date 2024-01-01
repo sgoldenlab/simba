@@ -16,7 +16,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.data import plug_holes_shortest_bout
-from simba.utils.printing import stdout_success
+from simba.utils.enums import TagNames
+from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
                                     write_df)
 
@@ -68,6 +69,11 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         TrainModelMixin.__init__(self)
+        log_event(
+            logger_name=str(__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
         _, self.feature_filename, ext = get_fn_ext(feature_file_path)
         (
             self.discrimination_threshold,
@@ -92,7 +98,6 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             self.clf_data_validation_dir, self.feature_filename + ".csv"
         )
         self.clf = read_df(file_path=model_path, file_type="pickle")
-        print(feature_file_path)
         self.in_df = read_df(feature_file_path, self.file_type)
 
     def __run_clf(self):
@@ -175,144 +180,128 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
                 space_scaler / (resolution_scaler / max_dim)
             )
 
-        try:
-            frm_cnt, clf_frm_cnt = 0, 0
-            while cap.isOpened():
-                ret, frame = cap.read()
-                clf_val = int(self.data_df.loc[frm_cnt, self.clf_name])
-                clf_frm_cnt += clf_val
-                if self.settings["pose"]:
-                    for animal_cnt, (animal_name, animal_data) in enumerate(
-                        self.animal_bp_dict.items()
-                    ):
-                        for bp_cnt, bp in enumerate(range(len(animal_data["X_bps"]))):
-                            x_header, y_header = (
-                                animal_data["X_bps"][bp],
-                                animal_data["Y_bps"][bp],
-                            )
-                            animal_cords = tuple(
-                                self.in_df.loc[
-                                    self.in_df.index[frm_cnt], [x_header, y_header]
-                                ]
-                            )
-                            cv2.circle(
-                                frame,
-                                (int(animal_cords[0]), int(animal_cords[1])),
-                                0,
-                                self.clr_lst[animal_cnt][bp_cnt],
-                                self.settings["styles"]["circle size"],
-                            )
-                if self.settings["animal_names"]:
-                    for animal_cnt, (animal_name, animal_data) in enumerate(
-                        self.animal_bp_dict.items()
-                    ):
+        frm_cnt, clf_frm_cnt = 0, 0
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if frame is None:
+                print(
+                    "SIMBA WARNING: Some frames appear to be missing in the video vs the data file."
+                )
+                break
+            clf_val = int(self.data_df.loc[frm_cnt, self.clf_name])
+            clf_frm_cnt += clf_val
+            if self.settings["pose"]:
+                for animal_cnt, (animal_name, animal_data) in enumerate(
+                    self.animal_bp_dict.items()
+                ):
+                    for bp_cnt, bp in enumerate(range(len(animal_data["X_bps"]))):
                         x_header, y_header = (
-                            animal_data["X_bps"][0],
-                            animal_data["Y_bps"][0],
+                            animal_data["X_bps"][bp],
+                            animal_data["Y_bps"][bp],
                         )
                         animal_cords = tuple(
                             self.in_df.loc[
                                 self.in_df.index[frm_cnt], [x_header, y_header]
                             ]
                         )
-                        cv2.putText(
+                        cv2.circle(
                             frame,
-                            animal_name,
                             (int(animal_cords[0]), int(animal_cords[1])),
-                            self.font,
-                            self.settings["styles"]["font size"],
-                            self.clr_lst[animal_cnt][0],
-                            1,
+                            0,
+                            self.clr_lst[animal_cnt][bp_cnt],
+                            self.settings["styles"]["circle size"],
                         )
-                target_timer = round((1 / self.fps) * clf_frm_cnt, 2)
+            if self.settings["animal_names"]:
+                for animal_cnt, (animal_name, animal_data) in enumerate(
+                    self.animal_bp_dict.items()
+                ):
+                    x_header, y_header = (
+                        animal_data["X_bps"][0],
+                        animal_data["Y_bps"][0],
+                    )
+                    animal_cords = tuple(
+                        self.in_df.loc[self.in_df.index[frm_cnt], [x_header, y_header]]
+                    )
+                    cv2.putText(
+                        frame,
+                        animal_name,
+                        (int(animal_cords[0]), int(animal_cords[1])),
+                        self.font,
+                        self.settings["styles"]["font size"],
+                        self.clr_lst[animal_cnt][0],
+                        1,
+                    )
+            target_timer = round((1 / self.fps) * clf_frm_cnt, 2)
+            cv2.putText(
+                frame,
+                "Timer",
+                (10, int(self.settings["styles"]["space_scale"])),
+                self.font,
+                self.settings["styles"]["font size"],
+                (0, 255, 0),
+                2,
+            )
+            addSpacer = 2
+            cv2.putText(
+                frame,
+                (f"{self.clf_name} {target_timer}s"),
+                (10, self.settings["styles"]["space_scale"] * addSpacer),
+                self.font,
+                self.settings["styles"]["font size"],
+                (0, 0, 255),
+                2,
+            )
+            addSpacer += 1
+            cv2.putText(
+                frame,
+                "Ensemble prediction",
+                (10, self.settings["styles"]["space_scale"] * addSpacer),
+                self.font,
+                self.settings["styles"]["font size"],
+                (0, 255, 0),
+                2,
+            )
+            addSpacer += 2
+            if clf_val == 1:
                 cv2.putText(
                     frame,
-                    "Timer",
-                    (10, self.settings["styles"]["space_scale"]),
+                    self.clf_name,
+                    (10, +self.settings["styles"]["space_scale"] * addSpacer),
                     self.font,
                     self.settings["styles"]["font size"],
-                    (0, 255, 0),
-                    2,
-                )
-                addSpacer = 2
-                cv2.putText(
-                    frame,
-                    (f"{self.clf_name} {target_timer}s"),
-                    (10, self.settings["styles"]["space_scale"]),
-                    self.font,
-                    self.settings["styles"]["font size"],
-                    (0, 0, 255),
+                    (2, 166, 249),
                     2,
                 )
                 addSpacer += 1
-                cv2.putText(
+            if self.create_gantt == "Gantt chart: final frame only (slightly faster)":
+                frame = np.concatenate((frame, self.gantt_img), axis=1)
+            elif self.create_gantt == "Gantt chart: video":
+                gantt_img = self.create_gantt_img(
+                    self.bouts_df,
+                    self.clf_name,
+                    frm_cnt,
+                    self.fps,
+                    "Behavior gantt chart",
+                )
+                gantt_img = self.resize_gantt(
+                    gantt_img, self.video_meta_data["video_height"]
+                )
+                frame = np.concatenate((frame, gantt_img), axis=1)
+            elif self.create_gantt != "None":
+                frame = cv2.resize(
                     frame,
-                    "Ensemble prediction",
-                    (10, self.settings["styles"]["space_scale"] * addSpacer),
-                    self.font,
-                    self.settings["styles"]["font size"],
-                    (0, 255, 0),
-                    2,
+                    (
+                        int(self.video_meta_data["width"] + self.gantt_img.shape[1]),
+                        self.video_meta_data["height"],
+                    ),
                 )
-                addSpacer += 2
-                if clf_val == 1:
-                    cv2.putText(
-                        frame,
-                        self.clf_name,
-                        (10, +self.settings["styles"]["space_scale"] * addSpacer),
-                        self.font,
-                        self.settings["styles"]["font size"],
-                        (2, 166, 249),
-                        2,
-                    )
-                    addSpacer += 1
-                if (
-                    self.create_gantt
-                    == "Gantt chart: final frame only (slightly faster)"
-                ):
-                    frame = np.concatenate((frame, self.gantt_img), axis=1)
-                elif self.create_gantt == "Gantt chart: video":
-                    gantt_img = self.create_gantt_img(
-                        self.bouts_df,
-                        self.clf_name,
-                        frm_cnt,
-                        self.fps,
-                        "Behavior gantt chart",
-                    )
-                    gantt_img = self.resize_gantt(
-                        gantt_img, self.video_meta_data["video_height"]
-                    )
-                    frame = np.concatenate((frame, gantt_img), axis=1)
-                elif self.create_gantt != "None":
-                    frame = cv2.resize(
-                        frame,
-                        (
-                            int(
-                                self.video_meta_data["width"] + self.gantt_img.shape[1]
-                            ),
-                            self.video_meta_data["height"],
-                        ),
-                    )
-                writer.write(np.uint8(frame))
-                print(
-                    "Frame created: {} / {}".format(
-                        str(frm_cnt + 1), str(len(self.data_df))
-                    )
-                )
-                frm_cnt += 1
-                if frame is None:
-                    print(
-                        "SIMBA WARNING: Some frames appear to be missing in the video vs the data file."
-                    )
-                    break
-
-        except Exception as e:
-            print(e)
+            writer.write(np.uint8(frame))
             print(
-                "SIMBA WARNING: Some frames appear to be missing in the video vs the data file."
+                "Frame created: {} / {}".format(
+                    str(frm_cnt + 1), str(len(self.data_df))
+                )
             )
-            cap.release()
-            writer.release()
+            frm_cnt += 1
 
         cap.release()
         writer.release()
@@ -320,16 +309,25 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         stdout_success(
             msg=f"Validation video saved at {self.vid_output_path}",
             elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
         )
 
     def run(self):
         self.__run_clf()
         if self.shortest_bout > 1:
             self.__plug_bouts()
-        else:
-            self.data_df = self.in_df
         self.__save()
         self.__create_video()
+
+
+# test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/troubleshooting/dam_nest-c-only_ryan/project_folder/project_config.ini',
+#                              feature_file_path='/Users/simon/Desktop/envs/troubleshooting/dam_nest-c-only_ryan/project_folder/csv/features_extracted/LBNF2_Ctrl_P04_4_2021-03-18_19-49-46c.csv',
+#                              model_path='/Users/simon/Desktop/envs/troubleshooting/dam_nest-c-only_ryan/models/dam_in_nest.sav',
+#                              discrimination_threshold=0.6,
+#                              shortest_bout=50,
+#                              settings={'pose': True, 'animal_names': True, 'styles': None},
+#                              create_gantt=None)
+# test.run()
 
 
 # test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini',
@@ -340,10 +338,10 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
 #                              settings={'pose': True, 'animal_names': True, 'styles': None},
 #                              create_gantt='Gantt chart: final frame only (slightly faster)')
 # test.run()
-#
+
 
 # test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                              feature_file_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/features_extracted/Together_2.csv',
+#                              feature_file_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/features_extracted/Together_1.csv',
 #                              model_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/models/generated_models/Attack.sav',
 #                              discrimination_threshold=0.6,
 #                              shortest_bout=50,

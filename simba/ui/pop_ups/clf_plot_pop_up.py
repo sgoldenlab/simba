@@ -1,5 +1,6 @@
 __author__ = "Simon Nilsson"
 
+import os.path
 from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
@@ -7,9 +8,10 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.plot_clf_results import PlotSklearnResultsSingleCore
 from simba.plotting.plot_clf_results_mp import PlotSklearnResultsMultiProcess
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box)
+                                        Entry_Box, FileSelect)
 from simba.utils.checks import check_float
-from simba.utils.enums import Formats, Keys, Links
+from simba.utils.enums import Formats, Keys, Links, Options
+from simba.utils.errors import NoFilesFoundError
 from simba.utils.read_write import find_all_videos_in_directory
 
 
@@ -141,9 +143,21 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
             command=lambda: self.__initiate_video_creation(multiple_videos=False),
         )
         self.single_video_dropdown = DropDownMenu(
-            self.run_single_video_frm, "Video:", self.video_lst, "12"
+            self.run_single_video_frm,
+            "Video:",
+            self.video_lst,
+            "12",
+            com=lambda x: self.__update_single_video_file_path(filename=x),
+        )
+        self.select_video_file_select = FileSelect(
+            self.run_single_video_frm,
+            "",
+            lblwidth="1",
+            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
+            dropdown=self.single_video_dropdown,
         )
         self.single_video_dropdown.setChoices(self.video_lst[0])
+        self.select_video_file_select.filePath.set(self.video_lst[0])
 
         self.run_multiple_videos = LabelFrame(
             self.run_frm,
@@ -185,8 +199,14 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.run_single_video_frm.grid(row=0, sticky=NW)
         self.run_single_video_btn.grid(row=1, sticky=NW)
         self.single_video_dropdown.grid(row=1, column=1, sticky=NW)
+        self.select_video_file_select.grid(row=1, column=2, sticky=NW)
         self.run_multiple_videos.grid(row=1, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
+
+        self.main_frm.mainloop()
+
+    def __update_single_video_file_path(self, filename: str):
+        self.select_video_file_select.filePath.set(filename)
 
     def get_bp_probability_threshold(self):
         try:
@@ -225,6 +245,11 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
 
         if not multiple_videos:
             video_file_path = self.single_video_dropdown.getChoices()
+            if not os.path.isfile(os.path.join(self.video_dir, video_file_path)):
+                raise NoFilesFoundError(
+                    msg=f"Selected video {video_file_path} is not a video in the SimBA project videos directory."
+                )
+
         else:
             video_file_path = None
 
@@ -253,4 +278,4 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         simba_plotter.run()
 
 
-# _ = SklearnVisualizationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
+# _ = SklearnVisualizationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

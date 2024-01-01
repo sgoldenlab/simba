@@ -18,7 +18,8 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         self.video_files = [os.path.basename(x) for x in video_filepaths]
         if len(self.video_files) == 0:
             raise NoFilesFoundError(
-                msg="SIMBA ERROR: No files detected in the project_folder/videos directory."
+                msg="SIMBA ERROR: No files detected in the project_folder/videos directory.",
+                source=self.__class__.__name__,
             )
 
         self.all_body_parts = []
@@ -53,6 +54,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
             ),
         )
         run_btn.grid(row=2, column=1, pady=10)
+        self.main_frm.mainloop()
 
 
 # _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

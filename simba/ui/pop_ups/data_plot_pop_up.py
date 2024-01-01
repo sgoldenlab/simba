@@ -133,7 +133,7 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
                 str(len(list(self.files_found_dict.keys())))
             ),
             fg="blue",
-            command=lambda: self.__create_data_plots(multiple_videos=False),
+            command=lambda: self.__create_data_plots(multiple_videos=True),
         )
 
         self.style_settings_frm.grid(row=0, sticky=NW)
@@ -156,6 +156,8 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.single_video_dropdown.grid(row=0, column=1, sticky=NW)
         self.run_multiple_videos.grid(row=1, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
+
+        self.main_frm.mainloop()
 
     def __populate_body_parts_menu(self, choice):
         if hasattr(self, "bp_dropdowns"):
@@ -212,7 +214,8 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
             video_setting=self.data_videos_var.get(),
         )
 
-        _ = data_plotter.create_data_plots()
+        _ = data_plotter.run()
 
 
 # _ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
+# _ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

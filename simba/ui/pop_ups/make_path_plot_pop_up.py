@@ -4,20 +4,25 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ez_lineplot import DrawPathPlot
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, FileSelect)
-from simba.utils.enums import Keys, Links
+from simba.utils.enums import Keys, Links, Options
 from simba.utils.lookups import get_color_dict
 
 
 class MakePathPlotPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CREATE PATH PLOT", size=(200, 200))
+        PopUpMixin.__init__(self, title="CREATE PATH PLOT", size=(500, 300))
         settings_frm = CreateLabelFrameWithIcon(
             parent=self.main_frm,
             header="SETTINGS",
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.VIDEO_TOOLS.value,
         )
-        video_path = FileSelect(settings_frm, "VIDEO PATH: ", lblwidth="30")
+        video_path = FileSelect(
+            settings_frm,
+            "VIDEO PATH: ",
+            lblwidth="30",
+            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
+        )
         body_part = Entry_Box(settings_frm, "BODY PART: ", "30")
         data_path = FileSelect(
             settings_frm, "DATA PATH (e.g., H5 or CSV file): ", lblwidth="30"
@@ -59,3 +64,7 @@ class MakePathPlotPopUp(PopUpMixin):
         line_thickness.grid(row=5, sticky=W)
         circle_size.grid(row=6, sticky=W)
         run_btn.grid(row=7, pady=10)
+        # self.main_frm.mainloop()
+
+
+# MakePathPlotPopUp()

@@ -20,7 +20,8 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
         ConfigReader.__init__(self, config_path=config_path)
         if self.animal_cnt == 1:
             raise AnimalNumberError(
-                msg="Cannot visualize directionality between animals in a 1 animal project."
+                msg="Cannot visualize directionality between animals in a 1 animal project.",
+                source=self.__class__.__name__,
             )
         PopUpMixin.__init__(self, title="CREATE ANIMAL DIRECTION VIDEOS")
         self.color_lst = list(self.colors_dict.keys())

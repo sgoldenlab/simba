@@ -3,17 +3,21 @@ __author__ = "Simon Nilsson"
 from tkinter import *
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.plot_pose_in_dir import create_video_from_dir
+from simba.plotting.pose_plotter_mp import PosePlotter
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FolderSelect)
+                                        FolderSelect)
+from simba.utils.checks import check_if_dir_exists
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import NotDirectoryError
 from simba.utils.lookups import get_color_dict
+from simba.utils.read_write import find_core_cnt
+
+ENTIRE_VIDEOS = "ENTIRE VIDEO(S)"
 
 
 class VisualizePoseInFolderPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="Visualize pose-estimation", size=(350, 200))
+        PopUpMixin.__init__(self, title="Visualize pose-estimation", size=(500, 200))
+
         settings_frame = CreateLabelFrameWithIcon(
             parent=self.main_frm,
             header="SETTINGS",
@@ -22,19 +26,36 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         )
         self.input_folder = FolderSelect(
             settings_frame,
-            "Input directory (with csv/parquet files)",
+            "Input directory (with csv/parquet files):",
             title="Select input folder",
-            lblwidth=20,
+            lblwidth=30,
         )
         self.output_folder = FolderSelect(
             settings_frame,
-            "Output directory (where your videos will be saved)",
+            "Output directory (where videos are saved):",
             title="Select output folder",
-            lblwidth=20,
+            lblwidth=30,
         )
-        self.circle_size = Entry_Box(
-            settings_frame, "Circle size", 0, validation="numeric", labelwidth=20
+        self.circle_size_dropdown = DropDownMenu(
+            settings_frame, "Circle size:", list(range(1, 20)), "30"
         )
+        self.circle_size_dropdown.setChoices(5)
+        self.sample_size_options = list(range(10, 210, 10))
+        self.sample_size_options.insert(0, ENTIRE_VIDEOS)
+        self.sample_size_dropdown = DropDownMenu(
+            settings_frame,
+            "Video output sample sizes (s):",
+            self.sample_size_options,
+            "30",
+        )
+        self.sample_size_dropdown.setChoices(ENTIRE_VIDEOS)
+        self.core_cnt_dropdown = DropDownMenu(
+            settings_frame,
+            "Core count (higher for faster runtime):",
+            list(range(1, find_core_cnt()[0])),
+            "30",
+        )
+        self.core_cnt_dropdown.setChoices(1)
         run_btn = Button(
             self.main_frm,
             text="VISUALIZE POSE",
@@ -50,37 +71,42 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
             command=lambda: self.launch_adv_settings(),
         )
         settings_frame.grid(row=0, sticky=W)
-        self.input_folder.grid(row=0, column=0, pady=10, sticky=W)
-        self.output_folder.grid(row=1, column=0, pady=10, sticky=W)
-        self.circle_size.grid(row=2, column=0, pady=10, sticky=W)
-        run_btn.grid(row=3, column=0, pady=10)
-        self.advanced_settings_btn.grid(row=4, column=0, pady=10)
+        self.input_folder.grid(row=0, column=0, sticky=NW)
+        self.output_folder.grid(row=1, column=0, sticky=NW)
+        self.circle_size_dropdown.grid(row=2, column=0, sticky=NW)
+        self.sample_size_dropdown.grid(row=3, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=4, column=0, sticky=NW)
+        run_btn.grid(row=5, column=0)
+        self.advanced_settings_btn.grid(row=6, column=0)
         self.color_lookup = None
 
+        self.main_frm.mainloop()
+
     def run(self):
-        circle_size_int = self.circle_size.entry_get
+        circle_size_int = int(self.circle_size_dropdown.getChoices())
         input_folder = self.input_folder.folder_path
         output_folder = self.output_folder.folder_path
-        if (input_folder == "") or (input_folder == "No folder selected"):
-            raise NotDirectoryError(
-                msg="SIMBA ERROR: Please select an input folder to continue"
-            )
-        elif (output_folder == "") or (output_folder == "No folder selected"):
-            raise NotDirectoryError(
-                msg="SimBA ERROR: Please select an output folder to continue"
-            )
+        check_if_dir_exists(in_dir=input_folder)
+        check_if_dir_exists(in_dir=output_folder)
+        if self.color_lookup is not None:
+            cleaned_color_lookup = {}
+            for k, v in self.color_lookup.items():
+                cleaned_color_lookup[k] = v.getChoices()
+            self.color_lookup = cleaned_color_lookup
+        if self.sample_size_dropdown.getChoices() == ENTIRE_VIDEOS:
+            sample_time = None
         else:
-            if self.color_lookup is not None:
-                cleaned_color_lookup = {}
-                for k, v in self.color_lookup.items():
-                    cleaned_color_lookup[k] = v.getChoices()
-                self.color_lookup = cleaned_color_lookup
-            create_video_from_dir(
-                in_directory=input_folder,
-                out_directory=output_folder,
-                circle_size=int(circle_size_int),
-                clr_attr=self.color_lookup,
-            )
+            sample_time = int(self.sample_size_dropdown.getChoices())
+
+        pose_plotter = PosePlotter(
+            in_dir=input_folder,
+            out_dir=output_folder,
+            circle_size=circle_size_int,
+            core_cnt=int(self.core_cnt_dropdown.getChoices()),
+            color_settings=self.color_lookup,
+            sample_time=sample_time,
+        )
+        pose_plotter.run()
 
     def launch_adv_settings(self):
         if self.advanced_settings_btn["text"] == "OPEN ADVANCED SETTINGS":
@@ -100,6 +126,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
             self.specify_animals_dropdown = DropDownMenu(
                 self.adv_settings_frm, "ANIMAL COUNT: ", list(range(1, 11)), "20"
             )
+            self.specify_animals_dropdown.setChoices(1)
             self.adv_settings_frm.grid(row=5, column=0, pady=10)
             self.specify_animals_dropdown.grid(row=0, column=0, sticky=NW)
             self.confirm_btn.grid(row=0, column=1)
@@ -135,3 +162,6 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
                 row=animal_cnt, column=0, sticky=NW
             )
         self.color_table_frme.grid(row=1, column=0, sticky=NW)
+
+
+# test = VisualizePoseInFolderPopUp()

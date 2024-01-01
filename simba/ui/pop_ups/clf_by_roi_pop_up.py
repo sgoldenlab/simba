@@ -19,7 +19,8 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         ConfigReader.__init__(self, config_path=config_path)
         if not os.path.isfile(self.roi_coordinates_path):
             raise ROICoordinatesNotFoundError(
-                expected_file_path=self.roi_coordinates_path
+                expected_file_path=self.roi_coordinates_path,
+                source=self.__class__.__name__,
             )
         PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI")
         self.read_roi_data()
@@ -127,11 +128,11 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
             if check_val.get() == 1:
                 behavior_list.append(self.clf_names[loop_val])
         if len(ROI_dict_lists) == 0:
-            raise NoChoosenROIError()
+            raise NoChoosenROIError(source=self.__class__.__name__)
         if len(behavior_list) == 0:
-            raise NoChoosenClassifierError()
+            raise NoChoosenClassifierError(source=self.__class__.__name__)
         if len(measurements_list) == 0:
-            raise NoChoosenMeasurementError()
+            raise NoChoosenMeasurementError(source=self.__class__.__name__)
         else:
             self.clf_roi_analyzer = ROIClfCalculator(config_ini=self.config_path)
             self.clf_roi_analyzer.run(

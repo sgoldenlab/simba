@@ -1,5 +1,6 @@
 __author__ = "Simon Nilsson"
 
+import threading
 from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
@@ -146,7 +147,7 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
             concat_video=self.one_vid_per_video_var.get(),
             data_paths=data_paths,
         )
-        clf_validator.run()
+        threading.Thread(target=clf_validator.run()).start()
 
 
 # _ = ClassifierValidationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

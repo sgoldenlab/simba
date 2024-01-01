@@ -1,7 +1,8 @@
 import os
+import re
 from subprocess import PIPE, Popen
 from tkinter import *
-from typing import Callable, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple, Union
 
 import cv2
 from PIL import Image, ImageTk
@@ -20,18 +21,33 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_time_stamp_from_frame_numbers,
                                     get_all_clf_names, get_fn_ext,
                                     get_video_meta_data, read_df, write_df)
+from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.video_processing import clip_video_in_range
 
 MAX_FRM_SIZE = 1280, 650
 
 
 class AnnotatorMixin(ConfigReader):
+
+    """
+    Methods for creating tkinter GUI frames and functions associated with annotating videos.
+
+    Currently under development (starting 01/24). As the number of different annotation methods and interfaces increases,
+    this class will contain common methods for all annotation interfaces to decrease code duplication.
+
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config ini file.
+    :param Union[str, os.PathLike] video_path: Path to video file to-be annotated.
+    :param Union[str, os.PathLike] data_path: Path to featurized pose-estimation data associated with the video.
+    :param Optional[Tuple[int, int]] frame_size: The size of the subframe displaying the video frame in the GUI.
+
+    """
+
     def __init__(
         self,
         config_path: Union[str, os.PathLike],
         video_path: Union[str, os.PathLike],
         data_path: Union[str, os.PathLike],
-        frame_size: Optional[Tuple[int]] = MAX_FRM_SIZE,
+        frame_size: Optional[Tuple[int, int]] = MAX_FRM_SIZE,
     ):
         ConfigReader.__init__(self, config_path=config_path)
         self.video_path = video_path
@@ -55,14 +71,18 @@ class AnnotatorMixin(ConfigReader):
         self,
         frm_number: int,
         max_size: Optional[Tuple[int, int]] = None,
-        loc: Tuple[int] = (0, 0),
+        loc: Tuple[int, int] = (0, 0),
     ) -> None:
         """
-        Inserts a video frame as a tkinter label fo specified maximum size at specified grid location
+        Inserts a video frame as a tkinter label at a specified maximum size at specified grid location.
 
         .. image:: _static/img/video_frm_label.png
            :width: 500
            :align: center
+
+        :param int frm_number: The frame number if the video that should be displayed as a tkinter label.
+        :param Optional[Tuple[int, int]] max_size: The maximum size of the image when displayed. If None, then ``frame_size`` defined at instance init.
+        :param Tuple[int, int] loc: The grid location (row, column) within the main frame at which the video frame should be displayed.
         """
 
         if max_size is None:
@@ -80,59 +100,95 @@ class AnnotatorMixin(ConfigReader):
     def h_nav_bar(
         self,
         parent: Frame,
-        change_frm_func: Callable[[int], None],
-        width: int = 700,
-        height: int = 300,
-    ) -> Frame:
+        update_funcs: Optional[List[Callable[[int], None]]] = None,
+        store_funcs: Optional[List[Callable[[], None]]] = None,
+        size: Optional[Tuple[int, int]] = (300, 700),
+        loc: Optional[Tuple[int, int]] = (1, 0),
+    ) -> None:
         """
-        Create a horizontal frame navigation bar where the buttons callbacks are tied to specified ``change_frm_func`` callback.
+        Creates a horizontal frame navigation bar where the buttons are tied to callbacks for changing and displaying video frames.
 
         .. image:: _static/img/h_nav_bar.png
            :width: 500
            :align: center
+
+        :param Frame parent: The tkinter Frame to place navigation bar within.
+        :param Optional[List[Callable[[int], None]]] update_funcs: Optional list of callables that accepts a single integer inputs.  Can be methods that updates part of the interface as the frame number changes.
+        :param Optional[List[Callable[[], None]]] store_funcs: Optional list of callables without arguments. Can be methods that stores the selections in memory as users proceeds through the frames.
+        :param Optional[Tuple[int, int]] size: The size of the navigation bar in h x w. Default 300 x 700.
+        :param Optional[Tuple[int, int]] loc: The grid location (row, column) within the parent frame at which the navigation bar should be displayed. Defualt: (1, 0).
         """
-        out_frm = Frame(parent, bd=2, width=width, height=height)
+
+        out_frm = Frame(parent, bd=2, width=size[1], height=size[0])
         nav_frm = Frame(out_frm)
         jump_frame = Frame(out_frm, bd=2)
         jump_lbl = Label(jump_frame, text="JUMP SIZE:")
         jump_size = Scale(jump_frame, from_=0, to=100, orient=HORIZONTAL, length=200)
         jump_size.set(0)
-        self.frm_box = Entry_Box(nav_frm, "FRAME NUMBER", "15")
+        self.frm_box = Entry_Box(nav_frm, "FRAME NUMBER", "15", validation="numeric")
         self.frm_box.entry_set(val=self.min_frm_no)
         forward_btn = Button(
             nav_frm,
             text=">",
-            command=lambda: change_frm_func(int(self.frm_box.entry_get) + 1),
+            command=lambda: self.change_frame(
+                new_frm_id=int(self.frm_box.entry_get) + 1,
+                update_funcs=update_funcs,
+                store_funcs=store_funcs,
+            ),
         )
         backward_btn = Button(
             nav_frm,
             text="<",
-            command=lambda: change_frm_func(int(self.frm_box.entry_get) - 1),
+            command=lambda: self.change_frame(
+                new_frm_id=int(self.frm_box.entry_get) - 1,
+                update_funcs=update_funcs,
+                store_funcs=store_funcs,
+            ),
         )
         forward_max_btn = Button(
-            nav_frm, text=">>", command=lambda: change_frm_func(self.max_frm_no - 1)
+            nav_frm,
+            text=">>",
+            command=lambda: self.change_frame(
+                new_frm_id=self.max_frm_no - 1,
+                update_funcs=update_funcs,
+                store_funcs=store_funcs,
+            ),
         )
         backward_max_btn = Button(
-            nav_frm, text="<<", command=lambda: change_frm_func(self.min_frm_no)
+            nav_frm,
+            text="<<",
+            command=lambda: self.change_frame(
+                new_frm_id=self.min_frm_no,
+                update_funcs=update_funcs,
+                store_funcs=store_funcs,
+            ),
         )
         jump_back = Button(
             jump_frame,
             text="<<",
-            command=lambda: change_frm_func(
-                int(self.frm_box.entry_get) - jump_size.get()
+            command=lambda: self.change_frame(
+                new_frm_id=int(self.frm_box.entry_get) - jump_size.get(),
+                update_funcs=update_funcs,
+                store_funcs=store_funcs,
             ),
         )
         jump_forward = Button(
             jump_frame,
             text=">>",
-            command=lambda: change_frm_func(
-                int(self.frm_box.entry_get) + jump_size.get()
+            command=lambda: self.change_frame(
+                new_frm_id=int(self.frm_box.entry_get) + jump_size.get(),
+                update_funcs=update_funcs,
+                store_funcs=store_funcs,
             ),
         )
         select_frm_btn = Button(
             nav_frm,
             text="VIEW SELECTED FRAME",
-            command=change_frm_func(int(self.frm_box.entry_get)),
+            command=lambda: self.change_frame(
+                new_frm_id=int(self.frm_box.entry_get),
+                update_funcs=update_funcs,
+                store_funcs=store_funcs,
+            ),
         )
 
         nav_frm.grid(row=0, column=0)
@@ -149,32 +205,60 @@ class AnnotatorMixin(ConfigReader):
         jump_back.grid(row=0, column=2, sticky=SE)
         jump_forward.grid(row=0, column=3, sticky=SE)
 
-        return out_frm
+        out_frm.grid(row=loc[0], column=loc[1], sticky=NW)
 
-    def v_navigation_pane_targeted_clips_version(self, parent: Frame) -> Frame:
-        """Create a vertical navigation pane for opening video and displaying keyboard shortcuts"""
+    def v_navigation_pane_targeted(
+        self,
+        parent: Frame,
+        save_func: Callable[[], None],
+        update_funcs: Optional[List[Callable[[int], None]]] = None,
+        store_funcs: Optional[List[Callable[[], None]]] = None,
+        loc: Optional[Tuple[int, int]] = (0, 2),
+    ) -> None:
+        """
+        Create a vertical navigation pane for playing a video and displaying and activating keyboard shortcuts when annotating bouts.
+
+        :param Frame parent: The tkinter Frame to place the vertical navigation bar within.
+        :param Callable[[], None] save_func: The save-data-to-disk function that should be called when using the save data shortcut.
+        :param Optional[List[Callable[[int], None]]] update_funcs: Optional list of callables that accepts a single integer inputs.  Can be methods that updates part of the interface as the frame number changes.
+        :param Optional[List[Callable[[], None]]] store_funcs: Optional list of callables without arguments. Can be methods that stores the selections in memory as users proceeds through the frames.
+        :param Optional[Tuple[int, int]] loc: The grid location (row, column) within the parent frame at which the navigation bar should be displayed. Default: (1, 0).
+
+        """
 
         def bind_shortcut_keys(parent):
-            parent.bind("<Control-s>", lambda x: self.__targeted_clips_save())
+            parent.bind("<Control-s>", lambda x: save_func())
             parent.bind(
                 "<Right>",
-                lambda x: self.change_frame_targeted_annotations(
-                    int(self.frm_box.entry_get) + 1
+                lambda x: self.change_frame(
+                    new_frm_id=int(self.frm_box.entry_get) + 1,
+                    update_funcs=update_funcs,
+                    store_funcs=store_funcs,
                 ),
             )
             parent.bind(
                 "<Left>",
-                lambda x: self.change_frame_targeted_annotations(
-                    int(self.frm_box.entry_get) - 1
+                lambda x: self.change_frame(
+                    new_frm_id=int(self.frm_box.entry_get) - 1,
+                    update_funcs=update_funcs,
+                    store_funcs=store_funcs,
                 ),
             )
             parent.bind(
                 "<Control-l>",
-                lambda x: self.change_frame_targeted_annotations(self.max_frm_no - 1),
+                lambda x: self.change_frame(
+                    new_frm_id=self.max_frm_no - 1,
+                    update_funcs=update_funcs,
+                    store_funcs=store_funcs,
+                ),
             )
             parent.bind(
                 "<Control-o>",
-                lambda x: self.change_frame_targeted_annotations(self.min_frm_no),
+                lambda x: self.change_frame(
+                    new_frm_id=self.min_frm_no,
+                    update_funcs=update_funcs,
+                    store_funcs=store_funcs,
+                ),
             )
 
         video_player_frm = Frame(parent)
@@ -205,10 +289,10 @@ class AnnotatorMixin(ConfigReader):
         )
         key_presses_lbl.grid(sticky=S)
         bind_shortcut_keys(parent)
-        return video_player_frm
+        video_player_frm.grid(row=loc[0], column=loc[1], sticky=NW)
 
-    def targeted_clips_pane(self, parent: Frame) -> Frame:
-        """Create a pane for choosing bouts start and end and a radiobutton truth table for targeted clips annotations"""
+    def targeted_bouts_pane(self, parent: Frame) -> Frame:
+        """Create a pane for choosing bouts start and end and a radiobutton truth table for targeted bouts annotations. Used by simba.labelling.targeted_annotations_bouts.TargetedAnnotatorBouts"""
 
         def set_selection():
             selection_txt.config(
@@ -281,6 +365,121 @@ class AnnotatorMixin(ConfigReader):
 
         return pane
 
+    def update_current_selected_frm_lbl(self, new_frm: Union[int, str]):
+        """Helper to update label showing current frame text shown when annotating bouts frame-wise."""
+        self.frame_selection_txt.config(text=f"ANNOTATING FRAME: {int(new_frm)}")
+        integers = [
+            int(x) for x in re.findall(r"\b\d+\b", self.bout_selection_txt.cget("text"))
+        ]
+        if (int(new_frm) < integers[0]) or (int(new_frm) > integers[1]):
+            FrameRangeWarning(
+                msg=f"You are viewing a frame ({new_frm}) that is OUTSIDE your selected bout (frame {integers[0]} to frame {integers[1]}). Any annotation for this frame will not be saved."
+            )
+
+    def __update_bout_selection_txt(
+        self, new_start_frm: Union[int, str], new_end_frm: Union[int, str]
+    ):
+        """Helper to update label showing current bout text shown when annotating bouts."""
+        self.bout_selection_txt.config(
+            text=f"BOUT SELECTION START: {new_start_frm}, END: {new_end_frm}"
+        )
+        self.save_button.config(
+            text=f"SAVE ANNOTATION CLIP \n START FRAME: {new_start_frm}, \n END FRAME: {new_end_frm}"
+        )
+
+    def targeted_frames_selection_pane(
+        self, parent: Frame, loc: Optional[Tuple[int, int]] = (0, 1)
+    ) -> None:
+        """
+        Creates a vertical pane that includes tkinter frames for selecting bouts and annotating behaviours in those bouts frame-wise.
+
+        :param Frame parent: The tkinter Frame to place the vertical annotation frame within.
+        :param Optional[Tuple[int, int]] loc: The grid location (row, column) within the parent frame at which the pane should be displayed. Default: (0, 1).
+        """
+
+        def set_selection():
+            if int(self.start_frm_bx.entry_get) >= int(self.end_frm_bx.entry_get):
+                raise FrameRangeError(
+                    msg=f"Start frame ({self.start_frm_bx.entry_get}) cannot be the same or larger than the end frame ({self.end_frm_bx.entry_get})"
+                )
+            self.__update_bout_selection_txt(
+                new_start_frm=self.start_frm_bx.entry_get,
+                new_end_frm=self.end_frm_bx.entry_get,
+            )
+            self.change_frame(
+                new_frm_id=self.start_frm_bx.entry_get,
+                update_funcs=[self.update_current_selected_frm_lbl],
+            )
+
+        self.results = {}
+        self.session_annotated_frames = []
+        pane, self.set_start, self.set_end = Frame(parent, bd=2), 0, 1
+        self.bout_selection_txt = Label(
+            pane,
+            text=f"BOUT SELECTED START: {0}, END: {1}",
+            font=("Helvetica", 14, "bold"),
+        )
+        self.frame_selection_txt = Label(
+            pane, text=f"ANNOTATING FRAME: {0}", font=("Helvetica", 14, "bold")
+        )
+        self.start_frm_bx = Entry_Box(
+            pane, "BOUT START FRAME:", "20", validation="numeric", entry_box_width=10
+        )
+        self.start_frm_bx.entry_set("0")
+        self.end_frm_bx = Entry_Box(
+            pane, "BOUT END FRAME:", "20", validation="numeric", entry_box_width=10
+        )
+        self.end_frm_bx.entry_set("1")
+        confirm_btn = Button(
+            pane, text="SET SELECTION", command=lambda: set_selection()
+        )
+        self.bout_selection_txt.grid(row=0, column=0, sticky=N)
+        self.frame_selection_txt.grid(row=1, column=0, sticky=N)
+        self.start_frm_bx.grid(row=2, column=0, sticky=S)
+        self.end_frm_bx.grid(row=3, column=0, sticky=S)
+        confirm_btn.grid(row=4, column=0, sticky=S)
+
+        Label(pane, text=f"PRESENT", font=("Helvetica", 12, "bold")).grid(
+            row=5, column=1, pady=20, sticky=NW
+        )
+        Label(pane, text=f"ABSENT", font=("Helvetica", 12, "bold")).grid(
+            row=5, column=2, pady=20, sticky=NW
+        )
+        self.clf_radio_btns = {}
+        for target_cnt, target in enumerate(self.target_lst):
+            self.clf_radio_btns[target] = StringVar(value=0)
+            Label(pane, text=target, font=("Helvetica", 12, "bold")).grid(
+                row=target_cnt + 6, column=0, sticky=NW
+            )
+            present = Radiobutton(
+                pane,
+                text=None,
+                variable=self.clf_radio_btns[target],
+                value=1,
+                command=None,
+            )
+            absent = Radiobutton(
+                pane,
+                text=None,
+                variable=self.clf_radio_btns[target],
+                value=0,
+                command=None,
+            )
+            present.grid(row=target_cnt + 6, column=1, pady=5, sticky=NW)
+            absent.grid(row=target_cnt + 6, column=2, pady=5, sticky=NW)
+
+        self.save_button = Button(
+            pane,
+            text=f"SAVE ANNOTATION CLIP \n START FRAME: {self.start_frm_bx.entry_get}, \n END FRAME: {self.end_frm_bx.entry_get}",
+            fg="green",
+            font=("Helvetica", 14, "bold"),
+            command=lambda: self.targeted_annotations_frames_save(),
+        )
+        self.save_button.grid(row=6 + len(self.target_lst), column=0, pady=40, sticky=S)
+        pane.grid(row=loc[0], column=loc[1], sticky=NW)
+
+        # return pane
+
     def __play_video(self):
         """Helper to play video when ``play video button`` is pressed"""
         p = Popen(
@@ -318,6 +517,7 @@ class AnnotatorMixin(ConfigReader):
         timestamps = find_time_stamp_from_frame_numbers(
             start_frame=start_idx, end_frame=end_idx, fps=self.video_meta_data["fps"]
         )
+
         clip_video_in_range(
             file_path=self.video_path,
             start_time=timestamps[0],
@@ -356,21 +556,150 @@ class AnnotatorMixin(ConfigReader):
             elapsed_time=timer.elapsed_time_str,
         )
 
-    def change_frame_targeted_annotations(self, new_frm_id: int):
-        print(new_frm_id)
+    def change_frame(
+        self,
+        new_frm_id: int,
+        min_frm: Optional[int] = None,
+        max_frm: Optional[int] = None,
+        update_funcs: Optional[List[Callable[[int], None]]] = None,
+        store_funcs: Optional[List[Callable[[], None]]] = None,
+    ):
+        """
+        Change the frame displayed in annotator GUI.
+
+        :parameter int new_frm_id: The frame number of the new frame.
+        :parameter Optional[int] min_frm: If the minimum frame number is not the first frame of the video, pass the minimum frame number here.
+        :parameter Optional[int] max_frm: If the maximum frame number is not the last frame of the video, pass the max frame number here.
+        :parameter Optional[int] max_frm: If the maximum frame number is not the last frame of the video, pass the max frame number here.
+        :parameter Optional[List[Callable[[int], None]]] update_funcs: Optional functions that takes accepts the new frame numers that should be called. E.g., if updating the frame number should cause the display of the new frame numbers in any other Frame.
+        :parameter Optional[List[Callable[[], None]]] save_funcs: Optional functions that saves user frame selections in memory.
+        """
+
         check_int(name="FRAME NUMBER", value=new_frm_id)
-        if new_frm_id > (self.max_frm_no - 1):
+        if min_frm != None:
+            check_int(
+                name="MIN FRAME NUMBER",
+                value=min_frm,
+                min_value=self.min_frm_no,
+                max_value=self.max_frm_no,
+            )
+        if max_frm != None:
+            check_int(
+                name="MIN FRAME NUMBER",
+                value=max_frm,
+                min_value=self.min_frm_no,
+                max_value=self.max_frm_no,
+            )
+        if int(new_frm_id) > (self.max_frm_no - 1):
             self.frm_box.entry_set(val=self.max_frm_no)
             raise FrameRangeError(
                 msg=f"FRAME {new_frm_id} CANNOT BE SHOWN - YOU ARE VIEWING THE FINAL FRAME OF THE VIDEO (FRAME NUMBER {self.max_frm_no})",
                 source=self.__class__.__name__,
             )
-        elif new_frm_id < 0:
+        elif int(new_frm_id) < 0:
             self.frm_box.entry_set(val=self.min_frm_no)
             raise FrameRangeError(
                 msg=f"FRAME {new_frm_id} CANNOT BE SHOWN - YOU ARE VIEWING THE FIRST FRAME OF THE VIDEO (FRAME NUMBER {self.min_frm_no})",
                 source=self.__class__.__name__,
             )
         else:
+            self.old_frm_val = self.frm_box.entry_get
             self.frm_box.entry_set(val=new_frm_id)
             self.video_frm_label(frm_number=int(new_frm_id))
+
+        if update_funcs is not None:
+            for f in update_funcs:
+                f(new_frm_id)
+
+        if store_funcs is not None:
+            for f in store_funcs:
+                f()
+
+    def store_targeted_annotations_frames(self):
+        """Method to store annotations in memory while annotating targeted bouts frame-wise"""
+        integers = [
+            int(x) for x in re.findall(r"\b\d+\b", self.bout_selection_txt.cget("text"))
+        ]
+        if (int(self.old_frm_val) < integers[0]) or (
+            int(self.old_frm_val) > integers[1]
+        ):
+            FrameRangeWarning(
+                msg=f"ANNOTATION NOT SAVED: Frame {self.old_frm_val} is outside the selected bout ({integers[0]}-{integers[1]})"
+            )
+        else:
+            self.results[int(self.old_frm_val)] = {}
+            for clf, btn in self.clf_radio_btns.items():
+                self.results[int(self.old_frm_val)][clf] = int(btn.get())
+            print(f"Saved results for frame {int(self.old_frm_val)}: \n")
+            for clf, btn in self.clf_radio_btns.items():
+                if int(btn.get()) == 1:
+                    print(f"{clf}: PRESENT")
+                else:
+                    print(f"{clf}: ABSENT")
+
+    def targeted_annotations_frames_save(self):
+        """Method to save annotations to disk when using targeted bout frame-wise annotations"""
+        save_timer = SimbaTimer(start=True)
+        annotated_frms = []
+        integers = [
+            int(x) for x in re.findall(r"\b\d+\b", self.bout_selection_txt.cget("text"))
+        ]
+        for frm, annotation_data in self.results.items():
+            annotated_frms.append(int(frm))
+        missing_frms = list(
+            set(list(range(integers[0], integers[1] + 1))) - set(annotated_frms)
+        )
+        additional_frms = list(
+            set(annotated_frms) - set(list(range(integers[0], integers[1] + 1)))
+        )
+        if len(missing_frms) > 0:
+            raise FrameRangeError(
+                msg=f"MISSING ANNOTATIONS FOR FRAMES IN SELECTED BOUT: {missing_frms}. ANNOTATE THESE FRAMES BEFORE SAVING SELECTED BOUT DATA."
+            )
+        if len(additional_frms) > 0:
+            FrameRangeWarning(
+                msg=f"Annotations found for frames that are not within the selected bout {additional_frms}. These annotations will not be saved."
+            )
+        annotated_frms = [x for x in annotated_frms if x not in additional_frms]
+        duplication_annotations = [
+            x for x in annotated_frms if x in self.session_annotated_frames
+        ]
+        if len(duplication_annotations) > 0:
+            raise FrameRangeError(
+                msg=f"Frames {duplication_annotations} of video {self.video_name} have already been annotated as part of a different bout. You can not annotate these frame again in the same annotation session."
+            )
+        annotated_rows = self.data_df.loc[annotated_frms]
+        for frm, annotation_data in self.results.items():
+            for clf, btn_val in annotation_data.items():
+                annotated_rows.loc[frm, clf] = int(btn_val)
+        save_path = os.path.join(
+            self.targets_folder,
+            f"{self.video_name}_{integers[0]}_{integers[1]}.{self.file_type}",
+        )
+        write_df(df=annotated_rows, file_type=self.file_type, save_path=save_path)
+        timestamps = find_time_stamp_from_frame_numbers(
+            start_frame=min(annotated_frms),
+            end_frame=max(annotated_frms),
+            fps=self.video_meta_data["fps"],
+        )
+        clip_video_in_range(
+            file_path=self.video_path,
+            start_time=timestamps[0],
+            end_time=timestamps[1],
+            out_dir=self.video_dir,
+            include_frame_numbers_in_filename=True,
+            overwrite=True,
+        )
+        self.add_video_to_video_info(
+            video_name=f"{self.video_name}_{integers[0]}_{integers[1]}",
+            fps=self.fps,
+            width=self.video_meta_data["width"],
+            height=self.video_meta_data["height"],
+            pixels_per_mm=self.pixels_per_mm,
+        )
+        save_timer.stop_timer()
+        stdout_success(
+            msg=f"Annotated clip {save_path} saved into SimBA project",
+            elapsed_time=save_timer.elapsed_time_str,
+        )
+        self.session_annotated_frames.extend(annotated_frms)

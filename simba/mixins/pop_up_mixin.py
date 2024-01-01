@@ -1158,6 +1158,32 @@ class PopUpMixin(object):
             import_single_btn.grid(row=2, sticky=W)
             import_videos_frm.grid(row=idx_row, column=idx_column, sticky=NW)
 
+    def create_multiprocess_choice(
+        self,
+        parent: Frame,
+        cb_text: str = "Multiprocess videos (faster)",
+    ):
+        self.multiprocess_var = BooleanVar(value=False)
+        self.multiprocess_dropdown = DropDownMenu(
+            parent, "CPU cores:", list(range(2, self.cpu_cnt)), "12"
+        )
+        multiprocess_cb = Checkbutton(
+            parent,
+            text=cb_text,
+            variable=self.multiprocess_var,
+            command=lambda: self.enable_dropdown_from_checkbox(
+                check_box_var=self.multiprocess_var,
+                dropdown_menus=[self.multiprocess_dropdown],
+            ),
+        )
+        self.multiprocess_dropdown.setChoices(2)
+        self.multiprocess_dropdown.disable()
+        multiprocess_cb.grid(row=self.frame_children(frame=parent), column=0, sticky=NW)
+        # print(multiprocess_dropdown.popupMenugrid_info)
+        self.multiprocess_dropdown.grid(
+            row=multiprocess_cb.grid_info()["row"], column=1, sticky=NW
+        )
+
     # def quit(self, e):
     #     self.main_frm.quit()
     #     self.main_frm.destroy()

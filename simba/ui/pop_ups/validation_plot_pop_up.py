@@ -11,7 +11,7 @@ from simba.plotting.single_run_model_validation_video_mp import \
     ValidateModelOneVideoMultiprocess
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box)
-from simba.utils.checks import check_float
+from simba.utils.checks import check_float, check_int
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.read_write import check_file_exist_and_readable, str_2_bool
 
@@ -134,25 +134,14 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         }
         settings["styles"] = None
         if not self.default_style_var.get():
+            settings["styles"] = {}
             check_float(name="FONT SIZE", value=self.font_size_eb.entry_get)
             check_float(name="CIRCLE SIZE", value=self.circle_size.entry_get)
             check_float(name="SPACE SCALE", value=self.spacing_eb.entry_get)
             settings["styles"]["circle size"] = int(self.circle_size.entry_get)
-            settings["styles"]["font size"] = self.font_size_eb.entry_get
+            settings["styles"]["font size"] = int(self.font_size_eb.entry_get)
             settings["styles"]["space_scale"] = int(self.spacing_eb.entry_get)
-        return settings
-
-    def get_short_bout(self):
-        try:
-            self.shortest_bout = int(self.shortest_bout)
-        except ValueError as e:
-            print(e.args[1])
-            return
-
-    def run_on_all(self):
-        settings = self.create_style_dict()
-        self.get_short_bout()
-        # check_float(name="MINIMUM BOUT LENGTH", value=self.shortest_bout)
+        check_int(name="MINIMUM BOUT LENGTH", value=self.shortest_bout)
         check_float(
             name="DISCRIMINATION THRESHOLD", value=self.discrimination_threshold
         )

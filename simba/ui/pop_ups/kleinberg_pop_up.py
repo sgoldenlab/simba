@@ -71,7 +71,7 @@ class KleinbergPopUp(PopUpMixin, ConfigReader):
                 targets.append(behaviour)
 
         if len(targets) == 0:
-            raise NoChoosenClassifierError()
+            raise NoChoosenClassifierError(source=self.__class__.__name__)
 
         check_int(name="Hierarchy", value=self.k_hierarchy.entry_get)
         check_float(name="Sigma", value=self.k_sigma.entry_get)

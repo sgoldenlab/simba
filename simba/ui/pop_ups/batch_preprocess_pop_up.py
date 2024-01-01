@@ -12,7 +12,7 @@ from simba.video_processors.batch_process_menus import BatchProcessFrame
 
 class BatchPreProcessPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="BATCH PROCESS VIDEO")
+        super().__init__(title="BATCH PROCESS VIDEO", size=(600, 400))
         selections_frm = CreateLabelFrameWithIcon(
             parent=self.main_frm,
             header="SELECTIONS",
@@ -42,18 +42,21 @@ class BatchPreProcessPopUp(PopUpMixin):
     def run(self):
         if not os.path.isdir(self.input_folder_select.folder_path):
             raise NotDirectoryError(
-                msg=f"INPUT folder dir ({self.input_folder_select.folder_path}) is not a valid directory."
+                msg=f"INPUT folder dir ({self.input_folder_select.folder_path}) is not a valid directory.",
+                source=self.__class__.__name__,
             )
         if not os.path.isdir(self.output_folder_select.folder_path):
             raise NotDirectoryError(
-                msg=f"OUTPUT folder dir ({self.output_folder_select.folder_path}) is not a valid directory."
+                msg=f"OUTPUT folder dir ({self.output_folder_select.folder_path}) is not a valid directory.",
+                source=self.__class__.__name__,
             )
         if (
             self.output_folder_select.folder_path
             == self.input_folder_select.folder_path
         ):
             raise DuplicationError(
-                msg="The INPUT directory and OUTPUT directory CANNOT be the same folder"
+                msg="The INPUT directory and OUTPUT directory CANNOT be the same folder",
+                source=self.__class__.__name__,
             )
         else:
             batch_preprocessor = BatchProcessFrame(

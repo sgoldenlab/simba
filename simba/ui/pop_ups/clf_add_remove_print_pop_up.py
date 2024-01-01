@@ -50,7 +50,10 @@ class AddClfPopUp(PopUpMixin, ConfigReader):
         )
         with open(self.config_path, "w") as f:
             self.config.write(f)
-        stdout_success(msg=f"{clf_name} classifier added to SimBA project")
+        stdout_success(
+            msg=f"{clf_name} classifier added to SimBA project",
+            source=self.__class__.__name__,
+        )
 
 
 class RemoveAClassifierPopUp(PopUpMixin, ConfigReader):
@@ -110,7 +113,8 @@ class RemoveAClassifierPopUp(PopUpMixin, ConfigReader):
             self.config.write(f)
 
         stdout_trash(
-            msg=f"{self.clf_dropdown.getChoices()} classifier removed from SimBA project."
+            msg=f"{self.clf_dropdown.getChoices()} classifier removed from SimBA project.",
+            source=self.__class__.__name__,
         )
 
 

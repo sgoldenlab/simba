@@ -3,6 +3,7 @@ import glob
 import multiprocessing
 import os
 import platform
+from copy import deepcopy
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Union
 
@@ -18,6 +19,7 @@ from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
                                     get_video_meta_data, read_df)
+from simba.utils.warnings import FrameRangeWarning
 
 
 def pose_plotter_mp(
@@ -116,10 +118,13 @@ class PosePlotter:
             filepaths=files_found,
             error_msg=f"0 files found in {in_dir} in {self.config.file_type} file format",
         )
+
         for file in files_found:
+            print(self.config.video_dir)
             self.data[file] = self.config.find_video_of_file(
                 video_dir=self.config.video_dir, filename=get_fn_ext(file)[1]
             )
+        self.original_bp_dict = deepcopy(self.config.animal_bp_dict)
 
     def run(self):
         for file_cnt, (pose_path, video_path) in enumerate(self.data.items()):
@@ -139,7 +144,7 @@ class PosePlotter:
             if (self.sample_time is None) and (
                 video_meta_data["frame_count"] != len(pose_df)
             ):
-                raise CountError(
+                FrameRangeWarning(
                     msg=f'The video {video_name} has pose-estimation data for {len(pose_df)} frames, but the video has {video_meta_data["frame_count"]} frames. Ensure the data and video has an equal number of frames.',
                     source=self.__class__.__name__,
                 )
@@ -163,9 +168,9 @@ class PosePlotter:
                     ]
             else:
                 for cnt, animal in enumerate(self.config.animal_bp_dict.keys()):
-                    self.config.animal_bp_dict[animal]["colors"] = tuple(
-                        self.config.animal_bp_dict[animal]["colors"][0]
-                    )
+                    self.config.animal_bp_dict[animal][
+                        "colors"
+                    ] = self.original_bp_dict[animal]["colors"][0]
 
             pose_lst, obs_per_split = PlottingMixin().split_and_group_df(
                 df=pose_df, splits=self.core_cnt
@@ -225,11 +230,18 @@ class PosePlotter:
 # test.run()
 
 
-#
-# test = PosePlotter(in_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location',
+# test = PosePlotter(in_dir='/Users/simon/Desktop/envs/troubleshooting/dam_nest-c-only_ryan/project_folder/csv/outlier_corrected_movement_location',
 #                    out_dir='/Users/simon/Desktop/video_tests_',
 #                    sample_time=2,
 #                    circle_size=10,
 #                    core_cnt=1,
-#                    color_settings={'Animal_1':  'Red', 'Animal_2':  'White'})
+#                    color_settings=None) #
+# test.run()
+
+
+# test = PosePlotter(in_dir='/Users/simon/Desktop/envs/troubleshooting/piotr/project_folder/csv/outlier_corrected_movement_location',
+#                    out_dir='/Users/simon/Desktop/envs/troubleshooting/piotr/project_folder/frames/output/test',
+#                    circle_size=10,
+#                    core_cnt=6,
+#                    color_settings={'Animal_1':  'Green', 'Animal_2':  'Red'})
 # test.run()

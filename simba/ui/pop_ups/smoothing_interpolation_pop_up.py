@@ -37,7 +37,8 @@ class InterpolatePopUp(PopUpMixin, ConfigReader):
     def run(self):
         if not os.path.isdir(self.input_dir.folder_path):
             raise NotDirectoryError(
-                msg=f"{self.input_dir.folder_path} is not a valid directory."
+                msg=f"{self.input_dir.folder_path} is not a valid directory.",
+                source=self.__class__.__name__,
             )
         Interpolate(
             config_path=self.config_path,
@@ -70,7 +71,8 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
     def run(self):
         if not os.path.isdir(self.input_dir.folder_path):
             raise NotDirectoryError(
-                msg=f"{self.input_dir.folder_path} is not a valid directory."
+                msg=f"{self.input_dir.folder_path} is not a valid directory.",
+                source=self.__class__.__name__,
             )
         check_int(name="TIME WINDOW", value=self.time_window.entry_get, min_value=1)
         _ = Smooth(

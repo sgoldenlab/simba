@@ -6,7 +6,7 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box)
-from simba.utils.enums import Formats, Keys, Links
+from simba.utils.enums import ConfigKey, Formats, Keys, Links
 from simba.utils.errors import NoROIDataError
 
 
@@ -15,7 +15,8 @@ class AppendROIFeaturesByAnimalPopUp(ConfigReader, PopUpMixin):
         ConfigReader.__init__(self, config_path=config_path)
         if not os.path.isfile(self.roi_coordinates_path):
             raise NoROIDataError(
-                msg=f"SIMBA ERROR: No ROIs have been defined. Please define ROIs before appending ROI-based features (no data file found at path {self.roi_coordinates_path})"
+                msg=f"SIMBA ERROR: No ROIs have been defined. Please define ROIs before appending ROI-based features (no data file found at path {self.roi_coordinates_path})",
+                source=self.__class__.__name__,
             )
         PopUpMixin.__init__(
             self, title="APPEND ROI FEATURES: BY ANIMALS", size=(400, 400)
@@ -55,10 +56,25 @@ class AppendROIFeaturesByAnimalPopUp(ConfigReader, PopUpMixin):
         self.create_run_frm(run_function=self.run)
 
     def run(self):
+        if self.config.has_section(ConfigKey.ROI_SETTINGS.value):
+            self.config.remove_section(ConfigKey.ROI_SETTINGS.value)
+        self.config.add_section(ConfigKey.ROI_SETTINGS.value)
+
+        for bp_cnt, bp_dropdown in self.body_parts_dropdowns.items():
+            self.config.set(
+                ConfigKey.ROI_SETTINGS.value,
+                f"animal_{bp_cnt+1}_bp",
+                bp_dropdown.getChoices(),
+            )
+        with open(self.config_path, "w") as f:
+            self.config.write(f)
+
         roi_feature_creator = ROIFeatureCreator(config_path=self.config_path)
         roi_feature_creator.run()
         roi_feature_creator.save()
-        self.root.destroy()
 
 
 # AppendROIFeaturesByAnimalPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/locomotion/project_folder/project_config.ini')
+
+
+# AppendROIFeaturesByAnimalPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

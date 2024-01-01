@@ -1,5 +1,7 @@
 from tkinter import *
 
+from simba.data_processors.boolean_conditional_calculator import \
+    BooleanConditionalCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
@@ -14,14 +16,13 @@ class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path)
         PopUpMixin.__init__(
-            self, title="CONDITIONAL AGGREGATE STATISTICS", size=(600, 400)
+            self, title="CONDITIONAL BOOLEAN AGGREGATE STATISTICS", size=(600, 400)
         )
-
         self.rule_cnt_frm = CreateLabelFrameWithIcon(
             parent=self.main_frm,
             header="CONDITIONAL RULES #",
             icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.PATH_PLOTS.value,
+            icon_link=Links.AGGREGATE_BOOL_STATS.value,
         )
         self.rule_cnt_dropdown = DropDownMenu(
             self.rule_cnt_frm,
@@ -61,7 +62,7 @@ class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
             self.rule_definitions_frame.destroy()
         self.rule_definitions_frame = LabelFrame(
             self.main_frm,
-            text="CONDITINAL RULES",
+            text="CONDITIONAL RULES",
             font=Formats.LABELFRAME_HEADER_FORMAT.value,
             pady=5,
             padx=5,
@@ -124,6 +125,11 @@ class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
             raise DuplicationError(
                 msg=f"Each row should be a unique behavior. However, behaviors {duplicates} are selected in more than 1 rows."
             )
+        boolean_calculator = BooleanConditionalCalculator(
+            config_path=self.config_path, rules=selections
+        )
+        boolean_calculator.run()
+        boolean_calculator.save()
 
 
 # roi_featurizer = BooleanConditionalSlicerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_animals_16bp_032023/project_folder/project_config.ini')

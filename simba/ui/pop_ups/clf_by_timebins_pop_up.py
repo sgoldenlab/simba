@@ -64,9 +64,9 @@ class TimeBinsClfPopUp(PopUpMixin, ConfigReader):
             if val.get():
                 clf_list.append(name)
         if len(measurement_lst) == 0:
-            raise NoChoosenMeasurementError()
+            raise NoChoosenMeasurementError(source=self.__class__.__name__)
         if len(clf_list) == 0:
-            raise NoChoosenClassifierError()
+            raise NoChoosenClassifierError(source=self.__class__.__name__)
         time_bins_clf_analyzer = TimeBinsClfCalculator(
             config_path=self.config_path,
             bin_length=int(self.timebin_entrybox.entry_get),

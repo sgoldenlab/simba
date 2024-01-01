@@ -107,8 +107,8 @@ class Paths(Enum):
     SHAP_LOGS = Path("logs/shap/")
     SPLASH_PATH_WINDOWS = Path("assets/img/splash.png")
     SPLASH_PATH_LINUX = Path("assets/img/splash.PNG")
-    SPLASH_PATH_MOVIE = Path("assets/img/splash.mp4")
-    BG_IMG_PATH = Path("assets/img/bg_2.png")
+    SPLASH_PATH_MOVIE = Path("assets/img/splash_2024.mp4")
+    BG_IMG_PATH = Path("assets/img/bg_2024.png")
     LOGO_ICON_WINDOWS_PATH = Path("assets/icons/SimBA_logo.ico")
     LOGO_ICON_DARWIN_PATH = Path("assets/icons/SimBA_logo.png")
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
@@ -256,6 +256,9 @@ class Options(Enum):
     SMOOTHING_OPTIONS_W_NONE = ["None", "Gaussian", "Savitzky Golay"]
     VIDEO_FORMAT_OPTIONS = ["mp4", "avi"]
     ALL_VIDEO_FORMAT_OPTIONS = (".avi", ".mp4", ".mov", ".flv", ".m4v")
+    ALL_IMAGE_FORMAT_OPTIONS = (".bmp", ".png", ".jpeg", ".jpg")
+    ALL_IMAGE_FORMAT_STR_OPTIONS = ".bmp .png .jpeg .jpg"
+    ALL_VIDEO_FORMAT_STR_OPTIONS = ".avi .mp4 .mov .flv .m4v"
     WORKFLOW_FILE_TYPE_OPTIONS = ["csv", "parquet"]
     TRACKING_TYPE_OPTIONS = ["Classic tracking", "Multi tracking", "3D tracking"]
     UNSUPERVISED_FEATURE_OPTIONS = [
@@ -348,7 +351,7 @@ class Defaults(Enum):
     LARGE_MAX_TASK_PER_CHILD = 1000
     CHUNK_SIZE = 1
     SPLASH_TIME = 2500
-    WELCOME_MSG = f"Welcome fellow scientists! \n SimBA v.local-dev \n "
+    WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v.{pkg_resources.get_distribution("simba-uw-tf-dev").version} \n '
     BROWSE_FOLDER_BTN_TEXT = "Browse Folder"
     BROWSE_FILE_BTN_TEXT = "Browse File"
     NO_FILE_SELECTED_TEXT = "No file selected"

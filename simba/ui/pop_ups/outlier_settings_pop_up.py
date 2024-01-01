@@ -8,7 +8,7 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box)
 from simba.utils.checks import check_float
-from simba.utils.enums import Formats, Keys, Links
+from simba.utils.enums import ConfigKey, Formats, Keys, Links
 from simba.utils.printing import stdout_success
 
 
@@ -126,7 +126,12 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
         )
         run_btn.grid(row=3, column=0, sticky=NW)
 
+        # self.main_frm.mainloop()
+
     def run(self):
+        if self.config.has_section(ConfigKey.OUTLIER_SETTINGS.value):
+            self.config.remove_section(ConfigKey.OUTLIER_SETTINGS.value)
+        self.config.add_section(ConfigKey.OUTLIER_SETTINGS.value)
         check_float(
             name="LOCATION CRITERION",
             value=self.location_criterion.entry_get,
@@ -137,39 +142,41 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
             value=self.movement_criterion.entry_get,
             min_value=0.0,
         )
+        if not self.config.has_section("Outlier settings"):
+            self.config.add_section("Outlier settings")
         self.config.set(
-            "Outlier settings",
-            "movement_criterion",
+            ConfigKey.OUTLIER_SETTINGS.value,
+            ConfigKey.MOVEMENT_CRITERION.value,
             str(self.movement_criterion.entry_get),
         )
         self.config.set(
-            "Outlier settings",
-            "location_criterion",
+            ConfigKey.OUTLIER_SETTINGS.value,
+            ConfigKey.LOCATION_CRITERION.value,
             str(self.location_criterion.entry_get),
         )
         self.config.set(
-            "Outlier settings",
+            ConfigKey.OUTLIER_SETTINGS.value,
             "mean_or_median",
             str(self.agg_type_dropdown.getChoices()),
         )
         for animal_cnt, animal_name in enumerate(self.animal_bp_dict.keys()):
             self.config.set(
-                "Outlier settings",
+                ConfigKey.OUTLIER_SETTINGS.value,
                 "movement_bodyPart1_{}".format(animal_name),
                 self.criterion_dropdowns[animal_name]["movement_bp_1"].getChoices(),
             )
             self.config.set(
-                "Outlier settings",
+                ConfigKey.OUTLIER_SETTINGS.value,
                 "movement_bodyPart2_{}".format(animal_name),
                 self.criterion_dropdowns[animal_name]["movement_bp_2"].getChoices(),
             )
             self.config.set(
-                "Outlier settings",
+                ConfigKey.OUTLIER_SETTINGS.value,
                 "location_bodyPart1_{}".format(animal_name),
                 self.criterion_dropdowns[animal_name]["location_bp_1"].getChoices(),
             )
             self.config.set(
-                "Outlier settings",
+                ConfigKey.OUTLIER_SETTINGS.value,
                 "location_bodyPart2_{}".format(animal_name),
                 self.criterion_dropdowns[animal_name]["location_bp_2"].getChoices(),
             )
@@ -177,9 +184,10 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
             self.config.write(f)
 
         stdout_success(
-            msg="Outlier correction settings updated in the project_config.ini"
+            msg="Outlier correction settings updated in the project_config.ini",
+            source=self.__class__.__name__,
         )
         self.root.destroy()
 
 
-# _ = OutlierSettingsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
+# _ = OutlierSettingsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

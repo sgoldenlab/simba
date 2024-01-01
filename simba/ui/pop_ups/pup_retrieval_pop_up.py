@@ -28,7 +28,8 @@ class PupRetrievalPopUp(object):
         self.ROI_path = os.path.join(self.project_path, Paths.ROI_DEFINITIONS.value)
         if not os.path.isfile(self.ROI_path):
             raise NoFilesFoundError(
-                msg=f"Requires ROI definitions: no file found at {self.ROI_path}"
+                msg=f"Requires ROI definitions: no file found at {self.ROI_path}",
+                source=self.__class__.__name__,
             )
 
         self.roi_analyzer = ROIAnalyzer(ini_path=config_path, data_path=None)

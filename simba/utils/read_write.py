@@ -185,8 +185,8 @@ def write_df(
             idx = np.arange(len(df)).astype(str)
             df.insert(0, "", idx)
             df = pa.Table.from_pandas(df=df)
-            if "__index_level_0__" in df.columns:
-                df = df.drop(["__index_level_0__"])
+            if "__index_level_0__" in df.column_names:
+                df = df.remove_column(df.column_names.index("__index_level_0__"))
             csv.write_csv(df, save_path)
         else:
             try:
@@ -452,21 +452,28 @@ def remove_a_folder(folder_dir: Union[str, os.PathLike]) -> None:
 
 
 def concatenate_videos_in_folder(
-    in_folder: str,
-    save_path: str,
+    in_folder: Union[str, os.PathLike],
+    save_path: Union[str, os.PathLike],
+    file_paths: Optional[List[Union[str, os.PathLike]]] = None,
     video_format: Optional[str] = "mp4",
+    substring: Optional[str] = None,
     remove_splits: Optional[bool] = True,
     gpu: Optional[bool] = False,
 ) -> None:
     """
-    Concatenate (temporally) all video files in a folder into a
-    single video.
+    Concatenate (temporally) all video files in a folder into a single video.
 
     .. important::
-       Input video parts have to have sequential numerical ordered file names, e.g., ``1.mp4``, ``2.mp4`` ...
+       Input video parts will be joined in alphanumeric order, should ideally have to have sequential numerical ordered file names, e.g., ``1.mp4``, ``2.mp4``....
 
-    :parameter str in_folder: Path to folder holding un-concatenated video files.
-    :parameter str save_path: Path to the saved the output file. Note: If the path exist, it will be overwritten
+    .. note::
+       If substring and file_paths are both not None, then file_paths with be sliced and only file paths with substring will be retained.
+
+    :parameter Union[str, os.PathLike] in_folder: Path to folder holding un-concatenated video files.
+    :parameter Union[str, os.PathLike] save_path: Path to the saved the output file. Note: If the path exist, it will be overwritten
+    :parameter Optional[List[Union[str, os.PathLike]]] file_paths: If not None, then the files that should be joined. If None, then all files. Default None.
+    :parameter Optional[str] video_format: The format of the video clips that should be concatenated. Default: mp4.
+    :parameter Optional[str] substring: If a string, then only videos in in_folder with a filename that contains substring will be joined. If None, then all are joined. Default: None.
     :parameter Optional[str] video_format: Format of the input video files in ``in_folder``. Default: ``mp4``.
     :parameter Optional[bool] remove_splits: If true, the input splits in the ``in_folder`` will be removed following concatenation. Default: True.
     """
@@ -477,18 +484,34 @@ def concatenate_videos_in_folder(
             source=concatenate_videos_in_folder.__name__,
         )
     timer = SimbaTimer(start=True)
-    files = glob.glob(in_folder + "/*.{}".format(video_format))
+    if file_paths is None:
+        files = glob.glob(in_folder + "/*.{}".format(video_format))
+    else:
+        for file_path in file_paths:
+            check_file_exist_and_readable(file_path=file_path)
+        files = file_paths
     check_if_filepath_list_is_empty(
         filepaths=files,
-        error_msg="SIMBA ERROR: Cannot join videos in directory {}. The directory contain ZERO files.".format(
-            in_folder
-        ),
+        error_msg=f"SIMBA ERROR: Cannot join videos in directory {in_folder}. The directory contain ZERO files in format {video_format}",
     )
+    if substring is not None:
+        sliced_paths = []
+        for file_path in files:
+            if substring in get_fn_ext(filepath=file_path)[1]:
+                sliced_paths.append(file_path)
+        check_if_filepath_list_is_empty(
+            filepaths=sliced_paths,
+            error_msg=f"SIMBA ERROR: Cannot join videos in directory {in_folder}. The directory contain ZERO files in format {video_format} with substring {substring}",
+        )
+        files = sliced_paths
     files.sort(key=lambda f: int(re.sub("\D", "", f)))
     temp_txt_path = Path(in_folder, "files.txt")
+    if os.path.isfile(temp_txt_path):
+        os.remove(temp_txt_path)
     with open(temp_txt_path, "w") as f:
         for file in files:
             f.write("file '" + str(Path(file)) + "'\n")
+
     if os.path.exists(save_path):
         os.remove(save_path)
     if check_nvidea_gpu_available() and gpu:
@@ -1587,3 +1610,74 @@ def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike]) -> None:
             os.rename(file_path, new_name)
         else:
             pass
+
+
+def copy_files_in_directory(
+    in_dir: Union[str, os.PathLike],
+    out_dir: Union[str, os.PathLike],
+    raise_error: bool = True,
+    filetype: Optional[str] = None,
+) -> None:
+    """
+    Copy files from the specified input directory to the output directory.
+
+    :param Union[str, os.PathLike] in_dir: The input directory from which files will be copied.
+    :param Union[str, os.PathLike] out_dir: The output directory where files will be copied to.
+    :param bool raise_error: If True, raise an error if no files are found in the input directory. Default is True.
+    :param Optional[str] filetype: If specified, only copy files with the given file extension. Default is None, meaning all files will be copied.
+
+    :example:
+    >>> copy_files_in_directory('/input_dir', '/output_dir', raise_error=True, filetype='txt')
+    """
+
+    check_if_dir_exists(in_dir=in_dir)
+    if not os.listdir(out_dir):
+        os.makedirs(out_dir)
+    if filetype is not None:
+        file_paths = glob.glob(in_dir + f"/*.{filetype}")
+    else:
+        file_paths = glob.glob(in_dir + f"/*.")
+    if len(file_paths) == 0 and raise_error:
+        raise NoFilesFoundError(
+            msg=f"No files found in {in_dir}", source=copy_files_in_directory.__name__
+        )
+    elif len(file_paths) == 0:
+        pass
+    else:
+        for file_path in file_paths:
+            shutil.copy(file_path, out_dir)
+
+
+def remove_files(
+    file_paths: List[Union[str, os.PathLike]], raise_error: Optional[bool] = False
+) -> None:
+    """
+    Remove the files specified within a list of filepaths.
+
+    :param Union[str, os.PathLike] file_paths: A list of file paths to be removed.
+    :param Optional[bool] raise_error: If True, raise exceptions for errors during file deletion. Else, pass. Defaults to False.
+
+    :exceptions:
+    >>> file_paths = ['/path/to/file1.txt', '/path/to/file2.txt']
+    >>> remove_files(file_paths, raise_error=True)
+    """
+
+    for file_path in file_paths:
+        if not os.path.isfile(file_path) and raise_error:
+            raise NoFilesFoundError(
+                msg=f"Cannot delete {file_path}. File does not exist",
+                source=remove_files.__name__,
+            )
+        elif not os.path.isfile(file_path):
+            pass
+        else:
+            try:
+                os.remove(file_path)
+            except:
+                if raise_error:
+                    raise PermissionError(
+                        msg=f"Cannot read {file_path}. Is the file open in an alternative app?",
+                        source=remove_files.__name__,
+                    )
+                else:
+                    pass
