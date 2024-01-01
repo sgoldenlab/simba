@@ -150,7 +150,7 @@ from simba.video_processors.video_processing import (
 
 # from simba.unsupervised.ui import UnsupervisedGUI
 
-sys.setrecursionlimit(10**6)
+sys.setrecursionlimit(10 ** 6)
 currentPlatform = platform.system()
 
 
@@ -1505,6 +1505,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 class App(object):
     def __init__(self):
         bg_path = os.path.join(os.path.dirname(__file__), Paths.BG_IMG_PATH.value)
+        if not os.path.exists(bg_path):
+            bg_path = os.path.join(os.path.dirname(__file__), Paths.BG_IMG_PATH_DEFAULT.value)
         emojis = get_emojis()
         icon_path_windows = os.path.join(
             os.path.dirname(__file__), Paths.LOGO_ICON_WINDOWS_PATH.value
@@ -2025,6 +2027,10 @@ class SplashMovie:
         splash_path = os.path.join(
             os.path.dirname(__file__), Paths.SPLASH_PATH_MOVIE.value
         )
+        if not os.path.exists(splash_path):
+            splash_path = os.path.join(
+                os.path.dirname(__file__), Paths.SPLASH_PATH_MOVIE_DEFAULT.value
+            )
         self.meta_ = get_video_meta_data(splash_path)
         self.cap = cv2.VideoCapture(splash_path)
         width, height = self.meta_["width"], self.meta_["height"]

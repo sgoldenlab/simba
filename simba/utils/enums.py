@@ -1,5 +1,6 @@
 __author__ = "Simon Nilsson"
 
+import importlib
 import os
 import sys
 from enum import Enum
@@ -108,7 +109,9 @@ class Paths(Enum):
     SPLASH_PATH_WINDOWS = Path("assets/img/splash.png")
     SPLASH_PATH_LINUX = Path("assets/img/splash.PNG")
     SPLASH_PATH_MOVIE = Path("assets/img/splash_2024.mp4")
+    SPLASH_PATH_MOVIE_DEFAULT = Path("assets/img/splash.mp4")
     BG_IMG_PATH = Path("assets/img/bg_2024.png")
+    BG_IMG_PATH_DEFAULT = Path("assets/img/bg.png")
     LOGO_ICON_WINDOWS_PATH = Path("assets/icons/SimBA_logo.ico")
     LOGO_ICON_DARWIN_PATH = Path("assets/icons/SimBA_logo.png")
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
@@ -351,7 +354,7 @@ class Defaults(Enum):
     LARGE_MAX_TASK_PER_CHILD = 1000
     CHUNK_SIZE = 1
     SPLASH_TIME = 2500
-    WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v.{pkg_resources.get_distribution("simba-uw-tf-dev").version} \n '
+    WELCOME_MSG = f'Welcome fellow scientists! \n SimBA v.{pkg_resources.get_distribution("simba-uw-tf-dev").version if importlib.util.find_spec("simba-uw-tf-dev") is not None else "dev"} \n '
     BROWSE_FOLDER_BTN_TEXT = "Browse Folder"
     BROWSE_FILE_BTN_TEXT = "Browse File"
     NO_FILE_SELECTED_TEXT = "No file selected"
