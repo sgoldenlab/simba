@@ -31,7 +31,7 @@ In some scenarios, however, employing these built-in feature-extraction scripts 
 
 4. After selecting the feature extraction script you would like to use in you project, click on `Extract Features` in the `Extract Features` sub-menu. You can follow the progress in the SimBA GUI main window and/or the operating system terminal which you used to boot up the SimBA GUI.
 
-### Writing a custom feature extraction script and running it in SimBA: Design, expected layout and gothas. 
+### Writing a custom feature extraction script and running it in SimBA: Design, expected layout and gotcha's. 
 
 >Note: For example outlines of SimBA feature extraction files, for either designing your own feature extraction script within SimBA, or modifying existing feature extraction scripts, please see the [hard-coded feature extraction scripts in SimBA](https://github.com/sgoldenlab/simba/tree/master/simba/features_scripts) or the SimBA [OSF repository](https://osf.io/emxyw/). For an example user-defined feature extraction script used to score behavior in zebrafish, see [THIS FILE](https://github.com/sgoldenlab/simba/blob/master/simba/feature_extractors/misc/fish_feature_extractor_2023_version_5.py). For an example classifyin pup/dam behavior, see [THIS FILE](https://github.com/lapphe/AMBER-pipeline/blob/main/SimBA_AMBER_project/AMBER_2_0__feature_extraction/amber_feature_extraction_20230815.py). For an example feature extraction script that calculates geometric features, see [THIS FILE](https://github.com/sgoldenlab/simba/blob/master/misc/geometry_feature_extraction.py).
 
