@@ -1,5 +1,6 @@
 __author__ = "Simon Nilsson"
 
+import os
 from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
@@ -16,7 +17,7 @@ from simba.utils.read_write import check_file_exist_and_readable, str_2_bool
 
 
 class ValidationVideoPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str, simba_main_frm: object):
+    def __init__(self, config_path: str, simba_main_frm: object, run_on_all=False):
         PopUpMixin.__init__(self, title="CREATE VALIDATION VIDEO")
         ConfigReader.__init__(self, config_path=config_path)
         self.feature_file_path = simba_main_frm.csvfile.file_path
@@ -119,11 +120,14 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         self.multiprocess_dropdown.grid(row=0, column=1, sticky=NW)
         gantt_frm.grid(row=3, column=0, sticky=NW)
         self.gantt_dropdown.grid(row=0, column=0, sticky=NW)
+        if run_on_all:
+            self.create_run_frm(run_function=self.run_on_all)
 
-        self.create_run_frm(run_function=self.run)
+        else:
+            self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
-    def run(self):
+    def create_style_dict(self) -> dict:
         settings = {
             "pose": str_2_bool(self.show_pose_dropdown.getChoices()),
             "animal_names": str_2_bool(self.show_animal_names_dropdown.getChoices()),
@@ -141,13 +145,17 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         check_float(
             name="DISCRIMINATION THRESHOLD", value=self.discrimination_threshold
         )
-        check_file_exist_and_readable(file_path=self.feature_file_path)
         check_file_exist_and_readable(file_path=self.model_path)
+        for root, dir, files in os.walk(self.features_dir):
+            for file in files:
+                self.create_video(os.path.join(root, file), settings)
+        self.root.destroy()
 
+    def create_video(self, feature_file: str, settings: dict):
         if not self.multiprocess_var.get():
             validation_video_creator = ValidateModelOneVideo(
                 config_path=self.config_path,
-                feature_file_path=self.feature_file_path,
+                feature_file_path=feature_file,
                 model_path=self.model_path,
                 discrimination_threshold=float(self.discrimination_threshold),
                 shortest_bout=int(self.shortest_bout),
@@ -158,7 +166,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         else:
             validation_video_creator = ValidateModelOneVideoMultiprocess(
                 config_path=self.config_path,
-                feature_file_path=self.feature_file_path,
+                feature_file_path=feature_file,
                 model_path=self.model_path,
                 discrimination_threshold=float(self.discrimination_threshold),
                 shortest_bout=int(self.shortest_bout),
@@ -167,3 +175,15 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                 create_gantt=self.gantt_dropdown.getChoices(),
             )
         validation_video_creator.run()
+
+    def run(self):
+        settings = self.create_style_dict()
+        self.get_short_bout()
+        # check_float(name="MINIMUM BOUT LENGTH", value=self.shortest_bout)
+        check_float(
+            name="DISCRIMINATION THRESHOLD", value=self.discrimination_threshold
+        )
+        check_file_exist_and_readable(file_path=self.feature_file_path)
+        check_file_exist_and_readable(file_path=self.model_path)
+        self.create_video(self.feature_file_path, settings)
+        self.root.destroy()

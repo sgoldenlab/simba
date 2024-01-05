@@ -80,6 +80,7 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         )
         movement_processor.run()
         movement_processor.save()
+        self.root.destroy()
         pass
 
 

@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from typing import List
 
 import simba
-from simba.utils.enums import ConfigKey, DirNames, Dtypes, Paths
+from simba.utils.enums import ConfigKey, DirNames, Dtypes, Paths, MachineLearningMetaKeys
 from simba.utils.errors import DirectoryExistError
 from simba.utils.printing import SimbaTimer, stdout_success
 
@@ -36,14 +36,14 @@ class ProjectConfigCreator(object):
     """
 
     def __init__(
-        self,
-        project_path: str,
-        project_name: str,
-        target_list: List[str],
-        pose_estimation_bp_cnt: str,
-        body_part_config_idx: int,
-        animal_cnt: int,
-        file_type: str = "csv",
+            self,
+            project_path: str,
+            project_name: str,
+            target_list: List[str],
+            pose_estimation_bp_cnt: str,
+            body_part_config_idx: int,
+            animal_cnt: int,
+            file_type: str = "csv",
     ):
         self.simba_dir = os.path.dirname(simba.__file__)
         self.animal_cnt = animal_cnt
@@ -185,76 +185,78 @@ class ProjectConfigCreator(object):
         self.config.add_section(ConfigKey.ROI_SETTINGS.value)
         self.config.add_section(ConfigKey.DIRECTIONALITY_SETTINGS.value)
         self.config.add_section(ConfigKey.PROCESS_MOVEMENT_SETTINGS.value)
-
         self.config.add_section(ConfigKey.CREATE_ENSEMBLE_SETTINGS.value)
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
             ConfigKey.POSE_SETTING.value
         ] = str(self.pose_estimation_bp_cnt)
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.CLASSIFIER.value
+            MachineLearningMetaKeys.CLASSIFIER.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.TT_SIZE.value
+            MachineLearningMetaKeys.TT_SIZE.value
         ] = str(0.20)
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.UNDERSAMPLE_SETTING.value
+            MachineLearningMetaKeys.UNDERSAMPLE_SETTING.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.UNDERSAMPLE_RATIO.value
+            MachineLearningMetaKeys.UNDERSAMPLE_RATIO.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.OVERSAMPLE_SETTING.value
+            MachineLearningMetaKeys.OVERSAMPLE_SETTING.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.OVERSAMPLE_RATIO.value
+            MachineLearningMetaKeys.OVERSAMPLE_RATIO.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.RF_ESTIMATORS.value
+            MachineLearningMetaKeys.RF_ESTIMATORS.value
         ] = str(2000)
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.MIN_LEAF.value
+            MachineLearningMetaKeys.MIN_LEAF.value
         ] = str(1)
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.RF_MAX_FEATURES.value
+            MachineLearningMetaKeys.RF_MAX_DEPTH.value
+        ] = str(7)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MachineLearningMetaKeys.RF_MAX_FEATURES.value
         ] = Dtypes.SQRT.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
             ConfigKey.RF_JOBS.value
         ] = str(-1)
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.RF_CRITERION.value
+            MachineLearningMetaKeys.RF_CRITERION.value
         ] = Dtypes.ENTROPY.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.RF_METADATA.value
+            MachineLearningMetaKeys.RF_METADATA.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.EX_DECISION_TREE.value
+            MachineLearningMetaKeys.EX_DECISION_TREE.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.EX_DECISION_TREE_FANCY.value
+            MachineLearningMetaKeys.EX_DECISION_TREE_FANCY.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.IMPORTANCE_LOG.value
+            MachineLearningMetaKeys.IMPORTANCE_LOG.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.IMPORTANCE_BAR_CHART.value
+            MachineLearningMetaKeys.IMPORTANCE_BAR_CHART.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.PERMUTATION_IMPORTANCE.value
+            MachineLearningMetaKeys.PERMUTATION_IMPORTANCE.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.LEARNING_CURVE.value
+            MachineLearningMetaKeys.LEARNING_CURVE.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.PRECISION_RECALL.value
+            MachineLearningMetaKeys.PRECISION_RECALL.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.IMPORTANCE_BARS_N.value
+            MachineLearningMetaKeys.IMPORTANCE_BARS_N.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.LEARNING_CURVE_K_SPLITS.value
+            MachineLearningMetaKeys.LEARNING_CURVE_K_SPLITS.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.LEARNING_DATA_SPLITS.value
+            MachineLearningMetaKeys.LEARNING_DATA_SPLITS.value
         ] = Dtypes.NONE.value
 
         self.config.add_section(ConfigKey.MULTI_ANIMAL_ID_SETTING.value)
@@ -269,7 +271,8 @@ class ProjectConfigCreator(object):
         self.config[ConfigKey.OUTLIER_SETTINGS.value][
             ConfigKey.LOCATION_CRITERION.value
         ] = Dtypes.NONE.value
-
+        self.config[ConfigKey.DIRECTIONALITY_SETTINGS.value][
+            ConfigKey.BODYPART_DIRECTION_VALUE.value] = Dtypes.NONE.value
         self.config_path = os.path.join(self.project_folder, "project_config.ini")
         with open(self.config_path, "w") as file:
             self.config.write(file)

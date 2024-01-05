@@ -87,6 +87,6 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
             body_parts=body_parts,
         )
         time_bin_movement_analyzer.run()
-
+        self.root.destroy()
 
 # MovementAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/locomotion/project_folder/project_config.ini')
