@@ -7,7 +7,7 @@ We have developed video and image processing tools and incorporated them into th
 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/tools_img_2024.png" />
+  <img src="https://github.com/sgoldenlab/simba/blob/master/images/tools_img_2024.png" style="height:700px;" />
 </p>
 
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
