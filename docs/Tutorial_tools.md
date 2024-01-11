@@ -35,6 +35,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Concatenate multiple videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#concatenate-multiple-videos)
 - [Extract ROI definitions to human-readable format](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-roi-definitions-to-human-readable-format)
 - [Temporally join videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#temporal-join-videos)
+- [Extract project annotation counts](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-project-annotation-counts)
 
 ## Shorten Videos
 This is a tool used to trim video lengths. The tool contains two different methods: 
