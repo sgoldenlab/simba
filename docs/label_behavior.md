@@ -189,12 +189,5 @@ For an example of expected output, see [THIS](https://github.com/sgoldenlab/simb
 
 
 
-
-```
-
-
-
-
-
 #
 Author [Simon N](https://github.com/sronilsson)
