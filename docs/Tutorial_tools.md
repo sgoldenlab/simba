@@ -540,15 +540,15 @@ For some examples of expected outputs, check [THIS](https://github.com/sgoldenla
 
 ### Extract project annotation counts
 
-If you have annotated (or appeneded annotations to) a bunch of videos in a SimBA project, you may want a count of how many frames, and how many seconds, you have annotated each behavior as present and absent in each video and the entire project. To get this, 
+If you have annotated (or appeneded annotations to) a bunch of videos in a SimBA project, you may want a count of how many frames, and how many seconds, you have annotated each behavior as present and absent in each video in the entire project. To get this, 
 
 1) Click the `Count labels in project` button in the tools menu.
 2) Next, select the `project_config.ini` file belonging to the project in which you want to count the annotations within.
 3) Click the RUN button.
 
-You can follow the progress in the main SimBa window. Once completem, annotation counts are saved in a CSV within the `project_folder/logs` directory in with the annotation_counts_20240110185525.csv filename format. For an example of expected output, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/print_project_annotation_counts_example.csv) file. 
+You can follow the progress in the main SimBA window. Once complete, the annotation counts are saved in a CSV within the `project_folder/logs` directory in with the annotation_counts_20240110185525.csv filename format. For an example of the expected output, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/print_project_annotation_counts_example.csv) file. 
 
->Note: Each of the videos inside the `project_folder/csv/targets_inserted` directory also have to be represented in the `project_folder/logs/video_info.csv` for this to work. This is in order for SimBa to know the FPS of the videos and accurcatly calculate the number of seconds that each behavior has been annotated as present and absent in each of the videos. 
+>Note: Each of the videos inside the `project_folder/csv/targets_inserted` directory also **have to be&& represented in the `project_folder/logs/video_info.csv` for this to work. This is in order for SimBA to know the FPS of the videos and accurately calculate the number of seconds that each behavior has been annotated as present and absent in each of the videos. 
 
 
 ##
