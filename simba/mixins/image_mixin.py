@@ -1,26 +1,30 @@
+from typing import List, Optional, Tuple, Union
+
 import numpy as np
-from typing import List, Optional, Union, Tuple
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-from shapely.geometry import Polygon
-import pandas as pd
-import cv2
+
 from copy import deepcopy
 
-from simba.utils.checks import check_instance, check_str, check_int
+import cv2
+import pandas as pd
+from shapely.geometry import Polygon
+
+from simba.utils.checks import check_instance, check_int, check_str
 from simba.utils.enums import GeometryEnum
 
-class ImageMixin(object):
 
+class ImageMixin(object):
     def __init__(self):
         pass
 
     @staticmethod
-    def brightness_intensity(imgs: List[np.ndarray],
-                             ignore_black: Optional[bool] = True) -> List[float]:
-
+    def brightness_intensity(
+        imgs: List[np.ndarray], ignore_black: Optional[bool] = True
+    ) -> List[float]:
         """
         Compute the average brightness intensity within each image within a list.
 
@@ -35,9 +39,17 @@ class ImageMixin(object):
         >>> [159.0]
         """
         results = []
-        check_instance(source=f'{ImageMixin().brightness_intensity.__name__} imgs', instance=imgs, accepted_types=list)
+        check_instance(
+            source=f"{ImageMixin().brightness_intensity.__name__} imgs",
+            instance=imgs,
+            accepted_types=list,
+        )
         for cnt, img in enumerate(imgs):
-            check_instance(source=f'{ImageMixin().brightness_intensity.__name__} img {cnt}', instance=img, accepted_types=np.ndarray)
+            check_instance(
+                source=f"{ImageMixin().brightness_intensity.__name__} img {cnt}",
+                instance=img,
+                accepted_types=np.ndarray,
+            )
             if len(img) == 0:
                 results.append(0)
             else:
@@ -48,32 +60,62 @@ class ImageMixin(object):
         return results
 
     @staticmethod
-    def get_histocomparison(img_1: np.ndarray,
-                            img_2: np.ndarray,
-                            method: Optional[Literal['chi_square', 'correlation', 'intersection', 'bhattacharyya', 'hellinger', 'chi_square_alternative', 'kl_divergence']] = 'correlation',
-                            absolute: Optional[bool] = True):
+    def get_histocomparison(
+        img_1: np.ndarray,
+        img_2: np.ndarray,
+        method: Optional[
+            Literal[
+                "chi_square",
+                "correlation",
+                "intersection",
+                "bhattacharyya",
+                "hellinger",
+                "chi_square_alternative",
+                "kl_divergence",
+            ]
+        ] = "correlation",
+        absolute: Optional[bool] = True,
+    ):
         """
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/0.png').astype(np.uint8)
         >>> img_2 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/3.png').astype(np.uint8)
         >>> ImageMixin.get_histocomparison(img_1=img_1, img_2=img_2, method='chi_square_alternative')
         """
-        check_instance(source=f'{ImageMixin().get_histocomparison.__name__} img_1', instance=img_1, accepted_types=np.ndarray)
-        check_instance(source=f'{ImageMixin().get_histocomparison.__name__} img_2', instance=img_2, accepted_types=np.ndarray)
-        check_str(name=f'{ImageMixin().get_histocomparison.__name__} method', value=method, options=list(GeometryEnum.HISTOGRAM_COMPARISON_MAP.value.keys()))
+        check_instance(
+            source=f"{ImageMixin().get_histocomparison.__name__} img_1",
+            instance=img_1,
+            accepted_types=np.ndarray,
+        )
+        check_instance(
+            source=f"{ImageMixin().get_histocomparison.__name__} img_2",
+            instance=img_2,
+            accepted_types=np.ndarray,
+        )
+        check_str(
+            name=f"{ImageMixin().get_histocomparison.__name__} method",
+            value=method,
+            options=list(GeometryEnum.HISTOGRAM_COMPARISON_MAP.value.keys()),
+        )
         method = GeometryEnum.HISTOGRAM_COMPARISON_MAP.value[method]
         if absolute:
-            return abs(cv2.compareHist(img_1.astype(np.float32), img_2.astype(np.float32), method))
+            return abs(
+                cv2.compareHist(
+                    img_1.astype(np.float32), img_2.astype(np.float32), method
+                )
+            )
         else:
-            return cv2.compareHist(img_1.astype(np.float32), img_2.astype(np.float32), method)
-
+            return cv2.compareHist(
+                img_1.astype(np.float32), img_2.astype(np.float32), method
+            )
 
     @staticmethod
-    def get_contourmatch(img_1: np.ndarray,
-                         img_2: np.ndarray,
-                         method: Optional[Literal['all', 'exterior']] = 'all',
-                         canny: Optional[bool] = True) -> float:
-
+    def get_contourmatch(
+        img_1: np.ndarray,
+        img_2: np.ndarray,
+        method: Optional[Literal["all", "exterior"]] = "all",
+        canny: Optional[bool] = True,
+    ) -> float:
         """
         Calculate contour similarity between two images.
 
@@ -88,31 +130,64 @@ class ImageMixin(object):
         >>> ImageMixin.get_contourmatch(img_1=img_1, img_2=img_2, method='exterior')
         """
 
-        check_instance(source=f'{ImageMixin().get_contourmatch.__name__} img_1', instance=img_1, accepted_types=np.ndarray)
-        check_instance(source=f'{ImageMixin().get_contourmatch.__name__} img_2', instance=img_2, accepted_types=np.ndarray)
-        check_str(name=f'{ImageMixin().get_contourmatch.__name__} method', value=method, options=['all', 'exterior'])
+        check_instance(
+            source=f"{ImageMixin().get_contourmatch.__name__} img_1",
+            instance=img_1,
+            accepted_types=np.ndarray,
+        )
+        check_instance(
+            source=f"{ImageMixin().get_contourmatch.__name__} img_2",
+            instance=img_2,
+            accepted_types=np.ndarray,
+        )
+        check_str(
+            name=f"{ImageMixin().get_contourmatch.__name__} method",
+            value=method,
+            options=["all", "exterior"],
+        )
         method = GeometryEnum.CONTOURS_MAP.value[method]
         orig_img_1, orig_img_2 = deepcopy(img_1), deepcopy(img_2)
         if canny:
-            canny_img_1, canny_img_2 = cv2.Canny(orig_img_1, 30, 200), cv2.Canny(orig_img_2, 30, 200)
-            _, img_1_contours, _ = cv2.findContours(canny_img_1, method, cv2.CHAIN_APPROX_SIMPLE)
-            _, img_2_contours, _ = cv2.findContours(canny_img_2, method, cv2.CHAIN_APPROX_SIMPLE)
+            canny_img_1, canny_img_2 = cv2.Canny(orig_img_1, 30, 200), cv2.Canny(
+                orig_img_2, 30, 200
+            )
+            _, img_1_contours, _ = cv2.findContours(
+                canny_img_1, method, cv2.CHAIN_APPROX_SIMPLE
+            )
+            _, img_2_contours, _ = cv2.findContours(
+                canny_img_2, method, cv2.CHAIN_APPROX_SIMPLE
+            )
         else:
             if len(orig_img_1.shape) >= 3:
-                _, img_1_contours, _ = cv2.findContours(cv2.cvtColor(orig_img_1, cv2.COLOR_BGR2GRAY), method, cv2.CHAIN_APPROX_SIMPLE)
+                _, img_1_contours, _ = cv2.findContours(
+                    cv2.cvtColor(orig_img_1, cv2.COLOR_BGR2GRAY),
+                    method,
+                    cv2.CHAIN_APPROX_SIMPLE,
+                )
             else:
-                _, img_1_contours, _ = cv2.findContours(orig_img_1, method, cv2.CHAIN_APPROX_SIMPLE)
+                _, img_1_contours, _ = cv2.findContours(
+                    orig_img_1, method, cv2.CHAIN_APPROX_SIMPLE
+                )
             if len(orig_img_2.shape) >= 3:
-                _, img_2_contours, _ = cv2.findContours(cv2.cvtColor(orig_img_2, cv2.COLOR_BGR2GRAY), method, cv2.CHAIN_APPROX_SIMPLE)
+                _, img_2_contours, _ = cv2.findContours(
+                    cv2.cvtColor(orig_img_2, cv2.COLOR_BGR2GRAY),
+                    method,
+                    cv2.CHAIN_APPROX_SIMPLE,
+                )
             else:
-                _, img_2_contours, _ = cv2.findContours(orig_img_2, method, cv2.CHAIN_APPROX_SIMPLE)
+                _, img_2_contours, _ = cv2.findContours(
+                    orig_img_2, method, cv2.CHAIN_APPROX_SIMPLE
+                )
 
-        return cv2.matchShapes(img_1_contours[0], img_2_contours[0], cv2.CONTOURS_MATCH_I1, 0.0)
+        return cv2.matchShapes(
+            img_1_contours[0], img_2_contours[0], cv2.CONTOURS_MATCH_I1, 0.0
+        )
 
     @staticmethod
-    def slice_shapes_in_img(img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]],
-                            geometries: List[Union[Polygon, np.ndarray]]):
-
+    def slice_shapes_in_img(
+        img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]],
+        geometries: List[Union[Polygon, np.ndarray]],
+    ):
         """
         Slice regions of interest (ROIs) from an image based on provided shapes.
 
@@ -130,13 +205,35 @@ class ImageMixin(object):
         """
 
         result = []
-        check_instance(source=f'{ImageMixin().slice_shapes_in_img.__name__} img', instance=img, accepted_types=(tuple, np.ndarray))
-        check_instance(source=f'{ImageMixin().slice_shapes_in_img.__name__} shapes', instance=geometries, accepted_types=list)
-        for shape_cnt, shape in enumerate(geometries): check_instance(source=f'{ImageMixin().slice_shapes_in_img.__name__} shapes {shape_cnt}', instance=shape,  accepted_types=(Polygon, np.ndarray))
+        check_instance(
+            source=f"{ImageMixin().slice_shapes_in_img.__name__} img",
+            instance=img,
+            accepted_types=(tuple, np.ndarray),
+        )
+        check_instance(
+            source=f"{ImageMixin().slice_shapes_in_img.__name__} shapes",
+            instance=geometries,
+            accepted_types=list,
+        )
+        for shape_cnt, shape in enumerate(geometries):
+            check_instance(
+                source=f"{ImageMixin().slice_shapes_in_img.__name__} shapes {shape_cnt}",
+                instance=shape,
+                accepted_types=(Polygon, np.ndarray),
+            )
         if isinstance(img, tuple):
-            check_instance(source=f'{ImageMixin().slice_shapes_in_img.__name__} img tuple first entry', instance=img[0], accepted_types=cv2.VideoCapture)
+            check_instance(
+                source=f"{ImageMixin().slice_shapes_in_img.__name__} img tuple first entry",
+                instance=img[0],
+                accepted_types=cv2.VideoCapture,
+            )
             frm_cnt = int(img[0].get(cv2.CAP_PROP_FRAME_COUNT))
-            check_int(name=f'{ImageMixin().slice_shapes_in_img.__name__} video frame count', value=img[1], max_value=frm_cnt, min_value=0)
+            check_int(
+                name=f"{ImageMixin().slice_shapes_in_img.__name__} video frame count",
+                value=img[1],
+                max_value=frm_cnt,
+                min_value=0,
+            )
             img[0].set(1, img[1])
             _, img = img[0].read()
         corrected_shapes = []
@@ -144,23 +241,28 @@ class ImageMixin(object):
             if isinstance(shape, np.ndarray):
                 corrected_shapes.append(shape)
             else:
-                corrected_shapes.append(np.array(shape.exterior.coords).astype(np.int64))
-        shapes = corrected_shapes; del corrected_shapes
+                corrected_shapes.append(
+                    np.array(shape.exterior.coords).astype(np.int64)
+                )
+        shapes = corrected_shapes
+        del corrected_shapes
         for shape_cnt, shape in enumerate(shapes):
             x, y, w, h = cv2.boundingRect(shape)
-            roi_img = img[y:y + h, x:x + w].copy()
+            roi_img = img[y : y + h, x : x + w].copy()
             mask = np.zeros(roi_img.shape[:2], np.uint8)
-            cv2.drawContours(mask, [shape - shape.min(axis=0)], -1, (255, 255, 255), -1, cv2.LINE_AA)
+            cv2.drawContours(
+                mask, [shape - shape.min(axis=0)], -1, (255, 255, 255), -1, cv2.LINE_AA
+            )
             bg = np.ones_like(roi_img, np.uint8)
             cv2.bitwise_not(bg, bg, mask=mask)
             roi_img = bg + cv2.bitwise_and(roi_img, roi_img, mask=mask)
             result.append(roi_img)
         return result
 
+
 # img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/0.png').astype(np.uint8)
 # img_2 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/10.png').astype(np.uint8)
 # ImageMixin.get_contourmatch(img_1=img_1, img_2=img_2, method='all')
-
 
 
 # img = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/img_comparisons_4/1.png')
@@ -178,5 +280,3 @@ class ImageMixin(object):
 
 # img = cv2.VideoCapture('/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/zebrafish/project_folder/videos/20200730_AB_7dpf_850nm_0003.mp4')
 # ImageMixin.slice_shapes_in_img(img=(img, 1))
-
-
