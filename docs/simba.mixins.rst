@@ -102,3 +102,11 @@ Annotation GUI methods
 .. automodule:: simba.mixins.annotator_mixin
    :members:
    :show-inheritance:
+
+Image attribute extraction
+---------------------------------------
+
+.. automodule:: simba.mixins.image_mixin
+   :members:
+   :show-inheritance:
+
