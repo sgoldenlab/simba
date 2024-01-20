@@ -63,6 +63,11 @@ Specifically, for working with directionality between animal in SimBA, begin by 
 
 >Note: These aggregate summary statistics are calculated based on all body-parts for each animal. If an animal is directing **any** body-part belonging to a specific other animal, then the animal is directing towards that other specific animal. For example, even if the animal with the ID *Simon* only has the tail-base of the animal with the ID JJ in the *line of sight* in one frame, the animal with the ID *JJ* is still counted as being in the *line of sight* in of the animal with the ID *Simon* in the aggregate statistics table. 
 
+* **APPEND BOOLEAN TABLES TO FEATURES**: At times, we may want to append the [boolean directionality tables](https://github.com/sgoldenlab/simba/blob/master/misc/boolean_directionaly_example.csv) to our feature inside the `project_folder/csv/features_extracted` directory. When we do this, SimBA will identify them as features and use these fields when it comes to creating supervides machine learning classifiers. To do this, check the `APPEND BOOLEAN TABLES TO FEATURES` checkbox.
+
+>Note 1: When this checkbox is checked, the `CREATE BOOLEAN TABLES` checkbox is automatically checked. Thus, you **cannot** append the boolean tables to your features without computing the boolean tables.
+
+>Note 2: For this to work, all files inside the `project_folder/csv/outlier_corrected_movement_location` directory has to have an equivalently named file inside the `project_folder/csv/features_extracted` directory with the same number of rows. For examples, he directionality statistics is compututed using the file `project_folder/csv/outlier_corrected_movement_location/Video_1.csv`. After it has been computed, it will be appended to the `project_folder/csv/features_extracted/Video_1.csv`. If this file does not exist, or contains more or less rows than the `project_folder/csv/outlier_corrected_movement_location/Video_1.csv` file, it cannot be appended. 
 
 Once you filled in your selected output formats, click `RUN`. You can follow the progress in the main SimBA terminal. The results will be saved in the `project_folder/logs` directory of your SimBA project. 
 
