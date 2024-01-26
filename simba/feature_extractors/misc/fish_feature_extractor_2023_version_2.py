@@ -474,9 +474,9 @@ class FishFeatureExtractor:
                 for c in self.csv_df_combined.columns
                 if f"distance_to_{side}_border" in c
             ]
-            self.csv_df_combined[
-                f"Mean_bp_distance_to_{side}_border"
-            ] = self.csv_df_combined[side_col_names].mean(axis=1)
+            self.csv_df_combined[f"Mean_bp_distance_to_{side}_border"] = (
+                self.csv_df_combined[side_col_names].mean(axis=1)
+            )
             for window in self.roll_windows_values:
                 self.csv_df_combined[f"Mean_bp_distance_to_{side}_border_{window}"] = (
                     self.csv_df_combined[f"Mean_bp_distance_to_{side}_border"]

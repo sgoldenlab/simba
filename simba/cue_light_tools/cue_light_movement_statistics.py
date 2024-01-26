@@ -152,25 +152,25 @@ class CueLightMovementAnalyzer(ConfigReader):
                 self.light_movement = {}
                 for cue_light in self.cue_light_names:
                     self.light_movement[cue_light] = {}
-                    self.light_movement[cue_light][
-                        "pre_window_movement"
-                    ] = self.movement[
-                        self.movement.index.isin(
-                            self.light_on_dict[cue_light]["pre_window_frames"]
-                        )
-                    ]
+                    self.light_movement[cue_light]["pre_window_movement"] = (
+                        self.movement[
+                            self.movement.index.isin(
+                                self.light_on_dict[cue_light]["pre_window_frames"]
+                            )
+                        ]
+                    )
                     self.light_movement[cue_light]["light_movement"] = self.movement[
                         self.movement.index.isin(
                             self.light_on_dict[cue_light]["light_on_frames"]
                         )
                     ]
-                    self.light_movement[cue_light][
-                        "post_window_movement"
-                    ] = self.movement[
-                        self.movement.index.isin(
-                            self.light_on_dict[cue_light]["post_window_frames"]
-                        )
-                    ]
+                    self.light_movement[cue_light]["post_window_movement"] = (
+                        self.movement[
+                            self.movement.index.isin(
+                                self.light_on_dict[cue_light]["post_window_frames"]
+                            )
+                        ]
+                    )
                 for cue_light in self.cue_light_names:
                     self.results[self.video_name][animal_name][cue_light] = {}
                     for state_name, df in zip(

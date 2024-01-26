@@ -13,7 +13,6 @@ from simba.utils.printing import stdout_success
 
 
 class ROISizeStandardizer(ConfigReader, FeatureExtractionMixin):
-
     """
     Standardize ROI sizes according to a reference video.
 

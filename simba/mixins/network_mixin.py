@@ -13,7 +13,6 @@ from simba.utils.errors import InvalidInputError
 
 
 class NetworkMixin(object):
-
     """
     Methods to create and analyze time-dependent graphs from pose-estimation data.
 

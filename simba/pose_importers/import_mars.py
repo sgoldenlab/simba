@@ -21,7 +21,6 @@ from simba.utils.read_write import (get_fn_ext, read_config_file,
 
 
 class MarsImporter(object):
-
     """
     Import two animal MARS pose-estimation data (in JSON format) into a SimBA project in
     parquet or CSV format.

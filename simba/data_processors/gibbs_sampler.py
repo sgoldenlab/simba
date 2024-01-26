@@ -10,7 +10,6 @@ from simba.utils.printing import stdout_success
 
 
 class GibbsSampler(ConfigReader):
-
     """
     Gibbs sampling for finding "motifs" in categorical sequences.
 

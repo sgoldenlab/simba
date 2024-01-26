@@ -20,7 +20,6 @@ from simba.utils.warnings import (
 
 
 class BorisAppender(ConfigReader):
-
     """
     Append BORIS human annotations onto featurized pose-estimation data.
 

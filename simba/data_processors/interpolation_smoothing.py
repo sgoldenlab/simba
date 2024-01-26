@@ -414,7 +414,6 @@ class Smooth(ConfigReader):
 
 
 class AdvancedInterpolator(ConfigReader):
-
     """
     Interpolation method that allows different interpolation parameters for different animals or body-parts.
     For example, interpolate some body-parts of animals using linear interpolation, and other body-parts of animals using nearest interpolation.

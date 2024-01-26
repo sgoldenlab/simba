@@ -14,7 +14,6 @@ from simba.utils.read_write import get_video_meta_data
 
 
 class FFMPEGCommandCreator(object):
-
     """
     Execute FFmpeg commands from instructions stored in json format.
 
@@ -87,12 +86,12 @@ class FFMPEGCommandCreator(object):
                 videos[video_data["video_info"]["video_name"]]["settings"] = video_data[
                     variable + "_settings"
                 ]
-                videos[video_data["video_info"]["video_name"]][
-                    "last_operation"
-                ] = video_data["last_operation"]
-                videos[video_data["video_info"]["video_name"]][
-                    "output_quality"
-                ] = video_data["output_quality"]
+                videos[video_data["video_info"]["video_name"]]["last_operation"] = (
+                    video_data["last_operation"]
+                )
+                videos[video_data["video_info"]["video_name"]]["output_quality"] = (
+                    video_data["output_quality"]
+                )
         return videos
 
     def downsample_videos(self):

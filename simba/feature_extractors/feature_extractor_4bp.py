@@ -422,9 +422,9 @@ class ExtractFeaturesFrom4bps(ConfigReader, FeatureExtractionMixin):
                 self.out_data["Sum_probabilities"].mean()
                 - self.out_data["Sum_probabilities"]
             )
-            self.out_data[
-                "Sum_probabilities_deviation_percentile_rank"
-            ] = self.out_data["Sum_probabilities_deviation"].rank(pct=True)
+            self.out_data["Sum_probabilities_deviation_percentile_rank"] = (
+                self.out_data["Sum_probabilities_deviation"].rank(pct=True)
+            )
             self.out_data["Sum_probabilities_percentile_rank"] = self.out_data[
                 "Sum_probabilities_deviation_percentile_rank"
             ].rank(pct=True)

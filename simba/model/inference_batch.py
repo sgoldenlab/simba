@@ -14,7 +14,6 @@ from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
 class InferenceBatch(TrainModelMixin, ConfigReader):
-
     """
     Run classifier inference on all files with the ``project_folder/csv/features_extracted`` directory.
     Results are stored in the ``project_folder/csv/machine_results`` directory of the SimBA project.

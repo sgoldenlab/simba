@@ -18,7 +18,6 @@ from simba.utils.read_write import get_fn_ext, read_df
 
 
 class AggBoundaryStatisticsCalculator(ConfigReader):
-
     """
     Compute aggregate boundary statistics
 

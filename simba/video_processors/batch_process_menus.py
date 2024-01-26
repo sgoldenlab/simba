@@ -604,17 +604,17 @@ class BatchProcessFrame(PopUpMixin):
                 name
             ]
             if not self.use_gpu_var.get():
-                out_video_dict["video_data"][name][
-                    "output_quality"
-                ] = self.percent_to_crf_lookup[
-                    self.videos[name]["video_quality_dropdown"].getChoices()
-                ]
+                out_video_dict["video_data"][name]["output_quality"] = (
+                    self.percent_to_crf_lookup[
+                        self.videos[name]["video_quality_dropdown"].getChoices()
+                    ]
+                )
             else:
-                out_video_dict["video_data"][name][
-                    "output_quality"
-                ] = self.video_quality_to_preset_lookup[
-                    self.videos[name]["video_quality_dropdown"].getChoices()
-                ]
+                out_video_dict["video_data"][name]["output_quality"] = (
+                    self.video_quality_to_preset_lookup[
+                        self.videos[name]["video_quality_dropdown"].getChoices()
+                    ]
+                )
             if name in self.crop_dict.keys():
                 out_video_dict["video_data"][name]["crop"] = True
                 out_video_dict["video_data"][name]["crop_settings"] = self.crop_dict[

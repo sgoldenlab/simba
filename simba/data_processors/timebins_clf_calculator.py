@@ -22,7 +22,6 @@ from simba.utils.read_write import get_fn_ext, read_df
 
 
 class TimeBinsClfCalculator(ConfigReader):
-
     """
     Computes aggregate classification results in user-defined time-bins. Results are stored in
     the ``project_folder/logs`` directory of the SimBA project`
@@ -124,9 +123,9 @@ class TimeBinsClfCalculator(ConfigReader):
                     video_dict[file_name][bin_cnt][clf] = defaultdict(list)
                     bout_df = bouts_df.loc[bouts_df["Event"] == clf]
                     if len(bouts_df) > 0:
-                        video_dict[file_name][bin_cnt][clf][
-                            "First occurrence (s)"
-                        ] = round(bout_df["Start_time"].min(), 3)
+                        video_dict[file_name][bin_cnt][clf]["First occurrence (s)"] = (
+                            round(bout_df["Start_time"].min(), 3)
+                        )
                         video_dict[file_name][bin_cnt][clf]["Event count"] = len(
                             bout_df
                         )

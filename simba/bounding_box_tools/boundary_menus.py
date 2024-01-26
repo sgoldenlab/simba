@@ -354,10 +354,10 @@ class BoundaryMenus(ConfigReader, PopUpMixin):
             self.animal_attr_dict[animal_name]["highlight_clr_dropdown"].setChoices(
                 "Red"
             )
-            self.animal_attr_dict[animal_name][
-                "highlight_clr_thickness"
-            ] = DropDownMenu(
-                self.roi_attr_frm, "", list(range(1, 10)), "10", command=None
+            self.animal_attr_dict[animal_name]["highlight_clr_thickness"] = (
+                DropDownMenu(
+                    self.roi_attr_frm, "", list(range(1, 10)), "10", command=None
+                )
             )
             self.animal_attr_dict[animal_name]["highlight_clr_thickness"].setChoices(5)
             self.animal_attr_dict[animal_name]["label"].grid(

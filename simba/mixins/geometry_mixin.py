@@ -31,7 +31,6 @@ from simba.utils.read_write import (SimbaTimer, find_core_cnt,
 
 
 class GeometryMixin(object):
-
     """
     Methods to perform geometry transformation of pose-estimation data. This includes creating bounding boxes,
     line objects, circles etc. from pose-estimated body-parts and computing metric representations

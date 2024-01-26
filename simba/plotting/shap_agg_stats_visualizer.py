@@ -16,7 +16,6 @@ from simba.utils.warnings import ShapWarning
 
 
 class ShapAggregateStatisticsVisualizer(ConfigReader):
-
     """
     Calculate aggregate (binned) SHAP value statistics where individual bins represent reaulated features.
     Also creates line chart visualizations reprsenting aggregations of behavior-present SHAP values.

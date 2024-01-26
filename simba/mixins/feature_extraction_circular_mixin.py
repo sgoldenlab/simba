@@ -6,7 +6,6 @@ from scipy import stats
 
 
 class FeatureExtractionCircularMixin(object):
-
     """
     Mixin for circular statistics. Support for multiple animals and base
     radial directions derived from two or three body-parts.

@@ -237,9 +237,9 @@ class FishFeatureExtractor:
                 )
                 / self.currPixPerMM
             )
-            self.csv_df_combined[
-                center_bp + "_cum_distance_travelled"
-            ] = self.csv_df_combined[center_bp + "_movement"].cumsum()
+            self.csv_df_combined[center_bp + "_cum_distance_travelled"] = (
+                self.csv_df_combined[center_bp + "_movement"].cumsum()
+            )
 
     def calc_X_relative_to_Y_movement_rolling_windows(self):
         for i in range(len(self.roll_windows_values)):

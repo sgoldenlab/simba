@@ -17,7 +17,6 @@ from simba.utils.read_write import (find_all_videos_in_project,
 
 
 class MADLCImporterH5(ConfigReader, PoseImporterMixin):
-
     """
     Importing multi-animal deeplabcut (maDLC) pose-estimation data (in H5 format)
     into a SimBA project in parquet or CSV format.

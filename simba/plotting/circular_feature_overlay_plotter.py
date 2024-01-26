@@ -18,7 +18,6 @@ from simba.utils.read_write import (find_video_of_file, get_fn_ext,
 
 
 class CircularFeaturePlotter(ConfigReader, PlottingMixin, FeatureExtractionMixin):
-
     """
     Create visualization of base angular features overlay on video. E.g., use to confirm
     accurate cardinality and angle degree computation.

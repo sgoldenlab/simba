@@ -236,10 +236,10 @@ class FishFeatureExtractor:
             )
             / self.fps
         )
-        self.csv_df_combined[
-            "Consecutive_ms_in_same_compass_direction_zscore"
-        ] = zscore(
-            self.csv_df_combined["Consecutive_ms_in_same_compass_direction"].values
+        self.csv_df_combined["Consecutive_ms_in_same_compass_direction_zscore"] = (
+            zscore(
+                self.csv_df_combined["Consecutive_ms_in_same_compass_direction"].values
+            )
         )
         for window in self.roll_windows_values:
             self.csv_df_combined[f"Unique_compass_directions_in_{window}_window"] = (
@@ -255,18 +255,18 @@ class FishFeatureExtractor:
             )
         )
         for window in self.roll_windows_values:
-            self.csv_df_combined[
-                f"Degree_shift_{window}_mean"
-            ] = framewise_degree_shift.rolling(window, min_periods=1).mean()
-            self.csv_df_combined[
-                f"Degree_shift_{window}_median"
-            ] = framewise_degree_shift.rolling(window, min_periods=1).median()
-            self.csv_df_combined[
-                f"Degree_shift_{window}_sum"
-            ] = framewise_degree_shift.rolling(window, min_periods=1).sum()
-            self.csv_df_combined[
-                f"Degree_shift_{window}_std"
-            ] = framewise_degree_shift.rolling(window, min_periods=1).std()
+            self.csv_df_combined[f"Degree_shift_{window}_mean"] = (
+                framewise_degree_shift.rolling(window, min_periods=1).mean()
+            )
+            self.csv_df_combined[f"Degree_shift_{window}_median"] = (
+                framewise_degree_shift.rolling(window, min_periods=1).median()
+            )
+            self.csv_df_combined[f"Degree_shift_{window}_sum"] = (
+                framewise_degree_shift.rolling(window, min_periods=1).sum()
+            )
+            self.csv_df_combined[f"Degree_shift_{window}_std"] = (
+                framewise_degree_shift.rolling(window, min_periods=1).std()
+            )
 
     def calc_angular_dispersion(self):
         dispersion_array = self.angular_dispersion(
@@ -542,9 +542,9 @@ class FishFeatureExtractor:
                 for c in self.csv_df_combined.columns
                 if f"distance_to_{side}_border" in c
             ]
-            self.csv_df_combined[
-                f"Mean_bp_distance_to_{side}_border"
-            ] = self.csv_df_combined[side_col_names].mean(axis=1)
+            self.csv_df_combined[f"Mean_bp_distance_to_{side}_border"] = (
+                self.csv_df_combined[side_col_names].mean(axis=1)
+            )
             for window in self.roll_windows_values:
                 self.csv_df_combined[f"Mean_bp_distance_to_{side}_border_{window}"] = (
                     self.csv_df_combined[f"Mean_bp_distance_to_{side}_border"]

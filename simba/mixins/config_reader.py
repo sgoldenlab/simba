@@ -295,12 +295,12 @@ class ConfigReader(object):
                     )
                 elif shape_type == Keys.ROI_POLYGONS.value:
                     try:
-                        self.roi_dict[Keys.ROI_POLYGONS.value][
-                            "Center_X"
-                        ] = self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"]
-                        self.roi_dict[Keys.ROI_POLYGONS.value][
-                            "Center_Y"
-                        ] = self.roi_dict[Keys.ROI_POLYGONS.value]["Center_Y"]
+                        self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"] = (
+                            self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"]
+                        )
+                        self.roi_dict[Keys.ROI_POLYGONS.value]["Center_Y"] = (
+                            self.roi_dict[Keys.ROI_POLYGONS.value]["Center_Y"]
+                        )
                     except KeyError:
                         pass
             self.video_names_w_rois = set(

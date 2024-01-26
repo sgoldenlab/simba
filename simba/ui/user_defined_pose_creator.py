@@ -17,7 +17,6 @@ from simba.utils.errors import InvalidFileTypeError
 
 
 class PoseConfigCreator(PlottingMixin):
-
     """
 
     Class for creating user-defined pose-estimation pipeline in SimBA through a GUI interface.

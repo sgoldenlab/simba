@@ -355,9 +355,9 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             if meta_dict[MetaKeys.RF_MAX_FEATURES.value] == Dtypes.NONE.value:
                 meta_dict[MetaKeys.RF_MAX_FEATURES.value] = None
             if MetaKeys.TRAIN_TEST_SPLIT_TYPE.value not in meta_dict.keys():
-                meta_dict[
-                    MetaKeys.TRAIN_TEST_SPLIT_TYPE.value
-                ] = Methods.SPLIT_TYPE_FRAMES.value
+                meta_dict[MetaKeys.TRAIN_TEST_SPLIT_TYPE.value] = (
+                    Methods.SPLIT_TYPE_FRAMES.value
+                )
 
             if ConfigKey.CLASS_WEIGHTS.value in meta_dict.keys():
                 if (

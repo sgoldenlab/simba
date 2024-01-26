@@ -222,9 +222,9 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
             self.border_clr_dropdown.getChoices()
         ]
         style_attr["Pose_estimation"] = self.show_pose_var.get()
-        style_attr[
-            "Directionality_style"
-        ] = self.directionality_type_dropdown.getChoices()
+        style_attr["Directionality_style"] = (
+            self.directionality_type_dropdown.getChoices()
+        )
 
         if not multiple:
             if not self.multiprocess_var.get():

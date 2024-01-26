@@ -214,23 +214,23 @@ class ExtractFeaturesFrom16bps(ConfigReader, FeatureExtractionMixin):
                 self.out_data["Lat_left_2_y"].values,
                 self.px_per_mm,
             )
-            self.out_data[
-                "Mouse_1_Centroid_to_lateral_right"
-            ] = self.euclidean_distance(
-                self.out_data["Center_1_x"].values,
-                self.out_data["Lat_right_1_x"].values,
-                self.out_data["Center_1_y"].values,
-                self.out_data["Lat_right_1_y"].values,
-                self.px_per_mm,
+            self.out_data["Mouse_1_Centroid_to_lateral_right"] = (
+                self.euclidean_distance(
+                    self.out_data["Center_1_x"].values,
+                    self.out_data["Lat_right_1_x"].values,
+                    self.out_data["Center_1_y"].values,
+                    self.out_data["Lat_right_1_y"].values,
+                    self.px_per_mm,
+                )
             )
-            self.out_data[
-                "Mouse_2_Centroid_to_lateral_right"
-            ] = self.euclidean_distance(
-                self.out_data["Center_2_x"].values,
-                self.out_data["Lat_right_2_x"].values,
-                self.out_data["Center_2_y"].values,
-                self.out_data["Lat_right_2_y"].values,
-                self.px_per_mm,
+            self.out_data["Mouse_2_Centroid_to_lateral_right"] = (
+                self.euclidean_distance(
+                    self.out_data["Center_2_x"].values,
+                    self.out_data["Lat_right_2_x"].values,
+                    self.out_data["Center_2_y"].values,
+                    self.out_data["Lat_right_2_y"].values,
+                    self.px_per_mm,
+                )
             )
             self.out_data["Centroid_distance"] = self.euclidean_distance(
                 self.out_data["Center_2_x"].values,
@@ -471,10 +471,10 @@ class ExtractFeaturesFrom16bps(ConfigReader, FeatureExtractionMixin):
             self.out_data["Total_movement_all_bodyparts_M2"] = self.out_data.eval(
                 "Movement_mouse_2_nose + Movement_mouse_2_tail_end + Movement_mouse_2_tail_base + Movement_mouse_2_left_ear + Movement_mouse_2_right_ear + Movement_mouse_2_lateral_left + Movement_mouse_2_lateral_right"
             )
-            self.out_data[
-                "Total_movement_all_bodyparts_both_mice"
-            ] = self.out_data.eval(
-                "Total_movement_all_bodyparts_M1 + Total_movement_all_bodyparts_M2"
+            self.out_data["Total_movement_all_bodyparts_both_mice"] = (
+                self.out_data.eval(
+                    "Total_movement_all_bodyparts_M1 + Total_movement_all_bodyparts_M2"
+                )
             )
 
             for window in self.roll_windows_values:
@@ -1122,9 +1122,9 @@ class ExtractFeaturesFrom16bps(ConfigReader, FeatureExtractionMixin):
             self.out_data["Centroid_distance_percentile_rank"] = self.out_data[
                 "Centroid_distance"
             ].rank(pct=True)
-            self.out_data[
-                "Centroid_distance_deviation_percentile_rank"
-            ] = self.out_data["Centroid_distance_deviation"].rank(pct=True)
+            self.out_data["Centroid_distance_deviation_percentile_rank"] = (
+                self.out_data["Centroid_distance_deviation"].rank(pct=True)
+            )
 
             for window in self.roll_windows_values:
                 col_name = "Total_movement_all_bodyparts_both_mice_mean_{}".format(
@@ -1255,9 +1255,9 @@ class ExtractFeaturesFrom16bps(ConfigReader, FeatureExtractionMixin):
                 self.out_data["Sum_probabilities"].mean()
                 - self.out_data["Sum_probabilities"]
             )
-            self.out_data[
-                "Sum_probabilities_deviation_percentile_rank"
-            ] = self.out_data["Sum_probabilities_deviation"].rank(pct=True)
+            self.out_data["Sum_probabilities_deviation_percentile_rank"] = (
+                self.out_data["Sum_probabilities_deviation"].rank(pct=True)
+            )
             self.out_data["Sum_probabilities_percentile_rank"] = self.out_data[
                 "Sum_probabilities_deviation_percentile_rank"
             ].rank(pct=True)

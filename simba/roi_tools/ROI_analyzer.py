@@ -387,22 +387,24 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                             )
                         ),
                     )
-                    self.roi_centroid_distance[video_name][animal_name][
-                        row["Name"]
-                    ] = np.sqrt(
-                        (animal_df[self.bp_dict[animal_name][0]] - center_cord[0]) ** 2
-                        + (animal_df[self.bp_dict[animal_name][1]] - center_cord[1])
-                        ** 2
+                    self.roi_centroid_distance[video_name][animal_name][row["Name"]] = (
+                        np.sqrt(
+                            (animal_df[self.bp_dict[animal_name][0]] - center_cord[0])
+                            ** 2
+                            + (animal_df[self.bp_dict[animal_name][1]] - center_cord[1])
+                            ** 2
+                        )
                     )
 
                 for _, row in video_circs.iterrows():
                     center_cord = (row["centerX"], row["centerY"])
-                    self.roi_centroid_distance[video_name][animal_name][
-                        row["Name"]
-                    ] = np.sqrt(
-                        (animal_df[self.bp_dict[animal_name][0]] - center_cord[0]) ** 2
-                        + (animal_df[self.bp_dict[animal_name][1]] - center_cord[1])
-                        ** 2
+                    self.roi_centroid_distance[video_name][animal_name][row["Name"]] = (
+                        np.sqrt(
+                            (animal_df[self.bp_dict[animal_name][0]] - center_cord[0])
+                            ** 2
+                            + (animal_df[self.bp_dict[animal_name][1]] - center_cord[1])
+                            ** 2
+                        )
                     )
 
                 for _, row in video_polys.iterrows():
@@ -410,12 +412,13 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                         list(zip(row["vertices"][:, 0], row["vertices"][:, 1]))
                     )
                     center_cord = polygon_shape.centroid.coords[0]
-                    self.roi_centroid_distance[video_name][animal_name][
-                        row["Name"]
-                    ] = np.sqrt(
-                        (animal_df[self.bp_dict[animal_name][0]] - center_cord[0]) ** 2
-                        + (animal_df[self.bp_dict[animal_name][1]] - center_cord[1])
-                        ** 2
+                    self.roi_centroid_distance[video_name][animal_name][row["Name"]] = (
+                        np.sqrt(
+                            (animal_df[self.bp_dict[animal_name][0]] - center_cord[0])
+                            ** 2
+                            + (animal_df[self.bp_dict[animal_name][1]] - center_cord[1])
+                            ** 2
+                        )
                     )
 
     def __transpose_dicts_to_dfs(self):

@@ -214,9 +214,9 @@ class FSTTCCalculator(ConfigReader, PlottingMixin):
                         )
                         if frames_between_behaviors <= 0:
                             frames_between_behaviors = 1
-                        second_clf_df_crtrn[
-                            "Frames_between_behaviors"
-                        ] = frames_between_behaviors
+                        second_clf_df_crtrn["Frames_between_behaviors"] = (
+                            frames_between_behaviors
+                        )
                         if self.time_delta_at_onset:
                             second_clf_df_crtrn[
                                 "Frames_between_second_behavior_start_to_time_window_end"

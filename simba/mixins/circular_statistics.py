@@ -10,7 +10,6 @@ from simba.utils.data import fast_mean_rank
 
 
 class CircularStatisticsMixin(object):
-
     """
     Mixin for circular statistics. Unlike linear data, circular data wrap around in a circular or periodic
     manner such as two measurements of e.g., 360 vs. 1 are more similar than two measurements of 1 vs. 3. Thus, the
@@ -815,9 +814,7 @@ class CircularStatisticsMixin(object):
         variance1 = 1 - np.abs(np.mean(np.exp(1j * sample_1)))
         variance2 = 1 - np.abs(np.mean(np.exp(1j * sample_2)))
         numerator = (variance1 + variance2) / 2
-        denominator = (variance1**2 / len(sample_1)) + (
-            variance2**2 / len(sample_2)
-        )
+        denominator = (variance1**2 / len(sample_1)) + (variance2**2 / len(sample_2))
         F = numerator / denominator
         return F
 

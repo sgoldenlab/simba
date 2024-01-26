@@ -7,7 +7,6 @@ from simba.mixins.config_reader import ConfigReader
 
 
 class Interpolate(ConfigReader):
-
     """
     Interpolate missing body-parts in pose-estimation data.
 

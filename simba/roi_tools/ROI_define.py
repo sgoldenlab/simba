@@ -559,9 +559,9 @@ class ROI_definitions(ConfigReader):
                 self.rectangle_size_dict = {}
                 self.rectangle_size_dict["Rectangles"] = {}
                 for rectangle in self.image_data.out_rectangles:
-                    self.rectangle_size_dict["Rectangles"][
-                        rectangle["Name"]
-                    ] = rectangle_size_calc(rectangle, self.curr_px_mm)
+                    self.rectangle_size_dict["Rectangles"][rectangle["Name"]] = (
+                        rectangle_size_calc(rectangle, self.curr_px_mm)
+                    )
                 self.image_data.rectangle_size_dict = self.rectangle_size_dict
 
             if len(self.image_data.out_circles) > 0:
@@ -577,9 +577,9 @@ class ROI_definitions(ConfigReader):
                 self.polygon_size_dict = {}
                 self.polygon_size_dict["Polygons"] = {}
                 for polygon in self.image_data.out_polygon:
-                    self.polygon_size_dict["Polygons"][
-                        polygon["Name"]
-                    ] = polygon_size_calc(polygon, self.curr_px_mm)
+                    self.polygon_size_dict["Polygons"][polygon["Name"]] = (
+                        polygon_size_calc(polygon, self.curr_px_mm)
+                    )
                 self.image_data.polygon_size_dict = self.polygon_size_dict
 
             self.image_data.insert_all_ROIs_into_image(show_size_info=True)

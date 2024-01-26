@@ -45,7 +45,6 @@ SETTINGS = [
 
 
 class BorisSourceCleaner(object):
-
     """
     Helper to clean BORIS files where behavior with the same name are assigned to different
     animals through the **Subjects** field.

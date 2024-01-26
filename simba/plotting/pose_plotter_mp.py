@@ -63,7 +63,6 @@ def pose_plotter_mp(
 
 
 class PosePlotter:
-
     """
     Create pose-estimation visualizations from data within a SimBA project folder.
 
@@ -168,9 +167,9 @@ class PosePlotter:
                     ]
             else:
                 for cnt, animal in enumerate(self.config.animal_bp_dict.keys()):
-                    self.config.animal_bp_dict[animal][
-                        "colors"
-                    ] = self.original_bp_dict[animal]["colors"][0]
+                    self.config.animal_bp_dict[animal]["colors"] = (
+                        self.original_bp_dict[animal]["colors"][0]
+                    )
 
             pose_lst, obs_per_split = PlottingMixin().split_and_group_df(
                 df=pose_df, splits=self.core_cnt

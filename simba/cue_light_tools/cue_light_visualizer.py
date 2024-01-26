@@ -385,9 +385,9 @@ class CueLightVisualizer(ConfigReader):
                         self.light_dict[light_name]["color"] = (90, 10, 10)
                         self.light_dict[light_name]["status"] = "OFF"
                         self.light_dict[light_name]["time_off"] += 1 / self.fps
-                    self.light_dict[light_name][
-                        "prior_frame_status"
-                    ] = self.data_df.loc[self.frame_cnt, light_name]
+                    self.light_dict[light_name]["prior_frame_status"] = (
+                        self.data_df.loc[self.frame_cnt, light_name]
+                    )
                     cv2.putText(
                         self.border_img,
                         str(self.light_dict[light_name]["status"]),

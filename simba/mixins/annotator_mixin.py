@@ -28,7 +28,6 @@ MAX_FRM_SIZE = 1280, 650
 
 
 class AnnotatorMixin(ConfigReader):
-
     """
     Methods for creating tkinter GUI frames and functions associated with annotating videos.
 

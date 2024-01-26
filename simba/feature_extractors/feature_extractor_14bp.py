@@ -214,23 +214,23 @@ class ExtractFeaturesFrom14bps(ConfigReader, FeatureExtractionMixin):
                 self.out_data["Lat_left_2_y"].values,
                 self.px_per_mm,
             )
-            self.out_data[
-                "Mouse_1_Centroid_to_lateral_right"
-            ] = self.euclidean_distance(
-                self.out_data["Center_1_x"].values,
-                self.out_data["Lat_right_1_x"].values,
-                self.out_data["Center_1_y"].values,
-                self.out_data["Lat_right_1_y"].values,
-                self.px_per_mm,
+            self.out_data["Mouse_1_Centroid_to_lateral_right"] = (
+                self.euclidean_distance(
+                    self.out_data["Center_1_x"].values,
+                    self.out_data["Lat_right_1_x"].values,
+                    self.out_data["Center_1_y"].values,
+                    self.out_data["Lat_right_1_y"].values,
+                    self.px_per_mm,
+                )
             )
-            self.out_data[
-                "Mouse_2_Centroid_to_lateral_right"
-            ] = self.euclidean_distance(
-                self.out_data["Center_2_x"].values,
-                self.out_data["Lat_right_2_x"].values,
-                self.out_data["Center_2_y"].values,
-                self.out_data["Lat_right_2_y"].values,
-                self.px_per_mm,
+            self.out_data["Mouse_2_Centroid_to_lateral_right"] = (
+                self.euclidean_distance(
+                    self.out_data["Center_2_x"].values,
+                    self.out_data["Lat_right_2_x"].values,
+                    self.out_data["Center_2_y"].values,
+                    self.out_data["Lat_right_2_y"].values,
+                    self.px_per_mm,
+                )
             )
             self.out_data["Centroid_distance"] = self.euclidean_distance(
                 self.out_data["Center_2_x"].values,
@@ -1037,9 +1037,9 @@ class ExtractFeaturesFrom14bps(ConfigReader, FeatureExtractionMixin):
             self.out_data["Centroid_distance_percentile_rank"] = self.out_data[
                 "Centroid_distance"
             ].rank(pct=True)
-            self.out_data[
-                "Centroid_distance_deviation_percentile_rank"
-            ] = self.out_data["Centroid_distance_deviation"].rank(pct=True)
+            self.out_data["Centroid_distance_deviation_percentile_rank"] = (
+                self.out_data["Centroid_distance_deviation"].rank(pct=True)
+            )
 
             for window in self.roll_windows_values:
                 col_name = "Total_movement_all_bodyparts_both_mice_mean_{}".format(
@@ -1170,9 +1170,9 @@ class ExtractFeaturesFrom14bps(ConfigReader, FeatureExtractionMixin):
                 self.out_data["Sum_probabilities"].mean()
                 - self.out_data["Sum_probabilities"]
             )
-            self.out_data[
-                "Sum_probabilities_deviation_percentile_rank"
-            ] = self.out_data["Sum_probabilities_deviation"].rank(pct=True)
+            self.out_data["Sum_probabilities_deviation_percentile_rank"] = (
+                self.out_data["Sum_probabilities_deviation"].rank(pct=True)
+            )
             self.out_data["Sum_probabilities_percentile_rank"] = self.out_data[
                 "Sum_probabilities_deviation_percentile_rank"
             ].rank(pct=True)

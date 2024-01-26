@@ -145,9 +145,9 @@ class ROIfeatureVisualizer(ConfigReader):
                 )
                 add_spacer += 1
                 if self.roi_directing_viable and self.style_attr["Directionality"]:
-                    self.loc_dict[animal_name][shape][
-                        "directing_text"
-                    ] = "{} {} {}".format(shape, animal_name, "facing")
+                    self.loc_dict[animal_name][shape]["directing_text"] = (
+                        "{} {} {}".format(shape, animal_name, "facing")
+                    )
                     self.loc_dict[animal_name][shape]["directing_text_loc"] = (
                         (self.video_meta_data["width"] + 5),
                         (

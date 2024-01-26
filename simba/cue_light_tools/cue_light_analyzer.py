@@ -166,9 +166,9 @@ class CueLightAnalyzer(ConfigReader):
             self.light_descriptive_statistics[shape_name]["descriptive_statistics"] = {}
         for cnt, (k, v) in enumerate(self.intensity_results.items()):
             for shape_name in self.cue_light_names:
-                self.light_descriptive_statistics[shape_name]["frame_by_frame"][
-                    cnt
-                ] = v[shape_name]
+                self.light_descriptive_statistics[shape_name]["frame_by_frame"][cnt] = (
+                    v[shape_name]
+                )
         for shape_name in self.cue_light_names:
             self.light_descriptive_statistics[shape_name]["kmeans"] = KMeans(
                 n_clusters=2, random_state=0

@@ -91,9 +91,9 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                     .reset_index(drop=True)
                     .sort_values(by=["Time bin #"])
                 )
-                body_part_df[
-                    f"Time bin # (bin length {self.bin_length}s)"
-                ] = body_part_df["Time bin #"]
+                body_part_df[f"Time bin # (bin length {self.bin_length}s)"] = (
+                    body_part_df["Time bin #"]
+                )
                 line_plot = sns.lineplot(
                     data=body_part_df,
                     x=f"Time bin # (bin length {self.bin_length}s)",

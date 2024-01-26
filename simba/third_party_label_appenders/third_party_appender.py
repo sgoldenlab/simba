@@ -37,7 +37,6 @@ BEHAVIOR = "BEHAVIOR"
 
 
 class ThirdPartyLabelAppender(ConfigReader):
-
     """
     Concatenate third-party annotations to featurized pose-estimation datasets in SimBA.
 

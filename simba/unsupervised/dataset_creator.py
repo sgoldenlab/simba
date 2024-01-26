@@ -17,7 +17,6 @@ from simba.utils.read_write import get_fn_ext, read_df
 
 
 class DatasetCreator(ConfigReader, UnsupervisedMixin):
-
     """
     Transform raw frame-wise supervised classification data into aggregated
     data for unsupervised analyses.

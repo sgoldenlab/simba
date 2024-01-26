@@ -23,7 +23,6 @@ SKIP_FILES_WITH_IDENTICAL = "skip_files_with_identical"
 
 
 class MutualExclusivityCorrector(ConfigReader):
-
     """
     Refactor classification results according to user-defined mutual exclusivity rules.
 

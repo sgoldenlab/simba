@@ -15,7 +15,6 @@ from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
 class DeepEthogramImporter(ConfigReader):
-
     """
     Append DeepEthogram optical flow annotations onto featurized pose-estimation data.
 

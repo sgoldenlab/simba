@@ -17,7 +17,6 @@ from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 
 class ExtractFeaturesFrom9bps(ConfigReader, FeatureExtractionMixin):
-
     """
     Extracts hard-coded set of features from pose-estimation data from single animals with 9 tracked body-parts.
     Results are stored in the `project_folder/csv/features_extracted` directory of the SimBA project.
@@ -120,41 +119,41 @@ class ExtractFeaturesFrom9bps(ConfigReader, FeatureExtractionMixin):
                 self.px_per_mm,
             )
 
-            self.out_data[
-                "Distance_unilateral_left_hands_feet"
-            ] = self.euclidean_distance(
-                self.in_data["Mouse1_left_foot_x"].values,
-                self.in_data["Mouse1_left_hand_x"].values,
-                self.in_data["Mouse1_left_foot_y"].values,
-                self.in_data["Mouse1_left_hand_y"].values,
-                self.px_per_mm,
+            self.out_data["Distance_unilateral_left_hands_feet"] = (
+                self.euclidean_distance(
+                    self.in_data["Mouse1_left_foot_x"].values,
+                    self.in_data["Mouse1_left_hand_x"].values,
+                    self.in_data["Mouse1_left_foot_y"].values,
+                    self.in_data["Mouse1_left_hand_y"].values,
+                    self.px_per_mm,
+                )
             )
-            self.out_data[
-                "Distance_unilateral_right_hands_feet"
-            ] = self.euclidean_distance(
-                self.in_data["Mouse1_right_foot_x"].values,
-                self.in_data["Mouse1_right_hand_x"].values,
-                self.in_data["Mouse1_right_foot_y"].values,
-                self.in_data["Mouse1_right_hand_y"].values,
-                self.px_per_mm,
+            self.out_data["Distance_unilateral_right_hands_feet"] = (
+                self.euclidean_distance(
+                    self.in_data["Mouse1_right_foot_x"].values,
+                    self.in_data["Mouse1_right_hand_x"].values,
+                    self.in_data["Mouse1_right_foot_y"].values,
+                    self.in_data["Mouse1_right_hand_y"].values,
+                    self.px_per_mm,
+                )
             )
-            self.out_data[
-                "Distance_bilateral_left_foot_right_hand"
-            ] = self.euclidean_distance(
-                self.in_data["Mouse1_left_foot_x"].values,
-                self.in_data["Mouse1_right_hand_x"].values,
-                self.in_data["Mouse1_left_foot_y"].values,
-                self.in_data["Mouse1_right_hand_y"].values,
-                self.px_per_mm,
+            self.out_data["Distance_bilateral_left_foot_right_hand"] = (
+                self.euclidean_distance(
+                    self.in_data["Mouse1_left_foot_x"].values,
+                    self.in_data["Mouse1_right_hand_x"].values,
+                    self.in_data["Mouse1_left_foot_y"].values,
+                    self.in_data["Mouse1_right_hand_y"].values,
+                    self.px_per_mm,
+                )
             )
-            self.out_data[
-                "Distance_bilateral_right_foot_left_hand"
-            ] = self.euclidean_distance(
-                self.in_data["Mouse1_right_foot_x"].values,
-                self.in_data["Mouse1_left_hand_x"].values,
-                self.in_data["Mouse1_right_foot_y"].values,
-                self.in_data["Mouse1_left_hand_y"].values,
-                self.px_per_mm,
+            self.out_data["Distance_bilateral_right_foot_left_hand"] = (
+                self.euclidean_distance(
+                    self.in_data["Mouse1_right_foot_x"].values,
+                    self.in_data["Mouse1_left_hand_x"].values,
+                    self.in_data["Mouse1_right_foot_y"].values,
+                    self.in_data["Mouse1_left_hand_y"].values,
+                    self.px_per_mm,
+                )
             )
             self.out_data["Distance_back_tail"] = self.euclidean_distance(
                 self.in_data["Mouse1_back_x"].values,
@@ -737,9 +736,9 @@ class ExtractFeaturesFrom9bps(ConfigReader, FeatureExtractionMixin):
                     tortuosity_M1.append(sum(tortuosity_List_M1) / (2 * math.pi))
                     start += 1
                     end += 1
-                self.out_data[
-                    f"Tortuosity_Mouse1_{self.roll_windows_values[k]}"
-                ] = tortuosity_M1
+                self.out_data[f"Tortuosity_Mouse1_{self.roll_windows_values[k]}"] = (
+                    tortuosity_M1
+                )
 
             ########### CALC THE NUMBER OF LOW PROBABILITY DETECTIONS & TOTAL PROBABILITY VALUE FOR ROW###########################################
             print("Calculating pose probability scores...")
@@ -758,9 +757,9 @@ class ExtractFeaturesFrom9bps(ConfigReader, FeatureExtractionMixin):
                 self.out_data["Sum_probabilities"].mean()
                 - self.out_data["Sum_probabilities"]
             )
-            self.out_data[
-                "Sum_probabilities_deviation_percentile_rank"
-            ] = self.out_data["Sum_probabilities_deviation"].rank(pct=True)
+            self.out_data["Sum_probabilities_deviation_percentile_rank"] = (
+                self.out_data["Sum_probabilities_deviation"].rank(pct=True)
+            )
             self.out_data["Sum_probabilities_percentile_rank"] = self.out_data[
                 "Sum_probabilities_deviation_percentile_rank"
             ].rank(pct=True)

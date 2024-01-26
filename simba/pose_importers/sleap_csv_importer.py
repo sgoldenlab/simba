@@ -22,7 +22,6 @@ INSTANCE_SCORE = "instance.score"
 
 
 class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
-
     """
     Importing SLEAP pose-estimation data into SimBA project in ``CSV`` format.
 

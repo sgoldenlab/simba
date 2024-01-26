@@ -225,9 +225,9 @@ class PupRetrieverCalculator(ConfigReader):
                 self.data_df[self.distance_pup_core_field]
                 > self.settings["start_distance_criterion"]
             ].index[0]
-            self.data_df.loc[
-                0:first_row, self.distance_pup_core_field
-            ] = self.data_df.loc[first_row, self.distance_pup_core_field]
+            self.data_df.loc[0:first_row, self.distance_pup_core_field] = (
+                self.data_df.loc[first_row, self.distance_pup_core_field]
+            )
             self.data_df.loc[0:first_row, self.pup_in_core_field] = 0
             self.data_df.loc[0:first_row, self.pup_in_nest_field] = 0
             self.correct_in_nest_frames()
@@ -369,9 +369,9 @@ class PupRetrieverCalculator(ConfigReader):
             self.results["VIDEO"] = video_name
             self.results["PUP IN NEST (FRAME)"] = frame_when_pup_is_in_zone
             self.results["PUP IN NEST (S)"] = time_seconds_until_zone
-            self.results[
-                "MINIMUM DISTANCE (PUP TO CORENEST)"
-            ] = closest_dist_between_pup_and_zone
+            self.results["MINIMUM DISTANCE (PUP TO CORENEST)"] = (
+                closest_dist_between_pup_and_zone
+            )
             self.results["REASON (PUP IN NEST)"] = reason_zone
             self.results["PUP IN CORE-NEST (FRAME)"] = frame_when_pup_is_in_core_nest
             self.results["PUP IN CORE-NEST (S)"] = time_seconds_until_corenest
@@ -379,17 +379,17 @@ class PupRetrieverCalculator(ConfigReader):
 
             for clf in self.clf_lst:
                 self.results[clf + " (TOTAL TIME)"] = total_times[clf]
-                self.results[
-                    clf + " (BEFORE RETRIEVAL)"
-                ] = event_counter_before_corenest[clf]
+                self.results[clf + " (BEFORE RETRIEVAL)"] = (
+                    event_counter_before_corenest[clf]
+                )
                 self.results[clf + " (LATENCY TO FIRST EVENT)"] = latencies[clf]
                 self.results[clf + " (EVENT COUNT)"] = event_counter[clf]
                 self.results[clf + " (MEAN DURATION)"] = mean_duration[clf]
                 self.results[clf + " (MEAN INTERVAL)"] = time_between_events[clf]
 
-            self.results[
-                "DIG TIME AFTER APPROACH AND BEFORE RETRIEVAL (S)"
-            ] = dig_bouts_in_window_seconds
+            self.results["DIG TIME AFTER APPROACH AND BEFORE RETRIEVAL (S)"] = (
+                dig_bouts_in_window_seconds
+            )
             self.results["DIG EVENTS AFTER APPROACH"] = len(dig_bouts_in_window)
             self.results["MEAN DIG DURATION AFTER APPROACH"] = round(
                 dig_bouts_in_window["Bout_time"].mean(), 3

@@ -73,7 +73,6 @@ def _heatmap_multiprocessor(
 
 
 class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
-
     """
     Create heatmaps representing the locations of the classified behavior.
 

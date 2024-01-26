@@ -220,9 +220,9 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
                 )
                 self.data_df["{}_{}_entry".format(animal, shape)] = 0
                 self.data_df.loc[roi_bouts, "{}_{}_entry".format(animal, shape)] = 1
-                self.data_df[
-                    "{}_{}_cum_sum_entries".format(animal, shape)
-                ] = self.data_df["{}_{}_entry".format(animal, shape)].cumsum()
+                self.data_df["{}_{}_cum_sum_entries".format(animal, shape)] = (
+                    self.data_df["{}_{}_entry".format(animal, shape)].cumsum()
+                )
 
     def __update_video_meta_data(self):
         new_cap = cv2.VideoCapture(self.video_path)

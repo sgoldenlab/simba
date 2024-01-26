@@ -207,9 +207,9 @@ class OutlierCorrecterMovementAdvanced(ConfigReader, FeatureExtractionMixin):
                             "outlier_ratio": len(over_criterion_idx)
                             / len(self.movements),
                         }
-                        self.results.loc[
-                            over_criterion_idx, [bp + "_x", bp + "_y"]
-                        ] = np.nan
+                        self.results.loc[over_criterion_idx, [bp + "_x", bp + "_y"]] = (
+                            np.nan
+                        )
                         self.results[[bp + "_x", bp + "_y"]] = (
                             self.results[[bp + "_x", bp + "_y"]]
                             .ffill()

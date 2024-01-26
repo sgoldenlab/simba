@@ -29,7 +29,6 @@ from simba.utils.read_write import (find_core_cnt,
 
 
 class ImageMixin(object):
-
     """
     Methods to slice and compute attributes of images and comparing those attributes across sequential images.
 

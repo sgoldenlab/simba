@@ -202,9 +202,9 @@ class FeatureSubsetsCalculator(ConfigReader, FeatureExtractionMixin, TrainModelM
                 col_names = list(
                     sum([(x + "_x", y + "_y") for (x, y) in zip(point, point)], ())
                 )
-                self.results[
-                    f"Angle (degrees) {point[0]}-{point[1]}-{point[2]}"
-                ] = self.angle3pt_serialized(data=self.df[col_names].values)
+                self.results[f"Angle (degrees) {point[0]}-{point[1]}-{point[2]}"] = (
+                    self.angle3pt_serialized(data=self.df[col_names].values)
+                )
 
     def calc_three_point_hulls(self):
         for animal, points in self.within_animal_three_point_combs.items():
