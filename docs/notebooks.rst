@@ -1,7 +1,6 @@
 Notebooks
 =============
 
-
 General processing
 -------------------
 .. toctree::
@@ -13,7 +12,7 @@ General processing
    nb/third_party_append
    nb/advanced_smoothing_interpolation
    nb/advanced_outlier_correction
-
+   nb/kleinberg_gridsearch
 
 Visualizations
 -------------------
