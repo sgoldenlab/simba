@@ -31,8 +31,8 @@ extensions = ['sphinx.ext.napoleon',
 intersphinx_mapping = {
   'python': ('https://docs.python.org/3', None),
   }
-html_favicon = "../simba/assets/icons/SimBA_logo.png"
-html_logo = "../simba/assets/icons/SimBA_logo.png"
+html_favicon = "../simba/assets/icons/readthedocs_logo.png"
+html_logo = "../simba/assets/icons/readthedocs_logo.png"
 latex_engine = 'xelatex'
 latex_elements = {'papersize': 'letterpaper'}
 
