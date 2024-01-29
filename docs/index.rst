@@ -3,7 +3,7 @@ Welcome to SimBA's documentation!
 =================================
 
 .. image:: tutorials_rst/img/index/landing_page_1.png
-   :width: 1200
+   :width: 900
    :align: center
 
 
