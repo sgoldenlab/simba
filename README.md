@@ -226,7 +226,7 @@ Below is a link to download trained  behavior classification models to apply it 
 ## License 📃
 This project is licensed under the GPLv3. Note that the software is provided 'as is', without warranty of any kind, express or implied. 
 
-If you use **any** part of the code or data, please cite us! Thank you 🙏!
+If you find **any** part of the code or data useful for your own work, please cite us. You can view and download the citation file by clicking the <kbd>Cite this repository</kbd> button at the top right of this page. Thank you 🙏!
 
     @article{Nilsson2020.04.19.049452,
       author = {Nilsson, Simon RO and Goodwin, Nastacia L. and Choong, Jia Jie and Hwang, Sophia and Wright, Hayden R and Norville, Zane C and Tong, Xiaoyu and Lin, Dayu and Bentzley, Brandon S. and Eshel, Neir and McLaughlin, Ryan J and Golden, Sam A.},
@@ -241,8 +241,6 @@ If you use **any** part of the code or data, please cite us! Thank you 🙏!
     }
 
 ## References 📜
-
-
 
 [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)](https://osf.io/d69jt/)
 
