@@ -1,0 +1,49 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Simple Behavioral Analysis (SimBA): an open source toolkit
+  for computer classification of complex social behaviors in
+  experimental animals
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file
+type: software
+authors:
+  - given-names: Simon
+    family-names: Nilsson
+    email: sronilsson@gmail.com
+  - given-names: Nastacia
+    family-names: Goodwin
+  - given-names: Jia Jie
+    family-names: Choong
+  - given-names: Sophia
+    family-names: Hwang
+  - given-names: Hayden
+    family-names: Wright
+  - given-names: Zane
+    family-names: Norville
+  - given-names: Xiaoyu
+    family-names: Tong
+  - given-names: Dayu
+    family-names: Lin
+  - given-names: Brandon
+    family-names: Bentzley
+  - given-names: Neir
+    family-names: Eshel
+  - given-names: Ryan
+    family-names: McLaughlin
+  - given-names: Sam
+    family-names: Golden
+identifiers:
+  - type: doi
+    value: 10.1101/2020.04.19.049452
+    description: bioRxiv preprint
+repository-code: 'https://github.com/sgoldenlab/simba'
+url: 'https://simba-uw-tf-dev.readthedocs.io/'
+repository: 'https://osf.io/tmu6y/'
+abstract: >-
+  Toolkit for classification of behaviors in experimental
+  animals
+license: GPL-3.0
