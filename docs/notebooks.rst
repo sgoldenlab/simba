@@ -30,6 +30,16 @@ Visualizations
    nb/hatmap_location_plotter
    nb/heatmap_clf
 
+Geometry- and image-related calculators
+-------------------
+Some example operations pertaining to working with animals and environments as geometries.
+
+.. toctree::
+   :maxdepth: 1
+
+   nb/geometry_example_1
+   nb/geometry_example_2
+
 Miscellaneous
 -------------------
 .. toctree::
@@ -37,5 +47,7 @@ Miscellaneous
 
    nb/import_sleap_h5
    nb/multiclass
+
+
 
 
