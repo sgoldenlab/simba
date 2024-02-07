@@ -1,0 +1,22 @@
+# Byte-compiled / optimized Python files
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE or editor specific files
+.idea/
+*.o
+*.pyc
+*.class
+
+# Ignore PyPI build artifacts
+dist/
+build/
+*.egg-info/
+*.egg
+*.tar.gz
+*.whl

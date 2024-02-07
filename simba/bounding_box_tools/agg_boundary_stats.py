@@ -5,17 +5,14 @@ from typing import List, Union
 
 import pandas as pd
 
-try:
-    from typing import Literal
-except:
-    from typing_extensions import Literal
+try: from typing import Literal
+except: from typing_extensions import Literal
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.data import detect_bouts, plug_holes_shortest_bout
 from simba.utils.errors import NotDirectoryError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-
 
 class AggBoundaryStatisticsCalculator(ConfigReader):
     """
