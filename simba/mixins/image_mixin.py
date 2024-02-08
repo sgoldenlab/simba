@@ -1041,7 +1041,7 @@ class ImageMixin(object):
         For example, given a stack of N images, and N*X geometries representing the region around the animal body-part(s),
         slice out the X geometries from each of the N images and return the sliced areas.
 
-        .. image:: _static/img/slice_shapes_in_imgs.gif
+        .. image:: _static/img/slice_shapes_in_imgs_4.gif
            :width: 400
            :align: center
 
