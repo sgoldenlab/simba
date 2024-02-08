@@ -2,12 +2,6 @@ name: PyPI Release
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-on:
-  push:
     tags:
      - '*'
 
