@@ -67,6 +67,15 @@ black_animal_polygons = GeometryMixin().multiframe_bodyparts_to_polygon(
     verbose=False,
     core_cnt=-1,
 )
+
+
+black_animal_center = df[['Nose_2_x', 'Nose_2_y']].values.astype(np.int)
+black_animal_circles = GeometryMixin().multiframe_bodyparts_to_circle(data=black_animal_center,
+                                                                       pixels_per_mm=pixels_per_mm,
+                                                                       parallel_offset=100,
+                                                                       core_cnt=-1)
+
+
 white_animal_polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(
     shapes=white_animal_polygons, verbose=False, core_cnt=-1
 )
@@ -75,12 +84,10 @@ black_animal_polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(
 )
 
 # IF WE WANT, THEN WE CAN VISUALIZE THE ANIMAL GEOMETRIES.
-imgs = ImageMixin().slice_shapes_in_imgs(
-    imgs=video_path, shapes=white_animal_polygons, verbose=False
-)
+imgs = ImageMixin().slice_shapes_in_imgs(imgs=video_path, shapes=black_animal_circles, verbose=False)
 ImageMixin.img_stack_to_video(
     imgs=imgs,
-    save_path="/Users/simon/Desktop/envs/simba/troubleshooting/RI/project_folder/frames/output/stack/test.mp4",
+    save_path="/Users/simon/Desktop/envs/simba/troubleshooting/RI/project_folder/frames/output/stack/test_3.mp4",
     fps=fps,
 )
 

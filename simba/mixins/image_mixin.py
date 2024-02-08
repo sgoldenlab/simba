@@ -1028,13 +1028,7 @@ class ImageMixin(object):
             idx_cnt += 1
         return results
 
-    def slice_shapes_in_imgs(
-        self,
-        imgs: Union[np.ndarray, os.PathLike],
-        shapes: Union[np.ndarray, List[Polygon]],
-        core_cnt: Optional[int] = -1,
-        verbose: Optional[bool] = False,
-    ) -> List[np.ndarray]:
+    def slice_shapes_in_imgs( self, imgs: Union[np.ndarray, os.PathLike], shapes: Union[np.ndarray, List[Polygon]], core_cnt: Optional[int] = -1, verbose: Optional[bool] = False) -> List[np.ndarray]:
         """
         Slice regions from a stack of images or a video file, where the regions are based on defined shapes. Uses multiprocessing.
 
@@ -1042,6 +1036,14 @@ class ImageMixin(object):
         slice out the X geometries from each of the N images and return the sliced areas.
 
         .. image:: _static/img/slice_shapes_in_imgs.gif
+           :width: 400
+           :align: center
+
+        .. image:: _static/img/bodyparts_to_circle_1.gif
+           :width: 400
+           :align: center
+
+        .. image:: _static/img/bodyparts_to_circle_2.gif
            :width: 400
            :align: center
 

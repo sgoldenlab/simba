@@ -164,9 +164,8 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def bodyparts_to_circle(
-        data: np.ndarray, parallel_offset: int, pixels_per_mm: Optional[int] = 1
-    ) -> Polygon:
+    def bodyparts_to_circle(data: np.ndarray, parallel_offset: float, pixels_per_mm: Optional[int] = 1) -> Polygon:
+
         """
         Create a circle geometry from a single body-part (x,y) coordinate.
 
@@ -182,7 +181,7 @@ class GeometryMixin(object):
            :align: center
 
         :param np.ndarray data: The body-part coordinate xy as a 1d array. E.g., np.array([364, 308])
-        :param int data: The radius of the resultant circle in millimeters.
+        :param float parallel_offset: The radius of the resultant circle in millimeters.
         :param int pixels_per_mm: The pixels per millimeter of the video. If not passed, 1 will be used meaning revert to radius in pixels rather than millimeters.
         :returns Polygon: Shapely Polygon of curcular shape.
 
@@ -196,7 +195,7 @@ class GeometryMixin(object):
                 msg=f"Cannot create circle data is not a (2,) array: " f"{data.shape}",
                 source=GeometryMixin.bodyparts_to_circle.__name__,
             )
-        check_int(
+        check_float(
             name=f"{GeometryMixin.bodyparts_to_circle.__name__} parallel_offset",
             value=pixels_per_mm,
             min_value=1,
@@ -1041,13 +1040,11 @@ class GeometryMixin(object):
         pool.terminate()
         return [i for s in results for i in s]
 
-    def multiframe_bodyparts_to_circle(
-        self,
-        data: np.ndarray,
-        parallel_offset: int = 1,
-        core_cnt: int = -1,
-        pixels_per_mm: Optional[int] = 1,
-    ) -> List[Polygon]:
+    def multiframe_bodyparts_to_circle(self,
+                                       data: np.ndarray,
+                                       parallel_offset: int = 1,
+                                       core_cnt: int = -1,
+                                       pixels_per_mm: Optional[int] = 1) -> List[Polygon]:
         """
         Convert a set of pose-estimated key-points to circles with specified radius using multiprocessing.
 
@@ -1062,6 +1059,7 @@ class GeometryMixin(object):
         >>> circles = GeometryMixin().multiframe_bodyparts_to_circle(data=data)
         """
 
+        timer = SimbaTimer(start=True)
         check_int(
             name="CORE COUNT",
             value=core_cnt,
@@ -1078,13 +1076,15 @@ class GeometryMixin(object):
             constants = functools.partial(
                 GeometryMixin.bodyparts_to_circle,
                 parallel_offset=parallel_offset,
-                pixels_per_mm=pixels_per_mm,
+                pixels_per_mm=pixels_per_mm
             )
             for cnt, mp_return in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(mp_return)
 
         pool.join()
         pool.terminate()
+        timer.stop_timer()
+        stdout_success(msg='Multiframe body-parts to circle complete', source=GeometryMixin.multiframe_bodyparts_to_circle.__name__, elapsed_time=timer.elapsed_time_str)
         return results
 
     @staticmethod
