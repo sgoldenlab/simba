@@ -48,6 +48,7 @@ from simba.utils.warnings import (FileExistWarning, InvalidValueWarning,
 PARSE_OPTIONS = csv.ParseOptions(delimiter=",")
 READ_OPTIONS = csv.ReadOptions(encoding="utf8")
 
+
 def read_df(
     file_path: Union[str, os.PathLike],
     file_type: Union[str, os.PathLike],

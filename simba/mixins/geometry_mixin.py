@@ -2012,7 +2012,11 @@ class GeometryMixin(object):
                 results.append(result)
 
         timer.stop_timer()
-        stdout_success(msg='Multistring skeleton complete.', elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(
+            msg="Multistring skeleton complete.",
+            elapsed_time=timer.elapsed_time_str,
+            source=self.__class__.__name__,
+        )
         return results
 
     @staticmethod
