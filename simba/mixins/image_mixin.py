@@ -964,7 +964,6 @@ class ImageMixin(object):
         for key, image in image_dict.items():
             pad_height = max_height - image.shape[0]
             pad_width = max_width - image.shape[1]
-            print(image.shape)
             padded_image = np.pad(
                 image,
                 ((0, pad_height), (0, pad_width), (0, 0)),
