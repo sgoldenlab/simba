@@ -30,9 +30,7 @@ WHITE = "Animal_1"
 BLACK = "Animal_2"
 
 config = ConfigReader(config_path=CONFIG_PATH, create_logger=False)
-data_path = os.path.join(
-    config.outlier_corrected_dir, f"{VIDEO_NAME}.{config.file_type}"
-)
+data_path = os.path.join(config.outlier_corrected_dir, f"{VIDEO_NAME}.{config.file_type}")
 video_path = os.path.join(config.video_dir, f"{VIDEO_NAME}.mp4")
 get_video_meta_data(video_path)
 df = read_df(file_path=data_path, file_type=config.file_type)
@@ -76,15 +74,15 @@ black_animal_circles = GeometryMixin().multiframe_bodyparts_to_circle(data=black
                                                                        core_cnt=-1)
 
 
-white_animal_polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(
-    shapes=white_animal_polygons, verbose=False, core_cnt=-1
-)
-black_animal_polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(
-    shapes=black_animal_polygons, verbose=False, core_cnt=-1
-)
+# white_animal_polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(
+#     shapes=white_animal_polygons, verbose=False, core_cnt=-1
+# )
+# black_animal_polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(
+#     shapes=black_animal_polygons, verbose=False, core_cnt=-1
+# )
 
 # IF WE WANT, THEN WE CAN VISUALIZE THE ANIMAL GEOMETRIES.
-imgs = ImageMixin().slice_shapes_in_imgs(imgs=video_path, shapes=black_animal_circles, verbose=False)
+imgs = ImageMixin().slice_shapes_in_imgs(imgs=video_path, shapes=white_animal_polygons, verbose=False)
 ImageMixin.img_stack_to_video(
     imgs=imgs,
     save_path="/Users/simon/Desktop/envs/simba/troubleshooting/RI/project_folder/frames/output/stack/test_3.mp4",
