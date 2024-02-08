@@ -164,8 +164,9 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def bodyparts_to_circle(data: np.ndarray, parallel_offset: float, pixels_per_mm: Optional[int] = 1) -> Polygon:
-
+    def bodyparts_to_circle(
+        data: np.ndarray, parallel_offset: float, pixels_per_mm: Optional[int] = 1
+    ) -> Polygon:
         """
         Create a circle geometry from a single body-part (x,y) coordinate.
 
@@ -1040,11 +1041,13 @@ class GeometryMixin(object):
         pool.terminate()
         return [i for s in results for i in s]
 
-    def multiframe_bodyparts_to_circle(self,
-                                       data: np.ndarray,
-                                       parallel_offset: int = 1,
-                                       core_cnt: int = -1,
-                                       pixels_per_mm: Optional[int] = 1) -> List[Polygon]:
+    def multiframe_bodyparts_to_circle(
+        self,
+        data: np.ndarray,
+        parallel_offset: int = 1,
+        core_cnt: int = -1,
+        pixels_per_mm: Optional[int] = 1,
+    ) -> List[Polygon]:
         """
         Convert a set of pose-estimated key-points to circles with specified radius using multiprocessing.
 
@@ -1076,7 +1079,7 @@ class GeometryMixin(object):
             constants = functools.partial(
                 GeometryMixin.bodyparts_to_circle,
                 parallel_offset=parallel_offset,
-                pixels_per_mm=pixels_per_mm
+                pixels_per_mm=pixels_per_mm,
             )
             for cnt, mp_return in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(mp_return)
@@ -1084,7 +1087,11 @@ class GeometryMixin(object):
         pool.join()
         pool.terminate()
         timer.stop_timer()
-        stdout_success(msg='Multiframe body-parts to circle complete', source=GeometryMixin.multiframe_bodyparts_to_circle.__name__, elapsed_time=timer.elapsed_time_str)
+        stdout_success(
+            msg="Multiframe body-parts to circle complete",
+            source=GeometryMixin.multiframe_bodyparts_to_circle.__name__,
+            elapsed_time=timer.elapsed_time_str,
+        )
         return results
 
     @staticmethod
