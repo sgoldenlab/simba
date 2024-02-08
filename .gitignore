@@ -12,6 +12,7 @@ ENV/
 *.o
 *.pyc
 *.class
+.ipynb_checkpoints/
 
 # Ignore PyPI build artifacts
 dist/
