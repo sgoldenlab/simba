@@ -8,7 +8,7 @@ Licensed under GNU Lesser General Public License v3.0
 
 import setuptools
 
-with open("project_description.md", "r", encoding="utf-8") as fh:
+with open("docs/project_description.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", "r") as f:

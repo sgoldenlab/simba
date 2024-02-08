@@ -1028,18 +1028,20 @@ class ImageMixin(object):
             idx_cnt += 1
         return results
 
-    def slice_shapes_in_imgs(
-        self,
-        imgs: Union[np.ndarray, os.PathLike],
-        shapes: Union[np.ndarray, List[Polygon]],
-        core_cnt: Optional[int] = -1,
-        verbose: Optional[bool] = False,
-    ) -> List[np.ndarray]:
+    def slice_shapes_in_imgs(self,
+                             imgs: Union[np.ndarray, os.PathLike],
+                             shapes: Union[np.ndarray, List[Polygon]],
+                             core_cnt: Optional[int] = -1,
+                             verbose: Optional[bool] = False) -> List[np.ndarray]:
         """
         Slice regions from a stack of images or a video file, where the regions are based on defined shapes. Uses multiprocessing.
 
         For example, given a stack of N images, and N*X geometries representing the region around the animal body-part(s),
         slice out the X geometries from each of the N images and return the sliced areas.
+
+        .. image:: _static/img/add_img_border_and_flood_fill.png
+           :width: 400
+           :align: center
 
         :example I:
         >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1.mp4', start_frm=0, end_frm=10)

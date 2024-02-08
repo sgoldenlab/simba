@@ -17,7 +17,10 @@ from simba.utils.checks import check_instance, check_int
 from simba.utils.enums import Formats
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (get_video_meta_data, read_df)
+from simba.utils.read_write import (get_video_meta_data, read_df, read_frm_of_video)
+import matplotlib.pyplot as plt
+import matplotlib
+dpi = matplotlib.rcParams['figure.dpi']
 
 CONFIG_PATH = "/Users/simon/Desktop/envs/simba/troubleshooting/RI/project_folder/project_config.ini"
 VIDEO_NAME = "RI_01_165_clipped"
@@ -47,6 +50,17 @@ black_animal_polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(sha
 # IF WE WANT, THEN WE CAN VISUALIZE THE ANIMAL GEOMETRIES.
 imgs = ImageMixin().slice_shapes_in_imgs(imgs=video_path, shapes=white_animal_polygons, verbose=False)
 ImageMixin.img_stack_to_video( imgs=imgs, save_path="/Users/simon/Desktop/envs/simba/troubleshooting/RI/project_folder/frames/output/stack/test.mp4", fps=fps)
+
+im = imgs[4]
+height, width, depth = im.shape
+figsize = width / float(dpi), height / float(dpi)
+
+plt.figure(figsize=figsize)
+plt.axis('off')
+plt.imshow(im)
+plt.show()
+
+
 
 # Entire_video
 GeometryPlotter(
