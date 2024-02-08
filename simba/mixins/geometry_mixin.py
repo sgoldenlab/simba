@@ -1946,6 +1946,7 @@ class GeometryMixin(object):
         >>> geometries = GeometryMixin().multiframe_bodyparts_to_multistring_skeleton(data_df=df, skeleton=skeleton, core_cnt=2, verbose=True)
         """
 
+        timer = SimbaTimer(start=True)
         check_instance(
             source=f"{GeometryMixin().multiframe_bodyparts_to_multistring_skeleton.__name__} data",
             instance=data_df,
@@ -2010,6 +2011,8 @@ class GeometryMixin(object):
                         )
                 results.append(result)
 
+        timer.stop_timer()
+        stdout_success(msg='Multistring skeleton complete.', elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)
         return results
 
     @staticmethod

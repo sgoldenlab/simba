@@ -1,7 +1,6 @@
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
-
 try:
     from typing import Literal
 except:
@@ -21,12 +20,13 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_instance, check_int, check_str,
                                 check_valid_array, check_valid_lst)
-from simba.utils.enums import Defaults, GeometryEnum, Options
+from simba.utils.enums import Defaults, GeometryEnum, Options, Formats
 from simba.utils.errors import ArrayError, FrameRangeError, InvalidInputError
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data,
                                     read_frm_of_video)
+from simba.utils.printing import SimbaTimer, stdout_success
 
 
 class ImageMixin(object):
@@ -935,17 +935,61 @@ class ImageMixin(object):
             results.append(cv2.bitwise_and(roi_img, mask))
         return results
 
+
     @staticmethod
-    def _slice_shapes_in_video_file_helper(
-        data: np.ndarray, video_path: Union[str, os.PathLike]
-    ):
+    def pad_img_stack(image_dict: Dict[int, np.ndarray], pad_value: Optional[int] = 0) -> Dict[int, np.ndarray]:
+        """
+        Pad images in a dictionary stack to have the same dimensions (the same dimension is represented by the largest image in the stack)
+
+        :param Dict[int, np.ndarray] image_dict: A dictionary mapping integer keys to numpy arrays representing images.
+        :param Optional[int] pad_value: The value used for padding. Defaults to 0 (black)
+        :return Dict[int, np.ndarray]: A dictionary mapping integer keys to numpy arrays representing padded images.
+        """
+        check_instance(source=ImageMixin.pad_img_stack.__name__, instance=image_dict, accepted_types=(dict,))
+        check_int(name=f'{ImageMixin.pad_img_stack.__name__} pad_value', value=pad_value, max_value=255, min_value=0)
+        max_height = max(image.shape[0] for image in image_dict.values())
+        max_width = max(image.shape[1] for image in image_dict.values())
+        padded_images = {}
+        for key, image in image_dict.items():
+            pad_height = max_height - image.shape[0]
+            pad_width = max_width - image.shape[1]
+            print(image.shape)
+            padded_image = np.pad(image, ((0, pad_height), (0, pad_width), (0, 0)), mode='constant',
+                                  constant_values=pad_value)
+            padded_images[key] = padded_image
+        return padded_images
+
+    @staticmethod
+    def img_stack_to_video(imgs: Dict[int, np.ndarray],
+                           save_path: Union[str, os.PathLike],
+                           fps: int,
+                           verbose: Optional[bool] = True):
+
+        check_instance(source=ImageMixin.img_stack_to_video.__name__, instance=imgs, accepted_types=(dict,))
+        img_sizes = set()
+        for k, v in imgs.items(): img_sizes.add(v.shape)
+        if len(list(img_sizes)) > 1: imgs = ImageMixin.pad_img_stack(imgs)
+        imgs = np.stack(imgs.values())
+        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+        writer = cv2.VideoWriter(save_path, fourcc, fps, (imgs[0].shape[1], imgs[0].shape[0]))
+        for i in range(imgs.shape[0]):
+            if verbose:
+                print(f'Writing img {i + 1}...')
+            writer.write(imgs[i])
+        writer.release()
+
+    @staticmethod
+    def _slice_shapes_in_video_file_helper(data: np.ndarray,
+                                           video_path: Union[str, os.PathLike],
+                                           verbose: bool):
         cap = cv2.VideoCapture(video_path)
         start_frm, current_frm, end_frm = data[0][0], data[0][0], data[-1][0]
         cap.set(1, start_frm)
         results = {}
         idx_cnt = 0
         while current_frm <= end_frm:
-            print(f"Processing frame {current_frm}...")
+            if verbose:
+                print(f"Processing frame {current_frm}...")
             img = cap.read(current_frm)[1].astype(np.uint8)
             shape = np.array(data[idx_cnt][1].exterior.coords).astype(np.int64)
             shape[shape < 0] = 0
@@ -960,12 +1004,11 @@ class ImageMixin(object):
             idx_cnt += 1
         return results
 
-    def slice_shapes_in_imgs(
-        self,
-        imgs: Union[np.ndarray, os.PathLike],
-        shapes: Union[np.ndarray, List[Polygon]],
-        core_cnt: Optional[int] = -1,
-    ) -> List[np.ndarray]:
+    def slice_shapes_in_imgs(self,
+                             imgs: Union[np.ndarray, os.PathLike],
+                             shapes: Union[np.ndarray, List[Polygon]],
+                             core_cnt: Optional[int] = -1,
+                             verbose: Optional[bool] = False) -> List[np.ndarray]:
         """
         Slice regions from a stack of images or a video file, where the regions are based on defined shapes. Uses multiprocessing.
 
@@ -994,7 +1037,7 @@ class ImageMixin(object):
 
 
         """
-
+        timer = SimbaTimer(start=True)
         check_int(
             name=f"{ImageMixin().slice_shapes_in_imgs.__name__} core count",
             value=core_cnt,
@@ -1059,20 +1102,17 @@ class ImageMixin(object):
                 ):
                     results.append(result)
         else:
-            shapes = np.array_split(
-                np.column_stack((np.arange(len(shapes)), shapes)), core_cnt
-            )
-            with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-            ) as pool:
-                constants = functools.partial(
-                    self._slice_shapes_in_video_file_helper, video_path=imgs
-                )
+            shapes = np.array_split(np.column_stack((np.arange(len(shapes)), shapes)), core_cnt)
+            with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+                constants = functools.partial(self._slice_shapes_in_video_file_helper,
+                                              video_path=imgs,
+                                              verbose=verbose)
                 for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
                     results.append(result)
                 results = dict(ChainMap(*results))
-        pool.join()
-        pool.terminate()
+        pool.join(); pool.terminate()
+        timer.stop_timer()
+        stdout_success(msg='Geometry image slicing complete.', elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)
         return results
 
 

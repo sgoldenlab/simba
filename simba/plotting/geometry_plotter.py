@@ -12,7 +12,7 @@ from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_instance,
-                                check_int, check_iterable_length, check_str)
+                                check_int, check_iterable_length, check_str, check_if_dir_exists)
 from simba.utils.enums import Defaults, Formats, TextOptions
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.lookups import get_color_dict
@@ -138,13 +138,12 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     :raises CountError: If the number of shapes in the geometries does not match the number of frames in the video.
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        geometries: List[List[Union[Polygon, LineString]]],
-        video_name: str,
-        core_cnt: int = -1,
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 geometries: List[List[Union[Polygon, LineString]]],
+                 video_name: str,
+                 core_cnt: Optional[int] = -1,
+                 save_path: Optional[Union[str, os.PathLike]] = None):
         check_file_exist_and_readable(file_path=config_path)
         check_instance(
             source=self.__class__.__name__, instance=geometries, accepted_types=list
@@ -197,7 +196,12 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         )
         if not os.path.isdir(self.temp_dir):
             os.makedirs(self.temp_dir)
-        self.save_path = os.path.join(self.geometry_dir, f"{video_name}.mp4")
+        if save_path is None:
+            self.save_path = os.path.join(self.geometry_dir, f"{video_name}.mp4")
+        else:
+            check_if_dir_exists(in_dir=os.path.dirname(save_path))
+            self.save_path = save_path
+
 
     def run(self):
         video_timer = SimbaTimer(start=True)
@@ -227,7 +231,6 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
             pool.join()
 
         print(f"Joining {self.video_name} geometry video...")
-        print(self.temp_dir, self.save_path)
         concatenate_videos_in_folder(
             in_folder=self.temp_dir, save_path=self.save_path, remove_splits=True
         )
