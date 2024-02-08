@@ -29,5 +29,5 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
           cd simba  # Change directory to your package directory
-          python -c "import setuptools; setuptools.setup()"
+          python -c import setuptools; setuptools.setup() sdist bdist_wheel
           twine upload dist/*
