@@ -68,9 +68,24 @@ def test_kullback_leibler_divergence(bucket_method, expected_results):
     results = Statistics().kullback_leibler_divergence(sample_1=sample_1, sample_2=sample_2, fill_value=1, bucket_method=bucket_method)
     assert np.round(results, 2) == expected_results
 
-@pytest.mark.parametrize('bucket_method, expected_results', [("fd", 0.13), ("doane", 0.32), ("auto", 0.3), ("scott", 0.25), ("stone", 0.43), ("rice", 0.3), ("sturges", 0.3), ("sqrt", 0.28), ("auto",   0.3)])
+@pytest.mark.parametrize('bucket_method, expected_results', [("fd", 0.13), ("doane", 0.32), ("auto", 0.3), ("scott", 0.25), ("stone", 0.43), ("rice", 0.3), ("sturges", 0.3), ("sqrt", 0.28)])
 def test_jensen_shannon_divergence(bucket_method, expected_results):
     sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
     sample_2 = np.array([8, 5, 5, 8, 8, 9, 10, 1, 7, 10, 10])
     results = Statistics().jensen_shannon_divergence(sample_1=sample_1, sample_2=sample_2, bucket_method=bucket_method)
+    assert np.round(results, 2) == expected_results
+
+
+@pytest.mark.parametrize('bucket_method, expected_results', [("fd", 0.05),
+                                                             ("doane", 0.03),
+                                                             ("auto", 0.03),
+                                                             ("scott", 0.12),
+                                                             ("stone", 0.0),
+                                                             ("rice", 0.03),
+                                                             ("sturges", 0.03),
+                                                             ("sqrt", 0.04)])
+def test_wasserstein_distance(bucket_method, expected_results):
+    sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
+    sample_2 = np.array([8, 5, 5, 8, 8, 9, 10, 1, 7, 10, 10])
+    results = Statistics().wasserstein_distance(sample_1=sample_1, sample_2=sample_2, bucket_method=bucket_method)
     assert np.round(results, 2) == expected_results
