@@ -3,7 +3,7 @@ import pytest
 import pickle
 
 from simba.mixins.statistics_mixin import Statistics
-from simba.utils.enums import TestPaths
+from simba.utils.enums import TestPaths, Paths
 
 
 def test_rolling_independent_sample_t():
@@ -18,7 +18,7 @@ def test_independent_samples_t(critical_values, expected_results):
     sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10]).astype(np.float32)
     sample_2 = np.array([2, 5, 10, 4, 8, 10, 7, 10, 7, 10, 10]).astype(np.float32)
     if critical_values:
-        critical_values = pickle.load(open(TestPaths.CRITICAL_VALUES.value, 'rb'))['independent_t_test']['one_tail'].values
+        critical_values = pickle.load(open(Paths.CRITICAL_VALUES.value, 'rb'))['independent_t_test']['one_tail'].values
         results = Statistics().independent_samples_t(sample_1=sample_1, sample_2=sample_2, critical_values=critical_values)
     else:
         results = Statistics().independent_samples_t(sample_1=sample_1, sample_2=sample_2)
@@ -51,7 +51,7 @@ def test_two_sample_ks():
 def test_one_way_anova():
     sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
     sample_2 = np.array([8, 5, 5, 8, 8, 9, 10, 1, 7, 10, 10])
-    critical_values = pickle.load(open(TestPaths.CRITICAL_VALUES.value, 'rb'))['f']['one_tail'].values
+    critical_values = pickle.load(open(Paths.CRITICAL_VALUES.value, 'rb'))['f']['one_tail'].values
     results = Statistics().one_way_anova(sample_1=sample_2, sample_2=sample_1, critical_values=critical_values)
     assert results == (5.8483754512635375, True)
 
