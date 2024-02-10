@@ -113,6 +113,7 @@ class Paths(Enum):
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
     CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
 
+
 class Formats(Enum):
     MP4_CODEC = "mp4v"
     AVI_CODEC = "XVID"
@@ -609,5 +610,6 @@ class MLParamKeys(Enum):
     SHAP_MULTIPROCESS = "shap_multiprocess"
     CLASSIFIER_MAP = "classifier_map"
 
+
 class TestPaths(Enum):
-    CRITICAL_VALUES = '../simba/assets/lookups/critical_values_05.pickle'
+    CRITICAL_VALUES = "../simba/assets/lookups/critical_values_05.pickle"
