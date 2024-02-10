@@ -63,7 +63,7 @@ class Statistics(FeatureExtractionMixin):
         return hist
 
     @staticmethod
-    @njit("(float64[:], float64, float64)", cache=True)
+    @njit("(float32[:], float64, float64)", cache=True)
     def rolling_independent_sample_t(data: np.ndarray,
                                      time_window: float,
                                      fps: float) -> np.ndarray:
@@ -86,7 +86,7 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> data_1, data_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
         >>> data = np.hstack([data_1, data_2])
-        >>> Statistics().rolling_independent_sample_t(data, group_size_s=1, fps=10)
+        >>> Statistics().rolling_independent_sample_t(data, time_window=1, fps=10)
         >>> [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -6.88741389, -6.88741389, -6.88741389, -6.88741389, -6.88741389, -6.88741389, -6.88741389, -6.88741389, -6.88741389, -6.88741389])
 
         """
@@ -234,7 +234,7 @@ class Statistics(FeatureExtractionMixin):
         E.g., compute KS statistics when comparing ``Feature N`` in the current 1s time-window, versus ``Feature N`` in the previous 1s time-window.
 
         :parameter ndarray data: 1D array of size len(frames) representing feature values.
-        :parameter int time_window: The size of the buckets in seconds.
+        :parameter float time_window: The size of the buckets in seconds.
         :parameter int fps: Frame-rate of recorded video.
         :return np.ndarray: Array of size data.shape[0] with KS statistics
 
@@ -330,7 +330,7 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics().one_way_anova(sample_1=sample_2, sample_2=sample_1)
         """
 
-        significance_bool = True
+        significance_bool = None
         n1, n2 = len(sample_1), len(sample_2)
         m1, m2 = np.mean(sample_1), np.mean(sample_2)
         ss_between = (
@@ -371,8 +371,8 @@ class Statistics(FeatureExtractionMixin):
            :align: center
 
         :example:
-        >>> sample = np.random.normal(loc=10, scale=1, size=10)
-        >>> Statistics().rolling_one_way_anova(data=sample, window_sizes=np.array([1]), fps=2)
+        >>> sample = np.random.normal(loc=10, scale=1, size=10).astype(np.float32)
+        >>> Statistics().rolling_one_way_anova(data=sample, time_windows=np.array([1.0]), fps=2)
         >>> [[0.00000000e+00][0.00000000e+00][2.26221263e-06][2.26221263e-06][5.39119950e-03][5.39119950e-03][1.46725486e-03][1.46725486e-03][1.16392111e-02][1.16392111e-02]]
         """
 
@@ -467,7 +467,7 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=700, size=5), np.random.normal(loc=50, scale=700, size=5)
         >>> data = np.hstack((sample_1, sample_2))
-        >>> Statistics().rolling_kullback_leibler_divergence(data=data, window_sizes=np.array([1]), fps=2)
+        >>> Statistics().rolling_kullback_leibler_divergence(data=data, time_windows=np.array([1]), fps=2)
         """
 
         check_valid_array(data=data, source=self.__class__.__name__, accepted_sizes=[1])
@@ -1381,9 +1381,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64, float64, float64)")
-    def sliding_autocorrelation(
-        data: np.ndarray, max_lag: float, time_window: float, fps: float
-    ):
+    def sliding_autocorrelation(data: np.ndarray, max_lag: float, time_window: float, fps: float):
         """
         Jitted compute of sliding auto-correlations (the correlation of a feature with itself using lagged windows).
 
@@ -2137,7 +2135,6 @@ class Statistics(FeatureExtractionMixin):
             elif (x[i] == 1) and (y[i] == 0):
                 t_f += 1.0 * w[i]
 
-        print(t_cnt, f_cnt, t_f, f_t)
         if t_f + f_t == 0.0:
             return 0.0
         else:
@@ -2249,8 +2246,3 @@ class Statistics(FeatureExtractionMixin):
         return self._hellinger_helper(
             x=s1_h.astype(np.float32), y=s2_h.astype(np.float32)
         )
-
-
-# data = np.random.randint(0, 100, (100,))
-# time_windows = np.array([1, 2])
-# Statistics().rolling_jensen_shannon_divergence(data=data, time_windows=time_windows, fps=30)

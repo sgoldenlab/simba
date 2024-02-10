@@ -111,7 +111,7 @@ class Paths(Enum):
     LOGO_ICON_WINDOWS_PATH = Path("assets/icons/SimBA_logo.ico")
     LOGO_ICON_DARWIN_PATH = Path("assets/icons/SimBA_logo.png")
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
-
+    CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
 
 class Formats(Enum):
     MP4_CODEC = "mp4v"
@@ -608,3 +608,6 @@ class MLParamKeys(Enum):
     SAVE_TRAIN_TEST_FRM_IDX = "save_train_test_frm_idx"
     SHAP_MULTIPROCESS = "shap_multiprocess"
     CLASSIFIER_MAP = "classifier_map"
+
+class TestPaths(Enum):
+    CRITICAL_VALUES = '../simba/assets/lookups/critical_values_05.pickle'
