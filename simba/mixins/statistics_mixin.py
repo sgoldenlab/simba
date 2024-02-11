@@ -858,7 +858,8 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> sample_1 = np.array([1, 1, 3, 4, 5]).astype(np.float64)
         >>> sample_2 = np.array([6, 7, 8, 9, 10]).astype(np.float64)
-        >>> results = Statistics().kruskal_wallis(sample_1=sample_1, sample_2=sample_2)
+        >>> Statistics().kruskal_wallis(sample_1=sample_1, sample_2=sample_2)
+        >>> 39.4
         """
 
         # sample_1 = np.concatenate((np.zeros((sample_1.shape[0], 1)), sample_1.reshape(-1, 1)), axis=1)
@@ -903,8 +904,8 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     @jit(nopython=True, cache=True)
     def levenes(
-        sample_1: np.ndarray, sample_2: np.ndarray, critical_values: np.ndarray
-    ) -> (float, Union[bool, None]):
+        sample_1: np.ndarray, sample_2: np.ndarray, critical_values: Optional[np.ndarray] = None) -> (float, Union[bool, None]):
+
         """
         Jitted compute of two-sample Leven's W.
 
@@ -1085,6 +1086,7 @@ class Statistics(FeatureExtractionMixin):
         >>> sample_1 = np.array([7, 2, 9, 4, 5, 6, 7, 8, 9]).astype(np.float32)
         >>> sample_2 = np.array([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]).astype(np.float32)
         >>> Statistics().pearsons_r(sample_1=sample_1, sample_2=sample_2)
+        >>> 0.47
         """
 
         m1, m2 = np.mean(sample_1), np.mean(sample_2)
@@ -1311,7 +1313,7 @@ class Statistics(FeatureExtractionMixin):
 
         :examples:
         >>> data = np.random.randint(0, 4, (200)).astype(np.float32)
-        >>> results = Statistics().rolling_mann_whitney(sample_1=sample_1, sample_2=sample_2)
+        >>> results = Statistics().rolling_mann_whitney(data=data, time_windows=np.array([1.0]), fps=1)
         """
 
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
@@ -1461,7 +1463,7 @@ class Statistics(FeatureExtractionMixin):
 
         References
         ----------
-        .. [1] `Stephanie Glen, "Kendall’s Tau (Kendall Rank Correlation Coefficient)"  <https://github.com/sgoldenlab/simba/blob/master/docs/FSTTC.md>`__.
+        .. [1] `Stephanie Glen, "Kendall’s Tau (Kendall Rank Correlation Coefficient)"  <https://www.statisticshowto.com/kendalls-tau/>`__.
         """
 
         rnks = np.argsort(sample_1)
@@ -1490,9 +1492,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
-    def sliding_kendall_tau(
-        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float
-    ) -> np.ndarray:
+    def sliding_kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Compute sliding Kendall's Tau correlation coefficient.
 
@@ -1505,6 +1505,11 @@ class Statistics(FeatureExtractionMixin):
            \\tau = \\frac{{\\text{{concordant pairs}} - \\text{{discordant pairs}}}}{{\\text{{concordant pairs}} + \\text{{discordant pairs}}}}
 
         where concordant pairs are pairs of elements with the same order in both samples, and discordant pairs are pairs with different orders.
+
+        References
+        ----------
+        .. [1] `Stephanie Glen, "Kendall’s Tau (Kendall Rank Correlation Coefficient)"  <https://www.statisticshowto.com/kendalls-tau/>`__.
+
 
         :param np.ndarray sample_1: First sample for comparison.
         :param np.ndarray sample_2: Second sample for comparison.
@@ -1562,7 +1567,7 @@ class Statistics(FeatureExtractionMixin):
         >>> data = np.random.normal(loc=45, scale=1, size=100).astype(np.float32)
         >>> for i in range(5): data = np.vstack([data, np.random.normal(loc=45, scale=1, size=100).astype(np.float32)])
         >>> for i in range(2): data = np.vstack([data, np.random.normal(loc=90, scale=1, size=100).astype(np.float32)])
-        >>> Statistics().local_outlier_factor(data=data, k=5).astype(np.float32)
+        >>> Statistics().local_outlier_factor(data=data, k=5)
         >>> [1.004, 1.007, 0.986, 1.018, 0.986, 0.996, 24.067, 24.057]
         """
 
@@ -1587,7 +1592,7 @@ class Statistics(FeatureExtractionMixin):
             k = int(data.shape[0] * k)
         lof_model = LocalOutlierFactor(n_neighbors=k, contamination=contamination)
         _ = lof_model.fit_predict(data)
-        return -lof_model.negative_outlier_factor_
+        return -lof_model.negative_outlier_factor_.astype(np.float32)
 
     @staticmethod
     @jit(nopython=True)
@@ -1626,7 +1631,7 @@ class Statistics(FeatureExtractionMixin):
         bucket_method: Literal[
             "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
         ] = "auto",
-    ):
+    ) -> np.ndarray:
         """
         Jitted compute of Histogram-based Outlier Scores (HBOS). HBOS quantifies the abnormality of data points based on the densities of their feature values
         within their respective buckets over all feature values.
@@ -1636,7 +1641,7 @@ class Statistics(FeatureExtractionMixin):
         :return np.ndarray: Array of size data.shape[0] representing outlier scores, with higher values representing greater outliers.
 
         .. image:: _static/img/hbos.png
-           :width: 800
+           :width: 1200
            :align: center
 
         :example:
@@ -1676,7 +1681,7 @@ class Statistics(FeatureExtractionMixin):
         results = self._hbos_compute(
             data=data, histograms=histograms, histogram_edges=histogram_edges
         )
-        return results
+        return results.astype(np.float32)
 
     def rolling_shapiro_wilks(
         self, data: np.ndarray, time_window: float, fps: int
@@ -1719,9 +1724,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64,)")
-    def sliding_z_scores(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_z_scores(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Calculate sliding Z-scores for a given data array over specified time windows.
 
@@ -1895,9 +1898,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit("(float32[:], float64[:], int64,)")
-    def sliding_skew(
-        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    def sliding_skew(data: np.ndarray, time_windows: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Compute the skewness of a 1D array within sliding time windows.
 
@@ -1913,11 +1914,11 @@ class Statistics(FeatureExtractionMixin):
 
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
-            window_size = time_windows[i] * sample_rate
+            window_size = int(time_windows[i] * sample_rate)
             for j in range(window_size, data.shape[0] + 1):
                 sample = data[j - window_size : j]
                 mean, std = np.mean(sample), np.std(sample)
-                results[j - 1][i] = (1 / n) * np.sum(((data - mean) / std) ** 3)
+                results[j - 1][i] = (1 / sample.shape[0]) * np.sum(((data - mean) / std) ** 3)
 
         return results
 
@@ -2037,7 +2038,7 @@ class Statistics(FeatureExtractionMixin):
         :parameter Optional[bool] sort: If True, sorts x and y prior to hamming distance calculation. Default, False.
 
         :example:
-        >>> x, y = np.random.randint(0, 10, (10,)).astype(np.float32), np.random.randint(0, 10, (10,)).astype(np.float32)
+        >>> x, y = np.random.randint(0, 2, (10,)).astype(np.int8), np.random.randint(0, 2, (10,)).astype(np.int8)
         >>> Statistics().hamming_distance(x=x, y=y)
         >>> 0.91
         """
@@ -2051,7 +2052,6 @@ class Statistics(FeatureExtractionMixin):
         for i in prange(x.shape[0]):
             if x[i] != y[i]:
                 results += 1.0 * w[i]
-                print(w[i])
         return results / x.shape[0]
 
     @staticmethod
@@ -2142,10 +2142,9 @@ class Statistics(FeatureExtractionMixin):
         else:
             return (f_t + t_f) / (2 * (t_cnt + f_cnt) + f_t + t_f)
 
+    @staticmethod
     @njit([(float32[:, :], float32[:, :]), (float32[:, :], types.misc.Omitted(None))])
-    def bray_curtis_dissimilarity(
-        x: np.ndarray, w: Optional[np.ndarray] = None
-    ) -> np.ndarray:
+    def bray_curtis_dissimilarity(x: np.ndarray, w: Optional[np.ndarray] = None) -> np.ndarray:
         """
         Jitted calculate of the Bray-Curtis dissimilarity matrix between samples based on feature values.
 
@@ -2215,7 +2214,7 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> x = np.random.randint(0, 9000, (500000,))
         >>> y = np.random.randint(0, 9000, (500000,))
-        >>> Statistics().hellinger_distance(x=y, y=y, bucket_method='auto')
+        >>> Statistics().hellinger_distance(x=x, y=y, bucket_method='auto')
         """
 
         check_instance(
@@ -2240,10 +2239,10 @@ class Statistics(FeatureExtractionMixin):
         )
         bin_width, bin_count = bucket_data(data=x, method=bucket_method)
         s1_h = self._hist_1d(
-            data=x, bins=bin_count, range=np.array([0, int(bin_width * bin_count)])
+            data=x, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)])
         )
         s2_h = self._hist_1d(
-            data=y, bins=bin_count, range=np.array([0, int(bin_width * bin_count)])
+            data=y, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)])
         )
         return self._hellinger_helper(
             x=s1_h.astype(np.float32), y=s2_h.astype(np.float32)
