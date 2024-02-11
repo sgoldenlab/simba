@@ -1293,8 +1293,8 @@ def copy_multiple_videos_to_project(
     source: Union[str, os.PathLike],
     file_type: str,
     symlink: Optional[bool] = False,
-    allowed_video_formats: Optional[Tuple[str]] = ("avi", "mp4")) -> None:
-
+    allowed_video_formats: Optional[Tuple[str]] = ("avi", "mp4"),
+) -> None:
     """
     Import directory of videos to SimBA project.
 
@@ -1307,8 +1307,13 @@ def copy_multiple_videos_to_project(
 
     multiple_video_timer = SimbaTimer(start=True)
     if file_type.lower().strip() not in allowed_video_formats:
-        raise InvalidFileTypeError(msg="SimBA only works with avi and mp4 video files (Please enter mp4 or avi in entrybox). Or convert your videos to mp4 or avi to continue.", source=copy_multiple_videos_to_project.__name__)
-    video_path_lst = find_all_videos_in_directory(directory=source, video_formats=(file_type), raise_error=True)
+        raise InvalidFileTypeError(
+            msg="SimBA only works with avi and mp4 video files (Please enter mp4 or avi in entrybox). Or convert your videos to mp4 or avi to continue.",
+            source=copy_multiple_videos_to_project.__name__,
+        )
+    video_path_lst = find_all_videos_in_directory(
+        directory=source, video_formats=(file_type), raise_error=True
+    )
     video_path_lst = [os.path.join(source, x) for x in video_path_lst]
     if len(video_path_lst) == 0:
         raise NoFilesFoundError(
@@ -1323,7 +1328,10 @@ def copy_multiple_videos_to_project(
         newFileName = os.path.join(filebasename + file_extension)
         dest1 = os.path.join(destination_dir, newFileName)
         if os.path.isfile(dest1):
-            FileExistWarning(msg=f"{filebasename} already exist in SimBA project. Skipping video...", source=copy_multiple_videos_to_project.__name__)
+            FileExistWarning(
+                msg=f"{filebasename} already exist in SimBA project. Skipping video...",
+                source=copy_multiple_videos_to_project.__name__,
+            )
         else:
             if not symlink:
                 shutil.copy(file_path, dest1)
@@ -1345,7 +1353,11 @@ def copy_multiple_videos_to_project(
                 )
 
     multiple_video_timer.stop_timer()
-    stdout_success(msg=f"{len(video_path_lst)} videos copied to project.", elapsed_time=multiple_video_timer.elapsed_time_str, source=copy_multiple_videos_to_project.__name__)
+    stdout_success(
+        msg=f"{len(video_path_lst)} videos copied to project.",
+        elapsed_time=multiple_video_timer.elapsed_time_str,
+        source=copy_multiple_videos_to_project.__name__,
+    )
 
 
 def find_all_videos_in_project(

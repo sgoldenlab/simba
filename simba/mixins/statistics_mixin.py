@@ -904,8 +904,10 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     @jit(nopython=True, cache=True)
     def levenes(
-        sample_1: np.ndarray, sample_2: np.ndarray, critical_values: Optional[np.ndarray] = None) -> (float, Union[bool, None]):
-
+        sample_1: np.ndarray,
+        sample_2: np.ndarray,
+        critical_values: Optional[np.ndarray] = None,
+    ) -> (float, Union[bool, None]):
         """
         Jitted compute of two-sample Leven's W.
 
@@ -1492,7 +1494,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
-    def sliding_kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
+    def sliding_kendall_tau(
+        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float
+    ) -> np.ndarray:
         """
         Compute sliding Kendall's Tau correlation coefficient.
 
@@ -1724,7 +1728,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64,)")
-    def sliding_z_scores(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
+    def sliding_z_scores(
+        data: np.ndarray, time_windows: np.ndarray, fps: int
+    ) -> np.ndarray:
         """
         Calculate sliding Z-scores for a given data array over specified time windows.
 
@@ -1898,7 +1904,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit("(float32[:], float64[:], int64,)")
-    def sliding_skew(data: np.ndarray, time_windows: np.ndarray, sample_rate: int) -> np.ndarray:
+    def sliding_skew(
+        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
         """
         Compute the skewness of a 1D array within sliding time windows.
 
@@ -1918,7 +1926,9 @@ class Statistics(FeatureExtractionMixin):
             for j in range(window_size, data.shape[0] + 1):
                 sample = data[j - window_size : j]
                 mean, std = np.mean(sample), np.std(sample)
-                results[j - 1][i] = (1 / sample.shape[0]) * np.sum(((data - mean) / std) ** 3)
+                results[j - 1][i] = (1 / sample.shape[0]) * np.sum(
+                    ((data - mean) / std) ** 3
+                )
 
         return results
 
@@ -2144,7 +2154,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit([(float32[:, :], float32[:, :]), (float32[:, :], types.misc.Omitted(None))])
-    def bray_curtis_dissimilarity(x: np.ndarray, w: Optional[np.ndarray] = None) -> np.ndarray:
+    def bray_curtis_dissimilarity(
+        x: np.ndarray, w: Optional[np.ndarray] = None
+    ) -> np.ndarray:
         """
         Jitted calculate of the Bray-Curtis dissimilarity matrix between samples based on feature values.
 
