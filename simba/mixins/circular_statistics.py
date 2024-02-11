@@ -73,7 +73,7 @@ class CircularStatisticsMixin(object):
 
         :example:
         >>> data = np.array([50, 90, 70, 60, 20, 90]).astype(np.float32)
-        >>> CircularStatisticsMixin().mean_resultant_vector_length(data=data_1)
+        >>> CircularStatisticsMixin().mean_resultant_vector_length(data=data)
         >>> 0.9132277170817057
         """
 
