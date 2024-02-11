@@ -15,7 +15,10 @@ from numba import njit, prange
 from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
                               MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
-from typing_extensions import Literal
+try:
+    from typing_extensions import Literal
+except:
+    from typing import Literal
 
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_float,
