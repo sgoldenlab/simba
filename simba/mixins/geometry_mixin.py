@@ -15,6 +15,7 @@ from numba import njit, prange
 from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
                               MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
+
 try:
     from typing_extensions import Literal
 except:
