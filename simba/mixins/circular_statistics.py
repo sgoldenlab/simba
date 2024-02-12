@@ -210,13 +210,11 @@ class CircularStatisticsMixin(object):
         """
 
         data = np.deg2rad(data)
-        return np.rad2deg(np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * data))))))
+        return np.abs(np.rad2deg(np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * data)))))))
 
     @staticmethod
     @njit("(float32[:], int64, float64[:])")
-    def sliding_circular_std(
-        data: np.ndarray, fps: int, time_windows: np.ndarray
-    ) -> np.ndarray:
+    def sliding_circular_std(data: np.ndarray, fps: int, time_windows: np.ndarray) -> np.ndarray:
         """
         Compute standard deviation of angular data in sliding time windows.
 
@@ -240,14 +238,14 @@ class CircularStatisticsMixin(object):
             window_size = int(time_windows[time_window_cnt] * fps)
             for window_end in prange(window_size, data.shape[0] + 1, 1):
                 window_data = data[window_end - window_size : window_end]
-                results[window_end - 1][time_window_cnt] = np.rad2deg(
-                    np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * window_data)))))
-                )
-        return results
+                m = np.rad2deg(np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * window_data))))))
+                results[window_end - 1][time_window_cnt] = np.abs(np.round(m, 4))
+
+        return results.astype(np.float32)
 
     @staticmethod
     @njit("(float32[:], int64)")
-    def instantaneous_angular_velocity(data: np.ndarray, bin_size: int):
+    def instantaneous_angular_velocity(data: np.ndarray, bin_size: int) -> np.ndarray:
         """
         Jitted compute of absolute angular change in the smallest possible time bin.
 
@@ -275,18 +273,17 @@ class CircularStatisticsMixin(object):
         >>> [-1., -1., 15.00002432, 0.]
         """
         data = np.deg2rad(data)
-        results = np.full((data.shape[0]), -1.0)
+        results = np.full((data.shape[0]), -1)
         left_idx, right_idx = 0, bin_size
         for end_idx in prange(right_idx, data.shape[0] + 1, 1):
-            results[end_idx] = np.rad2deg(
-                np.pi - np.abs(np.pi - np.abs(data[left_idx] - data[end_idx]))
-            )
+            v = np.rad2deg(np.pi - np.abs(np.pi - np.abs(data[left_idx] - data[end_idx])))
+            results[end_idx] = int(np.round(v, 4))
             left_idx += 1
         return results
 
     @staticmethod
     @njit("(float32[:],)")
-    def degrees_to_cardinal(degree_angles: np.ndarray) -> List[str]:
+    def degrees_to_cardinal(data: np.ndarray) -> List[str]:
         """
         Convert degree angles to cardinal direction bucket e.g., 0 -> "N", 180 -> "S"
 
@@ -309,8 +306,8 @@ class CircularStatisticsMixin(object):
 
         DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
         results = typed.List(["str"])
-        for i in prange(degree_angles.shape[0]):
-            ix = round(degree_angles[i] / (360.0 / len(DIRECTIONS)))
+        for i in prange(data.shape[0]):
+            ix = round(data[i] / (360.0 / len(DIRECTIONS)))
             direction = DIRECTIONS[ix % len(DIRECTIONS)]
             results.append(direction)
         return results[1:]

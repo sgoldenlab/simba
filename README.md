@@ -20,6 +20,12 @@
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/landing_1.gif" />
 </p>
 
+
+To install SimBA via pip, use the following command:
+```bash
+pip install simba-uw-tf-dev
+```
+
 ## Apr-16-2023: API Reference
 
 See SimBA on [readthedocs](https://simba-uw-tf-dev.readthedocs.io/) for [API reference](https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html) and [example notebooks](https://simba-uw-tf-dev.readthedocs.io/en/latest/notebooks.html) when you prefer to run methods available in SimBA through the command line over the GUI. If you find that notebook examples are lacking, please reach out to us [Gitter](https://gitter.im/SimBA-Resource/community) or by opening an issue and let's chat about typing up further examples!
