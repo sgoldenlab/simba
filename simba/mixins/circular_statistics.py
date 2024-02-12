@@ -147,12 +147,18 @@ class CircularStatisticsMixin(object):
         >>> 63.737892150878906
         """
 
-        m = np.rad2deg(np.arctan2(np.mean(np.sin(np.deg2rad(data))), np.mean(np.cos(np.deg2rad(data)))))
+        m = np.rad2deg(
+            np.arctan2(
+                np.mean(np.sin(np.deg2rad(data))), np.mean(np.cos(np.deg2rad(data)))
+            )
+        )
         return np.abs(np.round(m, 4))
 
     @staticmethod
     @njit("(float32[:], float64[:], float64)")
-    def sliding_circular_mean(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
+    def sliding_circular_mean(
+        data: np.ndarray, time_windows: np.ndarray, fps: int
+    ) -> np.ndarray:
         """
         Compute the circular mean in degrees within sliding temporal windows.
 
@@ -179,8 +185,12 @@ class CircularStatisticsMixin(object):
         for time_window in range(time_windows.shape[0]):
             window_size = int(time_windows[time_window] * fps)
             for current_frm in range(window_size - 1, results.shape[0]):
-                data_window = data[(current_frm - window_size) + 1: current_frm + 1]
-                m = np.rad2deg(np.arctan2(np.mean(np.sin(data_window)), np.mean(np.cos(data_window))))
+                data_window = data[(current_frm - window_size) + 1 : current_frm + 1]
+                m = np.rad2deg(
+                    np.arctan2(
+                        np.mean(np.sin(data_window)), np.mean(np.cos(data_window))
+                    )
+                )
                 results[current_frm, time_window] = np.abs(np.round(m, 4))
         return results
 
