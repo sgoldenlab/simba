@@ -14,8 +14,9 @@ import pandas as pd
 from sklearn.manifold import TSNE
 
 import simba
-#from simba.misc_tools import SimbaTimer, check_file_exist_and_readable
-#from simba.utils.enums import Paths
+
+# from simba.misc_tools import SimbaTimer, check_file_exist_and_readable
+# from simba.utils.enums import Paths
 
 
 class TSNEGridSearch(object):

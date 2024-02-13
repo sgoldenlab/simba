@@ -25,7 +25,12 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
 
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path)
-        PopUpMixin.__init__( self, title="UNSUPERVISED ANALYSIS", config_path=config_path, size=(1000, 800),)
+        PopUpMixin.__init__(
+            self,
+            title="UNSUPERVISED ANALYSIS",
+            config_path=config_path,
+            size=(1000, 800),
+        )
         self.main_frm = Toplevel()
         self.main_frm.minsize(1000, 800)
         self.main_frm.wm_title("UNSUPERVISED ANALYSIS")
@@ -38,27 +43,84 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
         self.visualization_tab = ttk.Frame(self.main_frm)
         self.metrics_tab = ttk.Frame(self.main_frm)
 
-        self.main_frm.add(self.create_dataset_tab,text=f'{"[CREATE DATASET]": ^20s}',compound="left",image=self.menu_icons["features"]["img"])
-        self.main_frm.add(self.dimensionality_reduction_tab,text=f'{"[DIMENSIONALITY REDUCTION]": ^20s}',compound="left",image=self.menu_icons["dimensionality_reduction"]["img"])
-        self.main_frm.add(self.clustering_tab,text=f'{"[CLUSTERING]": ^20s}',compound="left",image=self.menu_icons["cluster"]["img"])
-        self.main_frm.add(self.visualization_tab,text=f'{"[VISUALIZATION]": ^20s}',compound="left",image=self.menu_icons["visualize"]["img"])
-        self.main_frm.add(self.metrics_tab, text=f'{"[METRICS]": ^20s}', compound="left", image=self.menu_icons["metrics"]["img"])
+        self.main_frm.add(
+            self.create_dataset_tab,
+            text=f'{"[CREATE DATASET]": ^20s}',
+            compound="left",
+            image=self.menu_icons["features"]["img"],
+        )
+        self.main_frm.add(
+            self.dimensionality_reduction_tab,
+            text=f'{"[DIMENSIONALITY REDUCTION]": ^20s}',
+            compound="left",
+            image=self.menu_icons["dimensionality_reduction"]["img"],
+        )
+        self.main_frm.add(
+            self.clustering_tab,
+            text=f'{"[CLUSTERING]": ^20s}',
+            compound="left",
+            image=self.menu_icons["cluster"]["img"],
+        )
+        self.main_frm.add(
+            self.visualization_tab,
+            text=f'{"[VISUALIZATION]": ^20s}',
+            compound="left",
+            image=self.menu_icons["visualize"]["img"],
+        )
+        self.main_frm.add(
+            self.metrics_tab,
+            text=f'{"[METRICS]": ^20s}',
+            compound="left",
+            image=self.menu_icons["metrics"]["img"],
+        )
         self.main_frm.grid(row=0)
 
         self.clf_slice_options = [f"ALL CLASSIFIERS ({len(self.clf_names)})"]
-        for clf_name in self.clf_names: self.clf_slice_options.append(f"{clf_name}")
-        create_dataset_frm = LabelFrame(self.create_dataset_tab,text="CREATE DATASET",pady=5,padx=5,font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black")
-        self.feature_file_selected = FileSelect(create_dataset_frm, "FEATURE FILE (CSV)", lblwidth=25)
-        self.data_slice_dropdown = DropDownMenu(create_dataset_frm,"FEATURE SLICE:",UMLOptions.FEATURE_SLICE_OPTIONS.value,"25",com=lambda x: self.change_status_of_file_select())
+        for clf_name in self.clf_names:
+            self.clf_slice_options.append(f"{clf_name}")
+        create_dataset_frm = LabelFrame(
+            self.create_dataset_tab,
+            text="CREATE DATASET",
+            pady=5,
+            padx=5,
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            fg="black",
+        )
+        self.feature_file_selected = FileSelect(
+            create_dataset_frm, "FEATURE FILE (CSV)", lblwidth=25
+        )
+        self.data_slice_dropdown = DropDownMenu(
+            create_dataset_frm,
+            "FEATURE SLICE:",
+            UMLOptions.FEATURE_SLICE_OPTIONS.value,
+            "25",
+            com=lambda x: self.change_status_of_file_select(),
+        )
         self.data_slice_dropdown.setChoices(UMLOptions.FEATURE_SLICE_OPTIONS.value[0])
-        self.clf_slice_dropdown = DropDownMenu(create_dataset_frm, "CLASSIFIER SLICE:", self.clf_slice_options, "25")
+        self.clf_slice_dropdown = DropDownMenu(
+            create_dataset_frm, "CLASSIFIER SLICE:", self.clf_slice_options, "25"
+        )
         self.clf_slice_dropdown.setChoices(self.clf_slice_options[0])
         self.change_status_of_file_select()
-        self.bout_dropdown = DropDownMenu(create_dataset_frm,"BOUT AGGREGATION METHOD:",UMLOptions.BOUT_AGGREGATION_METHODS.value,"25")
-        self.bout_dropdown.setChoices(choice=UMLOptions.BOUT_AGGREGATION_METHODS.value[0])
-        self.min_bout_length = Entry_Box(create_dataset_frm, "MINIMUM BOUT LENGTH (MS): ", "25", validation="numeric")
+        self.bout_dropdown = DropDownMenu(
+            create_dataset_frm,
+            "BOUT AGGREGATION METHOD:",
+            UMLOptions.BOUT_AGGREGATION_METHODS.value,
+            "25",
+        )
+        self.bout_dropdown.setChoices(
+            choice=UMLOptions.BOUT_AGGREGATION_METHODS.value[0]
+        )
+        self.min_bout_length = Entry_Box(
+            create_dataset_frm, "MINIMUM BOUT LENGTH (MS): ", "25", validation="numeric"
+        )
         self.min_bout_length.entry_set(val=0)
-        self.create_btn = Button(create_dataset_frm,text="CREATE DATASET",fg="blue",command=lambda: self.create_dataset())
+        self.create_btn = Button(
+            create_dataset_frm,
+            text="CREATE DATASET",
+            fg="blue",
+            command=lambda: self.create_dataset(),
+        )
 
         create_dataset_frm.grid(row=0, column=0, sticky=NW)
         self.data_slice_dropdown.grid(row=0, column=0, sticky=NW)
