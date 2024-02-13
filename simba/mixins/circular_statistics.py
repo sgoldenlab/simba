@@ -215,11 +215,15 @@ class CircularStatisticsMixin(object):
         """
 
         data = np.deg2rad(data)
-        return np.abs(np.rad2deg(np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * data)))))))
+        return np.abs(
+            np.rad2deg(np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * data))))))
+        )
 
     @staticmethod
     @njit("(float32[:], int64, float64[:])")
-    def sliding_circular_std(data: np.ndarray, fps: int, time_windows: np.ndarray) -> np.ndarray:
+    def sliding_circular_std(
+        data: np.ndarray, fps: int, time_windows: np.ndarray
+    ) -> np.ndarray:
         """
         Compute standard deviation of angular data in sliding time windows.
 
@@ -243,7 +247,9 @@ class CircularStatisticsMixin(object):
             window_size = int(time_windows[time_window_cnt] * fps)
             for window_end in prange(window_size, data.shape[0] + 1, 1):
                 window_data = data[window_end - window_size : window_end]
-                m = np.rad2deg(np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * window_data))))))
+                m = np.rad2deg(
+                    np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * window_data)))))
+                )
                 results[window_end - 1][time_window_cnt] = np.abs(np.round(m, 4))
 
         return results.astype(np.float32)
@@ -281,7 +287,9 @@ class CircularStatisticsMixin(object):
         results = np.full((data.shape[0]), -1)
         left_idx, right_idx = 0, bin_size
         for end_idx in prange(right_idx, data.shape[0] + 1, 1):
-            v = np.rad2deg(np.pi - np.abs(np.pi - np.abs(data[left_idx] - data[end_idx])))
+            v = np.rad2deg(
+                np.pi - np.abs(np.pi - np.abs(data[left_idx] - data[end_idx]))
+            )
             results[end_idx] = int(np.round(v, 4))
             left_idx += 1
         return results
