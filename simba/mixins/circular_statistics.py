@@ -1,13 +1,8 @@
 __author__ = "Simon Nilsson"
 
-import time
-from typing import List, Tuple
-
+from typing import List, Tuple, Optional
 import numpy as np
-from numba import jit, njit, prange, typed
-
-from simba.utils.data import fast_mean_rank
-
+from numba import jit, njit, prange, typed, types, float32, int64
 
 class CircularStatisticsMixin(object):
     """
@@ -452,7 +447,7 @@ class CircularStatisticsMixin(object):
         :returns Tuple[np.ndarray, np.ndarray]: Two 2d arrays with the first representing Rayleigh Z scores and second representing associated p values.
 
         :example:
-        >>> data = np.random.randint(low=0, high=360, size=(100,)).astype(np.float32)
+        >>> data = np.random.randint(low=0, high=361, size=(100,)).astype(np.float32)
         >>> CircularStatisticsMixin().rolling_rayleigh_z(data=data, time_windows=np.array([0.5, 1.0]), fps=10)
         """
 
@@ -504,15 +499,11 @@ class CircularStatisticsMixin(object):
         m1 = np.arctan2(np.mean(np.sin(sample_1)), np.mean(np.cos(sample_1)))
         m2 = np.arctan2(np.mean(np.sin(sample_2)), np.mean(np.cos(sample_2)))
         sin_1, sin_2 = np.sin(sample_1 - m1), np.sin(sample_2 - m2)
-        return np.sum(sin_1 * sin_2) / np.sqrt(
-            np.sum(sin_1 * sin_1) * np.sum(sin_2 * sin_2)
-        )
+        return np.abs(np.sum(sin_1 * sin_2) / np.sqrt(np.sum(sin_1 * sin_1) * np.sum(sin_2 * sin_2)))
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
-    def sliding_circular_correlation(
-        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float
-    ) -> np.ndarray:
+    def sliding_circular_correlation( sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Jitted compute of correlations between two angular distributions in sliding time-windows
         using the cross-correlation coefficient.
@@ -520,6 +511,9 @@ class CircularStatisticsMixin(object):
         .. image:: _static/img/cicle_correlation.png
            :width: 800
            :align: center
+
+        .. note::
+           Values prior to the ending of the first time window will be filles with ``0``.
 
         :parameter np.ndarray sample_1: Angular data for e.g., Animal 1
         :parameter np.ndarray sample_1: Angular data for e.g., Animal 2
@@ -529,13 +523,13 @@ class CircularStatisticsMixin(object):
 
 
         :example:
-        >>> sample_1 = np.random.randint(0, 360, (200,)).astype(np.float32)
-        >>> sample_2 = np.random.randint(0, 360, (200,)).astype(np.float32)
+        >>> sample_1 = np.random.randint(0, 361, (200,)).astype(np.float32)
+        >>> sample_2 = np.random.randint(0, 361, (200,)).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_circular_correlation(sample_1=sample_1, sample_2=sample_2, time_windows=np.array([0.5, 1.0]), fps=10.0)
         """
 
         sample_1, sample_2 = np.deg2rad(sample_1), np.deg2rad(sample_2)
-        results = np.full((sample_1.shape[0], time_windows.shape[0]), np.nan)
+        results = np.full((sample_1.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
             win_size = int(time_windows[i] * fps)
             for j in prange(win_size, sample_1.shape[0] + 1):
@@ -551,22 +545,22 @@ class CircularStatisticsMixin(object):
                 c = np.sum(sin_1 * sin_2) / np.sqrt(
                     np.sum(sin_1 * sin_1) * np.sum(sin_2 * sin_2)
                 )
-                results[j][i] = c
+                results[j-1][i] = np.abs(c)
 
-        return results
+        return results.astype(np.float32)
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
-    def sliding_angular_diff(
-        data: np.ndarray, time_windows: np.ndarray, fps: float
-    ) -> np.ndarray:
+    def sliding_angular_diff(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Computes the angular difference in the current frame versus N seconds previously.
         For example, if the current angle is 45 degrees, and the angle N seconds previously was 350 degrees, then the difference
         is 55 degrees.
 
         .. note::
-           Frames where current frame - N seconds prior equal a negative value is populated with 0.
+           Frames where current frame - N seconds prior equal a negative value is populated with ``0``.
+
+           Results are returned in rounded nearest integer.
 
         .. image:: _static/img/sliding_angular_difference.png
            :width: 600
@@ -579,36 +573,28 @@ class CircularStatisticsMixin(object):
         :example:
         >>> data = np.array([350, 350, 1, 1]).astype(np.float32)
         >>> CircularStatisticsMixin().sliding_angular_diff(data=data, fps=1.0, time_windows=np.array([1.0]))
-        >>> [[ 0.], [ 0.], [11.00000964], [ 0.]]
         """
 
-        data_rad = np.deg2rad(data)
-        results = np.full((data_rad.shape[0], time_windows.shape[0]), 0.0)
+        data = np.deg2rad(data)
+        results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for time_window_cnt in prange(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
-            for left, right in zip(
-                prange(0, (data_rad.shape[0] - window_size) + 1),
-                prange(window_size - 1, data_rad.shape[0] + 1),
-            ):
-                distance = np.pi - np.abs(
-                    np.pi - np.abs(data_rad[left] - data_rad[right])
-                )
-                results[right][time_window_cnt] = np.rad2deg(distance)
+            for left, right in zip(range(0, (data.shape[0] - window_size)), range(window_size, data.shape[0] + 1)):
+                distance = np.pi - np.abs(np.pi - np.abs(data[left] - data[right]))
+                results[right][time_window_cnt] = np.abs(np.rint(np.rad2deg(distance)))
 
-        return results
+        return results.astype(np.int64)
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
-    def agg_angular_diff_timebins(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def agg_angular_diff_timebins(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the difference between the median angle in the current time-window versus the previous time window.
         For example, computes the difference between the mean angle in the first 1s of the video versus
         the second 1s of the video, the second 1s of the video versus the third 1s of the video, ... etc.
 
         .. note::
-           The first time-bin of the video can't be compared against the prior time-bin and is  populated with `0`.
+           The first time-bin of the video cannot be compared against the prior time-bin and is populated with `0`.
 
         .. image:: _static/img/circular_difference_time_bins.png
            :width: 800
@@ -625,30 +611,23 @@ class CircularStatisticsMixin(object):
 
         data = np.deg2rad(data)
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
-        for time_window_cnt in prange(time_windows.shape[0]):
+        for win_cnt, time_window_cnt in enumerate(prange(time_windows.shape[0])):
             window_size = int(time_windows[time_window_cnt] * fps)
-            prior_window = [0, window_size]
-            for win_cnt, window_end in enumerate(
-                prange(int(window_size * 2), data.shape[0] + 1, window_size)
-            ):
-                window_start = (window_end - window_size) - 1
-                current_data = data[window_start:window_end]
-                prior_data = data[prior_window[0] : prior_window[1]]
-                prior_median = np.arctan2(
-                    np.sum(np.sin(prior_data)), np.sum(np.cos(prior_data))
-                )
-                if prior_median < 0:
-                    prior_median += 2 * np.pi
-                current_median = np.arctan2(
-                    np.sum(np.sin(current_data)), np.sum(np.cos(current_data))
-                )
-                if current_median < 0:
-                    current_median += 2 * np.pi
+            w1_start, w1_end = 0, window_size
+            w2_start, w2_end = window_size, window_size * 2
+            while w2_start < data.shape[0]:
+                current_data = data[w2_start:w2_end]
+                prior_data = data[w1_start:w1_end]
+                prior_median = np.arctan2(np.sum(np.sin(prior_data)), np.sum(np.cos(prior_data)))
+                if prior_median < 0: prior_median += 2 * np.pi
+                current_median = np.arctan2(np.sum(np.sin(current_data)), np.sum(np.cos(current_data)))
+                if current_median < 0: current_median += 2 * np.pi
                 distance = np.pi - np.abs(np.pi - np.abs(prior_median - current_median))
-                results[window_start:window_end, win_cnt] = np.rad2deg(distance)
-                prior_window = [window_start, window_end]
+                results[w2_start: w2_end, win_cnt] = np.rad2deg(distance)
+                w1_start, w1_end = w2_start, w2_end
+                w2_start, w2_end = w2_start + window_size, w2_end + window_size
 
-        return results
+        return np.rint(results)
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
@@ -855,9 +834,7 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
-    def sliding_circular_range(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_circular_range(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Jitted compute of sliding circular range for a time series of circular data. The range is defined as the angular span of the
         shortest arc that can contain all the data points. Measures the circular spread of data within sliding time windows of specified duration.
@@ -865,6 +842,10 @@ class CircularStatisticsMixin(object):
         .. image:: _static/img/sliding_circular_range.png
            :width: 600
            :align: center
+
+        .. note::
+           Output data in the beginning of the series where a full time-window is not satisfied (e.g., first 9 observations when
+           fps equals 10 and time_windows = [1.0], will be populated by ``0``.
 
         :parameter np.ndarray data: 1D array of circular data measured in degrees
         :parameter np.ndarray time_windows: Size of sliding time window in seconds. E.g., two windows of 0.5s and 1s would be represented as np.array([0.5, 1.0])
@@ -877,19 +858,15 @@ class CircularStatisticsMixin(object):
         >>> [[ -1.],[ -1.],[ -1.],[ -1.],[100.],[80],[70],[30],[20],[25]]
         """
 
-        results = np.full((data.shape[0], time_windows.shape[0]), -1.0)
+        results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for time_window_cnt in prange(time_windows.shape[0]):
             win_size = int(time_windows[time_window_cnt] * fps)
-            for left, right in zip(
-                prange(0, (data.shape[0] - win_size) + 1),
-                prange(win_size - 1, data.shape[0] + 1),
-            ):
-                sample = np.sort(np.deg2rad(data[left : right + 1]))
+            for left, right in zip(range(0, (data.shape[0] - win_size) + 1), range(win_size, data.shape[0])):
+                sample = np.sort(np.deg2rad(data[left: right + 1]))
                 angular_diffs = np.diff(sample)
                 circular_range = np.max(angular_diffs)
-                results[right][time_window_cnt] = np.rad2deg(
-                    min(2 * np.pi - circular_range, sample[-1] - sample[0])
-                )
+                results[right][time_window_cnt] = np.abs(
+                    np.rint(np.rad2deg(min(2 * np.pi - circular_range, sample[-1] - sample[0]))))
         return results
 
     @staticmethod
@@ -898,17 +875,22 @@ class CircularStatisticsMixin(object):
         """
         Calculate the proportion of data points falling within circular bins.
 
-        :parameter ndarray data: 1D array of circular data measured in degrees.
-        :parameter ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive..
-        :return np.ndarray: 1D array containing the proportion of data points that fall within each specified circular bin.
-
         .. image:: _static/img/circular_hotspots.png
            :width: 700
            :align: center
 
+        .. warning:
+           Make sure the ``bins`` argument do not contain overlapping bin edge definitions. E.g.,
+           bins = np.array([[270, 0], [1, 90], [91, 180], [181, 269]]) is accepted but
+           bins = np.array([[270, 0], [0, 90], [90, 180], [180, 270]]) is not.
+
+        :parameter ndarray data: 1D array of circular data measured in degrees.
+        :parameter ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive..
+        :return np.ndarray: 1D array containing the proportion of data points that fall within each specified circular bin.
+
         :example:
         >>> data = np.array([270, 360, 10, 90, 91, 180, 185, 260]).astype(np.float32)
-        >>> bins = np.array([[270, 90], [91, 268]])
+        >>> bins = np.array([[270, 90], [91, 269]])
         >>> CircularStatisticsMixin().circular_hotspots(data=data, bins=bins)
         >>> [0.5, 0.5]
         >>> bins = np.array([[270, 0], [1, 90], [91, 180], [181, 269]])
@@ -941,8 +923,7 @@ class CircularStatisticsMixin(object):
         :parameter float fps: The frame-rate of the video.
 
         :return np.ndarray: A 2D numpy array where each row corresponds to a time point in `data`, and each column represents a circular bin. The values in the array represent the proportion of data points
-                            within each bin at each time point. If a bin contains no data points in the window, the
-                            corresponding value will be -1.0.
+                            within each bin at each time point.
 
         .. note::
            - The function utilizes the Numba JIT compiler for improved performance.
@@ -950,6 +931,11 @@ class CircularStatisticsMixin(object):
              within the range [0, 360], and the bins are defined using start and end angles inclusive.
              For example, (0, 90) represents the first quadrant in a circular space.
 
+             Output data in the beginning of the series where a full time-window is not satisfied (e.g., first 9 observations when
+             fps equals 10 and time_windows = [1.0], will be populated by ``0``.
+
+        .. warning::
+          Note that ``0`` is noted as a bin-edge, ``360`` should not be a bin-edge. Instead, use ``0`` and ``359`` or ``1`` and ``360``.
 
         .. image:: _static/img/sliding_circular_hotspot.png
            :width: 600
@@ -971,26 +957,22 @@ class CircularStatisticsMixin(object):
         >>>  [ 0. ,  0.5]]
 
         """
-        results = np.full((data.shape[0], bins.shape[0]), -1.0)
+        results = np.full((data.shape[0], bins.shape[0]), 0.0)
         win_size = int(time_window * fps)
-        for left, right in zip(
-            prange(0, (data.shape[0] - win_size) + 1),
-            prange(win_size - 1, data.shape[0] + 1),
-        ):
+        for left, right in zip(prange(0, (data.shape[0] - win_size) + 1), prange(win_size - 1, data.shape[0] + 1)):
             sample = data[left : right + 1]
             for bin_cnt in range(bins.shape[0]):
                 if bins[bin_cnt][0] > bins[bin_cnt][1]:
-                    mask = ((sample >= bins[bin_cnt][0]) & (sample <= 360)) | (
-                        (sample >= 0) & (sample <= bins[bin_cnt][1])
-                    )
+                    mask = ((sample >= bins[bin_cnt][0]) & (sample <= 360)) | ((sample >= 0) & (sample <= bins[bin_cnt][1]))
                 else:
                     mask = (sample >= bins[bin_cnt][0]) & (sample <= bins[bin_cnt][1])
-                results[right][bin_cnt] = data[mask].shape[0] / data.shape[0]
+                results[right][bin_cnt] = np.float32(data[mask].shape[0] / sample.shape[0])
         return results
 
     @staticmethod
-    @njit("(float32[:],)")
-    def rotational_direction(data: np.ndarray) -> np.ndarray:
+    @njit([(float32[:], int64),
+           (float32[:], types.misc.Omitted(value=1))])
+    def rotational_direction(data: np.ndarray, stride: int = 1) -> np.ndarray:
         """
         Jitted compute of frame-by-frame rotational direction within a 1D timeseries array of angular data.
 
@@ -1015,25 +997,30 @@ class CircularStatisticsMixin(object):
         """
 
         data = data % 360
-        data_rad = np.deg2rad(data)
-        result, prior_angle = np.full((data.shape[0]), -1.0), data_rad[0]
-        for i in prange(1, data.shape[0]):
-            current_angle = data_rad[i]
-            distance = np.round(
-                np.rad2deg(np.pi - np.abs(np.pi - np.abs(current_angle - prior_angle)))
-            )
-            if data[i - 1] == data[i]:
+        data = np.deg2rad(data)
+        result, prior_idx = np.full((data.shape[0]), 0.0), 0
+        for i in prange(int(stride), data.shape[0]):
+            prior_angle = data[prior_idx]
+            current_angle = data[i]
+            angle_diff = current_angle - prior_angle
+
+            if angle_diff > np.pi:
+                angle_diff -= 2 * np.pi
+            elif angle_diff < -np.pi:
+                angle_diff += 2 * np.pi
+
+            if angle_diff == 0:
                 result[i] = 0
-            elif data[i - 1] == (data[i] - distance) % 360:
+            elif angle_diff > 0:
                 result[i] = 1
             else:
                 result[i] = 2
-            prior_angle = current_angle
-        return result
+            prior_idx += 1
+        return result.astype(np.int8)
 
     @staticmethod
-    @njit("(int64[:, :, :], int64)")
-    def fit_circle(data: np.ndarray, max_iterations: int) -> np.ndarray:
+    @njit([(int64[:, :, :], int64), (int64[:, :, :], types.misc.Omitted(value=100))])
+    def fit_circle(data: np.ndarray, max_iterations: Optional[int] = 100) -> np.ndarray:
         """
         Fit a circle to a dataset using the least squares method.
 
