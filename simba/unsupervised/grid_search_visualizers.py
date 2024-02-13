@@ -10,9 +10,9 @@ import seaborn as sns
 
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.checks import (check_if_dir_exists,
-                                check_if_filepath_list_is_empty)
+from simba.utils.checks import (check_if_dir_exists, check_if_filepath_list_is_empty)
 from simba.utils.printing import stdout_success
+from simba.utils.enums import Formats
 
 
 class GridSearchVisualizer(UnsupervisedMixin):
@@ -35,11 +35,8 @@ class GridSearchVisualizer(UnsupervisedMixin):
         check_if_dir_exists(in_dir=save_dir)
         check_if_dir_exists(in_dir=model_dir)
         self.save_dir, self.settings, self.model_dir = save_dir, settings, model_dir
-        self.data_path = glob.glob(model_dir + "/*.pickle")
-        check_if_filepath_list_is_empty(
-            filepaths=self.data_path,
-            error_msg=f"SIMBA ERROR: No pickle files in {model_dir}",
-        )
+        self.data_path = glob.glob(model_dir + f"/*.{Formats.PICKLE.value}")
+        check_if_filepath_list_is_empty(filepaths=self.data_path, error_msg=f"SIMBA ERROR: No pickle files found in {model_dir}")
 
     def __join_data(self, data: object):
         embedding_data = pd.DataFrame(
@@ -130,7 +127,7 @@ class GridSearchVisualizer(UnsupervisedMixin):
         )
 
 
-# settings = {'PALETTE': 'Pastel1'}
+settings = {'PALETTE': 'Pastel1'}
 # test = GridSearchVisualizer(model_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models',
 #                             save_dir='/Users/simon/Desktop/envs/troubleshooting/unsupervised/images',
 #                             settings=settings)

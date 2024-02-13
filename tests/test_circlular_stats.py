@@ -214,3 +214,20 @@ def test_fit_circle_2(size, iterations):
     assert results.shape[0] == data.shape[0]
     assert np.issubdtype(results.dtype, np.number)
     assert results.shape[1] == 3
+
+def test_rao_spacing():
+    results_1 = CircularStatisticsMixin().rao_spacing(data=np.random.randint(0, 360, (5000,)).astype(np.float32))
+    results_2 = CircularStatisticsMixin().rao_spacing(data=np.random.randint(45, 90, (5000,)).astype(np.float32))
+    results_3 = CircularStatisticsMixin().rao_spacing(data=np.random.randint(0, 10, (5000,)).astype(np.float32))
+    assert results_1 > results_2 > results_3 >= 0
+
+@pytest.mark.parametrize('low, high, time_windows', [(0, 10, (1.5, 2.0)), (0, 319, (1.5))])
+def test_sliding_rao_spacing(low, high, time_windows):
+    data = np.random.randint(low=low, high=high, size=(500,)).astype(np.float32)
+    time_windows = np.array([time_windows]).flatten().astype(np.float64)
+    result = CircularStatisticsMixin().sliding_rao_spacing(data=data, time_windows=time_windows, fps=10)
+    assert np.min(result) >= 0.0
+    assert np.issubdtype(result.dtype, np.number)
+    assert result.shape[0] == data.shape[0]
+    assert result.shape[1] == time_windows.shape[0]
+
