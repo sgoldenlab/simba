@@ -1698,7 +1698,6 @@ def web_callback(url: str) -> None:
     except ValueError:
         raise InvalidInputError(msg="Invalid URL: {url}", source=web_callback.__name__)
 
-
 def get_pkg_version(pkg: str):
     """
     Helper to get the version of a package in the current python environment.
@@ -1713,3 +1712,53 @@ def get_pkg_version(pkg: str):
         return pkg_resources.get_distribution(pkg).version
     except pkg_resources.DistributionNotFound:
         return None
+
+def write_pickle(data: dict,
+                 save_path: Union[str, os.PathLike]) -> None:
+
+    """
+    Write a single object as pickle.
+
+    :param str data_path: Pickled file path.
+    :param str save_path: Location of saved pickle.
+
+    :example:
+    >>> write_pickle(data=my_model, save_path='/test/unsupervised/cluster_models/My_model.pickle')
+    """
+    check_instance(source=write_pickle.__name__, instance=data, accepted_types=(dict,))
+    check_if_dir_exists(in_dir=os.path.dirname(save_path))
+    try:
+        with open(save_path, "wb") as f:
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+    except Exception as e:
+        print(e.args[0])
+        raise InvalidFileTypeError(msg="Data could not be saved as a pickle.", source=write_pickle.__name__)
+
+def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
+    """
+    Read a single or directory of pickled objects. If directory, returns dict with numerical sequential integer keys for
+    each object.
+
+    :param str data_path: Pickled file path, or directory of pickled files.
+    :returns dict
+
+    :example:
+    >>> data = read_pickle(data_path='/test/unsupervised/cluster_models')
+    """
+    if os.path.isdir(data_path):
+        print(f'Reading in data directory {data_path}...')
+        data = {}
+        files_found = glob.glob(data_path + f"/*.{Formats.PICKLE.value}")
+        if len(files_found) == 0:
+            raise NoFilesFoundError(msg=f"SIMBA ERROR: Zero pickle files found in {data_path}.",source=self.__class__.__name__)
+        for file_cnt, file_path in enumerate(files_found):
+            with open(file_path, "rb") as f:
+                data[file_cnt] = pickle.load(f)
+    elif os.path.isfile(data_path):
+        with open(data_path, "rb") as f:
+            data = pickle.load(f)
+    else:
+        raise InvalidFilepathError(msg=f'The path {data_path} is neither a valid file or directory path', source=read_pickle.__name__)
+
+    return data
+

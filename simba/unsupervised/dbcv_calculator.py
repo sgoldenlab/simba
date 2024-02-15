@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os.path
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -12,9 +13,10 @@ from scipy.sparse.csgraph import minimum_spanning_tree
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+from simba.utils.read_write import read_pickle
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
 from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
+
 
 CLUSTERER_NAME = "CLUSTERER_NAME"
 CLUSTER_COUNT = "CLUSTER_COUNT"
@@ -44,15 +46,18 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     >>> results = dbcv_calculator.run()
     """
 
-    def __init__(self, config_path: str, data_path: str):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_path: Union[str, os.PathLike]):
+
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         if os.path.isdir(data_path):
             check_if_dir_exists(in_dir=data_path)
-            self.data = self.read_pickle(data_path=data_path)
+            self.data = read_pickle(data_path=data_path)
         else:
             check_file_exist_and_readable(file_path=data_path)
-            self.data = {0: self.read_pickle(data_path=data_path)}
+            self.data = {0: read_pickle(data_path=data_path)}
         self.save_path = os.path.join(self.logs_path, f"DBCV_{self.datetime}.xlsx")
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
@@ -63,54 +68,29 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
         for k, v in self.data.items():
             model_timer = SimbaTimer(start=True)
             self.results[k], dbcv_results = {}, "nan"
-            self.results[k][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][
-                Unsupervised.HASHED_NAME.value
-            ]
-            self.results[k][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][
-                Unsupervised.HASHED_NAME.value
-            ]
-            print(
-                f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}..."
-            )
-            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][
-                Unsupervised.MODEL.value
-            ].labels_
+            self.results[k][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]
+            self.results[k][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]
+            print(f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}...")
+            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
             x = v[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_
             self.results[k] = {
                 **self.results[k],
                 **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value],
                 **v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value],
             }
-            cluster_cnt = self.get_cluster_cnt(
-                data=cluster_lbls,
-                clusterer_name=v[Clustering.CLUSTER_MODEL.value][
-                    Unsupervised.HASHED_NAME.value
-                ],
-                minimum_clusters=1,
-            )
-
+            cluster_cnt = self.get_cluster_cnt(data=cluster_lbls, clusterer_name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min_clusters=1)
             if cluster_cnt > 1:
                 dbcv_results = self.DBCV(x, cluster_lbls)
-            else:
-                stdout_warning(
-                    msg=f"No DBCV calculated for clusterer {self.results[k][CLUSTERER_NAME]}: Less than two clusters identified."
-                )
             self.results[k] = {
                 **self.results[k],
                 **{DBCV: dbcv_results},
                 **{CLUSTER_COUNT: cluster_cnt},
             }
             model_timer.stop_timer()
-            stdout_success(
-                msg=f"DBCV complete for model {self.results[k][CLUSTERER_NAME]}",
-                elapsed_time=model_timer.elapsed_time_str,
-            )
+            stdout_success(msg=f"DBCV complete for model {self.results[k][CLUSTERER_NAME]} ...",elapsed_time=model_timer.elapsed_time_str)
         self.__save_results()
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"ALL DBCV calculations complete and saved in {self.save_path}",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"ALL DBCV calculations complete and saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
 
     def __save_results(self):
         for k, v in self.results.items():

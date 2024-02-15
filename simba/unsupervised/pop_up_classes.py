@@ -1,9 +1,12 @@
 __author__ = "Simon Nilsson"
 
+import os
+
 """ Tkinter pop-up classes for unsupervised ML"""
 
 import glob
 from tkinter import *
+from typing import Union
 
 import numpy as np
 
@@ -12,8 +15,7 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
                                         FolderSelect)
-from simba.unsupervised.cluster_statistics import (
-    ClusterFrequentistCalculator, ClusterXAICalculator,
+from simba.unsupervised.cluster_statistics import (ClusterXAICalculator,
     EmbeddingCorrelationCalculator)
 from simba.unsupervised.cluster_visualizer import ClusterVisualizer
 from simba.unsupervised.data_extractor import DataExtractor
@@ -30,16 +32,12 @@ from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 
 
-class GridSearchVisualizerPopUp(PopUpMixin):
-    def __init__(self, config_path: str):
-        super().__init__(config_path=config_path, title="GRID SEARCH VISUALIZER")
-
-        data_frm = LabelFrame(
-            self.main_frm,
-            text="DATA",
-            fg="black",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-        )
+class GridSearchVisualizerPopUp(PopUpMixin, ConfigReader):
+    def __init__(self, config_path: Union[str, os.PathLike]):
+        ConfigReader.__init__(self, config_path=config_path)
+        PopUpMixin.__init__(self, config_path=config_path, title="GRID SEARCH VISUALIZER")
+        ConfigReader.__init__(self, config_path=config_path)
+        data_frm = LabelFrame(self.main_frm,text="DATA",fg="black",font=Formats.LABELFRAME_HEADER_FORMAT.value)
         self.data_dir_select = FolderSelect(data_frm, "DATA DIRECTORY:", lblwidth=25)
         self.save_dir_select = FolderSelect(data_frm, "OUTPUT DIRECTORY: ", lblwidth=25)
         data_frm.grid(row=0, column=0, sticky=NW)
@@ -854,276 +852,6 @@ class ClusterVisualizerPopUp(PopUpMixin, ConfigReader):
 
 
 # _ = ClusterVisualizerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
-#
-class ClusterFrequentistStatisticsPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="CLUSTER FREQUENTIST STATISTICS")
-        ConfigReader.__init__(self, config_path=config_path)
-        self.descriptive_stats_var = BooleanVar(value=True)
-        self.oneway_anova_var = BooleanVar(value=True)
-        self.tukey_var = BooleanVar(value=True)
-        self.use_scaled_var = BooleanVar(value=False)
-
-        self.data_frm = LabelFrame(
-            self.main_frm,
-            text="DATA",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.model_select = FileSelect(self.data_frm, "CLUSTERER PATH:", lblwidth=25)
-        self.data_frm.grid(row=0, column=0, sticky=NW)
-        self.model_select.grid(row=0, column=0, sticky=NW)
-
-        self.stats_frm = LabelFrame(
-            self.main_frm,
-            text="STATISTICS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.descriptive_stats_cb = Checkbutton(
-            self.stats_frm,
-            text="CLUSTER DESCRIPTIVE STATISTICS",
-            variable=self.descriptive_stats_var,
-        )
-        self.oneway_anova_cb = Checkbutton(
-            self.stats_frm,
-            text="CLUSTER FEATURE ONE-WAY ANOVA",
-            variable=self.oneway_anova_var,
-        )
-        self.feature_tukey_posthoc_cb = Checkbutton(
-            self.stats_frm,
-            text="CLUSTER FEATURE POST-HOC (TUKEY)",
-            variable=self.tukey_var,
-        )
-        self.use_scaled_cb = Checkbutton(
-            self.stats_frm,
-            text="USE SCALED FEATURE VALUES",
-            variable=self.use_scaled_var,
-        )
-
-        self.stats_frm.grid(row=1, column=0, sticky=NW)
-        self.descriptive_stats_cb.grid(row=0, column=0, sticky=NW)
-        self.oneway_anova_cb.grid(row=1, column=0, sticky=NW)
-        self.feature_tukey_posthoc_cb.grid(row=2, column=0, sticky=NW)
-        self.use_scaled_cb.grid(row=3, column=0, sticky=NW)
-        self.create_run_frm(run_function=self.run)
-
-        self.main_frm.mainloop()
-
-    def run(self):
-        check_file_exist_and_readable(self.model_select.file_path)
-        settings = {
-            "scaled": self.use_scaled_var.get(),
-            "anova": self.oneway_anova_var.get(),
-            "tukey_posthoc": self.tukey_var.get(),
-            "descriptive_statistics": self.descriptive_stats_var.get(),
-        }
-
-        calculator = ClusterFrequentistCalculator(
-            config_path=self.config_path,
-            data_path=self.model_select.file_path,
-            settings=settings,
-        )
-        calculator.run()
-
-
-# _ = ClusterFrequentistStatisticsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
-
-
-class ClusterXAIPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
-        super().__init__(title="CLUSTER XAI STATISTICS")
-        ConfigReader.__init__(self, config_path=config_path)
-        self.gini_importance_var = BooleanVar(value=True)
-        self.permutation_importance_var = BooleanVar(value=True)
-        self.shap_var = BooleanVar(value=False)
-
-        self.data_frm = LabelFrame(
-            self.main_frm,
-            text="DATA",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.model_select = FileSelect(self.data_frm, "MODEL PATH:", lblwidth=25)
-        self.data_frm.grid(row=0, column=0, sticky=NW)
-        self.model_select.grid(row=0, column=0, sticky=NW)
-
-        self.settings_frm = LabelFrame(
-            self.main_frm,
-            text="SETTINGS",
-            pady=5,
-            padx=5,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.gini_importance_cb = Checkbutton(
-            self.settings_frm,
-            text="CLUSTER RF GINI IMPORTANCE",
-            variable=self.gini_importance_var,
-        )
-        self.permutation_cb = Checkbutton(
-            self.settings_frm,
-            text="CLUSTER RF PERMUTATION IMPORTANCE",
-            variable=self.permutation_importance_var,
-        )
-        self.shap_method_dropdown = DropDownMenu(
-            self.settings_frm,
-            "SHAP METHOD:",
-            UMLOptions.SHAP_CLUSTER_METHODS.value,
-            "25",
-        )
-        self.shap_method_dropdown.setChoices(UMLOptions.SHAP_CLUSTER_METHODS.value[0])
-        self.shap_sample_dropdown = DropDownMenu(
-            self.settings_frm,
-            "SHAP SAMPLES:",
-            UMLOptions.SHAP_SAMPLE_OPTIONS.value,
-            "25",
-        )
-        self.shap_sample_dropdown.setChoices(100)
-        self.shap_method_dropdown.disable()
-        self.shap_sample_dropdown.disable()
-        self.shap_cb = Checkbutton(
-            self.settings_frm,
-            text="CLUSTER RF SHAP VALUES",
-            variable=self.shap_var,
-            command=lambda: self.enable_dropdown_from_checkbox(
-                check_box_var=self.shap_var,
-                dropdown_menus=[self.shap_method_dropdown, self.shap_sample_dropdown],
-            ),
-        )
-
-        self.settings_frm.grid(row=1, column=0, sticky=NW)
-        self.gini_importance_cb.grid(row=0, column=0, sticky=NW)
-        self.permutation_cb.grid(row=1, column=0, sticky=NW)
-        self.shap_cb.grid(row=2, column=0, sticky=NW)
-        self.shap_method_dropdown.grid(row=3, column=0, sticky=NW)
-        self.shap_sample_dropdown.grid(row=4, column=0, sticky=NW)
-        self.create_run_frm(run_function=self.run)
-
-        self.main_frm.mainloop()
-
-    def run(self):
-        check_file_exist_and_readable(file_path=self.model_select.file_path)
-        settings = {
-            "gini_importance": self.gini_importance_var.get(),
-            "permutation_importance": self.permutation_importance_var.get(),
-            "shap": {
-                "method": self.shap_method_dropdown.getChoices(),
-                "run": self.shap_var.get(),
-                "sample": self.shap_sample_dropdown.getChoices(),
-            },
-        }
-        xai_calculator = ClusterXAICalculator(
-            data_path=self.model_select.file_path,
-            settings=settings,
-            config_path=self.config_path,
-        )
-        xai_calculator.run()
-
-
-# _ = ClusterXAIPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
-
-
-class EmbedderCorrelationsPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="EMBEDDING CORRELATIONS")
-        ConfigReader.__init__(self, config_path=config_path)
-        self.spearman_var = BooleanVar(value=True)
-        self.pearsons_var = BooleanVar(value=True)
-        self.kendall_var = BooleanVar(value=True)
-        self.plots_var = BooleanVar(value=False)
-
-        self.data_frm = LabelFrame(
-            self.main_frm,
-            text="DATA",
-            pady=5,
-            padx=5,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.data_file_selected = FileSelect(self.data_frm, "DATASET (PICKLE):")
-        self.data_frm.grid(row=0, column=0, sticky=NW)
-        self.data_file_selected.grid(row=0, column=0, sticky=NW)
-
-        self.settings_frm = LabelFrame(
-            self.main_frm,
-            text="SETTINGS",
-            pady=5,
-            padx=5,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.spearman_cb = Checkbutton(
-            self.settings_frm, text="SPEARMAN", variable=self.spearman_var
-        )
-        self.pearsons_cb = Checkbutton(
-            self.settings_frm, text="PEARSONS", variable=self.pearsons_var
-        )
-        self.kendall_cb = Checkbutton(
-            self.settings_frm, text="KENDALL", variable=self.kendall_var
-        )
-        self.plot_correlation_dropdown = DropDownMenu(
-            self.settings_frm,
-            "PLOT CORRELATION:",
-            UMLOptions.CORRELATION_OPTIONS.value,
-            "25",
-        )
-        self.plot_correlation_clr_dropdown = DropDownMenu(
-            self.settings_frm, "PLOT CORRELATION:", Options.PALETTE_OPTIONS.value, "25"
-        )
-        self.plot_correlation_dropdown.setChoices(
-            UMLOptions.CORRELATION_OPTIONS.value[0]
-        )
-        self.plot_correlation_dropdown.disable()
-        self.plot_correlation_clr_dropdown.setChoices(Options.PALETTE_OPTIONS.value[0])
-        self.plot_correlation_clr_dropdown.disable()
-        self.plots_cb = Checkbutton(
-            self.settings_frm,
-            text="PLOTS",
-            variable=self.plots_var,
-            command=lambda: self.enable_dropdown_from_checkbox(
-                check_box_var=self.plots_var,
-                dropdown_menus=[
-                    self.plot_correlation_dropdown,
-                    self.plot_correlation_clr_dropdown,
-                ],
-            ),
-        )
-
-        self.settings_frm.grid(row=1, column=0, sticky=NW)
-        self.spearman_cb.grid(row=0, column=0, sticky=NW)
-        self.pearsons_cb.grid(row=1, column=0, sticky=NW)
-        self.kendall_cb.grid(row=2, column=0, sticky=NW)
-        self.plots_cb.grid(row=3, column=0, sticky=NW)
-        self.plot_correlation_dropdown.grid(row=4, column=0, sticky=NW)
-        self.plot_correlation_clr_dropdown.grid(row=5, column=0, sticky=NW)
-
-        self.create_run_frm(run_function=self.run)
-        self.main_frm.mainloop()
-
-    def run(self):
-        check_file_exist_and_readable(self.data_file_selected.file_path)
-        settings = {
-            "correlations": [],
-            "plots": {"create": False, "correlations": None, "palette": None},
-        }
-        if self.spearman_var.get():
-            settings["correlations"].append("spearman")
-        if self.pearsons_var.get():
-            settings["correlations"].append("pearson")
-        if self.kendall_var.get():
-            settings["correlations"].append("kendall")
-
-        calculator = EmbeddingCorrelationCalculator(
-            config_path=self.config_path,
-            data_path=self.data_file_selected.file_path,
-            settings=settings,
-        )
-        calculator.run()
-
-
-# _ = EmbedderCorrelationsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
-
 
 class PrintEmBeddingInfoPopUp(PopUpMixin, ConfigReader, UnsupervisedMixin):
     def __init__(self, config_path: str):
@@ -1155,39 +883,4 @@ class PrintEmBeddingInfoPopUp(PopUpMixin, ConfigReader, UnsupervisedMixin):
 
 # _ = PrintEmBeddingInfoPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
 
-
-class DBCVPopUp(PopUpMixin, ConfigReader, UnsupervisedMixin):
-    def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="DENSITY BASED CLUSTER VALIDATION")
-        ConfigReader.__init__(self, config_path=config_path)
-        UnsupervisedMixin.__init__(self)
-
-        self.data_frm = LabelFrame(
-            self.main_frm,
-            text="DATA",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.folder_selected = FolderSelect(
-            self.data_frm, "DATASETS (DIRECTORY WITH PICKLES):", lblwidth=35
-        )
-        self.data_frm.grid(row=0, column=0, sticky=NW)
-        self.folder_selected.grid(row=0, column=0, sticky=NW)
-        self.create_run_frm(run_function=self.run)
-
-        self.main_frm.mainloop()
-
-    def run(self):
-        check_if_dir_exists(in_dir=self.folder_selected.folder_path)
-        data_paths = glob.glob(self.folder_selected.folder_path + "/*.pickle")
-        check_if_filepath_list_is_empty(
-            filepaths=data_paths,
-            error_msg=f"No pickle files in {self.folder_selected.folder_path}",
-        )
-        dbcv_calculator = DBCVCalculator(
-            data_path=self.folder_selected.folder_path, config_path=self.config_path
-        )
-        dbcv_calculator.run()
-
-
-# _ = DBCVPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
+#GridSearchVisualizerPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')

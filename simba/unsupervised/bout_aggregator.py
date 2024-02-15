@@ -8,6 +8,7 @@ from joblib.externals.loky import get_reusable_executor
 
 from simba.utils.data import detect_bouts
 from simba.utils.read_write import read_video_info
+from simba.utils.printing import SimbaTimer, stdout_success
 
 
 def bout_aggregator(
@@ -30,8 +31,8 @@ def bout_aggregator(
     :return pd.DataFrame: Featurized data at aggregate bout level.
     """
 
+    timer = SimbaTimer(start=True)
     print("Calculating bout aggregate statistics...")
-
     def bout_aggregator_mp(frms, data, clf_name):
         bout_df = data.iloc[frms[0] : frms[1] + 1]
         bout_video, start_frm, end_frm = (
@@ -53,9 +54,7 @@ def bout_aggregator(
 
     output = []
     for cnt, video in enumerate(data["VIDEO"].unique()):
-        print(
-            f'Processing video {video}...({str(cnt+1)}/{str(len(data["VIDEO"].unique()))})'
-        )
+        print(f'Processing video {video} ({str(cnt+1)}/{str(len(data["VIDEO"].unique()))})...')
         video_df = data[data["VIDEO"] == video].reset_index(drop=True)
         for clf in clfs:
             _, _, fps = read_video_info(vid_info_df=video_info, video_name=video)
@@ -75,5 +74,6 @@ def bout_aggregator(
                 )
                 output.append(results)
     get_reusable_executor().shutdown(wait=True)
-
+    timer.stop_timer()
+    stdout_success(msg='Bout aggregation statistics complete!', elapsed_time=timer.elapsed_time_str)
     return pd.concat(output, axis=0).reset_index(drop=True)

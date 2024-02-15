@@ -16,10 +16,10 @@ with open("requirements.txt", "r") as f:
 
 setuptools.setup(
     name="Simba-UW-tf-dev",
-    version="1.85.1",
+    version="1.85.2",
     author="Simon Nilsson, Jia Jie Choong, Sophia Hwang",
     author_email="sronilsson@gmail.com",
-    description="Toolkit for computer classification of complex social behaviors in experimental animals",
+    description="Toolkit for computer classification of behaviors in experimental animals",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/sgoldenlab/simba",

@@ -14,7 +14,6 @@ from simba.utils.printing import SimbaTimer, stdout_success
 
 try:
     from cuml import UMAP
-
     gpu_flag = True
 except ModuleNotFoundError:
     from umap import UMAP
@@ -41,17 +40,17 @@ class UmapEmbedder(UnsupervisedMixin):
     def __init__(self):
         super().__init__()
 
-    def fit(self, data_path: str, save_dir: str, hyper_parameters: dict):
+    def fit(self,
+            data_path: str,
+            save_dir: str,
+            hyper_parameters: dict):
+
         self.data_path = data_path
         check_file_exist_and_readable(file_path=self.data_path)
         self.data = self.read_pickle(data_path=data_path)
-        self.umap_df = deepcopy(self.data[Unsupervised.BOUTS_FEATURES.value]).set_index(
-            [
-                Unsupervised.VIDEO.value,
-                Unsupervised.START_FRAME.value,
-                Unsupervised.END_FRAME.value,
-            ]
-        )
+        self.umap_df = deepcopy(self.data[Unsupervised.BOUTS_FEATURES.value]).reset_index().set_index([Unsupervised.VIDEO.value,
+                                                                                                       Unsupervised.START_FRAME.value,
+                                                                                                       Unsupervised.END_FRAME.value])
         self.save_dir = save_dir
         self.check_that_directory_is_empty(directory=self.save_dir)
         self.low_var_cols, self.hyper_parameters = None, hyper_parameters
@@ -127,7 +126,7 @@ class UmapEmbedder(UnsupervisedMixin):
                     Unsupervised.SPREAD.value
                 ],
                 metric=Unsupervised.EUCLIDEAN.value,
-                verbose=2,
+                verbose=0,
             )
             self.model[Unsupervised.MODEL.value].fit(self.scaled_umap_data.values)
             results = {}
@@ -227,6 +226,10 @@ class UmapEmbedder(UnsupervisedMixin):
             )
 
 
+
+
+
+
 # data_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/logs/unsupervised_data_20230416145821.pickle'
 # save_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/transformed_umap'
 # settings = {'DATA': 'RAW', 'format': 'csv'}
@@ -246,8 +249,8 @@ class UmapEmbedder(UnsupervisedMixin):
 #
 
 # hyper_parameters = {'n_neighbors': [10, 2], 'min_distance': [1.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25}
-# data_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/logs/unsupervised_data_20230416145821.pickle'
-# save_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models'
-# config_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini'
-# embedder = UmapEmbedder(data_path=data_path, save_dir=save_dir)
-# embedder.fit(hyper_parameters=hyper_parameters)
+# data_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/logs/unsupervised_data_20240214093117.pickle'
+# save_dir = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/dim_reduction_mdls'
+# config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini'
+# embedder = UmapEmbedder()
+# embedder.fit(data_path=data_path, save_dir=save_dir, hyper_parameters=hyper_parameters)

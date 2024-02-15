@@ -124,6 +124,7 @@ class Formats(Enum):
     CSV = "csv"
     PARQUET = "parquet"
     PICKLE = "pickle"
+    XLXS = "xlsx"
     PERIMETER = "perimeter"
     AREA = "area"
     H5 = "h5"

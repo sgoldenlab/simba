@@ -30,6 +30,9 @@ from sklearn.metrics import precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
+from sklearn.preprocessing import (MinMaxScaler,
+                                   QuantileTransformer,
+                                   StandardScaler)
 from tabulate import tabulate
 from yellowbrick.classifier import ClassificationReport
 
@@ -54,7 +57,8 @@ from simba.plotting.shap_agg_stats_visualizer import \
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_if_valid_input, check_int, check_str,
-                                check_that_column_exist)
+                                check_that_column_exist,
+                                check_instance)
 from simba.utils.data import (create_color_palette, detect_bouts,
                               detect_bouts_multiclass)
 from simba.utils.enums import (ConfigKey, Defaults, Dtypes, Methods,
@@ -2818,6 +2822,12 @@ class TrainModelMixin(object):
 
         results = pd.concat(results_df_lst, axis=0)
         return results.drop([target_field], axis=1), results[target_field]
+
+    @staticmethod
+    def scaler_inverse_transform(data: pd.DataFrame, scaler: Union[MinMaxScaler, StandardScaler, QuantileTransformer]) -> pd.DataFrame:
+        check_instance(source=f'{TrainModelMixin.scaler_inverse_transform.__name__} data', instance=data, accepted_types=(pd.DataFrame,))
+        check_instance(source=f'{TrainModelMixin.scaler_inverse_transform.__name__} scaler', instance=scaler, accepted_types=(MinMaxScaler, StandardScaler, QuantileTransformer,))
+        return pd.DataFrame(scaler.inverse_transform(data), columns=data.columns).set_index(data.index)
 
 
 # test = TrainModelMixin()

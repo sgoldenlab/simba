@@ -56,14 +56,7 @@ class GeometryMixin(object):
         pass
 
     @staticmethod
-    def bodyparts_to_polygon(
-        data: np.ndarray,
-        cap_style: Literal["round", "square", "flat"] = "round",
-        parallel_offset: int = 1,
-        pixels_per_mm: int = 1,
-        simplify_tolerance: float = 2,
-        preserve_topology: bool = True,
-    ) -> Polygon:
+    def bodyparts_to_polygon(data: np.ndarray, cap_style: Literal["round", "square", "flat"] = "round", parallel_offset: int = 1, pixels_per_mm: int = 1, simplify_tolerance: float = 2, preserve_topology: bool = True) -> Polygon:
         """
         .. image:: _static/img/bodyparts_to_polygon.png
            :width: 400
@@ -118,9 +111,7 @@ class GeometryMixin(object):
             )
 
     @staticmethod
-    def bodyparts_to_points(
-        data: np.ndarray, buffer: Optional[int] = None, px_per_mm: Optional[int] = None
-    ) -> List[Union[Point, Polygon]]:
+    def bodyparts_to_points(data: np.ndarray, buffer: Optional[int] = None, px_per_mm: Optional[int] = None) -> List[Union[Point, Polygon]]:
         """
         Convert body-parts coordinate to Point geometries.
 
@@ -192,7 +183,7 @@ class GeometryMixin(object):
 
         :example:
         >>> data = np.array([364, 308])
-        >>> polygon = GeometryMixin().bodyparts_to_circle(data=data)
+        >>> polygon = GeometryMixin().bodyparts_to_circle(data=data, parallel_offset=10, pixels_per_mm=4)
         """
 
         if data.shape != (2,):
@@ -284,7 +275,7 @@ class GeometryMixin(object):
         )
 
     @staticmethod
-    def compute_pct_shape_overlap(shapes: List[Union[Polygon, LineString]]) -> float:
+    def compute_pct_shape_overlap(shapes: List[Union[Polygon, LineString]]) -> int:
         """
         Compute the percentage of overlap between two shapes.
 
@@ -293,13 +284,13 @@ class GeometryMixin(object):
            :align: center
 
         :param List[Union[LineString, Polygon]] shapes: A list of two input Polygon or LineString shapes.
-        :return float: The percentage of overlap between the two shapes.
+        :return float: The percentage of overlap between the two shapes as integer.
 
         :example:
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[364, 308],[383, 323],[403, 335],[423, 351]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[356, 307],[376, 319],[396, 331],[419, 347]]))
         >>> GeometryMixin().compute_pct_shape_overlap(shapes=[polygon_1, polygon_2])
-        >>> 37.96
+        >>> 38.36
         """
 
         for shape in shapes:
@@ -315,16 +306,9 @@ class GeometryMixin(object):
         )
         if shapes[0].intersects(shapes[1]):
             intersection = shapes[0].intersection(shapes[1])
-            return round(
-                (
-                    intersection.area
-                    / ((shapes[0].area + shapes[1].area) - intersection.area)
-                    * 100
-                ),
-                2,
-            )
+            return np.round((intersection.area / ((shapes[0].area + shapes[1].area) - intersection.area) * 100), 2)
         else:
-            return 0.0
+            return 0
 
     @staticmethod
     def compute_shape_overlap(shapes: List[Union[Polygon, LineString]]) -> int:
@@ -846,7 +830,7 @@ class GeometryMixin(object):
             return img
 
     @staticmethod
-    def minimum_rotated_rectangle(shape=Polygon) -> bool:
+    def minimum_rotated_rectangle(shape=Polygon) -> Polygon:
         """
         Calculate the minimum rotated rectangle that bounds a given polygon.
 
@@ -1570,11 +1554,9 @@ class GeometryMixin(object):
             slope = (y2 - y1) / (x2 - x1)
             intercept = y1 - slope * x1
 
-            # Calculate intersection points with the bounding box boundaries
             x_min_intersection = (min_y - intercept) / slope
             x_max_intersection = (max_y - intercept) / slope
 
-            # Clip the intersection points to ensure they are within the valid range
             # x_min_intersection = np.clip(x_min_intersection, min_x, max_x)
             # x_max_intersection = np.clip(x_max_intersection, min_x, max_x)
 

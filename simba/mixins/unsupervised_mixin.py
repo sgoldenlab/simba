@@ -192,7 +192,7 @@ class UnsupervisedMixin(object):
     def scaler_transform(
         self,
         data: pd.DataFrame,
-        scaler: Literal[MinMaxScaler or StandardScaler or QuantileTransformer],
+        scaler: Union[MinMaxScaler, StandardScaler, QuantileTransformer],
     ) -> pd.DataFrame:
         """
         Helper to run transform using fitted scaler.
@@ -228,24 +228,27 @@ class UnsupervisedMixin(object):
                 msg=f"{key} does not exist in object", source=self.__class__.__name__
             )
 
-    def get_cluster_cnt(
-        self, data: np.array, clusterer_name: str, minimum_clusters: Optional[int] = 1
-    ) -> int:
+    @staticmethod
+    def get_cluster_cnt(data: np.ndarray,
+                        clusterer_name: str,
+                        min_clusters: Optional[int] = 1,
+                        max_clusters: Optional[int] = None) -> int:
         """
         Helper to check the number of unique observations in array. E.g., check the number of unique clusters.
 
-        :param np.array data: 1D numpy array with cluster assignments.
+        :param np.ndarray data: 1D numpy array with cluster assignments.
         :param str clusterer_name: Arbitrary name of the fitted model used to generate ``data``.
         :param Optional[int] minimum_clusters: Minimum number of clusters allowed.
         :raises IntegerError: If unique cluster count is less than ``minimum_clusters``.
         """
 
         cnt = np.unique(data).shape[0]
-        if cnt < minimum_clusters:
-            raise IntegerError(
-                msg=f"Clustrer {clusterer_name} has {str(cnt)} clusters, but {str(minimum_clusters)} clusters is required for the operation.",
-                source=self.__class__.__name__,
-            )
+        if min_clusters is not None:
+            if cnt < min_clusters:
+                raise IntegerError(msg=f"Clustrer {clusterer_name} has {cnt} clusters, but {min_clusters} clusters is required for the operation.", source=UnsupervisedMixin.get_cluster_cnt.__name__)
+        if max_clusters is not None:
+            if cnt > max_clusters:
+                raise IntegerError(msg=f"Clustrer {clusterer_name} has {cnt} clusters, but no more than {max_clusters} clusters is required for the operation.", source=UnsupervisedMixin.get_cluster_cnt.__name__)
         return cnt
 
     def check_that_directory_is_empty(self, directory: Union[str, os.PathLike]) -> None:

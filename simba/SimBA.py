@@ -12,7 +12,7 @@ import threading
 import tkinter.ttk as ttk
 import urllib.request
 import webbrowser
-from tkinter.filedialog import askdirectory, askopenfilename
+from tkinter.filedialog import askdirectory
 from tkinter.messagebox import askyesno
 
 import PIL.Image
@@ -136,7 +136,6 @@ from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
-from simba.utils.data import run_user_defined_feature_extraction_class
 from simba.utils.enums import OS, Defaults, Formats, TagNames
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
@@ -144,15 +143,11 @@ from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
-from simba.video_processors.video_processing import (
-    extract_frames_from_all_videos_in_directory, superimpose_frame_count,
-    video_to_greyscale)
-
-# from simba.unsupervised.ui import UnsupervisedGUI
-
+from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 
+UNSUPERVISED = False
 
 class LoadProjectPopUp(object):
     def __init__(self):
@@ -1169,9 +1164,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             lbl_addon,
             text="Animal-anchored ROI analysis",
             fg="orange",
-            command=lambda: BoundaryMenus(config_path=self.config_path),
-        )
-        # unsupervised_btn = Button(lbl_addon,text='Unsupervised analysis', fg='purple', command=lambda: UnsupervisedGUI(config_path=self.config_path))
+            command=lambda: BoundaryMenus(config_path=self.config_path))
 
         self.create_import_videos_menu(parent_frm=import_frm, idx_row=0, idx_column=0)
         self.create_import_pose_menu(parent_frm=import_frm, idx_row=1, idx_column=0)
@@ -1287,7 +1280,11 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_bel.grid(row=0, sticky=W)
         cue_light_analyser_btn.grid(row=1, sticky=NW)
         anchored_roi_analysis_btn.grid(row=2, sticky=NW)
-        # unsupervised_btn.grid(row=3, sticky=NW)
+
+        if UNSUPERVISED:
+            from simba.unsupervised.unsupervised_main import UnsupervisedGUI
+            unsupervised_btn = Button(lbl_addon,text='Unsupervised analysis', fg='purple', command=lambda: UnsupervisedGUI(config_path=self.config_path))
+            unsupervised_btn.grid(row=3, sticky=NW)
 
     def create_video_info_table(self):
         video_info_tabler = VideoInfoTable(config_path=self.config_path)
@@ -2058,7 +2055,6 @@ def terminate_children(children):
 def main():
     if currentPlatform == OS.WINDOWS.value:
         import ctypes
-
         myappid = "SimBA development wheel"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     SplashMovie()

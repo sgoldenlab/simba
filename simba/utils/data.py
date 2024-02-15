@@ -868,9 +868,7 @@ def slp_to_df_convert(
     return data_df
 
 
-def find_ranked_colors(
-    data: Dict[str, float], palette: str, as_hex: Optional[bool] = False
-) -> Dict[str, Union[Tuple[int], str]]:
+def find_ranked_colors(data: Dict[str, float], palette: str, as_hex: Optional[bool] = False) -> Dict[str, Union[Tuple[int], str]]:
     """
     Find ranked colors for a given data dictionary values based on a specified color palette.
 
@@ -913,9 +911,7 @@ def find_ranked_colors(
     return results
 
 
-def run_user_defined_feature_extraction_class(
-    file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]
-) -> None:
+def run_user_defined_feature_extraction_class(file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]) -> None:
     """
     Loads and executes user-defined feature extraction class within .py file.
 

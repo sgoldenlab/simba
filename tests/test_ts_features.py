@@ -127,5 +127,3 @@ def test_benford_distribution():
     assert np.round(results, 1) == 1.0
 
 
-
-
