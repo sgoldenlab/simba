@@ -13,6 +13,8 @@ ENV/
 *.pyc
 *.class
 .ipynb_checkpoints/
+.pytest_cache/
+simba/pose_configurations_archive/
 
 # Ignore PyPI build artifacts
 dist/

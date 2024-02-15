@@ -113,10 +113,10 @@ def test_time_since_previous_threshold():
 
 def test_time_since_previous_target_value():
     data = np.array([8, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
-    results = TimeseriesFeatureMixin().time_since_previous_target_value(data=data, value=8.0, inverse=False, sample_rate=2.0)
+    results = TimeseriesFeatureMixin().time_since_previous_target_value(data=data, value=8.0, inverse=False, fps=2.0)
     expected = np.array([0., 0., 0.5, 1., 0., 0.5, 0., 0.5, 1., 1.5])
     assert np.array_equal(results, expected)
-    results = TimeseriesFeatureMixin().time_since_previous_target_value(data=data, value=8.0, inverse=True, sample_rate=2.0)
+    results = TimeseriesFeatureMixin().time_since_previous_target_value(data=data, value=8.0, inverse=True, fps=2.0)
     expected = np.array([-1., -1., 0., 0., 0.5, 0., 0.5, 0., 0., 0.])
     assert np.array_equal(results, expected)
 

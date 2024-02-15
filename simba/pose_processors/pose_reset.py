@@ -71,7 +71,8 @@ class PoseResetter(object):
         stdout_trash(
             msg="User-defined pose-estimation configuration reset. User-defined poses removed."
         )
-        master.destroy()
+        if master is not None:
+            master.destroy()
 
 
 # test = PoseResetter()

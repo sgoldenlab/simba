@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from typing import List
 
 import simba
-from simba.utils.enums import ConfigKey, DirNames, Dtypes, Paths
+from simba.utils.enums import ConfigKey, DirNames, Dtypes, Paths, MLParamKeys
 from simba.utils.errors import DirectoryExistError
 from simba.utils.printing import SimbaTimer, stdout_success
 
@@ -187,74 +187,54 @@ class ProjectConfigCreator(object):
         self.config.add_section(ConfigKey.PROCESS_MOVEMENT_SETTINGS.value)
 
         self.config.add_section(ConfigKey.CREATE_ENSEMBLE_SETTINGS.value)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.POSE_SETTING.value
-        ] = str(self.pose_estimation_bp_cnt)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.CLASSIFIER.value
-        ] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.TT_SIZE.value
-        ] = str(0.20)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.UNDERSAMPLE_SETTING.value
-        ] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.UNDERSAMPLE_RATIO.value
-        ] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.OVERSAMPLE_SETTING.value
-        ] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.OVERSAMPLE_RATIO.value
-        ] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.RF_ESTIMATORS.value
-        ] = str(2000)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.MIN_LEAF.value
-        ] = str(1)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.RF_MAX_FEATURES.value
-        ] = Dtypes.SQRT.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][ConfigKey.POSE_SETTING.value] = str(self.pose_estimation_bp_cnt)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.CLASSIFIER.value] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.TT_SIZE.value] = str(0.20)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.UNDERSAMPLE_SETTING.value] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.UNDERSAMPLE_RATIO.value] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.OVERSAMPLE_SETTING.value] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.OVERSAMPLE_RATIO.value] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.RF_ESTIMATORS.value] = str(2000)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.MIN_LEAF.value] = str(1)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.RF_MAX_FEATURES.value] = Dtypes.SQRT.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
             ConfigKey.RF_JOBS.value
         ] = str(-1)
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.RF_CRITERION.value
+            MLParamKeys.RF_CRITERION.value
         ] = Dtypes.ENTROPY.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.RF_METADATA.value
+            MLParamKeys.RF_METADATA.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.EX_DECISION_TREE.value
+            MLParamKeys.EX_DECISION_TREE.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.EX_DECISION_TREE_FANCY.value
+            MLParamKeys.EX_DECISION_TREE_FANCY.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.IMPORTANCE_LOG.value
+            MLParamKeys.IMPORTANCE_LOG.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.IMPORTANCE_BAR_CHART.value
+            MLParamKeys.IMPORTANCE_BAR_CHART.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.PERMUTATION_IMPORTANCE.value
+            MLParamKeys.PERMUTATION_IMPORTANCE.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.LEARNING_CURVE.value
+            MLParamKeys.LEARNING_CURVE.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.PRECISION_RECALL.value
+            MLParamKeys.PRECISION_RECALL.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.IMPORTANCE_BARS_N.value
+            MLParamKeys.IMPORTANCE_BARS_N.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.LEARNING_CURVE_K_SPLITS.value
+            MLParamKeys.LEARNING_CURVE_K_SPLITS.value
         ] = Dtypes.NONE.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.LEARNING_DATA_SPLITS.value
+            MLParamKeys.LEARNING_DATA_SPLITS.value
         ] = Dtypes.NONE.value
 
         self.config.add_section(ConfigKey.MULTI_ANIMAL_ID_SETTING.value)

@@ -82,40 +82,16 @@ class PoseConfigCreator(PlottingMixin):
 
     def launch(self):
         def draw_circle(event, x, y, flags, param):
-            if event == cv2.EVENT_LBUTTONDBLCLK:
-                cv2.circle(
-                    self.overlay,
-                    (x, int(y - self.side_img.shape[0])),
-                    self.circle_scale,
-                    self.color_lst[self.bp_cnt],
-                    -1,
-                )
-                cv2.putText(
-                    self.overlay,
-                    str(self.bp_cnt + 1),
-                    (x + 4, int(y - self.side_img.shape[0])),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    self.font_size,
-                    self.color_lst[self.bp_cnt],
-                    2,
-                )
+            if event == cv2.EVENT_LBUTTONDOWN:
+                cv2.circle(self.overlay,(x, int(y - self.side_img.shape[0])),self.circle_scale,self.color_lst[self.bp_cnt], -1)
+                cv2.putText( self.overlay, str(self.bp_cnt + 1), (x + 4, int(y - self.side_img.shape[0])), cv2.FONT_HERSHEY_SIMPLEX, self.font_size, self.color_lst[self.bp_cnt], 2)
                 self.cord_written = True
 
         for bp_cnt, bp_name in enumerate(self.bp_list):
             self.cord_written = False
             self.bp_cnt = bp_cnt
-            self.side_img = np.zeros(
-                (int(self.img_height / 4), self.img_width, 3), np.uint8
-            )
-            cv2.putText(
-                self.side_img,
-                "Double left click on body part {}.".format(bp_name),
-                (10, 50),
-                self.font,
-                self.font_size,
-                self.color_lst[bp_cnt],
-                2,
-            )
+            self.side_img = np.zeros((int(self.img_height / 4), self.img_width, 3), np.uint8)
+            cv2.putText(self.side_img,"Left click on body part {}.".format(bp_name),(10, 50),self.font,self.font_size,self.color_lst[bp_cnt],2)
             img_concat = cv2.vconcat([self.side_img, self.overlay])
             cv2.namedWindow("Define pose", cv2.WINDOW_NORMAL)
             cv2.imshow("Define pose", img_concat)
@@ -150,5 +126,5 @@ class PoseConfigCreator(PlottingMixin):
         cv2.imwrite(new_img_path, overlay)
 
 
-# pose_config_creator = PoseConfigCreator(pose_name="My_test_config", no_animals=1, img_path='/Users/simon/Desktop/rotate.png', bp_list=['Ear', 'Nose', 'Left_ear'], animal_id_int_list= [1, 1, 1, 2, 2, 2])
+# pose_config_creator = PoseConfigCreator(pose_name="My_test_config", no_animals=1, img_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_viz_2/intelligent_hermann_CLASSIFIER.png', bp_list=['Ear', 'Nose', 'Left_ear'], animal_id_int_list= [1, 1, 1, 2, 2, 2])
 # pose_config_creator.launch()
