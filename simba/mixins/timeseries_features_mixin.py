@@ -76,7 +76,8 @@ class TimeseriesFeatureMixin(object):
         dx = np.diff(np.ascontiguousarray(data))
         ddx = np.diff(np.ascontiguousarray(dx))
         x_var, dx_var = np.var(data), np.var(dx)
-        if (x_var <= 0) or (dx_var <= 0): return 0, 0, 0
+        if (x_var <= 0) or (dx_var <= 0):
+            return 0, 0, 0
 
         ddx_var = np.var(ddx)
         mobility = np.sqrt(dx_var / x_var)
@@ -209,7 +210,9 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64,  float64[:], int64,)")
-    def sliding_crossings(data: np.ndarray, val: float, time_windows: np.ndarray, fps: int) -> np.ndarray:
+    def sliding_crossings(
+        data: np.ndarray, val: float, time_windows: np.ndarray, fps: int
+    ) -> np.ndarray:
         """
         Compute the number of crossings over sliding windows in a data array.
 
@@ -258,7 +261,9 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
-    def percentile_difference(data: np.ndarray, upper_pct: int, lower_pct: int) -> float:
+    def percentile_difference(
+        data: np.ndarray, upper_pct: int, lower_pct: int
+    ) -> float:
         """
         Jitted compute of the difference between the ``upper`` and ``lower`` percentiles of the data as
         a percentage of the median value. Helps understanding the spread or variability of the data within specified percentiles.
@@ -281,13 +286,20 @@ class TimeseriesFeatureMixin(object):
         >>> 0.7401574764125177
 
         """
-        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(data, lower_pct)
+        upper_val, lower_val = np.percentile(data, upper_pct), np.percentile(
+            data, lower_pct
+        )
         return np.abs(upper_val - lower_val) / np.median(data)
 
     @staticmethod
     @njit("(float32[:], int64, int64, float64[:], int64, )", cache=True, fastmath=True)
-    def sliding_percentile_difference(data: np.ndarray,upper_pct: int,lower_pct: int,window_sizes: np.ndarray, fps: int) -> np.ndarray:
-
+    def sliding_percentile_difference(
+        data: np.ndarray,
+        upper_pct: int,
+        lower_pct: int,
+        window_sizes: np.ndarray,
+        fps: int,
+    ) -> np.ndarray:
         """
         Jitted computes the difference between the upper and lower percentiles within a sliding window for each position
         in the time series using various window sizes. It returns a 2D array where each row corresponds to a position in the time series,
@@ -352,7 +364,9 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float64[:], float64, float64[:], int64,)", cache=True, fastmath=True)
-    def sliding_percent_beyond_n_std(data: np.ndarray, n: float, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
+    def sliding_percent_beyond_n_std(
+        data: np.ndarray, n: float, window_sizes: np.ndarray, sample_rate: int
+    ) -> np.ndarray:
         """
         Computed the percentage of data points that exceed 'n' standard deviations from the mean for each position in
         the time series using various window sizes. It returns a 2D array where each row corresponds to a position in the time series,
@@ -1015,7 +1029,9 @@ class TimeseriesFeatureMixin(object):
             (float32[:], float64, int64, types.misc.Omitted(True)),
         ]
     )
-    def time_since_previous_threshold(data: np.ndarray, threshold: float, fps: int, above: bool) -> np.ndarray:
+    def time_since_previous_threshold(
+        data: np.ndarray, threshold: float, fps: int, above: bool
+    ) -> np.ndarray:
         """
         Jitted compute of the time (in seconds) that has elapsed since the last occurrence of a value above (or below)
         a specified threshold in a time series. The time series is assumed to have a constant sample rate.

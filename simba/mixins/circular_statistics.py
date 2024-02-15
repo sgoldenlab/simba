@@ -607,7 +607,9 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
-    def agg_angular_diff_timebins(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
+    def agg_angular_diff_timebins(
+        data: np.ndarray, time_windows: np.ndarray, fps: int
+    ) -> np.ndarray:
         """
         Compute the difference between the median angle in the current time-window versus the previous time window.
         For example, computes the difference between the mean angle in the first 1s of the video versus
@@ -678,9 +680,14 @@ class CircularStatisticsMixin(object):
         data = np.sort(data)
         Ti, TiL = np.full((data.shape[0]), np.nan), np.full((data.shape[0]), np.nan)
         l = np.int8(360 / len(data))
-        Ti[-1] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(data[0]) - np.deg2rad(data[-1]))))
+        Ti[-1] = np.rad2deg(
+            np.pi - np.abs(np.pi - np.abs(np.deg2rad(data[0]) - np.deg2rad(data[-1])))
+        )
         for j in prange(data.shape[0] - 1, -1, -1):
-            Ti[j] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(data[j]) - np.deg2rad(data[j - 1]))))
+            Ti[j] = np.rad2deg(
+                np.pi
+                - np.abs(np.pi - np.abs(np.deg2rad(data[j]) - np.deg2rad(data[j - 1])))
+            )
         for k in prange(Ti.shape[0]):
             TiL[int(k)] = max((l, Ti[k])) - min((l, Ti[k]))
         S = np.sum(TiL)
@@ -689,7 +696,9 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
-    def sliding_rao_spacing(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
+    def sliding_rao_spacing(
+        data: np.ndarray, time_windows: np.ndarray, fps: int
+    ) -> np.ndarray:
         """
         Jitted compute of the uniformity of a circular dataset in sliding windows.
 
@@ -726,11 +735,24 @@ class CircularStatisticsMixin(object):
             window_size = int(time_windows[win_cnt] * fps)
             for i in range(window_size, data.shape[0]):
                 w_data = np.sort(data[i - window_size : i])
-                Ti, TiL = np.full((w_data.shape[0]), np.nan), np.full((w_data.shape[0]), np.nan)
+                Ti, TiL = np.full((w_data.shape[0]), np.nan), np.full(
+                    (w_data.shape[0]), np.nan
+                )
                 l = np.int8(360 / len(w_data))
-                Ti[-1] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(w_data[0]) - np.deg2rad(w_data[-1]))))
+                Ti[-1] = np.rad2deg(
+                    np.pi
+                    - np.abs(
+                        np.pi - np.abs(np.deg2rad(w_data[0]) - np.deg2rad(w_data[-1]))
+                    )
+                )
                 for j in prange(w_data.shape[0] - 1, -1, -1):
-                    Ti[j] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(w_data[j]) - np.deg2rad(w_data[j - 1]))))
+                    Ti[j] = np.rad2deg(
+                        np.pi
+                        - np.abs(
+                            np.pi
+                            - np.abs(np.deg2rad(w_data[j]) - np.deg2rad(w_data[j - 1]))
+                        )
+                    )
                 for k in prange(Ti.shape[0]):
                     TiL[int(k)] = max((l, Ti[k])) - min((l, Ti[k]))
                 S = np.sum(TiL)
@@ -965,7 +987,9 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], int64[:, :], float64, float64)")
-    def sliding_circular_hotspots(data: np.ndarray, bins: np.ndarray, time_window: float, fps: float) -> np.ndarray:
+    def sliding_circular_hotspots(
+        data: np.ndarray, bins: np.ndarray, time_window: float, fps: float
+    ) -> np.ndarray:
         """
         Jitted compute of sliding circular hotspots in a dataset. Calculates circular hotspots in a time-series dataset by sliding a time window
         across the data and computing hotspot statistics for specified circular bins.
