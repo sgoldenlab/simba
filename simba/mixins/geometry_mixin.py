@@ -56,7 +56,14 @@ class GeometryMixin(object):
         pass
 
     @staticmethod
-    def bodyparts_to_polygon(data: np.ndarray, cap_style: Literal["round", "square", "flat"] = "round", parallel_offset: int = 1, pixels_per_mm: int = 1, simplify_tolerance: float = 2, preserve_topology: bool = True) -> Polygon:
+    def bodyparts_to_polygon(
+        data: np.ndarray,
+        cap_style: Literal["round", "square", "flat"] = "round",
+        parallel_offset: int = 1,
+        pixels_per_mm: int = 1,
+        simplify_tolerance: float = 2,
+        preserve_topology: bool = True,
+    ) -> Polygon:
         """
         .. image:: _static/img/bodyparts_to_polygon.png
            :width: 400
@@ -111,7 +118,9 @@ class GeometryMixin(object):
             )
 
     @staticmethod
-    def bodyparts_to_points(data: np.ndarray, buffer: Optional[int] = None, px_per_mm: Optional[int] = None) -> List[Union[Point, Polygon]]:
+    def bodyparts_to_points(
+        data: np.ndarray, buffer: Optional[int] = None, px_per_mm: Optional[int] = None
+    ) -> List[Union[Point, Polygon]]:
         """
         Convert body-parts coordinate to Point geometries.
 
@@ -306,7 +315,14 @@ class GeometryMixin(object):
         )
         if shapes[0].intersects(shapes[1]):
             intersection = shapes[0].intersection(shapes[1])
-            return np.round((intersection.area / ((shapes[0].area + shapes[1].area) - intersection.area) * 100), 2)
+            return np.round(
+                (
+                    intersection.area
+                    / ((shapes[0].area + shapes[1].area) - intersection.area)
+                    * 100
+                ),
+                2,
+            )
         else:
             return 0
 

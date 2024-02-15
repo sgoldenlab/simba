@@ -143,11 +143,14 @@ from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
-from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
+from simba.video_processors.video_processing import \
+    extract_frames_from_all_videos_in_directory
+
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 
 UNSUPERVISED = False
+
 
 class LoadProjectPopUp(object):
     def __init__(self):
@@ -1164,7 +1167,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             lbl_addon,
             text="Animal-anchored ROI analysis",
             fg="orange",
-            command=lambda: BoundaryMenus(config_path=self.config_path))
+            command=lambda: BoundaryMenus(config_path=self.config_path),
+        )
 
         self.create_import_videos_menu(parent_frm=import_frm, idx_row=0, idx_column=0)
         self.create_import_pose_menu(parent_frm=import_frm, idx_row=1, idx_column=0)
@@ -1283,7 +1287,13 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         if UNSUPERVISED:
             from simba.unsupervised.unsupervised_main import UnsupervisedGUI
-            unsupervised_btn = Button(lbl_addon,text='Unsupervised analysis', fg='purple', command=lambda: UnsupervisedGUI(config_path=self.config_path))
+
+            unsupervised_btn = Button(
+                lbl_addon,
+                text="Unsupervised analysis",
+                fg="purple",
+                command=lambda: UnsupervisedGUI(config_path=self.config_path),
+            )
             unsupervised_btn.grid(row=3, sticky=NW)
 
     def create_video_info_table(self):
@@ -2055,6 +2065,7 @@ def terminate_children(children):
 def main():
     if currentPlatform == OS.WINDOWS.value:
         import ctypes
+
         myappid = "SimBA development wheel"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     SplashMovie()

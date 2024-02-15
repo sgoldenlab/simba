@@ -4,28 +4,56 @@ import os
 
 """ Tkinter pop-up classes for unsupervised ML"""
 
+import threading
 from tkinter import *
 from typing import Union
+
 import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect, FolderSelect)
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
+                                        FolderSelect)
 from simba.unsupervised.enums import Clustering, UMLOptions, Unsupervised
 from simba.unsupervised.hdbscan_clusterer import HDBSCANClusterer
 from simba.utils.checks import check_if_dir_exists
 from simba.utils.enums import Formats, Options
-import threading
+
 
 class FitClusterModelsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="CLUSTERING FIT: GRID SEARCH")
         ConfigReader.__init__(self, config_path=config_path)
 
-        self.dataset_frm = LabelFrame(self.main_frm,text="DATASET", font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black")
-        self.data_dir_selected = FolderSelect(self.dataset_frm, "DATA DIRECTORY (PICKLES): ", lblwidth=25, initialdir=self.project_path)
-        self.save_frm = LabelFrame(self.main_frm,text="SAVE",font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black")
-        self.save_dir = FolderSelect(self.save_frm, "SAVE DIRECTORY: ", lblwidth=25, initialdir=self.project_path)
-        self.algo_frm = LabelFrame(self.main_frm,text="ALGORITHM",pady=5,padx=5,font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black")
+        self.dataset_frm = LabelFrame(
+            self.main_frm,
+            text="DATASET",
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            fg="black",
+        )
+        self.data_dir_selected = FolderSelect(
+            self.dataset_frm,
+            "DATA DIRECTORY (PICKLES): ",
+            lblwidth=25,
+            initialdir=self.project_path,
+        )
+        self.save_frm = LabelFrame(
+            self.main_frm,
+            text="SAVE",
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            fg="black",
+        )
+        self.save_dir = FolderSelect(
+            self.save_frm, "SAVE DIRECTORY: ", lblwidth=25, initialdir=self.project_path
+        )
+        self.algo_frm = LabelFrame(
+            self.main_frm,
+            text="ALGORITHM",
+            pady=5,
+            padx=5,
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            fg="black",
+        )
         self.algo_dropdown = DropDownMenu(
             self.algo_frm,
             "ALGORITHM:",
@@ -198,7 +226,13 @@ class FitClusterModelsPopUp(PopUpMixin, ConfigReader):
             "cluster_selection_epsilon": epsilons,
         }
         clusterer = HDBSCANClusterer()
-        threading.Thread(target=clusterer.fit(data_path=self.data_directory,save_dir=self.save_directory,hyper_parameters=hyper_parameters)).start()
+        threading.Thread(
+            target=clusterer.fit(
+                data_path=self.data_directory,
+                save_dir=self.save_directory,
+                hyper_parameters=hyper_parameters,
+            )
+        ).start()
 
 
-#_ = FitClusterModelsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')
+# _ = FitClusterModelsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')

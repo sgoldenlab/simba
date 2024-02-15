@@ -15,8 +15,8 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
                                         FolderSelect)
-from simba.unsupervised.cluster_statistics import (ClusterXAICalculator,
-    EmbeddingCorrelationCalculator)
+from simba.unsupervised.cluster_statistics import (
+    ClusterXAICalculator, EmbeddingCorrelationCalculator)
 from simba.unsupervised.cluster_visualizer import ClusterVisualizer
 from simba.unsupervised.data_extractor import DataExtractor
 from simba.unsupervised.dbcv_calculator import DBCVCalculator
@@ -35,9 +35,16 @@ from simba.utils.errors import NoSpecifiedOutputError
 class GridSearchVisualizerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
-        PopUpMixin.__init__(self, config_path=config_path, title="GRID SEARCH VISUALIZER")
+        PopUpMixin.__init__(
+            self, config_path=config_path, title="GRID SEARCH VISUALIZER"
+        )
         ConfigReader.__init__(self, config_path=config_path)
-        data_frm = LabelFrame(self.main_frm,text="DATA",fg="black",font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        data_frm = LabelFrame(
+            self.main_frm,
+            text="DATA",
+            fg="black",
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+        )
         self.data_dir_select = FolderSelect(data_frm, "DATA DIRECTORY:", lblwidth=25)
         self.save_dir_select = FolderSelect(data_frm, "OUTPUT DIRECTORY: ", lblwidth=25)
         data_frm.grid(row=0, column=0, sticky=NW)
@@ -853,6 +860,7 @@ class ClusterVisualizerPopUp(PopUpMixin, ConfigReader):
 
 # _ = ClusterVisualizerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
 
+
 class PrintEmBeddingInfoPopUp(PopUpMixin, ConfigReader, UnsupervisedMixin):
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, title="PRINT EMBEDDING MODEL INFO")
@@ -883,4 +891,4 @@ class PrintEmBeddingInfoPopUp(PopUpMixin, ConfigReader, UnsupervisedMixin):
 
 # _ = PrintEmBeddingInfoPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
 
-#GridSearchVisualizerPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')
+# GridSearchVisualizerPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')

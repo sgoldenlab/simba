@@ -93,17 +93,18 @@ class UMLOptions(Enum):
     GRAPH_CNT = list(range(1, 11))
     SCATTER_SIZE = list(range(10, 110, 10))
     SHAP_SAMPLE_OPTIONS = list(range(100, 1100, 100))
-    DATA_TYPES = ["BOUTS FEATURES",
-                  "BOUTS TARGETS",
-                  "BOUTS DIMENSIONALITY REDUCTION DATA",
-                  "BOUTS CLUSTER LABELS",
-                  "CLUSTERER HYPER-PARAMETERS",
-                  "DIMENSIONALITY REDUCTION HYPER-PARAMETERS",
-                  "FEATURE NAMES",
-                  "FRAME FEATURES",
-                  "FRAME POSE",
-                  "FRAME TARGETS",
-                  "LOW VARIANCE FIELDS",
-                  "SCALER",
-                  "SCALED DATA"]
-
+    DATA_TYPES = [
+        "BOUTS FEATURES",
+        "BOUTS TARGETS",
+        "BOUTS DIMENSIONALITY REDUCTION DATA",
+        "BOUTS CLUSTER LABELS",
+        "CLUSTERER HYPER-PARAMETERS",
+        "DIMENSIONALITY REDUCTION HYPER-PARAMETERS",
+        "FEATURE NAMES",
+        "FRAME FEATURES",
+        "FRAME POSE",
+        "FRAME TARGETS",
+        "LOW VARIANCE FIELDS",
+        "SCALER",
+        "SCALED DATA",
+    ]

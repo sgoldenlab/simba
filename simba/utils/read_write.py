@@ -1698,6 +1698,7 @@ def web_callback(url: str) -> None:
     except ValueError:
         raise InvalidInputError(msg="Invalid URL: {url}", source=web_callback.__name__)
 
+
 def get_pkg_version(pkg: str):
     """
     Helper to get the version of a package in the current python environment.
@@ -1713,9 +1714,8 @@ def get_pkg_version(pkg: str):
     except pkg_resources.DistributionNotFound:
         return None
 
-def write_pickle(data: dict,
-                 save_path: Union[str, os.PathLike]) -> None:
 
+def write_pickle(data: dict, save_path: Union[str, os.PathLike]) -> None:
     """
     Write a single object as pickle.
 
@@ -1732,7 +1732,10 @@ def write_pickle(data: dict,
             pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
     except Exception as e:
         print(e.args[0])
-        raise InvalidFileTypeError(msg="Data could not be saved as a pickle.", source=write_pickle.__name__)
+        raise InvalidFileTypeError(
+            msg="Data could not be saved as a pickle.", source=write_pickle.__name__
+        )
+
 
 def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
     """
@@ -1746,11 +1749,14 @@ def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
     >>> data = read_pickle(data_path='/test/unsupervised/cluster_models')
     """
     if os.path.isdir(data_path):
-        print(f'Reading in data directory {data_path}...')
+        print(f"Reading in data directory {data_path}...")
         data = {}
         files_found = glob.glob(data_path + f"/*.{Formats.PICKLE.value}")
         if len(files_found) == 0:
-            raise NoFilesFoundError(msg=f"SIMBA ERROR: Zero pickle files found in {data_path}.",source=self.__class__.__name__)
+            raise NoFilesFoundError(
+                msg=f"SIMBA ERROR: Zero pickle files found in {data_path}.",
+                source=self.__class__.__name__,
+            )
         for file_cnt, file_path in enumerate(files_found):
             with open(file_path, "rb") as f:
                 data[file_cnt] = pickle.load(f)
@@ -1758,7 +1764,9 @@ def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
         with open(data_path, "rb") as f:
             data = pickle.load(f)
     else:
-        raise InvalidFilepathError(msg=f'The path {data_path} is neither a valid file or directory path', source=read_pickle.__name__)
+        raise InvalidFilepathError(
+            msg=f"The path {data_path} is neither a valid file or directory path",
+            source=read_pickle.__name__,
+        )
 
     return data
-

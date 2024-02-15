@@ -229,10 +229,12 @@ class UnsupervisedMixin(object):
             )
 
     @staticmethod
-    def get_cluster_cnt(data: np.ndarray,
-                        clusterer_name: str,
-                        min_clusters: Optional[int] = 1,
-                        max_clusters: Optional[int] = None) -> int:
+    def get_cluster_cnt(
+        data: np.ndarray,
+        clusterer_name: str,
+        min_clusters: Optional[int] = 1,
+        max_clusters: Optional[int] = None,
+    ) -> int:
         """
         Helper to check the number of unique observations in array. E.g., check the number of unique clusters.
 
@@ -245,10 +247,16 @@ class UnsupervisedMixin(object):
         cnt = np.unique(data).shape[0]
         if min_clusters is not None:
             if cnt < min_clusters:
-                raise IntegerError(msg=f"Clustrer {clusterer_name} has {cnt} clusters, but {min_clusters} clusters is required for the operation.", source=UnsupervisedMixin.get_cluster_cnt.__name__)
+                raise IntegerError(
+                    msg=f"Clustrer {clusterer_name} has {cnt} clusters, but {min_clusters} clusters is required for the operation.",
+                    source=UnsupervisedMixin.get_cluster_cnt.__name__,
+                )
         if max_clusters is not None:
             if cnt > max_clusters:
-                raise IntegerError(msg=f"Clustrer {clusterer_name} has {cnt} clusters, but no more than {max_clusters} clusters is required for the operation.", source=UnsupervisedMixin.get_cluster_cnt.__name__)
+                raise IntegerError(
+                    msg=f"Clustrer {clusterer_name} has {cnt} clusters, but no more than {max_clusters} clusters is required for the operation.",
+                    source=UnsupervisedMixin.get_cluster_cnt.__name__,
+                )
         return cnt
 
     def check_that_directory_is_empty(self, directory: Union[str, os.PathLike]) -> None:
