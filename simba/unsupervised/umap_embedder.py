@@ -14,6 +14,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 
 try:
     from cuml import UMAP
+
     gpu_flag = True
 except ModuleNotFoundError:
     from umap import UMAP
@@ -40,17 +41,22 @@ class UmapEmbedder(UnsupervisedMixin):
     def __init__(self):
         super().__init__()
 
-    def fit(self,
-            data_path: str,
-            save_dir: str,
-            hyper_parameters: dict):
+    def fit(self, data_path: str, save_dir: str, hyper_parameters: dict):
 
         self.data_path = data_path
         check_file_exist_and_readable(file_path=self.data_path)
         self.data = self.read_pickle(data_path=data_path)
-        self.umap_df = deepcopy(self.data[Unsupervised.BOUTS_FEATURES.value]).reset_index().set_index([Unsupervised.VIDEO.value,
-                                                                                                       Unsupervised.START_FRAME.value,
-                                                                                                       Unsupervised.END_FRAME.value])
+        self.umap_df = (
+            deepcopy(self.data[Unsupervised.BOUTS_FEATURES.value])
+            .reset_index()
+            .set_index(
+                [
+                    Unsupervised.VIDEO.value,
+                    Unsupervised.START_FRAME.value,
+                    Unsupervised.END_FRAME.value,
+                ]
+            )
+        )
         self.save_dir = save_dir
         self.check_that_directory_is_empty(directory=self.save_dir)
         self.low_var_cols, self.hyper_parameters = None, hyper_parameters
@@ -224,10 +230,6 @@ class UmapEmbedder(UnsupervisedMixin):
             print(
                 f"Transformed data saved at {save_dir} (elapsed time: {timer.elapsed_time_str}s)"
             )
-
-
-
-
 
 
 # data_path = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/logs/unsupervised_data_20230416145821.pickle'

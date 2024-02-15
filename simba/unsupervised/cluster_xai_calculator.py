@@ -1,18 +1,21 @@
 import itertools
 import os
 from copy import deepcopy
-from typing import Union, Dict, Optional
+from typing import Dict, Optional, Union
+
 import numpy as np
 import pandas as pd
 import shap
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.checks import check_file_exist_and_readable, check_if_keys_exist_in_dict
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_keys_exist_in_dict)
 from simba.utils.enums import Formats
+from simba.utils.printing import SimbaTimer, stdout_success
 
 FEATURE_NAME = "FEATURE NAME"
 FEATURE_IMPORTANCE = "IMPORTANCE"
@@ -40,12 +43,9 @@ PERMUTATION_IMPORTANCE = "permutation_importance"
 DESCRIPTIVE_STATISTICS = "descriptive_statistics"
 ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 
-class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
-    def __init__(self,
-                 data_path: str,
-                 config_path: str,
-                 settings: dict):
 
+class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
+    def __init__(self, data_path: str, config_path: str, settings: dict):
         """
         Class for building RF models on top of cluster assignments, and calculating explainability metrics on RF models
 
@@ -64,15 +64,44 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         self.settings, self.data_path = settings, data_path
         check_file_exist_and_readable(file_path=data_path)
         self.data = self.read_pickle(data_path=self.data_path)
-        check_if_keys_exist_in_dict(data=self.data, key=[Unsupervised.METHODS.value, Clustering.CLUSTER_MODEL.value], name=self.data_path)
-        check_if_keys_exist_in_dict(data=self.settings, key=[GINI_IMPORTANCE, PERMUTATION_IMPORTANCE, SHAP], name=self.data_path)
-        self.save_path = os.path.join(self.logs_path, f"cluster_xai_statistics_{self.data[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.{Formats.XLXS.value}")
+        check_if_keys_exist_in_dict(
+            data=self.data,
+            key=[Unsupervised.METHODS.value, Clustering.CLUSTER_MODEL.value],
+            name=self.data_path,
+        )
+        check_if_keys_exist_in_dict(
+            data=self.settings,
+            key=[GINI_IMPORTANCE, PERMUTATION_IMPORTANCE, SHAP],
+            name=self.data_path,
+        )
+        self.save_path = os.path.join(
+            self.logs_path,
+            f"cluster_xai_statistics_{self.data[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.{Formats.XLXS.value}",
+        )
 
     def run(self):
-        self.x_df = self.data[Unsupervised.METHODS.value][Unsupervised.SCALED_DATA.value]
-        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
-        self.x_y_df = pd.concat([self.x_df, pd.DataFrame(self.cluster_data, columns=[CLUSTER], index=self.x_df.index)], axis=1)
-        self.cluster_cnt = self.get_cluster_cnt(data=self.cluster_data, clusterer_name=self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min_clusters=2)
+        self.x_df = self.data[Unsupervised.METHODS.value][
+            Unsupervised.SCALED_DATA.value
+        ]
+        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][
+            Unsupervised.MODEL.value
+        ].labels_
+        self.x_y_df = pd.concat(
+            [
+                self.x_df,
+                pd.DataFrame(
+                    self.cluster_data, columns=[CLUSTER], index=self.x_df.index
+                ),
+            ],
+            axis=1,
+        )
+        self.cluster_cnt = self.get_cluster_cnt(
+            data=self.cluster_data,
+            clusterer_name=self.data[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.HASHED_NAME.value
+            ],
+            min_clusters=2,
+        )
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
         self.__train_rf_models()
@@ -83,12 +112,14 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         if self.settings[SHAP][RUN]:
             self.__shap_values()
         self.timer.stop_timer()
-        stdout_success(msg=f"Cluster XAI complete. Data saved at {self.save_path}",elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(
+            msg=f"Cluster XAI complete. Data saved at {self.save_path}",
+            elapsed_time=self.timer.elapsed_time_str,
+        )
 
     def __save_results(self, df: pd.DataFrame, name: str):
         with pd.ExcelWriter(self.save_path, mode="a") as writer:
             df.to_excel(writer, sheet_name=name, index=True)
-
 
     def __train_rf_models(self, n_estimators: Optional[int] = 100):
         print("Training ML model...")

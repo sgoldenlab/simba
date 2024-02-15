@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import Union, Dict
+from typing import Dict, Union
 
 import numpy as np
 import pandas as pd
@@ -10,10 +10,11 @@ from statsmodels.stats.libqsturng import psturng
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import check_file_exist_and_readable, check_if_keys_exist_in_dict
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_keys_exist_in_dict)
 from simba.utils.enums import Methods
 from simba.utils.printing import SimbaTimer, stdout_success
 
@@ -42,6 +43,7 @@ PERMUTATION_IMPORTANCE = "permutation_importance"
 DESCRIPTIVE_STATISTICS = "descriptive_statistics"
 ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 
+
 class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
     """
     Class for computing frequentist statitics based on cluster assignment labels (for explainability purposes).
@@ -56,26 +58,59 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
     >>> calculator.run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 data_path: Union[str, os.PathLike],
-                 settings: Dict[str, bool]):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        data_path: Union[str, os.PathLike],
+        settings: Dict[str, bool],
+    ):
 
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         self.settings = settings
         check_file_exist_and_readable(file_path=data_path)
         self.data = self.read_pickle(data_path=data_path)
-        self.save_path = os.path.join(self.logs_path, f"cluster_descriptive_statistics_{self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.xlsx")
-        check_if_keys_exist_in_dict(data=self.data, key=[Clustering.CLUSTER_MODEL.value, Unsupervised.METHODS.value], name=data_path)
-        check_if_keys_exist_in_dict(data=settings, key=[ANOVA, DESCRIPTIVE_STATISTICS, TUKEY], name='settings')
+        self.save_path = os.path.join(
+            self.logs_path,
+            f"cluster_descriptive_statistics_{self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.xlsx",
+        )
+        check_if_keys_exist_in_dict(
+            data=self.data,
+            key=[Clustering.CLUSTER_MODEL.value, Unsupervised.METHODS.value],
+            name=data_path,
+        )
+        check_if_keys_exist_in_dict(
+            data=settings, key=[ANOVA, DESCRIPTIVE_STATISTICS, TUKEY], name="settings"
+        )
+
     def run(self):
-        self.x_data = self.data[Unsupervised.METHODS.value][Unsupervised.SCALED_DATA.value]
-        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
+        self.x_data = self.data[Unsupervised.METHODS.value][
+            Unsupervised.SCALED_DATA.value
+        ]
+        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][
+            Unsupervised.MODEL.value
+        ].labels_
         if not self.settings[Unsupervised.SCALED.value]:
-            self.x_data = TrainModelMixin.scaler_inverse_transform(data=self.x_data, scaler=self.data[Unsupervised.METHODS.value][Unsupervised.SCALER.value])
-        self.x_y_df = pd.concat([self.x_data, pd.DataFrame(self.cluster_data, columns=[CLUSTER], index=self.x_data.index)], axis=1)
-        self.cluster_cnt = UnsupervisedMixin.get_cluster_cnt(data=self.cluster_data, clusterer_name=self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min_clusters=2)
+            self.x_data = TrainModelMixin.scaler_inverse_transform(
+                data=self.x_data,
+                scaler=self.data[Unsupervised.METHODS.value][Unsupervised.SCALER.value],
+            )
+        self.x_y_df = pd.concat(
+            [
+                self.x_data,
+                pd.DataFrame(
+                    self.cluster_data, columns=[CLUSTER], index=self.x_data.index
+                ),
+            ],
+            axis=1,
+        )
+        self.cluster_cnt = UnsupervisedMixin.get_cluster_cnt(
+            data=self.cluster_data,
+            clusterer_name=self.data[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.HASHED_NAME.value
+            ],
+            min_clusters=2,
+        )
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
         if self.settings[ANOVA]:
@@ -85,7 +120,10 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
         if self.settings[TUKEY]:
             self.__tukey_posthoc()
         self.timer.stop_timer()
-        stdout_success(msg=f"Cluster statistics complete. Data saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(
+            msg=f"Cluster statistics complete. Data saved at {self.save_path}",
+            elapsed_time=self.timer.elapsed_time_str,
+        )
 
     def __save_results(self, df: pd.DataFrame, name: str):
         with pd.ExcelWriter(self.save_path, mode="a") as writer:

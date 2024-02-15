@@ -6,7 +6,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union, Iterable
+from typing import Any, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -845,19 +845,34 @@ def check_valid_lst(
 
     return True
 
-def check_if_keys_exist_in_dict(data: dict,
-                                key: Union[str, int, tuple, List],
-                                name: Optional[str] = '',
-                                raise_error: Optional[bool] = True) -> bool:
+
+def check_if_keys_exist_in_dict(
+    data: dict,
+    key: Union[str, int, tuple, List],
+    name: Optional[str] = "",
+    raise_error: Optional[bool] = True,
+) -> bool:
 
     check_instance(source=name, instance=data, accepted_types=(dict,))
-    check_instance(source=name, instance=key, accepted_types=(str, int, tuple, List,))
+    check_instance(
+        source=name,
+        instance=key,
+        accepted_types=(
+            str,
+            int,
+            tuple,
+            List,
+        ),
+    )
     if not isinstance(key, list):
         key = [key]
     for k in key:
         if k not in data.keys():
             if raise_error:
-                raise InvalidInputError(msg=f"{k} does not exist in object {name}", source=check_if_keys_exist_in_dict.__class__.__name__)
+                raise InvalidInputError(
+                    msg=f"{k} does not exist in object {name}",
+                    source=check_if_keys_exist_in_dict.__class__.__name__,
+                )
         else:
             return False
 
