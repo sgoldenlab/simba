@@ -1,9 +1,9 @@
-from numba import njit, prange, int64, float32, types
-import numpy as np
-from numba.typed import Dict, List
 from typing import Optional
-from typing_extensions import Literal
 
+import numpy as np
+from numba import float32, int64, njit, prange, types
+from numba.typed import Dict, List
+from typing_extensions import Literal
 
 
 # @njit("(float32[:], int64, int64,)", fastmath=True)
@@ -15,7 +15,13 @@ from typing_extensions import Literal
         '(float32[:, :], float64, int64, types.misc.Omitted(1), types.misc.Omitted("mm"))',
     ]
 )
-def acceleration(data: np.ndarray, pixels_per_mm: float, fps: int, time_window: float = 1, unit: Literal["mm", "cm", "dm", "m"] = "mm") -> np.ndarray:
+def acceleration(
+    data: np.ndarray,
+    pixels_per_mm: float,
+    fps: int,
+    time_window: float = 1,
+    unit: Literal["mm", "cm", "dm", "m"] = "mm",
+) -> np.ndarray:
     """
     Compute acceleration.
     Computes acceleration from a sequence of body-part coordinates over time. It calculates the difference in velocity between consecutive frames and provides an array of accelerations.
@@ -59,6 +65,7 @@ def acceleration(data: np.ndarray, pixels_per_mm: float, fps: int, time_window: 
             results[wS:wE] = v - pv
         pv = v
     return results
+
 
 data = np.array([[1, 2], [1, 1], [2, 1], [1, 1]]).astype(np.float32)
 acceleration(data=data, pixels_per_mm=1.0, fps=2, time_window=1.0)
