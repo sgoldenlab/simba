@@ -975,7 +975,7 @@ class TrainModelMixin(object):
         """
 
         table_view = [
-            ["Model name", model_dict[MLParamKeys.CLASSIFIER.value]],
+            ["Model name", model_dict[MLParamKeys.CLASSIFIER_NAME.value]],
             ["Ensemble method", "RF"],
             ["Estimators (trees)", model_dict[MLParamKeys.RF_ESTIMATORS.value]],
             ["Max features", model_dict[MLParamKeys.RF_MAX_FEATURES.value]],
@@ -1478,13 +1478,8 @@ class TrainModelMixin(object):
             )
         return clf.fit(x_df, y_df)
 
-    def _read_data_file_helper(
-        self,
-        file_path: str,
-        file_type: str,
-        clf_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
-    ):
+    @staticmethod
+    def _read_data_file_helper(file_path: str,file_type: str,clf_names: Optional[List[str]] = None,raise_bool_clf_error: bool = True):
         """
         Private function called by :meth:`simba.train_model_functions.read_all_files_in_folder_mp`
         """
@@ -1500,7 +1495,7 @@ class TrainModelMixin(object):
                     raise ColumnNotFoundError(
                         column_name=clf_name,
                         file_name=file_path,
-                        source=self.__class__.__name__,
+                        source=TrainModelMixin._read_data_file_helper.__name__,
                     )
                 elif (
                     len(set(df[clf_name].unique()) - {0, 1}) > 0
@@ -1508,7 +1503,7 @@ class TrainModelMixin(object):
                 ):
                     raise InvalidInputError(
                         msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.",
-                        source=self.__class__.__name__,
+                        source=TrainModelMixin._read_data_file_helper.__name__,
                     )
         timer.stop_timer()
         print(
@@ -1517,13 +1512,8 @@ class TrainModelMixin(object):
 
         return df, frame_numbers
 
-    def read_all_files_in_folder_mp(
-        self,
-        file_paths: List[str],
-        file_type: Literal["csv", "parquet", "pickle"],
-        classifier_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
-    ) -> (pd.DataFrame, List[int]):
+    @staticmethod
+    def read_all_files_in_folder_mp(file_paths: List[str],file_type: Literal["csv", "parquet", "pickle"],classifier_names: Optional[List[str]] = None,raise_bool_clf_error: bool = True) -> (pd.DataFrame, List[int]):
         """
 
         Multiprocessing helper function to read in all data files in a folder to a single
@@ -1541,14 +1531,14 @@ class TrainModelMixin(object):
         :return pd.DataFrame: List of frame indexes of all concatenated files.
 
         """
-        if platform.system() == "Darwin":
+        if (platform.system() == "Darwin") and (multiprocessing.get_start_method() != 'spawn'):
             multiprocessing.set_start_method("spawn", force=True)
         cpu_cnt, _ = find_core_cnt()
         df_lst, frame_numbers_lst = [], []
         try:
             with ProcessPoolExecutor(int(np.ceil(cpu_cnt / 2))) as pool:
                 for res in pool.map(
-                    self._read_data_file_helper,
+                    TrainModelMixin._read_data_file_helper,
                     file_paths,
                     repeat(file_type),
                     repeat(classifier_names),
@@ -1562,7 +1552,7 @@ class TrainModelMixin(object):
             if len(df_concat) == 0:
                 raise NoDataError(
                     msg="SimBA found 0 observations (frames) in the project_folder/csv/targets_inserted directory",
-                    source=self.read_all_files_in_folder_mp.__name__,
+                    source=TrainModelMixin.read_all_files_in_folder_mp.__name__,
                 )
             df_concat = df_concat.loc[
                 :, ~df_concat.columns.str.contains("^Unnamed")
@@ -1575,11 +1565,8 @@ class TrainModelMixin(object):
             return df_concat, frame_numbers_lst
 
         except BrokenProcessPool or AttributeError:
-            MultiProcessingFailedWarning(
-                msg="Multi-processing file read failed, reverting to single core (increased run-time).",
-                source=self.__class__.__name__,
-            )
-            return self.read_all_files_in_folder(
+            MultiProcessingFailedWarning(msg="Multi-processing file read failed, reverting to single core (increased run-time).")
+            return TrainModelMixin.read_all_files_in_folder(
                 file_paths=file_paths,
                 file_type=file_type,
                 classifier_names=classifier_names,
@@ -1587,12 +1574,7 @@ class TrainModelMixin(object):
             )
 
     @staticmethod
-    def _read_data_file_helper_futures(
-        file_path: str,
-        file_type: str,
-        clf_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
-    ):
+    def _read_data_file_helper_futures(file_path: str,file_type: str,clf_names: Optional[List[str]] = None, raise_bool_clf_error: bool = True):
         """
         Private function called by :meth:`simba.train_model_functions.read_all_files_in_folder_mp_futures`
         """
@@ -1606,23 +1588,12 @@ class TrainModelMixin(object):
             for clf_name in clf_names:
                 if not clf_name in df.columns:
                     raise ColumnNotFoundError(column_name=clf_name, file_name=file_path)
-                elif (
-                    len(set(df[clf_name].unique()) - {0, 1}) > 0
-                    and raise_bool_clf_error
-                ):
-                    raise InvalidInputError(
-                        msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}."
-                    )
+                elif (len(set(df[clf_name].unique()) - {0, 1}) > 0 and raise_bool_clf_error):
+                    raise InvalidInputError(msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.")
         timer.stop_timer()
         return df, vid_name, timer.elapsed_time_str, frm_numbers
 
-    def read_all_files_in_folder_mp_futures(
-        self,
-        annotations_file_paths: List[str],
-        file_type: Literal["csv", "parquet", "pickle"],
-        classifier_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
-    ) -> (pd.DataFrame, List[int]):
+    def read_all_files_in_folder_mp_futures(self, annotations_file_paths: List[str], file_type: Literal["csv", "parquet", "pickle"], classifier_names: Optional[List[str]] = None, raise_bool_clf_error: bool = True) -> (pd.DataFrame, List[int]):
         """
         Multiprocessing helper function to read in all data files in a folder to a single
         pd.DataFrame for downstream ML through ``concurrent.Futures``. Asserts that all classifiers
@@ -1642,29 +1613,16 @@ class TrainModelMixin(object):
 
         """
         try:
-            if platform.system() == "Darwin":
-                multiprocessing.set_start_method("spawn")
+            if (platform.system() == "Darwin") and (multiprocessing.get_start_method() != 'spawn'):
+                multiprocessing.set_start_method("spawn", force=True)
             cpu_cnt, _ = find_core_cnt()
             df_lst, frm_number_list = [], []
-            with concurrent.futures.ProcessPoolExecutor(
-                max_workers=cpu_cnt
-            ) as executor:
-                results = [
-                    executor.submit(
-                        self._read_data_file_helper_futures,
-                        data,
-                        file_type,
-                        classifier_names,
-                        raise_bool_clf_error,
-                    )
-                    for data in annotations_file_paths
-                ]
+            with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cnt) as executor:
+                results = [executor.submit(self._read_data_file_helper_futures, data, file_type, classifier_names, raise_bool_clf_error) for data in annotations_file_paths]
                 for result in concurrent.futures.as_completed(results):
                     df_lst.append(result.result()[0])
                     frm_number_list.extend((result.result()[-1]))
-                    print(
-                        f"Reading complete {result.result()[1]} (elapsed time: {result.result()[2]}s)..."
-                    )
+                    print(f"Reading complete {result.result()[1]} (elapsed time: {result.result()[2]}s)...")
             df_concat = pd.concat(df_lst, axis=0).round(4)
             if "scorer" in df_concat.columns:
                 df_concat = df_concat.drop(["scorer"], axis=1)
@@ -1672,9 +1630,7 @@ class TrainModelMixin(object):
             return df_concat, frm_number_list
 
         except Exception as e:
-            MultiProcessingFailedWarning(
-                msg=f"Multi-processing file read failed, reverting to single core (increased run-time on large datasets). Exception: {e.args}"
-            )
+            MultiProcessingFailedWarning(msg=f"Multi-processing file read failed, reverting to single core (increased run-time on large datasets). Exception: {e.args}")
             return self.read_all_files_in_folder(
                 file_paths=annotations_file_paths,
                 file_type=file_type,
@@ -2291,8 +2247,8 @@ class TrainModelMixin(object):
             meta_dict = {k.lower(): v for k, v in meta_dict.items()}
             errors.append(
                 check_str(
-                    name=meta_dict[MLParamKeys.CLASSIFIER.value],
-                    value=meta_dict[MLParamKeys.CLASSIFIER.value],
+                    name=meta_dict[MLParamKeys.CLASSIFIER_NAME.value],
+                    value=meta_dict[MLParamKeys.CLASSIFIER_NAME.value],
                     raise_error=False,
                 )[1]
             )
@@ -2436,16 +2392,16 @@ class TrainModelMixin(object):
                 )
                 try:
                     present_len, absent_len = len(
-                        data_df[data_df[meta_dict[MLParamKeys.CLASSIFIER.value]] == 1]
+                        data_df[data_df[meta_dict[MLParamKeys.CLASSIFIER_NAME.value]] == 1]
                     ), len(
-                        data_df[data_df[meta_dict[MLParamKeys.CLASSIFIER.value]] == 0]
+                        data_df[data_df[meta_dict[MLParamKeys.CLASSIFIER_NAME.value]] == 0]
                     )
                     ratio_n = int(
                         present_len * meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value]
                     )
                     if absent_len < ratio_n:
                         errors.append(
-                            f"The under-sample ratio of {meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value]} in \n classifier {meta_dict[MLParamKeys.CLASSIFIER.value]} demands {ratio_n} behavior-absent annotations."
+                            f"The under-sample ratio of {meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value]} in \n classifier {meta_dict[MLParamKeys.CLASSIFIER_NAME.value]} demands {ratio_n} behavior-absent annotations."
                         )
                 except:
                     pass

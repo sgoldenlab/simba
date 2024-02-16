@@ -36,35 +36,16 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
 
     def __init__(self, config_path: Union[str, os.PathLike]):
 
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         TrainModelMixin.__init__(self)
-        log_event(
-            logger_name=str(self.__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
         self.read_model_settings_from_config(config=self.config)
-
-        check_if_filepath_list_is_empty(
-            filepaths=self.target_file_paths,
-            error_msg="Zero annotation files found in project_folder/csv/targets_inserted directory, cannot create model.",
-        )
-        print(
-            "Reading in {} annotated files...".format(str(len(self.target_file_paths)))
-        )
-        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(
-            self.target_file_paths, self.file_type, [self.clf_name]
-        )
-        self.frm_idx = pd.DataFrame(
-            {"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx}
-        )
-        self.data_df = self.check_raw_dataset_integrity(
-            df=self.data_df, logs_path=self.logs_path
-        )
+        check_if_filepath_list_is_empty(filepaths=self.target_file_paths,error_msg="Zero annotation files found in project_folder/csv/targets_inserted directory, cannot create model.")
+        print("Reading in {} annotated files...".format(str(len(self.target_file_paths))))
+        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp(self.target_file_paths, self.file_type, [self.clf_name])
+        self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
+        self.data_df = self.check_raw_dataset_integrity(df=self.data_df, logs_path=self.logs_path)
         self.data_df_wo_cords = self.drop_bp_cords(df=self.data_df)
-        annotation_cols_to_remove = self.read_in_all_model_names_to_remove(
-            self.config, self.clf_cnt, self.clf_name
-        )
+        annotation_cols_to_remove = self.read_in_all_model_names_to_remove(self.config, self.clf_cnt, self.clf_name)
         self.x_y_df = self.delete_other_annotation_columns(
             self.data_df_wo_cords, list(annotation_cols_to_remove)
         )
@@ -522,7 +503,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         )
 
 
-# test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.perform_sampling()
 # test.train_model()
 # test.save_model()

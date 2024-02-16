@@ -35,53 +35,24 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
 
     def __init__(self, config_path: str):
 
-        ConfigReader.__init__(self, config_path=config_path)
-        log_event(
-            logger_name=str(self.__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
+        ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         TrainModelMixin.__init__(self)
-        self.model_dir_out = os.path.join(
-            read_config_entry(
-                self.config,
-                ConfigKey.SML_SETTINGS.value,
-                ConfigKey.MODEL_DIR.value,
-                data_type=Dtypes.STR.value,
-            ),
-            "validations",
-        )
+        self.model_dir_out = os.path.join(read_config_entry(self.config, ConfigKey.SML_SETTINGS.value, ConfigKey.MODEL_DIR.value,    data_type=Dtypes.STR.value,), "validations",)
         if not os.path.exists(self.model_dir_out):
             os.makedirs(self.model_dir_out)
-        check_if_filepath_list_is_empty(
-            filepaths=self.target_file_paths,
-            error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create models.",
-        )
+        check_if_filepath_list_is_empty(filepaths=self.target_file_paths,error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create models." )
         if not os.path.exists(self.configs_meta_dir):
             os.makedirs(self.configs_meta_dir)
         self.meta_file_lst = sorted(read_simba_meta_files(self.configs_meta_dir))
-        print(
-            "Reading in {} annotated files...".format(str(len(self.target_file_paths)))
-        )
-        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(
-            self.target_file_paths, self.file_type
-        )
-        self.frm_idx = pd.DataFrame(
-            {"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx}
-        )
-        self.data_df = self.check_raw_dataset_integrity(
-            self.data_df, logs_path=self.logs_path
-        )
+        print(f"Reading in {len(self.target_file_paths)} annotated files...")
+        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type)
+        self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
+        self.data_df = self.check_raw_dataset_integrity(self.data_df, logs_path=self.logs_path)
         self.data_df = self.drop_bp_cords(df=self.data_df)
 
     def perform_sampling(self, meta_dict: dict):
-        if (
-            meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value]
-            == Methods.SPLIT_TYPE_FRAMES.value
-        ):
-            self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
-                self.x_df, self.y_df, test_size=meta_dict["train_test_size"]
-            )
+        if (meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value] == Methods.SPLIT_TYPE_FRAMES.value):
+            self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_df, self.y_df, test_size=meta_dict["train_test_size"])
         elif (
             meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value]
             == Methods.SPLIT_TYPE_BOUTS.value
@@ -162,22 +133,22 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             )
         for config_cnt, meta_dict in self.meta_dicts.items():
             self.config_cnt = config_cnt
-            self.clf_name = meta_dict[MLParamKeys.CLASSIFIER.value]
+            self.clf_name = meta_dict[MLParamKeys.CLASSIFIER_NAME.value]
             print(
-                f"Training model {config_cnt+1}/{len(self.meta_dicts.keys())} ({meta_dict[MLParamKeys.CLASSIFIER.value]})..."
+                f"Training model {config_cnt+1}/{len(self.meta_dicts.keys())} ({meta_dict[MLParamKeys.CLASSIFIER_NAME.value]})..."
             )
             self.class_names = [
-                f"Not_{meta_dict[MLParamKeys.CLASSIFIER.value]}",
-                meta_dict[MLParamKeys.CLASSIFIER.value],
+                f"Not_{meta_dict[MLParamKeys.CLASSIFIER_NAME.value]}",
+                meta_dict[MLParamKeys.CLASSIFIER_NAME.value],
             ]
             annotation_cols_to_remove = self.read_in_all_model_names_to_remove(
-                self.config, self.clf_cnt, meta_dict[MLParamKeys.CLASSIFIER.value]
+                self.config, self.clf_cnt, meta_dict[MLParamKeys.CLASSIFIER_NAME.value]
             )
             self.x_y_df = self.delete_other_annotation_columns(
                 self.data_df, annotation_cols_to_remove
             )
             self.x_df, self.y_df = self.split_df_to_x_y(
-                self.x_y_df, meta_dict[MLParamKeys.CLASSIFIER.value]
+                self.x_y_df, meta_dict[MLParamKeys.CLASSIFIER_NAME.value]
             )
             self.feature_names = self.x_df.columns
             self.check_sampled_dataset_integrity(x_df=self.x_df, y_df=self.y_df)
@@ -360,6 +331,9 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             source=self.__class__.__name__,
         )
 
+
+# test = GridSearchRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# test.run()
 
 # test = GridSearchRandomForestClassifier(config_path='/Users/simon/Desktop/envs/troubleshooting/testing_enum/project_folder/project_config.ini')
 # test.run()
