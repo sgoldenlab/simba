@@ -25,20 +25,39 @@ class GridSearchMulticlassRandomForestClassifier(ConfigReader, TrainModelMixin):
     def __init__(self, config_path: str):
 
         ConfigReader.__init__(self, config_path=config_path)
-        log_event(logger_name=str(self.__class__.__name__),log_type=TagNames.CLASS_INIT.value,msg=self.create_log_msg_from_init_args(locals=locals()))
+        log_event(
+            logger_name=str(self.__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
         TrainModelMixin.__init__(self)
-        self.model_dir_out = os.path.join(read_config_entry(self.config,ConfigKey.SML_SETTINGS.value,ConfigKey.MODEL_DIR.value,data_type=Dtypes.STR.value), "validations")
+        self.model_dir_out = os.path.join(
+            read_config_entry(
+                self.config,
+                ConfigKey.SML_SETTINGS.value,
+                ConfigKey.MODEL_DIR.value,
+                data_type=Dtypes.STR.value,
+            ),
+            "validations",
+        )
         if not os.path.exists(self.model_dir_out):
             os.makedirs(self.model_dir_out)
-        check_if_filepath_list_is_empty(filepaths=self.target_file_paths,error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create models.",)
+        check_if_filepath_list_is_empty(
+            filepaths=self.target_file_paths,
+            error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create models.",
+        )
         if not os.path.exists(self.configs_meta_dir):
             os.makedirs(self.configs_meta_dir)
         self.meta_file_lst = sorted(
             read_simba_meta_files(folder_path=self.configs_meta_dir, raise_error=True)
         )
         print(f"Reading in {len(self.target_file_paths)} annotated files...")
-        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type)
-        self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
+        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(
+            self.target_file_paths, self.file_type
+        )
+        self.frm_idx = pd.DataFrame(
+            {"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx}
+        )
         self.data_df = self.check_raw_dataset_integrity(
             self.data_df, logs_path=self.logs_path
         )

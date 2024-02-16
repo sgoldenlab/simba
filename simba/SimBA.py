@@ -871,13 +871,17 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             label_trainmachinemodel,
             text="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)",
             fg="blue",
-            command=lambda: self.train_single_model(config_path=self.config_path))
+            command=lambda: self.train_single_model(config_path=self.config_path),
+        )
 
         button_train_multimodel = Button(
             label_trainmachinemodel,
             text="TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)",
             fg="green",
-            command=lambda:self.train_multiple_models_from_meta(config_path=self.config_path))
+            command=lambda: self.train_multiple_models_from_meta(
+                config_path=self.config_path
+            ),
+        )
 
         label_model_validation = CreateLabelFrameWithIcon(
             parent=tab9,

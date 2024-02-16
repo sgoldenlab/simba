@@ -37,22 +37,44 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
 
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         TrainModelMixin.__init__(self)
-        self.model_dir_out = os.path.join(read_config_entry(self.config, ConfigKey.SML_SETTINGS.value, ConfigKey.MODEL_DIR.value,    data_type=Dtypes.STR.value,), "validations",)
+        self.model_dir_out = os.path.join(
+            read_config_entry(
+                self.config,
+                ConfigKey.SML_SETTINGS.value,
+                ConfigKey.MODEL_DIR.value,
+                data_type=Dtypes.STR.value,
+            ),
+            "validations",
+        )
         if not os.path.exists(self.model_dir_out):
             os.makedirs(self.model_dir_out)
-        check_if_filepath_list_is_empty(filepaths=self.target_file_paths,error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create models." )
+        check_if_filepath_list_is_empty(
+            filepaths=self.target_file_paths,
+            error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create models.",
+        )
         if not os.path.exists(self.configs_meta_dir):
             os.makedirs(self.configs_meta_dir)
         self.meta_file_lst = sorted(read_simba_meta_files(self.configs_meta_dir))
         print(f"Reading in {len(self.target_file_paths)} annotated files...")
-        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type)
-        self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
-        self.data_df = self.check_raw_dataset_integrity(self.data_df, logs_path=self.logs_path)
+        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(
+            self.target_file_paths, self.file_type
+        )
+        self.frm_idx = pd.DataFrame(
+            {"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx}
+        )
+        self.data_df = self.check_raw_dataset_integrity(
+            self.data_df, logs_path=self.logs_path
+        )
         self.data_df = self.drop_bp_cords(df=self.data_df)
 
     def perform_sampling(self, meta_dict: dict):
-        if (meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value] == Methods.SPLIT_TYPE_FRAMES.value):
-            self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_df, self.y_df, test_size=meta_dict["train_test_size"])
+        if (
+            meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value]
+            == Methods.SPLIT_TYPE_FRAMES.value
+        ):
+            self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
+                self.x_df, self.y_df, test_size=meta_dict["train_test_size"]
+            )
         elif (
             meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value]
             == Methods.SPLIT_TYPE_BOUTS.value
