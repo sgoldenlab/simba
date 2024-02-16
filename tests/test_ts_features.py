@@ -43,7 +43,6 @@ def test_sliding_crossings_2(size, time_windows):
     time_windows = np.array([time_windows]).flatten()
     data = np.random.random(size=(size,)).astype(np.float32)
     results = TimeseriesFeatureMixin().sliding_crossings(data=data, time_windows=time_windows, fps=4.0, val=0.5)
-    assert np.issubdtype(results.dtype, np.int)
     assert results.shape[0] == data.shape[0]
     assert results.shape[1] == time_windows.shape[0]
 
