@@ -28,7 +28,7 @@ def test_crossings_2(size, threshold):
     data = np.random.random(size=(size,)).astype(np.float32)
     results = TimeseriesFeatureMixin().crossings(data=data, val=threshold)
     assert type(results) == int
-    assert results > size
+    assert results <= size
 
 def test_sliding_crossings_1():
     data = np.array([3.9, 7.5,  4.2, 6.2, 7.5, 3.9, 6.2, 6.5, 7.2, 9.5]).astype(np.float32)

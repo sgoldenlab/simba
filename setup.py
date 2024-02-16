@@ -5,8 +5,9 @@ Contributors.
 https://github.com/sgoldenlab/simba#contributors-
 Licensed under GNU Lesser General Public License v3.0
 """
-
 import setuptools
+
+exclusion_patterns = ["pose_configurations_archive"]
 
 with open("docs/project_description.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -25,7 +26,7 @@ setuptools.setup(
     url="https://github.com/sgoldenlab/simba",
     install_requires=requirements,
     license='GNU Lesser General Public License v3 (LGPLv3)',
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=exclusion_patterns),
     include_package_data=True,
     classifiers=(
         "Programming Language :: Python :: 3",
