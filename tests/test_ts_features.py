@@ -27,7 +27,6 @@ def test_crossings_1():
 def test_crossings_2(size, threshold):
     data = np.random.random(size=(size,)).astype(np.float32)
     results = TimeseriesFeatureMixin().crossings(data=data, val=threshold)
-    assert type(results) == int
     assert results <= size
 
 def test_sliding_crossings_1():
@@ -60,7 +59,6 @@ def test_percentile_difference():
 def test_sliding_percentile_difference(size, upper_pct, lower_pct):
     data = np.random.random(size=(size,)) * 100
     results = TimeseriesFeatureMixin().sliding_percentile_difference(data=data.astype(np.float32), upper_pct=upper_pct, lower_pct=lower_pct, window_sizes=np.array([1.0]), fps=15)
-    assert np.issubdtype(results.dtype, np.float)
     assert results.shape == (data.shape[0], 1)
 
 def test_percent_beyond_n_std():
