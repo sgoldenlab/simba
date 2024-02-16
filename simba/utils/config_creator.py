@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from typing import List
 
 import simba
-from simba.utils.enums import ConfigKey, DirNames, Dtypes, Paths, MLParamKeys
+from simba.utils.enums import ConfigKey, DirNames, Dtypes, MLParamKeys, Paths
 from simba.utils.errors import DirectoryExistError
 from simba.utils.printing import SimbaTimer, stdout_success
 
@@ -187,16 +187,36 @@ class ProjectConfigCreator(object):
         self.config.add_section(ConfigKey.PROCESS_MOVEMENT_SETTINGS.value)
 
         self.config.add_section(ConfigKey.CREATE_ENSEMBLE_SETTINGS.value)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][ConfigKey.POSE_SETTING.value] = str(self.pose_estimation_bp_cnt)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.CLASSIFIER.value] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.TT_SIZE.value] = str(0.20)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.UNDERSAMPLE_SETTING.value] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.UNDERSAMPLE_RATIO.value] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.OVERSAMPLE_SETTING.value] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.OVERSAMPLE_RATIO.value] = Dtypes.NONE.value
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.RF_ESTIMATORS.value] = str(2000)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.MIN_LEAF.value] = str(1)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][MLParamKeys.RF_MAX_FEATURES.value] = Dtypes.SQRT.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            ConfigKey.POSE_SETTING.value
+        ] = str(self.pose_estimation_bp_cnt)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.CLASSIFIER.value
+        ] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.TT_SIZE.value
+        ] = str(0.20)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.UNDERSAMPLE_SETTING.value
+        ] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.UNDERSAMPLE_RATIO.value
+        ] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.OVERSAMPLE_SETTING.value
+        ] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.OVERSAMPLE_RATIO.value
+        ] = Dtypes.NONE.value
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.RF_ESTIMATORS.value
+        ] = str(2000)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.MIN_LEAF.value
+        ] = str(1)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
+            MLParamKeys.RF_MAX_FEATURES.value
+        ] = Dtypes.SQRT.value
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
             ConfigKey.RF_JOBS.value
         ] = str(-1)

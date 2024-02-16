@@ -6,7 +6,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.pose_processors.pose_reset import PoseResetter
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect, TwoOptionQuestionPopUp)
+                                        Entry_Box, FileSelect,
+                                        TwoOptionQuestionPopUp)
 from simba.utils.checks import check_str
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.printing import stdout_success, stdout_trash
@@ -117,20 +118,30 @@ class RemoveAClassifierPopUp(PopUpMixin, ConfigReader):
             source=self.__class__.__name__,
         )
 
+
 # _ = RemoveAClassifierPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
+
 
 class PrintModelInfoPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="PRINT MACHINE MODEL INFO", size=(250, 250))
-        model_info_frame = LabelFrame(self.main_frm, text="PRINT MODEL INFORMATION", padx=5, pady=5, font="bold")
-        model_path_selector = FileSelect(model_info_frame, "Model path", title="Select a video file")
-        btn_print_info = Button(model_info_frame,text="PRINT MODEL INFO",command=lambda: tabulate_clf_info(clf_path=model_path_selector.file_path))
+        model_info_frame = LabelFrame(
+            self.main_frm, text="PRINT MODEL INFORMATION", padx=5, pady=5, font="bold"
+        )
+        model_path_selector = FileSelect(
+            model_info_frame, "Model path", title="Select a video file"
+        )
+        btn_print_info = Button(
+            model_info_frame,
+            text="PRINT MODEL INFO",
+            command=lambda: tabulate_clf_info(clf_path=model_path_selector.file_path),
+        )
         model_info_frame.grid(row=0, sticky=W)
         model_path_selector.grid(row=0, sticky=W, pady=5)
         btn_print_info.grid(row=1, sticky=W)
 
 
-class PoseResetterPopUp():
+class PoseResetterPopUp:
     def __init__(self):
         # PopUpMixin.__init__(self, title="WARNING!", size=(300, 100))
         # popupframe = LabelFrame(self.main_frm)
@@ -138,12 +149,16 @@ class PoseResetterPopUp():
         # label.grid(row=0, columnspan=2)
         # B1 = Button(popupframe,text="YES",fg="blue",command=lambda: PoseResetter(master=self.main_frm))
         # B2 = Button(popupframe, text="NO", fg="red", command=self.main_frm.destroy)
-        question = TwoOptionQuestionPopUp(title="WARNING!", question="Do you want to remove user-defined pose-configurations?", option_one="YES", option_two="NO")
-        if question.selected_option == 'YES':
+        question = TwoOptionQuestionPopUp(
+            title="WARNING!",
+            question="Do you want to remove user-defined pose-configurations?",
+            option_one="YES",
+            option_two="NO",
+        )
+        if question.selected_option == "YES":
             _ = PoseResetter(master=None)
         else:
             pass
-
 
         # popupframe.grid(row=0, columnspan=2)
         # B1.grid(row=1, column=0, sticky=W)
