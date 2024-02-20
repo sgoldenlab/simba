@@ -151,6 +151,7 @@ currentPlatform = platform.system()
 
 UNSUPERVISED = False
 
+
 class LoadProjectPopUp(object):
     def __init__(self):
         self.main_frm = Toplevel()
@@ -585,7 +586,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.EXTRACT_FEATURES.value,
         )
-        button_extractfeatures = Button(label_extractfeatures, text="EXTRACT FEATURES", fg="blue", command=lambda: threading.Thread(target=self.run_feature_extraction).start())
+        button_extractfeatures = Button(
+            label_extractfeatures,
+            text="EXTRACT FEATURES",
+            fg="blue",
+            command=lambda: threading.Thread(
+                target=self.run_feature_extraction
+            ).start(),
+        )
 
         def activate(box, *args):
             for entry in args:
@@ -1438,15 +1446,26 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         _ = MachineModelSettingsPopUp(config_path=self.config_path)
 
     def run_feature_extraction(self):
-        print(f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts")
+        print(
+            f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts"
+        )
         feature_extractor_classes = get_bp_config_code_class_pairs()
         if self.user_defined_var.get():
-            custom_feature_extractor = CustomFeatureExtractor(extractor_file_path=self.scriptfile.file_path, config_path=self.config_path)
+            custom_feature_extractor = CustomFeatureExtractor(
+                extractor_file_path=self.scriptfile.file_path,
+                config_path=self.config_path,
+            )
             custom_feature_extractor.run()
-            stdout_success(msg="Custom feature extraction complete!",source=self.__class__.__name__)
+            stdout_success(
+                msg="Custom feature extraction complete!",
+                source=self.__class__.__name__,
+            )
         else:
             if self.pose_setting not in feature_extractor_classes.keys():
-                raise InvalidInputError(msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}. Check the pose-estimation setting in the project_config.ini", source=self.__class__.__name__)
+                raise InvalidInputError(
+                    msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}. Check the pose-estimation setting in the project_config.ini",
+                    source=self.__class__.__name__,
+                )
             if self.pose_setting == "8":
                 feature_extractor = feature_extractor_classes[self.pose_setting][self.animal_cnt](config_path=self.config_path)
             else:

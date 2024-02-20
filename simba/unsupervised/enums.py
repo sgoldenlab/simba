@@ -79,11 +79,13 @@ class UMLOptions(Enum):
         Unsupervised.USER_DEFINED_SET.value,
     ]
     BOUT_AGGREGATION_METHODS = ["MEAN", "MEDIAN"]
-    UMAP_ADDITIONAL_DATA = ['NONE',
-                            'SCALED FEATURES',
-                            'RAW FEATURES',
-                            'SCALED FEATURES & CLASSIFICATIONS',
-                            'RAW FEATURES & CLASSIFICATIONS']
+    UMAP_ADDITIONAL_DATA = [
+        "NONE",
+        "SCALED FEATURES",
+        "RAW FEATURES",
+        "SCALED FEATURES & CLASSIFICATIONS",
+        "RAW FEATURES & CLASSIFICATIONS",
+    ]
     DATA_FORMATS = ["NONE", "SCALED", "RAW"]
     SAVE_FORMATS = ["CSV", "PICKLE"]
     CORRELATION_OPTIONS = ["SPEARMAN", "PEARSONS", "KENDALL"]

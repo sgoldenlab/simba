@@ -13,11 +13,12 @@ import pandas as pd
 import trafaret as t
 
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
-                                CorruptedFileError, CountError, FloatError,
+                                CorruptedFileError, CountError,
+                                DirectoryNotEmptyError, FloatError,
                                 IntegerError, InvalidFilepathError,
                                 InvalidInputError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ParametersFileError, StringError, DirectoryNotEmptyError)
+                                ParametersFileError, StringError)
 from simba.utils.warnings import NoDataFoundWarning
 
 
@@ -878,6 +879,7 @@ def check_if_keys_exist_in_dict(
 
     return True
 
+
 def check_that_directory_is_empty(directory: Union[str, os.PathLike]) -> None:
     """
     Checks if a directory is empty
@@ -888,9 +890,14 @@ def check_that_directory_is_empty(directory: Union[str, os.PathLike]) -> None:
 
     check_if_dir_exists(in_dir=directory)
     try:
-        all_files_in_folder = [f for f in next(os.walk(directory))[2] if not f[0] == "."]
+        all_files_in_folder = [
+            f for f in next(os.walk(directory))[2] if not f[0] == "."
+        ]
     except StopIteration:
         return 0
     else:
         if len(all_files_in_folder) > 0:
-            raise DirectoryNotEmptyError(msg=f"The {directory} is not empty and contains {str(len(all_files_in_folder))} files. Use a directory that is empty.",source=self.__class__.__name__)
+            raise DirectoryNotEmptyError(
+                msg=f"The {directory} is not empty and contains {str(len(all_files_in_folder))} files. Use a directory that is empty.",
+                source=self.__class__.__name__,
+            )

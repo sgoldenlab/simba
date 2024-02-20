@@ -197,7 +197,6 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
         )
 
 
-
 # test = SLEAPImporterCSV(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini',
 #                  data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/csv_import',
 #                  id_lst=['Simon', 'jj'],

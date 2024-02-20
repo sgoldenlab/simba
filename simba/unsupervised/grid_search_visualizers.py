@@ -81,7 +81,9 @@ class GridSearchVisualizer(UnsupervisedMixin):
         )
         data = read_pickle(data_path=self.model_dir)
         img_cnt = len(list(data.keys())) * len(categorical_vars)
-        print(f"Creating {len(categorical_vars)} categorical plots for {len(list(data.keys()))} models (total: {img_cnt} images)...")
+        print(
+            f"Creating {len(categorical_vars)} categorical plots for {len(list(data.keys()))} models (total: {img_cnt} images)..."
+        )
         for k, v in data.items():
             check_if_keys_exist_in_dict(
                 data=v,
@@ -176,7 +178,6 @@ class GridSearchVisualizer(UnsupervisedMixin):
             msg="All continuous cluster images created.",
             elapsed_time=self.timer.elapsed_time_str,
         )
-
 
 
 # settings = {'CATEGORICAL_PALETTE': 'Pastel1', 'CONTINUOUS_PALETTE': 'magma', 'SCATTER_SIZE': 10}
