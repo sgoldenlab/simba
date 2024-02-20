@@ -255,7 +255,9 @@ def plug_holes_shortest_bout(
     return data_df
 
 
-def create_color_palettes(no_animals: int, map_size: int, cmaps: Optional[List[str]] = None) -> List[List[int]]:
+def create_color_palettes(
+    no_animals: int, map_size: int, cmaps: Optional[List[str]] = None
+) -> List[List[int]]:
     """
     Create list of lists of bgr colors, one for each animal. Each list is pulled from a different palette
     matplotlib color map.

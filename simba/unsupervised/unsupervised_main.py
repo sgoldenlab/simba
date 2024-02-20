@@ -12,9 +12,6 @@ from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
                                         hxtScrollbar)
 from simba.unsupervised.dataset_creator import DatasetCreator
 from simba.unsupervised.enums import UMLOptions, Unsupervised
-from simba.unsupervised.pop_ups.transform_dim_reduction_popup import TransformDimReductionPopUp
-from simba.unsupervised.pop_ups.transform_cluster_popup import TransformClustererPopUp
-
 from simba.unsupervised.pop_ups.cluster_frequentist_stats_popup import \
     ClusterFrequentistStatisticsPopUp
 from simba.unsupervised.pop_ups.cluster_videos_popup import \
@@ -31,6 +28,10 @@ from simba.unsupervised.pop_ups.grid_search_visualizer_popup import \
     GridSearchVisualizerPopUp
 from simba.unsupervised.pop_ups.print_embedding_info_popup import \
     PrintEmBeddingInfoPopUp
+from simba.unsupervised.pop_ups.transform_cluster_popup import \
+    TransformClustererPopUp
+from simba.unsupervised.pop_ups.transform_dim_reduction_popup import \
+    TransformDimReductionPopUp
 from simba.utils.enums import Formats
 
 
@@ -309,4 +310,6 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
         threading.Thread(target=dataset_creator.run()).start()
 
 
-UnsupervisedGUI(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')
+UnsupervisedGUI(
+    config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini"
+)

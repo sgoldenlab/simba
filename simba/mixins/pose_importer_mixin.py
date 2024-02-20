@@ -224,7 +224,9 @@ class PoseImporterMixin(object):
         )
         self.img_concat = np.uint8(np.concatenate((self.img_overlay, side_img), axis=0))
         cv2.imshow("Define animal IDs", self.img_concat)
-        cv2.resizeWindow("Define animal IDs", self.video_info["height"], self.video_info["width"])
+        cv2.resizeWindow(
+            "Define animal IDs", self.video_info["height"], self.video_info["width"]
+        )
         keyboard_choice = False
         while not keyboard_choice:
             k = cv2.waitKey(20)
@@ -246,7 +248,7 @@ class PoseImporterMixin(object):
                 break
 
     def choose_animal_ui(self):
-        print('s')
+        print("s")
         self.id_cords = {}
         for cnt, animal in enumerate(self.animal_bp_dict.keys()):
             self.animal_name, self.cnt = animal, cnt

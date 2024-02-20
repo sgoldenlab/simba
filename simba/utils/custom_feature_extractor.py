@@ -16,6 +16,7 @@ from simba.utils.read_write import get_fn_ext
 
 ABSTRACT_CLASS_NAME = "AbstractFeatureExtraction"
 
+
 class CustomFeatureExtractor(ConfigReader):
     """
     Class to execute a feature extraction process based on the user-defined Python script.

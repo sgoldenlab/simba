@@ -191,15 +191,22 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             )
 
             print(f"Fitting {self.clf_name} model...")
-            self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
-            if (meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value] in Options.PERFORM_FLAGS.value):
-                self.calc_permutation_importance(self.x_test,
-                                                 self.y_test,
-                                                 self.rf_clf,
-                                                 self.feature_names,
-                                                 self.clf_name,
-                                                 self.model_dir_out,
-                                                 save_file_no=config_cnt)
+            self.rf_clf = self.clf_fit(
+                clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train
+            )
+            if (
+                meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value]
+                in Options.PERFORM_FLAGS.value
+            ):
+                self.calc_permutation_importance(
+                    self.x_test,
+                    self.y_test,
+                    self.rf_clf,
+                    self.feature_names,
+                    self.clf_name,
+                    self.model_dir_out,
+                    save_file_no=config_cnt,
+                )
             if (
                 meta_dict[MLParamKeys.LEARNING_CURVE.value]
                 in Options.PERFORM_FLAGS.value

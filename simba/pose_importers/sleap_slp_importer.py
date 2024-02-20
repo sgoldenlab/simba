@@ -227,7 +227,9 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
         for frame_cnt, frame in enumerate(range(self.analysis_dict["no_frames"])):
             frame_idx = self.analysis_dict["frames"][frame_cnt][2]
             self.frame_dict = {}
-            print(f"Restructuring SLEAP frame: {frame_cnt}/{self.analysis_dict['no_frames']}, Video: {self.video_name}")
+            print(
+                f"Restructuring SLEAP frame: {frame_cnt}/{self.analysis_dict['no_frames']}, Video: {self.video_name}"
+            )
             self.cnt_animals_frm = self.analysis_dict["animals_in_each_frame"][frame]
             if self.cnt_animals_frm == 0:
                 self.frame_dict[0] = [0] * len(self.analysis_dict["xyp_headers"])
@@ -236,7 +238,9 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
                 )
 
             else:
-                end_frame = start_frame + (len(self.analysis_dict["ordered_bps"]) * self.cnt_animals_frm)
+                end_frame = start_frame + (
+                    len(self.analysis_dict["ordered_bps"]) * self.cnt_animals_frm
+                )
                 start_animal, end_animal = 0, len(self.analysis_dict["ordered_bps"])
                 frame_arr = self.analysis_dict["predicted_points"][
                     start_frame:end_frame
@@ -268,7 +272,6 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
         self.data_df.columns = self.bp_headers
 
 
-
 # test = SLEAPImporterSLP(project_path="/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini",
 #                         data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/slp_import',
 #                         id_lst=['Simon', 'JJ'],
@@ -277,10 +280,6 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
 # test.run()
 #
 # print('All SLEAP imports complete.')
-
-
-
-
 
 
 # test = SLEAPImporterSLP(project_path="/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/project_folder/project_config.ini",

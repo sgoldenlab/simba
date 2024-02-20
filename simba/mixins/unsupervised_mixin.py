@@ -23,10 +23,11 @@ from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
 from simba.unsupervised.enums import UMLOptions, Unsupervised
 from simba.utils.checks import check_float
 from simba.utils.enums import Paths
-from simba.utils.errors import (DirectoryNotEmptyError, IntegerError,
+from simba.utils.errors import (DirectoryNotEmptyError,
+                                FeatureNumberMismatchError, IntegerError,
                                 InvalidFileTypeError, InvalidInputError,
                                 MissingColumnsError, NoDataError,
-                                NoFilesFoundError, FeatureNumberMismatchError)
+                                NoFilesFoundError)
 from simba.utils.printing import SimbaTimer
 
 
@@ -158,10 +159,9 @@ class UnsupervisedMixin(object):
             )
         return low_variance_fields
 
-    def drop_fields(self,
-                    data: pd.DataFrame,
-                    fields: List[str],
-                    raise_error: Optional[bool] = False) -> pd.DataFrame:
+    def drop_fields(
+        self, data: pd.DataFrame, fields: List[str], raise_error: Optional[bool] = False
+    ) -> pd.DataFrame:
         """
         Drops specified fields in dataframe.
 
@@ -171,14 +171,17 @@ class UnsupervisedMixin(object):
         """
         if fields is None or len(fields) > 1:
             if raise_error:
-                raise FeatureNumberMismatchError(msg=f'Fields contain no names', source=UnsupervisedMixin.drop_fields.__name__)
+                raise FeatureNumberMismatchError(
+                    msg=f"Fields contain no names",
+                    source=UnsupervisedMixin.drop_fields.__name__,
+                )
             else:
                 return data
         else:
             if raise_error:
-                return data.drop(columns=fields, errors='raise')
+                return data.drop(columns=fields, errors="raise")
             else:
-                return data.drop(columns=fields, errors='ignore')
+                return data.drop(columns=fields, errors="ignore")
 
     def define_scaler(
         self, scaler_name: Literal["MIN-MAX", "STANDARD", "QUANTILE"]

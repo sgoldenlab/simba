@@ -12,13 +12,8 @@ import imutils
 import numpy as np
 import pandas as pd
 from numba import njit, prange
-from shapely.geometry import (GeometryCollection,
-                              LineString,
-                              MultiLineString,
-                              MultiPoint,
-                              MultiPolygon,
-                              Point,
-                              Polygon)
+from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
+                              MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
 
 try:
@@ -29,22 +24,14 @@ except:
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_float,
                                 check_if_2d_array_has_min_unique_values,
-                                check_if_valid_input,
-                                check_instance,
-                                check_int,
-                                check_iterable_length,
-                                check_str,
-                                check_valid_array,
-                                check_if_dir_exists,
-                                check_if_valid_rgb_tuple,
-                                check_if_valid_img,
-                                check_valid_lst)
-
-
-from simba.utils.data import create_color_palette
-from simba.utils.enums import Defaults, GeometryEnum, Formats, TextOptions
+                                check_if_dir_exists, check_if_valid_img,
+                                check_if_valid_input, check_if_valid_rgb_tuple,
+                                check_instance, check_int,
+                                check_iterable_length, check_str,
+                                check_valid_array, check_valid_lst)
+from simba.utils.data import create_color_palette, create_color_palettes
+from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions
 from simba.utils.errors import CountError, InvalidInputError
-from simba.utils.data import create_color_palettes
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
                                     find_max_vertices_coordinates,
                                     read_frm_of_video, stdout_success)
@@ -760,11 +747,12 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def view_shapes(shapes: List[Union[LineString, Polygon, MultiPolygon, MultiLineString]],
-                    bg_img: Optional[np.ndarray] = None,
-                    bg_clr: Optional[Tuple[int]] = None,
-                    size: Optional[int] = None) -> np.ndarray:
-
+    def view_shapes(
+        shapes: List[Union[LineString, Polygon, MultiPolygon, MultiLineString]],
+        bg_img: Optional[np.ndarray] = None,
+        bg_clr: Optional[Tuple[int]] = None,
+        size: Optional[int] = None,
+    ) -> np.ndarray:
         """
         Helper function to draw shapes on white canvas or specified background image. Useful for quick troubleshooting.
 
@@ -776,13 +764,27 @@ class GeometryMixin(object):
         """
 
         for i in shapes:
-            check_instance(source=GeometryMixin.view_shapes.__name__, instance=i, accepted_types=(LineString, Polygon, MultiPolygon, MultiLineString, Point))
+            check_instance(
+                source=GeometryMixin.view_shapes.__name__,
+                instance=i,
+                accepted_types=(
+                    LineString,
+                    Polygon,
+                    MultiPolygon,
+                    MultiLineString,
+                    Point,
+                ),
+            )
         max_vertices = find_max_vertices_coordinates(shapes=shapes, buffer=50)
         if bg_img is None:
             if bg_clr is None:
-                img = np.ones((max_vertices[0], max_vertices[1], 3), dtype=np.uint8) * 255
+                img = (
+                    np.ones((max_vertices[0], max_vertices[1], 3), dtype=np.uint8) * 255
+                )
             else:
-                img = np.full((max_vertices[0], max_vertices[1], 3), bg_clr, dtype=np.uint8)
+                img = np.full(
+                    (max_vertices[0], max_vertices[1], 3), bg_clr, dtype=np.uint8
+                )
         else:
             img = bg_img
         colors = create_color_palette(pallete_name="Set1", increments=len(shapes))
@@ -853,13 +855,16 @@ class GeometryMixin(object):
             return img
 
     @staticmethod
-    def geometry_video(shapes: List[List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint]]],
-                       save_path: Union[str, os.PathLike],
-                       size: Optional[Tuple[int]],
-                       fps: Optional[int] = 10,
-                       bg_img: Optional[np.ndarray] = None,
-                       bg_clr: Optional[Tuple[int]] = None) -> None:
-
+    def geometry_video(
+        shapes: List[
+            List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint]]
+        ],
+        save_path: Union[str, os.PathLike],
+        size: Optional[Tuple[int]],
+        fps: Optional[int] = 10,
+        bg_img: Optional[np.ndarray] = None,
+        bg_clr: Optional[Tuple[int]] = None,
+    ) -> None:
         """
         Helper to create a geometry video from a list of shapes.
 
@@ -882,15 +887,42 @@ class GeometryMixin(object):
         timer = SimbaTimer(start=True)
         for i in shapes:
             for j in i:
-                check_instance(source=GeometryMixin.geometry_video.__name__, instance=j, accepted_types=(LineString, Polygon, MultiPolygon, MultiPoint, MultiLineString, Point))
+                check_instance(
+                    source=GeometryMixin.geometry_video.__name__,
+                    instance=j,
+                    accepted_types=(
+                        LineString,
+                        Polygon,
+                        MultiPolygon,
+                        MultiPoint,
+                        MultiLineString,
+                        Point,
+                    ),
+                )
         check_if_dir_exists(in_dir=os.path.dirname(save_path))
-        check_int(name='fps', value=fps, min_value=1)
-        if bg_img is not None: check_if_valid_img(data=bg_img, source=GeometryMixin.geometry_video.__name__)
-        if bg_clr is not None: check_if_valid_rgb_tuple(data=bg_clr)
-        check_instance(source=GeometryMixin.geometry_video.__name__, instance=size, accepted_types=(tuple,))
-        if (len(size) != 2): raise InvalidInputError(msg=f'Size has to be 2 values, got {len(size)}',
-                                                     source=GeometryMixin.geometry_video.__name__)
-        for i in size: check_instance(source=GeometryMixin.geometry_video.__name__, instance=i, accepted_types=(int,))
+        check_int(name="fps", value=fps, min_value=1)
+        if bg_img is not None:
+            check_if_valid_img(
+                data=bg_img, source=GeometryMixin.geometry_video.__name__
+            )
+        if bg_clr is not None:
+            check_if_valid_rgb_tuple(data=bg_clr)
+        check_instance(
+            source=GeometryMixin.geometry_video.__name__,
+            instance=size,
+            accepted_types=(tuple,),
+        )
+        if len(size) != 2:
+            raise InvalidInputError(
+                msg=f"Size has to be 2 values, got {len(size)}",
+                source=GeometryMixin.geometry_video.__name__,
+            )
+        for i in size:
+            check_instance(
+                source=GeometryMixin.geometry_video.__name__,
+                instance=i,
+                accepted_types=(int,),
+            )
         if bg_img is None:
             if bg_clr is None:
                 img = np.ones((size[0], size[1], 3), dtype=np.uint8) * 255
@@ -905,35 +937,86 @@ class GeometryMixin(object):
             frm_img = deepcopy(img)
             for shape_cnt, shape in enumerate(frm_shapes):
                 if isinstance(shape, Polygon):
-                    cv2.polylines(frm_img, [np.array(shape.exterior.coords).astype(np.int)], True,
-                                  (clrs[shape_cnt][0][::-1]), thickness=2, )
-                    interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in
-                                       shape.interiors]
-                    for interior in interior_coords: cv2.polylines(frm_img, [interior], isClosed=True,
-                                                                   color=(clrs[shape_cnt][0][::-1]), thickness=2)
+                    cv2.polylines(
+                        frm_img,
+                        [np.array(shape.exterior.coords).astype(np.int)],
+                        True,
+                        (clrs[shape_cnt][0][::-1]),
+                        thickness=2,
+                    )
+                    interior_coords = [
+                        np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2))
+                        for interior in shape.interiors
+                    ]
+                    for interior in interior_coords:
+                        cv2.polylines(
+                            frm_img,
+                            [interior],
+                            isClosed=True,
+                            color=(clrs[shape_cnt][0][::-1]),
+                            thickness=2,
+                        )
                 elif isinstance(shape, LineString):
-                    cv2.polylines(frm_img, [np.array(shape.coords, dtype=np.int32)], False, (clrs[shape_cnt][0][::-1]),
-                                  thickness=TextOptions.LINE_THICKNESS.value, )
+                    cv2.polylines(
+                        frm_img,
+                        [np.array(shape.coords, dtype=np.int32)],
+                        False,
+                        (clrs[shape_cnt][0][::-1]),
+                        thickness=TextOptions.LINE_THICKNESS.value,
+                    )
                 elif isinstance(shape, MultiPolygon):
                     for polygon_cnt, polygon in enumerate(shape.geoms):
-                        polygon_np = np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)
-                        cv2.polylines(frm_img, [polygon_np], True, (clrs[shape_cnt + polygon_cnt + 1][::-1]),
-                                      thickness=2)
+                        polygon_np = np.array(
+                            (polygon.convex_hull.exterior.coords), dtype=np.int32
+                        )
+                        cv2.polylines(
+                            frm_img,
+                            [polygon_np],
+                            True,
+                            (clrs[shape_cnt + polygon_cnt + 1][::-1]),
+                            thickness=2,
+                        )
                 elif isinstance(shape, MultiLineString):
                     for line_cnt, line in enumerate(shape.geoms):
-                        cv2.polylines(frm_img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False,
-                                      (clrs[shape_cnt][0][::-1]), thickness=2)
+                        cv2.polylines(
+                            frm_img,
+                            [np.array(shape[line_cnt].coords, dtype=np.int32)],
+                            False,
+                            (clrs[shape_cnt][0][::-1]),
+                            thickness=2,
+                        )
                 elif isinstance(shape, MultiPoint):
                     for point in shape:
-                        cv2.circle(frm_img, (int(np.array(point.centroid)[0]), int(np.array(point.centroid)[1])), 0, clrs[shape_cnt][0][::-1], 10)
+                        cv2.circle(
+                            frm_img,
+                            (
+                                int(np.array(point.centroid)[0]),
+                                int(np.array(point.centroid)[1]),
+                            ),
+                            0,
+                            clrs[shape_cnt][0][::-1],
+                            10,
+                        )
                 elif isinstance(shape, Point):
-                    cv2.circle(frm_img, (int(np.array(shape.centroid)[0]), int(np.array(shape.centroid)[1])), 0, clrs[shape_cnt][0][::-1], 10)
-
+                    cv2.circle(
+                        frm_img,
+                        (
+                            int(np.array(shape.centroid)[0]),
+                            int(np.array(shape.centroid)[1]),
+                        ),
+                        0,
+                        clrs[shape_cnt][0][::-1],
+                        10,
+                    )
 
             video_writer.write(frm_img.astype(np.uint8))
         video_writer.release()
         timer.stop_timer()
-        stdout_success(msg=f'Video {save_path} complete!', elapsed_time=timer.elapsed_time_str, source=GeometryMixin.geometry_video.__name__)
+        stdout_success(
+            msg=f"Video {save_path} complete!",
+            elapsed_time=timer.elapsed_time_str,
+            source=GeometryMixin.geometry_video.__name__,
+        )
 
     @staticmethod
     def minimum_rotated_rectangle(shape=Polygon) -> Polygon:
@@ -1083,10 +1166,12 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def multiframe_bodypart_to_point(data: np.ndarray,
-                                     core_cnt: Optional[int] = -1,
-                                     buffer: Optional[int] = None,
-                                     px_per_mm: Optional[int] = None) -> Union[List[Point], List[List[Point]]]:
+    def multiframe_bodypart_to_point(
+        data: np.ndarray,
+        core_cnt: Optional[int] = -1,
+        buffer: Optional[int] = None,
+        px_per_mm: Optional[int] = None,
+    ) -> Union[List[Point], List[List[Point]]]:
         """
         Process multiple frames of body part data in parallel and convert them to shapely Points.
 
@@ -1111,15 +1196,28 @@ class GeometryMixin(object):
         >>> point_lst_of_lst = GeometryMixin().multiframe_bodypart_to_point(data=data)
         """
 
-        check_valid_array(data=data, accepted_dtypes=(np.int64, np.int32, np.int8), accepted_ndims=(2, 3))
-        check_int(name=GeometryMixin().multiframe_bodypart_to_point.__name__, value=core_cnt, min_value=-1)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        check_valid_array(
+            data=data,
+            accepted_dtypes=(np.int64, np.int32, np.int8),
+            accepted_ndims=(2, 3),
+        )
+        check_int(
+            name=GeometryMixin().multiframe_bodypart_to_point.__name__,
+            value=core_cnt,
+            min_value=-1,
+        )
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         results = []
         data_ndim = data.ndim
         if data_ndim == 2:
             data = np.array_split(data, core_cnt)
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(GeometryMixin.bodyparts_to_points, buffer=buffer, px_per_mm=px_per_mm)
+        with multiprocessing.Pool(
+            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
+        ) as pool:
+            constants = functools.partial(
+                GeometryMixin.bodyparts_to_points, buffer=buffer, px_per_mm=px_per_mm
+            )
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(result)
         pool.join()
@@ -2049,7 +2147,10 @@ class GeometryMixin(object):
             check_instance(
                 source=f"{GeometryMixin().multiframe_bodyparts_to_multistring_skeleton.__name__} skeleton {i}",
                 instance=i,
-                accepted_types=(list, tuple,),
+                accepted_types=(
+                    list,
+                    tuple,
+                ),
             )
             check_iterable_length(
                 source=f"{GeometryMixin().multiframe_bodyparts_to_multistring_skeleton.__name__} skeleton",
