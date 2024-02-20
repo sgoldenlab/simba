@@ -93,7 +93,7 @@ class UMLOptions(Enum):
     CATEGORICAL_OPTIONS = ["VIDEO", "CLASSIFIER", "CLUSTER"]
     CONTINUOUS_OPTIONS = ["START_FRAME", "END_FRAME", "PROBABILITY"]
     SPEED_OPTIONS = [round(x, 1) for x in list(np.arange(0.1, 2.1, 0.1))]
-    SHAP_CLUSTER_METHODS = ["Paired clusters", 'One-against-all']
+    SHAP_CLUSTER_METHODS = ["Paired clusters", "One-against-all"]
     DR_ALGO_OPTIONS = ["UMAP", "TSNE"]
     CLUSTERING_ALGO_OPTIONS = ["HDBSCAN"]
     VARIANCE_OPTIONS = list(range(0, 100, 10))

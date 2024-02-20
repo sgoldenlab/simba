@@ -309,7 +309,7 @@ class Options(Enum):
         "Multi-animals; 4 body-parts",
         "Multi-animals; 7 body-parts",
         "Multi-animals; 8 body-parts",
-        "AMBER"
+        "AMBER",
     ]
     THREE_DIM_TRACKING_OPTIONS = ["3D tracking"]
     TRAIN_TEST_SPLIT = ["FRAMES", "BOUTS"]

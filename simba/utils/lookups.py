@@ -80,6 +80,7 @@ def get_bp_config_codes() -> dict:
         "AMBER": "AMBER",
     }
 
+
 def get_bp_config_code_class_pairs() -> dict:
     """
     Helper to match SimBA project_config.ini [create ensemble settings][pose_estimation_body_parts] to feature extraction module class.
@@ -87,15 +88,24 @@ def get_bp_config_code_class_pairs() -> dict:
     :return dict: Dictionary with [create ensemble settings][pose_estimation_body_parts] entry as keys and feature extraction classes as keys.
     """
 
-    from simba.feature_extractors.feature_extractor_4bp import ExtractFeaturesFrom4bps
-    from simba.feature_extractors.feature_extractor_7bp import ExtractFeaturesFrom7bps
-    from simba.feature_extractors.feature_extractor_8bp import ExtractFeaturesFrom8bps
-    from simba.feature_extractors.feature_extractor_8bps_2_animals import ExtractFeaturesFrom8bps2Animals
-    from simba.feature_extractors.feature_extractor_9bp import ExtractFeaturesFrom9bps
-    from simba.feature_extractors.feature_extractor_14bp import ExtractFeaturesFrom14bps
-    from simba.feature_extractors.feature_extractor_16bp import ExtractFeaturesFrom16bps
-    from simba.feature_extractors.feature_extractor_user_defined import UserDefinedFeatureExtractor
-    from simba.feature_extractors.amber_feature_extractor import AmberFeatureExtractor
+    from simba.feature_extractors.amber_feature_extractor import \
+        AmberFeatureExtractor
+    from simba.feature_extractors.feature_extractor_4bp import \
+        ExtractFeaturesFrom4bps
+    from simba.feature_extractors.feature_extractor_7bp import \
+        ExtractFeaturesFrom7bps
+    from simba.feature_extractors.feature_extractor_8bp import \
+        ExtractFeaturesFrom8bps
+    from simba.feature_extractors.feature_extractor_8bps_2_animals import \
+        ExtractFeaturesFrom8bps2Animals
+    from simba.feature_extractors.feature_extractor_9bp import \
+        ExtractFeaturesFrom9bps
+    from simba.feature_extractors.feature_extractor_14bp import \
+        ExtractFeaturesFrom14bps
+    from simba.feature_extractors.feature_extractor_16bp import \
+        ExtractFeaturesFrom16bps
+    from simba.feature_extractors.feature_extractor_user_defined import \
+        UserDefinedFeatureExtractor
 
     return {
         "16": ExtractFeaturesFrom16bps,
@@ -105,7 +115,7 @@ def get_bp_config_code_class_pairs() -> dict:
         "7": ExtractFeaturesFrom7bps,
         "4": ExtractFeaturesFrom4bps,
         "user_defined": UserDefinedFeatureExtractor,
-        'AMBER': AmberFeatureExtractor,
+        "AMBER": AmberFeatureExtractor,
     }
 
 
@@ -363,8 +373,7 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
         "copper",
         "turbo",
         "Set3",
-        "Set2"
-        "Paired"
+        "Set2" "Paired",
     ]
     for colormap in range(no_animals):
         currColorMap = cm.get_cmap(cmaps[colormap], map_size)

@@ -105,7 +105,11 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         )
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
-        if self.settings[GINI_IMPORTANCE] or self.settings[PERMUTATION_IMPORTANCE] or (self.settings[SHAP][METHOD] == PAIRED):
+        if (
+            self.settings[GINI_IMPORTANCE]
+            or self.settings[PERMUTATION_IMPORTANCE]
+            or (self.settings[SHAP][METHOD] == PAIRED)
+        ):
             self.__train_paired_rf_models()
         if self.settings[GINI_IMPORTANCE]:
             self.__gini_importance()
@@ -214,8 +218,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             elapsed_time=timer.elapsed_time_str,
         )
 
-
-    def __train_all_against_one_rf_models(self,  n_estimators: Optional[int] = 100):
+    def __train_all_against_one_rf_models(self, n_estimators: Optional[int] = 100):
         all_against_one_rf_mdls = {}
         rf_clf = RandomForestClassifier(
             n_estimators=n_estimators,
@@ -226,9 +229,13 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             bootstrap=True,
             verbose=1,
         )
-        for cluster_id in sorted(self.x_y_df['CLUSTER'].unique()):
-            cluster_df = self.x_y_df[self.x_y_df['CLUSTER'] == cluster_id].drop(['CLUSTER'], axis=1)
-            noncluster_df = self.x_y_df[self.x_y_df['CLUSTER'] != cluster_id].drop(['CLUSTER'], axis=1)
+        for cluster_id in sorted(self.x_y_df["CLUSTER"].unique()):
+            cluster_df = self.x_y_df[self.x_y_df["CLUSTER"] == cluster_id].drop(
+                ["CLUSTER"], axis=1
+            )
+            noncluster_df = self.x_y_df[self.x_y_df["CLUSTER"] != cluster_id].drop(
+                ["CLUSTER"], axis=1
+            )
             cluster_df[TARGET] = 1
             noncluster_df[TARGET] = 0
 
@@ -308,22 +315,61 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             print("Calculating one-against-all shap values ...")
             mdls = self.__train_all_against_one_rf_models()
             for cluster_id, cluster_mdl in mdls.items():
-                print(f'Computing SHAP for cluster {cluster_id}...')
-                explainer = shap.TreeExplainer(cluster_mdl,data=None, model_output="raw", feature_perturbation="tree_path_dependent")
-                cluster_one_sample = self.x_y_df[self.x_y_df['CLUSTER'] == cluster_id].sample(n=self.settings[SHAP][SAMPLE])
-                cluster_two_sample = self.x_y_df[self.x_y_df['CLUSTER'] != cluster_id].sample(n=self.settings[SHAP][SAMPLE])
-                cluster_one_shap = pd.DataFrame(explainer.shap_values(cluster_one_sample, check_additivity=False)[1],columns=cluster_one_sample.columns, index=cluster_one_sample.index)
-                cluster_two_shap = pd.DataFrame(explainer.shap_values(cluster_two_sample, check_additivity=False)[1],columns=cluster_two_sample.columns, index=cluster_one_sample.index)
-                cluster_two_shap['CLUSTER'] = cluster_two_sample['CLUSTER'].values
-                cluster_one_shap['CLUSTER'] = cluster_one_sample['CLUSTER'].values
+                print(f"Computing SHAP for cluster {cluster_id}...")
+                explainer = shap.TreeExplainer(
+                    cluster_mdl,
+                    data=None,
+                    model_output="raw",
+                    feature_perturbation="tree_path_dependent",
+                )
+                cluster_one_sample = self.x_y_df[
+                    self.x_y_df["CLUSTER"] == cluster_id
+                ].sample(n=self.settings[SHAP][SAMPLE])
+                cluster_two_sample = self.x_y_df[
+                    self.x_y_df["CLUSTER"] != cluster_id
+                ].sample(n=self.settings[SHAP][SAMPLE])
+                cluster_one_shap = pd.DataFrame(
+                    explainer.shap_values(cluster_one_sample, check_additivity=False)[
+                        1
+                    ],
+                    columns=cluster_one_sample.columns,
+                    index=cluster_one_sample.index,
+                )
+                cluster_two_shap = pd.DataFrame(
+                    explainer.shap_values(cluster_two_sample, check_additivity=False)[
+                        1
+                    ],
+                    columns=cluster_two_sample.columns,
+                    index=cluster_one_sample.index,
+                )
+                cluster_two_shap["CLUSTER"] = cluster_two_sample["CLUSTER"].values
+                cluster_one_shap["CLUSTER"] = cluster_one_sample["CLUSTER"].values
                 results = pd.concat([cluster_one_shap, cluster_two_shap], axis=0)
-                self.__save_results(df=results, name=f"SHAP CLUSTER {cluster_id} vs. ALL")
+                self.__save_results(
+                    df=results, name=f"SHAP CLUSTER {cluster_id} vs. ALL"
+                )
             timer.stop_timer()
-            stdout_success(msg=f"SHAP one-vs-all values complete", elapsed_time=timer.elapsed_time_str)
+            stdout_success(
+                msg=f"SHAP one-vs-all values complete",
+                elapsed_time=timer.elapsed_time_str,
+            )
 
-settings = {'gini_importance': False, 'permutation_importance': False, 'shap': {'method': 'cluster_paired', 'run': True, 'sample': 10}}
-settings = {'gini_importance': False, 'permutation_importance': False, 'shap': {'method': 'One-against-all', 'run': True, 'sample': 10}}
-calculator = ClusterXAICalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini', data_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle', settings=settings)
+
+settings = {
+    "gini_importance": False,
+    "permutation_importance": False,
+    "shap": {"method": "cluster_paired", "run": True, "sample": 10},
+}
+settings = {
+    "gini_importance": False,
+    "permutation_importance": False,
+    "shap": {"method": "One-against-all", "run": True, "sample": 10},
+}
+calculator = ClusterXAICalculator(
+    config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini",
+    data_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle",
+    settings=settings,
+)
 
 
 calculator.run()

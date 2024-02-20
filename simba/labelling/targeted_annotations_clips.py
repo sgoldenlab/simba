@@ -29,7 +29,8 @@ class TargetedAnnotatorWithClips(AnnotatorMixin, ConfigReader):
         )
 
         self.video_frm_label(frm_number=self.min_frm_no)
-        self.nav_bar = self.h_nav_bar(parent=self.main_frm, change_frm_func=self.change_frame_targeted_annotations
+        self.nav_bar = self.h_nav_bar(
+            parent=self.main_frm, change_frm_func=self.change_frame_targeted_annotations
         )
         self.selection_pane = self.targeted_clips_pane(parent=self.main_frm)
         self.play_video_frame = self.v_navigation_pane_targeted_clips_version(
@@ -53,4 +54,4 @@ def select_labelling_video_targeted_clips(config_path: Union[str, os.PathLike]):
     _ = TargetedAnnotatorWithClips(config_path=config_path, video_path=video_file_path)
 
 
-#test = TargetedAnnotatorWithClips(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_name='Together_1')
+# test = TargetedAnnotatorWithClips(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_name='Together_1')

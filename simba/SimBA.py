@@ -1467,9 +1467,13 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                     source=self.__class__.__name__,
                 )
             if self.pose_setting == "8":
-                feature_extractor = feature_extractor_classes[self.pose_setting][self.animal_cnt](config_path=self.config_path)
+                feature_extractor = feature_extractor_classes[self.pose_setting][
+                    self.animal_cnt
+                ](config_path=self.config_path)
             else:
-                feature_extractor = feature_extractor_classes[self.pose_setting](config_path=self.config_path)
+                feature_extractor = feature_extractor_classes[self.pose_setting](
+                    config_path=self.config_path
+                )
             feature_extractor.run()
 
     def set_distance_mm(self):
