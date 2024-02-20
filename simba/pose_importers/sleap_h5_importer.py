@@ -53,11 +53,7 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
     ):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PoseImporterMixin.__init__(self)
-        log_event(
-            logger_name=str(__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
+        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         self.interpolation_settings, self.smoothing_settings = (
             interpolation_settings,
             smoothing_settings,
@@ -214,6 +210,15 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
             smoothing_method=self.smoothing_settings["Method"],
             initial_import_multi_index=True,
         )
+
+# test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini",
+#                    data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/h5_import',
+#                    id_lst=['White', 'Black'],
+#                    interpolation_settings= "Body-parts: Nearest", #'"Body-parts: Nearest",
+#                    smoothing_settings = {'Method': 'None', 'Parameters': {'Time_window': '200'}})
+# test.run()
+
+
 
 
 # test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/troubleshooting/sleap_import/project_folder/project_config.ini",

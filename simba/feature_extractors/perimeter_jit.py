@@ -18,7 +18,7 @@ def process(S, P, a, b):
     return process(S, K, a, c)[:-1] + process(S, K, c, b)
 
 
-@njit("(float32[:, :,:], types.unicode_type)", fastmath=True)
+@njit("(float32[:, :, :], types.unicode_type)", fastmath=True)
 def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
     """
     Compute attributes (e.g., perimeter or area) of a polygon.

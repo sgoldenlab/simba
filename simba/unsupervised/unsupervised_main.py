@@ -12,8 +12,9 @@ from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
                                         hxtScrollbar)
 from simba.unsupervised.dataset_creator import DatasetCreator
 from simba.unsupervised.enums import UMLOptions, Unsupervised
-from simba.unsupervised.pop_up_classes import (TransformClustererPopUp,
-                                               TransformDimReductionPopUp)
+from simba.unsupervised.pop_ups.transform_dim_reduction_popup import TransformDimReductionPopUp
+from simba.unsupervised.pop_ups.transform_cluster_popup import TransformClustererPopUp
+
 from simba.unsupervised.pop_ups.cluster_frequentist_stats_popup import \
     ClusterFrequentistStatisticsPopUp
 from simba.unsupervised.pop_ups.cluster_videos_popup import \
@@ -168,7 +169,7 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
             self.dim_reduction_frm,
             text="DIMENSIONALITY REDUCTION: TRANSFORM",
             fg="green",
-            command=lambda: TransformDimReductionPopUp(),
+            command=lambda: TransformDimReductionPopUp(config_path=config_path),
         )
         self.dim_reduction_frm.grid(row=0, column=0, sticky=NW)
         self.dim_reduction_fit_btn.grid(row=1, column=0, sticky=NW)
@@ -214,8 +215,8 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
         )
         self.cluster_visualizer = Button(
             self.visualization_frm,
-            text="DATA VISUALIZERS",
-            fg="red",
+            text="CLUSTER VIDEOS",
+            fg="green",
             command=lambda: ClusterVisualizerPopUp(config_path=self.config_path),
         )
         self.visualization_frm.grid(row=0, column=0, sticky="NW")
@@ -308,4 +309,4 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
         threading.Thread(target=dataset_creator.run()).start()
 
 
-# UnsupervisedGUI(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')
+UnsupervisedGUI(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')

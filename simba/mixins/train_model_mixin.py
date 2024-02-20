@@ -2778,10 +2778,9 @@ class TrainModelMixin(object):
         return results.drop([target_field], axis=1), results[target_field]
 
     @staticmethod
-    def scaler_inverse_transform(
-        data: pd.DataFrame,
-        scaler: Union[MinMaxScaler, StandardScaler, QuantileTransformer],
-    ) -> pd.DataFrame:
+    def scaler_inverse_transform(data: pd.DataFrame,
+                                 scaler: Union[MinMaxScaler, StandardScaler, QuantileTransformer],
+                                 name: Optional[str] = '') -> pd.DataFrame:
         check_instance(
             source=f"{TrainModelMixin.scaler_inverse_transform.__name__} data",
             instance=data,
@@ -2796,9 +2795,35 @@ class TrainModelMixin(object):
                 QuantileTransformer,
             ),
         )
+
+        if hasattr(scaler, 'n_features_in_'):
+            if len(data.columns) != scaler.n_features_in_:
+                raise FeatureNumberMismatchError(msg=f'The scaler {name} expects {scaler.n_features_in_} features. Got {len(data.columns)}.', source=TrainModelMixin.scaler_transform.__name__)
+
         return pd.DataFrame(
             scaler.inverse_transform(data), columns=data.columns
         ).set_index(data.index)
+
+
+    @staticmethod
+    def scaler_transform(data: pd.DataFrame,
+                         scaler: Union[MinMaxScaler, StandardScaler, QuantileTransformer],
+                         name: Optional[str] = '') -> pd.DataFrame:
+        """
+        Helper to run transform dataframe using previously fitted scaler.
+
+        :param pd.DataFrame data: Data to transform.
+        :param scaler: fitted scaler.
+        """
+
+        check_instance(source=TrainModelMixin.scaler_transform.__name__, instance=data, accepted_types=(pd.DataFrame,))
+        check_instance(source=f"{TrainModelMixin.scaler_transform.__name__} scaler", instance=scaler, accepted_types=(MinMaxScaler, StandardScaler, QuantileTransformer))
+
+        if hasattr(scaler, 'n_features_in_'):
+            if len(data.columns) != scaler.n_features_in_:
+                raise FeatureNumberMismatchError(msg=f'The scaler {name} expects {scaler.n_features_in_} features. Got {len(data.columns)}.', source=TrainModelMixin.scaler_transform.__name__)
+
+        return pd.DataFrame(scaler.transform(data), columns=data.columns).set_index(data.index)
 
 
 # test = TrainModelMixin()

@@ -176,10 +176,10 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
         ).astype(np.float32)
         results["FRAME_POSE"] = self.raw_bp_df.set_index(
             [Unsupervised.VIDEO.value, Unsupervised.FRAME.value]
-        ).astype(np.float32)
+        ).astype(np.int64)
         results["FRAME_TARGETS"] = self.raw_y_df.set_index(
             [Unsupervised.VIDEO.value, Unsupervised.FRAME.value]
-        ).astype(np.float32)
+        ).astype(np.int8)
         results["BOUTS_FEATURES"] = self.bouts_x_df.set_index(
             [
                 Unsupervised.VIDEO.value,

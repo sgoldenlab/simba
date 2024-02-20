@@ -142,6 +142,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 )
             self.data_df.columns = self.bp_headers
             self.out_df = deepcopy(self.data_df)
+
             if self.animal_cnt > 1:
                 self.initialize_multi_animal_ui(
                     animal_bp_dict=self.animal_bp_dict,
@@ -195,6 +196,14 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
             initial_import_multi_index=True,
         )
 
+
+
+# test = SLEAPImporterCSV(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini',
+#                  data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/csv_import',
+#                  id_lst=['Simon', 'jj'],
+#                  interpolation_settings="None",
+#                  smoothing_settings = {'Method': 'None', 'Parameters': {'Time_window': '200'}})
+# test.run()
 
 # test = SLEAPImporterCSV(config_path=r'/Users/simon/Desktop/envs/troubleshooting/Hornet/project_folder/project_config.ini',
 #                  data_folder=r'/Users/simon/Desktop/envs/troubleshooting/Hornet_single_slp/import',

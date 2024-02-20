@@ -186,12 +186,15 @@ class Options(Enum):
     ]
     PALETTE_OPTIONS_CATEGORICAL = [
         "Pastel1",
+        "Pastel2",
         "Paired",
         "Accent",
-        "Dark",
+        "Dark2",
         "Set1",
         "Set2",
+        "Set3",
         "tab10",
+        "tab20",
     ]
     RESOLUTION_OPTIONS = [
         "320×240",
@@ -615,3 +618,7 @@ class MLParamKeys(Enum):
 
 class TestPaths(Enum):
     CRITICAL_VALUES = "../simba/assets/lookups/critical_values_05.pickle"
+
+
+
+

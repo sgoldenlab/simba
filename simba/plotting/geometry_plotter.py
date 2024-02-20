@@ -124,7 +124,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     A class for creating overlay geometry visualization videos based on provided geometries and video name.
 
     .. note::
-       To quickly create geometries on a white background (useful for troubleshooting unexpected geometries), instead use
+       To quickly create static geometries on a white background (useful for troubleshooting unexpected geometries), use
        :meth:`simba.mixins.geometry_mixin.GeometryMixin.view_shapes`.
 
     .. image:: _static/img/GeometryPlotter.gif

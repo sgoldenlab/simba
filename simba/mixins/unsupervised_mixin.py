@@ -26,7 +26,7 @@ from simba.utils.enums import Paths
 from simba.utils.errors import (DirectoryNotEmptyError, IntegerError,
                                 InvalidFileTypeError, InvalidInputError,
                                 MissingColumnsError, NoDataError,
-                                NoFilesFoundError)
+                                NoFilesFoundError, FeatureNumberMismatchError)
 from simba.utils.printing import SimbaTimer
 
 
@@ -158,14 +158,27 @@ class UnsupervisedMixin(object):
             )
         return low_variance_fields
 
-    def drop_fields(self, data: pd.DataFrame, fields: List[str]) -> pd.DataFrame:
+    def drop_fields(self,
+                    data: pd.DataFrame,
+                    fields: List[str],
+                    raise_error: Optional[bool] = False) -> pd.DataFrame:
         """
         Drops specified fields in dataframe.
+
         :param pd.DataFrame: Data in pandas format.
         :param  List[str] fields: Columns to drop.
         :return pd.DataFrame
         """
-        return data.drop(columns=fields)
+        if fields is None or len(fields) > 1:
+            if raise_error:
+                raise FeatureNumberMismatchError(msg=f'Fields contain no names', source=UnsupervisedMixin.drop_fields.__name__)
+            else:
+                return data
+        else:
+            if raise_error:
+                return data.drop(columns=fields, errors='raise')
+            else:
+                return data.drop(columns=fields, errors='ignore')
 
     def define_scaler(
         self, scaler_name: Literal["MIN-MAX", "STANDARD", "QUANTILE"]
@@ -266,7 +279,6 @@ class UnsupervisedMixin(object):
         :param str directory: Directory to check.
         :raises DirectoryNotEmptyError: If ``directory`` contains files.
         """
-
         try:
             all_files_in_folder = [
                 f for f in next(os.walk(directory))[2] if not f[0] == "."

@@ -14,8 +14,6 @@ from simba.utils.read_write import read_df, write_df, get_fn_ext
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_str
 
-
-
 def calculate_weighted_avg(x, p=None, threshold=0.2):
     if p is not None and len(x) != len(p):
         raise ValueError('Got x and p with different lengths')
@@ -143,14 +141,15 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
             csv_df['side_y'] = np.where(csv_df['left_ventrum_side_p'] > dam_threshold, csv_df['left_ventrum_side_y'], csv_df['right_ventrum_side_y'])
             csv_df['side_p'] = np.where(csv_df['left_ventrum_side_p'] > dam_threshold, csv_df['left_ventrum_side_p'], csv_df['right_ventrum_side_p'])
             print(time.time() - start)
+
             # Calculate dam centroids and convex hulls
             csv_df['dam_centroid_x'] = csv_df.apply(lambda row: calculate_weighted_avg([row[str(column) + '_x'] for column in dam_body_part_names], [row[str(column) + '_p'] for column in dam_body_part_names], threshold=dam_threshold), axis=1)
             csv_df['dam_centroid_y'] = csv_df.apply(lambda row: calculate_weighted_avg([row[str(column) + '_y'] for column in dam_body_part_names], [row[str(column) + '_p'] for column in dam_body_part_names], threshold=dam_threshold), axis=1)
 
             dam_body_polygon = csv_df.apply(lambda row: polygon_fill([row[p + '_x'] for p in dam_body_part_names],
                                                                      [row[p + '_y'] for p in dam_body_part_names],
-                                                                     [row[p + '_p'] for p in dam_body_part_names], 0.2)
-                                            , axis=1)
+                                                                     [row[p + '_p'] for p in dam_body_part_names], 0.2), axis=1)
+
             dam_body_polygon = np.array(dam_body_polygon.tolist()).reshape((len(dam_body_polygon), -1, 2)).astype(
                 np.float32)
             csv_df['dam_convex_hull'] = jitted_hull(points=dam_body_polygon.astype(np.float32), target='area') / (
@@ -795,6 +794,7 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
             # csv_df['leg_behind_movement_roll_sum_2s'] = csv_df['leg_behind_movement'].rolling(roll_windows[4],
             #                                                                                   min_periods=0, center=True).sum()
 
+            #HERE
             csv_df['wrist_movement_roll_sum_1s'] = csv_df['wrist_movement'].rolling(roll_windows[0],
                                                                                     min_periods=0, center=True).sum()
             csv_df['wrist_movement_roll_sum_1ds'] = csv_df['wrist_movement'].rolling(roll_windows[2],
@@ -985,7 +985,7 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
             print('Saving features for video {}...'.format(file_name))
             self.data_df = csv_df
             self.data_df.columns = csv_df.columns
-            self.data_df = self.data_df.fillna(0).apply(pd.to_numeric)
+            self.data_df = self.data_df.fillna(0).apply(pd.to_numeric).astype(np.float32)
             save_path = os.path.join(self.save_dir, file_name + '.' + self.file_type)
             self.data_df = self.data_df.reset_index(drop=True).fillna(0)
             write_df(self.data_df, self.file_type, save_path)

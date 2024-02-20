@@ -10,7 +10,7 @@ imgaug == 0.4.0
 imutils == 0.5.2
 matplotlib >= 3.0.3
 numpy
-opencv-python == 3.4.16.59; python_version=="3.6"
+opencv-python == 3.4.5.20; python_version=="3.6"
 opencv-python == 4.8.1.78; python_version>="3.9"
 pandas==0.25.3;python_version=="3.6"
 pandas;python_version>="3.9"

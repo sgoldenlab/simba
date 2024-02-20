@@ -255,7 +255,7 @@ def plug_holes_shortest_bout(
     return data_df
 
 
-def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
+def create_color_palettes(no_animals: int, map_size: int, cmaps: Optional[List[str]] = None) -> List[List[int]]:
     """
     Create list of lists of bgr colors, one for each animal. Each list is pulled from a different palette
     matplotlib color map.
@@ -269,19 +269,20 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
     >>> [[[255.0, 0.0, 255.0], [0.0, 255.0, 255.0]], [[102.0, 127.5, 0.0], [102.0, 255.0, 255.0]]]
     """
     colorListofList = []
-    cmaps = [
-        "spring",
-        "summer",
-        "autumn",
-        "cool",
-        "Wistia",
-        "Pastel1",
-        "Set1",
-        "winter",
-        "afmhot",
-        "gist_heat",
-        "copper",
-    ]
+    if cmaps is None:
+        cmaps = [
+            "spring",
+            "summer",
+            "autumn",
+            "cool",
+            "Wistia",
+            "Pastel1",
+            "Set1",
+            "winter",
+            "afmhot",
+            "gist_heat",
+            "copper",
+        ]
     for colormap in range(no_animals):
         currColorMap = cm.get_cmap(cmaps[colormap], map_size)
         currColorList = []
