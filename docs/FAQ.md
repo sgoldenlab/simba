@@ -372,7 +372,7 @@ If your classifiers performs well, and you don't want to update them, I would st
   
 </details>
 
-### 25) My pose-estimation tracking looks good when I visualize it in the pose-estimation tool. However, after I import it into SimBA, it doesn’t look good anymore, why??
+### 25. My pose-estimation tracking looks good when I visualize it in the pose-estimation tool. However, after I import it into SimBA, it doesn’t look good anymore, why??
 
 <details>
   <summary>Show solutions!</summary>
@@ -393,6 +393,21 @@ SimBA however, assign different colors to the different body-parts, and these bo
 Some pose-estimation tools, like DeepLabCut also has a filtering method, which can remove body-part predictions where the confidence is low. This will make the visualizations in DeepLabCut much better. However, these low-confidence predictions become apparent when imported into SimBA. 
 
 </details>
+
+### 26. When I try to install SimBA I get an error about scikit learn missing '_OneToOneFeatureMixin' e.g., end of error message may read: ``from sklearn.base import _OneToOneFeatureMixin as OneToOneFeatureMixin ImportError: cannot import name '_OneToOneFeatureMixin'``
+
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/>
+
+Check out this potential solution on [stackoverflow](https://stackoverflow.com/questions/56549270/importerror-cannot-import-name-multioutputmixin-from-sklearn-base). 
+
+Specifically, try:
+
+i) `pip install imblearn` followed by;
+ii) ``conda install -c conda-forge imbalanced-learn``
+
+Then try to relaunch simba by typing `simba`.
 
 ##
 Author [Simon N](https://github.com/sronilsson)

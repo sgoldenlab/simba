@@ -186,14 +186,27 @@ class CustomFeatureExtractor(ConfigReader):
                 msg=f"The user-defined feature extraction file ({self.extractor_file_path}) contains more than 1 python class. SimBA will use the first python class: {class_names[0]}."
             )
         class_name = class_names[0]
-        class_ = self._find_astClass_from_name(parsed_py=parsed_py, class_name=class_name)
+        class_ = self._find_astClass_from_name(
+            parsed_py=parsed_py, class_name=class_name
+        )
         has_abstract_inheritance = self._check_inheritance(class_=class_)
-        has_main_block = self.has_block(file_path=self.extractor_file_path, target='if __name__ == "__main__":')
-        has_config_argparse = self.has_argparser_argument(file_path=self.extractor_file_path, target_argument="config_path")
+        has_main_block = self.has_block(
+            file_path=self.extractor_file_path, target='if __name__ == "__main__":'
+        )
+        has_config_argparse = self.has_argparser_argument(
+            file_path=self.extractor_file_path, target_argument="config_path"
+        )
         print(has_config_argparse)
-        if (has_abstract_inheritance and has_config_argparse and has_argparse and has_main_block):
+        if (
+            has_abstract_inheritance
+            and has_config_argparse
+            and has_argparse
+            and has_main_block
+        ):
             command = f'python "{self.extractor_file_path}" --config_path "{self.config_path}"'
-            print("Follow feature extraction progress in the operating system terminal window...")
+            print(
+                "Follow feature extraction progress in the operating system terminal window..."
+            )
             subprocess.call(command, shell=True)
 
         else:
