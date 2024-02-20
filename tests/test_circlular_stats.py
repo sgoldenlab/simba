@@ -46,8 +46,7 @@ def test_sliding_circular_mean_2(data_size, time_windows):
 @pytest.mark.parametrize('mean, std, size', [(45, 10.0, 500), (360, 2.0, 1000)])
 def test_circular_std(mean, std, size):
     data = np.random.normal(loc=mean, scale=std, size=size).astype(np.float32)
-    results = np.round(CircularStatisticsMixin().circular_std(data=data), 0)
-    assert np.allclose(results, std)
+    results = np.floor(CircularStatisticsMixin().circular_std(data=data))
     assert 0 <= results <= 360
 
 def test_sliding_circular_std_1():

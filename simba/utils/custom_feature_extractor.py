@@ -196,7 +196,7 @@ class CustomFeatureExtractor(ConfigReader):
         has_config_argparse = self.has_argparser_argument(
             file_path=self.extractor_file_path, target_argument="config_path"
         )
-        print(has_config_argparse)
+
         if (
             has_abstract_inheritance
             and has_config_argparse
@@ -210,6 +210,7 @@ class CustomFeatureExtractor(ConfigReader):
             subprocess.call(command, shell=True)
 
         else:
+            print(has_abstract_inheritance)
             spec = importlib.util.spec_from_file_location(
                 class_name, self.extractor_file_path
             )
@@ -226,6 +227,6 @@ class CustomFeatureExtractor(ConfigReader):
                 user_class(self.config_path)
 
 
-# test = CustomFeatureExtractor(extractor_file_path='/Users/simon/Desktop/envs/simba/simba/simba/sandbox/amber_featurizer.py',
-#                               config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# test = CustomFeatureExtractor(extractor_file_path='/Users/simon/Desktop/envs/simba/simba/simba/feature_extractors/amber_feature_extractor.py',
+#                               config_path='/Users/simon/Desktop/envs/simba/troubleshooting/Amber_test/project_folder/project_config.ini')
 # test.run()

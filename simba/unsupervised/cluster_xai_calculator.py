@@ -23,7 +23,8 @@ F_STATISTIC = "F-STATISTIC"
 MEASURE = "MEASURE"
 P_VALUE = "P-VALUE"
 CLUSTER = "CLUSTER"
-PAIRED = "cluster_paired"
+PAIRED = "Paired clusters"
+ONE_AGAINST_ALL = "One-against-all"
 CORRELATION_METHODS = "correlation_methods"
 GINI_IMPORTANCE = "gini_importance"
 TUKEY = "tukey_posthoc"
@@ -104,7 +105,8 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         )
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
-        self.__train_rf_models()
+        if self.settings[GINI_IMPORTANCE] or self.settings[PERMUTATION_IMPORTANCE] or (self.settings[SHAP][METHOD] == PAIRED):
+            self.__train_paired_rf_models()
         if self.settings[GINI_IMPORTANCE]:
             self.__gini_importance()
         if self.settings[PERMUTATION_IMPORTANCE]:
@@ -121,7 +123,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         with pd.ExcelWriter(self.save_path, mode="a") as writer:
             df.to_excel(writer, sheet_name=name, index=True)
 
-    def __train_rf_models(self, n_estimators: Optional[int] = 100):
+    def __train_paired_rf_models(self, n_estimators: Optional[int] = 100):
         print("Training ML model...")
         rf_clf = RandomForestClassifier(
             n_estimators=n_estimators,
@@ -212,6 +214,30 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             elapsed_time=timer.elapsed_time_str,
         )
 
+
+    def __train_all_against_one_rf_models(self,  n_estimators: Optional[int] = 100):
+        all_against_one_rf_mdls = {}
+        rf_clf = RandomForestClassifier(
+            n_estimators=n_estimators,
+            max_features="sqrt",
+            n_jobs=-1,
+            criterion="gini",
+            min_samples_leaf=1,
+            bootstrap=True,
+            verbose=1,
+        )
+        for cluster_id in sorted(self.x_y_df['CLUSTER'].unique()):
+            cluster_df = self.x_y_df[self.x_y_df['CLUSTER'] == cluster_id].drop(['CLUSTER'], axis=1)
+            noncluster_df = self.x_y_df[self.x_y_df['CLUSTER'] != cluster_id].drop(['CLUSTER'], axis=1)
+            cluster_df[TARGET] = 1
+            noncluster_df[TARGET] = 0
+
+            x = pd.concat([cluster_df, noncluster_df], axis=0)
+            y = x.pop(TARGET)
+            rf_clf.fit(x, y)
+            all_against_one_rf_mdls[cluster_id] = rf_clf
+        return all_against_one_rf_mdls
+
     def __shap_values(self):
         if self.settings[SHAP][METHOD] == PAIRED:
             print("Calculating paired-clusters shap values ...")
@@ -277,3 +303,27 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
                 msg=f"Paired clusters SHAP values complete",
                 elapsed_time=timer.elapsed_time_str,
             )
+        if self.settings[SHAP][METHOD] == ONE_AGAINST_ALL:
+            timer = SimbaTimer(start=True)
+            print("Calculating one-against-all shap values ...")
+            mdls = self.__train_all_against_one_rf_models()
+            for cluster_id, cluster_mdl in mdls.items():
+                print(f'Computing SHAP for cluster {cluster_id}...')
+                explainer = shap.TreeExplainer(cluster_mdl,data=None, model_output="raw", feature_perturbation="tree_path_dependent")
+                cluster_one_sample = self.x_y_df[self.x_y_df['CLUSTER'] == cluster_id].sample(n=self.settings[SHAP][SAMPLE])
+                cluster_two_sample = self.x_y_df[self.x_y_df['CLUSTER'] != cluster_id].sample(n=self.settings[SHAP][SAMPLE])
+                cluster_one_shap = pd.DataFrame(explainer.shap_values(cluster_one_sample, check_additivity=False)[1],columns=cluster_one_sample.columns, index=cluster_one_sample.index)
+                cluster_two_shap = pd.DataFrame(explainer.shap_values(cluster_two_sample, check_additivity=False)[1],columns=cluster_two_sample.columns, index=cluster_one_sample.index)
+                cluster_two_shap['CLUSTER'] = cluster_two_sample['CLUSTER'].values
+                cluster_one_shap['CLUSTER'] = cluster_one_sample['CLUSTER'].values
+                results = pd.concat([cluster_one_shap, cluster_two_shap], axis=0)
+                self.__save_results(df=results, name=f"SHAP CLUSTER {cluster_id} vs. ALL")
+            timer.stop_timer()
+            stdout_success(msg=f"SHAP one-vs-all values complete", elapsed_time=timer.elapsed_time_str)
+
+settings = {'gini_importance': False, 'permutation_importance': False, 'shap': {'method': 'cluster_paired', 'run': True, 'sample': 10}}
+settings = {'gini_importance': False, 'permutation_importance': False, 'shap': {'method': 'One-against-all', 'run': True, 'sample': 10}}
+calculator = ClusterXAICalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini', data_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle', settings=settings)
+
+
+calculator.run()

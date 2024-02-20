@@ -1448,13 +1448,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             if self.pose_setting not in feature_extractor_classes.keys():
                 raise InvalidInputError(msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}. Check the pose-estimation setting in the project_config.ini", source=self.__class__.__name__)
             if self.pose_setting == "8":
-                feature_extractor = feature_extractor_classes[self.pose_setting][
-                    self.animal_cnt
-                ](config_path=self.config_path)
+                feature_extractor = feature_extractor_classes[self.pose_setting][self.animal_cnt](config_path=self.config_path)
             else:
-                feature_extractor = feature_extractor_classes[self.pose_setting](
-                    config_path=self.config_path
-                )
+                feature_extractor = feature_extractor_classes[self.pose_setting](config_path=self.config_path)
             feature_extractor.run()
 
     def set_distance_mm(self):

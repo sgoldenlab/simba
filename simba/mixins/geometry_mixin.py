@@ -867,7 +867,7 @@ class GeometryMixin(object):
            If more aesthetic videos are needed, overlaid on video, then use ``simba.plotting.geometry_plotter.GeometryPlotter``
            If single images of geometries are needed, then use ``simba.mixins.geometry_mixin.view_shapes``
 
-        .. image:: _static/img/geometry_video.png
+        .. image:: _static/img/geometry_video.gif
            :width: 500
            :align: center
 
