@@ -3013,10 +3013,7 @@ class GeometryMixin(object):
             accepted_types=np.ndarray,
         )
         if (data.shape[1] != 2) or (data.ndim != 2):
-            raise CountError(
-                msg=f"A N x 2 array is required (got {data.shape})",
-                source=self.__class__.__name__,
-            )
+            raise CountError(msg=f"A N x 2 array is required (got {data.shape})", source=self.__class__.__name__, )
         check_int(name="fps", value=fps, min_value=1)
         check_int(name="core_cnt", value=core_cnt, min_value=-1)
         if core_cnt == -1:

@@ -187,11 +187,11 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                 file_path=file_path, file_type=self.file_type, usecols=self.bp_lst
             )
             squares, aspect_ratio = GeometryMixin().bucket_img_into_grid_square(
-                bucket_size_mm=self.style_attr["bin_size"],
+                bucket_grid_size_mm=self.style_attr["bin_size"],
                 img_size=(self.width, self.height),
                 px_per_mm=self.px_per_mm,
             )
-            cum_sum_squares = GeometryMixin().cumsum_geometries(
+            cum_sum_squares = GeometryMixin().cumsum_coord_geometries(
                 data=self.data_df.values, fps=self.fps, geometries=squares
             )
             if self.max_scale == "auto":

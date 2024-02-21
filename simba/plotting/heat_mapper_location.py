@@ -184,11 +184,11 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
                     os.makedirs(self.save_video_folder)
             self.data_df = read_df(file_path, self.file_type)[self.bp_lst]
             squares, aspect_ratio = GeometryMixin().bucket_img_into_grid_square(
-                bucket_size_mm=self.style_attr["bin_size"],
+                bucket_grid_size_mm=self.style_attr["bin_size"],
                 img_size=(self.width, self.height),
                 px_per_mm=self.px_per_mm,
             )
-            location_array = GeometryMixin().cumsum_geometries(
+            location_array = GeometryMixin().cumsum_coord_geometries(
                 data=self.data_df.values, fps=self.fps, geometries=squares
             )
 
@@ -265,13 +265,13 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
 
 
 #
-# test = HeatmapperLocationSingleCore(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+# test = HeatmapperLocationSingleCore(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                                       style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 100, 'max_scale': 'auto'},
 #                                       final_img_setting=True,
 #                                       video_setting=True,
 #                                       frame_setting=False,
 #                                       bodypart='Nose_1',
-#                                       files_found=['/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'])
+#                                       files_found=['/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_1.csv'])
 # test.run()
 
 
