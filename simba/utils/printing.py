@@ -12,7 +12,9 @@ from typing import Optional
 from simba.utils.enums import Defaults, TagNames
 
 
-def stdout_success(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
+def stdout_success(
+    msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None
+) -> None:
     """
     Helper to parse msg of completed operation to SimBA main interface.
 
@@ -57,7 +59,9 @@ def stdout_warning(msg: str, elapsed_time: Optional[str] = None) -> None:
         )
 
 
-def stdout_trash(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
+def stdout_trash(
+    msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None
+) -> None:
     """
     Helper to parse msg of delete operation to SimBA main interface.
 
@@ -83,7 +87,8 @@ def stdout_trash(msg: str, source: Optional[str] = "", elapsed_time: Optional[st
 
 
 class SimbaTimer(object):
-    """ Timer class for keeping track of start and end-times of calls"""
+    """Timer class for keeping track of start and end-times of calls"""
+
     def __init__(self, start: bool = False):
         if start:
             self.start_timer()

@@ -12,7 +12,8 @@ from shapely.geometry import Point, Polygon
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.enums import ConfigKey, Dtypes
-from simba.utils.errors import BodypartColumnNotFoundError, NoFilesFoundError, MissingColumnsError
+from simba.utils.errors import (BodypartColumnNotFoundError,
+                                MissingColumnsError, NoFilesFoundError)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
 from simba.utils.warnings import NoDataFoundWarning
@@ -43,12 +44,14 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     >>> roi_analyzer.save()
     """
 
-    def __init__(self,
-                 ini_path: str,
-                 data_path: Optional[str] = None,
-                 detailed_bout_data: Optional[bool] = False,
-                 settings: Optional[dict] = None,
-                 calculate_distances: Optional[bool] = False):
+    def __init__(
+        self,
+        ini_path: str,
+        data_path: Optional[str] = None,
+        detailed_bout_data: Optional[bool] = False,
+        settings: Optional[dict] = None,
+        calculate_distances: Optional[bool] = False,
+    ):
 
         ConfigReader.__init__(self, config_path=ini_path)
         FeatureExtractionMixin.__init__(self)
@@ -60,7 +63,9 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             self.input_folder = os.path.join(self.project_path, "csv", data_path)
             self.files_found = glob.glob(self.input_folder + "/*." + self.file_type)
             if len(self.files_found) == 0:
-                raise NoFilesFoundError(msg=f"No data files found in {self.input_folder}")
+                raise NoFilesFoundError(
+                    msg=f"No data files found in {self.input_folder}"
+                )
 
         if not self.settings:
             self.roi_config = dict(self.config.items(ConfigKey.ROI_SETTINGS.value))
@@ -167,7 +172,10 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                 )
                 self.data_df = read_df(file_path, self.file_type).reset_index(drop=True)
                 if len(self.bp_headers) != len(self.data_df.columns):
-                    raise MissingColumnsError(msg=f'The data file {file_path} contains {len(self.data_df.columns)} body-part columns, but the project is made for {len(self.bp_headers)} body-parts', source=self.__class__.__name__)
+                    raise MissingColumnsError(
+                        msg=f"The data file {file_path} contains {len(self.data_df.columns)} body-part columns, but the project is made for {len(self.bp_headers)} body-parts",
+                        source=self.__class__.__name__,
+                    )
                 self.data_df.columns = self.bp_headers
                 data_df_sliced = self.data_df[self.bp_names]
                 self.video_length_s = data_df_sliced.shape[0] / self.fps
@@ -476,8 +484,12 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                     df["BODY-PART"] = body_part
                     df["SHAPE"] = shape_name
                     self.detailed_df = pd.concat([self.detailed_df, df], axis=0)
-        self.detailed_df["ANIMAL"] = self.detailed_df["ANIMAL"].map(self.body_part_to_animal_lookup)
-        self.detailed_df = self.detailed_df[["VIDEO", "ANIMAL", "BODY-PART", "SHAPE", "ENTRY FRAMES", "EXIT FRAMES"]]
+        self.detailed_df["ANIMAL"] = self.detailed_df["ANIMAL"].map(
+            self.body_part_to_animal_lookup
+        )
+        self.detailed_df = self.detailed_df[
+            ["VIDEO", "ANIMAL", "BODY-PART", "SHAPE", "ENTRY FRAMES", "EXIT FRAMES"]
+        ]
 
         if self.calculate_distances:
             self.movements_df = pd.DataFrame(
@@ -506,15 +518,33 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
         None
         """
 
-        self.entries_df.to_csv(os.path.join(self.logs_path, f'{"ROI_entry_data"}_{self.datetime}.csv'))
-        self.time_df.to_csv(os.path.join(self.logs_path, f'{"ROI_time_data"}_{self.datetime}.csv'))
+        self.entries_df.to_csv(
+            os.path.join(self.logs_path, f'{"ROI_entry_data"}_{self.datetime}.csv')
+        )
+        self.time_df.to_csv(
+            os.path.join(self.logs_path, f'{"ROI_time_data"}_{self.datetime}.csv')
+        )
         if self.detailed_bout_data:
-            self.detailed_df.to_csv(os.path.join(self.logs_path, f'{"Detailed_ROI_data"}_{self.datetime}.csv'))
-            stdout_success(msg='Detailed ROI data, have been saved in the "project_folder/logs/" directory in CSV format.')
-        stdout_success(msg='ROI time, ROI entry, and Detailed ROI data, have been saved in the "project_folder/logs/" directory in CSV format.')
+            self.detailed_df.to_csv(
+                os.path.join(
+                    self.logs_path, f'{"Detailed_ROI_data"}_{self.datetime}.csv'
+                )
+            )
+            stdout_success(
+                msg='Detailed ROI data, have been saved in the "project_folder/logs/" directory in CSV format.'
+            )
+        stdout_success(
+            msg='ROI time, ROI entry, and Detailed ROI data, have been saved in the "project_folder/logs/" directory in CSV format.'
+        )
         if self.calculate_distances:
-            self.movements_df.to_csv(os.path.join(self.logs_path, f'{"ROI_movement_data"}_{self.datetime}.csv'))
-            stdout_success(msg='ROI movement data saved in the "project_folder/logs/" directory')
+            self.movements_df.to_csv(
+                os.path.join(
+                    self.logs_path, f'{"ROI_movement_data"}_{self.datetime}.csv'
+                )
+            )
+            stdout_success(
+                msg='ROI movement data saved in the "project_folder/logs/" directory'
+            )
 
         self.timer.stop_timer()
         stdout_success(
