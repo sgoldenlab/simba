@@ -459,7 +459,10 @@ class ROIfeatureVisualizer(ConfigReader):
         self.timer.stop_timer()
         self.cap.release()
         self.writer.release()
-        stdout_success("Feature video {} saved in {} directory ...", elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(
+            "Feature video {} saved in {} directory ...",
+            elapsed_time=self.timer.elapsed_time_str,
+        )
 
 
 # style_attr = {'ROI_centers': True, 'ROI_ear_tags': True, 'Directionality': True, 'Directionality_style': 'Funnel', 'Border_color': (0, 128, 0), 'Pose_estimation': True}
