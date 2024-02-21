@@ -13,6 +13,7 @@ General processing
    nb/advanced_smoothing_interpolation
    nb/advanced_outlier_correction
    nb/kleinberg_gridsearch
+   nb/train_models
 
 Visualizations
 -------------------

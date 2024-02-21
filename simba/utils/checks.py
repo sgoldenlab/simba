@@ -222,7 +222,7 @@ def check_iterable_length(
 
 
 def check_instance(
-    source: str, instance: object, accepted_types: Union[Tuple[object], object]
+    source: str, instance: object, accepted_types: Union[Tuple[Any], Any]
 ) -> None:
     """
     Check if an instance is an acceptable type.

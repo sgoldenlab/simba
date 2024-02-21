@@ -1312,9 +1312,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
     def train_single_model(self, config_path=None):
         model_trainer = TrainRandomForestClassifier(config_path=config_path)
-        model_trainer.perform_sampling()
-        model_trainer.train_model()
-        model_trainer.save_model()
+        model_trainer.run()
+        model_trainer.save()
 
     def train_multiple_models_from_meta(self, config_path=None):
         model_trainer = GridSearchRandomForestClassifier(config_path=config_path)

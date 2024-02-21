@@ -74,8 +74,6 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                 str(round(self.y_df.sum() / len(self.y_df), 4) * 100),
             )
         )
-        print("Training and evaluating model...")
-        self.timer = SimbaTimer(start=True)
 
     def perform_sampling(self):
         """
@@ -127,11 +125,13 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                 f"Frame index for the train and test sets saved in {self.eval_out_path} directory..."
             )
 
-    def train_model(self):
+    def run(self):
         """
         Method for training single random forest model.
         """
-
+        print("Training and evaluating model...")
+        self.timer = SimbaTimer(start=True)
+        self.perform_sampling()
         if self.algo == "RF":
             n_estimators = read_config_entry(
                 self.config,
@@ -497,7 +497,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                     meta_data_lst, self.clf_name, self.eval_out_path
                 )
 
-    def save_model(self) -> None:
+    def save(self) -> None:
         """
         Method for saving pickled RF model. The model is saved in the `models/generated_models` directory
         of the SimBA project tree.
@@ -517,9 +517,8 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
 
 
 # test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
-# test.perform_sampling()
-# test.train_model()
-# test.save_model()
+# test.run()
+# test.save()
 
 
 # test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
