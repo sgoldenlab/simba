@@ -256,7 +256,11 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader, PlottingMixin):
                 )
 
             print("Joining {} multi-processed video...".format(self.video_name))
-            concatenate_videos_in_folder(in_folder=self.save_temp_dir,save_path=self.save_path, video_format="mp4",)
+            concatenate_videos_in_folder(
+                in_folder=self.save_temp_dir,
+                save_path=self.save_path,
+                video_format="mp4",
+            )
             self.timer.stop_timer()
             pool.terminate()
             pool.join()
