@@ -6,7 +6,7 @@ import re
 import struct
 import sys
 from multiprocessing import Lock, Process, Value
-from typing import List
+from typing import List, Dict, Union, Tuple
 
 import pandas as pd
 from matplotlib import cm
@@ -19,6 +19,8 @@ from simba.utils.read_write import get_fn_ext
 
 
 class SharedCounter(object):
+    """ Counter that can be shared across processes on different cores"""
+
     def __init__(self, initval=0):
         self.val = Value("i", initval)
         self.lock = Lock()
@@ -32,7 +34,7 @@ class SharedCounter(object):
             return self.val.value
 
 
-def get_body_part_configurations() -> dict:
+def get_body_part_configurations() -> Dict[str, Union[str, os.PathLike]]:
     """
     Return dict with named body-part schematics of pose-estimation schemas in SimBA installation as keys,
     and paths to the images representing those body-part schematics as values.
@@ -57,11 +59,10 @@ def get_body_part_configurations() -> dict:
     return lookup
 
 
-def get_bp_config_codes() -> dict:
+def get_bp_config_codes() -> Dict[str, str]:
     """
     Helper to match SimBA project_config.ini [create ensemble settings][pose_estimation_body_parts] to string names.
 
-    :return dict
     """
 
     return {
@@ -80,11 +81,9 @@ def get_bp_config_codes() -> dict:
         "AMBER": "AMBER",
     }
 
-def get_bp_config_code_class_pairs() -> dict:
+def get_bp_config_code_class_pairs() -> Dict[str, object]:
     """
-    Helper to match SimBA project_config.ini [create ensemble settings][pose_estimation_body_parts] to feature extraction module class.
-
-    :return dict: Dictionary with [create ensemble settings][pose_estimation_body_parts] entry as keys and feature extraction classes as keys.
+    Helper to match SimBA project_config.ini [create ensemble settings][pose_estimation_body_parts] setting to feature extraction module class.
     """
 
     from simba.feature_extractors.feature_extractor_4bp import ExtractFeaturesFrom4bps
@@ -109,11 +108,10 @@ def get_bp_config_code_class_pairs() -> dict:
     }
 
 
-def get_icons_paths() -> dict:
+def get_icons_paths() -> Dict[str, Union[str, os.PathLike]]:
     """
-    Helper to get dictionary with icons and their paths.
-
-    :return dict: Dictionary with icon names as keys and icon paths as values.
+    Helper to get dictionary with icons with the icon names as keys (grabbed from file-name) and their
+    file paths as values.
     """
 
     simba_dir = os.path.dirname(simba.__file__)
@@ -127,11 +125,9 @@ def get_icons_paths() -> dict:
     return icons
 
 
-def get_third_party_appender_file_formats() -> dict:
+def get_third_party_appender_file_formats() -> Dict[str, str]:
     """
-    Helper to get dictionary the file-types of third-party annotation tools.
-
-    :return dict: Dictionary with tool as keys and file types as values.
+    Helper to get dictionary that maps different third-party annotation tools with different file formats.
     """
 
     return {
@@ -144,9 +140,10 @@ def get_third_party_appender_file_formats() -> dict:
     }
 
 
-def get_emojis() -> dict:
+def get_emojis() -> Dict[str, str]:
     """
-    Helper to get dictionary of emojis with names as keys and emojis as values.
+    Helper to get dictionary of emojis with names as keys and emojis as values. Note, the same emojis are
+    represented differently in different python versions.
     """
     python_version = str(f"{sys.version_info.major}.{sys.version_info.minor}")
     if python_version == "3.6":
@@ -266,7 +263,7 @@ def get_cmaps() -> List[str]:
     ]
 
 
-def get_color_dict() -> dict:
+def get_color_dict() -> Dict[str, Tuple[int]]:
     """
     Get dict of color names as keys and RGB tuples as values
     """
@@ -378,15 +375,28 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
     return colorListofList
 
 
-def cardinality_to_integer_lookup():
+def cardinality_to_integer_lookup() -> Dict[str, int]:
+    """
+    Create dictionary that maps cardinal compass directions to integers.
+    """
+
     return {"N": 0, "NE": 1, "E": 2, "SE": 3, "S": 4, "SW": 5, "W": 6, "NW": 7}
 
 
 def integer_to_cardinality_lookup():
+    """
+    Create dictionary that maps integers to cardinal compass directions.
+    """
     return {0: "N", 1: "NE", 2: "E", 3: "SE", 4: "S", 5: "SW", 6: "W", 7: "NW"}
 
 
-def percent_to_crf_lookup():
+def percent_to_crf_lookup() -> Dict[str, int]:
+    """
+    Create dictionary that matches human-readable percent values to FFmpeg Constant Rate Factor (CRF)
+    values that regulates video quality in CPU codecs. Higher CRF values translates to lower video quality and reduced
+    file sizes.
+    """
+
     return {
         "10": 37,
         "20": 34,
@@ -401,7 +411,11 @@ def percent_to_crf_lookup():
     }
 
 
-def video_quality_to_preset_lookup():
+def video_quality_to_preset_lookup() -> Dict[str, str]:
+    """
+    Create dictionary that matches human-readable video quality settings to FFmpeg presets for GPU codecs.
+    """
+
     return {"Low": "fast", "Medium": "medium", "High": "slow"}
 
 

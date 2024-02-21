@@ -12,9 +12,16 @@ from typing import Optional
 from simba.utils.enums import Defaults, TagNames
 
 
-def stdout_success(
-    msg: str, source: str = "", elapsed_time: Optional[str] = None
-) -> None:
+def stdout_success(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
+    """
+    Helper to parse msg of completed operation to SimBA main interface.
+
+    :param str msg: Message to be parsed.
+    :param Optional[str] source: Optional string indicating the source method or function of the msg for logging.
+    :param Optional[str] elapsed_time: Optional string indicating the runtime of the completed operation.
+    :return None:
+    """
+
     log_event(
         logger_name=f"{source}.{stdout_success.__name__}",
         log_type=TagNames.COMPLETE.value,
@@ -31,6 +38,15 @@ def stdout_success(
 
 
 def stdout_warning(msg: str, elapsed_time: Optional[str] = None) -> None:
+    """
+    Helper to parse warning msg to SimBA main interface.
+
+    :param str msg: Message to be parsed.
+    :param Optional[str] source: Optional string indicating the source method or function of the msg for logging.
+    :param elapsed_time: Optional string indicating the runtime.
+    :return None:
+    """
+
     if elapsed_time:
         print(
             f"SIMBA WARNING: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}"
@@ -41,9 +57,16 @@ def stdout_warning(msg: str, elapsed_time: Optional[str] = None) -> None:
         )
 
 
-def stdout_trash(
-    msg: str, source: str = "", elapsed_time: Optional[str] = None
-) -> None:
+def stdout_trash(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
+    """
+    Helper to parse msg of delete operation to SimBA main interface.
+
+    :param str msg: Message to be parsed.
+    :param Optional[str] source: Optional string indicating the source method or function of the operation for logging.
+    :param elapsed_time: Optional string indicating the runtime.
+    :return None:
+    """
+
     log_event(
         logger_name=f"{source}.{stdout_trash.__name__}",
         log_type=TagNames.TRASH.value,
@@ -60,6 +83,7 @@ def stdout_trash(
 
 
 class SimbaTimer(object):
+    """ Timer class for keeping track of start and end-times of calls"""
     def __init__(self, start: bool = False):
         if start:
             self.start_timer()
