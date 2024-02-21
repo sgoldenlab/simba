@@ -204,7 +204,7 @@ class ROIfeatureVisualizer(ConfigReader):
             (self.directing_data["ROI"] == self.shape_name)
             & (self.directing_data["Animal"] == self.animal_name)
             & (self.directing_data["Frame"] == self.frame_cnt)
-        ]
+        ].reset_index(drop=True)
         clr = self.shape_dicts[self.shape_name]["Color BGR"]
         thickness = self.shape_dicts[self.shape_name]["Thickness"]
         if self.style_attr["Directionality_style"] == "Funnel":
@@ -269,7 +269,6 @@ class ROIfeatureVisualizer(ConfigReader):
                     self.__insert_texts(self.video_recs)
                     self.__insert_texts(self.video_circs)
                     self.__insert_texts(self.video_polys)
-
                     if self.style_attr["Pose_estimation"]:
                         for animal, animal_bp_name in self.bp_names.items():
                             bp_cords = self.data_df.loc[
@@ -291,7 +290,6 @@ class ROIfeatureVisualizer(ConfigReader):
                                 self.animal_bp_dict[animal]["colors"][0],
                                 1,
                             )
-
                     for _, row in self.video_recs.iterrows():
                         cv2.rectangle(
                             self.img_w_border,
@@ -321,7 +319,6 @@ class ROIfeatureVisualizer(ConfigReader):
                                     row["Color BGR"],
                                     -1,
                                 )
-
                     for _, row in self.video_circs.iterrows():
                         cv2.circle(
                             self.img_w_border,
@@ -347,7 +344,6 @@ class ROIfeatureVisualizer(ConfigReader):
                                     row["Color BGR"],
                                     -1,
                                 )
-
                     for _, row in self.video_polys.iterrows():
                         cv2.polylines(
                             self.img_w_border,
@@ -373,7 +369,6 @@ class ROIfeatureVisualizer(ConfigReader):
                                     row["Color BGR"],
                                     -1,
                                 )
-
                     for animal_name, shape_name in itertools.product(
                         self.multi_animal_id_list, self.video_shapes
                     ):
@@ -438,7 +433,6 @@ class ROIfeatureVisualizer(ConfigReader):
                             )
                             if facing_value:
                                 self.__insert_directing_line()
-
                     self.frame_cnt += 1
                     self.writer.write(np.uint8(self.img_w_border))
                     print(
@@ -448,7 +442,6 @@ class ROIfeatureVisualizer(ConfigReader):
                             self.video_name,
                         )
                     )
-
                 else:
                     self.timer.stop_timer()
                     self.cap.release()
@@ -459,20 +452,18 @@ class ROIfeatureVisualizer(ConfigReader):
                         )
                     )
 
-            except:
+            except Exception as e:
+                print(e.args)
                 break
 
         self.timer.stop_timer()
         self.cap.release()
         self.writer.release()
-        stdout_success(
-            "Feature video {} saved in {} directory ...",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success("Feature video {} saved in {} directory ...", elapsed_time=self.timer.elapsed_time_str)
 
 
-# style_attr = {'ROI_centers': True, 'ROI_ear_tags': True, 'Directionality': True, 'Border_color': (0, 128, 0), 'Pose_estimation': True}
-# test = ROIfeatureVisualizer(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_name='Together_1.avi', style_attr=style_attr)
+# style_attr = {'ROI_centers': True, 'ROI_ear_tags': True, 'Directionality': True, 'Directionality_style': 'Funnel', 'Border_color': (0, 128, 0), 'Pose_estimation': True}
+# test = ROIfeatureVisualizer(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_name='Together_1.avi', style_attr=style_attr)
 # test.run()
 
 
