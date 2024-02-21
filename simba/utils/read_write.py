@@ -531,8 +531,7 @@ def concatenate_videos_in_folder(
             pass
         else:
             if remove_splits:
-                print(in_folder, Path(in_folder).parents[0])
-                remove_a_folder(folder_dir=Path(in_folder).parents[0])
+                remove_a_folder(folder_dir=Path(in_folder))
             break
     timer.stop_timer()
     stdout_success(
