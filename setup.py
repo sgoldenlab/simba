@@ -17,7 +17,7 @@ with open("requirements.txt", "r") as f:
 
 setuptools.setup(
     name="Simba-UW-tf-dev",
-    version="1.85.8",
+    version="1.86.1",
     author="Simon Nilsson, Jia Jie Choong, Sophia Hwang",
     author_email="sronilsson@gmail.com",
     description="Toolkit for computer classification of behaviors in experimental animals",
