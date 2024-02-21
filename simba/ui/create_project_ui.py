@@ -149,13 +149,23 @@ class ProjectCreatorPopUp(PopUpMixin):
         )
         self.tracking_type_dropdown.setChoices(Options.TRACKING_TYPE_OPTIONS.value[0])
 
-        project_animal_cnt_path = os.path.join(os.path.dirname(simba.__file__), Paths.SIMBA_NO_ANIMALS_PATH.value)
-        self.animal_count_lst = list(pd.read_csv(project_animal_cnt_path, header=None)[0])
+        project_animal_cnt_path = os.path.join(
+            os.path.dirname(simba.__file__), Paths.SIMBA_NO_ANIMALS_PATH.value
+        )
+        self.animal_count_lst = list(
+            pd.read_csv(project_animal_cnt_path, header=None)[0]
+        )
         self.bp_lu = get_body_part_configurations()
         self.bp_config_codes = get_bp_config_codes()
-        self.classical_tracking_options = deepcopy(Options.CLASSICAL_TRACKING_OPTIONS.value)
-        self.multi_tracking_options = deepcopy(Options.MULTI_ANIMAL_TRACKING_OPTIONS.value)
-        self.three_dim_tracking_options = deepcopy(Options.THREE_DIM_TRACKING_OPTIONS.value)
+        self.classical_tracking_options = deepcopy(
+            Options.CLASSICAL_TRACKING_OPTIONS.value
+        )
+        self.multi_tracking_options = deepcopy(
+            Options.MULTI_ANIMAL_TRACKING_OPTIONS.value
+        )
+        self.three_dim_tracking_options = deepcopy(
+            Options.THREE_DIM_TRACKING_OPTIONS.value
+        )
         self.user_defined_options = [
             x
             for x in list(self.bp_lu.keys())
@@ -343,4 +353,4 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.create_import_videos_menu(parent_frm=self.import_videos_tab)
 
 
-#ProjectCreatorPopUp()
+# ProjectCreatorPopUp()
