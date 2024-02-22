@@ -291,9 +291,12 @@ class TrainModelMixin(object):
         >>> self.smoteen_oversampler(x_train=x_train, y_train=y_train, sample_ratio=1.0)
         """
 
-        print("Performing SMOTEEN oversampling...")
+        print("Performing SMOTEENN oversampling...")
         smt = SMOTEENN(sampling_strategy=sample_ratio)
-        return smt.fit_sample(x_train, y_train)
+        if hasattr(smt, 'fit_sample'):
+            return smt.fit_sample(x_train, y_train)
+        else:
+            return smt.fit_resample(x_train, y_train)
 
     def smote_oversampler(
         self,
@@ -315,7 +318,10 @@ class TrainModelMixin(object):
         """
         print("Performing SMOTE oversampling...")
         smt = SMOTE(sampling_strategy=sample_ratio)
-        return smt.fit_sample(x_train, y_train)
+        if hasattr(smt, 'fit_sample'):
+            return smt.fit_sample(x_train, y_train)
+        else:
+            return smt.fit_resample(x_train, y_train)
 
     def calc_permutation_importance(
         self,

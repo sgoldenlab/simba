@@ -846,30 +846,31 @@ class PlottingMixin(object):
                 & (directing_data["Animal"] == animal_name)
                 & (directing_data["Frame"] == frame_cnt)
             ]
-            clr = shape_info[shape_name]["Color BGR"]
-            thickness = shape_info[shape_name]["Thickness"]
-            if style_attr["Directionality_style"] == "Funnel":
-                convex_hull_arr = (
-                    np.array(
-                        [
-                            [r["ROI_edge_1_x"], r["ROI_edge_1_y"]],
-                            [r["ROI_edge_2_x"], r["ROI_edge_2_y"]],
-                            [r["Eye_x"], r["Eye_y"]],
-                        ]
+            if len(r) > 0:
+                clr = shape_info[shape_name]["Color BGR"]
+                thickness = shape_info[shape_name]["Thickness"]
+                if style_attr["Directionality_style"] == "Funnel":
+                    convex_hull_arr = (
+                        np.array(
+                            [
+                                [r["ROI_edge_1_x"], r["ROI_edge_1_y"]],
+                                [r["ROI_edge_2_x"], r["ROI_edge_2_y"]],
+                                [r["Eye_x"], r["Eye_y"]],
+                            ]
+                        )
+                        .reshape(-1, 2)
+                        .astype(int)
                     )
-                    .reshape(-1, 2)
-                    .astype(int)
-                )
-                cv2.fillPoly(img, [convex_hull_arr], clr)
+                    cv2.fillPoly(img, [convex_hull_arr], clr)
 
-            if style_attr["Directionality_style"] == "Lines":
-                cv2.line(
-                    img,
-                    (int(r["Eye_x"]), int(r["Eye_y"])),
-                    (int(r["ROI_x"]), int(r["ROI_y"])),
-                    clr,
-                    int(thickness),
-                )
+                if style_attr["Directionality_style"] == "Lines":
+                    cv2.line(
+                        img,
+                        (int(r["Eye_x"]), int(r["Eye_y"])),
+                        (int(r["ROI_x"]), int(r["ROI_y"])),
+                        clr,
+                        int(thickness),
+                    )
 
             return img
 
@@ -945,9 +946,7 @@ class PlottingMixin(object):
                     1,
                 )
                 if directing_viable and style_attr["Directionality"]:
-                    facing_col_name = "{} {} {}".format(
-                        shape_name, animal_name, "facing"
-                    )
+                    facing_col_name = "{} {} {}".format(shape_name, animal_name, "facing")
                     facing_value = bool(data.loc[current_frm, facing_col_name])
                     cv2.putText(
                         img,

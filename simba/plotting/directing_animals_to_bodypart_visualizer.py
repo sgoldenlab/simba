@@ -41,8 +41,7 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
     :parameter dict style_attr: Visualisation attributes (colors and sizes etc.)
 
 
-    Examples
-    -----
+    :example:
     >>> style_attr = {'Show_pose': True,
     >>>               'Pose_circle_size': 3,
     >>>               "Direction_color": 'Random',
@@ -50,15 +49,19 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
     >>> _ = DirectingAnimalsToBodyPartVisualizer(config_path='/Users/simon/Desktop/envs/troubleshooting/sleap_5_animals/project_folder/project_config.ini', video_name='Testing_Video_3.mp4', style_attr=style_attr).run()
     """
 
-    def __init__(self, config_path: str, data_path: str, style_attr: dict):
+    def __init__(self,
+                 config_path: str,
+                 data_path: str,
+                 style_attr: dict):
+
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
 
         self.data_path = data_path
         _, self.video_name, _ = get_fn_ext(self.data_path)
-        self.direction_analyzer = DirectingAnimalsToBodyPartAnalyzer(
-            config_path=config_path,
-        )
+        self.direction_analyzer = DirectingAnimalsToBodyPartAnalyzer(config_path=config_path)
+        self.direction_analyzer.process_directionality()
+        self.direction_analyzer.create_directionality_dfs()
         self.data_dict = self.direction_analyzer.read_directionality_dfs()
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         self.style_attr, self.pose_colors = style_attr, []
@@ -149,11 +152,9 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
                                 )
 
                     if img_cnt in frames_index:
-                        img_data = self.video_data[
-                            self.video_data["Frame_#"] == img_cnt
-                        ]
+                        img_data = self.video_data[self.video_data["Frame_#"] == img_cnt].reset_index(drop=True)
                         if self.style_attr["Polyfill"]:
-                            convex_hull_arr = img_data.loc[
+                            img_data = img_data.loc[
                                 0, ["Eye_x", "Eye_y"]
                             ].values.reshape(-1, 2)
                         else:
@@ -184,3 +185,7 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
             msg=f"Directionality video {self.video_name} saved in {self.directing_body_part_animal_video_output_path} directory",
             elapsed_time=video_timer.elapsed_time_str,
         )
+
+#
+# style_attr = {'Show_pose': True, 'Polyfill': False, 'Pose_circle_size': 3, "Direction_color": 'Random', 'Direction_thickness': 4, 'Highlight_endpoints': True}
+# _ = DirectingAnimalsToBodyPartVisualizer(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_1.csv', style_attr=style_attr).run()

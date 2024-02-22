@@ -1102,8 +1102,8 @@ class CircularStatisticsMixin(object):
         return result.astype(np.int8)
 
     @staticmethod
-    @njit([(int64[:, :, :], int64), (int64[:, :, :], types.misc.Omitted(value=100))])
-    def fit_circle(data: np.ndarray, max_iterations: Optional[int] = 100) -> np.ndarray:
+    @njit([(int64[:, :, :], int64), (int64[:, :, :], types.misc.Omitted(value=400))])
+    def fit_circle(data: np.ndarray, max_iterations: Optional[int] = 400) -> np.ndarray:
         """
         Fit a circle to a dataset using the least squares method.
 
@@ -1189,7 +1189,7 @@ class CircularStatisticsMixin(object):
                 ]
             )
 
-        return results.astype(np.int64)
+        return results
 
 
 # data_sizes = [1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000]

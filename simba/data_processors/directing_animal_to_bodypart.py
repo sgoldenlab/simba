@@ -166,7 +166,7 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
         for file_cnt, file_path in enumerate(self.body_part_directionality_paths):
             video_timer = SimbaTimer(start=True)
             _, file_name, _ = get_fn_ext(file_path)
-            results[file_name] = read_df(file_path, self.file_type)
+            results[file_name] = pd.read_csv(file_path)
             video_timer.stop_timer()
             print(
                 "read body part directionality data completed for video {} ({}/{}, elapsed time: {}s)...".format(

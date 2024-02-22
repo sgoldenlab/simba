@@ -100,9 +100,10 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                 self.y_train,
                 meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value],
             )
+
         if (
             meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value].lower()
-            == Methods.SMOTEENN.value
+            == Methods.SMOTEENN.value.lower()
         ):
             self.x_train, self.y_train = self.smoteen_oversampler(
                 self.x_train,
@@ -111,7 +112,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             )
         elif (
             meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value].lower()
-            == Methods.SMOTE.value
+            == Methods.SMOTE.value.lower()
         ):
             self.x_train, self.y_train = self.smote_oversampler(
                 self.x_train,
