@@ -293,7 +293,7 @@ class TrainModelMixin(object):
 
         print("Performing SMOTEENN oversampling...")
         smt = SMOTEENN(sampling_strategy=sample_ratio)
-        if hasattr(smt, 'fit_sample'):
+        if hasattr(smt, "fit_sample"):
             return smt.fit_sample(x_train, y_train)
         else:
             return smt.fit_resample(x_train, y_train)
@@ -318,7 +318,7 @@ class TrainModelMixin(object):
         """
         print("Performing SMOTE oversampling...")
         smt = SMOTE(sampling_strategy=sample_ratio)
-        if hasattr(smt, 'fit_sample'):
+        if hasattr(smt, "fit_sample"):
             return smt.fit_sample(x_train, y_train)
         else:
             return smt.fit_resample(x_train, y_train)
