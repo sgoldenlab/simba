@@ -3,6 +3,10 @@ __author__ = "Simon Nilsson"
 import json
 import os
 from typing import Optional, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import numpy as np
 import pandas as pd
@@ -12,9 +16,11 @@ from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
-                                check_if_keys_exist_in_dict)
+                                check_if_keys_exist_in_dict,
+                                check_instance)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import read_pickle, write_pickle
+from simba.utils.errors import InvalidInputError
 
 CLUSTERER_PARAMETERS = "CLUSTERER HYPER-PARAMETERS"
 DIMENSIONALITY_REDUCTION_PARAMETERS = "DIMENSIONALITY REDUCTION HYPER-PARAMETERS"
@@ -37,7 +43,7 @@ class DataExtractor(UnsupervisedMixin, ConfigReader):
 
     :param config_path: path to SimBA configparser.ConfigParser project_config.ini
     :param data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-    :param data_type: The type of data to extract.
+    :param data_type: The type of data to extract. E.g., CLUSTERER_PARAMETERS, DIMENSIONALITY_REDUCTION_PARAMETERS, SCALER, SCALED_DATA, LOW_VARIANCE_FIELDS, FEATURE_NAMES, FRAME_FEATURES, FRAME_POSE, FRAME_TARGET, BOUTS_FEATURES, BOUTS_TARGETS, BOUTS_DIM_CORDS
     :param settings: User-defined parameters for data extraction.
 
     :example:
@@ -45,13 +51,14 @@ class DataExtractor(UnsupervisedMixin, ConfigReader):
     >>> extractor.run()
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        data_path: Union[str, os.PathLike],
-        data_type: str,
-        settings: Optional[dict] = None,
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_path: Union[str, os.PathLike],
+                 data_type: str,
+                 settings: Optional[dict] = None):
+
+        check_file_exist_and_readable(file_path=config_path)
+
 
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
@@ -390,6 +397,9 @@ class DataExtractor(UnsupervisedMixin, ConfigReader):
                 msg=f"Bout cluster label data for {len(list(self.data.keys()))} model(s) at {self.logs_path}!",
                 elapsed_time=self.timer.elapsed_time_str,
             )
+
+        else:
+            raise InvalidInputError(msg=f'Invalid datatype {self.data_type}.')
 
 
 # test = DataExtractor(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle',

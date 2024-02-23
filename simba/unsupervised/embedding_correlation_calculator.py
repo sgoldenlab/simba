@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson"
 import itertools
 import os
 from copy import deepcopy
-from typing import Dict, Union
+from typing import Dict, Union, Any
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -12,7 +12,7 @@ import seaborn as sns
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.checks import check_file_exist_and_readable, check_instance
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import read_pickle
 
@@ -28,25 +28,26 @@ CORRELATIONS = "correlations"
 
 
 class EmbeddingCorrelationCalculator(UnsupervisedMixin, ConfigReader):
-    def __init__(
-        self,
-        data_path: Union[str, os.PathLike],
-        config_path: Union[str, os.PathLike],
-        settings: dict,
-    ):
-        """
-        Class for correlating dimensionality reduction features with original features (for explainability purposes)
+    """
+    Class for correlating dimensionality reduction features with original features for explainability purposes.
 
-        :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
-        :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-        :param dict settings: dict holding which statistical tests to use and how to create plots.
+    :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
+    :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
+    :param dict settings: dict holding which statistical tests to use and how to create plots.
 
-        :Example:
-        >>> settings = {'correlation_methods': ['pearson', 'kendall', 'spearman'], 'plots': {'create': True, 'correlations': 'pearson', 'palette': 'jet'}}
-        >>> calculator = EmbeddingCorrelationCalculator(config_path='unsupervised/project_folder/project_config.ini', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings)
-        >>> calculator.run()
-        """
+    :Example:
+    >>> settings = {'correlation_methods': ['pearson', 'kendall', 'spearman'], 'plots': {'create': True, 'correlations': 'pearson', 'palette': 'jet'}}
+    >>> calculator = EmbeddingCorrelationCalculator(config_path='unsupervised/project_folder/project_config.ini', data_path='unsupervised/cluster_models/quizzical_rhodes.pickle', settings=settings)
+    >>> calculator.run()
+    """
 
+    def __init__(self,
+                 data_path: Union[str, os.PathLike],
+                 config_path: Union[str, os.PathLike],
+                 settings: Dict[str, Any]):
+
+        check_file_exist_and_readable(file_path=config_path)
+        check_instance(source=f'{self.__class__.__name__} settings', instance=settings, accepted_types=(dict,))
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         check_file_exist_and_readable(file_path=data_path)

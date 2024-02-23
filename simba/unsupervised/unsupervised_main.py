@@ -310,6 +310,6 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
         threading.Thread(target=dataset_creator.run()).start()
 
 
-UnsupervisedGUI(
-    config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini"
-)
+# UnsupervisedGUI(
+#     config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini"
+# )

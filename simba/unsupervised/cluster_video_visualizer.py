@@ -32,10 +32,13 @@ class ClusterVideoVisualizer(ConfigReader, UnsupervisedMixin):
     """
     Class for creating video examples of cluster assignments.
 
-    :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
-    :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-    :param str video_dir: path to directory holding videos.
-    :param dict settings: dict holding attributes of the videos
+
+    :param Union[str, os.PathLike] config_path: Path to SimBA project configuration file.
+    :param Union[str, os.PathLike] data_path: Path to pickle file containing unsupervised results.
+    :param Optional[Union[int, None]] max_videos: Maximum number of videos to create for each cluster. Defaults to None.
+    :param Optional[int] speed: Speed of the generated videos. Defaults to 1.0.
+    :param Optional[Tuple[int, int, int]] bg_clr: Background color of the videos as RGB tuple. Defaults to white (255, 255, 255).
+    :param Optional[Literal] plot_type: Type of plot to generate ('VIDEO', 'HULL', 'SKELETON', 'POINTS'). Defaults to 'SKELETON'.
 
     :example:
     >>> config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini'
@@ -44,36 +47,30 @@ class ClusterVideoVisualizer(ConfigReader, UnsupervisedMixin):
     >>> visualizer.run()
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        data_path: Union[str, os.PathLike],
-        max_videos: Optional[Union[int, None]] = None,
-        speed: Optional[int] = 1.0,
-        bg_clr: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        plot_type: Optional[
-            Literal["VIDEO", "HULL", "SKELETON", "POINTS"]
-        ] = "SKELETON",
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_path: Union[str, os.PathLike],
+                 max_videos: Optional[Union[int, None]] = None,
+                 speed: Optional[int] = 1.0,
+                 bg_clr: Optional[Tuple[int, int, int]] = (255, 255, 255),
+                 plot_type: Optional[Literal["VIDEO", "HULL", "SKELETON", "POINTS"] ] = "SKELETON"):
 
+        check_file_exist_and_readable(file_path=data_path)
+        check_file_exist_and_readable(file_path=config_path)
+        check_if_valid_rgb_tuple(data=bg_clr)
+        if max_videos != None:
+            check_int(name="max_videos", value=max_videos, min_value=1)
+        check_float(name="speed", value=speed, min_value=0.1)
+        check_str(name="plot_type", value=plot_type, options=("VIDEO", "HULL", "SKELETON", "POINTS"))
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
-        check_file_exist_and_readable(file_path=data_path)
         self.data = read_pickle(data_path=data_path)
         check_if_keys_exist_in_dict(
             data=self.data,
             key=[Clustering.CLUSTER_MODEL.value],
             name=ClusterVideoVisualizer.__name__,
         )
-        check_if_valid_rgb_tuple(data=bg_clr)
-        if max_videos != None:
-            check_int(name="max_videos", value=max_videos, min_value=1)
-        check_float(name="speed", value=speed, min_value=0.1)
-        check_str(
-            name="plot_type",
-            value=plot_type,
-            options=("VIDEO", "HULL", "SKELETON", "POINTS"),
-        )
+
         self.max_videos, self.speed, self.plot_type = max_videos, speed, plot_type
         self.bg_clr = bg_clr
 

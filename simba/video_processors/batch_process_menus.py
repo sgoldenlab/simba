@@ -50,12 +50,8 @@ class BatchProcessFrame(PopUpMixin):
 
     """
 
-    def __init__(
-        self, input_dir: Union[str, os.PathLike], output_dir: Union[str, os.PathLike]
-    ):
-        PopUpMixin.__init__(
-            self, title="BATCH PRE-PROCESS VIDEOS IN SIMBA", size=(1600, 600)
-        )
+    def __init__(self, input_dir: Union[str, os.PathLike], output_dir: Union[str, os.PathLike]):
+        PopUpMixin.__init__(self, title="BATCH PRE-PROCESS VIDEOS IN SIMBA", size=(2400, 600))
         self.input_dir, self.output_dir = input_dir, output_dir
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)

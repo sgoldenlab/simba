@@ -46,11 +46,11 @@ ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 
 class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
     """
-    Class for computing frequentist statitics based on cluster assignment labels (for explainability purposes).
+    Class for computing frequentist statitics based on cluster assignment labels for explainability purposes.
 
-    :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
-    :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-    :param dict settings: dict holding which statistical tests to use
+    :param Union[str, os.PathLike] config_path: path to SimBA configparser.ConfigParser project_config.ini
+    :param Union[str, os.PathLike] data_path: path to pickle holding unsupervised results in ``simba.unsupervised.data_map.yaml`` format.
+    :param dict settings: Dict holding which statistical tests to use, with test name as keys and booleans as values.
 
     :example:
     >>> settings = {'scaled': True, 'ANOVA': True, 'tukey_posthoc': True, 'descriptive_statistics': True}
@@ -58,17 +58,16 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
     >>> calculator.run()
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        data_path: Union[str, os.PathLike],
-        settings: Dict[str, bool],
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_path: Union[str, os.PathLike],
+                 settings: Dict[str, bool]):
 
+        check_file_exist_and_readable(file_path=data_path)
+        check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         self.settings = settings
-        check_file_exist_and_readable(file_path=data_path)
         self.data = self.read_pickle(data_path=data_path)
         self.save_path = os.path.join(
             self.logs_path,

@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os
+from typing import Union, Dict, Any
 
 import numpy as np
 import pandas as pd
@@ -10,7 +11,8 @@ from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.bout_aggregator import bout_aggregator
 from simba.unsupervised.enums import Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_filepath_list_is_empty)
+                                check_if_filepath_list_is_empty,
+                                check_instance)
 from simba.utils.errors import NoDataError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_pickle
@@ -19,17 +21,22 @@ from simba.utils.read_write import get_fn_ext, read_df, write_pickle
 class DatasetCreator(ConfigReader, UnsupervisedMixin):
     """
     Transform raw frame-wise supervised classification data into aggregated
-    data for unsupervised analyses.
+    data for unsupervised analyses. Saves the aggergated data in to logs directory of the SimBa project.
 
-    :param config_path: path to SimBA configparser.ConfigParser project_config.ini
-    :param settings: user attributes for how the data should be aggregated.
+    :param Union[str, os.PathLike] config_path: path to SimBA configparser.ConfigParser project_config.ini
+    :param Dict[str, Any] settings: Attributes for which data should be included and how the data should be aggregated.
 
     :example:
     >>> settings = {'data_slice': 'ALL FEATURES (EXCLUDING POSE)', 'clf_slice': 'Attack', 'bout_aggregation_type': 'MEDIAN', 'min_bout_length': 66, 'feature_path': '/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv'}
-    >>> _ = DatasetCreator(config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini', settings=settings)
+    >>> db_creator = DatasetCreator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini', settings=settings)
+    >>> db_creator.run()
     """
 
-    def __init__(self, config_path: str, settings: dict):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 settings: Dict[str, Any]):
+        check_file_exist_and_readable(file_path=config_path)
+        check_instance(source=f'{self.__class__.__name__} settings', instance=settings, accepted_types=(dict,))
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         print(
@@ -197,10 +204,6 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
         )
 
 
-# settings = {'data_slice': 'ALL FEATURES (EXCLUDING POSE)',
-#             'clf_slice': 'Attack',
-#             'bout_aggregation_type': 'MEDIAN',
-#             'min_bout_length': 66,
-#             'feature_path': '/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv'}
-# #
-# creator = DatasetCreator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini', settings=settings)
+settings = {'data_slice': 'ALL FEATURES (EXCLUDING POSE)', 'clf_slice': 'Attack', 'bout_aggregation_type': 'MEDIAN', 'min_bout_length': 66, 'feature_path': '/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv'}
+db_creator = DatasetCreator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini', settings=settings)
+db_creator.run()

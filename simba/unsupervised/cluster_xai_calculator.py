@@ -1,7 +1,7 @@
 import itertools
 import os
 from copy import deepcopy
-from typing import Dict, Optional, Union
+from typing import Optional, Dict, Any, Union
 
 import numpy as np
 import pandas as pd
@@ -13,7 +13,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_keys_exist_in_dict)
+                                check_if_keys_exist_in_dict,
+                                check_instance)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_success
 
@@ -46,13 +47,16 @@ ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 
 
 class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
-    def __init__(self, data_path: str, config_path: str, settings: dict):
+    def __init__(self,
+                 data_path: Union[str, os.PathLike],
+                 config_path: Union[str, os.PathLike],
+                 settings: Dict[str, Any]):
         """
         Class for building RF models on top of cluster assignments, and calculating explainability metrics on RF models
 
-        :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
-        :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
-        :param dict settings: dict holding which tests to use.
+        :param Union[str, os.PathLike] config_path: path to SimBA configparser.ConfigParser project_config.ini
+        :param Union[str, os.PathLike] data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
+        :param Dict[str, Any] settings: Dict holding which explainability tests to use.
 
         :Example:
         >>> settings = {'gini_importance': True, 'permutation_importance': True, 'shap': {'method': 'cluster_paired', 'create': True, 'sample': 100}}
@@ -60,10 +64,12 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         >>> calculator.run()
         """
 
+        check_file_exist_and_readable(file_path=data_path)
+        check_file_exist_and_readable(file_path=config_path)
+        check_instance(source=f'{self.__class__.__name__} settings', instance=settings, accepted_types=(dict,))
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         self.settings, self.data_path = settings, data_path
-        check_file_exist_and_readable(file_path=data_path)
         self.data = self.read_pickle(data_path=self.data_path)
         check_if_keys_exist_in_dict(
             data=self.data,
@@ -355,21 +361,21 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             )
 
 
-settings = {
-    "gini_importance": False,
-    "permutation_importance": False,
-    "shap": {"method": "cluster_paired", "run": True, "sample": 10},
-}
-settings = {
-    "gini_importance": False,
-    "permutation_importance": False,
-    "shap": {"method": "One-against-all", "run": True, "sample": 10},
-}
-calculator = ClusterXAICalculator(
-    config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini",
-    data_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle",
-    settings=settings,
-)
-
-
-calculator.run()
+# settings = {
+#     "gini_importance": False,
+#     "permutation_importance": False,
+#     "shap": {"method": "cluster_paired", "run": True, "sample": 10},
+# }
+# settings = {
+#     "gini_importance": False,
+#     "permutation_importance": False,
+#     "shap": {"method": "One-against-all", "run": True, "sample": 10},
+# }
+# calculator = ClusterXAICalculator(
+#     config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini",
+#     data_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle",
+#     settings=settings,
+# )
+#
+#
+# calculator.run()
