@@ -58,10 +58,12 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
     >>> calculator.run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 data_path: Union[str, os.PathLike],
-                 settings: Dict[str, bool]):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        data_path: Union[str, os.PathLike],
+        settings: Dict[str, bool],
+    ):
 
         check_file_exist_and_readable(file_path=data_path)
         check_file_exist_and_readable(file_path=config_path)

@@ -2,7 +2,7 @@ __author__ = "Simon Nilsson"
 
 import glob
 import os
-from typing import List, Union, Dict, Any
+from typing import Any, Dict, List, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,9 +12,8 @@ import seaborn as sns
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_if_dir_exists,
-                                check_instance,
                                 check_if_filepath_list_is_empty,
-                                check_if_keys_exist_in_dict,
+                                check_if_keys_exist_in_dict, check_instance,
                                 check_that_column_exist, check_valid_lst)
 from simba.utils.enums import Formats
 from simba.utils.printing import stdout_success
@@ -36,15 +35,21 @@ class GridSearchVisualizer(UnsupervisedMixin):
     >>> visualizer.categorical_visualizer(categoricals=['CLUSTER'])
     """
 
-    def __init__(self,
-                 model_dir: Union[str, os.PathLike],
-                 save_dir: Union[str, os.PathLike],
-                 settings: Dict[str, Any]):
+    def __init__(
+        self,
+        model_dir: Union[str, os.PathLike],
+        save_dir: Union[str, os.PathLike],
+        settings: Dict[str, Any],
+    ):
 
         super().__init__()
         check_if_dir_exists(in_dir=save_dir)
         check_if_dir_exists(in_dir=model_dir)
-        check_instance(source=f'{self.__class__.__name__} settings', instance=settings, accepted_types=(dict,))
+        check_instance(
+            source=f"{self.__class__.__name__} settings",
+            instance=settings,
+            accepted_types=(dict,),
+        )
         self.save_dir, self.settings, self.model_dir = save_dir, settings, model_dir
         self.data_path = glob.glob(model_dir + f"/*.{Formats.PICKLE.value}")
         check_if_keys_exist_in_dict(

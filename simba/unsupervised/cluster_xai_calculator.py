@@ -1,7 +1,7 @@
 import itertools
 import os
 from copy import deepcopy
-from typing import Optional, Dict, Any, Union
+from typing import Any, Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -13,8 +13,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_keys_exist_in_dict,
-                                check_instance)
+                                check_if_keys_exist_in_dict, check_instance)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_success
 
@@ -47,10 +46,12 @@ ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 
 
 class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
-    def __init__(self,
-                 data_path: Union[str, os.PathLike],
-                 config_path: Union[str, os.PathLike],
-                 settings: Dict[str, Any]):
+    def __init__(
+        self,
+        data_path: Union[str, os.PathLike],
+        config_path: Union[str, os.PathLike],
+        settings: Dict[str, Any],
+    ):
         """
         Class for building RF models on top of cluster assignments, and calculating explainability metrics on RF models
 
@@ -66,7 +67,11 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
 
         check_file_exist_and_readable(file_path=data_path)
         check_file_exist_and_readable(file_path=config_path)
-        check_instance(source=f'{self.__class__.__name__} settings', instance=settings, accepted_types=(dict,))
+        check_instance(
+            source=f"{self.__class__.__name__} settings",
+            instance=settings,
+            accepted_types=(dict,),
+        )
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         self.settings, self.data_path = settings, data_path

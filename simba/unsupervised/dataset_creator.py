@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import Union, Dict, Any
+from typing import Any, Dict, Union
 
 import numpy as np
 import pandas as pd
@@ -32,11 +32,13 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
     >>> db_creator.run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 settings: Dict[str, Any]):
+    def __init__(self, config_path: Union[str, os.PathLike], settings: Dict[str, Any]):
         check_file_exist_and_readable(file_path=config_path)
-        check_instance(source=f'{self.__class__.__name__} settings', instance=settings, accepted_types=(dict,))
+        check_instance(
+            source=f"{self.__class__.__name__} settings",
+            instance=settings,
+            accepted_types=(dict,),
+        )
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         print(
@@ -204,6 +206,15 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
         )
 
 
-settings = {'data_slice': 'ALL FEATURES (EXCLUDING POSE)', 'clf_slice': 'Attack', 'bout_aggregation_type': 'MEDIAN', 'min_bout_length': 66, 'feature_path': '/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv'}
-db_creator = DatasetCreator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini', settings=settings)
+settings = {
+    "data_slice": "ALL FEATURES (EXCLUDING POSE)",
+    "clf_slice": "Attack",
+    "bout_aggregation_type": "MEDIAN",
+    "min_bout_length": 66,
+    "feature_path": "/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv",
+}
+db_creator = DatasetCreator(
+    config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini",
+    settings=settings,
+)
 db_creator.run()
