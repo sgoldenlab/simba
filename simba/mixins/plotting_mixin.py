@@ -946,7 +946,9 @@ class PlottingMixin(object):
                     1,
                 )
                 if directing_viable and style_attr["Directionality"]:
-                    facing_col_name = "{} {} {}".format(shape_name, animal_name, "facing")
+                    facing_col_name = "{} {} {}".format(
+                        shape_name, animal_name, "facing"
+                    )
                     facing_value = bool(data.loc[current_frm, facing_col_name])
                     cv2.putText(
                         img,
