@@ -1062,7 +1062,9 @@ def multi_split_video(
 # multi_split_video(file_path=r'/Users/simon/Desktop/time_s_converted.mp4', start_times=['00:00:01', '00:00:02'], end_times=['00:00:04', '00:00:05'], gpu=False)
 
 
-def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def crop_single_video(
+    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
+) -> None:
     """
     Crop a single video using ``simba.video_processors.roi_selector.ROISelector`` interface. Results is saved in the same directory as input video with the
     ``_cropped.mp4`` suffix`.

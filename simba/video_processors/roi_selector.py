@@ -27,7 +27,13 @@ class ROISelector:
     >>> img_selector.run()
     """
 
-    def __init__(self, path: Union[str, os.PathLike], thickness: int = 10, clr: Tuple[int, int, int] = (147, 20, 255), title: Optional[str] = None,) -> None:
+    def __init__(
+        self,
+        path: Union[str, os.PathLike],
+        thickness: int = 10,
+        clr: Tuple[int, int, int] = (147, 20, 255),
+        title: Optional[str] = None,
+    ) -> None:
         check_file_exist_and_readable(file_path=path)
         check_if_valid_rgb_tuple(data=clr)
         check_int(name="Thickness", value=thickness, min_value=1, raise_error=True)
@@ -127,20 +133,35 @@ class ROISelector:
                     break
 
     def run_checks(self):
-        self.top_left = min(self.roi_start[0], self.roi_end[0]), min(self.roi_start[1], self.roi_end[1])
-        self.bottom_right = max(self.roi_start[0], self.roi_end[0]), max(self.roi_start[1], self.roi_end[1])
-        if self.top_left[0] < 0: self.top_left = (0, self.top_left[1])
-        if self.top_left[1] < 0: self.top_left = (self.top_left[0], 0)
-        if self.bottom_right[0] < 0: self.bottom_right = (0, self.bottom_right[1])
-        if self.bottom_right[1] < 0: self.bottom_right = (self.bottom_right[0], 0)
+        self.top_left = min(self.roi_start[0], self.roi_end[0]), min(
+            self.roi_start[1], self.roi_end[1]
+        )
+        self.bottom_right = max(self.roi_start[0], self.roi_end[0]), max(
+            self.roi_start[1], self.roi_end[1]
+        )
+        if self.top_left[0] < 0:
+            self.top_left = (0, self.top_left[1])
+        if self.top_left[1] < 0:
+            self.top_left = (self.top_left[0], 0)
+        if self.bottom_right[0] < 0:
+            self.bottom_right = (0, self.bottom_right[1])
+        if self.bottom_right[1] < 0:
+            self.bottom_right = (self.bottom_right[0], 0)
 
-        if self.bottom_right[0] > self.w: self.bottom_right = (self.w, self.bottom_right[1])
-        if self.bottom_right[1] > self.h: self.bottom_right = (self.bottom_right[0], self.h)
+        if self.bottom_right[0] > self.w:
+            self.bottom_right = (self.w, self.bottom_right[1])
+        if self.bottom_right[1] > self.h:
+            self.bottom_right = (self.bottom_right[0], self.h)
         self.width = self.bottom_right[0] - self.top_left[0]
         self.height = self.bottom_right[1] - self.top_left[1]
 
-        if (self.width == 0 and self.height == 0) or (self.width + self.height + self.top_left[0] + self.top_left[1] == 0):
-            CropWarning(msg="CROP WARNING: Cropping height and width are both 0. Please try again.", source=self.__class__.__name__,)
+        if (self.width == 0 and self.height == 0) or (
+            self.width + self.height + self.top_left[0] + self.top_left[1] == 0
+        ):
+            CropWarning(
+                msg="CROP WARNING: Cropping height and width are both 0. Please try again.",
+                source=self.__class__.__name__,
+            )
             return False
 
         else:
