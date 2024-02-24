@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson"
 import itertools
 import os
 from copy import deepcopy
-from typing import Dict, Union, Any
+from typing import Any, Dict, Union
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -41,13 +41,19 @@ class EmbeddingCorrelationCalculator(UnsupervisedMixin, ConfigReader):
     >>> calculator.run()
     """
 
-    def __init__(self,
-                 data_path: Union[str, os.PathLike],
-                 config_path: Union[str, os.PathLike],
-                 settings: Dict[str, Any]):
+    def __init__(
+        self,
+        data_path: Union[str, os.PathLike],
+        config_path: Union[str, os.PathLike],
+        settings: Dict[str, Any],
+    ):
 
         check_file_exist_and_readable(file_path=config_path)
-        check_instance(source=f'{self.__class__.__name__} settings', instance=settings, accepted_types=(dict,))
+        check_instance(
+            source=f"{self.__class__.__name__} settings",
+            instance=settings,
+            accepted_types=(dict,),
+        )
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         check_file_exist_and_readable(file_path=data_path)

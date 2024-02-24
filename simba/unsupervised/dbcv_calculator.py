@@ -46,9 +46,9 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     >>> results = dbcv_calculator.run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 data_path: Union[str, os.PathLike]):
+    def __init__(
+        self, config_path: Union[str, os.PathLike], data_path: Union[str, os.PathLike]
+    ):
 
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)

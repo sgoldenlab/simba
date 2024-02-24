@@ -1,16 +1,22 @@
+import functools
+import multiprocessing
 from typing import List, Optional, Union
+
 import numpy as np
-from simba.mixins.geometry_mixin import GeometryMixin
 from shapely.geometry import Point
 
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import check_int, check_valid_array
 from simba.utils.enums import Defaults
 from simba.utils.read_write import find_core_cnt
 
-from simba.utils.checks import check_valid_array, check_int
-import functools
-import multiprocessing
 
-def multiframe_bodypart_to_point(data: np.ndarray, core_cnt: Optional[int] = -1, buffer: Optional[int] = None, px_per_mm: Optional[int] = None) -> Union[List[Point], List[List[Point]]]:
+def multiframe_bodypart_to_point(
+    data: np.ndarray,
+    core_cnt: Optional[int] = -1,
+    buffer: Optional[int] = None,
+    px_per_mm: Optional[int] = None,
+) -> Union[List[Point], List[List[Point]]]:
     """
     Process multiple frames of body part data in parallel and convert them to shapely Points.
 
@@ -35,15 +41,26 @@ def multiframe_bodypart_to_point(data: np.ndarray, core_cnt: Optional[int] = -1,
     >>> point_lst_of_lst = multiframe_bodypart_to_point(data=data)
     """
 
-    check_valid_array(data=data, accepted_dtypes=(np.int64, np.int32, np.int8), accepted_ndims=(2, 3))
-    check_int(name=GeometryMixin().multiframe_bodypart_to_point.__name__, value=core_cnt, min_value=-1)
-    if core_cnt == -1: core_cnt = find_core_cnt()[0]
+    check_valid_array(
+        data=data, accepted_dtypes=(np.int64, np.int32, np.int8), accepted_ndims=(2, 3)
+    )
+    check_int(
+        name=GeometryMixin().multiframe_bodypart_to_point.__name__,
+        value=core_cnt,
+        min_value=-1,
+    )
+    if core_cnt == -1:
+        core_cnt = find_core_cnt()[0]
     results = []
     data_ndim = data.ndim
     if data_ndim == 2:
         data = np.array_split(data, core_cnt)
-    with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-        constants = functools.partial(GeometryMixin.bodyparts_to_points, buffer=buffer, px_per_mm=px_per_mm)
+    with multiprocessing.Pool(
+        core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
+    ) as pool:
+        constants = functools.partial(
+            GeometryMixin.bodyparts_to_points, buffer=buffer, px_per_mm=px_per_mm
+        )
         for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
             results.append(result)
     pool.join()
@@ -54,7 +71,6 @@ def multiframe_bodypart_to_point(data: np.ndarray, core_cnt: Optional[int] = -1,
         return results
 
 
-
-#data = np.random.randint(0, 100, (10, 2))
+# data = np.random.randint(0, 100, (10, 2))
 data = np.random.randint(0, 100, (10, 10, 2))
 points = multiframe_bodypart_to_point(data=data)

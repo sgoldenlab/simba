@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import json
 import os
 from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
@@ -16,11 +17,10 @@ from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
-                                check_if_keys_exist_in_dict,
-                                check_instance)
+                                check_if_keys_exist_in_dict, check_instance)
+from simba.utils.errors import InvalidInputError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import read_pickle, write_pickle
-from simba.utils.errors import InvalidInputError
 
 CLUSTERER_PARAMETERS = "CLUSTERER HYPER-PARAMETERS"
 DIMENSIONALITY_REDUCTION_PARAMETERS = "DIMENSIONALITY REDUCTION HYPER-PARAMETERS"
@@ -51,14 +51,15 @@ class DataExtractor(UnsupervisedMixin, ConfigReader):
     >>> extractor.run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 data_path: Union[str, os.PathLike],
-                 data_type: str,
-                 settings: Optional[dict] = None):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        data_path: Union[str, os.PathLike],
+        data_type: str,
+        settings: Optional[dict] = None,
+    ):
 
         check_file_exist_and_readable(file_path=config_path)
-
 
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
@@ -399,7 +400,7 @@ class DataExtractor(UnsupervisedMixin, ConfigReader):
             )
 
         else:
-            raise InvalidInputError(msg=f'Invalid datatype {self.data_type}.')
+            raise InvalidInputError(msg=f"Invalid datatype {self.data_type}.")
 
 
 # test = DataExtractor(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle',
