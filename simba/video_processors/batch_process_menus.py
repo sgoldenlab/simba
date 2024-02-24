@@ -4,7 +4,7 @@ import json
 import os
 import re
 from tkinter import *
-from typing import Union
+from typing import Union, Tuple
 
 import cv2
 
@@ -566,10 +566,7 @@ class BatchProcessFrame(PopUpMixin):
 
     def batch_process_crop_function(self, video_name):
         check_file_exist_and_readable(self.videos_in_dir_dict[video_name]["file_path"])
-        roi_selector = ROISelector(
-            path=self.videos_in_dir_dict[video_name]["file_path"],
-            title=f"CROP {video_name} - Press ESC when ROI drawn",
-        )
+        roi_selector = ROISelector(path=self.videos_in_dir_dict[video_name]["file_path"], title=f"CROP {video_name} - Press ESC when ROI drawn")
         roi_selector.run()
         self.crop_dict[video_name] = {}
         self.crop_dict[video_name]["top_left_x"] = roi_selector.top_left[0]
@@ -750,8 +747,8 @@ class BatchProcessFrame(PopUpMixin):
         )
 
 
-# test = BatchProcessFrame(input_dir=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos',
-#                          output_dir=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/edited')
+# test = BatchProcessFrame(input_dir=r'/Users/simon/Desktop',
+#                          output_dir=r'/Users/simon/Desktop/edited')
 # test.create_main_window()
 # test.create_video_table_headings()
 # test.create_video_rows()

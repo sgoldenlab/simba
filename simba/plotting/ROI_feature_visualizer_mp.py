@@ -134,7 +134,6 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader, PlottingMixin):
                 ].reset_index(drop=True)
         else:
             self.directing_data = None
-        print(self.directing_data)
         self.roi_feature_creator.out_df.fillna(0, inplace=True)
 
     def __calc_text_locs(self):
