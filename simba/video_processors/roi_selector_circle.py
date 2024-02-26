@@ -1,17 +1,17 @@
 import os
+from typing import Optional, Tuple, Union
+
 import cv2
 import numpy as np
 
-from typing import Union, Tuple, Optional
-from simba.utils.enums import Options
-from simba.utils.warnings import CropWarning
-from simba.utils.errors import InvalidFileTypeError
-from simba.utils.read_write import read_frm_of_video, get_fn_ext
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_rgb_tuple,
-                                check_int,
-                                check_str,
-                                check_if_valid_img)
+                                check_if_valid_img, check_if_valid_rgb_tuple,
+                                check_int, check_str)
+from simba.utils.enums import Options
+from simba.utils.errors import InvalidFileTypeError
+from simba.utils.read_write import get_fn_ext, read_frm_of_video
+from simba.utils.warnings import CropWarning
+
 
 class ROISelectorCircle(object):
     """
@@ -33,16 +33,19 @@ class ROISelectorCircle(object):
     >>> circle_selector.run()
     """
 
-    def __init__(self,
-                 path: Union[str, os.PathLike],
-                 thickness: int = 10,
-                 clr: Tuple[int, int, int] = (147, 20, 255),
-                 title: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        path: Union[str, os.PathLike],
+        thickness: int = 10,
+        clr: Tuple[int, int, int] = (147, 20, 255),
+        title: Optional[str] = None,
+    ) -> None:
 
         check_file_exist_and_readable(file_path=path)
         check_if_valid_rgb_tuple(data=clr)
         check_int(name="Thickness", value=thickness, min_value=1, raise_error=True)
-        if title is not None: check_str(name="ROI title window", value=title)
+        if title is not None:
+            check_str(name="ROI title window", value=title)
 
         if isinstance(path, np.ndarray):
             check_if_valid_img(path, source=self.__class__.__name__, raise_error=True)
@@ -55,14 +58,18 @@ class ROISelectorCircle(object):
             elif ext in Options.ALL_IMAGE_FORMAT_OPTIONS.value:
                 self.image = cv2.imread(path)
             else:
-                raise InvalidFileTypeError( msg=f"Cannot crop a {ext} file.", source=self.__class__.__name__)
+                raise InvalidFileTypeError(
+                    msg=f"Cannot crop a {ext} file.", source=self.__class__.__name__
+                )
             if title is None:
                 title = f"Draw ROI video {filename} - Press ESC when drawn"
 
         self.img_cpy = self.image.copy()
         self.w, self.h = self.image.shape[1], self.image.shape[0]
-        if title is None: self.title = "Draw ROI - Press ESC when drawn"
-        else: self.title = title
+        if title is None:
+            self.title = "Draw ROI - Press ESC when drawn"
+        else:
+            self.title = title
 
         self.drawing, self.clr, self.thickness = False, clr, thickness
         self.circle_center, self.circle_radius = (-1, -1), 1
@@ -73,33 +80,53 @@ class ROISelectorCircle(object):
             self.circle_center = (x, y)
         elif event == cv2.EVENT_MOUSEMOVE:
             if self.drawing:
-                self.circle_radius = max(abs(x - self.circle_center[0]), abs(y - self.circle_center[1]))
+                self.circle_radius = max(
+                    abs(x - self.circle_center[0]), abs(y - self.circle_center[1])
+                )
         elif event == cv2.EVENT_LBUTTONUP:
             self.drawing = False
-            self.circle_radius = max(abs(x - self.circle_center[0]), abs(y - self.circle_center[1]))
+            self.circle_radius = max(
+                abs(x - self.circle_center[0]), abs(y - self.circle_center[1])
+            )
+
     def run(self):
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.title, self.draw_circle)
         while True:
             img_copy = self.image.copy()
             if self.drawing:
-                cv2.circle(img_copy, self.circle_center, self.circle_radius, self.clr, self.thickness)
+                cv2.circle(
+                    img_copy,
+                    self.circle_center,
+                    self.circle_radius,
+                    self.clr,
+                    self.thickness,
+                )
             cv2.imshow(self.title, img_copy)
             key = cv2.waitKey(1)
-            if key in [27, ord('q'), ord('Q'), ord(' ')]:
+            if key in [27, ord("q"), ord("Q"), ord(" ")]:
                 if self.run_checks():
                     cv2.destroyAllWindows()
                     cv2.waitKey(1)
                     break
+
     def run_checks(self):
-        if ((self.circle_center[0] - self.circle_radius) < 0) or \
-                ((self.circle_center[0] + self.circle_radius) > self.w) or \
-            ((self.circle_center[1] - self.circle_radius) < 0) or \
-                ((self.circle_center[1] + self.circle_radius) > self.h):
-            CropWarning(msg="CROP WARNING: Selected ROI radius extends beyond the image. Please try again.", source=self.__class__.__name__,)
+        if (
+            ((self.circle_center[0] - self.circle_radius) < 0)
+            or ((self.circle_center[0] + self.circle_radius) > self.w)
+            or ((self.circle_center[1] - self.circle_radius) < 0)
+            or ((self.circle_center[1] + self.circle_radius) > self.h)
+        ):
+            CropWarning(
+                msg="CROP WARNING: Selected ROI radius extends beyond the image. Please try again.",
+                source=self.__class__.__name__,
+            )
             return False
         if self.circle_radius == 0:
-            CropWarning(msg="CROP WARNING: Selected ROI radius equals 0. Please try again.", source=self.__class__.__name__, )
+            CropWarning(
+                msg="CROP WARNING: Selected ROI radius equals 0. Please try again.",
+                source=self.__class__.__name__,
+            )
             return False
         else:
             return True

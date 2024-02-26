@@ -544,6 +544,7 @@ class Links(Enum):
     COUNT_ANNOTATIONS_OUTSIDE_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-project-annotation-counts"
     CIRCLE_CROP = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop"
 
+
 class Labelling(Enum):
     PADDING = 5
     MAX_FRM_SIZE = (1280, 650)

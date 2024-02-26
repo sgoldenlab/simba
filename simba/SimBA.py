@@ -123,12 +123,12 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ChangeFpsSingleVideoPopUp, ChangeImageFormatPopUp, CLAHEPopUp,
     ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
     ConvertROIDefinitionsPopUp, ConvertVideoPopUp, CreateGIFPopUP,
-    CropVideoPopUp, DownsampleVideoPopUp, ExtractAllFramesPopUp,
-    ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
+    CropVideoCirclesPopUp, CropVideoPopUp, DownsampleVideoPopUp,
+    ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
     ExtractSpecificFramesPopUp, GreyscaleSingleVideoPopUp,
     ImportFrameDirectoryPopUp, MergeFrames2VideoPopUp, MultiCropPopUp,
     MultiShortenPopUp, SuperImposeFrameCountPopUp, VideoRotatorPopUp,
-    VideoTemporalJoinPopUp, CropVideoCirclesPopUp)
+    VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect

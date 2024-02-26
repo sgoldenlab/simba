@@ -21,7 +21,9 @@ from simba.utils.read_write import get_fn_ext, read_df, write_df
         (float64[:, :], float32[:, :], float64),
     ]
 )
-def calculate_weighted_avg(bp: np.ndarray, p: Union[np.ndarray, None], threshold: float):
+def calculate_weighted_avg(
+    bp: np.ndarray, p: Union[np.ndarray, None], threshold: float
+):
     results = np.full((bp.shape[0]), np.nan)
     n = bp.shape[0]
     for i in prange(n):
@@ -43,7 +45,9 @@ def calculate_weighted_avg(bp: np.ndarray, p: Union[np.ndarray, None], threshold
 
 
 @njit([(float32[:, :], float32[:, :], float32[:, :], float64)])
-def polygon_fill(x_bps: np.ndarray, y_bps: np.ndarray, p_bps: np.ndarray, threshold: float):
+def polygon_fill(
+    x_bps: np.ndarray, y_bps: np.ndarray, p_bps: np.ndarray, threshold: float
+):
     results = np.full((x_bps.shape[0], x_bps[0].shape[0], 2), np.nan)
     for frm_cnt in prange(x_bps.shape[0]):
         frm_bp_cnt = 0
@@ -63,6 +67,7 @@ def polygon_fill(x_bps: np.ndarray, y_bps: np.ndarray, p_bps: np.ndarray, thresh
 
     return results
 
+
 def get_circle_fit_angle(x: np.ndarray, y: np.ndarray, p: np.ndarray, threshold: float):
     combined_arr = np.stack((x, y), axis=2)
     circles = CircularStatisticsMixin.fit_circle(data=combined_arr)
@@ -70,7 +75,9 @@ def get_circle_fit_angle(x: np.ndarray, y: np.ndarray, p: np.ndarray, threshold:
     diff_y_last = y[:, -1] - circles[:, 1]
     diff_x_first = x[:, 0] - circles[:, 0]
     diff_y_first = y[:, 0] - circles[:, 1]
-    angles = np.degrees(np.arctan2(diff_y_last, diff_x_last) - np.arctan2(diff_y_first, diff_x_first))
+    angles = np.degrees(
+        np.arctan2(diff_y_last, diff_x_last) - np.arctan2(diff_y_first, diff_x_first)
+    )
     angles = angles + 360 * (angles < 0)
 
     below_thresh_idx = np.argwhere(np.average(p, axis=1) < threshold)
