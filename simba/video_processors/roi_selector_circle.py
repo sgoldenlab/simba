@@ -26,6 +26,13 @@ class ROISelectorCircle(object):
     :raises InvalidFileTypeError: If the file type is not supported.
     :raises CropWarning: If the selected ROI extends beyond the image boundaries or if the ROI radius equals zero.
 
+    .. image:: _static/img/circle_crop_2.gif
+       :width: 700
+       :align: center
+
+    .. notes::
+       `Circle crop tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop>`__.
+
     :example:
     >>> circle_selector = ROISelectorCircle(path='/Users/simon/Desktop/amber.png')
     >>> circle_selector.run()
