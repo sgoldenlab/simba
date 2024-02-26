@@ -559,9 +559,9 @@ Sometimes, we may want to crop videos according to user-defined circles rather t
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/crop_circles_3.png" />
-</p
+</p>
 
-2) To circle crop a single video, select the video path in the top menu and click the <kbd>Crop</kbd> button. 
+2). To circle crop a single video, select the video path in the top menu and click the <kbd>Crop</kbd> button. 
 
 3). The first frame of the video should pop open. Click and hold-down the left mouse-button at the center of your to-be cropped region. The, drag the mouse towards teh outer boundary of the circle regions. Finally, **without letting go of the left mouse button**, hit the ESC, SPACE or Q button on your keyboard.  See the videos below for expected input and output. 
 
