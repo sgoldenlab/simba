@@ -974,8 +974,12 @@ class ImageMixin(object):
         return padded_images
 
     @staticmethod
-    def img_stack_to_video(imgs: Dict[int, np.ndarray], save_path: Union[str, os.PathLike], fps: int, verbose: Optional[bool] = True):
-
+    def img_stack_to_video(
+        imgs: Dict[int, np.ndarray],
+        save_path: Union[str, os.PathLike],
+        fps: int,
+        verbose: Optional[bool] = True,
+    ):
         """
         Convert a dictionary of images into a video file.
 
@@ -987,7 +991,6 @@ class ImageMixin(object):
         :param int fps: Frames per second (FPS) of the output video.
         :param Optional[bool] verbose: If True, prints progress messages. Defaults to True.
         """
-
 
         check_instance(
             source=ImageMixin.img_stack_to_video.__name__,
@@ -1009,7 +1012,7 @@ class ImageMixin(object):
                 print(f"Writing img {i + 1}...")
             writer.write(imgs[i])
         writer.release()
-        stdout_success(msg=f'Video {save_path} complete')
+        stdout_success(msg=f"Video {save_path} complete")
 
     @staticmethod
     def _slice_shapes_in_video_file_helper(
