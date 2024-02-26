@@ -566,12 +566,12 @@ Sometimes, we may want to crop videos according to user-defined circles rather t
 3). The first frame of the video should pop open. Click and hold-down the left mouse-button at the center of your to-be cropped region. The, drag the mouse towards teh outer boundary of the circle regions. Finally, **without letting go of the left mouse button**, hit the ESC, SPACE or Q button on your keyboard.  See the videos below for expected input and output. 
 
 <video controls>
-  <source src="https://github.com/sgoldenlab/simba/blob/master/images/circle_crop_1.mp4" type="video/mp4">
+  <source src="https://raw.githubusercontent.com/sgoldenlab/simba/master/images/circle_crop_1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 <video controls>
-  <source src="https://github.com/sgoldenlab/simba/blob/master/images/circle_crop_2.mp4" type="video/mp4">
+  <source src="https://raw.githubusercontent.com/sgoldenlab/simba/master/images/circle_crop_2.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
