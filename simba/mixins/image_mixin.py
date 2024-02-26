@@ -974,12 +974,20 @@ class ImageMixin(object):
         return padded_images
 
     @staticmethod
-    def img_stack_to_video(
-        imgs: Dict[int, np.ndarray],
-        save_path: Union[str, os.PathLike],
-        fps: int,
-        verbose: Optional[bool] = True,
-    ):
+    def img_stack_to_video(imgs: Dict[int, np.ndarray], save_path: Union[str, os.PathLike], fps: int, verbose: Optional[bool] = True):
+
+        """
+        Convert a dictionary of images into a video file.
+
+        .. note::
+           The input dict can be greated with ImageMixin().slice_shapes_in_imgs()
+
+        :param Dict[int, np.ndarray] imgs: A dictionary containing frames of the video, where the keys represent frame indices and the values are numpy arrays representing the images.
+        :param Union[str, os.PathLike] save_path: The path to save the output video file.
+        :param int fps: Frames per second (FPS) of the output video.
+        :param Optional[bool] verbose: If True, prints progress messages. Defaults to True.
+        """
+
 
         check_instance(
             source=ImageMixin.img_stack_to_video.__name__,
@@ -1001,6 +1009,7 @@ class ImageMixin(object):
                 print(f"Writing img {i + 1}...")
             writer.write(imgs[i])
         writer.release()
+        stdout_success(msg=f'Video {save_path} complete')
 
     @staticmethod
     def _slice_shapes_in_video_file_helper(
@@ -1034,7 +1043,7 @@ class ImageMixin(object):
         shapes: Union[np.ndarray, List[Polygon]],
         core_cnt: Optional[int] = -1,
         verbose: Optional[bool] = False,
-    ) -> List[np.ndarray]:
+    ) -> Dict[int, np.ndarray]:
         """
         Slice regions from a stack of images or a video file, where the regions are based on defined shapes. Uses multiprocessing.
 

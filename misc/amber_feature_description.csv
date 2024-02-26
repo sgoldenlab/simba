@@ -1,0 +1,218 @@
+﻿Feature,Description
+arm_y,Selects left or right armpit y coordinate based on probability
+arm_p,Associated probability for arm_y
+side_y,Selects left or right ventrum y coordinate based on probability
+side_p,Associated probability for side_y
+dam_centroid_y,Centroid of all dam points with probablilites above .4 weighted by keypoint probabilities 
+dam_convex_hull,Perimeter of the convex hull of dam points with keypoint probabilities above .4
+head_centroid_y,Centroid of all dam head points with probablilites above .4 weighted by keypoint probabilities 
+head_convex_hull,Perimeter of the convex hull of dam head points with probabilities above .4
+pups_convex_hull,Perimeter of the convex hull of all pup points with keypoint probabilities above .4
+pup_avg_p,The mean probability of all pup points
+high_p_pup_bp,The number of pup points with porbabilities above .4
+high_p_dam_bp,The number of dam points with probabilities above .4
+dam_nose_movement,Movement of the dam nose point from the previous frame
+top_head_dam_movement,Movement of the dam top head point from the previous frame
+back_1_left_movement,Movement of the dam back 1 left point from the previous frame
+back_1_right_movement,Movement of the dam back 1 right point from the previous frame
+back_1_center_movement,Movement of the dam back 1 center point from the previous frame
+back_2_movement,Movement of the dam back 2 point from the previous frame
+back_3_movement,Movement of the dam back 3 point from the previous frame
+back_4_movement,Movement of the dam back 4 point from the previous frame
+back_5_movement,Movement of the dam back 5 point from the previous frame
+back_6_movement,Movement of the dam back 6 point from the previous frame
+back_7_movement,Movement of the dam back 7 point from the previous frame
+back_8_movement,Movement of the dam back 8 point from the previous frame
+back_9_movement,Movement of the dam back 9 point from the previous frame
+back_10_movement,Movement of the dam back 10 point from the previous frame
+tail_base_movement,Movement of the dam tail base point from the previous frame
+left_shoulder_movement,Movement of the dam left shoulder point from the previous frame
+right_shoulder_movement,Movement of the dam right shoulder point from the previous frame
+left_ventrum_side_movement,Movement of the dam left ventrum point from the previous frame
+right_ventrum_side_movement,Movement of the dam right ventrum point from the previous frame
+center_ventrum_movement,Movement of the dam center ventrum point from the previous frame
+btwn_arms_movement,Movement of the dam between arms point from the previous frame
+btwn_legs_movement,Movement of the dam between legs point from the previous frame
+back_avg_movement,Mean movement of all dam back points from the previous frame
+head_avg_movement,Mean movement of all dam head points from the previous frame
+head_max_movement,Maximum movement of all dam head points from the previous frame
+ventrum_side_movement,Mean of left_ventrum and right_ventrum movement weighted by point probabilities
+leg_front_movement,Mean of left_leg_front and right_leg_front movement weighted by point probabilities
+leg_behind_movement,Mean of left_leg_behind and right_leg_behind movement weighted by point probabilities
+wrist_movement,Mean of left_wrist and right_wrist movement weighted by point probabilities
+armpit_movement,Mean of left_armpit and right_armpit movement weighted by point probabilities
+shoulder_movement,Mean of left_shoulder and right_shoulder movement weighted by point probabilities
+eye_movement,Mean of left_eye and right_eye movement weighted by point probabilities
+ear_movement,Mean of left_ear and right_ear movement weighted by point probabilities
+ankle_movement,Mean of left_ankle and right_ankle movement weighted by point probabilities
+dam_pup30m_distance,Distance between the dam centroid in the current frame to the pup centroid over a centered 30 minute window (or longest period available)
+head_pup30m_distance,Distance between the dam head centroid in the current frame to the pup centroid over a centered 30 minute window (or longest period available)
+dam_pup60m_distance,Distance between the dam centroid in the current frame to the pup centroid over a centered 60 minute window (or longest period available)
+head_pup60m_distance,Distance between the dam head centroid in the current frame to the pup centroid over a centered 60 minute window (or longest period available)
+dam_pup_distance,Distance between the dam centroid and pup centroid in the current frame
+head_pup_distance,Distance between the dam head centroid and pup centroid in the current frame
+back_length,Distance between dam back 1 and back 10
+nose_back10_length,Distance between dam nose and back 10
+wrist_nose_length,Distance between dam wrist and nose 
+avg_dam_bp_p,Mean probability of dam points
+sum_probabilities,Sum probability of dam points
+dam_back_angle,"Angle between dam back 1, the center of a circle fitted through all dam back points, and dam back 10 "
+dam_head_angle,"Angle between dam back 10, back 1 center, and top head points"
+dam_back_top_angle,"Angle between dam back 10, back 4, and back 1 center points"
+dam_head_angle2,"Angle between dam back 2, back 1 center, and top head points"
+head_avg_movement_roll_mean_1s,Mean movement of dam head points over a centered 1 second window
+head_avg_movement_roll_mean_1ds,Mean movement of dam head points over a centered 1 decisecond window
+head_avg_movement_roll_mean_2s,Mean movement of dam head points over a centered 2 second window
+back_avg_movement_roll_mean_1s,Mean movement of dam back points over a centered 1 second window
+back_avg_movement_roll_mean_1ds,Mean movement of dam back points over a centered 1 decisecond window
+back_avg_movement_roll_mean_2s,Mean movement of dam back points over a centered 2 second window
+head_back_rel_roll_mean_1s,Mean head_Mean_movement divided by sum of head_Mean_movement plus back_Mean movement over a centered 1 second window
+head_back_rel_roll_mean_1ds,Mean head_Mean_movement divided by sum of head_Mean_movement plus back_Mean movement over a centered 1 decisecond window
+head_back_rel_roll_mean_2s,Mean head_Mean_movement divided by sum of head_Mean_movement plus back_Mean movement over a centered 2 second window
+pups_convex_hull_roll_mean_1s,Mean perimeter of pup convex hall over a centered 1 second window
+pups_convex_hull_roll_mean_1ds,Mean perimeter of pup convex hall over a centered 1 decisecond window
+pups_convex_hull_roll_mean_2s,Mean perimeter of pup convex hall over a centered 2 second window window
+dam_pup_distance_roll_mean_1s,Mean distance between the dam centroid and pup centroid over a centered 1 second window
+dam_pup_distance_roll_mean_1ds,Mean distance between the dam centroid and pup centroid over a centered 1 decisecond
+dam_pup_distance_roll_mean_2s,Mean distance between the dam centroid and pup centroid over a centered 2 second window
+dam_pup30m_distance_roll_sum_1s,Mean distance between the dam centroid and pup 30 minute centroid over a centered 1 second window
+dam_pup30m_distance_roll_mean_1ds,Mean distance between the dam centroid and pup 30 minute centroid over a centered 1 decisecond
+dam_pup30m_distance_roll_mean_2s,Mean distance between the dam centroid and pup 30 minute centroid over a centered 2 second window
+dam_pup60m_distance_roll_mean_1s,Mean distance between the dam centroid and pup 60 minute centroid over a centered 1 second window
+dam_pup60m_distance_roll_mean_1ds,Mean distance between the dam centroid and pup 60 minute centroid over a centered 1 decisecond
+dam_pup60m_distance_roll_mean_2s,Mean distance between the dam centroid and pup 60 minute centroid over a centered 2 second window
+dam_back_angle_roll_mean_1s,Mean back_angle over a centered 1 second window
+dam_back_angle_roll_mean_2s,Mean back_angle over a centered 2 second window
+dam_head_angle_roll_mean_1s,Mean head_angle over a centered 1 second window
+dam_head_angle_roll_mean_1ds,Mean head_angle over a centered 1 decisecond
+dam_head_angle_roll_mean_2s,Mean head_angle over a centered 2 second window
+dam_head_angle2_roll_mean_1s,Mean head_angle2 over a centered 1 second window
+dam_head_angle2_roll_mean_1ds,Mean head_angle2 over a centered 1 decisecond
+dam_head_angle2_roll_mean_2s,Mean head_angle2 over a centered 2 second window
+dam_back_top_angle_roll_mean_1s,"1S between dam back 1s, back 1 center, and top back_top_angle_roll_mean points"
+dam_back_top_angle_roll_mean_2s,"2S between dam back 2s, back 1 center, and top back_top_angle_roll_mean points"
+dam_nose_movement_roll_mean_1s,Mean movement of the dam nose point over a centered 1 second window
+dam_nose_movement_roll_mean_1ds,Mean movement of the dam nose point over a centered 1 decisecond
+dam_nose_movement_roll_mean_2s,Mean movement of the dam nose point over a centered 2 second window
+eye_movement_roll_mean_1s,Mean movement of the dam eye point over a centered 1 second window
+eye_movement_roll_mean_1ds,Mean movement of the dam eye point over a centered 1 decisecond
+eye_movement_roll_mean_2s,Mean movement of the dam eye point over a centered 2 second window
+ear_movement_roll_mean_1s,Mean movement of the dam ear point over a centered 1 second window
+ear_movement_roll_mean_1ds,Mean movement of the dam ear point over a centered 1 decisecond
+ear_movement_roll_mean_2s,Mean movement of the dam ear point over a centered 2 second window
+top_head_dam_movement_roll_mean_1s,Mean movement of the dam top head point over a centered 1 second window
+top_head_dam_movement_roll_mean_1ds,Mean movement of the dam top head point over a centered 1 decisecond
+top_head_dam_movement_roll_mean_2s,Mean movement of the dam top head point over a centered 2 second window
+wrist_movement_roll_mean_1s,Mean movement of the dam wrist point over a centered 1 second window
+wrist_movement_roll_mean_1ds,Mean movement of the dam wrist point over a centered 1 decisecond
+wrist_movement_roll_mean_2s,Mean movement of the dam wrist point over a centered 2 second window
+armpit_movement_roll_mean_1s,Mean movement of the dam armpit point over a centered 1 second window
+armpit_movement_roll_mean_1ds,Mean movement of the dam armpit point over a centered 1 decisecond
+armpit_movement_roll_mean_2s,Mean movement of the dam armpit point over a centered 2 second window
+dam_convex_hull_roll_mean_1s,Mean movement of the dam convex hull perimeter over a centered 1 second window
+dam_convex_hull_roll_mean_1ds,Mean movement of the dam convex hull perimeter over a centered 1 decisecond
+dam_convex_hull_roll_mean_2s,Mean movement of the dam convex hull perimeter over a centered 2 second window
+head_convex_hull_roll_mean_1s,Mean movement of the dam head convex hull perimeter over a centered 1 second window
+head_convex_hull_roll_mean_1ds,Mean movement of the dam head convex hull perimeter over a centered 1 decisecond
+head_convex_hull_roll_mean_2s,Mean movement of the dam head convex hull perimeter over a centered 2 second window
+high_p_pup_bp_roll_mean_1s,Mean number of high probability pup points over a centered 1 second window
+high_p_pup_bp_roll_mean_1ds,Mean number of high probability pup points over a centered 1 decisecond
+high_p_pup_bp_roll_mean_2s,Mean number of high probability pup points over a centered 2 second window
+high_p_dam_bp_roll_mean_1s,Mean number of high probability dam points over a centered 1 second window
+high_p_dam_bp_roll_mean_1ds,Mean number of high probability dam points over a centered 1 decisecond
+high_p_dam_bp_roll_mean_2s,Mean number of high probability dam points over a centered 2 second window
+nose_back10_length_roll_mean_1s,Mean nose_back10_length over a centered 1 second window
+nose_back10_length_roll_mean_1ds,Mean nose_back10 length over a centered 1 decisecond
+nose_back10_length_roll_mean_2s,Mean nose_back10_length over a centered 2 second window
+head_avg_movement_roll_sum_1s,Sum movement of dam head points over a centered 1 second window
+head_avg_movement_roll_sum_1ds,Sum movement of dam head points over a centered 1 decisecond
+head_avg_movement_roll_sum_2s,Sum movement of dam head points over a centered 2 second window
+head_max_movement_roll_sum_1s,Sum of maximum movement of dam head points over a centered 1 second window
+head_max_movement_roll_sum_1ds,Sum of maximum movement of dam head points over a centered 1 decisecond
+head_max_movement_roll_sum_2s,Sum of maximum movement of dam back head over a centered 2 second window
+back_avg_movement_roll_sum_1s,Sum of mean back movement over a centered 1 second window
+back_avg_movement_roll_sum_1ds,Sum of mean back movement over a centered 1 decisecond window
+back_avg_movement_roll_sum_2s,Sum of mean back movement over a centered 2 second window
+head_back_rel_roll_sum_1s,Sum of head_back_rel movementover a centered 1 second window
+head_back_rel_roll_sum_1ds,Sum of head_back_rel movementover a centered 1 decisecond window
+head_back_rel_roll_sum_2s,Sum of head_back_rel movementover a centered 2 second window
+pups_convex_hull_roll_sum_1s,Sum perimeter of pup convex hall over a centered 1 second window 
+pups_convex_hull_roll_sum_1ds,Sum perimeter of pup convex hall over a centered 1 decisecond 
+pups_convex_hull_roll_sum_2s,Sum perimeter of pup convex hall over a centered 2 second window 
+dam_pup_distance_roll_sum_1s,Sum distance between the dam centroid and pup centroid over a centered 1 second window
+dam_pup_distance_roll_sum_1ds,Sum distance between the dam centroid and pup centroid over a centered 1 decisecond
+dam_pup_distance_roll_sum_2s,Sum distance between the dam centroid and pup centroid over a centered 2 second window
+dam_pup30m_distance_roll_sum_1ds,Sum distance between the dam centroid and pup 30 minute centroid over a centered 1 decisecond
+dam_pup30m_distance_roll_sum_2s,Sum distance between the dam centroid and pup 30 minute centroid over a centered 2 second window
+dam_pup60m_distance_roll_sum_1s,Sum distance between the dam centroid and pup 60 minute centroid over a centered 1 second window
+dam_pup60m_distance_roll_sum_1ds,Sum distance between the dam centroid and pup 60 minute centroid over a centered 1 decisecond
+dam_pup60m_distance_roll_sum_2s,Sum distance between the dam centroid and pup 60 minute centroid over a centered 2 second window
+top_head_dam_movement_roll_sum_1s,Sum movement of the dam top head point over a centered 1 second window
+top_head_dam_movement_roll_sum_1ds,Sum movement of the dam top head point over a centered 1 decisecond
+top_head_dam_movement_roll_sum_2s,Sum movement of the dam top head point over a centered 2 second window
+dam_back_angle_roll_sum_1s,Sum back_angle over a centered 1 second window
+dam_back_angle_roll_sum_1ds,Sum back_angle over a centered 1 decisecond
+dam_back_angle_roll_sum_2s,Sum back_angle over a centered 2 second window
+dam_nose_movement_roll_sum_1s,Sum movement of the dam nose point over a centered 1 second window
+dam_nose_movement_roll_sum_1ds,Sum movement of the dam nose point over a centered 1 decisecond
+dam_nose_movement_roll_sum_2s,Sum movement of the dam nose point over a centered 2 second window
+eye_movement_roll_sum_1s,Sum movement of the dam eye point over a centered 1 second window
+eye_movement_roll_sum_1ds,Sum movement of the dam eye point over a centered 1 decisecond
+eye_movement_roll_sum_2s,Sum movement of the dam eye point over a centered 2 second window
+ear_movement_roll_sum_1s,Sum movement of the dam ear point over a centered 1 second window
+ear_movement_roll_sum_1ds,Sum movement of the dam ear point over a centered 1 decisecond
+ear_movement_roll_sum_2s,Sum movement of the dam ear point over a centered 2 second window
+wrist_movement_roll_sum_1s,Sum movement of the dam wrist point over a centered 1 second window
+wrist_movement_roll_sum_1ds,Sum movement of the dam wrist point over a centered 1 decisecond
+wrist_movement_roll_sum_2s,Sum movement of the dam wrist point over a centered 2 second window
+armpit_movement_roll_sum_1s,Sum movement of the dam armpit point over a centered 1 second window
+armpit_movement_roll_sum_1ds,Sum movement of the dam armpit point over a centered 1 decisecond
+armpit_movement_roll_sum_2s,Sum movement of the dam armpit point over a centered 2 second window
+dam_convex_hull_roll_sum_1s,Sum movement of the dam convex hull perimeter over a centered 1 second window
+dam_convex_hull_roll_sum_1ds,Sum movement of the dam convex hull perimeter over a centered 1 decisecond
+dam_convex_hull_roll_sum_2s,Sum movement of the dam convex hull perimeter over a centered 2 second window
+high_p_pup_bp_roll_sum_1s,Sum of number of high probability pup points over a centered 1 second window
+high_p_pup_bp_roll_sum_1ds,Sum of number of high probability pup points over a centered 1 decisecond
+high_p_pup_bp_roll_sum_2s,Sum of number of high probability pup points over a centered 2 second window
+high_p_dam_bp_roll_sum_1s,Sum of number of high probability dam points over a centered 1 second window
+high_p_dam_bp_roll_sum_1ds,Sum of number of high probability dam points over a centered 1 decisecond
+high_p_dam_bp_roll_sum_2s,Sum of number of high probability dam points over a centered 2 second window
+nose_back10_length_roll_sum_1s,Sum of the distance between the dam nose and back 10 over a centered 1 second window
+nose_back10_length_roll_sum_1ds,Sum of the distance between the dam nose and back 10 over a centered 1 decisecond
+nose_back10_length_roll_sum_2s,Sum of the distance between the dam nose and back 10 over a centered 2 second window
+head_avg_movement_roll_std_1s,Standard deviation of the Mean movement of dam head points over a centered 1 second window
+head_avg_movement_roll_std_2s,Standard deviation of the Mean movement of dam head points over a centered 2 second window
+back_avg_movement_roll_std_1s,Standard deviation of the Mean movement of dam back points over a centered 1 second window
+back_avg_movement_roll_std_2s,Standard deviation of the Mean movement of dam back points over a centered 2 second window
+pups_convex_hull_roll_std_1s,Standard deviation of the pup point convex hull perimeter over a centered 1 second window
+pups_convex_hull_roll_std_2s,Standard deviation of the pup point convex hull perimeter over a centered 2 second window
+dam_pup_distance_roll_std_1s,Standard deviation of the distance between dam centroid and pup centroid over a centered 1 second window
+dam_pup_distance_roll_std_2s,Standard deviation of the distance between dam centroid and pup centroid over a centered 2 second window
+dam_pup30m_distance_roll_std_1s,Standard deviation of the distance between dam centroid and pup 30 minute centroid over a centered 1 second window
+dam_pup30m_distance_roll_std_2s,Standard deviation of the distance between dam centroid and pup 30 minute centroid over a centered 2 second window
+dam_pup60m_distance_roll_std_1s,Standard deviation of the distance between dam centroid and pup 60 minute centroid over a centered 1 second window
+dam_pup60m_distance_roll_std_2s,Standard deviation of the distance between dam centroid and pup 60 minute centroid over a centered 2 second window
+eye_movement_roll_std_1s,Standard deviation of dam eye movement over a centered 1 seceond
+eye_movement_roll_std_2s,Standard deviation of dam eye movement over a centered 2 seceonds
+ear_movement_roll_std_1s,Standard deviation of dam ear movement over a centered 1 seceond
+ear_movement_roll_std_2s,Standard deviation of dam ear movement over a centered 2 seceonds
+wrist_movement_roll_std_1s,Standard deviation of dam wrist movement over a centered 1 seceond
+wrist_movement_roll_std_2s,Standard deviation of dam wrist movement over a centered 2 seceonds
+armpit_movement_roll_std_1s,Standard deviation of dam armpit movement over a centered 1 seceond
+armpit_movement_roll_std_2s,Standard deviation of dam armpit movement over a centered 2 seceonds
+dam_convex_hull_roll_std_1s,Standard deviation of dam convex hull perimeter over a centered 1 second window
+dam_convex_hull_roll_std_2s,Standard deviation of dam convex hull perimeter over a centered 2 second window
+head_convex_hull_roll_std_1s,Standard deviation of dam head convex hull perimeter over a centered 1 second window
+head_convex_hull_roll_std_2s,Standard deviation of dam head convex hull perimeter over a centered 2 second window
+high_p_pup_bp_roll_std_1s,Standard deviation of the number of high probability pup points over a centered 1 second window
+high_p_pup_bp_roll_std_2s,Standard deviation of the number of high probability pup points over a centered 2 second window
+high_p_dam_bp_roll_std_1s,Standard deviation of the number of high probability dam points over a centered 1 second window
+high_p_dam_bp_roll_std_2s,Standard deviation of the number of high probability dam points over a centered 2 second window
+nose_back10_length_roll_std_1s,Standard deviation of the distance between the dam nose and back 10 over a centered 1 second window
+nose_back10_length_roll_std_2s,Standard deviation of the distance between the dam nose and back 10 over a centered 2 second window
+dam_head_angle_roll_std_1s,Standard deviation of the dam head angle over a centered 1 second window
+dam_head_angle_roll_std_2s,Standard deviation of the dam head angle over a centered 2 second window
+dam_head_angle2_roll_std_1s,Standard deviation of the dam head angle2 over a centered 1 second window
+dam_head_angle2_roll_std_2s,Standard deviation of the dam head angle2 over a centered 2 second window
+dam_back_top_angle_roll_std_1s,Standard deviation of the dam back top angle over a centered 1 second window
+dam_back_top_angle_roll_std_2s,Standard deviation of the dam back top angle over a centered 2 second window

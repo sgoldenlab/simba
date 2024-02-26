@@ -855,8 +855,7 @@ class GeometryMixin(object):
             return img
 
     @staticmethod
-    def geometry_video(
-        shapes: List[
+    def geometry_video(shapes: List[
             List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint]]
         ],
         save_path: Union[str, os.PathLike],

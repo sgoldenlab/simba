@@ -21,10 +21,7 @@ from simba.utils.read_write import get_fn_ext, read_df, write_df
         (float64[:, :], float32[:, :], float64),
     ]
 )
-def calculate_weighted_avg(
-    bp: np.ndarray, p: Union[np.ndarray, None], threshold: float
-):
-
+def calculate_weighted_avg(bp: np.ndarray, p: Union[np.ndarray, None], threshold: float):
     results = np.full((bp.shape[0]), np.nan)
     n = bp.shape[0]
     for i in prange(n):
@@ -46,9 +43,7 @@ def calculate_weighted_avg(
 
 
 @njit([(float32[:, :], float32[:, :], float32[:, :], float64)])
-def polygon_fill(
-    x_bps: np.ndarray, y_bps: np.ndarray, p_bps: np.ndarray, threshold: float
-):
+def polygon_fill(x_bps: np.ndarray, y_bps: np.ndarray, p_bps: np.ndarray, threshold: float):
     results = np.full((x_bps.shape[0], x_bps[0].shape[0], 2), np.nan)
     for frm_cnt in prange(x_bps.shape[0]):
         frm_bp_cnt = 0
@@ -68,17 +63,14 @@ def polygon_fill(
 
     return results
 
-
 def get_circle_fit_angle(x: np.ndarray, y: np.ndarray, p: np.ndarray, threshold: float):
-    combined_arr = np.stack((x, y), axis=2).astype(np.int64)
+    combined_arr = np.stack((x, y), axis=2)
     circles = CircularStatisticsMixin.fit_circle(data=combined_arr)
     diff_x_last = x[:, -1] - circles[:, 0]
     diff_y_last = y[:, -1] - circles[:, 1]
     diff_x_first = x[:, 0] - circles[:, 0]
     diff_y_first = y[:, 0] - circles[:, 1]
-    angles = np.degrees(
-        np.arctan2(diff_y_last, diff_x_last) - np.arctan2(diff_y_first, diff_x_first)
-    )
+    angles = np.degrees(np.arctan2(diff_y_last, diff_x_last) - np.arctan2(diff_y_first, diff_x_first))
     angles = angles + 360 * (angles < 0)
 
     below_thresh_idx = np.argwhere(np.average(p, axis=1) < threshold)
@@ -89,8 +81,25 @@ def get_circle_fit_angle(x: np.ndarray, y: np.ndarray, p: np.ndarray, threshold:
 
 class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     """
-    Class for featurizing data within SimBA project using user-defined body-parts in the pose-estimation data.
-    Results are stored in the `project_folder/csv/features_extracted` directory of the SimBA project.
+    Class for extracting features for the AMBER pipeline.
+
+    The AMBER pipeline was developed for quantifying home-cage maternal and mother-pup interactions from side-view recordings.
+    Downstream behavior classifiers can be trained to assess maternal nest attendance, nursing, pup-directed licking and grooming, self-directed grooming, eating, and drinking.
+
+    .. note::
+       `AMBER publication <https://www.nature.com/articles/s41598-023-45495-4>`_.
+       `AMBER GitHub Repository <https://github.com/lapphe/AMBER-pipeline>`_.
+       `AMBER OSF Repository <https://osf.io/e3dyc/>`_.
+
+       For more info, contact Hannah E. Lapp `Hannah.Lapp@austin.utexas.edu <Hannah.Lapp@austin.utexas.edu/>`_.
+
+    :example:
+    >>> AmberFeatureExtractor(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+
+    References
+    ----------
+    .. [1] Lapp H et al., Automated maternal behavior during early life in rodents (AMBER) pipeline, Sci. Rep.,
+           2023.
     """
 
     def __init__(self, config_path: str):
@@ -100,7 +109,7 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
         print(f"Extracting features from {len(self.files_found)} file(s)...")
         self.pup_threshold = 0.4
         self.dam_threshold = 0.4
-        roll_windows_values = [
+        self.roll_windows_values = [
             1,
             2,
             5,
@@ -1614,6 +1623,3 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
             f"Feature extraction complete for {str(len(self.files_found))} video(s). Results are saved inside the project_folder/csv/features_extracted directory",
             elapsed_time=self.timer.elapsed_time_str,
         )
-
-
-# AmberFeatureExtractor(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

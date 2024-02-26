@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson"
 from typing import List, Optional, Tuple
 
 import numpy as np
-from numba import float32, int64, jit, njit, prange, typed, types
+from numba import float32, int64, float64, jit, njit, prange, typed, types
 
 
 class CircularStatisticsMixin(object):
@@ -1102,7 +1102,7 @@ class CircularStatisticsMixin(object):
         return result.astype(np.int8)
 
     @staticmethod
-    @njit([(int64[:, :, :], int64), (int64[:, :, :], types.misc.Omitted(value=400))])
+    @njit([(float64[:, :, :], int64), (float64[:, :, :], types.misc.Omitted(value=400))])
     def fit_circle(data: np.ndarray, max_iterations: Optional[int] = 400) -> np.ndarray:
         """
         Fit a circle to a dataset using the least squares method.

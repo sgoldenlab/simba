@@ -5,7 +5,6 @@ import glob
 import multiprocessing
 import os
 import platform
-import re
 import shutil
 import subprocess
 import time
@@ -17,15 +16,15 @@ from typing import List, Optional, Union
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
-
-import simba
-from simba.mixins.config_reader import ConfigReader
+from shapely.geometry import Polygon
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
+import simba
+from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
@@ -48,6 +47,8 @@ from simba.utils.warnings import (FileExistWarning, InValidUserInputWarning,
                                   SameInputAndOutputWarning)
 from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
+from simba.mixins.image_mixin import ImageMixin
+from simba.video_processors.roi_selector_circle import ROISelectorCircle
 
 MAX_FRM_SIZE = 1080, 650
 
@@ -1759,24 +1760,78 @@ def append_audio(
     )
 
 
-# append_audio(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/merged_video_20230425201637.mp4',
-# audio_path="/Users/simon/Documents/Zoom/ddd/video1180732233.mp4")
+def crop_single_video_circle(file_path: Union[str, os.PathLike]) -> None:
+    """
+    Crop a video based on circular regions of interest (ROIs) selected by the user.
+
+    :param  Union[str, os.PathLike] file_path: The path to the input video file.
+
+    .. note::
+       This function crops the input video based on circular regions of interest (ROIs) selected by the user.
+       The user is prompted to select a circular ROI on the video frame, and the function then crops the video
+       based on the selected ROI. The cropped video is saved with "_circle_cropped" suffix in the same directory
+       as the input video file.
+
+    :example:
+    >>> crop_single_video_circle(file_path='/Users/simon/Desktop/AGGRESSIVITY_4_11_21_Trial_2_camera1_rotated_20240211143355.mp4')
+    """
+
+    dir, video_name, _ = get_fn_ext(filepath=file_path)
+    save_path = os.path.join(dir, f'{video_name}_circle_cropped.mp4')
+    video_meta_data = get_video_meta_data(video_path=file_path)
+    check_file_exist_and_readable(file_path=file_path)
+    circle_selector = ROISelectorCircle(path=file_path)
+    circle_selector.run()
+    timer = SimbaTimer(start=True)
+    r = circle_selector.circle_radius
+    x, y = circle_selector.circle_center[0], circle_selector.circle_center[1]
+    polygon = Polygon([(x + r * np.cos(angle), y + r * np.sin(angle)) for angle in np.linspace(0, 2 * np.pi, 100)])
+    polygons = [polygon for x in range(video_meta_data['frame_count'])]
+    if (platform.system() == "Darwin") and (multiprocessing.get_start_method() is None):
+        multiprocessing.set_start_method("spawn", force=True)
+    polygons = ImageMixin().slice_shapes_in_imgs(imgs=file_path, shapes=polygons, verbose=False)
+    time.sleep(3)
+    _ = ImageMixin.img_stack_to_video(imgs=polygons, save_path=save_path, fps=video_meta_data['fps'])
+    timer.stop_timer()
+    stdout_success(msg=f'Circle-based cropped saved at to {save_path}', elapsed_time=timer.elapsed_time_str)
 
 
-# r = VideoRotator(input_path=r'/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Testing/Together_1_downsampled.mp4',
-#              output_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Blah',
-#              gpu=True)
-# r.run()
+def crop_multiple_videos_circles(in_dir: Union[str, os.PathLike], out_dir: Union[str, os.PathLike]) -> None:
+    """
+    Crop multiple videos based on circular regions of interest (ROIs) selected by the user.
 
+    :param  Union[str, os.PathLike] in_dir: The directory containing input video files.
+    :param  Union[str, os.PathLike] out_dir: The directory to save the cropped video files.
 
-# video_concatenator(video_one_path='/Users/simon/Desktop/troubleshooting/Open_field_5/project_folder/frames/output/gantt_plots/SI_DAY3_308_CD1_PRESENT_2.mp4',
-#                    video_two_path= '/Users/simon/Desktop/troubleshooting/Open_field_5/project_folder/frames/output/gantt_plots/SI_DAY3_308_CD1_PRESENT.mp4',
-#                    resolution='Video 1',
-#                    horizontal=False)
+    .. note::
+       This function crops multiple videos based on circular ROIs selected by the user.
+       The user is asked to define a circle manually in one video within the input directory.
+       The function then crops all the video in the input directory according to the shape defined
+       using the first video and saves the videos in the ``out_dir`` with the same filenames as the original videos..
 
+    :example:
+    >>> crop_multiple_videos_circles(in_dir='/Users/simon/Desktop/edited/tests', out_dir='/Users/simon/Desktop')
+    """
 
-# video_concatenator(video_one_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi',
-#                    video_two_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi',
-#                    resolution='Video_1',
-#                    horizontal=True,
-#                    gpu=False)
+    check_if_dir_exists(in_dir=in_dir); check_if_dir_exists(in_dir=out_dir)
+    video_files = find_all_videos_in_directory(directory=in_dir)
+    circle_selector = ROISelectorCircle(path=os.path.join(in_dir, video_files[0]))
+    circle_selector.run()
+    r = circle_selector.circle_radius
+    x, y = circle_selector.circle_center[0], circle_selector.circle_center[1]
+    polygon = Polygon([(x + r * np.cos(angle), y + r * np.sin(angle)) for angle in np.linspace(0, 2 * np.pi, 100)])
+    timer = SimbaTimer(start=True)
+    if (platform.system() == "Darwin") and (multiprocessing.get_start_method() is None):
+        multiprocessing.set_start_method("spawn", force=True)
+    for video_cnt, video_path in enumerate(video_files):
+        print(f'Circle cropping video {video_path} ({video_cnt+1}/{len(video_files)})...')
+        video_path = os.path.join(in_dir, video_path)
+        _, video_name, _ = get_fn_ext(filepath=video_path)
+        save_path = os.path.join(out_dir, f'{video_name}.mp4')
+        video_meta_data = get_video_meta_data(video_path=video_path)
+        polygons = [polygon for x in range(video_meta_data['frame_count'])]
+        polygons = ImageMixin().slice_shapes_in_imgs(imgs=video_path, shapes=polygons, verbose=False)
+        time.sleep(1)
+        _ = ImageMixin.img_stack_to_video(imgs=polygons, save_path=save_path, fps=video_meta_data['fps'])
+    timer.stop_timer()
+    stdout_success(msg=f'Circle-based cropped {len(video_files)} files to directory {out_dir}', elapsed_time=timer.elapsed_time_str)

@@ -13,6 +13,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
 - [Clip video into multiple videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-video-into-multiple-videos)
 - [Crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
+- [Circle crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop)
 - [Fixed Crop Videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#fixed-crop-videos)
 - [Multi-crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos)
 - [Downsample videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video)
@@ -542,7 +543,7 @@ For some examples of expected outputs, check [THIS](https://github.com/sgoldenla
 
 If you have annotated (or appeneded annotations to) a bunch of videos in a SimBA project, you may want a count of how many frames, and how many seconds, you have annotated each behavior as present and absent in each video in the entire project. To get this, 
 
-1) Click the `Count labels in project` button in the tools menu.
+1) Click the `Count labels in project` button in the Tools menu.
 2) Next, select the `project_config.ini` file belonging to the project in which you want to count the annotations within.
 3) Click the RUN button.
 
@@ -550,6 +551,30 @@ You can follow the progress in the main SimBA window. Once complete, the annotat
 
 >Note: Each of the videos inside the `project_folder/csv/targets_inserted` directory also **have to be&& represented in the `project_folder/logs/video_info.csv` for this to work. This is in order for SimBA to know the FPS of the videos and accurately calculate the number of seconds that each behavior has been annotated as present and absent in each of the videos. 
 
+### Circle crop
+
+Sometimes, we may want to crop videos according to user-defined circles rather than [user-defined rectangles](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video). To do this, 
+
+1) Click the 'Crop videos (circles)' button in the Tools menu, and you should see the pop-up below. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/crop_circles_3.png" />
+</p
+
+2) To circle crop a single video, select the video path in the top menu and click the <kbd>Crop</kbd> button. 
+
+3). The first frame of the video should pop open. Click and hold-down the left mouse-button at the center of your to-be cropped region. The, drag the mouse towards teh outer boundary of the circle regions. Finally, **without letting go of the left mouse button**, hit the ESC, SPACE or Q button on your keyboard.  See the videos below for expected input and output. 
+
+![Input](https://github.com/sgoldenlab/simba/blob/master/images/circle_crop_1.mp4)
+![Output](https://github.com/sgoldenlab/simba/blob/master/images/circle_crop_2.mp4)
+
+4). If you want to circle crop multiple videos, and your camera location / arena location is static across multiple recordings,
+then you may just want to define the cropped circle location in one video and crop all videos in a directory using the circle defined one. For this, 
+use the ``Fixed circle coordinates crop for multiple videos`` submenu. 
+
+5) Define the directory where your videos are stored using the ``Video directory`` browse button. 
+6) Use the ``Output directory`` browse button to specify the location directory where the cropped videos should be stored. 
+7) Hit the ``Crop Videos`` button. You can follow the progress in the main SimBA terminal window. 
 
 ##
 Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)

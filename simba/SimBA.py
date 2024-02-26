@@ -128,7 +128,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ExtractSpecificFramesPopUp, GreyscaleSingleVideoPopUp,
     ImportFrameDirectoryPopUp, MergeFrames2VideoPopUp, MultiCropPopUp,
     MultiShortenPopUp, SuperImposeFrameCountPopUp, VideoRotatorPopUp,
-    VideoTemporalJoinPopUp)
+    VideoTemporalJoinPopUp, CropVideoCirclesPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1679,6 +1679,12 @@ class App(object):
             compound="left",
             image=self.menu_icons["crop"]["img"],
             command=CropVideoPopUp,
+        )
+        video_process_menu.add_command(
+            label="Crop videos (circles)",
+            compound="left",
+            image=self.menu_icons["circle"]["img"],
+            command=CropVideoCirclesPopUp,
         )
         video_process_menu.add_command(
             label="Down-sample videos",

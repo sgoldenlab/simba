@@ -3,9 +3,11 @@ from typing import Optional, Tuple, Union
 
 import cv2
 import numpy as np
-
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_rgb_tuple, check_int, check_str)
+                                check_if_valid_rgb_tuple,
+                                check_int,
+                                check_str,
+                                check_if_valid_img)
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidFileTypeError
 from simba.utils.read_write import get_fn_ext, get_video_meta_data
@@ -15,7 +17,7 @@ from simba.utils.warnings import CropWarning
 class ROISelector:
     """
     A class for selecting and reflecting Regions of Interest (ROI) in an image.
-    The selected region variables:  top_left, bottom_right, width, height are stored in self.
+    The selected region variables are stored in self: top_left, bottom_right, width, height.
 
     :param Union[str, os.PathLike] path: Path to the image or video file. Can also be an image represented as a numpy array.
     :param int thickness: Thickness of the rectangle border for visualizing the ROI.
@@ -27,8 +29,12 @@ class ROISelector:
     >>> img_selector.run()
     """
 
-    def __init__(self, path: Union[str, os.PathLike], thickness: int = 10, clr: Tuple[int, int, int] = (147, 20, 255), title: Optional[str] = None,) -> None:
-        check_file_exist_and_readable(file_path=path)
+    def __init__(self,
+                 path: Union[str, os.PathLike],
+                 thickness: int = 10,
+                 clr: Tuple[int, int, int] = (147, 20, 255),
+                 title: Optional[str] = None,) -> None:
+
         check_if_valid_rgb_tuple(data=clr)
         check_int(name="Thickness", value=thickness, min_value=1, raise_error=True)
         if title is not None:
@@ -41,7 +47,9 @@ class ROISelector:
 
         if isinstance(path, np.ndarray):
             self.image = path
+            check_if_valid_img(data=self.image, source=self.__class__.__name__, raise_error=True)
         else:
+            check_file_exist_and_readable(file_path=path)
             _, filename, ext = get_fn_ext(filepath=path)
             if ext in Options.ALL_VIDEO_FORMAT_OPTIONS.value:
                 _ = get_video_meta_data(video_path=path)
@@ -56,8 +64,8 @@ class ROISelector:
                 raise InvalidFileTypeError(
                     msg=f"Cannot crop a {ext} file.", source=self.__class__.__name__
                 )
-
-            title = f"Draw ROI video {filename} - Press ESC when drawn"
+            if title is None:
+                title = f"Draw ROI video {filename} - Press ESC when drawn"
 
         self.img_cpy = self.image.copy()
         self.w, self.h = self.image.shape[1], self.image.shape[0]
@@ -145,71 +153,3 @@ class ROISelector:
 
         else:
             return True
-
-
-# img_selector = ROISelector(path='/Users/simon/Desktop/amber.png')
-# img_selector.run()
-# img_selector = ROISelector(path='/Users/simon/Desktop/compute_overlap.png', clr=(0, 255, 0), thickness=2)
-# img_selector.run()
-
-#
-# # Global variables to store the ROI coordinates
-# roi_start = None
-# roi_end = None
-# selecting_roi = False
-# image_copy = None
-#
-# def mouse_callback(event, x, y, flags, param):
-#     global roi_start, roi_end, selecting_roi, image_copy
-#
-#     if event == cv2.EVENT_LBUTTONDOWN:
-#         roi_start = (x, y)
-#         roi_end = (x, y)
-#         selecting_roi = True
-#
-#     elif event == cv2.EVENT_LBUTTONUP:
-#         roi_end = (x, y)
-#         selecting_roi = False
-#
-#     elif event == cv2.EVENT_MOUSEMOVE and selecting_roi:
-#         roi_end = (x, y)
-#         image_copy = image.copy()
-#         cv2.rectangle(image_copy, roi_start, roi_end, (0, 255, 0), 2)
-#
-# # Load your image
-# image_path = '/Users/simon/Desktop/compute_overlap.png'
-# image = cv2.imread(image_path)
-# image_copy = image.copy()
-#
-# # Create a window and set the mouse callback
-# cv2.namedWindow('Select ROI')
-# cv2.setMouseCallback('Select ROI', mouse_callback)
-#
-# while True:
-#     if roi_start is not None and roi_end is not None:
-#         # Draw the selected ROI on the image copy
-#         image_copy = image.copy()
-#         cv2.rectangle(image_copy, roi_start, roi_end, (0, 255, 0), 2)
-#
-#     cv2.imshow('Select ROI', image_copy)
-#
-#     key = cv2.waitKey(1) & 0xFF
-#
-#     if key == ord('c') and roi_start is not None and roi_end is not None:
-#         # Copy the selected ROI
-#         selected_roi = image[roi_start[1]:roi_end[1], roi_start[0]:roi_end[0]].copy()
-#
-#         # Reflect the ROI horizontally
-#         reflected_roi = cv2.flip(selected_roi, 1)
-#
-#         # Replace the original ROI with the reflected one
-#         image[roi_start[1]:roi_end[1], roi_start[0]:roi_end[0]] = reflected_roi
-#
-#         # Reset ROI coordinates
-#         roi_start = None
-#         roi_end = None
-#
-#     elif key == 27:  # Press Esc to exit
-#         break
-#
-# cv2.destroyAllWindows()
