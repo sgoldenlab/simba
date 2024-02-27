@@ -139,7 +139,7 @@ class ROITimebinCalculator(ConfigReader):
         )
 
 
-test = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
-                            bin_length=5, body_parts=['Nose_1', 'Nose_2'], threshold=0.00)
-test.run()
+#test = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
+#                            bin_length=5, body_parts=['Nose_1', 'Nose_2'], threshold=0.00)
+#test.run()
 # test.save()

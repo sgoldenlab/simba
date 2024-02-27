@@ -32,7 +32,7 @@ class Statistics(FeatureExtractionMixin):
        `line graph <https://github.com/sgoldenlab/simba/blob/master/docs/_static/img/statistics_runtimes.png>`_ below for expected run-times for a few methods included in this class.
 
        Most method has numba typed `signatures <https://numba.pydata.org/numba-doc/latest/reference/types.html>`_ to decrease
-       compilation time. Make sure to pass the correct dtypes as indicated by signature decorators. If dtype is not specified at
+       compilation time through reduced type inference. Make sure to pass the correct dtypes as indicated by signature decorators. If dtype is not specified at
        array creation, it will typically be ``float64`` or ``int64``. As most methods here use ``float32`` for the input data argument,
        make sure to downcast.
 

@@ -69,7 +69,7 @@ def polygon_fill(
 
 
 def get_circle_fit_angle(x: np.ndarray, y: np.ndarray, p: np.ndarray, threshold: float):
-    combined_arr = np.stack((x, y), axis=2)
+    combined_arr = np.stack((x, y), axis=2).astype(np.float64)
     circles = CircularStatisticsMixin.fit_circle(data=combined_arr)
     diff_x_last = x[:, -1] - circles[:, 0]
     diff_y_last = y[:, -1] - circles[:, 1]
@@ -1630,3 +1630,7 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
             f"Feature extraction complete for {str(len(self.files_found))} video(s). Results are saved inside the project_folder/csv/features_extracted directory",
             elapsed_time=self.timer.elapsed_time_str,
         )
+
+#
+# extractor = AmberFeatureExtractor(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# extractor.run()

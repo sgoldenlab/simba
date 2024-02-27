@@ -23,3 +23,7 @@ build/
 *.egg
 *.tar.gz
 *.whl
+
+
+# dev
+simba/sandbox/

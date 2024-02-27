@@ -22,7 +22,7 @@ class CircularStatisticsMixin(object):
 
     .. note::
         Many method has numba typed `signatures <https://numba.pydata.org/numba-doc/latest/reference/types.html>`_ to decrease
-        compilation time. Make sure to pass the correct dtypes as indicated by signature decorators.
+        compilation time through reduced type inference. Make sure to pass the correct dtypes as indicated by signature decorators.
 
     .. important::
         See references below for mature packages computing more extensive circular measurements.

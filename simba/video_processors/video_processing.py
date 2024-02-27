@@ -104,23 +104,16 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike]) -> None:
     >>> _ = clahe_enhance_video(file_path: 'project_folder/videos/Video_1.mp4')
     """
 
-    check_file_exist_and_readable(file_path=file_path)
     dir, file_name, file_ext = get_fn_ext(filepath=file_path)
-    save_path = os.path.join(dir, "CLAHE_{}.avi".format(file_name))
+    save_path = os.path.join(dir, f"CLAHE_{file_name}.avi")
     video_meta_data = get_video_meta_data(file_path)
     fourcc = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
-    print("Applying CLAHE on video {}, this might take awhile...".format(file_name))
+    print(f"Applying CLAHE on video {file_name}, this might take awhile...")
     cap = cv2.VideoCapture(file_path)
-    writer = cv2.VideoWriter(
-        save_path,
-        fourcc,
-        video_meta_data["fps"],
-        (video_meta_data["height"], video_meta_data["width"]),
-        0,
-    )
+    writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]), 0)
     clahe_filter = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16))
+    frm_cnt = 0
     try:
-        frm_cnt = 0
         while True:
             ret, img = cap.read()
             if ret:
@@ -128,25 +121,20 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike]) -> None:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 clahe_frm = clahe_filter.apply(img)
                 writer.write(clahe_frm)
-                print(
-                    "CLAHE converted frame {}/{}".format(
-                        str(frm_cnt), str(video_meta_data["frame_count"])
-                    )
-                )
+                print(f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']}")
             else:
-                cap.release()
-                writer.release()
+                break
+        cap.release()
+        writer.release()
+        print(f'CLAHE video created: {save_path}.')
     except Exception as se:
         print(se.args)
-        print("CLAHE conversion failed for video {}".format(file_name))
+        print(f"CLAHE conversion failed for video {file_name}.")
         cap.release()
         writer.release()
         raise ValueError()
 
-
-def extract_frame_range(
-    file_path: Union[str, os.PathLike], start_frame: int, end_frame: int
-) -> None:
+def extract_frame_range(file_path: Union[str, os.PathLike], start_frame: int, end_frame: int) -> None:
     """
     Extract a user-defined range of frames from a video file to `png` format. Images
     are saved in a folder with the suffix `_frames` within the same directory as the video file.

@@ -4,6 +4,7 @@ import glob
 import os
 import sys
 from tkinter import *
+import threading
 
 from PIL import Image, ImageTk
 
@@ -60,8 +61,12 @@ class CLAHEPopUp(PopUpMixin):
         button_clahe = Button(
             clahe_frm,
             text="Apply CLAHE",
-            command=lambda: clahe_enhance_video(file_path=selected_video.file_path),
+            command=lambda: threading.Thread(target=clahe_enhance_video(file_path=selected_video.file_path)).start(),
         )
+
+
+
+
         clahe_frm.grid(row=0, sticky=W)
         selected_video.grid(row=0, sticky=W)
         button_clahe.grid(row=1, pady=5)
