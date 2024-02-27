@@ -34,11 +34,12 @@ from simba.video_processors.video_processing import (
     change_fps_of_multiple_videos, change_img_format, change_single_video_fps,
     clahe_enhance_video, clip_video_in_range, convert_to_mp4,
     convert_video_powerpoint_compatible_format, copy_img_folder,
-    crop_multiple_videos, crop_multiple_videos_circles, crop_single_video,
-    crop_single_video_circle, downsample_video, extract_frame_range,
+    crop_multiple_videos, crop_multiple_videos_circles,
+    crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
+    crop_single_video_polygon, downsample_video, extract_frame_range,
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, superimpose_frame_count,
-    video_concatenator, video_to_greyscale, crop_single_video_polygon, crop_multiple_videos_polygons)
+    video_concatenator, video_to_greyscale)
 
 sys.setrecursionlimit(10**7)
 
@@ -1593,7 +1594,9 @@ class CropVideoCirclesPopUp(PopUpMixin):
         button_crop_video_multiple.grid(row=3, sticky=NW)
         self.main_frm.mainloop()
 
+
 # _ = CropVideoCirclesPopUp()
+
 
 class CropVideoPolygonsPopUp(PopUpMixin):
     def __init__(self):
@@ -1618,7 +1621,13 @@ class CropVideoPolygonsPopUp(PopUpMixin):
                 file_path=selected_video.file_path
             ),
         )
-        crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="Fixed POLYGON coordinates crop for multiple videos", font=Formats.LABELFRAME_HEADER_FORMAT.value, padx=5, pady=5)
+        crop_video_lbl_frm_multiple = LabelFrame(
+            self.main_frm,
+            text="Fixed POLYGON coordinates crop for multiple videos",
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            padx=5,
+            pady=5,
+        )
         input_folder = FolderSelect(
             crop_video_lbl_frm_multiple,
             "Video directory:",

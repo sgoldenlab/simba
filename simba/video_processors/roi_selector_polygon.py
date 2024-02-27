@@ -11,6 +11,8 @@ from simba.utils.enums import Options
 from simba.utils.errors import InvalidFileTypeError
 from simba.utils.read_write import get_fn_ext, read_frm_of_video
 from simba.utils.warnings import CropWarning
+
+
 class ROISelectorPolygon(object):
     """
     Class for selecting a polygonal region of interest (ROI) within an image or video frame.
@@ -84,13 +86,25 @@ class ROISelectorPolygon(object):
             if self.drawing:
                 temp_img = self.image.copy()
                 for i in range(len(self.polygon_vertices) - 1):
-                    cv2.line(temp_img, self.polygon_vertices[i], self.polygon_vertices[i + 1], self.clr, self.thickness)
+                    cv2.line(
+                        temp_img,
+                        self.polygon_vertices[i],
+                        self.polygon_vertices[i + 1],
+                        self.clr,
+                        self.thickness,
+                    )
                 cv2.imshow(self.title, temp_img)
         elif event == cv2.EVENT_LBUTTONUP:
             self.drawing = False
             temp_img = self.image.copy()
             for i in range(len(self.polygon_vertices) - 1):
-                cv2.line(temp_img, self.polygon_vertices[i], self.polygon_vertices[i + 1], self.clr, self.thickness)
+                cv2.line(
+                    temp_img,
+                    self.polygon_vertices[i],
+                    self.polygon_vertices[i + 1],
+                    self.clr,
+                    self.thickness,
+                )
             cv2.imshow(self.title, temp_img)
 
     def run(self):
@@ -99,9 +113,21 @@ class ROISelectorPolygon(object):
         while True:
             img_copy = self.image.copy()
             for i in range(len(self.polygon_vertices) - 1):
-                cv2.line(img_copy, self.polygon_vertices[i], self.polygon_vertices[i + 1], self.clr, self.thickness)
+                cv2.line(
+                    img_copy,
+                    self.polygon_vertices[i],
+                    self.polygon_vertices[i + 1],
+                    self.clr,
+                    self.thickness,
+                )
             if self.drawing and len(self.polygon_vertices) > 0:
-                cv2.line(img_copy, self.polygon_vertices[-1], (self.polygon_vertices[-1][0], self.polygon_vertices[-1][1]), self.clr, self.thickness)
+                cv2.line(
+                    img_copy,
+                    self.polygon_vertices[-1],
+                    (self.polygon_vertices[-1][0], self.polygon_vertices[-1][1]),
+                    self.clr,
+                    self.thickness,
+                )
             cv2.imshow(self.title, img_copy)
             key = cv2.waitKey(1)
             if key in [27, ord("q"), ord("Q"), ord(" ")]:
@@ -110,9 +136,13 @@ class ROISelectorPolygon(object):
                     cv2.waitKey(1)
                     self.polygon_vertices = np.array(self.polygon_vertices)
                     break
+
     def run_checks(self):
         if len(list(set(self.polygon_vertices))) < 3:
-            CropWarning(msg="CROP WARNING: At least 3 unique vertices are needed to form a polygon. Please try again.", source=self.__class__.__name__)
+            CropWarning(
+                msg="CROP WARNING: At least 3 unique vertices are needed to form a polygon. Please try again.",
+                source=self.__class__.__name__,
+            )
             return False
         else:
             return True

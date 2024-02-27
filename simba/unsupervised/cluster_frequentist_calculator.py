@@ -16,8 +16,8 @@ from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict)
 from simba.utils.enums import Methods
-from simba.utils.read_write import read_pickle
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import read_pickle
 
 FEATURE_NAME = "FEATURE NAME"
 FEATURE_IMPORTANCE = "IMPORTANCE"
