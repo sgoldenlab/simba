@@ -84,7 +84,7 @@ class HDBSCANClusterer(UnsupervisedMixin):
                 ]
             )
         )
-        self.embeddings = self.read_pickle(data_path=self.data_path)
+        self.embeddings = read_pickle(data_path=self.data_path)
         print(
             f"Fitting {str(len(self.search_space) * len(self.embeddings.keys()))} HDBSCAN model(s)..."
         )
@@ -181,7 +181,7 @@ class HDBSCANClusterer(UnsupervisedMixin):
         timer = SimbaTimer(start=True)
         if isinstance(model, str):
             check_file_exist_and_readable(file_path=model)
-            model = self.read_pickle(data_path=model)
+            model = read_pickle(data_path=model)
         check_file_exist_and_readable(file_path=data_path)
         if save_dir is not None:
             check_if_dir_exists(in_dir=save_dir)

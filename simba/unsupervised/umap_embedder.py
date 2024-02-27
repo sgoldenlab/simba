@@ -64,7 +64,7 @@ class UmapEmbedder(UnsupervisedMixin):
         check_file_exist_and_readable(file_path=data_path)
         check_that_directory_is_empty(directory=save_dir)
         self.data_path = data_path
-        self.data = self.read_pickle(data_path=data_path)
+        self.data = read_pickle(data_path=data_path)
         self.umap_df = (
             deepcopy(self.data[Unsupervised.BOUTS_FEATURES.value])
             .reset_index()

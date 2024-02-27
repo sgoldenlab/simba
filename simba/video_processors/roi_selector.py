@@ -18,6 +18,10 @@ class ROISelector:
     A class for selecting and reflecting Regions of Interest (ROI) in an image.
     The selected region variables are stored in self: top_left, bottom_right, width, height.
 
+    .. image:: _static/img/roi_selector.gif
+       :width: 600
+       :align: center
+
     :param Union[str, os.PathLike] path: Path to the image or video file. Can also be an image represented as a numpy array.
     :param int thickness: Thickness of the rectangle border for visualizing the ROI.
     :param Tuple[int, int, int] clr: BGR color tuple for visualizing the ROI. Default: deep pink.

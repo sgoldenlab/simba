@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson"
 import glob
 import itertools
 import os
-from typing import Dict, Optional
+from typing import Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -44,41 +44,29 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     >>> roi_analyzer.save()
     """
 
-    def __init__(
-        self,
-        ini_path: str,
-        data_path: Optional[str] = None,
-        detailed_bout_data: Optional[bool] = False,
-        settings: Optional[dict] = None,
-        calculate_distances: Optional[bool] = False,
-    ):
+    def __init__(self,
+                 ini_path: Union[str, os.PathLike],
+                 data_path: Optional[str] = None,
+                 detailed_bout_data: Optional[bool] = False,
+                 settings: Optional[dict] = None,
+                 calculate_distances: Optional[bool] = False):
 
         ConfigReader.__init__(self, config_path=ini_path)
         FeatureExtractionMixin.__init__(self)
         self.calculate_distances, self.settings = calculate_distances, settings
         self.detailed_bout_data = detailed_bout_data
-        if not os.path.exists(self.detailed_roi_data_dir):
-            os.makedirs(self.detailed_roi_data_dir)
+        if not os.path.exists(self.detailed_roi_data_dir): os.makedirs(self.detailed_roi_data_dir)
         if data_path != None:
-            self.input_folder = os.path.join(self.project_path, "csv", data_path)
-            self.files_found = glob.glob(self.input_folder + "/*." + self.file_type)
-            if len(self.files_found) == 0:
-                raise NoFilesFoundError(
-                    msg=f"No data files found in {self.input_folder}"
-                )
+            self.input_folder = os.path.join(self.project_path, 'csv', data_path)
+            self.files_found = glob.glob(self.input_folder + f"/*.{self.file_type}")
+            if len(self.files_found) == 0: raise NoFilesFoundError( msg=f"No files in format {self.file_type} found in {self.input_folder}", source=self.__class__.__name__)
 
-        if not self.settings:
+        if self.settings is None:
             self.roi_config = dict(self.config.items(ConfigKey.ROI_SETTINGS.value))
             if "animal_1_bp" not in self.roi_config.keys():
-                raise BodypartColumnNotFoundError(msg="Please analyze ROI data FIRST.")
+                raise BodypartColumnNotFoundError(msg="Could not find animal_1_bp settings in the project config. Please analyze ROI data FIRST.")
             self.settings = {}
-            self.settings["threshold"] = read_config_entry(
-                self.config,
-                ConfigKey.ROI_SETTINGS.value,
-                ConfigKey.PROBABILITY_THRESHOLD.value,
-                Dtypes.FLOAT.value,
-                0.00,
-            )
+            self.settings["threshold"] = read_config_entry(self.config, ConfigKey.ROI_SETTINGS.value, ConfigKey.PROBABILITY_THRESHOLD.value, Dtypes.FLOAT.value, 0.00)
             self.settings["body_parts"] = {}
             self.__check_that_roi_config_data_is_valid()
             for animal_name, bp in self.roi_bp_config.items():
@@ -86,17 +74,13 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
 
         self.body_part_to_animal_lookup = {}
         for animal_cnt, body_part_name in self.settings["body_parts"].items():
-            animal_name = self.find_animal_name_from_body_part_name(
-                bp_name=body_part_name, bp_dict=self.animal_bp_dict
-            )
+            animal_name = self.find_animal_name_from_body_part_name(bp_name=body_part_name, bp_dict=self.animal_bp_dict)
             self.body_part_to_animal_lookup[animal_cnt] = animal_name
 
         self.bp_dict, self.bp_names = {}, []
         for animal_name, bp in self.settings["body_parts"].items():
             self.bp_dict[animal_name] = []
-            self.bp_dict[animal_name].extend(
-                [f'{bp}_{"x"}', f'{bp}_{"y"}', f'{bp}_{"p"}']
-            )
+            self.bp_dict[animal_name].extend([f'{bp}_{"x"}', f'{bp}_{"y"}', f'{bp}_{"p"}'])
             self.bp_names.extend([f'{bp}_{"x"}', f'{bp}_{"y"}', f'{bp}_{"p"}'])
         self.read_roi_data()
 
@@ -121,100 +105,38 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
         return lst[0], lst[-1]
 
     def run(self):
-        """
-        Method to analyze ROI statistics.
-
-        Returns
-        -------
-        Attribute: list
-            dist_lst, list of pd.DataFrame holding ROI-dependent movement statistics.
-        """
-        (
-            self.time_dict,
-            self.entries_dict,
-            self.entries_exit_dict,
-            self.movement_dict,
-        ) = ({}, {}, {}, {})
+        self.time_dict, self.entries_dict, self.entries_exit_dict, self.movement_dict = {}, {}, {}, {}
         for file_path in self.files_found:
             _, video_name, _ = get_fn_ext(file_path)
-            (
-                self.time_dict[video_name],
-                self.entries_dict[video_name],
-                self.entries_exit_dict[video_name],
-            ) = ({}, {}, {})
-            print("Analysing ROI data for video {}...".format(video_name))
-            self.video_recs = self.rectangles_df.loc[
-                self.rectangles_df["Video"] == video_name
-            ]
-            self.video_circs = self.circles_df.loc[
-                self.circles_df["Video"] == video_name
-            ]
-            self.video_polys = self.polygon_df.loc[
-                self.polygon_df["Video"] == video_name
-            ]
-            video_shapes = list(
-                itertools.chain(
-                    self.video_recs["Name"].unique(),
-                    self.video_circs["Name"].unique(),
-                    self.video_polys["Name"].unique(),
-                )
-            )
+            self.time_dict[video_name], self.entries_dict[video_name], self.entries_exit_dict[video_name] = {}, {}, {}
+            print(f"Analysing ROI data for video {video_name}...")
+            self.video_recs = self.rectangles_df.loc[self.rectangles_df["Video"] == video_name]
+            self.video_circs = self.circles_df.loc[self.circles_df["Video"] == video_name]
+            self.video_polys = self.polygon_df.loc[self.polygon_df["Video"] == video_name]
+            video_shapes = list(itertools.chain(self.video_recs["Name"].unique(), self.video_circs["Name"].unique(), self.video_polys["Name"].unique()))
 
             if video_shapes == 0:
-                NoDataFoundWarning(
-                    msg=f"Skipping video {video_name}: No user-defined ROI data found for this video..."
-                )
+                NoDataFoundWarning(msg=f"Skipping video {video_name}: No user-defined ROI data found for this video...")
                 continue
-
             else:
-                video_settings, pix_per_mm, self.fps = self.read_video_info(
-                    video_name=video_name
-                )
+                video_settings, pix_per_mm, self.fps = self.read_video_info(video_name=video_name)
                 self.data_df = read_df(file_path, self.file_type).reset_index(drop=True)
                 if len(self.bp_headers) != len(self.data_df.columns):
-                    raise MissingColumnsError(
-                        msg=f"The data file {file_path} contains {len(self.data_df.columns)} body-part columns, but the project is made for {len(self.bp_headers)} body-parts",
-                        source=self.__class__.__name__,
-                    )
+                    raise MissingColumnsError(msg=f"The data file {file_path} contains {len(self.data_df.columns)} body-part columns, but the project is made for {len(self.bp_headers)} body-parts", source=self.__class__.__name__)
                 self.data_df.columns = self.bp_headers
                 data_df_sliced = self.data_df[self.bp_names]
                 self.video_length_s = data_df_sliced.shape[0] / self.fps
                 for animal_name in self.bp_dict:
                     animal_df = self.data_df[self.bp_dict[animal_name]]
-                    (
-                        self.time_dict[video_name][animal_name],
-                        self.entries_dict[video_name][animal_name],
-                    ) = ({}, {})
+                    self.time_dict[video_name][animal_name], self.entries_dict[video_name][animal_name] = {}, {}
                     self.entries_exit_dict[video_name][animal_name] = {}
                     for _, row in self.video_recs.iterrows():
-                        top_left_x, top_left_y, shape_name = (
-                            row["topLeftX"],
-                            row["topLeftY"],
-                            row["Name"],
-                        )
+                        top_left_x, top_left_y, shape_name = row["topLeftX"], row["topLeftY"], row["Name"]
                         self.entries_exit_dict[video_name][animal_name][shape_name] = {}
-                        bottom_right_x, bottom_right_y = (
-                            row["Bottom_right_X"],
-                            row["Bottom_right_Y"],
-                        )
-                        slice_x = animal_df[
-                            animal_df[self.bp_dict[animal_name][0]].between(
-                                top_left_x, bottom_right_x, inclusive=True
-                            )
-                        ]
-                        slice_y = slice_x[
-                            slice_x[self.bp_dict[animal_name][1]].between(
-                                top_left_y, bottom_right_y, inclusive=True
-                            )
-                        ]
-                        slice = (
-                            slice_y[
-                                slice_y[self.bp_dict[animal_name][2]]
-                                >= self.settings["threshold"]
-                            ]
-                            .reset_index()
-                            .rename(columns={"index": "frame_no"})
-                        )
+                        bottom_right_x, bottom_right_y = (row["Bottom_right_X"], row["Bottom_right_Y"])
+                        slice_x = animal_df[animal_df[self.bp_dict[animal_name][0]].between(top_left_x, bottom_right_x, inclusive=True)]
+                        slice_y = slice_x[slice_x[self.bp_dict[animal_name][1]].between(top_left_y, bottom_right_y, inclusive=True)]
+                        slice = (slice_y[slice_y[self.bp_dict[animal_name][2]]>= self.settings["threshold"]].reset_index().rename(columns={"index": "frame_no"}))
                         bouts = [
                             self.__get_bouts(g)
                             for _, g in itertools.groupby(
@@ -222,31 +144,15 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                                 key=lambda n, c=itertools.count(): n - next(c),
                             )
                         ]
-                        self.time_dict[video_name][animal_name][shape_name] = round(
-                            len(slice) / self.fps, 3
-                        )
-                        self.entries_dict[video_name][animal_name][shape_name] = len(
-                            bouts
-                        )
-                        self.entries_exit_dict[video_name][animal_name][shape_name][
-                            "Entry_times"
-                        ] = list(map(lambda x: x[0], bouts))
-                        self.entries_exit_dict[video_name][animal_name][shape_name][
-                            "Exit_times"
-                        ] = list(map(lambda x: x[1], bouts))
+                        self.time_dict[video_name][animal_name][shape_name] = round(len(slice) / self.fps, 3)
+                        self.entries_dict[video_name][animal_name][shape_name] = len(bouts)
+                        self.entries_exit_dict[video_name][animal_name][shape_name]["Entry_times"] = list(map(lambda x: x[0], bouts))
+                        self.entries_exit_dict[video_name][animal_name][shape_name]["Exit_times"] = list(map(lambda x: x[1], bouts))
 
                     for _, row in self.video_circs.iterrows():
-                        center_x, center_y, radius, shape_name = (
-                            row["centerX"],
-                            row["centerY"],
-                            row["radius"],
-                            row["Name"],
-                        )
+                        center_x, center_y, radius, shape_name = (row["centerX"], row["centerY"], row["radius"], row["Name"])
                         self.entries_exit_dict[video_name][animal_name][shape_name] = {}
-                        animal_df["distance"] = np.sqrt(
-                            (animal_df[self.bp_dict[animal_name][0]] - center_x) ** 2
-                            + (animal_df[self.bp_dict[animal_name][1]] - center_y) ** 2
-                        )
+                        animal_df["distance"] = np.sqrt((animal_df[self.bp_dict[animal_name][0]] - center_x) ** 2 + (animal_df[self.bp_dict[animal_name][1]] - center_y) ** 2)
                         slice = (
                             animal_df.loc[
                                 (animal_df["distance"] <= radius)
@@ -551,6 +457,12 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             msg="ROI analysis complete", elapsed_time=self.timer.elapsed_time_str
         )
 
+
+
+# test = ROIAnalyzer(ini_path = r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
+#                    data_path = "outlier_corrected_movement_location",
+#                    calculate_distances=True)
+# test.run()
 
 # test = ROIAnalyzer(ini_path = r"/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/zebrafish/project_folder/project_config.ini",
 #                    data_path = "outlier_corrected_movement_location",

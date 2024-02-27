@@ -52,9 +52,24 @@ Video processing tools
    :members:
    :show-inheritance:
 
-Crop ROI selector
+Crop ROI selector (rectangles)
 ------------------------------------------------
 
 .. automodule:: simba.video_processors.roi_selector
+   :members:
+   :show-inheritance:
+
+
+Crop ROI selector (circles)
+------------------------------------------------
+
+.. automodule:: simba.video_processors.roi_selector_circle
+   :members:
+   :show-inheritance:
+
+Crop ROI selector (polygons)
+------------------------------------------------
+
+.. automodule:: simba.video_processors.roi_selector_polygon
    :members:
    :show-inheritance:

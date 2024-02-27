@@ -58,7 +58,7 @@ class EmbeddingCorrelationCalculator(UnsupervisedMixin, ConfigReader):
         UnsupervisedMixin.__init__(self)
         check_file_exist_and_readable(file_path=data_path)
         self.settings, self.data_path = settings, data_path
-        self.data = self.read_pickle(data_path=self.data_path)
+        self.data = read_pickle(data_path=self.data_path)
         self.save_path = os.path.join(
             self.logs_path,
             f"embedding_correlations_{self.data[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.csv",

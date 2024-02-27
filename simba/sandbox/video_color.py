@@ -70,8 +70,8 @@ class VideoColorChanger(PopUpMixin):
         self.main_frm.mainloop()
 
 
-rotator = VideoColorChanger(
-    input_path="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1_downsampled.mp4",
-    output_dir="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/rotated",
-)
-rotator.run()
+# rotator = VideoColorChanger(
+#     input_path="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1_downsampled.mp4",
+#     output_dir="/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/rotated",
+# )
+# rotator.run()

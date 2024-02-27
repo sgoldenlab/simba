@@ -10,6 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
 
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.read_write import read_pickle
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
@@ -75,7 +76,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         self.settings, self.data_path = settings, data_path
-        self.data = self.read_pickle(data_path=self.data_path)
+        self.data = read_pickle(data_path=self.data_path)
         check_if_keys_exist_in_dict(
             data=self.data,
             key=[Unsupervised.METHODS.value, Clustering.CLUSTER_MODEL.value],

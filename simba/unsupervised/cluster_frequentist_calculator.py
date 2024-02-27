@@ -16,6 +16,7 @@ from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict)
 from simba.utils.enums import Methods
+from simba.utils.read_write import read_pickle
 from simba.utils.printing import SimbaTimer, stdout_success
 
 FEATURE_NAME = "FEATURE NAME"
@@ -70,7 +71,7 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         self.settings = settings
-        self.data = self.read_pickle(data_path=data_path)
+        self.data = read_pickle(data_path=data_path)
         self.save_path = os.path.join(
             self.logs_path,
             f"cluster_descriptive_statistics_{self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.xlsx",

@@ -37,7 +37,7 @@ from simba.video_processors.video_processing import (
     crop_single_video_circle, downsample_video, extract_frame_range,
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, superimpose_frame_count,
-    video_concatenator, video_to_greyscale)
+    video_concatenator, video_to_greyscale, crop_single_video_polygon, crop_multiple_videos_polygons)
 
 sys.setrecursionlimit(10**7)
 
@@ -1555,7 +1555,7 @@ class CropVideoCirclesPopUp(PopUpMixin):
         crop_video_lbl_frm_multiple = LabelFrame(
             self.main_frm,
             text="Fixed CIRCLE coordinates crop for multiple videos",
-            font="bold",
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
             padx=5,
             pady=5,
         )
@@ -1588,6 +1588,57 @@ class CropVideoCirclesPopUp(PopUpMixin):
         button_crop_video_multiple.grid(row=3, sticky=NW)
         self.main_frm.mainloop()
 
-
-#
 # _ = CropVideoCirclesPopUp()
+
+class CropVideoPolygonsPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (POLYGONS)")
+        crop_video_lbl_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="Crop Video (POLYGONS)",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.CIRCLE_CROP.value,
+        )
+        selected_video = FileSelect(
+            crop_video_lbl_frm,
+            "Video path",
+            title="Select a video file",
+            lblwidth=20,
+            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
+        )
+        button_crop_video_single = Button(
+            crop_video_lbl_frm,
+            text="Crop Video",
+            command=lambda: crop_single_video_polygon(
+                file_path=selected_video.file_path
+            ),
+        )
+        crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="Fixed POLYGON coordinates crop for multiple videos", font=Formats.LABELFRAME_HEADER_FORMAT.value, padx=5, pady=5)
+        input_folder = FolderSelect(
+            crop_video_lbl_frm_multiple,
+            "Video directory:",
+            title="Select Folder with videos",
+            lblwidth=20,
+        )
+        output_folder = FolderSelect(
+            crop_video_lbl_frm_multiple,
+            "Output directory:",
+            title="Select a folder for your output videos",
+            lblwidth=20,
+        )
+        button_crop_video_multiple = Button(
+            crop_video_lbl_frm_multiple,
+            text="Crop Videos",
+            command=lambda: crop_multiple_videos_polygons(
+                in_dir=input_folder.folder_path, out_dir=output_folder.folder_path
+            ),
+        )
+
+        crop_video_lbl_frm.grid(row=0, sticky=NW)
+        selected_video.grid(row=0, sticky=NW)
+        button_crop_video_single.grid(row=3, sticky=NW)
+        crop_video_lbl_frm_multiple.grid(row=1, sticky=NW)
+        input_folder.grid(row=0, sticky=NW)
+        output_folder.grid(row=1, sticky=NW)
+        button_crop_video_multiple.grid(row=3, sticky=NW)
+        self.main_frm.mainloop()
