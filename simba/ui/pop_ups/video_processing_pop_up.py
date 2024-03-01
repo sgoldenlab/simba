@@ -3,8 +3,8 @@ __author__ = "Simon Nilsson"
 import glob
 import os
 import sys
-from tkinter import *
 import threading
+from tkinter import *
 
 from PIL import Image, ImageTk
 
@@ -62,11 +62,10 @@ class CLAHEPopUp(PopUpMixin):
         button_clahe = Button(
             clahe_frm,
             text="Apply CLAHE",
-            command=lambda: threading.Thread(target=clahe_enhance_video(file_path=selected_video.file_path)).start(),
+            command=lambda: threading.Thread(
+                target=clahe_enhance_video(file_path=selected_video.file_path)
+            ).start(),
         )
-
-
-
 
         clahe_frm.grid(row=0, sticky=W)
         selected_video.grid(row=0, sticky=W)
