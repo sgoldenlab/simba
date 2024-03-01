@@ -27,7 +27,7 @@ dash == 1.14.0
 dash_color_picker == 0.0.1
 dash_core_components == 1.10.2
 dash_colorscales == 0.0.4
-dash_html_components == 1.0.3
+dash_html_components == 2.0.0
 h5py
 numba==0.52.0;python_version=="3.6"
 numba;python_version>="3.9"
