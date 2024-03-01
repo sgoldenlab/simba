@@ -201,14 +201,14 @@ def test_rotational_direction_2(size, stride):
     assert results.shape[0] == data.shape[0]
 
 def test_fit_circle_1():
-    data = np.array([[[5, 10], [10, 5], [15, 10], [10, 15]]])
+    data = np.array([[[5, 10], [10, 5], [15, 10], [10, 15]]]).astype(np.float64)
     results = CircularStatisticsMixin().fit_circle(data=data, max_iterations=300)
     expected_results = np.array([[10, 10,  5]])
     assert np.array_equal(expected_results, results)
 
 @pytest.mark.parametrize('size, iterations', [(500, 100), (100, 200)])
 def test_fit_circle_2(size, iterations):
-    data = np.random.randint(0, 500, size=(size, 10, 10))
+    data = np.random.randint(0, 500, size=(size, 10, 10)).astype(np.float64)
     results = CircularStatisticsMixin().fit_circle(data=data, max_iterations=iterations)
     assert results.shape[0] == data.shape[0]
     assert np.issubdtype(results.dtype, np.number)
