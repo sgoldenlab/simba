@@ -6,12 +6,13 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import Any, Iterable, List, Optional, Tuple, Union, Dict
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import trafaret as t
 
+from simba.utils.enums import Options, UMAPParam
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 CorruptedFileError, CountError,
                                 DirectoryNotEmptyError, FloatError,
@@ -20,7 +21,6 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, StringError)
 from simba.utils.warnings import NoDataFoundWarning
-from simba.utils.enums import UMAPParam, Options
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
@@ -598,10 +598,16 @@ def check_if_list_contains_values(
             missing_values.append(value)
 
     if len(missing_values) > 0 and raise_error:
-        raise NoDataError(msg=f"{name} does not contain the following expected values: {missing_values}", source=check_if_list_contains_values.__name__)
+        raise NoDataError(
+            msg=f"{name} does not contain the following expected values: {missing_values}",
+            source=check_if_list_contains_values.__name__,
+        )
 
     elif len(missing_values) > 0 and not raise_error:
-        NoDataFoundWarning(msg=f"{name} does not contain the following expected values: {missing_values}", source=check_if_list_contains_values.__name__)
+        NoDataFoundWarning(
+            msg=f"{name} does not contain the following expected values: {missing_values}",
+            source=check_if_list_contains_values.__name__,
+        )
 
 
 def check_valid_hex_color(color_hex: str, raise_error: Optional[bool] = True) -> bool:
@@ -822,7 +828,12 @@ def check_valid_lst(
                 else:
                     return False
     if min_len is not None:
-        check_int(name=f'{source} {min_len}', value=min_len, min_value=0, raise_error=raise_error)
+        check_int(
+            name=f"{source} {min_len}",
+            value=min_len,
+            min_value=0,
+            raise_error=raise_error,
+        )
         if len(data) < min_len:
             if raise_error:
                 raise InvalidInputError(
@@ -832,7 +843,12 @@ def check_valid_lst(
             else:
                 return False
     if max_len is not None:
-        check_int(name=f'{source} {max_len}', value=max_len, min_value=0, raise_error=raise_error)
+        check_int(
+            name=f"{source} {max_len}",
+            value=max_len,
+            min_value=0,
+            raise_error=raise_error,
+        )
         if len(data) > max_len:
             if raise_error:
                 raise InvalidInputError(
@@ -842,10 +858,18 @@ def check_valid_lst(
             else:
                 return False
     if exact_len is not None:
-        check_int(name=f'{source} {exact_len}', value=exact_len, min_value=0, raise_error=raise_error)
+        check_int(
+            name=f"{source} {exact_len}",
+            value=exact_len,
+            min_value=0,
+            raise_error=raise_error,
+        )
         if len(data) == exact_len:
             if raise_error:
-                raise InvalidInputError(msg=f"Invalid length of list. Found {len(data)}, accepted: {exact_len}", source=source)
+                raise InvalidInputError(
+                    msg=f"Invalid length of list. Found {len(data)}, accepted: {exact_len}",
+                    source=source,
+                )
             else:
                 return False
     return True
@@ -883,7 +907,10 @@ def check_if_keys_exist_in_dict(
 
     return True
 
-def check_that_directory_is_empty(directory: Union[str, os.PathLike], raise_error: Optional[bool] = True) -> None:
+
+def check_that_directory_is_empty(
+    directory: Union[str, os.PathLike], raise_error: Optional[bool] = True
+) -> None:
     """
     Checks if a directory is empty. If the directory has content, then returns False or raises ``DirectoryNotEmptyError``.
 
@@ -893,17 +920,23 @@ def check_that_directory_is_empty(directory: Union[str, os.PathLike], raise_erro
 
     check_if_dir_exists(in_dir=directory)
     try:
-        all_files_in_folder = [f for f in next(os.walk(directory))[2] if not f[0] == "."]
+        all_files_in_folder = [
+            f for f in next(os.walk(directory))[2] if not f[0] == "."
+        ]
     except StopIteration:
         return 0
     else:
         if len(all_files_in_folder) > 0:
             if raise_error:
-                raise DirectoryNotEmptyError(msg=f"The {directory} is not empty and contains {str(len(all_files_in_folder))} files. Use a directory that is empty.",source=check_that_directory_is_empty.__name__)
+                raise DirectoryNotEmptyError(
+                    msg=f"The {directory} is not empty and contains {str(len(all_files_in_folder))} files. Use a directory that is empty.",
+                    source=check_that_directory_is_empty.__name__,
+                )
             else:
                 return False
         else:
             return True
+
 
 def check_umap_hyperparameters(hyper_parameters: Dict[str, Any]) -> None:
     """
@@ -917,15 +950,39 @@ def check_umap_hyperparameters(hyper_parameters: Dict[str, Any]) -> None:
     """
     for key in UMAPParam.HYPERPARAMETERS.value:
         if key not in hyper_parameters.keys():
-            raise InvalidInputError(msg=f"Hyperparameter dictionary is missing {key} entry.", source=check_umap_hyperparameters.__name__)
-    for key in [UMAPParam.N_NEIGHBORS.value, UMAPParam.MIN_DISTANCE.value, UMAPParam.SPREAD.value]:
+            raise InvalidInputError(
+                msg=f"Hyperparameter dictionary is missing {key} entry.",
+                source=check_umap_hyperparameters.__name__,
+            )
+    for key in [
+        UMAPParam.N_NEIGHBORS.value,
+        UMAPParam.MIN_DISTANCE.value,
+        UMAPParam.SPREAD.value,
+    ]:
         if not isinstance(hyper_parameters[key], list):
-            raise InvalidInputError(msg=f"Hyperparameter dictionary key {key} has to be a list but got {type(hyper_parameters[key])}.", source=check_umap_hyperparameters.__name__)
+            raise InvalidInputError(
+                msg=f"Hyperparameter dictionary key {key} has to be a list but got {type(hyper_parameters[key])}.",
+                source=check_umap_hyperparameters.__name__,
+            )
         if len(hyper_parameters[key]) == 0:
-            raise InvalidInputError(msg=f"Hyperparameter dictionary key {key} has 0 entries.", source=check_umap_hyperparameters.__name__)
+            raise InvalidInputError(
+                msg=f"Hyperparameter dictionary key {key} has 0 entries.",
+                source=check_umap_hyperparameters.__name__,
+            )
         for value in hyper_parameters[key]:
             if not isinstance(value, (int, float)):
-                raise InvalidInputError(msg=f"Hyperparameter dictionary key {key} have to have numeric entries but got {type(value)}.", source=check_umap_hyperparameters.__name__)
-    if (hyper_parameters[UMAPParam.SCALER.value] not in Options.SCALER_OPTIONS.value):
-        raise InvalidInputError( msg=f"Scaler {hyper_parameters[UMAPParam.SCALER.value]} not supported. Opitions: {Options.SCALER_OPTIONS.value}", source=check_umap_hyperparameters.__name__,)
-    check_float("VARIANCE THRESHOLD", value=hyper_parameters[UMAPParam.VARIANCE.value], min_value=0.0, max_value=100.0)
+                raise InvalidInputError(
+                    msg=f"Hyperparameter dictionary key {key} have to have numeric entries but got {type(value)}.",
+                    source=check_umap_hyperparameters.__name__,
+                )
+    if hyper_parameters[UMAPParam.SCALER.value] not in Options.SCALER_OPTIONS.value:
+        raise InvalidInputError(
+            msg=f"Scaler {hyper_parameters[UMAPParam.SCALER.value]} not supported. Opitions: {Options.SCALER_OPTIONS.value}",
+            source=check_umap_hyperparameters.__name__,
+        )
+    check_float(
+        "VARIANCE THRESHOLD",
+        value=hyper_parameters[UMAPParam.VARIANCE.value],
+        min_value=0.0,
+        max_value=100.0,
+    )

@@ -372,16 +372,16 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
         "Set3",
         "Set2",
         "Paired",
-        'seismic',
-        'prism',
-        'ocean'
+        "seismic",
+        "prism",
+        "ocean",
     ]
 
     for colormap in range(no_animals):
         if colormap in cm.cmap_d:
             currColorMap = cm.get_cmap(cmaps[colormap], map_size)
         else:
-            currColorMap = cm.get_cmap('spring', map_size)
+            currColorMap = cm.get_cmap("spring", map_size)
         currColorList = []
         for i in range(currColorMap.N):
             rgb = list((currColorMap(i)[:3]))

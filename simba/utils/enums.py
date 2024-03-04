@@ -342,7 +342,6 @@ class Options(Enum):
     QUANTILE_SCALER = "QUANTILE"
 
 
-
 class TextOptions(Enum):
     FIRST_LINE_SPACING = (
         2  # DISTANCE MULTIPLIER BETWEEN FIRST PRINTED ROW AND THE TOP OF THE IMAGE.
@@ -421,12 +420,13 @@ class Keys(Enum):
 
 
 class UMAPParam(Enum):
-    N_NEIGHBORS = 'n_neighbors'
+    N_NEIGHBORS = "n_neighbors"
     MIN_DISTANCE = "min_distance"
     SPREAD = "spread"
     VARIANCE = "variance"
     SCALER = "scaler"
     HYPERPARAMETERS = [N_NEIGHBORS, MIN_DISTANCE, SPREAD, SCALER, VARIANCE]
+
 
 class Dtypes(Enum):
     NAN = "NaN"

@@ -40,7 +40,13 @@ class ProjectCreatorPopUp(PopUpMixin):
         parent_tab = ttk.Notebook(hxtScrollbar(self.main_frm))
         self.btn_icons = get_icons_paths()
         for k in self.btn_icons.keys():
-            self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname("__file__"), self.btn_icons[k]["icon_path"])))
+            self.btn_icons[k]["img"] = ImageTk.PhotoImage(
+                image=PIL.Image.open(
+                    os.path.join(
+                        os.path.dirname("__file__"), self.btn_icons[k]["icon_path"]
+                    )
+                )
+            )
         self.create_project_tab = ttk.Frame(parent_tab)
         self.import_videos_tab = ttk.Frame(parent_tab)
         self.import_data_tab = ttk.Frame(parent_tab)
@@ -169,7 +175,9 @@ class ProjectCreatorPopUp(PopUpMixin):
         ]
         for k in self.bp_lu.keys():
             self.bp_lu[k]["img"] = ImageTk.PhotoImage(
-                file=os.path.join(os.path.dirname("__file__"), self.bp_lu[k]["img_path"])
+                file=os.path.join(
+                    os.path.dirname("__file__"), self.bp_lu[k]["img_path"]
+                )
             )
         self.classical_tracking_option_dict = {
             k: self.bp_lu[k] for k in self.classical_tracking_options
@@ -347,4 +355,4 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.create_import_videos_menu(parent_frm=self.import_videos_tab)
 
 
-#ProjectCreatorPopUp()
+# ProjectCreatorPopUp()

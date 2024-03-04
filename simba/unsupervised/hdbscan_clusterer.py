@@ -30,13 +30,12 @@ from simba.unsupervised.umap_embedder import UmapEmbedder
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
-                                check_if_keys_exist_in_dict, check_instance,
-                                check_str,
-                                check_if_list_contains_values,
-                                check_that_directory_is_empty)
+                                check_if_keys_exist_in_dict,
+                                check_if_list_contains_values, check_instance,
+                                check_str, check_that_directory_is_empty)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import read_pickle, write_pickle, drop_df_fields
+from simba.utils.read_write import drop_df_fields, read_pickle, write_pickle
 
 
 class HDBSCANClusterer(UnsupervisedMixin):
@@ -226,7 +225,11 @@ class HDBSCANClusterer(UnsupervisedMixin):
             scaler=model[Unsupervised.METHODS.value][Unsupervised.SCALER.value],
             name=dr_mdl_name,
         )
-        check_if_list_contains_values(data=list(scaled_data.columns), values=model[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value], name=self.__class__.__name__)
+        check_if_list_contains_values(
+            data=list(scaled_data.columns),
+            values=model[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value],
+            name=self.__class__.__name__,
+        )
         results = pd.DataFrame(
             model[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].transform(
                 scaled_data
