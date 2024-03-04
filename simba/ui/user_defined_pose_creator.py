@@ -150,5 +150,5 @@ class PoseConfigCreator(PlottingMixin):
         cv2.imwrite(new_img_path, overlay)
 
 
-# pose_config_creator = PoseConfigCreator(pose_name="My_test_config", no_animals=1, img_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_viz_2/intelligent_hermann_CLASSIFIER.png', bp_list=['Ear', 'Nose', 'Left_ear'], animal_id_int_list= [1, 1, 1, 2, 2, 2])
+# pose_config_creator = PoseConfigCreator(pose_name="My_test_config", no_animals=1, img_path='/Users/simon/Desktop/crop_circles_3.png', bp_list=['Ear', 'Nose', 'Left_ear'], animal_id_int_list= [1, 1, 1, 2, 2, 2])
 # pose_config_creator.launch()

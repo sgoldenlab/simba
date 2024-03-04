@@ -41,9 +41,7 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
         )
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
-        print(
-            f"Creating unsupervised learning dataset from {len(self.machine_results_paths)} data files..."
-        )
+        print(f"Creating unsupervised learning dataset from {len(self.machine_results_paths)} data files...")
         check_if_filepath_list_is_empty(
             filepaths=self.machine_results_paths,
             error_msg="NO MACHINE LEARNING DATA FOUND in project_folder/csv/machine_results directory",
@@ -165,7 +163,7 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
         )
 
     def save(self):
-        print("Saving SimBa unsupervised dataset...")
+        print("Saving SimBA unsupervised dataset...")
         if len(self.bouts_x_df) == 0:
             raise NoDataError(
                 msg="The data contains zero frames after the selected slice setting",
@@ -200,21 +198,9 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
         write_pickle(data=results, save_path=self.save_path)
         self.timer.stop_timer()
         self.__aggregate_dataset_stats()
-        stdout_success(
-            msg=f"Dataset for unsupervised learning saved at {self.save_path}",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"Dataset for unsupervised learning saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
 
 
-settings = {
-    "data_slice": "ALL FEATURES (EXCLUDING POSE)",
-    "clf_slice": "Attack",
-    "bout_aggregation_type": "MEDIAN",
-    "min_bout_length": 66,
-    "feature_path": "/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv",
-}
-db_creator = DatasetCreator(
-    config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini",
-    settings=settings,
-)
-db_creator.run()
+# settings = {"data_slice": "ALL FEATURES (EXCLUDING POSE)", "clf_slice": "Attack", "bout_aggregation_type": "MEDIAN", "min_bout_length": 66, "feature_path": "/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv",}
+# db_creator = DatasetCreator(config_path="/Users/simon/Desktop/envs/simba/troubleshooting/unsupervised/project_folder/project_config.ini", settings=settings)
+# db_creator.run()

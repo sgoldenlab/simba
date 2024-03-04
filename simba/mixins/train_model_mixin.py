@@ -28,10 +28,10 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import partial_dependence, permutation_importance
 from sklearn.metrics import precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
-from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
-                                   StandardScaler)
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer, StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
+from sklearn.feature_selection import VarianceThreshold
 from tabulate import tabulate
 from yellowbrick.classifier import ClassificationReport
 
@@ -2867,6 +2867,24 @@ class TrainModelMixin(object):
         ).set_index(data.index)
 
     @staticmethod
+    def define_scaler(scaler_name: Literal["MIN-MAX", "STANDARD", "QUANTILE"]) -> Union[MinMaxScaler, StandardScaler, QuantileTransformer]:
+        """
+        Defines a sklearn scaler object. See ``UMLOptions.SCALER_OPTIONS.value`` for accepted scalers.
+
+        :example:
+        >>> TrainModelMixin.define_scaler(scaler_name='MIN-MAX')
+        """
+
+        if scaler_name not in Options.SCALER_OPTIONS.value:
+            raise InvalidInputError(msg=f"Scaler {scaler_name} not supported. Options: {Options.SCALER_OPTIONS.value}", source=self.__class__.__name__)
+        if scaler_name == Options.MIN_MAX_SCALER.value:
+            return MinMaxScaler()
+        elif scaler_name == Options.STANDARD_SCALER.value:
+            return StandardScaler()
+        elif scaler_name == Options.QUANTILE_SCALER.value:
+            return QuantileTransformer()
+
+    @staticmethod
     def scaler_transform(
         data: pd.DataFrame,
         scaler: Union[MinMaxScaler, StandardScaler, QuantileTransformer],
@@ -2900,6 +2918,23 @@ class TrainModelMixin(object):
         return pd.DataFrame(scaler.transform(data), columns=data.columns).set_index(
             data.index
         )
+
+    @staticmethod
+    def find_low_variance_fields(data: pd.DataFrame, variance_threshold: float) -> List[str]:
+        """
+        Finds fields with variance below provided threshold.
+
+        :param pd.DataFrame data: Dataframe with continoues numerical features.
+        :param float variance: Variance threshold (0.0-1.0).
+        :return List[str]:
+        """
+        feature_selector = VarianceThreshold(threshold=round((variance_threshold / 100), 2))
+        feature_selector.fit(data)
+        low_variance_fields = [c for c in data.columns if c not in data.columns[feature_selector.get_support()]]
+        if len(low_variance_fields) == len(data.columns):
+            raise NoDataError(msg=f"All feature columns show a variance below the {variance_threshold} threshold. Thus, no data remain for analysis.", source=TrainModelMixin.find_low_variance_fields.__name__)
+        return low_variance_fields
+
 
 
 # test = TrainModelMixin()

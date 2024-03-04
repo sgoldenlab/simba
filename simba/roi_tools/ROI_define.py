@@ -21,6 +21,7 @@ from simba.utils.lookups import get_color_dict
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
+from simba.utils.checks import  check_file_exist_and_readable
 
 WINDOW_SIZE = (800, 750)
 
@@ -48,35 +49,25 @@ class ROI_definitions(ConfigReader, PopUpMixin):
 
     def __init__(self, config_path: str, video_path: str):
 
+        check_file_exist_and_readable(file_path=config_path)
+        check_file_exist_and_readable(file_path=video_path)
+
         ConfigReader.__init__(self, config_path=config_path)
-        log_event(
-            logger_name=str(__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
+        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         self.video_path = video_path
         _, self.file_name, self.file_ext = get_fn_ext(self.video_path)
-        self.other_video_paths = list(
-            find_all_videos_in_directory(
-                directory=self.video_dir, as_dict=True
-            ).values()
-        )
+        self.other_video_paths = list(find_all_videos_in_directory(directory=self.video_dir, as_dict=True).values())
         self.other_video_paths.remove(video_path)
         self.other_video_file_names = []
-        for video in self.other_video_paths:
-            self.other_video_file_names.append(os.path.basename(video))
-        self.video_info, self.curr_px_mm, self.curr_fps = self.read_video_info(
-            video_name=self.file_name
-        )
+        for video in self.other_video_paths: self.other_video_file_names.append(os.path.basename(video))
+        self.video_info, self.curr_px_mm, self.curr_fps = self.read_video_info(video_name=self.file_name)
 
         self.roi_root = Toplevel()
         self.roi_root.minsize(WINDOW_SIZE[0], WINDOW_SIZE[1])
         self.screen_width = self.roi_root.winfo_screenwidth()
         self.screen_height = self.roi_root.winfo_screenheight()
         self.default_top_left_x = self.screen_width - WINDOW_SIZE[0]
-        self.roi_root.geometry(
-            "%dx%d+%d+%d" % (WINDOW_SIZE[0], WINDOW_SIZE[1], self.default_top_left_x, 0)
-        )
+        self.roi_root.geometry("%dx%d+%d+%d" % (WINDOW_SIZE[0], WINDOW_SIZE[1], self.default_top_left_x, 0))
         self.roi_root.wm_title("Region of Interest Settings")
         self.roi_root.protocol("WM_DELETE_WINDOW", self._terminate)
 
@@ -108,66 +99,34 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.interact_menus()
         self.draw_menu()
         self.save_menu()
-        self.image_data = ROI_image_class(
-            config_path=self.config_path,
-            video_path=self.video_path,
-            ROI_define_instance=self,
-        )
+        self.image_data = ROI_image_class(config_path=self.config_path, video_path=self.video_path, ROI_define_instance=self)
         self.video_frame_count = int(self.image_data.video_frame_count)
         self.get_all_ROI_names()
         if len(self.video_ROIs) > 0:
             self.update_delete_ROI_menu()
 
-        # self.master.mainloop()
+        self.master.mainloop()
 
     def _terminate(self):
         self.Exit()
 
     def show_video_info(self):
-        self.video_info_frame = LabelFrame(
-            self.master,
-            text="Video information",
-            font=("Arial", 14, "bold"),
-            padx=5,
-            pady=5,
-        )
+        self.video_info_frame = LabelFrame(self.master, text="Video information", font=("Arial", 14, "bold"), padx=5, pady=5)
         self.video_info_frame.grid_configure(ipadx=55)
-        self.video_name_lbl_1 = Label(
-            self.video_info_frame, text="Video name: ", font=("Arial", 10)
-        ).grid(row=0, column=0)
-        self.video_name_lbl_2 = Label(
-            self.video_info_frame, text=str(self.file_name), font=("Arial", 10, "bold")
-        )
+        self.video_name_lbl_1 = Label(self.video_info_frame, text="Video name: ", font=("Arial", 10)).grid(row=0, column=0)
+        self.video_name_lbl_2 = Label(self.video_info_frame, text=str(self.file_name), font=("Arial", 10, "bold"))
 
-        self.video_ext_lbl_1 = Label(
-            self.video_info_frame, text="Video format: ", font=("Arial", 10)
-        ).grid(row=0, column=2)
-        self.video_ext_lbl_2 = Label(
-            self.video_info_frame, text=str(self.file_ext), font=("Arial", 10, "bold")
-        )
+        self.video_ext_lbl_1 = Label(self.video_info_frame, text="Video format: ", font=("Arial", 10)).grid(row=0, column=2)
+        self.video_ext_lbl_2 = Label(self.video_info_frame, text=str(self.file_ext), font=("Arial", 10, "bold"))
 
-        self.video_fps_lbl_1 = Label(
-            self.video_info_frame, text="FPS: ", font=("Arial", 10)
-        ).grid(row=0, column=4)
-        self.video_fps_lbl_2 = Label(
-            self.video_info_frame, text=str(self.curr_fps), font=("Arial", 10, "bold")
-        )
+        self.video_fps_lbl_1 = Label(self.video_info_frame, text="FPS: ", font=("Arial", 10)).grid(row=0, column=4)
+        self.video_fps_lbl_2 = Label(self.video_info_frame, text=str(self.curr_fps), font=("Arial", 10, "bold"))
 
-        self.video_frame_lbl_1 = Label(
-            self.video_info_frame, text="Display frame #: ", font=("Arial", 10)
-        ).grid(row=0, column=6)
-        self.video_frame_lbl_2 = Label(
-            self.video_info_frame, text=str(self.img_no), font=("Arial", 10, "bold")
-        )
+        self.video_frame_lbl_1 = Label(self.video_info_frame, text="Display frame #: ", font=("Arial", 10)).grid(row=0, column=6)
+        self.video_frame_lbl_2 = Label(self.video_info_frame, text=str(self.img_no), font=("Arial", 10, "bold"))
 
-        self.video_frame_time_1 = Label(
-            self.video_info_frame, text="Display frame (s): ", font=("Arial", 10)
-        ).grid(row=0, column=8)
-        self.video_frame_time_2 = Label(
-            self.video_info_frame,
-            text=str(round((self.img_no / self.curr_fps), 2)),
-            font=("Arial", 10, "bold"),
-        )
+        self.video_frame_time_1 = Label(self.video_info_frame, text="Display frame (s): ", font=("Arial", 10)).grid(row=0, column=8)
+        self.video_frame_time_2 = Label(self.video_info_frame,text=str(round((self.img_no / self.curr_fps), 2)), font=("Arial", 10, "bold"))
 
         self.video_info_frame.grid(row=0, sticky=W)
         self.video_name_lbl_2.grid(row=0, column=1)
@@ -177,36 +136,14 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.video_frame_time_2.grid(row=0, column=9)
 
     def select_img(self):
-        self.img_no_frame = LabelFrame(
-            self.master, text="Change image", font=("Arial", 16, "bold"), padx=5, pady=5
-        )
+        self.img_no_frame = LabelFrame(self.master, text="Change image", font=("Arial", 16, "bold"), padx=5, pady=5)
         self.img_no_frame.grid_configure(ipadx=100)
-        self.pos_1s = Button(
-            self.img_no_frame,
-            text="+1s",
-            fg=self.non_select_color,
-            command=lambda: self.set_current_image("plus"),
-        )
-        self.neg_1s = Button(
-            self.img_no_frame,
-            text="-1s",
-            fg=self.non_select_color,
-            command=lambda: self.set_current_image("minus"),
-        )
-        self.reset_btn = Button(
-            self.img_no_frame,
-            text="Reset first frame",
-            fg=self.non_select_color,
-            command=lambda: self.set_current_image("reset"),
-        )
+        self.pos_1s = Button(self.img_no_frame, text="+1s", fg=self.non_select_color, command=lambda: self.set_current_image("plus"))
+        self.neg_1s = Button(self.img_no_frame, text="-1s", fg=self.non_select_color, command=lambda: self.set_current_image("minus"))
+        self.reset_btn = Button(self.img_no_frame, text="Reset first frame", fg=self.non_select_color, command=lambda: self.set_current_image("reset"))
         self.seconds_fw_label = Label(self.img_no_frame, text="Seconds forward: ")
         self.seconds_fw_entry = Entry(self.img_no_frame, width=4)
-        self.custom_run_seconds = Button(
-            self.img_no_frame,
-            text="Move",
-            fg=self.non_select_color,
-            command=lambda: self.set_current_image("custom"),
-        )
+        self.custom_run_seconds = Button(self.img_no_frame, text="Move", fg=self.non_select_color, command=lambda: self.set_current_image("custom"))
         self.img_no_frame.grid(row=1, sticky=W)
         self.pos_1s.grid(row=1, column=0, sticky=W, pady=10, padx=10)
         self.neg_1s.grid(row=1, column=1, sticky=W, pady=10, padx=10)
@@ -244,9 +181,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
                 self.custom_run_seconds.configure(fg=self.select_color)
 
         self.video_frame_lbl_2.config(text=str(self.img_no))
-        self.video_frame_time_2.config(
-            text=str(round((self.img_no / self.curr_fps), 2))
-        )
+        self.video_frame_time_2.config(text=str(round((self.img_no / self.curr_fps), 2)))
         self.image_data.update_frame_no(self.img_no)
 
     def get_other_videos_w_data(self):
@@ -300,13 +235,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
 
     def apply_from_other_videos_menu(self):
         self.get_other_videos_w_data()
-        self.apply_from_other_video = LabelFrame(
-            self.master,
-            text="Apply shapes from another video",
-            font=("Arial", 16, "bold"),
-            padx=5,
-            pady=5,
-        )
+        self.apply_from_other_video = LabelFrame(self.master,text="Apply shapes from another video", font=("Arial", 16, "bold"), padx=5, pady=5)
         self.select_video_label = Label(
             self.apply_from_other_video, text="Select video: "
         ).grid(row=1, column=0)
@@ -439,12 +368,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
             pady=5,
         )
         self.interact_frame.grid_configure(ipadx=30)
-        self.move_shape_button = Button(
-            self.interact_frame,
-            text="Move shape",
-            fg=self.non_select_color,
-            command=lambda: self.set_interact_state("move_shape"),
-        )
+        self.move_shape_button = Button(self.interact_frame, text="Move shape", fg=self.non_select_color, command=lambda: self.set_interact_state("move_shape"))
         self.zoom_in_button = Button(
             self.interact_frame,
             text="Zoom IN",
@@ -699,6 +623,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
                 self.zoom_home.configure(fg=self.non_select_color)
                 self.pan.configure(fg=self.select_color)
             self.stored_interact = c_interact
+
         self.image_data.interact_functions(self.stored_interact, zoom_val=0)
         self.reset_selected_buttons("interact")
 
@@ -1154,8 +1079,8 @@ class PreferenceMenu:
         )
 
 
-# test = ROI_definitions(config_path='/Users/simon/Desktop/envs/simba_dev/tests/test_data/mouse_open_field/project_folder/project_config.ini',
-#                       video_path='/Users/simon/Desktop/envs/simba_dev/tests/test_data/mouse_open_field/project_folder/videos/Video1.mp4')
+# test = ROI_definitions(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+#                       video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi')
 
 
 # test = ROI_definitions(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi')

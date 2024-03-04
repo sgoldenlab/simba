@@ -216,18 +216,10 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                                 key=lambda n, c=itertools.count(): n - next(c),
                             )
                         ]
-                        self.time_dict[video_name][animal_name][shape_name] = round(
-                            len(slice) / self.fps, 3
-                        )
-                        self.entries_dict[video_name][animal_name][shape_name] = len(
-                            bouts
-                        )
-                        self.entries_exit_dict[video_name][animal_name][shape_name][
-                            "Entry_times"
-                        ] = list(map(lambda x: x[0], bouts))
-                        self.entries_exit_dict[video_name][animal_name][shape_name][
-                            "Exit_times"
-                        ] = list(map(lambda x: x[1], bouts))
+                        self.time_dict[video_name][animal_name][shape_name] = round(len(slice) / self.fps, 3)
+                        self.entries_dict[video_name][animal_name][shape_name] = len(bouts)
+                        self.entries_exit_dict[video_name][animal_name][shape_name]["Entry_times"] = list(map(lambda x: x[0], bouts))
+                        self.entries_exit_dict[video_name][animal_name][shape_name]["Exit_times"] = list(map(lambda x: x[1], bouts))
 
                     for _, row in self.video_circs.iterrows():
                         center_x, center_y, radius, shape_name = (
@@ -283,15 +275,20 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                         points_arr = animal_df[
                             [self.bp_dict[animal_name][0], self.bp_dict[animal_name][1]]
                         ].to_numpy()
+
+
                         contains_func = np.vectorize(
                             lambda p: polygon_shape.contains(Point(p)),
                             signature="(n)->()",
                         )
+
                         inside_frame_no = [
                             j
                             for sub in np.argwhere(contains_func(points_arr))
                             for j in sub
                         ]
+
+
                         slice = (
                             animal_df.loc[
                                 (animal_df.index.isin(inside_frame_no))
@@ -303,6 +300,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                             .reset_index()
                             .rename(columns={"index": "frame_no"})
                         )
+
                         bouts = [
                             self.__get_bouts(g)
                             for _, g in itertools.groupby(
@@ -310,6 +308,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                                 key=lambda n, c=itertools.count(): n - next(c),
                             )
                         ]
+
                         self.time_dict[video_name][animal_name][shape_name] = round(
                             len(slice) / self.fps, 3
                         )
@@ -323,11 +322,10 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                             "Exit_times"
                         ] = list(map(lambda x: x[1], bouts))
 
+                print('ss')
                 if self.calculate_distances:
                     self.movement_dict[video_name] = {}
-                    for animal, shape_dicts in self.entries_exit_dict[
-                        video_name
-                    ].items():
+                    for animal, shape_dicts in self.entries_exit_dict[video_name].items():
                         self.movement_dict[video_name][animal] = {}
                         for shape_name, shape_data in shape_dicts.items():
                             d = pd.DataFrame.from_dict(
@@ -545,6 +543,13 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             msg="ROI analysis complete", elapsed_time=self.timer.elapsed_time_str
         )
 
+
+
+# test = ROIAnalyzer(ini_path = r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
+#                    data_path = "outlier_corrected_movement_location",
+#                    calculate_distances=False,
+#                    settings={'threshold': 0.00, 'body_parts': {'Animal_1': 'Nose'}})
+# test.run()
 
 # test = ROIAnalyzer(ini_path = r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
 #                    data_path = "outlier_corrected_movement_location",

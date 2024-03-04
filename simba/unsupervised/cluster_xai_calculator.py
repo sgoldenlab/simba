@@ -16,7 +16,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict, check_instance)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import read_pickle
+from simba.utils.read_write import read_pickle, get_unique_values_in_iterable
 
 FEATURE_NAME = "FEATURE NAME"
 FEATURE_IMPORTANCE = "IMPORTANCE"
@@ -108,13 +108,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             ],
             axis=1,
         )
-        self.cluster_cnt = self.get_cluster_cnt(
-            data=self.cluster_data,
-            clusterer_name=self.data[Clustering.CLUSTER_MODEL.value][
-                Unsupervised.HASHED_NAME.value
-            ],
-            min_clusters=2,
-        )
+        self.cluster_cnt = get_unique_values_in_iterable(data=self.cluster_data, name=self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min=2)
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
         if (

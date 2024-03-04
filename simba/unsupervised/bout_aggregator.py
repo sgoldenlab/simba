@@ -18,14 +18,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import read_video_info
 
 
-def bout_aggregator(
-    data: pd.DataFrame,
-    clfs: List[str],
-    feature_names: List[str],
-    video_info: pd.DataFrame,
-    min_bout_length: Optional[int] = 0,
-    aggregator: Optional[Literal["MEAN", "MEDIAN"]] = "MEAN",
-) -> pd.DataFrame:
+def bout_aggregator(data: pd.DataFrame, clfs: List[str], feature_names: List[str], video_info: pd.DataFrame, min_bout_length: Optional[int] = 0, aggregator: Optional[Literal["MEAN", "MEDIAN"]] = "MEAN") -> pd.DataFrame:
     """
     Helper to aggregate features to bout-level representations for unsupervised analysis.
 
@@ -35,7 +28,6 @@ def bout_aggregator(
     :param Optional[Literal['MEAN', 'MEDIAN']] aggregator: Aggregation type, e.g., 'MEAN', 'MEDIAN'. Default 'MEAN'.
     :param Optional[int] min_bout_length: The length of the shortest allowed bout in milliseconds. Default 0 which means all bouts.
     :param pd.DataFrame video_info: Dataframe holding video names, fps, resolution etc typically located at project_folder/logs/video_info.csv of SimBA project.
-
     :return pd.DataFrame: Featurized data at aggregate bout level.
     """
 
@@ -119,3 +111,6 @@ def bout_aggregator(
         msg="Bout aggregation statistics complete!", elapsed_time=timer.elapsed_time_str
     )
     return pd.concat(output, axis=0).reset_index(drop=True)
+
+
+

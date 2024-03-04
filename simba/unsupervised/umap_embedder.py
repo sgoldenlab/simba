@@ -19,11 +19,15 @@ from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
-                                check_if_keys_exist_in_dict, check_instance,
-                                check_str, check_that_directory_is_empty)
+                                check_if_keys_exist_in_dict,
+                                check_instance,
+                                check_str,
+                                check_that_directory_is_empty,
+                                check_if_list_contains_values,
+                                check_umap_hyperparameters)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import read_pickle, write_df, write_pickle
+from simba.utils.read_write import read_pickle, write_df, write_pickle, drop_df_fields
 
 try:
     from cuml import UMAP
@@ -79,7 +83,7 @@ class UmapEmbedder(UnsupervisedMixin):
         self.save_dir = save_dir
 
         self.low_var_cols, self.hyper_parameters = None, hyper_parameters
-        self.check_umap_hyperparameters(hyper_parameters=hyper_parameters)
+        check_umap_hyperparameters(hyper_parameters=hyper_parameters)
         self.search_space = list(
             itertools.product(
                 *[
@@ -91,18 +95,11 @@ class UmapEmbedder(UnsupervisedMixin):
         )
         print(f"Building {len(self.search_space)} UMAP model(s)...")
         if hyper_parameters[Unsupervised.VARIANCE.value] > 0:
-            self.low_var_cols = self.find_low_variance_fields(
-                data=self.umap_df,
-                variance=hyper_parameters[Unsupervised.VARIANCE.value],
-            )
-            self.umap_df = self.drop_fields(data=self.umap_df, fields=self.low_var_cols)
-        self.scaler = self.define_scaler(
-            scaler_name=hyper_parameters[Unsupervised.SCALER.value]
-        )
+            self.low_var_cols = TrainModelMixin.find_low_variance_fields(data=self.umap_df, variance_threshold=hyper_parameters[Unsupervised.VARIANCE.value])
+            self.umap_df = drop_df_fields(data=self.umap_df, fields=self.low_var_cols)
+        self.scaler = TrainModelMixin.define_scaler(scaler_name=hyper_parameters[Unsupervised.SCALER.value])
         self.scaler.fit(self.umap_df)
-        self.scaled_umap_data = self.scaler_transform(
-            data=self.umap_df, scaler=self.scaler
-        )
+        self.scaled_umap_data = TrainModelMixin.scaler_transform(data=self.umap_df, scaler=self.scaler)
         self.__create_methods_log()
         self.__fit_umaps()
         self.timer.stop_timer()
@@ -161,7 +158,7 @@ class UmapEmbedder(UnsupervisedMixin):
             self.__save(data=results)
 
     def __save(self, data: dict) -> None:
-        self.write_pickle(
+        write_pickle(
             data=data,
             save_path=os.path.join(
                 self.save_dir,
@@ -228,18 +225,13 @@ class UmapEmbedder(UnsupervisedMixin):
             data=umap_df,
             scaler=model[Unsupervised.METHODS.value][Unsupervised.SCALER.value],
         )
-        scaled_umap_data = self.drop_fields(
+        scaled_umap_data = drop_df_fields(
             data=scaled_umap_data,
             fields=model[Unsupervised.METHODS.value][
                 Unsupervised.LOW_VARIANCE_FIELDS.value
             ],
         )
-        self.check_expected_fields(
-            data_fields=list(scaled_umap_data.columns),
-            expected_fields=model[Unsupervised.METHODS.value][
-                Unsupervised.FEATURE_NAMES.value
-            ],
-        )
+        check_if_list_contains_values(data=list(scaled_umap_data.columns), values=model[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value], name=self.__class__.__name__)
         results = pd.DataFrame(
             model[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].transform(
                 scaled_umap_data

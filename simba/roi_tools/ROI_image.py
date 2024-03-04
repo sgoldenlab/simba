@@ -2,24 +2,24 @@ import itertools
 import os
 import re
 from copy import deepcopy
-
 import cv2
 import numpy as np
 import pandas as pd
+import threading
 
-from simba.roi_tools import ROI_define
+#from simba.roi_tools import ROI_define
 from simba.roi_tools.ROI_move_shape import move_edge, move_edge_align
 from simba.roi_tools.ROI_zoom import zoom_in
 from simba.utils.data import add_missing_ROI_cols
 from simba.utils.enums import ConfigKey, Keys, Paths
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import get_fn_ext, read_config_file
+#from simba.utils.keyboard_listener import KeyboardListener
+from simba.utils.read_write import get_fn_ext, read_config_file #kbd_listener
 
 
 class ROI_image_class:
 
-    def __init__(
-        self, config_path: str, video_path: str, ROI_define_instance: ROI_define
+    def __init__(self, config_path: str, video_path: str, ROI_define_instance: object,
     ):
 
         config = read_config_file(config_path=config_path)
@@ -59,6 +59,7 @@ class ROI_image_class:
         self.zoomed_img_ratio = 1
         self.no_shapes = 0
         self.current_zoom = 100
+        # self.kbd_listener = kbd_listener()
         self.working_frame = deepcopy(self.orig_frame)
         cv2.namedWindow("Define shape", cv2.WINDOW_NORMAL)
         cv2.imshow("Define shape", self.working_frame)
@@ -386,11 +387,7 @@ class ROI_image_class:
                     )
 
             if self.closest_roi["Shape_type"] == "Circle":
-                cv2.circle(
-                    self.working_frame,
-                    (self.closest_roi["centerX"], self.closest_roi["centerY"]),
-                    self.closest_roi["radius"],
-                    self.select_color,
+                cv2.circle(self.working_frame, (self.closest_roi["centerX"], self.closest_roi["centerY"]), self.closest_roi["radius"], self.select_color,
                     int(self.closest_roi["Thickness"]),
                 )
 
@@ -449,22 +446,9 @@ class ROI_image_class:
             merged_out = self.out_rectangles + self.out_circles + self.out_polygon
             for s in merged_out:
                 for t in s["Tags"]:
-                    dist = int(
-                        (
-                            np.sqrt(
-                                (self.click_loc[0] - s["Tags"][t][0]) ** 2
-                                + (self.click_loc[1] - s["Tags"][t][1]) ** 2
-                            )
-                        )
-                    )
-                    if ((not self.closest_roi) and (dist < self.click_sens)) or (
-                        dist < self.closest_dist
-                    ):
-                        self.closest_roi, self.closest_tag, self.closest_dist = (
-                            s,
-                            t,
-                            dist,
-                        )
+                    dist = int((np.sqrt((self.click_loc[0] - s["Tags"][t][0]) ** 2 + (self.click_loc[1] - s["Tags"][t][1]) ** 2)))
+                    if ((not self.closest_roi) and (dist < self.click_sens)) or (dist < self.closest_dist):
+                        self.closest_roi, self.closest_tag, self.closest_dist = (s, t, dist)
             if self.closest_dist is not np.inf:
                 recolor_roi_tags()
 
@@ -504,19 +488,16 @@ class ROI_image_class:
             try:
                 initiate_x_y_callback()
             except:
-                raise InvalidInputError(
-                    msg="Complete ROI before preceding by clicking ESC or ENTER or SPACE",
-                    source=self.__class__.__name__,
-                )
+                raise InvalidInputError(msg="Complete ROI before preceding by clicking ESC or ENTER or SPACE", source=self.__class__.__name__)
 
-            # initiate_x_y_callback() # get x y loc ROI tag
-            find_closest_ROI_tag()  # find closest ROI tag to x y loc
-            initiate_x_y_callback()  # get x y loc for new x y loc
+            find_closest_ROI_tag()
+            initiate_x_y_callback()
             check_if_click_is_tag()
+
+            # TODO if self.check_shift_key():
+
             if self.click_roi:
-                move_edge_align(
-                    self.closest_roi, self.closest_tag, self.click_roi, self.click_tag
-                )
+                move_edge_align(self.closest_roi, self.closest_tag, self.click_roi, self.click_tag)
             else:
                 move_edge(self.closest_roi, self.closest_tag, self.click_loc)
             self.insert_all_ROIs_into_image()  # re-insert ROIs

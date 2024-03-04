@@ -31,10 +31,12 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_keys_exist_in_dict, check_instance,
-                                check_str)
+                                check_str,
+                                check_if_list_contains_values,
+                                check_that_directory_is_empty)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import read_pickle, write_pickle
+from simba.utils.read_write import read_pickle, write_pickle, drop_df_fields
 
 
 class HDBSCANClusterer(UnsupervisedMixin):
@@ -63,7 +65,7 @@ class HDBSCANClusterer(UnsupervisedMixin):
         """
 
         self.save_dir, self.data_path = save_dir, data_path
-        self.check_that_directory_is_empty(directory=self.save_dir)
+        check_that_directory_is_empty(directory=self.save_dir)
         if os.path.isdir(data_path):
             check_if_dir_exists(in_dir=data_path)
             check_if_filepath_list_is_empty(
@@ -143,7 +145,7 @@ class HDBSCANClusterer(UnsupervisedMixin):
                 self.__save(data=results)
 
     def __save(self, data: dict) -> None:
-        self.write_pickle(
+        write_pickle(
             data=data,
             save_path=os.path.join(
                 self.save_dir, f"{self.model[Unsupervised.HASHED_NAME.value]}.pickle"
@@ -213,7 +215,7 @@ class HDBSCANClusterer(UnsupervisedMixin):
             Unsupervised.HASHED_NAME.value
         ]
         data_df = deepcopy(data[Unsupervised.BOUTS_FEATURES.value])
-        data_df = self.drop_fields(
+        data_df = drop_df_fields(
             data=data_df,
             fields=model[Unsupervised.METHODS.value][
                 Unsupervised.LOW_VARIANCE_FIELDS.value
@@ -224,12 +226,7 @@ class HDBSCANClusterer(UnsupervisedMixin):
             scaler=model[Unsupervised.METHODS.value][Unsupervised.SCALER.value],
             name=dr_mdl_name,
         )
-        self.check_expected_fields(
-            data_fields=list(scaled_data.columns),
-            expected_fields=model[Unsupervised.METHODS.value][
-                Unsupervised.FEATURE_NAMES.value
-            ],
-        )
+        check_if_list_contains_values(data=list(scaled_data.columns), values=model[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value], name=self.__class__.__name__)
         results = pd.DataFrame(
             model[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].transform(
                 scaled_data

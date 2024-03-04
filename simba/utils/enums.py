@@ -336,6 +336,11 @@ class Options(Enum):
         "Annotations EVENT COUNT conflict",
         "Annotations data file NOT FOUND",
     ]
+    SCALER_OPTIONS = ["MIN-MAX", "STANDARD", "QUANTILE"]
+    MIN_MAX_SCALER = "MIN-MAX"
+    STANDARD_SCALER = "STANDARD"
+    QUANTILE_SCALER = "QUANTILE"
+
 
 
 class TextOptions(Enum):
@@ -414,6 +419,14 @@ class Keys(Enum):
     DOCUMENTATION = "documentation"
     FRAME_COUNT = "frame_count"
 
+
+class UMAPParam(Enum):
+    N_NEIGHBORS = 'n_neighbors'
+    MIN_DISTANCE = "min_distance"
+    SPREAD = "spread"
+    VARIANCE = "variance"
+    SCALER = "scaler"
+    HYPERPARAMETERS = [N_NEIGHBORS, MIN_DISTANCE, SPREAD, SCALER, VARIANCE]
 
 class Dtypes(Enum):
     NAN = "NaN"

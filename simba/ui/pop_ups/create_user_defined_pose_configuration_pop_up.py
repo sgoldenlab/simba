@@ -57,13 +57,11 @@ class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):
         self.main_frm.mainloop()
 
     def create_bodypart_table(self):
-        if hasattr(self, "bp_table_frm"):
-            self.bp_table_frm.destroy()
+        if hasattr(self, "table_frame"):
+            self.table_frame.destroy()
         check_int(name="ANIMAL NUMBER", value=self.animal_cnt_entry_box.entry_get)
         check_int(name="BODY-PART NUMBER", value=self.no_body_parts_entry_box.entry_get)
-        self.selected_animal_cnt, self.selected_bp_cnt = int(
-            self.animal_cnt_entry_box.entry_get
-        ), int(self.no_body_parts_entry_box.entry_get)
+        self.selected_animal_cnt, self.selected_bp_cnt = int(self.animal_cnt_entry_box.entry_get), int(self.no_body_parts_entry_box.entry_get)
         check_int(name="number of animals", value=self.selected_animal_cnt)
         check_int(name="number of body-parts", value=self.selected_bp_cnt)
         self.bp_name_list = []
@@ -77,9 +75,7 @@ class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):
                 width=700,
             )
         else:
-            self.table_frame = LabelFrame(
-                self.main_frm, text="Bodypart name            "
-            )
+            self.table_frame = LabelFrame(self.main_frm, text="Bodypart name            ", height=500, width=700)
 
         scroll_table = hxtScrollbar(self.table_frame)
 
@@ -144,4 +140,4 @@ class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):
         self.root.destroy()
 
 
-# CreateUserDefinedPoseConfigurationPopUp()
+#CreateUserDefinedPoseConfigurationPopUp()

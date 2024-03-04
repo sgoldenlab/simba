@@ -1,1 +1,9 @@
 recursive-include simba *
+prune */__pycache__
+recursive-exclude */__pycache__ *
+global-exclude __pycache__/*
+global-exclude */__pycache__/*
+prune */pose_configurations_archive
+recursive-exclude */pose_configurations_archive *
+global-exclude pose_configurations_archive/*
+global-exclude */pose_configurations_archive/*
