@@ -2698,6 +2698,37 @@ class GeometryMixin(object):
         return [shapes[idx] for idx in ranked]
 
     @staticmethod
+    def contours_to_geometries(contours: List[np.ndarray], force_rectangles: Optional[bool] = True) -> List[Polygon]:
+        """
+        Convert a list of contours to a list of geometries.
+
+        E.g., convert a list of contours detected with ``ImageMixin.find_contours`` to a list of Shapely geometries
+        that can be used within the ``GeometryMixin``.
+
+        :param List[np.ndarray] contours: List of contours represented as 2D arrays.
+        :param force_rectangles: If True, then force the resulting geometries to be rectangular.
+        :return List[Polygon]: List of Shapley Polygons.
+
+        :example:
+        >>> video_frm = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4')
+        >>> contours = ImageMixin.find_contours(img=video_frm)
+        >>> GeometryMixin.contours_to_geometries(contours=contours)
+        """
+
+        check_instance(source=GeometryMixin.contours_to_geometries.__name__, instance=contours, accepted_types=(list,))
+        for i in contours: check_instance(source=f'{GeometryMixin.contours_to_geometries.__name__} {i}', instance=i,
+                                          accepted_types=(np.ndarray,))
+        results = []
+        for contour in contours:
+            if contour.ndim == 3:
+                contour = contour.reshape(contour.shape[0], 2)
+            polygon = GeometryMixin.bodyparts_to_polygon(data=contour)
+            if force_rectangles:
+                polygon = GeometryMixin.minimum_rotated_rectangle(shape=polygon)
+            results.append(polygon)
+        return results
+
+    @staticmethod
     def adjust_geometries(
         geometries: List[Polygon], shift: Tuple[int, int]
     ) -> List[Polygon]:
@@ -3005,7 +3036,13 @@ class GeometryMixin(object):
         :param np.ndarray data: Input data array where rows represent frames and columns represent body-part x and y coordinates.
         :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. Created by ``GeometryMixin.bucket_img_into_squares``.
         :param Optional[int] fps: Frames per second (fps) for time normalization. If None, cumulative sum of frame count is returned.
+
+        :example:
+        >>> img_geometries = GeometryMixin.bucket_img_into_grid_square(img_size=(640, 640), bucket_grid_size=(10, 10), px_per_mm=1)
+        >>> bp_arr = np.random.randint(0, 640, (5000, 2))
+        >>> geo_data = GeometryMixin().cumsum_coord_geometries(data=bp_arr, geometries=img_geometries[0], verbose=False, fps=1)
         """
+
         timer = SimbaTimer(start=True)
         check_instance(
             source=f"{self.__class__.__name__} data",
@@ -3017,7 +3054,10 @@ class GeometryMixin(object):
                 msg=f"A N x 2 array is required (got {data.shape})",
                 source=self.__class__.__name__,
             )
-        check_int(name="fps", value=fps, min_value=1)
+        if fps is not None:
+            check_int(name="fps", value=fps, min_value=1)
+        else:
+            fps = 1
         check_int(name="core_cnt", value=core_cnt, min_value=-1)
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]

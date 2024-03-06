@@ -766,7 +766,7 @@ class FeatureExtractionMixin(object):
         :example:
         >>> loc_1 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
         >>> loc_2 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
-        >>> FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False)
+        >>> FeatureExtractionMixin.framewise_euclidean_distance(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False)
         >>> [49.80098657, 46.54963644, 49.60650394, 70.35919993, 37.91069901, 71.95422524]
         """
         # if not px_per_mm and centimeter:
