@@ -89,18 +89,39 @@ class ImageMixin(object):
     @staticmethod
     def gaussian_blur(img: np.ndarray, kernel_size: Optional[Tuple] = (9, 9)):
         check_if_valid_img(data=img, source=ImageMixin.gaussian_blur.__name__)
-        check_instance(source=ImageMixin.gaussian_blur.__name__, instance=kernel_size, accepted_types=(tuple,))
-        check_valid_lst(data=list(kernel_size), source=ImageMixin.gaussian_blur.__name__, valid_dtypes=(int,), exact_len=2)
+        check_instance(
+            source=ImageMixin.gaussian_blur.__name__,
+            instance=kernel_size,
+            accepted_types=(tuple,),
+        )
+        check_valid_lst(
+            data=list(kernel_size),
+            source=ImageMixin.gaussian_blur.__name__,
+            valid_dtypes=(int,),
+            exact_len=2,
+        )
         return cv2.GaussianBlur(img, kernel_size, 0)
 
     @staticmethod
-    def erode(img: np.ndarray, kernel_size: Optional[Tuple] = (3, 3), iterations: Optional[int] = 3):
+    def erode(
+        img: np.ndarray,
+        kernel_size: Optional[Tuple] = (3, 3),
+        iterations: Optional[int] = 3,
+    ):
         check_if_valid_img(data=img, source=ImageMixin.gaussian_blur.__name__)
-        check_instance(source=ImageMixin.gaussian_blur.__name__, instance=kernel_size, accepted_types=(tuple,))
-        check_valid_lst(data=list(kernel_size), source=ImageMixin.gaussian_blur.__name__, valid_dtypes=(int,), exact_len=2)
+        check_instance(
+            source=ImageMixin.gaussian_blur.__name__,
+            instance=kernel_size,
+            accepted_types=(tuple,),
+        )
+        check_valid_lst(
+            data=list(kernel_size),
+            source=ImageMixin.gaussian_blur.__name__,
+            valid_dtypes=(int,),
+            exact_len=2,
+        )
         check_int(name=ImageMixin.erode.__name__, value=iterations, min_value=1)
         return cv2.erode(img, np.ones((3, 3), np.uint8), iterations=3)
-
 
     @staticmethod
     def get_histocomparison(

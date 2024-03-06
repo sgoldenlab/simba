@@ -2698,7 +2698,9 @@ class GeometryMixin(object):
         return [shapes[idx] for idx in ranked]
 
     @staticmethod
-    def contours_to_geometries(contours: List[np.ndarray], force_rectangles: Optional[bool] = True) -> List[Polygon]:
+    def contours_to_geometries(
+        contours: List[np.ndarray], force_rectangles: Optional[bool] = True
+    ) -> List[Polygon]:
         """
         Convert a list of contours to a list of geometries.
 
@@ -2715,9 +2717,17 @@ class GeometryMixin(object):
         >>> GeometryMixin.contours_to_geometries(contours=contours)
         """
 
-        check_instance(source=GeometryMixin.contours_to_geometries.__name__, instance=contours, accepted_types=(list,))
-        for i in contours: check_instance(source=f'{GeometryMixin.contours_to_geometries.__name__} {i}', instance=i,
-                                          accepted_types=(np.ndarray,))
+        check_instance(
+            source=GeometryMixin.contours_to_geometries.__name__,
+            instance=contours,
+            accepted_types=(list,),
+        )
+        for i in contours:
+            check_instance(
+                source=f"{GeometryMixin.contours_to_geometries.__name__} {i}",
+                instance=i,
+                accepted_types=(np.ndarray,),
+            )
         results = []
         for contour in contours:
             if contour.ndim == 3:
