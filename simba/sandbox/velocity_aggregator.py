@@ -1,17 +1,21 @@
 import glob
 import os
-from typing import Union, Optional
+from typing import Optional, Union
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from numba import typed
 import seaborn as sns
-import matplotlib.pyplot as plt
+from numba import typed
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import check_if_dir_exists, check_if_filepath_list_is_empty
-from simba.utils.read_write import read_df, get_fn_ext
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_filepath_list_is_empty)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
+
 
 def velocity_aggregator(config_path: Union[str, os.PathLike],
                         data_dir: Union[str, os.PathLike],

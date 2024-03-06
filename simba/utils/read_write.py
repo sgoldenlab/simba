@@ -8,12 +8,12 @@ import pickle
 import platform
 import re
 import shutil
+import threading
 import webbrowser
 from configparser import ConfigParser
-import threading
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, Iterable
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import cv2
@@ -30,20 +30,21 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int,
-                                check_nvidea_gpu_available,
-                                check_valid_lst)
+                                check_nvidea_gpu_available, check_valid_lst)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys
 from simba.utils.errors import (DataHeaderError, DuplicationError,
+                                FeatureNumberMismatchError,
                                 FFMPEGCodecGPUError, FileExistError,
-                                FrameRangeError, InvalidFilepathError,
-                                InvalidFileTypeError, InvalidInputError,
-                                InvalidVideoFileError,
+                                FrameRangeError, IntegerError,
+                                InvalidFilepathError, InvalidFileTypeError,
+                                InvalidInputError, InvalidVideoFileError,
                                 MissingProjectConfigEntryError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ParametersFileError, PermissionError, IntegerError, FeatureNumberMismatchError)
+                                ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (FileExistWarning, InvalidValueWarning,
                                   NoDataFoundWarning, NoFileFoundWarning)
+
 # from simba.utils.keyboard_listener import KeyboardListener
 
 
@@ -1731,7 +1732,9 @@ def write_pickle(data: Dict[str, Any], save_path: Union[str, os.PathLike]) -> No
             pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
     except Exception as e:
         print(e.args[0])
-        raise InvalidFileTypeError(msg="Data could not be saved as a pickle.", source=write_pickle.__name__)
+        raise InvalidFileTypeError(
+            msg="Data could not be saved as a pickle.", source=write_pickle.__name__
+        )
 
 
 def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
@@ -1768,7 +1771,10 @@ def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
 
     return data
 
-def drop_df_fields(data: pd.DataFrame, fields: List[str], raise_error: Optional[bool] = False) -> pd.DataFrame:
+
+def drop_df_fields(
+    data: pd.DataFrame, fields: List[str], raise_error: Optional[bool] = False
+) -> pd.DataFrame:
     """
     Drops specified fields in dataframe.
 
@@ -1777,14 +1783,28 @@ def drop_df_fields(data: pd.DataFrame, fields: List[str], raise_error: Optional[
     :return pd.DataFrame
     """
 
-    check_instance(source=drop_df_fields.__name__, instance=data, accepted_types=(pd.DataFrame,))
-    check_valid_lst(data=fields, source=drop_df_fields.__name__, valid_dtypes=(str,), min_len=1, raise_error=raise_error)
+    check_instance(
+        source=drop_df_fields.__name__, instance=data, accepted_types=(pd.DataFrame,)
+    )
+    check_valid_lst(
+        data=fields,
+        source=drop_df_fields.__name__,
+        valid_dtypes=(str,),
+        min_len=1,
+        raise_error=raise_error,
+    )
     if raise_error:
         return data.drop(columns=fields, errors="raise")
     else:
         return data.drop(columns=fields, errors="ignore")
 
-def get_unique_values_in_iterable(data: Iterable, name: Optional[str] = '', min: Optional[int] = 1, max: Optional[int] = None) -> int:
+
+def get_unique_values_in_iterable(
+    data: Iterable,
+    name: Optional[str] = "",
+    min: Optional[int] = 1,
+    max: Optional[int] = None,
+) -> int:
     """
     Helper to get and check the number of unique variables in iterable. E.g., check the number of unique identified clusters.
 
@@ -1793,23 +1813,44 @@ def get_unique_values_in_iterable(data: Iterable, name: Optional[str] = '', min:
     :param Optional[int] min: Optional minimum number of unique variables. Default 1.
     :param Optional[int] max: Optional maximum number of unique variables. Default None.
     """
-    check_instance(source=get_unique_values_in_iterable.__name__, instance=data, accepted_types=(np.ndarray, list, tuple,))
-    check_instance(source=get_unique_values_in_iterable.__name__, instance=name, accepted_types=(str,))
+    check_instance(
+        source=get_unique_values_in_iterable.__name__,
+        instance=data,
+        accepted_types=(
+            np.ndarray,
+            list,
+            tuple,
+        ),
+    )
+    check_instance(
+        source=get_unique_values_in_iterable.__name__,
+        instance=name,
+        accepted_types=(str,),
+    )
 
     if not all(isinstance(item, (int, float, str)) for item in data):
         dtypes = [type(i) for i in data if i not in (int, float, str)]
-        raise InvalidInputError(msg=f'Data {name} contains invalid dtypes {dtypes}. Accepted dtypes: int, float, str', source=get_unique_values_in_iterable.__name__)
+        raise InvalidInputError(
+            msg=f"Data {name} contains invalid dtypes {dtypes}. Accepted dtypes: int, float, str",
+            source=get_unique_values_in_iterable.__name__,
+        )
     if isinstance(data, (list, tuple)):
         data = np.array(data)
     cnt = np.unique(data).shape[0]
     if min is not None:
         check_int(name=name, value=min, min_value=1)
         if cnt < min:
-            raise IntegerError(msg=f"{name} has {cnt} unique observations, but {min} unique observations is required for the operation.",source=get_unique_values_in_iterable.__name__)
+            raise IntegerError(
+                msg=f"{name} has {cnt} unique observations, but {min} unique observations is required for the operation.",
+                source=get_unique_values_in_iterable.__name__,
+            )
     if max is not None:
         check_int(name=name, value=max, min_value=1)
         if cnt > max:
-            raise IntegerError(msg=f"{name} has {cnt} unique observations, but no more than {max} unique observations is allowed for the operation.", source=get_unique_values_in_iterable.__name__)
+            raise IntegerError(
+                msg=f"{name} has {cnt} unique observations, but no more than {max} unique observations is allowed for the operation.",
+                source=get_unique_values_in_iterable.__name__,
+            )
     return cnt
 
 

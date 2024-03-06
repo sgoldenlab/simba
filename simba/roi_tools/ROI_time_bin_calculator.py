@@ -6,11 +6,11 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+from simba.utils.checks import check_float, check_int
 from simba.utils.enums import DirNames
 from simba.utils.errors import ROICoordinatesNotFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
-from simba.utils.checks import check_int, check_float
 
 
 class ROITimebinCalculator(ConfigReader):
@@ -29,26 +29,46 @@ class ROITimebinCalculator(ConfigReader):
     >>> roi_time_bin_calculator.save()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 bin_length: int,
-                 body_parts: List[str],
-                 threshold: float):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        bin_length: int,
+        body_parts: List[str],
+        threshold: float,
+    ):
 
         ConfigReader.__init__(self, config_path=config_path)
         if not os.path.isfile(self.roi_coordinates_path):
-            raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
-        check_float(name='bin_length', value=bin_length, min_value=1.0)
-        check_float(name='threshold', value=threshold, min_value=0.0, max_value=1.0)
+            raise ROICoordinatesNotFoundError(
+                expected_file_path=self.roi_coordinates_path
+            )
+        check_float(name="bin_length", value=bin_length, min_value=1.0)
+        check_float(name="threshold", value=threshold, min_value=0.0, max_value=1.0)
         self.read_roi_data()
-        self.bin_length, self.body_parts, self.threshold = bin_length, body_parts, threshold
-        self.save_path_time = os.path.join(self.logs_path, f"ROI_time_bins_{bin_length}s_time_data_{self.datetime}.csv")
-        self.save_path_entries = os.path.join(self.logs_path,  f"ROI_time_bins_{bin_length}s_entry_data_{self.datetime}.csv")
+        self.bin_length, self.body_parts, self.threshold = (
+            bin_length,
+            body_parts,
+            threshold,
+        )
+        self.save_path_time = os.path.join(
+            self.logs_path, f"ROI_time_bins_{bin_length}s_time_data_{self.datetime}.csv"
+        )
+        self.save_path_entries = os.path.join(
+            self.logs_path,
+            f"ROI_time_bins_{bin_length}s_entry_data_{self.datetime}.csv",
+        )
         settings = {"threshold": threshold, "body_parts": {}}
         for i in body_parts:
-            animal_name = self.find_animal_name_from_body_part_name(bp_name=i, bp_dict=self.animal_bp_dict)
+            animal_name = self.find_animal_name_from_body_part_name(
+                bp_name=i, bp_dict=self.animal_bp_dict
+            )
             settings["body_parts"][animal_name] = i
-        self.roi_analyzer = ROIAnalyzer(ini_path=self.config_path, data_path=DirNames.OUTLIER_MOVEMENT_LOCATION.value, calculate_distances=False, settings=settings)
+        self.roi_analyzer = ROIAnalyzer(
+            ini_path=self.config_path,
+            data_path=DirNames.OUTLIER_MOVEMENT_LOCATION.value,
+            calculate_distances=False,
+            settings=settings,
+        )
 
         self.roi_analyzer.run()
         self.animal_names = list(self.roi_analyzer.bp_dict.keys())
@@ -56,15 +76,24 @@ class ROITimebinCalculator(ConfigReader):
 
     def run(self):
         self.out_time_lst, self.out_entries_lst = [], []
-        print(f"Analyzing time-bin data for {len(self.outlier_corrected_paths)} video(s)...")
+        print(
+            f"Analyzing time-bin data for {len(self.outlier_corrected_paths)} video(s)..."
+        )
         for file_cnt, file_path in enumerate(self.outlier_corrected_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
             _, _, fps = self.read_video_info(video_name=self.video_name)
             frames_per_bin = int(fps * self.bin_length)
-            video_frms = list(range(0, len(read_df(file_path=file_path, file_type=self.file_type))))
-            frame_bins = [video_frms[i * frames_per_bin : (i + 1) * frames_per_bin] for i in range((len(video_frms) + frames_per_bin - 1) // frames_per_bin)]
-            self.video_data = self.entries_exits_df[self.entries_exits_df["VIDEO"] == self.video_name]
+            video_frms = list(
+                range(0, len(read_df(file_path=file_path, file_type=self.file_type)))
+            )
+            frame_bins = [
+                video_frms[i * frames_per_bin : (i + 1) * frames_per_bin]
+                for i in range((len(video_frms) + frames_per_bin - 1) // frames_per_bin)
+            ]
+            self.video_data = self.entries_exits_df[
+                self.entries_exits_df["VIDEO"] == self.video_name
+            ]
             for animal_name, shape_name in list(
                 itertools.product(self.animal_names, self.shape_names)
             ):
@@ -139,7 +168,7 @@ class ROITimebinCalculator(ConfigReader):
         )
 
 
-#test = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
+# test = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
 #                            bin_length=5, body_parts=['Nose_1', 'Nose_2'], threshold=0.00)
-#test.run()
+# test.run()
 # test.save()

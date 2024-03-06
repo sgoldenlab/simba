@@ -16,7 +16,7 @@ from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists)
 from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
-from simba.utils.read_write import read_pickle, get_unique_values_in_iterable
+from simba.utils.read_write import get_unique_values_in_iterable, read_pickle
 
 CLUSTERER_NAME = "CLUSTERER_NAME"
 CLUSTER_COUNT = "CLUSTER_COUNT"
@@ -87,7 +87,11 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
                 **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value],
                 **v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value],
             }
-            cluster_cnt = get_unique_values_in_iterable(data=cluster_lbls, name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min=1)
+            cluster_cnt = get_unique_values_in_iterable(
+                data=cluster_lbls,
+                name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value],
+                min=1,
+            )
             if cluster_cnt > 1:
                 dbcv_results = self.DBCV(x, cluster_lbls)
             self.results[k] = {

@@ -18,7 +18,14 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import read_video_info
 
 
-def bout_aggregator(data: pd.DataFrame, clfs: List[str], feature_names: List[str], video_info: pd.DataFrame, min_bout_length: Optional[int] = 0, aggregator: Optional[Literal["MEAN", "MEDIAN"]] = "MEAN") -> pd.DataFrame:
+def bout_aggregator(
+    data: pd.DataFrame,
+    clfs: List[str],
+    feature_names: List[str],
+    video_info: pd.DataFrame,
+    min_bout_length: Optional[int] = 0,
+    aggregator: Optional[Literal["MEAN", "MEDIAN"]] = "MEAN",
+) -> pd.DataFrame:
     """
     Helper to aggregate features to bout-level representations for unsupervised analysis.
 
@@ -111,6 +118,3 @@ def bout_aggregator(data: pd.DataFrame, clfs: List[str], feature_names: List[str
         msg="Bout aggregation statistics complete!", elapsed_time=timer.elapsed_time_str
     )
     return pd.concat(output, axis=0).reset_index(drop=True)
-
-
-
