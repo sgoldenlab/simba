@@ -415,7 +415,9 @@ def read_config_file(config_path: Union[str, os.PathLike]) -> configparser.Confi
     return config
 
 
-def get_video_meta_data(video_path: Union[str, os.PathLike], fps_as_int: bool = True) -> dict:
+def get_video_meta_data(
+    video_path: Union[str, os.PathLike], fps_as_int: bool = True
+) -> dict:
     """
     Read video metadata (fps, resolution, frame cnt etc.) from video file (e.g., mp4).
 
@@ -648,7 +650,14 @@ def find_all_videos_in_directory(
     return video_lst
 
 
-def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture], frame_index: int = 0, opacity: Optional[float] = None, size: Optional[Tuple[int, int]] = None, greyscale: Optional[bool] = False, clahe: Optional[bool] = False) -> np.ndarray:
+def read_frm_of_video(
+    video_path: Union[str, os.PathLike, cv2.VideoCapture],
+    frame_index: int = 0,
+    opacity: Optional[float] = None,
+    size: Optional[Tuple[int, int]] = None,
+    greyscale: Optional[bool] = False,
+    clahe: Optional[bool] = False,
+) -> np.ndarray:
     """
     Reads single image from video file.
 
@@ -710,13 +719,18 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture], fra
         if size:
             img = cv2.resize(img, size, interpolation=cv2.INTER_LINEAR)
         if greyscale:
-            if len(img.shape) > 2: img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            if len(img.shape) > 2:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         if clahe:
-            if len(img.shape) > 2: img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            if len(img.shape) > 2:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
     else:
-        NoDataFoundWarning(msg=f"Frame {frame_index} for video {video_path} could not be read.")
+        NoDataFoundWarning(
+            msg=f"Frame {frame_index} for video {video_path} could not be read."
+        )
     return img
+
 
 def find_video_of_file(
     video_dir: Union[str, os.PathLike], filename: str, raise_error: bool = False
