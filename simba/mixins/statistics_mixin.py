@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson"
 
 from typing import Optional, Tuple, Union
+
 from sklearn.neighbors import LocalOutlierFactor
 
 try:
@@ -2302,10 +2303,12 @@ class Statistics(FeatureExtractionMixin):
         return 1 - np.sum(w_mat * data) / np.sum(w_mat * expected)
 
     @staticmethod
-    def d_prime(x: np.ndarray,
-                y: np.ndarray,
-                lower_limit: Optional[float] = 0.0001,
-                upper_limit: Optional[float] = 0.9999) -> float:
+    def d_prime(
+        x: np.ndarray,
+        y: np.ndarray,
+        lower_limit: Optional[float] = 0.0001,
+        upper_limit: Optional[float] = 0.9999,
+    ) -> float:
         """
         Computes d-prime from two Boolean 1d arrays, e.g., between classifications and ground truth.
 
@@ -2321,25 +2324,50 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.d_prime(x=x, y=y)
         """
 
-        check_valid_array(data=x, source=Statistics.d_prime.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
-        check_valid_array(data=y, source=Statistics.d_prime.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
-        if len(list({x.shape[0], y.shape[0] })) != 1:
-            raise CountError(msg=f'The two arrays has to be equal lengths but got: {x.shape[0], y.shape[0]}', source=Statistics.d_prime.__name__)
+        check_valid_array(
+            data=x,
+            source=Statistics.d_prime.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, np.int8),
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.d_prime.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, np.int8),
+        )
+        if len(list({x.shape[0], y.shape[0]})) != 1:
+            raise CountError(
+                msg=f"The two arrays has to be equal lengths but got: {x.shape[0], y.shape[0]}",
+                source=Statistics.d_prime.__name__,
+            )
         for i in [x, y]:
             additional = list(set(list(np.sort(np.unique(i)))) - {0, 1})
-            if len(additional) > 0: raise InvalidInputError(
-                msg=f'D-prime requires binary input data but found {additional}', source=Statistics.d_prime().__name__)
+            if len(additional) > 0:
+                raise InvalidInputError(
+                    msg=f"D-prime requires binary input data but found {additional}",
+                    source=Statistics.d_prime().__name__,
+                )
         target_idx = np.argwhere(y == 1).flatten()
         hit_rate = np.sum(x[np.argwhere(y == 1)]) / target_idx.shape[0]
         false_alarm_rate = np.sum(x[np.argwhere(y == 0)]) / target_idx.shape[0]
-        if hit_rate < lower_limit: hit_rate = lower_limit
-        elif hit_rate > upper_limit: hit_rate = upper_limit
-        if false_alarm_rate < lower_limit: false_alarm_rate = lower_limit
-        elif false_alarm_rate > upper_limit: false_alarm_rate = upper_limit
+        if hit_rate < lower_limit:
+            hit_rate = lower_limit
+        elif hit_rate > upper_limit:
+            hit_rate = upper_limit
+        if false_alarm_rate < lower_limit:
+            false_alarm_rate = lower_limit
+        elif false_alarm_rate > upper_limit:
+            false_alarm_rate = upper_limit
         return stats.norm.ppf(hit_rate) - stats.norm.ppf(false_alarm_rate)
 
     @staticmethod
-    def mcnemar(x: np.ndarray, y: np.ndarray, ground_truth: np.ndarray, continuity_corrected: Optional[bool] = True) -> Tuple[float, float]:
+    def mcnemar(
+        x: np.ndarray,
+        y: np.ndarray,
+        ground_truth: np.ndarray,
+        continuity_corrected: Optional[bool] = True,
+    ) -> Tuple[float, float]:
         """
         McNemar's Test to compare the difference in predictive accuracy of two models.
 
@@ -2361,18 +2389,47 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.mcnemar(x=x, y=y, ground_truth=ground_truth)
         """
 
-        check_valid_array(data=x, source=Statistics.mcnemar.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
-        check_valid_array(data=y, source=Statistics.mcnemar.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
-        check_valid_array(data=ground_truth, source=Statistics.mcnemar.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
+        check_valid_array(
+            data=x,
+            source=Statistics.mcnemar.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, np.int8),
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.mcnemar.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, np.int8),
+        )
+        check_valid_array(
+            data=ground_truth,
+            source=Statistics.mcnemar.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, np.int8),
+        )
         if len(list({x.shape[0], y.shape[0], ground_truth.shape[0]})) != 1:
-            raise CountError(msg=f'The three arrays has to be equal lengths but got: {x.shape[0], y.shape[0], ground_truth.shape[0]}', source=Statistics.mcnemar.__name__)
+            raise CountError(
+                msg=f"The three arrays has to be equal lengths but got: {x.shape[0], y.shape[0], ground_truth.shape[0]}",
+                source=Statistics.mcnemar.__name__,
+            )
         for i in [x, y, ground_truth]:
             additional = list(set(list(np.sort(np.unique(i)))) - {0, 1})
-            if len(additional) > 0: raise InvalidInputError(
-                msg=f'Mcnemar requires binary input data but found {additional}', source=Statistics.mcnemar.__name__)
-        data = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1), ground_truth.reshape(-1, 1)))
-        b = np.where((data == (0, 1, 0)).all(axis=1))[0].shape[0] + np.where((data == (1, 0, 1)).all(axis=1))[0].shape[0]
-        c = np.where((data == (1, 0, 0)).all(axis=1))[0].shape[0] + np.where((data == (0, 1, 1)).all(axis=1))[0].shape[0]
+            if len(additional) > 0:
+                raise InvalidInputError(
+                    msg=f"Mcnemar requires binary input data but found {additional}",
+                    source=Statistics.mcnemar.__name__,
+                )
+        data = np.hstack(
+            (x.reshape(-1, 1), y.reshape(-1, 1), ground_truth.reshape(-1, 1))
+        )
+        b = (
+            np.where((data == (0, 1, 0)).all(axis=1))[0].shape[0]
+            + np.where((data == (1, 0, 1)).all(axis=1))[0].shape[0]
+        )
+        c = (
+            np.where((data == (1, 0, 0)).all(axis=1))[0].shape[0]
+            + np.where((data == (0, 1, 1)).all(axis=1))[0].shape[0]
+        )
         if not continuity_corrected:
             x = (np.square(b - c)) / (b + c)
         else:
@@ -2397,10 +2454,15 @@ class Statistics(FeatureExtractionMixin):
         >>> data = np.random.randint(0, 2, (100000, 4))
         >>> Statistics.cochrans_q(data=data)
         """
-        check_valid_array(data=data, source=Statistics.cochrans_q.__name__, accepted_ndims=(2,))
+        check_valid_array(
+            data=data, source=Statistics.cochrans_q.__name__, accepted_ndims=(2,)
+        )
         additional = list(set(list(np.sort(np.unique(data)))) - {0, 1})
         if len(additional) > 0:
-            raise InvalidInputError(msg=f'Cochrans Q requires binary input data but found {additional}', source=Statistics.cochrans_q.__name__)
+            raise InvalidInputError(
+                msg=f"Cochrans Q requires binary input data but found {additional}",
+                source=Statistics.cochrans_q.__name__,
+            )
         col_sums = np.sum(data, axis=0)
         row_sum_sum = np.sum(np.sum(data, axis=1))
         row_sum_square_sum = np.sum(np.square(np.sum(data, axis=1)))

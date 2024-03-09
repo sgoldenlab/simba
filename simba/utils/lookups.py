@@ -378,7 +378,7 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
     ]
 
     for colormap in range(no_animals):
-        if hasattr(cm, 'cmap_d') and colormap in cm.cmap_d:
+        if hasattr(cm, "cmap_d") and colormap in cm.cmap_d:
             currColorMap = cm.get_cmap(cmaps[colormap], map_size)
         else:
             currColorMap = cm.get_cmap("spring", map_size)
