@@ -169,6 +169,25 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
+    def to_linestring(data: np.ndarray) -> LineString:
+        """
+        Convert a 2D array of x and y coordinates to a shapely linestring.
+
+        Linestrings are useful for representing an animal path, and to answer questions like (i)
+        "How far along the animals paths was the animal most proximal to geometry X"?
+        "How far had the animal travelled at time T?"
+        "When does the animal path intersect geometry X?"
+
+        :param np.ndarray data: 2D array with floats or ints of size Nx2 representing body-part coordinates.
+
+        :example:
+        >>> data = np.load('/Users/simon/Desktop/envs/simba/simba/simba/sandbox/data.npy')
+        >>> linestring = GeometryMixin.to_linestring(data=data)
+        """
+        check_valid_array(data=data, source=GeometryMixin.to_linestring.__name__, accepted_ndims=(2,), accepted_dtypes=(float, np.float32, np.float64, np.int32, np.int64))
+        return LineString(data)
+
+    @staticmethod
     def bodyparts_to_circle(
         data: np.ndarray, parallel_offset: float, pixels_per_mm: Optional[int] = 1
     ) -> Polygon:
@@ -775,7 +794,7 @@ class GeometryMixin(object):
                     Point,
                 ),
             )
-        max_vertices = find_max_vertices_coordinates(shapes=shapes, buffer=50)
+        max_vertices = find_max_vertices_coordinates(shapes=shapes, buffer=200)
         if bg_img is None:
             if bg_clr is None:
                 img = (

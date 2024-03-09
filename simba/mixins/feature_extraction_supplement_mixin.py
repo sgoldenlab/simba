@@ -23,7 +23,8 @@ from simba.utils.checks import (check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_instance,
                                 check_that_column_exist,
-                                check_valid_lst)
+                                check_valid_lst,
+                                check_valid_array)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 from simba.utils.errors import CountError
@@ -488,7 +489,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         check_instance(source=FeatureExtractionSupplemental.spontaneous_alternations.__name__, instance=data, accepted_types=(pd.DataFrame,))
         check_valid_lst(data=shape_names, source=FeatureExtractionSupplemental.spontaneous_alternations.__name__, valid_dtypes=(str,))
         for shape_name in shape_names: check_that_column_exist(df=data, column_name=shape_name, file_name='')
-        data = data[shape_names]
+        data = data[shape_names].apply(pd.to_numeric, errors='coerce', axis=1)
         additional_vals = list(set(np.unique(data.values.flatten())) - {0, 1})
         if len(additional_vals) > 0:
             raise CountError(msg=f'When computing spontaneous alternation, ROI fields can only be 0 or 1. Found {additional_vals}', source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
@@ -525,3 +526,33 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                 'alternate_arm_returns_cnt': alternate_arm_returns_cnt,
                 'same_arm_returns_dict': same_arm_returns,
                 'alternate_arm_returns_dict': alternations}
+
+    @staticmethod
+    def find_path_loops(data: np.ndarray) -> Dict[Tuple[int], List[int]]:
+        """
+        Compute the loops detected within a 2-dimensional path.
+
+        .. image:: _static/img/find_path_loops.png
+           :width: 500
+           :align: center
+
+        :param np.ndarray data: Nx2 2-dimensional array with the x and y coordinated represented on axis 1.
+        :return: Dictionary with the coordinate tuple(x, y) as keys, and sequential frame numbers as values when animals visited, and re-visited the key coordinate.
+
+        :example:
+        >>> data = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', usecols=['Center_x', 'Center_y'], file_type='csv').values.astype(int)
+        >>> FeatureExtractionSupplemental.find_path_loops(data=data)
+        """
+
+        check_valid_array(data=data, source=FeatureExtractionSupplemental.find_path_loops.__name__, accepted_ndims=(2,), accepted_dtypes=(np.int32, np.int64, np.int8))
+        seen = {}
+        for i in range(data.shape[0]):
+            value = tuple(data[i])
+            if value not in seen.keys():
+                seen[value] = [i]
+            else:
+                seen[value].append(i)
+        seen_dedup = {}
+        for k, v in seen.items():
+            seen_dedup[k] = [x for cnt, x in enumerate(v) if cnt == 0 or v[cnt] > v[cnt - 1] + 1]
+        return {k: v for k, v in seen_dedup.items() if len(v) > 1}

@@ -257,11 +257,12 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.other_videos_w_ROIs = []
         if os.path.isfile(self.roi_coordinates_path):
             for shape_type in ["rectangles", "circleDf", "polygons"]:
-                c_df = pd.read_hdf(self.roi_coordinates_path, key=shape_type)
+                try:
+                    c_df = pd.read_hdf(self.roi_coordinates_path, key=shape_type)
+                except ValueError as e:
+                    raise NoROIDataError(msg=f'Could not read prior ROI data for video {self.file_name}: The ROI data for the video was likely saved in a different python / pickle version. {e.args}', source=self.__class__.__name__)
                 if len(c_df) > 0:
-                    self.other_videos_w_ROIs = list(
-                        set(self.other_videos_w_ROIs + list(c_df["Video"].unique()))
-                    )
+                    self.other_videos_w_ROIs = list(set(self.other_videos_w_ROIs + list(c_df["Video"].unique())))
         if len(self.other_videos_w_ROIs) == 0:
             self.other_videos_w_ROIs = ["None"]
 

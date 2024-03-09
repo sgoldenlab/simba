@@ -1,7 +1,6 @@
 __author__ = "Simon Nilsson"
 
 from typing import Optional, Tuple, Union
-
 from sklearn.neighbors import LocalOutlierFactor
 
 try:
@@ -13,13 +12,14 @@ import numpy as np
 from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional,
                    prange, typed, types)
 from scipy import stats
+from scipy.stats.distributions import chi2
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_str, check_valid_array)
 from simba.utils.data import bucket_data, fast_mean_rank, fast_minimum_rank
 from simba.utils.enums import Options
-from simba.utils.errors import CountError
+from simba.utils.errors import CountError, InvalidInputError
 
 
 class Statistics(FeatureExtractionMixin):
@@ -1763,19 +1763,31 @@ class Statistics(FeatureExtractionMixin):
     @njit("(int64[:, :],)")
     def phi_coefficient(data: np.ndarray) -> float:
         """
-        Compute the phi coefficient for a 2x2 contingency table derived from binary data.
+        Compute the phi coefficient for a Nx2 array of binary data.
 
-        The phi coefficient is a measure of association for binary data in a 2x2 contingency table. It quantifies the
+        The phi coefficient (a.k.a Matthews Correlation Coefficient (MCC)), is a measure of association for binary data in a 2x2 contingency table. It quantifies the
         degree of association or correlation between two binary variables (e.g., binary classification targets).
+
+        The formula for the phi coefficient is defined as:
+
+        .. math::
+           \phi = \frac{(BC - AD)}{\sqrt{(C_1 + C_2)(R_1 + R_2)(C_1 + R_1)(C_2 + R_2)}}
+
+        where:
+        - BC: Hit rate (reponse and truth is both 1)
+        - AD: Correct rejections (response and truth are both 0)
+        - C1, C2: Counts of occurrences where the response is 1 and 0, respectively.
+        - R1, R2: Counts of occurrences where the truth is 1 and 0, respectively.
 
         :param np.ndarray data: A NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables. Columns represent two features or two binary classification results.
         :param float: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
-
 
         :example:
         >>> data = np.array([[0, 1], [1, 0], [1, 0], [1, 1]]).astype(np.int64)
         >>> Statistics().phi_coefficient(data=data)
         >>> 0.8164965809277261
+        >>> data = np.random.randint(0, 2, (100, 2))
+        >>> result = Statistics.phi_coefficient(data=data)
         """
         cnt_0_0 = len(np.argwhere((data[:, 0] == 0) & (data[:, 1] == 0)).flatten())
         cnt_0_1 = len(np.argwhere((data[:, 0] == 0) & (data[:, 1] == 1)).flatten())
@@ -2259,3 +2271,144 @@ class Statistics(FeatureExtractionMixin):
         return self._hellinger_helper(
             x=s1_h.astype(np.float32), y=s2_h.astype(np.float32)
         )
+
+    @staticmethod
+    @njit("(int64[:],int64[:])")
+    def cohens_kappa(sample_1: np.ndarray, sample_2: np.ndarray):
+        """
+        Jitted compute Cohen's Kappa coefficient for two binary samples.
+
+        Cohen's Kappa coefficient between classifications and ground truth taking into account agreement between classifications and ground truth occurring by chance.
+
+        :example:
+        >>> sample_1 = np.random.randint(0, 2, size=(10000,))
+        >>> sample_2 = np.random.randint(0, 2, size=(10000,))
+        >>> Statistics.cohens_kappa(sample_1=sample_1, sample_2=sample_2))
+        """
+        sample_1 = np.ascontiguousarray(sample_1)
+        sample_2 = np.ascontiguousarray(sample_2)
+        data = np.hstack((sample_1.reshape(-1, 1), sample_2.reshape(-1, 1)))
+        tp = len(np.argwhere((data[:, 0] == 1) & (data[:, 1] == 1)).flatten())
+        tn = len(np.argwhere((data[:, 0] == 0) & (data[:, 1] == 0)).flatten())
+        fp = len(np.argwhere((data[:, 0] == 1) & (data[:, 1] == 0)).flatten())
+        fn = len(np.argwhere((data[:, 0] == 0) & (data[:, 1] == 1)).flatten())
+        data = np.array(([tp, fp], [fn, tn]))
+        sum0 = data.sum(axis=0)
+        sum1 = data.sum(axis=1)
+        expected = np.outer(sum0, sum1) / np.sum(sum0)
+        w_mat = np.full(shape=(2, 2), fill_value=1)
+        w_mat[0, 0] = 0
+        w_mat[1, 1] = 0
+        return 1 - np.sum(w_mat * data) / np.sum(w_mat * expected)
+
+    @staticmethod
+    def d_prime(x: np.ndarray,
+                y: np.ndarray,
+                lower_limit: Optional[float] = 0.0001,
+                upper_limit: Optional[float] = 0.9999) -> float:
+        """
+        Computes d-prime from two Boolean 1d arrays, e.g., between classifications and ground truth.
+
+        :param np.ndarray x: Boolean 1D array of response values, where 1 represents presence, and 0 representing absence.
+        :param np.ndarray y: Boolean 1D array of ground truth, where 1 represents presence, and 0 representing absence.
+        :param Optional[float] lower_limit: Lower limit to bound hit and false alarm rates. Defaults to 0.0001.
+        :param Optional[float] upper_limit: Upper limit to bound hit and false alarm rates. Defaults to 0.9999.
+        :return float: The calculated d' (d-prime) value.
+
+        :example:
+        >>> x = np.random.randint(0, 2, (1000,))
+        >>> y = np.random.randint(0, 2, (1000,))
+        >>> Statistics.d_prime(x=x, y=y)
+        """
+
+        check_valid_array(data=x, source=Statistics.d_prime.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
+        check_valid_array(data=y, source=Statistics.d_prime.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
+        if len(list({x.shape[0], y.shape[0] })) != 1:
+            raise CountError(msg=f'The two arrays has to be equal lengths but got: {x.shape[0], y.shape[0]}', source=Statistics.d_prime.__name__)
+        for i in [x, y]:
+            additional = list(set(list(np.sort(np.unique(i)))) - {0, 1})
+            if len(additional) > 0: raise InvalidInputError(
+                msg=f'D-prime requires binary input data but found {additional}', source=Statistics.d_prime().__name__)
+        target_idx = np.argwhere(y == 1).flatten()
+        hit_rate = np.sum(x[np.argwhere(y == 1)]) / target_idx.shape[0]
+        false_alarm_rate = np.sum(x[np.argwhere(y == 0)]) / target_idx.shape[0]
+        if hit_rate < lower_limit: hit_rate = lower_limit
+        elif hit_rate > upper_limit: hit_rate = upper_limit
+        if false_alarm_rate < lower_limit: false_alarm_rate = lower_limit
+        elif false_alarm_rate > upper_limit: false_alarm_rate = upper_limit
+        return stats.norm.ppf(hit_rate) - stats.norm.ppf(false_alarm_rate)
+
+    @staticmethod
+    def mcnemar(x: np.ndarray, y: np.ndarray, ground_truth: np.ndarray, continuity_corrected: Optional[bool] = True) -> Tuple[float, float]:
+        """
+        McNemar's Test to compare the difference in predictive accuracy of two models.
+
+        E.g., can be used to compute if the accuracy of two classifiers are significantly different when transforming the same data.
+
+        .. note::
+           `mlextend <https://github.com/rasbt/mlxtend/blob/master/mlxtend/evaluate/mcnemar.py>`__.
+
+
+        :param np.ndarray x: 1-dimensional Boolean array with predictions of the first model.
+        :param np.ndarray x: 1-dimensional Boolean array with predictions of the second model.
+        :param np.ndarray x: 1-dimensional Boolean array with ground truth labels.
+        :param Optional[bool] continuity_corrected : Whether to apply continuity correction. Default is True.
+
+        :example:
+        >>> x = np.random.randint(0, 2, (100000, ))
+        >>> y = np.random.randint(0, 2, (100000, ))
+        >>> ground_truth = np.random.randint(0, 2, (100000, ))
+        >>> Statistics.mcnemar(x=x, y=y, ground_truth=ground_truth)
+        """
+
+        check_valid_array(data=x, source=Statistics.mcnemar.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
+        check_valid_array(data=y, source=Statistics.mcnemar.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
+        check_valid_array(data=ground_truth, source=Statistics.mcnemar.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8))
+        if len(list({x.shape[0], y.shape[0], ground_truth.shape[0]})) != 1:
+            raise CountError(msg=f'The three arrays has to be equal lengths but got: {x.shape[0], y.shape[0], ground_truth.shape[0]}', source=Statistics.mcnemar.__name__)
+        for i in [x, y, ground_truth]:
+            additional = list(set(list(np.sort(np.unique(i)))) - {0, 1})
+            if len(additional) > 0: raise InvalidInputError(
+                msg=f'Mcnemar requires binary input data but found {additional}', source=Statistics.mcnemar.__name__)
+        data = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1), ground_truth.reshape(-1, 1)))
+        b = np.where((data == (0, 1, 0)).all(axis=1))[0].shape[0] + np.where((data == (1, 0, 1)).all(axis=1))[0].shape[0]
+        c = np.where((data == (1, 0, 0)).all(axis=1))[0].shape[0] + np.where((data == (0, 1, 1)).all(axis=1))[0].shape[0]
+        if not continuity_corrected:
+            x = (np.square(b - c)) / (b + c)
+        else:
+            x = (np.square(np.abs(b - c) - 1)) / (b + c)
+        p = chi2.sf(x, 1)
+        return x, p
+
+    @staticmethod
+    def cochrans_q(data: np.ndarray) -> float:
+        """
+        Compute Cochrans Q for 2-dimensional boolean array.
+
+        Can be used to evaluate if the performance of multiple (>=2) classifiers on the same data is the same or significantly different.
+
+        .. note::
+           If two classifiers, consider ``simba.mixins.statistics.Statistics.mcnemar``.
+
+        :param np.ndarray data: Two dimensional array of boolean values where axis 1 represents classifiers or features and rows represent frames.
+        :return float: Cochran's Q statistic
+
+        :example:
+        >>> data = np.random.randint(0, 2, (100000, 4))
+        >>> Statistics.cochrans_q(data=data)
+        """
+        check_valid_array(data=data, source=Statistics.cochrans_q.__name__, accepted_ndims=(2,))
+        additional = list(set(list(np.sort(np.unique(data)))) - {0, 1})
+        if len(additional) > 0:
+            raise InvalidInputError(msg=f'Cochrans Q requires binary input data but found {additional}', source=Statistics.cochrans_q.__name__)
+        col_sums = np.sum(data, axis=0)
+        row_sum_sum = np.sum(np.sum(data, axis=1))
+        row_sum_square_sum = np.sum(np.square(np.sum(data, axis=1)))
+        k = data.shape[1]
+        g2 = np.sum(sum(np.square(col_sums)))
+        nominator = (k - 1) * ((k * g2) - np.square(np.sum(col_sums)))
+        denominator = (k * row_sum_sum) - row_sum_square_sum
+        if nominator == 0 or denominator == 0:
+            return -1.0
+        else:
+            return nominator / denominator
