@@ -796,15 +796,28 @@ def check_valid_array(
 
     if accepted_axis_0_shape is not None:
         if data.ndim is not 2:
-            raise ArrayError(msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}", source=check_valid_array.__name__)
+            raise ArrayError(
+                msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}",
+                source=check_valid_array.__name__,
+            )
         elif data.shape[0] not in accepted_axis_0_shape:
-            raise ArrayError(msg=f"Array not of acceptable shape. Found {data.shape[0]} rows, accepted: {accepted_axis_0_shape}, {source}", source=check_valid_array.__name__)
+            raise ArrayError(
+                msg=f"Array not of acceptable shape. Found {data.shape[0]} rows, accepted: {accepted_axis_0_shape}, {source}",
+                source=check_valid_array.__name__,
+            )
 
     if accepted_axis_1_shape is not None:
         if data.ndim is not 2:
-            raise ArrayError(msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}", source=check_valid_array.__name__)
+            raise ArrayError(
+                msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}",
+                source=check_valid_array.__name__,
+            )
         elif data.shape[1] not in accepted_axis_1_shape:
-            raise ArrayError(msg=f"Array not of acceptable shape. Found {data.shape[0]} columns (axis=1), accepted: {accepted_axis_1_shape}, {source}", source=check_valid_array.__name__)
+            raise ArrayError(
+                msg=f"Array not of acceptable shape. Found {data.shape[0]} columns (axis=1), accepted: {accepted_axis_1_shape}, {source}",
+                source=check_valid_array.__name__,
+            )
+
 
 def check_valid_lst(
     data: list,
