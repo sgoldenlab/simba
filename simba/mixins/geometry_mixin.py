@@ -22,6 +22,7 @@ except:
     from typing import Literal
 
 from simba.mixins.image_mixin import ImageMixin
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import (check_float,
                                 check_if_2d_array_has_min_unique_values,
                                 check_if_dir_exists, check_if_valid_img,
@@ -479,7 +480,7 @@ class GeometryMixin(object):
 
     @staticmethod
     def shape_distance(
-        shapes: List[Union[LineString, Polygon]],
+        shapes: List[Union[LineString, Polygon, Point]],
         pixels_per_mm: float,
         unit: Literal["mm", "cm", "dm", "m"] = "mm",
     ) -> float:
@@ -506,7 +507,7 @@ class GeometryMixin(object):
             check_instance(
                 source=GeometryMixin.shape_distance.__name__,
                 instance=shape,
-                accepted_types=(LineString, Polygon),
+                accepted_types=(LineString, Polygon, Point),
             )
         check_iterable_length(
             source=GeometryMixin.shape_distance.__name__,
@@ -1585,10 +1586,11 @@ class GeometryMixin(object):
         if len(shape_1) != len(shape_2):
             raise InvalidInputError(
                 msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}",
-                source=GeometryMixin.multifrm_compute_pct_shape_overlap.__name__,
+                source=GeometryMixin.multiframe_shape_distance.__name__,
             )
         check_float(name="pixels_per_mm", value=pixels_per_mm, min_value=0.0)
-        data, results = np.column_stack((shape_1, shape_2)), []
+        data = [list(x) for x in zip(shape_1, shape_2)]
+        results = []
         with multiprocessing.Pool(
             core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
         ) as pool:
@@ -3291,17 +3293,69 @@ class GeometryMixin(object):
         else:
             return np.cumsum(img_arr, axis=0) / fps
 
+    @staticmethod
+    def locate_line_point(path: Union[LineString, np.ndarray],
+                          geometry: Union[LineString, Polygon, Point],
+                          px_per_mm: Optional[float] = 1,
+                          fps: Optional[float] = 1,
+                          core_cnt: Optional[int] = -1,
+                          distance_min: Optional[bool] = True,
+                          time_prior: Optional[bool] = True) -> Dict[str, float]:
 
-# img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-01-21 at 10.15.55 AM.png')
-# geometries = GeometryMixin.tessellate_image(img_size=img.shape, triangle_size_px=50)
-#
-# hue_values = np.linspace(0, 179, len(list(geometries.values())), dtype=np.uint8)
-# colors_rgb = np.stack([hue_values, np.full_like(hue_values, 254), np.full_like(hue_values, 254)], axis=-1).astype(np.int)
-# colors_bgr = colors_rgb[..., ::-1]
-# #
-# for cnt, i in enumerate(geometries.values()):
-#     coords = np.array(i.exterior.coords).astype(np.int)
-#     b, g, r = np.random.randint(0, 255, (1))[0], np.random.randint(0, 255, (1))[0], np.random.randint(0, 255, (1))[0]
-#     cv2.polylines(img, [coords], True, (int(b), int(g), int(r)), 4)
-# cv2.imshow('img', img)
-# cv2.waitKey()
+        """
+        Compute the time and distance travelled to along a path to reach the most proximal point in reference to a second geometry.
+
+        .. note::
+           (i) To compute the time and distance travelled to along a path to reach the most distal point to a second geometry, pass ``distance_min = False``.
+
+           (ii) To compute the time and distance travelled along a path **after** reaching the most distal or proximal point to a second geometry, pass ``time_prior = False``.
+
+        .. image:: _static/img/locate_line_point.png
+           :width: 600
+           :align: center
+
+        :example:
+        >>> line = LineString([[10, 10], [7.5, 7.5], [15, 15], [7.5, 7.5]])
+        >>> polygon = Polygon([[0, 5], [0, 0], [5, 0], [5, 5]])
+        >>> GeometryMixin.locate_line_point(path=line, geometry=polygon)
+        >>> {'distance_value': 3.5355339059327378, 'distance_travelled': 3.5355339059327378, 'time_travelled': 1.0, 'distance_index': 1}
+        """
+
+        check_instance(source=GeometryMixin.locate_line_point.__name__, instance=path, accepted_types=(LineString, np.ndarray))
+        check_instance(source=GeometryMixin.locate_line_point.__name__, instance=geometry, accepted_types=(LineString, Polygon, Point))
+        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True, )
+        check_float(name="PIXELS PER MM", value=px_per_mm, min_value=0.1, raise_error=True)
+        check_float(name="FPS", value=fps, min_value=1, raise_error=True)
+        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+
+        if isinstance(path, np.ndarray):
+            check_valid_array(data=path, accepted_axis_1_shape=(2,),
+                              accepted_dtypes=(np.float32, np.float64, np.int64, np.int32))
+            path = LineString(path)
+        if isinstance(geometry, Point):
+            geometry = np.array(geometry.coords)
+            distances = FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=np.array(path.coords),
+                                                                                location_2=geometry,
+                                                                                px_per_mm=px_per_mm)
+        else:
+            points = [Point(x) for x in np.array(path.coords)]
+            geometry = [geometry for x in range(len(points))]
+            distances = GeometryMixin().multiframe_shape_distance(shape_1=points, shape_2=geometry,
+                                                                  pixels_per_mm=px_per_mm, core_cnt=core_cnt)
+
+        if distance_min:
+            distance_idx = np.argmin(distances)
+        else:
+            distance_idx = np.argmax(distances)
+        if time_prior:
+            dist_travelled = np.sum(np.abs(np.diff(distances[:distance_idx + 1]))) / px_per_mm
+            time_travelled = distance_idx / fps
+        else:
+            dist_travelled = np.sum(np.abs(np.diff(distances[distance_idx:]))) / px_per_mm
+            time_travelled = (distances - distance_idx) / fps
+        dist_val = distances[distance_idx] / px_per_mm
+
+        return {'distance_value': dist_val,
+                'distance_travelled': dist_travelled,
+                'time_travelled': time_travelled,
+                'distance_index': distance_idx}

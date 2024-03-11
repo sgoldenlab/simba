@@ -2279,6 +2279,7 @@ class Statistics(FeatureExtractionMixin):
         Jitted compute Cohen's Kappa coefficient for two binary samples.
 
         Cohen's Kappa coefficient between classifications and ground truth taking into account agreement between classifications and ground truth occurring by chance.
+        Interpretation: >0.8	Almost Perfect, >0.6	Substantial,  >0.4	Moderate >0.2	Fair, 0-0,2	Slight, <0	Poor ( Landis & Koch (1977)).
 
         :example:
         >>> sample_1 = np.random.randint(0, 2, size=(10000,))
@@ -2341,13 +2342,12 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     def mcnemar(x: np.ndarray, y: np.ndarray, ground_truth: np.ndarray, continuity_corrected: Optional[bool] = True) -> Tuple[float, float]:
         """
-        McNemar's Test to compare the difference in predictive accuracy of two models.
+        McNemar's test to compare the difference in predictive accuracy of two models.
 
         E.g., can be used to compute if the accuracy of two classifiers are significantly different when transforming the same data.
 
         .. note::
            `mlextend <https://github.com/rasbt/mlxtend/blob/master/mlxtend/evaluate/mcnemar.py>`__.
-
 
         :param np.ndarray x: 1-dimensional Boolean array with predictions of the first model.
         :param np.ndarray x: 1-dimensional Boolean array with predictions of the second model.
@@ -2381,7 +2381,7 @@ class Statistics(FeatureExtractionMixin):
         return x, p
 
     @staticmethod
-    def cochrans_q(data: np.ndarray) -> float:
+    def cochrans_q(data: np.ndarray) -> Tuple[float, float]:
         """
         Compute Cochrans Q for 2-dimensional boolean array.
 
@@ -2389,9 +2389,10 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            If two classifiers, consider ``simba.mixins.statistics.Statistics.mcnemar``.
+           `Useful background  <https://psych.unl.edu/psycrs/handcomp/hccochran.PDF>`__.
 
         :param np.ndarray data: Two dimensional array of boolean values where axis 1 represents classifiers or features and rows represent frames.
-        :return float: Cochran's Q statistic
+        :return Tuple[float, float]: Cochran's Q statistic signidicance value.
 
         :example:
         >>> data = np.random.randint(0, 2, (100000, 4))
@@ -2409,6 +2410,7 @@ class Statistics(FeatureExtractionMixin):
         nominator = (k - 1) * ((k * g2) - np.square(np.sum(col_sums)))
         denominator = (k * row_sum_sum) - row_sum_square_sum
         if nominator == 0 or denominator == 0:
-            return -1.0
+            return -1.0, -1.0
         else:
-            return nominator / denominator
+            q = nominator / denominator,
+            return q, stats.chi2.sf(q, k - 1)

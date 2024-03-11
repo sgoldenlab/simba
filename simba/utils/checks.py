@@ -747,6 +747,8 @@ def check_valid_array(
     source: Optional[str] = "",
     accepted_ndims: Optional[List[Tuple[int]]] = None,
     accepted_sizes: Optional[List[int]] = None,
+    accepted_axis_0_shape: Optional[List[int]] = None,
+    accepted_axis_1_shape: Optional[List[int]] = None,
     accepted_dtypes: Optional[List[str]] = None,
     accepted_shapes: Optional[List[Tuple[int]]] = None,
 ) -> None:
@@ -756,6 +758,8 @@ def check_valid_array(
     :parameter np.ndarray data: The numpy array to be checked.
     :parameter Optional[str] source: A string identifying the source, name, or purpose of the array for interpretable error messaging.
     :parameter Optional[Tuple[int]] accepted_ndims: List of tuples representing acceptable dimensions. If provided, checks whether the array's number of dimensions matches any tuple in the list.
+    :parameter Optional[List[str]] accepted_axis_0_shape: List of accepted number of rows of 2-dimensional array. Will also raise error if value passed and input is not a 2-dimensional array.
+    :parameter Optional[List[str]] accepted_axis_1_shape: List of accepted number of columns or fields of 2-dimensional array. Will also raise error if value passed and input is not a 2-dimensional array.
     :parameter Optional[List[int]] accepted_sizes: List of acceptable sizes for the array's shape. If provided, checks whether the length of the array's shape matches any value in the list.
     :parameter Optional[List[str]] accepted_dtypes: List of acceptable data types for the array. If provided, checks whether the array's data type matches any string in the list.
 
@@ -790,6 +794,17 @@ def check_valid_array(
                 source=check_valid_array.__name__,
             )
 
+    if accepted_axis_0_shape is not None:
+        if data.ndim is not 2:
+            raise ArrayError(msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}", source=check_valid_array.__name__)
+        elif data.shape[0] not in accepted_axis_0_shape:
+            raise ArrayError(msg=f"Array not of acceptable shape. Found {data.shape[0]} rows, accepted: {accepted_axis_0_shape}, {source}", source=check_valid_array.__name__)
+
+    if accepted_axis_1_shape is not None:
+        if data.ndim is not 2:
+            raise ArrayError(msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}", source=check_valid_array.__name__)
+        elif data.shape[1] not in accepted_axis_1_shape:
+            raise ArrayError(msg=f"Array not of acceptable shape. Found {data.shape[0]} columns (axis=1), accepted: {accepted_axis_1_shape}, {source}", source=check_valid_array.__name__)
 
 def check_valid_lst(
     data: list,
