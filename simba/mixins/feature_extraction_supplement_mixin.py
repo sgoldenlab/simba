@@ -568,8 +568,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         For every onset of behavior C, count the proportions of behavior T onsets in the time-window preceding the onset
         of behavior C vs the proportion of behavior T onsets in the time-window proceeding the onset of behavior C.
 
-        A value of -1 indicates that behavior T always follows behavior C. A value closer to 1.0 indicates that behavior T
-        always precede behavior C. A value closer to 0.0 indicates that behavior T follows behavior C. A value of -1.0 indicates
+        A value closer to 1.0 indicates that behavior T always precede behavior C. A value closer to 0.0 indicates that behavior T follows behavior C. A value of -1.0 indicates
         that behavior T never precede nor proceed behavior C.
 
         :example:
