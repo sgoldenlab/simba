@@ -1,15 +1,15 @@
 __author__ = "Simon Nilsson"
 
 import glob
+import itertools
 import os
-from typing import Optional, Union, List, Tuple, Dict
+from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from numba import jit, prange, typed
-import itertools
 
 try:
     from typing import Literal
@@ -19,18 +19,15 @@ except:
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (check_if_dir_exists,
+from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
-                                check_instance,
-                                check_that_column_exist,
-                                check_valid_lst,
-                                check_valid_array,
-                                check_str,
-                                check_float)
+                                check_instance, check_str,
+                                check_that_column_exist, check_valid_array,
+                                check_valid_lst)
 from simba.utils.data import detect_bouts
+from simba.utils.errors import CountError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-from simba.utils.errors import CountError
 
 
 class FeatureExtractionSupplemental(FeatureExtractionMixin):
@@ -440,8 +437,9 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         )
 
     @staticmethod
-    def spontaneous_alternations(data: pd.DataFrame,
-                                 shape_names: List[str]) -> Tuple[int, Dict[str, np.ndarray]]:
+    def spontaneous_alternations(
+        data: pd.DataFrame, shape_names: List[str]
+    ) -> Tuple[int, Dict[str, np.ndarray]]:
         """
         Detects spontaneous alternations between a set of user-defined ROIs.
 
@@ -469,16 +467,22 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> spontanous_alternations = FeatureExtractionSupplemental.spontaneous_alternations(data=df, shape_names=['left', 'top', 'right', 'bottom'])
         """
 
-        def get_sliding_alternation(data: np.ndarray) -> Tuple[
-            Dict[int, List[int]], Dict[int, List[int]], Dict[Tuple[int], List[int]]]:
+        def get_sliding_alternation(
+            data: np.ndarray,
+        ) -> Tuple[
+            Dict[int, List[int]], Dict[int, List[int]], Dict[Tuple[int], List[int]]
+        ]:
             alt_cnt, stride = 0, data.shape[1] - 1
             arm_visits = np.full((data.shape[0]), -1)
             same_arm_returns, alternations, alternate_arm_returns = {}, {}, {}
-            for i in range(data.shape[1] - 1):  alternate_arm_returns[i], same_arm_returns[i] = [], []
-            for i in list(itertools.permutations(list(range(0, data.shape[1] - 1)))): alternations[i] = []
-            for i in range(data.shape[0]): arm_visits[i] = np.argwhere(data[i, 1:] == 1).flatten()[0]
+            for i in range(data.shape[1] - 1):
+                alternate_arm_returns[i], same_arm_returns[i] = [], []
+            for i in list(itertools.permutations(list(range(0, data.shape[1] - 1)))):
+                alternations[i] = []
+            for i in range(data.shape[0]):
+                arm_visits[i] = np.argwhere(data[i, 1:] == 1).flatten()[0]
             for i in range(stride - 1, arm_visits.shape[0]):
-                current, priors = arm_visits[i], arm_visits[i - (stride - 1):i]
+                current, priors = arm_visits[i], arm_visits[i - (stride - 1) : i]
                 sequence = np.append(priors, [current])
                 if np.unique(sequence).shape[0] == stride:
                     alternations[tuple(sequence)].append(data[i, 0])
@@ -489,29 +493,56 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                         alternate_arm_returns[current].append(data[i, 0])
             return same_arm_returns, alternate_arm_returns, alternations
 
-        check_instance(source=FeatureExtractionSupplemental.spontaneous_alternations.__name__, instance=data, accepted_types=(pd.DataFrame,))
-        check_valid_lst(data=shape_names, source=FeatureExtractionSupplemental.spontaneous_alternations.__name__, valid_dtypes=(str,))
-        for shape_name in shape_names: check_that_column_exist(df=data, column_name=shape_name, file_name='')
-        data = data[shape_names].apply(pd.to_numeric, errors='coerce', axis=1)
+        check_instance(
+            source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
+            instance=data,
+            accepted_types=(pd.DataFrame,),
+        )
+        check_valid_lst(
+            data=shape_names,
+            source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
+            valid_dtypes=(str,),
+        )
+        for shape_name in shape_names:
+            check_that_column_exist(df=data, column_name=shape_name, file_name="")
+        data = data[shape_names].apply(pd.to_numeric, errors="coerce", axis=1)
         additional_vals = list(set(np.unique(data.values.flatten())) - {0, 1})
         if len(additional_vals) > 0:
-            raise CountError(msg=f'When computing spontaneous alternation, ROI fields can only be 0 or 1. Found {additional_vals}', source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
+            raise CountError(
+                msg=f"When computing spontaneous alternation, ROI fields can only be 0 or 1. Found {additional_vals}",
+                source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
+            )
         above_1_idx = np.argwhere(np.sum(data.values, axis=1) > 1)
-        if above_1_idx.shape[0] > 0: raise CountError(msg=f'When computing spontaneous alternation, animals should only exist in <=1 ROIs in any one frame. In {above_1_idx.shape[0]} frames, the animal exist in more than one ROI.', source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
+        if above_1_idx.shape[0] > 0:
+            raise CountError(
+                msg=f"When computing spontaneous alternation, animals should only exist in <=1 ROIs in any one frame. In {above_1_idx.shape[0]} frames, the animal exist in more than one ROI.",
+                source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
+            )
         shape_map = {}
-        for i in range(len(shape_names)): shape_map[i] = shape_names[i]
+        for i in range(len(shape_names)):
+            shape_map[i] = shape_names[i]
         data = np.hstack((np.arange(0, data.shape[0]).reshape(-1, 1), data.values))
         data = data[np.sum(data, axis=1) != 0]
-        data = data[np.concatenate(([0], np.where(~(data[:, 1:][1:] == data[:, 1:][:-1]).all(axis=1))[0] + 1))]
+        data = data[
+            np.concatenate(
+                (
+                    [0],
+                    np.where(~(data[:, 1:][1:] == data[:, 1:][:-1]).all(axis=1))[0] + 1,
+                )
+            )
+        ]
         same_arm, alternate_arm, alt = get_sliding_alternation(data=data)
 
         same_arm_returns, alternate_arm_returns = {}, {}
-        for k, v in same_arm.items(): same_arm_returns[shape_map[k]] = v
-        for k, v in alternate_arm.items(): alternate_arm_returns[shape_map[k]] = v
+        for k, v in same_arm.items():
+            same_arm_returns[shape_map[k]] = v
+        for k, v in alternate_arm.items():
+            alternate_arm_returns[shape_map[k]] = v
         alternations = {}
         for k, v in alt.items():
             new_k = []
-            for i in k: new_k.append(shape_map[i])
+            for i in k:
+                new_k.append(shape_map[i])
             alternations[tuple(new_k)] = v
 
         same_arm_returns_cnt, alternation_cnt, alternate_arm_returns_cnt = 0, 0, 0
@@ -519,16 +550,19 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             same_arm_returns_cnt += len(v)
         for v in alternate_arm_returns.values():
             alternate_arm_returns_cnt += len(v)
-        for v in alternations.values(): alternation_cnt += len(v)
+        for v in alternations.values():
+            alternation_cnt += len(v)
         pct_alternation = alternation_cnt / (data.shape[0] - (data.shape[1] - 1))
 
-        return {'pct_alternation': pct_alternation * 100,
-                'alternation_cnt': alternation_cnt,
-                'error_cnt': same_arm_returns_cnt + alternate_arm_returns_cnt,
-                'same_arm_returns_cnt': same_arm_returns_cnt,
-                'alternate_arm_returns_cnt': alternate_arm_returns_cnt,
-                'same_arm_returns_dict': same_arm_returns,
-                'alternate_arm_returns_dict': alternations}
+        return {
+            "pct_alternation": pct_alternation * 100,
+            "alternation_cnt": alternation_cnt,
+            "error_cnt": same_arm_returns_cnt + alternate_arm_returns_cnt,
+            "same_arm_returns_cnt": same_arm_returns_cnt,
+            "alternate_arm_returns_cnt": alternate_arm_returns_cnt,
+            "same_arm_returns_dict": same_arm_returns,
+            "alternate_arm_returns_dict": alternations,
+        }
 
     @staticmethod
     def find_path_loops(data: np.ndarray) -> Dict[Tuple[int], List[int]]:
@@ -547,7 +581,12 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> FeatureExtractionSupplemental.find_path_loops(data=data)
         """
 
-        check_valid_array(data=data, source=FeatureExtractionSupplemental.find_path_loops.__name__, accepted_ndims=(2,), accepted_dtypes=(np.int32, np.int64, np.int8))
+        check_valid_array(
+            data=data,
+            source=FeatureExtractionSupplemental.find_path_loops.__name__,
+            accepted_ndims=(2,),
+            accepted_dtypes=(np.int32, np.int64, np.int8),
+        )
         seen = {}
         for i in range(data.shape[0]):
             value = tuple(data[i])
@@ -557,11 +596,15 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                 seen[value].append(i)
         seen_dedup = {}
         for k, v in seen.items():
-            seen_dedup[k] = [x for cnt, x in enumerate(v) if cnt == 0 or v[cnt] > v[cnt - 1] + 1]
+            seen_dedup[k] = [
+                x for cnt, x in enumerate(v) if cnt == 0 or v[cnt] > v[cnt - 1] + 1
+            ]
         return {k: v for k, v in seen_dedup.items() if len(v) > 1}
 
     @staticmethod
-    def sequential_lag_analysis(data: pd.DataFrame, criterion: str, target: str, time_window: float, fps: float):
+    def sequential_lag_analysis(
+        data: pd.DataFrame, criterion: str, target: str, time_window: float, fps: float
+    ):
         """
         Perform sequential lag analysis to determine the temporal relationship between two events.
 
@@ -582,30 +625,67 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                2022.
         """
 
-        check_instance(source=FeatureExtractionSupplemental.sequential_lag_analysis.__name__, instance=data, accepted_types=(pd.DataFrame))
-        check_str(name=f'{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} criterion', value=criterion)
-        check_str(name=f'{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} target', value=target)
-        check_float(name=f'{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} fps', value=fps, min_value=1.0)
-        check_float(name=f'{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} time-window', value=time_window, min_value=0.01)
-        check_that_column_exist(df=data, column_name=[criterion, target], file_name=FeatureExtractionSupplemental.sequential_lag_analysis.__name__)
+        check_instance(
+            source=FeatureExtractionSupplemental.sequential_lag_analysis.__name__,
+            instance=data,
+            accepted_types=(pd.DataFrame),
+        )
+        check_str(
+            name=f"{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} criterion",
+            value=criterion,
+        )
+        check_str(
+            name=f"{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} target",
+            value=target,
+        )
+        check_float(
+            name=f"{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} fps",
+            value=fps,
+            min_value=1.0,
+        )
+        check_float(
+            name=f"{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} time-window",
+            value=time_window,
+            min_value=0.01,
+        )
+        check_that_column_exist(
+            df=data,
+            column_name=[criterion, target],
+            file_name=FeatureExtractionSupplemental.sequential_lag_analysis.__name__,
+        )
         bouts = detect_bouts(data_df=data, target_lst=[criterion, target], fps=fps)
         if len(bouts) == 0:
-            raise CountError(msg=f'No events of behaviors {criterion} and {target} detected in data.',
-                             source=FeatureExtractionSupplemental.sequential_lag_analysis)
-        criterion_starts = bouts['Start_frame'][bouts['Event'] == criterion].values
-        target_starts = bouts['Start_frame'][bouts['Event'] == target].values
+            raise CountError(
+                msg=f"No events of behaviors {criterion} and {target} detected in data.",
+                source=FeatureExtractionSupplemental.sequential_lag_analysis,
+            )
+        criterion_starts = bouts["Start_frame"][bouts["Event"] == criterion].values
+        target_starts = bouts["Start_frame"][bouts["Event"] == target].values
         preceding_cnt, proceeding_cnt = 0, 0
         window = int(fps * time_window)
-        if window < 1.0: window = 1
+        if window < 1.0:
+            window = 1
         for criterion_start in criterion_starts:
-            preceeding_events = target_starts[np.argwhere(
-                (target_starts < criterion_start) & (target_starts >= (criterion_start - window)))].flatten()
+            preceeding_events = target_starts[
+                np.argwhere(
+                    (target_starts < criterion_start)
+                    & (target_starts >= (criterion_start - window))
+                )
+            ].flatten()
             preceding_cnt += preceeding_events.shape[0]
-            target_starts = np.array([x for x in target_starts if x not in preceeding_events])
-            proceeding_events = target_starts[np.argwhere(
-                (target_starts > criterion_start) & (target_starts <= (criterion_start + window)))].flatten()
+            target_starts = np.array(
+                [x for x in target_starts if x not in preceeding_events]
+            )
+            proceeding_events = target_starts[
+                np.argwhere(
+                    (target_starts > criterion_start)
+                    & (target_starts <= (criterion_start + window))
+                )
+            ].flatten()
             proceeding_cnt += proceeding_events.shape[0]
-            target_starts = np.array([x for x in target_starts if x not in proceeding_events])
+            target_starts = np.array(
+                [x for x in target_starts if x not in proceeding_events]
+            )
         if preceding_cnt == 0 and proceeding_cnt == 0:
             return -1.0
         elif preceding_cnt == 0:
