@@ -185,7 +185,12 @@ class GeometryMixin(object):
         >>> data = np.load('/Users/simon/Desktop/envs/simba/simba/simba/sandbox/data.npy')
         >>> linestring = GeometryMixin.to_linestring(data=data)
         """
-        check_valid_array(data=data, source=GeometryMixin.to_linestring.__name__, accepted_ndims=(2,), accepted_dtypes=(float, np.float32, np.float64, np.int32, np.int64))
+        check_valid_array(
+            data=data,
+            source=GeometryMixin.to_linestring.__name__,
+            accepted_ndims=(2,),
+            accepted_dtypes=(float, np.float32, np.float64, np.int32, np.int64),
+        )
         return LineString(data)
 
     @staticmethod
