@@ -1513,7 +1513,7 @@ class ConvertROIDefinitionsPopUp(PopUpMixin):
             "ROI DEFINITIONS PATH (H5)",
             title="SELECT H5 FILE",
             lblwidth=20,
-            file_types=[("H5 FILE", ('.h5', '.H5'))],
+            file_types=[("H5 FILE", (".h5", ".H5"))],
         )
         self.save_dir = FolderSelect(
             settings_frm, "SAVE DIRECTORY", title="SELECT H5 FILE", lblwidth=20

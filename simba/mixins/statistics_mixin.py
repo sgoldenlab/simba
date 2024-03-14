@@ -2492,8 +2492,18 @@ class Statistics(FeatureExtractionMixin):
         >>> y = np.random.random((100,))
         >>> Statistics.hartley_fmax(x=x, y=y)
         """
-        check_valid_array(data=x, source=Statistics.hartley_fmax.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int64, np.float32))
-        check_valid_array(data=y, source=Statistics.hartley_fmax.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int64, np.float32))
+        check_valid_array(
+            data=x,
+            source=Statistics.hartley_fmax.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int64, np.float32),
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.hartley_fmax.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int64, np.float32),
+        )
         max_var = np.max((np.var(x), np.var(y)))
         min_var = np.min((np.var(x), np.var(y)))
         if (max_var == 0) or (min_var == 0):
@@ -2513,7 +2523,12 @@ class Statistics(FeatureExtractionMixin):
         >>> x = np.random.random((100,))
         >>> Statistics.grubbs_test(x=x)
         """
-        check_valid_array(data=x, source=Statistics.grubbs_test.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int64, np.float32))
+        check_valid_array(
+            data=x,
+            source=Statistics.grubbs_test.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int64, np.float32),
+        )
         x = np.sort(x)
         if left_tail:
             return (np.mean(x) - np.min(x)) / np.std(x)
@@ -2522,7 +2537,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def wilcoxon(x: np.ndarray, y: np.ndarray):
-        """ Non-parametric two-way within-subjects test"""
+        """Non-parametric two-way within-subjects test"""
         data = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))
         n = data.shape[0]
         diff = np.diff(data).flatten()
@@ -2541,12 +2556,16 @@ class Statistics(FeatureExtractionMixin):
         u_w = (n * (n + 1)) / 4
         std_correction = 0
         for i in range(signed_rank_w_ties.shape[0]):
-            same_rank_n = np.argwhere(signed_rank_w_ties == signed_rank_w_ties[i]).flatten().shape[0]
+            same_rank_n = (
+                np.argwhere(signed_rank_w_ties == signed_rank_w_ties[i])
+                .flatten()
+                .shape[0]
+            )
             if same_rank_n > 1:
-                std_correction += (((same_rank_n ** 3) - same_rank_n) / 2)
+                std_correction += ((same_rank_n**3) - same_rank_n) / 2
 
         std = np.sqrt(((n * (n + 1)) * ((2 * n) + 1) - std_correction) / 24)
         W = np.min((t_plus, t_minus))
         z = (W - u_w) / std
-        r = (z / np.sqrt(n))
+        r = z / np.sqrt(n)
         return z, r

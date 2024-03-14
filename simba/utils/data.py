@@ -916,8 +916,13 @@ def find_ranked_colors(
 
     return results
 
+
 def get_mode(x: np.ndarray):
-    check_valid_array(source=f'{get_mode.__name__} x', data=x, accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8))
+    check_valid_array(
+        source=f"{get_mode.__name__} x",
+        data=x,
+        accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8),
+    )
     values, counts = np.unique(x, return_counts=True)
     return counts.argmax()
 
