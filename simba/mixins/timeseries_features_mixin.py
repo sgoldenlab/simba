@@ -7,7 +7,9 @@ from numba import (boolean, float32, float64, int64, jit, njit, prange, typed,
                    types)
 from numba.typed import Dict, List
 from numpy.lib.stride_tricks import as_strided
-from statsmodels.tsa.stattools import adfuller, kpss, zivot_andrews
+from statsmodels.tsa.stattools import adfuller, kpss, zivot_andrews, grangercausalitytests
+import itertools
+import pandas as pd
 
 from simba.utils.errors import InvalidInputError
 
@@ -19,6 +21,7 @@ except:
 from typing import get_type_hints
 
 from simba.utils.read_write import find_core_cnt
+from simba.utils.checks import (check_instance, check_valid_lst, check_str, check_int, check_that_column_exist)
 
 
 class TimeseriesFeatureMixin(object):
@@ -1250,12 +1253,12 @@ class TimeseriesFeatureMixin(object):
             - spike_vals (List[np.ndarray]): A list of 1D arrays, each containing the values of the data points within a detected spike.
             - spike_dict (Dict[int, Dict[str, float]]): A dictionary where the keys are spike indices, and the values are dictionaries containing spike characteristics including 'amplitude' (spike amplitude), 'fwhm' (FWHM), and 'half_width' (half-width).
 
-        .. notes::
+        .. note::
            - The function uses the Numba JIT (Just-In-Time) compilation for optimized performance. Without fastmath=True there is no runtime improvement over standard numpy.
 
         :example:
         >>> data = np.array([0.1, 0.1, 0.3, 0.1, 10, 10, 8, 0.1, 0.1, 0.1, 10, 10, 8, 99, 0.1, 99, 99, 0.1]).astype(np.float32)
-        >>> spike_idx, spike_vals, spike_stats = spike_finder(data=data, baseline=1, min_spike_amplitude=5, sample_rate=2, min_fwhm=-np.inf, min_half_width=0.0002)
+        >>> spike_idx, spike_vals, spike_stats = TimeseriesFeatureMixin().spike_finder(data=data, baseline=1, min_spike_amplitude=5, sample_rate=2, min_fwhm=-np.inf, min_half_width=0.0002)
         """
 
         spike_idxs = np.argwhere(data >= baseline + min_spike_amplitude).flatten()
@@ -1565,3 +1568,39 @@ class TimeseriesFeatureMixin(object):
                 results[wS:wE] = v - pv
             pv = v
         return results
+
+    @staticmethod
+    def granger_tests(data: pd.DataFrame,
+                      variables: List[str],
+                      lag: int,
+                      test: Literal[
+                          'ssr_ftest', 'ssr_chi2test', 'lrtest', 'params_ftest'] = 'ssr_chi2test') -> pd.DataFrame:
+        """
+        Perform Granger causality tests between pairs of variables in a DataFrame.
+
+        This function computes Granger causality tests between pairs of variables in a DataFrame
+        using the statsmodels library. The Granger causality test assesses whether one time series
+        variable (predictor) can predict another time series variable (outcome). This test can help
+        determine the presence of causal relationships between variables.
+
+        .. note::
+           Modified from `Selva Prabhakaran <https://www.machinelearningplus.com/time-series/granger-causality-test-in-python/>`_.
+
+        :example:
+        >>> x = np.random.randint(0, 50, (100, 2))
+        >>> data = pd.DataFrame(x, columns=['r', 'k'])
+        >>> TimeseriesFeatureMixin.granger_tests(data=data, variables=['r', 'k'], lag=4, test='ssr_chi2test')
+        """
+
+        check_instance(source=TimeseriesFeatureMixin.granger_tests.__name__, instance=data, accepted_types=(pd.DataFrame,))
+        check_valid_lst(data=variables, source=TimeseriesFeatureMixin.granger_tests.__name__, valid_dtypes=(str,), min_len=2)
+        check_that_column_exist(df=data, column_name=variables, file_name='')
+        check_str(name=TimeseriesFeatureMixin.granger_tests.__name__, value=test,
+                  options=('ssr_ftest', 'ssr_chi2test', 'lrtest', 'params_ftest'))
+        check_int(name=TimeseriesFeatureMixin.granger_tests.__name__, value=lag, min_value=1)
+        df = pd.DataFrame(np.zeros((len(variables), len(variables))), columns=variables, index=variables)
+        for c, r in itertools.product(df.columns, df.index):
+            result = grangercausalitytests(data[[r, c]], maxlag=[lag], verbose=False)
+            p_val = min([round(result[lag][0][test][1], 4) for i in range(1)])
+            df.loc[r, c] = p_val
+        return df
