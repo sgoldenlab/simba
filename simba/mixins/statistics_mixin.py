@@ -2476,3 +2476,77 @@ class Statistics(FeatureExtractionMixin):
         else:
             q = (nominator / denominator,)
             return q, stats.chi2.sf(q, k - 1)
+
+    @staticmethod
+    def hartley_fmax(x: np.ndarray, y: np.ndarray):
+        """
+        Compute Hartley's Fmax statistic to test for equality of variances between two features or groups.
+
+        Values close to one represents closer to equal variance.
+
+        :param np.ndarray x: 1D array representing numeric data of the first group/feature.
+        :param np.ndarray x: 1D array representing numeric data of the second group/feature.
+
+        :example:
+        >>> x = np.random.random((100,))
+        >>> y = np.random.random((100,))
+        >>> Statistics.hartley_fmax(x=x, y=y)
+        """
+        check_valid_array(data=x, source=Statistics.hartley_fmax.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int64, np.float32))
+        check_valid_array(data=y, source=Statistics.hartley_fmax.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int64, np.float32))
+        max_var = np.max((np.var(x), np.var(y)))
+        min_var = np.min((np.var(x), np.var(y)))
+        if (max_var == 0) or (min_var == 0):
+            return -1.0
+        return max_var / min_var
+
+    @staticmethod
+    def grubbs_test(x: np.ndarray, left_tail: Optional[bool] = False) -> float:
+        """
+        Perform Grubbs' test to detect outliers if the minimum or maximum value in a feature series is an outlier.
+
+        :param np.ndarray x: 1D array representing numeric data.
+        :param Optional[bool] left_tail: If True, the test calculates the Grubbs' test statistic for the left tail (minimum value). If False (default), it calculates the statistic for the right tail (maximum value).
+        :return float: The computed Grubbs' test statistic.
+
+        :example:
+        >>> x = np.random.random((100,))
+        >>> Statistics.grubbs_test(x=x)
+        """
+        check_valid_array(data=x, source=Statistics.grubbs_test.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int64, np.float32))
+        x = np.sort(x)
+        if left_tail:
+            return (np.mean(x) - np.min(x)) / np.std(x)
+        else:
+            return (np.max(x) - np.mean(x)) / np.std(x)
+
+    @staticmethod
+    def wilcoxon(x: np.ndarray, y: np.ndarray):
+        """ Non-parametric two-way within-subjects test"""
+        data = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))
+        n = data.shape[0]
+        diff = np.diff(data).flatten()
+        diff_abs = np.abs(diff)
+        rank_w_ties = fast_mean_rank(data=diff_abs, descending=False)
+        signed_rank_w_ties = np.full((rank_w_ties.shape[0]), np.nan)
+        t_plus, t_minus = 0, 0
+
+        for i in range(diff.shape[0]):
+            if diff[i] < 0:
+                signed_rank_w_ties[i] = -rank_w_ties[i]
+                t_minus += np.abs(rank_w_ties[i])
+            else:
+                signed_rank_w_ties[i] = rank_w_ties[i]
+                t_plus += np.abs(rank_w_ties[i])
+        u_w = (n * (n + 1)) / 4
+        std_correction = 0
+        for i in range(signed_rank_w_ties.shape[0]):
+            same_rank_n = np.argwhere(signed_rank_w_ties == signed_rank_w_ties[i]).flatten().shape[0]
+            if same_rank_n > 1:
+                std_correction += (((same_rank_n ** 3) - same_rank_n) / 2)
+
+        std = np.sqrt(((n * (n + 1)) * ((2 * n) + 1) - std_correction) / 24)
+        W = np.min((t_plus, t_minus))
+        z = (W - u_w) / std
+        r = (z / np.sqrt(n))
+        return z, r

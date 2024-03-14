@@ -1,14 +1,17 @@
 import itertools
 import os
 from typing import Dict, List, Optional, Tuple, Union
+import numpy as np
+from numba import jit
 
 import networkx as nx
 from pyvis.network import Network
 
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_iterable_length, check_str,
-                                check_valid_hex_color)
-from simba.utils.data import create_color_palette, find_ranked_colors
+                                check_valid_hex_color,
+                                check_valid_array)
+from simba.utils.data import create_color_palette, find_ranked_colors, get_mode
 from simba.utils.errors import CountError, InvalidInputError
 
 
@@ -490,26 +493,119 @@ class NetworkMixin(object):
                 if save_path is not None:
                     network_graph.save_graph(graph_save_path)
 
+    @staticmethod
+    @jit(nopython=True)
+    def simpson_index(x: np.ndarray) -> float:
+        """
+        Calculate Simpson's diversity index for a given array of values.
 
-graph = NetworkMixin.create_graph(
-    {
-        ("Animal_1", "Animal_2"): 0.0,
-        ("Animal_1", "Animal_3"): 0.0,
-        ("Animal_1", "Animal_4"): 0.0,
-        ("Animal_1", "Animal_5"): 0.1,
-        ("Animal_2", "Animal_3"): 1.0,
-        ("Animal_2", "Animal_4"): 1.0,
-        ("Animal_2", "Animal_5"): 1.5,
-        ("Animal_3", "Animal_4"): 1.0,
-        ("Animal_3", "Animal_5"): 1.0,
-        ("Animal_4", "Animal_5"): 1.0,
-    }
-)
+        Simpson's diversity index is a measure of diversity that takes into account the number of different categories
+        present in the input data as well as the relative abundance of each category.
 
-G = nx.Graph(graph)
+        :param np.ndarray x: 1-dimensional numpy array containing the values representing categories for which Simpson's index is calculated.
+        :return float: Simpson's diversity index value for the input array `x`
+        """
 
-NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)
+        unique_v = np.unique(x)
+        n_unique = np.unique(x).shape[0]
+        results = np.full((n_unique, 3), np.nan)
+        for i in range(unique_v.shape[0]):
+            v = unique_v[i]
+            cnt = np.argwhere(x == v).flatten().shape[0]
+            squared = cnt * (cnt - 1)
+            results[i, :] = np.array([v, cnt, squared])
+        return (np.sum(results[:, 2])) / (x.shape[0] * (x.shape[0] - 1))
+
+    @staticmethod
+    def berger_parker(x: np.ndarray) -> float:
+        """
+        Berger-Parker index for the given one-dimensional array.
+        The Berger-Parker index is a measure of category dominance, calculated as the ratio of
+        the frequency of the most abundant category to the total number of observations
+
+        :example:
+        >>> x = np.random.randint(0, 25, (100,)).astype(np.float32)
+        >>> z = NetworkMixin.berger_parker(x=x)
+        """
+        check_valid_array(source=f'{NetworkMixin.berger_parker.__name__} x', accepted_ndims=(1,), data=x,
+                          accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8))
+        return get_mode(x=x) / x.shape[0]
+
+    @staticmethod
+    @jit(nopython=True)
+    def shannon_diversity_index(x: np.ndarray) -> float:
+        """
+        Calculate the Shannon Diversity Index for a given array of categories. The Shannon Diversity Index is a measure of diversity in a
+        categorical feature, taking into account both the number of different categories (richness)
+        and their relative abundances (evenness).
+
+        :example:
+        >>> x = np.random.randint(0, 100, (100, ))
+        >>> NetworkMixin.shannon_diversity_index(x=x)
+        """
+
+        unique_v = np.unique(x)
+        n_unique = np.unique(x).shape[0]
+        results = np.full((n_unique,), np.nan)
+        for i in range(unique_v.shape[0]):
+            v = unique_v[i]
+            cnt = np.argwhere(x == v).flatten().shape[0]
+            pi = cnt / x.shape[0]
+            results[i] = pi * np.log(pi)
+        return np.sum(np.abs(results))
+
+    @staticmethod
+    def margalef_diversification_index(x: np.array) -> float:
+        """
+        Calculate the Margalef Diversification Index for a given array of values.
+
+        The Margalef Diversification Index is a measure of category diversity. It quantifies the richness of a community
+        relative to the number of individuals.
+
+        :example:
+        >>> x = np.random.randint(0, 100, (100,))
+        >>> NetworkMixin.margalef_diversification_index(x=x)
+        """
+        check_valid_array(source=f'{NetworkMixin.margalef_diversification_index.__name__} x', accepted_ndims=(1,), data=x,
+                          accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8), min_axis_0=2)
+        n_unique = np.unique(x).shape[0]
+        return (n_unique - 1) / np.log(x.shape[0])
+
+    @staticmethod
+    def menhinicks_index(x: np.array) -> float:
+        """
+        Calculate the Menhinick's Index for a given array of values.
+
+        Menhinick's Index is a measure of category richness.
+        It quantifies the number of categories relative to the square root of the total number of observations.
+
+        :example:
+        >>> x = np.random.randint(0, 5, (1000,))
+        >>> NetworkMixin.menhinicks_index(x=x)
+        """
+        check_valid_array(source=f'{NetworkMixin.menhinicks_index.__name__} x', accepted_ndims=(1,), data=x,
+                          accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8), min_axis_0=2)
+        return np.unique(x).shape[0] / np.sqrt(x.shape[0])
+
+# graph = NetworkMixin.create_graph(
+#     {
+#         ("Animal_1", "Animal_2"): 0.0,
+#         ("Animal_1", "Animal_3"): 0.0,
+#         ("Animal_1", "Animal_4"): 0.0,
+#         ("Animal_1", "Animal_5"): 0.1,
+#         ("Animal_2", "Animal_3"): 1.0,
+#         ("Animal_2", "Animal_4"): 1.0,
+#         ("Animal_2", "Animal_5"): 1.5,
+#         ("Animal_3", "Animal_4"): 1.0,
+#         ("Animal_3", "Animal_5"): 1.0,
+#         ("Animal_4", "Animal_5"): 1.0,
+#     }
+# )
 #
+# G = nx.Graph(graph)
+#
+# NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)
+# #
 #
 # communities = list(nx.algorithms.community.(G, weight='weight'))
 #

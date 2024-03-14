@@ -777,6 +777,7 @@ class GeometryMixin(object):
         bg_img: Optional[np.ndarray] = None,
         bg_clr: Optional[Tuple[int]] = None,
         size: Optional[int] = None,
+        color_palette: Optional[str] = None,
     ) -> np.ndarray:
         """
         Helper function to draw shapes on white canvas or specified background image. Useful for quick troubleshooting.
@@ -835,13 +836,22 @@ class GeometryMixin(object):
                         thickness=2,
                     )
             if isinstance(shape, LineString):
-                cv2.polylines(
-                    img,
-                    [np.array(shape.coords, dtype=np.int32)],
-                    False,
-                    (colors[shape_cnt][::-1]),
-                    thickness=2,
-                )
+                if color_palette is None:
+                    cv2.polylines(
+                        img,
+                        [np.array(shape.coords, dtype=np.int32)],
+                        False,
+                        (colors[shape_cnt][::-1]),
+                        thickness=2,
+                    )
+                else:
+                    lines = np.array(shape.coords, dtype=np.int32)
+                    palette = create_color_palette(pallete_name=color_palette, increments=lines.shape[0])
+                    for i in range(1, lines.shape[0]):
+                        p1, p2 = lines[i-1], lines[i]
+                        cv2.line(img, tuple(p1), tuple(p2), palette[i], 2)
+
+
             if isinstance(shape, MultiPolygon):
                 for polygon_cnt, polygon in enumerate(shape.geoms):
                     polygon_np = np.array(

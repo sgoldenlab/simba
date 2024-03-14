@@ -111,6 +111,7 @@ def geometry_visualizer(
                     colors[shape_cnt][::-1],
                     TextOptions.LINE_THICKNESS.value,
                 )
+
         video_writer.write(img.astype(np.uint8))
         print(f"Creating frame {frm_id} (core: {group})")
     video_writer.release()

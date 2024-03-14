@@ -40,6 +40,7 @@ Some example operations pertaining to working with animals and environments as g
 
    nb/geometry_example_1
    nb/geometry_example_2
+   nb/geometry_ex_3
 
 Miscellaneous
 -------------------

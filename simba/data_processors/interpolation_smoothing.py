@@ -50,8 +50,8 @@ class Interpolate(ConfigReader):
 
     def __init__(
         self,
-        input_path: str,
-        config_path: str,
+        input_path: Union[str, os.PathLike],
+        config_path: Union[str, os.PathLike],
         method: Literal[
             "Animal(s): Nearest",
             "Animal(s): Linear",

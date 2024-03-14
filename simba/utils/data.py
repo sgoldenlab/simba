@@ -31,7 +31,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_module_has_import,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int, check_str,
-                                check_that_hhmmss_start_is_before_end)
+                                check_that_hhmmss_start_is_before_end,
+                                check_valid_array)
 from simba.utils.enums import ConfigKey, Dtypes, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 DataHeaderError, FrameRangeError,
@@ -634,7 +635,7 @@ def convert_roi_definitions(
     :param Union[str, os.PathLike] save_dir: Directory location where the output data should be stored
     """
 
-    datetime_str = datetime.now().strftime("%Y%m%d%H%M%S")
+    datetime_str = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     check_file_exist_and_readable(file_path=roi_definitions_path)
     check_if_dir_exists(in_dir=save_dir)
     rectangle_df, circle_df, polygon_df = read_roi_data(roi_path=roi_definitions_path)
@@ -914,6 +915,11 @@ def find_ranked_colors(
         results[k] = clrs[int(v) - 1]
 
     return results
+
+def get_mode(x: np.ndarray):
+    check_valid_array(source=f'{get_mode.__name__} x', data=x, accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8))
+    values, counts = np.unique(x, return_counts=True)
+    return counts.argmax()
 
 
 def run_user_defined_feature_extraction_class(
