@@ -1,16 +1,15 @@
 import itertools
 import os
 from typing import Dict, List, Optional, Tuple, Union
-import numpy as np
-from numba import jit
 
 import networkx as nx
+import numpy as np
+from numba import jit
 from pyvis.network import Network
 
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_iterable_length, check_str,
-                                check_valid_hex_color,
-                                check_valid_array)
+                                check_valid_array, check_valid_hex_color)
 from simba.utils.data import create_color_palette, find_ranked_colors, get_mode
 from simba.utils.errors import CountError, InvalidInputError
 
@@ -527,8 +526,12 @@ class NetworkMixin(object):
         >>> x = np.random.randint(0, 25, (100,)).astype(np.float32)
         >>> z = NetworkMixin.berger_parker(x=x)
         """
-        check_valid_array(source=f'{NetworkMixin.berger_parker.__name__} x', accepted_ndims=(1,), data=x,
-                          accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8))
+        check_valid_array(
+            source=f"{NetworkMixin.berger_parker.__name__} x",
+            accepted_ndims=(1,),
+            data=x,
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8),
+        )
         return get_mode(x=x) / x.shape[0]
 
     @staticmethod
@@ -566,8 +569,13 @@ class NetworkMixin(object):
         >>> x = np.random.randint(0, 100, (100,))
         >>> NetworkMixin.margalef_diversification_index(x=x)
         """
-        check_valid_array(source=f'{NetworkMixin.margalef_diversification_index.__name__} x', accepted_ndims=(1,), data=x,
-                          accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8), min_axis_0=2)
+        check_valid_array(
+            source=f"{NetworkMixin.margalef_diversification_index.__name__} x",
+            accepted_ndims=(1,),
+            data=x,
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8),
+            min_axis_0=2,
+        )
         n_unique = np.unique(x).shape[0]
         return (n_unique - 1) / np.log(x.shape[0])
 
@@ -583,9 +591,15 @@ class NetworkMixin(object):
         >>> x = np.random.randint(0, 5, (1000,))
         >>> NetworkMixin.menhinicks_index(x=x)
         """
-        check_valid_array(source=f'{NetworkMixin.menhinicks_index.__name__} x', accepted_ndims=(1,), data=x,
-                          accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8), min_axis_0=2)
+        check_valid_array(
+            source=f"{NetworkMixin.menhinicks_index.__name__} x",
+            accepted_ndims=(1,),
+            data=x,
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8),
+            min_axis_0=2,
+        )
         return np.unique(x).shape[0] / np.sqrt(x.shape[0])
+
 
 # graph = NetworkMixin.create_graph(
 #     {

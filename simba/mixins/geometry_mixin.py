@@ -846,11 +846,12 @@ class GeometryMixin(object):
                     )
                 else:
                     lines = np.array(shape.coords, dtype=np.int32)
-                    palette = create_color_palette(pallete_name=color_palette, increments=lines.shape[0])
+                    palette = create_color_palette(
+                        pallete_name=color_palette, increments=lines.shape[0]
+                    )
                     for i in range(1, lines.shape[0]):
-                        p1, p2 = lines[i-1], lines[i]
+                        p1, p2 = lines[i - 1], lines[i]
                         cv2.line(img, tuple(p1), tuple(p2), palette[i], 2)
-
 
             if isinstance(shape, MultiPolygon):
                 for polygon_cnt, polygon in enumerate(shape.geoms):

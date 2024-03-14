@@ -999,11 +999,21 @@ class FeatureExtractionMixin(object):
             frm_bp1, frm_bp2 = bp_1[i], bp_2[i]
             axis_0_diff = np.abs(np.diff(np.array((frm_bp1[0], frm_bp2[0]))))[0]
             axis_1_diff = np.abs(np.diff(np.array((frm_bp1[1], frm_bp2[1]))))[0]
-            x_dist_percentile, y_dist_percentile = int(axis_0_diff * percentile), int(axis_1_diff * percentile)
+            x_dist_percentile, y_dist_percentile = int(axis_0_diff * percentile), int(
+                axis_1_diff * percentile
+            )
             new_x = np.min(np.array((frm_bp1[0], frm_bp2[0]))) + x_dist_percentile
             new_y = np.min(np.array((frm_bp1[1], frm_bp2[1]))) + y_dist_percentile
             result[i] = np.array([new_x, new_y])
-            print([new_x, new_y], bp_1[i], bp_2[i], axis_0_diff, axis_1_diff, x_dist_percentile, y_dist_percentile)
+            print(
+                [new_x, new_y],
+                bp_1[i],
+                bp_2[i],
+                axis_0_diff,
+                axis_1_diff,
+                x_dist_percentile,
+                y_dist_percentile,
+            )
 
         return result.astype(np.int64)
 
@@ -1013,5 +1023,3 @@ class FeatureExtractionMixin(object):
 # bp_2 = np.array([[10, 4],
 #                  [20, 1]]).astype(np.int64)
 # FeatureExtractionMixin().find_midpoints(bp_1=bp_1, bp_2=bp_2, percentile=0.5)
-
-

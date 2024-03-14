@@ -820,10 +820,12 @@ def check_valid_array(
             )
 
     if min_axis_0 is not None:
-        check_int(name=f'{source} min_axis_0', value=min_axis_0)
+        check_int(name=f"{source} min_axis_0", value=min_axis_0)
         if data.shape[0] < min_axis_0:
-            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[0]} rows, minimum accepted: {min_axis_0}, {source}", source=check_valid_array.__name__)
-
+            raise ArrayError(
+                msg=f"Array not of acceptable shape. Found  {data.shape[0]} rows, minimum accepted: {min_axis_0}, {source}",
+                source=check_valid_array.__name__,
+            )
 
 
 def check_valid_lst(
