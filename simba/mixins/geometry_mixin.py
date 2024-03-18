@@ -34,8 +34,8 @@ from simba.utils.data import create_color_palette, create_color_palettes
 from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
-                                    find_max_vertices_coordinates,
-                                    read_frm_of_video, stdout_success, read_df)
+                                    find_max_vertices_coordinates, read_df,
+                                    read_frm_of_video, stdout_success)
 
 
 class GeometryMixin(object):
@@ -3310,7 +3310,9 @@ class GeometryMixin(object):
             return np.cumsum(img_arr, axis=0) / fps
 
     @staticmethod
-    def hausdorff_distance(geometries: List[List[Union[Polygon, LineString]]]) -> np.ndarray:
+    def hausdorff_distance(
+        geometries: List[List[Union[Polygon, LineString]]]
+    ) -> np.ndarray:
         """
         The Hausdorff distance measure of the similarity between time-series sequential geometries. It is defined as the maximum of the distances
         from each point in one set to the nearest point in the other set.
@@ -3322,18 +3324,32 @@ class GeometryMixin(object):
         :return np.ndarray: 1D array of hausdorff distances of geometries in each list.
         """
 
-        check_instance(source=GeometryMixin.hausdorff_distance.__name__, instance=geometries, accepted_types=(list,))
+        check_instance(
+            source=GeometryMixin.hausdorff_distance.__name__,
+            instance=geometries,
+            accepted_types=(list,),
+        )
         for i in geometries:
-            check_valid_lst(source=GeometryMixin.hausdorff_distance.__name__, data=i, valid_dtypes=(Polygon, LineString,), exact_len=2)
+            check_valid_lst(
+                source=GeometryMixin.hausdorff_distance.__name__,
+                data=i,
+                valid_dtypes=(
+                    Polygon,
+                    LineString,
+                ),
+                exact_len=2,
+            )
         results = np.full((len(geometries)), np.nan)
         for i in range(len(geometries)):
             results[i] = geometries[i][0].hausdorff_distance(geometries[i][1])
         return results
 
-    def multiframe_hausdorff_distance(self,
-                                      geometries: List[Union[Polygon, LineString]],
-                                      lag: Optional[int] = 1,
-                                      core_cnt: Optional[int] = -1) -> List[float]:
+    def multiframe_hausdorff_distance(
+        self,
+        geometries: List[Union[Polygon, LineString]],
+        lag: Optional[int] = 1,
+        core_cnt: Optional[int] = -1,
+    ) -> List[float]:
         """
         The Hausdorff distance measure of the similarity between sequential time-series  geometries.
 
@@ -3345,16 +3361,45 @@ class GeometryMixin(object):
         >>> hausdorff_distances = GeometryMixin.multiframe_hausdorff_distance(geometries=geometries)
         """
 
-        check_valid_lst(source=GeometryMixin.multiframe_hausdorff_distance.__name__, data=geometries, valid_dtypes=(Polygon, LineString,), min_len=1)
-        check_int(name=f"{GeometryMixin.multiframe_hausdorff_distance.__name__} CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
-        check_int(name=f"{GeometryMixin.multiframe_hausdorff_distance.__name__} LAG", value=lag, min_value=-1, max_value=len(geometries) - 1, raise_error=True)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        check_valid_lst(
+            source=GeometryMixin.multiframe_hausdorff_distance.__name__,
+            data=geometries,
+            valid_dtypes=(
+                Polygon,
+                LineString,
+            ),
+            min_len=1,
+        )
+        check_int(
+            name=f"{GeometryMixin.multiframe_hausdorff_distance.__name__} CORE COUNT",
+            value=core_cnt,
+            min_value=-1,
+            max_value=find_core_cnt()[0],
+            raise_error=True,
+        )
+        check_int(
+            name=f"{GeometryMixin.multiframe_hausdorff_distance.__name__} LAG",
+            value=lag,
+            min_value=-1,
+            max_value=len(geometries) - 1,
+            raise_error=True,
+        )
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         reshaped_geometries = []
-        for i in range(lag): reshaped_geometries.append([[geometries[i], geometries[i]]])
-        for i in range(lag, len(geometries)): reshaped_geometries.append([[geometries[i - lag], geometries[i]]])
+        for i in range(lag):
+            reshaped_geometries.append([[geometries[i], geometries[i]]])
+        for i in range(lag, len(geometries)):
+            reshaped_geometries.append([[geometries[i - lag], geometries[i]]])
         results = []
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            for cnt, mp_return in enumerate(pool.imap(GeometryMixin.hausdorff_distance, reshaped_geometries, chunksize=1)):
+        with multiprocessing.Pool(
+            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
+        ) as pool:
+            for cnt, mp_return in enumerate(
+                pool.imap(
+                    GeometryMixin.hausdorff_distance, reshaped_geometries, chunksize=1
+                )
+            ):
                 results.append(mp_return[0])
         return results
 
@@ -3459,8 +3504,10 @@ class GeometryMixin(object):
         }
 
     @staticmethod
-    @njit('(float32[:,:], float32[:,:], int64)')
-    def linear_frechet_distance(x: np.ndarray, y: np.ndarray, sample: int = 100) -> float:
+    @njit("(float32[:,:], float32[:,:], int64)")
+    def linear_frechet_distance(
+        x: np.ndarray, y: np.ndarray, sample: int = 100
+    ) -> float:
         """
         Compute the Linear Fréchet Distance between two trajectories.
 
@@ -3481,7 +3528,8 @@ class GeometryMixin(object):
         >>> distance = GeometryMixin.linear_frechet_distance(x=x, y=y, sample=100)
 
         """
-        if sample > 1: x, y = x[::sample], y[::sample]
+        if sample > 1:
+            x, y = x[::sample], y[::sample]
         n_p, n_q = x.shape[0], y.shape[0]
         ca = np.full((n_p, n_q), 0.0)
         for i in prange(n_p):

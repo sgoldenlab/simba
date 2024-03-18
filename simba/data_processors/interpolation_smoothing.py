@@ -114,10 +114,11 @@ class Interpolate(ConfigReader):
             if self.initial_import_multi_index:
                 if len(df.columns) != len(self.bp_headers):
                     raise DataHeaderError(
-                        msg=f'The file {file_path} contains {len(df.columns)} columns, but your SimBA project expects {len(self.bp_headers)} columns representing {int(len(self.bp_headers) / 3)} body-parts (x, y, p).',
-                        source=self.__class__.__name__)
+                        msg=f"The file {file_path} contains {len(df.columns)} columns, but your SimBA project expects {len(self.bp_headers)} columns representing {int(len(self.bp_headers) / 3)} body-parts (x, y, p).",
+                        source=self.__class__.__name__,
+                    )
                 df.columns = self.bp_headers
-            df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
+            df = df.apply(pd.to_numeric, errors="coerce").fillna(0)
             df[df < 0] = 0
             for animal_name, animal_bps in self.animal_bp_dict.items():
                 animal_df = (
@@ -166,19 +167,31 @@ class Interpolate(ConfigReader):
         for file_path in self.files_found:
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=file_path)
-            df = read_df(file_path=file_path, file_type=self.file_type, check_multiindex=True)
+            df = read_df(
+                file_path=file_path, file_type=self.file_type, check_multiindex=True
+            )
             if self.initial_import_multi_index:
                 if len(df.columns) != len(self.bp_headers):
-                    raise DataHeaderError(msg=f'The file {file_path} contains {len(df.columns)} columns, but your SimBA project expects {len(self.bp_headers)} columns representing {int(len(self.bp_headers)/3)} body-parts (x, y, p).', source=self.__class__.__name__)
+                    raise DataHeaderError(
+                        msg=f"The file {file_path} contains {len(df.columns)} columns, but your SimBA project expects {len(self.bp_headers)} columns representing {int(len(self.bp_headers)/3)} body-parts (x, y, p).",
+                        source=self.__class__.__name__,
+                    )
                 df.columns = self.bp_headers
-            df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
+            df = df.apply(pd.to_numeric, errors="coerce").fillna(0)
             df[df < 0] = 0
             for animal in self.animal_bp_dict:
-                for x_bps_name, y_bps_name in zip(self.animal_bp_dict[animal]["X_bps"],self.animal_bp_dict[animal]["Y_bps"]):
+                for x_bps_name, y_bps_name in zip(
+                    self.animal_bp_dict[animal]["X_bps"],
+                    self.animal_bp_dict[animal]["Y_bps"],
+                ):
                     df[x_bps_name] = df[x_bps_name].astype(int)
                     df[y_bps_name] = df[y_bps_name].astype(int)
-                    idx = df.loc[(df[x_bps_name] <= 0.0) & (df[y_bps_name] <= 0.0)].index.tolist()
-                    print(f"Interpolating {len(idx)} {x_bps_name[:-2]} body-parts for animal {animal} in video {video_name}...")
+                    idx = df.loc[
+                        (df[x_bps_name] <= 0.0) & (df[y_bps_name] <= 0.0)
+                    ].index.tolist()
+                    print(
+                        f"Interpolating {len(idx)} {x_bps_name[:-2]} body-parts for animal {animal} in video {video_name}..."
+                    )
                     df.loc[idx, [x_bps_name, y_bps_name]] = np.nan
                     df[x_bps_name] = (
                         df[x_bps_name]
