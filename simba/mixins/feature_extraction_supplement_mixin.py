@@ -693,4 +693,3 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             return 1.0
         else:
             return np.round(preceding_cnt / (preceding_cnt + proceeding_cnt), 3)
-
