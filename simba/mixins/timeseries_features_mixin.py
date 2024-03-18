@@ -3,8 +3,7 @@ __author__ = "Simon Nilsson"
 import multiprocessing
 
 import numpy as np
-from numba import (boolean, float32, float64, int64, jit, njit, prange, typed,
-                   types)
+from numba import (boolean, float32, float64, int64, jit, njit, prange, typed,types)
 from numba.typed import Dict, List
 from numpy.lib.stride_tricks import as_strided
 from statsmodels.tsa.stattools import adfuller, kpss, zivot_andrews, grangercausalitytests
@@ -18,7 +17,9 @@ try:
 except:
     from typing_extensions import Literal
 
+import typing
 from typing import get_type_hints
+
 
 from simba.utils.read_write import find_core_cnt
 from simba.utils.checks import (check_instance, check_valid_lst, check_str, check_int, check_that_column_exist)
@@ -1571,10 +1572,10 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     def granger_tests(data: pd.DataFrame,
-                      variables: List[str],
+                      variables: typing.List[str],
                       lag: int,
-                      test: Literal[
-                          'ssr_ftest', 'ssr_chi2test', 'lrtest', 'params_ftest'] = 'ssr_chi2test') -> pd.DataFrame:
+                      test: Literal['ssr_ftest', 'ssr_chi2test', 'lrtest', 'params_ftest'] = 'ssr_chi2test') -> pd.DataFrame:
+
         """
         Perform Granger causality tests between pairs of variables in a DataFrame.
 
@@ -1590,6 +1591,11 @@ class TimeseriesFeatureMixin(object):
         >>> x = np.random.randint(0, 50, (100, 2))
         >>> data = pd.DataFrame(x, columns=['r', 'k'])
         >>> TimeseriesFeatureMixin.granger_tests(data=data, variables=['r', 'k'], lag=4, test='ssr_chi2test')
+        >>>     r           k
+        >>>     r  1.0000  0.4312
+        >>>     k  0.3102  1.0000
+
+
         """
 
         check_instance(source=TimeseriesFeatureMixin.granger_tests.__name__, instance=data, accepted_types=(pd.DataFrame,))
@@ -1604,3 +1610,6 @@ class TimeseriesFeatureMixin(object):
             p_val = min([round(result[lag][0][test][1], 4) for i in range(1)])
             df.loc[r, c] = p_val
         return df
+
+
+

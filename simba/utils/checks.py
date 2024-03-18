@@ -901,7 +901,7 @@ def check_valid_lst(
             min_value=0,
             raise_error=raise_error,
         )
-        if len(data) == exact_len:
+        if len(data) != exact_len:
             if raise_error:
                 raise InvalidInputError(
                     msg=f"Invalid length of list. Found {len(data)}, accepted: {exact_len}",

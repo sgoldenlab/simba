@@ -45,8 +45,7 @@ def geometry_visualizer(
         (video_meta_data["width"], video_meta_data["height"]),
     )
     cap = cv2.VideoCapture(video_path)
-
-    for frm_cnt, frm_id in enumerate(range(start_frm, end_frm - 1)):
+    for frm_cnt, frm_id in enumerate(range(start_frm, end_frm+1)):
         cap.set(1, int(frm_id))
         _, img = cap.read()
         for shape_cnt, shape in enumerate(data[frm_cnt][0:-2]):
@@ -216,9 +215,11 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
             include_row_index=True,
             include_split_order=False,
         )
+
         for i in range(len(data)):
             new_col = np.full(len(data[i]), fill_value=i).reshape(-1, 1)
             data[i] = np.concatenate((data[i], new_col), axis=1)
+        print(data)
         with multiprocessing.Pool(
             self.core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
         ) as pool:
