@@ -328,7 +328,7 @@ class CircularStatisticsMixin(object):
         return results[1:]
 
     @staticmethod
-    @njit('(int32[:,:], float64, float64)')
+    @njit("(int32[:,:], float64, float64)")
     def sliding_bearing(x: np.ndarray, lag: float, fps: float) -> np.ndarray:
         """
         Calculates the sliding bearing (direction) of movement in degrees for a sequence of 2D points representing a single body-part.

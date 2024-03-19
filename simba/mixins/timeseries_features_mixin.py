@@ -1,14 +1,16 @@
 __author__ = "Simon Nilsson"
 
+import itertools
 import multiprocessing
 
 import numpy as np
-from numba import (boolean, float32, float64, int64, jit, njit, prange, typed,types)
+import pandas as pd
+from numba import (boolean, float32, float64, int64, jit, njit, prange, typed,
+                   types)
 from numba.typed import Dict, List
 from numpy.lib.stride_tricks import as_strided
-from statsmodels.tsa.stattools import adfuller, kpss, zivot_andrews, grangercausalitytests
-import itertools
-import pandas as pd
+from statsmodels.tsa.stattools import (adfuller, grangercausalitytests, kpss,
+                                       zivot_andrews)
 
 from simba.utils.errors import InvalidInputError
 
@@ -20,9 +22,9 @@ except:
 import typing
 from typing import get_type_hints
 
-
+from simba.utils.checks import (check_instance, check_int, check_str,
+                                check_that_column_exist, check_valid_lst)
 from simba.utils.read_write import find_core_cnt
-from simba.utils.checks import (check_instance, check_valid_lst, check_str, check_int, check_that_column_exist)
 
 
 class TimeseriesFeatureMixin(object):
@@ -1571,11 +1573,14 @@ class TimeseriesFeatureMixin(object):
         return results
 
     @staticmethod
-    def granger_tests(data: pd.DataFrame,
-                      variables: typing.List[str],
-                      lag: int,
-                      test: Literal['ssr_ftest', 'ssr_chi2test', 'lrtest', 'params_ftest'] = 'ssr_chi2test') -> pd.DataFrame:
-
+    def granger_tests(
+        data: pd.DataFrame,
+        variables: typing.List[str],
+        lag: int,
+        test: Literal[
+            "ssr_ftest", "ssr_chi2test", "lrtest", "params_ftest"
+        ] = "ssr_chi2test",
+    ) -> pd.DataFrame:
         """
         Perform Granger causality tests between pairs of variables in a DataFrame.
 
@@ -1595,13 +1600,31 @@ class TimeseriesFeatureMixin(object):
         >>>     r  1.0000  0.4312
         >>>     k  0.3102  1.0000
         """
-        check_instance(source=TimeseriesFeatureMixin.granger_tests.__name__, instance=data, accepted_types=(pd.DataFrame,))
-        check_valid_lst(data=variables, source=TimeseriesFeatureMixin.granger_tests.__name__, valid_dtypes=(str,), min_len=2)
-        check_that_column_exist(df=data, column_name=variables, file_name='')
-        check_str(name=TimeseriesFeatureMixin.granger_tests.__name__, value=test,
-                  options=('ssr_ftest', 'ssr_chi2test', 'lrtest', 'params_ftest'))
-        check_int(name=TimeseriesFeatureMixin.granger_tests.__name__, value=lag, min_value=1)
-        df = pd.DataFrame(np.zeros((len(variables), len(variables))), columns=variables, index=variables)
+        check_instance(
+            source=TimeseriesFeatureMixin.granger_tests.__name__,
+            instance=data,
+            accepted_types=(pd.DataFrame,),
+        )
+        check_valid_lst(
+            data=variables,
+            source=TimeseriesFeatureMixin.granger_tests.__name__,
+            valid_dtypes=(str,),
+            min_len=2,
+        )
+        check_that_column_exist(df=data, column_name=variables, file_name="")
+        check_str(
+            name=TimeseriesFeatureMixin.granger_tests.__name__,
+            value=test,
+            options=("ssr_ftest", "ssr_chi2test", "lrtest", "params_ftest"),
+        )
+        check_int(
+            name=TimeseriesFeatureMixin.granger_tests.__name__, value=lag, min_value=1
+        )
+        df = pd.DataFrame(
+            np.zeros((len(variables), len(variables))),
+            columns=variables,
+            index=variables,
+        )
         for c, r in itertools.product(df.columns, df.index):
             result = grangercausalitytests(data[[r, c]], maxlag=[lag], verbose=False)
             p_val = min([round(result[lag][0][test][1], 4) for i in range(1)])
@@ -1609,12 +1632,10 @@ class TimeseriesFeatureMixin(object):
         return df
 
     @staticmethod
-    @njit('(int32[:,:], float64[:], float64, float64)')
-    def sliding_displacement(x: np.ndarray,
-                             time_windows: np.ndarray,
-                             fps: float,
-                             px_per_mm: float) -> np.ndarray:
-
+    @njit("(int32[:,:], float64[:], float64, float64)")
+    def sliding_displacement(
+        x: np.ndarray, time_windows: np.ndarray, fps: float, px_per_mm: float
+    ) -> np.ndarray:
         """
         Calculate sliding Euclidean displacement of a body-part point over time windows.
 
@@ -1638,5 +1659,7 @@ class TimeseriesFeatureMixin(object):
             w = int(time_windows[i] * fps)
             for j in range(w, x.shape[0]):
                 c, s = x[j], x[j - w]
-                results[j, i] = (np.sqrt((s[0] - c[0]) ** 2 + (s[1] - c[1]) ** 2)) / px_per_mm
+                results[j, i] = (
+                    np.sqrt((s[0] - c[0]) ** 2 + (s[1] - c[1]) ** 2)
+                ) / px_per_mm
         return results.astype(np.float32)
