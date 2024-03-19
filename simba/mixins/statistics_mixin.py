@@ -2571,7 +2571,9 @@ class Statistics(FeatureExtractionMixin):
         return z, r
 
     @staticmethod
-    @njit('(float32[:,:], )', )
+    @njit(
+        "(float32[:,:], )",
+    )
     def cov_matrix(data: np.ndarray):
         """
         Jitted helper to compute the covariance matrix of the input data. Helper for computing cronbach alpha,
@@ -2590,11 +2592,13 @@ class Statistics(FeatureExtractionMixin):
             mean_i = np.sum(data[:, i]) / n
             for j in range(m):
                 mean_j = np.sum(data[:, j]) / n
-                cov[i, j] = np.sum((data[:, i] - mean_i) * (data[:, j] - mean_j)) / (n - 1)
+                cov[i, j] = np.sum((data[:, i] - mean_i) * (data[:, j] - mean_j)) / (
+                    n - 1
+                )
         return cov
 
     @staticmethod
-    @njit('(float32[:], float64,)')
+    @njit("(float32[:], float64,)")
     def mad_median_rule(data: np.ndarray, k: int) -> np.ndarray:
         """
         Detect outliers using the MAD-Median Rule. Returns 1d array of size data.shape[0] with 1 representing outlier and 0 representing inlier.
@@ -2611,8 +2615,10 @@ class Statistics(FeatureExtractionMixin):
         return outliers * 1
 
     @staticmethod
-    @njit('(float32[:], float64, float64[:], float64)')
-    def sliding_mad_median_rule(data: np.ndarray, k: int, time_windows: np.ndarray, fps: float) -> np.ndarray:
+    @njit("(float32[:], float64, float64[:], float64)")
+    def sliding_mad_median_rule(
+        data: np.ndarray, k: int, time_windows: np.ndarray, fps: float
+    ) -> np.ndarray:
         """
         Count the number of outliers in a sliding time-window using the MAD-Median Rule.
 
@@ -2630,7 +2636,7 @@ class Statistics(FeatureExtractionMixin):
         for time_window in time_windows:
             w = int(fps * time_window)
             for i in range(w, data.shape[0] + 1, 1):
-                w_data = data[i - w:i]
+                w_data = data[i - w : i]
                 median = np.median(w_data)
                 mad = np.median(np.abs(w_data - median))
                 threshold = k * mad
