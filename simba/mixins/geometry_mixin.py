@@ -311,7 +311,12 @@ class GeometryMixin(object):
         )
 
     @staticmethod
-    def compute_pct_shape_overlap(shapes: List[Union[Polygon, LineString]], denominator: Optional[Literal['difference', 'shape_1', 'shape_2']] = 'difference') -> int:
+    def compute_pct_shape_overlap(
+        shapes: List[Union[Polygon, LineString]],
+        denominator: Optional[
+            Literal["difference", "shape_1", "shape_2"]
+        ] = "difference",
+    ) -> int:
         """
         Compute the percentage of overlap between two shapes.
 
@@ -345,12 +350,23 @@ class GeometryMixin(object):
             val=len(shapes),
             exact_accepted_length=2,
         )
-        check_str(name=GeometryMixin.compute_pct_shape_overlap.__name__, value=denominator, options=('difference', 'shape_1', 'shape_2'))
+        check_str(
+            name=GeometryMixin.compute_pct_shape_overlap.__name__,
+            value=denominator,
+            options=("difference", "shape_1", "shape_2"),
+        )
         if shapes[0].intersects(shapes[1]):
             intersection = shapes[0].intersection(shapes[1])
-            if denominator == 'difference':
-                return np.round((intersection.area / ((shapes[0].area + shapes[1].area) - intersection.area) * 100), 2)
-            elif denominator == 'shape_1':
+            if denominator == "difference":
+                return np.round(
+                    (
+                        intersection.area
+                        / ((shapes[0].area + shapes[1].area) - intersection.area)
+                        * 100
+                    ),
+                    2,
+                )
+            elif denominator == "shape_1":
                 return np.round((intersection.area / shapes[0].area) * 100, 2)
             else:
                 return np.round((intersection.area / shapes[1].area) * 100, 2)
@@ -1424,8 +1440,8 @@ class GeometryMixin(object):
         video_name: Optional[str] = None,
         verbose: Optional[bool] = False,
         animal_names: Optional[Tuple[str]] = None,
-        denominator: Optional[Literal['difference', 'shape_1', 'shape_2']] = difference) -> List[float]:
-
+        denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = difference,
+    ) -> List[float]:
         """
         Compute the percentage overlap between corresponding Polygons in two lists.
 
@@ -1463,10 +1479,22 @@ class GeometryMixin(object):
                 msg=f"shape_1 and shape_2 contains more than 1 dtype {input_dtypes}",
                 source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__,
             )
-        check_instance(source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__, instance=shape_1[0], accepted_types=(LineString, Polygon))
-        data, results, timer = (np.column_stack((shape_1, shape_2)), [], SimbaTimer(start=True))
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(GeometryMixin.compute_pct_shape_overlap, denominator=denominator)
+        check_instance(
+            source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__,
+            instance=shape_1[0],
+            accepted_types=(LineString, Polygon),
+        )
+        data, results, timer = (
+            np.column_stack((shape_1, shape_2)),
+            [],
+            SimbaTimer(start=True),
+        )
+        with multiprocessing.Pool(
+            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
+        ) as pool:
+            constants = functools.partial(
+                GeometryMixin.compute_pct_shape_overlap, denominator=denominator
+            )
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 if verbose:
                     if not video_name and not animal_names:
@@ -1601,7 +1629,9 @@ class GeometryMixin(object):
         with multiprocessing.Pool(
             core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
         ) as pool:
-            constants = functools.partial(GeometryMixin.shape_distance, pixels_per_mm=pixels_per_mm, unit=unit)
+            constants = functools.partial(
+                GeometryMixin.shape_distance, pixels_per_mm=pixels_per_mm, unit=unit
+            )
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(result)
 
@@ -3720,4 +3750,3 @@ class GeometryMixin(object):
 # polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[0, 100],[100, 100],[0, 0],[100, 0]]))
 # polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[25, 75],[75, 75],[25, 25],[75, 25]]))
 # y = GeometryMixin().compute_pct_shape_overlap(shapes=[polygon_1, polygon_2], denominator='shape_2')
-
