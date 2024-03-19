@@ -448,16 +448,16 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            :align: center
 
         :param pd.DataFrame data: DataFrame containing shape data where each row represents a frame and each column represents a shape where 0 represents not in ROI and 1 represents inside the ROI
-        :param pd.DataFrame data: List of column names in the DataFrame corresponding to shape names.
+        :param List[str] shape_names: List of column names in the DataFrame corresponding to shape names.
         :returns Dict[Union[str, Tuple[str], Union[int, float, List[int]]]]: Dict with the following keys and values:
-                'pct_alternation': Percent alternation computed as spontaneous alternation cnt /(total number of arm entries − (number of arms - 1))} × 100
-                'alternation_cnt': The sliding count of ROI entry sequences of len(shape_names) that are all unique.
-                'same_arm_returns_cnt': Aggregate count of sequantial visits to the same ROI.
-                'alternate_arm_returns_cnt': Aggregate count of errors which are not same-arm-return errors.
-                'error_cnt': Aggregate error count (same_arm_returns_cnt + alternate_arm_returns_cnt),
-                'same_arm_returns_dict': Dictionary with the keys being the name of the ROI and values are a list of frames when the same-arm-return errors where committed.
-                'alternate_arm_returns_cnt': Dictionary with the keys being the name of the ROI and values are a list of frames when the alternate-arm-return errors where committed.
-                'alternations_dict': Dictionary with the keys being unique ROI name tuple sequences of length len(shape_names) and values are a list of frames when the sequence was completed.
+                - 'pct_alternation' - Percent alternation computed as spontaneous alternation cnt /(total number of arm entries − (number of arms - 1))} × 100
+                - 'alternation_cnt' - The sliding count of ROI entry sequences of len(shape_names) that are all unique.
+                - 'same_arm_returns_cnt' - Aggregate count of sequantial visits to the same ROI.
+                - 'alternate_arm_returns_cnt' - Aggregate count of errors which are not same-arm-return errors.
+                - 'error_cnt' - Aggregate error count (same_arm_returns_cnt + alternate_arm_returns_cnt),
+                - 'same_arm_returns_dict' - Dictionary with the keys being the name of the ROI and values are a list of frames when the same-arm-return errors where committed.
+                - 'alternate_arm_returns_cnt' - Dictionary with the keys being the name of the ROI and values are a list of frames when the alternate-arm-return errors where committed.
+                - 'alternations_dict' - Dictionary with the keys being unique ROI name tuple sequences of length len(shape_names) and values are a list of frames when the sequence was completed.
 
         :example:
         >>> data = np.zeros((100, 4), dtype=int)
