@@ -29,7 +29,7 @@ from simba.utils.checks import (check_float,
                                 check_if_valid_input, check_if_valid_rgb_tuple,
                                 check_instance, check_int,
                                 check_iterable_length, check_str,
-                                check_valid_array, check_valid_lst)
+                                check_valid_array, check_valid_lst, check_that_column_exist)
 from simba.utils.data import create_color_palette, create_color_palettes
 from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions
 from simba.utils.errors import CountError, InvalidInputError
@@ -418,10 +418,8 @@ class GeometryMixin(object):
         return shapes[0].crosses(shapes[1])
 
     @staticmethod
-    def is_shape_covered(
-        shape: Union[LineString, Polygon, MultiPolygon],
-        other_shape: Union[LineString, Polygon, MultiPolygon],
-    ) -> bool:
+    def is_shape_covered(shapes: List[Union[LineString, Polygon, MultiPolygon, MultiPoint]]) -> bool:
+
         """
         Check if one geometry fully covers another.
 
@@ -429,28 +427,17 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        :param Union[LineString, Polygon, MultiPolygon] shape: The first geometry to be checked for coverage.
-        :param Union[LineString, Polygon, MultiPolygon] other_shape: The second geometry that is potentially covered by the first.
-        :return bool: True if the first geometry fully covers the second, False otherwise.
+        :param Union[LineString, Polygon, MultiPolygon, MultiPoint] shapes: The first geometry to be checked for coverage.
+        :return bool: True if the second geometry fully covers the first geometry, otherwise False.
 
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[25, 25], [25, 75], [90, 25], [90, 75]]))
-        >>> GeometryMixin().is_shape_covered(shape=polygon_1, other_shape=polygon_2)
+        >>> GeometryMixin().is_shape_covered(shapes=[polygon_1, polygon_2])
         >>> True
 
         """
-        check_instance(
-            source=GeometryMixin.is_shape_covered.__name__,
-            instance=shape,
-            accepted_types=(LineString, Polygon, MultiPolygon),
-        )
-        check_instance(
-            source=GeometryMixin.is_shape_covered.__name__,
-            instance=other_shape,
-            accepted_types=(LineString, Polygon, MultiPolygon),
-        )
-
-        return shape.covers(other_shape)
+        check_valid_lst(data=shapes, source=GeometryMixin.is_shape_covered.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon, MultiPoint), exact_len=2)
+        return shapes[1].covers(shapes[0])
 
     @staticmethod
     def area(shape: Union[MultiPolygon, Polygon], pixels_per_mm: float):
@@ -2275,7 +2262,7 @@ class GeometryMixin(object):
         >>> data = pd.read_csv(data_path, usecols=['Nose_x', 'Nose_y']).sample(n=3).fillna(1).values.astype(np.int64)
         >>> geometries = []
         >>> for frm_data in data: geometries.append(GeometryMixin().bodyparts_to_circle(frm_data, 100))
-        >>> GeometryMixin()get_geometry_brightness_intensity(img=img, geometries=geometries, ignore_black=False)
+        >>> GeometryMixin().get_geometry_brightness_intensity(img=img, geometries=geometries, ignore_black=False)
         >>> [125.0, 113.0, 118.0]
         """
 
@@ -2414,6 +2401,39 @@ class GeometryMixin(object):
         return ImageMixin().get_histocomparison(
             img_1=imgs[0], img_2=imgs[1], method=method, absolute=absolute
         )
+
+    def multiframe_is_shape_covered(self,
+                                    shape_1: List[Polygon],
+                                    shape_2: List[Polygon],
+                                    core_cnt: Optional[int] = -1) -> List[bool]:
+        """
+        For each shape in time-series of shapes, check if another shape in the same time-series fully covers the
+        first shape.
+
+        .. image:: _static/img/multiframe_is_shape_covered.png
+           :width: 600
+           :align: center
+
+
+        :example:
+        >>> shape_1 = GeometryMixin().multiframe_bodyparts_to_polygon(data=np.random.randint(0, 200, (100, 6, 2)))
+        >>> shape_2 = [Polygon([[0, 0], [20, 20], [20, 10], [10, 20]]) for x in range(len(shape_1))]
+        >>> GeometryMixin.multiframe_is_shape_covered(shape_1=shape_1, shape_2=shape_2, core_cnt=3)
+        """
+        check_valid_lst(data=shape_1, source=GeometryMixin.multiframe_is_shape_covered.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon,))
+        check_valid_lst(data=shape_2, source=GeometryMixin.multiframe_is_shape_covered.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon,))
+        if len(shape_1) != len(shape_2):
+            raise InvalidInputError(msg=f'shape_1 ({len(shape_1)}) and shape_2 ({len(shape_2)}) are unequal length', source=GeometryMixin.multiframe_is_shape_covered.__name__)
+        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
+        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        shapes = [list(x) for x in zip(shape_1, shape_2)]
+        results = []
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+            for cnt, mp_return in enumerate(pool.imap(GeometryMixin.is_shape_covered, shapes, chunksize=1)):
+                results.append(mp_return)
+        pool.join()
+        pool.terminate()
+        return results
 
     @staticmethod
     def geometry_contourcomparison(
@@ -3545,3 +3565,73 @@ class GeometryMixin(object):
                 else:
                     ca[i, j] = d
         return ca[n_p - 1, n_q - 1]
+
+    @staticmethod
+    def simba_roi_to_geometries(rectangles_df: pd.DataFrame, circles_df: pd.DataFrame,
+                                polygons_df: pd.DataFrame) -> dict:
+        """
+        Convert SimBA dataframes holding ROI geometries to nested dictionary holding Shapley polygons.
+
+        :example:
+        >>> #config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini'
+        >>> #config = ConfigReader(config_path=config_path)
+        >>> #config.read_roi_data()
+        >>> #GeometryMixin.simba_roi_to_geometries(rectangles_df=config.rectangles_df, circles_df=config.circles_df, polygons_df=config.polygon_df)
+        """
+
+        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=rectangles_df, accepted_types=(pd.DataFrame,))
+        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=circles_df, accepted_types=(pd.DataFrame,))
+        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=polygons_df, accepted_types=(pd.DataFrame,))
+        for i in [rectangles_df, circles_df, polygons_df]: check_that_column_exist(df=i, column_name=['Video', 'Name','Tags'], file_name='')
+        results = {}
+        for video_name in rectangles_df['Video'].unique():
+            if video_name not in results.keys(): results[video_name] = {}
+            video_shapes = rectangles_df[['Tags', 'Name']][rectangles_df['Video'] == video_name]
+            for shape_name in video_shapes['Name'].unique():
+                shape_data = video_shapes[video_shapes['Name'] == shape_name].reset_index(drop=True)
+                tags, name = list(shape_data['Tags'].values[0].values()), shape_data['Name'].values[0]
+                results[video_name][name] = Polygon(tags)
+        for video_name in polygons_df['Video'].unique():
+            if video_name not in results.keys(): results[video_name] = {}
+            video_shapes = polygons_df[['Tags', 'Name']][polygons_df['Video'] == video_name]
+            for shape_name in video_shapes['Name'].unique():
+                shape_data = video_shapes[video_shapes['Name'] == shape_name].reset_index(drop=True)
+                tags, name = list(shape_data['Tags'].values[0].values()), shape_data['Name'].values[0]
+                results[video_name][name] = Polygon(tags)
+        for video_name in circles_df['Video'].unique():
+            if video_name not in results.keys(): results[video_name] = {}
+            video_shapes = circles_df[['Tags', 'Name']][circles_df['Video'] == video_name]
+            for shape_name in video_shapes['Name'].unique():
+                shape_data = video_shapes[video_shapes['Name'] == shape_name].reset_index(drop=True)
+                tags, name, radius = list(shape_data['Tags'].values[0].values()), shape_data['Name'].values[0], \
+                shape_data['radius'].values[0]
+                results[video_name][name] = Point(tags['Center tag']).buffer(distance=radius)
+        return results
+
+    @staticmethod
+    def filter_low_p_bps_for_shapes(x: np.ndarray, p: np.ndarray, threshold: float):
+        """
+        Filter body-part data for geometry construction while maintaining valid geometry arrays.
+
+        Having a 3D array representing body-parts across time, and a second 3D array representing probabilities of those
+        body-parts across time, we want to "remove" body-parts with low detection probabilities whilst also keeping the array sizes
+        intact and suitable for geometry construction. To do this, we find body-parts with detection probabilities below the threshold, and replace these with a body-part
+        that doesn't fall below the detection probability threshold within the same frame. However, to construct a geometry, we need >= 3 unique key-point locations.
+        Thus, no substitution can be made to when there are less than three unique body-part locations within a frame that falls above the threshold.
+
+        :example:
+        >>> x = np.random.randint(0, 500, (18000, 7, 2))
+        >>> p = np.random.random(size=(18000, 7, 1))
+        >>> x = filter_low_p_bps_for_shapes(x=x, p=p, threshold=0.1)
+        >>> x = x.reshape(x.shape[0], int(x.shape[1] * 2))
+        """
+
+        results = np.copy(x)
+        for i in range(x.shape[0]):
+            below_p_idx = np.argwhere(p[i].flatten() < threshold).flatten()
+            above_p_idx = np.argwhere(p[i].flatten() >= threshold).flatten()
+            if (below_p_idx.shape[0] > 0) and (above_p_idx.shape[0] >= 3):
+                for j in below_p_idx:
+                    new_val = x[i][above_p_idx[0]]
+                    results[i][j] = new_val
+        return results

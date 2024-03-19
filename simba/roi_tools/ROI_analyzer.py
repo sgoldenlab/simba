@@ -12,32 +12,28 @@ from shapely.geometry import Point, Polygon
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.enums import ConfigKey, Dtypes
-from simba.utils.errors import (BodypartColumnNotFoundError,
-                                MissingColumnsError, NoFilesFoundError)
+from simba.utils.errors import (BodypartColumnNotFoundError, MissingColumnsError, NoFilesFoundError)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
 from simba.utils.warnings import NoDataFoundWarning
+from simba.utils.checks import check_file_exist_and_readable
 
 
 class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     """
-
     Analyze movements, entries, exits, and time-spent-in user-defined ROIs. Results are stored in the
     'project_folder/logs' directory of the SimBA project.
 
     :param str ini_path: Path to SimBA project config file in Configparser format.
-    :param Optional[str] data_path: Path to folder holding the data used to caluclate ROI aggregate statistics. If None, then `project_folder/
-        csv/outlier_corrected_movement_location`. Deafult: None.
-    :param Optional[dict] settings: If dict, the animal body-parts and the probability threshold. If None, then the data is read from the
-        project_config.ini. Defalt: None.
-    :param Optional[bool] calculate_distances: If True, then calculate movements aggregate statistics (distances and velocities) inside ROIs. Results
-                                               are saved in ``project_folder/logs/`` directory. Default: False.
+    :param Optional[str] data_path: Path to folder holding the data used to calculate ROI aggregate statistics. If None, then `project_folder/csv/outlier_corrected_movement_location`. Default: None.
+    :param Optional[str] file_path: Path to single file holding the data used to calculate ROI statistics. If not None, then it overrides ``data_path``. Default: None.
+    :param Optional[dict] settings: If dict, the animal body-parts and the probability threshold. If None, then the data is read from the project_config.ini. Defalt: None.
+    :param Optional[bool] calculate_distances: If True, then calculate movements aggregate statistics (distances and velocities) inside ROIs. Results are saved in ``project_folder/logs/`` directory. Default: False.
 
     .. note::
        `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
-    Examples
-    ----------
+    :example:
     >>> settings = {'body_parts': {'Simon': 'Ear_left_1', 'JJ': 'Ear_left_2'}, 'threshold': 0.4}
     >>> roi_analyzer = ROIAnalyzer(ini_path='MyProjectConfig', data_path='outlier_corrected_movement_location', settings=settings, calculate_distances=True)
     >>> roi_analyzer.run()
@@ -47,7 +43,8 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     def __init__(
         self,
         ini_path: Union[str, os.PathLike],
-        data_path: Optional[str] = None,
+        data_path: Optional[Union[str, os.PathLike]] = None,
+        file_path: Optional[Union[str, os.PathLike]] = None,
         detailed_bout_data: Optional[bool] = False,
         settings: Optional[dict] = None,
         calculate_distances: Optional[bool] = False,
@@ -63,17 +60,14 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             self.input_folder = os.path.join(self.project_path, "csv", data_path)
             self.files_found = glob.glob(self.input_folder + f"/*.{self.file_type}")
             if len(self.files_found) == 0:
-                raise NoFilesFoundError(
-                    msg=f"No files in format {self.file_type} found in {self.input_folder}",
-                    source=self.__class__.__name__,
-                )
-
+                raise NoFilesFoundError(msg=f"No files in format {self.file_type} found in {self.input_folder}", source=self.__class__.__name__)
+        if file_path is not None:
+            check_file_exist_and_readable(file_path=file_path)
+            self.files_found = [file_path]
         if self.settings is None:
             self.roi_config = dict(self.config.items(ConfigKey.ROI_SETTINGS.value))
             if "animal_1_bp" not in self.roi_config.keys():
-                raise BodypartColumnNotFoundError(
-                    msg="Could not find animal_1_bp settings in the project config. Please analyze ROI data FIRST."
-                )
+                raise BodypartColumnNotFoundError(msg="Could not find animal_1_bp settings in the project config. Please analyze ROI data FIRST.")
             self.settings = {}
             self.settings["threshold"] = read_config_entry(
                 self.config,
@@ -328,7 +322,6 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                             "Exit_times"
                         ] = list(map(lambda x: x[1], bouts))
 
-                print("ss")
                 if self.calculate_distances:
                     self.movement_dict[video_name] = {}
                     for animal, shape_dicts in self.entries_exit_dict[

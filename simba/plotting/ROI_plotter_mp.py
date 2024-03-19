@@ -385,8 +385,8 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
             )
 
 
-# test = ROIPlotMultiprocess(ini_path=r'/Users/simon/Desktop/envs/troubleshooting/Termites_5/project_folder/project_config.ini',
-#                video_path="termite_test.mp4",
+# test = ROIPlotMultiprocess(ini_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',
+#                video_path="F1 HAB.mp4",
 #                core_cnt=5,
 #                style_attr={'Show_body_part': True, 'Show_animal_name': True})
 # test.run()
