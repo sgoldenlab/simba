@@ -11,12 +11,13 @@ from shapely.geometry import Point, Polygon
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import ConfigKey, Dtypes
-from simba.utils.errors import (BodypartColumnNotFoundError, MissingColumnsError, NoFilesFoundError)
+from simba.utils.errors import (BodypartColumnNotFoundError,
+                                MissingColumnsError, NoFilesFoundError)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
 from simba.utils.warnings import NoDataFoundWarning
-from simba.utils.checks import check_file_exist_and_readable
 
 
 class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
@@ -60,14 +61,19 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             self.input_folder = os.path.join(self.project_path, "csv", data_path)
             self.files_found = glob.glob(self.input_folder + f"/*.{self.file_type}")
             if len(self.files_found) == 0:
-                raise NoFilesFoundError(msg=f"No files in format {self.file_type} found in {self.input_folder}", source=self.__class__.__name__)
+                raise NoFilesFoundError(
+                    msg=f"No files in format {self.file_type} found in {self.input_folder}",
+                    source=self.__class__.__name__,
+                )
         if file_path is not None:
             check_file_exist_and_readable(file_path=file_path)
             self.files_found = [file_path]
         if self.settings is None:
             self.roi_config = dict(self.config.items(ConfigKey.ROI_SETTINGS.value))
             if "animal_1_bp" not in self.roi_config.keys():
-                raise BodypartColumnNotFoundError(msg="Could not find animal_1_bp settings in the project config. Please analyze ROI data FIRST.")
+                raise BodypartColumnNotFoundError(
+                    msg="Could not find animal_1_bp settings in the project config. Please analyze ROI data FIRST."
+                )
             self.settings = {}
             self.settings["threshold"] = read_config_entry(
                 self.config,

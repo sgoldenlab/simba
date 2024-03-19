@@ -29,7 +29,8 @@ from simba.utils.checks import (check_float,
                                 check_if_valid_input, check_if_valid_rgb_tuple,
                                 check_instance, check_int,
                                 check_iterable_length, check_str,
-                                check_valid_array, check_valid_lst, check_that_column_exist)
+                                check_that_column_exist, check_valid_array,
+                                check_valid_lst)
 from simba.utils.data import create_color_palette, create_color_palettes
 from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions
 from simba.utils.errors import CountError, InvalidInputError
@@ -418,8 +419,9 @@ class GeometryMixin(object):
         return shapes[0].crosses(shapes[1])
 
     @staticmethod
-    def is_shape_covered(shapes: List[Union[LineString, Polygon, MultiPolygon, MultiPoint]]) -> bool:
-
+    def is_shape_covered(
+        shapes: List[Union[LineString, Polygon, MultiPolygon, MultiPoint]]
+    ) -> bool:
         """
         Check if one geometry fully covers another.
 
@@ -436,7 +438,12 @@ class GeometryMixin(object):
         >>> True
 
         """
-        check_valid_lst(data=shapes, source=GeometryMixin.is_shape_covered.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon, MultiPoint), exact_len=2)
+        check_valid_lst(
+            data=shapes,
+            source=GeometryMixin.is_shape_covered.__name__,
+            valid_dtypes=(LineString, Polygon, MultiPolygon, MultiPoint),
+            exact_len=2,
+        )
         return shapes[1].covers(shapes[0])
 
     @staticmethod
@@ -2402,10 +2409,12 @@ class GeometryMixin(object):
             img_1=imgs[0], img_2=imgs[1], method=method, absolute=absolute
         )
 
-    def multiframe_is_shape_covered(self,
-                                    shape_1: List[Polygon],
-                                    shape_2: List[Polygon],
-                                    core_cnt: Optional[int] = -1) -> List[bool]:
+    def multiframe_is_shape_covered(
+        self,
+        shape_1: List[Polygon],
+        shape_2: List[Polygon],
+        core_cnt: Optional[int] = -1,
+    ) -> List[bool]:
         """
         For each shape in time-series of shapes, check if another shape in the same time-series fully covers the
         first shape.
@@ -2420,16 +2429,46 @@ class GeometryMixin(object):
         >>> shape_2 = [Polygon([[0, 0], [20, 20], [20, 10], [10, 20]]) for x in range(len(shape_1))]
         >>> GeometryMixin.multiframe_is_shape_covered(shape_1=shape_1, shape_2=shape_2, core_cnt=3)
         """
-        check_valid_lst(data=shape_1, source=GeometryMixin.multiframe_is_shape_covered.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon,))
-        check_valid_lst(data=shape_2, source=GeometryMixin.multiframe_is_shape_covered.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon,))
+        check_valid_lst(
+            data=shape_1,
+            source=GeometryMixin.multiframe_is_shape_covered.__name__,
+            valid_dtypes=(
+                LineString,
+                Polygon,
+                MultiPolygon,
+            ),
+        )
+        check_valid_lst(
+            data=shape_2,
+            source=GeometryMixin.multiframe_is_shape_covered.__name__,
+            valid_dtypes=(
+                LineString,
+                Polygon,
+                MultiPolygon,
+            ),
+        )
         if len(shape_1) != len(shape_2):
-            raise InvalidInputError(msg=f'shape_1 ({len(shape_1)}) and shape_2 ({len(shape_2)}) are unequal length', source=GeometryMixin.multiframe_is_shape_covered.__name__)
-        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+            raise InvalidInputError(
+                msg=f"shape_1 ({len(shape_1)}) and shape_2 ({len(shape_2)}) are unequal length",
+                source=GeometryMixin.multiframe_is_shape_covered.__name__,
+            )
+        check_int(
+            name="CORE COUNT",
+            value=core_cnt,
+            min_value=-1,
+            max_value=find_core_cnt()[0],
+            raise_error=True,
+        )
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         shapes = [list(x) for x in zip(shape_1, shape_2)]
         results = []
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            for cnt, mp_return in enumerate(pool.imap(GeometryMixin.is_shape_covered, shapes, chunksize=1)):
+        with multiprocessing.Pool(
+            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
+        ) as pool:
+            for cnt, mp_return in enumerate(
+                pool.imap(GeometryMixin.is_shape_covered, shapes, chunksize=1)
+            ):
                 results.append(mp_return)
         pool.join()
         pool.terminate()
@@ -3567,8 +3606,9 @@ class GeometryMixin(object):
         return ca[n_p - 1, n_q - 1]
 
     @staticmethod
-    def simba_roi_to_geometries(rectangles_df: pd.DataFrame, circles_df: pd.DataFrame,
-                                polygons_df: pd.DataFrame) -> dict:
+    def simba_roi_to_geometries(
+        rectangles_df: pd.DataFrame, circles_df: pd.DataFrame, polygons_df: pd.DataFrame
+    ) -> dict:
         """
         Convert SimBA dataframes holding ROI geometries to nested dictionary holding Shapley polygons.
 
@@ -3579,33 +3619,74 @@ class GeometryMixin(object):
         >>> #GeometryMixin.simba_roi_to_geometries(rectangles_df=config.rectangles_df, circles_df=config.circles_df, polygons_df=config.polygon_df)
         """
 
-        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=rectangles_df, accepted_types=(pd.DataFrame,))
-        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=circles_df, accepted_types=(pd.DataFrame,))
-        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=polygons_df, accepted_types=(pd.DataFrame,))
-        for i in [rectangles_df, circles_df, polygons_df]: check_that_column_exist(df=i, column_name=['Video', 'Name','Tags'], file_name='')
+        check_instance(
+            source=GeometryMixin.simba_roi_to_geometries.__name__,
+            instance=rectangles_df,
+            accepted_types=(pd.DataFrame,),
+        )
+        check_instance(
+            source=GeometryMixin.simba_roi_to_geometries.__name__,
+            instance=circles_df,
+            accepted_types=(pd.DataFrame,),
+        )
+        check_instance(
+            source=GeometryMixin.simba_roi_to_geometries.__name__,
+            instance=polygons_df,
+            accepted_types=(pd.DataFrame,),
+        )
+        for i in [rectangles_df, circles_df, polygons_df]:
+            check_that_column_exist(
+                df=i, column_name=["Video", "Name", "Tags"], file_name=""
+            )
         results = {}
-        for video_name in rectangles_df['Video'].unique():
-            if video_name not in results.keys(): results[video_name] = {}
-            video_shapes = rectangles_df[['Tags', 'Name']][rectangles_df['Video'] == video_name]
-            for shape_name in video_shapes['Name'].unique():
-                shape_data = video_shapes[video_shapes['Name'] == shape_name].reset_index(drop=True)
-                tags, name = list(shape_data['Tags'].values[0].values()), shape_data['Name'].values[0]
+        for video_name in rectangles_df["Video"].unique():
+            if video_name not in results.keys():
+                results[video_name] = {}
+            video_shapes = rectangles_df[["Tags", "Name"]][
+                rectangles_df["Video"] == video_name
+            ]
+            for shape_name in video_shapes["Name"].unique():
+                shape_data = video_shapes[
+                    video_shapes["Name"] == shape_name
+                ].reset_index(drop=True)
+                tags, name = (
+                    list(shape_data["Tags"].values[0].values()),
+                    shape_data["Name"].values[0],
+                )
                 results[video_name][name] = Polygon(tags)
-        for video_name in polygons_df['Video'].unique():
-            if video_name not in results.keys(): results[video_name] = {}
-            video_shapes = polygons_df[['Tags', 'Name']][polygons_df['Video'] == video_name]
-            for shape_name in video_shapes['Name'].unique():
-                shape_data = video_shapes[video_shapes['Name'] == shape_name].reset_index(drop=True)
-                tags, name = list(shape_data['Tags'].values[0].values()), shape_data['Name'].values[0]
+        for video_name in polygons_df["Video"].unique():
+            if video_name not in results.keys():
+                results[video_name] = {}
+            video_shapes = polygons_df[["Tags", "Name"]][
+                polygons_df["Video"] == video_name
+            ]
+            for shape_name in video_shapes["Name"].unique():
+                shape_data = video_shapes[
+                    video_shapes["Name"] == shape_name
+                ].reset_index(drop=True)
+                tags, name = (
+                    list(shape_data["Tags"].values[0].values()),
+                    shape_data["Name"].values[0],
+                )
                 results[video_name][name] = Polygon(tags)
-        for video_name in circles_df['Video'].unique():
-            if video_name not in results.keys(): results[video_name] = {}
-            video_shapes = circles_df[['Tags', 'Name']][circles_df['Video'] == video_name]
-            for shape_name in video_shapes['Name'].unique():
-                shape_data = video_shapes[video_shapes['Name'] == shape_name].reset_index(drop=True)
-                tags, name, radius = list(shape_data['Tags'].values[0].values()), shape_data['Name'].values[0], \
-                shape_data['radius'].values[0]
-                results[video_name][name] = Point(tags['Center tag']).buffer(distance=radius)
+        for video_name in circles_df["Video"].unique():
+            if video_name not in results.keys():
+                results[video_name] = {}
+            video_shapes = circles_df[["Tags", "Name"]][
+                circles_df["Video"] == video_name
+            ]
+            for shape_name in video_shapes["Name"].unique():
+                shape_data = video_shapes[
+                    video_shapes["Name"] == shape_name
+                ].reset_index(drop=True)
+                tags, name, radius = (
+                    list(shape_data["Tags"].values[0].values()),
+                    shape_data["Name"].values[0],
+                    shape_data["radius"].values[0],
+                )
+                results[video_name][name] = Point(tags["Center tag"]).buffer(
+                    distance=radius
+                )
         return results
 
     @staticmethod
