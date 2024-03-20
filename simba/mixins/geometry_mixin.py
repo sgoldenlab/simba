@@ -1429,6 +1429,10 @@ class GeometryMixin(object):
         """
         Compute the percentage overlap between corresponding Polygons in two lists.
 
+        .. image:: _static/img/multiframe_compute_pct_shape_overlap.png
+           :width: 600
+           :align: center
+
         :param List[Polygon] shape_1: List of Polygons.
         :param List[Polygon] shape_2: List of Polygons with the same length as shape_1.
         :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
