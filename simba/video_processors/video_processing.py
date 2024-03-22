@@ -186,7 +186,9 @@ def extract_frame_range(
     )
 
 
-def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False) -> None:
+def change_single_video_fps(
+    file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False
+) -> None:
     """
     Change the fps of a single video file. Results are stored in the same directory as in the input file with
     the suffix ``_fps_new_fps``.
@@ -220,7 +222,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: O
     save_path = os.path.join(
         dir_name, file_name + "_fps_{}{}".format(str(fps), str(ext))
     )
-    print(f'Converting the FPS to {fps} for video {file_name} ...')
+    print(f"Converting the FPS to {fps} for video {file_name} ...")
     if os.path.isfile(save_path):
         FileExistWarning(
             msg=f"Overwriting existing file at {save_path}...",
