@@ -111,3 +111,10 @@ Gibbs sampling
 .. automodule:: simba.data_processors.gibbs_sampler
    :members:
    :show-inheritance:
+
+Spontaneous alternation calculator
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.spontaneous_alternation_calculator
+   :members:
+   :show-inheritance:

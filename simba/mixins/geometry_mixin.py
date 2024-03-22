@@ -15,7 +15,7 @@ from numba import njit, prange
 from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
                               MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
-
+import shapely
 try:
     from typing_extensions import Literal
 except:
@@ -355,6 +355,7 @@ class GeometryMixin(object):
             value=denominator,
             options=("difference", "shape_1", "shape_2"),
         )
+
         if shapes[0].intersects(shapes[1]):
             intersection = shapes[0].intersection(shapes[1])
             if denominator == "difference":
@@ -803,18 +804,7 @@ class GeometryMixin(object):
         >>> img = GeometryMixin.view_shapes(shapes=[line_1, polygon_1, multipolygon_1])
         """
 
-        for i in shapes:
-            check_instance(
-                source=GeometryMixin.view_shapes.__name__,
-                instance=i,
-                accepted_types=(
-                    LineString,
-                    Polygon,
-                    MultiPolygon,
-                    MultiLineString,
-                    Point,
-                ),
-            )
+        check_valid_lst(data=shapes, source=GeometryMixin.view_shapes.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon, MultiLineString, Point), min_len=1)
         max_vertices = find_max_vertices_coordinates(shapes=shapes, buffer=200)
         if bg_img is None:
             if bg_clr is None:
@@ -1177,7 +1167,10 @@ class GeometryMixin(object):
                 min_value=0.1,
                 raise_error=True,
             )
-            parallel_offset = parallel_offset / pixels_per_mm
+            parallel_offset = np.ceil(parallel_offset * pixels_per_mm)
+            if parallel_offset < 1: parallel_offset = 1
+
+
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results, timer = [], SimbaTimer(start=True)
@@ -1505,7 +1498,7 @@ class GeometryMixin(object):
                         print(f"Computing % overlap {cnt+1}/{data.shape[0]}...")
                     elif not video_name and animal_names:
                         print(
-                            f"Computing % overlap {cnt + 1}/{data.shape[0]} (Animals: {animal_names})..."
+                            f"Computing % overlap {cnt + 1}/{data.shape[0]} (Animals/Shapes: {animal_names})..."
                         )
                     elif video_name and not animal_names:
                         print(
@@ -3635,9 +3628,7 @@ class GeometryMixin(object):
         return ca[n_p - 1, n_q - 1]
 
     @staticmethod
-    def simba_roi_to_geometries(
-        rectangles_df: pd.DataFrame, circles_df: pd.DataFrame, polygons_df: pd.DataFrame
-    ) -> dict:
+    def simba_roi_to_geometries(rectangles_df: pd.DataFrame, circles_df: pd.DataFrame, polygons_df: pd.DataFrame, color: Optional[bool] = False) -> dict:
         """
         Convert SimBA dataframes holding ROI geometries to nested dictionary holding Shapley polygons.
 
@@ -3664,44 +3655,29 @@ class GeometryMixin(object):
             accepted_types=(pd.DataFrame,),
         )
         for i in [rectangles_df, circles_df, polygons_df]:
-            check_that_column_exist(
-                df=i, column_name=["Video", "Name", "Tags"], file_name=""
-            )
-        results = {}
+            check_that_column_exist(df=i, column_name=["Video", "Name", "Tags", 'Color BGR'], file_name="")
+        results_roi, results_clr = {}, {}
         for video_name in rectangles_df["Video"].unique():
-            if video_name not in results.keys():
-                results[video_name] = {}
-            video_shapes = rectangles_df[["Tags", "Name"]][
-                rectangles_df["Video"] == video_name
-            ]
+            if video_name not in results_roi.keys(): results_roi[video_name] = {};  results_clr[video_name] = {}
+            video_shapes = rectangles_df[["Tags", "Name", 'Color BGR']][rectangles_df["Video"] == video_name]
             for shape_name in video_shapes["Name"].unique():
-                shape_data = video_shapes[
-                    video_shapes["Name"] == shape_name
-                ].reset_index(drop=True)
-                tags, name = (
-                    list(shape_data["Tags"].values[0].values()),
-                    shape_data["Name"].values[0],
-                )
-                results[video_name][name] = Polygon(tags)
+                shape_data = video_shapes[video_shapes["Name"] == shape_name].reset_index(drop=True)
+                tags, name = (list(shape_data["Tags"].values[0].values()), shape_data["Name"].values[0])
+                results_roi[video_name][name] = Polygon(Polygon(tags).convex_hull.exterior.coords)
+                results_clr[video_name][name] = shape_data["Color BGR"].values[0]
         for video_name in polygons_df["Video"].unique():
-            if video_name not in results.keys():
-                results[video_name] = {}
-            video_shapes = polygons_df[["Tags", "Name"]][
-                polygons_df["Video"] == video_name
-            ]
+            if video_name not in results_roi.keys():
+                results_roi[video_name] = {};  results_clr[video_name] = {}
+            video_shapes = polygons_df[["Tags", "Name", 'Color BGR']][polygons_df["Video"] == video_name]
             for shape_name in video_shapes["Name"].unique():
-                shape_data = video_shapes[
-                    video_shapes["Name"] == shape_name
-                ].reset_index(drop=True)
-                tags, name = (
-                    list(shape_data["Tags"].values[0].values()),
-                    shape_data["Name"].values[0],
-                )
-                results[video_name][name] = Polygon(tags)
+                shape_data = video_shapes[ video_shapes["Name"] == shape_name].reset_index(drop=True)
+                tags, name = (list(shape_data["Tags"].values[0].values()), shape_data["Name"].values[0])
+                results_roi[video_name][name] = Polygon(Polygon(tags).convex_hull.exterior.coords)
+                results_clr[video_name][name] = shape_data["Color BGR"].values[0]
         for video_name in circles_df["Video"].unique():
-            if video_name not in results.keys():
-                results[video_name] = {}
-            video_shapes = circles_df[["Tags", "Name"]][
+            if video_name not in results_roi.keys():
+                results_roi[video_name] = {};  results_clr[video_name] = {}
+            video_shapes = circles_df[["Tags", "Name", "Color BGR"]][
                 circles_df["Video"] == video_name
             ]
             for shape_name in video_shapes["Name"].unique():
@@ -3713,10 +3689,12 @@ class GeometryMixin(object):
                     shape_data["Name"].values[0],
                     shape_data["radius"].values[0],
                 )
-                results[video_name][name] = Point(tags["Center tag"]).buffer(
-                    distance=radius
-                )
-        return results
+                results_roi[video_name][name] = Point(tags["Center tag"]).buffer(distance=radius)
+                results_clr[video_name][name] = shape_data["Color BGR"].values[0]
+        if not color:
+            return results_roi, None
+        else:
+            return results_roi, results_clr
 
     @staticmethod
     def filter_low_p_bps_for_shapes(x: np.ndarray, p: np.ndarray, threshold: float):

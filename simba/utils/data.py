@@ -655,6 +655,9 @@ def freedman_diaconis(data: np.array) -> (float, int):
     """
     Use Freedman-Diaconis rule to compute optimal count of histogram bins and their width.
 
+    .. note::
+       Can also use ``simba.utils.data.bucket_data`` passing method ``fd``.
+
     :references:
        .. [2] `Reference freedman_diaconis <http://www.jtrive.com/determining-histogram-bin-width-using-the-freedman-diaconis-rule.html>`_.
 
@@ -671,15 +674,13 @@ def hist_1d(data: np.ndarray, bins: int, range: np.ndarray):
     return np.histogram(data, bins, (range[0], range[1]))[0]
 
 
-def bucket_data(
-    data: np.array,
-    method: Literal[
-        "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
-    ] = "auto",
-):
+def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"] = "auto") -> Tuple[float, int]:
     """
-    Use Freedman-Diaconis, Doane, Acott, Stone, Rice, Sturges or sqrt to compute the optimal bin count.
-    'auto' represents the maximum of the Sturges and Freedman-Diaconis estimators.
+    Computes the optimal bin count and bin width non-heuristically using specified method.
+
+    :param np.ndarray data: 1D array of numerical data.
+    :param np.ndarray data: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
+    :returns Tuple[float, int]: A tuple containing the optimal bin width and bin count.
 
     :example:
     >>> data = np.random.randint(low=1, high=1000, size=(1, 100))
@@ -689,6 +690,8 @@ def bucket_data(
     >>> (106.0, 10)
     """
 
+    check_valid_array(data=data, source=bucket_data.__name__, accepted_ndims=(1,))
+    check_str(name=f'{bucket_data.__name__} method', options=("fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"))
     bin_edges = np.histogram_bin_edges(a=data, bins=method)
     bin_counts = bin_edges.shape[0]
     bin_width = bin_edges[1] - bin_edges[0]

@@ -25,7 +25,7 @@ from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_that_column_exist, check_valid_array,
                                 check_valid_lst)
 from simba.utils.data import detect_bouts
-from simba.utils.errors import CountError
+from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 
@@ -437,27 +437,33 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         )
 
     @staticmethod
-    def spontaneous_alternations(
-        data: pd.DataFrame, shape_names: List[str]
-    ) -> Tuple[int, Dict[str, np.ndarray]]:
+    def spontaneous_alternations(data: pd.DataFrame,
+                                 arm_names: List[str],
+                                 center_name: str) -> Tuple[Dict[Union[str, Tuple[int]], int]]:
+
         """
         Detects spontaneous alternations between a set of user-defined ROIs.
 
-        .. image:: _static/img/spontaneous_alternations.png
-           :width: 500
-           :align: center
+            .. image:: _static/img/spontaneous_alternations.png
+               :width: 500
+               :align: center
 
         :param pd.DataFrame data: DataFrame containing shape data where each row represents a frame and each column represents a shape where 0 represents not in ROI and 1 represents inside the ROI
         :param List[str] shape_names: List of column names in the DataFrame corresponding to shape names.
-        :returns Dict[Union[str, Tuple[str], Union[int, float, List[int]]]]: Dict with the following keys and values:
-                - 'pct_alternation' - Percent alternation computed as spontaneous alternation cnt /(total number of arm entries − (number of arms - 1))} × 100
-                - 'alternation_cnt' - The sliding count of ROI entry sequences of len(shape_names) that are all unique.
-                - 'same_arm_returns_cnt' - Aggregate count of sequantial visits to the same ROI.
-                - 'alternate_arm_returns_cnt' - Aggregate count of errors which are not same-arm-return errors.
-                - 'error_cnt' - Aggregate error count (same_arm_returns_cnt + alternate_arm_returns_cnt),
-                - 'same_arm_returns_dict' - Dictionary with the keys being the name of the ROI and values are a list of frames when the same-arm-return errors where committed.
-                - 'alternate_arm_returns_cnt' - Dictionary with the keys being the name of the ROI and values are a list of frames when the alternate-arm-return errors where committed.
-                - 'alternations_dict' - Dictionary with the keys being unique ROI name tuple sequences of length len(shape_names) and values are a list of frames when the sequence was completed.
+        :returns Dict[Union[str, Tuple[str], Union[int, float, List[int]]]]:
+            Dict with the following keys and values:
+
+                Dict with the following keys and values:
+
+        - 'pct_alternation': Percent alternation computed as `(spontaneous alternation cnt / (total number of arm entries - (number of arms - 1))) × 100`
+        - 'alternation_cnt': The sliding count of ROI entry sequences of length `len(shape_names)` that are all unique.
+        - 'same_arm_returns_cnt': Aggregate count of sequential visits to the same ROI.
+        - 'alternate_arm_returns_cnt': Aggregate count of errors which are not same-arm-return errors.
+        - 'error_cnt': Aggregate error count (`same_arm_returns_cnt + alternate_arm_returns_cnt`),
+        - 'same_arm_returns_dict': Dictionary with the keys being the name of the ROI and values are a list of frames when the same-arm-return errors were committed.
+        - 'alternate_arm_returns_cnt': Dictionary with the keys being the name of the ROI and values are a list of frames when the alternate-arm-return errors were committed.
+        - 'alternations_dict': Dictionary with the keys being unique ROI name tuple sequences of length `len(shape_names)` and values are a list of frames when the sequence was completed.
+        - 'arm_entry_sequence': List of strings representing the sequence of arm entries.
 
         :example:
         >>> data = np.zeros((100, 4), dtype=int)
@@ -467,102 +473,59 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> spontanous_alternations = FeatureExtractionSupplemental.spontaneous_alternations(data=df, shape_names=['left', 'top', 'right', 'bottom'])
         """
 
-        def get_sliding_alternation(
-            data: np.ndarray,
-        ) -> Tuple[
-            Dict[int, List[int]], Dict[int, List[int]], Dict[Tuple[int], List[int]]
-        ]:
-            alt_cnt, stride = 0, data.shape[1] - 1
-            arm_visits = np.full((data.shape[0]), -1)
-            same_arm_returns, alternations, alternate_arm_returns = {}, {}, {}
-            for i in range(data.shape[1] - 1):
-                alternate_arm_returns[i], same_arm_returns[i] = [], []
-            for i in list(itertools.permutations(list(range(0, data.shape[1] - 1)))):
-                alternations[i] = []
-            for i in range(data.shape[0]):
-                arm_visits[i] = np.argwhere(data[i, 1:] == 1).flatten()[0]
-            for i in range(stride - 1, arm_visits.shape[0]):
-                current, priors = arm_visits[i], arm_visits[i - (stride - 1) : i]
-                sequence = np.append(priors, [current])
-                if np.unique(sequence).shape[0] == stride:
-                    alternations[tuple(sequence)].append(data[i, 0])
-                else:
-                    if current == priors[-1]:
-                        same_arm_returns[current].append(data[i, 0])
-                    else:
-                        alternate_arm_returns[current].append(data[i, 0])
-            return same_arm_returns, alternate_arm_returns, alternations
+        def get_sliding_alternation(data: np.ndarray) -> Tuple[Union[Dict[int, List[int]], Dict[int, List[int]], Dict[Tuple[int], List[int]]]]:
+            stride, same_arm_return_cnt, alternate_arm_return_cnt = len(arm_names) - 1, 0, 0
+            alternation_cnt = 0
+            alternations, same_arm_returns, alternate_arm_returns = {}, {}, {}
+            for i in list(itertools.permutations(arm_names)): alternations[i] = []
+            for i in arm_names: same_arm_returns[i] = []; alternate_arm_returns[i] = []
+            for i in range(stride, data.shape[0]):
+                current, priors = data[i], data[i - (stride):i]
+                sequence = np.append(priors[:, 0].flatten(), current[0])
+                if np.unique(sequence).shape[0] == sequence.shape[0]:
+                    alternations[tuple(sequence)].append(current[1])
+                    alternation_cnt += 1
+                elif sequence[-1] == sequence[-2]:
+                    same_arm_returns[sequence[-1]].append(current[1])
+                    same_arm_return_cnt += 1
+                elif sequence[-1] in sequence[:-1]:
+                    alternate_arm_returns[sequence[-1]].append(current[1])
+                    alternate_arm_return_cnt += 1
+            return alternate_arm_returns, same_arm_returns, alternations, alternate_arm_return_cnt, same_arm_return_cnt, alternation_cnt
 
-        check_instance(
-            source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            instance=data,
-            accepted_types=(pd.DataFrame,),
-        )
-        check_valid_lst(
-            data=shape_names,
-            source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            valid_dtypes=(str,),
-        )
-        for shape_name in shape_names:
-            check_that_column_exist(df=data, column_name=shape_name, file_name="")
-        data = data[shape_names].apply(pd.to_numeric, errors="coerce", axis=1)
-        additional_vals = list(set(np.unique(data.values.flatten())) - {0, 1})
-        if len(additional_vals) > 0:
-            raise CountError(
-                msg=f"When computing spontaneous alternation, ROI fields can only be 0 or 1. Found {additional_vals}",
-                source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            )
-        above_1_idx = np.argwhere(np.sum(data.values, axis=1) > 1)
-        if above_1_idx.shape[0] > 0:
-            raise CountError(
-                msg=f"When computing spontaneous alternation, animals should only exist in <=1 ROIs in any one frame. In {above_1_idx.shape[0]} frames, the animal exist in more than one ROI.",
-                source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            )
-        shape_map = {}
-        for i in range(len(shape_names)):
-            shape_map[i] = shape_names[i]
-        data = np.hstack((np.arange(0, data.shape[0]).reshape(-1, 1), data.values))
-        data = data[np.sum(data, axis=1) != 0]
-        data = data[
-            np.concatenate(
-                (
-                    [0],
-                    np.where(~(data[:, 1:][1:] == data[:, 1:][:-1]).all(axis=1))[0] + 1,
-                )
-            )
-        ]
-        same_arm, alternate_arm, alt = get_sliding_alternation(data=data)
+        check_instance(source=FeatureExtractionSupplemental.spontaneous_alternations.__name__, instance=data, accepted_types=(pd.DataFrame,))
+        check_valid_lst(data=arm_names, source=FeatureExtractionSupplemental.spontaneous_alternations.__name__, valid_dtypes=(str,), valid_values=data.columns)
+        check_str(name='center name', value=center_name, options=data.columns)
+        if center_name in arm_names: InvalidInputError(msg='One ROI is defined both as an arm ans as the center', source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
+        if len(list(set(arm_names))) != len(arm_names): InvalidInputError(msg=f'Each arm has to be unique but got {arm_names}', source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
+        roi_names = arm_names + [center_name]
+        data_df = data[roi_names]
+        invalid_vals = list(set(np.unique(data_df.values.flatten())) - {0, 1})
+        if len(invalid_vals) > 0:
+            raise CountError(msg=f'When computing spontaneous alternation, ROI fields can only be 0 or 1. Found {invalid_vals}', source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
+        multiple_rois_frm_idx = np.argwhere(np.sum(data_df.values, axis=1) > 1)
+        if multiple_rois_frm_idx.shape[0] > 0:
+            raise CountError(msg=f'When computing spontaneous alternation, animals should only exist in <=1 ROIs in any one frame. In {multiple_rois_frm_idx.shape[0]} frames, the animal exist in more than one ROI.', source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
+        bout_df = detect_bouts(data_df=data_df, target_lst=data_df.columns, fps=1)[
+            ['Event', 'Start_frame']].sort_values(['Start_frame']).reset_index(drop=True)
+        shifted_ = pd.concat([bout_df, bout_df.shift(-1).add_suffix('_shifted').reset_index(drop=True)], axis=1)[
+            ['Event', 'Event_shifted']].values
+        unique_counts = [len(list(set(list(x)))) for x in shifted_]
+        drop_idx = np.argwhere(np.array(unique_counts) == 1) + 1
+        bout_df = bout_df.drop(drop_idx.flatten(), axis=0).reset_index(drop=True)
+        arm_entry_sequence = bout_df[bout_df['Event'] != center_name].values
+        (alternate_arm_returns, same_arm_returns, alternations, alternate_arm_return_cnt, same_arm_return_cnt, alternation_cnt) = get_sliding_alternation(data=arm_entry_sequence)
+        pct_alternation = alternation_cnt / (arm_entry_sequence.shape[0] - (len(arm_names) - 1))
 
-        same_arm_returns, alternate_arm_returns = {}, {}
-        for k, v in same_arm.items():
-            same_arm_returns[shape_map[k]] = v
-        for k, v in alternate_arm.items():
-            alternate_arm_returns[shape_map[k]] = v
-        alternations = {}
-        for k, v in alt.items():
-            new_k = []
-            for i in k:
-                new_k.append(shape_map[i])
-            alternations[tuple(new_k)] = v
-
-        same_arm_returns_cnt, alternation_cnt, alternate_arm_returns_cnt = 0, 0, 0
-        for v in same_arm_returns.values():
-            same_arm_returns_cnt += len(v)
-        for v in alternate_arm_returns.values():
-            alternate_arm_returns_cnt += len(v)
-        for v in alternations.values():
-            alternation_cnt += len(v)
-        pct_alternation = alternation_cnt / (data.shape[0] - (data.shape[1] - 1))
-
-        return {
-            "pct_alternation": pct_alternation * 100,
-            "alternation_cnt": alternation_cnt,
-            "error_cnt": same_arm_returns_cnt + alternate_arm_returns_cnt,
-            "same_arm_returns_cnt": same_arm_returns_cnt,
-            "alternate_arm_returns_cnt": alternate_arm_returns_cnt,
-            "same_arm_returns_dict": same_arm_returns,
-            "alternate_arm_returns_dict": alternations,
-        }
+        return {'pct_alternation': pct_alternation * 100,
+                'alternation_cnt': alternation_cnt,
+                'error_cnt': same_arm_return_cnt + alternate_arm_return_cnt,
+                'same_arm_returns_cnt': same_arm_return_cnt,
+                'alternate_arm_returns_cnt': alternate_arm_return_cnt,
+                'same_arm_returns_dict': same_arm_returns,
+                'alternate_arm_returns_dict': alternate_arm_returns,
+                'alternations_dict': alternations,
+                'arm_entry_sequence': arm_entry_sequence[:, 0].flatten()}
 
     @staticmethod
     def find_path_loops(data: np.ndarray) -> Dict[Tuple[int], List[int]]:

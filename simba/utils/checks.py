@@ -12,14 +12,14 @@ import numpy as np
 import pandas as pd
 import trafaret as t
 
-from simba.utils.enums import Options, UMAPParam
+from simba.utils.enums import Options, UMAPParam, Keys
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 CorruptedFileError, CountError,
                                 DirectoryNotEmptyError, FloatError,
                                 IntegerError, InvalidFilepathError,
                                 InvalidInputError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ParametersFileError, StringError)
+                                ParametersFileError, StringError, NoROIDataError)
 from simba.utils.warnings import NoDataFoundWarning
 
 
@@ -832,6 +832,7 @@ def check_valid_lst(
     data: list,
     source: Optional[str] = "",
     valid_dtypes: Optional[Tuple[Any]] = None,
+    valid_values: Optional[List[Any]] = None,
     min_len: Optional[int] = 1,
     max_len: Optional[int] = None,
     exact_len: Optional[int] = None,
@@ -840,12 +841,13 @@ def check_valid_lst(
     """
     Check the validity of a list based on passed  criteria.
 
-    :parameter list data: The input list to be validated.
-    :parameter Optional[str] source: A string indicating the source or context of the data for informative error messaging.
-    :parameter Optional[Tuple[Any]] valid_dtypes: A tuple of accepted data types. If provided, check if all elements in the list have data types in this tuple.
-    :parameter Optional[int] min_len: The minimum allowed length of the list.
-    :parameter Optional[int] max_len: The maximum allowed length of the list.
-    :parameter Optional[bool] raise_error: If True, raise an InvalidInputError if any validation fails. If False, return False instead of raising an error.
+    :param list data: The input list to be validated.
+    :param Optional[str] source: A string indicating the source or context of the data for informative error messaging.
+    :param Optional[Tuple[Any]] valid_dtypes: A tuple of accepted data types. If provided, check if all elements in the list have data types in this tuple.
+    :param Optional[List[Any]] valid_values: A list of accepted list values. If provided, check if all elements in the list have matching values in this list.
+    :param Optional[int] min_len: The minimum allowed length of the list.
+    :param Optional[int] max_len: The maximum allowed length of the list.
+    :param Optional[bool] raise_error: If True, raise an InvalidInputError if any validation fails. If False, return False instead of raising an error.
     :return bool: True if all validation criteria are met, False otherwise.
 
     :example:
@@ -909,6 +911,15 @@ def check_valid_lst(
                 )
             else:
                 return False
+
+        if valid_values != None:
+            check_valid_lst(data=valid_values, source=check_valid_lst.__name__, min_len=1)
+            invalids = list(set(data) - set(valid_values))
+            if len(invalids):
+                if raise_error:
+                    raise InvalidInputError(msg=f"Invalid list entries. Found {invalids}, accepted: {valid_values}", source=source)
+                else:
+                    return False
     return True
 
 
@@ -1023,3 +1034,22 @@ def check_umap_hyperparameters(hyper_parameters: Dict[str, Any]) -> None:
         min_value=0.0,
         max_value=100.0,
     )
+
+def check_video_has_rois(roi_dict: dict, video_names: List[str], roi_names: List[str]):
+    """
+    Check that specified videos all have user-defined ROIs with specified names.
+    """
+    check_if_keys_exist_in_dict(data=roi_dict, key=[Keys.ROI_RECTANGLES.value, Keys.ROI_CIRCLES.value, Keys.ROI_POLYGONS.value], name='roi dict')
+    check_valid_lst(data=roi_names, source=check_video_has_rois.__name__, valid_dtypes=(str,), min_len=1)
+    check_valid_lst(data=video_names, source=check_video_has_rois.__name__, valid_dtypes=(str,), min_len=1)
+    for k, v in roi_dict.items():
+        check_instance(source=check_video_has_rois.__name__, instance=v, accepted_types=(pd.DataFrame,))
+        check_that_column_exist(df=v, column_name='Video', file_name='')
+    for video_name in video_names:
+        video_rectangles = roi_dict[Keys.ROI_RECTANGLES.value][roi_dict[Keys.ROI_RECTANGLES.value]['Video'] == video_name]
+        video_circles = roi_dict[Keys.ROI_CIRCLES.value][roi_dict[Keys.ROI_CIRCLES.value]['Video'] == video_name]
+        video_polygons = roi_dict[Keys.ROI_POLYGONS.value][roi_dict[Keys.ROI_POLYGONS.value]['Video'] == video_name]
+        video_shape_names = list(video_circles['Name']) + list(video_rectangles['Name']) + list(video_polygons['Name'])
+        missing_rois = list(set(roi_names) - set(video_shape_names))
+        if len(missing_rois) > 0:
+            raise NoROIDataError(msg=f'{len(missing_rois)} ROI(s) are missing from {video_name}: {missing_rois}', source=spontaneous_alternations.__name__)

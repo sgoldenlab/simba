@@ -338,7 +338,8 @@ def get_named_colors() -> List[str]:
         "dodgerblue",
         "springgreen",
         "firebrick",
-        "indigo" "white",
+        "indigo" 
+        "white",
     ]
 
 

@@ -226,3 +226,11 @@ Geometry plotter (generic)
    :members:
    :show-inheritance:
 
+
+Spontaneous alternation plotter
+---------------------------------------------------------------
+
+.. automodule:: simba.plotting.spontaneous_alternation_plotter
+   :members:
+   :show-inheritance:
+

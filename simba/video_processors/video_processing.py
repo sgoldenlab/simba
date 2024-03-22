@@ -186,12 +186,13 @@ def extract_frame_range(
     )
 
 
-def change_single_video_fps(
-    file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False
-) -> None:
+def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False) -> None:
     """
     Change the fps of a single video file. Results are stored in the same directory as in the input file with
     the suffix ``_fps_new_fps``.
+
+    .. note::
+       To change the FPS of all videos in a directory, use ``simba.video_processors.video_processing.change_fps_of_multiple_videos``.
 
     :parameter Union[str, os.PathLike] file_path: Path to video file
     :parameter int fps: Fps of the new video file.
@@ -219,6 +220,7 @@ def change_single_video_fps(
     save_path = os.path.join(
         dir_name, file_name + "_fps_{}{}".format(str(fps), str(ext))
     )
+    print(f'Converting the FPS to {fps} for video {file_name} ...')
     if os.path.isfile(save_path):
         FileExistWarning(
             msg=f"Overwriting existing file at {save_path}...",
@@ -665,11 +667,11 @@ def clip_video_in_range(
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -y'
     else:
         command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -y'
-    print(f"Clipping video {file_name}... ")
+    print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(
-        msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
+        msg=f"Video converted! {save_name} generated!",
         elapsed_time=timer.elapsed_time_str,
         source=clip_video_in_range.__name__,
     )

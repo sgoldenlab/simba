@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson"
 import os
 from tkinter import *
 from tkinter import messagebox
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, Callable
 
 import PIL.Image
 from PIL import ImageTk
@@ -282,7 +282,7 @@ class PopUpMixin(object):
         self.time_bin_entrybox.grid(row=0, column=0, sticky=NW)
         self.time_bin_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 
-    def create_run_frm(self, run_function: object, title: str = "RUN") -> None:
+    def create_run_frm(self, run_function: Callable, title: Optional[str] = "RUN", btn_txt_clr: Optional[str] = 'black') -> None:
         """
         Create a label frame with a single button with a specified callback.
 
@@ -295,9 +295,9 @@ class PopUpMixin(object):
             self.run_btn.destroy()
         self.run_frm = LabelFrame(
             self.main_frm,
-            text="RUN",
+            text=title,
             font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
+            fg=btn_txt_clr,
         )
         self.run_btn = Button(
             self.run_frm, text=title, fg="blue", command=lambda: run_function()
