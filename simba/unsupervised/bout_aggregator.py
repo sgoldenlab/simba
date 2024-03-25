@@ -15,7 +15,7 @@ from simba.utils.checks import (check_instance, check_int, check_str,
                                 check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import read_video_info, find_core_cnt
+from simba.utils.read_write import find_core_cnt, read_video_info
 
 
 def bout_aggregator(

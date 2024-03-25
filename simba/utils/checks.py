@@ -832,15 +832,17 @@ def check_valid_array(
     if max_axis_1 is not None:
         check_int(name=f"{source} max_axis_1", value=max_axis_1)
         if data.shape[1] > max_axis_1:
-            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}", source=check_valid_array.__name__)
+            raise ArrayError(
+                msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}",
+                source=check_valid_array.__name__,
+            )
     if min_axis_1 is not None:
         check_int(name=f"{source} min_axis_1", value=max_axis_1)
         if data.shape[1] < min_axis_1:
-            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}", source=check_valid_array.__name__)
-
-
-
-
+            raise ArrayError(
+                msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}",
+                source=check_valid_array.__name__,
+            )
 
 
 def check_valid_lst(

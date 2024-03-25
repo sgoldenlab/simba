@@ -9,8 +9,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
@@ -19,6 +19,7 @@ from simba.utils.checks import (check_if_dir_exists,
 from simba.utils.enums import Formats
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import read_pickle
+
 
 class GridSearchVisualizer(UnsupervisedMixin):
     """
@@ -103,9 +104,24 @@ class GridSearchVisualizer(UnsupervisedMixin):
         for k, v in data.items():
             data = self.__extract_plot_data(data=v)
             for variable in categorical_vars:
-                check_that_column_exist(df=data, column_name=variable, file_name=v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value])
-                save_path = os.path.join(self.save_dir, f"{v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{variable}.png")
-                _ = PlottingMixin.categorical_scatter(data=data, columns=('X', 'Y', variable), palette=self.settings["CATEGORICAL_PALETTE"], size=self.settings["SCATTER_SIZE"], save_path=save_path)
+                check_that_column_exist(
+                    df=data,
+                    column_name=variable,
+                    file_name=v[Unsupervised.DR_MODEL.value][
+                        Unsupervised.HASHED_NAME.value
+                    ],
+                )
+                save_path = os.path.join(
+                    self.save_dir,
+                    f"{v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{variable}.png",
+                )
+                _ = PlottingMixin.categorical_scatter(
+                    data=data,
+                    columns=("X", "Y", variable),
+                    palette=self.settings["CATEGORICAL_PALETTE"],
+                    size=self.settings["SCATTER_SIZE"],
+                    save_path=save_path,
+                )
                 stdout_success(msg=f"Saved {save_path}...")
                 plt.close("all")
         self.timer.stop_timer()
@@ -131,9 +147,27 @@ class GridSearchVisualizer(UnsupervisedMixin):
         for k, v in data.items():
             data = self.__extract_plot_data(data=v)
             for variable in continuous_vars:
-                check_that_column_exist(df=data,column_name=variable,file_name=v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value])
-                save_path = os.path.join(self.save_dir,f"{v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{variable}.png")
-                _ = PlottingMixin.continuous_scatter(data=data, columns=('X', 'Y', variable), palette=self.settings["CONTINUOUS_PALETTE"], size=self.settings["SCATTER_SIZE"], title=v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value], save_path=save_path)
+                check_that_column_exist(
+                    df=data,
+                    column_name=variable,
+                    file_name=v[Unsupervised.DR_MODEL.value][
+                        Unsupervised.HASHED_NAME.value
+                    ],
+                )
+                save_path = os.path.join(
+                    self.save_dir,
+                    f"{v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{variable}.png",
+                )
+                _ = PlottingMixin.continuous_scatter(
+                    data=data,
+                    columns=("X", "Y", variable),
+                    palette=self.settings["CONTINUOUS_PALETTE"],
+                    size=self.settings["SCATTER_SIZE"],
+                    title=v[Unsupervised.DR_MODEL.value][
+                        Unsupervised.HASHED_NAME.value
+                    ],
+                    save_path=save_path,
+                )
                 plt.close("all")
                 stdout_success(msg=f"Saved {save_path}...")
         self.timer.stop_timer()

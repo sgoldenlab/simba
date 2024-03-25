@@ -5,7 +5,7 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-from numba import jit, prange, njit
+from numba import jit, njit, prange
 from numba.typed import List
 from scipy.sparse import csgraph
 from scipy.sparse.csgraph import minimum_spanning_tree
@@ -76,8 +76,12 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
             self.results[k][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][
                 Unsupervised.HASHED_NAME.value
             ]
-            print(f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}...")
-            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
+            print(
+                f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}..."
+            )
+            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.MODEL.value
+            ].labels_
             x = v[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_
             self.results[k] = {
                 **self.results[k],
@@ -90,7 +94,9 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
                 min=1,
             )
             if cluster_cnt > 1:
-                dbcv_results = self.DBCV(x.astype(np.float32), cluster_lbls.astype(np.int64))
+                dbcv_results = self.DBCV(
+                    x.astype(np.float32), cluster_lbls.astype(np.int64)
+                )
             self.results[k] = {
                 **self.results[k],
                 **{DBCV: dbcv_results},
@@ -121,13 +127,13 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
         :returns float: DBCV cluster validity score
         """
         print(X.shape)
-        print('Computing mutual reach distance ... (Step  1/4)')
+        print("Computing mutual reach distance ... (Step  1/4)")
         arrays_by_cluster, ordered_labels = self._mutual_reach_dist_graph(X, labels)
-        print('Computing pairwise distances ... (Step  2/4)')
+        print("Computing pairwise distances ... (Step  2/4)")
         graph = self.calculate_dists(X, arrays_by_cluster)
-        print('Computing minimum spanning tree ... (Step  3/4)')
+        print("Computing minimum spanning tree ... (Step  3/4)")
         mst = self._mutual_reach_dist_MST(graph)
-        print('Computing cluster validity index ... (Step  4/4)')
+        print("Computing cluster validity index ... (Step  4/4)")
         return self._clustering_validity_index(mst, ordered_labels)
 
     @staticmethod

@@ -10,7 +10,8 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional, prange, typed, types)
+from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional,
+                   prange, typed, types)
 from scipy import stats
 from scipy.stats.distributions import chi2
 

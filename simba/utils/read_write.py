@@ -1842,7 +1842,10 @@ def get_unique_values_in_iterable(
         accepted_types=(str,),
     )
 
-    if not all(isinstance(item, (int, float, str, np.int64, np.int32, np.float32, np.float64)) for item in data):
+    if not all(
+        isinstance(item, (int, float, str, np.int64, np.int32, np.float32, np.float64))
+        for item in data
+    ):
         dtypes = [type(i) for i in data if i not in (int, float, str)]
         raise InvalidInputError(
             msg=f"Data {name} contains invalid dtypes {dtypes}. Accepted dtypes: int, float, str",
