@@ -41,21 +41,12 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
         )
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
-        print(
-            f"Creating unsupervised learning dataset from {len(self.machine_results_paths)} data files..."
-        )
-        check_if_filepath_list_is_empty(
-            filepaths=self.machine_results_paths,
-            error_msg="NO MACHINE LEARNING DATA FOUND in project_folder/csv/machine_results directory",
-        )
+        print(f"Creating unsupervised learning dataset from {len(self.machine_results_paths)} data files...")
+        check_if_filepath_list_is_empty(filepaths=self.machine_results_paths, error_msg="NO MACHINE LEARNING DATA FOUND in project_folder/csv/machine_results directory",)
         self.settings = settings
         self.clf_type, self.feature_lst = None, None
-        self.save_path = os.path.join(
-            self.logs_path, "unsupervised_data_{}.pickle".format(self.datetime)
-        )
-        self.log_save_path = os.path.join(
-            self.logs_path, "unsupervised_data_log_{}.csv".format(self.datetime)
-        )
+        self.save_path = os.path.join(self.logs_path, f"unsupervised_data_{self.datetime}.pickle")
+        self.log_save_path = os.path.join(self.logs_path, f"unsupervised_data_log_{self.datetime}.csv")
         self.clf_probability_cols = [f"Probability_{x}" for x in self.clf_names]
         self.clf_cols = self.clf_names + self.clf_probability_cols
 
@@ -208,4 +199,9 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
 
 # settings = {"data_slice": "ALL FEATURES (EXCLUDING POSE)", "clf_slice": "Attack", "bout_aggregation_type": "MEDIAN", "min_bout_length": 66, "feature_path": "/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv",}
 # db_creator = DatasetCreator(config_path="/Users/simon/Desktop/envs/simba/troubleshooting/unsupervised/project_folder/project_config.ini", settings=settings)
+# db_creator.run()
+
+
+# settings = {"data_slice": "ALL FEATURES (EXCLUDING POSE)", "clf_slice": "ALL CLASSIFIERS (6)", "bout_aggregation_type": "MEDIAN", "min_bout_length": 66, "feature_path": "/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv",}
+# db_creator = DatasetCreator(config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini", settings=settings)
 # db_creator.run()

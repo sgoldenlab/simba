@@ -68,6 +68,9 @@ class SpontaneousAlternationsPlotter(ConfigReader):
        :width: 700
        :align: center
 
+    .. note::
+       Uses ``simba.data_processors.spontaneous_alternation_calculator.SpontaneousAlternationCalculator`` to compute alternation statistics.
+
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param List[str] arm_names: List of ROI names representing the arms.
     :param str center_name: Name of the ROI representing the center of the maze

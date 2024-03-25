@@ -27,6 +27,8 @@ class SpontaneousAlternationCalculator(ConfigReader):
        specified threshold, then the animal considered to visiting the relevant arm. The animal is considered exiting an arm
        when the percent overlap with a different ROI is above the threshold.
 
+
+
     .. attention::
        Requires SimBA project with (i) only one tracked animal, (ii) at least three pose-estmated body-parts, and (iii) defined
        ROIs representing the arms and the center of the maze.

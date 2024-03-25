@@ -290,6 +290,24 @@ class UmapEmbedder(UnsupervisedMixin):
             return results
 
 
+
+# hyper_parameters = {'n_neighbors': [5], 'min_distance': [0.1, 0.5, 0.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25}
+# data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/logs/unsupervised_data_20240325092459.pickle'
+# save_dir = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_embeddings'
+# config_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini'
+# embedder = UmapEmbedder()
+# embedder.fit(data_path=data_path, save_dir=save_dir, hyper_parameters=hyper_parameters)
+#
+
+# data_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/logs/unsupervised_data_20240215143716.pickle'
+# model_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/clustering1704/academic_montalcini.pickle'
+# embedder = UmapEmbedder()
+# #embedder.transform(save_dir=None, data_path=data_path, model=model_path, settings=None)
+#
+# embedder.transform(save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/new_viz', data_path=data_path, model=model_path, settings={'DATA_FORMAT': 'scaled', 'CLASSIFICATIONS': True})
+
+
+
 # data_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/logs/unsupervised_data_20240215143716.pickle'
 # model_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/clustering1704/academic_montalcini.pickle'
 # embedder = UmapEmbedder()

@@ -15,7 +15,7 @@ from simba.utils.checks import (check_instance, check_int, check_str,
                                 check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import read_video_info
+from simba.utils.read_write import read_video_info, find_core_cnt
 
 
 def bout_aggregator(
@@ -39,6 +39,7 @@ def bout_aggregator(
     """
 
     timer = SimbaTimer(start=True)
+    core_cnt = find_core_cnt()[1]
     print("Calculating bout aggregate statistics...")
     check_instance(
         source=f"{bout_aggregator.__name__} data",
@@ -105,7 +106,7 @@ def bout_aggregator(
             ].values
             if len(bouts) > 0:
                 bouts = [x.tolist() for x in bouts]
-                results = Parallel(n_jobs=-1, verbose=0, backend="loky")(
+                results = Parallel(n_jobs=core_cnt, verbose=0, backend="loky")(
                     delayed(bout_aggregator_mp)(j, video_df, clf) for j in bouts
                 )
                 results = pd.concat(results, axis=0).sort_values(

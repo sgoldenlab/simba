@@ -10,6 +10,7 @@ import pandas as pd
 import seaborn as sns
 
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
@@ -18,7 +19,6 @@ from simba.utils.checks import (check_if_dir_exists,
 from simba.utils.enums import Formats
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import read_pickle
-
 
 class GridSearchVisualizer(UnsupervisedMixin):
     """
@@ -103,28 +103,9 @@ class GridSearchVisualizer(UnsupervisedMixin):
         for k, v in data.items():
             data = self.__extract_plot_data(data=v)
             for variable in categorical_vars:
-                check_that_column_exist(
-                    df=data,
-                    column_name=variable,
-                    file_name=v[Unsupervised.DR_MODEL.value][
-                        Unsupervised.HASHED_NAME.value
-                    ],
-                )
-                save_path = os.path.join(
-                    self.save_dir,
-                    f"{v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{variable}.png",
-                )
-                sns.scatterplot(
-                    data=data,
-                    x="X",
-                    y="Y",
-                    hue=variable,
-                    palette=sns.color_palette(
-                        self.settings["CATEGORICAL_PALETTE"],
-                        len(data[variable].unique()),
-                    ),
-                )
-                plt.savefig(save_path)
+                check_that_column_exist(df=data, column_name=variable, file_name=v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value])
+                save_path = os.path.join(self.save_dir, f"{v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{variable}.png")
+                _ = PlottingMixin.categorical_scatter(data=data, columns=('X', 'Y', variable), palette=self.settings["CATEGORICAL_PALETTE"], size=self.settings["SCATTER_SIZE"], save_path=save_path)
                 stdout_success(msg=f"Saved {save_path}...")
                 plt.close("all")
         self.timer.stop_timer()
@@ -150,37 +131,9 @@ class GridSearchVisualizer(UnsupervisedMixin):
         for k, v in data.items():
             data = self.__extract_plot_data(data=v)
             for variable in continuous_vars:
-                check_that_column_exist(
-                    df=data,
-                    column_name=variable,
-                    file_name=v[Unsupervised.DR_MODEL.value][
-                        Unsupervised.HASHED_NAME.value
-                    ],
-                )
-                save_path = os.path.join(
-                    self.save_dir,
-                    f"{v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{variable}.png",
-                )
-                fig, ax = plt.subplots()
-                plt.xlabel("X")
-                plt.ylabel("Y")
-                points = ax.scatter(
-                    data["X"],
-                    data["Y"],
-                    c=data[variable],
-                    s=self.settings["SCATTER_SIZE"],
-                    cmap=self.settings["CONTINUOUS_PALETTE"],
-                )
-                cbar = fig.colorbar(points)
-                cbar.set_label(variable, loc="center")
-                title = v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]
-                plt.title(
-                    title,
-                    ha="center",
-                    fontsize=15,
-                    bbox={"facecolor": "orange", "alpha": 0.5, "pad": 0},
-                )
-                fig.savefig(save_path)
+                check_that_column_exist(df=data,column_name=variable,file_name=v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value])
+                save_path = os.path.join(self.save_dir,f"{v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{variable}.png")
+                _ = PlottingMixin.continuous_scatter(data=data, columns=('X', 'Y', variable), palette=self.settings["CONTINUOUS_PALETTE"], size=self.settings["SCATTER_SIZE"], title=v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value], save_path=save_path)
                 plt.close("all")
                 stdout_success(msg=f"Saved {save_path}...")
         self.timer.stop_timer()
@@ -191,10 +144,11 @@ class GridSearchVisualizer(UnsupervisedMixin):
 
 
 # settings = {'CATEGORICAL_PALETTE': 'Pastel1', 'CONTINUOUS_PALETTE': 'magma', 'SCATTER_SIZE': 10}
-# test = GridSearchVisualizer(model_dir='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/dim_reduction_test_2',
-#                             save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/viz_nastacia',
+# test = GridSearchVisualizer(model_dir='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/clusters',
+#                             save_dir='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/cluster_vis',
 #                             settings=settings)
-# test.categorical_visualizer(categorical_vars=['CLASSIFIER'])
+# # test.categorical_visualizer(categorical_vars=['CLASSIFIER'])
+# # test.continuous_visualizer(continuous_vars=['START_FRAME'])
 
 
 # settings = {'CATEGORICAL_PALETTE': 'Pastel1', 'CONTINUOUS_PALETTE': 'magma', 'SCATTER_SIZE': 10}

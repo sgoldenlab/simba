@@ -752,6 +752,8 @@ def check_valid_array(
     accepted_dtypes: Optional[List[str]] = None,
     accepted_shapes: Optional[List[Tuple[int]]] = None,
     min_axis_0: Optional[int] = None,
+    max_axis_1: Optional[int] = None,
+    min_axis_1: Optional[int] = None,
 ) -> None:
     """
     Check if the given  array satisfies specified criteria regarding its dimensions, shape, and data type.
@@ -826,6 +828,18 @@ def check_valid_array(
                 msg=f"Array not of acceptable shape. Found  {data.shape[0]} rows, minimum accepted: {min_axis_0}, {source}",
                 source=check_valid_array.__name__,
             )
+    if max_axis_1 is not None:
+        check_int(name=f"{source} max_axis_1", value=max_axis_1)
+        if data.shape[1] > max_axis_1:
+            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}", source=check_valid_array.__name__)
+    if min_axis_1 is not None:
+        check_int(name=f"{source} min_axis_1", value=max_axis_1)
+        if data.shape[1] < min_axis_1:
+            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}", source=check_valid_array.__name__)
+
+
+
+
 
 
 def check_valid_lst(

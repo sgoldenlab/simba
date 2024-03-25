@@ -307,9 +307,14 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
         dataset_creator = DatasetCreator(
             settings=settings, config_path=self.config_path
         )
-        threading.Thread(target=dataset_creator.run()).start()
+
+        _ = dataset_creator.run()
+
+        #threading.Thread(target=dataset_creator.run()).start()
 
 
-UnsupervisedGUI(
-    config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini"
-)
+# UnsupervisedGUI(
+#     config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini"
+# )
+
+#UnsupervisedGUI(config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini")

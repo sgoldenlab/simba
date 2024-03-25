@@ -282,6 +282,18 @@ class HDBSCANClusterer(UnsupervisedMixin):
             return results
 
 
+# hyper_parameters = {'alpha': [1.0], 'min_cluster_size': [15], 'min_samples': [1], 'cluster_selection_epsilon': [1, 0.5]}
+# embedding_dir = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_embeddings'
+# save_dir = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters'
+# config_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini'
+# clusterer = HDBSCANClusterer()
+# clusterer.fit(hyper_parameters=hyper_parameters, data_path=embedding_dir, save_dir=save_dir)
+#
+# #
+#
+
+
+
 # hyper_parameters = {'alpha': [1.0], 'min_cluster_size': [10], 'min_samples': [1], 'cluster_selection_epsilon': [20]}
 # embedding_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models'
 # save_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models'

@@ -148,7 +148,7 @@ from simba.video_processors.video_processing import \
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 
-UNSUPERVISED = False
+UNSUPERVISED = True
 
 
 class LoadProjectPopUp(object):

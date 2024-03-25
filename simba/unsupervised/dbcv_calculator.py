@@ -5,7 +5,7 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-from numba import jit, prange
+from numba import jit, prange, njit
 from numba.typed import List
 from scipy.sparse import csgraph
 from scipy.sparse.csgraph import minimum_spanning_tree
@@ -30,8 +30,9 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 
     .. note::
        Jitted version of `DBCSV <https://github.com/christopherjenness/DBCV>`__.
-       Faster runtime by replacing meth:`scipy.spatial.distance.cdist` in original DBCSV with LLVM as discussed
-       `HERE <https://github.com/numba/numba-scipy/issues/38>`__.
+       Faster runtime by replacing meth:`scipy.spatial.distance.cdist` in original DBCSV with LLVM as discussed `HERE <https://github.com/numba/numba-scipy/issues/38>`__.
+       A further non-jitted implementaion can be found in the `hdbscan library  <https://github.com/scikit-learn-contrib/hdbscan/blob/master/hdbscan/validity.py>`__.
+       `AWS Denseclus <https://github.com/awslabs/amazon-denseclus>`_ HDBSCAN appears to have DBCV as an attribute of returned object. maybe a faster alternative?
 
     :param str embedders_path: Directory holding dimensionality reduction models in pickle format.
     :param str clusterers_path: Directory holding cluster models in pickle format.
@@ -75,12 +76,8 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
             self.results[k][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][
                 Unsupervised.HASHED_NAME.value
             ]
-            print(
-                f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}..."
-            )
-            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][
-                Unsupervised.MODEL.value
-            ].labels_
+            print(f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}...")
+            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
             x = v[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_
             self.results[k] = {
                 **self.results[k],
@@ -93,7 +90,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
                 min=1,
             )
             if cluster_cnt > 1:
-                dbcv_results = self.DBCV(x, cluster_lbls)
+                dbcv_results = self.DBCV(x.astype(np.float32), cluster_lbls.astype(np.int64))
             self.results[k] = {
                 **self.results[k],
                 **{DBCV: dbcv_results},
@@ -117,38 +114,32 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
             with pd.ExcelWriter(self.save_path, mode="a") as writer:
                 df.to_excel(writer, sheet_name=v[CLUSTERER_NAME], index=True)
 
-    def DBCV(self, X, labels):
+    def DBCV(self, X: np.ndarray, labels: np.ndarray) -> float:
         """
-        Parameters
-        ----------
-        X : array with shape len(observations) x len(dimentionality reduced dimensions)
-        labels : 1D array with cluster labels
-
-        Returns
-        -------
-        DBCV_validity_index: DBCV cluster validity score
-
+        :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)
+        :param np.ndarray labels: 1D array with cluster labels
+        :returns float: DBCV cluster validity score
         """
-
-        neighbours_w_labels, ordered_labels = self._mutual_reach_dist_graph(X, labels)
-        graph = self.calculate_dists(X, neighbours_w_labels)
+        print(X.shape)
+        print('Computing mutual reach distance ... (Step  1/4)')
+        arrays_by_cluster, ordered_labels = self._mutual_reach_dist_graph(X, labels)
+        print('Computing pairwise distances ... (Step  2/4)')
+        graph = self.calculate_dists(X, arrays_by_cluster)
+        print('Computing minimum spanning tree ... (Step  3/4)')
         mst = self._mutual_reach_dist_MST(graph)
+        print('Computing cluster validity index ... (Step  4/4)')
         return self._clustering_validity_index(mst, ordered_labels)
 
     @staticmethod
-    @jit(nopython=True)
-    def _mutual_reach_dist_graph(X, labels):
+    @njit("(float32[:,:], int64[:])")
+    def _mutual_reach_dist_graph(X: np.ndarray, labels: np.ndarray):
         """
-        Parameters
-        ----------
-        X :  array with shape len(observations) x len(dimensionality reduced dimensions)
-        labels : 1D array with cluster labels
+        :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)
+        :param np.ndarray labels: 1D array with cluster labels
+        :returns ListType arrays_by_cluster: 3D array in numba ListType, of shape len(number of clusters) x len(cluster_members) x len(dimensionality reduced dimensions)
+        :returns v arrays_by_cluster: numba ListType of labels in the order of arrays_by_cluster
+        """
 
-        Returns
-        -------
-        arrays_by_cluster: 3D array in numba ListType, of shape len(number of clusters) x len(cluster_members) x len(dimensionality reduced dimensions)
-        ordered_labels:  numba ListType of labels in the order of arrays_by_cluster
-        """
         unique_cluster_labels = np.unique(labels)
         arrays_by_cluster = List()
         ordered_labels = List()
@@ -169,16 +160,11 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 
     @staticmethod
     @jit(nopython=True, fastmath=True)
-    def calculate_dists(X, arrays_by_cluster):
+    def calculate_dists(X: np.ndarray, arrays_by_cluster: List):
         """
-        Parameters
-        ----------
-        arrays_by_cluster: 3D array in numba ListType, of shape len(number of clusters) x len(cluster_members) x len(dimentionality reduced dimensions
-
-        Returns
-        -------
-        graph: Graph of all pair-wise mutual reachability distances between points.
-
+        :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)
+        :param numba.types.ListType[list[np.ndarray]] arrays_by_cluster: Numba typed List of list with 2d arrays.
+        :returns np.ndarray graph: Graph of all pair-wise mutual reachability distances between points of size X.shape[0] x X.shape[0].
         """
 
         cluster_n = len(arrays_by_cluster)
@@ -233,43 +219,32 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 
         return graph
 
-    def _mutual_reach_dist_MST(self, dist_tree):
+    def _mutual_reach_dist_MST(self, graph: np.ndarray) -> np.ndarray:
         """
-        Parameters
-        dist_tree : array of dimensions len(observations) x len(observations
-
-
-        Returns
-        -------
-        minimum_spanning_tree: array of dimensions len(observations) x len(observations, minimum spanning tree of all pair-wise mutual reachability distances between points.
-
+        :param np.ndarray graph: array of dimensions len(observations) x len(observations). Can be computed by ``calculate_dists``.
+        :return np.ndarray minimum_spanning_tree: array of dimensions len(observations) x len(observations, minimum spanning tree of all pair-wise mutual reachability distances between points.
         """
-
-        mst = minimum_spanning_tree(dist_tree).toarray()
-        return self.transpose_np(mst)
+        mst = minimum_spanning_tree(graph).toarray()
+        return self.transpose_np(mst.astype(np.float32))
 
     @staticmethod
-    @jit(nopython=True)
+    @njit("(float32[:,:]),")
     def transpose_np(mst):
         return mst + np.transpose(mst)
 
-    def _clustering_validity_index(self, MST, labels):
+    def _clustering_validity_index(self, mst: np.ndarray, labels: np.ndarray) -> float:
         """
-        Parameters
-        MST: minimum spanning tree of all pair-wisemutual reachability distances between points
-        labels : 1D array with cluster labels
-
-        Returns
-        -------
-        validity_index : float score in range[-1, 1] indicating validity of clustering assignments
-
+        :param np.ndarray graph: minimum spanning tree of all pair-wise mutual reachability distances between points.
+        :param np.ndarray labels: 1D array with cluster labels
+        :returns validity_index: float score in range -1 to 1 indicating validity of clustering assignments
         """
+
         n_samples = len(labels)
         validity_index = 0
 
         for label in np.unique(labels):
             fraction = np.sum(labels == label) / float(n_samples)
-            cluster_validity = self._cluster_validity_index(MST, labels, label)
+            cluster_validity = self._cluster_validity_index(mst, labels, label)
             validity_index += fraction * cluster_validity
 
         return validity_index
@@ -311,4 +286,13 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 
 # test = DBCVCalculator(data_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models',
 #                       config_path='/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini')
+# test.run()
+
+# test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
+#                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/large_clusters')
+# test.run()
+
+
+# test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
+#                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters')
 # test.run()

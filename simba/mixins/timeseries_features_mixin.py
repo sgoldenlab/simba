@@ -1314,6 +1314,11 @@ class TimeseriesFeatureMixin(object):
         minimum spike train length, and maximum spike train separation, to identify and analyze
         spike trains in the data.
 
+        .. note::
+           - The function may return an empty dictionary if no spike trains meet the criteria.
+           - A required input is ``spike_idx``, which is returned by :func:`~timeseries_features_mixin.TimeseriesFeatureMixin.spike_finder`.
+
+
         :param np.ndarray data: The data from which spike trains are extracted.
         :param types.List(types.Array(types.int64, 1, 'C')) data: A list of spike indices, typically as integer timestamps.
         :param float sample_rate: The sample rate of the data.
@@ -1340,11 +1345,6 @@ class TimeseriesFeatureMixin(object):
             - 'train_std_amplitude': Standard deviation of spike amplitudes.
             - 'train_min_amplitude': Minimum spike amplitude.
             - 'train_max_amplitude': Maximum spike amplitude.
-
-
-        .. note::
-           - The function may return an empty dictionary if no spike trains meet the criteria.
-           - A required input is ``spike_idx``, which is returned by :func:`~timeseries_features_mixin.TimeseriesFeatureMixin.spike_finder`.
 
         :example:
         >>> data = np.array([0.1, 0.1, 0.3, 0.1, 10, 10, 8, 0.1, 0.1, 0.1, 10, 10, 8, 99, 0.1, 99, 99, 0.1]).astype(np.float32)
