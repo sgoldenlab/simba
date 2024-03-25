@@ -70,7 +70,7 @@ class Paths(Enum):
     ROI_FEATURES = Path("frames/output/ROI_features/")
     ROI_ANALYSIS = Path("frames/output/ROI_analysis/")
     ANNOTATED_FRAMES_DIR = Path("frames/output/annotated_frames/")
-    SPONTANEOUS_ALTERNATION_VIDEOS_DIR = Path('frames/output/spontanous_alternation')
+    SPONTANEOUS_ALTERNATION_VIDEOS_DIR = Path("frames/output/spontanous_alternation")
     DIRECTIONALITY_DF_DIR = Path("logs/directionality_dataframes/")
     BODY_PART_DIRECTIONALITY_DF_DIR = Path("logs/body_part_directionality_dataframes/")
     DIRECTING_ANIMALS_OUTPUT_PATH = Path("frames/output/ROI_directionality_visualize/")

@@ -674,7 +674,12 @@ def hist_1d(data: np.ndarray, bins: int, range: np.ndarray):
     return np.histogram(data, bins, (range[0], range[1]))[0]
 
 
-def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"] = "auto") -> Tuple[float, int]:
+def bucket_data(
+    data: np.ndarray,
+    method: Literal[
+        "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
+    ] = "auto",
+) -> Tuple[float, int]:
     """
     Computes the optimal bin count and bin width non-heuristically using specified method.
 
@@ -691,7 +696,10 @@ def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott"
     """
 
     check_valid_array(data=data, source=bucket_data.__name__, accepted_ndims=(1,))
-    check_str(name=f'{bucket_data.__name__} method', options=("fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"))
+    check_str(
+        name=f"{bucket_data.__name__} method",
+        options=("fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"),
+    )
     bin_edges = np.histogram_bin_edges(a=data, bins=method)
     bin_counts = bin_edges.shape[0]
     bin_width = bin_edges[1] - bin_edges[0]
