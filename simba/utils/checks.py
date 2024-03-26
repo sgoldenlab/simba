@@ -688,8 +688,9 @@ def check_if_module_has_import(parsed_file: ast.Module, import_name: str) -> boo
     return False
 
 
-def check_valid_extension(path: Union[str, os.PathLike],
-                          accepted_extensions: Union[List[str], str]):
+def check_valid_extension(
+    path: Union[str, os.PathLike], accepted_extensions: Union[List[str], str]
+):
     """
     Checks if the file extension of the provided path is in the list of accepted extensions.
 
@@ -697,15 +698,26 @@ def check_valid_extension(path: Union[str, os.PathLike],
     :param List[str] accepted_extensions: A list of accepted file extensions. E.g., ['pickle', 'csv'].
     """
     if isinstance(accepted_extensions, (list, tuple)):
-        check_valid_lst(data=accepted_extensions, source=f'{check_valid_extension.__name__} accepted_extensions', valid_dtypes=(str,), min_len=1)
+        check_valid_lst(
+            data=accepted_extensions,
+            source=f"{check_valid_extension.__name__} accepted_extensions",
+            valid_dtypes=(str,),
+            min_len=1,
+        )
     elif isinstance(accepted_extensions, str):
-        check_str(name=f'{check_valid_extension.__name__} accepted_extensions', value=accepted_extensions)
+        check_str(
+            name=f"{check_valid_extension.__name__} accepted_extensions",
+            value=accepted_extensions,
+        )
         accepted_extensions = [accepted_extensions]
     accepted_extensions = [x.lower() for x in accepted_extensions]
     check_file_exist_and_readable(file_path=path)
     extension = get_fn_ext(filepath=path)[2][1:]
     if extension.lower() not in accepted_extensions:
-        raise InvalidFilepathError(msg=f'File extension for file {path} has an invalid extension. Found {extension}, accepted: {accepted_extensions}', source=check_valid_extension.__name__)
+        raise InvalidFilepathError(
+            msg=f"File extension for file {path} has an invalid extension. Found {extension}, accepted: {accepted_extensions}",
+            source=check_valid_extension.__name__,
+        )
 
 
 def check_if_valid_img(
@@ -852,11 +864,18 @@ def check_valid_array(
     if max_axis_1 is not None:
         check_int(name=f"{source} max_axis_1", value=max_axis_1)
         if data.shape[1] > max_axis_1:
-            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}", source=check_valid_array.__name__)
+            raise ArrayError(
+                msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}",
+                source=check_valid_array.__name__,
+            )
     if min_axis_1 is not None:
         check_int(name=f"{source} min_axis_1", value=max_axis_1)
         if data.shape[1] < min_axis_1:
-            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}", source=check_valid_array.__name__)
+            raise ArrayError(
+                msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}",
+                source=check_valid_array.__name__,
+            )
+
 
 def check_valid_lst(
     data: list,
@@ -982,7 +1001,10 @@ def check_if_keys_exist_in_dict(
     for k in key:
         if k not in list(data.keys()):
             if raise_error:
-                raise InvalidInputError(msg=f"{k} does not exist in object {name}",source=check_if_keys_exist_in_dict.__class__.__name__)
+                raise InvalidInputError(
+                    msg=f"{k} does not exist in object {name}",
+                    source=check_if_keys_exist_in_dict.__class__.__name__,
+                )
         else:
             pass
     return True

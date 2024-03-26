@@ -1767,21 +1767,29 @@ def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
         files_found = glob.glob(data_path + f"/*.{Formats.PICKLE.value}")
         if len(files_found) == 0:
             raise NoFilesFoundError(
-                msg=f"SIMBA ERROR: Zero pickle files found in {data_path}.", source=read_pickle.__name__)
+                msg=f"SIMBA ERROR: Zero pickle files found in {data_path}.",
+                source=read_pickle.__name__,
+            )
         for file_cnt, file_path in enumerate(files_found):
             with open(file_path, "rb") as f:
                 try:
                     data[file_cnt] = pickle.load(f)
                 except Exception as e:
                     print(e.args)
-                    raise InvalidFileTypeError(msg=f'Could not decompress file {file_path} - invalid pickle', source=read_pickle.__name__)
+                    raise InvalidFileTypeError(
+                        msg=f"Could not decompress file {file_path} - invalid pickle",
+                        source=read_pickle.__name__,
+                    )
     elif os.path.isfile(data_path):
         with open(data_path, "rb") as f:
             try:
                 data = pickle.load(f)
             except Exception as e:
                 print(e.args)
-                raise InvalidFileTypeError(msg=f'Could not decompress file {data_path} - invalid pickle', source=read_pickle.__name__)
+                raise InvalidFileTypeError(
+                    msg=f"Could not decompress file {data_path} - invalid pickle",
+                    source=read_pickle.__name__,
+                )
     else:
         raise InvalidFilepathError(
             msg=f"The path {data_path} is neither a valid file or directory path",

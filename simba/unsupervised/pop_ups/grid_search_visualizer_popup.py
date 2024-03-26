@@ -162,4 +162,4 @@ class GridSearchVisualizerPopUp(PopUpMixin, ConfigReader):
             ).start()
 
 
-#_ = GridSearchVisualizerPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')
+# _ = GridSearchVisualizerPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')

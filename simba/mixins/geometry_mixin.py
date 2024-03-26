@@ -961,7 +961,10 @@ class GeometryMixin(object):
             accepted_types=(tuple,),
         )
         if len(size) != 2:
-            raise InvalidInputError(msg=f"Size has to be 2 values, got {len(size)}", source=GeometryMixin.geometry_video.__name__,)
+            raise InvalidInputError(
+                msg=f"Size has to be 2 values, got {len(size)}",
+                source=GeometryMixin.geometry_video.__name__,
+            )
         for i in size:
             check_instance(
                 source=GeometryMixin.geometry_video.__name__,
@@ -1056,7 +1059,7 @@ class GeometryMixin(object):
 
             video_writer.write(frm_img.astype(np.uint8))
             if verbose:
-                print(f'Geometry frame complete ({frm_cnt+1} / {len(shapes)})')
+                print(f"Geometry frame complete ({frm_cnt+1} / {len(shapes)})")
         video_writer.release()
         timer.stop_timer()
         stdout_success(
