@@ -29,8 +29,9 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_module_has_import,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int, check_str,
+                                check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_that_column_exist)
+                                check_valid_array)
 from simba.utils.enums import ConfigKey, Dtypes, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
@@ -937,9 +938,17 @@ def sample_df_n_by_unique(df: pd.DataFrame, field: str, n: int) -> pd.DataFrame:
     :return pd.DataFrame: A dataframe containing randomly sampled rows.
     """
 
-    check_instance(source=sample_df_n_by_unique.__name__, instance=df, accepted_types=(pd.DataFrame,))
-    check_str(name=f'{sample_df_n_by_unique.__name__} field', value=field, options=tuple(df.columns))
-    check_int(name=f'{sample_df_n_by_unique.__name__} n', value=n, min_value=1)
+    check_instance(
+        source=sample_df_n_by_unique.__name__,
+        instance=df,
+        accepted_types=(pd.DataFrame,),
+    )
+    check_str(
+        name=f"{sample_df_n_by_unique.__name__} field",
+        value=field,
+        options=tuple(df.columns),
+    )
+    check_int(name=f"{sample_df_n_by_unique.__name__} n", value=n, min_value=1)
     check_that_column_exist(df=df, column_name=field, file_name="")
     unique_vals = df[field].unique()
     results = []
@@ -951,8 +960,9 @@ def sample_df_n_by_unique(df: pd.DataFrame, field: str, n: int) -> pd.DataFrame:
             results.append(sample.sample(n=n, replace=False))
     return pd.concat(results, axis=0)
 
+
 def get_mode(x: np.ndarray) -> Union[float, int]:
-    """ Get the mode (most frequent value) within an aarray  """
+    """Get the mode (most frequent value) within an aarray"""
     check_valid_array(
         source=f"{get_mode.__name__} x",
         data=x,

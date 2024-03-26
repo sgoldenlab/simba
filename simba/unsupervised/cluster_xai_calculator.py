@@ -272,8 +272,14 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
                     feature_perturbation="tree_path_dependent",
                 )
 
-                if self.settings[SHAP][SAMPLE] > (len(self.rf_data[cluster_one_id]["X"]) or len(self.rf_data[cluster_two_id]["X"])):
-                    self.settings[SHAP][SAMPLE] = min(len(self.rf_data[cluster_one_id]["X"]),len(self.rf_data[cluster_two_id]["X"]))
+                if self.settings[SHAP][SAMPLE] > (
+                    len(self.rf_data[cluster_one_id]["X"])
+                    or len(self.rf_data[cluster_two_id]["X"])
+                ):
+                    self.settings[SHAP][SAMPLE] = min(
+                        len(self.rf_data[cluster_one_id]["X"]),
+                        len(self.rf_data[cluster_two_id]["X"]),
+                    )
                 cluster_one_sample = self.rf_data[cluster_one_id]["X"].sample(
                     self.settings[SHAP][SAMPLE], replace=False
                 )

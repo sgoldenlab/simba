@@ -35,7 +35,7 @@ PEARSON = "pearson"
 ANOVA = "anova"
 KENDALL = "kendall"
 SHAP = "shap"
-SCALED = 'scaled'
+SCALED = "scaled"
 PLOTS = "plots"
 CREATE = "create"
 SPEARMAN = "spearman"
@@ -73,15 +73,33 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
         UnsupervisedMixin.__init__(self)
         self.settings = settings
         self.data = read_pickle(data_path=data_path)
-        self.save_path = os.path.join(self.logs_path,f"cluster_descriptive_statistics_{self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.xlsx",)
-        check_if_keys_exist_in_dict(data=self.data, key=[Clustering.CLUSTER_MODEL.value, Unsupervised.METHODS.value], name=data_path)
-        check_if_keys_exist_in_dict(data=settings, key=[SCALED, ANOVA, DESCRIPTIVE_STATISTICS, TUKEY], name="settings")
+        self.save_path = os.path.join(
+            self.logs_path,
+            f"cluster_descriptive_statistics_{self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.xlsx",
+        )
+        check_if_keys_exist_in_dict(
+            data=self.data,
+            key=[Clustering.CLUSTER_MODEL.value, Unsupervised.METHODS.value],
+            name=data_path,
+        )
+        check_if_keys_exist_in_dict(
+            data=settings,
+            key=[SCALED, ANOVA, DESCRIPTIVE_STATISTICS, TUKEY],
+            name="settings",
+        )
 
     def run(self):
-        self.x_data = self.data[Unsupervised.METHODS.value][Unsupervised.SCALED_DATA.value]
-        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
+        self.x_data = self.data[Unsupervised.METHODS.value][
+            Unsupervised.SCALED_DATA.value
+        ]
+        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][
+            Unsupervised.MODEL.value
+        ].labels_
         if not self.settings[SCALED]:
-            self.x_data = TrainModelMixin.scaler_inverse_transform(data=self.x_data, scaler=self.data[Unsupervised.METHODS.value][Unsupervised.SCALER.value])
+            self.x_data = TrainModelMixin.scaler_inverse_transform(
+                data=self.x_data,
+                scaler=self.data[Unsupervised.METHODS.value][Unsupervised.SCALER.value],
+            )
         self.x_y_df = pd.concat(
             [
                 self.x_data,

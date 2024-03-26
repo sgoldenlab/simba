@@ -50,7 +50,12 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def _hist_1d(data: np.ndarray, bin_count: int, range: np.ndarray, normalize: Optional[bool] = False) -> np.ndarray:
+    def _hist_1d(
+        data: np.ndarray,
+        bin_count: int,
+        range: np.ndarray,
+        normalize: Optional[bool] = False,
+    ) -> np.ndarray:
         """
         Jitted helper to compute 1D histograms with counts or rations (if normalize is True)
 
@@ -435,10 +440,26 @@ class Statistics(FeatureExtractionMixin):
         :parameter Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
         :returns float: Kullback-Leibler divergence between ``sample_1`` and ``sample_2``
         """
-        check_valid_array(data=sample_1, source=Statistics.jensen_shannon_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float))
-        check_valid_array(data=sample_2, source=Statistics.jensen_shannon_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float))
-        check_str(name=f'{self.__class__.__name__} bucket_method', value=bucket_method, options=Options.BUCKET_METHODS.value)
-        check_int(name=f'{self.__class__.__name__} fill value', value=fill_value, min_value=1)
+        check_valid_array(
+            data=sample_1,
+            source=Statistics.jensen_shannon_divergence.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+        )
+        check_valid_array(
+            data=sample_2,
+            source=Statistics.jensen_shannon_divergence.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+        )
+        check_str(
+            name=f"{self.__class__.__name__} bucket_method",
+            value=bucket_method,
+            options=Options.BUCKET_METHODS.value,
+        )
+        check_int(
+            name=f"{self.__class__.__name__} fill value", value=fill_value, min_value=1
+        )
         bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
         sample_1_hist = self._hist_1d(
             data=sample_1,
@@ -557,9 +578,23 @@ class Statistics(FeatureExtractionMixin):
         >>> 0.30806541358219786
         """
 
-        check_valid_array(data=sample_1, source=Statistics.jensen_shannon_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float))
-        check_valid_array(data=sample_2, source=Statistics.jensen_shannon_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float))
-        check_str(name=f'{self.__class__.__name__} bucket_method', value=bucket_method, options=Options.BUCKET_METHODS.value)
+        check_valid_array(
+            data=sample_1,
+            source=Statistics.jensen_shannon_divergence.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+        )
+        check_valid_array(
+            data=sample_2,
+            source=Statistics.jensen_shannon_divergence.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+        )
+        check_str(
+            name=f"{self.__class__.__name__} bucket_method",
+            value=bucket_method,
+            options=Options.BUCKET_METHODS.value,
+        )
         bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
         sample_1_hist = self._hist_1d(
             data=sample_1,
@@ -666,9 +701,23 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics().wasserstein_distance(sample_1=sample_1, sample_2=sample_2)
         >>> 0.020833333333333332
         """
-        check_valid_array(data=sample_1, source=Statistics.jensen_shannon_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float))
-        check_valid_array(data=sample_2, source=Statistics.jensen_shannon_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float))
-        check_str(name=f'{self.__class__.__name__} bucket_method', value=bucket_method, options=Options.BUCKET_METHODS.value)
+        check_valid_array(
+            data=sample_1,
+            source=Statistics.jensen_shannon_divergence.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+        )
+        check_valid_array(
+            data=sample_2,
+            source=Statistics.jensen_shannon_divergence.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+        )
+        check_str(
+            name=f"{self.__class__.__name__} bucket_method",
+            value=bucket_method,
+            options=Options.BUCKET_METHODS.value,
+        )
         bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
         sample_1_hist = self._hist_1d(
             data=sample_1,
@@ -754,7 +803,13 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    def total_variation_distance(x: np.ndarray, y: np.ndarray, bucket_method: Optional[Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]] = "auto"):
+    def total_variation_distance(
+        x: np.ndarray,
+        y: np.ndarray,
+        bucket_method: Optional[
+            Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]
+        ] = "auto",
+    ):
         """
         Calculate the total variation distance between two probability distributions.
 
@@ -775,12 +830,52 @@ class Statistics(FeatureExtractionMixin):
         >>> 0.3999999761581421
         """
 
-        check_valid_array(data=x, source=Statistics.total_variation_distance.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8, np.float32, np.float64, int, float))
-        check_valid_array(data=y, source=Statistics.total_variation_distance.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8, np.float32, np.float64, int, float))
-        check_str(name=f"{Statistics.total_variation_distance.__name__} method", value=bucket_method, options=Options.BUCKET_METHODS.value)
+        check_valid_array(
+            data=x,
+            source=Statistics.total_variation_distance.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(
+                np.int64,
+                np.int32,
+                np.int8,
+                np.float32,
+                np.float64,
+                int,
+                float,
+            ),
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.total_variation_distance.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(
+                np.int64,
+                np.int32,
+                np.int8,
+                np.float32,
+                np.float64,
+                int,
+                float,
+            ),
+        )
+        check_str(
+            name=f"{Statistics.total_variation_distance.__name__} method",
+            value=bucket_method,
+            options=Options.BUCKET_METHODS.value,
+        )
         bin_width, bin_count = bucket_data(data=x, method=bucket_method)
-        s1_h = Statistics._hist_1d(data=x, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]), normalize=True)
-        s2_h = Statistics._hist_1d(data=y, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]), normalize=True)
+        s1_h = Statistics._hist_1d(
+            data=x,
+            bin_count=bin_count,
+            range=np.array([0, int(bin_width * bin_count)]),
+            normalize=True,
+        )
+        s2_h = Statistics._hist_1d(
+            data=y,
+            bin_count=bin_count,
+            range=np.array([0, int(bin_width * bin_count)]),
+            normalize=True,
+        )
         return 0.5 * np.sum(np.abs(s1_h - s2_h))
 
     def population_stability_index(
@@ -2300,8 +2395,34 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics().hellinger_distance(x=x, y=y, bucket_method='auto')
         """
 
-        check_valid_array(data=x, source=Statistics.hellinger_distance.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8, np.float32, np.float64, int, float))
-        check_valid_array(data=y, source=Statistics.hellinger_distance.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, np.int8, np.float32, np.float64, int, float))
+        check_valid_array(
+            data=x,
+            source=Statistics.hellinger_distance.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(
+                np.int64,
+                np.int32,
+                np.int8,
+                np.float32,
+                np.float64,
+                int,
+                float,
+            ),
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.hellinger_distance.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(
+                np.int64,
+                np.int32,
+                np.int8,
+                np.float32,
+                np.float64,
+                int,
+                float,
+            ),
+        )
         check_str(
             name=f"{Statistics.hellinger_distance.__name__} method",
             value=bucket_method,
@@ -2690,10 +2811,10 @@ class Statistics(FeatureExtractionMixin):
         return results
 
 
-#sample_1 = np.random.normal(loc=10, scale=2, size=1000).astype(np.float64)
-#sample_2 = np.random.normal(loc=12, scale=2, size=10000).astype(np.float64)
+# sample_1 = np.random.normal(loc=10, scale=2, size=1000).astype(np.float64)
+# sample_2 = np.random.normal(loc=12, scale=2, size=10000).astype(np.float64)
 
-sample_1 = np.random.randint(0, 100, (100, )).astype(np.float64)
-sample_2 = np.random.randint(110, 200, (100, )).astype(np.float64)
+sample_1 = np.random.randint(0, 100, (100,)).astype(np.float64)
+sample_2 = np.random.randint(110, 200, (100,)).astype(np.float64)
 
 Statistics().jensen_shannon_divergence(sample_1=sample_1, sample_2=sample_2)
