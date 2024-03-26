@@ -451,12 +451,12 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        :param Union[LineString, Polygon, MultiPolygon, MultiPoint] shapes: The first geometry to be checked for coverage.
+        :param Union[LineString, Polygon, MultiPolygon, MultiPoint] shapes: List of 2 geometries, checks if the second geometry fully covers the first geometry.
         :return bool: True if the second geometry fully covers the first geometry, otherwise False.
 
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[25, 25], [25, 75], [90, 25], [90, 75]]))
-        >>> GeometryMixin().is_shape_covered(shapes=[polygon_1, polygon_2])
+        >>> GeometryMixin().is_shape_covered(shapes=[polygon_2, polygon_1])
         >>> True
 
         """

@@ -165,9 +165,10 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 
                 indices = np.where(Ci != 0)
                 Ci = Ci[indices]
-
                 numerator = ((1 / Ci) ** A.shape[1]).sum()
-                core_dist_i = (numerator / (A.shape[0] - 1)) ** (-1 / A.shape[1])
+                denominator_axis_0 = np.max(np.array([2, A.shape[0]]))
+
+                core_dist_i = (numerator / (denominator_axis_0 - 1)) ** (-1 / A.shape[1])
                 graph_row = np.zeros((0))
 
                 for array_cnt in range(len(arrays_by_cluster)):
@@ -183,15 +184,11 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
                             Cii[j] = np.sqrt(acc)
                         indices_ii = np.where(Cii != 0)
                         Cii = Cii[indices_ii]
-
-                        numerator = ((1 / Cii) ** B.shape[1]).sum()
-                        core_dist_j = (numerator / (B.shape[0] - 1)) ** (
-                            -1 / B.shape[1]
-                        )
+                        numerator = np.max(np.array([1, ((1 / Cii) ** B.shape[1]).sum()]))
+                        denominator_axis_0 = np.max(np.array(([2, B.shape[0]])))
+                        core_dist_j = (numerator / (denominator_axis_0 - 1)) ** (-1 / B.shape[1])
                         dist = np.linalg.norm(A[a] - B[b])
-                        mutual_reachability = np.max(
-                            np.array([core_dist_i, core_dist_j, dist])
-                        )
+                        mutual_reachability = np.max(np.array([core_dist_i, core_dist_j, dist]))
                         graph_row = np.append(graph_row, mutual_reachability)
 
                 graph[graph_row_counter] = graph_row
@@ -273,6 +270,6 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 # test.run()
 
 #
-test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
-                      data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters')
-test.run()
+# test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
+#                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/error_mdl/ecstatic_darwin.pickle')
+# test.run()

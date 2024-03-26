@@ -314,7 +314,7 @@ class SpontaneousAlternationsPlotter(ConfigReader):
 #     center_name='Center',
 #     threshold=0.0,
 #     buffer=1,
-#     animal_area=100,
+#     animal_area=60,
 #     data_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/csv/outlier_corrected_movement_location/F1 HAB.csv')
 # x.run()
 

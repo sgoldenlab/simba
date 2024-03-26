@@ -500,7 +500,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                 elif sequence[-1] == sequence[-2]:
                     same_arm_returns[sequence[-1]].append(current[1])
                     same_arm_return_cnt += 1
-                elif sequence[-1] in sequence[:-1]:
+                else:
                     alternate_arm_returns[sequence[-1]].append(current[1])
                     alternate_arm_return_cnt += 1
             return (

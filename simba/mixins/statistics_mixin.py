@@ -1608,18 +1608,19 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    def local_outlier_factor(
-        data: np.ndarray, k: Union[int, float] = 5, contamination: float = 1e-10
-    ) -> np.ndarray:
+    def local_outlier_factor(data: np.ndarray, k: Union[int, float] = 5, contamination: float = 1e-10) -> np.ndarray:
         """
         Compute the local outlier factor of each observation.
 
         .. note::
+
+           The final LOF scores are negated. Thus, higher values indicate more atypical (outlier) data points.
+
            Method calls ``sklearn.neighbors.LocalOutlierFactor`` directly. Previously called using own implementation JIT'ed method,
            but runtime was 3x-ish slower than ``sklearn.neighbors.LocalOutlierFactor``.
 
         :parameter ndarray data: 2D array with feature values where rows represent frames and columns represent features.
-        :parameter Union[int, float] sample_1: Number of neighbors to evaluate for each observation. If float, then interpreted as the ratio of data.shape[0].
+        :parameter Union[int, float] k: Number of neighbors to evaluate for each observation. If the value is a float, then interpreted as the ratio of data.shape[0]. If the value is an integer, then it represent the number of neighbours to evaluate.
         :parameter float contamination: Small pseudonumber to avoid DivisionByZero error.
         :returns np.ndarray: Array of size data.shape[0] with local outlier scores.
 
@@ -1650,15 +1651,17 @@ class Statistics(FeatureExtractionMixin):
         )
         if isinstance(k, float):
             k = int(data.shape[0] * k)
+
+        if k > data.shape[0]:
+            k = data.shape[0]
+
         lof_model = LocalOutlierFactor(n_neighbors=k, contamination=contamination)
         _ = lof_model.fit_predict(data)
         return -lof_model.negative_outlier_factor_.astype(np.float32)
 
     @staticmethod
     @jit(nopython=True)
-    def _hbos_compute(
-        data: np.ndarray, histograms: typed.Dict, histogram_edges: typed.Dict
-    ) -> np.ndarray:
+    def _hbos_compute(data: np.ndarray, histograms: typed.Dict, histogram_edges: typed.Dict) -> np.ndarray:
         """
         Jitted helper to compute Histogram-based Outlier Score (HBOS) called by ``simba.mixins.statistics_mixin.Statistics.hbos``.
 
@@ -1723,24 +1726,13 @@ class Statistics(FeatureExtractionMixin):
         )
         min_vals, max_vals = np.min(data, axis=0), np.max(data, axis=0)
         data = (data - min_vals) / (max_vals - min_vals) * (1 - 0) + 0
-        histogram_edges = typed.Dict.empty(
-            key_type=types.int64, value_type=types.float64[:]
-        )
+        histogram_edges = typed.Dict.empty(key_type=types.int64, value_type=types.float64[:])
         histograms = typed.Dict.empty(key_type=types.int64, value_type=types.int64[:])
         for i in range(data.shape[1]):
-            bin_width, bin_count = bucket_data(data=data, method=bucket_method)
-            histograms[i] = self._hist_1d(
-                data=data,
-                bin_count=bin_count,
-                range=np.array([0, int(bin_width * bin_count)]),
-            )
-            histogram_edges[i] = np.arange(0, 1 + bin_width, bin_width).astype(
-                np.float64
-            )
-
-        results = self._hbos_compute(
-            data=data, histograms=histograms, histogram_edges=histogram_edges
-        )
+            bin_width, bin_count = bucket_data(data=data[:, i], method=bucket_method)
+            histograms[i] = self._hist_1d(data=data[:, i].flatten(), bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)])).astype(np.int64)
+            histogram_edges[i] = np.arange(0, 1 + bin_width, bin_width).astype(np.float64)
+        results = self._hbos_compute(data=data, histograms=histograms, histogram_edges=histogram_edges)
         return results.astype(np.float32)
 
     def rolling_shapiro_wilks(
@@ -2690,10 +2682,15 @@ class Statistics(FeatureExtractionMixin):
         return results
 
 
+# sample_1 = np.random.random_integers(low=1, high=2, size=(10, 50)).astype(np.float64)
+# sample_2 = np.random.random_integers(low=7, high=20, size=(10, 50)).astype(np.float64)
+# data = np.vstack([sample_1, sample_2])
+# Statistics().hbos(data=data)
+
 #sample_1 = np.random.normal(loc=10, scale=2, size=1000).astype(np.float64)
 #sample_2 = np.random.normal(loc=12, scale=2, size=10000).astype(np.float64)
 
-sample_1 = np.random.randint(0, 100, (100, )).astype(np.float64)
-sample_2 = np.random.randint(110, 200, (100, )).astype(np.float64)
-
-Statistics().jensen_shannon_divergence(sample_1=sample_1, sample_2=sample_2)
+# sample_1 = np.random.randint(0, 100, (100, )).astype(np.float64)
+# sample_2 = np.random.randint(110, 200, (100, )).astype(np.float64)
+#
+# Statistics().jensen_shannon_divergence(sample_1=sample_1, sample_2=sample_2)

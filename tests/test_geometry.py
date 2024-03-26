@@ -40,10 +40,10 @@ def test_crosses():
 def test_is_shape_covered():
     polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
     polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[25, 25], [25, 75], [90, 25], [90, 75]]))
-    results = GeometryMixin().is_shape_covered(shape=polygon_1, other_shape=polygon_2)
+    results = GeometryMixin().is_shape_covered(shapes=[polygon_2, polygon_1])
     assert results is True
     polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[0, 0], [0, 75], [90, 25], [90, 75]]))
-    results = GeometryMixin().is_shape_covered(shape=polygon_1, other_shape=polygon_2)
+    results = GeometryMixin().is_shape_covered(shapes=[polygon_2, polygon_1])
     assert results is False
 
 @pytest.mark.parametrize('data_size,', [(10, 2), (15, 2), (4, 2)])

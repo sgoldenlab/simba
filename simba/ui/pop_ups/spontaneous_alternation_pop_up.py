@@ -23,6 +23,7 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
 
 class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
     """
+    Pop-up window for setting spontaneous alternation parameters and running spontaneous alternation analysis and visualizations.
 
     :example:
     >>> _ = SpontaneousAlternationPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini')
