@@ -41,12 +41,21 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
         )
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
-        print(f"Creating unsupervised learning dataset from {len(self.machine_results_paths)} data files...")
-        check_if_filepath_list_is_empty(filepaths=self.machine_results_paths, error_msg="NO MACHINE LEARNING DATA FOUND in project_folder/csv/machine_results directory",)
+        print(
+            f"Creating unsupervised learning dataset from {len(self.machine_results_paths)} data files..."
+        )
+        check_if_filepath_list_is_empty(
+            filepaths=self.machine_results_paths,
+            error_msg="NO MACHINE LEARNING DATA FOUND in project_folder/csv/machine_results directory",
+        )
         self.settings = settings
         self.clf_type, self.feature_lst = None, None
-        self.save_path = os.path.join(self.logs_path, f"unsupervised_data_{self.datetime}.pickle")
-        self.log_save_path = os.path.join(self.logs_path, f"unsupervised_data_log_{self.datetime}.csv")
+        self.save_path = os.path.join(
+            self.logs_path, f"unsupervised_data_{self.datetime}.pickle"
+        )
+        self.log_save_path = os.path.join(
+            self.logs_path, f"unsupervised_data_log_{self.datetime}.csv"
+        )
         self.clf_probability_cols = [f"Probability_{x}" for x in self.clf_names]
         self.clf_cols = self.clf_names + self.clf_probability_cols
 

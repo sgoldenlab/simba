@@ -293,7 +293,6 @@ class HDBSCANClusterer(UnsupervisedMixin):
 #
 
 
-
 # hyper_parameters = {'alpha': [1.0], 'min_cluster_size': [10], 'min_samples': [1], 'cluster_selection_epsilon': [20]}
 # embedding_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/dr_models'
 # save_dir = '/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models'
