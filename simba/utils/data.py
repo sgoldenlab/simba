@@ -24,21 +24,17 @@ try:
 except:
     from typing_extensions import Literal
 
-from numba import njit, typed
-
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_module_has_import,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int, check_str,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array)
+                                check_valid_array, check_that_column_exist)
 from simba.utils.enums import ConfigKey, Dtypes, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
-                                DataHeaderError, FrameRangeError,
                                 InvalidFileTypeError, InvalidInputError,
                                 NoFilesFoundError)
-from simba.utils.lookups import get_bp_config_code_class_pairs
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
@@ -698,7 +694,8 @@ def bucket_data(
     check_valid_array(data=data, source=bucket_data.__name__, accepted_ndims=(1,))
     check_str(
         name=f"{bucket_data.__name__} method",
-        options=("fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"),
+        value=method,
+        options=Options.BUCKET_METHODS.value,
     )
     bin_edges = np.histogram_bin_edges(a=data, bins=method)
     bin_counts = bin_edges.shape[0]
@@ -928,7 +925,34 @@ def find_ranked_colors(
     return results
 
 
-def get_mode(x: np.ndarray):
+def sample_df_n_by_unique(df: pd.DataFrame, field: str, n: int) -> pd.DataFrame:
+    """
+    Randomly sample at most N rows per unique value in specified field of a dataframe.
+
+    For example, sample 100 observation from each inferred cluster assignment.
+
+    :param pd.DataFramedf: The dataframe to sample from.
+    :param str field: The column name in the DataFrame to use for sampling based on unique values.
+    :param int n: The maximum number of rows to sample for each unique value in the specified column.
+    :return pd.DataFrame: A dataframe containing randomly sampled rows.
+    """
+
+    check_instance(source=sample_df_n_by_unique.__name__, instance=df, accepted_types=(pd.DataFrame,))
+    check_str(name=f'{sample_df_n_by_unique.__name__} field', value=field, options=tuple(df.columns))
+    check_int(name=f'{sample_df_n_by_unique.__name__} n', value=n, min_value=1)
+    check_that_column_exist(df=df, column_name=field, file_name="")
+    unique_vals = df[field].unique()
+    results = []
+    for unique_val in unique_vals:
+        sample = df[df[field] == unique_val]
+        if (len(sample) <= n) or (n > len(sample)):
+            results.append(sample)
+        else:
+            results.append(sample.sample(n=n, replace=False))
+    return pd.concat(results, axis=0)
+
+def get_mode(x: np.ndarray) -> Union[float, int]:
+    """ Get the mode (most frequent value) within an aarray  """
     check_valid_array(
         source=f"{get_mode.__name__} x",
         data=x,

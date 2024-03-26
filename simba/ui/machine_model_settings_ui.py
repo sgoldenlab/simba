@@ -259,6 +259,10 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         )
         self.shap_save_it_dropdown.setChoices("ALL FRAMES")
         self.shap_save_it_dropdown.disable()
+        self.shap_multiprocess_dropdown = DropDownMenu(self.evaluations_frm, 'Multi-process SHAP values: ', ['True', 'False'], '25', com=lambda x: self.change_shap_cadence_options(x))
+        self.shap_multiprocess_dropdown.setChoices('False')
+        self.shap_multiprocess_dropdown.disable()
+
         self.partial_dependency_cb = Checkbutton(
             self.evaluations_frm,
             text="Calculate partial dependencies (Note: CPU intensive)",
@@ -268,17 +272,8 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             self.evaluations_frm,
             text="Calculate SHAP scores",
             variable=self.calc_shap_scores_var,
-            command=lambda: [
-                self.enable_entrybox_from_checkbox(
-                    check_box_var=self.calc_shap_scores_var,
-                    entry_boxes=[self.shap_present, self.shap_absent],
-                ),
-                self.enable_dropdown_from_checkbox(
-                    check_box_var=self.calc_shap_scores_var,
-                    dropdown_menus=[self.shap_save_it_dropdown],
-                ),
-            ],
-        )
+            command=lambda: [self.enable_entrybox_from_checkbox(check_box_var=self.calc_shap_scores_var, entry_boxes=[self.shap_present,self.shap_absent]),
+                                                                                                                                                             self.enable_dropdown_from_checkbox(check_box_var=self.calc_shap_scores_var, dropdown_menus=[self.shap_save_it_dropdown, self.shap_multiprocess_dropdown])])
         self.save_frame = LabelFrame(
             self.main_frm, text="SAVE", font=Formats.LABELFRAME_HEADER_FORMAT.value
         )
@@ -345,6 +340,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.shap_present.grid(row=13, column=0, sticky=NW)
         self.shap_absent.grid(row=14, column=0, sticky=NW)
         self.shap_save_it_dropdown.grid(row=15, column=0, sticky=NW)
+        self.shap_multiprocess_dropdown.grid(row=16, column=0, sticky=NW)
 
         self.save_frame.grid(row=5, column=0, sticky=NW)
         save_global_btn.grid(row=0, column=0, sticky=NW)
@@ -358,6 +354,13 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             box.set_state(NORMAL)
         else:
             box.set_state(DISABLED)
+
+    def change_shap_cadence_options(self, x):
+        if x == 'True':
+            self.shap_save_it_dropdown.setChoices('ALL FRAMES')
+            self.shap_save_it_dropdown.disable()
+        else:
+            self.shap_save_it_dropdown.enable()
 
     def create_class_weight_table(self):
         if hasattr(self, "class_weight_frm"):
@@ -472,6 +475,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             self.shap_scores_absent = self.shap_absent.entry_get
             self.shap_scores_present = self.shap_present.entry_get
             self.shap_save_it = self.shap_save_it_dropdown.getChoices()
+            self.shap_multiprocess = self.shap_multiprocess_dropdown.getChoices()
         self.learning_curve = self.learning_curve_var.get()
         self.partial_dependency = self.partial_dependency_var.get()
         self.learning_curve_k_split = 0
@@ -608,6 +612,8 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.config.set(
             "create ensemble settings", "shap_save_iteration", str(self.shap_save_it)
         )
+
+        self.config.set('create ensemble settings', 'shap_multiprocess', str(self.shap_multiprocess))
         self.config.set(
             "create ensemble settings",
             "partial_dependency",
@@ -657,6 +663,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             "shap_target_present_no": self.shap_scores_present,
             "shap_target_absent_no": self.shap_scores_absent,
             "shap_save_iteration": self.shap_save_it,
+            'shap_multiprocess': self.shap_multiprocess,
             "partial_dependency": self.partial_dependency,
             "class_weights": self.class_weight_method,
             "class_custom_weights": str(self.class_custom_weights),
@@ -786,17 +793,21 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             self.shap_absent.set_state(NORMAL)
             self.shap_absent.set_state(NORMAL)
             self.shap_save_it_dropdown.enable()
+            self.shap_multiprocess_dropdown.enable()
             self.shap_present.entry_set(val=self.meta["shap_target_present_no"])
             self.shap_absent.entry_set(val=self.meta["shap_target_absent_no"])
             if "shap_save_iteration" in self.meta.keys():
                 self.shap_save_it_dropdown.setChoices(self.meta["shap_save_iteration"])
             else:
                 self.shap_save_it_dropdown.setChoices("ALL FRAMES")
+            if 'shap_multiprocess' in self.meta.keys():
+                self.shap_multiprocess_dropdown.setChoices(self.meta['shap_multiprocess'])
         else:
             self.calc_shap_scores_var.set(value=False)
             self.shap_present.set_state(DISABLED)
             self.shap_absent.set_state(DISABLED)
             self.shap_save_it_dropdown.enable()
+            self.shap_multiprocess_dropdown.disable()
 
         if "train_test_split_type" in self.meta.keys():
             self.train_test_type_dropdown.setChoices(self.meta["train_test_split_type"])
@@ -804,8 +815,10 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             self.train_test_type_dropdown.setChoices(Options.TRAIN_TEST_SPLIT.value[0])
         if "shap_save_iteration" in self.meta.keys():
             self.shap_save_it_dropdown.setChoices(self.meta["shap_save_iteration"])
+        if 'shap_multiprocess' in self.meta.keys():
+            self.shap_multiprocess_dropdown.setChoices(self.meta['shap_multiprocess'])
         if "partial_dependency" in self.meta.keys():
-            if self.meta["partial_dependency"] in Options.RUN_OPTIONS_FLAGS.value:
+            if self.meta["partial_dependency"] in Options.PERFORM_FLAGS.value:
                 self.partial_dependency_var.set(value=True)
         else:
             self.shap_save_it_dropdown.setChoices("None")
@@ -826,37 +839,36 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         print("Loaded parameters from config {}...".format(config_name))
 
     def get_expected_meta_dict_entry_keys(self):
-        self.expected_meta_dict_entries = [
-            "classifier_name",
-            "rf_n_estimators",
-            "rf_max_features",
-            "rf_criterion",
-            "train_test_size",
-            "rf_min_sample_leaf",
-            "under_sample_ratio",
-            "under_sample_setting",
-            "over_sample_ratio",
-            "over_sample_setting",
-            "generate_rf_model_meta_data_file",
-            "generate_example_decision_tree",
-            "generate_classification_report",
-            "generate_features_importance_log",
-            "generate_features_importance_bar_graph",
-            "n_feature_importance_bars",
-            "compute_feature_permutation_importance",
-            "generate_sklearn_learning_curves",
-            "generate_precision_recall_curves",
-            "learning_curve_k_splits",
-            "learning_curve_data_splits",
-            "generate_example_decision_tree_fancy",
-            "generate_shap_scores",
-            "shap_target_present_no",
-            "shap_target_absent_no",
-            "shap_save_iteration",
-            "partial_dependency",
-            "class_weights",
-            "class_custom_weights",
-        ]
+        self.expected_meta_dict_entries = ['classifier_name',
+                                           'rf_n_estimators',
+                                           'rf_max_features',
+                                           'rf_criterion',
+                                           'train_test_size',
+                                           'rf_min_sample_leaf',
+                                           'under_sample_ratio',
+                                           'under_sample_setting',
+                                           'over_sample_ratio',
+                                           'over_sample_setting',
+                                           'generate_rf_model_meta_data_file',
+                                           'generate_example_decision_tree',
+                                           'generate_classification_report',
+                                           'generate_features_importance_log',
+                                           'generate_features_importance_bar_graph',
+                                           'n_feature_importance_bars',
+                                           'compute_feature_permutation_importance',
+                                           'generate_sklearn_learning_curves',
+                                           'generate_precision_recall_curves',
+                                           'learning_curve_k_splits',
+                                           'learning_curve_data_splits',
+                                           'generate_example_decision_tree_fancy',
+                                           'generate_shap_scores',
+                                           'shap_target_present_no',
+                                           'shap_target_absent_no',
+                                           'shap_save_iteration',
+                                           'shap_multiprocess',
+                                           'partial_dependency',
+                                           'class_weights',
+                                           'class_custom_weights']
 
 
-# _ = MachineModelSettingsPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#_ = MachineModelSettingsPopUp(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini')

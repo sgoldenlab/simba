@@ -35,6 +35,7 @@ PEARSON = "pearson"
 ANOVA = "anova"
 KENDALL = "kendall"
 SHAP = "shap"
+SCALED = 'scaled'
 PLOTS = "plots"
 CREATE = "create"
 SPEARMAN = "spearman"
@@ -72,31 +73,15 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
         UnsupervisedMixin.__init__(self)
         self.settings = settings
         self.data = read_pickle(data_path=data_path)
-        self.save_path = os.path.join(
-            self.logs_path,
-            f"cluster_descriptive_statistics_{self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.xlsx",
-        )
-        check_if_keys_exist_in_dict(
-            data=self.data,
-            key=[Clustering.CLUSTER_MODEL.value, Unsupervised.METHODS.value],
-            name=data_path,
-        )
-        check_if_keys_exist_in_dict(
-            data=settings, key=[ANOVA, DESCRIPTIVE_STATISTICS, TUKEY], name="settings"
-        )
+        self.save_path = os.path.join(self.logs_path,f"cluster_descriptive_statistics_{self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.xlsx",)
+        check_if_keys_exist_in_dict(data=self.data, key=[Clustering.CLUSTER_MODEL.value, Unsupervised.METHODS.value], name=data_path)
+        check_if_keys_exist_in_dict(data=settings, key=[SCALED, ANOVA, DESCRIPTIVE_STATISTICS, TUKEY], name="settings")
 
     def run(self):
-        self.x_data = self.data[Unsupervised.METHODS.value][
-            Unsupervised.SCALED_DATA.value
-        ]
-        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][
-            Unsupervised.MODEL.value
-        ].labels_
-        if not self.settings[Unsupervised.SCALED.value]:
-            self.x_data = TrainModelMixin.scaler_inverse_transform(
-                data=self.x_data,
-                scaler=self.data[Unsupervised.METHODS.value][Unsupervised.SCALER.value],
-            )
+        self.x_data = self.data[Unsupervised.METHODS.value][Unsupervised.SCALED_DATA.value]
+        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
+        if not self.settings[SCALED]:
+            self.x_data = TrainModelMixin.scaler_inverse_transform(data=self.x_data, scaler=self.data[Unsupervised.METHODS.value][Unsupervised.SCALER.value])
         self.x_y_df = pd.concat(
             [
                 self.x_data,
@@ -216,3 +201,8 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
             msg=f"Tukey post-hocs' statistics saved in {self.save_path}",
             elapsed_time=timer.elapsed_time_str,
         )
+
+
+# settings = {'scaled': True, 'anova': True, 'tukey_posthoc': True, 'descriptive_statistics': True}
+# calculator = ClusterFrequentistCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini', data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle', settings=settings)
+# calculator.run()

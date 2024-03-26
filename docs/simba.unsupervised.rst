@@ -8,17 +8,24 @@ Bout aggregation helper
    :members:
    :show-inheritance:
 
-Cluster statistics calculator
+Cluster frequentist statistics calculator
 ---------------------------------------------
 
-.. automodule:: simba.unsupervised.cluster_statistics
+.. automodule:: simba.unsupervised.cluster_frequentist_calculator
    :members:
    :show-inheritance:
 
-Cluster visualizer
+Cluster video visualizer
 ---------------------------------------------
 
-.. automodule:: simba.unsupervised.cluster_visualizer
+.. automodule:: simba.unsupervised.cluster_video_visualizer
+   :members:
+   :show-inheritance:
+
+Cluster XAI calculator
+---------------------------------------------
+
+.. automodule:: simba.unsupervised.cluster_xai_calculator
    :members:
    :show-inheritance:
 
@@ -43,10 +50,10 @@ Density-based cluster validation (DBCV)
    :members:
    :show-inheritance:
 
-Enums
--------------------------------
+Embedding correlation calculator
+------------------------------------------
 
-.. automodule:: simba.unsupervised.enums
+.. automodule:: simba.unsupervised.embedding_correlation_calculator
    :members:
    :show-inheritance:
 
@@ -64,30 +71,8 @@ HDBSCAN clusterer
    :members:
    :show-inheritance:
 
-UI pop-up classes
-------------------------------------------
-
-.. automodule:: simba.unsupervised.pop_up_classes
-   :members:
-   :show-inheritance:
-
-TSNE embedder
-------------------------------
-
-.. automodule:: simba.unsupervised.tsne
-   :members:
-   :show-inheritance:
-
-Main UI
-----------------------------
-
-.. automodule:: simba.unsupervised.ui
-   :members:
-   :show-inheritance:
-
 UMAP embedder
 ----------------------------------------
-
 .. automodule:: simba.unsupervised.umap_embedder
    :members:
    :show-inheritance:

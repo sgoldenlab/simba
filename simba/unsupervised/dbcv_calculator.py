@@ -13,10 +13,11 @@ from scipy.sparse.csgraph import minimum_spanning_tree
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_valid_extension)
 from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
-from simba.utils.read_write import get_unique_values_in_iterable, read_pickle
+from simba.utils.read_write import get_unique_values_in_iterable, read_pickle, find_files_of_filetypes_in_directory
+from simba.utils.enums import Formats
+
 
 CLUSTERER_NAME = "CLUSTERER_NAME"
 CLUSTER_COUNT = "CLUSTER_COUNT"
@@ -47,66 +48,45 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     >>> results = dbcv_calculator.run()
     """
 
-    def __init__(
-        self, config_path: Union[str, os.PathLike], data_path: Union[str, os.PathLike]
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_path: Union[str, os.PathLike]):
 
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         if os.path.isdir(data_path):
             check_if_dir_exists(in_dir=data_path)
-            self.data = read_pickle(data_path=data_path)
+            self.data_paths = find_files_of_filetypes_in_directory(directory=data_path, extensions=[f'.{Formats.PICKLE.value}'], raise_error=True)
         else:
-            check_file_exist_and_readable(file_path=data_path)
-            self.data = {0: read_pickle(data_path=data_path)}
+            check_valid_extension(path=data_path, accepted_extensions=Formats.PICKLE.value)
+            self.data_paths = [data_path]
         self.save_path = os.path.join(self.logs_path, f"DBCV_{self.datetime}.xlsx")
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
 
     def run(self):
-        print(f"Analyzing DBCV for {len(self.data.keys())} clusterers...")
+        print(f"Analyzing DBCV for {len(self.data_paths)} clusterers...")
         self.results = {}
-        for k, v in self.data.items():
+        for file_cnt, file_path in enumerate(self.data_paths):
             model_timer = SimbaTimer(start=True)
-            self.results[k], dbcv_results = {}, "nan"
-            self.results[k][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][
-                Unsupervised.HASHED_NAME.value
-            ]
-            self.results[k][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][
-                Unsupervised.HASHED_NAME.value
-            ]
-            print(f"Performing DBCV for cluster model {self.results[k][CLUSTERER_NAME]}...")
+            v = read_pickle(data_path=file_path)
+            self.results[file_cnt], dbcv_results = {}, "nan"
+            self.results[file_cnt][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]
+            self.results[file_cnt][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]
+            print(f"Performing DBCV for cluster model {self.results[file_cnt][CLUSTERER_NAME]}...")
             cluster_lbls = v[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
             x = v[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_
-            self.results[k] = {
-                **self.results[k],
-                **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value],
-                **v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value],
-            }
-            cluster_cnt = get_unique_values_in_iterable(
-                data=cluster_lbls,
-                name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value],
-                min=1,
-            )
+            self.results[file_cnt] = {**self.results[file_cnt], **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value], **v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value]}
+            cluster_cnt = get_unique_values_in_iterable(data=cluster_lbls, name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min=1)
             if cluster_cnt > 1:
                 dbcv_results = self.DBCV(x.astype(np.float32), cluster_lbls.astype(np.int64))
-            self.results[k] = {
-                **self.results[k],
-                **{DBCV: dbcv_results},
-                **{CLUSTER_COUNT: cluster_cnt},
-            }
+            self.results[file_cnt] = {**self.results[file_cnt], **{DBCV: dbcv_results}, **{CLUSTER_COUNT: cluster_cnt}}
             model_timer.stop_timer()
-            stdout_success(
-                msg=f"DBCV complete for model {self.results[k][CLUSTERER_NAME]} ...",
-                elapsed_time=model_timer.elapsed_time_str,
-            )
+            stdout_success(msg=f"DBCV complete for model {self.results[file_cnt][CLUSTERER_NAME]} ...", elapsed_time=model_timer.elapsed_time_str)
         self.__save_results()
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"ALL DBCV calculations complete and saved in {self.save_path}",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"ALL DBCV calculations complete and saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
 
     def __save_results(self):
         for k, v in self.results.items():
@@ -120,7 +100,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
         :param np.ndarray labels: 1D array with cluster labels
         :returns float: DBCV cluster validity score
         """
-        print(X.shape)
+
         print('Computing mutual reach distance ... (Step  1/4)')
         arrays_by_cluster, ordered_labels = self._mutual_reach_dist_graph(X, labels)
         print('Computing pairwise distances ... (Step  2/4)')
@@ -292,7 +272,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 #                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/large_clusters')
 # test.run()
 
-
-# test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
-#                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters')
-# test.run()
+#
+test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
+                      data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters')
+test.run()

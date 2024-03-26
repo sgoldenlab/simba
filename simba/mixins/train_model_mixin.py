@@ -2,8 +2,7 @@ __author__ = "Simon Nilsson"
 
 
 import warnings
-
-warnings.simplefilter(action="ignore", category=FutureWarning)
+warnings.filterwarnings('ignore')
 
 import ast
 import concurrent
@@ -1815,34 +1814,17 @@ class TrainModelMixin(object):
         shap_timer = SimbaTimer(start=True)
         data_df = pd.concat([x_df, y_df], axis=1)
         if save_file_no == None:
-            self.out_df_shap_path = os.path.join(
-                save_path, f"SHAP_values_{clf_name}.csv"
-            )
-            self.out_df_raw_path = os.path.join(
-                save_path, f"RAW_SHAP_feature_values_{clf_name}.csv"
-            )
+            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{clf_name}.csv")
+            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{clf_name}.csv")
         else:
-            self.out_df_shap_path = os.path.join(
-                save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv"
-            )
-            self.out_df_raw_path = os.path.join(
-                save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv"
-            )
-        target_df, nontarget_df = (
-            data_df[data_df[y_df.name] == 1],
-            data_df[data_df[y_df.name] == 0],
-        )
+            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv")
+            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv")
+        target_df, nontarget_df = (data_df[data_df[y_df.name] == 1], data_df[data_df[y_df.name] == 0])
         if len(target_df) < cnt_present:
-            NotEnoughDataWarning(
-                msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available",
-                source=self.__class__.__name__,
-            )
+            NotEnoughDataWarning(msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available",source=self.__class__.__name__)
             cnt_present = len(target_df)
         if len(nontarget_df) < cnt_absent:
-            NotEnoughDataWarning(
-                msg=f"Train data contains {len(nontarget_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(nontarget_df)} behavior-absent frames available",
-                source=self.__class__.__name__,
-            )
+            NotEnoughDataWarning(msg=f"Train data contains {len(nontarget_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(nontarget_df)} behavior-absent frames available",source=self.__class__.__name__)
             cnt_absent = len(nontarget_df)
         non_target_for_shap = nontarget_df.sample(cnt_absent, replace=False)
         targets_for_shap = target_df.sample(cnt_present, replace=False)
@@ -1868,41 +1850,18 @@ class TrainModelMixin(object):
         shap_results, shap_raw = [], []
         try:
             with multiprocessing.Pool(cores, maxtasksperchild=10) as pool:
-                constants = functools.partial(
-                    self._create_shap_mp_helper, explainer=explainer, clf_name=clf_name
-                )
-                for cnt, result in enumerate(
-                    pool.imap_unordered(constants, shap_data, chunksize=1)
-                ):
-                    print(
-                        f"Concatenating multi-processed SHAP data (batch {cnt+1}/{len(shap_data)})"
-                    )
+                constants = functools.partial(self._create_shap_mp_helper, explainer=explainer, clf_name=clf_name)
+                for cnt, result in enumerate(pool.imap_unordered(constants, shap_data, chunksize=1)):
+                    print(f"Concatenating multi-processed SHAP data (batch {cnt+1}/{len(shap_data)})")
                     proba = rf_clf.predict_proba(result[1])[:, 1].reshape(-1, 1)
                     shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
-                    shap_results.append(
-                        np.hstack(
-                            (
-                                result[0],
-                                np.full((result[0].shape[0]), expected_value).reshape(
-                                    -1, 1
-                                ),
-                                shap_sum,
-                                proba,
-                                result[2],
-                            )
-                        )
-                    )
+                    batch_shap_results = np.hstack((result[0], np.full((result[0].shape[0]), expected_value).reshape(-1, 1), shap_sum, proba, result[2]))
+                    shap_results.append(batch_shap_results)
                     shap_raw.append(result[1])
             pool.terminate()
             pool.join()
-            shap_save_df = pd.DataFrame(
-                data=np.row_stack(shap_results),
-                columns=list(x_names)
-                + ["Expected_value", "Sum", "Prediction_probability", clf_name],
-            )
-            raw_save_df = pd.DataFrame(
-                data=np.row_stack(shap_raw), columns=list(x_names)
-            )
+            shap_save_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])
+            raw_save_df = pd.DataFrame(data=np.row_stack(shap_raw), columns=list(x_names))
             shap_save_df.to_csv(self.out_df_shap_path)
             raw_save_df.to_csv(self.out_df_raw_path)
             shap_timer.stop_timer()
@@ -2962,3 +2921,5 @@ class TrainModelMixin(object):
 # test.read_all_files_in_folder_mp(file_paths=['/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437C_c3_2022-11-01_13-16-23_color.csv', '/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437D_c4_2022-11-01_13-16-39_color.csv'],
 #                               file_type='csv', classifier_names=['attack', 'non-agresive parallel swimming'])
 #
+
+

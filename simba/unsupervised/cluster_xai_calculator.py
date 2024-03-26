@@ -271,14 +271,9 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
                     model_output="raw",
                     feature_perturbation="tree_path_dependent",
                 )
-                if self.settings[SHAP][SAMPLE] > (
-                    len(self.rf_data[cluster_one_id]["X"])
-                    or len(self.rf_data[cluster_two_id]["X"])
-                ):
-                    self.settings[SHAP][SAMPLE] = min(
-                        len(self.rf_data[cluster_one_id]["X"]),
-                        len(self.rf_data[cluster_two_id]["X"]),
-                    )
+
+                if self.settings[SHAP][SAMPLE] > (len(self.rf_data[cluster_one_id]["X"]) or len(self.rf_data[cluster_two_id]["X"])):
+                    self.settings[SHAP][SAMPLE] = min(len(self.rf_data[cluster_one_id]["X"]),len(self.rf_data[cluster_two_id]["X"]))
                 cluster_one_sample = self.rf_data[cluster_one_id]["X"].sample(
                     self.settings[SHAP][SAMPLE], replace=False
                 )
@@ -370,7 +365,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
 # settings = {
 #     "gini_importance": False,
 #     "permutation_importance": False,
-#     "shap": {"method": "cluster_paired", "run": True, "sample": 10},
+#     "shap": {"method": "Paired clusters", "run": True, "sample": 10},
 # }
 # settings = {
 #     "gini_importance": False,
@@ -378,10 +373,9 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
 #     "shap": {"method": "One-against-all", "run": True, "sample": 10},
 # }
 # calculator = ClusterXAICalculator(
-#     config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini",
-#     data_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle",
-#     settings=settings,
-# )
+#     config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini",
+#     data_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle",
+#     settings=settings)
 #
 #
 # calculator.run()

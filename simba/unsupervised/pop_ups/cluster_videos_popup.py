@@ -4,6 +4,8 @@ import os
 import threading
 from tkinter import *
 from typing import Union
+import platform
+import multiprocessing
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
@@ -14,7 +16,6 @@ from simba.unsupervised.enums import UMLOptions
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats
 from simba.utils.lookups import get_color_dict
-
 
 class ClusterVisualizerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
@@ -107,7 +108,8 @@ class ClusterVisualizerPopUp(PopUpMixin, ConfigReader):
             max_videos=max_videos,
             speed=speed,
         )
-
+        if platform.system() == "Darwin":
+            multiprocessing.set_start_method("spawn", force=True)
         threading.Thread(target=cluster_visualizer.run()).start()
 
 

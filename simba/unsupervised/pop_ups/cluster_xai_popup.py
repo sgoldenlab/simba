@@ -99,7 +99,7 @@ class ClusterXAIPopUp(PopUpMixin, ConfigReader):
             "shap": {
                 "method": self.shap_method_dropdown.getChoices(),
                 "run": self.shap_var.get(),
-                "sample": self.shap_sample_dropdown.getChoices(),
+                "sample": int(self.shap_sample_dropdown.getChoices()),
             },
         }
         xai_calculator = ClusterXAICalculator(

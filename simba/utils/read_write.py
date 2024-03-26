@@ -1739,7 +1739,6 @@ def write_pickle(data: Dict[str, Any], save_path: Union[str, os.PathLike]) -> No
     >>> write_pickle(data=my_model, save_path='/test/unsupervised/cluster_models/My_model.pickle')
     """
 
-    check_instance(source=write_pickle.__name__, instance=data, accepted_types=(dict,))
     check_if_dir_exists(in_dir=os.path.dirname(save_path))
     try:
         with open(save_path, "wb") as f:
@@ -1768,15 +1767,21 @@ def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
         files_found = glob.glob(data_path + f"/*.{Formats.PICKLE.value}")
         if len(files_found) == 0:
             raise NoFilesFoundError(
-                msg=f"SIMBA ERROR: Zero pickle files found in {data_path}.",
-                source=self.__class__.__name__,
-            )
+                msg=f"SIMBA ERROR: Zero pickle files found in {data_path}.", source=read_pickle.__name__)
         for file_cnt, file_path in enumerate(files_found):
             with open(file_path, "rb") as f:
-                data[file_cnt] = pickle.load(f)
+                try:
+                    data[file_cnt] = pickle.load(f)
+                except Exception as e:
+                    print(e.args)
+                    raise InvalidFileTypeError(msg=f'Could not decompress file {file_path} - invalid pickle', source=read_pickle.__name__)
     elif os.path.isfile(data_path):
         with open(data_path, "rb") as f:
-            data = pickle.load(f)
+            try:
+                data = pickle.load(f)
+            except Exception as e:
+                print(e.args)
+                raise InvalidFileTypeError(msg=f'Could not decompress file {data_path} - invalid pickle', source=read_pickle.__name__)
     else:
         raise InvalidFilepathError(
             msg=f"The path {data_path} is neither a valid file or directory path",

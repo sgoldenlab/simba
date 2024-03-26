@@ -1966,6 +1966,7 @@ class PlottingMixin(object):
     def continuous_scatter(data: Union[np.ndarray, pd.DataFrame],
                            columns: Optional[List[str]] = ('X', 'Y', 'Cluster'),
                            palette: Optional[str] = 'magma',
+                           show_box: Optional[bool] = False,
                            size: Optional[int] = 10,
                            title: Optional[str] = None,
                            save_path: Optional[Union[str, os.PathLike]] = None):
@@ -1981,6 +1982,7 @@ class PlottingMixin(object):
             data = pd.DataFrame(data, columns=list(columns))
 
         fig, ax = plt.subplots()
+        if not show_box: plt.axis('off')
         plt.xlabel(columns[0])
         plt.ylabel(columns[1])
         plot = ax.scatter(data[columns[0]], data[columns[1]], c=data[columns[2]], s=size, cmap=palette)
@@ -1999,6 +2001,7 @@ class PlottingMixin(object):
     def categorical_scatter(data: Union[np.ndarray, pd.DataFrame],
                             columns: Optional[List[str]] = ('X', 'Y', 'Cluster'),
                             palette: Optional[str] = 'Set1',
+                            show_box: Optional[bool] = False,
                             size: Optional[int] = 10,
                             title: Optional[str] = None,
                             save_path: Optional[Union[str, os.PathLike]] = None):
@@ -2014,6 +2017,7 @@ class PlottingMixin(object):
             check_valid_array(data=data, source=PlottingMixin.categorical_scatter.__name__, accepted_ndims=(2,), max_axis_1=len(columns), min_axis_1=len(columns))
             data = pd.DataFrame(data, columns=list(columns))
 
+        if not show_box: plt.axis('off')
         pct_x = np.percentile(data[columns[0]].values, 25)
         pct_y = np.percentile(data[columns[1]].values, 25)
         plt.xlim(data[columns[0]].min() - pct_x, data[columns[0]].max() + pct_x)

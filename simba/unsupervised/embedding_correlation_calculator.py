@@ -1,18 +1,13 @@
 __author__ = "Simon Nilsson"
 
-import itertools
 import os
-from copy import deepcopy
 from typing import Any, Dict, Union
-
-import matplotlib.pyplot as plt
 import pandas as pd
-import seaborn as sns
-
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.checks import check_file_exist_and_readable, check_instance
+from simba.utils.checks import check_file_exist_and_readable, check_instance, check_if_keys_exist_in_dict
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import read_pickle
 
@@ -30,6 +25,10 @@ CORRELATIONS = "correlations"
 class EmbeddingCorrelationCalculator(UnsupervisedMixin, ConfigReader):
     """
     Class for correlating dimensionality reduction features with original features for explainability purposes.
+
+    .. image:: _static/img/EmbeddingCorrelationCalculator.png
+       :width: 700
+       :align: center
 
     :param str config_path: path to SimBA configparser.ConfigParser project_config.ini
     :param str data_path: path to pickle holding unsupervised results in ``data_map.yaml`` format.
@@ -49,31 +48,20 @@ class EmbeddingCorrelationCalculator(UnsupervisedMixin, ConfigReader):
     ):
 
         check_file_exist_and_readable(file_path=config_path)
-        check_instance(
-            source=f"{self.__class__.__name__} settings",
-            instance=settings,
-            accepted_types=(dict,),
-        )
+        check_instance(source=f"{self.__class__.__name__} settings", instance=settings, accepted_types=(dict,))
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         check_file_exist_and_readable(file_path=data_path)
         self.settings, self.data_path = settings, data_path
+        check_if_keys_exist_in_dict(data=settings, key=[CORRELATIONS, PLOTS], name=f'{self.__class__.__name__} settings')
         self.data = read_pickle(data_path=self.data_path)
-        self.save_path = os.path.join(
-            self.logs_path,
-            f"embedding_correlations_{self.data[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.csv",
-        )
+        check_if_keys_exist_in_dict(data=self.data, key=[Unsupervised.METHODS.value, Unsupervised.DR_MODEL.value], name=self.data_path)
+        self.save_path = os.path.join(self.logs_path, f"embedding_correlations_{self.data[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.csv")
 
     def run(self):
         print("Calculating embedding correlations...")
-        self.x_df = self.data[Unsupervised.METHODS.value][
-            Unsupervised.SCALED_DATA.value
-        ]
-        self.y_df = pd.DataFrame(
-            self.data[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_,
-            columns=["X", "Y"],
-            index=self.x_df.index,
-        )
+        self.x_df = self.data[Unsupervised.METHODS.value][Unsupervised.SCALED_DATA.value]
+        self.y_df = pd.DataFrame(self.data[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_, columns=["X", "Y"], index=self.x_df.index)
         results = pd.DataFrame()
         for correlation_method in self.settings[CORRELATIONS]:
             results[f"{correlation_method}_Y"] = self.x_df.corrwith(
@@ -92,34 +80,19 @@ class EmbeddingCorrelationCalculator(UnsupervisedMixin, ConfigReader):
         if self.settings[PLOTS][CREATE]:
             print("Creating embedding correlation plots...")
             df = pd.concat([self.x_df, self.y_df], axis=1)
-            save_dir = os.path.join(self.logs_path, "embedding_correlation_plots")
+            save_dir = os.path.join(self.logs_path, f"embedding_correlation_plots_{self.data[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}")
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
-            for feature_cnt, feature_name in enumerate(
-                self.data[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value]
-            ):
-                color_bar = plt.cm.ScalarMappable(cmap=self.settings[PLOTS][PALETTE])
-                color_bar.set_array([])
-                plot = sns.scatterplot(
-                    data=df,
-                    x="X",
-                    y="Y",
-                    hue=feature_name,
-                    cmap=self.settings[PLOTS][PALETTE],
-                )
-                plot.get_legend().remove()
-                plot.figure.colorbar(color_bar, label=feature_name)
-                plt.suptitle(feature_name, x=0.5, y=0.92)
+            for feature_cnt, feature_name in enumerate(self.data[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value]):
                 save_path = os.path.join(save_dir, f"{feature_name}.png")
-                plot.figure.savefig(save_path, bbox_inches="tight")
-                plot.clear()
-                plt.close()
-                print(
-                    f"Saving image {str(feature_cnt+1)}/{str(len(df.columns))} ({feature_name})"
-                )
+                _ = PlottingMixin.continuous_scatter(data=df, columns=['X', 'Y', feature_name], palette=self.settings[PLOTS][PALETTE], title=feature_name, save_path=save_path, show_box=False)
+                print(f"Saving image {str(feature_cnt+1)}/{str(len(df.columns))} ({feature_name})")
 
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"Embedding correlation calculations complete",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"Embedding correlation calculations complete", elapsed_time=self.timer.elapsed_time_str)
+
+# settings = {'correlations': ['pearson', 'kendall', 'spearman'], 'plots': {'create': True, 'correlations': 'pearson', 'palette': 'jet'}}
+# calculator = EmbeddingCorrelationCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
+#                                             data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/clusters/beautiful_beaver.pickle',
+#                                             settings=settings)
+# calculator.run()

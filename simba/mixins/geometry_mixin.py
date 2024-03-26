@@ -908,6 +908,7 @@ class GeometryMixin(object):
         save_path: Union[str, os.PathLike],
         size: Optional[Tuple[int]],
         fps: Optional[int] = 10,
+        verbose: Optional[bool] = False,
         bg_img: Optional[np.ndarray] = None,
         bg_clr: Optional[Tuple[int]] = None,
     ) -> None:
@@ -926,6 +927,7 @@ class GeometryMixin(object):
         :param Union[str, os.PathLike] save_path: Path where the resulting video will be saved.
         :param Optional[Tuple[int]] size: Tuple specifying the size of the output video in pixels (width, height).
         :param Optional[int] fps: Frames per second of the output video. Defaults to 10.
+        :param Optional[bool] verbose: If True, then prints progress frmae-by-frame. Default: False.
         :param Optional[np.ndarray] bg_img: Background image to be used as the canvas for drawing shapes. Defaults to None. Could be e.g., a low opacity image of the arena.
         :param Optional[Tuple[int]] bg_clr: Background color specified as a tuple of RGB values. Defaults to white.
         """
@@ -959,10 +961,7 @@ class GeometryMixin(object):
             accepted_types=(tuple,),
         )
         if len(size) != 2:
-            raise InvalidInputError(
-                msg=f"Size has to be 2 values, got {len(size)}",
-                source=GeometryMixin.geometry_video.__name__,
-            )
+            raise InvalidInputError(msg=f"Size has to be 2 values, got {len(size)}", source=GeometryMixin.geometry_video.__name__,)
         for i in size:
             check_instance(
                 source=GeometryMixin.geometry_video.__name__,
@@ -1056,6 +1055,8 @@ class GeometryMixin(object):
                     )
 
             video_writer.write(frm_img.astype(np.uint8))
+            if verbose:
+                print(f'Geometry frame complete ({frm_cnt+1} / {len(shapes)})')
         video_writer.release()
         timer.stop_timer()
         stdout_success(
