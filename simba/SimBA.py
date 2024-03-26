@@ -88,7 +88,6 @@ from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
 from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
 from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
-from simba.ui.pop_ups.spontaneous_alternation_pop_up import SpontaneousAlternationPopUp
 from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp
 from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
@@ -113,6 +112,8 @@ from simba.ui.pop_ups.set_machine_model_parameters_pop_up import \
 from simba.ui.pop_ups.severity_analysis_pop_up import AnalyzeSeverityPopUp
 from simba.ui.pop_ups.smoothing_interpolation_pop_up import (InterpolatePopUp,
                                                              SmoothingPopUp)
+from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
+    SpontaneousAlternationPopUp
 from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
     FeatureSubsetExtractorPopUp
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
