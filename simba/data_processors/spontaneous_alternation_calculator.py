@@ -173,7 +173,6 @@ class SpontaneousAlternationCalculator(ConfigReader):
                 bp_arr = GeometryMixin.filter_low_p_bps_for_shapes(
                     x=bp_arr, p=p_arr, threshold=self.threshold
                 ).reshape(bp_arr.shape[0], -1, 2)
-            print(px_per_mm)
             self.animal_polygons = GeometryMixin().multiframe_bodyparts_to_polygon(
                 data=bp_arr,
                 parallel_offset=self.buffer,
@@ -182,8 +181,6 @@ class SpontaneousAlternationCalculator(ConfigReader):
                 animal_name="Animal",
                 verbose=self.verbose,
             )
-            print(self.animal_polygons[1])
-
             self.roi_df = pd.DataFrame()
             for geo_name, geo in self.roi_geos[self.video_name].items():
                 roi_geo = [geo for x in range(len(self.animal_polygons))]

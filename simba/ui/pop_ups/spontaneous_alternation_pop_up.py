@@ -83,19 +83,19 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
         )
         self.animal_area_dropdown = DropDownMenu(
             self.animal_settings_frm,
-            "ANIMAL AREA: ",
+            "ANIMAL AREA (%): ",
             list(range(51, 101, 1)),
             labelwidth=35,
         )
         self.buffer_dropdown = DropDownMenu(
             self.animal_settings_frm,
-            "ANIMAL BUFFER: ",
+            "ANIMAL BUFFER (MM): ",
             list(range(0, 105, 5)),
             labelwidth=35,
         )
         self.detailed_data_dropdown = DropDownMenu(
             self.animal_settings_frm,
-            "DETAILED DATA: ",
+            "SAVE DETAILED DATA: ",
             ["True", "False"],
             labelwidth=35,
         )
@@ -165,12 +165,12 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
         self.center_name = self.arm_dict["MAZE CENTER:"].getChoices()
         if self.center_name in self.arm_names:
             raise InvalidInputError(
-                msg=f"One ROI has been defined both as an ARM, and as the CENTER: {center_name}",
+                msg=f"One ROI has been defined both as an ARM, and as the CENTER: {self.center_name}",
                 source=self.__class__.__name__,
             )
         if len(list(set(self.arm_names))) != len(self.arm_names):
             raise InvalidInputError(
-                msg=f"Each arm has to be unique but got {arm_names}",
+                msg=f"Each arm has to be unique but got {self.arm_names}",
                 source=self.__class__.__name__,
             )
         self.animal_area = int(self.animal_area_dropdown.getChoices())
