@@ -532,12 +532,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                 config_path=self.config_path
             ),
         )
-        btn_agg_boolean_conditional_statistics = Button(
-            processmovementdupLabel,
-            text="AGGREGATE BOOLEAN CONDITIONAL STATISTICS",
-            fg="grey",
-            command=lambda: BooleanConditionalSlicerPopUp(config_path=self.config_path),
-        )
+        btn_agg_boolean_conditional_statistics = Button(processmovementdupLabel, text="AGGREGATE BOOLEAN CONDITIONAL STATISTICS", fg="grey", command=lambda: BooleanConditionalSlicerPopUp(config_path=self.config_path))
+        spontaneous_alternation_pop_up_btn = Button(processmovementdupLabel, text="SPONTANEOUS ALTERNATION", fg="navy", command=lambda: SpontaneousAlternationPopUp(config_path=self.config_path))
 
         # organize
         processmovementdupLabel.grid(row=0, column=3, sticky=NW)
@@ -550,6 +546,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_analyzeDirection_bp.grid(row=6, sticky=NW)
         button_visualizeDirection_bp.grid(row=7, sticky=NW)
         btn_agg_boolean_conditional_statistics.grid(row=8, sticky=NW)
+        spontaneous_alternation_pop_up_btn.grid(row=9, sticky=NW)
 
         label_outliercorrection = CreateLabelFrameWithIcon(
             parent=tab4,

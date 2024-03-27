@@ -1729,7 +1729,7 @@ class Statistics(FeatureExtractionMixin):
         histogram_edges = typed.Dict.empty(key_type=types.int64, value_type=types.float64[:])
         histograms = typed.Dict.empty(key_type=types.int64, value_type=types.int64[:])
         for i in range(data.shape[1]):
-            bin_width, bin_count = bucket_data(data=data[:, i], method=bucket_method)
+            bin_width, bin_count = bucket_data(data=data[:, i].flatten(), method=bucket_method)
             histograms[i] = self._hist_1d(data=data[:, i].flatten(), bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)])).astype(np.int64)
             histogram_edges[i] = np.arange(0, 1 + bin_width, bin_width).astype(np.float64)
         results = self._hbos_compute(data=data, histograms=histograms, histogram_edges=histogram_edges)
