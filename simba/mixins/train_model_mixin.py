@@ -43,7 +43,7 @@ except:
 
 import functools
 import multiprocessing
-from typing import Any, Dict, List, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 
@@ -887,50 +887,99 @@ class TrainModelMixin(object):
         shap_timer = SimbaTimer(start=True)
         data_df = pd.concat([x_df, y_df], axis=1)
         if save_file_no == None:
-            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{clf_name}.csv")
-            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{clf_name}.csv")
+            self.out_df_shap_path = os.path.join(
+                save_path, f"SHAP_values_{clf_name}.csv"
+            )
+            self.out_df_raw_path = os.path.join(
+                save_path, f"RAW_SHAP_feature_values_{clf_name}.csv"
+            )
         else:
-            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv")
-            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv")
+            self.out_df_shap_path = os.path.join(
+                save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv"
+            )
+            self.out_df_raw_path = os.path.join(
+                save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv"
+            )
 
-        target_df, nontarget_df = (data_df[data_df[y_df.name] == 1], data_df[data_df[y_df.name] == 0])
+        target_df, nontarget_df = (
+            data_df[data_df[y_df.name] == 1],
+            data_df[data_df[y_df.name] == 0],
+        )
         if len(target_df) < cnt_present:
-            NotEnoughDataWarning(msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available", source=self.__class__.__name__)
+            NotEnoughDataWarning(
+                msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available",
+                source=self.__class__.__name__,
+            )
             cnt_present = len(target_df)
         if len(nontarget_df) < cnt_absent:
-            NotEnoughDataWarning(msg=f"Train data contains {len(nontarget_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(nontarget_df)} behavior-absent frames available", source=self.__class__.__name__)
+            NotEnoughDataWarning(
+                msg=f"Train data contains {len(nontarget_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(nontarget_df)} behavior-absent frames available",
+                source=self.__class__.__name__,
+            )
             cnt_absent = len(nontarget_df)
         non_target_for_shap = nontarget_df.sample(cnt_absent, replace=False)
         targets_for_shap = target_df.sample(cnt_present, replace=False)
         shap_df = pd.concat([targets_for_shap, non_target_for_shap], axis=0)
         y_df = shap_df.pop(clf_name).values
-        explainer = shap.TreeExplainer(rf_clf, data=None, model_output="raw", feature_perturbation="tree_path_dependent")
+        explainer = shap.TreeExplainer(
+            rf_clf,
+            data=None,
+            model_output="raw",
+            feature_perturbation="tree_path_dependent",
+        )
         expected_value = explainer.expected_value[1]
         out_df_raw = pd.DataFrame(columns=x_names)
         shap_headers = list(x_names)
-        shap_headers.extend(("Expected_value", "Sum", "Prediction_probability", clf_name))
+        shap_headers.extend(
+            ("Expected_value", "Sum", "Prediction_probability", clf_name)
+        )
         out_df_shap = pd.DataFrame(columns=shap_headers)
         for cnt, frame in enumerate(range(len(shap_df))):
             shap_frm_timer = SimbaTimer(start=True)
             frame_data = shap_df.iloc[[frame]]
-            frame_shap = explainer.shap_values(frame_data, check_additivity=False)[1][0].tolist()
-            frame_shap.extend((expected_value, sum(frame_shap), rf_clf.predict_proba(frame_data)[0][1], y_df[cnt]))
+            frame_shap = explainer.shap_values(frame_data, check_additivity=False)[1][
+                0
+            ].tolist()
+            frame_shap.extend(
+                (
+                    expected_value,
+                    sum(frame_shap),
+                    rf_clf.predict_proba(frame_data)[0][1],
+                    y_df[cnt],
+                )
+            )
             out_df_raw.loc[len(out_df_raw)] = list(shap_df.iloc[frame])
             out_df_shap.loc[len(out_df_shap)] = frame_shap
-            if (cnt % save_it == 0) or (cnt == len(shap_df) - 1) and (cnt != 0) and (save_path is not None):
+            if (
+                (cnt % save_it == 0)
+                or (cnt == len(shap_df) - 1)
+                and (cnt != 0)
+                and (save_path is not None)
+            ):
                 print(f"Saving SHAP data after {cnt} iterations...")
                 out_df_shap.to_csv(self.out_df_shap_path)
                 out_df_raw.to_csv(self.out_df_raw_path)
             shap_frm_timer.stop_timer()
-            print(f"SHAP frame: {cnt + 1} / {len(shap_df)}, elapsed time: {shap_frm_timer.elapsed_time_str}...")
+            print(
+                f"SHAP frame: {cnt + 1} / {len(shap_df)}, elapsed time: {shap_frm_timer.elapsed_time_str}..."
+            )
 
         shap_timer.stop_timer()
-        stdout_success(msg="SHAP calculations complete", elapsed_time=shap_timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(
+            msg="SHAP calculations complete",
+            elapsed_time=shap_timer.elapsed_time_str,
+            source=self.__class__.__name__,
+        )
         if save_path is not None:
-            _ = ShapAggregateStatisticsVisualizer(config_path=ini_file_path,classifier_name=clf_name,shap_df=out_df_shap,shap_baseline_value=int(expected_value * 100),save_path=save_path)
+            _ = ShapAggregateStatisticsVisualizer(
+                config_path=ini_file_path,
+                classifier_name=clf_name,
+                shap_df=out_df_shap,
+                shap_baseline_value=int(expected_value * 100),
+                save_path=save_path,
+            )
         else:
             return (out_df_shap, out_df_raw)
-
 
     def print_machine_model_information(self, model_dict: dict) -> None:
         """
@@ -1419,7 +1468,9 @@ class TrainModelMixin(object):
         else:
             return p_vals
 
-    def clf_fit(self, clf: RandomForestClassifier, x_df: pd.DataFrame, y_df: pd.DataFrame) -> RandomForestClassifier:
+    def clf_fit(
+        self, clf: RandomForestClassifier, x_df: pd.DataFrame, y_df: pd.DataFrame
+    ) -> RandomForestClassifier:
         """
         Helper to fit clf model
 
@@ -1772,17 +1823,34 @@ class TrainModelMixin(object):
         shap_timer = SimbaTimer(start=True)
         data_df = pd.concat([x_df, y_df], axis=1)
         if (save_file_no == None) and (save_path is not None):
-            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{clf_name}.csv")
-            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{clf_name}.csv")
+            self.out_df_shap_path = os.path.join(
+                save_path, f"SHAP_values_{clf_name}.csv"
+            )
+            self.out_df_raw_path = os.path.join(
+                save_path, f"RAW_SHAP_feature_values_{clf_name}.csv"
+            )
         elif (save_file_no is not None) and (save_path is not None):
-            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv")
-            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv")
-        target_df, nontarget_df = (data_df[data_df[y_df.name] == 1], data_df[data_df[y_df.name] == 0])
+            self.out_df_shap_path = os.path.join(
+                save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv"
+            )
+            self.out_df_raw_path = os.path.join(
+                save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv"
+            )
+        target_df, nontarget_df = (
+            data_df[data_df[y_df.name] == 1],
+            data_df[data_df[y_df.name] == 0],
+        )
         if len(target_df) < cnt_present:
-            NotEnoughDataWarning(msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available",source=self.__class__.__name__)
+            NotEnoughDataWarning(
+                msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available",
+                source=self.__class__.__name__,
+            )
             cnt_present = len(target_df)
         if len(nontarget_df) < cnt_absent:
-            NotEnoughDataWarning(msg=f"Train data contains {len(nontarget_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(nontarget_df)} behavior-absent frames available", source=self.__class__.__name__,)
+            NotEnoughDataWarning(
+                msg=f"Train data contains {len(nontarget_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(nontarget_df)} behavior-absent frames available",
+                source=self.__class__.__name__,
+            )
             cnt_absent = len(nontarget_df)
         non_target_for_shap = nontarget_df.sample(cnt_absent, replace=False)
         targets_for_shap = target_df.sample(cnt_present, replace=False)
@@ -1844,18 +1912,42 @@ class TrainModelMixin(object):
             )
 
             shap_timer.stop_timer()
-            stdout_success(msg="SHAP calculations complete", elapsed_time=shap_timer.elapsed_time_str, source=self.__class__.__name__,)
+            stdout_success(
+                msg="SHAP calculations complete",
+                elapsed_time=shap_timer.elapsed_time_str,
+                source=self.__class__.__name__,
+            )
             if save_path:
                 shap_save_df.to_csv(self.out_df_shap_path)
                 raw_save_df.to_csv(self.out_df_raw_path)
-                _ = ShapAggregateStatisticsVisualizer(config_path=ini_file_path, classifier_name=clf_name, shap_df=shap_save_df, shap_baseline_value=int(expected_value * 100), save_path=save_path)
+                _ = ShapAggregateStatisticsVisualizer(
+                    config_path=ini_file_path,
+                    classifier_name=clf_name,
+                    shap_df=shap_save_df,
+                    shap_baseline_value=int(expected_value * 100),
+                    save_path=save_path,
+                )
             else:
                 return (shap_save_df, raw_save_df)
 
-
         except:
-            ShapWarning(msg="Multiprocessing SHAP values failed. Revert to single core. This will negatively affect run-time. ",source=self.__class__.__name__,)
-            self.create_shap_log(ini_file_path=ini_file_path, rf_clf=rf_clf, x_df=x_df, y_df=y_df, x_names=x_names, clf_name=clf_name, cnt_present=cnt_present, cnt_absent=cnt_absent, save_path=save_path, save_it=len(x_df), save_file_no=save_file_no)
+            ShapWarning(
+                msg="Multiprocessing SHAP values failed. Revert to single core. This will negatively affect run-time. ",
+                source=self.__class__.__name__,
+            )
+            self.create_shap_log(
+                ini_file_path=ini_file_path,
+                rf_clf=rf_clf,
+                x_df=x_df,
+                y_df=y_df,
+                x_names=x_names,
+                clf_name=clf_name,
+                cnt_present=cnt_present,
+                cnt_absent=cnt_absent,
+                save_path=save_path,
+                save_it=len(x_df),
+                save_file_no=save_file_no,
+            )
 
     def check_df_dataset_integrity(
         self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]

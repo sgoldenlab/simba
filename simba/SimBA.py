@@ -543,10 +543,10 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             processmovementdupLabel,
             text="SPONTANEOUS ALTERNATION",
             fg="navy",
-            command=lambda: threading.Thread(target=SpontaneousAlternationPopUp(config_path=self.config_path)).start(),
+            command=lambda: threading.Thread(
+                target=SpontaneousAlternationPopUp(config_path=self.config_path)
+            ).start(),
         )
-
-
 
         # organize
         processmovementdupLabel.grid(row=0, column=3, sticky=NW)

@@ -57,7 +57,7 @@ class GeometryMixin(object):
     def __init__(self):
         if platform.system() == "Darwin":
             if not multiprocessing.get_start_method(allow_none=True):
-                multiprocessing.set_start_method('fork', force=True)
+                multiprocessing.set_start_method("fork", force=True)
         pass
 
     @staticmethod
@@ -79,25 +79,60 @@ class GeometryMixin(object):
         >>> GeometryMixin().bodyparts_to_polygon(data=data)
         """
 
-        check_valid_array(source=f"{GeometryMixin().bodyparts_to_polygon.__name__} data", data=data, accepted_ndims=(3,), accepted_dtypes=(np.float64, np.float32, np.int32, np.int64, int, float))
+        check_valid_array(
+            source=f"{GeometryMixin().bodyparts_to_polygon.__name__} data",
+            data=data,
+            accepted_ndims=(3,),
+            accepted_dtypes=(np.float64, np.float32, np.int32, np.int64, int, float),
+        )
 
-        check_str(name=f"{GeometryMixin().bodyparts_to_polygon.__name__} cap style", value=cap_style, options=list(GeometryEnum.CAP_STYLE_MAP.value.keys()))
-        check_float(name=f"{GeometryMixin().bodyparts_to_polygon.__name__} parallel_offset", value=parallel_offset, min_value=0)
-        check_float(name=f"{GeometryMixin().bodyparts_to_polygon.__name__} pixels_per_mm", value=pixels_per_mm, min_value=0.01)
-        check_float(name=f"{GeometryMixin().bodyparts_to_polygon.__name__} simplify_tolerance", value=simplify_tolerance, min_value=1)
+        check_str(
+            name=f"{GeometryMixin().bodyparts_to_polygon.__name__} cap style",
+            value=cap_style,
+            options=list(GeometryEnum.CAP_STYLE_MAP.value.keys()),
+        )
+        check_float(
+            name=f"{GeometryMixin().bodyparts_to_polygon.__name__} parallel_offset",
+            value=parallel_offset,
+            min_value=0,
+        )
+        check_float(
+            name=f"{GeometryMixin().bodyparts_to_polygon.__name__} pixels_per_mm",
+            value=pixels_per_mm,
+            min_value=0.01,
+        )
+        check_float(
+            name=f"{GeometryMixin().bodyparts_to_polygon.__name__} simplify_tolerance",
+            value=simplify_tolerance,
+            min_value=1,
+        )
         results = []
 
-        if parallel_offset > 0: buffer = int(parallel_offset / pixels_per_mm)
-        else: buffer = 0
+        if parallel_offset > 0:
+            buffer = int(parallel_offset / pixels_per_mm)
+        else:
+            buffer = 0
 
         for i in range(data.shape[0]):
             if not check_if_2d_array_has_min_unique_values(data=data[i], min=3):
                 results.append(Polygon([(0, 0), (0, 0), (0, 0)]))
             else:
-                results.append(Polygon(LineString(data[i].tolist()).buffer(distance=buffer, cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style]).simplify(tolerance=simplify_tolerance, preserve_topology=preserve_topology).convex_hull))
+                results.append(
+                    Polygon(
+                        LineString(data[i].tolist())
+                        .buffer(
+                            distance=buffer,
+                            cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style],
+                        )
+                        .simplify(
+                            tolerance=simplify_tolerance,
+                            preserve_topology=preserve_topology,
+                        )
+                        .convex_hull
+                    )
+                )
 
         return results
-
 
     @staticmethod
     def bodyparts_to_points(
@@ -316,18 +351,39 @@ class GeometryMixin(object):
         >>> results = GeometryMixin.compute_pct_shape_overlap(shapes=data)
         """
 
-        check_valid_array(data=shapes, source=GeometryMixin.compute_pct_shape_overlap.__name__, accepted_ndims=(2,), max_axis_1=2, min_axis_0=1, accepted_dtypes=(Polygon, LineString))
+        check_valid_array(
+            data=shapes,
+            source=GeometryMixin.compute_pct_shape_overlap.__name__,
+            accepted_ndims=(2,),
+            max_axis_1=2,
+            min_axis_0=1,
+            accepted_dtypes=(Polygon, LineString),
+        )
         results = np.full((shapes.shape[0],), np.nan)
 
         for i in range(shapes.shape[0]):
             if shapes[i][0].intersects(shapes[i][1]):
                 intersection = shapes[i][0].intersection(shapes[i][1])
                 if denominator == "difference":
-                    results[i] = np.round((intersection.area / ((shapes[i][0].area + shapes[i][1].area) - intersection.area) * 100), 2)
+                    results[i] = np.round(
+                        (
+                            intersection.area
+                            / (
+                                (shapes[i][0].area + shapes[i][1].area)
+                                - intersection.area
+                            )
+                            * 100
+                        ),
+                        2,
+                    )
                 elif denominator == "shape_1":
-                    results[i] = np.round((intersection.area / shapes[i][0].area) * 100, 2)
+                    results[i] = np.round(
+                        (intersection.area / shapes[i][0].area) * 100, 2
+                    )
                 else:
-                    results[i] = np.round((intersection.area / shapes[i][1].area) * 100, 2)
+                    results[i] = np.round(
+                        (intersection.area / shapes[i][1].area) * 100, 2
+                    )
             else:
                 results[i] = 0
 
@@ -1121,33 +1177,60 @@ class GeometryMixin(object):
         >>> GeometryMixin().multiframe_bodyparts_to_polygon(data=data)
         """
 
-        check_valid_array(data=data, source=GeometryMixin().multiframe_bodyparts_to_polygon.__name__, accepted_ndims=(3,), accepted_dtypes=(float, int, np.float32, np.float64, np.int32, np.int64))
-        check_int(name="CORE COUNT",value=core_cnt,min_value=-1,max_value=find_core_cnt()[0],raise_error=True)
+        check_valid_array(
+            data=data,
+            source=GeometryMixin().multiframe_bodyparts_to_polygon.__name__,
+            accepted_ndims=(3,),
+            accepted_dtypes=(float, int, np.float32, np.float64, np.int32, np.int64),
+        )
+        check_int(
+            name="CORE COUNT",
+            value=core_cnt,
+            min_value=-1,
+            max_value=find_core_cnt()[0],
+            raise_error=True,
+        )
         if pixels_per_mm is not None:
-            check_float(name="PIXELS PER MM",value=pixels_per_mm,min_value=0.1,raise_error=True)
+            check_float(
+                name="PIXELS PER MM",
+                value=pixels_per_mm,
+                min_value=0.1,
+                raise_error=True,
+            )
             parallel_offset = np.ceil(parallel_offset * pixels_per_mm)
             if parallel_offset < 1:
                 parallel_offset = 1
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         results, timer = [], SimbaTimer(start=True)
         data = np.array_split(data, core_cnt)
 
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(GeometryMixin.bodyparts_to_polygon,
-                                          parallel_offset=parallel_offset,
-                                          cap_style=cap_style,
-                                          simplify_tolerance=simplify_tolerance,
-                                          preserve_topology=preserve_topology)
+        with multiprocessing.Pool(
+            core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value
+        ) as pool:
+            constants = functools.partial(
+                GeometryMixin.bodyparts_to_polygon,
+                parallel_offset=parallel_offset,
+                cap_style=cap_style,
+                simplify_tolerance=simplify_tolerance,
+                preserve_topology=preserve_topology,
+            )
             for cnt, mp_return in enumerate(pool.imap(constants, data, chunksize=1)):
                 if verbose:
                     if not video_name and not animal_name:
                         print(f"Computing polygon batch {cnt+1}/{len(data)}...")
                     elif not video_name and animal_name:
-                        print(f"Computing polygon batch {cnt + 1}/{len(data)} (Animal: {animal_name})...")
+                        print(
+                            f"Computing polygon batch {cnt + 1}/{len(data)} (Animal: {animal_name})..."
+                        )
                     elif video_name and not animal_name:
-                        print(f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name})...")
+                        print(
+                            f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name})..."
+                        )
                     else:
-                        print(f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name}, Animal: {animal_name})...")
+                        print(
+                            f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name}, Animal: {animal_name})..."
+                        )
                 results.append(mp_return)
         #
         timer.stop_timer()
@@ -1373,7 +1456,18 @@ class GeometryMixin(object):
         pool.terminate()
         return results
 
-    def multiframe_compute_pct_shape_overlap(self, shape_1: List[Polygon], shape_2: List[Polygon], core_cnt: Optional[int] = -1, video_name: Optional[str] = None, verbose: Optional[bool] = False, animal_names: Optional[Tuple[str]] = None, denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = 'difference') -> List[float]:
+    def multiframe_compute_pct_shape_overlap(
+        self,
+        shape_1: List[Polygon],
+        shape_2: List[Polygon],
+        core_cnt: Optional[int] = -1,
+        video_name: Optional[str] = None,
+        verbose: Optional[bool] = False,
+        animal_names: Optional[Tuple[str]] = None,
+        denominator: Optional[
+            Literal["difference", "shape_1", "shape_2"]
+        ] = "difference",
+    ) -> List[float]:
         """
         Compute the percentage overlap between corresponding Polygons in two lists.
 
@@ -1392,18 +1486,46 @@ class GeometryMixin(object):
 
         :example:
         """
-        check_int(name="CORE COUNT",value=core_cnt,min_value=-1,max_value=find_core_cnt()[0],raise_error=True)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        check_int(
+            name="CORE COUNT",
+            value=core_cnt,
+            min_value=-1,
+            max_value=find_core_cnt()[0],
+            raise_error=True,
+        )
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         if len(shape_1) != len(shape_2):
-            raise InvalidInputError(msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}", source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__)
-        input_dtypes = list(set([type(x) for x in shape_1] + [type(x) for x in shape_2]))
+            raise InvalidInputError(
+                msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}",
+                source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__,
+            )
+        input_dtypes = list(
+            set([type(x) for x in shape_1] + [type(x) for x in shape_2])
+        )
         if len(input_dtypes) > 1:
-            raise InvalidInputError(msg=f"shape_1 and shape_2 contains more than 1 dtype {input_dtypes}", source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__)
-        check_instance(source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__, instance=shape_1[0], accepted_types=(LineString, Polygon))
-        data, results, timer = np.column_stack((shape_1, shape_2)), [], SimbaTimer(start=True)
+            raise InvalidInputError(
+                msg=f"shape_1 and shape_2 contains more than 1 dtype {input_dtypes}",
+                source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__,
+            )
+        check_instance(
+            source=GeometryMixin.multiframe_compute_pct_shape_overlap.__name__,
+            instance=shape_1[0],
+            accepted_types=(LineString, Polygon),
+        )
+        data, results, timer = (
+            np.column_stack((shape_1, shape_2)),
+            [],
+            SimbaTimer(start=True),
+        )
         data = np.array_split(data, core_cnt)
-        pool = multiprocessing.Pool(processes=core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
-        constants = functools.partial(GeometryMixin.compute_pct_shape_overlap, denominator=denominator)
+        pool = multiprocessing.Pool(
+            processes=core_cnt,
+            maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value,
+        )
+        constants = functools.partial(
+            GeometryMixin.compute_pct_shape_overlap, denominator=denominator
+        )
         for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
             if verbose:
                 if not video_name and not animal_names:
@@ -1422,7 +1544,9 @@ class GeometryMixin(object):
                     )
             results.append(result)
         timer.stop_timer()
-        stdout_success(msg="Compute overlap complete.", elapsed_time=timer.elapsed_time_str)
+        stdout_success(
+            msg="Compute overlap complete.", elapsed_time=timer.elapsed_time_str
+        )
         pool.close()
         pool.join()
         pool.terminate()
@@ -3665,7 +3789,6 @@ class GeometryMixin(object):
                     new_val = x[i][above_p_idx[0]]
                     results[i][j] = new_val
         return results
-
 
 
 # data = np.array([[[364, 308], [383, 323], [403, 335], [423, 351]],

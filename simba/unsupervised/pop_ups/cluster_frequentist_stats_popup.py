@@ -98,4 +98,4 @@ class ClusterFrequentistStatisticsPopUp(PopUpMixin, ConfigReader):
         calculator.run()
 
 
-#_ = ClusterFrequentistStatisticsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')
+# _ = ClusterFrequentistStatisticsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')
