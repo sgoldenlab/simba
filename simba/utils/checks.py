@@ -1141,5 +1141,5 @@ def check_video_has_rois(roi_dict: dict, video_names: List[str], roi_names: List
         if len(missing_rois) > 0:
             raise NoROIDataError(
                 msg=f"{len(missing_rois)} ROI(s) are missing from {video_name}: {missing_rois}",
-                source=spontaneous_alternations.__name__,
+                source=check_video_has_rois.__name__,
             )

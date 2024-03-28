@@ -1,11 +1,11 @@
 __author__ = "Simon Nilsson"
 
 import os.path
-from typing import Union
+from typing import Union, Tuple
 
 import numpy as np
 import pandas as pd
-from numba import jit, njit, prange
+from numba import jit, njit, prange, types
 from numba.typed import List
 from scipy.sparse import csgraph
 from scipy.sparse.csgraph import minimum_spanning_tree
@@ -78,50 +78,22 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
         for file_cnt, file_path in enumerate(self.data_paths):
             model_timer = SimbaTimer(start=True)
             v = read_pickle(data_path=file_path)
-            self.results[file_cnt], dbcv_results = {}, "nan"
-            self.results[file_cnt][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][
-                Unsupervised.HASHED_NAME.value
-            ]
-            self.results[file_cnt][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][
-                Unsupervised.HASHED_NAME.value
-            ]
-            print(
-                f"Performing DBCV for cluster model {self.results[file_cnt][CLUSTERER_NAME]}..."
-            )
-            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][
-                Unsupervised.MODEL.value
-            ].labels_
+            self.results[file_cnt], dbcv_results, warning = {}, "nan", False
+            self.results[file_cnt][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]
+            self.results[file_cnt][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]
+            print(f"Performing DBCV for cluster model {self.results[file_cnt][CLUSTERER_NAME]}...")
+            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
             x = v[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_
-            self.results[file_cnt] = {
-                **self.results[file_cnt],
-                **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value],
-                **v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value],
-            }
-            cluster_cnt = get_unique_values_in_iterable(
-                data=cluster_lbls,
-                name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value],
-                min=1,
-            )
+            self.results[file_cnt] = {**self.results[file_cnt], **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value],**v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value]}
+            cluster_cnt = get_unique_values_in_iterable(data=cluster_lbls, name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min=1)
             if cluster_cnt > 1:
-                dbcv_results = self.DBCV(
-                    x.astype(np.float32), cluster_lbls.astype(np.int64)
-                )
-            self.results[file_cnt] = {
-                **self.results[file_cnt],
-                **{DBCV: dbcv_results},
-                **{CLUSTER_COUNT: cluster_cnt},
-            }
+                dbcv_results, warning = self.DBCV(x.astype(np.float32), cluster_lbls.astype(np.int64))
+            self.results[file_cnt] = {**self.results[file_cnt], **{DBCV: dbcv_results}, **{CLUSTER_COUNT: cluster_cnt}, **{'WARNING (POTENTIALLY INACCURATE)': str(warning)}}
             model_timer.stop_timer()
-            stdout_success(
-                msg=f"DBCV complete for model {self.results[file_cnt][CLUSTERER_NAME]} ...",
-                elapsed_time=model_timer.elapsed_time_str,
-            )
+            stdout_success(msg=f"DBCV complete for model {self.results[file_cnt][CLUSTERER_NAME]} ...", elapsed_time=model_timer.elapsed_time_str)
         self.__save_results()
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"ALL DBCV calculations complete and saved in {self.save_path}",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"ALL DBCV calculations complete and saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
 
     def __save_results(self):
         for k, v in self.results.items():
@@ -139,11 +111,11 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
         print("Computing mutual reach distance ... (Step  1/4)")
         arrays_by_cluster, ordered_labels = self._mutual_reach_dist_graph(X, labels)
         print("Computing pairwise distances ... (Step  2/4)")
-        graph = self.calculate_dists(X, arrays_by_cluster)
+        graph, warning = self.calculate_dists(X, arrays_by_cluster)
         print("Computing minimum spanning tree ... (Step  3/4)")
         mst = self._mutual_reach_dist_MST(graph)
         print("Computing cluster validity index ... (Step  4/4)")
-        return self._clustering_validity_index(mst, ordered_labels)
+        return self._clustering_validity_index(mst, ordered_labels), warning
 
     @staticmethod
     @njit("(float32[:,:], int64[:])")
@@ -175,16 +147,17 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 
     @staticmethod
     @jit(nopython=True, fastmath=True)
-    def calculate_dists(X: np.ndarray, arrays_by_cluster: List):
+    def calculate_dists(X: np.ndarray, arrays_by_cluster: types.List) -> Tuple[np.ndarray, bool]:
         """
         :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)
         :param numba.types.ListType[list[np.ndarray]] arrays_by_cluster: Numba typed List of list with 2d arrays.
-        :returns np.ndarray graph: Graph of all pair-wise mutual reachability distances between points of size X.shape[0] x X.shape[0].
+        :returns Tuple[np.ndarray, bool): Graph of all pair-wise mutual reachability distances between points of size X.shape[0] x X.shape[0].
+                                          Boolean representing if any issues where detected. Including: If (i) any clusters consist of a single observation.
         """
-
         cluster_n = len(arrays_by_cluster)
         graph = np.empty((X.shape[0], X.shape[0]), X.dtype)
         graph_row_counter = 0
+        warning_flag = False
 
         for cluster_a in range(cluster_n):
             A = arrays_by_cluster[cluster_a][0]
@@ -201,6 +174,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
                 indices = np.where(Ci != 0)
                 Ci = Ci[indices]
                 numerator = ((1 / Ci) ** A.shape[1]).sum()
+                if A.shape[0] < 2: warning_flag = True
                 denominator_axis_0 = np.max(np.array([2, A.shape[0]]))
 
                 core_dist_i = (numerator / (denominator_axis_0 - 1)) ** (
@@ -237,7 +211,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
                 graph[graph_row_counter] = graph_row
                 graph_row_counter += 1
 
-        return graph
+        return graph, warning_flag
 
     def _mutual_reach_dist_MST(self, graph: np.ndarray) -> np.ndarray:
         """
@@ -309,10 +283,10 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 # test.run()
 
 # test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
-#                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/large_clusters')
+#                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters')
 # test.run()
 
 #
-# test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
-#                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/error_mdl/ecstatic_darwin.pickle')
-# test.run()
+test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
+                      data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/error_mdl/ecstatic_darwin.pickle')
+test.run()

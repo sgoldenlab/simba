@@ -1,6 +1,7 @@
 import os
 import warnings
 from typing import List, Optional, Union
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -8,8 +9,7 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.feature_extraction_supplement_mixin import \
-    FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int, check_str,
@@ -20,6 +20,8 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import (get_file_name_info_in_directory,
                                     get_fn_ext, read_df)
 from simba.utils.warnings import NoFileFoundWarning
+import platform
+import multiprocessing
 
 TAIL_END = "tail_end"
 
@@ -46,7 +48,7 @@ class SpontaneousAlternationCalculator(ConfigReader):
     :param Optional[float] threshold: Value between 0.0 and 1.0. Body-parts with detection probabilities below this value will be (if possible) filtered when constructing the animal geometry.
     :param Optional[int] buffer: Millimeters area for which the animal geometry should be increased in size. Useful if the animal geometry does not fully cover the animal.
     :param Optional[bool] detailed_data: If True, saves an additional CSV for each analyzed video with detailed data pertaining each error type and alternation sequence.
-    :param Optional[Union[str, os.PathLike]] data_path: Directory of path to the file sto be analyzed. If None, then ``project_folder/outlier_corrected_movement_location`` directory.
+    :param Optional[Union[str, os.PathLike]] data_path: Directory of path to the file to be analyzed. If None, then ``project_folder/outlier_corrected_movement_location`` directory.
 
     :example:
     >>> x = SpontaneousAlternationCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini', arm_names=['A', 'B', 'C'], center_name='Center', threshold=0.0, animal_area=100, buffer=2, detailed_data=True)
@@ -119,11 +121,7 @@ class SpontaneousAlternationCalculator(ConfigReader):
                 msg=f"{len(files_w_missing_rois)} file(s) at {data_path} are missing ROI definitions and will be skipped when performing spontaneous alternation calculations: {files_w_missing_rois}",
                 source=__class__.__name__,
             )
-        check_video_has_rois(
-            roi_dict=self.roi_dict,
-            video_names=self.files_w_rois,
-            roi_names=arm_names + [center_name],
-        )
+        check_video_has_rois(roi_dict=self.roi_dict, video_names=self.files_w_rois, roi_names=arm_names + [center_name],)
         self.file_paths = list(
             {file_paths[k] for k in self.files_w_rois if k in file_paths}
         )
@@ -148,9 +146,7 @@ class SpontaneousAlternationCalculator(ConfigReader):
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
             _, px_per_mm, fps = self.read_video_info(video_name=self.video_name)
 
-            self.data_df = read_df(file_path=file_path, file_type=self.file_type).head(
-                5000
-            )
+            self.data_df = read_df(file_path=file_path, file_type=self.file_type)
             bp_df = self.data_df[
                 [
                     x
@@ -197,9 +193,8 @@ class SpontaneousAlternationCalculator(ConfigReader):
                 frames_in_roi = np.zeros(pct_overlap.shape)
                 frames_in_roi[np.argwhere(pct_overlap >= self.animal_area)] = 1
                 self.roi_df[geo_name] = frames_in_roi
-            self.video_results = FeatureExtractionSupplemental.spontaneous_alternations(
-                data=self.roi_df, arm_names=self.arm_names, center_name=self.center_name
-            )
+
+            self.video_results = FeatureExtractionSupplemental.spontaneous_alternations(data=self.roi_df, arm_names=self.arm_names, center_name=self.center_name)
             self.results[self.video_name] = self.video_results
 
     def save(self):
@@ -267,17 +262,47 @@ class SpontaneousAlternationCalculator(ConfigReader):
                 msg=f"Detailed spontaneous alternation data for {len(list(self.results.keys()))} video(s) saved at {save_dir}"
             )
 
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser(description='SimBA Custom Feature Extractor')
+#     parser.add_argument('--config_path', type=str, help='SimBA project config path')
+#     parser.add_argument('--arm_names', nargs='+', help='List of ROI arm names')
+#     parser.add_argument('--center_name', type=str, help='Name of ROI center')
+#     parser.add_argument('--animal_area', type=int, default=80, help='Size of animal geometry required for scored entry/exit')
+#     parser.add_argument('--threshold', type=float, default=0.0, help='Body-part threshold')
+#     parser.add_argument('--buffer', type=int, default=2, help='Added buffer to animal geometry')
+#     parser.add_argument('--verbose', type=bool, default=False, help='If process print outs')
+#     parser.add_argument('--detailed_data', default=False, type=bool, help='If to create additional detailed data')
+#     parser.add_argument('--data_path', type=bool, default=None, help='Path to directory or file.')
+#     args = parser.parse_args()
+#     x = SpontaneousAlternationCalculator(config_path=args.config_path,
+#                                          arm_names=args.arm_names,
+#                                          center_name=args.center_name,
+#                                          threshold=args.threshold,
+#                                          animal_area=args.animal_area,
+#                                          buffer=args.buffer,
+#                                          verbose=args.verbose,
+#                                          detailed_data=args.detailed_data,
+#                                          data_path=args.data_path)
+#     x.run()
+#     x.save()
 
-# x = SpontaneousAlternationCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',
-#                                      arm_names=['A', 'B', 'C'],
-#                                      center_name='Center',
-#                                      threshold=0.0,
-#                                      animal_area=100,
-#                                      buffer=2,
-#                                      detailed_data=True)
+
+# config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini'
+# arm_names = ['A', 'B', 'C']
+# center_name = 'Center'
+# threshold = 0.0
+# animal_area = 60
+# buffer = 2
+# verbose = True
 #
+# x = SpontaneousAlternationCalculator(config_path=config_path,
+#                                      arm_names=arm_names,
+#                                      center_name=center_name,
+#                                      threshold=threshold,
+#                                      animal_area=animal_area,
+#                                      buffer=buffer,
+#                                      verbose=verbose)
 # x.run()
 # x.save()
 
-# spontaneous_alternations(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',
-#                          roi_names=['A', 'B', 'C'], body_part='Center')
+

@@ -369,6 +369,7 @@ class TextOptions(Enum):
 class Defaults(Enum):
     MAX_TASK_PER_CHILD = 10
     LARGE_MAX_TASK_PER_CHILD = 1000
+    MAXIMUM_MAX_TASK_PER_CHILD = 8000
     CHUNK_SIZE = 1
     SPLASH_TIME = 2500
     try:

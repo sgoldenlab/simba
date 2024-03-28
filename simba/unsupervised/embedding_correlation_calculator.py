@@ -30,7 +30,7 @@ class EmbeddingCorrelationCalculator(UnsupervisedMixin, ConfigReader):
     Class for correlating dimensionality reduction features with original features for explainability purposes.
 
     .. image:: _static/img/EmbeddingCorrelationCalculator.png
-       :width: 700
+       :width: 800
        :align: center
 
     :param str config_path: path to SimBA configparser.ConfigParser project_config.ini

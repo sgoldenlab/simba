@@ -6,6 +6,7 @@ from typing import Dict, Union
 import numpy as np
 import pandas as pd
 from scipy.stats import f_oneway
+from scipy.stats import kruskal
 from statsmodels.stats.libqsturng import psturng
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
@@ -39,11 +40,13 @@ SCALED = "scaled"
 PLOTS = "plots"
 CREATE = "create"
 SPEARMAN = "spearman"
+KRUSKAL_WALLIS = "kruskal_wallis"
 MEAN = "MEAN"
 STDEV = "STANDARD DEVIATION"
 PERMUTATION_IMPORTANCE = "permutation_importance"
 DESCRIPTIVE_STATISTICS = "descriptive_statistics"
 ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
+KRUSKAL_HEADERS = ["FEATURE NAME", "KRUSKAL-WALLIS H STATISTIC", "P-VALUE"]
 
 
 class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
@@ -125,6 +128,9 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
             self.__descriptive_stats()
         if self.settings[TUKEY]:
             self.__tukey_posthoc()
+        if self.settings[KRUSKAL_WALLIS]:
+            self.__kruskal_wallis()
+
         self.timer.stop_timer()
         stdout_success(
             msg=f"Cluster statistics complete. Data saved at {self.save_path}",
@@ -197,13 +203,9 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
         print("Calculating tukey posthocs...")
         timer = SimbaTimer(start=True)
         self.post_hoc_results = []
-        for feature_name in self.data[Unsupervised.METHODS.value][
-            Unsupervised.FEATURE_NAMES.value
-        ]:
+        for feature_name in self.data[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value]:
             data = pairwise_tukeyhsd(self.x_y_df[feature_name], self.x_y_df[CLUSTER])
-            df = pd.DataFrame(
-                data=data._results_table.data[1:], columns=data._results_table.data[0]
-            )
+            df = pd.DataFrame(data=data._results_table.data[1:], columns=data._results_table.data[0])
             df[P_VALUE] = psturng(
                 np.abs(data.meandiffs / data.std_pairs),
                 len(data.groupsunique),
@@ -220,7 +222,28 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
             elapsed_time=timer.elapsed_time_str,
         )
 
+    def __kruskal_wallis(self):
+        timer = SimbaTimer(start=True)
+        print("Calculating Kruskal-Wallis...")
+        results = pd.DataFrame(columns=KRUSKAL_HEADERS)
+        for feature_name in self.data[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value]:
+            feature_data = []
+            for i in self.x_y_df[CLUSTER].unique():
+                feature_data.append(list(self.x_y_df[feature_name][self.x_y_df[CLUSTER] == i].values))
+            statistic, p_val = kruskal(*feature_data)
+            results.loc[len(results)] = [feature_name, statistic, p_val]
+        results = results.reset_index(drop=True).set_index(FEATURE_NAME).sort_values('P-VALUE', ascending=True)
+        self.__save_results(df=results, name=KRUSKAL_WALLIS)
+        timer.stop_timer()
+        stdout_success(msg=f"Kruskal-Wallis statistics saved in {self.save_path}", elapsed_time=timer.elapsed_time_str,)
 
-# settings = {'scaled': True, 'anova': True, 'tukey_posthoc': True, 'descriptive_statistics': True}
+
+            #data = pairwise_tukeyhsd(self.x_y_df[feature_name], self.x_y_df[CLUSTER])
+
+# settings = {'scaled': True,
+#             'anova': False,
+#             'tukey_posthoc': False,
+#             'descriptive_statistics': False,
+#             'kruskal_wallis': True}
 # calculator = ClusterFrequentistCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini', data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle', settings=settings)
 # calculator.run()

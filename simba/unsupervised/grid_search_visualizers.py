@@ -26,7 +26,7 @@ class GridSearchVisualizer(UnsupervisedMixin):
     Visualize grid-searched latent spaces in .png format.
 
     .. image:: _static/img/GridSearchVisualizer.png
-       :width: 700
+       :width: 800
        :align: center
 
     :param model_dir: path to pickle holding unsupervised results in ``data_map.yaml`` format.

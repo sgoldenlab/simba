@@ -18,6 +18,7 @@ class ClusterFrequentistStatisticsPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="CLUSTER FREQUENTIST STATISTICS")
         ConfigReader.__init__(self, config_path=config_path)
         self.descriptive_stats_var = BooleanVar(value=True)
+        self.kruskal_wallis_var = BooleanVar(value=True)
         self.oneway_anova_var = BooleanVar(value=True)
         self.tukey_var = BooleanVar(value=True)
         self.use_scaled_var = BooleanVar(value=False)
@@ -65,11 +66,18 @@ class ClusterFrequentistStatisticsPopUp(PopUpMixin, ConfigReader):
             variable=self.use_scaled_var,
         )
 
+        self.kruskal_wallis_cb = Checkbutton(
+            self.stats_frm,
+            text="KRUSKAL-WALLIS",
+            variable=self.kruskal_wallis_var,
+        )
+
         self.stats_frm.grid(row=1, column=0, sticky=NW)
         self.descriptive_stats_cb.grid(row=0, column=0, sticky=NW)
         self.oneway_anova_cb.grid(row=1, column=0, sticky=NW)
-        self.feature_tukey_posthoc_cb.grid(row=2, column=0, sticky=NW)
-        self.use_scaled_cb.grid(row=3, column=0, sticky=NW)
+        self.kruskal_wallis_cb.grid(row=2, column=0, sticky=NW)
+        self.feature_tukey_posthoc_cb.grid(row=3, column=0, sticky=NW)
+        self.use_scaled_cb.grid(row=4, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -79,6 +87,7 @@ class ClusterFrequentistStatisticsPopUp(PopUpMixin, ConfigReader):
             "scaled": self.use_scaled_var.get(),
             "anova": self.oneway_anova_var.get(),
             "tukey_posthoc": self.tukey_var.get(),
+            "kruskal_wallis": self.kruskal_wallis_var.get(),
             "descriptive_statistics": self.descriptive_stats_var.get(),
         }
         calculator = ClusterFrequentistCalculator(
@@ -89,4 +98,4 @@ class ClusterFrequentistStatisticsPopUp(PopUpMixin, ConfigReader):
         calculator.run()
 
 
-# _ = ClusterFrequentistStatisticsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')
+#_ = ClusterFrequentistStatisticsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini')

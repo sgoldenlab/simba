@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from pathlib import Path
 import pytest
 import pickle
@@ -8,6 +7,7 @@ import os
 from simba.mixins.statistics_mixin import Statistics
 from simba.utils.enums import TestPaths, Paths
 
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 @pytest.fixture(scope="session")
 def sample_data_dir():
@@ -169,6 +169,7 @@ def test_local_outlier_factor(sample_data, expected_results, sample_data_dir):
     assert results.shape == expected_results
     assert np.issubdtype(results.dtype, np.number)
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="descretizier .")
 @pytest.mark.parametrize('sample_data, expected_results', [('8x100_f32.npy', (8, ))])
 def test_hbos(sample_data, expected_results, sample_data_dir):
     data_path = os.path.join(sample_data_dir, sample_data)

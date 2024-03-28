@@ -428,7 +428,6 @@ def get_video_meta_data(
     :example:
     >>> get_video_meta_data('test_data/video_tests/Video_1.avi')
     {'video_name': 'Video_1', 'fps': 30, 'width': 400, 'height': 600, 'frame_count': 300, 'resolution_str': '400 x 600', 'video_length_s': 10}
-
     """
 
     video_data = {}
@@ -442,9 +441,7 @@ def get_video_meta_data(
     video_data["frame_count"] = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     for k, v in video_data.items():
         if v == 0:
-            raise InvalidVideoFileError(
-                msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).',
-                source=get_video_meta_data.__name__,
+            raise InvalidVideoFileError(msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).',source=get_video_meta_data.__name__,
             )
     video_data["resolution_str"] = str(
         f'{video_data["width"]} x {video_data["height"]}'

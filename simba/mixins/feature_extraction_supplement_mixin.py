@@ -472,18 +472,8 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> spontanous_alternations = FeatureExtractionSupplemental.spontaneous_alternations(data=df, shape_names=['left', 'top', 'right', 'bottom'])
         """
 
-        def get_sliding_alternation(
-            data: np.ndarray,
-        ) -> Tuple[
-            Union[
-                Dict[int, List[int]], Dict[int, List[int]], Dict[Tuple[int], List[int]]
-            ]
-        ]:
-            stride, same_arm_return_cnt, alternate_arm_return_cnt = (
-                len(arm_names) - 1,
-                0,
-                0,
-            )
+        def get_sliding_alternation(data: np.ndarray) -> Tuple[Union[Dict[int, List[int]], Dict[int, List[int]], Dict[Tuple[int], List[int]]]]:
+            stride, same_arm_return_cnt, alternate_arm_return_cnt = (len(arm_names) - 1, 0, 0)
             alternation_cnt = 0
             alternations, same_arm_returns, alternate_arm_returns = {}, {}, {}
             for i in list(itertools.permutations(arm_names)):
@@ -571,6 +561,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             same_arm_return_cnt,
             alternation_cnt,
         ) = get_sliding_alternation(data=arm_entry_sequence)
+
         pct_alternation = alternation_cnt / (
             arm_entry_sequence.shape[0] - (len(arm_names) - 1)
         )

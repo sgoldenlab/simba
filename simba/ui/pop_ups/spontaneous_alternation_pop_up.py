@@ -5,12 +5,10 @@ import threading
 from tkinter import *
 from typing import Union
 
-from simba.data_processors.spontaneous_alternation_calculator import \
-    SpontaneousAlternationCalculator
+from simba.data_processors.spontaneous_alternation_calculator import SpontaneousAlternationCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.spontaneous_alternation_plotter import \
-    SpontaneousAlternationsPlotter
+from simba.plotting.spontaneous_alternation_plotter import SpontaneousAlternationsPlotter
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         FileSelect)
 from simba.utils.enums import Formats, Keys, Links, Options
@@ -115,37 +113,20 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
         self.buffer_dropdown.grid(row=2, column=0, sticky=NW)
         self.detailed_data_dropdown.grid(row=3, column=0, sticky=NW)
         self.verbose_dropdown.grid(row=4, column=0, sticky=NW)
-        self.create_run_frm(run_function=self.run_analysis, title="RUN ANALYSIS")
+        #self.create_run_frm(run_function=self.run_analysis, title="RUN ANALYSIS")
 
-        self.run_visualization_frm = LabelFrame(
-            self.main_frm,
-            text="RUN VISUALIZATION",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.video_run_btn = Button(
-            self.run_visualization_frm,
-            text="CREATE VIDEO",
-            fg="blue",
-            command=lambda: self.run_visualization(),
-        )
-        self.single_video_dropdown = DropDownMenu(
-            self.run_visualization_frm,
-            "Video:",
-            self.video_names,
-            "12",
-            com=lambda x: self.__update_single_video_file_path(filename=x),
-        )
-        self.select_video_file_select = FileSelect(
-            self.run_visualization_frm,
-            "",
-            lblwidth="1",
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-            dropdown=self.single_video_dropdown,
-        )
+        self.run_analysis_frm = LabelFrame(self.main_frm, text="RUN ANALYSIS", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
+        self.run_analysis_btn = Button(self.run_analysis_frm, text="RUN ANALYSIS", fg="blue", command=lambda: threading.Thread(target=self.run_analysis()).start())
+
+        self.run_analysis_frm.grid(row=5, column=0, sticky=NW)
+        self.run_analysis_btn.grid(row=0, column=0, sticky=NW)
+
+        self.run_visualization_frm = LabelFrame(self.main_frm, text="RUN VISUALIZATION", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
+        self.video_run_btn = Button(self.run_visualization_frm, text="CREATE VIDEO", fg="blue", command=lambda: self.run_visualization())
+        self.single_video_dropdown = DropDownMenu( self.run_visualization_frm,"Video:",self.video_names,"12",com=lambda x: self.__update_single_video_file_path(filename=x))
+        self.select_video_file_select = FileSelect(self.run_visualization_frm,"",lblwidth="1",file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],dropdown=self.single_video_dropdown)
         self.single_video_dropdown.setChoices(self.video_names[0])
         self.select_video_file_select.filePath.set(self.video_names[0])
-
         self.run_visualization_frm.grid(row=6, column=0, sticky=NW)
         self.video_run_btn.grid(row=0, column=0, sticky=NW)
         self.single_video_dropdown.grid(row=0, column=1, sticky=NW)
@@ -184,8 +165,6 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
             self.verbose = True
         else:
             self.verbose = False
-        if platform.system() == "Darwin":
-            multiprocessing.set_start_method("spawn", force=True)
 
     def run_analysis(self):
         self.__checks()
@@ -199,6 +178,8 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
             verbose=self.verbose,
             detailed_data=self.detailed_data,
         )
+        #calculator.run()
+
         threading.Thread(target=calculator.run()).start()
         calculator.save()
 
@@ -220,3 +201,7 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
             data_path=data_path,
         )
         plotter.run()
+
+
+#_ = SpontaneousAlternationPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini')
+
