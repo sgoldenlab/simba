@@ -4,6 +4,7 @@ import itertools
 import os
 from typing import List, Union, Optional
 import pandas as pd
+import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
@@ -55,10 +56,11 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         if not os.path.exists(plots_dir): os.makedirs(plots_dir)
         for video_name in self.results["VIDEO"].unique():
             video_df = self.results.loc[(self.results["VIDEO"] == video_name) & (self.results["MEASUREMENT"] == "Movement (cm)")]
-            video_df["Time bin #"] = video_df["Time bin #"].astype(int)
+            video_df["TIME BIN #"] = video_df["TIME BIN #"].astype(int)
             for body_part in video_df["BODY-PART"].unique():
-                body_part_df = (video_df[video_df["BODY-PART"] == body_part].reset_index(drop=True).sort_values(by=["Time bin #"]))
-                body_part_df[f"Time bin # (bin length {self.bin_length}s)"] = (body_part_df["Time bin #"])
+                body_part_df = (video_df[video_df["BODY-PART"] == body_part].reset_index(drop=True).sort_values(by=["TIME BIN #"]))
+                body_part_df[f"Time bin # (bin length {self.bin_length}s)"] = body_part_df["TIME BIN #"]
+                body_part_df['VALUE'] = body_part_df['VALUE'].astype(float)
                 _ = PlottingMixin.line_plot(df=body_part_df, x=f"Time bin # (bin length {self.bin_length}s)", y="VALUE", y_label='Distance (cm)', save_path=os.path.join(plots_dir, f"{video_name}_{body_part}.png"))
         timer.stop_timer()
         stdout_success(msg=f"Time bin movement plots saved in {plots_dir}",
@@ -82,41 +84,31 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                 raise FrameRangeError(msg=f'The specified time-bin length of {self.bin_length} is TOO SHORT for video {video_name} which has a specified FPS of {fps}. This results in time bins that are LESS THAN a single frame.', source=self.__class__.__name__)
             data_df = read_df(file_path, self.file_type, usecols=self.col_headers)
             data_df = self.create_shifted_df(df=data_df)
+            results = []
             for animal_data in self.bp_dict.values():
                 name, bps = list(animal_data.keys())[0], list(animal_data.values())[0]
                 bp_time_1, bp_time_2 = (data_df[bps].values, data_df[[f"{bps[0]}_shifted", f"{bps[1]}_shifted"]].values)
                 movement_data = pd.DataFrame(self.framewise_euclidean_distance(location_1=bp_time_1, location_2=bp_time_2, px_per_mm=px_per_mm, centimeter=True,), columns=["VALUE"])
-                results_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
-                indexed_df = []
-                for bin, results in enumerate(results_df_lists):
-                    time_bin_per_s = [results[i : i + fps] for i in range(0, results.shape[0], fps)]
-                    for second, df in enumerate(time_bin_per_s):
-                        df["Time bin #"] = bin
-                        df["Second"] = second
-                        indexed_df.append(df)
-                indexed_df = pd.concat(indexed_df, axis=0)
-                velocity_df = (indexed_df.groupby(["Time bin #", "Second"])["VALUE"].sum().reset_index())
-                velocity_df = (velocity_df.groupby(["Time bin #"])["VALUE"].mean().reset_index())
-                velocity_df["ANIMAL"] = list(animal_data.keys())[0]
-                velocity_df["BODY-PART"] = bps[0][:-2]
-                velocity_df["MEASUREMENT"] = "Velocity (cm/s)"
-                movement_df = (indexed_df.groupby(["Time bin #"])["VALUE"].sum().reset_index())
-                movement_df["ANIMAL"] = list(animal_data.keys())[0]
-                movement_df["BODY-PART"] = bps[0][:-2]
-                movement_df["MEASUREMENT"] = "Movement (cm)"
-                results = pd.concat([movement_df, velocity_df], axis=0)
-                results["VIDEO"] = video_name
-                out_df_lst.append(results)
+                movement_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
+                for bin, movement_df in enumerate(movement_df_lists):
+                    time_bin_sliced = [movement_df[i : i + fps] for i in range(0, movement_df.shape[0], fps)]
+                    bin_velocities = []
+                    for slice, df in enumerate(time_bin_sliced):
+                        bin_velocities.append(df['VALUE'].sum() * (1 / (len(df) / fps)))
+                    results.append({"VIDEO": video_name, 'TIME BIN #': bin, 'ANIMAL': name, "BODY-PART": bps[0][:-2], "MEASUREMENT": "Movement (cm)", 'VALUE': round(movement_df.sum(), 4)[0]})
+                    results.append({"VIDEO": video_name, 'TIME BIN #': bin, 'ANIMAL': name, "BODY-PART": bps[0][:-2], "MEASUREMENT": "Velocity (cm/s)", 'VALUE': round(np.mean(bin_velocities), 4)})
+            results = pd.DataFrame(results).reset_index(drop=True)
+            out_df_lst.append(results)
             video_timer.stop_timer()
             print(f"Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
-        self.results = pd.concat(out_df_lst, axis=0).sort_values(by=["VIDEO", "Time bin #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "Time bin #", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]
+        self.results = pd.concat(out_df_lst, axis=0).sort_values(by=["VIDEO", "TIME BIN #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "TIME BIN #", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]
         self.results.set_index('VIDEO').to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(msg=f"Movement time-bins results saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__,)
         if self.plots: self.__create_plots()
 
 # test = TimeBinsMovementCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                                   bin_length=0.04,
+#                                   bin_length=0.1,
 #                                   plots=True,
-#                                   body_parts=['Nose_1', 'Nose_2'])
+#                                   body_parts=['Nose_1'])
 # test.run()
