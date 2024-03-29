@@ -5,8 +5,7 @@ from typing import Dict, Union
 
 import numpy as np
 import pandas as pd
-from scipy.stats import f_oneway
-from scipy.stats import kruskal
+from scipy.stats import f_oneway, kruskal
 from statsmodels.stats.libqsturng import psturng
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
@@ -203,9 +202,13 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
         print("Calculating tukey posthocs...")
         timer = SimbaTimer(start=True)
         self.post_hoc_results = []
-        for feature_name in self.data[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value]:
+        for feature_name in self.data[Unsupervised.METHODS.value][
+            Unsupervised.FEATURE_NAMES.value
+        ]:
             data = pairwise_tukeyhsd(self.x_y_df[feature_name], self.x_y_df[CLUSTER])
-            df = pd.DataFrame(data=data._results_table.data[1:], columns=data._results_table.data[0])
+            df = pd.DataFrame(
+                data=data._results_table.data[1:], columns=data._results_table.data[0]
+            )
             df[P_VALUE] = psturng(
                 np.abs(data.meandiffs / data.std_pairs),
                 len(data.groupsunique),
@@ -226,19 +229,30 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
         timer = SimbaTimer(start=True)
         print("Calculating Kruskal-Wallis...")
         results = pd.DataFrame(columns=KRUSKAL_HEADERS)
-        for feature_name in self.data[Unsupervised.METHODS.value][Unsupervised.FEATURE_NAMES.value]:
+        for feature_name in self.data[Unsupervised.METHODS.value][
+            Unsupervised.FEATURE_NAMES.value
+        ]:
             feature_data = []
             for i in self.x_y_df[CLUSTER].unique():
-                feature_data.append(list(self.x_y_df[feature_name][self.x_y_df[CLUSTER] == i].values))
+                feature_data.append(
+                    list(self.x_y_df[feature_name][self.x_y_df[CLUSTER] == i].values)
+                )
             statistic, p_val = kruskal(*feature_data)
             results.loc[len(results)] = [feature_name, statistic, p_val]
-        results = results.reset_index(drop=True).set_index(FEATURE_NAME).sort_values('P-VALUE', ascending=True)
+        results = (
+            results.reset_index(drop=True)
+            .set_index(FEATURE_NAME)
+            .sort_values("P-VALUE", ascending=True)
+        )
         self.__save_results(df=results, name=KRUSKAL_WALLIS)
         timer.stop_timer()
-        stdout_success(msg=f"Kruskal-Wallis statistics saved in {self.save_path}", elapsed_time=timer.elapsed_time_str,)
+        stdout_success(
+            msg=f"Kruskal-Wallis statistics saved in {self.save_path}",
+            elapsed_time=timer.elapsed_time_str,
+        )
 
+        # data = pairwise_tukeyhsd(self.x_y_df[feature_name], self.x_y_df[CLUSTER])
 
-            #data = pairwise_tukeyhsd(self.x_y_df[feature_name], self.x_y_df[CLUSTER])
 
 # settings = {'scaled': True,
 #             'anova': False,

@@ -1,15 +1,19 @@
+import argparse
 import os
 import warnings
 from typing import List, Optional, Union
-import argparse
 
 import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
 
+import multiprocessing
+import platform
+
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import \
+    FeatureExtractionSupplemental
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int, check_str,
@@ -20,8 +24,6 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import (get_file_name_info_in_directory,
                                     get_fn_ext, read_df)
 from simba.utils.warnings import NoFileFoundWarning
-import platform
-import multiprocessing
 
 TAIL_END = "tail_end"
 
@@ -121,7 +123,11 @@ class SpontaneousAlternationCalculator(ConfigReader):
                 msg=f"{len(files_w_missing_rois)} file(s) at {data_path} are missing ROI definitions and will be skipped when performing spontaneous alternation calculations: {files_w_missing_rois}",
                 source=__class__.__name__,
             )
-        check_video_has_rois(roi_dict=self.roi_dict, video_names=self.files_w_rois, roi_names=arm_names + [center_name],)
+        check_video_has_rois(
+            roi_dict=self.roi_dict,
+            video_names=self.files_w_rois,
+            roi_names=arm_names + [center_name],
+        )
         self.file_paths = list(
             {file_paths[k] for k in self.files_w_rois if k in file_paths}
         )
@@ -194,7 +200,9 @@ class SpontaneousAlternationCalculator(ConfigReader):
                 frames_in_roi[np.argwhere(pct_overlap >= self.animal_area)] = 1
                 self.roi_df[geo_name] = frames_in_roi
 
-            self.video_results = FeatureExtractionSupplemental.spontaneous_alternations(data=self.roi_df, arm_names=self.arm_names, center_name=self.center_name)
+            self.video_results = FeatureExtractionSupplemental.spontaneous_alternations(
+                data=self.roi_df, arm_names=self.arm_names, center_name=self.center_name
+            )
             self.results[self.video_name] = self.video_results
 
     def save(self):
@@ -262,6 +270,7 @@ class SpontaneousAlternationCalculator(ConfigReader):
                 msg=f"Detailed spontaneous alternation data for {len(list(self.results.keys()))} video(s) saved at {save_dir}"
             )
 
+
 # if __name__ == "__main__":
 #     parser = argparse.ArgumentParser(description='SimBA Custom Feature Extractor')
 #     parser.add_argument('--config_path', type=str, help='SimBA project config path')
@@ -304,5 +313,3 @@ class SpontaneousAlternationCalculator(ConfigReader):
 #                                      verbose=verbose)
 # x.run()
 # x.save()
-
-

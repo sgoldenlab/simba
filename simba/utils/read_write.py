@@ -441,7 +441,9 @@ def get_video_meta_data(
     video_data["frame_count"] = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     for k, v in video_data.items():
         if v == 0:
-            raise InvalidVideoFileError(msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).',source=get_video_meta_data.__name__,
+            raise InvalidVideoFileError(
+                msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).',
+                source=get_video_meta_data.__name__,
             )
     video_data["resolution_str"] = str(
         f'{video_data["width"]} x {video_data["height"]}'
