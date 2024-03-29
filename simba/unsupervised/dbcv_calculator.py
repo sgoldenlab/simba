@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os.path
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -49,7 +49,9 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     >>> results = dbcv_calculator.run()
     """
 
-    def __init__(self, config_path: Union[str, os.PathLike], data_path: Union[str, os.PathLike]):
+    def __init__(
+        self, config_path: Union[str, os.PathLike], data_path: Union[str, os.PathLike]
+    ):
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
@@ -76,21 +78,50 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
             model_timer = SimbaTimer(start=True)
             v = read_pickle(data_path=file_path)
             self.results[file_cnt], dbcv_results, warning = {}, "nan", False
-            self.results[file_cnt][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]
-            self.results[file_cnt][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]
-            print(f"Performing DBCV for cluster model {self.results[file_cnt][CLUSTERER_NAME]}...")
-            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
+            self.results[file_cnt][CLUSTERER_NAME] = v[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.HASHED_NAME.value
+            ]
+            self.results[file_cnt][EMBEDDER_NAME] = v[Unsupervised.DR_MODEL.value][
+                Unsupervised.HASHED_NAME.value
+            ]
+            print(
+                f"Performing DBCV for cluster model {self.results[file_cnt][CLUSTERER_NAME]}..."
+            )
+            cluster_lbls = v[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.MODEL.value
+            ].labels_
             x = v[Unsupervised.DR_MODEL.value][Unsupervised.MODEL.value].embedding_
-            self.results[file_cnt] = {**self.results[file_cnt], **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value],**v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value]}
-            cluster_cnt = get_unique_values_in_iterable(data=cluster_lbls, name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min=1)
+            self.results[file_cnt] = {
+                **self.results[file_cnt],
+                **v[Clustering.CLUSTER_MODEL.value][Unsupervised.PARAMETERS.value],
+                **v[Unsupervised.DR_MODEL.value][Unsupervised.PARAMETERS.value],
+            }
+            cluster_cnt = get_unique_values_in_iterable(
+                data=cluster_lbls,
+                name=v[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value],
+                min=1,
+            )
             if cluster_cnt > 1:
-                dbcv_results, warning = self.DBCV(x.astype(np.float32), cluster_lbls.astype(np.int64))
-            self.results[file_cnt] = {**self.results[file_cnt], **{DBCV: dbcv_results}, **{CLUSTER_COUNT: cluster_cnt}, **{'WARNING (POTENTIALLY INACCURATE)': str(warning)}}
+                dbcv_results, warning = self.DBCV(
+                    x.astype(np.float32), cluster_lbls.astype(np.int64)
+                )
+            self.results[file_cnt] = {
+                **self.results[file_cnt],
+                **{DBCV: dbcv_results},
+                **{CLUSTER_COUNT: cluster_cnt},
+                **{"WARNING (POTENTIALLY INACCURATE)": str(warning)},
+            }
             model_timer.stop_timer()
-            stdout_success(msg=f"DBCV complete for model {self.results[file_cnt][CLUSTERER_NAME]} ...", elapsed_time=model_timer.elapsed_time_str)
+            stdout_success(
+                msg=f"DBCV complete for model {self.results[file_cnt][CLUSTERER_NAME]} ...",
+                elapsed_time=model_timer.elapsed_time_str,
+            )
         self.__save_results()
         self.timer.stop_timer()
-        stdout_success(msg=f"ALL DBCV calculations complete and saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(
+            msg=f"ALL DBCV calculations complete and saved in {self.save_path}",
+            elapsed_time=self.timer.elapsed_time_str,
+        )
 
     def __save_results(self):
         for k, v in self.results.items():
@@ -144,7 +175,9 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 
     @staticmethod
     @jit(nopython=True, fastmath=True)
-    def calculate_dists(X: np.ndarray, arrays_by_cluster: types.List) -> Tuple[np.ndarray, bool]:
+    def calculate_dists(
+        X: np.ndarray, arrays_by_cluster: types.List
+    ) -> Tuple[np.ndarray, bool]:
         """
         :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)
         :param numba.types.ListType[list[np.ndarray]] arrays_by_cluster: Numba typed List of list with 2d arrays.
@@ -171,7 +204,8 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
                 indices = np.where(Ci != 0)
                 Ci = Ci[indices]
                 numerator = ((1 / Ci) ** A.shape[1]).sum()
-                if A.shape[0] < 2: warning_flag = True
+                if A.shape[0] < 2:
+                    warning_flag = True
                 denominator_axis_0 = np.max(np.array([2, A.shape[0]]))
 
                 core_dist_i = (numerator / (denominator_axis_0 - 1)) ** (

@@ -2,7 +2,8 @@ __author__ = "Simon Nilsson"
 
 import itertools
 import os
-from typing import Union, Optional
+from typing import Optional, Union
+
 import cv2
 import numpy as np
 import pandas as pd
@@ -10,17 +11,15 @@ import pandas as pd
 import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_instance,
-                                check_str,
-                                check_that_column_exist,
-                                check_if_dir_exists,
-                                check_int,
-                                check_if_df_field_is_boolean)
+                                check_if_df_field_is_boolean,
+                                check_if_dir_exists, check_instance, check_int,
+                                check_str, check_that_column_exist)
 from simba.utils.enums import Paths
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import ShapWarning
 
 SIMBA_DIR = os.path.dirname(simba.__file__)
+
 
 class ShapAggregateStatisticsVisualizer(ConfigReader):
     """
@@ -46,32 +45,63 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
     >>> _ = ShapAggregateStatisticsVisualizer(config_path='SimBAConfigFilePath', classifier_name='Attack', shap_df='tests/test_data/test_shap/data/test_shap.csv', shap_baseline_value=4, save_path='SaveDirectory')
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 shap_df: pd.DataFrame,
-                 classifier_name: str,
-                 shap_baseline_value: int,
-                 visualization: Optional[bool] = True,
-                 save_path: Optional[Union[str, os.PathLike]] = None):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        shap_df: pd.DataFrame,
+        classifier_name: str,
+        shap_baseline_value: int,
+        visualization: Optional[bool] = True,
+        save_path: Optional[Union[str, os.PathLike]] = None,
+    ):
 
         check_file_exist_and_readable(file_path=config_path)
-        check_instance(source=f'{self.__class__.__name__} shap_df', instance=shap_df, accepted_types=(pd.DataFrame,))
-        check_str(name=f'{self.__class__.__name__} classifier_name', value=classifier_name)
-        check_that_column_exist(df=shap_df, column_name=classifier_name, file_name='shap dataframe')
+        check_instance(
+            source=f"{self.__class__.__name__} shap_df",
+            instance=shap_df,
+            accepted_types=(pd.DataFrame,),
+        )
+        check_str(
+            name=f"{self.__class__.__name__} classifier_name", value=classifier_name
+        )
+        check_that_column_exist(
+            df=shap_df, column_name=classifier_name, file_name="shap dataframe"
+        )
         check_if_df_field_is_boolean(df=shap_df, field=classifier_name)
-        check_int(name=f'{self.__class__.__name__} shap_baseline_value', value=shap_baseline_value, max_value=100, min_value=0)
+        check_int(
+            name=f"{self.__class__.__name__} shap_baseline_value",
+            value=shap_baseline_value,
+            max_value=100,
+            min_value=0,
+        )
 
         ConfigReader.__init__(self, config_path=config_path)
         if (self.pose_setting != "14") and (self.pose_setting != "16"):
-            ShapWarning("SHAP visualizations/aggregate stats skipped (only viable for projects with two animals and default 7 or 8 body-parts per animal) ...")
+            ShapWarning(
+                "SHAP visualizations/aggregate stats skipped (only viable for projects with two animals and default 7 or 8 body-parts per animal) ..."
+            )
         else:
-            self.classifier_name, self.shap_df, self.shap_baseline_value = (classifier_name, shap_df, shap_baseline_value)
-            if not os.path.exists(self.shap_logs_path): os.makedirs(self.shap_logs_path)
-            self.img_save_path = os.path.join(self.shap_logs_path, f"SHAP_summary_line_graph_{self.classifier_name}_{self.datetime}.png")
-            feature_categories_csv_path = os.path.join(SIMBA_DIR, Paths.SIMBA_SHAP_CATEGORIES_PATH.value)
+            self.classifier_name, self.shap_df, self.shap_baseline_value = (
+                classifier_name,
+                shap_df,
+                shap_baseline_value,
+            )
+            if not os.path.exists(self.shap_logs_path):
+                os.makedirs(self.shap_logs_path)
+            self.img_save_path = os.path.join(
+                self.shap_logs_path,
+                f"SHAP_summary_line_graph_{self.classifier_name}_{self.datetime}.png",
+            )
+            feature_categories_csv_path = os.path.join(
+                SIMBA_DIR, Paths.SIMBA_SHAP_CATEGORIES_PATH.value
+            )
             check_file_exist_and_readable(file_path=feature_categories_csv_path)
-            self.feature_categories_df = pd.read_csv(feature_categories_csv_path, header=[0, 1])
-            self.unique_feature_category_names, self.unique_time_bin_names = set(list(self.feature_categories_df.columns.levels[0])), set(list(self.feature_categories_df.columns.levels[1]))
+            self.feature_categories_df = pd.read_csv(
+                feature_categories_csv_path, header=[0, 1]
+            )
+            self.unique_feature_category_names, self.unique_time_bin_names = set(
+                list(self.feature_categories_df.columns.levels[0])
+            ), set(list(self.feature_categories_df.columns.levels[1]))
             self.__run()
             if visualization:
                 self.__create_base_shap_img()
@@ -96,19 +126,39 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
         self.agg_stats_timer = SimbaTimer(start=True)
         for clf_state, clf_state_name in zip(range(2), ["ABSENT", "PRESENT"]):
             self.results = {}
-            self.df_save_path = os.path.join(self.shap_logs_path, f"SHAP_summary_{self.classifier_name}_{clf_state_name}_{self.datetime}.csv")
-            shap_clf_sliced = self.shap_df[self.shap_df[self.classifier_name] == clf_state]
+            self.df_save_path = os.path.join(
+                self.shap_logs_path,
+                f"SHAP_summary_{self.classifier_name}_{clf_state_name}_{self.datetime}.csv",
+            )
+            shap_clf_sliced = self.shap_df[
+                self.shap_df[self.classifier_name] == clf_state
+            ]
             print(shap_clf_sliced)
-            for feature_category, feature_time_bin in itertools.product(self.unique_feature_category_names, self.unique_time_bin_names):
+            for feature_category, feature_time_bin in itertools.product(
+                self.unique_feature_category_names, self.unique_time_bin_names
+            ):
                 if feature_category not in self.results.keys():
                     self.results[feature_category] = {}
-                feature_names_sliced = list(self.feature_categories_df.loc[:, (feature_category, feature_time_bin)])
-                feature_names_sliced = [x for x in feature_names_sliced if str(x) != "nan" and x in shap_clf_sliced]
-                self.results[feature_category][feature_time_bin] = round(shap_clf_sliced[feature_names_sliced].sum(axis=1).mean() * 100, 6)
+                feature_names_sliced = list(
+                    self.feature_categories_df.loc[
+                        :, (feature_category, feature_time_bin)
+                    ]
+                )
+                feature_names_sliced = [
+                    x
+                    for x in feature_names_sliced
+                    if str(x) != "nan" and x in shap_clf_sliced
+                ]
+                self.results[feature_category][feature_time_bin] = round(
+                    shap_clf_sliced[feature_names_sliced].sum(axis=1).mean() * 100, 6
+                )
             self.__save_aggregate_scores()
         self.agg_stats_timer.stop_timer()
         self.visualization_timer = SimbaTimer(start=True)
-        stdout_success(msg=f"Aggregate SHAP statistics saved in {self.shap_logs_path} directory",elapsed_time=self.agg_stats_timer.elapsed_time_str,)
+        stdout_success(
+            msg=f"Aggregate SHAP statistics saved in {self.shap_logs_path} directory",
+            elapsed_time=self.agg_stats_timer.elapsed_time_str,
+        )
 
     def __create_base_shap_img(self):
         """
@@ -116,10 +166,12 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
         """
         shap_img_path = os.path.join(SIMBA_DIR, Paths.SIMBA_SHAP_IMG_PATH.value)
         check_if_dir_exists(in_dir=shap_img_path)
-        self.scale_img_dict = {"baseline_scale": os.path.join(shap_img_path, "baseline_scale.jpg"),
-                               "small_arrow": os.path.join(shap_img_path, "down_arrow.jpg"),
-                               "side_scale": os.path.join(shap_img_path, "side_scale.jpg"),
-                               "color_bar": os.path.join(shap_img_path, "color_bar.jpg")}
+        self.scale_img_dict = {
+            "baseline_scale": os.path.join(shap_img_path, "baseline_scale.jpg"),
+            "small_arrow": os.path.join(shap_img_path, "down_arrow.jpg"),
+            "side_scale": os.path.join(shap_img_path, "side_scale.jpg"),
+            "color_bar": os.path.join(shap_img_path, "color_bar.jpg"),
+        }
         self.category_img_dict = {
             "Animal distances": {
                 "icon": os.path.join(shap_img_path, "animal_distances.jpg")
@@ -128,9 +180,7 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
                 "icon": os.path.join(shap_img_path, "intruder_movement.jpg")
             },
             "Resident+intruder movement": {
-                "icon": os.path.join(
-                    shap_img_path, "resident_intruder_movement.jpg"
-                )
+                "icon": os.path.join(shap_img_path, "resident_intruder_movement.jpg")
             },
             "Resident movement": {
                 "icon": os.path.join(shap_img_path, "resident_movement.jpg")
@@ -275,7 +325,13 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
         Private helper to insert the data (i.e., colored arrows, text etc.) into the aggregate shap value visualization
         and save the results.
         """
-        data_df = pd.read_csv(os.path.join(self.shap_logs_path, f"SHAP_summary_{self.classifier_name}_PRESENT_{self.datetime}.csv"), index_col=0)
+        data_df = pd.read_csv(
+            os.path.join(
+                self.shap_logs_path,
+                f"SHAP_summary_{self.classifier_name}_PRESENT_{self.datetime}.csv",
+            ),
+            index_col=0,
+        )
         for feature_category in self.unique_feature_category_names:
             self.category_img_dict[feature_category]["value"] = int(
                 data_df.loc[feature_category, :].sum()
@@ -383,7 +439,10 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
         )
         cv2.imwrite(self.img_save_path, self.img)
         self.visualization_timer.stop_timer()
-        stdout_success(msg=f"SHAP summary graph saved at {self.img_save_path}", elapsed_time=self.visualization_timer.elapsed_time_str)
+        stdout_success(
+            msg=f"SHAP summary graph saved at {self.img_save_path}",
+            elapsed_time=self.visualization_timer.elapsed_time_str,
+        )
 
 
 # shap_df = pd.read_csv('/Users/simon/Desktop/envs/simba_dev/tests/test_data/test_shap/data/test_shap.csv', index_col=0)
