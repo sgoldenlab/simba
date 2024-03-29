@@ -1,8 +1,9 @@
 __author__ = "Simon Nilsson"
 
-from typing import Optional, Tuple, Union
-from sklearn.neighbors import LocalOutlierFactor
 from itertools import permutations
+from typing import Optional, Tuple, Union
+
+from sklearn.neighbors import LocalOutlierFactor
 
 try:
     from typing import Literal
@@ -2842,13 +2843,26 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.dunn_index(x=x, y=y)
         """
 
-        check_valid_array(data=x, source=Statistics.dunn_index.__name__, accepted_ndims=(2,), accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
-        check_valid_array(data=y, source=Statistics.dunn_index.__name__, accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
-        distances = FeatureExtractionMixin.cdist(array_1=x.astype(np.float32), array_2=x.astype(np.float32))
+        check_valid_array(
+            data=x,
+            source=Statistics.dunn_index.__name__,
+            accepted_ndims=(2,),
+            accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.dunn_index.__name__,
+            accepted_ndims=(1,),
+            accepted_shapes=[(x.shape[0],)],
+            accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),
+        )
+        distances = FeatureExtractionMixin.cdist(
+            array_1=x.astype(np.float32), array_2=x.astype(np.float32)
+        )
         ks = np.sort(np.unique(y)).astype(np.int64)
         deltas = np.full((ks.shape[0], ks.shape[0]), np.inf)
         big_deltas = np.zeros([ks.shape[0], 1])
-        for (i, l) in list(permutations(ks, 2)):
+        for i, l in list(permutations(ks, 2)):
             values = distances[np.where((y == i))][:, np.where((y == l))]
             deltas[i, l] = np.min(values[np.nonzero(values)])
         for k in ks:
@@ -2877,8 +2891,19 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.davis_bouldin(x=x, y=y)
         """
 
-        check_valid_array(data=x, source=Statistics.davis_bouldin.__name__, accepted_ndims=(2,), accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
-        check_valid_array(data=y, source=Statistics.davis_bouldin.__name__, accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
+        check_valid_array(
+            data=x,
+            source=Statistics.davis_bouldin.__name__,
+            accepted_ndims=(2,),
+            accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.davis_bouldin.__name__,
+            accepted_ndims=(1,),
+            accepted_shapes=[(x.shape[0],)],
+            accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),
+        )
         n_labels = np.unique(y).shape[0]
         labels = np.unique(y)
         intra_dists = np.full((n_labels), 0.0)
@@ -2889,13 +2914,16 @@ class Statistics(FeatureExtractionMixin):
             for i in range(cluster_mean.shape[0]):
                 cluster_mean[i] = np.mean(cluster_k[:, i].flatten())
             centroids[k] = cluster_mean
-            intra_dists[k] = np.average(FeatureExtractionMixin.framewise_euclidean_distance(location_1=cluster_k,
-                                                                                            location_2=np.full(
-                                                                                                cluster_k.shape,
-                                                                                                cluster_mean),
-                                                                                            px_per_mm=1))
-        centroid_distances = FeatureExtractionMixin.cdist(array_1=centroids.astype(np.float32),
-                                                          array_2=centroids.astype(np.float32))
+            intra_dists[k] = np.average(
+                FeatureExtractionMixin.framewise_euclidean_distance(
+                    location_1=cluster_k,
+                    location_2=np.full(cluster_k.shape, cluster_mean),
+                    px_per_mm=1,
+                )
+            )
+        centroid_distances = FeatureExtractionMixin.cdist(
+            array_1=centroids.astype(np.float32), array_2=centroids.astype(np.float32)
+        )
         if np.allclose(intra_dists, 0) or np.allclose(centroid_distances, 0):
             return 0.0
         centroid_distances[centroid_distances == 0] = np.inf
@@ -2904,8 +2932,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:,:], int64[:])", cache=True)
-    def calinski_harabasz(x: np.ndarray,
-                          y: np.ndarray) -> float:
+    def calinski_harabasz(x: np.ndarray, y: np.ndarray) -> float:
         """
         Compute the Calinski-Harabasz score to evaluate clustering quality.
 
@@ -2942,9 +2969,6 @@ class Statistics(FeatureExtractionMixin):
             return 0.0
         else:
             return extra_dispersion * (x.shape[0] - n_labels) / denominator
-
-
-
 
 
 # sample_1 = np.random.random_integers(low=1, high=2, size=(10, 50)).astype(np.float64)

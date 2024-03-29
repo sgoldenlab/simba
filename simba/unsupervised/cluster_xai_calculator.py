@@ -7,17 +7,19 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
-from simba.plotting.shap_agg_stats_visualizer import ShapAggregateStatisticsVisualizer
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.plotting.shap_agg_stats_visualizer import \
+    ShapAggregateStatisticsVisualizer
 from simba.unsupervised.enums import Clustering, Unsupervised
-from simba.utils.checks import (check_file_exist_and_readable, check_if_keys_exist_in_dict, check_instance)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_keys_exist_in_dict, check_instance)
 from simba.utils.enums import Formats
+from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_unique_values_in_iterable, read_pickle
-from simba.utils.errors import InvalidInputError
 
 FEATURE_NAME = "FEATURE NAME"
 FEATURE_IMPORTANCE = "IMPORTANCE"
@@ -48,7 +50,6 @@ ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 
 
 class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
-
     """
     Class for building RF models on top of cluster assignments, and calculating latent space explainability metrics based on RF models.
 
@@ -62,27 +63,69 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
     >>> calculator.run()
     """
 
-    def __init__(self, data_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike], settings: Dict[str, Any]):
+    def __init__(
+        self,
+        data_path: Union[str, os.PathLike],
+        config_path: Union[str, os.PathLike],
+        settings: Dict[str, Any],
+    ):
         check_file_exist_and_readable(file_path=data_path)
         check_file_exist_and_readable(file_path=config_path)
-        check_instance(source=f"{self.__class__.__name__} settings", instance=settings, accepted_types=(dict,),)
+        check_instance(
+            source=f"{self.__class__.__name__} settings",
+            instance=settings,
+            accepted_types=(dict,),
+        )
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         self.settings, self.data_path = settings, data_path
         self.data = read_pickle(data_path=self.data_path)
-        check_if_keys_exist_in_dict(data=self.data, key=[Unsupervised.METHODS.value, Clustering.CLUSTER_MODEL.value], name=self.data_path,)
-        check_if_keys_exist_in_dict(data=self.settings, key=[GINI_IMPORTANCE, PERMUTATION_IMPORTANCE, SHAP], name=self.data_path)
-        self.save_path = os.path.join(self.logs_path, f"cluster_xai_statistics_{self.data[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.{Formats.XLXS.value}")
+        check_if_keys_exist_in_dict(
+            data=self.data,
+            key=[Unsupervised.METHODS.value, Clustering.CLUSTER_MODEL.value],
+            name=self.data_path,
+        )
+        check_if_keys_exist_in_dict(
+            data=self.settings,
+            key=[GINI_IMPORTANCE, PERMUTATION_IMPORTANCE, SHAP],
+            name=self.data_path,
+        )
+        self.save_path = os.path.join(
+            self.logs_path,
+            f"cluster_xai_statistics_{self.data[Unsupervised.DR_MODEL.value][Unsupervised.HASHED_NAME.value]}_{self.datetime}.{Formats.XLXS.value}",
+        )
 
     def run(self):
-        self.x_df = self.data[Unsupervised.METHODS.value][Unsupervised.SCALED_DATA.value]
-        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
-        self.x_y_df = pd.concat([self.x_df, pd.DataFrame(self.cluster_data, columns=[CLUSTER], index=self.x_df.index)], axis=1)
-        self.cluster_cnt = get_unique_values_in_iterable(data=self.cluster_data, name=self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value], min=2)
+        self.x_df = self.data[Unsupervised.METHODS.value][
+            Unsupervised.SCALED_DATA.value
+        ]
+        self.cluster_data = self.data[Clustering.CLUSTER_MODEL.value][
+            Unsupervised.MODEL.value
+        ].labels_
+        self.x_y_df = pd.concat(
+            [
+                self.x_df,
+                pd.DataFrame(
+                    self.cluster_data, columns=[CLUSTER], index=self.x_df.index
+                ),
+            ],
+            axis=1,
+        )
+        self.cluster_cnt = get_unique_values_in_iterable(
+            data=self.cluster_data,
+            name=self.data[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.HASHED_NAME.value
+            ],
+            min=2,
+        )
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
 
-        if (self.settings[GINI_IMPORTANCE] or self.settings[PERMUTATION_IMPORTANCE] or (self.settings[SHAP][METHOD] == PAIRED)):
+        if (
+            self.settings[GINI_IMPORTANCE]
+            or self.settings[PERMUTATION_IMPORTANCE]
+            or (self.settings[SHAP][METHOD] == PAIRED)
+        ):
             self.__train_paired_rf_models()
         if self.settings[GINI_IMPORTANCE]:
             self.__gini_importance()
@@ -102,18 +145,38 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
 
     def __train_paired_rf_models(self, n_estimators: Optional[int] = 100):
         print("Training RF ML model...")
-        clf = RandomForestClassifier(n_estimators=n_estimators, max_features="sqrt", n_jobs=-1, criterion="gini", min_samples_leaf=1, bootstrap=True, verbose=1,)
+        clf = RandomForestClassifier(
+            n_estimators=n_estimators,
+            max_features="sqrt",
+            n_jobs=-1,
+            criterion="gini",
+            min_samples_leaf=1,
+            bootstrap=True,
+            verbose=1,
+        )
         self.rf_data = {}
         for clf_cnt, cluster_id in enumerate(self.x_y_df[CLUSTER].unique()):
             print(f"Training model {clf_cnt+1}/{self.cluster_cnt} ...")
             self.rf_data[cluster_id] = {}
-            target_df = self.x_y_df[self.x_y_df[CLUSTER] == cluster_id].drop([CLUSTER], axis=1)
-            non_target_df = self.x_y_df[self.x_y_df[CLUSTER] != cluster_id].drop([CLUSTER], axis=1)
+            target_df = self.x_y_df[self.x_y_df[CLUSTER] == cluster_id].drop(
+                [CLUSTER], axis=1
+            )
+            non_target_df = self.x_y_df[self.x_y_df[CLUSTER] != cluster_id].drop(
+                [CLUSTER], axis=1
+            )
             target_df[TARGET] = 1
             non_target_df[TARGET] = 0
-            self.rf_data[cluster_id]["X"] = (pd.concat([target_df, non_target_df], axis=0).reset_index(drop=True).sample(frac=1))
+            self.rf_data[cluster_id]["X"] = (
+                pd.concat([target_df, non_target_df], axis=0)
+                .reset_index(drop=True)
+                .sample(frac=1)
+            )
             self.rf_data[cluster_id]["Y"] = self.rf_data[cluster_id]["X"].pop(TARGET)
-            clf = TrainModelMixin().clf_fit(clf=clf, x_df=self.rf_data[cluster_id]["X"], y_df=self.rf_data[cluster_id]["Y"])
+            clf = TrainModelMixin().clf_fit(
+                clf=clf,
+                x_df=self.rf_data[cluster_id]["X"],
+                y_df=self.rf_data[cluster_id]["Y"],
+            )
             self.rf_data[cluster_id][Unsupervised.MODEL.value] = deepcopy(clf)
 
     def __gini_importance(self):
@@ -176,53 +239,111 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         )
 
     def __train_all_against_one_rf_models(self, n_estimators: Optional[int] = 100):
-        """ Private helper to create random forest classifiers training observations in one cluster against all observations in other clusters"""
+        """Private helper to create random forest classifiers training observations in one cluster against all observations in other clusters"""
         all_against_one_rf_mdls = {}
         for cluster_id in sorted(self.x_y_df[CLUSTER].unique()):
-            clf = RandomForestClassifier(n_estimators=n_estimators, max_features="sqrt", n_jobs=-1, criterion="gini", min_samples_leaf=1, bootstrap=True, verbose=1)
-            cluster_df = self.x_y_df[self.x_y_df[CLUSTER] == cluster_id].drop([CLUSTER], axis=1)
-            noncluster_df = self.x_y_df[self.x_y_df[CLUSTER] != cluster_id].drop([CLUSTER], axis=1)
+            clf = RandomForestClassifier(
+                n_estimators=n_estimators,
+                max_features="sqrt",
+                n_jobs=-1,
+                criterion="gini",
+                min_samples_leaf=1,
+                bootstrap=True,
+                verbose=1,
+            )
+            cluster_df = self.x_y_df[self.x_y_df[CLUSTER] == cluster_id].drop(
+                [CLUSTER], axis=1
+            )
+            noncluster_df = self.x_y_df[self.x_y_df[CLUSTER] != cluster_id].drop(
+                [CLUSTER], axis=1
+            )
             cluster_df[TARGET] = 1
             noncluster_df[TARGET] = 0
             x = pd.concat([cluster_df, noncluster_df], axis=0)
             y = x.pop(TARGET)
-            all_against_one_rf_mdls[cluster_id] = TrainModelMixin().clf_fit(clf=clf, x_df=x, y_df=y)
+            all_against_one_rf_mdls[cluster_id] = TrainModelMixin().clf_fit(
+                clf=clf, x_df=x, y_df=y
+            )
         return all_against_one_rf_mdls
 
     def __shap_values(self):
         if self.settings[SHAP][METHOD] == PAIRED:
             print("Computing paired-clusters shap values ...")
             timer = SimbaTimer(start=True)
-            cluster_combinations = list(itertools.combinations(list(self.rf_data.keys()), 2))
+            cluster_combinations = list(
+                itertools.combinations(list(self.rf_data.keys()), 2)
+            )
             for cluster_one_id, cluster_two_id in cluster_combinations:
-                mdl_name = f"SHAP CLUSTER {str(cluster_one_id)} vs. {str(cluster_two_id)}"
+                mdl_name = (
+                    f"SHAP CLUSTER {str(cluster_one_id)} vs. {str(cluster_two_id)}"
+                )
                 print(f"Computing {mdl_name} values ...")
-                sample_n = min(self.settings[SHAP][SAMPLE], len(self.rf_data[cluster_one_id]["X"]), len(self.rf_data[cluster_two_id]["X"]))
-                cluster_one_sample = self.rf_data[cluster_one_id]["X"].sample(sample_n, replace=False)
-                cluster_two_sample = self.rf_data[cluster_two_id]["X"].sample(sample_n, replace=False)
-                cluster_one_sample[mdl_name] = 1; cluster_two_sample[mdl_name] = 0
-                x_df = pd.concat([cluster_one_sample, cluster_two_sample], axis=0).reset_index(drop=True)
+                sample_n = min(
+                    self.settings[SHAP][SAMPLE],
+                    len(self.rf_data[cluster_one_id]["X"]),
+                    len(self.rf_data[cluster_two_id]["X"]),
+                )
+                cluster_one_sample = self.rf_data[cluster_one_id]["X"].sample(
+                    sample_n, replace=False
+                )
+                cluster_two_sample = self.rf_data[cluster_two_id]["X"].sample(
+                    sample_n, replace=False
+                )
+                cluster_one_sample[mdl_name] = 1
+                cluster_two_sample[mdl_name] = 0
+                x_df = pd.concat(
+                    [cluster_one_sample, cluster_two_sample], axis=0
+                ).reset_index(drop=True)
                 y_df = x_df.pop(mdl_name)
-                shap_df, _, expected_value = TrainModelMixin().create_shap_log_mp(ini_file_path=self.config_path,
-                                                                                  rf_clf=self.rf_data[cluster_one_id]["MODEL"],
-                                                                                  x_df=x_df,
-                                                                                  y_df=y_df,
-                                                                                  x_names=list(x_df.columns),
-                                                                                  clf_name=mdl_name,
-                                                                                  cnt_present=sample_n,
-                                                                                  cnt_absent=sample_n)
-                _ = ShapAggregateStatisticsVisualizer(config_path=self.config_path, classifier_name=mdl_name, shap_df=shap_df, shap_baseline_value=expected_value, save_path=None)
+                shap_df, _, expected_value = TrainModelMixin().create_shap_log_mp(
+                    ini_file_path=self.config_path,
+                    rf_clf=self.rf_data[cluster_one_id]["MODEL"],
+                    x_df=x_df,
+                    y_df=y_df,
+                    x_names=list(x_df.columns),
+                    clf_name=mdl_name,
+                    cnt_present=sample_n,
+                    cnt_absent=sample_n,
+                )
+                _ = ShapAggregateStatisticsVisualizer(
+                    config_path=self.config_path,
+                    classifier_name=mdl_name,
+                    shap_df=shap_df,
+                    shap_baseline_value=expected_value,
+                    save_path=None,
+                )
                 cluster_one_shap = shap_df[shap_df[mdl_name] == 1]
                 cluster_two_shap = shap_df[shap_df[mdl_name] == 0]
-                mean_df_cluster_one, stdev_df_cluster_one = pd.DataFrame(cluster_one_shap.mean(), columns=["MEAN"]), pd.DataFrame(cluster_one_shap.std(), columns=["STDEV"])
-                mean_df_cluster_two, stdev_df_cluster_two = pd.DataFrame(cluster_two_shap.mean(), columns=["MEAN"]), pd.DataFrame(cluster_two_shap.std(), columns=["STDEV"])
-                mean_df_cluster_two['MEAN'] = mean_df_cluster_two['MEAN'] * -1
-                results_cluster_two = mean_df_cluster_two.join(stdev_df_cluster_two).sort_values(by="MEAN", ascending=False).drop([mdl_name, 'Expected_value', 'Sum', 'Prediction_probability'], axis=0)
-                results_cluster_one = mean_df_cluster_one.join(stdev_df_cluster_one).sort_values(by="MEAN", ascending=False).drop([mdl_name, 'Expected_value', 'Sum', 'Prediction_probability'], axis=0)
+                mean_df_cluster_one, stdev_df_cluster_one = pd.DataFrame(
+                    cluster_one_shap.mean(), columns=["MEAN"]
+                ), pd.DataFrame(cluster_one_shap.std(), columns=["STDEV"])
+                mean_df_cluster_two, stdev_df_cluster_two = pd.DataFrame(
+                    cluster_two_shap.mean(), columns=["MEAN"]
+                ), pd.DataFrame(cluster_two_shap.std(), columns=["STDEV"])
+                mean_df_cluster_two["MEAN"] = mean_df_cluster_two["MEAN"] * -1
+                results_cluster_two = (
+                    mean_df_cluster_two.join(stdev_df_cluster_two)
+                    .sort_values(by="MEAN", ascending=False)
+                    .drop(
+                        [mdl_name, "Expected_value", "Sum", "Prediction_probability"],
+                        axis=0,
+                    )
+                )
+                results_cluster_one = (
+                    mean_df_cluster_one.join(stdev_df_cluster_one)
+                    .sort_values(by="MEAN", ascending=False)
+                    .drop(
+                        [mdl_name, "Expected_value", "Sum", "Prediction_probability"],
+                        axis=0,
+                    )
+                )
                 self.__save_results(df=results_cluster_one, name=mdl_name)
                 self.__save_results(df=results_cluster_two, name=mdl_name)
             timer.stop_timer()
-            stdout_success(msg=f"Paired clusters SHAP values complete", elapsed_time=timer.elapsed_time_str)
+            stdout_success(
+                msg=f"Paired clusters SHAP values complete",
+                elapsed_time=timer.elapsed_time_str,
+            )
 
         elif self.settings[SHAP][METHOD] == ONE_AGAINST_ALL:
             timer = SimbaTimer(start=True)
@@ -231,31 +352,70 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             for cluster_id, cluster_mdl in mdls.items():
                 shap_mdl_name = f"SHAP CLUSTER {cluster_id} vs. ALL"
                 print(f"Computing SHAP for cluster {shap_mdl_name}...")
-                cluster_one_sample = self.x_y_df[self.x_y_df[CLUSTER] == cluster_id].drop(CLUSTER, axis=1)
-                cluster_two_sample = self.x_y_df[self.x_y_df[CLUSTER] != cluster_id].drop(CLUSTER, axis=1)
-                sample_n = min(self.settings[SHAP][SAMPLE], len(cluster_one_sample), len(cluster_one_sample))
+                cluster_one_sample = self.x_y_df[
+                    self.x_y_df[CLUSTER] == cluster_id
+                ].drop(CLUSTER, axis=1)
+                cluster_two_sample = self.x_y_df[
+                    self.x_y_df[CLUSTER] != cluster_id
+                ].drop(CLUSTER, axis=1)
+                sample_n = min(
+                    self.settings[SHAP][SAMPLE],
+                    len(cluster_one_sample),
+                    len(cluster_one_sample),
+                )
                 cluster_one_sample = cluster_one_sample.sample(sample_n, replace=False)
                 cluster_two_sample = cluster_two_sample.sample(sample_n, replace=False)
-                cluster_one_sample[shap_mdl_name] = 1; cluster_two_sample[shap_mdl_name] = 0
-                x_df = pd.concat([cluster_one_sample, cluster_two_sample], axis=0).reset_index(drop=True)
+                cluster_one_sample[shap_mdl_name] = 1
+                cluster_two_sample[shap_mdl_name] = 0
+                x_df = pd.concat(
+                    [cluster_one_sample, cluster_two_sample], axis=0
+                ).reset_index(drop=True)
                 y_df = x_df.pop(shap_mdl_name)
-                shap_df, _, expected_value = TrainModelMixin().create_shap_log_mp(ini_file_path=self.config_path,
-                                                                                       rf_clf=mdls[cluster_id],
-                                                                                       x_df=x_df,
-                                                                                       y_df=y_df,
-                                                                                       x_names=list(x_df.columns),
-                                                                                       clf_name=shap_mdl_name,
-                                                                                       cnt_present=sample_n,
-                                                                                       cnt_absent=sample_n)
-                _ = ShapAggregateStatisticsVisualizer(config_path=self.config_path, classifier_name=shap_mdl_name, shap_df=shap_df, shap_baseline_value=expected_value, save_path=None)
-                mean_df, stdev_df = pd.DataFrame(shap_df.mean(), columns=["MEAN"]), pd.DataFrame(shap_df.std(), columns=["STDEV"])
-                shap_df = mean_df.join(stdev_df).sort_values(by="MEAN", ascending=False).drop([shap_mdl_name, 'Expected_value', 'Sum', 'Prediction_probability'], axis=0)
+                shap_df, _, expected_value = TrainModelMixin().create_shap_log_mp(
+                    ini_file_path=self.config_path,
+                    rf_clf=mdls[cluster_id],
+                    x_df=x_df,
+                    y_df=y_df,
+                    x_names=list(x_df.columns),
+                    clf_name=shap_mdl_name,
+                    cnt_present=sample_n,
+                    cnt_absent=sample_n,
+                )
+                _ = ShapAggregateStatisticsVisualizer(
+                    config_path=self.config_path,
+                    classifier_name=shap_mdl_name,
+                    shap_df=shap_df,
+                    shap_baseline_value=expected_value,
+                    save_path=None,
+                )
+                mean_df, stdev_df = pd.DataFrame(
+                    shap_df.mean(), columns=["MEAN"]
+                ), pd.DataFrame(shap_df.std(), columns=["STDEV"])
+                shap_df = (
+                    mean_df.join(stdev_df)
+                    .sort_values(by="MEAN", ascending=False)
+                    .drop(
+                        [
+                            shap_mdl_name,
+                            "Expected_value",
+                            "Sum",
+                            "Prediction_probability",
+                        ],
+                        axis=0,
+                    )
+                )
                 self.__save_results(df=shap_df, name=shap_mdl_name)
                 timer.stop_timer()
-                stdout_success(msg=f"SHAP one-vs-all values complete",  elapsed_time=timer.elapsed_time_str)
+                stdout_success(
+                    msg=f"SHAP one-vs-all values complete",
+                    elapsed_time=timer.elapsed_time_str,
+                )
 
         else:
-            raise InvalidInputError(msg=f'Shap parameter {self.settings[SHAP][METHOD]} not recognized', source=self.__class__.__name__)
+            raise InvalidInputError(
+                msg=f"Shap parameter {self.settings[SHAP][METHOD]} not recognized",
+                source=self.__class__.__name__,
+            )
 
 
 # settings = {"gini_importance": False, "permutation_importance": False, "shap": {"method": PAIRED, "run": True, "sample": 10}}

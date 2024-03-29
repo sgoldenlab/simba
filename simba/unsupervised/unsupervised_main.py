@@ -14,11 +14,12 @@ from simba.unsupervised.dataset_creator import DatasetCreator
 from simba.unsupervised.enums import UMLOptions, Unsupervised
 from simba.unsupervised.pop_ups.cluster_frequentist_stats_popup import \
     ClusterFrequentistStatisticsPopUp
+from simba.unsupervised.pop_ups.cluster_validation_pop_up import \
+    ClusterValidatorPopUp
 from simba.unsupervised.pop_ups.cluster_videos_popup import \
     ClusterVisualizerPopUp
 from simba.unsupervised.pop_ups.cluster_xai_popup import ClusterXAIPopUp
 from simba.unsupervised.pop_ups.data_extractor_popup import DataExtractorPopUp
-from simba.unsupervised.pop_ups.cluster_validation_pop_up import ClusterValidatorPopUp
 from simba.unsupervised.pop_ups.embedding_correlations_popup import \
     EmbedderCorrelationsPopUp
 from simba.unsupervised.pop_ups.fit_cluster_popup import FitClusterModelsPopUp

@@ -1,11 +1,13 @@
 __author__ = "Simon Nilsson"
 
 from tkinter import *
-from simba.data_processors.timebins_movement_calculator import TimeBinsMovementCalculator
+
+from simba.data_processors.timebins_movement_calculator import \
+    TimeBinsMovementCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu)
-from simba.utils.checks import check_int, check_float
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.utils.checks import check_float, check_int
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 
 
@@ -16,7 +18,6 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
     :example:
     >>> _ =  MovementAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     """
-
 
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path)
@@ -69,15 +70,32 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.create_run_frm(run_function=self.run)
 
     def run(self):
-        check_float(name="Time bin", value=str(self.time_bin_entrybox.entry_get), min_value=10e-6)
-        self.config.set(ConfigKey.PROCESS_MOVEMENT_SETTINGS.value, ConfigKey.ROI_ANIMAL_CNT.value, str(self.animal_cnt_dropdown.getChoices()),)
+        check_float(
+            name="Time bin",
+            value=str(self.time_bin_entrybox.entry_get),
+            min_value=10e-6,
+        )
+        self.config.set(
+            ConfigKey.PROCESS_MOVEMENT_SETTINGS.value,
+            ConfigKey.ROI_ANIMAL_CNT.value,
+            str(self.animal_cnt_dropdown.getChoices()),
+        )
         body_parts = []
         for cnt, dropdown in self.body_parts_dropdowns.items():
-            self.config.set(ConfigKey.PROCESS_MOVEMENT_SETTINGS.value, f"animal_{cnt + 1}_bp", str(dropdown.getChoices()))
+            self.config.set(
+                ConfigKey.PROCESS_MOVEMENT_SETTINGS.value,
+                f"animal_{cnt + 1}_bp",
+                str(dropdown.getChoices()),
+            )
             body_parts.append(dropdown.getChoices())
         self.update_config()
-        time_bin_movement_analyzer = TimeBinsMovementCalculator(config_path=self.config_path, bin_length=float(self.time_bin_entrybox.entry_get), plots=self.plots_var.get(), body_parts=body_parts)
+        time_bin_movement_analyzer = TimeBinsMovementCalculator(
+            config_path=self.config_path,
+            bin_length=float(self.time_bin_entrybox.entry_get),
+            plots=self.plots_var.get(),
+            body_parts=body_parts,
+        )
         time_bin_movement_analyzer.run()
 
 
-#_ =  MovementAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# _ =  MovementAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
