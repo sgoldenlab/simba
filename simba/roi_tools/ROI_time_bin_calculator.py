@@ -6,11 +6,11 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
-from simba.utils.checks import check_float, check_int
+from simba.utils.checks import check_float
 from simba.utils.enums import DirNames
-from simba.utils.errors import ROICoordinatesNotFoundError
+from simba.utils.errors import ROICoordinatesNotFoundError, FrameRangeError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, write_df
+from simba.utils.read_write import get_fn_ext, read_df
 
 
 class ROITimebinCalculator(ConfigReader):
@@ -32,31 +32,19 @@ class ROITimebinCalculator(ConfigReader):
     def __init__(
         self,
         config_path: Union[str, os.PathLike],
-        bin_length: int,
+        bin_length: float,
         body_parts: List[str],
         threshold: float,
     ):
 
         ConfigReader.__init__(self, config_path=config_path)
-        if not os.path.isfile(self.roi_coordinates_path):
-            raise ROICoordinatesNotFoundError(
-                expected_file_path=self.roi_coordinates_path
-            )
-        check_float(name="bin_length", value=bin_length, min_value=1.0)
+        if not os.path.isfile(self.roi_coordinates_path): raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
+        check_float(name="bin_length", value=bin_length, min_value=10e-6)
         check_float(name="threshold", value=threshold, min_value=0.0, max_value=1.0)
         self.read_roi_data()
-        self.bin_length, self.body_parts, self.threshold = (
-            bin_length,
-            body_parts,
-            threshold,
-        )
-        self.save_path_time = os.path.join(
-            self.logs_path, f"ROI_time_bins_{bin_length}s_time_data_{self.datetime}.csv"
-        )
-        self.save_path_entries = os.path.join(
-            self.logs_path,
-            f"ROI_time_bins_{bin_length}s_entry_data_{self.datetime}.csv",
-        )
+        self.bin_length, self.body_parts, self.threshold = (bin_length, body_parts, threshold)
+        self.save_path_time = os.path.join(self.logs_path, f"ROI_time_bins_{bin_length}s_time_data_{self.datetime}.csv")
+        self.save_path_entries = os.path.join(self.logs_path, f"ROI_time_bins_{bin_length}s_entry_data_{self.datetime}.csv",)
         settings = {"threshold": threshold, "body_parts": {}}
         for i in body_parts:
             animal_name = self.find_animal_name_from_body_part_name(
@@ -84,6 +72,9 @@ class ROITimebinCalculator(ConfigReader):
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
             _, _, fps = self.read_video_info(video_name=self.video_name)
             frames_per_bin = int(fps * self.bin_length)
+            if frames_per_bin == 0:
+                raise FrameRangeError(msg=f'The specified time-bin length of {self.bin_length} is TOO SHORT for video {video_name} which has a specified FPS of {fps}. This results in time bins that are LESS THAN a single frame.', source=self.__class__.__name__)
+
             video_frms = list(
                 range(0, len(read_df(file_path=file_path, file_type=self.file_type)))
             )

@@ -276,9 +276,7 @@ class PopUpMixin(object):
         self.time_bin_frm = LabelFrame(
             self.main_frm, text="TIME BIN", font=Formats.LABELFRAME_HEADER_FORMAT.value
         )
-        self.time_bin_entrybox = Entry_Box(
-            self.time_bin_frm, "Time-bin size (s): ", "12", validation="numeric"
-        )
+        self.time_bin_entrybox = Entry_Box(self.time_bin_frm, "Time-bin size (s): ", "12")
         self.time_bin_entrybox.grid(row=0, column=0, sticky=NW)
         self.time_bin_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 

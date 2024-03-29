@@ -34,7 +34,7 @@ class DataExtractorPopUp(PopUpMixin, ConfigReader):
             if v.get(): selections.append(k)
         check_if_dir_exists(self.data_dir_select.folder_path)
         if len(selections) == 0:
-            raise CountError(msg='Select at least 1 checkbox', source=self.__class__.__name__)
+            raise CountError(msg='Select at least 1 data-type checkbox', source=self.__class__.__name__)
         check_if_dir_exists(self.data_dir_select.folder_path)
         _ = find_files_of_filetypes_in_directory(directory=self.data_dir_select.folder_path,
                                                  extensions=[f'.{Formats.PICKLE.value}'], raise_error=True)

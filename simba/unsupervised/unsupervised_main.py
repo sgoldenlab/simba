@@ -18,7 +18,7 @@ from simba.unsupervised.pop_ups.cluster_videos_popup import \
     ClusterVisualizerPopUp
 from simba.unsupervised.pop_ups.cluster_xai_popup import ClusterXAIPopUp
 from simba.unsupervised.pop_ups.data_extractor_popup import DataExtractorPopUp
-from simba.unsupervised.pop_ups.dbcv_popup import DBCVPopUp
+from simba.unsupervised.pop_ups.cluster_validation_pop_up import ClusterValidatorPopUp
 from simba.unsupervised.pop_ups.embedding_correlations_popup import \
     EmbedderCorrelationsPopUp
 from simba.unsupervised.pop_ups.fit_cluster_popup import FitClusterModelsPopUp
@@ -234,9 +234,9 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
         )
         self.dbcv_btn = Button(
             self.metrics_frm,
-            text="DENSITY-BASED CLUSTER VALIDATION",
+            text="CLUSTER VALIDATIONS",
             fg="blue",
-            command=lambda: DBCVPopUp(config_path=self.config_path),
+            command=lambda: ClusterValidatorPopUp(config_path=self.config_path),
         )
         self.extract_single_metrics_btn = Button(
             self.metrics_frm,

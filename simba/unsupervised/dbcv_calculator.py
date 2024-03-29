@@ -49,10 +49,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     >>> results = dbcv_calculator.run()
     """
 
-    def __init__(
-        self, config_path: Union[str, os.PathLike], data_path: Union[str, os.PathLike]
-    ):
-
+    def __init__(self, config_path: Union[str, os.PathLike], data_path: Union[str, os.PathLike]):
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
@@ -287,6 +284,6 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
 # test.run()
 
 #
-test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
-                      data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/error_mdl/ecstatic_darwin.pickle')
-test.run()
+# test = DBCVCalculator(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
+#                       data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/error_mdl/ecstatic_darwin.pickle')
+# test.run()

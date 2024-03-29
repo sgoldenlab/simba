@@ -886,10 +886,10 @@ class TrainModelMixin(object):
         print("Calculating SHAP values (SINGLE CORE)...")
         shap_timer = SimbaTimer(start=True)
         data_df = pd.concat([x_df, y_df], axis=1)
-        if save_file_no == None:
+        if (save_file_no == None) and (save_path is not None):
             self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{clf_name}.csv")
             self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{clf_name}.csv")
-        else:
+        elif (save_file_no is not None) and (save_path is not None):
             self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv")
             self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv")
 
@@ -929,7 +929,7 @@ class TrainModelMixin(object):
         if save_path is not None:
             _ = ShapAggregateStatisticsVisualizer(config_path=ini_file_path,classifier_name=clf_name,shap_df=out_df_shap,shap_baseline_value=int(expected_value * 100),save_path=save_path)
         else:
-            return (out_df_shap, out_df_raw)
+            return (out_df_shap, out_df_raw, int(expected_value * 100))
 
 
     def print_machine_model_information(self, model_dict: dict) -> None:
@@ -1850,8 +1850,7 @@ class TrainModelMixin(object):
                 raw_save_df.to_csv(self.out_df_raw_path)
                 _ = ShapAggregateStatisticsVisualizer(config_path=ini_file_path, classifier_name=clf_name, shap_df=shap_save_df, shap_baseline_value=int(expected_value * 100), save_path=save_path)
             else:
-                return (shap_save_df, raw_save_df)
-
+                return (shap_save_df, raw_save_df, int(expected_value * 100))
 
         except:
             ShapWarning(msg="Multiprocessing SHAP values failed. Revert to single core. This will negatively affect run-time. ",source=self.__class__.__name__,)

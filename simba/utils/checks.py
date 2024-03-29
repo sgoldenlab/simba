@@ -1143,3 +1143,17 @@ def check_video_has_rois(roi_dict: dict, video_names: List[str], roi_names: List
                 msg=f"{len(missing_rois)} ROI(s) are missing from {video_name}: {missing_rois}",
                 source=check_video_has_rois.__name__,
             )
+
+
+def check_if_df_field_is_boolean(df: pd.DataFrame, field: str, raise_error: Optional[bool] = True, bool_values: Optional[Tuple[Any]] = (0,1)):
+    """Helper to check if a dataframe field is a boolean value"""
+    check_instance(source=check_if_df_field_is_boolean.__name__, instance=df, accepted_types=(pd.DataFrame,))
+    check_str(name=f'{check_if_df_field_is_boolean.__name__} name', value=field)
+    check_that_column_exist(df=df, column_name=field, file_name=check_if_df_field_is_boolean.__name__)
+    additional = list((set(list(df[field])) - set(bool_values)))
+    if len(additional) > 0:
+        if raise_error:
+            raise CountError(msg=f'Field {field} not a boolean. Found values {additional}. Accepted: {bool_values}', source=check_if_df_field_is_boolean.__name__)
+        else:
+            return False
+    return True

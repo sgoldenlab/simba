@@ -1,8 +1,8 @@
 __author__ = "Simon Nilsson"
 
 from typing import Optional, Tuple, Union
-
 from sklearn.neighbors import LocalOutlierFactor
+from itertools import permutations
 
 try:
     from typing import Literal
@@ -2817,6 +2817,134 @@ class Statistics(FeatureExtractionMixin):
                 outliers = np.abs(w_data - median) > threshold
                 results[i - 1] = np.sum(outliers * 1)
         return results
+
+    @staticmethod
+    def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Calculate the Dunn index to evaluate the quality of clustered labels.
+
+        This function calculates the Dunn index, which is a measure of clustering quality.
+        The index considers the ratio of the minimum inter-cluster distance to the maximum
+        intra-cluster distance. A higher Dunn index indicates better clustering.
+
+        .. note::
+           Modified from `jqmviegas <https://github.com/jqmviegas/jqm_cvi/>`_
+           Wiki `https://en.wikipedia.org/wiki/Dunn_index <https://en.wikipedia.org/wiki/Dunn_index>`_
+           Uses Euclidean distances.
+
+        :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features).
+        :param np.ndarray y: 2D array representing cluster labels for each data point. Shape (n_samples,).
+        :return float: The Dunn index value
+
+        :example:
+        >>> x = np.random.randint(0, 100, (100, 2))
+        >>> y = np.random.randint(0, 3, (100,))
+        >>> Statistics.dunn_index(x=x, y=y)
+        """
+
+        check_valid_array(data=x, source=Statistics.dunn_index.__name__, accepted_ndims=(2,), accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
+        check_valid_array(data=y, source=Statistics.dunn_index.__name__, accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
+        distances = FeatureExtractionMixin.cdist(array_1=x.astype(np.float32), array_2=x.astype(np.float32))
+        ks = np.sort(np.unique(y)).astype(np.int64)
+        deltas = np.full((ks.shape[0], ks.shape[0]), np.inf)
+        big_deltas = np.zeros([ks.shape[0], 1])
+        for (i, l) in list(permutations(ks, 2)):
+            values = distances[np.where((y == i))][:, np.where((y == l))]
+            deltas[i, l] = np.min(values[np.nonzero(values)])
+        for k in ks:
+            values = distances[np.where((y == ks[k]))][:, np.where((y == ks[k]))]
+            big_deltas[k] = np.max(values)
+
+        return np.min(deltas) / np.max(big_deltas)
+
+    def davis_bouldin(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Calculate the Davis-Bouldin index for evaluating clustering performance.
+
+        Davis-Bouldin index measures the clustering quality based on the within-cluster
+        similarity and between-cluster dissimilarity. Lower values indicate better clustering.
+
+        .. note::
+           Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/f07e0138bfee41cd2c0a5d0251dc3fe03e6e1084/sklearn/metrics/cluster/_unsupervised.py#L390>`_
+
+        :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
+        :param np.ndarray y: 2D array representing cluster labels for each data point. Shape (n_samples,).
+        :return float: Davis-Bouldin score.
+
+        :example:
+        >>> x = np.random.randint(0, 100, (100, 2))
+        >>> y = np.random.randint(0, 3, (100,))
+        >>> Statistics.davis_bouldin(x=x, y=y)
+        """
+
+        check_valid_array(data=x, source=Statistics.davis_bouldin.__name__, accepted_ndims=(2,), accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
+        check_valid_array(data=y, source=Statistics.davis_bouldin.__name__, accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
+        n_labels = np.unique(y).shape[0]
+        labels = np.unique(y)
+        intra_dists = np.full((n_labels), 0.0)
+        centroids = np.full((n_labels, x.shape[1]), 0.0)
+        for k in range(n_labels):
+            cluster_k = x[np.argwhere(y == labels[k])].reshape(-1, 2)
+            cluster_mean = np.full((x.shape[1]), np.nan)
+            for i in range(cluster_mean.shape[0]):
+                cluster_mean[i] = np.mean(cluster_k[:, i].flatten())
+            centroids[k] = cluster_mean
+            intra_dists[k] = np.average(FeatureExtractionMixin.framewise_euclidean_distance(location_1=cluster_k,
+                                                                                            location_2=np.full(
+                                                                                                cluster_k.shape,
+                                                                                                cluster_mean),
+                                                                                            px_per_mm=1))
+        centroid_distances = FeatureExtractionMixin.cdist(array_1=centroids.astype(np.float32),
+                                                          array_2=centroids.astype(np.float32))
+        if np.allclose(intra_dists, 0) or np.allclose(centroid_distances, 0):
+            return 0.0
+        centroid_distances[centroid_distances == 0] = np.inf
+        combined_intra_dists = intra_dists[:, None] + intra_dists
+        return np.mean(np.max(combined_intra_dists / centroid_distances, axis=1))
+
+    @staticmethod
+    @njit("(float32[:,:], int64[:])", cache=True)
+    def calinski_harabasz(x: np.ndarray,
+                          y: np.ndarray) -> float:
+        """
+        Compute the Calinski-Harabasz score to evaluate clustering quality.
+
+        The Calinski-Harabasz score is a measure of cluster separation and compactness.
+        It is calculated as the ratio of the between-cluster dispersion to the
+        within-cluster dispersion. A higher score indicates better clustering.
+
+        :param x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
+        :param y: 2D array representing cluster labels for each data point. Shape (n_samples,).
+        :return float: Calinski-Harabasz score.
+
+        :example:
+        >>> x = np.random.random((100, 2)).astype(np.float32)
+        >>> y = np.random.randint(0, 100, (100,)).astype(np.int64)
+        >>> Statistics.calinski_harabasz(x=x, y=y)
+        """
+
+        n_labels = np.unique(y).shape[0]
+        labels = np.unique(y)
+        extra_dispersion, intra_dispersion = 0.0, 0.0
+        global_mean = np.full((x.shape[1]), np.nan)
+        for i in range(x.shape[1]):
+            global_mean[i] = np.mean(x[:, i].flatten())
+        for k in range(n_labels):
+            cluster_k = x[np.argwhere(y == labels[k]).flatten(), :]
+            mean_k = np.full((cluster_k.shape[1]), np.nan)
+            for i in range(cluster_k.shape[1]):
+                mean_k[i] = np.mean(cluster_k[:, i].flatten())
+            extra_dispersion += len(cluster_k) * np.sum((mean_k - global_mean) ** 2)
+            intra_dispersion += np.sum((cluster_k - mean_k) ** 2)
+
+        denominator = intra_dispersion * (n_labels - 1.0)
+        if denominator == 0.0:
+            return 0.0
+        else:
+            return extra_dispersion * (x.shape[0] - n_labels) / denominator
+
+
+
 
 
 # sample_1 = np.random.random_integers(low=1, high=2, size=(10, 50)).astype(np.float64)

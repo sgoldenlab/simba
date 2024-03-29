@@ -18,7 +18,6 @@ class ClusterXAIPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="CLUSTER XAI STATISTICS")
         ConfigReader.__init__(self, config_path=config_path)
-
         self.gini_importance_var = BooleanVar(value=True)
         self.permutation_importance_var = BooleanVar(value=True)
         self.shap_var = BooleanVar(value=False)
