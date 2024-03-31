@@ -9,6 +9,7 @@ import numpy as np
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_filepath_list_is_empty, check_int, check_float)
 from simba.utils.enums import TagNames
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
@@ -35,7 +36,11 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
     >>> calculator.run()
     """
 
-    def __init__(self, config_path: str, bin_length: Union[int, float], body_parts: List[str], plots: Optional[bool] = False):
+    def __init__(self, config_path: str,
+                 bin_length: Union[int, float],
+                 body_parts: List[str],
+                 plots: Optional[bool] = False):
+
         ConfigReader.__init__(self, config_path=config_path)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         self.bin_length, self.plots = bin_length, plots
@@ -69,8 +74,9 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         )
 
     def run(self):
-        video_dict, out_df_lst = {}, []
-        self.save_path = os.path.join(self.project_path, "logs", f"Time_bins_movement_results_{self.datetime}.csv")
+        video_dict, self.out_df_lst = {}, []
+        self.movement_dict = {}
+        self.save_path = os.path.join(self.project_path, "logs", f"Time_bins_{self.bin_length}s_movement_results_{self.datetime}.csv")
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.outlier_corrected_paths)
         for file_cnt, file_path in enumerate(self.outlier_corrected_paths):
             video_timer = SimbaTimer(start=True)
@@ -82,33 +88,37 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             bin_length_frames = int(fps * self.bin_length)
             if bin_length_frames == 0:
                 raise FrameRangeError(msg=f'The specified time-bin length of {self.bin_length} is TOO SHORT for video {video_name} which has a specified FPS of {fps}. This results in time bins that are LESS THAN a single frame.', source=self.__class__.__name__)
-            data_df = read_df(file_path, self.file_type, usecols=self.col_headers)
-            data_df = self.create_shifted_df(df=data_df)
+            self.data_df = read_df(file_path, self.file_type, usecols=self.col_headers)
+            self.data_df = self.create_shifted_df(df=self.data_df)
             results = []
             for animal_data in self.bp_dict.values():
                 name, bps = list(animal_data.keys())[0], list(animal_data.values())[0]
-                bp_time_1, bp_time_2 = (data_df[bps].values, data_df[[f"{bps[0]}_shifted", f"{bps[1]}_shifted"]].values)
+                bp_time_1, bp_time_2 = (self.data_df[bps].values, self.data_df[[f"{bps[0]}_shifted", f"{bps[1]}_shifted"]].values)
                 movement_data = pd.DataFrame(self.framewise_euclidean_distance(location_1=bp_time_1, location_2=bp_time_2, px_per_mm=px_per_mm, centimeter=True,), columns=["VALUE"])
+                self.movement_dict[video_name] = movement_data
                 movement_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
                 for bin, movement_df in enumerate(movement_df_lists):
-                    time_bin_sliced = [movement_df[i : i + fps] for i in range(0, movement_df.shape[0], fps)]
-                    bin_velocities = []
-                    for slice, df in enumerate(time_bin_sliced):
-                        bin_velocities.append(df['VALUE'].sum() * (1 / (len(df) / fps)))
-                    results.append({"VIDEO": video_name, 'TIME BIN #': bin, 'ANIMAL': name, "BODY-PART": bps[0][:-2], "MEASUREMENT": "Movement (cm)", 'VALUE': round(movement_df.sum(), 4)[0]})
-                    results.append({"VIDEO": video_name, 'TIME BIN #': bin, 'ANIMAL': name, "BODY-PART": bps[0][:-2], "MEASUREMENT": "Velocity (cm/s)", 'VALUE': round(np.mean(bin_velocities), 4)})
+                    movement, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=movement_df['VALUE'].values,
+                                                                                             fps=fps,
+                                                                                             pixels_per_mm=px_per_mm,
+                                                                                             centimeters=False)
+                    results.append({"VIDEO": video_name, 'TIME BIN #': bin, 'ANIMAL': name, "BODY-PART": bps[0][:-2], "MEASUREMENT": "Movement (cm)", 'VALUE': round(movement, 4)})
+                    results.append({"VIDEO": video_name, 'TIME BIN #': bin, 'ANIMAL': name, "BODY-PART": bps[0][:-2], "MEASUREMENT": "Velocity (cm/s)", 'VALUE': round(velocity, 4)})
             results = pd.DataFrame(results).reset_index(drop=True)
-            out_df_lst.append(results)
+            self.out_df_lst.append(results)
             video_timer.stop_timer()
             print(f"Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
-        self.results = pd.concat(out_df_lst, axis=0).sort_values(by=["VIDEO", "TIME BIN #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "TIME BIN #", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]
+
+    def save(self):
+        self.results = pd.concat(self.out_df_lst, axis=0).sort_values(by=["VIDEO", "TIME BIN #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "TIME BIN #", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]
         self.results.set_index('VIDEO').to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(msg=f"Movement time-bins results saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__,)
         if self.plots: self.__create_plots()
 
 # test = TimeBinsMovementCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                                   bin_length=0.1,
+#                                   bin_length=0.5,
 #                                   plots=True,
 #                                   body_parts=['Nose_1'])
 # test.run()
+# test.save()

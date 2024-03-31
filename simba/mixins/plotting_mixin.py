@@ -27,7 +27,7 @@ except:
 import simba
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_instance, check_str,
-                                check_that_column_exist, check_valid_array)
+                                check_that_column_exist, check_valid_array, check_valid_lst)
 from simba.utils.enums import Formats, Options, TextOptions
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
@@ -2197,6 +2197,8 @@ class PlottingMixin(object):
             value=y,
             options=tuple(df.columns),
         )
+
+        check_valid_lst(data=list(df[y]), source=f"{PlottingMixin.line_plot.__name__} y", valid_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float))
         sns.set_style("whitegrid", {"grid.linestyle": "--"})
         plot = sns.lineplot(data=df, x=x, y=y)
 

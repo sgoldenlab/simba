@@ -84,7 +84,7 @@ Likewise, if you'd like to delete all the shapes you have drawn for all of the v
 
 # Part 2. Analyzing ROI data.
 
-1. You can now generate CSV files containing descriptive statistics for the the number entries into each ROI shape, and the time spent within each ROI. SimBA allows you to generate these measures for one body-part per animal in your project. If you would like to get these measures for more than one body-part per animal in your project, then we suggest that you  run the analysis multiple times. 
+1. You can now generate CSV files containing descriptive statistics for the number entries into each ROI shape, and the time spent within each ROI. SimBA allows you to generate these measures for one body-part per animal in your project. If you would like to get these measures for more than one body-part per animal in your project, then we suggest that you  run the analysis multiple times. 
 
 2. To analyze your ROI data, first click on `ANALYZE ROI DATA: AGGREGATES` in the `Analyze ROI data` sub-menu frame. The following menu will pop open:
 
@@ -111,11 +111,20 @@ Once complete, a statement will be printed in the main SimBA terminal window not
 
 * A second file, named `ROI_time_data`, contain the time spent in seconds the different ROIs. It also contains the percent of the session time spent in each of the ROIs. For an expected output ROI time CSV file, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_data_example.csv).
 
-3. If you want to further calculate time-spent and the number of entries made into the user-defined ROIs within **user-specified time-bins**, go ahead and click on **Time bins: Analyze ROIs** located in the *Analyze ROI* sub-menu. Clicking on this button brings up this menu:
 
-![](https://github.com/sgoldenlab/simba/blob/master/images/Roi_time_3.png)
+### ANALYZING ROI DATA SPLIT BY TIME BINS
 
-Select (i) how many animals you want to calculate time-bin ROI data for, (ii) which body-parts you want to use to infer the location of the animals, (iii) and the size of each time bin in seconds. Once the information is filled in click on `Analyze`. You can follow the analyis progress in the SimBA main terminal window. Once the analysis is complete, the data will be saved in two date-time stamped CSV file the `project_folder/log` directory with names containing the size of the time-bins. The file names could be something like `ROI_time_bins_60s_entry_data_20210713164401.csv` and `ROI_time_bins_60s_entry_data_20210713162124.csv`, with one file containing the entry data and the other file containing the latency data. The file should contain 7 columns, and the top of the time file look similar to this:
+If you want to further calculate time-spent and the number of entries made into the user-defined ROIs within **user-specified time-bins**, 
+go ahead and click on **Time bins: Analyze ROIs** located in the *Analyze ROI* sub-menu. Clicking on this button brings up this menu:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROIAnalysisTimeBinsPopUp.png" />
+</p>
+
+Here, select (i) how many animals/body-parts you want to calculate time-bin ROI data for, (ii) which body-parts you want to use to infer the location of the animals, and (iii)  the size of each time bin in seconds. 
+If you also want to produce data for the average velocity and distances moved within each ROI within each time bin, tick the *Compute distances moved within ROIs in each time-bin*. For an example of anticipated output of the movement/velocity analysis split by ROI and time-bin, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/Time_bins_0.5s_movement_results_20240330143150.csv)) file.
+
+Once the information is filled in click the `Run` button. You can follow the progress in the SimBA main terminal window. Once the analysis is complete, the data will be saved date-time stamped CSV file the `project_folder/log` directory with names containing the size of the time-bins. The file names could be something like `ROI_time_bins_60s_entry_data_20210713164401.csv` and `ROI_time_bins_60s_entry_data_20210713162124.csv`, with one file containing the entry data and the other file containing the latency data. The file should contain 7 columns, and the top of the time file look similar to this:
 
 
 ![](https://github.com/sgoldenlab/simba/blob/master/images/roi_time_9.png)
