@@ -720,7 +720,8 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     @staticmethod
     def distance_and_velocity(x: np.array,
-                              fps: float, pixels_per_mm: float,
+                              fps: float,
+                              pixels_per_mm: float,
                               centimeters: Optional[bool] = True) -> Tuple[float, float]:
         """
         Calculate total movement and mean velocity from a sequence of position data.
@@ -730,6 +731,10 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param pixels_per_mm: Conversion factor from pixels to millimeters.
         :param Optional[bool] centimeters: If True, results are returned in centimeters. Defaults to True.
         :return Tuple[float, float]: A tuple containing total movement and mean velocity.
+
+        :example:
+        >>> x = np.random.randint(0, 100, (100, 2))
+        >>> sum_movement, avg_velocity = FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)
         """
 
         check_valid_array(data=x, source=FeatureExtractionSupplemental.distance_and_velocity.__name__, accepted_ndims=(1,),
@@ -744,5 +749,8 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         if centimeters:
             v = [vi / 10 for vi in v]
             movement = movement / 10
-
         return movement, np.mean(v)
+
+
+
+

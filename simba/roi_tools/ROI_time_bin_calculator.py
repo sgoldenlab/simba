@@ -17,8 +17,11 @@ from simba.utils.read_write import get_fn_ext, read_df
 
 class ROITimebinCalculator(ConfigReader):
     """
-    Calculate how much time and how many entries animals are making into user-defined ROIs
-    within user-defined time bins. Results are stored in the ``project_folder/logs`` directory of
+    Compute how much time and how many entries animals are making into user-defined ROIs
+    within user-defined time bins. Also compute the average velocity and distance moved within user-defined ROIs
+    split by time-bins.
+
+    Results are stored in the ``project_folder/logs`` directory of
     the SimBA project.
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
@@ -28,13 +31,14 @@ class ROITimebinCalculator(ConfigReader):
     :param Optional[bool] movement: If True, compute the distances and velocities within time-bins. Default False.
 
     .. note::
+       `Example anticipated ROI time-bins entry results <https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_bins_5.2s_entry_data_20240331125343.csv>`__.
+       `Example anticipated ROI time-bins latency results <https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_bins_5.2s_time_data_20240331125343.csv>`__.
        `Example anticipated movement results <https://github.com/sgoldenlab/simba/blob/master/misc/Time_bins_0.5s_movement_results_20240330143150.csv>`__.
 
     :example:
     >>> calculator = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini", bin_length=1.0, body_parts=['Nose_1'], threshold=0.00, movement=True)
     >>> calculator.run()
     >>> calculator.save()
-
     """
 
     def __init__(self,
@@ -112,7 +116,7 @@ class ROITimebinCalculator(ConfigReader):
         stdout_success(msg=f"ROI time bin time data saved at {self.save_path_time}",elapsed_time=self.timer.elapsed_time_str)
         if self.movement:
             self.results_movement_velocity.sort_values(by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]).set_index('VIDEO').to_csv(self.save_path_movement_velocity)
-            stdout_success(msg=f"ROI time bin movement data saved at {self.save_path_entries}", elapsed_time=self.timer.elapsed_time_str)
+            stdout_success(msg=f"ROI time-bin movement data saved at {self.save_path_movement_velocity}", elapsed_time=self.timer.elapsed_time_str)
 
 
 # test = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
