@@ -719,10 +719,12 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             return np.round(preceding_cnt / (preceding_cnt + proceeding_cnt), 3)
 
     @staticmethod
-    def distance_and_velocity(x: np.array,
-                              fps: float,
-                              pixels_per_mm: float,
-                              centimeters: Optional[bool] = True) -> Tuple[float, float]:
+    def distance_and_velocity(
+        x: np.array,
+        fps: float,
+        pixels_per_mm: float,
+        centimeters: Optional[bool] = True,
+    ) -> Tuple[float, float]:
         """
         Calculate total movement and mean velocity from a sequence of position data.
 
@@ -737,20 +739,29 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> sum_movement, avg_velocity = FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)
         """
 
-        check_valid_array(data=x, source=FeatureExtractionSupplemental.distance_and_velocity.__name__, accepted_ndims=(1,),
-                          accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float), min_axis_0=1)
-        check_float(name=f'{FeatureExtractionSupplemental.distance_and_velocity.__name__} fps', value=fps, min_value=1)
-        check_float(name=f'{FeatureExtractionSupplemental.distance_and_velocity.__name__} pixels_per_mm', value=pixels_per_mm, min_value=10e-6)
-        movement = (np.sum(x) / pixels_per_mm)
+        check_valid_array(
+            data=x,
+            source=FeatureExtractionSupplemental.distance_and_velocity.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+            min_axis_0=1,
+        )
+        check_float(
+            name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} fps",
+            value=fps,
+            min_value=1,
+        )
+        check_float(
+            name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} pixels_per_mm",
+            value=pixels_per_mm,
+            min_value=10e-6,
+        )
+        movement = np.sum(x) / pixels_per_mm
         v = []
         for i in range(0, x.shape[0], int(fps)):
-            w = x[i: (i + int(fps))]
+            w = x[i : (i + int(fps))]
             v.append((np.sum(w) / pixels_per_mm) * (1 / (w.shape[0] / int(fps))))
         if centimeters:
             v = [vi / 10 for vi in v]
             movement = movement / 10
         return movement, np.mean(v)
-
-
-
-
