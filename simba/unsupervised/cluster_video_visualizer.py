@@ -50,7 +50,10 @@ class ClusterVideoVisualizer(ConfigReader, UnsupervisedMixin):
         max_videos: Optional[Union[int, None]] = None,
         speed: Optional[int] = 1.0,
         bg_clr: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        plot_type: Optional[Literal["VIDEO", "HULL", "SKELETON", "POINTS"]] = "SKELETON"):
+        plot_type: Optional[
+            Literal["VIDEO", "HULL", "SKELETON", "POINTS"]
+        ] = "SKELETON",
+    ):
 
         check_file_exist_and_readable(file_path=data_path)
         check_file_exist_and_readable(file_path=config_path)
@@ -58,15 +61,32 @@ class ClusterVideoVisualizer(ConfigReader, UnsupervisedMixin):
         if max_videos != None:
             check_int(name="max_videos", value=max_videos, min_value=1)
         check_float(name="speed", value=speed, min_value=0.1)
-        check_str(name="plot_type", value=plot_type, options=("VIDEO", "HULL", "SKELETON", "POINTS"))
+        check_str(
+            name="plot_type",
+            value=plot_type,
+            options=("VIDEO", "HULL", "SKELETON", "POINTS"),
+        )
         ConfigReader.__init__(self, config_path=config_path)
         UnsupervisedMixin.__init__(self)
         self.data = read_pickle(data_path=data_path)
-        check_if_keys_exist_in_dict(data=self.data, key=[Clustering.CLUSTER_MODEL.value, Unsupervised.DATA.value], name=data_path)
-        self.max_videos, self.speed, self.plot_type, self.bg_clr = (max_videos, speed, plot_type, bg_clr)
-        self.cl_mdl_name = self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]
+        check_if_keys_exist_in_dict(
+            data=self.data,
+            key=[Clustering.CLUSTER_MODEL.value, Unsupervised.DATA.value],
+            name=data_path,
+        )
+        self.max_videos, self.speed, self.plot_type, self.bg_clr = (
+            max_videos,
+            speed,
+            plot_type,
+            bg_clr,
+        )
+        self.cl_mdl_name = self.data[Clustering.CLUSTER_MODEL.value][
+            Unsupervised.HASHED_NAME.value
+        ]
         self.animal_bp_cols, self.skeleton_perm = {}, {}
-        self.save_dir = os.path.join(self.project_path, self.frames_output_dir, "clusters")
+        self.save_dir = os.path.join(
+            self.project_path, self.frames_output_dir, "clusters"
+        )
         if not os.path.isdir(self.save_dir):
             os.makedirs(self.save_dir)
         for animal_nme in self.animal_bp_dict.keys():

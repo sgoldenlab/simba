@@ -1,42 +1,56 @@
 import os
+from typing import Optional, Union
+
 import pandas as pd
-from typing import Union, Optional
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 import numpy as np
 
-from simba.utils.read_write import read_pickle
-from simba.unsupervised.enums import Unsupervised, Clustering
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.statistics_mixin import Statistics
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.mixins.statistics_mixin import Statistics
+from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.errors import CountError
+from simba.utils.read_write import read_pickle
 from simba.utils.warnings import CountWarning
 
-LOF = 'local outlier factor'
-EE = 'elliptic envelope'
+LOF = "local outlier factor"
+EE = "elliptic envelope"
 
 
 class OutlierDetector(ConfigReader):
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 data_path: Union[str, os.PathLike],
-                 algorithm: Literal[LOF, EE],
-                 cluster_sliced: Optional[bool] = True):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        data_path: Union[str, os.PathLike],
+        algorithm: Literal[LOF, EE],
+        cluster_sliced: Optional[bool] = True,
+    ):
 
-        ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
+        ConfigReader.__init__(
+            self, config_path=config_path, read_video_info=False, create_logger=False
+        )
         data = read_pickle(data_path=data_path, verbose=True)
-        self.x = data[Unsupervised.DR_MODEL.value]['MODEL'].embedding_
-        idx = np.array(list(map(np.array, np.array(data['DATA']['BOUTS_FEATURES'].index.values))))
+        self.x = data[Unsupervised.DR_MODEL.value]["MODEL"].embedding_
+        idx = np.array(
+            list(map(np.array, np.array(data["DATA"]["BOUTS_FEATURES"].index.values)))
+        )
         self.x = np.hstack((idx, self.x))
         if cluster_sliced:
-            self.y = data[Clustering.CLUSTER_MODEL.value][Unsupervised.MODEL.value].labels_
+            self.y = data[Clustering.CLUSTER_MODEL.value][
+                Unsupervised.MODEL.value
+            ].labels_
             self.unique_labels = [x for x in list(np.unique(self.y)) if x != -1]
             if len(self.unique_labels) <= 1:
-                CountWarning(msg='Too few clusters for performing cluster_sliced, reverting to False', source=self.__class__.__name__)
+                CountWarning(
+                    msg="Too few clusters for performing cluster_sliced, reverting to False",
+                    source=self.__class__.__name__,
+                )
                 cluster_sliced = False
         else:
             self.y = None
@@ -69,17 +83,11 @@ class OutlierDetector(ConfigReader):
         #
         # print(self.results)
 
-
-
-            #img = PlottingMixin.continuous_scatter(data=self.results, columns=('X', 'Y', 'LOF'), size=20, palette='seismic')
-
+        # img = PlottingMixin.continuous_scatter(data=self.results, columns=('X', 'Y', 'LOF'), size=20, palette='seismic')
 
         # results = pd.DataFrame(np.vstack((results, unclustered)), columns=('X', 'Y', 'CLUSTER', 'LOF'))
 
-        #img = PlottingMixin.continuous_scatter(data=self.results, columns=('X', 'Y', 'LOF'), size=20, palette='seismic')
-
-
-
+        # img = PlottingMixin.continuous_scatter(data=self.results, columns=('X', 'Y', 'LOF'), size=20, palette='seismic')
 
         #
         #
@@ -108,8 +116,12 @@ class OutlierDetector(ConfigReader):
         #
 
 
-
-#data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/clusters/beautiful_beaver.pickle'
-data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle'
-x = OutlierDetector(data_path=data_path, config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini', algorithm=LOF, cluster_sliced=True)
+# data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/clusters/beautiful_beaver.pickle'
+data_path = "/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle"
+x = OutlierDetector(
+    data_path=data_path,
+    config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini",
+    algorithm=LOF,
+    cluster_sliced=True,
+)
 x.run()

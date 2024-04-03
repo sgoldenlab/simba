@@ -1,11 +1,11 @@
 __author__ = "Simon Nilsson"
 
-from itertools import permutations
+from itertools import combinations, permutations
 from typing import Optional, Tuple, Union
-from itertools import combinations
 
+from sklearn.metrics import (adjusted_mutual_info_score, adjusted_rand_score,
+                             fowlkes_mallows_score)
 from sklearn.neighbors import LocalOutlierFactor
-from sklearn.metrics import adjusted_rand_score, fowlkes_mallows_score, adjusted_mutual_info_score
 
 try:
     from typing import Literal
@@ -13,16 +13,19 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional, prange, typed, types)
+from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional,
+                   prange, typed, types)
 from scipy import stats
 from scipy.stats.distributions import chi2
 from sklearn.covariance import EllipticEnvelope
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_float, check_int, check_str, check_valid_array, check_valid_dataframe)
+from simba.utils.checks import (check_float, check_int, check_str,
+                                check_valid_array, check_valid_dataframe)
 from simba.utils.data import bucket_data, fast_mean_rank, fast_minimum_rank
 from simba.utils.enums import Options
 from simba.utils.errors import CountError, InvalidInputError
+
 
 class Statistics(FeatureExtractionMixin):
     """
@@ -1704,10 +1707,12 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    def find_collinear_features(df: pd.DataFrame,
-                                threshold: float,
-                                method: Optional[Literal['pearson', 'spearman', 'kendall']] = 'pearson',
-                                verbose: Optional[bool] = False) -> List[str]:
+    def find_collinear_features(
+        df: pd.DataFrame,
+        threshold: float,
+        method: Optional[Literal["pearson", "spearman", "kendall"]] = "pearson",
+        verbose: Optional[bool] = False,
+    ) -> List[str]:
         """
         Identify collinear features in the dataframe based on the specified correlation method and threshold.
 
@@ -1721,33 +1726,57 @@ class Statistics(FeatureExtractionMixin):
         >>> names = Statistics.find_collinear_features(df=x, threshold=0.2, method='pearson', verbose=True)
         """
 
-        check_valid_dataframe(df=df, source=Statistics.find_collinear_features.__name__,
-                              valid_dtypes=(float, int, np.float32, np.float64, np.int32, np.int64), min_axis_1=1,
-                              min_axis_0=1)
-        check_float(name=Statistics.find_collinear_features.__name__, value=threshold, max_value=1.0, min_value=0.0)
-        check_str(name=Statistics.find_collinear_features.__name__, value=method, options=('pearson', 'spearman', 'kendall'))
+        check_valid_dataframe(
+            df=df,
+            source=Statistics.find_collinear_features.__name__,
+            valid_dtypes=(float, int, np.float32, np.float64, np.int32, np.int64),
+            min_axis_1=1,
+            min_axis_0=1,
+        )
+        check_float(
+            name=Statistics.find_collinear_features.__name__,
+            value=threshold,
+            max_value=1.0,
+            min_value=0.0,
+        )
+        check_str(
+            name=Statistics.find_collinear_features.__name__,
+            value=method,
+            options=("pearson", "spearman", "kendall"),
+        )
         feature_names = set()
         feature_pairs = list(combinations(list(df.columns), 2))
 
         for cnt, i in enumerate(feature_pairs):
             if verbose:
-                print(f'Analyzing feature pair collinearity {cnt + 1}/{len(feature_pairs)}...')
+                print(
+                    f"Analyzing feature pair collinearity {cnt + 1}/{len(feature_pairs)}..."
+                )
             if (i[0] not in feature_names) and (i[1] not in feature_names):
-                sample_1, sample_2 = df[i[0]].values.astype(np.float32), df[i[1]].values.astype(np.float32)
-                if method == 'pearson':
+                sample_1, sample_2 = df[i[0]].values.astype(np.float32), df[
+                    i[1]
+                ].values.astype(np.float32)
+                if method == "pearson":
                     r = Statistics.pearsons_r(sample_1=sample_1, sample_2=sample_2)
-                elif method == 'spearman':
-                    r = Statistics.spearman_rank_correlation(sample_1=sample_1, sample_2=sample_2)
+                elif method == "spearman":
+                    r = Statistics.spearman_rank_correlation(
+                        sample_1=sample_1, sample_2=sample_2
+                    )
                 else:
                     r = Statistics.kendall_tau(sample_1=sample_1, sample_2=sample_2)[0]
                 if abs(r) > threshold:
                     feature_names.add(i[0])
         if verbose:
-            print('Collinear analysis complete.')
+            print("Collinear analysis complete.")
         return feature_names
 
     @staticmethod
-    def local_outlier_factor(data: np.ndarray, k: Union[int, float] = 5, contamination: Optional[float] = 1e-10, normalize: Optional[bool] = False) -> np.ndarray:
+    def local_outlier_factor(
+        data: np.ndarray,
+        k: Union[int, float] = 5,
+        contamination: Optional[float] = 1e-10,
+        normalize: Optional[bool] = False,
+    ) -> np.ndarray:
         """
         Compute the local outlier factor of each observation.
 
@@ -1779,10 +1808,12 @@ class Statistics(FeatureExtractionMixin):
         )
         if k is not None:
             check_float(name=f"{Statistics.__class__.__name__} k", value=k)
-            if isinstance(k, int): k = min(k, data.shape[0])
+            if isinstance(k, int):
+                k = min(k, data.shape[0])
             elif isinstance(k, float):
                 k = int(data.shape[0] * k)
-                if k > data.shape[0]: k = data.shape[0]
+                if k > data.shape[0]:
+                    k = data.shape[0]
 
         check_float(
             name=f"{Statistics.__class__.__name__} contamination",
@@ -1797,10 +1828,13 @@ class Statistics(FeatureExtractionMixin):
             return (y - np.min(y)) / (np.max(y) - np.min(y))
         else:
             return y
+
     @staticmethod
-    def elliptic_envelope(data: np.ndarray,
-                          contamination: Optional[float] = 1e-1,
-                          normalize: Optional[bool] = True) -> np.ndarray:
+    def elliptic_envelope(
+        data: np.ndarray,
+        contamination: Optional[float] = 1e-1,
+        normalize: Optional[bool] = True,
+    ) -> np.ndarray:
         """
         Compute the Mahalanobis distances of each observation in the input array using Elliptic Envelope method.
 
@@ -1821,8 +1855,17 @@ class Statistics(FeatureExtractionMixin):
         >>> img = PlottingMixin.continuous_scatter(data=data, columns=('X', 'Y', 'Mahalanobis distances'), size=20, palette='jet')
         """
 
-        check_valid_array(data=data, accepted_ndims=(2,), accepted_dtypes=(np.float64, np.float32, np.int32, np.int64, float, int))
-        check_float(name=f'{Statistics.elliptic_envelope.__name__} contamination', value=contamination, min_value=0.0, max_value=1.0)
+        check_valid_array(
+            data=data,
+            accepted_ndims=(2,),
+            accepted_dtypes=(np.float64, np.float32, np.int32, np.int64, float, int),
+        )
+        check_float(
+            name=f"{Statistics.elliptic_envelope.__name__} contamination",
+            value=contamination,
+            min_value=0.0,
+            max_value=1.0,
+        )
         mdl = EllipticEnvelope(contamination=contamination).fit(data)
         y = -mdl.score_samples(data)
         if normalize:
@@ -3058,10 +3101,20 @@ class Statistics(FeatureExtractionMixin):
         >>> 1.0
         """
 
-        check_valid_array(data=x, source=Statistics.adjusted_rand.__name__, accepted_ndims=(1,),
-                          accepted_dtypes=(np.int64, np.int32, int), min_axis_0=1)
-        check_valid_array(data=y, source=Statistics.adjusted_rand.__name__, accepted_ndims=(1,),
-                          accepted_dtypes=(np.int64, np.int32, int), accepted_shapes=[(x.shape[0],)])
+        check_valid_array(
+            data=x,
+            source=Statistics.adjusted_rand.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, int),
+            min_axis_0=1,
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.adjusted_rand.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, int),
+            accepted_shapes=[(x.shape[0],)],
+        )
         return adjusted_rand_score(labels_true=x, labels_pred=y)
 
     @staticmethod
@@ -3073,10 +3126,20 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray y: 1D array representing the labels of the second model.
         :return float: Score between 0 and 1. 1 indicates perfect clustering agreement, 0 indicates random clustering.
         """
-        check_valid_array(data=x, source=Statistics.fowlkes_mallows.__name__, accepted_ndims=(1,),
-                          accepted_dtypes=(np.int64, np.int32, int), min_axis_0=1)
-        check_valid_array(data=y, source=Statistics.fowlkes_mallows.__name__, accepted_ndims=(1,),
-                          accepted_dtypes=(np.int64, np.int32, int), accepted_shapes=[(x.shape[0],)])
+        check_valid_array(
+            data=x,
+            source=Statistics.fowlkes_mallows.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, int),
+            min_axis_0=1,
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.fowlkes_mallows.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, int),
+            accepted_shapes=[(x.shape[0],)],
+        )
         return fowlkes_mallows_score(labels_true=x, labels_pred=y)
 
     @staticmethod
@@ -3090,10 +3153,21 @@ class Statistics(FeatureExtractionMixin):
         :return float: Score between 0 and 1, where 1 indicates perfect clustering agreement.
 
         """
-        check_valid_array(data=x, source=Statistics.adjusted_mutual_info.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, int), min_axis_0=1)
-        check_valid_array(data=y, source=Statistics.adjusted_mutual_info.__name__, accepted_ndims=(1,), accepted_dtypes=(np.int64, np.int32, int), accepted_shapes=[(x.shape[0],)])
+        check_valid_array(
+            data=x,
+            source=Statistics.adjusted_mutual_info.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, int),
+            min_axis_0=1,
+        )
+        check_valid_array(
+            data=y,
+            source=Statistics.adjusted_mutual_info.__name__,
+            accepted_ndims=(1,),
+            accepted_dtypes=(np.int64, np.int32, int),
+            accepted_shapes=[(x.shape[0],)],
+        )
         return adjusted_mutual_info_score(labels_true=x, labels_pred=y)
-
 
 
 # sample_1 = np.random.random_integers(low=1, high=2, size=(10, 50)).astype(np.float64)

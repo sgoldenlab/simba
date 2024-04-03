@@ -1749,7 +1749,9 @@ def write_pickle(data: Dict[str, Any], save_path: Union[str, os.PathLike]) -> No
         )
 
 
-def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = False) -> dict:
+def read_pickle(
+    data_path: Union[str, os.PathLike], verbose: Optional[bool] = False
+) -> dict:
     """
     Read a single or directory of pickled objects. If directory, returns dict with numerical sequential integer keys for
     each object.

@@ -19,6 +19,8 @@ from simba.unsupervised.pop_ups.cluster_validation_pop_up import \
 from simba.unsupervised.pop_ups.cluster_videos_popup import \
     ClusterVisualizerPopUp
 from simba.unsupervised.pop_ups.cluster_xai_popup import ClusterXAIPopUp
+from simba.unsupervised.pop_ups.clusterer_comparison_popup import \
+    ClustererComparisonPopUp
 from simba.unsupervised.pop_ups.data_extractor_popup import DataExtractorPopUp
 from simba.unsupervised.pop_ups.embedding_correlations_popup import \
     EmbedderCorrelationsPopUp
@@ -33,8 +35,6 @@ from simba.unsupervised.pop_ups.transform_cluster_popup import \
     TransformClustererPopUp
 from simba.unsupervised.pop_ups.transform_dim_reduction_popup import \
     TransformDimReductionPopUp
-from simba.unsupervised.pop_ups.clusterer_comparison_popup import \
-    ClustererComparisonPopUp
 from simba.utils.enums import Formats
 
 
@@ -329,4 +329,4 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
 #     config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini"
 # )
 
-#UnsupervisedGUI(config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini")
+# UnsupervisedGUI(config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini")
