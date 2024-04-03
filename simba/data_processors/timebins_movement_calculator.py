@@ -140,31 +140,12 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             results = []
             for animal_data in self.bp_dict.values():
                 name, bps = list(animal_data.keys())[0], list(animal_data.values())[0]
-                bp_time_1, bp_time_2 = (
-                    self.data_df[bps].values,
-                    self.data_df[[f"{bps[0]}_shifted", f"{bps[1]}_shifted"]].values,
-                )
-                movement_data = pd.DataFrame(
-                    self.framewise_euclidean_distance(
-                        location_1=bp_time_1,
-                        location_2=bp_time_2,
-                        px_per_mm=px_per_mm,
-                        centimeter=True,
-                    ),
-                    columns=["VALUE"],
-                )
+                bp_time_1, bp_time_2 = (self.data_df[bps].values, self.data_df[[f"{bps[0]}_shifted", f"{bps[1]}_shifted"]].values)
+                movement_data = pd.DataFrame(self.framewise_euclidean_distance(location_1=bp_time_1, location_2=bp_time_2, px_per_mm=px_per_mm, centimeter=True), columns=["VALUE"])
                 self.movement_dict[video_name] = movement_data
                 movement_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
-
                 for bin, movement_df in enumerate(movement_df_lists):
-                    movement, velocity = (
-                        FeatureExtractionSupplemental.distance_and_velocity(
-                            x=movement_df["VALUE"].values,
-                            fps=fps,
-                            pixels_per_mm=px_per_mm,
-                            centimeters=False,
-                        )
-                    )
+                    movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_df["VALUE"].values, fps=fps, pixels_per_mm=1, centimeters=False))
                     results.append(
                         {
                             "VIDEO": video_name,
@@ -188,9 +169,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             results = pd.DataFrame(results).reset_index(drop=True)
             self.out_df_lst.append(results)
             video_timer.stop_timer()
-            print(
-                f"Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)..."
-            )
+            print(f"Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
 
     def save(self):
         self.results = pd.concat(self.out_df_lst, axis=0).sort_values(
@@ -208,7 +187,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
 
 
 # test = TimeBinsMovementCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                                   bin_length=0.5,
+#                                   bin_length=0.1,
 #                                   plots=True,
 #                                   body_parts=['Nose_1'])
 # test.run()

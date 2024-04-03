@@ -1345,7 +1345,7 @@ class PlottingMixin(object):
         cap = cv2.VideoCapture(input_video_path)
         cap.set(1, start_frm)
 
-        while current_frm < end_frm:
+        while current_frm <= end_frm:
             ret, img = cap.read()
             border_img = cv2.copyMakeBorder(
                 img,

@@ -384,12 +384,23 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
                 source=self.__class__.__name__,
             )
 
+#
+# test = ROIPlotMultiprocess(ini_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
+#                video_path="2022-06-20_NOB_DOT_4.mp4",
+#                core_cnt=7,
+#                style_attr={'Show_body_part': True, 'Show_animal_name': True}, body_parts={'Animal_1': 'Nose'})
+# test.run()
+#
 
+#
 # test = ROIPlotMultiprocess(ini_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',
 #                video_path="F1 HAB.mp4",
 #                core_cnt=5,
 #                style_attr={'Show_body_part': True, 'Show_animal_name': True})
 # test.run()
+#
+# get_video_meta_data(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/frames/output/ROI_analysis/2022-06-20_NOB_DOT_4.mp4')
+ # get_video_meta_data(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi')
 
 # test = ROIPlot(ini_path=r'/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini', video_path=r"Together_1.avi")
 # test.insert_data()
