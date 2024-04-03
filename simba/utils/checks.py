@@ -1144,7 +1144,6 @@ def check_video_has_rois(roi_dict: dict, video_names: List[str], roi_names: List
                 source=check_video_has_rois.__name__,
             )
 
-
 def check_if_df_field_is_boolean(
     df: pd.DataFrame,
     field: str,
@@ -1171,3 +1170,47 @@ def check_if_df_field_is_boolean(
         else:
             return False
     return True
+
+
+def check_valid_dataframe(df: pd.DataFrame,
+                          source: Optional[str] = '',
+                          valid_dtypes: Optional[Tuple[Any]] = None,
+                          min_axis_0: Optional[int] = None,
+                          min_axis_1: Optional[int] = None,
+                          max_axis_0: Optional[int] = None,
+                          max_axis_1: Optional[int] = None):
+    """Helper to check if a dataframe is valid"""
+    check_instance(source=source, instance=df, accepted_types=(pd.DataFrame,))
+    if valid_dtypes is not None:
+        dtypes = list(set(df.dtypes))
+        additional = [x for x in dtypes if x not in valid_dtypes]
+        if len(additional) > 0:
+            raise InvalidInputError(msg=f'The dataframe {source} has invalid data format(s) {additional}.',
+                                    source=source)
+    if min_axis_1 is not None:
+        check_int(name=f'{source} min_axis_1', value=min_axis_1, min_value=1)
+        if len(df.columns) < min_axis_1:
+            raise InvalidInputError(
+                msg=f'The dataframe {source} has less than ({df.columns}) the required minimum number of columns ({min_axis_1}).',
+                source=source)
+    if min_axis_0 is not None:
+        check_int(name=f'{source} min_axis_0', value=min_axis_0, min_value=1)
+        if len(df) < min_axis_0:
+            raise InvalidInputError(
+                msg=f'The dataframe {source} has less than ({len(df)}) the required minimum number of rows ({min_axis_0}).',
+                source=source)
+    if max_axis_0 is not None:
+        check_int(name=f'{source} max_axis_0', value=min_axis_0, min_value=1)
+        if len(df) > max_axis_0:
+            raise InvalidInputError(
+                msg=f'The dataframe {source} has more than ({len(df)}) the required maximum number of rows ({max_axis_0}).',
+                source=source)
+    if max_axis_1 is not None:
+        check_int(name=f'{source} max_axis_1', value=min_axis_1, min_value=1)
+        if len(df.columns) > max_axis_1:
+            raise InvalidInputError(
+                msg=f'The dataframe {source} has more than ({df.columns}) the required maximum number of columns ({max_axis_1}).',
+                source=source)
+
+
+

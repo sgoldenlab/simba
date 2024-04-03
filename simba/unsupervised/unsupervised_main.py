@@ -33,6 +33,8 @@ from simba.unsupervised.pop_ups.transform_cluster_popup import \
     TransformClustererPopUp
 from simba.unsupervised.pop_ups.transform_dim_reduction_popup import \
     TransformDimReductionPopUp
+from simba.unsupervised.pop_ups.clusterer_comparison_popup import \
+    ClustererComparisonPopUp
 from simba.utils.enums import Formats
 
 
@@ -265,6 +267,14 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
             fg="orange",
             command=lambda: EmbedderCorrelationsPopUp(config_path=self.config_path),
         )
+
+        self.clusterer_comparisons_btn = Button(
+            self.metrics_frm,
+            text="CLUSTERER COMPARISONS",
+            fg="green",
+            command=lambda: ClustererComparisonPopUp(config_path=self.config_path),
+        )
+
         self.print_embedding_info_btn = Button(
             self.metrics_frm,
             text="PRINT MODEL INFO",
@@ -278,7 +288,8 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
         self.cluster_descriptives_btn.grid(row=2, column=0, sticky="NW")
         self.cluster_xai_btn.grid(row=3, column=0, sticky="NW")
         self.embedding_corr_btn.grid(row=4, column=0, sticky="NW")
-        self.print_embedding_info_btn.grid(row=5, column=0, sticky="NW")
+        self.clusterer_comparisons_btn.grid(row=5, column=0, sticky="NW")
+        self.print_embedding_info_btn.grid(row=6, column=0, sticky="NW")
 
         self.main_frm.mainloop()
 
@@ -318,4 +329,4 @@ class UnsupervisedGUI(ConfigReader, PopUpMixin):
 #     config_path="/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini"
 # )
 
-# UnsupervisedGUI(config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini")
+#UnsupervisedGUI(config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini")

@@ -133,7 +133,7 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
             shap_clf_sliced = self.shap_df[
                 self.shap_df[self.classifier_name] == clf_state
             ]
-            print(shap_clf_sliced)
+
             for feature_category, feature_time_bin in itertools.product(
                 self.unique_feature_category_names, self.unique_time_bin_names
             ):

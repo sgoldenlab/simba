@@ -2065,8 +2065,8 @@ class PlottingMixin(object):
 
         if not show_box:
             plt.axis("off")
-        pct_x = np.percentile(data[columns[0]].values, 25)
-        pct_y = np.percentile(data[columns[1]].values, 25)
+        pct_x = np.percentile(data[columns[0]].values, 75)
+        pct_y = np.percentile(data[columns[1]].values, 75)
         plt.xlim(data[columns[0]].min() - pct_x, data[columns[0]].max() + pct_x)
         plt.ylim(data[columns[1]].min() - pct_y, data[columns[1]].max() + pct_y)
 
@@ -2142,8 +2142,8 @@ class PlottingMixin(object):
             )
             data = pd.DataFrame(data, columns=list(columns))
 
-        pct_x = np.percentile(data[columns[0]].values, 10)
-        pct_y = np.percentile(data[columns[1]].values, 10)
+        pct_x = np.percentile(data[columns[0]].values, 75)
+        pct_y = np.percentile(data[columns[1]].values, 75)
         plot = sns.jointplot(
             data=data,
             x=columns[0],

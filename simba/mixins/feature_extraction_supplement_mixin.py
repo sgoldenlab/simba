@@ -719,7 +719,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             return np.round(preceding_cnt / (preceding_cnt + proceeding_cnt), 3)
 
     @staticmethod
-    def distance_and_velocity(x: np.array,
+    def distance_and_velocity(x: np.ndarray,
                               fps: float,
                               pixels_per_mm: float,
                               centimeters: Optional[bool] = True) -> Tuple[float, float]:

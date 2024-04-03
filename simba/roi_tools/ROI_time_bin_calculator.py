@@ -3,6 +3,7 @@ import os
 from typing import List, Union, Optional
 import statistics
 import pandas as pd
+import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
@@ -85,13 +86,13 @@ class ROITimebinCalculator(ConfigReader):
             if frames_per_bin == 0:
                 raise FrameRangeError(msg=f"The specified time-bin length of {self.bin_length} is TOO SHORT for video {self.video_name} which has a specified FPS of {fps}. This results in time bins that are LESS THAN a single frame.",source=self.__class__.__name__)
             video_frms = list(range(0, len(read_df(file_path=file_path, file_type=self.file_type))))
-            frame_bins = [video_frms[i * frames_per_bin : (i + 1) * frames_per_bin] for i in range((len(video_frms) + frames_per_bin - 1) // frames_per_bin)]
+            frame_bins = [video_frms[i: i + (frames_per_bin)] for i in range(0, len(video_frms), frames_per_bin)]
             self.video_data = self.entries_exits_df[self.entries_exits_df["VIDEO"] == self.video_name]
             for animal_name, shape_name in list(itertools.product(self.animal_names, self.shape_names)):
                 body_part = self.settings['body_parts'][animal_name]
                 data_df = self.video_data.loc[(self.video_data["SHAPE"] == shape_name) & (self.video_data["ANIMAL"] == animal_name)]
                 entry_frms = list(data_df["ENTRY FRAMES"])
-                inside_shape_frms = [list(range(x, y)) for x, y in zip(list(data_df["ENTRY FRAMES"].astype(int)),list(data_df["EXIT FRAMES"].astype(int) + 1))]
+                inside_shape_frms = [list(range(x, y)) for x, y in zip(list(data_df["ENTRY FRAMES"].astype(int)), list(data_df["EXIT FRAMES"].astype(int) + 1))]
                 inside_shape_frms = [i for s in inside_shape_frms for i in s]
                 for bin_cnt, bin_frms in enumerate(frame_bins):
                     frms_inside_roi_in_timebin = [x for x in inside_shape_frms if x in bin_frms]
@@ -100,11 +101,11 @@ class ROITimebinCalculator(ConfigReader):
                     self.results_entries.loc[len(self.results_entries)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, len(entry_roi_in_timebin)]
                     if self.movement:
                         if (len(frms_inside_roi_in_timebin) > 0):
-                            bin_move = self.movement_timebins.movement_dict[self.video_name].iloc[frms_inside_roi_in_timebin].values.flatten()
-                            movement, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=bin_move, fps=fps, pixels_per_mm=px_per_mm, centimeters=True)
-                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, round(movement, 4), round(velocity, 4)]
+                            bin_move = self.movement_timebins.movement_dict[self.video_name].iloc[frms_inside_roi_in_timebin].values.flatten().astype(np.float32)
+                            _, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=bin_move, fps=fps, pixels_per_mm=1, centimeters=False)
+                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, bin_move[1:].sum(), velocity]
                         else:
-                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, 0, 0]
+                           self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, 0, 0]
             video_timer.stop_timer()
             print(f"Video {self.video_name} complete (elapsed time {video_timer.elapsed_time_str}s)")
 
@@ -120,7 +121,7 @@ class ROITimebinCalculator(ConfigReader):
 
 
 # test = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
-#                             bin_length=1.0,
+#                             bin_length=1,
 #                             body_parts=['Nose_1'],
 #                             threshold=0.00,
 #                             movement=True)

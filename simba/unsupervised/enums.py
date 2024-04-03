@@ -32,6 +32,7 @@ class Unsupervised(Enum):
     TSNE = "TSNE"
     SCALER_TYPE = "SCALER_TYPE"
     CSV = "CSV"
+    MULTICOLLINEARITY = 'multicollinearity'
     FORMAT = "format"
     SCALED_DATA = "SCALED_DATA"
     PARAMETERS = "PARAMETERS"

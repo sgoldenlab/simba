@@ -412,6 +412,11 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
 def cardinality_to_integer_lookup() -> Dict[str, int]:
     """
     Create dictionary that maps cardinal compass directions to integers.
+
+    :example:
+    >>> data = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+    >>> [cardinality_to_integer_lookup()[d] for d in data]
+    >>> [0, 1, 2, 3, 4, 5, 6, 7]
     """
 
     return {"N": 0, "NE": 1, "E": 2, "SE": 3, "S": 4, "SW": 5, "W": 6, "NW": 7}
@@ -522,3 +527,6 @@ def get_log_config():
 #      800.0: 137.46,
 #      900.0: 137.18,
 #      1000.0: 136.94}
+
+
+

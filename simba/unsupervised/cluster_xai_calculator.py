@@ -11,8 +11,7 @@ from sklearn.inspection import permutation_importance
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
-from simba.plotting.shap_agg_stats_visualizer import \
-    ShapAggregateStatisticsVisualizer
+from simba.plotting.shap_agg_stats_visualizer import ShapAggregateStatisticsVisualizer
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict, check_instance)
@@ -111,13 +110,13 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             ],
             axis=1,
         )
+        self.mdl_file_name = self.data[Clustering.CLUSTER_MODEL.value][Unsupervised.HASHED_NAME.value]
         self.cluster_cnt = get_unique_values_in_iterable(
             data=self.cluster_data,
-            name=self.data[Clustering.CLUSTER_MODEL.value][
-                Unsupervised.HASHED_NAME.value
-            ],
+            name=self.mdl_file_name,
             min=2,
         )
+
         with pd.ExcelWriter(self.save_path, mode="w") as writer:
             pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
 
@@ -145,39 +144,20 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
 
     def __train_paired_rf_models(self, n_estimators: Optional[int] = 100):
         print("Training RF ML model...")
-        clf = RandomForestClassifier(
-            n_estimators=n_estimators,
-            max_features="sqrt",
-            n_jobs=-1,
-            criterion="gini",
-            min_samples_leaf=1,
-            bootstrap=True,
-            verbose=1,
-        )
+        clf = RandomForestClassifier(n_estimators=n_estimators, max_features="sqrt", n_jobs=-1, criterion="gini", min_samples_leaf=1, bootstrap=True, verbose=1)
         self.rf_data = {}
-        for clf_cnt, cluster_id in enumerate(self.x_y_df[CLUSTER].unique()):
-            print(f"Training model {clf_cnt+1}/{self.cluster_cnt} ...")
-            self.rf_data[cluster_id] = {}
-            target_df = self.x_y_df[self.x_y_df[CLUSTER] == cluster_id].drop(
-                [CLUSTER], axis=1
-            )
-            non_target_df = self.x_y_df[self.x_y_df[CLUSTER] != cluster_id].drop(
-                [CLUSTER], axis=1
-            )
+        cluster_permutations = list(itertools.permutations(list(self.x_y_df[CLUSTER].unique()), 2))
+        for clf_cnt, (x1, x2) in enumerate(cluster_permutations):
+            print(f"Training model {clf_cnt + 1}/{len(cluster_permutations)} ...")
+            self.rf_data[x1] = {}
+            target_df = self.x_y_df[self.x_y_df[CLUSTER] == x1].drop([CLUSTER], axis=1)
+            non_target_df = self.x_y_df[self.x_y_df[CLUSTER] == x2].drop([CLUSTER], axis=1)
             target_df[TARGET] = 1
             non_target_df[TARGET] = 0
-            self.rf_data[cluster_id]["X"] = (
-                pd.concat([target_df, non_target_df], axis=0)
-                .reset_index(drop=True)
-                .sample(frac=1)
-            )
-            self.rf_data[cluster_id]["Y"] = self.rf_data[cluster_id]["X"].pop(TARGET)
-            clf = TrainModelMixin().clf_fit(
-                clf=clf,
-                x_df=self.rf_data[cluster_id]["X"],
-                y_df=self.rf_data[cluster_id]["Y"],
-            )
-            self.rf_data[cluster_id][Unsupervised.MODEL.value] = deepcopy(clf)
+            self.rf_data[x1]["X"] = pd.concat([target_df, non_target_df], axis=0).reset_index(drop=True)
+            self.rf_data[x1]["Y"] = self.rf_data[x1]["X"].pop(TARGET)
+            clf = TrainModelMixin().clf_fit(clf=clf, x_df=self.rf_data[x1]["X"], y_df=self.rf_data[x1]["Y"])
+            self.rf_data[x1][Unsupervised.MODEL.value] = deepcopy(clf)
 
     def __gini_importance(self):
         print("Calculating cluster gini importances'...")
@@ -270,30 +250,18 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
         if self.settings[SHAP][METHOD] == PAIRED:
             print("Computing paired-clusters shap values ...")
             timer = SimbaTimer(start=True)
-            cluster_combinations = list(
-                itertools.combinations(list(self.rf_data.keys()), 2)
-            )
+            cluster_combinations = list(itertools.combinations(list(self.rf_data.keys()), 2))
             for cluster_one_id, cluster_two_id in cluster_combinations:
-                mdl_name = (
-                    f"SHAP CLUSTER {str(cluster_one_id)} vs. {str(cluster_two_id)}"
-                )
+                mdl_name = f"SHAP CLUSTER {str(cluster_one_id)} vs. {str(cluster_two_id)} {self.mdl_file_name}"
                 print(f"Computing {mdl_name} values ...")
-                sample_n = min(
-                    self.settings[SHAP][SAMPLE],
-                    len(self.rf_data[cluster_one_id]["X"]),
-                    len(self.rf_data[cluster_two_id]["X"]),
-                )
-                cluster_one_sample = self.rf_data[cluster_one_id]["X"].sample(
-                    sample_n, replace=False
-                )
-                cluster_two_sample = self.rf_data[cluster_two_id]["X"].sample(
-                    sample_n, replace=False
-                )
+                cluster_one_sample = self.x_y_df[self.x_y_df[CLUSTER] == cluster_one_id].drop(CLUSTER, axis=1)
+                cluster_two_sample = self.x_y_df[self.x_y_df[CLUSTER] == cluster_two_id].drop(CLUSTER, axis=1)
+                sample_n = min(self.settings[SHAP][SAMPLE], len(cluster_one_sample), len(cluster_two_sample))
+                cluster_one_sample = cluster_one_sample.sample(sample_n, replace=False)
+                cluster_two_sample = cluster_two_sample.sample(sample_n, replace=False)
                 cluster_one_sample[mdl_name] = 1
                 cluster_two_sample[mdl_name] = 0
-                x_df = pd.concat(
-                    [cluster_one_sample, cluster_two_sample], axis=0
-                ).reset_index(drop=True)
+                x_df = pd.concat([cluster_one_sample, cluster_two_sample], axis=0).reset_index(drop=True)
                 y_df = x_df.pop(mdl_name)
                 shap_df, _, expected_value = TrainModelMixin().create_shap_log_mp(
                     ini_file_path=self.config_path,
@@ -314,9 +282,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
                 )
                 cluster_one_shap = shap_df[shap_df[mdl_name] == 1]
                 cluster_two_shap = shap_df[shap_df[mdl_name] == 0]
-                mean_df_cluster_one, stdev_df_cluster_one = pd.DataFrame(
-                    cluster_one_shap.mean(), columns=["MEAN"]
-                ), pd.DataFrame(cluster_one_shap.std(), columns=["STDEV"])
+                mean_df_cluster_one, stdev_df_cluster_one = pd.DataFrame(cluster_one_shap.mean(), columns=["MEAN"]), pd.DataFrame(cluster_one_shap.std(), columns=["STDEV"])
                 mean_df_cluster_two, stdev_df_cluster_two = pd.DataFrame(
                     cluster_two_shap.mean(), columns=["MEAN"]
                 ), pd.DataFrame(cluster_two_shap.std(), columns=["STDEV"])
@@ -350,7 +316,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             print("Calculating one-against-all shap values ...")
             mdls = self.__train_all_against_one_rf_models()
             for cluster_id, cluster_mdl in mdls.items():
-                shap_mdl_name = f"SHAP CLUSTER {cluster_id} vs. ALL"
+                shap_mdl_name = f"SHAP CLUSTER {cluster_id} vs. ALL {self.mdl_file_name}"
                 print(f"Computing SHAP for cluster {shap_mdl_name}...")
                 cluster_one_sample = self.x_y_df[
                     self.x_y_df[CLUSTER] == cluster_id
@@ -419,14 +385,9 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
 
 
 # settings = {"gini_importance": False, "permutation_importance": False, "shap": {"method": PAIRED, "run": True, "sample": 10}}
-# # settings = {
-# #     "gini_importance": False,
-# #     "permutation_importance": False,
-# #     "shap": {"method": "One-against-all", "run": True, "sample": 10},
-# # }
 # calculator = ClusterXAICalculator(
 #     config_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini",
-#     data_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle",
+#     data_path="/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/error_xai/determined_wing.pickle",
 #     settings=settings)
 # # #
 # # #

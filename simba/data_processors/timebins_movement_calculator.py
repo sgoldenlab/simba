@@ -154,10 +154,8 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                     columns=["VALUE"],
                 )
                 self.movement_dict[video_name] = movement_data
-                movement_df_lists = [
-                    movement_data[i : i + bin_length_frames]
-                    for i in range(0, movement_data.shape[0], bin_length_frames)
-                ]
+                movement_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
+
                 for bin, movement_df in enumerate(movement_df_lists):
                     movement, velocity = (
                         FeatureExtractionSupplemental.distance_and_velocity(

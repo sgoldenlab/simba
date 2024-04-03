@@ -1749,19 +1749,21 @@ def write_pickle(data: Dict[str, Any], save_path: Union[str, os.PathLike]) -> No
         )
 
 
-def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
+def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = False) -> dict:
     """
     Read a single or directory of pickled objects. If directory, returns dict with numerical sequential integer keys for
     each object.
 
     :param str data_path: Pickled file path, or directory of pickled files.
+    :param Optional[bool] verbose: If True, prints progress. Default False.
     :returns dict
 
     :example:
     >>> data = read_pickle(data_path='/test/unsupervised/cluster_models')
     """
     if os.path.isdir(data_path):
-        print(f"Reading in data directory {data_path}...")
+        if verbose:
+            print(f"Reading in data directory {data_path}...")
         data = {}
         files_found = glob.glob(data_path + f"/*.{Formats.PICKLE.value}")
         if len(files_found) == 0:
@@ -1770,6 +1772,9 @@ def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
                 source=read_pickle.__name__,
             )
         for file_cnt, file_path in enumerate(files_found):
+            if verbose:
+                _, file_name, _ = get_fn_ext(filepath=file_path)
+                print(f"Reading in data file {file_name}...")
             with open(file_path, "rb") as f:
                 try:
                     data[file_cnt] = pickle.load(f)
@@ -1780,6 +1785,9 @@ def read_pickle(data_path: Union[str, os.PathLike]) -> dict:
                         source=read_pickle.__name__,
                     )
     elif os.path.isfile(data_path):
+        if verbose:
+            _, file_name, _ = get_fn_ext(filepath=data_path)
+            print(f"Reading in data file {file_name}...")
         with open(data_path, "rb") as f:
             try:
                 data = pickle.load(f)

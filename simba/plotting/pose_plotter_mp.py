@@ -109,8 +109,8 @@ class PosePlotter:
                 msg=f'When visualizing pose-estimation, select an input sub-directory of the project_folder/csv folder. {in_dir} is not a sub-directory to the "project_folder/csv" directory and therefore SimBA cant locate the project_config.ini (expected at {config_path}',
                 source=self.__class__.__name__,
             )
-        # if platform.system() == OS.MAC.value:
-        #     multiprocessing.set_start_method('spawn', force=True)
+        if platform.system() == OS.MAC.value:
+            multiprocessing.set_start_method('spawn', force=True)
         self.config = ConfigReader(config_path=config_path, read_video_info=False)
         files_found = glob.glob(in_dir + f"/*.{self.config.file_type}")
         check_if_filepath_list_is_empty(
@@ -134,15 +134,9 @@ class PosePlotter:
                 self.config.remove_a_folder(self.temp_folder)
             os.makedirs(self.temp_folder)
             save_video_path = os.path.join(self.out_dir, f"{video_name}.mp4")
-            pose_df = read_df(
-                file_path=pose_path,
-                file_type=self.config.file_type,
-                check_multiindex=True,
-            )
+            pose_df = read_df(file_path=pose_path, file_type=self.config.file_type, check_multiindex=True,)
             video_meta_data = get_video_meta_data(video_path=video_path)
-            if (self.sample_time is None) and (
-                video_meta_data["frame_count"] != len(pose_df)
-            ):
+            if (self.sample_time is None) and (video_meta_data["frame_count"] != len(pose_df)):
                 FrameRangeWarning(
                     msg=f'The video {video_name} has pose-estimation data for {len(pose_df)} frames, but the video has {video_meta_data["frame_count"]} frames. Ensure the data and video has an equal number of frames.',
                     source=self.__class__.__name__,

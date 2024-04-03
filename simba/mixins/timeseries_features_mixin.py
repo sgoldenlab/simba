@@ -1539,7 +1539,7 @@ class TimeseriesFeatureMixin(object):
            :width: 700
            :align: center
 
-        :param np.ndarray data: 2D array of size len(frames) x 2 with body-part coordinates.
+        :param np.ndarray data: 1D array of framewise euclidean distances.
         :param float pixels_per_mm: Pixels per millimeter of the recorded video.
         :param int fps: Frames per second (FPS) of the recorded video.
         :param float time_window: Rolling time window in seconds. Default is 1.0 representing 1 second.

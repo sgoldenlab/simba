@@ -18,7 +18,7 @@ from simba.utils.errors import (BodypartColumnNotFoundError,
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
 from simba.utils.warnings import NoDataFoundWarning
-
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 
 class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     """
@@ -61,19 +61,14 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             self.input_folder = os.path.join(self.project_path, "csv", data_path)
             self.files_found = glob.glob(self.input_folder + f"/*.{self.file_type}")
             if len(self.files_found) == 0:
-                raise NoFilesFoundError(
-                    msg=f"No files in format {self.file_type} found in {self.input_folder}",
-                    source=self.__class__.__name__,
-                )
+                raise NoFilesFoundError(msg=f"No files in format {self.file_type} found in {self.input_folder}", source=self.__class__.__name__,)
         if file_path is not None:
             check_file_exist_and_readable(file_path=file_path)
             self.files_found = [file_path]
         if self.settings is None:
             self.roi_config = dict(self.config.items(ConfigKey.ROI_SETTINGS.value))
             if "animal_1_bp" not in self.roi_config.keys():
-                raise BodypartColumnNotFoundError(
-                    msg="Could not find animal_1_bp settings in the project config. Please analyze ROI data FIRST."
-                )
+                raise BodypartColumnNotFoundError(msg="Could not find animal_1_bp settings in the project config. Please analyze ROI data FIRST.")
             self.settings = {}
             self.settings["threshold"] = read_config_entry(
                 self.config,
@@ -129,7 +124,8 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             self.entries_dict,
             self.entries_exit_dict,
             self.movement_dict,
-        ) = ({}, {}, {}, {})
+            self.velocity_dict,
+        ) = ({}, {}, {}, {}, {})
         for file_path in self.files_found:
             _, video_name, _ = get_fn_ext(file_path)
             (
@@ -330,30 +326,22 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
 
                 if self.calculate_distances:
                     self.movement_dict[video_name] = {}
-                    for animal, shape_dicts in self.entries_exit_dict[
-                        video_name
-                    ].items():
+                    self.velocity_dict[video_name] = {}
+                    for animal, shape_dicts in self.entries_exit_dict[video_name].items():
                         self.movement_dict[video_name][animal] = {}
+                        self.velocity_dict[video_name][animal] = {}
                         for shape_name, shape_data in shape_dicts.items():
-                            d = pd.DataFrame.from_dict(
-                                shape_data, orient="index"
-                            ).T.values.tolist()
+                            d = pd.DataFrame.from_dict(shape_data, orient="index").T.values.tolist()
+                            movements_, velocity_ = [], []
                             for entry in d:
-                                df = self.data_df[self.bp_dict[animal][0:2]][
-                                    self.data_df.index.isin(
-                                        list(range(entry[0], entry[1] + 1))
-                                    )
-                                ]
+                                df = self.data_df[self.bp_dict[animal][0:2]][self.data_df.index.isin(list(range(entry[0], entry[1] + 1)))]
                                 df = self.create_shifted_df(df=df)
-                                df["Movement"] = (
-                                    np.sqrt(
-                                        (df.iloc[:, 0] - df.iloc[:, 2]) ** 2
-                                        + (df.iloc[:, 1] - df.iloc[:, 3]) ** 2
-                                    )
-                                ) / pix_per_mm
-                                self.movement_dict[video_name][animal][shape_name] = (
-                                    df["Movement"].sum() / 10
-                                )
+                                movement = FeatureExtractionMixin.framewise_euclidean_distance(location_1=df.values[:, [0, 1]], location_2=df.values[:, [2, 3]], px_per_mm=pix_per_mm).astype(np.float32)
+                                movement, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=movement, fps=self.fps, pixels_per_mm=1, centimeters=True)
+                                movements_.append(movement); velocity_.append(velocity)
+                            self.movement_dict[video_name][animal][shape_name] = sum(movements_)
+                            self.velocity_dict[video_name][animal][shape_name] = np.average(velocity_)
+
             self.__transpose_dicts_to_dfs()
 
     def compute_framewise_distance_to_roi_centroids(self):
@@ -491,21 +479,19 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
         ]
 
         if self.calculate_distances:
-            self.movements_df = pd.DataFrame(
-                columns=["VIDEO", "ANIMAL", "SHAPE", "MOVEMENT INSIDE SHAPE (CM)"]
-            )
+            self.movements_df = pd.DataFrame(columns=["VIDEO", "ANIMAL", "SHAPE", "MEASUREMENT", "VALUE"])
             for video_name, video_data in self.movement_dict.items():
                 for animal_name, animal_data in video_data.items():
                     for shape_name, shape_data in animal_data.items():
-                        self.movements_df.loc[len(self.movements_df)] = [
-                            video_name,
-                            animal_name,
-                            shape_name,
-                            shape_data,
-                        ]
-            self.movements_df["ANIMAL"] = self.movements_df["ANIMAL"].map(
-                self.body_part_to_animal_lookup
-            )
+                        self.movements_df.loc[len(self.movements_df)] = [video_name, animal_name, shape_name, 'Movement (cm)', shape_data]
+            self.movements_df["ANIMAL"] = self.movements_df["ANIMAL"].map(self.body_part_to_animal_lookup)
+            self.velocity_df = pd.DataFrame(columns=["VIDEO", "ANIMAL", "SHAPE", "MEASUREMENT", "VALUE"])
+            for video_name, video_data in self.velocity_dict.items():
+                for animal_name, animal_data in video_data.items():
+                    for shape_name, shape_data in animal_data.items():
+                        self.velocity_df.loc[len(self.velocity_df)] = [video_name, animal_name, shape_name, 'Average velocity (cm/s)', shape_data]
+            self.velocity_df["ANIMAL"] = self.velocity_df["ANIMAL"].map(self.body_part_to_animal_lookup)
+            self.movements_df = pd.concat([self.movements_df, self.velocity_df], axis=0).set_index('VIDEO')
 
     def save(self):
         """
@@ -550,12 +536,13 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             msg="ROI analysis complete", elapsed_time=self.timer.elapsed_time_str
         )
 
-
+#
 # test = ROIAnalyzer(ini_path = r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
 #                    data_path = "outlier_corrected_movement_location",
-#                    calculate_distances=False,
-#                    settings={'threshold': 0.00, 'body_parts': {'Animal_1': 'Nose'}})
+#                    calculate_distances=True,
+#                    settings={'threshold': 0.00, 'body_parts': {'Animal_1': 'Nose_1'}})
 # test.run()
+# test.save()
 
 # test = ROIAnalyzer(ini_path = r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
 #                    data_path = "outlier_corrected_movement_location",

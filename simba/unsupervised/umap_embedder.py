@@ -46,7 +46,7 @@ class UmapEmbedder(UnsupervisedMixin):
     :param hyper_parameters: dict holding UMAP hyperparameters in list format.
 
     :Example I: Fit.
-    >>> hyper_parameters = {'n_neighbors': [10, 2], 'min_distance': [1.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25}
+    >>> hyper_parameters = {'n_neighbors': [10, 2], 'min_distance': [1.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25, "multicolinearity": 0.5}
     >>> data_path = 'unsupervised/project_folder/logs/unsupervised_data_20230416145821.pickle'
     >>> save_dir = 'unsupervised/dr_models'
     >>> config_path = 'unsupervised/project_folder/project_config.ini'
@@ -83,29 +83,16 @@ class UmapEmbedder(UnsupervisedMixin):
 
         self.low_var_cols, self.hyper_parameters = None, hyper_parameters
         check_umap_hyperparameters(hyper_parameters=hyper_parameters)
-        self.search_space = list(
-            itertools.product(
-                *[
-                    hyper_parameters[Unsupervised.N_NEIGHBORS.value],
-                    hyper_parameters[Unsupervised.MIN_DISTANCE.value],
-                    hyper_parameters[Unsupervised.SPREAD.value],
-                ]
-            )
-        )
+        self.search_space = list(itertools.product(*[hyper_parameters[Unsupervised.N_NEIGHBORS.value], hyper_parameters[Unsupervised.MIN_DISTANCE.value], hyper_parameters[Unsupervised.SPREAD.value]]))
         print(f"Building {len(self.search_space)} UMAP model(s)...")
         if hyper_parameters[Unsupervised.VARIANCE.value] > 0:
-            self.low_var_cols = TrainModelMixin.find_low_variance_fields(
-                data=self.umap_df,
-                variance_threshold=hyper_parameters[Unsupervised.VARIANCE.value],
-            )
+            self.low_var_cols = TrainModelMixin.find_low_variance_fields(data=self.umap_df, variance_threshold=hyper_parameters[Unsupervised.VARIANCE.value])
             self.umap_df = drop_df_fields(data=self.umap_df, fields=self.low_var_cols)
-        self.scaler = TrainModelMixin.define_scaler(
-            scaler_name=hyper_parameters[Unsupervised.SCALER.value]
-        )
+        # if hyper_parameters[Unsupervised.MULTICOLLINEARITY.value] > 0:
+        #     print(hyper_parameters[Unsupervised.MULTICOLLINEARITY.value])
+        self.scaler = TrainModelMixin.define_scaler(scaler_name=hyper_parameters[Unsupervised.SCALER.value])
         self.scaler.fit(self.umap_df)
-        self.scaled_umap_data = TrainModelMixin.scaler_transform(
-            data=self.umap_df, scaler=self.scaler
-        )
+        self.scaled_umap_data = TrainModelMixin.scaler_transform(data=self.umap_df, scaler=self.scaler)
         self.__create_methods_log()
         self.__fit_umaps()
         self.timer.stop_timer()
@@ -290,12 +277,12 @@ class UmapEmbedder(UnsupervisedMixin):
             return results
 
 
-# hyper_parameters = {'n_neighbors': [5], 'min_distance': [0.1, 0.5, 0.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25}
-# data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/logs/unsupervised_data_20240325092459.pickle'
-# save_dir = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_embeddings'
-# config_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini'
-# embedder = UmapEmbedder()
-# embedder.fit(data_path=data_path, save_dir=save_dir, hyper_parameters=hyper_parameters)
+hyper_parameters = {'n_neighbors': [5], 'min_distance': [0.1, 0.5, 0.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25, 'multicollinearity': 0.7}
+data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/logs/unsupervised_data_20240325092459.pickle'
+save_dir = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/embedding_2'
+config_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini'
+embedder = UmapEmbedder()
+embedder.fit(data_path=data_path, save_dir=save_dir, hyper_parameters=hyper_parameters)
 #
 
 # data_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/logs/unsupervised_data_20240215143716.pickle'
@@ -332,7 +319,7 @@ class UmapEmbedder(UnsupervisedMixin):
 #
 #
 #
-
+#
 # hyper_parameters = {'n_neighbors': [10, 2], 'min_distance': [1.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25}
 # data_path = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/logs/unsupervised_data_20240214093117.pickle'
 # save_dir = '/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/dim_reduction_mdls'
