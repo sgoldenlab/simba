@@ -30,8 +30,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_instance, check_int, check_str,
                                 check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array,
-                                check_valid_dataframe)
+                                check_valid_array, check_valid_dataframe)
 from simba.utils.enums import ConfigKey, Dtypes, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
@@ -970,6 +969,7 @@ def get_mode(x: np.ndarray) -> Union[float, int]:
     )
     values, counts = np.unique(x, return_counts=True)
     return counts.argmax()
+
 
 def run_user_defined_feature_extraction_class(
     file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]

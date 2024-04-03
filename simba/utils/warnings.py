@@ -247,9 +247,11 @@ def FrameRangeWarning(msg: str, source: str = ""):
 def SamplingWarning(msg: str, source: str = ""):
     pass
 
+
 @log_warning
 def CropWarning(msg: str, source: str = ""):
     pass
+
 
 @log_warning
 def CountWarning(msg: str, source: str = ""):
