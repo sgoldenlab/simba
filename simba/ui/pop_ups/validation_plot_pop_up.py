@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import threading
+from tkinter import *
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
@@ -9,7 +9,8 @@ from simba.plotting.single_run_model_validation_video import \
     ValidateModelOneVideo
 from simba.plotting.single_run_model_validation_video_mp import \
     ValidateModelOneVideoMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
 from simba.utils.checks import check_float, check_int
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.read_write import check_file_exist_and_readable, str_2_bool
@@ -138,14 +139,19 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
             settings["styles"]["font size"] = int(self.font_size_eb.entry_get)
             settings["styles"]["space_scale"] = int(self.spacing_eb.entry_get)
         check_int(name="MINIMUM BOUT LENGTH", value=self.shortest_bout)
-        check_float(name="DISCRIMINATION THRESHOLD", value=self.discrimination_threshold)
+        check_float(
+            name="DISCRIMINATION THRESHOLD", value=self.discrimination_threshold
+        )
         check_file_exist_and_readable(file_path=self.feature_file_path)
         check_file_exist_and_readable(file_path=self.model_path)
 
         create_gantt = self.gantt_dropdown.getChoices()
-        if create_gantt.strip() == 'Gantt chart: final frame only (slightly faster)':  create_gantt = 1
-        elif create_gantt.strip() == 'Gantt chart: video': create_gantt = 2
-        else: create_gantt = None
+        if create_gantt.strip() == "Gantt chart: final frame only (slightly faster)":
+            create_gantt = 1
+        elif create_gantt.strip() == "Gantt chart: video":
+            create_gantt = 2
+        else:
+            create_gantt = None
 
         if not self.multiprocess_var.get():
             validation_video_creator = ValidateModelOneVideo(
