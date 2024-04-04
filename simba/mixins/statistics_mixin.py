@@ -2,8 +2,8 @@ __author__ = "Simon Nilsson"
 
 from itertools import combinations, permutations
 from typing import Optional, Tuple, Union
-import pandas as pd
 
+import pandas as pd
 from sklearn.metrics import (adjusted_mutual_info_score, adjusted_rand_score,
                              fowlkes_mallows_score)
 from sklearn.neighbors import LocalOutlierFactor
