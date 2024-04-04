@@ -384,6 +384,7 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
                 source=self.__class__.__name__,
             )
 
+
 #
 # test = ROIPlotMultiprocess(ini_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
 #                video_path="2022-06-20_NOB_DOT_4.mp4",
@@ -400,7 +401,7 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
 # test.run()
 #
 # get_video_meta_data(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/frames/output/ROI_analysis/2022-06-20_NOB_DOT_4.mp4')
- # get_video_meta_data(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi')
+# get_video_meta_data(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi')
 
 # test = ROIPlot(ini_path=r'/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini', video_path=r"Together_1.avi")
 # test.insert_data()
