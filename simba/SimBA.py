@@ -137,7 +137,7 @@ from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
-from simba.utils.enums import OS, Defaults, Formats, TagNames
+from simba.utils.enums import OS, Defaults, Formats, TagNames, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
                                  get_icons_paths)
@@ -900,24 +900,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value,
         )
         # label_model_validation = LabelFrame(tab9, text='VALIDATE MODEL ON SINGLE VIDEO', pady=5, padx=5, font=("Helvetica", 12, 'bold'), fg='blue')
-        self.csvfile = FileSelect(
-            label_model_validation,
-            "SELECT DATA FEATURE FILE",
-            color="blue",
-            lblwidth=30,
-            file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")],
-        )
-        self.modelfile = FileSelect(
-            label_model_validation, "SELECT MODEL FILE", color="blue", lblwidth=30
-        )
-        button_runvalidmodel = Button(
-            label_model_validation,
-            text="RUN MODEL",
-            fg="blue",
-            command=lambda: threading.Thread(
-                target=self.validate_model_first_step
-            ).start(),
-        )
+        self.csvfile = FileSelect(label_model_validation, "SELECT DATA FEATURE FILE", color="blue", lblwidth=30, file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")], initialdir=os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value))
+        self.modelfile = FileSelect(label_model_validation, "SELECT MODEL FILE", color="blue", lblwidth=30, initialdir=self.project_path)
+        button_runvalidmodel = Button(label_model_validation, text="RUN MODEL", fg="blue", command=lambda: threading.Thread(target=self.validate_model_first_step).start())
 
         button_generateplot = Button(
             label_model_validation,

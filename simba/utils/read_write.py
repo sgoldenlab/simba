@@ -465,6 +465,7 @@ def concatenate_videos_in_folder(
     substring: Optional[str] = None,
     remove_splits: Optional[bool] = True,
     gpu: Optional[bool] = False,
+    verbose: Optional[bool] = True,
 ) -> None:
     """
     Concatenate (temporally) all video files in a folder into a single video.
@@ -521,13 +522,9 @@ def concatenate_videos_in_folder(
     if os.path.exists(save_path):
         os.remove(save_path)
     if check_nvidea_gpu_available() and gpu:
-        returned = os.system(
-            f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}"'
-        )
+        returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}"')
     else:
-        returned = os.system(
-            f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info'
-        )
+        returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info')
     while True:
         if returned != 0:
             pass
