@@ -487,6 +487,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.pr_curve = self.create_pr_curve_var.get()
         self.shap_scores_absent = 0
         self.shap_scores_present = 0
+        self.shap_multiprocess = False
         self.shap_save_it = "ALL FRAMES"
         self.shap_scores = self.calc_shap_scores_var.get()
         if self.shap_scores:
@@ -494,6 +495,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             self.shap_scores_present = self.shap_present.entry_get
             self.shap_save_it = self.shap_save_it_dropdown.getChoices()
             self.shap_multiprocess = self.shap_multiprocess_dropdown.getChoices()
+
         self.learning_curve = self.learning_curve_var.get()
         self.partial_dependency = self.partial_dependency_var.get()
         self.learning_curve_k_split = 0
