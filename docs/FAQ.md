@@ -404,7 +404,7 @@ Check out this potential solution on [stackoverflow](https://stackoverflow.com/q
 
 Specifically, try:
 
-i) `pip install imblearn` followed by;
+i) `pip uninstall imblearn` followed by;
 ii) ``conda install -c conda-forge imbalanced-learn``
 
 Then try to relaunch simba by typing `simba`.
