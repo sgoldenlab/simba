@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 from tkinter import *
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -26,20 +26,21 @@ except:
 import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_tuple,
-                                check_ffmpeg_available)
+                                check_valid_tuple)
 from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
-                                FileExistError, InvalidFileTypeError,
-                                InvalidInputError, NoDataError,
-                                NoFilesFoundError, NotDirectoryError, InvalidVideoFileError, FrameRangeError)
+                                FileExistError, FrameRangeError,
+                                InvalidFileTypeError, InvalidInputError,
+                                InvalidVideoFileError, NoDataError,
+                                NoFilesFoundError, NotDirectoryError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -55,10 +56,12 @@ from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
 MAX_FRM_SIZE = 1080, 650
 
 
-def change_img_format(directory: Union[str, os.PathLike],
-                      file_type_in: str,
-                      file_type_out: str,
-                      verbose: Optional[bool] = False) -> None:
+def change_img_format(
+    directory: Union[str, os.PathLike],
+    file_type_in: str,
+    file_type_out: str,
+    verbose: Optional[bool] = False,
+) -> None:
     """
     Convert the file type of all image files within a directory.
 
@@ -74,20 +77,29 @@ def change_img_format(directory: Union[str, os.PathLike],
     check_if_dir_exists(in_dir=directory, source=change_img_format.__name__)
     files_found = glob.glob(directory + f"/*.{file_type_in}")
     if len(files_found) == 0:
-        raise NoFilesFoundError(f'SIMBA ERROR: No {file_type_in} files (with .{file_type_in} file extension) found in the {directory} directory', source=change_img_format.__name__)
+        raise NoFilesFoundError(
+            f"SIMBA ERROR: No {file_type_in} files (with .{file_type_in} file extension) found in the {directory} directory",
+            source=change_img_format.__name__,
+        )
     print(f"{len(files_found)} image files found in {directory}...")
     for file_cnt, file_path in enumerate(files_found):
         if verbose:
-            print(f'Converting file {file_cnt+1}/{len(files_found)} ...')
+            print(f"Converting file {file_cnt+1}/{len(files_found)} ...")
         im = Image.open(file_path)
         save_name = file_path.replace("." + str(file_type_in), "." + str(file_type_out))
         im.save(save_name)
         os.remove(file_path)
-    stdout_success(msg=f"SIMBA COMPLETE: Files in {directory} directory converted to {file_type_out}", source=change_img_format.__name__,)
+    stdout_success(
+        msg=f"SIMBA COMPLETE: Files in {directory} directory converted to {file_type_out}",
+        source=change_img_format.__name__,
+    )
 
-def clahe_enhance_video(file_path: Union[str, os.PathLike],
-                        clip_limit: Optional[int] = 2,
-                        tile_grid_size: Optional[Tuple[int]] = (16, 16)) -> None:
+
+def clahe_enhance_video(
+    file_path: Union[str, os.PathLike],
+    clip_limit: Optional[int] = 2,
+    tile_grid_size: Optional[Tuple[int]] = (16, 16),
+) -> None:
     """
     Convert a single video file to clahe-enhanced greyscale .avi file. The result is saved with prefix
     ``CLAHE_`` in the same directory as in the input file.
@@ -101,18 +113,38 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
     """
 
     check_file_exist_and_readable(file_path=file_path)
-    check_int(name=f'{clahe_enhance_video.__name__} clip_limit', value=clip_limit, min_value=0)
+    check_int(
+        name=f"{clahe_enhance_video.__name__} clip_limit", value=clip_limit, min_value=0
+    )
     video_meta_data = get_video_meta_data(file_path)
-    check_valid_tuple(x=tile_grid_size, source=clahe_enhance_video.__name__, accepted_lengths=(2,), valid_dtypes=(int,))
-    if (tile_grid_size[0] > video_meta_data["height"]) or ((tile_grid_size[1] > video_meta_data["width"])):
-        raise InvalidInputError(msg=f'The tile grid size ({tile_grid_size}) is larger than the video size ({video_meta_data["resolution_str"]})', source=clahe_enhance_video.__name__)
+    check_valid_tuple(
+        x=tile_grid_size,
+        source=clahe_enhance_video.__name__,
+        accepted_lengths=(2,),
+        valid_dtypes=(int,),
+    )
+    if (tile_grid_size[0] > video_meta_data["height"]) or (
+        (tile_grid_size[1] > video_meta_data["width"])
+    ):
+        raise InvalidInputError(
+            msg=f'The tile grid size ({tile_grid_size}) is larger than the video size ({video_meta_data["resolution_str"]})',
+            source=clahe_enhance_video.__name__,
+        )
     dir, file_name, file_ext = get_fn_ext(filepath=file_path)
     save_path = os.path.join(dir, f"CLAHE_{file_name}.avi")
     fourcc = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
     print(f"Applying CLAHE on video {file_name}, this might take awhile...")
     cap = cv2.VideoCapture(file_path)
-    writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]), 0)
-    clahe_filter = cv2.createCLAHE(clipLimit=int(clip_limit), tileGridSize=tile_grid_size)
+    writer = cv2.VideoWriter(
+        save_path,
+        fourcc,
+        video_meta_data["fps"],
+        (video_meta_data["width"], video_meta_data["height"]),
+        0,
+    )
+    clahe_filter = cv2.createCLAHE(
+        clipLimit=int(clip_limit), tileGridSize=tile_grid_size
+    )
     frm_cnt = 0
     try:
         while True:
@@ -122,7 +154,9 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 clahe_frm = clahe_filter.apply(img)
                 writer.write(clahe_frm)
-                print(f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']}")
+                print(
+                    f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']}"
+                )
             else:
                 break
         cap.release()
@@ -133,9 +167,15 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
         print(f"CLAHE conversion failed for video {file_name}.")
         cap.release()
         writer.release()
-        raise InvalidVideoFileError(msg=f'Could not convert file {file_path} to CLAHE enhanced video', source=clahe_enhance_video.__name__)
+        raise InvalidVideoFileError(
+            msg=f"Could not convert file {file_path} to CLAHE enhanced video",
+            source=clahe_enhance_video.__name__,
+        )
 
-def extract_frame_range(file_path: Union[str, os.PathLike], start_frame: int, end_frame: int) -> None:
+
+def extract_frame_range(
+    file_path: Union[str, os.PathLike], start_frame: int, end_frame: int
+) -> None:
     """
     Extract a user-defined range of frames from a video file to `png` format. Images
     are saved in a folder with the suffix `_frames` within the same directory as the video file.
@@ -152,7 +192,9 @@ def extract_frame_range(file_path: Union[str, os.PathLike], start_frame: int, en
     video_meta_data = get_video_meta_data(file_path)
     check_int(name="start frame", value=start_frame, min_value=0)
     file_dir, file_name, file_ext = get_fn_ext(filepath=file_path)
-    check_int(name="end frame", value=end_frame, max_value=video_meta_data["frame_count"])
+    check_int(
+        name="end frame", value=end_frame, max_value=video_meta_data["frame_count"]
+    )
     frame_range = list(range(int(start_frame), int(end_frame) + 1))
     save_dir = os.path.join(file_dir, file_name + "_frames")
     cap = cv2.VideoCapture(file_path)
@@ -164,9 +206,15 @@ def extract_frame_range(file_path: Union[str, os.PathLike], start_frame: int, en
         frm_save_path = os.path.join(save_dir, f"{frm_number}.png")
         cv2.imwrite(frm_save_path, frame)
         print(f"Frame {frm_number} saved (Frame {frm_cnt}/{len(frame_range)-1})")
-    stdout_success(msg=f"{len(frame_range)-1} frames extracted for video {file_name} saved in {save_dir}", source=extract_frame_range.__name__)
+    stdout_success(
+        msg=f"{len(frame_range)-1} frames extracted for video {file_name} saved in {save_dir}",
+        source=extract_frame_range.__name__,
+    )
 
-def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False) -> None:
+
+def change_single_video_fps(
+    file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False
+) -> None:
     """
     Change the fps of a single video file. Results are stored in the same directory as in the input file with
     the suffix ``_fps_new_fps``.
@@ -185,7 +233,10 @@ def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: O
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)",source=change_single_video_fps.__name__)
+        raise FFMPEGCodecGPUError(
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=change_single_video_fps.__name__,
+        )
     check_file_exist_and_readable(file_path=file_path)
     check_int(name="New fps", value=fps)
     video_meta_data = get_video_meta_data(video_path=file_path)
@@ -216,7 +267,10 @@ def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: O
         source=change_single_video_fps.__name__,
     )
 
-def change_fps_of_multiple_videos(directory: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False) -> None:
+
+def change_fps_of_multiple_videos(
+    directory: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False
+) -> None:
     """
     Change the fps of all video files in a folder. Results are stored in the same directory as in the input files with
     the suffix ``_fps_new_fps``.
@@ -237,7 +291,10 @@ def change_fps_of_multiple_videos(directory: Union[str, os.PathLike], fps: int, 
             source=change_fps_of_multiple_videos.__name__,
         )
     if not os.path.isdir(directory):
-        raise NotDirectoryError(msg=f"SIMBA ERROR: {directory} is not a valid directory", source=change_fps_of_multiple_videos.__name__)
+        raise NotDirectoryError(
+            msg=f"SIMBA ERROR: {directory} is not a valid directory",
+            source=change_fps_of_multiple_videos.__name__,
+        )
     check_int(name="New fps", value=fps)
     video_paths = []
     file_paths_in_folder = [f for f in glob.glob(directory + "/*") if os.path.isfile(f)]
@@ -256,14 +313,18 @@ def change_fps_of_multiple_videos(directory: Union[str, os.PathLike], fps: int, 
         video_timer = SimbaTimer(start=True)
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
         print(f"Converting FPS for {file_name}...")
-        save_path = os.path.join(dir_name, file_name + "_fps_{}{}".format(str(fps), str(ext)))
+        save_path = os.path.join(
+            dir_name, file_name + "_fps_{}{}".format(str(fps), str(ext))
+        )
         if gpu:
             command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
         else:
             command = f'ffmpeg -i {file_path} -filter:v fps=fps={fps} -c:v libx264 "{save_path}" -y'
         subprocess.call(command, shell=True)
         video_timer.stop_timer()
-        print(f"Video {file_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)")
+        print(
+            f"Video {file_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)"
+        )
     timer.stop_timer()
     stdout_success(
         msg=f"SIMBA COMPLETE: FPS of {len(video_paths)} video(s) changed to {fps}",
@@ -271,7 +332,10 @@ def change_fps_of_multiple_videos(directory: Union[str, os.PathLike], fps: int, 
         source=change_fps_of_multiple_videos.__name__,
     )
 
-def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+
+def convert_video_powerpoint_compatible_format(
+    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
+) -> None:
     """
     Create MS PowerPoint compatible copy of a video file. The result is stored in the same directory as the
     input file with the ``_powerpointready`` suffix.
@@ -314,10 +378,12 @@ def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike
     )
 
 
-#convert_video_powerpoint_compatible_format(file_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test/SI_DAY3_308_CD1_PRESENT_fps_10_fps_15.mp4", gpu=False)
+# convert_video_powerpoint_compatible_format(file_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test/SI_DAY3_308_CD1_PRESENT_fps_10_fps_15.mp4", gpu=False)
 
 
-def convert_to_mp4(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def convert_to_mp4(
+    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
+) -> None:
     """
     Convert a video file to mp4 format. The result is stored in the same directory as the
     input file with the ``_converted.mp4`` suffix.
@@ -361,7 +427,10 @@ def convert_to_mp4(file_path: Union[str, os.PathLike], gpu: Optional[bool] = Fal
         source=convert_to_mp4.__name__,
     )
 
-def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+
+def video_to_greyscale(
+    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
+) -> None:
     """
     Convert a video file to greyscale mp4 format. The result is stored in the same directory as the
     input file with the ``_grayscale.mp4`` suffix.
@@ -403,7 +472,9 @@ def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] =
     )
 
 
-def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def batch_video_to_greyscale(
+    directory: Union[str, os.PathLike], gpu: Optional[bool] = False
+) -> None:
     """
     Convert a directory of video file to greyscale mp4 format. The results are stored in the same directory as the
     input files with the ``_grayscale.mp4`` suffix.
@@ -417,10 +488,15 @@ def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[b
     """
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=batch_video_to_greyscale.__name__)
+        raise FFMPEGCodecGPUError(
+            msg="No GPU found (as evaluated by nvidea-smi returning None)",
+            source=batch_video_to_greyscale.__name__,
+        )
     timer = SimbaTimer(start=True)
     check_if_dir_exists(in_dir=directory, source=batch_video_to_greyscale.__name__)
-    video_paths = find_all_videos_in_directory(directory=directory, as_dict=True, raise_error=True)
+    video_paths = find_all_videos_in_directory(
+        directory=directory, as_dict=True, raise_error=True
+    )
     for file_cnt, (file_name, file_path) in enumerate(video_paths.items()):
         video_timer = SimbaTimer(start=True)
         in_dir, _, _ = get_fn_ext(filepath=file_path)
@@ -429,17 +505,25 @@ def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[b
             command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -c:a copy "{save_name}" -y'
         else:
             command = f'ffmpeg -i "{file_path}" -vf format=gray -c:v libx264 "{save_name}" -hide_banner -loglevel error -y'
-        print(f"Converting {file_name} to greyscale (Video {file_cnt+1}/{len(list(video_paths.keys()))})... ")
+        print(
+            f"Converting {file_name} to greyscale (Video {file_cnt+1}/{len(list(video_paths.keys()))})... "
+        )
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         video_timer.stop_timer()
-        print(f'Video {save_name} complete, (elapsed time: {video_timer.elapsed_time_str}s)')
+        print(
+            f"Video {save_name} complete, (elapsed time: {video_timer.elapsed_time_str}s)"
+        )
     timer.stop_timer()
-    stdout_success(msg=f"{len(list(video_paths.keys()))} video(s) converted to gresyscale! Saved in {directory} with '_greyscale' suffix", elapsed_time=timer.elapsed_time_str, source=batch_video_to_greyscale.__name__,)
+    stdout_success(
+        msg=f"{len(list(video_paths.keys()))} video(s) converted to gresyscale! Saved in {directory} with '_greyscale' suffix",
+        elapsed_time=timer.elapsed_time_str,
+        source=batch_video_to_greyscale.__name__,
+    )
 
 
-
-
-def superimpose_frame_count(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def superimpose_frame_count(
+    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
+) -> None:
     """
     Superimpose frame count on a video file. The result is stored in the same directory as the
     input file with the ``_frame_no.mp4`` suffix.
@@ -492,10 +576,13 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike], gpu: Optional[bo
         elapsed_time=timer.elapsed_time_str,
     )
 
-#_ = superimpose_frame_count(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', gpu=False)
+
+# _ = superimpose_frame_count(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', gpu=False)
 
 
-def remove_beginning_of_video(file_path: Union[str, os.PathLike], time: int, gpu: Optional[bool] = False) -> None:
+def remove_beginning_of_video(
+    file_path: Union[str, os.PathLike], time: int, gpu: Optional[bool] = False
+) -> None:
     """
     Remove N seconds from the beginning of a video file. The result is stored in the same directory as the
     input file with the ``_shorten.mp4`` suffix.
@@ -540,7 +627,7 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike], time: int, gpu
     )
 
 
-#remove_beginning_of_video(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_frame_no.mp4', time=10, gpu=False)
+# remove_beginning_of_video(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_frame_no.mp4', time=10, gpu=False)
 
 
 def clip_video_in_range(
@@ -697,8 +784,11 @@ def gif_creator(
     check_int(name="Duration", value=duration, min_value=1)
     check_int(name="Width", value=width)
     video_meta_data = get_video_meta_data(file_path)
-    if (start_time + duration) > video_meta_data['video_length_s']:
-        raise FrameRangeError(msg=f'The end of the gif (start time: {start_time} + duration: {duration}) is longer than the {file_path} video: {video_meta_data["video_length_s"]}s', source=gif_creator.__name__)
+    if (start_time + duration) > video_meta_data["video_length_s"]:
+        raise FrameRangeError(
+            msg=f'The end of the gif (start time: {start_time} + duration: {duration}) is longer than the {file_path} video: {video_meta_data["video_length_s"]}s',
+            source=gif_creator.__name__,
+        )
 
     dir, file_name, ext = get_fn_ext(filepath=file_path)
     save_name = os.path.join(dir, file_name + ".gif")
@@ -720,7 +810,8 @@ def gif_creator(
         source=gif_creator.__name__,
     )
 
-#gif_creator(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', start_time=5, duration=15, width=600, gpu=False)
+
+# gif_creator(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', start_time=5, duration=15, width=600, gpu=False)
 
 
 def batch_convert_video_format(
@@ -775,7 +866,9 @@ def batch_convert_video_format(
         video_timer = SimbaTimer(start=True)
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
         print(f"Processing video {file_name}...")
-        save_path = os.path.join(dir_name, file_name + ".{}".format(output_format.lower()))
+        save_path = os.path.join(
+            dir_name, file_name + ".{}".format(output_format.lower())
+        )
         if os.path.isfile(save_path):
             raise FileExistError(
                 msg="SIMBA ERROR: The outfile file already exist: {}.".format(
@@ -791,13 +884,16 @@ def batch_convert_video_format(
             command = f'ffmpeg -y -i "{file_path}" -c:v libx264 -crf 21 -preset medium -c:a libmp3lame -b:a 320k "{save_path}"'
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         video_timer.stop_timer()
-        print(f"Video {file_name} complete, (elapsed time: {video_timer.elapsed_time_str}s) (Video {file_cnt + 1}/{len(video_paths)})...")
+        print(
+            f"Video {file_name} complete, (elapsed time: {video_timer.elapsed_time_str}s) (Video {file_cnt + 1}/{len(video_paths)})..."
+        )
     stdout_success(
         msg=f"SIMBA COMPLETE: {str(len(video_paths))} videos converted in {directory} directory!",
         source=batch_convert_video_format.__name__,
     )
 
-#_ = batch_convert_video_format(directory='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_2',input_format='mp4', output_format='avi')
+
+# _ = batch_convert_video_format(directory='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_2',input_format='mp4', output_format='avi')
 
 
 def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
@@ -874,8 +970,8 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike]) -> None:
         source=extract_frames_single_video.__name__,
     )
 
-#_ = extract_frames_single_video(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4')
 
+# _ = extract_frames_single_video(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4')
 
 
 def multi_split_video(
@@ -965,7 +1061,9 @@ def multi_split_video(
 # multi_split_video(file_path=r'/Users/simon/Desktop/time_s_converted.mp4', start_times=['00:00:01', '00:00:02'], end_times=['00:00:04', '00:00:05'], gpu=False)
 
 
-def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def crop_single_video(
+    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
+) -> None:
     """
     Crop a single video using ``simba.video_processors.roi_selector.ROISelector`` interface. Results is saved in the same directory as input video with the
     ``_cropped.mp4`` suffix`.
@@ -1180,12 +1278,14 @@ def frames_to_movie(
         command = f'ffmpeg -y -r {fps} -f image2 -s {img_h}x{img_w} -i "{ffmpeg_fn}" -c:v h264_nvenc -b:v {bitrate}k "{save_path}" -y'
     else:
         command = f'ffmpeg -y -r {fps} -f image2 -s {img_h}x{img_w} -i "{ffmpeg_fn}" -vcodec libx264 -b {bitrate}k "{save_path}" -y'
-    print(f"Creating {os.path.basename(save_path)} from {len(img_paths_in_folder)} images...")
+    print(
+        f"Creating {os.path.basename(save_path)} from {len(img_paths_in_folder)} images..."
+    )
     subprocess.call(command, shell=True)
     stdout_success(msg=f"Video created at {save_path}", source=frames_to_movie.__name__)
 
 
-#_ = frames_to_movie(directory='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled', fps=15, bitrate=32000, img_format='png')
+# _ = frames_to_movie(directory='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled', fps=15, bitrate=32000, img_format='png')
 
 
 def video_concatenator(
@@ -1464,7 +1564,9 @@ class VideoRotator(ConfigReader):
         self.main_frm.mainloop()
 
 
-def extract_frames_from_all_videos_in_directory(config_path: Union[str, os.PathLike], directory: Union[str, os.PathLike]) -> None:
+def extract_frames_from_all_videos_in_directory(
+    config_path: Union[str, os.PathLike], directory: Union[str, os.PathLike]
+) -> None:
     """
     Extract all frames from all videos in a directory. The results are saved in the project_folder/frames/input directory of the SimBA project
 
@@ -1483,7 +1585,10 @@ def extract_frames_from_all_videos_in_directory(config_path: Union[str, os.PathL
         if ext.lower() in video_types:
             video_paths.append(file_path)
     if len(video_paths) == 0:
-        raise NoFilesFoundError(msg=f"SIMBA ERROR: 0 video files in mp4 or avi format found in {directory}", source=extract_frames_from_all_videos_in_directory.__name__)
+        raise NoFilesFoundError(
+            msg=f"SIMBA ERROR: 0 video files in mp4 or avi format found in {directory}",
+            source=extract_frames_from_all_videos_in_directory.__name__,
+        )
     config = read_config_file(config_path)
     project_path = read_config_entry(
         config, "General settings", "project_path", data_type="folder_path"

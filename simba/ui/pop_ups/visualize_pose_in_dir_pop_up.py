@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
-from tkinter import *
 import threading
+from tkinter import *
 
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.pose_plotter_mp import PosePlotter
@@ -174,5 +174,4 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         self.color_table_frme.grid(row=1, column=0, sticky=NW)
 
 
-
-#test = VisualizePoseInFolderPopUp()
+# test = VisualizePoseInFolderPopUp()

@@ -583,16 +583,19 @@ class CircularStatisticsMixin(object):
             for j in prange(win_size, sample_1.shape[0] + 1):
                 data_1_window = sample_1[j - win_size : j]
                 data_2_window = sample_2[j - win_size : j]
-                m1 = np.arctan2(np.mean(np.sin(data_1_window)), np.mean(np.cos(data_1_window)))
-                m2 = np.arctan2(np.mean(np.sin(data_2_window)), np.mean(np.cos(data_2_window)))
+                m1 = np.arctan2(
+                    np.mean(np.sin(data_1_window)), np.mean(np.cos(data_1_window))
+                )
+                m2 = np.arctan2(
+                    np.mean(np.sin(data_2_window)), np.mean(np.cos(data_2_window))
+                )
                 sin_1, sin_2 = np.sin(data_1_window - m1), np.sin(data_2_window - m2)
                 denominator = np.sqrt(np.sum(sin_1 * sin_1) * np.sum(sin_2 * sin_2))
                 numerator = np.sum(sin_1 * sin_2)
-                if (denominator == 0):
+                if denominator == 0:
                     results[j - 1][i] = 0.0
                 else:
                     results[j - 1][i] = np.abs(numerator / denominator)
-
 
         return results.astype(np.float32)
 
