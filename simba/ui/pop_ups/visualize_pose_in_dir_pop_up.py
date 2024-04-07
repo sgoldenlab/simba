@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson"
 
 from tkinter import *
+import threading
 
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.pose_plotter_mp import PosePlotter
@@ -56,7 +57,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
             "30",
         )
         self.core_cnt_dropdown.setChoices(1)
-        run_btn = Button(
+        self.run_btn = Button(
             self.main_frm,
             text="VISUALIZE POSE",
             font=Formats.LABELFRAME_HEADER_FORMAT.value,
@@ -76,7 +77,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         self.circle_size_dropdown.grid(row=2, column=0, sticky=NW)
         self.sample_size_dropdown.grid(row=3, column=0, sticky=NW)
         self.core_cnt_dropdown.grid(row=4, column=0, sticky=NW)
-        run_btn.grid(row=5, column=0)
+        self.run_btn.grid(row=5, column=0)
         self.advanced_settings_btn.grid(row=6, column=0)
         self.color_lookup = None
 
@@ -106,7 +107,8 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
             color_settings=self.color_lookup,
             sample_time=sample_time,
         )
-        pose_plotter.run()
+
+        threading.Thread(target=pose_plotter.run()).start()
 
     def launch_adv_settings(self):
         if self.advanced_settings_btn["text"] == "OPEN ADVANCED SETTINGS":
@@ -117,6 +119,13 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
                 font=Formats.LABELFRAME_HEADER_FORMAT.value,
                 pady=5,
                 padx=5,
+            )
+            self.run_btn = Button(
+                self.adv_settings_frm,
+                text="VISUALIZE POSE",
+                font=Formats.LABELFRAME_HEADER_FORMAT.value,
+                fg="blue",
+                command=lambda: self.run(),
             )
             self.confirm_btn = Button(
                 self.adv_settings_frm,
@@ -130,6 +139,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
             self.adv_settings_frm.grid(row=5, column=0, pady=10)
             self.specify_animals_dropdown.grid(row=0, column=0, sticky=NW)
             self.confirm_btn.grid(row=0, column=1)
+            self.run_btn.grid(row=2, column=0)
         elif self.advanced_settings_btn["text"] == "CLOSE ADVANCED SETTINGS":
             if hasattr(self, "adv_settings_frm"):
                 self.adv_settings_frm.destroy()
@@ -164,4 +174,5 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         self.color_table_frme.grid(row=1, column=0, sticky=NW)
 
 
-# test = VisualizePoseInFolderPopUp()
+
+#test = VisualizePoseInFolderPopUp()

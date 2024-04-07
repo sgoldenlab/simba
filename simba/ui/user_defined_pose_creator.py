@@ -15,7 +15,6 @@ from simba.utils.data import create_color_palettes
 from simba.utils.enums import Paths
 from simba.utils.errors import InvalidFileTypeError
 
-
 class PoseConfigCreator(PlottingMixin):
     """
 

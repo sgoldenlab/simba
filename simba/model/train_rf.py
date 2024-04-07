@@ -43,9 +43,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             filepaths=self.target_file_paths,
             error_msg="Zero annotation files found in project_folder/csv/targets_inserted directory, cannot create model.",
         )
-        print(
-            "Reading in {} annotated files...".format(str(len(self.target_file_paths)))
-        )
+        print(f"Reading in {len(self.target_file_paths)} annotated files...")
         self.data_df, self.frm_idx = self.read_all_files_in_folder_mp(
             self.target_file_paths, self.file_type, [self.clf_name]
         )
@@ -504,6 +502,8 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         """
 
         self.timer.stop_timer()
+        print(self.model_dir_out)
+        if not os.listdir(self.model_dir_out): os.makedirs(self.model_dir_out)
         self.save_rf_model(self.rf_clf, self.clf_name, self.model_dir_out)
         stdout_success(
             msg=f"Classifier {self.clf_name} saved in models/generated_models directory",
@@ -516,7 +516,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         )
 
 
-# test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini')
 # test.run()
 # test.save()
 

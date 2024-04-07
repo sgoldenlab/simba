@@ -1462,9 +1462,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         _ = MachineModelSettingsPopUp(config_path=self.config_path)
 
     def run_feature_extraction(self):
-        print(
-            f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts"
-        )
+        print('Running feature extraction...')
+        print(f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts...")
         feature_extractor_classes = get_bp_config_code_class_pairs()
         if self.user_defined_var.get():
             custom_feature_extractor = CustomFeatureExtractor(

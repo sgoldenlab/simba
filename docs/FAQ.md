@@ -404,10 +404,31 @@ Check out this potential solution on [stackoverflow](https://stackoverflow.com/q
 
 Specifically, try:
 
-i) `pip install imblearn` followed by;
+i) `pip uninstall imblearn` followed by;
 ii) ``conda install -c conda-forge imbalanced-learn``
 
 Then try to relaunch simba by typing `simba`.
 
-##
+</details>
+
+### 27. I'm on Linux, and when I install SimBA I get a complaint error while installint the SHAP library, complaining about ``gcc`` and exit code 1
+
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/>
+
+Check out this solution on [stackoverflow](https://github.com/watson-developer-cloud/python-sdk/issues/418#issuecomment-674038596) 
+
+Specifically, try:
+
+i) `sudo apt-get install gcc` followed by `sudo apt-get install g++`
+
+Then try to relaunch simba by typing `simba`.
+
+</details>
+
+
+
+
+
 Author [Simon N](https://github.com/sronilsson)

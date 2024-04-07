@@ -20,7 +20,7 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 InvalidInputError, NoDataError,
                                 NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
-                                StringError)
+                                StringError, FFMPEGNotFoundError)
 from simba.utils.warnings import NoDataFoundWarning
 
 
@@ -304,18 +304,20 @@ def check_all_file_names_are_represented_in_video_log(
         )
 
 
-def check_if_dir_exists(in_dir: Union[str, os.PathLike]) -> None:
+def check_if_dir_exists(in_dir: Union[str, os.PathLike], source: Optional[str] = None) -> None:
     """
     Check if a directory path exists.
 
-    :param str in_dir: Putative directory path.
+    :param Union[str, os.PathLike] in_dir: Putative directory path.
+    :param str source: String source for interpretable error messaging.
     :raise NotDirectoryError: The directory does not exist.
     """
+
     if not os.path.isdir(in_dir):
-        raise NotDirectoryError(
-            msg=f"{in_dir} is not a valid directory",
-            source=check_if_dir_exists.__name__,
-        )
+        if source is None:
+            raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=check_if_dir_exists.__name__)
+        else:
+            raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=source)
 
 
 def check_that_column_exist(
@@ -507,18 +509,22 @@ def check_nvidea_gpu_available() -> bool:
         return False
 
 
-def check_ffmpeg_available() -> bool:
+def check_ffmpeg_available(raise_error: Optional[bool] = False) -> Union[bool, None]:
     """
     Helper to check of FFMpeg is available via subprocess ``ffmpeg``.
 
-    returns bool: True if ``ffmpeg`` returns not None. Else False.
+    :param Optional[bool] raise_error: If True, raises ``FFMPEGNotFoundError`` if FFmpeg can't be found. Else return False. Default False.
+    :returns bool: True if ``ffmpeg`` returns not None and raise_error is False. Else False.
     """
+
     try:
         subprocess.call("ffmpeg", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         return True
     except Exception:
-        return False
-
+        if raise_error:
+            raise FFMPEGNotFoundError(msg='FFMpeg could not be found on the instance (as evaluated via subprocess ffmpeg). Please make sure FFMpeg is installed.')
+        else:
+            return False
 
 def check_if_valid_rgb_str(
     input: str,
@@ -1189,7 +1195,7 @@ def check_valid_dataframe(
         additional = [x for x in dtypes if x not in valid_dtypes]
         if len(additional) > 0:
             raise InvalidInputError(
-                msg=f"The dataframe {source} has invalid data format(s) {additional}.",
+                msg=f"The dataframe {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}",
                 source=source,
             )
     if min_axis_1 is not None:
@@ -1220,3 +1226,15 @@ def check_valid_dataframe(
                 msg=f"The dataframe {source} has more than ({df.columns}) the required maximum number of columns ({max_axis_1}).",
                 source=source,
             )
+
+def check_valid_tuple(x: tuple, source: Optional[str] = '', accepted_lengths: Optional[Tuple[int]] = None, valid_dtypes: Optional[Tuple[Any]] = None):
+    if not isinstance(x, (tuple)):
+        raise InvalidInputError(msg=f'{check_valid_tuple.__name__} {source} is not a valid tuple', source=source)
+    if accepted_lengths is not None:
+        if len(x) not in accepted_lengths:
+            raise InvalidInputError(msg=f'Tuple is not of valid lengths. Found {len(x)}. Accepted: {accepted_lengths}', source=source)
+    if valid_dtypes is not None:
+        dtypes = list(set([type(v) for v in x]))
+        additional = [x for x in dtypes if x not in valid_dtypes]
+        if len(additional) > 0:
+            raise InvalidInputError(msg=f"The tuple {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}", source=source)

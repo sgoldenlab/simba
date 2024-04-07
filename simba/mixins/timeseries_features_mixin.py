@@ -22,8 +22,7 @@ except:
 import typing
 from typing import get_type_hints
 
-from simba.utils.checks import (check_instance, check_int, check_str,
-                                check_that_column_exist, check_valid_lst)
+from simba.utils.checks import (check_instance, check_int, check_str, check_that_column_exist, check_valid_lst, check_valid_array, check_float)
 from simba.utils.read_write import find_core_cnt
 
 
@@ -400,6 +399,22 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
+    @njit(
+        [
+            (float32[:], float64[:], int64),
+            (int64[:], float64[:], int64),
+        ])
+    def sliding_unique(x: np.ndarray, time_windows: np.ndarray, fps: int):
+        results = np.full((x.shape[0], time_windows.shape[0]), -1)
+        for i in prange(time_windows.shape[0]):
+            window_size = int(time_windows[i] * fps)
+            for l, r in zip(range(0, x.shape[0] + 1), range(window_size, x.shape[0] + 1)):
+                sample = x[l:r]
+                unique_cnt = np.unique(sample)
+                results[r - 1, i] = unique_cnt.shape[0]
+        return results
+
+    @staticmethod
     @njit("(float32[:], int64, int64, )", fastmath=True)
     def percent_in_percentile_window(data: np.ndarray, upper_pct: int, lower_pct: int):
         """
@@ -755,9 +770,7 @@ class TimeseriesFeatureMixin(object):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l:r]
                 results[r - 1, i] = np.sum(np.abs(np.diff(sample.astype(np.float64))))
         return results.astype(np.float32)
@@ -1203,7 +1216,7 @@ class TimeseriesFeatureMixin(object):
 
         :examples:
         >>> data = np.array([1, 8, 2, 10, 8, 6, 8, 1, 1, 1]).astype(np.float32)
-        >>> sliding_benford_correlation(data=data, time_windows=np.array([1.0]), sample_rate=2)
+        >>> TimeseriesFeatureMixin.sliding_benford_correlation(data=data, time_windows=np.array([1.0]), sample_rate=2)
         >>> [[ 0.][0.447][0.017][0.877][0.447][0.358][0.358][0.447][0.864][0.864]]
         """
 
@@ -1663,3 +1676,87 @@ class TimeseriesFeatureMixin(object):
                     np.sqrt((s[0] - c[0]) ** 2 + (s[1] - c[1]) ** 2)
                 ) / px_per_mm
         return results.astype(np.float32)
+
+    @staticmethod
+    @njit('(float64[:], float64[:], float64[:], float64, boolean, float64)')
+    def sliding_two_signal_crosscorrelation(x: np.ndarray,
+                                            y: np.ndarray,
+                                            windows: np.ndarray,
+                                            sample_rate: float,
+                                            normalize: bool,
+                                            lag: float) -> np.ndarray:
+        """
+        Calculate sliding (lagged) cross-correlation between two signals, e.g., the movement and velocity of two animals.
+
+        .. note::
+            If no lag needed, pass lag 0.0.
+
+        :param np.ndarray x: The first input signal.
+        :param np.ndarray y: The second input signal.
+        :param np.ndarray windows: Array of window lengths in seconds.
+        :param float sample_rate: Sampling rate of the signals (in Hz or FPS).
+        :param bool normalize: If True, normalize the signals before computing the correlation.
+        :param float lag: Time lag between the signals in seconds.
+
+        :return: 2D array of sliding cross-correlation values. Each row corresponds to a time index, and each column corresponds to a window size specified in the `windows` parameter.
+
+        :example:
+        >>> x = np.random.randint(0, 10, size=(20,))
+        >>> y = np.random.randint(0, 10, size=(20,))
+        >>> TimeseriesFeatureMixin.sliding_two_signal_crosscorrelation(x=x, y=y, windows=np.array([1.0, 1.2]), sample_rate=10, normalize=True, lag=0.0)
+        """
+
+        results = np.full((x.shape[0], windows.shape[0]), 0.0)
+        lag = int(sample_rate * lag)
+        for i in prange(windows.shape[0]):
+            W_s = int(windows[i] * sample_rate)
+            for cnt, (l1, r1) in enumerate(zip(range(0, x.shape[0] + 1), range(W_s, x.shape[0] + 1))):
+                l2 = l1 - lag
+                if l2 < 0: l2 = 0
+                r2 = r1 - lag
+                if r2 - l2 < W_s: r2 = l2 + W_s
+                X_w = x[l1:r1]
+                Y_w = y[l2:r2]
+                if normalize:
+                    X_w = (X_w - np.mean(X_w)) / (np.std(X_w) * X_w.shape[0])
+                    Y_w = (Y_w - np.mean(Y_w)) / np.std(Y_w)
+                v = np.correlate(a=X_w, v=Y_w)[0]
+                if np.isnan(v):
+                    results[r1 - 1, i] = 0.0
+                else:
+                    results[int(r1 - 1), i] = v
+        return results.astype(np.float32)
+
+    @staticmethod
+    def sliding_pct_in_top_n(x: np.ndarray, windows: np.ndarray, n: int, fps: float) -> np.ndarray:
+        """
+        Compute the percentage of elements in the top 'n' frequencies in sliding windows of the input array.
+
+        .. note::
+          To compute percentage of elements in the top 'n' frequencies in entire array, use ``simba.mixins.statistics_mixin.Statistics.pct_in_top_n``.
+
+        :param np.ndarray x: Input 1D array.
+        :param np.ndarray windows: Array of window sizes in seconds.
+        :param int n: Number of top frequencies.
+        :param float fps: Sampling frequency for time convesrion.
+        :return np.ndarray: 2D array of computed percentages of elements in the top 'n' frequencies for each sliding window.
+
+        :example:
+        >>> x = np.random.randint(0, 10, (100000,))
+        >>> results = TimeseriesFeatureMixin.sliding_pct_in_top_n(x=x, windows=np.array([1.0]), n=4, fps=10)
+        """
+
+        check_valid_array(data=x, source=f'{TimeseriesFeatureMixin.sliding_pct_in_top_n.__name__} x', accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int64, np.int32, int, float))
+        check_valid_array(data=windows, source=f'{TimeseriesFeatureMixin.sliding_pct_in_top_n.__name__} windows', accepted_ndims=(1,), accepted_dtypes=(np.float32, np.float64, np.int64, np.int32, int, float))
+        check_int(name=f'{TimeseriesFeatureMixin.sliding_pct_in_top_n.__name__} n', value=n, min_value=1)
+        check_float(name=f'{TimeseriesFeatureMixin.sliding_pct_in_top_n.__name__} fps', value=n, min_value=10e-6)
+        results = np.full((x.shape[0], windows.shape[0]), -1.0)
+        for i in range(windows.shape[0]):
+            W_s = int(windows[i] * fps)
+            for cnt, (l, r) in enumerate(zip(range(0, x.shape[0] + 1), range(W_s, x.shape[0] + 1))):
+                sample = x[l:r]
+                cnts = np.sort(np.unique(sample, return_counts=True)[1])[-n:]
+                results[int(r - 1), i] = np.sum(cnts) / sample.shape[0]
+        return results
+
+

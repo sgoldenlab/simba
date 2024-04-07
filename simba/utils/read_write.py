@@ -630,14 +630,10 @@ def find_all_videos_in_directory(
             video_lst.append(i)
     if not video_lst:
         if raise_error:
-            raise NoFilesFoundError(
-                f"No videos found in directory {directory} in formats {video_formats}."
-            )
-        video_lst.append("No videos found")
-        NoFileFoundWarning(
-            msg=f"No videos found in directory ({directory})",
-            source=find_all_videos_in_directory.__name__,
-        )
+            raise NoFilesFoundError(f"No videos found in directory {directory} in formats {video_formats}.")
+        else:
+            video_lst.append("No videos found")
+            NoFileFoundWarning(msg=f"No videos found in directory ({directory})", source=find_all_videos_in_directory.__name__)
 
     if video_lst and as_dict:
         video_dict = {}

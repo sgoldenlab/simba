@@ -205,16 +205,12 @@ class CustomFeatureExtractor(ConfigReader):
             and has_main_block
         ):
             command = f'python "{self.extractor_file_path}" --config_path "{self.config_path}"'
-            print(
-                "Follow feature extraction progress in the operating system terminal window..."
-            )
+            print("Follow feature extraction progress in the operating system terminal window...")
             subprocess.call(command, shell=True)
 
         else:
-            print(has_abstract_inheritance)
-            spec = importlib.util.spec_from_file_location(
-                class_name, self.extractor_file_path
-            )
+            print('Running user-defined feature extraction class...')
+            spec = importlib.util.spec_from_file_location(class_name, self.extractor_file_path)
             user_module = importlib.util.module_from_spec(spec)
             sys.modules[class_name] = user_module
             spec.loader.exec_module(user_module)
