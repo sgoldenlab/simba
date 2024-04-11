@@ -2905,23 +2905,7 @@ class GeometryMixin(object):
         :example:
         >>> shapes = GeometryMixin().adjust_geometries(geometries=shapes, shift=(0, 333))
         """
-
-        check_instance(
-            source=f"{GeometryMixin().adjust_geometries.__name__} geometries",
-            instance=geometries,
-            accepted_types=list,
-        )
-        if len(geometries) == 0:
-            raise CountError(
-                msg="Geometry list is empty",
-                source=GeometryMixin().adjust_geometries.__name__,
-            )
-        for i in range(len(geometries)):
-            check_instance(
-                source=f"{GeometryMixin().adjust_geometries.__name__} geometries {i}",
-                instance=geometries[i],
-                accepted_types=Polygon,
-            )
+        check_valid_lst(data=geometries, source=f"{GeometryMixin().adjust_geometries.__name__} geometries", valid_dtypes=(Polygon,), min_len=1)
         results = []
         for shape_cnt, shape in enumerate(geometries):
             results.append(
@@ -3426,18 +3410,22 @@ class GeometryMixin(object):
             return np.cumsum(img_arr, axis=0) / fps
 
     @staticmethod
-    def hausdorff_distance(
-        geometries: List[List[Union[Polygon, LineString]]]
-    ) -> np.ndarray:
+    def hausdorff_distance(geometries: List[List[Union[Polygon, LineString]]]) -> np.ndarray:
         """
         The Hausdorff distance measure of the similarity between time-series sequential geometries. It is defined as the maximum of the distances
         from each point in one set to the nearest point in the other set.
 
         Hausdorff distance can be used to measure the similarity of the geometry in one frame relative to the geometry in the next frame.
-        Large values indicate that the animal has a different shape than in the preceding shape.
+        Larger values indicate that the animal has a different shape than in the preceding shape.
 
         :param List[List[Union[Polygon, LineString]]] geometries: List of list where each list has two geometries.
         :return np.ndarray: 1D array of hausdorff distances of geometries in each list.
+
+        :example:
+        >>> x = Polygon([[0,1], [0, 2], [1,1]])
+        >>> y = Polygon([[0,1], [0, 2], [0,1]])
+        >>> GeometryMixin.hausdorff_distance(geometries=[[x, y]])
+        >>> [1.]
         """
 
         check_instance(

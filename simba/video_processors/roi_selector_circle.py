@@ -30,7 +30,7 @@ class ROISelectorCircle(object):
        :width: 700
        :align: center
 
-    .. notes::
+    .. note::
        `Circle crop tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop>`__.
 
     :example:

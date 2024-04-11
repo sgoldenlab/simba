@@ -516,6 +516,11 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         )
 
 
+# test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini')
+# test.run()
+# test.save()
+
+
 # test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini')
 # test.run()
 # test.save()

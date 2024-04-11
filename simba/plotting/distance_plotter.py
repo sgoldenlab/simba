@@ -1,25 +1,26 @@
 __author__ = "Simon Nilsson"
 
-import io
+import matplotlib
+matplotlib.use('TkAgg')
 import os
-from typing import Dict, List
-
+from typing import Dict, List, Union, Optional
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-import PIL
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.enums import Formats
-from simba.utils.errors import NoSpecifiedOutputError
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.checks import (check_instance,
+                                check_file_exist_and_readable,
+                                check_valid_lst,
+                                check_all_file_names_are_represented_in_video_log)
+from simba.utils.errors import NoSpecifiedOutputError, CountError, InvalidInputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 
 
-class DistancePlotterSingleCore(ConfigReader, PlottingMixin):
+class DistancePlotterSingleCore(ConfigReader):
     """
     Class for visualizing the distance between two pose-estimated body-parts (e.g., two animals) through line
     charts. Results are saved as individual line charts, and/or videos of line charts.
@@ -44,188 +45,119 @@ class DistancePlotterSingleCore(ConfigReader, PlottingMixin):
     >>> distance_plotter.run()
     """
 
-    def __init__(
-        self,
-        config_path: str,
-        frame_setting: bool,
-        video_setting: bool,
-        final_img: bool,
-        files_found: List[str],
-        style_attr: Dict[str, int],
-        line_attr: Dict[int, list],
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_paths: List[Union[str, os.PathLike]],
+                 style_attr: Dict[str, int],
+                 line_attr: List[List[str]],
+                 frame_setting: Optional[bool] = False,
+                 video_setting: Optional[bool] = False,
+                 final_img: Optional[bool] = False):
+
+        if (not frame_setting) and (not video_setting) and (not final_img):
+            raise NoSpecifiedOutputError(msg="Please choice to create frames and/or video distance plots", source=self.__class__.__name__)
+        check_instance(source=f'{self.__class__.__name__} line_attr', instance=line_attr, accepted_types=(list,))
+        for cnt, i in enumerate(line_attr):
+            check_valid_lst(source=f'{self.__class__.__name__} line_attr {cnt}', data=i, valid_dtypes=(str,), exact_len=3)
+        check_valid_lst(data=data_paths, valid_dtypes=(str,), min_len=1)
+        _ = [check_file_exist_and_readable(i) for i in data_paths]
         ConfigReader.__init__(self, config_path=config_path)
-        PlottingMixin.__init__(self)
-        (
-            self.video_setting,
-            self.frame_setting,
-            self.files_found,
-            self.style_attr,
-            self.line_attr,
-            self.final_img,
-        ) = (
-            video_setting,
-            frame_setting,
-            files_found,
-            style_attr,
-            line_attr,
-            final_img,
-        )
-        if (not frame_setting) and (not video_setting) and (not self.final_img):
-            raise NoSpecifiedOutputError(
-                "Please choice to create frames and/or video distance plots"
-            )
-        self.colors_dict = get_color_dict()
-        if not os.path.exists(self.line_plot_dir):
-            os.makedirs(self.line_plot_dir)
-        check_if_filepath_list_is_empty(
-            filepaths=self.outlier_corrected_paths,
-            error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing distances.",
-        )
-        print(f"Processing {str(len(self.files_found))} videos...")
+        self.video_setting, self.frame_setting, self.data_paths, self.style_attr, self.line_attr, self.final_img = video_setting, frame_setting, data_paths, style_attr, line_attr, final_img
+        self.color_names = get_color_dict()
+
+
 
     def run(self):
-        """
-        Creates line charts. Results are stored in the `project_folder/frames/line_plot` directory
-
-        Returns
-        ----------
-        None
-        """
-
-        for file_cnt, file_path in enumerate(self.files_found):
+        print(f"Processing {len(self.data_paths)} videos...")
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
-            self.data_df = read_df(file_path, self.file_type)
-            distance_arr = np.full(
-                (len(self.data_df), len(self.line_attr.keys())), np.nan
-            )
-            _, self.video_name, _ = get_fn_ext(file_path)
-            self.video_info, self.px_per_mm, self.fps = self.read_video_info(
-                video_name=self.video_name
-            )
-            for distance_cnt, data in enumerate(self.line_attr.values()):
-                distance_arr[:, distance_cnt] = (
-                    np.sqrt(
-                        (self.data_df[data[0] + "_x"] - self.data_df[data[1] + "_x"])
-                        ** 2
-                        + (self.data_df[data[0] + "_y"] - self.data_df[data[1] + "_y"])
-                        ** 2
-                    )
-                    / self.px_per_mm
-                ) / 10
-            if self.video_setting:
-                self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-                self.video_save_path = os.path.join(
-                    self.line_plot_dir, self.video_name + ".mp4"
-                )
-                writer = cv2.VideoWriter(
-                    self.video_save_path,
-                    self.fourcc,
-                    self.fps,
-                    (self.style_attr["width"], self.style_attr["height"]),
-                )
-            if self.frame_setting:
-                self.save_video_folder = os.path.join(
-                    self.line_plot_dir, self.video_name
-                )
-                if not os.path.exists(self.save_video_folder):
-                    os.makedirs(self.save_video_folder)
+            data_df = read_df(file_path, self.file_type)
+            _, video_name, _ = get_fn_ext(file_path)
+            self.video_info, px_per_mm, fps = self.read_video_info(video_name=video_name)
+            self.save_video_folder = os.path.join(self.line_plot_dir, video_name)
+            self.save_frame_folder_dir = os.path.join(self.line_plot_dir, video_name)
 
-            distance_arr = np.nan_to_num(distance_arr, nan=0.0)
+            try:
+                data_df.columns = self.bp_headers
+            except ValueError:
+                raise CountError(msg=f'SimBA expects {self.bp_headers} columns but found {len(data_df)} columns in {file_path}', source=self.__class__.__name__)
+            distances = []
+            colors = []
+            for cnt, i in enumerate(self.line_attr):
+                if i[2] not in list(self.color_names.keys()):
+                    raise InvalidInputError(msg=f'{i[2]} is not a valid color. Options: {list(self.color_names.keys())}.', source=self.__class__.__name__)
+                colors.append(i[2])
+                bp_1, bp_2 = [f'{i[0]}_x', f'{i[0]}_y'], [f'{i[1]}_x', f'{i[1]}_y']
+                if len(list(set(bp_1) - set(data_df.columns))) > 0: raise InvalidInputError(msg=f'Could not find fields {bp_1} in {file_path}', source=self.__class__.__name__)
+                if len(list(set(bp_2) - set(data_df.columns))) > 0: raise InvalidInputError(msg=f'Could not find fields {bp_2} in {file_path}', source=self.__class__.__name__)
+                distances.append(FeatureExtractionMixin.framewise_euclidean_distance(location_1=data_df[bp_1].values, location_2=data_df[bp_2].values, px_per_mm=px_per_mm, centimeter=True))
+            if self.frame_setting:
+                if os.path.exists(self.save_frame_folder_dir):
+                    self.remove_a_folder(self.save_frame_folder_dir)
+                os.makedirs(self.save_frame_folder_dir)
+            if self.video_setting:
+                save_video_path = os.path.join(self.line_plot_dir, f"{video_name}.avi")
+                fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+                video_writer = cv2.VideoWriter(save_video_path, fourcc, fps, (self.style_attr["width"], self.style_attr["height"]))
+
             if self.final_img:
-                self.final_img_path = os.path.join(
-                    self.line_plot_dir, self.video_name + "_final_img.png"
-                )
-                self.make_distance_plot(
-                    data=distance_arr,
-                    line_attr=self.line_attr,
-                    style_attr=self.style_attr,
-                    fps=self.fps,
-                    save_path=self.final_img_path,
-                    save_img=True,
-                )
+                _ = PlottingMixin.make_line_plot(data=distances,
+                                                 colors=colors,
+                                                 width=self.style_attr['width'],
+                                                 height=self.style_attr['height'],
+                                                 line_width=self.style_attr['line width'],
+                                                 font_size=self.style_attr['font size'],
+                                                 title='Animal distances',
+                                                 y_lbl='distance (cm)',
+                                                 x_lbl='time (s)',
+                                                 x_lbl_divisor=fps,
+                                                 y_max=self.style_attr['y_max'],
+                                                 line_opacity=self.style_attr['opacity'],
+                                                 save_path=os.path.join(self.line_plot_dir, f"{video_name}_final_distances.png"))
 
             if self.video_setting or self.frame_setting:
-                if self.style_attr["y_max"] == "auto":
-                    max_y = np.amax(distance_arr)
-                else:
-                    max_y = float(self.style_attr["y_max"])
-                y_ticks_locs = y_lbls = np.round(np.linspace(0, max_y, 10), 2)
-                for i in range(distance_arr.shape[0]):
-                    for j in range(distance_arr.shape[1]):
-                        color = self.colors_dict[self.line_attr[j][-1]][::-1]
-                        color = tuple(x / 255 for x in color)
-                        plt.plot(
-                            distance_arr[0:i, j],
-                            color=color,
-                            linewidth=self.style_attr["line width"],
-                            alpha=self.style_attr["opacity"],
-                        )
-
-                    x_ticks_locs = x_lbls = np.round(np.linspace(0, i, 5))
-                    x_lbls = np.round((x_lbls / self.fps), 1)
-                    plt.ylim(0, max_y)
-
-                    plt.xlabel("time (s)")
-                    plt.ylabel("distance (cm)")
-                    plt.xticks(
-                        x_ticks_locs,
-                        x_lbls,
-                        rotation="horizontal",
-                        fontsize=self.style_attr["font size"],
-                    )
-                    plt.yticks(
-                        y_ticks_locs, y_lbls, fontsize=self.style_attr["font size"]
-                    )
-                    plt.suptitle(
-                        "Animal distances",
-                        x=0.5,
-                        y=0.92,
-                        fontsize=self.style_attr["font size"] + 4,
-                    )
-
-                    self.buffer_ = io.BytesIO()
-                    plt.savefig(self.buffer_, format="png")
-                    self.buffer_.seek(0)
-                    img = PIL.Image.open(self.buffer_)
-                    img = np.uint8(cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR))
-                    self.buffer_.close()
-                    plt.close()
-
-                    img = cv2.resize(
-                        img, (self.style_attr["width"], self.style_attr["height"])
-                    )
-
-                    if self.frame_setting:
-                        frame_save_path = os.path.join(
-                            self.save_video_folder, str(i) + ".png"
-                        )
-                        cv2.imwrite(frame_save_path, img)
+                if self.style_attr["y_max"] == -1: self.style_attr["y_max"] = max([np.max(x) for x in distances])
+                for frm_cnt in range(distances[0].shape[0]):
+                    line_data = [x[:frm_cnt] for x in distances]
+                    img = PlottingMixin.make_line_plot_plotly(data=line_data,
+                                                              colors=colors,
+                                                              width=self.style_attr['width'],
+                                                              height=self.style_attr['height'],
+                                                              line_width=self.style_attr['line width'],
+                                                              font_size=self.style_attr['font size'],
+                                                              title='Animal distances',
+                                                              y_lbl='distance (cm)',
+                                                              x_lbl='frame count',
+                                                              x_lbl_divisor=fps,
+                                                              y_max=self.style_attr['y_max'],
+                                                              line_opacity=self.style_attr['opacity'],
+                                                              save_path=None).astype(np.uint8)
                     if self.video_setting:
-                        writer.write(img)
-                    print(
-                        "Distance frame: {} / {}. Video: {} ({}/{})".format(
-                            str(i + 1),
-                            str(len(self.data_df)),
-                            self.video_name,
-                            str(file_cnt + 1),
-                            len(self.files_found),
-                        )
-                    )
-
+                        video_writer.write(img[:, :, :3])
+                    if self.frame_setting:
+                        frm_name = os.path.join(self.save_frame_folder_dir, f"{frm_cnt}.png")
+                        cv2.imwrite(frm_name, np.uint8(img))
+                    print(f"Distance frame created: {frm_cnt}, Video: {video_name} ...")
                 if self.video_setting:
-                    writer.release()
+                    video_writer.release()
                 video_timer.stop_timer()
-                print(
-                    "Distance plot for video {} saved (elapsed time: {}s)...".format(
-                        self.video_name, video_timer.elapsed_time_str
-                    )
-                )
+                stdout_success(msg=f"Distance visualizations created for {video_name} saved at {self.line_plot_dir}", elapsed_time=video_timer.elapsed_time_str)
         self.timer.stop_timer()
-        stdout_success(
-            msg="All distance visualizations created in project_folder/frames/output/line_plot directory",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"Distance visualizations complete for {len(self.data_paths)} video(s)", elapsed_time=self.timer.elapsed_time_str)
+
+# style_attr = {'width': 640, 'height': 480, 'line width': 6, 'font size': 12, 'y_max': -1, 'opacity': 0.5}
+# line_attr = [['Center_1', 'Center_2', 'Green'], ['Ear_left_2', 'Ear_right_2', 'Red']]
+# test = DistancePlotterSingleCore(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+#                                  frame_setting=True,
+#                                  video_setting=True,
+#                                  style_attr=style_attr,
+#                                  final_img=True,
+#                                  data_paths=['/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_1.csv'],
+#                                  line_attr=line_attr)
+# test.run()
+
+
 
 
 #

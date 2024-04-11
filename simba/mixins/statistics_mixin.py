@@ -1791,75 +1791,107 @@ class Statistics(FeatureExtractionMixin):
         return feature_names
 
     @staticmethod
-    def local_outlier_factor(
-        data: np.ndarray,
-        k: Union[int, float] = 5,
-        contamination: Optional[float] = 1e-10,
-        normalize: Optional[bool] = False,
-    ) -> np.ndarray:
+    def local_outlier_factor(data: np.ndarray,
+                             k: Union[int, float] = 5,
+                             contamination: Optional[float] = 1e-10,
+                             normalize: Optional[bool] = False,
+                             groupby_idx: Optional[int] = None) -> np.ndarray:
         """
         Compute the local outlier factor of each observation.
 
         .. note::
-
-           The final LOF scores are negated. Thus, higher values indicate more atypical (outlier) data points.
-
-           Method calls ``sklearn.neighbors.LocalOutlierFactor`` directly. Previously called using own implementation JIT'ed method,
+           The final LOF scores are negated. Thus, higher values indicate more atypical (outlier) data points. Values
+           Method calls ``sklearn.neighbors.LocalOutlierFactor`` directly. Attempted to use own jit compiled implementation,
            but runtime was 3x-ish slower than ``sklearn.neighbors.LocalOutlierFactor``.
 
-        :parameter ndarray data: 2D array with feature values where rows represent frames and columns represent features.
-        :parameter Union[int, float] k: Number of neighbors to evaluate for each observation. If the value is a float, then interpreted as the ratio of data.shape[0]. If the value is an integer, then it represent the number of neighbours to evaluate.
-        :parameter Optional[float] contamination: Small pseudonumber to avoid DivisionByZero error.
-        :parameter Optional[bool] normalize: Whether to normalize the Mahalanobis distances between 0 and 1. Defaults to False.
+           If groupby_idx is not None, then the index 1 of ``data`` array for which to group the data and compute LOF within each segment/cluster.
+           E.g., can be field holding cluster identifier. Thus, outliers are computed within each segment/cluster, ensuring that other segments cannot affect
+           outlier scores within each analyzing each cluster.
+
+           If groupby_idx is provided, then all observations with cluster/segment variable ``-1`` will be treated as unclustered and assigned the max outlier score found withiin the clustered observations.
+
+        .. image:: _static/img/local_outlier_factor.png
+           :width: 700
+           :align: center
+
+        :param ndarray data: 2D array with feature values where rows represent frames and columns represent features.
+        :param Union[int, float] k: Number of neighbors to evaluate for each observation. If the value is a float, then interpreted as the ratio of data.shape[0]. If the value is an integer, then it represent the number of neighbours to evaluate.
+        :param Optional[float] contamination: Small pseudonumber to avoid DivisionByZero error.
+        :param Optional[bool] normalize: Whether to normalize the distances between 0 and 1. Defaults to False.
+        :param Optional[int] groupby_idx: If int, then the index 1 of ``data`` for which to group the data and compute LOF on each segment. E.g., can be field holding a cluster identifier.
         :returns np.ndarray: Array of size data.shape[0] with local outlier scores.
 
         :example:
-        >>> data = np.random.normal(loc=45, scale=1, size=100).astype(np.float32)
-        >>> for i in range(5): data = np.vstack([data, np.random.normal(loc=45, scale=1, size=100).astype(np.float32)])
-        >>> for i in range(2): data = np.vstack([data, np.random.normal(loc=90, scale=1, size=100).astype(np.float32)])
-        >>> Statistics().local_outlier_factor(data=data, k=5)
-        >>> [1.004, 1.007, 0.986, 1.018, 0.986, 0.996, 24.067, 24.057]
+        >>> data, lbls = make_blobs(n_samples=2000, n_features=2, centers=10, random_state=42)
+        >>> data = np.hstack((data, lbls.reshape(-1, 1)))
+        >>> lof = Statistics.local_outlier_factor(data=data, groupby_idx=2, k=100, normalize=True)
+        >>> results = np.hstack((data[:, 0:2], lof.reshape(lof.shape[0], 1)))
+        >>> PlottingMixin.continuous_scatter(data=results, palette='seismic', bg_clr='lightgrey',size=30)
         """
 
-        check_valid_array(
-            source=f"{Statistics.__class__.__name__} local_outlier_factor",
-            data=data,
-            accepted_sizes=[2],
-        )
-        if k is not None:
-            check_float(name=f"{Statistics.__class__.__name__} k", value=k)
+        def get_lof(data, k, contamination):
+            check_float(name=f"{Statistics.local_outlier_factor.__name__} k", value=k)
             if isinstance(k, int):
                 k = min(k, data.shape[0])
             elif isinstance(k, float):
                 k = int(data.shape[0] * k)
-                if k > data.shape[0]:
-                    k = data.shape[0]
+            lof_model = LocalOutlierFactor(n_neighbors=k, contamination=contamination)
+            _ = lof_model.fit_predict(data)
+            y = -lof_model.negative_outlier_factor_.astype(np.float32)
+            if normalize:
+                return (y - np.min(y)) / (np.max(y) - np.min(y))
+            else:
+                return y
 
-        check_float(
-            name=f"{Statistics.__class__.__name__} contamination",
-            value=contamination,
-            min_value=0.0,
-        )
-
-        lof_model = LocalOutlierFactor(n_neighbors=k, contamination=contamination)
-        _ = lof_model.fit_predict(data)
-        y = -lof_model.negative_outlier_factor_.astype(np.float32)
-        if normalize:
-            return (y - np.min(y)) / (np.max(y) - np.min(y))
+        if groupby_idx is not None:
+            check_int(name=f'{Statistics.local_outlier_factor.__name__} groupby_idx', value=groupby_idx, min_value=0,
+                      max_value=data.shape[1] - 1)
+            check_valid_array(source=f"{Statistics.local_outlier_factor.__name__} local_outlier_factor", data=data,
+                              accepted_sizes=[2], min_axis_1=3)
         else:
-            return y
+            check_valid_array(source=f"{Statistics.local_outlier_factor.__name__} data", data=data, accepted_sizes=[2],
+                              min_axis_1=2)
+        check_float(name=f"{Statistics.local_outlier_factor.__name__} contamination", value=contamination, min_value=0.0)
 
-    @staticmethod
-    def elliptic_envelope(
-        data: np.ndarray,
-        contamination: Optional[float] = 1e-1,
-        normalize: Optional[bool] = True,
-    ) -> np.ndarray:
+        if groupby_idx is None:
+            return get_lof(data, k, contamination)
+        else:
+            results = []
+            data_w_idx = np.hstack((np.arange(0, data.shape[0]).reshape(-1, 1), data))
+            unique_c = np.unique(data[:, groupby_idx]).astype(np.float32)
+            if -1.0 in unique_c:
+                unique_c = unique_c[np.where(unique_c != -1)]
+                unclustered_idx = np.argwhere(data[:, groupby_idx] == -1.0).flatten()
+                unclustered = data_w_idx[unclustered_idx]
+                data_w_idx = np.delete(data_w_idx, unclustered_idx, axis=0)
+            else:
+                unclustered = None
+            for i in unique_c:
+                s_data = data_w_idx[np.argwhere(data_w_idx[:, groupby_idx + 1] == i)].reshape(-1, data_w_idx.shape[1])
+                idx = s_data[:, 0].reshape(s_data.shape[0], 1)
+                s_data = np.delete(s_data, [0, groupby_idx + 1], 1)
+                lof = get_lof(s_data, k, contamination).reshape(s_data.shape[0], 1)
+                results.append(np.hstack((idx, lof)))
+            x = np.concatenate(results, axis=0)
+            if unclustered is not None:
+                max_lof = np.full((unclustered.shape[0], 1), np.max(x[:, -1]))
+                unclustered = np.hstack((unclustered, max_lof))[:, [0, -1]]
+                x = np.vstack((x, unclustered))
+            return x[np.argsort(x[:, 0])][:, -1]
+
+    def elliptic_envelope(data: np.ndarray,
+                          contamination: Optional[float] = 1e-1,
+                          normalize: Optional[bool] = False,
+                          groupby_idx: Optional[int] = None) -> np.ndarray:
         """
         Compute the Mahalanobis distances of each observation in the input array using Elliptic Envelope method.
 
+        .. image:: _static/img/EllipticEnvelope.png
+           :width: 700
+           :align: center
+
         .. image:: _static/img/elliptic_envelope.png
-           :width: 800
+           :width: 700
            :align: center
 
         :param data: Input data array of shape (n_samples, n_features).
@@ -1868,29 +1900,53 @@ class Statistics(FeatureExtractionMixin):
         :return np.ndarray: The Mahalanobis distances of each observation in array. Larger values indicate outliers.
 
         :example:
-        >>> data_path = '/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/clusters/beautiful_beaver.pickle'
-        >>> x = read_pickle(data_path=data_path)['DR_MODEL']['MODEL'].embedding_
-        >>> y = elliptic_envelope(data=x, contamination=0.1)
-        >>> data = np.hstack((x, y.reshape(-1, 1)))
-        >>> img = PlottingMixin.continuous_scatter(data=data, columns=('X', 'Y', 'Mahalanobis distances'), size=20, palette='jet')
+        >>> data, lbls = make_blobs(n_samples=2000, n_features=2, centers=1, random_state=42)
+        >>> envelope_score = elliptic_envelope(data=data, normalize=True)
+        >>> results = np.hstack((data[:, 0:2], envelope_score.reshape(lof.shape[0], 1)))
+        >>> results = pd.DataFrame(results, columns=['X', 'Y', 'ENVELOPE SCORE'])
+        >>> PlottingMixin.continuous_scatter(data=results, palette='seismic', bg_clr='lightgrey', columns=['X', 'Y', 'ENVELOPE SCORE'],size=30)
+
         """
 
-        check_valid_array(
-            data=data,
-            accepted_ndims=(2,),
-            accepted_dtypes=(np.float64, np.float32, np.int32, np.int64, float, int),
-        )
-        check_float(
-            name=f"{Statistics.elliptic_envelope.__name__} contamination",
-            value=contamination,
-            min_value=0.0,
-            max_value=1.0,
-        )
-        mdl = EllipticEnvelope(contamination=contamination).fit(data)
-        y = -mdl.score_samples(data)
-        if normalize:
-            y = (y - np.min(y)) / (np.max(y) - np.min(y))
-        return y
+        def get_envelope(data, contamination) -> np.ndarray:
+            mdl = EllipticEnvelope(contamination=contamination).fit(data)
+            y = -mdl.score_samples(data)
+            if normalize:
+                y = (y - np.min(y)) / (np.max(y) - np.min(y))
+            return y
+
+        if groupby_idx is not None:
+            check_int(name=f'{Statistics.elliptic_envelope.__name__} groupby_idx', value=groupby_idx, min_value=0, max_value=data.shape[1] - 1)
+            check_valid_array(source=f"{Statistics.elliptic_envelope.__name__} local_outlier_factor", data=data, accepted_sizes=[2], min_axis_1=3)
+        else:
+            check_valid_array(source=f"{Statistics.elliptic_envelope.__name__} data", data=data, accepted_sizes=[2], min_axis_1=2)
+
+        check_float(name=f"{Statistics.elliptic_envelope.__name__} contamination", value=contamination, min_value=0.0, max_value=1.0)
+        if groupby_idx is None:
+            return get_envelope(data, contamination)
+        else:
+            results = []
+            data_w_idx = np.hstack((np.arange(0, data.shape[0]).reshape(-1, 1), data))
+            unique_c = np.unique(data[:, groupby_idx]).astype(np.float32)
+            if -1.0 in unique_c:
+                unique_c = unique_c[np.where(unique_c != -1)]
+                unclustered_idx = np.argwhere(data[:, groupby_idx] == -1.0).flatten()
+                unclustered = data_w_idx[unclustered_idx]
+                data_w_idx = np.delete(data_w_idx, unclustered_idx, axis=0)
+            else:
+                unclustered = None
+            for i in unique_c:
+                s_data = data_w_idx[np.argwhere(data_w_idx[:, groupby_idx + 1] == i)].reshape(-1, data_w_idx.shape[1])
+                idx = s_data[:, 0].reshape(s_data.shape[0], 1)
+                s_data = np.delete(s_data, [0, groupby_idx + 1], 1)
+                lof = get_envelope(s_data, contamination).reshape(s_data.shape[0], 1)
+                results.append(np.hstack((idx, lof)))
+            x = np.concatenate(results, axis=0)
+            if unclustered is not None:
+                max_env_score = np.full((unclustered.shape[0], 1), np.max(x[:, -1]))
+                unclustered = np.hstack((unclustered, max_env_score))[:, [0, -1]]
+                x = np.vstack((x, unclustered))
+            return x[np.argsort(x[:, 0])][:, -1]
 
     @staticmethod
     @jit(nopython=True)

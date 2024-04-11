@@ -2,9 +2,8 @@ __author__ = "Simon Nilsson"
 
 import os
 import shutil
-import subprocess
+from typing import Optional, List, Union
 from datetime import datetime
-from typing import Dict, Optional
 
 try:
     from typing import Literal
@@ -12,14 +11,26 @@ except ImportError:
     from typing_extensions import Literal
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_nvidea_gpu_available
+from simba.utils.checks import (check_nvidea_gpu_available,
+                                check_ffmpeg_available,
+                                check_str,
+                                check_file_exist_and_readable,
+                                check_int,
+                                check_valid_lst)
 from simba.utils.enums import Paths, TagNames
 from simba.utils.errors import FFMPEGCodecGPUError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
-                                    read_config_entry, read_config_file,
-                                    remove_a_folder)
+from simba.video_processors.video_processing import (mixed_mosaic_concatenator,
+                                                     horizontal_video_concatenator,
+                                                     vertical_video_concatenator,
+                                                     mosaic_concatenator)
+from simba.utils.read_write import get_fn_ext, copy_files_to_directory
 
+HORIZONTAL = 'horizontal'
+VERTICAL = 'vertical'
+MOSAIC = 'mosaic'
+MIXED_MOSAIC = 'mixed_mosaic'
+ACCEPTED_TYPES = [HORIZONTAL, VERTICAL, MOSAIC, MIXED_MOSAIC]
 
 class FrameMergererFFmpeg(ConfigReader):
     """
@@ -32,305 +43,75 @@ class FrameMergererFFmpeg(ConfigReader):
           :width: 600
           :align: center
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str concat_type: Type of concatenation. OPTIONS: 'horizontal', 'vertical', 'mosaic', 'mixed_mosaic'.
-    :parameter dict frame_types: Dict holding video path to videos to concatenate. E.g., {'Video 1': path, 'Video 2': path}
-    :parameter int video_height: Output video height.
-    :parameter int video_width: Output video width.
+    :parameter str config_path: Optional path to SimBA project config file in Configparser format.
+    :parameter Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"] concat_type: Type of concatenation. OPTIONS: 'horizontal', 'vertical', 'mosaic', 'mixed_mosaic'.
+    :parameter List[Union[str, os.PathLike]] video_paths: List with videos to concatenate.
+    :parameter Optional[int] video_height: Optional height of the canatenated videos. Required if concat concat_type is not mixed_mosaic.
+    :parameter int video_width: Optional wisth of the canatenated videos. Required if concat concat_type is not mixed_mosaic.
     :parameter Optional[bool] gpu: If True, use NVIDEA FFMpeg GPU codecs. Default False.
 
-    Example
-    ----------
-    >>> frame_types={'Video 1': 'project_folder/videos/Video_1.avi', 'Video 2': 'project_folder/videos/Video_2.avi'}
-    >>> video_height, video_width, concat_type = 640, 480, 'vertical'
-    >>> FrameMergererFFmpeg(config_path='MySimBaConfigPath', frame_types=frame_types, video_height=video_height, video_width=video_width, concat_type=concat_type)
+    :example:
+    >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4']
+    >>> merger = FrameMergererFFmpeg(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_paths=videos, video_height=600, video_width=600, concat_type='mosaic')
+    >>> merger.run()
     """
 
-    def __init__(
-        self,
-        concat_type: Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"],
-        frame_types: Dict[str, str],
-        video_height: int,
-        video_width: int,
-        config_path: Optional[str] = None,
-        gpu: Optional[bool] = False,
-    ):
+    def __init__(self,
+                 concat_type: Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"],
+                 video_paths: List[Union[str, os.PathLike]],
+                 video_height: Optional[int] = None,
+                 video_width: Optional[int] = None,
+                 config_path: Optional[str] = None,
+                 gpu: Optional[bool] = False):
+
         if gpu and not check_nvidea_gpu_available():
-            raise FFMPEGCodecGPUError(
-                msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
-                source=self.__class__.__name__,
-            )
-        self.timer = SimbaTimer(start=True)
-        self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+            raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=self.__class__.__name__)
+        check_ffmpeg_available()
+        check_str(name=f'{FrameMergererFFmpeg.__name__} concat_type', value=concat_type, options=ACCEPTED_TYPES)
+        check_valid_lst(data=video_paths, source=f'{self.__class__.__name__} video_paths', valid_dtypes=(str,), min_len=2)
+        for i in video_paths: check_file_exist_and_readable(file_path=i)
+        if concat_type != MIXED_MOSAIC:
+            check_int(name=f'{FrameMergererFFmpeg.__name__} video_height', value=video_height, min_value=0)
+            check_int(name=f'{FrameMergererFFmpeg.__name__} video_width', value=video_height, min_value=0)
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path)
-            log_event(
-                logger_name=str(__class__.__name__),
-                log_type=TagNames.CLASS_INIT.value,
-                msg=self.create_log_msg_from_init_args(locals=locals()),
-            )
-            self.output_dir = os.path.join(
-                self.project_path, Paths.CONCAT_VIDEOS_DIR.value
-            )
-            self.temp_dir = os.path.join(
-                self.project_path, Paths.CONCAT_VIDEOS_DIR.value, "temp"
-            )
-            self.output_path = os.path.join(
-                self.project_path,
-                Paths.CONCAT_VIDEOS_DIR.value,
-                f"merged_video_{self.datetime}.mp4",
-            )
+            log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
+            self.output_dir = os.path.join( self.project_path, Paths.CONCAT_VIDEOS_DIR.value)
+            self.output_path = os.path.join(self.project_path, Paths.CONCAT_VIDEOS_DIR.value, f"merged_video_{self.datetime}.mp4",)
         else:
-            self.file_path = list(frame_types.values())[0]
-            self.output_dir, ss, df = get_fn_ext(filepath=self.file_path)
-            self.temp_dir = os.path.join(self.output_dir, "temp")
-            self.output_path = os.path.join(
-                self.output_dir, f"merged_video_{self.datetime}.mp4"
-            )
+            self.timer = SimbaTimer(start=True)
+            self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+            self.output_dir, _, _ = get_fn_ext(filepath=video_paths[0])
+            self.output_path = os.path.join(self.output_dir, f"merged_video_{self.datetime}.mp4")
 
         self.video_height, self.video_width, self.gpu = video_height, video_width, gpu
-        self.frame_types, self.concat_type = frame_types, concat_type
-        self.video_cnt = len(self.frame_types.keys())
-        self.even_bool = (len(self.frame_types.keys()) % 2) == 0
-        self.blank_path = os.path.join(self.temp_dir, "blank.mp4")
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
-        if not os.path.exists(self.temp_dir):
-            os.makedirs(self.temp_dir)
-        if concat_type == "horizontal":
-            self.__horizontal_concatenator(
-                out_path=self.output_path, frames_dict=self.frame_types, final_img=True
-            )
-        elif concat_type == "vertical":
-            self.__vertical_concatenator(
-                out_path=self.output_path, frames_dict=self.frame_types, final_img=True
-            )
-        elif concat_type == "mosaic":
-            self.__mosaic_concatenator(
-                output_path=self.output_path,
-                frames_dict=self.frame_types,
-                final_img=True,
-            )
-        elif concat_type == "mixed_mosaic":
-            self.__mixed_mosaic_concatenator()
-        remove_a_folder(folder_dir=self.temp_dir)
-
-    def __resize_height(self, new_height: int):
-        for video_cnt, (video_type, video_path) in enumerate(self.frame_types.items()):
-            video_meta_data = get_video_meta_data(video_path=video_path)
-            out_path = os.path.join(self.temp_dir, video_type + ".mp4")
-            if video_meta_data["height"] != new_height:
-                print("Resizing {}...".format(video_type))
-                if self.gpu:
-                    command = 'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{}" -vf scale_npp=-2:{} -c:v h264_nvenc "{}" -hide_banner -loglevel error -y'.format(
-                        video_path, new_height, out_path
-                    )
-                else:
-                    command = 'ffmpeg -y -i "{}" -vf scale=-2:{} "{}" -hide_banner -loglevel error -y'.format(
-                        video_path, new_height, out_path
-                    )
-                subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-            else:
-                shutil.copy(video_path, out_path)
-
-    def __resize_width(self, new_width: int):
-        """Helper to change the width of videos"""
-
-        for video_cnt, (video_type, video_path) in enumerate(self.frame_types.items()):
-            video_meta_data = get_video_meta_data(video_path=video_path)
-            out_path = os.path.join(self.temp_dir, video_type + ".mp4")
-            if video_meta_data["height"] != new_width:
-                print("Resizing {}...".format(video_type))
-                if self.gpu:
-                    command = 'ffmpeg -y -hwaccel auto -i "{}" -vf scale_npp={}:-2 -c:v h264_nvenc "{}" -hide_banner -loglevel error -y'.format(
-                        video_path, new_width, out_path
-                    )
-                else:
-                    command = 'ffmpeg -y -i "{}" -vf scale={}:-2 "{}" -hide_banner -loglevel error -y'.format(
-                        video_path, new_width, out_path
-                    )
-                subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-            else:
-                shutil.copy(video_path, out_path)
-
-    def __resize_width_and_height(self, new_width: int, new_height: int):
-        """Helper to change the width and height videos"""
-
-        for video_cnt, (video_type, video_path) in enumerate(self.frame_types.items()):
-            video_meta_data = get_video_meta_data(video_path=video_path)
-            out_path = os.path.join(self.temp_dir, video_type + ".mp4")
-            if video_meta_data["height"] != new_width:
-                print("Resizing {}...".format(video_type))
-                if self.gpu:
-                    command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "scale=w={new_width}:h={new_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc "{out_path}" -hide_banner -loglevel error -y'
-                else:
-                    command = 'ffmpeg -y -i "{}" -vf scale={}:{} "{}" -hide_banner -loglevel error -y'.format(
-                        video_path, new_width, new_height, out_path
-                    )
-                subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-            else:
-                shutil.copy(video_path, out_path)
-
-    def __create_blank_video(self):
-        """Helper to create a blank (black) video"""
-        video_meta_data = get_video_meta_data(list(self.frame_types.values())[0])
-        if self.gpu:
-            cmd = 'ffmpeg -y -t {} -f lavfi -i color=c=black:s={}x{} -c:v h264_nvenc -preset slow -tune stillimage -pix_fmt yuv420p "{}" -hide_banner -loglevel error -y'.format(
-                str(video_meta_data["video_length_s"]),
-                str(self.video_width),
-                str(self.video_height),
-                self.blank_path,
-            )
+        self.video_paths, self.concat_type = video_paths, concat_type
+        if not os.path.exists(self.output_dir): os.makedirs(self.output_dir)
+    def run(self):
+        if self.concat_type == HORIZONTAL:
+            _ = horizontal_video_concatenator(video_paths=self.video_paths, save_path=self.output_path, height_px=self.video_height, gpu=self.gpu, verbose=True)
+        elif self.concat_type == VERTICAL:
+            _ = vertical_video_concatenator(video_paths=self.video_paths, save_path=self.output_path, width_px=self.video_width, gpu=self.gpu, verbose=True)
+        elif self.concat_type == MOSAIC:
+            _ = mosaic_concatenator(video_paths=self.video_paths, save_path=self.output_path, width_px=self.video_width, height_px=self.video_height, gpu=self.gpu, verbose=True)
         else:
-            cmd = 'ffmpeg -y -t {} -f lavfi -i color=c=black:s={}x{} -c:v libx264 -tune stillimage -pix_fmt yuv420p "{}" -hide_banner -loglevel error -y'.format(
-                str(video_meta_data["video_length_s"]),
-                str(self.video_width),
-                str(self.video_height),
-                self.blank_path,
-            )
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-        self.frame_types["blank"] = self.blank_path
-
-    def __horizontal_concatenator(
-        self, frames_dict: dict, out_path: str, include_resize=True, final_img=True
-    ):
-        """Helper to horizontally concatenate N videos"""
-
-        if include_resize:
-            self.__resize_height(new_height=self.video_height)
-        video_path_str = ""
-        for video_type in frames_dict.keys():
-            video_path_str += ' -i "{}"'.format(
-                os.path.join(self.temp_dir, video_type + ".mp4")
-            )
-        if self.gpu:
-            cmd = 'ffmpeg -y{} -filter_complex "hstack=inputs={}" -c:v h264_nvenc -vsync 2 "{}" -hide_banner -loglevel error -y'.format(
-                video_path_str, str(len(frames_dict.keys())), out_path
-            )
-        else:
-            cmd = 'ffmpeg -y{} -filter_complex hstack=inputs={} -vsync 2 "{}" -hide_banner -loglevel error -y'.format(
-                video_path_str, str(len(frames_dict.keys())), out_path
-            )
-        print(
-            "Concatenating (horizontal) {} videos...".format(
-                str(len(frames_dict.keys()))
-            )
-        )
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-        if final_img:
-            self.timer.stop_timer()
-            stdout_success(
-                msg=f"Merged video saved at {out_path}",
-                elapsed_time=self.timer.elapsed_time_str,
-                source=self.__class__.__name__,
-            )
-
-    def __vertical_concatenator(
-        self, frames_dict: dict, out_path: str, include_resize=True, final_img=True
-    ):
-        """Helper to vertically concatenate N videos"""
-
-        if include_resize:
-            self.__resize_width(new_width=self.video_width)
-        video_path_str = ""
-        for video_type in frames_dict.keys():
-            video_path_str += ' -i "{}"'.format(
-                os.path.join(self.temp_dir, video_type + ".mp4")
-            )
-        if self.gpu:
-            cmd = 'ffmpeg -y{} -filter_complex "vstack=inputs={}" -c:v h264_nvenc -vsync 2 "{}" -hide_banner -loglevel error -y'.format(
-                video_path_str, str(len(frames_dict.keys())), out_path
-            )
-        else:
-            cmd = 'ffmpeg -y{} -filter_complex vstack=inputs={} -vsync 2 "{}" -hide_banner -loglevel error -y'.format(
-                video_path_str, str(len(frames_dict.keys())), out_path
-            )
-        print(
-            "Concatenating (vertical) {} videos...".format(str(len(frames_dict.keys())))
-        )
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-        if final_img:
-            self.timer.stop_timer()
-            stdout_success(
-                msg=f"Merged video saved at {out_path}",
-                elapsed_time=self.timer.elapsed_time_str,
-                source=self.__class__.__name__,
-            )
-
-    def __mosaic_concatenator(
-        self, frames_dict: dict, output_path: str, final_img: bool
-    ):
-        self.__resize_width_and_height(
-            new_width=self.video_width, new_height=self.video_height
-        )
-        if not self.even_bool:
-            self.__create_blank_video()
-        lower_dict = dict(list(frames_dict.items())[len(frames_dict) // 2 :])
-        upper_dict = dict(list(frames_dict.items())[: len(frames_dict) // 2])
-        if (len(upper_dict.keys()) == 1) & (len(lower_dict.keys()) != 1):
-            upper_dict["blank"] = self.blank_path
-        if (len(lower_dict.keys()) == 1) & (len(upper_dict.keys()) != 1):
-            lower_dict["blank"] = self.blank_path
-        self.__horizontal_concatenator(
-            frames_dict=upper_dict,
-            out_path=os.path.join(self.temp_dir, "upper.mp4"),
-            include_resize=False,
-            final_img=False,
-        )
-        self.__horizontal_concatenator(
-            frames_dict=lower_dict,
-            out_path=os.path.join(self.temp_dir, "lower.mp4"),
-            include_resize=False,
-            final_img=False,
-        )
-        frames_dict = {
-            "upper": os.path.join(self.temp_dir, "upper.mp4"),
-            "lower": os.path.join(self.temp_dir, "lower.mp4"),
-        }
-        self.__vertical_concatenator(
-            frames_dict=frames_dict,
-            out_path=output_path,
-            include_resize=False,
-            final_img=final_img,
-        )
-
-    def __mixed_mosaic_concatenator(self):
-        large_mosaic_dict = {
-            str(list(self.frame_types.keys())[0]): str(
-                list(self.frame_types.values())[0]
-            )
-        }
-        del self.frame_types[str(list(self.frame_types.keys())[0])]
-        self.even_bool = (len(self.frame_types.keys()) % 2) == 0
-        output_path = os.path.join(self.temp_dir, "mosaic.mp4")
-        self.__mosaic_concatenator(
-            frames_dict=self.frame_types, output_path=output_path, final_img=False
-        )
-        self.frame_types = large_mosaic_dict
-        self.__resize_height(
-            new_height=get_video_meta_data(video_path=output_path)["height"]
-        )
-        self.frame_types = {
-            str(list(large_mosaic_dict.keys())[0]): os.path.join(
-                self.temp_dir, str(list(large_mosaic_dict.keys())[0]) + ".mp4"
-            ),
-            "mosaic": os.path.join(self.temp_dir, "mosaic.mp4"),
-        }
-        self.__horizontal_concatenator(
-            frames_dict=self.frame_types,
-            out_path=self.output_path,
-            include_resize=False,
-            final_img=True,
-        )
+            _ = mixed_mosaic_concatenator(video_paths=self.video_paths, save_path=self.output_path, gpu=self.gpu, verbose=True)
+        self.timer.stop_timer()
+        stdout_success(msg=f'Merged video saved at {self.output_path}', source=self.__class__.__name__, elapsed_time=self.timer.elapsed_time_str)
 
 
-# FrameMergererFFmpeg(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                     frame_types={'Video 1': '/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi',
-#                                  'Video 2': '/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi'},
-#                     video_height=640,
-#                     video_width=480,
-#                     concat_type='vertical') #horizontal, vertical, mosaic, mixed_mosaic
+
+# videos = ['/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4']
 #
+# merger = FrameMergererFFmpeg(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+#                     video_paths=videos,
+#                     video_height=600,
+#                     video_width=600,
+#                     concat_type='vertical') #horizontal, vertical, mosaic, mixed_mosaic
+# merger.run()
+
+
+
 #
 # FrameMergererFFmpeg(config_path=None,
 #                     frame_types={'Video 1': '/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi',

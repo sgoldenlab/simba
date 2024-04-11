@@ -33,7 +33,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_tuple,
-                                check_ffmpeg_available)
+                                check_ffmpeg_available,
+                                check_valid_lst)
 from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
@@ -1829,3 +1830,432 @@ def crop_multiple_videos_polygons(
         msg=f"Polygon-based cropped {len(video_files)} files to directory {out_dir}",
         elapsed_time=timer.elapsed_time_str,
     )
+
+
+
+def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
+                            height: Union[int, str],
+                            overwrite: Optional[bool] = False,
+                            save_dir: Optional[Union[str, os.PathLike]] = None,
+                            gpu: Optional[bool] = False,
+                            verbose: Optional[bool] = True) -> Union[None, List[Union[None, str, os.PathLike]]]:
+    """
+    Re-size a list of videos to a specified height while retaining their aspect ratios.
+
+    :param List[Union[str, os.PathLike]] video_paths: List of path to videos.
+    :param Union[int, str] height: The height of the output videos. If int, then the height in pixels. If str, then the index in ``video_paths`` from which to grab the height.
+    :param Optional[bool] overwrite: If True, then overwrites the original videos. Default False.
+    :param Optional[Union[str, os.PathLike]] save_dir: If not None, then the directory where to store the re-sized videos.
+    :param Optional[bool] gpu: If True, then use FFmpeg GPU codecs. Default False.
+    :param Optional[bool] verbose: If True, prints progress. Default True.
+    :return Union[None, List[Union[str, os.PathLike]]]: If save_dir is not None, returns the paths of the re-sized videos. Else returns empty list.
+
+    :example:
+    >>> video_paths= ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4']
+    >>> _ = resize_videos_by_height(video_paths=video_paths, height=300, overwrite=False, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new')
+    """
+    timer = SimbaTimer(start=True)
+    if (not overwrite) and (save_dir is None):
+        raise InvalidInputError(msg='Pass a save_dir OR set overwrite to True', source=resize_videos_by_height.__name__)
+    elif (overwrite) and (save_dir is not None):
+        raise InvalidInputError(msg='Pass EITHER overwrite as True OR pass a save_dir', source=resize_videos_by_height.__name__)
+    if save_dir is not None:
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir)
+    check_valid_lst(data=video_paths, source=resize_videos_by_height.__name__, min_len=1)
+    _ = [check_file_exist_and_readable(x) for x in video_paths]
+    new_video_paths = []
+    if isinstance(height, str):
+        check_int(name=f'{resize_videos_by_height.__name__} height', value=height, min_value=0,  max_value=len(video_paths))
+        video_heights = []
+        for i in video_paths: video_heights.append(get_video_meta_data(video_path=i)['height'])
+        height = video_heights[int(height)]
+    for cnt, video_path in enumerate(video_paths):
+        dir_name, video_name, ext = get_fn_ext(video_path)
+        if verbose:
+            print(f'Resizing height video {video_name} (Video {cnt+1}/{len(video_paths)})...')
+        if overwrite:
+            dt = datetime.now().strftime("%Y%m%d%H%M%S")
+            save_path = os.path.join(dir_name, f'{video_name}_{dt}.mp4')
+        else:
+            save_path = os.path.join(save_dir, f'{video_name}.mp4')
+            new_video_paths.append(save_path)
+        if gpu:
+            cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf scale_npp=-2:{height} -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -y'
+        else:
+            cmd = f'ffmpeg -y -i "{video_path}" -vf scale=-2:{height} "{save_path}" -hide_banner -loglevel error -y'
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        if overwrite:
+            shutil.copy(save_path, video_path)
+            os.remove(save_path)
+    timer.stop_timer()
+    if verbose:
+        print(f'Resized height {len(video_paths)} video(s). Elapsed time: {timer.elapsed_time_str}s.')
+    return new_video_paths
+
+
+def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
+                           width: Union[int, str],
+                           overwrite: Optional[bool] = False,
+                           save_dir: Optional[Union[str, os.PathLike]] = None,
+                           gpu: Optional[bool] = False,
+                           verbose: Optional[bool] = True) -> Union[None, List[Union[None, str, os.PathLike]]]:
+
+    """
+    Re-size a list of videos to a specified width while retaining their aspect ratios.
+
+    :param List[Union[str, os.PathLike]] video_paths: List of path to videos.
+    :param Union[int, str] width: The width of the output videos. If int, then the width in pixels. If str, then the index in ``video_paths`` from which to grab the width.
+    :param Optional[bool] overwrite: If True, then overwrites the original videos. Default False.
+    :param Optional[Union[str, os.PathLike]] save_dir: If not None, then the directory where to store the re-sized videos.
+    :param Optional[bool] gpu: If True, then use FFmpeg GPU codecs. Default False.
+    :param Optional[bool] verbose: If True, prints progress. Default True.
+    :return Union[None, List[Union[str, os.PathLike]]]: If save_dir is not None, returns the paths of the re-sized videos. Else returns empty list.
+
+    :example:
+    >>> video_paths= ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4']
+    >>> _ = resize_videos_by_width(video_paths=video_paths, width=300, overwrite=False, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new')
+    """
+
+    timer = SimbaTimer(start=True)
+    if (not overwrite) and (save_dir is None):
+        raise InvalidInputError(msg='Provide a save_dir or set overwrite to True', source=resize_videos_by_width.__name__)
+    elif (overwrite) and (save_dir is not None):
+        raise InvalidInputError(msg='Set EITHER overwrite to True OR Provide a save_dir', source=resize_videos_by_width.__name__)
+    if save_dir is not None:
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir)
+    check_valid_lst(data=video_paths, source=resize_videos_by_width.__name__, min_len=1)
+    _ = [check_file_exist_and_readable(x) for x in video_paths]
+    new_video_paths = []
+    if isinstance(width, str):
+        check_int(name=f'{resize_videos_by_width.__name__} height', value=width, min_value=0,  max_value=len(video_paths))
+        video_widths = []
+        for i in video_paths: video_widths.append(get_video_meta_data(video_path=i)['width'])
+        width = video_widths[int(width)]
+    for cnt, video_path in enumerate(video_paths):
+        dir_name, video_name, ext = get_fn_ext(video_path)
+        if verbose:
+            print(f'Resizing width video {video_name} (Video {cnt+1}/{len(video_paths)})...')
+        if overwrite:
+            dt = datetime.now().strftime("%Y%m%d%H%M%S")
+            save_path = os.path.join(dir_name, f'{video_name}_{dt}.mp4')
+        else:
+            save_path = os.path.join(save_dir, f'{video_name}.mp4')
+            new_video_paths.append(save_path)
+        if gpu:
+            cmd = f'ffmpeg -y -hwaccel auto -i "{video_path}" -vf scale_npp={width}:-2 -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -y'
+        else:
+            cmd = f'ffmpeg -y -i "{video_path}" -vf scale={width}:-2 "{save_path}" -hide_banner -loglevel error -y'
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        if overwrite:
+            shutil.copy(save_path, video_path)
+            os.remove(save_path)
+    timer.stop_timer()
+    if verbose:
+        print(f'Resized width {len(video_paths)} video(s). Elapsed time: {timer.elapsed_time_str}s.')
+    return new_video_paths
+
+def create_blank_video(path: Union[str, os.PathLike],
+                       length: int,
+                       width: int,
+                       height: int,
+                       color: Optional[str] = 'black',
+                       gpu: Optional[bool] = False,
+                       verbose: Optional[bool] = False) -> None:
+
+    """
+    Create a "blank" uni-colored video of specified size and length.
+
+    :param Union[str, os.PathLike] path: Location where to store the blank video.
+    :param int length: Length of the blank video in seconds.
+    :param int width: Width of the blank video in pixels.
+    :param int height: Height of the blank video in pixels.
+    :param Optional[str] color: Color of the blank video. Default black.
+    :param Optional[bool] gpu: If True, then use FFmpeg GPU codecs. Default False.
+    :param Optional[bool] verbose: If True, prints progress. Default True.
+    :return: None.
+
+    :example:
+    >>> _ = create_blank_video(path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4', length=5, width=300, height=400, gpu=False, verbose=True, color='orange')
+    """
+
+    check_int(name=f'{create_blank_video.__name__} length', value=length, min_value=1)
+    check_int(name=f'{create_blank_video.__name__} width', value=width, min_value=1)
+    check_int(name=f'{create_blank_video.__name__} height', value=height, min_value=1)
+    check_if_dir_exists(in_dir=os.path.dirname(path))
+    timer = SimbaTimer(start=True)
+    if verbose:
+        print('Creating blank video...')
+    if gpu:
+        cmd = f'ffmpeg -y -t {length} -f lavfi -i color=c={color}:s={width}x{height} -c:v h264_nvenc -preset slow -tune stillimage -pix_fmt yuv420p "{path}" -hide_banner -loglevel error -y'
+    else:
+        cmd = f'ffmpeg -y -t {length} -f lavfi -i color=c={color}:s={width}x{height} -c:v libx264 -tune stillimage -pix_fmt yuv420p "{path}" -hide_banner -loglevel error -y'
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    if verbose:
+        print(f'Blank video complete. Elapsed time: {timer.elapsed_time_str}s.')
+
+def horizontal_video_concatenator(video_paths: List[Union[str, os.PathLike]],
+                                  save_path: Union[str, os.PathLike],
+                                  height_px: Optional[Union[int, str]] = None,
+                                  height_idx: Optional[Union[int, str]] = None,
+                                  gpu: Optional[bool] = False,
+                                  verbose: Optional[bool] = True) -> None:
+
+    """
+    Concatenates multiple videos horizontally.
+
+    .. image:: _static/img/horizontal_video_concatenator.png
+       :width: 300
+       :align: center
+
+    :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
+    :param Union[str, os.PathLike] save_path: File path to save the concatenated video.
+    :param Optional[int] height_px: Height of the output video in pixels.
+    :param Optional[int] height_idx: Index of the video to use for determining Height.
+    :param Optional[bool] gpu: Whether to use GPU-accelerated codec (default: False).
+    :param Optional[bool] verbose:Whether to print progress messages (default: True).
+
+    :example:
+    >>> video_paths = ['video1.mp4', 'video2.mp4']
+    >>> x = horizontal_video_concatenator(video_paths=video_paths, height_px=50, save_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/08102021_DOT_Rat7_8(2)_.mp4', gpu=False)
+    """
+    check_ffmpeg_available()
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None)", source=horizontal_video_concatenator.__name__)
+    timer = SimbaTimer(start=True)
+    check_valid_lst(data=video_paths, source=horizontal_video_concatenator.__name__, min_len=2)
+    check_if_dir_exists(in_dir=os.path.dirname(save_path), source=horizontal_video_concatenator.__name__)
+    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
+    if ((height_px is None) and (height_idx is None)) or ((height_px is not None) and (height_idx is not None)):
+        raise InvalidInputError(msg='Provide a height_px OR height_idx', source=horizontal_video_concatenator.__name__)
+    if height_idx is not None:
+        check_int(name=f'{horizontal_video_concatenator.__name__} height', value=height_idx, min_value=0, max_value=len(video_paths)-1)
+        height = int(video_meta_data[height_idx]['height'])
+    else:
+        check_int(name=f'{horizontal_video_concatenator.__name__} height', value=height_px, min_value=1)
+        height = int(height_px)
+    video_path_str = " ".join([f'-i "{path}"' for path in video_paths])
+    codec = 'h264_nvenc' if gpu else 'libvpx-vp9'
+    filter_complex = ";".join([f"[{idx}:v]scale=-1:{height}[v{idx}]" for idx in range(len(video_paths))])
+    filter_complex += f";{''.join([f'[v{idx}]' for idx in range(len(video_paths))])}hstack=inputs={len(video_paths)}[v]"
+    if verbose:
+        print(f'Concatenating {len(video_paths)} videos horizontally with a {height} pixel height... ')
+    cmd = f'ffmpeg {video_path_str} -filter_complex "{filter_complex}" -map "[v]" -c:v {codec} -loglevel error -stats "{save_path}" -y'
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    if verbose:
+        print(f'Horizontal concatenation complete, saved at {save_path} (elapsed time: {timer.elapsed_time_str}s.)')
+
+def vertical_video_concatenator(video_paths: List[Union[str, os.PathLike]],
+                                save_path: Union[str, os.PathLike],
+                                width_px: Optional[int] = None,
+                                width_idx: Optional[int] = None,
+                                gpu: Optional[bool] = False,
+                                verbose: Optional[bool] = True) -> None:
+    """
+    Concatenates multiple videos vertically.
+
+    .. image:: _static/img/vertical_video_concatenator.png
+       :width: 300
+       :align: center
+
+    :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
+    :param Union[str, os.PathLike] save_path: File path to save the concatenated video.
+    :param Optional[int] width_px: Width of the output video in pixels.
+    :param Optional[int] width_idx: Index of the video to use for determining width.
+    :param Optional[bool] gpu: Whether to use GPU-accelerated codec (default: False).
+    :param Optional[bool] verbose:Whether to print progress messages (default: True).
+    :raises FFMPEGCodecGPUError: If GPU is requested but not available.
+    :raises InvalidInputError: If both or neither width_px and width_idx are provided.
+
+    :example:
+    >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4',
+    >>>                '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4',
+    >>>                '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12_1.mp4']
+    >>> _ = vertical_video_concatenator(video_paths=video_paths, width_idx=1, save_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/08102021_DOT_Rat7_8(2)_.mp4', gpu=False)
+    """
+
+    check_ffmpeg_available()
+    if gpu and not check_nvidea_gpu_available(): raise FFMPEGCodecGPUError(msg="NVIDIA GPU not available", source=vertical_video_concatenator.__name__)
+    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
+    timer = SimbaTimer(start=True)
+    check_valid_lst(data=video_paths, source=vertical_video_concatenator.__name__, min_len=2)
+    check_if_dir_exists(in_dir=os.path.dirname(save_path), source=vertical_video_concatenator.__name__)
+    if ((width_px is None) and (width_idx is None)) or ((width_px is not None) and (width_idx is not None)):
+        raise InvalidInputError(msg='Provide a width_px OR width_idx', source=vertical_video_concatenator.__name__)
+    if width_idx is not None:
+        check_int(name=f'{vertical_video_concatenator.__name__} width index', value=width_idx, min_value=0, max_value=len(video_paths) - 1)
+        width = int(video_meta_data[width_idx]['width'])
+    else:
+        check_int(name=f'{vertical_video_concatenator.__name__} width', value=width_px, min_value=1)
+        width = int(width_px)
+    video_path_str = " ".join([f'-i "{path}"' for path in video_paths])
+    codec = 'h264_nvenc' if gpu else 'libvpx-vp9'
+    filter_complex = ";".join([f"[{idx}:v]scale={width}:-1[v{idx}]" for idx in range(len(video_paths))])
+    filter_complex += f";{''.join([f'[v{idx}]' for idx in range(len(video_paths))])}"
+    filter_complex += f"vstack=inputs={len(video_paths)}[v]"
+    if verbose:
+        print(f'Concatenating {len(video_paths)} videos vertically with a {width} pixel width...')
+    cmd = f'ffmpeg {video_path_str} -filter_complex "{filter_complex}" -map "[v]" -c:v {codec} -loglevel error -stats "{save_path}" -y'
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    if verbose:
+        print(f'Vertical concatenation complete. Saved at {save_path} (Elapsed time: {timer.elapsed_time_str}s.)')
+
+
+
+def mosaic_concatenator(video_paths: List[Union[str, os.PathLike]],
+                        save_path: Union[str, os.PathLike],
+                        width_idx: Optional[Union[int, str]] = None,
+                        width_px: Optional[Union[int, str]] = None,
+                        height_idx: Optional[Union[int, str]] = None,
+                        height_px: Optional[Union[int, str]] = None,
+                        gpu: Optional[bool] = False,
+                        verbose: Optional[bool] = True,
+                        uneven_fill_color: Optional[str] = 'black') -> None:
+    """
+    Concatenates multiple videos into a mosaic layout.
+
+    .. image:: _static/img/mosaic_concatenator.png
+       :width: 600
+       :align: center
+
+    .. note::
+       if an uneven number of videos, the last index will be filled by ``uneven_fill_color``.
+
+    :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
+    :param Union[str, os.PathLike] save_path: File path to save the concatenated video.
+    :param Optional[int] width_px: Width of the output video in pixels.
+    :param Optional[int] width_idx: Index of the video to use for determining width.
+    :param Optional[int] height_px: Height of the output video panels in pixels.
+    :param Optional[int] height_idx: Height of the video to use for determining width.
+    :param Optional[bool] gpu: Whether to use GPU-accelerated codec (default: False).
+    :param Optional[bool] verbose: Whether to print progress messages (default: True).
+
+    :example:
+    >>> video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/2022-06-21_NOB_IOT_23.mp4']
+    >>> save_path = '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4'
+    >>> mosaic_concatenator(video_paths=video_paths, save_path=save_path, width_idx=1, height_idx=1, gpu=False)
+    """
+
+    check_ffmpeg_available()
+    if gpu and not check_nvidea_gpu_available(): raise FFMPEGCodecGPUError(msg="NVIDIA GPU not available", source=mosaic_concatenator.__name__)
+    timer = SimbaTimer(start=True)
+    dt = datetime.now().strftime("%Y%m%d%H%M%S")
+    check_valid_lst(data=video_paths, source=f'{mosaic_concatenator.__name__} video_paths', min_len=3)
+    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
+    max_video_length = max([x['video_length_s'] for x in video_meta_data])
+    if ((width_px is None) and (width_idx is None)) or ((width_px is not None) and (width_idx is not None)):
+        raise InvalidInputError(msg='Provide a width_px OR width_idx', source=mosaic_concatenator.__name__)
+    if ((height_px is None) and (height_idx is None)) or ((height_px is not None) and (height_idx is not None)):
+        raise InvalidInputError(msg='Provide a height_px OR height_idx', source=mosaic_concatenator.__name__)
+    if width_idx is not None:
+        check_int(name=f'{vertical_video_concatenator.__name__} width index', value=width_idx, min_value=1, max_value=len(video_paths) - 1)
+        width = int(video_meta_data[width_idx]['width'])
+    else:
+        width = width_px
+    if height_idx is not None:
+        check_int(name=f'{vertical_video_concatenator.__name__} height index', value=width_idx, min_value=1, max_value=len(video_paths) - 1)
+        height = int(video_meta_data[width_idx]['height'])
+    else:
+        height = height_px
+    if verbose:
+        print(f'Creating mosaic video ...')
+    temp_dir = os.path.join(os.path.dirname(video_paths[0]), f'temp_{dt}')
+    os.makedirs(temp_dir)
+    if not (len(video_paths) % 2) == 0:
+        blank_path = os.path.join(temp_dir, f'{dt}.mp4')
+        create_blank_video(path=blank_path, length=max_video_length, width=width, height=height, gpu=gpu, verbose=verbose, color=uneven_fill_color)
+        video_paths.append(blank_path)
+    upper_videos, lower_videos = video_paths[:len(video_paths)//2], video_paths[len(video_paths)//2:]
+    if verbose: print('Creating upper mosaic... (Step 1/3)')
+    if len(upper_videos) > 1:
+        upper_path = os.path.join(temp_dir, 'upper.mp4')
+        horizontal_video_concatenator(video_paths=upper_videos, save_path=upper_path, gpu=gpu, height_px=height, verbose=verbose)
+    else:
+        upper_path = upper_videos[0]
+    if verbose: print('Creating lower mosaic... (Step 2/3)')
+    if len(lower_videos) > 1:
+        lower_path = os.path.join(temp_dir, 'lower.mp4')
+        horizontal_video_concatenator(video_paths=lower_videos, save_path=lower_path, gpu=gpu, height_px=height, verbose=verbose)
+    else:
+        lower_path = lower_videos[0]
+    panels_meta = [get_video_meta_data(video_path=video_path) for video_path in [lower_path, upper_path]]
+    if verbose: print('Joining upper and lower mosaic... (Step 2/3)')
+    vertical_video_concatenator(video_paths=[upper_path, lower_path], save_path=save_path, verbose=verbose, gpu=gpu, width_px=max([x['width'] for x in panels_meta]))
+    timer.stop_timer()
+    shutil.rmtree(temp_dir)
+    if verbose:
+        print(f'Mosaic concatenation complete. Saved at {save_path} (Elapsed time: {timer.elapsed_time_str}s.)')
+
+
+def mixed_mosaic_concatenator(video_paths: List[Union[str, os.PathLike]],
+                              save_path: Union[str, os.PathLike],
+                              gpu: Optional[bool] = False,
+                              verbose: Optional[bool] = True,
+                              uneven_fill_color: Optional[str] = 'black') -> None:
+    """
+    Create a mixed mosaic video by concatenating multiple input videos in a mosaic layout of various sizes.
+
+    .. image:: _static/img/mixed_mosaic_concatenator.png
+       :width: 600
+       :align: center
+
+    .. note::
+       The resolution of the output video is determined by the resolution of the video path at the first index.
+
+       If an uneven number of right-panel videos ( if not (len(video_paths)-1) % 2) == 0), then the last index will be filled by ``uneven_fill_color``.
+
+    :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
+    :param Union[str, os.PathLike] save_path: File path to save the concatenated video.
+    :param Optional[bool] gpu: Whether to use GPU-accelerated codec (default: False).
+    :param Optional[bool] verbose: Whether to print progress messages (default: True).
+
+    :example:
+    >>> video_paths = ['video1.mp4', 'video2.mp4', 'video3.mp4']
+    >>> save_path = '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4'
+    >>> mixed_mosaic_concatenator(video_paths=video_paths, save_path=save_path, gpu=False, verbose=True)
+    """
+
+    check_ffmpeg_available()
+    if gpu and not check_nvidea_gpu_available(): raise FFMPEGCodecGPUError(msg="NVIDIA GPU not available", source=mixed_mosaic_concatenator.__name__)
+    timer = SimbaTimer(start=True)
+    check_valid_lst(data=video_paths, source=mixed_mosaic_concatenator.__name__, min_len=2)
+    dt = datetime.now().strftime("%Y%m%d%H%M%S")
+    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
+    max_video_length = max([x['video_length_s'] for x in video_meta_data])
+    check_if_dir_exists(in_dir=os.path.dirname(save_path), source=mixed_mosaic_concatenator.__name__)
+    large_mosaic_path, video_paths = video_paths[0], video_paths[1:]
+    mosaic_height = int(video_meta_data[0]['height'] / 2)
+    if verbose: print('Creating mixed mosaic video... ')
+    temp_dir = os.path.join(os.path.dirname(video_paths[0]), f'temp_{dt}')
+    os.makedirs(temp_dir)
+    if not (len(video_paths) % 2) == 0:
+        blank_path = os.path.join(temp_dir, f'{dt}.mp4')
+        create_blank_video(path=blank_path, length=max_video_length, width=video_meta_data[-1]['width'], height=mosaic_height, gpu=gpu, verbose=True, color=uneven_fill_color)
+        video_paths.append(blank_path)
+    upper_videos, lower_videos = video_paths[:len(video_paths) // 2], video_paths[len(video_paths) // 2:]
+    if verbose: print('Creating upper right mosaic ... (Step 1/4)')
+    if len(upper_videos) > 1:
+        upper_path = os.path.join(temp_dir, 'upper.mp4')
+        horizontal_video_concatenator(video_paths=upper_videos, save_path=upper_path, gpu=gpu, height_px=mosaic_height, verbose=verbose)
+    else:
+        upper_path = upper_videos[0]
+    if verbose: print('Creating lower right mosaic ... (Step 2/4)')
+    if len(lower_videos) > 1:
+        lower_path = os.path.join(temp_dir, 'lower.mp4')
+        horizontal_video_concatenator(video_paths=lower_videos, save_path=lower_path, gpu=gpu, verbose=verbose)
+    else:
+        lower_path = lower_videos[0]
+    panels_meta = [get_video_meta_data(video_path=video_path) for video_path in [lower_path, upper_path]]
+    mosaic_path = os.path.join(temp_dir, 'mosaic.mp4')
+    if verbose: print('Joining upper and lower right mosaic... (Step 3/4)')
+    vertical_video_concatenator(video_paths=[upper_path, lower_path], width_px=min([x['width'] for x in panels_meta]), save_path=mosaic_path, gpu=gpu, verbose=verbose)
+    if verbose: print('Joining left and right mosaic... (Step 4/4)')
+    horizontal_video_concatenator(video_paths=[large_mosaic_path, mosaic_path], height_idx=0, save_path=save_path, gpu=gpu)
+    timer.stop_timer()
+    shutil.rmtree(temp_dir)
+    if verbose:
+        print(f'Mixed mosaic concatenation complete. Saved at {save_path} (Elapsed time: {timer.elapsed_time_str}s.)')

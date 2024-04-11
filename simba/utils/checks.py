@@ -875,7 +875,7 @@ def check_valid_array(
                 source=check_valid_array.__name__,
             )
     if min_axis_1 is not None:
-        check_int(name=f"{source} min_axis_1", value=max_axis_1)
+        check_int(name=f"{source} min_axis_1", value=min_axis_1)
         if data.shape[1] < min_axis_1:
             raise ArrayError(
                 msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}",
@@ -1183,6 +1183,7 @@ def check_valid_dataframe(
     df: pd.DataFrame,
     source: Optional[str] = "",
     valid_dtypes: Optional[Tuple[Any]] = None,
+    required_fields: Optional[List[str]] = None,
     min_axis_0: Optional[int] = None,
     min_axis_1: Optional[int] = None,
     max_axis_0: Optional[int] = None,
@@ -1226,6 +1227,13 @@ def check_valid_dataframe(
                 msg=f"The dataframe {source} has more than ({df.columns}) the required maximum number of columns ({max_axis_1}).",
                 source=source,
             )
+    if required_fields is not None:
+        check_valid_lst(data=required_fields, source=check_valid_dataframe.__name__, valid_dtypes=(str,))
+        missing = list(set(required_fields) - set(df.columns))
+        if len(missing) > 0:
+            raise InvalidInputError(msg=f"The dataframe {source} are missing required columns {missing}.", source=source)
+
+
 
 def check_valid_tuple(x: tuple, source: Optional[str] = '', accepted_lengths: Optional[Tuple[int]] = None, valid_dtypes: Optional[Tuple[Any]] = None):
     if not isinstance(x, (tuple)):

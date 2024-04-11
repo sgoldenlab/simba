@@ -5,6 +5,7 @@ import os
 import sys
 import threading
 from tkinter import *
+from typing import Optional, Union
 
 from PIL import Image, ImageTk
 
@@ -1045,7 +1046,7 @@ class ConcatenatingVideosPopUp(PopUpMixin):
 
 
 class ConcatenatorPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str or None):
+    def __init__(self, config_path: Optional[Union[str, os.PathLike]] = None):
         PopUpMixin.__init__(self, title="MERGE (CONCATENATE) VIDEOS")
         self.config_path = config_path
         self.select_video_cnt_frm = CreateLabelFrameWithIcon(
@@ -1066,37 +1067,19 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         self.select_video_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.select_video_cnt_dropdown.grid(row=0, column=0, sticky=NW)
         self.select_video_cnt_btn.grid(row=0, column=1, sticky=NW)
+        self.main_frm.mainloop()
 
     def populate_table(self):
         if hasattr(self, "video_table_frm"):
             self.video_table_frm.destroy()
             self.join_type_frm.destroy()
-        self.video_table_frm = LabelFrame(
-            self.main_frm,
-            text="VIDEO PATHS",
-            pady=5,
-            padx=5,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
+        self.video_table_frm = LabelFrame(self.main_frm, text="VIDEO PATHS", pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
         self.video_table_frm.grid(row=1, sticky=NW)
-        self.join_type_frm = LabelFrame(
-            self.main_frm,
-            text="JOIN TYPE",
-            pady=5,
-            padx=5,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
+        self.join_type_frm = LabelFrame(self.main_frm, text="JOIN TYPE", pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
         self.join_type_frm.grid(row=2, sticky=NW)
         self.videos_dict = {}
         for cnt in range(int(self.select_video_cnt_dropdown.getChoices())):
-            self.videos_dict[cnt] = FileSelect(
-                self.video_table_frm,
-                "Video {}: ".format(str(cnt + 1)),
-                title="Select a video file",
-                file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-            )
+            self.videos_dict[cnt] = FileSelect(self.video_table_frm, "Video {}: ".format(str(cnt + 1)), title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
             self.videos_dict[cnt].grid(row=cnt, column=0, sticky=NW)
 
         self.join_type_var = StringVar()
@@ -1104,7 +1087,7 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         simba_dir = os.path.dirname(simba.__file__)
         icon_assets_dir = os.path.join(simba_dir, Paths.ICON_ASSETS.value)
         concat_icon_dir = os.path.join(icon_assets_dir, "concat_icons")
-        for file_cnt, file_path in enumerate(glob.glob(concat_icon_dir + "/*")):
+        for file_cnt, file_path in enumerate(glob.glob(concat_icon_dir + "/*.png")):
             _, file_name, _ = get_fn_ext(file_path)
             self.icons_dict[file_name] = {}
             self.icons_dict[file_name]["img"] = ImageTk.PhotoImage(
@@ -1133,11 +1116,11 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         self.resolution_width = DropDownMenu(
             self.resolution_frm, "Width", ["480", "640", "1280", "1920", "2560"], "15"
         )
-        self.resolution_width.setChoices("640")
+        self.resolution_width.setChoices("480")
         self.resolution_height = DropDownMenu(
             self.resolution_frm, "Height", ["480", "640", "1280", "1920", "2560"], "15"
         )
-        self.resolution_height.setChoices("480")
+        self.resolution_height.setChoices("640")
         self.gpu_frm = LabelFrame(
             self.main_frm,
             text="GPU",
@@ -1147,9 +1130,7 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             fg="black",
         )
         self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(
-            self.gpu_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var
-        )
+        use_gpu_cb = Checkbutton(self.gpu_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var)
         use_gpu_cb.grid(row=0, column=0, sticky="NW")
         self.resolution_frm.grid(row=3, column=0, sticky=NW)
         self.gpu_frm.grid(row=4, column=0, sticky="NW")
@@ -1160,28 +1141,30 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         run_btn.grid(row=5, column=0, sticky=NW)
 
     def run(self):
-        videos_info = {}
+        file_paths = []
         for cnt, (video_name, video_data) in enumerate(self.videos_dict.items()):
             _ = get_video_meta_data(video_path=video_data.file_path)
-            videos_info["Video {}".format(str(cnt + 1))] = video_data.file_path
+            file_paths.append(video_data.file_path)
 
-        if (len(videos_info.keys()) < 3) & (self.join_type_var.get() == "mixed_mosaic"):
-            raise MixedMosaicError(
-                msg="Ff using the mixed mosaic join type, please tick check-boxes for at least three video types.",
-                source=self.__class__.__name__,
-            )
-        if (len(videos_info.keys()) < 3) & (self.join_type_var.get() == "mosaic"):
+        if (len(file_paths) < 3) & (self.join_type_var.get() == "mixed_mosaic"):
+            raise MixedMosaicError(msg="If using the mixed mosaic join type, please tick check-boxes for at least three video types.", source=self.__class__.__name__,)
+        if (len(file_paths) < 3) & (self.join_type_var.get() == "mosaic"):
             self.join_type_var.set(value="vertical")
 
-        _ = FrameMergererFFmpeg(
+        video_merger = FrameMergererFFmpeg(
             config_path=self.config_path,
-            frame_types=videos_info,
+            video_paths=file_paths,
             video_height=int(self.resolution_height.getChoices()),
             video_width=int(self.resolution_width.getChoices()),
             concat_type=self.join_type_var.get(),
             gpu=self.use_gpu_var.get(),
         )
 
+        threading.Thread(
+            target=video_merger.run())
+
+
+#ConcatenatorPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 
 class VideoRotatorPopUp(PopUpMixin):
     def __init__(self):

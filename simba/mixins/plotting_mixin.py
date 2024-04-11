@@ -5,6 +5,9 @@ import itertools
 import os
 import random
 import shutil
+import plotly.graph_objs as go
+import plotly.io as pio
+from PIL import Image
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cv2
@@ -1794,6 +1797,7 @@ class PlottingMixin(object):
         show_box: Optional[bool] = False,
         size: Optional[int] = 10,
         title: Optional[str] = None,
+        bg_clr: Optional[str] = None,
         save_path: Optional[Union[str, os.PathLike]] = None,
     ):
         """Create a 2D scatterplot with a continuous legend"""
@@ -1821,13 +1825,15 @@ class PlottingMixin(object):
             data = pd.DataFrame(data, columns=list(columns))
 
         fig, ax = plt.subplots()
+        if bg_clr is not None:
+            if bg_clr not in get_named_colors():
+                raise InvalidInputError(msg=f'bg_clr {bg_clr} is not a valid named color. Options: {get_named_colors()}', source=PlottingMixin.continuous_scatter.__name__)
+            fig.set_facecolor(bg_clr)
         if not show_box:
             plt.axis("off")
         plt.xlabel(columns[0])
         plt.ylabel(columns[1])
-        plot = ax.scatter(
-            data[columns[0]], data[columns[1]], c=data[columns[2]], s=size, cmap=palette
-        )
+        plot = ax.scatter(data[columns[0]], data[columns[1]], c=data[columns[2]], s=size, cmap=palette)
         cbar = fig.colorbar(plot)
         cbar.set_label(columns[2], loc="center")
         if title is not None:
@@ -2045,3 +2051,170 @@ class PlottingMixin(object):
             plt.close("all")
         else:
             return plot
+
+    @staticmethod
+    def make_line_plot(data: List[np.ndarray],
+                       colors: List[str],
+                       show_box: Optional[bool] = True,
+                       width: Optional[int] = 640,
+                       height: Optional[int] = 480,
+                       line_width: Optional[int] = 6,
+                       font_size: Optional[int] = 8,
+                       bg_clr: Optional[str] = None,
+                       x_lbl_divisor: Optional[float] = None,
+                       title: Optional[str] = None,
+                       y_lbl: Optional[str] = None,
+                       x_lbl: Optional[str] = None,
+                       y_max: Optional[int] = -1,
+                       line_opacity: Optional[int] = 0.0,
+                       save_path: Optional[Union[str, os.PathLike]] = None):
+
+        check_valid_lst(data=data, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(np.ndarray, list,))
+        check_valid_lst(data=colors, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(str,), exact_len=len(data))
+        clr_dict = get_color_dict()
+        matplotlib.font_manager._get_font.cache_clear()
+        plt.close("all")
+        fig, ax = plt.subplots()
+        if bg_clr is not None: fig.set_facecolor(bg_clr)
+        if not show_box: plt.axis("off")
+        for i in range(len(data)):
+            line_clr = clr_dict[colors[i]][::-1]
+            line_clr = tuple(x / 255 for x in line_clr)
+            flat_data = data[i].flatten()
+            plt.plot(flat_data, color=line_clr, linewidth=line_width, alpha=line_opacity)
+        max_x = max([len(x) for x in data])
+        if y_max == -1: y_max = max([np.max(x) for x in data])
+        y_ticks_locs = y_lbls = np.round(np.linspace(0, y_max, 10), 2)
+        x_ticks_locs = x_lbls = np.linspace(0, max_x, 5)
+        if x_lbl_divisor is not None: x_lbls = np.round((x_lbls / x_lbl_divisor), 1)
+        if y_lbl is not None: plt.ylabel(y_lbl)
+        if x_lbl is not None: plt.xlabel(x_lbl)
+        plt.xticks(x_ticks_locs, x_lbls, rotation="horizontal", fontsize=font_size)
+        plt.yticks(y_ticks_locs, y_lbls, fontsize=font_size)
+        plt.ylim(0, y_max)
+        if title is not None: plt.suptitle(title, x=0.5, y=0.92, fontsize=font_size + 4)
+        buffer_ = io.BytesIO()
+        plt.savefig(buffer_, format="png")
+        buffer_.seek(0)
+        img = PIL.Image.open(buffer_)
+        img = np.uint8(cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR))
+        buffer_.close()
+        plt.close()
+        img = cv2.resize(img, (width, height))
+        if save_path is not None:
+            cv2.imwrite(save_path, img)
+            stdout_success(msg=f'Line plot saved at {save_path}')
+        else:
+            return img
+
+    @staticmethod
+    def make_line_plot_plotly(data: List[np.ndarray],
+                              colors: List[str],
+                              show_box: Optional[bool] = True,
+                              show_grid: Optional[bool] = False,
+                              width: Optional[int] = 640,
+                              height: Optional[int] = 480,
+                              line_width: Optional[int] = 6,
+                              font_size: Optional[int] = 8,
+                              bg_clr: Optional[str] = 'white',
+                              x_lbl_divisor: Optional[float] = None,
+                              title: Optional[str] = None,
+                              y_lbl: Optional[str] = None,
+                              x_lbl: Optional[str] = None,
+                              y_max: Optional[int] = -1,
+                              line_opacity: Optional[int] = 0.5,
+                              save_path: Optional[Union[str, os.PathLike]] = None):
+
+        """
+        Create a line plot using Plotly.
+
+        .. note::
+           Plotly can be more reliable than matplotlib on some systems when accessed through multprocessing calls.
+
+           If **not** called though multiprocessing, consider using ``simba.mixins.plotting_mixin.PlottingMixin.make_line_plot()``
+
+           Uses ``kaleido`` for transform image to numpy array or save to disk.
+
+        :param List[np.ndarray] data: List of 1D numpy arrays representing lines.
+        :param List[str] colors: List of named colors of size len(data).
+        :param bool show_box: Whether to show the plot box (axes, title, etc.).
+        :param bool show_grid: Whether to show gridlines on the plot.
+        :param int width: Width of the plot in pixels.
+        :param int height: Height of the plot in pixels.
+        :param int line_width: Width of the lines in the plot.
+        :param int font_size: Font size for axis labels and tick labels.
+        :param str bg_clr: Background color of the plot.
+        :param float x_lbl_divisor: Divisor for adjusting the tick spacing on the x-axis.
+        :param str title: Title of the plot.
+        :param str y_lbl: Label for the y-axis.
+        :param str x_lbl: Label for the x-axis.
+        :param int y_max: Maximum value for the y-axis.
+        :param float line_opacity: Opacity of the lines in the plot.
+        :param Union[str, os.PathLike] save_path: Path to save the plot image. If None, returns a numpy array of the plot.
+        :return: If save_path is None, returns a numpy array representing the plot image.
+
+        :example:
+        >>> p = np.random.randint(0, 50, (100,))
+        >>> y = np.random.randint(0, 50, (200,))
+        >>> img = PlottingMixin.make_line_plot_plotly(data=[p, y], show_box=False, font_size=20, bg_clr='white', show_grid=False, x_lbl_divisor=30, colors=['Red', 'Green'], save_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial     3_final_img.png')
+        """
+
+        def tick_formatter(x):
+            if x_lbl_divisor is not None:
+                return str(round(x / x_lbl_divisor, 2))
+            else:
+                return str(x)
+
+        fig = go.Figure()
+        clr_dict = get_color_dict()
+        if y_max == -1: y_max = max([np.max(i) for i in data])
+        for i in range(len(data)):
+            line_clr = clr_dict[colors[i]]
+            line_clr = f'rgba({line_clr[0]}, {line_clr[1]}, {line_clr[2]}, {line_opacity})'
+            fig.add_trace(go.Scatter(y=data[i].flatten(), mode='lines', line=dict(color=line_clr, width=line_width)))
+
+        if not show_box:
+            fig.update_layout(width=width, height=height, title=title, xaxis_visible=False, yaxis_visible=False,
+                              showlegend=False)
+        else:
+            if fig['layout']['xaxis']['tickvals'] is None:
+                tickvals = [i for i in range(data[0].shape[0])]
+            else:
+                tickvals = fig['layout']['xaxis']['tickvals']
+            if x_lbl_divisor is not None:
+                ticktext = [tick_formatter(x) for x in tickvals]
+            else:
+                ticktext = tickvals
+            fig.update_layout(
+                width=width,
+                height=height,
+                title=title,
+                xaxis=dict(
+                    title=x_lbl,
+                    tickvals=tickvals,
+                    ticktext=ticktext,
+                    tickmode='auto',
+                    tick0=0,
+                    dtick=10,
+                    tickfont=dict(size=font_size),
+                    showgrid=show_grid,
+                ),
+                yaxis=dict(
+                    title=y_lbl,
+                    tickfont=dict(size=font_size),
+                    range=[0, y_max],
+                    showgrid=show_grid,
+                ),
+                showlegend=False
+            )
+
+        if bg_clr is not None:
+            fig.update_layout(plot_bgcolor=bg_clr)
+        if save_path is not None:
+            pio.write_image(fig, save_path)
+            stdout_success(msg=f'Line plot saved at {save_path}')
+        else:
+            img_bytes = fig.to_image(format="png")
+            img = PIL.Image.open(io.BytesIO(img_bytes))
+            fig = None
+            return np.array(img).astype(np.uint8)

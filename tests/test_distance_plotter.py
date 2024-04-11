@@ -56,7 +56,7 @@ class TestDistancePlotter(object):
     def core_cnt_args(self, request):
         return request
 
-    @pytest.fixture(params=[{0: ['Center_1', 'Center_2', 'Green'], 1: ['Ear_left_2', 'Ear_left_1', 'Red']}])
+    @pytest.fixture(params=[['Center_1', 'Center_2', 'Green'],['Ear_left_2', 'Ear_left_1', 'Red']])
     def line_attr_args(self, request):
         return request
 
@@ -81,7 +81,7 @@ class TestDistancePlotter(object):
                                                      video_setting=True,
                                                      style_attr=style_attr,
                                                      final_img=True,
-                                                     files_found=data_path_args.param,
+                                                     data_paths=data_path_args.param,
                                                      line_attr=line_attr_args.param)
         distance_plotter.run()
 

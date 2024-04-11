@@ -23,7 +23,7 @@ from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_instance, check_str,
                                 check_that_column_exist, check_valid_array,
-                                check_valid_lst)
+                                check_valid_lst, check_valid_dataframe)
 from simba.utils.data import detect_bouts
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -626,9 +626,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         return {k: v for k, v in seen_dedup.items() if len(v) > 1}
 
     @staticmethod
-    def sequential_lag_analysis(
-        data: pd.DataFrame, criterion: str, target: str, time_window: float, fps: float
-    ):
+    def sequential_lag_analysis(data: pd.DataFrame, criterion: str, target: str, time_window: float, fps: float):
         """
         Perform sequential lag analysis to determine the temporal relationship between two events.
 
@@ -638,8 +636,12 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         A value closer to 1.0 indicates that behavior T always precede behavior C. A value closer to 0.0 indicates that behavior T follows behavior C. A value of -1.0 indicates
         that behavior T never precede nor proceed behavior C.
 
+
+        .. seealso::
+           :class:`simba.data_processorsfsttc_calculator.FSTTCCalculator`
+
         :example:
-        >>> df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/targets_inserted/Together_1.csv', file_type='csv')
+        >>> df = pd.DataFrame(np.random.randint(0, 2, (100, 2)), columns=['Attack', 'Sniffing'])
         >>> FeatureExtractionSupplemental.sequential_lag_analysis(data=df, criterion='Attack', target='Sniffing', fps=5, time_window=2.0)
 
         References
@@ -648,11 +650,6 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                2022.
         """
 
-        check_instance(
-            source=FeatureExtractionSupplemental.sequential_lag_analysis.__name__,
-            instance=data,
-            accepted_types=(pd.DataFrame),
-        )
         check_str(
             name=f"{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} criterion",
             value=criterion,
@@ -669,19 +666,15 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         check_float(
             name=f"{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} time-window",
             value=time_window,
-            min_value=0.01,
+            min_value=10e-6,
         )
-        check_that_column_exist(
-            df=data,
-            column_name=[criterion, target],
-            file_name=FeatureExtractionSupplemental.sequential_lag_analysis.__name__,
-        )
+        check_valid_dataframe(df=data, source=f'{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} data',
+                              valid_dtypes=(np.float32, np.float64, np.int64, np.int32, float, int),
+                              required_fields=[criterion, target])
+
         bouts = detect_bouts(data_df=data, target_lst=[criterion, target], fps=fps)
         if len(bouts) == 0:
-            raise CountError(
-                msg=f"No events of behaviors {criterion} and {target} detected in data.",
-                source=FeatureExtractionSupplemental.sequential_lag_analysis,
-            )
+            raise CountError(msg=f"No events of behaviors {criterion} and {target} detected in data.", source=FeatureExtractionSupplemental.sequential_lag_analysis)
         criterion_starts = bouts["Start_frame"][bouts["Event"] == criterion].values
         target_starts = bouts["Start_frame"][bouts["Event"] == target].values
         preceding_cnt, proceeding_cnt = 0, 0
@@ -765,3 +758,10 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             v = [vi / 10 for vi in v]
             movement = movement / 10
         return movement, np.mean(v)
+
+
+
+#df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/targets_inserted/Together_1.csv', file_type='csv')
+#
+# df = pd.DataFrame(np.random.randint(0, 2, (100, 2)), columns=['Attack', 'Sniffing'])
+# FeatureExtractionSupplemental.sequential_lag_analysis(data=df, criterion='Attack', target='Sniffing', fps=5, time_window=2.0)

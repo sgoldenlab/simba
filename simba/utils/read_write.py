@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 from urllib.parse import urlparse
+import subprocess
 
 import cv2
 import numpy as np
@@ -1890,8 +1891,40 @@ def get_unique_values_in_iterable(
     return cnt
 
 
-# def kbd_listener() -> KeyboardListener:
-#     kbd_listener = KeyboardListener()
-#     monitor_thread = threading.Thread(target=kbd_listener.start)
-#     monitor_thread.start()
-#     return kbd_listener
+def copy_files_to_directory(file_paths: List[Union[str, os.PathLike]],
+                            dir: Union[str, os.PathLike],
+                            verbose: Optional[bool] = True,
+                            integer_save_names: Optional[bool] = False) -> List[Union[str, os.PathLike]]:
+    """
+    Copy a list of files to a specified directory.
+
+    :param List[Union[str, os.PathLike]] file_paths: List of paths to the files to be copied.
+    :param Union[str, os.PathLike] dir: Path to the directory where files will be copied.
+    :param Optional[bool] verbose: If True, prints progress information. Default True.
+    :param Optional[bool] integer_save_names: If True, saves files with integer names. E.g., file one in ``file_paths`` will be saved as dir/0.
+    :return List[Union[str, os.PathLike]]: List of paths to the copied files
+    """
+
+    check_valid_lst(data=file_paths, source=copy_files_to_directory.__name__, min_len=1)
+    _ = [check_file_exist_and_readable(x) for x in file_paths]
+    check_if_dir_exists(in_dir=dir, source=copy_files_to_directory)
+    destinations = []
+    for cnt, file_path in enumerate(file_paths):
+        if verbose:
+            print(f'Copying file {os.path.basename(file_path)} ({cnt+1}/{len(file_paths)})...')
+        if not integer_save_names:
+            destination = os.path.join(dir, os.path.basename(file_path))
+        else:
+            _, file_name, ext = get_fn_ext(filepath=file_path)
+            destination = os.path.join(dir, f'{cnt}{ext}')
+        try:
+            if os.path.isfile(destination):
+                os.remove(destination)
+        except Exception as e:
+            print(e.args)
+            raise PermissionError(
+                msg=f"Not allowed to overwrite file {destination}. Try running SimBA in terminal opened in admin mode or delete existing file before copying.",
+                source=copy_files_to_directory.__name__, )
+        destinations.append(destination)
+        shutil.copy(file_path, destination)
+    return destinations

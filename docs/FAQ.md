@@ -411,7 +411,7 @@ Then try to relaunch simba by typing `simba`.
 
 </details>
 
-### 27. I'm on Linux, and when I install SimBA I get a complaint error while installint the SHAP library, complaining about ``gcc`` and exit code 1
+### 27. I'm on Linux, and when I install SimBA I get a complaint error while installing the SHAP library, complaining about ``gcc`` and exit code 1
 
 <details>
   <summary>Show solutions!</summary>
