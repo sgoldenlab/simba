@@ -323,8 +323,8 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
             settings,
             feature_file_path,
         )
-        # if platform.system() == "Darwin":
-        #     multiprocessing.set_start_method("spawn", force=True)
+        if platform.system() == "Darwin":
+            multiprocessing.set_start_method("spawn", force=True)
 
     def __index_df_for_multiprocessing(
         self, data: List[np.ndarray]
@@ -426,17 +426,6 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
             msg=f"Video {self.feature_filename} complete",
             elapsed_time=self.timer.elapsed_time_str,
         )
-
-
-# test = ValidateModelOneVideoMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
-#                              feature_file_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/csv/features_extracted/Trial    10.csv',
-#                              model_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/models/generated_models/Nose to Nose.sav',
-#                              discrimination_threshold=0.6,
-#                              shortest_bout=50,
-#                              cores=6,
-#                              settings={'pose': True, 'animal_names': True, 'styles': None},
-#                              create_gantt=None)
-# test.run()
 
 
 # test = ValidateModelOneVideoMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',

@@ -503,7 +503,8 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
 
         self.timer.stop_timer()
         print(self.model_dir_out)
-        if not os.listdir(self.model_dir_out): os.makedirs(self.model_dir_out)
+        if not os.listdir(self.model_dir_out):
+            os.makedirs(self.model_dir_out)
         self.save_rf_model(self.rf_clf, self.clf_name, self.model_dir_out)
         stdout_success(
             msg=f"Classifier {self.clf_name} saved in models/generated_models directory",

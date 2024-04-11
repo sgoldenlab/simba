@@ -32,15 +32,15 @@ from simba.video_processors.multi_cropper import MultiCropper
 from simba.video_processors.px_to_mm import get_coordinates_nilsson
 from simba.video_processors.video_processing import (
     VideoRotator, batch_convert_video_format, batch_create_frames,
-    change_fps_of_multiple_videos, change_img_format, change_single_video_fps,
-    clahe_enhance_video, clip_video_in_range, convert_to_mp4,
-    convert_video_powerpoint_compatible_format, copy_img_folder,
-    crop_multiple_videos, crop_multiple_videos_circles,
+    batch_video_to_greyscale, change_fps_of_multiple_videos, change_img_format,
+    change_single_video_fps, clahe_enhance_video, clip_video_in_range,
+    convert_to_mp4, convert_video_powerpoint_compatible_format,
+    copy_img_folder, crop_multiple_videos, crop_multiple_videos_circles,
     crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
     crop_single_video_polygon, downsample_video, extract_frame_range,
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, superimpose_frame_count,
-    video_concatenator, video_to_greyscale, batch_video_to_greyscale)
+    video_concatenator, video_to_greyscale)
 
 sys.setrecursionlimit(10**7)
 
@@ -236,17 +236,46 @@ class ClipVideoPopUp(PopUpMixin):
 class GreyscaleSingleVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="GREYSCALE VIDEO")
-        video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GREYSCALE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(video_frm, "VIDEO FILE PATH", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        video_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="GREYSCALE VIDEO",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
+        )
+        self.selected_video = FileSelect(
+            video_frm,
+            "VIDEO FILE PATH",
+            title="Select a video file",
+            lblwidth=20,
+            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
+        )
         self.use_gpu_var_video = BooleanVar(value=False)
-        use_gpu_video_cb = Checkbutton(video_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var_video)
-        run_video_btn = Button(video_frm, text="RUN", command=lambda: self.run_video(), fg='blue')
+        use_gpu_video_cb = Checkbutton(
+            video_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var_video
+        )
+        run_video_btn = Button(
+            video_frm, text="RUN", command=lambda: self.run_video(), fg="blue"
+        )
 
-        dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GREYSCALE VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.dir_selected = FolderSelect(dir_frm, "VIDEO DIRECTORY PATH", title="Select folder with videos", lblwidth=20)
+        dir_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="GREYSCALE VIDEO DIRECTORY",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
+        )
+        self.dir_selected = FolderSelect(
+            dir_frm,
+            "VIDEO DIRECTORY PATH",
+            title="Select folder with videos",
+            lblwidth=20,
+        )
         self.use_gpu_var_dir = BooleanVar(value=False)
-        use_gpu_dir_cb = Checkbutton(dir_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var_dir)
-        run_dir_btn = Button(dir_frm, text="RUN", command=lambda: self.run_dir(), fg='blue')
+        use_gpu_dir_cb = Checkbutton(
+            dir_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var_dir
+        )
+        run_dir_btn = Button(
+            dir_frm, text="RUN", command=lambda: self.run_dir(), fg="blue"
+        )
 
         video_frm.grid(row=0, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
@@ -262,11 +291,16 @@ class GreyscaleSingleVideoPopUp(PopUpMixin):
 
     def run_video(self):
         check_file_exist_and_readable(file_path=self.selected_video.file_path)
-        video_to_greyscale(file_path=self.selected_video.file_path, gpu=self.use_gpu_var_video.get())
+        video_to_greyscale(
+            file_path=self.selected_video.file_path, gpu=self.use_gpu_var_video.get()
+        )
 
     def run_dir(self):
         check_if_dir_exists(in_dir=self.dir_selected.folder_path)
-        batch_video_to_greyscale(directory=self.dir_selected.folder_path, gpu=self.use_gpu_var_dir.get())
+        batch_video_to_greyscale(
+            directory=self.dir_selected.folder_path, gpu=self.use_gpu_var_dir.get()
+        )
+
 
 class SuperImposeFrameCountPopUp(PopUpMixin):
     def __init__(self):

@@ -1046,7 +1046,9 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.pct_in_top_n(x=x, n=5)
         """
 
-        check_valid_array(data=x, accepted_ndims=(1,), source=Statistics.pct_in_top_n.__name__)
+        check_valid_array(
+            data=x, accepted_ndims=(1,), source=Statistics.pct_in_top_n.__name__
+        )
         check_int(name=Statistics.pct_in_top_n.__name__, value=n, max_value=x.shape[0])
         cnts = np.sort(np.unique(x, return_counts=True)[1])[-n:]
         return np.sum(cnts) / x.shape[0]
@@ -1560,7 +1562,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64, float64, float64)")
-    def sliding_autocorrelation(data: np.ndarray, max_lag: float, time_window: float, fps: float):
+    def sliding_autocorrelation(
+        data: np.ndarray, max_lag: float, time_window: float, fps: float
+    ):
         """
         Jitted compute of sliding auto-correlations (the correlation of a feature with itself using lagged windows).
 
@@ -1574,7 +1578,7 @@ class Statistics(FeatureExtractionMixin):
         results = np.full((data.shape[0]), -1.0)
         for right in prange(time_window_frms - 1, data.shape[0]):
             left = right - time_window_frms + 1
-            w_data = data[left: right + 1]
+            w_data = data[left : right + 1]
             corrcfs = np.full((max_frm_lag), np.nan)
             corrcfs[0] = 1
             for shift in range(1, max_frm_lag):
@@ -1587,7 +1591,9 @@ class Statistics(FeatureExtractionMixin):
             const = np.ones_like(corrcfs)
             mat_[:, 0] = const
             mat_[:, 1] = corrcfs
-            det_ = np.linalg.lstsq(mat_.astype(np.float32), np.arange(0, max_frm_lag).astype(np.float32))[0]
+            det_ = np.linalg.lstsq(
+                mat_.astype(np.float32), np.arange(0, max_frm_lag).astype(np.float32)
+            )[0]
             results[right] = det_[::-1][0]
         return results
 

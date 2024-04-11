@@ -15,12 +15,12 @@ import trafaret as t
 from simba.utils.enums import Keys, Options, UMAPParam
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 CorruptedFileError, CountError,
-                                DirectoryNotEmptyError, FloatError,
-                                IntegerError, InvalidFilepathError,
+                                DirectoryNotEmptyError, FFMPEGNotFoundError,
+                                FloatError, IntegerError, InvalidFilepathError,
                                 InvalidInputError, NoDataError,
                                 NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
-                                StringError, FFMPEGNotFoundError)
+                                StringError)
 from simba.utils.warnings import NoDataFoundWarning
 
 
@@ -304,7 +304,9 @@ def check_all_file_names_are_represented_in_video_log(
         )
 
 
-def check_if_dir_exists(in_dir: Union[str, os.PathLike], source: Optional[str] = None) -> None:
+def check_if_dir_exists(
+    in_dir: Union[str, os.PathLike], source: Optional[str] = None
+) -> None:
     """
     Check if a directory path exists.
 
@@ -315,9 +317,14 @@ def check_if_dir_exists(in_dir: Union[str, os.PathLike], source: Optional[str] =
 
     if not os.path.isdir(in_dir):
         if source is None:
-            raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=check_if_dir_exists.__name__)
+            raise NotDirectoryError(
+                msg=f"{in_dir} is not a valid directory",
+                source=check_if_dir_exists.__name__,
+            )
         else:
-            raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=source)
+            raise NotDirectoryError(
+                msg=f"{in_dir} is not a valid directory", source=source
+            )
 
 
 def check_that_column_exist(
@@ -522,9 +529,12 @@ def check_ffmpeg_available(raise_error: Optional[bool] = False) -> Union[bool, N
         return True
     except Exception:
         if raise_error:
-            raise FFMPEGNotFoundError(msg='FFMpeg could not be found on the instance (as evaluated via subprocess ffmpeg). Please make sure FFMpeg is installed.')
+            raise FFMPEGNotFoundError(
+                msg="FFMpeg could not be found on the instance (as evaluated via subprocess ffmpeg). Please make sure FFMpeg is installed."
+            )
         else:
             return False
+
 
 def check_if_valid_rgb_str(
     input: str,
@@ -1235,14 +1245,29 @@ def check_valid_dataframe(
 
 
 
-def check_valid_tuple(x: tuple, source: Optional[str] = '', accepted_lengths: Optional[Tuple[int]] = None, valid_dtypes: Optional[Tuple[Any]] = None):
+
+def check_valid_tuple(
+    x: tuple,
+    source: Optional[str] = "",
+    accepted_lengths: Optional[Tuple[int]] = None,
+    valid_dtypes: Optional[Tuple[Any]] = None,
+):
     if not isinstance(x, (tuple)):
-        raise InvalidInputError(msg=f'{check_valid_tuple.__name__} {source} is not a valid tuple', source=source)
+        raise InvalidInputError(
+            msg=f"{check_valid_tuple.__name__} {source} is not a valid tuple",
+            source=source,
+        )
     if accepted_lengths is not None:
         if len(x) not in accepted_lengths:
-            raise InvalidInputError(msg=f'Tuple is not of valid lengths. Found {len(x)}. Accepted: {accepted_lengths}', source=source)
+            raise InvalidInputError(
+                msg=f"Tuple is not of valid lengths. Found {len(x)}. Accepted: {accepted_lengths}",
+                source=source,
+            )
     if valid_dtypes is not None:
         dtypes = list(set([type(v) for v in x]))
         additional = [x for x in dtypes if x not in valid_dtypes]
         if len(additional) > 0:
-            raise InvalidInputError(msg=f"The tuple {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}", source=source)
+            raise InvalidInputError(
+                msg=f"The tuple {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}",
+                source=source,
+            )
