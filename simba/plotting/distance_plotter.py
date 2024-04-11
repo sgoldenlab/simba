@@ -1,8 +1,5 @@
 __author__ = "Simon Nilsson"
 
-import matplotlib
-
-matplotlib.use("TkAgg")
 import os
 from typing import Dict, List, Optional, Union
 
