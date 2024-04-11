@@ -169,14 +169,14 @@ def test_local_outlier_factor(sample_data, expected_results, sample_data_dir):
     assert results.shape == expected_results
     assert np.issubdtype(results.dtype, np.number)
 
-# @pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="descretizier .")
-# @pytest.mark.parametrize('sample_data, expected_results', [('8x100_f32.npy', (8, ))])
-# def test_hbos(sample_data, expected_results, sample_data_dir):
-#     data_path = os.path.join(sample_data_dir, sample_data)
-#     data = np.load(data_path)
-#     results = Statistics().hbos(data=data)
-#     assert results.shape == expected_results
-#     assert np.issubdtype(results.dtype, np.number)
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="descretizier.")
+@pytest.mark.parametrize('sample_data, expected_results', [('8x100_f32.npy', (8, ))])
+def test_hbos(sample_data, expected_results, sample_data_dir):
+    data_path = os.path.join(sample_data_dir, sample_data)
+    data = np.load(data_path)
+    results = Statistics().hbos(data=data)
+    assert results.shape == expected_results
+    assert np.issubdtype(results.dtype, np.number)
 
 def test_cohens_h():
     sample_1 = np.array([1, 0, 0, 1])

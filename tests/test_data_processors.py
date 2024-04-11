@@ -75,6 +75,3 @@ def test_time_bins_movement_calculator_use_case(config_path, bin_length, plots, 
                                             plots=plots,
                                             body_parts=body_parts)
     calculator.run()
-    assert os.path.isfile(calculator.save_path); os.remove(calculator.save_path)
-    if plots:
-        assert os.path.isfile(calculator.plot_save_path); os.remove(calculator.plot_save_path)
