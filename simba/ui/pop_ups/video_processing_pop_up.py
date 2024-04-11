@@ -1107,13 +1107,32 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         if hasattr(self, "video_table_frm"):
             self.video_table_frm.destroy()
             self.join_type_frm.destroy()
-        self.video_table_frm = LabelFrame(self.main_frm, text="VIDEO PATHS", pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
+        self.video_table_frm = LabelFrame(
+            self.main_frm,
+            text="VIDEO PATHS",
+            pady=5,
+            padx=5,
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            fg="black",
+        )
         self.video_table_frm.grid(row=1, sticky=NW)
-        self.join_type_frm = LabelFrame(self.main_frm, text="JOIN TYPE", pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
+        self.join_type_frm = LabelFrame(
+            self.main_frm,
+            text="JOIN TYPE",
+            pady=5,
+            padx=5,
+            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            fg="black",
+        )
         self.join_type_frm.grid(row=2, sticky=NW)
         self.videos_dict = {}
         for cnt in range(int(self.select_video_cnt_dropdown.getChoices())):
-            self.videos_dict[cnt] = FileSelect(self.video_table_frm, "Video {}: ".format(str(cnt + 1)), title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+            self.videos_dict[cnt] = FileSelect(
+                self.video_table_frm,
+                "Video {}: ".format(str(cnt + 1)),
+                title="Select a video file",
+                file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
+            )
             self.videos_dict[cnt].grid(row=cnt, column=0, sticky=NW)
 
         self.join_type_var = StringVar()
@@ -1164,7 +1183,9 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             fg="black",
         )
         self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(self.gpu_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var)
+        use_gpu_cb = Checkbutton(
+            self.gpu_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var
+        )
         use_gpu_cb.grid(row=0, column=0, sticky="NW")
         self.resolution_frm.grid(row=3, column=0, sticky=NW)
         self.gpu_frm.grid(row=4, column=0, sticky="NW")
@@ -1181,7 +1202,10 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             file_paths.append(video_data.file_path)
 
         if (len(file_paths) < 3) & (self.join_type_var.get() == "mixed_mosaic"):
-            raise MixedMosaicError(msg="If using the mixed mosaic join type, please tick check-boxes for at least three video types.", source=self.__class__.__name__,)
+            raise MixedMosaicError(
+                msg="If using the mixed mosaic join type, please tick check-boxes for at least three video types.",
+                source=self.__class__.__name__,
+            )
         if (len(file_paths) < 3) & (self.join_type_var.get() == "mosaic"):
             self.join_type_var.set(value="vertical")
 
@@ -1194,11 +1218,11 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             gpu=self.use_gpu_var.get(),
         )
 
-        threading.Thread(
-            target=video_merger.run())
+        threading.Thread(target=video_merger.run())
 
 
-#ConcatenatorPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# ConcatenatorPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+
 
 class VideoRotatorPopUp(PopUpMixin):
     def __init__(self):

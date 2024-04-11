@@ -1238,12 +1238,17 @@ def check_valid_dataframe(
                 source=source,
             )
     if required_fields is not None:
-        check_valid_lst(data=required_fields, source=check_valid_dataframe.__name__, valid_dtypes=(str,))
+        check_valid_lst(
+            data=required_fields,
+            source=check_valid_dataframe.__name__,
+            valid_dtypes=(str,),
+        )
         missing = list(set(required_fields) - set(df.columns))
         if len(missing) > 0:
-            raise InvalidInputError(msg=f"The dataframe {source} are missing required columns {missing}.", source=source)
-
-
+            raise InvalidInputError(
+                msg=f"The dataframe {source} are missing required columns {missing}.",
+                source=source,
+            )
 
 
 def check_valid_tuple(
