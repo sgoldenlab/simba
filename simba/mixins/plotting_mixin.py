@@ -5,9 +5,6 @@ import itertools
 import os
 import random
 import shutil
-import plotly.graph_objs as go
-import plotly.io as pio
-from PIL import Image
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cv2
@@ -17,10 +14,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import PIL
+import plotly.graph_objs as go
+import plotly.io as pio
 import seaborn as sns
 from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from numba import njit
+from PIL import Image
 
 try:
     from typing import Literal
@@ -1827,13 +1827,18 @@ class PlottingMixin(object):
         fig, ax = plt.subplots()
         if bg_clr is not None:
             if bg_clr not in get_named_colors():
-                raise InvalidInputError(msg=f'bg_clr {bg_clr} is not a valid named color. Options: {get_named_colors()}', source=PlottingMixin.continuous_scatter.__name__)
+                raise InvalidInputError(
+                    msg=f"bg_clr {bg_clr} is not a valid named color. Options: {get_named_colors()}",
+                    source=PlottingMixin.continuous_scatter.__name__,
+                )
             fig.set_facecolor(bg_clr)
         if not show_box:
             plt.axis("off")
         plt.xlabel(columns[0])
         plt.ylabel(columns[1])
-        plot = ax.scatter(data[columns[0]], data[columns[1]], c=data[columns[2]], s=size, cmap=palette)
+        plot = ax.scatter(
+            data[columns[0]], data[columns[1]], c=data[columns[2]], s=size, cmap=palette
+        )
         cbar = fig.colorbar(plot)
         cbar.set_label(columns[2], loc="center")
         if title is not None:
@@ -2053,46 +2058,69 @@ class PlottingMixin(object):
             return plot
 
     @staticmethod
-    def make_line_plot(data: List[np.ndarray],
-                       colors: List[str],
-                       show_box: Optional[bool] = True,
-                       width: Optional[int] = 640,
-                       height: Optional[int] = 480,
-                       line_width: Optional[int] = 6,
-                       font_size: Optional[int] = 8,
-                       bg_clr: Optional[str] = None,
-                       x_lbl_divisor: Optional[float] = None,
-                       title: Optional[str] = None,
-                       y_lbl: Optional[str] = None,
-                       x_lbl: Optional[str] = None,
-                       y_max: Optional[int] = -1,
-                       line_opacity: Optional[int] = 0.0,
-                       save_path: Optional[Union[str, os.PathLike]] = None):
+    def make_line_plot(
+        data: List[np.ndarray],
+        colors: List[str],
+        show_box: Optional[bool] = True,
+        width: Optional[int] = 640,
+        height: Optional[int] = 480,
+        line_width: Optional[int] = 6,
+        font_size: Optional[int] = 8,
+        bg_clr: Optional[str] = None,
+        x_lbl_divisor: Optional[float] = None,
+        title: Optional[str] = None,
+        y_lbl: Optional[str] = None,
+        x_lbl: Optional[str] = None,
+        y_max: Optional[int] = -1,
+        line_opacity: Optional[int] = 0.0,
+        save_path: Optional[Union[str, os.PathLike]] = None,
+    ):
 
-        check_valid_lst(data=data, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(np.ndarray, list,))
-        check_valid_lst(data=colors, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(str,), exact_len=len(data))
+        check_valid_lst(
+            data=data,
+            source=PlottingMixin.make_line_plot.__name__,
+            valid_dtypes=(
+                np.ndarray,
+                list,
+            ),
+        )
+        check_valid_lst(
+            data=colors,
+            source=PlottingMixin.make_line_plot.__name__,
+            valid_dtypes=(str,),
+            exact_len=len(data),
+        )
         clr_dict = get_color_dict()
         matplotlib.font_manager._get_font.cache_clear()
         plt.close("all")
         fig, ax = plt.subplots()
-        if bg_clr is not None: fig.set_facecolor(bg_clr)
-        if not show_box: plt.axis("off")
+        if bg_clr is not None:
+            fig.set_facecolor(bg_clr)
+        if not show_box:
+            plt.axis("off")
         for i in range(len(data)):
             line_clr = clr_dict[colors[i]][::-1]
             line_clr = tuple(x / 255 for x in line_clr)
             flat_data = data[i].flatten()
-            plt.plot(flat_data, color=line_clr, linewidth=line_width, alpha=line_opacity)
+            plt.plot(
+                flat_data, color=line_clr, linewidth=line_width, alpha=line_opacity
+            )
         max_x = max([len(x) for x in data])
-        if y_max == -1: y_max = max([np.max(x) for x in data])
+        if y_max == -1:
+            y_max = max([np.max(x) for x in data])
         y_ticks_locs = y_lbls = np.round(np.linspace(0, y_max, 10), 2)
         x_ticks_locs = x_lbls = np.linspace(0, max_x, 5)
-        if x_lbl_divisor is not None: x_lbls = np.round((x_lbls / x_lbl_divisor), 1)
-        if y_lbl is not None: plt.ylabel(y_lbl)
-        if x_lbl is not None: plt.xlabel(x_lbl)
+        if x_lbl_divisor is not None:
+            x_lbls = np.round((x_lbls / x_lbl_divisor), 1)
+        if y_lbl is not None:
+            plt.ylabel(y_lbl)
+        if x_lbl is not None:
+            plt.xlabel(x_lbl)
         plt.xticks(x_ticks_locs, x_lbls, rotation="horizontal", fontsize=font_size)
         plt.yticks(y_ticks_locs, y_lbls, fontsize=font_size)
         plt.ylim(0, y_max)
-        if title is not None: plt.suptitle(title, x=0.5, y=0.92, fontsize=font_size + 4)
+        if title is not None:
+            plt.suptitle(title, x=0.5, y=0.92, fontsize=font_size + 4)
         buffer_ = io.BytesIO()
         plt.savefig(buffer_, format="png")
         buffer_.seek(0)
@@ -2103,28 +2131,29 @@ class PlottingMixin(object):
         img = cv2.resize(img, (width, height))
         if save_path is not None:
             cv2.imwrite(save_path, img)
-            stdout_success(msg=f'Line plot saved at {save_path}')
+            stdout_success(msg=f"Line plot saved at {save_path}")
         else:
             return img
 
     @staticmethod
-    def make_line_plot_plotly(data: List[np.ndarray],
-                              colors: List[str],
-                              show_box: Optional[bool] = True,
-                              show_grid: Optional[bool] = False,
-                              width: Optional[int] = 640,
-                              height: Optional[int] = 480,
-                              line_width: Optional[int] = 6,
-                              font_size: Optional[int] = 8,
-                              bg_clr: Optional[str] = 'white',
-                              x_lbl_divisor: Optional[float] = None,
-                              title: Optional[str] = None,
-                              y_lbl: Optional[str] = None,
-                              x_lbl: Optional[str] = None,
-                              y_max: Optional[int] = -1,
-                              line_opacity: Optional[int] = 0.5,
-                              save_path: Optional[Union[str, os.PathLike]] = None):
-
+    def make_line_plot_plotly(
+        data: List[np.ndarray],
+        colors: List[str],
+        show_box: Optional[bool] = True,
+        show_grid: Optional[bool] = False,
+        width: Optional[int] = 640,
+        height: Optional[int] = 480,
+        line_width: Optional[int] = 6,
+        font_size: Optional[int] = 8,
+        bg_clr: Optional[str] = "white",
+        x_lbl_divisor: Optional[float] = None,
+        title: Optional[str] = None,
+        y_lbl: Optional[str] = None,
+        x_lbl: Optional[str] = None,
+        y_max: Optional[int] = -1,
+        line_opacity: Optional[int] = 0.5,
+        save_path: Optional[Union[str, os.PathLike]] = None,
+    ):
         """
         Create a line plot using Plotly.
 
@@ -2167,20 +2196,35 @@ class PlottingMixin(object):
 
         fig = go.Figure()
         clr_dict = get_color_dict()
-        if y_max == -1: y_max = max([np.max(i) for i in data])
+        if y_max == -1:
+            y_max = max([np.max(i) for i in data])
         for i in range(len(data)):
             line_clr = clr_dict[colors[i]]
-            line_clr = f'rgba({line_clr[0]}, {line_clr[1]}, {line_clr[2]}, {line_opacity})'
-            fig.add_trace(go.Scatter(y=data[i].flatten(), mode='lines', line=dict(color=line_clr, width=line_width)))
+            line_clr = (
+                f"rgba({line_clr[0]}, {line_clr[1]}, {line_clr[2]}, {line_opacity})"
+            )
+            fig.add_trace(
+                go.Scatter(
+                    y=data[i].flatten(),
+                    mode="lines",
+                    line=dict(color=line_clr, width=line_width),
+                )
+            )
 
         if not show_box:
-            fig.update_layout(width=width, height=height, title=title, xaxis_visible=False, yaxis_visible=False,
-                              showlegend=False)
+            fig.update_layout(
+                width=width,
+                height=height,
+                title=title,
+                xaxis_visible=False,
+                yaxis_visible=False,
+                showlegend=False,
+            )
         else:
-            if fig['layout']['xaxis']['tickvals'] is None:
+            if fig["layout"]["xaxis"]["tickvals"] is None:
                 tickvals = [i for i in range(data[0].shape[0])]
             else:
-                tickvals = fig['layout']['xaxis']['tickvals']
+                tickvals = fig["layout"]["xaxis"]["tickvals"]
             if x_lbl_divisor is not None:
                 ticktext = [tick_formatter(x) for x in tickvals]
             else:
@@ -2193,7 +2237,7 @@ class PlottingMixin(object):
                     title=x_lbl,
                     tickvals=tickvals,
                     ticktext=ticktext,
-                    tickmode='auto',
+                    tickmode="auto",
                     tick0=0,
                     dtick=10,
                     tickfont=dict(size=font_size),
@@ -2205,14 +2249,14 @@ class PlottingMixin(object):
                     range=[0, y_max],
                     showgrid=show_grid,
                 ),
-                showlegend=False
+                showlegend=False,
             )
 
         if bg_clr is not None:
             fig.update_layout(plot_bgcolor=bg_clr)
         if save_path is not None:
             pio.write_image(fig, save_path)
-            stdout_success(msg=f'Line plot saved at {save_path}')
+            stdout_success(msg=f"Line plot saved at {save_path}")
         else:
             img_bytes = fig.to_image(format="png")
             img = PIL.Image.open(io.BytesIO(img_bytes))

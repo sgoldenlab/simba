@@ -331,7 +331,9 @@ class ConfigReader(object):
             )
         return model_names
 
-    def insert_column_headers_for_outlier_correction(self, data_df: pd.DataFrame, new_headers: List[str], filepath: str) -> pd.DataFrame:
+    def insert_column_headers_for_outlier_correction(
+        self, data_df: pd.DataFrame, new_headers: List[str], filepath: str
+    ) -> pd.DataFrame:
         """
         Helper to insert new column headers onto a dataframe.
 
@@ -350,7 +352,10 @@ class ConfigReader(object):
             difference = int(len(data_df.columns) - len(new_headers))
             bp_missing = int(abs(difference) / 3)
             if difference < 0:
-                raise DataHeaderError(msg=f"SIMBA ERROR: SimBA expects {len(new_headers)} columns of data inside the files within project_folder/csv/input_csv directory. However, within file {filepath} file, SimBA found {len(data_df.columns)} columns. Thus, there is {abs(difference)} missing data columns in the imported data, which may represent {int(bp_missing)} bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {bp_missing} less body-part, or include {bp_missing} more body-part in the imported data", source=self.__class__.__name__,)
+                raise DataHeaderError(
+                    msg=f"SIMBA ERROR: SimBA expects {len(new_headers)} columns of data inside the files within project_folder/csv/input_csv directory. However, within file {filepath} file, SimBA found {len(data_df.columns)} columns. Thus, there is {abs(difference)} missing data columns in the imported data, which may represent {int(bp_missing)} bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {bp_missing} less body-part, or include {bp_missing} more body-part in the imported data",
+                    source=self.__class__.__name__,
+                )
             else:
                 raise DataHeaderError(
                     msg=f"SIMBA ERROR: SimBA expects {len(new_headers)} columns of data inside the files within project_folder/csv/input_csv directory. However, within file {filepath} file, SimBA found {len(data_df.columns)} columns. Thus, there is {abs(difference)} more data columns in the imported data than anticipated, which may represent {int(bp_missing)} bodyparts if each body-part has an x, y and p value. Either revise the SimBA project pose-configuration with {bp_missing} more body-part, or include {bp_missing} less body-part in the imported data",

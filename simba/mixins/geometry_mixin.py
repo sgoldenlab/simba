@@ -2905,7 +2905,12 @@ class GeometryMixin(object):
         :example:
         >>> shapes = GeometryMixin().adjust_geometries(geometries=shapes, shift=(0, 333))
         """
-        check_valid_lst(data=geometries, source=f"{GeometryMixin().adjust_geometries.__name__} geometries", valid_dtypes=(Polygon,), min_len=1)
+        check_valid_lst(
+            data=geometries,
+            source=f"{GeometryMixin().adjust_geometries.__name__} geometries",
+            valid_dtypes=(Polygon,),
+            min_len=1,
+        )
         results = []
         for shape_cnt, shape in enumerate(geometries):
             results.append(
@@ -3410,7 +3415,9 @@ class GeometryMixin(object):
             return np.cumsum(img_arr, axis=0) / fps
 
     @staticmethod
-    def hausdorff_distance(geometries: List[List[Union[Polygon, LineString]]]) -> np.ndarray:
+    def hausdorff_distance(
+        geometries: List[List[Union[Polygon, LineString]]]
+    ) -> np.ndarray:
         """
         The Hausdorff distance measure of the similarity between time-series sequential geometries. It is defined as the maximum of the distances
         from each point in one set to the nearest point in the other set.

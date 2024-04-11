@@ -1,17 +1,16 @@
 __author__ = "Simon Nilsson"
 
 import os
-from tkinter import *
-from collections import defaultdict
 import threading
+from collections import defaultdict
+from tkinter import *
 
 import numpy as np
-from simba.plotting.distance_plotter import DistancePlotterSingleCore
-from simba.plotting.distance_plotter_mp import DistancePlotterMultiCore
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-
+from simba.plotting.distance_plotter import DistancePlotterSingleCore
+from simba.plotting.distance_plotter_mp import DistancePlotterMultiCore
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box)
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
@@ -234,7 +233,9 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
         if multiple_videos:
             data_paths = list(self.files_found_dict.values())
         else:
-            data_paths = [self.files_found_dict[self.single_video_dropdown.getChoices()]]
+            data_paths = [
+                self.files_found_dict[self.single_video_dropdown.getChoices()]
+            ]
 
         line_attr = defaultdict(list)
         for attr in (self.bp_1, self.bp_2, self.distance_clrs):
@@ -244,15 +245,24 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
 
         for cnt, v in enumerate(line_attr):
             if v[0] == v[1]:
-                raise DuplicationError(msg=f"DISTANCE LINE {cnt+1} ERROR: The two body-parts cannot be the same body-part.", source=self.__class__.__name__)
+                raise DuplicationError(
+                    msg=f"DISTANCE LINE {cnt+1} ERROR: The two body-parts cannot be the same body-part.",
+                    source=self.__class__.__name__,
+                )
 
         width = int(self.resolution_dropdown.getChoices().split("×")[0])
         height = int(self.resolution_dropdown.getChoices().split("×")[1])
-        check_int(name="DISTANCE FONT SIZE", value=self.font_size_entry.entry_get, min_value=1)
-        check_int(name="DISTANCE LINE WIDTH", value=self.line_width.entry_get, min_value=1)
+        check_int(
+            name="DISTANCE FONT SIZE", value=self.font_size_entry.entry_get, min_value=1
+        )
+        check_int(
+            name="DISTANCE LINE WIDTH", value=self.line_width.entry_get, min_value=1
+        )
         max_y = self.max_y_dropdown.getChoices()
-        if max_y == 'auto': max_y = -1
-        else: max_y = int(max_y)
+        if max_y == "auto":
+            max_y = -1
+        else:
+            max_y = int(max_y)
 
         style_attr = {
             "width": width,
@@ -288,7 +298,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
         threading.Thread(distance_plotter.run()).start()
 
 
-#_ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# _ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 
 
 # _ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

@@ -1797,11 +1797,13 @@ class Statistics(FeatureExtractionMixin):
         return feature_names
 
     @staticmethod
-    def local_outlier_factor(data: np.ndarray,
-                             k: Union[int, float] = 5,
-                             contamination: Optional[float] = 1e-10,
-                             normalize: Optional[bool] = False,
-                             groupby_idx: Optional[int] = None) -> np.ndarray:
+    def local_outlier_factor(
+        data: np.ndarray,
+        k: Union[int, float] = 5,
+        contamination: Optional[float] = 1e-10,
+        normalize: Optional[bool] = False,
+        groupby_idx: Optional[int] = None,
+    ) -> np.ndarray:
         """
         Compute the local outlier factor of each observation.
 
@@ -1850,14 +1852,30 @@ class Statistics(FeatureExtractionMixin):
                 return y
 
         if groupby_idx is not None:
-            check_int(name=f'{Statistics.local_outlier_factor.__name__} groupby_idx', value=groupby_idx, min_value=0,
-                      max_value=data.shape[1] - 1)
-            check_valid_array(source=f"{Statistics.local_outlier_factor.__name__} local_outlier_factor", data=data,
-                              accepted_sizes=[2], min_axis_1=3)
+            check_int(
+                name=f"{Statistics.local_outlier_factor.__name__} groupby_idx",
+                value=groupby_idx,
+                min_value=0,
+                max_value=data.shape[1] - 1,
+            )
+            check_valid_array(
+                source=f"{Statistics.local_outlier_factor.__name__} local_outlier_factor",
+                data=data,
+                accepted_sizes=[2],
+                min_axis_1=3,
+            )
         else:
-            check_valid_array(source=f"{Statistics.local_outlier_factor.__name__} data", data=data, accepted_sizes=[2],
-                              min_axis_1=2)
-        check_float(name=f"{Statistics.local_outlier_factor.__name__} contamination", value=contamination, min_value=0.0)
+            check_valid_array(
+                source=f"{Statistics.local_outlier_factor.__name__} data",
+                data=data,
+                accepted_sizes=[2],
+                min_axis_1=2,
+            )
+        check_float(
+            name=f"{Statistics.local_outlier_factor.__name__} contamination",
+            value=contamination,
+            min_value=0.0,
+        )
 
         if groupby_idx is None:
             return get_lof(data, k, contamination)
@@ -1873,7 +1891,9 @@ class Statistics(FeatureExtractionMixin):
             else:
                 unclustered = None
             for i in unique_c:
-                s_data = data_w_idx[np.argwhere(data_w_idx[:, groupby_idx + 1] == i)].reshape(-1, data_w_idx.shape[1])
+                s_data = data_w_idx[
+                    np.argwhere(data_w_idx[:, groupby_idx + 1] == i)
+                ].reshape(-1, data_w_idx.shape[1])
                 idx = s_data[:, 0].reshape(s_data.shape[0], 1)
                 s_data = np.delete(s_data, [0, groupby_idx + 1], 1)
                 lof = get_lof(s_data, k, contamination).reshape(s_data.shape[0], 1)
@@ -1885,10 +1905,12 @@ class Statistics(FeatureExtractionMixin):
                 x = np.vstack((x, unclustered))
             return x[np.argsort(x[:, 0])][:, -1]
 
-    def elliptic_envelope(data: np.ndarray,
-                          contamination: Optional[float] = 1e-1,
-                          normalize: Optional[bool] = False,
-                          groupby_idx: Optional[int] = None) -> np.ndarray:
+    def elliptic_envelope(
+        data: np.ndarray,
+        contamination: Optional[float] = 1e-1,
+        normalize: Optional[bool] = False,
+        groupby_idx: Optional[int] = None,
+    ) -> np.ndarray:
         """
         Compute the Mahalanobis distances of each observation in the input array using Elliptic Envelope method.
 
@@ -1922,12 +1944,32 @@ class Statistics(FeatureExtractionMixin):
             return y
 
         if groupby_idx is not None:
-            check_int(name=f'{Statistics.elliptic_envelope.__name__} groupby_idx', value=groupby_idx, min_value=0, max_value=data.shape[1] - 1)
-            check_valid_array(source=f"{Statistics.elliptic_envelope.__name__} local_outlier_factor", data=data, accepted_sizes=[2], min_axis_1=3)
+            check_int(
+                name=f"{Statistics.elliptic_envelope.__name__} groupby_idx",
+                value=groupby_idx,
+                min_value=0,
+                max_value=data.shape[1] - 1,
+            )
+            check_valid_array(
+                source=f"{Statistics.elliptic_envelope.__name__} local_outlier_factor",
+                data=data,
+                accepted_sizes=[2],
+                min_axis_1=3,
+            )
         else:
-            check_valid_array(source=f"{Statistics.elliptic_envelope.__name__} data", data=data, accepted_sizes=[2], min_axis_1=2)
+            check_valid_array(
+                source=f"{Statistics.elliptic_envelope.__name__} data",
+                data=data,
+                accepted_sizes=[2],
+                min_axis_1=2,
+            )
 
-        check_float(name=f"{Statistics.elliptic_envelope.__name__} contamination", value=contamination, min_value=0.0, max_value=1.0)
+        check_float(
+            name=f"{Statistics.elliptic_envelope.__name__} contamination",
+            value=contamination,
+            min_value=0.0,
+            max_value=1.0,
+        )
         if groupby_idx is None:
             return get_envelope(data, contamination)
         else:
@@ -1942,7 +1984,9 @@ class Statistics(FeatureExtractionMixin):
             else:
                 unclustered = None
             for i in unique_c:
-                s_data = data_w_idx[np.argwhere(data_w_idx[:, groupby_idx + 1] == i)].reshape(-1, data_w_idx.shape[1])
+                s_data = data_w_idx[
+                    np.argwhere(data_w_idx[:, groupby_idx + 1] == i)
+                ].reshape(-1, data_w_idx.shape[1])
                 idx = s_data[:, 0].reshape(s_data.shape[0], 1)
                 s_data = np.delete(s_data, [0, groupby_idx + 1], 1)
                 lof = get_envelope(s_data, contamination).reshape(s_data.shape[0], 1)

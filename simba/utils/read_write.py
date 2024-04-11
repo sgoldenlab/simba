@@ -8,6 +8,7 @@ import pickle
 import platform
 import re
 import shutil
+import subprocess
 import threading
 import webbrowser
 from configparser import ConfigParser
@@ -15,7 +16,6 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 from urllib.parse import urlparse
-import subprocess
 
 import cv2
 import numpy as np
@@ -1896,10 +1896,12 @@ def get_unique_values_in_iterable(
     return cnt
 
 
-def copy_files_to_directory(file_paths: List[Union[str, os.PathLike]],
-                            dir: Union[str, os.PathLike],
-                            verbose: Optional[bool] = True,
-                            integer_save_names: Optional[bool] = False) -> List[Union[str, os.PathLike]]:
+def copy_files_to_directory(
+    file_paths: List[Union[str, os.PathLike]],
+    dir: Union[str, os.PathLike],
+    verbose: Optional[bool] = True,
+    integer_save_names: Optional[bool] = False,
+) -> List[Union[str, os.PathLike]]:
     """
     Copy a list of files to a specified directory.
 
@@ -1916,12 +1918,14 @@ def copy_files_to_directory(file_paths: List[Union[str, os.PathLike]],
     destinations = []
     for cnt, file_path in enumerate(file_paths):
         if verbose:
-            print(f'Copying file {os.path.basename(file_path)} ({cnt+1}/{len(file_paths)})...')
+            print(
+                f"Copying file {os.path.basename(file_path)} ({cnt+1}/{len(file_paths)})..."
+            )
         if not integer_save_names:
             destination = os.path.join(dir, os.path.basename(file_path))
         else:
             _, file_name, ext = get_fn_ext(filepath=file_path)
-            destination = os.path.join(dir, f'{cnt}{ext}')
+            destination = os.path.join(dir, f"{cnt}{ext}")
         try:
             if os.path.isfile(destination):
                 os.remove(destination)
@@ -1929,7 +1933,8 @@ def copy_files_to_directory(file_paths: List[Union[str, os.PathLike]],
             print(e.args)
             raise PermissionError(
                 msg=f"Not allowed to overwrite file {destination}. Try running SimBA in terminal opened in admin mode or delete existing file before copying.",
-                source=copy_files_to_directory.__name__, )
+                source=copy_files_to_directory.__name__,
+            )
         destinations.append(destination)
         shutil.copy(file_path, destination)
     return destinations
