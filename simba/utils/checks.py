@@ -304,18 +304,22 @@ def check_all_file_names_are_represented_in_video_log(
         )
 
 
-def check_if_dir_exists(
-    in_dir: Union[str, os.PathLike], source: Optional[str] = None
-) -> None:
+def check_if_dir_exists(in_dir: Union[str, os.PathLike], source: Optional[str] = None, create_if_not_exist: Optional[bool] = False) -> None:
     """
     Check if a directory path exists.
 
     :param Union[str, os.PathLike] in_dir: Putative directory path.
-    :param str source: String source for interpretable error messaging.
+    :param Optional[str] source: String source for interpretable error messaging.
+    :param Optional[bool] create_if_not_exist: If directory does not exist, then create it. Default False,
     :raise NotDirectoryError: The directory does not exist.
     """
 
     if not os.path.isdir(in_dir):
+        if create_if_not_exist:
+            try:
+                os.makedirs(in_dir)
+            except:
+                pass
         if source is None:
             raise NotDirectoryError(
                 msg=f"{in_dir} is not a valid directory",

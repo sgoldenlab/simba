@@ -1,5 +1,4 @@
 __author__ = "Simon Nilsson"
-
 import io
 import itertools
 import os
@@ -1235,7 +1234,7 @@ class PlottingMixin(object):
         video_writer = None
         if video_setting:
             fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-            video_save_path = os.path.join(video_save_dir, "{}.mp4".format(str(group)))
+            video_save_path = os.path.join(video_save_dir, f"{group}.mp4")
             video_writer = cv2.VideoWriter(
                 video_save_path, fourcc, fps, (width, height)
             )

@@ -437,7 +437,6 @@ def percent_to_crf_lookup() -> Dict[str, int]:
     values that regulates video quality in CPU codecs. Higher CRF values translates to lower video quality and reduced
     file sizes.
     """
-
     return {
         "10": 37,
         "20": 34,

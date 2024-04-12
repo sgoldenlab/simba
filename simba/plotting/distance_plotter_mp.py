@@ -1,7 +1,4 @@
 __author__ = "Simon Nilsson"
-import matplotlib
-
-matplotlib.use("TkAgg")
 import functools
 import multiprocessing
 import os

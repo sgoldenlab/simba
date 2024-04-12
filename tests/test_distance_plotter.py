@@ -108,7 +108,7 @@ class TestDistancePlotter(object):
                                                     video_setting=True,
                                                     style_attr=style_attr,
                                                     final_img=True,
-                                                    files_found=data_path_args.param,
+                                                    data_paths=data_path_args.param,
                                                     line_attr=line_attr_args.param,
                                                     core_cnt=core_cnt_args.param)
         distance_plotter.run()

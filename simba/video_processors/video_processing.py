@@ -2125,7 +2125,7 @@ def create_blank_video(
     check_int(name=f"{create_blank_video.__name__} length", value=length, min_value=1)
     check_int(name=f"{create_blank_video.__name__} width", value=width, min_value=1)
     check_int(name=f"{create_blank_video.__name__} height", value=height, min_value=1)
-    check_if_dir_exists(in_dir=os.path.dirname(path))
+    check_if_dir_exists(in_dir=os.path.dirname(path), source=create_blank_video.__name__, create_if_not_exist=True)
     timer = SimbaTimer(start=True)
     if verbose:
         print("Creating blank video...")
@@ -2136,7 +2136,7 @@ def create_blank_video(
     subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     if verbose:
-        print(f"Blank video complete. Elapsed time: {timer.elapsed_time_str}s.")
+        print(f"Blank video complete. Saved at {path}. Elapsed time: {timer.elapsed_time_str}s.")
 
 
 def horizontal_video_concatenator(
@@ -2493,17 +2493,11 @@ def mixed_mosaic_concatenator(
 
     check_ffmpeg_available()
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="NVIDIA GPU not available", source=mixed_mosaic_concatenator.__name__
-        )
+        raise FFMPEGCodecGPUError(msg="NVIDIA GPU not available", source=mixed_mosaic_concatenator.__name__)
     timer = SimbaTimer(start=True)
-    check_valid_lst(
-        data=video_paths, source=mixed_mosaic_concatenator.__name__, min_len=2
-    )
+    check_valid_lst(data=video_paths, source=mixed_mosaic_concatenator.__name__, min_len=2)
     dt = datetime.now().strftime("%Y%m%d%H%M%S")
-    video_meta_data = [
-        get_video_meta_data(video_path=video_path) for video_path in video_paths
-    ]
+    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
     max_video_length = max([x["video_length_s"] for x in video_meta_data])
     check_if_dir_exists(
         in_dir=os.path.dirname(save_path), source=mixed_mosaic_concatenator.__name__
@@ -2512,24 +2506,21 @@ def mixed_mosaic_concatenator(
     mosaic_height = int(video_meta_data[0]["height"] / 2)
     if verbose:
         print("Creating mixed mosaic video... ")
-    temp_dir = os.path.join(os.path.dirname(video_paths[0]), f"temp_{dt}")
+    temp_dir = os.path.join(os.path.dirname(large_mosaic_path), f"temp_{dt}")
     os.makedirs(temp_dir)
     if not (len(video_paths) % 2) == 0:
         blank_path = os.path.join(temp_dir, f"{dt}.mp4")
         create_blank_video(
             path=blank_path,
             length=max_video_length,
-            width=video_meta_data[-1]["width"],
-            height=mosaic_height,
+            width=get_video_meta_data(video_path=video_paths[-1])["width"],
+            height=get_video_meta_data(video_path=video_paths[-1])["height"],
             gpu=gpu,
             verbose=True,
             color=uneven_fill_color,
         )
         video_paths.append(blank_path)
-    upper_videos, lower_videos = (
-        video_paths[: len(video_paths) // 2],
-        video_paths[len(video_paths) // 2 :],
-    )
+    upper_videos, lower_videos = (video_paths[: len(video_paths) // 2], video_paths[len(video_paths) // 2 :])
     if verbose:
         print("Creating upper right mosaic ... (Step 1/4)")
     if len(upper_videos) > 1:
@@ -2547,9 +2538,7 @@ def mixed_mosaic_concatenator(
         print("Creating lower right mosaic ... (Step 2/4)")
     if len(lower_videos) > 1:
         lower_path = os.path.join(temp_dir, "lower.mp4")
-        horizontal_video_concatenator(
-            video_paths=lower_videos, save_path=lower_path, gpu=gpu, verbose=verbose
-        )
+        horizontal_video_concatenator(video_paths=lower_videos, save_path=lower_path, gpu=gpu, verbose=verbose, height_px=mosaic_height)
     else:
         lower_path = lower_videos[0]
     panels_meta = [
@@ -2561,7 +2550,7 @@ def mixed_mosaic_concatenator(
         print("Joining upper and lower right mosaic... (Step 3/4)")
     vertical_video_concatenator(
         video_paths=[upper_path, lower_path],
-        width_px=min([x["width"] for x in panels_meta]),
+        width_px=max([x["width"] for x in panels_meta]),
         save_path=mosaic_path,
         gpu=gpu,
         verbose=verbose,
@@ -2575,8 +2564,34 @@ def mixed_mosaic_concatenator(
         gpu=gpu,
     )
     timer.stop_timer()
-    shutil.rmtree(temp_dir)
+    #shutil.rmtree(temp_dir)
     if verbose:
         print(
             f"Mixed mosaic concatenation complete. Saved at {save_path} (Elapsed time: {timer.elapsed_time_str}s.)"
         )
+
+
+# video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_line.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial     3_clipped.mp4']
+#
+# video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/Trial    10.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_line.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial     3_clipped.mp4']
+#
+# save_path = '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/out.mp4'
+
+#
+# video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/gantt_plots/Trial    10.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/Trial    10.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial    10.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial     3.mp4']
+# save_path = '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new/blank_test.mp4'
+
+# video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/Trial    10.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial    10.mp4',
+#                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial     3.mp4']
+
+#mixed_mosaic_concatenator(video_paths=video_paths, save_path=save_path, gpu=False, verbose=True)

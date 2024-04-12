@@ -18,8 +18,7 @@ from simba.utils.read_write import get_file_name_info_in_directory
 
 class HeatmapClfPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="CREATE CLASSIFICATION HEATMAP PLOTS")
-        ConfigReader.__init__(self, config_path=config_path)
+
         self.data_path = os.path.join(
             self.project_path, Paths.MACHINE_RESULTS_DIR.value
         )
@@ -30,6 +29,8 @@ class HeatmapClfPopUp(PopUpMixin, ConfigReader):
             filepaths=list(self.files_found_dict.keys()),
             error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. ",
         )
+        PopUpMixin.__init__(self, title="CREATE CLASSIFICATION HEATMAP PLOTS")
+        ConfigReader.__init__(self, config_path=config_path)
         max_scales = list(np.linspace(5, 600, 5))
         max_scales.insert(0, "Auto-compute")
 
