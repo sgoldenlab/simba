@@ -1646,11 +1646,36 @@ class App(object):
         )
 
         crop_video_menu = Menu(menu)
-        crop_video_menu.add_command(label="Crop videos", compound="left", image=self.menu_icons["crop"]["img"], command=CropVideoPopUp)
-        crop_video_menu.add_command(label="Crop videos (circles)", compound="left", image=self.menu_icons["circle"]["img"], command=CropVideoCirclesPopUp)
-        crop_video_menu.add_command(label="Crop videos (polygons)", compound="left", image=self.menu_icons["polygon"]["img"], command=CropVideoPolygonsPopUp)
-        crop_video_menu.add_command(label="Multi-crop", compound="left", image=self.menu_icons["crop"]["img"], command=MultiCropPopUp)
-        video_process_menu.add_cascade(label="Crop videos...", compound="left", image=self.menu_icons["crop"]["img"], menu=crop_video_menu)
+        crop_video_menu.add_command(
+            label="Crop videos",
+            compound="left",
+            image=self.menu_icons["crop"]["img"],
+            command=CropVideoPopUp,
+        )
+        crop_video_menu.add_command(
+            label="Crop videos (circles)",
+            compound="left",
+            image=self.menu_icons["circle"]["img"],
+            command=CropVideoCirclesPopUp,
+        )
+        crop_video_menu.add_command(
+            label="Crop videos (polygons)",
+            compound="left",
+            image=self.menu_icons["polygon"]["img"],
+            command=CropVideoPolygonsPopUp,
+        )
+        crop_video_menu.add_command(
+            label="Multi-crop",
+            compound="left",
+            image=self.menu_icons["crop"]["img"],
+            command=MultiCropPopUp,
+        )
+        video_process_menu.add_cascade(
+            label="Crop videos...",
+            compound="left",
+            image=self.menu_icons["crop"]["img"],
+            menu=crop_video_menu,
+        )
 
         format_menu = Menu(video_process_menu)
         format_menu.add_command(
