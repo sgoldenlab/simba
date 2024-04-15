@@ -1009,7 +1009,6 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
             f"1 PIXEL REPRESENTS {round(mm_cnt, 4)} MILLIMETERS IN VIDEO {os.path.basename(self.video_path.file_path)}."
         )
 
-
 class ConcatenatingVideosPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CONCATENATE VIDEOS", size=(300, 300))
@@ -2038,7 +2037,6 @@ class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
             data_dir=self.input_folder.folder_path,
             save_dir=self.output_folder.folder_path,
         )
-
 
 # ClipMultipleVideosByFrameNumbers
 # ClipMultipleVideosByFrameNumbers(data_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/test', save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/clipped')

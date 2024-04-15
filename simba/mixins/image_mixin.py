@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
-
+import platform
 try:
     from typing import Literal
 except:
@@ -1045,8 +1045,7 @@ class ImageMixin(object):
             save_path, fourcc, fps, (imgs[0].shape[1], imgs[0].shape[0])
         )
         for i in range(imgs.shape[0]):
-            if verbose:
-                print(f"Writing img {i + 1}...")
+            if verbose:print(f"Writing img {i + 1}...")
             writer.write(imgs[i])
         writer.release()
         stdout_success(msg=f"Video {save_path} complete")

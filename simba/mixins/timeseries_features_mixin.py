@@ -29,6 +29,7 @@ from simba.utils.read_write import find_core_cnt
 
 
 class TimeseriesFeatureMixin(object):
+
     """
     Time-series methods focused on signal complexity in sliding windows. Mainly in time-domain - fft methods (through e.g. scipy)
     I've found so far has not been fast enough for rolling windows in large datasets.

@@ -1625,6 +1625,7 @@ class App(object):
             label="Clip multiple videos",
             command=InitiateClipMultipleVideosByTimestampsPopUp,
         )
+
         clip_video_menu.add_command(
             label="Clip video into multiple videos", command=MultiShortenPopUp
         )
@@ -1643,6 +1644,14 @@ class App(object):
             image=self.menu_icons["clip"]["img"],
             menu=clip_video_menu,
         )
+
+        crop_video_menu = Menu(menu)
+        crop_video_menu.add_command(label="Crop videos", compound="left", image=self.menu_icons["crop"]["img"], command=CropVideoPopUp)
+        crop_video_menu.add_command(label="Crop videos (circles)", compound="left", image=self.menu_icons["circle"]["img"], command=CropVideoCirclesPopUp)
+        crop_video_menu.add_command(label="Crop videos (polygons)", compound="left", image=self.menu_icons["polygon"]["img"], command=CropVideoPolygonsPopUp)
+        crop_video_menu.add_command(label="Multi-crop", compound="left", image=self.menu_icons["crop"]["img"], command=MultiCropPopUp)
+        video_process_menu.add_cascade(label="Crop videos...", compound="left", image=self.menu_icons["crop"]["img"], menu=crop_video_menu)
+
         format_menu = Menu(video_process_menu)
         format_menu.add_command(
             label="Change image file formats", command=ChangeImageFormatPopUp
@@ -1707,24 +1716,7 @@ class App(object):
             image=self.menu_icons["path"]["img"],
             command=MakePathPlotPopUp,
         )
-        video_process_menu.add_command(
-            label="Crop videos",
-            compound="left",
-            image=self.menu_icons["crop"]["img"],
-            command=CropVideoPopUp,
-        )
-        video_process_menu.add_command(
-            label="Crop videos (circles)",
-            compound="left",
-            image=self.menu_icons["circle"]["img"],
-            command=CropVideoCirclesPopUp,
-        )
-        # video_process_menu.add_command(
-        #     label="Crop videos (polygons)",
-        #     compound="left",
-        #     image=self.menu_icons["polygon"]["img"],
-        #     command=CropVideoPolygonsPopUp,
-        # )
+
         video_process_menu.add_command(
             label="Down-sample videos",
             compound="left",
@@ -1772,12 +1764,6 @@ class App(object):
             compound="left",
             image=self.menu_icons["merge"]["img"],
             command=MergeFrames2VideoPopUp,
-        )
-        video_process_menu.add_command(
-            label="Multi-crop",
-            compound="left",
-            image=self.menu_icons["crop"]["img"],
-            command=MultiCropPopUp,
         )
         video_process_menu.add_command(
             label="Print classifier info...",

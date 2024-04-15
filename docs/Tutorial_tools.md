@@ -583,3 +583,61 @@ use the ``Fixed circle coordinates crop for multiple videos`` submenu.
 
 ##
 Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
+
+
+### Clip (trim) single video by frame numbers
+
+Sometimes, we may want to clip videos between specified frame numbers instead of specified [time-stamps](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
+To do this, click the **Clip single video by frame number** button in the Tools menu, and you should see the follow po-up menu:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/frame_id_trim_single_video.png" />
+</p>
+
+i) Browse and select for the video that you want to clip by frame number.
+
+ii) In the `START FRAME` entry-box, select the frame where the trimmed video should start.  In the `END FRAME` entry-box, select the frame where the trimmed video should end.
+
+iii) Click the `RUN` button. You can follow the progress in the main SimBA terminal and the opertaing system terminal. 
+
+iv) Once complete, a new video will be stored in the same directory as in the input video, with a suffix in the file-name representing the clipped start and end point frame numbers. 
+
+
+### Clip (trim) multiple videos by frame numbers
+
+Sometimes, we may want to clip multiple videos between specified frame numbers instead of specified [time-stamps]
+To do this, click the **Clip multiple videos by frame number** button in the Tools menu. 
+
+i) First, you will be asked to select a directory containing input videos, as well as a directory where the clipped videos should be stored. Select the directories and click ``RUN``, and you should see the following pop-up:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/frame_id_trim_multiple_videos.png" />
+</p>
+
+ii) The table will contain one row per video in the input directory. For reference, under the `TOTAL FRAMES` heading, is the total number of frames contained in each video file.
+
+iii) In the `START FRAME` entry-box, select the frame where the trimmed video should start.  In the `END FRAME` entry-box, select the frame where the trimmed video should end.
+
+iv) Click the `RUN` button. You can follow the progress in the main SimBA terminal and the operating system terminal. 
+
+v) Once complete, new videos will be stored in your selected output directory.
+
+### Clip multiple videos
+
+Use this menu to clip multiple videos between specified time-stamps.
+
+>Note: If you instead want to clip videos between specific frame numbers rather than time-stamps, use the [Clip (trim) multiple videos by frame numbers] or [lip (trim) single video by frame numbers] functions. 
+
+i) First, you will be asked to select a directory containing input videos, as well as a directory where the clipped videos should be stored. Select the directories and click ``RUN``, and you should see the following pop-up:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/clip_multiple_videos_tools.png" />
+</p>
+
+ii) The table will contain one row per video in the input directory. For reference, under the `VIDEO LENGTH` heading, is the length of each video in HH:MM:SS format.
+
+iii) In the `START TIME` entry-box, enter the time when the new video should start. E.g., enter `00:02:01` to make the new video start after two minutes and one second of the input video.  In the `END TIME` entry-box, enter the time when the new video should end.  E.g., enter `00:04:21` to make the new video end after four minutes and twenty-one second of the input video.
+
+iv) Click the `RUN` button. You can follow the progress in the main SimBA terminal and the operating system terminal. 
+
+v) Once complete, new videos will be stored in your selected output directory.
