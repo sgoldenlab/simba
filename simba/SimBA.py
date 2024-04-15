@@ -122,15 +122,16 @@ from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
     ChangeFpsSingleVideoPopUp, ChangeImageFormatPopUp, CLAHEPopUp,
-    ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
-    ConvertROIDefinitionsPopUp, ConvertVideoPopUp, CreateGIFPopUP,
-    CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
-    DownsampleVideoPopUp, ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp,
-    ExtractSEQFramesPopUp, ExtractSpecificFramesPopUp,
-    GreyscaleSingleVideoPopUp, ImportFrameDirectoryPopUp,
-    MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
-    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp,
-    ClipSingleVideoByFrameNumbers, InitiateClipMultipleVideosByFrameNumbersPopUp, InitiateClipMultipleVideosByTimestampsPopUp)
+    ClipSingleVideoByFrameNumbers, ClipVideoPopUp, ConcatenatingVideosPopUp,
+    ConcatenatorPopUp, ConvertROIDefinitionsPopUp, ConvertVideoPopUp,
+    CreateGIFPopUP, CropVideoCirclesPopUp, CropVideoPolygonsPopUp,
+    CropVideoPopUp, DownsampleVideoPopUp, ExtractAllFramesPopUp,
+    ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
+    ExtractSpecificFramesPopUp, GreyscaleSingleVideoPopUp,
+    ImportFrameDirectoryPopUp, InitiateClipMultipleVideosByFrameNumbersPopUp,
+    InitiateClipMultipleVideosByTimestampsPopUp, MergeFrames2VideoPopUp,
+    MultiCropPopUp, MultiShortenPopUp, SuperImposeFrameCountPopUp,
+    VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1620,12 +1621,28 @@ class App(object):
 
         clip_video_menu = Menu(menu)
         clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp)
-        clip_video_menu.add_command(label="Clip multiple videos", command=InitiateClipMultipleVideosByTimestampsPopUp)
-        clip_video_menu.add_command(label="Clip video into multiple videos", command=MultiShortenPopUp)
-        clip_video_menu.add_command(label="Clip single video by frame numbers", command=ClipSingleVideoByFrameNumbers)
-        clip_video_menu.add_command(label="Clip multiple videos by frame numbers", command=InitiateClipMultipleVideosByFrameNumbersPopUp)
+        clip_video_menu.add_command(
+            label="Clip multiple videos",
+            command=InitiateClipMultipleVideosByTimestampsPopUp,
+        )
+        clip_video_menu.add_command(
+            label="Clip video into multiple videos", command=MultiShortenPopUp
+        )
+        clip_video_menu.add_command(
+            label="Clip single video by frame numbers",
+            command=ClipSingleVideoByFrameNumbers,
+        )
+        clip_video_menu.add_command(
+            label="Clip multiple videos by frame numbers",
+            command=InitiateClipMultipleVideosByFrameNumbersPopUp,
+        )
 
-        video_process_menu.add_cascade(label="Clip videos...", compound="left", image=self.menu_icons["clip"]["img"], menu=clip_video_menu,)
+        video_process_menu.add_cascade(
+            label="Clip videos...",
+            compound="left",
+            image=self.menu_icons["clip"]["img"],
+            menu=clip_video_menu,
+        )
         format_menu = Menu(video_process_menu)
         format_menu.add_command(
             label="Change image file formats", command=ChangeImageFormatPopUp

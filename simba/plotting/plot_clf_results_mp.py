@@ -19,9 +19,10 @@ from simba.utils.data import create_color_palette
 from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
-                                    read_df, find_core_cnt)
+                                    read_df)
 
 
 def _multiprocess_sklearn_video(
@@ -196,40 +197,67 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     >>> clf_plotter.run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 video_setting: Optional[bool] = True,
-                 frame_setting: Optional[bool] = True,
-                 cores: Optional[int] = -1,
-                 video_file_path: Optional[str] = None,
-                 text_settings: Optional[Union[Dict[str, float], bool]] = False,
-                 rotate: Optional[bool] = False,
-                 print_timers: Optional[bool] = True):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        video_setting: Optional[bool] = True,
+        frame_setting: Optional[bool] = True,
+        cores: Optional[int] = -1,
+        video_file_path: Optional[str] = None,
+        text_settings: Optional[Union[Dict[str, float], bool]] = False,
+        rotate: Optional[bool] = False,
+        print_timers: Optional[bool] = True,
+    ):
 
         if (not video_setting) and (not frame_setting):
-            raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames", source=self.__class__.__name__)
-        check_int(name=f'{self.__class__.__name__} cores', value=cores, min_value=-1)
-        if cores == -1: cores = find_core_cnt()[0]
+            raise NoSpecifiedOutputError(
+                msg="SIMBA ERROR: Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames",
+                source=self.__class__.__name__,
+            )
+        check_int(name=f"{self.__class__.__name__} cores", value=cores, min_value=-1)
+        if cores == -1:
+            cores = find_core_cnt()[0]
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
         PlottingMixin.__init__(self)
-        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
+        log_event(
+            logger_name=str(__class__.__name__),
+            log_type=TagNames.CLASS_INIT.value,
+            msg=self.create_log_msg_from_init_args(locals=locals()),
+        )
 
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
 
-        self.video_file_path, self.print_timers, self.text_settings = video_file_path, print_timers, text_settings
-        self.video_setting, self.frame_setting, self.cores, self.rotate = video_setting, frame_setting, cores, rotate
-        if not os.path.exists(self.sklearn_plot_dir): os.makedirs(self.sklearn_plot_dir)
-        self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
+        self.video_file_path, self.print_timers, self.text_settings = (
+            video_file_path,
+            print_timers,
+            text_settings,
+        )
+        self.video_setting, self.frame_setting, self.cores, self.rotate = (
+            video_setting,
+            frame_setting,
+            cores,
+            rotate,
+        )
+        if not os.path.exists(self.sklearn_plot_dir):
+            os.makedirs(self.sklearn_plot_dir)
+        self.pose_threshold = read_config_entry(
+            self.config,
+            ConfigKey.THRESHOLD_SETTINGS.value,
+            ConfigKey.SKLEARN_BP_PROB_THRESH.value,
+            Dtypes.FLOAT.value,
+            0.00,
+        )
         self.model_dict = self.get_model_info(self.config, self.clf_cnt)
-        self.clf_colors = create_color_palette(pallete_name="Set1", increments=self.clf_cnt)
+        self.clf_colors = create_color_palette(
+            pallete_name="Set1", increments=self.clf_cnt
+        )
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
 
         if video_file_path is not None:
             check_file_exist_and_readable(os.path.join(self.video_dir, video_file_path))
             self.data_files = video_file_path
-
 
     def __get_print_settings(self):
         self.text_attr = {}

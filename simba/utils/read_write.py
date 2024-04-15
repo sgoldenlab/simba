@@ -1939,11 +1939,14 @@ def copy_files_to_directory(
         shutil.copy(file_path, destination)
     return destinations
 
+
 def seconds_to_timestamp(seconds: int) -> str:
     """
     Convert an integer number representing seconds to a HH:MM:SS format.
     """
-    check_int(name=f'{seconds_to_timestamp.__name__} seconds', value=seconds, min_value=0)
+    check_int(
+        name=f"{seconds_to_timestamp.__name__} seconds", value=seconds, min_value=0
+    )
     hours = int(seconds / 3600)
     minutes = int((seconds % 3600) / 60)
     seconds = int(seconds % 60)
