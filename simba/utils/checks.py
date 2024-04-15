@@ -304,7 +304,11 @@ def check_all_file_names_are_represented_in_video_log(
         )
 
 
-def check_if_dir_exists(in_dir: Union[str, os.PathLike], source: Optional[str] = None, create_if_not_exist: Optional[bool] = False) -> None:
+def check_if_dir_exists(
+    in_dir: Union[str, os.PathLike],
+    source: Optional[str] = None,
+    create_if_not_exist: Optional[bool] = False,
+) -> None:
     """
     Check if a directory path exists.
 
