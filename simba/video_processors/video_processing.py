@@ -1921,8 +1921,12 @@ def crop_multiple_videos_polygons(
         save_path = os.path.join(out_dir, f"{video_name}.mp4")
         video_meta_data = get_video_meta_data(video_path=video_path)
         polygons = [polygon for x in range(video_meta_data["frame_count"])]
-        polygons = ImageMixin().slice_shapes_in_imgs(imgs=video_path, shapes=polygons, verbose=False)
-        _ = ImageMixin.img_stack_to_video(imgs=polygons, save_path=save_path, fps=video_meta_data["fps"])
+        polygons = ImageMixin().slice_shapes_in_imgs(
+            imgs=video_path, shapes=polygons, verbose=False
+        )
+        _ = ImageMixin.img_stack_to_video(
+            imgs=polygons, save_path=save_path, fps=video_meta_data["fps"]
+        )
     timer.stop_timer()
     stdout_success(
         msg=f"Polygon-based cropped {len(video_files)} files to directory {out_dir}",

@@ -11,6 +11,9 @@ We have developed video and image processing tools and incorporated them into th
 </p>
 
 - [Clip videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
+- [Clip multiple videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-multiple-videos)
+- [Clip multiple videos by frame numbers](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-trim-multiple-videos-by-frame-numbers)
+- [Clip (trim) single video by frame numbers](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-trim-single-video-by-frame-numbers)
 - [Clip video into multiple videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-video-into-multiple-videos)
 - [Crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video)
 - [Circle crop videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop)
@@ -581,10 +584,6 @@ use the ``Fixed circle coordinates crop for multiple videos`` submenu.
 6) Use the ``Output directory`` browse button to specify the location directory where the cropped videos should be stored. 
 7) Hit the ``Crop Videos`` button. You can follow the progress in the main SimBA terminal window. 
 
-##
-Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
-
-
 ### Clip (trim) single video by frame numbers
 
 Sometimes, we may want to clip videos between specified frame numbers instead of specified [time-stamps](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
@@ -605,7 +604,7 @@ iv) Once complete, a new video will be stored in the same directory as in the in
 
 ### Clip (trim) multiple videos by frame numbers
 
-Sometimes, we may want to clip multiple videos between specified frame numbers instead of specified [time-stamps]
+Sometimes, we may want to clip multiple videos between specified frame numbers instead of specified [time-stamps](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos)
 To do this, click the **Clip multiple videos by frame number** button in the Tools menu. 
 
 i) First, you will be asked to select a directory containing input videos, as well as a directory where the clipped videos should be stored. Select the directories and click ``RUN``, and you should see the following pop-up:
@@ -626,7 +625,7 @@ v) Once complete, new videos will be stored in your selected output directory.
 
 Use this menu to clip multiple videos between specified time-stamps.
 
->Note: If you instead want to clip videos between specific frame numbers rather than time-stamps, use the [Clip (trim) multiple videos by frame numbers] or [lip (trim) single video by frame numbers] functions. 
+>Note: If you instead want to clip videos between specific frame numbers rather than time-stamps, use the [Clip (trim) multiple videos by frame numbers](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-trim-multiple-videos-by-frame-numbers) or [clip (trim) single video by frame numbers](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-trim-single-video-by-frame-numbers) functions. 
 
 i) First, you will be asked to select a directory containing input videos, as well as a directory where the clipped videos should be stored. Select the directories and click ``RUN``, and you should see the following pop-up:
 
@@ -641,3 +640,8 @@ iii) In the `START TIME` entry-box, enter the time when the new video should sta
 iv) Click the `RUN` button. You can follow the progress in the main SimBA terminal and the operating system terminal. 
 
 v) Once complete, new videos will be stored in your selected output directory.
+
+
+##
+Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
+
