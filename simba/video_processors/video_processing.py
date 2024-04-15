@@ -688,12 +688,11 @@ def clip_video_in_range(
     if gpu:
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -y'
     else:
-        command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -y'
+        command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v libvpx-vp9 "{save_name}" -y'
     print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=clip_video_in_range.__name__,)
-
 
 def downsample_video(
     file_path: Union[str, os.PathLike],
@@ -780,7 +779,7 @@ def gif_creator(
     check_int(name="Duration", value=duration, min_value=1)
     check_int(name="Width", value=width)
     video_meta_data = get_video_meta_data(file_path)
-    if (start_time + duration) > video_meta_data["video_length_s"]:
+    if (int(start_time) + int(duration)) > video_meta_data["video_length_s"]:
         raise FrameRangeError(
             msg=f'The end of the gif (start time: {start_time} + duration: {duration}) is longer than the {file_path} video: {video_meta_data["video_length_s"]}s',
             source=gif_creator.__name__,
@@ -2146,8 +2145,8 @@ def horizontal_video_concatenator(
     """
     Concatenates multiple videos horizontally.
 
-    .. image:: _static/img/horizontal_video_concatenator.png
-       :width: 300
+    .. image:: _static/img/horizontal_video_concatenator.gif
+       :width: 600
        :align: center
 
     :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
