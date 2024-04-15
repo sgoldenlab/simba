@@ -953,8 +953,16 @@ class CreateGIFPopUP(PopUpMixin):
         gpu_cb = Checkbutton(
             settings_frm, text="Use GPU (decreased runtime)", variable=gpu_var
         )
-        width_instructions_1 = Label(settings_frm, text="Example Width: 240, 360, 480, 720, 1080", font=("Times", 12, "italic"))
-        width_instructions_2 = Label(settings_frm, text="Aspect ratio is kept (i.e., height is automatically computed)", font=("Times", 12, "italic"))
+        width_instructions_1 = Label(
+            settings_frm,
+            text="Example Width: 240, 360, 480, 720, 1080",
+            font=("Times", 12, "italic"),
+        )
+        width_instructions_2 = Label(
+            settings_frm,
+            text="Aspect ratio is kept (i.e., height is automatically computed)",
+            font=("Times", 12, "italic"),
+        )
         run_btn = Button(
             settings_frm,
             text="CREATE GIF",

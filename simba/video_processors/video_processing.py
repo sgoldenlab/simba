@@ -698,6 +698,7 @@ def clip_video_in_range(
         source=clip_video_in_range.__name__,
     )
 
+
 def downsample_video(
     file_path: Union[str, os.PathLike],
     video_height: int,
