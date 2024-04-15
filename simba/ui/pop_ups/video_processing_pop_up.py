@@ -19,37 +19,35 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         FileSelect, FolderSelect)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
-                                check_if_filepath_list_is_empty, check_int,
-                                check_that_hhmmss_start_is_before_end,
-                                check_if_string_value_is_valid_video_timestamp)
+                                check_if_filepath_list_is_empty,
+                                check_if_string_value_is_valid_video_timestamp,
+                                check_int,
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.data import convert_roi_definitions
 from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
 from simba.utils.errors import (CountError, FrameRangeError, MixedMosaicError,
                                 NoChoosenClassifierError, NoFilesFoundError,
                                 NotDirectoryError)
-from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
-                                    get_video_meta_data, find_all_videos_in_directory,
-                                    check_if_hhmmss_timestamp_is_valid_part_of_video,
-                                    seconds_to_timestamp)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video,
+    concatenate_videos_in_folder, find_all_videos_in_directory, get_fn_ext,
+    get_video_meta_data, seconds_to_timestamp)
 from simba.video_processors.extract_seqframes import extract_seq_frames
 from simba.video_processors.multi_cropper import MultiCropper
 from simba.video_processors.px_to_mm import get_coordinates_nilsson
-from simba.utils.printing import SimbaTimer, stdout_success
-
 from simba.video_processors.video_processing import (
     VideoRotator, batch_convert_video_format, batch_create_frames,
     batch_video_to_greyscale, change_fps_of_multiple_videos, change_img_format,
     change_single_video_fps, clahe_enhance_video, clip_video_in_range,
-    convert_to_mp4, convert_video_powerpoint_compatible_format,
-    copy_img_folder, crop_multiple_videos, crop_multiple_videos_circles,
+    clip_videos_by_frame_ids, convert_to_mp4,
+    convert_video_powerpoint_compatible_format, copy_img_folder,
+    crop_multiple_videos, crop_multiple_videos_circles,
     crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
     crop_single_video_polygon, downsample_video, extract_frame_range,
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, superimpose_frame_count,
-    video_concatenator, video_to_greyscale, clip_videos_by_frame_ids)
-
-
-
+    video_concatenator, video_to_greyscale)
 
 sys.setrecursionlimit(10**7)
 
@@ -1709,14 +1707,28 @@ class CropVideoPolygonsPopUp(PopUpMixin):
         self.main_frm.mainloop()
 
 
-
 class ClipSingleVideoByFrameNumbers(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLIP SINGLE VIDEO BY FRAME NUMBERS")
-        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(settings_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=15)
-        self.start_frm_eb = Entry_Box(settings_frm, "START FRAME: ", "15", validation="numeric")
-        self.end_frm_eb = Entry_Box(settings_frm, "END FRAME: ", "15", validation="numeric")
+        settings_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="SETTINGS",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
+        )
+        self.selected_video = FileSelect(
+            settings_frm,
+            "VIDEO PATH: ",
+            title="Select a video file",
+            file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
+            lblwidth=15,
+        )
+        self.start_frm_eb = Entry_Box(
+            settings_frm, "START FRAME: ", "15", validation="numeric"
+        )
+        self.end_frm_eb = Entry_Box(
+            settings_frm, "END FRAME: ", "15", validation="numeric"
+        )
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.selected_video.grid(row=0, column=0, sticky=NW)
@@ -1728,88 +1740,148 @@ class ClipSingleVideoByFrameNumbers(PopUpMixin):
     def run(self):
         check_file_exist_and_readable(file_path=self.selected_video.file_path)
         video_meta_data = get_video_meta_data(video_path=self.selected_video.file_path)
-        check_int(name='Start frame', value=self.start_frm_eb.entry_get, min_value=0)
-        check_int(name='End frame', value=self.end_frm_eb.entry_get, min_value=1)
+        check_int(name="Start frame", value=self.start_frm_eb.entry_get, min_value=0)
+        check_int(name="End frame", value=self.end_frm_eb.entry_get, min_value=1)
         start_frame = int(self.start_frm_eb.entry_get)
         end_frame = int(self.end_frm_eb.entry_get)
-        if start_frame >= end_frame: raise FrameRangeError(msg=f'Start frame ({start_frame}) is after or the same as the end frame ({end_frame})', source=__class__.__name__)
-        if (start_frame < 0) or (end_frame < 1): raise FrameRangeError(msg=f'Start frame has to be at least 0 and end frame has to be at least 1', source=__class__.__name__)
+        if start_frame >= end_frame:
+            raise FrameRangeError(
+                msg=f"Start frame ({start_frame}) is after or the same as the end frame ({end_frame})",
+                source=__class__.__name__,
+            )
+        if (start_frame < 0) or (end_frame < 1):
+            raise FrameRangeError(
+                msg=f"Start frame has to be at least 0 and end frame has to be at least 1",
+                source=__class__.__name__,
+            )
         if start_frame > video_meta_data["frame_count"]:
-            raise FrameRangeError(msg=f'The video  has {video_meta_data["frame_count"]} frames, which is less than the start frame: {start_frame}', source=__class__.__name__)
+            raise FrameRangeError(
+                msg=f'The video  has {video_meta_data["frame_count"]} frames, which is less than the start frame: {start_frame}',
+                source=__class__.__name__,
+            )
         if end_frame > video_meta_data["frame_count"]:
-            raise FrameRangeError(msg=f'The video  has {video_meta_data["frame_count"]} frames, which is less than the end frame: {end_frame}', source=__class__.__name__)
+            raise FrameRangeError(
+                msg=f'The video  has {video_meta_data["frame_count"]} frames, which is less than the end frame: {end_frame}',
+                source=__class__.__name__,
+            )
         frm_ids = [[start_frame, end_frame]]
-        _ = clip_videos_by_frame_ids(file_paths=[self.selected_video.file_path], frm_ids=frm_ids, save_dir=None)
+        _ = clip_videos_by_frame_ids(
+            file_paths=[self.selected_video.file_path], frm_ids=frm_ids, save_dir=None
+        )
+
 
 # ClipSingleVideoByFrameNumbers()
 
 
 class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
 
-    def __init__(self,
-                 data_dir: Union[str, os.PathLike],
-                 save_dir: Union[str, os.PathLike]):
+    def __init__(
+        self, data_dir: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]
+    ):
 
-        check_if_dir_exists(in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False)
-        check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
-        self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
-        self.video_meta_data = [get_video_meta_data(video_path=x)['frame_count'] for x in
-                                list(self.video_paths.values())]
+        check_if_dir_exists(
+            in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False
+        )
+        check_if_dir_exists(
+            in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True
+        )
+        self.video_paths = find_all_videos_in_directory(
+            directory=data_dir, as_dict=True, raise_error=True
+        )
+        self.video_meta_data = [
+            get_video_meta_data(video_path=x)["frame_count"]
+            for x in list(self.video_paths.values())
+        ]
         max_video_name_len = len(max(list(self.video_paths.keys())))
         super().__init__(title="CLIP MULTIPLE VIDEOS BY FRAME NUMBERS")
         self.save_dir = save_dir
-        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS",
-                                            icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        data_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="VIDEO SETTINGS",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
+        )
         data_frm.grid(row=0, column=0, sticky=NW)
-        Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(row=0, column=0, sticky=NW)
+        Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(
+            row=0, column=0, sticky=NW
+        )
         Label(data_frm, text="TOTAL FRAMES", width=10).grid(row=0, column=1)
         Label(data_frm, text="START FRAME", width=10).grid(row=0, column=2)
         Label(data_frm, text="END FRAME", width=10).grid(row=0, column=3)
         self.entry_boxes = {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
-            Label(data_frm, text=video_name, width=max_video_name_len).grid(row=cnt + 1, column=0, sticky=NW)
-            Label(data_frm, text=self.video_meta_data[cnt], width=max_video_name_len).grid(row=cnt + 1, column=1,
-                                                                                           sticky=NW)
-            self.entry_boxes[video_name]['start'] = Entry_Box(data_frm, "", 5, validation="numeric")
-            self.entry_boxes[video_name]['end'] = Entry_Box(data_frm, "", 5, validation="numeric")
-            self.entry_boxes[video_name]['start'].grid(row=cnt + 1, column=2, sticky=NW)
-            self.entry_boxes[video_name]['end'].grid(row=cnt + 1, column=3, sticky=NW)
-        self.create_run_frm(run_function=self.run, btn_txt_clr='blue')
+            Label(data_frm, text=video_name, width=max_video_name_len).grid(
+                row=cnt + 1, column=0, sticky=NW
+            )
+            Label(
+                data_frm, text=self.video_meta_data[cnt], width=max_video_name_len
+            ).grid(row=cnt + 1, column=1, sticky=NW)
+            self.entry_boxes[video_name]["start"] = Entry_Box(
+                data_frm, "", 5, validation="numeric"
+            )
+            self.entry_boxes[video_name]["end"] = Entry_Box(
+                data_frm, "", 5, validation="numeric"
+            )
+            self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
+            self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
+        self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
 
     def run(self):
         video_paths, frame_ids = [], []
         for cnt, (video_name, v) in enumerate(self.entry_boxes.items()):
             video_paths.append(self.video_paths[video_name])
             video_frm_cnt = self.video_meta_data[cnt]
-            check_int(name=f'START {video_name}', value=v['start'].entry_get, min_value=0)
-            check_int(name=f'START {video_name}', value=v['end'].entry_get, min_value=1)
-            start, end = int(v['start'].entry_get), int(v['end'].entry_get)
-            if start >= end: raise FrameRangeError(
-                msg=f'For video {video_name}, the start frame ({start}) is after or the same as the end frame ({end})',
-                source=__class__.__name__)
+            check_int(
+                name=f"START {video_name}", value=v["start"].entry_get, min_value=0
+            )
+            check_int(name=f"START {video_name}", value=v["end"].entry_get, min_value=1)
+            start, end = int(v["start"].entry_get), int(v["end"].entry_get)
+            if start >= end:
+                raise FrameRangeError(
+                    msg=f"For video {video_name}, the start frame ({start}) is after or the same as the end frame ({end})",
+                    source=__class__.__name__,
+                )
             if (start < 0) or (end < 1):
                 raise FrameRangeError(
-                    msg=f'For video {video_name}, start frame has to be at least 0 and end frame has to be at least 1',
-                    source=__class__.__name__)
+                    msg=f"For video {video_name}, start frame has to be at least 0 and end frame has to be at least 1",
+                    source=__class__.__name__,
+                )
             if start > video_frm_cnt:
                 raise FrameRangeError(
-                    msg=f'The video {video_name} has {video_frm_cnt} frames, which is less than the start frame: {start}',
-                    source=__class__.__name__)
+                    msg=f"The video {video_name} has {video_frm_cnt} frames, which is less than the start frame: {start}",
+                    source=__class__.__name__,
+                )
             if end > video_frm_cnt:
                 raise FrameRangeError(
-                    msg=f'The video {video_name} has {video_frm_cnt} frames, which is less than the end frame: {end}',
-                    source=__class__.__name__)
+                    msg=f"The video {video_name} has {video_frm_cnt} frames, which is less than the end frame: {end}",
+                    source=__class__.__name__,
+                )
             frame_ids.append([start, end])
 
-        _ = clip_videos_by_frame_ids(file_paths=video_paths, frm_ids=frame_ids, save_dir=self.save_dir)
+        _ = clip_videos_by_frame_ids(
+            file_paths=video_paths, frm_ids=frame_ids, save_dir=self.save_dir
+        )
+
 
 class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLIP MULTIPLE VIDEOS BY FRAME NUMBERS")
-        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT DATA DIRECTORIES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.input_folder = FolderSelect(data_frm, "Video directory:", title="Select Folder with videos", lblwidth=20)
-        self.output_folder = FolderSelect(data_frm, "Output directory:", title="Select a folder for your output videos", lblwidth=20)
+        data_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="SELECT DATA DIRECTORIES",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
+        )
+        self.input_folder = FolderSelect(
+            data_frm, "Video directory:", title="Select Folder with videos", lblwidth=20
+        )
+        self.output_folder = FolderSelect(
+            data_frm,
+            "Output directory:",
+            title="Select a folder for your output videos",
+            lblwidth=20,
+        )
         data_frm.grid(row=0, column=0, sticky=NW)
         self.input_folder.grid(row=0, column=0, sticky=NW)
         self.output_folder.grid(row=1, column=0, sticky=NW)
@@ -1817,31 +1889,65 @@ class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         self.main_frm.mainloop()
 
     def run(self):
-        check_if_dir_exists(in_dir=self.input_folder.folder_path, source=self.__class__.__name__, create_if_not_exist=False)
-        check_if_dir_exists(in_dir=self.output_folder.folder_path, source=self.__class__.__name__, create_if_not_exist=True)
-        self.video_paths = find_all_videos_in_directory(directory=self.input_folder.folder_path, as_dict=True, raise_error=True)
+        check_if_dir_exists(
+            in_dir=self.input_folder.folder_path,
+            source=self.__class__.__name__,
+            create_if_not_exist=False,
+        )
+        check_if_dir_exists(
+            in_dir=self.output_folder.folder_path,
+            source=self.__class__.__name__,
+            create_if_not_exist=True,
+        )
+        self.video_paths = find_all_videos_in_directory(
+            directory=self.input_folder.folder_path, as_dict=True, raise_error=True
+        )
         self.root.destroy()
-        _ = ClipMultipleVideosByFrameNumbersPopUp(data_dir=self.input_folder.folder_path, save_dir=self.output_folder.folder_path)
+        _ = ClipMultipleVideosByFrameNumbersPopUp(
+            data_dir=self.input_folder.folder_path,
+            save_dir=self.output_folder.folder_path,
+        )
+
 
 class ClipMultipleVideosByTimestamps(PopUpMixin):
 
-    def __init__(self,
-                 data_dir: Union[str, os.PathLike],
-                 save_dir: Union[str, os.PathLike]):
+    def __init__(
+        self, data_dir: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]
+    ):
 
-        check_if_dir_exists(in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False)
-        check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
-        self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
-        self.video_meta_data = [get_video_meta_data(video_path=x) for x in list(self.video_paths.values())]
+        check_if_dir_exists(
+            in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False
+        )
+        check_if_dir_exists(
+            in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True
+        )
+        self.video_paths = find_all_videos_in_directory(
+            directory=data_dir, as_dict=True, raise_error=True
+        )
+        self.video_meta_data = [
+            get_video_meta_data(video_path=x) for x in list(self.video_paths.values())
+        ]
         max_video_name_len = len(max(list(self.video_paths.keys())))
         super().__init__(title="CLIP MULTIPLE VIDEOS BY TIME-STAMPS")
         self.save_dir = save_dir
-        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        data_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="VIDEO SETTINGS",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
+        )
         data_frm.grid(row=0, column=0, sticky=NW)
         self.save_dir = save_dir
-        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        data_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="VIDEO SETTINGS",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
+        )
         data_frm.grid(row=0, column=0, sticky=NW)
-        Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(row=0, column=0, sticky=NW)
+        Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(
+            row=0, column=0, sticky=NW
+        )
         Label(data_frm, text="VIDEO LENGTH", width=10).grid(row=0, column=1)
         Label(data_frm, text="START TIME (HH:MM:SS)", width=18).grid(row=0, column=2)
         Label(data_frm, text="END TIME (HH:MM:SS)", width=18).grid(row=0, column=3)
@@ -1849,48 +1955,98 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         self.entry_boxes = {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
-            Label(data_frm, text=video_name, width=max_video_name_len).grid(row=cnt+1, column=0, sticky=NW)
-            video_length = self.video_meta_data[cnt]['video_length_s']
+            Label(data_frm, text=video_name, width=max_video_name_len).grid(
+                row=cnt + 1, column=0, sticky=NW
+            )
+            video_length = self.video_meta_data[cnt]["video_length_s"]
             video_length_hhmmss = seconds_to_timestamp(seconds=video_length)
-            Label(data_frm, text=video_length_hhmmss, width=max_video_name_len).grid(row=cnt + 1, column=1, sticky=NW)
-            self.entry_boxes[video_name]['start'] = Entry_Box(data_frm, "", 5)
-            self.entry_boxes[video_name]['end'] = Entry_Box(data_frm, "", 5)
-            self.entry_boxes[video_name]['start'].grid(row=cnt+1, column=2, sticky=NW)
-            self.entry_boxes[video_name]['end'].grid(row=cnt+1, column=3, sticky=NW)
-        self.create_run_frm(run_function=self.run, btn_txt_clr='blue')
+            Label(data_frm, text=video_length_hhmmss, width=max_video_name_len).grid(
+                row=cnt + 1, column=1, sticky=NW
+            )
+            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, "", 5)
+            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, "", 5)
+            self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
+            self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
+        self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
         self.main_frm.mainloop()
 
     def run(self):
         timer = SimbaTimer(start=True)
         for cnt, (video_name, v) in enumerate(self.entry_boxes.items()):
-            start, end = v['start'].entry_get, v['end'].entry_get
-            check_if_string_value_is_valid_video_timestamp(value=start, name=f'{video_name} START TIME')
-            check_if_string_value_is_valid_video_timestamp(value=end, name=f'{video_name} END TIME')
-            check_that_hhmmss_start_is_before_end(start_time=start, end_time=end, name=video_name)
-            check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start, video_path=self.video_paths[video_name])
-            check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end, video_path=self.video_paths[video_name])
-            clip_video_in_range(file_path=self.video_paths[video_name], start_time=start, end_time=end, out_dir=self.save_dir, overwrite=True, include_clip_time_in_filename=False)
+            start, end = v["start"].entry_get, v["end"].entry_get
+            check_if_string_value_is_valid_video_timestamp(
+                value=start, name=f"{video_name} START TIME"
+            )
+            check_if_string_value_is_valid_video_timestamp(
+                value=end, name=f"{video_name} END TIME"
+            )
+            check_that_hhmmss_start_is_before_end(
+                start_time=start, end_time=end, name=video_name
+            )
+            check_if_hhmmss_timestamp_is_valid_part_of_video(
+                timestamp=start, video_path=self.video_paths[video_name]
+            )
+            check_if_hhmmss_timestamp_is_valid_part_of_video(
+                timestamp=end, video_path=self.video_paths[video_name]
+            )
+            clip_video_in_range(
+                file_path=self.video_paths[video_name],
+                start_time=start,
+                end_time=end,
+                out_dir=self.save_dir,
+                overwrite=True,
+                include_clip_time_in_filename=False,
+            )
         timer.stop_timer()
-        stdout_success(msg=f'{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}', elapsed_time=timer.elapsed_time_str)
+        stdout_success(
+            msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}",
+            elapsed_time=timer.elapsed_time_str,
+        )
+
 
 class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLIP MULTIPLE VIDEOS BY TIME-STAMPS")
-        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT DATA DIRECTORIES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.input_folder = FolderSelect(data_frm, "Video directory:", title="Select Folder with videos", lblwidth=20)
-        self.output_folder = FolderSelect(data_frm, "Output directory:", title="Select a folder for your output videos", lblwidth=20)
+        data_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="SELECT DATA DIRECTORIES",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
+        )
+        self.input_folder = FolderSelect(
+            data_frm, "Video directory:", title="Select Folder with videos", lblwidth=20
+        )
+        self.output_folder = FolderSelect(
+            data_frm,
+            "Output directory:",
+            title="Select a folder for your output videos",
+            lblwidth=20,
+        )
         data_frm.grid(row=0, column=0, sticky=NW)
         self.input_folder.grid(row=0, column=0, sticky=NW)
         self.output_folder.grid(row=1, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
     def run(self):
-        check_if_dir_exists(in_dir=self.input_folder.folder_path, source=self.__class__.__name__, create_if_not_exist=False)
-        check_if_dir_exists(in_dir=self.output_folder.folder_path, source=self.__class__.__name__, create_if_not_exist=True)
-        self.video_paths = find_all_videos_in_directory(directory=self.input_folder.folder_path, as_dict=True, raise_error=True)
+        check_if_dir_exists(
+            in_dir=self.input_folder.folder_path,
+            source=self.__class__.__name__,
+            create_if_not_exist=False,
+        )
+        check_if_dir_exists(
+            in_dir=self.output_folder.folder_path,
+            source=self.__class__.__name__,
+            create_if_not_exist=True,
+        )
+        self.video_paths = find_all_videos_in_directory(
+            directory=self.input_folder.folder_path, as_dict=True, raise_error=True
+        )
         self.root.destroy()
-        _ = ClipMultipleVideosByTimestamps(data_dir=self.input_folder.folder_path, save_dir=self.output_folder.folder_path)
+        _ = ClipMultipleVideosByTimestamps(
+            data_dir=self.input_folder.folder_path,
+            save_dir=self.output_folder.folder_path,
+        )
 
-#ClipMultipleVideosByFrameNumbers
-#ClipMultipleVideosByFrameNumbers(data_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/test', save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/clipped')
 
+# ClipMultipleVideosByFrameNumbers
+# ClipMultipleVideosByFrameNumbers(data_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/test', save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/clipped')

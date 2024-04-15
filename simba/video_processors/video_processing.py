@@ -692,7 +692,11 @@ def clip_video_in_range(
     print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(msg=f"Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=clip_video_in_range.__name__,)
+    stdout_success(
+        msg=f"Video converted! {save_name} generated!",
+        elapsed_time=timer.elapsed_time_str,
+        source=clip_video_in_range.__name__,
+    )
 
 
 def downsample_video(
@@ -2121,7 +2125,11 @@ def create_blank_video(
     check_int(name=f"{create_blank_video.__name__} length", value=length, min_value=1)
     check_int(name=f"{create_blank_video.__name__} width", value=width, min_value=1)
     check_int(name=f"{create_blank_video.__name__} height", value=height, min_value=1)
-    check_if_dir_exists(in_dir=os.path.dirname(path), source=create_blank_video.__name__, create_if_not_exist=True)
+    check_if_dir_exists(
+        in_dir=os.path.dirname(path),
+        source=create_blank_video.__name__,
+        create_if_not_exist=True,
+    )
     timer = SimbaTimer(start=True)
     if verbose:
         print("Creating blank video...")
@@ -2132,7 +2140,9 @@ def create_blank_video(
     subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     if verbose:
-        print(f"Blank video complete. Saved at {path}. Elapsed time: {timer.elapsed_time_str}s.")
+        print(
+            f"Blank video complete. Saved at {path}. Elapsed time: {timer.elapsed_time_str}s."
+        )
 
 
 def horizontal_video_concatenator(
@@ -2489,11 +2499,17 @@ def mixed_mosaic_concatenator(
 
     check_ffmpeg_available()
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(msg="NVIDIA GPU not available", source=mixed_mosaic_concatenator.__name__)
+        raise FFMPEGCodecGPUError(
+            msg="NVIDIA GPU not available", source=mixed_mosaic_concatenator.__name__
+        )
     timer = SimbaTimer(start=True)
-    check_valid_lst(data=video_paths, source=mixed_mosaic_concatenator.__name__, min_len=2)
+    check_valid_lst(
+        data=video_paths, source=mixed_mosaic_concatenator.__name__, min_len=2
+    )
     dt = datetime.now().strftime("%Y%m%d%H%M%S")
-    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
+    video_meta_data = [
+        get_video_meta_data(video_path=video_path) for video_path in video_paths
+    ]
     max_video_length = max([x["video_length_s"] for x in video_meta_data])
     check_if_dir_exists(
         in_dir=os.path.dirname(save_path), source=mixed_mosaic_concatenator.__name__
@@ -2516,7 +2532,10 @@ def mixed_mosaic_concatenator(
             color=uneven_fill_color,
         )
         video_paths.append(blank_path)
-    upper_videos, lower_videos = (video_paths[: len(video_paths) // 2], video_paths[len(video_paths) // 2 :])
+    upper_videos, lower_videos = (
+        video_paths[: len(video_paths) // 2],
+        video_paths[len(video_paths) // 2 :],
+    )
     if verbose:
         print("Creating upper right mosaic ... (Step 1/4)")
     if len(upper_videos) > 1:
@@ -2534,7 +2553,13 @@ def mixed_mosaic_concatenator(
         print("Creating lower right mosaic ... (Step 2/4)")
     if len(lower_videos) > 1:
         lower_path = os.path.join(temp_dir, "lower.mp4")
-        horizontal_video_concatenator(video_paths=lower_videos, save_path=lower_path, gpu=gpu, verbose=verbose, height_px=mosaic_height)
+        horizontal_video_concatenator(
+            video_paths=lower_videos,
+            save_path=lower_path,
+            gpu=gpu,
+            verbose=verbose,
+            height_px=mosaic_height,
+        )
     else:
         lower_path = lower_videos[0]
     panels_meta = [
@@ -2567,10 +2592,11 @@ def mixed_mosaic_concatenator(
         )
 
 
-def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
-                             frm_ids: List[List[int]],
-                             save_dir: Optional[Union[str, os.PathLike]] = None):
-
+def clip_videos_by_frame_ids(
+    file_paths: List[Union[str, os.PathLike]],
+    frm_ids: List[List[int]],
+    save_dir: Optional[Union[str, os.PathLike]] = None,
+):
     """
     Clip videos specified by frame IDs (numbers).
 
@@ -2586,37 +2612,76 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
     """
 
     timer = SimbaTimer(start=True)
-    check_valid_lst(data=file_paths, source=clip_videos_by_frame_ids.__name__, valid_dtypes=(str,), min_len=1)
-    check_valid_lst(data=frm_ids, source=clip_videos_by_frame_ids.__name__, valid_dtypes=(list,), exact_len=len(file_paths))
+    check_valid_lst(
+        data=file_paths,
+        source=clip_videos_by_frame_ids.__name__,
+        valid_dtypes=(str,),
+        min_len=1,
+    )
+    check_valid_lst(
+        data=frm_ids,
+        source=clip_videos_by_frame_ids.__name__,
+        valid_dtypes=(list,),
+        exact_len=len(file_paths),
+    )
     for cnt, i in enumerate(frm_ids):
-        check_valid_lst(data=i, source=f'clip_videos_by_frame_count.__name_ frm_ids {cnt}', valid_dtypes=(int,), exact_len=2)
-        if i[0] >= i[1]: raise FrameRangeError(msg=f'Start frame for video {i} is after or the same as the end frame ({i[0]}, {i[1]})', source=clip_videos_by_frame_ids.__name__)
-        if (i[0] < 0) or (i[1] < 1): raise FrameRangeError(msg=f'Start frame has to be at least 0 and end frame has to be at least 1', source=clip_videos_by_frame_ids.__name__)
+        check_valid_lst(
+            data=i,
+            source=f"clip_videos_by_frame_count.__name_ frm_ids {cnt}",
+            valid_dtypes=(int,),
+            exact_len=2,
+        )
+        if i[0] >= i[1]:
+            raise FrameRangeError(
+                msg=f"Start frame for video {i} is after or the same as the end frame ({i[0]}, {i[1]})",
+                source=clip_videos_by_frame_ids.__name__,
+            )
+        if (i[0] < 0) or (i[1] < 1):
+            raise FrameRangeError(
+                msg=f"Start frame has to be at least 0 and end frame has to be at least 1",
+                source=clip_videos_by_frame_ids.__name__,
+            )
     video_meta_data = [get_video_meta_data(video_path=x) for x in file_paths]
     for i in range(len(video_meta_data)):
-        if (frm_ids[i][0] > video_meta_data[i]['frame_count']) or (frm_ids[i][1] > video_meta_data[i]['frame_count']):
-            raise FrameRangeError(msg=f'Video {i+1} has {video_meta_data[i]["frame_count"]} frames, cannot use start and end frame {frm_ids[i]}', source=clip_videos_by_frame_ids.__name__)
+        if (frm_ids[i][0] > video_meta_data[i]["frame_count"]) or (
+            frm_ids[i][1] > video_meta_data[i]["frame_count"]
+        ):
+            raise FrameRangeError(
+                msg=f'Video {i+1} has {video_meta_data[i]["frame_count"]} frames, cannot use start and end frame {frm_ids[i]}',
+                source=clip_videos_by_frame_ids.__name__,
+            )
     if save_dir is not None:
-        check_if_dir_exists(in_dir=save_dir, source=clip_videos_by_frame_ids.__name__, create_if_not_exist=True)
+        check_if_dir_exists(
+            in_dir=save_dir,
+            source=clip_videos_by_frame_ids.__name__,
+            create_if_not_exist=True,
+        )
     for cnt, file_path in enumerate(file_paths):
         video_timer = SimbaTimer(start=True)
         dir, video_name, ext = get_fn_ext(filepath=file_path)
         s_f, e_f = frm_ids[cnt][0], frm_ids[cnt][1]
-        print(f'Trimming {video_name} from frame {s_f} to frame {e_f}...')
+        print(f"Trimming {video_name} from frame {s_f} to frame {e_f}...")
         if save_dir is not None:
             out_path = os.path.join(save_dir, os.path.basename(file_path))
         else:
-            out_path = os.path.join(dir, f'{video_name}_{s_f}_{e_f}{ext}')
+            out_path = os.path.join(dir, f"{video_name}_{s_f}_{e_f}{ext}")
         cmd = f'ffmpeg -i "{file_path}" -vf "trim={s_f}:{e_f},setpts=PTS-STARTPTS" -c:v libx264 -c:a aac -loglevel error -stats "{out_path}" -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         video_timer.stop_timer()
-        print(f'Video {video_name} complete (elapsed time {video_timer.elapsed_time_str}s)')
+        print(
+            f"Video {video_name} complete (elapsed time {video_timer.elapsed_time_str}s)"
+        )
     timer.stop_timer()
     if save_dir is None:
-        stdout_success(msg=f'{len(file_paths)} video(s) clipped by frame', elapsed_time=timer.elapsed_time_str)
+        stdout_success(
+            msg=f"{len(file_paths)} video(s) clipped by frame",
+            elapsed_time=timer.elapsed_time_str,
+        )
     else:
-        stdout_success(msg=f'{len(file_paths)} video(s) clipped by frame and saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
-
+        stdout_success(
+            msg=f"{len(file_paths)} video(s) clipped by frame and saved in {save_dir}",
+            elapsed_time=timer.elapsed_time_str,
+        )
 
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
@@ -2642,4 +2707,4 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial    10.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial     3.mp4']
 
-#mixed_mosaic_concatenator(video_paths=video_paths, save_path=save_path, gpu=False, verbose=True)
+# mixed_mosaic_concatenator(video_paths=video_paths, save_path=save_path, gpu=False, verbose=True)
