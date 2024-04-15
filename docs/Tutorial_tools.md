@@ -47,6 +47,9 @@ This is a tool used to trim video lengths. The tool contains two different metho
 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/shortenvideos.PNG" width="330" height="287" />
 
+> Note: To trim multiple videos at specified time stamps, you can use the [batch pre-processing](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md) tools in SimBA or
+> the [clip multiple videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-multiple-videos) function.
+
 ### Method 1 
 Use Method 1 to trim both the beginning and the end of the video. 
 
@@ -625,7 +628,9 @@ v) Once complete, new videos will be stored in your selected output directory.
 
 Use this menu to clip multiple videos between specified time-stamps.
 
->Note: If you instead want to clip videos between specific frame numbers rather than time-stamps, use the [Clip (trim) multiple videos by frame numbers](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-trim-multiple-videos-by-frame-numbers) or [clip (trim) single video by frame numbers](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-trim-single-video-by-frame-numbers) functions. 
+>Note I: If you instead want to clip videos between specific frame numbers rather than time-stamps, use the [Clip (trim) multiple videos by frame numbers](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-trim-multiple-videos-by-frame-numbers) or [clip (trim) single video by frame numbers](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-trim-single-video-by-frame-numbers) functions. 
+
+>Note II: To clip multiple videos by specified time-stamps, you can also use the [batch pre-processing](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md) tools in SimBA.
 
 i) First, you will be asked to select a directory containing input videos, as well as a directory where the clipped videos should be stored. Select the directories and click ``RUN``, and you should see the following pop-up:
 
