@@ -116,11 +116,12 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
     .. note::
        `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
-    .. important::
-       See :meth:`simba.utils.lookups.get_color_dict` for keys for named color options.
-
     .. image:: _static/img/path_plot.png
        :width: 300
+       :align: center
+
+    .. image:: _static/img/path_plot_mp.gif
+       :width: 500
        :align: center
 
     :example:
