@@ -1392,18 +1392,14 @@ class VideoRotator(ConfigReader):
     >>> VideoRotator(input_path='project_folder/videos/Video_1.mp4', output_dir='project_folder/videos')
     """
 
-    def __init__(
-        self,
-        input_path: Union[str, os.PathLike],
-        output_dir: Union[str, os.PathLike],
-        gpu: Optional[bool] = False,
-        ffmpeg: Optional[bool] = False,
-    ) -> None:
+    def __init__(self,
+                 input_path: Union[str, os.PathLike],
+                 output_dir: Union[str, os.PathLike],
+                 gpu: Optional[bool] = False,
+                 ffmpeg: Optional[bool] = False) -> None:
+
         if gpu and not check_nvidea_gpu_available():
-            raise FFMPEGCodecGPUError(
-                msg="No GPU found (as evaluated by nvidea-smi returning None)",
-                source=self.__class__.__name__,
-            )
+            raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=self.__class__.__name__,)
         if ffmpeg and not check_ffmpeg_available():
             raise FFMPEGNotFoundError(
                 msg='FFMPEG not found on the computer (as evaluated by "ffmpeg" returning None)',
@@ -1458,9 +1454,9 @@ class VideoRotator(ConfigReader):
                     self.save_dir, f"{name}_rotated_{self.datetime}.mp4"
                 )
                 if self.gpu:
-                    cmd = f'ffmpeg -hwaccel auto -i {video_path} -vf "hwupload_cuda,rotate={rotation}*(PI/180),format=nv12|cuda" -c:v h264_nvenc {save_path} -y'
+                    cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "hwupload_cuda,rotate={rotation}*(PI/180),format=nv12|cuda" -c:v h264_nvenc "{save_path}" -y'
                 else:
-                    cmd = f'ffmpeg -i {video_path} -vf "rotate={rotation}*(PI/180)" {save_path} -y'
+                    cmd = f'ffmpeg -i "{video_path}" -vf "rotate={rotation}*(PI/180)" "{save_path}" -y'
                 subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         else:
             for video_cnt, (video_path, rotation) in enumerate(self.results.items()):
