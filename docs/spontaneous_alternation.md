@@ -40,17 +40,17 @@ Onces the ROIs have been defined, click on the `SPONTANEOUS ALTERNATION` button 
 
   - `ANIMAL AREA (%)`: When detecting the location of the animal within the maze, SimBA will draw a "convex hull" or polygon around the animal that encapsulates all of the tracked body-parts, similar to how propriatory tools like [AnyMaze](https://www.any-maze.com/applications/y-maze/) compute spontaneous alternations.
 
-    <p align="center"> <img src="https://github.com/sgoldenlab/simba/blob/master/images/spontaneous_alternation_2.png" /> </p>
+    <p align="center"> <img src="https://github.com/sgoldenlab/simba/blob/master/images/spontaneous_alternation_3.png" /> </p>
 
     The `ANIMAL AREA (%)` represents the percent of this area that have to enter, or exit, the maze arms or the maze center for it to count as an entry or an exit. Smaller `ANIMAL AREA (%)` values are likely to results in more arm entries and exits being counted.
     The below image may not be the most suited as it doesnt show a 3-arm maze, but it can help to visualize how `ANIMAL AREA (%)` represents a threshold value:
 
-    <p align="center"> <img src="https://github.com/sgoldenlab/simba/blob/master/images/spontaneous_alternation_3.png" /> </p>
+    <p align="center"> <img src="https://github.com/sgoldenlab/simba/blob/master/images/spontaneous_alternation_4.png" /> </p>
     
   - `ANIMAL BUFFER (MM)`: As mentioned above, SimBA will draw a "convex hull" or polygon around the animal that encapsulates all of the tracked body-parts. Sometimes, you may want to extend the
     size if this polygon, and give it a little wriggle room, especially if you don't pose-estimate the outer boundaries of your animals. For example, in this image below, the original detected animal polygon is shown at the top, and the buffered polygon with N % is shown at the bottom:
 
-      <p align="center"> <img src="https://github.com/sgoldenlab/simba/blob/master/images/spontaneous_alternation_4.png" /> </p>
+      <p align="center"> <img src="https://github.com/sgoldenlab/simba/blob/master/images/spontaneous_alternation_5.png" /> </p>
 
   - `SAVE DETAILED DATA`: Beyond the standard metrics (alternation rate, alternation count, same-arm return errors, alternate arm return errors), we may want data for specific arm combinations and exact frame count for when alternations or errors happened towards those arms and combinations. Setting this dropdown to `TRUE` will create one CSV file for each video inside the logs folder of your SimBA project within a subdirectory named something like `detailed_spontaneous_alternation_data_20240327141628`.
 
