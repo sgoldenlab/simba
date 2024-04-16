@@ -598,7 +598,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         )
         self.config.set(
             "create ensemble settings",
-            "generate_precision_recall_curve",
+            "generate_precision_recall_curves",
             str(self.pr_curve),
         )
         self.config.set(

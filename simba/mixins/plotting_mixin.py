@@ -1562,7 +1562,7 @@ class PlottingMixin(object):
         video_path: Optional[Union[str, os.PathLike]] = None,
     ):
 
-        group = int(data[0][0][0])
+        group = int(data[0][0])
         color_dict = get_color_dict()
         if video_setting:
             fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
@@ -1583,13 +1583,11 @@ class PlottingMixin(object):
 
         for i in range(data.shape[0]):
             if input_style_attr is not None:
-                if (type(input_style_attr["bg color"]) == dict) and (
-                    input_style_attr["bg color"]["type"]
-                ) == "moving":
+                if (type(input_style_attr["bg color"]) == dict) and (input_style_attr["bg color"]["type"]) == "moving":
                     style_attr["bg color"] = input_style_attr["bg color"]
-            frame_id = int(data[i, -1, 1] + 1)
-            frame_data = data[i, :, 2:].astype(int)
-            frame_data = np.split(frame_data, len(list(animal_attr.keys())), axis=1)
+            frame_id = int(data[i][1])
+            frame_data = data[i][2:].astype(int)
+            frame_data = np.split(frame_data, len(list(animal_attr.keys())), axis=0)
             img = np.zeros(
                 (
                     int(video_info["Resolution_height"].values[0]),
@@ -1609,21 +1607,9 @@ class PlottingMixin(object):
             img[:] = style_attr["bg color"]
             for animal_cnt, animal_data in enumerate(frame_data):
                 animal_clr = style_attr["animal clrs"][animal_cnt]
-                for j in range(animal_data.shape[0] - 1):
-                    cv2.line(
-                        img,
-                        tuple(animal_data[j]),
-                        tuple(animal_data[j + 1]),
-                        animal_clr,
-                        style_attr["line width"],
-                    )
-                cv2.circle(
-                    img,
-                    tuple(animal_data[-1]),
-                    0,
-                    animal_clr,
-                    style_attr["circle size"],
-                )
+                print(animal_data)
+                cv2.line(img, tuple(animal_data), animal_clr, int(style_attr["line width"]))
+                cv2.circle(img, tuple(animal_data[-1]), 0, animal_clr, style_attr["circle size"],)
                 if print_animal_names:
                     cv2.putText(
                         img,
@@ -1663,7 +1649,8 @@ class PlottingMixin(object):
                     str(frame_id + 1), video_name, str(group + 1)
                 )
             )
-
+        if video_setting:
+            video_writer.release()
         return group
 
     @staticmethod

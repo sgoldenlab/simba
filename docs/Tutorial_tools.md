@@ -53,7 +53,7 @@ This is a tool used to trim video lengths. The tool contains two different metho
 ### Method 1 
 Use Method 1 to trim both the beginning and the end of the video. 
 
-Let's say we have a 2 minute long video and we want to get rid of the first 10 seconds, and the last 5 seconds.
+Let's say we have a 2-minute-long video, and we want to get rid of the first 10 seconds, and the last 5 seconds.
 We would start our video on at `00:00:10`, and end the video at `00:01:55`.
 
 1. First, click on `Browse File` to select the video to trim.

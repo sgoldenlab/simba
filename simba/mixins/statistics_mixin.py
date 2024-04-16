@@ -1906,6 +1906,7 @@ class Statistics(FeatureExtractionMixin):
                 x = np.vstack((x, unclustered))
             return x[np.argsort(x[:, 0])][:, -1]
 
+    @staticmethod
     def elliptic_envelope(
         data: np.ndarray,
         contamination: Optional[float] = 1e-1,
