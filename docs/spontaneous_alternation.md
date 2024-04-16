@@ -52,7 +52,24 @@ Onces the ROIs have been defined, click on the `SPONTANEOUS ALTERNATION` button 
 
       <p align="center"> <img src="https://github.com/sgoldenlab/simba/blob/master/images/spontaneous_alternation_4.png" /> </p>
 
-  - `SAVE DETAILED DATA`: Beyond the standard metrics (alternation rate, alternation count, same-arm return errors, alternate arm return errors), we may want data for specific arm combinations and exact frame count for when  
+  - `SAVE DETAILED DATA`: Beyond the standard metrics (alternation rate, alternation count, same-arm return errors, alternate arm return errors), we may want data for specific arm combinations and exact frame count for when alternations or errors happened towards those arms and combinations. Setting this dropdown to `TRUE` will create one CSV file for each video inside the logs folder of your SimBA project within a subdirectory named something like `detailed_spontaneous_alternation_data_20240327141628`.
+
+  - `VERBOSE`: This dropdown is helful for general troubleshooting. Setting thir dropdown to TRUE will print more information within each step of the processing pipeline.
+
+4) Once the above has been selected, click the `RUN ANALYSIS` button. You can follow the progress in the SimBA main window and the operating system terminal window. Every video represented in the `project_folder/csv/outlier_corrected_movement_location` will be analysed. Once complete, a CSV file will be stored in the logs folder of your SimBA project named something like `spontaneous_alternation_20240327145612.csv`. This file will have one row per video and columns representing alternation rate, alternation count, same-arm return error count, alternate arm return errors count. For an example file of expected output file with one analysed video, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/spontaneous_alternation_20240327150723.csv).
+
+If you have selected `SAVE DETAILED DATA`, you will also get a further CSV file for each analysed video, documenting the frame counts when different errors and alternation sequences occured. For an example file of expected output of the detailed data, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/spontaneous_alternation_detailed_data_ex.csv)
+
+
+5) We may want to visualize the spontanous alternation for some videos to make sure the alternation counts and errors as counted by SimBa matches up with manual scoring.
+   To do this, go to the `RUN VISUALIZATION` sub-menu and select the video you want to visualize spontaneous alternation for. Next, click `CREATE VIDEO`. A video will be stored in the `/project_folder/frames/output/spontanous_alternation` directory of your SimBA project. Overlay on the video, is the convex hull polygon of the animal according to your settings, the ARM and CENTER ROIs, the current 3-arm sequence, and current alternation and error counts. Click play on the video below for an example.
+
+   
+
+
+https://github.com/sgoldenlab/simba/assets/34761092/18484295-5cad-42dd-85bf-62a3305be37b
+
+
 
     
 
