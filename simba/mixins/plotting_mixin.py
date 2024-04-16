@@ -1583,7 +1583,9 @@ class PlottingMixin(object):
 
         for i in range(data.shape[0]):
             if input_style_attr is not None:
-                if (type(input_style_attr["bg color"]) == dict) and (input_style_attr["bg color"]["type"]) == "moving":
+                if (type(input_style_attr["bg color"]) == dict) and (
+                    input_style_attr["bg color"]["type"]
+                ) == "moving":
                     style_attr["bg color"] = input_style_attr["bg color"]
             frame_id = int(data[i][1])
             frame_data = data[i][2:].astype(int)
@@ -1608,8 +1610,16 @@ class PlottingMixin(object):
             for animal_cnt, animal_data in enumerate(frame_data):
                 animal_clr = style_attr["animal clrs"][animal_cnt]
                 print(animal_data)
-                cv2.line(img, tuple(animal_data), animal_clr, int(style_attr["line width"]))
-                cv2.circle(img, tuple(animal_data[-1]), 0, animal_clr, style_attr["circle size"],)
+                cv2.line(
+                    img, tuple(animal_data), animal_clr, int(style_attr["line width"])
+                )
+                cv2.circle(
+                    img,
+                    tuple(animal_data[-1]),
+                    0,
+                    animal_clr,
+                    style_attr["circle size"],
+                )
                 if print_animal_names:
                     cv2.putText(
                         img,

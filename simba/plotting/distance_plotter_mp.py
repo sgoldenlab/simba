@@ -270,7 +270,10 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
                 frm_range = np.array_split(frm_range, self.core_cnt)
 
                 distances = np.array_split(distances, self.core_cnt)
-                distances = [self.__insert_group_idx_column(data=i, group=cnt) for cnt, i in enumerate(distances)]
+                distances = [
+                    self.__insert_group_idx_column(data=i, group=cnt)
+                    for cnt, i in enumerate(distances)
+                ]
                 distances = np.concatenate(distances, axis=0)
                 print(
                     f"Creating distance plots, multiprocessing, follow progress in terminal (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})"
