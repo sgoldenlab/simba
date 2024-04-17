@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import Dict, List, Union, Optional, Any
+from typing import Any, Dict, List, Optional, Union
 
 import cv2
 import numpy as np
@@ -10,19 +10,22 @@ from joblib import Parallel, delayed
 
 from simba.data_processors.movement_calculator import MovementCalculator
 from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_if_keys_exist_in_dict, check_valid_lst)
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext
-from simba.utils.checks import check_valid_lst, check_if_keys_exist_in_dict, check_all_file_names_are_represented_in_video_log
 
-BG_COLOR = 'bg_color'
-HEADER_COLOR = 'header_color'
-FONT_THICKNESS = 'font_thickness'
-SIZE = 'size'
-DATA_ACCURACY = 'data_accuracy'
+BG_COLOR = "bg_color"
+HEADER_COLOR = "header_color"
+FONT_THICKNESS = "font_thickness"
+SIZE = "size"
+DATA_ACCURACY = "data_accuracy"
 STYLE_KEYS = [BG_COLOR, HEADER_COLOR, FONT_THICKNESS, SIZE, DATA_ACCURACY]
+
 
 class DataPlotter(ConfigReader):
     """
@@ -42,23 +45,38 @@ class DataPlotter(ConfigReader):
     >>> _ = DataPlotter(config_path='MyConfigPath').run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 style_attr: Dict[str, Any],
-                 body_part_attr: List[List[str]],
-                 data_paths: List[str],
-                 video_setting: Optional[bool] = True,
-                 frame_setting: Optional[bool] = True):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        style_attr: Dict[str, Any],
+        body_part_attr: List[List[str]],
+        data_paths: List[str],
+        video_setting: Optional[bool] = True,
+        frame_setting: Optional[bool] = True,
+    ):
 
         if (not video_setting) and (not frame_setting):
-            raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please choose to create video and/or frames data plots. SimBA found that you ticked neither video and/or frames")
-        check_valid_lst(data=data_paths, source=self.__class__.__name__, valid_dtypes=(str,))
-        check_valid_lst(data=body_part_attr, source=self.__class__.__name__, valid_dtypes=(list,))
-        for i in body_part_attr: check_valid_lst(data=i, source=self.__class__.__name__, valid_dtypes=(str,), exact_len=2)
+            raise NoSpecifiedOutputError(
+                msg="SIMBA ERROR: Please choose to create video and/or frames data plots. SimBA found that you ticked neither video and/or frames"
+            )
+        check_valid_lst(
+            data=data_paths, source=self.__class__.__name__, valid_dtypes=(str,)
+        )
+        check_valid_lst(
+            data=body_part_attr, source=self.__class__.__name__, valid_dtypes=(list,)
+        )
+        for i in body_part_attr:
+            check_valid_lst(
+                data=i, source=self.__class__.__name__, valid_dtypes=(str,), exact_len=2
+            )
         check_if_keys_exist_in_dict(data=style_attr, key=STYLE_KEYS)
         ConfigReader.__init__(self, config_path=config_path)
         self.video_setting, self.frame_setting = video_setting, frame_setting
-        self.files_found, self.style_attr, self.body_part_attr = (data_paths, style_attr, body_part_attr)
+        self.files_found, self.style_attr, self.body_part_attr = (
+            data_paths,
+            style_attr,
+            body_part_attr,
+        )
         if not os.path.exists(self.data_table_path):
             os.makedirs(self.data_table_path)
         self.process_movement()
@@ -85,7 +103,12 @@ class DataPlotter(ConfigReader):
             y_cord += 50
 
     def process_movement(self):
-        movement_processor = MovementCalculator(config_path=self.config_path, file_paths=self.files_found, threshold=0.00, body_parts=[x[0] for x in self.body_part_attr])
+        movement_processor = MovementCalculator(
+            config_path=self.config_path,
+            file_paths=self.files_found,
+            threshold=0.00,
+            body_parts=[x[0] for x in self.body_part_attr],
+        )
         movement_processor.run()
         self.movement = movement_processor.movement_dfs
 
@@ -174,7 +197,9 @@ class DataPlotter(ConfigReader):
                 )
             return img
 
-        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.files_found)
+        check_all_file_names_are_represented_in_video_log(
+            video_info_df=self.video_info_df, data_paths=self.files_found
+        )
         for file_cnt, file_path in enumerate(self.files_found):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(file_path)
@@ -183,13 +208,19 @@ class DataPlotter(ConfigReader):
             _, _, self.fps = self.read_video_info(video_name=video_name)
             if self.video_setting:
                 self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-                self.video_save_path = os.path.join(self.data_table_path, f"{video_name}.mp4")
-                self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, self.style_attr["size"])
+                self.video_save_path = os.path.join(
+                    self.data_table_path, f"{video_name}.mp4"
+                )
+                self.writer = cv2.VideoWriter(
+                    self.video_save_path, self.fourcc, self.fps, self.style_attr["size"]
+                )
             if self.frame_setting:
                 self.frame_save_path = os.path.join(self.data_table_path, video_name)
                 if not os.path.exists(self.frame_save_path):
                     os.makedirs(self.frame_save_path)
-            video_data_lst = np.array_split(pd.DataFrame(self.video_data), int(len(self.video_data) / self.fps))
+            video_data_lst = np.array_split(
+                pd.DataFrame(self.video_data), int(len(self.video_data) / self.fps)
+            )
             self.imgs = Parallel(
                 n_jobs=self.cpu_to_use, verbose=1, backend="threading"
             )(

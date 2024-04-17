@@ -57,19 +57,27 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
     >>> gantt_creator = GanttCreatorMultiprocess(config_path='project_folder/project_config.ini', frame_setting=False, video_setting=True, files_found=['project_folder/csv/machine_results/Together_1.csv'], cores=5, style_attr={'width': 640, 'height': 480, 'font size': 8, 'font rotation': 45}).run()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 style_attr: Dict[str, int],
-                 files_found: List[Union[str, os.PathLike]],
-                 frame_setting: Optional[bool] = False,
-                 video_setting: Optional[bool] = False,
-                 last_frm_setting: Optional[bool] = True,
-                 cores: Optional[int] = -1):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        style_attr: Dict[str, int],
+        files_found: List[Union[str, os.PathLike]],
+        frame_setting: Optional[bool] = False,
+        video_setting: Optional[bool] = False,
+        last_frm_setting: Optional[bool] = True,
+        cores: Optional[int] = -1,
+    ):
 
         check_file_exist_and_readable(file_path=config_path)
         if (not frame_setting) and (not video_setting) and (not last_frm_setting):
-            raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please select gantt videos, frames, and/or last frame.", source=self.__class__.__name__)
-        check_if_filepath_list_is_empty(filepaths=files_found, error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing gantt charts")
+            raise NoSpecifiedOutputError(
+                msg="SIMBA ERROR: Please select gantt videos, frames, and/or last frame.",
+                source=self.__class__.__name__,
+            )
+        check_if_filepath_list_is_empty(
+            filepaths=files_found,
+            error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing gantt charts",
+        )
         check_int(
             name=f"{self.__class__.__name__} core_cnt",
             value=cores,

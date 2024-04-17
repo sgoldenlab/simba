@@ -1,0 +1,13 @@
+Behavior,Arm,Frames
+same arm return,A,
+same arm return,B,
+same arm return,C,
+alternate arm return,A,"9603, 10887, 16962"
+alternate arm return,B,"3173, 14238"
+alternate arm return,C,"2223, 2901, 4805, 6912, 13892, 14776"
+alternations,"('A', 'B', 'C')",
+alternations,"('A', 'C', 'B')","2421, 4504, 12253, 13427"
+alternations,"('B', 'A', 'C')","4332, 11816, 13248"
+alternations,"('B', 'C', 'A')","888, 5359, 14986"
+alternations,"('C', 'A', 'B')","10604, 16834"
+alternations,"('C', 'B', 'A')","3437, 12597"

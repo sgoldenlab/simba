@@ -1392,14 +1392,19 @@ class VideoRotator(ConfigReader):
     >>> VideoRotator(input_path='project_folder/videos/Video_1.mp4', output_dir='project_folder/videos')
     """
 
-    def __init__(self,
-                 input_path: Union[str, os.PathLike],
-                 output_dir: Union[str, os.PathLike],
-                 gpu: Optional[bool] = False,
-                 ffmpeg: Optional[bool] = False) -> None:
+    def __init__(
+        self,
+        input_path: Union[str, os.PathLike],
+        output_dir: Union[str, os.PathLike],
+        gpu: Optional[bool] = False,
+        ffmpeg: Optional[bool] = False,
+    ) -> None:
 
         if gpu and not check_nvidea_gpu_available():
-            raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=self.__class__.__name__,)
+            raise FFMPEGCodecGPUError(
+                msg="No GPU found (as evaluated by nvidea-smi returning None)",
+                source=self.__class__.__name__,
+            )
         if ffmpeg and not check_ffmpeg_available():
             raise FFMPEGNotFoundError(
                 msg='FFMPEG not found on the computer (as evaluated by "ffmpeg" returning None)',
