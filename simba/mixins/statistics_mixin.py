@@ -1648,7 +1648,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64, float64, float64)")
-    def sliding_autocorrelation(data: np.ndarray, max_lag: float, time_window: float, fps: float):
+    def sliding_autocorrelation(
+        data: np.ndarray, max_lag: float, time_window: float, fps: float
+    ):
         """
         Jitted computation of sliding autocorrelations, which measures the correlation of a feature with itself using lagged windows.
 
@@ -2573,7 +2575,8 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit("(float32[:], float64[:], int64,)")
-    def sliding_kurtosis(data: np.ndarray, time_windows: np.ndarray, sample_rate: int
+    def sliding_kurtosis(
+        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
     ) -> np.ndarray:
         """
         Compute the kurtosis of a 1D array within sliding time windows.
@@ -2598,7 +2601,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def kmeans_1d(data: np.ndarray, k: int, max_iters: int, calc_medians: bool) -> Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]:
+    def kmeans_1d(
+        data: np.ndarray, k: int, max_iters: int, calc_medians: bool
+    ) -> Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]:
         """
         Perform k-means clustering on a 1-dimensional dataset.
 
@@ -2801,7 +2806,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit([(float32[:, :], float32[:, :]), (float32[:, :], types.misc.Omitted(None))])
-    def bray_curtis_dissimilarity(x: np.ndarray, w: Optional[np.ndarray] = None) -> np.ndarray:
+    def bray_curtis_dissimilarity(
+        x: np.ndarray, w: Optional[np.ndarray] = None
+    ) -> np.ndarray:
         """
         Jitted compute of the Bray-Curtis dissimilarity matrix between samples based on feature values.
 
