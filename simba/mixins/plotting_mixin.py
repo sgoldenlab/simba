@@ -27,10 +27,12 @@ except:
     from typing_extensions import Literal
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_instance, check_str,
-                                check_that_column_exist, check_valid_array,
-                                check_valid_lst, check_if_valid_rgb_tuple, check_int, check_float, check_if_keys_exist_in_dict)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict,
+                                check_if_valid_rgb_tuple, check_instance,
+                                check_int, check_str, check_that_column_exist,
+                                check_valid_array, check_valid_lst)
 from simba.utils.enums import Formats, Options, TextOptions
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
@@ -2156,20 +2158,21 @@ class PlottingMixin(object):
             return np.array(img).astype(np.uint8)
 
     @staticmethod
-    def make_path_plot(data: List[np.ndarray],
-                       colors: List[Tuple[int, int, int]],
-                       width: Optional[int] = 640,
-                       height: Optional[int] = 480,
-                       max_lines: Optional[int] = None,
-                       bg_clr: Optional[Union[Tuple[int, int, int], np.ndarray]] = (255, 255, 255),
-                       circle_size: Optional[Union[int, None]] = 3,
-                       font_size: Optional[float] = 2.0,
-                       font_thickness: Optional[int] = 2,
-                       line_width: Optional[int] = 2,
-                       animal_names: Optional[List[str]] = None,
-                       clf_attr: Optional[Dict[str, Any]] = None,
-                       save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, np.ndarray]:
-
+    def make_path_plot(
+        data: List[np.ndarray],
+        colors: List[Tuple[int, int, int]],
+        width: Optional[int] = 640,
+        height: Optional[int] = 480,
+        max_lines: Optional[int] = None,
+        bg_clr: Optional[Union[Tuple[int, int, int], np.ndarray]] = (255, 255, 255),
+        circle_size: Optional[Union[int, None]] = 3,
+        font_size: Optional[float] = 2.0,
+        font_thickness: Optional[int] = 2,
+        line_width: Optional[int] = 2,
+        animal_names: Optional[List[str]] = None,
+        clf_attr: Optional[Dict[str, Any]] = None,
+        save_path: Optional[Union[str, os.PathLike]] = None,
+    ) -> Union[None, np.ndarray]:
         """
         Creates a path plot visualization from the given data.
 
@@ -2203,20 +2206,60 @@ class PlottingMixin(object):
         >>> PlottingMixin.make_path_plot(data=[x, y], colors=[(0, 255, 0), (255, 0, 0)], clf_attr=clf_data)
         """
 
-        check_valid_lst(data=data, source=PlottingMixin.make_path_plot.__name__, valid_dtypes=(np.ndarray,), min_len=1)
-        for i in data: check_valid_array(data=i, source=PlottingMixin.make_path_plot.__name__, accepted_ndims=(2,),
-                                         accepted_axis_1_shape=(2,),
-                                         accepted_dtypes=(int, float, np.int32, np.int64, np.float32, np.float64))
-        check_valid_lst(data=colors, source=PlottingMixin.make_path_plot.__name__, valid_dtypes=(tuple,), exact_len=len(data))
-        for i in colors: check_if_valid_rgb_tuple(data=i)
-        check_instance(source='bg_clr', instance=bg_clr, accepted_types=(np.ndarray, tuple))
+        check_valid_lst(
+            data=data,
+            source=PlottingMixin.make_path_plot.__name__,
+            valid_dtypes=(np.ndarray,),
+            min_len=1,
+        )
+        for i in data:
+            check_valid_array(
+                data=i,
+                source=PlottingMixin.make_path_plot.__name__,
+                accepted_ndims=(2,),
+                accepted_axis_1_shape=(2,),
+                accepted_dtypes=(
+                    int,
+                    float,
+                    np.int32,
+                    np.int64,
+                    np.float32,
+                    np.float64,
+                ),
+            )
+        check_valid_lst(
+            data=colors,
+            source=PlottingMixin.make_path_plot.__name__,
+            valid_dtypes=(tuple,),
+            exact_len=len(data),
+        )
+        for i in colors:
+            check_if_valid_rgb_tuple(data=i)
+        check_instance(
+            source="bg_clr", instance=bg_clr, accepted_types=(np.ndarray, tuple)
+        )
         if isinstance(bg_clr, tuple):
             check_if_valid_rgb_tuple(data=bg_clr)
-        check_int(name=f'{PlottingMixin.make_path_plot.__name__} height', value=height, min_value=1)
-        check_int(name=f'{PlottingMixin.make_path_plot.__name__} height', value=width, min_value=1)
-        check_float(name=f'{PlottingMixin.make_path_plot.__name__} font_size', value=font_size)
-        check_int(name=f'{PlottingMixin.make_path_plot.__name__} font_thickness', value=font_thickness)
-        check_int(name=f'{PlottingMixin.make_path_plot.__name__} line_width', value=line_width)
+        check_int(
+            name=f"{PlottingMixin.make_path_plot.__name__} height",
+            value=height,
+            min_value=1,
+        )
+        check_int(
+            name=f"{PlottingMixin.make_path_plot.__name__} height",
+            value=width,
+            min_value=1,
+        )
+        check_float(
+            name=f"{PlottingMixin.make_path_plot.__name__} font_size", value=font_size
+        )
+        check_int(
+            name=f"{PlottingMixin.make_path_plot.__name__} font_thickness",
+            value=font_thickness,
+        )
+        check_int(
+            name=f"{PlottingMixin.make_path_plot.__name__} line_width", value=line_width
+        )
         timer = SimbaTimer(start=True)
         img = np.zeros((height, width, 3))
         img[:] = bg_clr
@@ -2224,28 +2267,53 @@ class PlottingMixin(object):
             clr = colors[line_cnt]
             line_data = data[line_cnt]
             if max_lines is not None:
-                check_int(name=f'{PlottingMixin.make_path_plot.__name__} max_lines', value=max_lines, min_value=1)
+                check_int(
+                    name=f"{PlottingMixin.make_path_plot.__name__} max_lines",
+                    value=max_lines,
+                    min_value=1,
+                )
                 line_data = line_data[-max_lines:]
             for i in range(1, line_data.shape[0]):
-                cv2.line(img, tuple(line_data[i]), tuple(line_data[i - 1]), clr, line_width)
+                cv2.line(
+                    img, tuple(line_data[i]), tuple(line_data[i - 1]), clr, line_width
+                )
             if circle_size is not None:
                 cv2.circle(img, tuple(line_data[-1]), 0, clr, circle_size)
             if animal_names is not None:
-                cv2.putText(img, animal_names[line_cnt], tuple(line_data[-1]), cv2.FONT_HERSHEY_COMPLEX, font_size, clr,
-                            font_thickness)
+                cv2.putText(
+                    img,
+                    animal_names[line_cnt],
+                    tuple(line_data[-1]),
+                    cv2.FONT_HERSHEY_COMPLEX,
+                    font_size,
+                    clr,
+                    font_thickness,
+                )
         if clf_attr is not None:
-            check_instance(source=PlottingMixin.make_path_plot.__name__, instance=clf_attr, accepted_types=(dict,))
+            check_instance(
+                source=PlottingMixin.make_path_plot.__name__,
+                instance=clf_attr,
+                accepted_types=(dict,),
+            )
             for k, v in clf_attr.items():
-                check_if_keys_exist_in_dict(data=v, key=['color', 'size', 'positions', 'clfs'], name='clf_attr')
+                check_if_keys_exist_in_dict(
+                    data=v, key=["color", "size", "positions", "clfs"], name="clf_attr"
+                )
             for clf_name, clf_data in clf_attr.items():
-                clf_positions = clf_data['positions'][np.argwhere(clf_data['clfs'] == 1).flatten()]
+                clf_positions = clf_data["positions"][
+                    np.argwhere(clf_data["clfs"] == 1).flatten()
+                ]
                 for i in clf_positions:
-                    cv2.circle(img, tuple(i), 0, clf_data['color'], clf_data['size'])
+                    cv2.circle(img, tuple(i), 0, clf_data["color"], clf_data["size"])
         img = cv2.resize(img, (width, height)).astype(np.uint8)
         if save_path is not None:
             check_if_dir_exists(in_dir=os.path.dirname(save_path))
             timer.stop_timer()
             cv2.imwrite(save_path, img)
-            stdout_success(msg=f"Path plot saved at {save_path}", elapsed_time=timer.elapsed_time_str, source=PlottingMixin.make_path_plot.__name__, )
+            stdout_success(
+                msg=f"Path plot saved at {save_path}",
+                elapsed_time=timer.elapsed_time_str,
+                source=PlottingMixin.make_path_plot.__name__,
+            )
         else:
             return img
