@@ -455,7 +455,6 @@ def video_quality_to_preset_lookup() -> Dict[str, str]:
     """
     Create dictionary that matches human-readable video quality settings to FFmpeg presets for GPU codecs.
     """
-
     return {"Low": "fast", "Medium": "medium", "High": "slow"}
 
 

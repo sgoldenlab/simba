@@ -1,9 +1,10 @@
 __author__ = "Simon Nilsson"
 
 import os
-from collections import defaultdict
+import threading
 from copy import deepcopy
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
@@ -18,10 +19,12 @@ from simba.utils.checks import (check_if_filepath_list_is_empty,
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import get_file_name_info_in_directory
+from simba.utils.lookups import get_color_dict
+
 
 
 class PathPlotPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
         self.data_path = os.path.join(
             self.project_path, Paths.MACHINE_RESULTS_DIR.value
@@ -460,11 +463,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
                 name="FONT THICKNESS", value=self.font_thickness.entry_get, min_value=1
             )
             if self.bg_clr_dropdown.getChoices() == "Video - static frame":
-                check_int(
-                    name="Static frame index",
-                    value=self.static_frm_index_eb.entry_get,
-                    min_value=0,
-                )
+                check_int(name="Static frame index", value=self.static_frm_index_eb.entry_get, min_value=0,)
                 bg_clr = {
                     "type": "static",
                     "opacity": int(
@@ -488,7 +487,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
                     ),
                 }
             else:
-                bg_clr = self.bg_clr_dropdown.getChoices()
+                bg_clr = get_color_dict()[self.bg_clr_dropdown.getChoices()]
 
             style_attr = {
                 "width": width,
@@ -504,32 +503,27 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
             if self.max_prior_lines_dropdown.getChoices() == "Entire video":
                 style_attr["max lines"] = "entire video"
             else:
-                check_int(
-                    name="PATH MAX LINES",
-                    value=self.max_lines_entry.entry_get,
-                    min_value=1,
-                )
-                style_attr["max lines"] = self.max_lines_entry.entry_get
+                check_int(name="PATH MAX LINES", value=self.max_lines_entry.entry_get, min_value=1)
+                style_attr["max lines"] = int(self.max_lines_entry.entry_get)
 
-        animal_attr = defaultdict(list)
-        for attr in (self.bp_dropdowns, self.bp_colors):
-            for key, value in attr.items():
-                animal_attr[key].append(value.getChoices())
-        for c, (k, v) in enumerate(animal_attr.items()):
-            if v[1] == "Custom":
-                custom_rgb_val = self.custom_rgb_selections[c].entry_get
-                custom_rgb_val = check_if_valid_rgb_str(input=custom_rgb_val)
-                animal_attr[k] = [v[0], custom_rgb_val]
+        animal_attr = {}
+        for cnt, (key, value) in enumerate(self.bp_colors.items()):
+            if cnt not in animal_attr.keys(): animal_attr[cnt] = {}
+            clr = value.getChoices()
+            if clr == "Custom":
+                clr = self.custom_rgb_selections[cnt].entry_get
+                clr = check_if_valid_rgb_str(input=clr)
+                animal_attr[cnt]['color'] = clr
+            else:
+                animal_attr[cnt]['color'] = get_color_dict()[value.getChoices()]
+        for cnt, (key, value) in enumerate(self.bp_dropdowns.items()):
+            if cnt not in animal_attr.keys(): animal_attr[cnt] = {}
+            animal_attr[cnt]['bp'] = value.getChoices()
 
         self.slicing = None
         if self.slice_var.get():
-            check_if_string_value_is_valid_video_timestamp(
-                value=self.video_start_time_entry.entry_get,
-                name="Video slicing START TIME",
-            )
-            check_if_string_value_is_valid_video_timestamp(
-                value=self.video_end_time_entry.entry_get, name="Video slicing END TIME"
-            )
+            check_if_string_value_is_valid_video_timestamp(value=self.video_start_time_entry.entry_get, name="Video slicing START TIME")
+            check_if_string_value_is_valid_video_timestamp(value=self.video_end_time_entry.entry_get, name="Video slicing END TIME")
             if (
                 self.video_start_time_entry.entry_get
                 == self.video_end_time_entry.entry_get
@@ -550,48 +544,48 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
         clf_attr = None
         if self.include_clf_locations_var.get():
-            clf_attr = defaultdict(list)
-            for attr in (self.clf_name, self.clf_clr, self.clf_size):
-                for key, value in attr.items():
-                    clf_attr[key].append(value.getChoices())
+            clf_attr = {}
+            for cnt, (key, value) in enumerate(self.clf_name.items()):
+                clf_attr[value.getChoices()] = {}
+                clf_attr[value.getChoices()]['color'] = get_color_dict()[self.clf_clr[cnt].getChoices()]
+                size = "".join(filter(str.isdigit, self.clf_size[cnt].getChoices()))
+                clf_attr[value.getChoices()]['size'] = int(size)
 
         if multiple_videos:
             data_paths = list(self.files_found_dict.values())
         else:
-            data_paths = [
-                self.files_found_dict[self.single_video_dropdown.getChoices()]
-            ]
+            data_paths = [self.files_found_dict[self.single_video_dropdown.getChoices()]]
 
         if not self.multiprocessing_var.get():
-            path_plotter = PathPlotterSingleCore(
-                config_path=self.config_path,
-                frame_setting=self.path_frames_var.get(),
-                video_setting=self.path_videos_var.get(),
-                last_frame=self.path_last_frm_var.get(),
-                files_found=data_paths,
-                input_style_attr=style_attr,
-                print_animal_names=self.include_animal_names_var.get(),
-                animal_attr=animal_attr,
-                input_clf_attr=clf_attr,
-                slicing=self.slicing,
-            )
+            path_plotter = PathPlotterSingleCore(config_path=self.config_path,
+                                                 frame_setting=self.path_frames_var.get(),
+                                                 video_setting=self.path_videos_var.get(),
+                                                 last_frame=self.path_last_frm_var.get(),
+                                                 files_found=data_paths,
+                                                 input_style_attr=style_attr,
+                                                 print_animal_names=self.include_animal_names_var.get(),
+                                                 animal_attr=animal_attr,
+                                                 clf_attr=clf_attr,
+                                                 slicing=self.slicing)
         else:
-            path_plotter = PathPlotterMulticore(
-                config_path=self.config_path,
-                frame_setting=self.path_frames_var.get(),
-                video_setting=self.path_videos_var.get(),
-                last_frame=self.path_last_frm_var.get(),
-                files_found=data_paths,
-                input_style_attr=style_attr,
-                print_animal_names=self.include_animal_names_var.get(),
-                animal_attr=animal_attr,
-                input_clf_attr=clf_attr,
-                cores=int(self.multiprocess_dropdown.getChoices()),
-                slicing=self.slicing,
+            path_plotter = PathPlotterMulticore(config_path=self.config_path,
+                                                frame_setting=self.path_frames_var.get(),
+                                                video_setting=self.path_videos_var.get(),
+                                                last_frame=self.path_last_frm_var.get(),
+                                                files_found=data_paths,
+                                                input_style_attr=style_attr,
+                                                print_animal_names=self.include_animal_names_var.get(),
+                                                animal_attr=animal_attr,
+                                                clf_attr=clf_attr,
+                                                cores=int(self.multiprocess_dropdown.getChoices()),
+                                                slicing=self.slicing,
             )
 
-        path_plotter.run()
+        threading.Thread(target=path_plotter.run()).start()
 
+
+
+# _ = PathPlotPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini')
 
 # _ = PathPlotPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 
