@@ -1159,7 +1159,6 @@ class CircularStatisticsMixin(object):
 
         References
         ----------
-
         .. [1] Kanatani, Rangarajan, Hyper least squares fitting of circles and ellipses, `Computational Statistics & Data Analysis`,
                vol. 55, pp. 2197-2208, 2011.
         .. [2] Lapp, Salazar, Champagne. Automated maternal behavior during early life in rodents (AMBER) pipeline, `Scientific Reports`,

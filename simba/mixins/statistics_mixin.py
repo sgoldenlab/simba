@@ -145,13 +145,24 @@ class Statistics(FeatureExtractionMixin):
         """
         Jitted compute independent-samples t-test statistic and boolean significance between two distributions.
 
+        .. note::
+           Critical values are stored in simba.assets.lookups.critical_values_**.pickle
+
+
+        The t-statistic for independent samples t-test is calculated using the following formula:
+
+        .. math::
+           t = \\frac{{\\bar{x}_1 - \\bar{x}_2}}{{s_p \\sqrt{{\\frac{1}{n_1} + \\frac{1}{n_2}}}}
+
+        where:
+        - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
+        - \\(s_p\\) is the pooled standard deviation,
+        - \\(n_1\\) and \\(n_2\\) are the sample sizes of sample_1 and sample_2 respectively.
+
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
         :parameter ndarray critical_values: 2d array where the first column represents degrees of freedom and second column represents critical values.
         :returns (float Union[None, bool]) t_statistic, p_value: Representing t-statistic and associated probability value. p_value is ``None`` if critical_values is None. Else True or False with True representing significant.
-
-        .. note::
-           Critical values are stored in simba.assets.lookups.critical_values_**.pickle
 
         :example:
         >>> sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
@@ -190,7 +201,16 @@ class Statistics(FeatureExtractionMixin):
     @njit("(float64[:], float64[:])", cache=True)
     def cohens_d(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
-        Jitted compute of Cohen's d between two distributions
+        Jitted compute of Cohen's d between two distributions.
+
+        Cohen's d is a measure of effect size that quantifies the difference between the means of two distributions in terms of their standard deviation. It is calculated as the difference between the means of the two distributions divided by the pooled standard deviation.
+
+        .. math::
+           d = \\frac{{\\bar{x}_1 - \\bar{x}_2}}{{\\sqrt{{\\frac{{s_1^2 + s_2^2}}{2}}}}}
+
+        where:
+        - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
+        - \\(s_1\\) and \\(s_2\\) are the standard deviations of sample_1 and sample_2 respectively.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
@@ -295,13 +315,20 @@ class Statistics(FeatureExtractionMixin):
         critical_values: Optional[float64[:, :]] = None,
     ) -> (float, Union[bool, None]):
         """
-        Compute the two-sample Kolmogorov-Smirnov (KS) test statistic and, optionally, test for statistical significance.
+        Jitted compute the two-sample Kolmogorov-Smirnov (KS) test statistic and, optionally, test for statistical significance.
 
         The two-sample KS test is a non-parametric test that compares the cumulative distribution functions (ECDFs) of two independent samples to assess whether they come from the same distribution.
 
+        KS statistic (D) is calculated as the maximum absolute difference between the empirical cumulative distribution functions (ECDFs) of the two samples.
+
+        .. math::
+           D = \\max(| ECDF_1(x) - ECDF_2(x) |)
+
+        If `critical_values` are provided, the function checks the significance of the KS statistic against the critical values.
+
         :param np.ndarray data: The first sample array for the KS test.
         :param np.ndarray data: The second sample array for the KS test.
-        :param Optional[bool] time_windows: An array of critical values for the KS test. If provided, the function will also check the significance of the KS statistic against the critical values. Default: None.
+        :param Optional[float64[:, :]] critical_values: An array of critical values for the KS test. If provided, the function will also check the significance of the KS statistic against the critical values. Default: None.
         :returns (float Union[bool, None]): Returns a tuple containing the KS statistic and a boolean indicating whether the test is statistically significant.
 
         :example:
@@ -896,6 +923,10 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute Population Stability Index (PSI) comparing two distributions.
 
+        The Population Stability Index (PSI) is a measure of the difference in distribution
+        patterns between two groups of data. A low PSI value indicates a minimal or negligible change in the distribution patterns between the two samples.
+        A high PSI value suggests a significant difference in the distribution patterns between the two samples.
+
         .. note::
            Empty bins (0 observations in bin) in is replaced with ``fill_value``. The PSI value ranges from 0 to positive infinity.
 
@@ -1006,11 +1037,14 @@ class Statistics(FeatureExtractionMixin):
     @njit("(float64[:], float64[:])", cache=True)
     def kruskal_wallis(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
-        Jitted compute of Kruskal-Wallis H between two distributions.
+        Compute the Kruskal-Wallis H statistic between two distributions.
+
+        The Kruskal-Wallis test is a non-parametric method for testing whether samples originate from the same distribution.
+        It ranks all the values from the combined samples, then calculates the H statistic based on the ranks.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
-        :returns float: Kruskal-Wallis H.
+        :returns float: Kruskal-Wallis H statistic.
 
         :example:
         >>> sample_1 = np.array([1, 1, 3, 4, 5]).astype(np.float64)
@@ -1036,11 +1070,14 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     def pct_in_top_n(x: np.ndarray, n: float) -> float:
         """
-        Compute percentage of elements in the top 'n' frequencies in the input.
+        Compute the percentage of elements in the top 'n' frequencies in the input array.
 
-        :param x: Input array.
-        :param n: Number of top frequencies.
-        :return: Percentage of elements in the top 'n' frequencies.
+        This function calculates the percentage of elements that belong to the 'n' most
+        frequent categories in the input array 'x'.
+
+        :param np.ndarray x: Input array.
+        :param float n: Number of top frequencies.
+        :return float: Percentage of elements in the top 'n' frequencies.
 
         :example:
         >>> x = np.random.randint(0, 10, (100,))
@@ -1060,12 +1097,24 @@ class Statistics(FeatureExtractionMixin):
         """
         Jitted compute of Mann-Whitney U between two distributions.
 
+        The Mann-Whitney U test is used to assess whether the distributions of two groups
+        are the same or different based on their ranks. It is commonly used as an alternative
+        to the t-test when the assumptions of normality and equal variances are violated.
+
+        .. math::
+           U = \\min(U_1, U_2)
+
+        Where:
+              - U is the Mann-Whitney U statistic,
+              - U_1 is the sum of ranks for sample 1,
+              - U_2 is the sum of ranks for sample 2.
+
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
-        :returns float: Mann-Whitney U.
+        :returns float: The Mann-Whitney U statistic.
 
         :references:
-            `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
+        `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
 
         :example:
         >>> sample_1 = np.array([1, 1, 3, 4, 5])
@@ -1087,14 +1136,16 @@ class Statistics(FeatureExtractionMixin):
         critical_values: Optional[np.ndarray] = None,
     ) -> (float, Union[bool, None]):
         """
-        Jitted compute of two-sample Leven's W.
+        Compute Levene's W statistic, a test for the equality of variances between two samples.
+
+        Levene's test is a statistical test used to determine whether two or more groups have equal variances. It is often
+        used as an alternative to the Bartlett test when the assumption of normality is violated. The function computes the
+        Levene's W statistic, which measures the degree of difference in variances between the two samples.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
-        :parameter ndarray critical_values: 2D array with where first column represent dfn first row dfd with values represent critical values.
-                                            Can be found in ``simba.assets.critical_values_05.pickle``
-
-        :returns float: Leven's W.
+        :parameter ndarray critical_values: 2D array with where first column represent dfn first row dfd with values represent critical values. Can be found in ``simba.assets.critical_values_05.pickle``
+        :returns tuple[float, Union[bool, None]]: Levene's W statistic and a boolean indicating whether the test is statistically significant (if critical values is not None).
 
         :examples:
         >>> sample_1 = np.array(list(range(0, 50)))
@@ -1191,12 +1242,16 @@ class Statistics(FeatureExtractionMixin):
         """
         Jitted compute of Brunner-Munzel W between two distributions.
 
+        The Brunner-Munzel W statistic compares the central tendency and the spread of two independent samples. It is useful
+        for comparing the distribution of a continuous variable between two groups, especially when the assumptions of
+        parametric tests like the t-test are violated.
+
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
         :returns float: Brunner-Munzel W.
 
         .. note::
-           Modified from ``scipy.stats.brunnermunzel``.
+           Modified from `scipy.stats.brunnermunzel <https://github.com/scipy/scipy/blob/7dcd8c59933524986923cde8e9126f5fc2e6b30b/scipy/stats/_stats_py.py#L9387>`_
 
         :example:
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
@@ -1262,6 +1317,20 @@ class Statistics(FeatureExtractionMixin):
         -1 indicating a perfect negative linear relationship, 1 indicating a perfect positive linear relationship, and 0
         indicating no linear relationship.
 
+        Pearson's r is calculated using the formula:
+
+        .. math::
+
+           r = \frac{\sum{(x_i - \bar{x})(y_i - \bar{y})}}{\sqrt{\sum{(x_i - \bar{x})^2}\sum{(y_i - \bar{y})^2}}}
+
+        where:
+           - \( x_i \) and \( y_i \) are individual data points in sample_1 and sample_2, respectively.
+           - \( \bar{x} \) and \( \bar{y} \) are the means of sample_1 and sample_2, respectively.
+
+        :param np.ndarray sample_1: First numeric sample.
+        :param np.ndarray sample_2: Second numeric sample.
+        :return float: Pearson's correlation coefficient between the two samples.
+
         :example:
         >>> sample_1 = np.array([7, 2, 9, 4, 5, 6, 7, 8, 9]).astype(np.float32)
         >>> sample_2 = np.array([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]).astype(np.float32)
@@ -1281,6 +1350,22 @@ class Statistics(FeatureExtractionMixin):
     @njit("(float32[:], float32[:])")
     def spearman_rank_correlation(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
+        Jitted compute of Spearman's rank correlation coefficient between two samples.
+
+        Spearman's rank correlation coefficient assesses how well the relationship between two variables can be described using a monotonic function.
+        It computes the strength and direction of the monotonic relationship between ranked variables.
+
+        .. math::
+           ρ = 1 - \\frac{{6 ∑(d_i^2)}}{{n(n^2 - 1)}}
+
+            where:
+        - \( d_i \) is the difference between the ranks of corresponding elements in sample_1 and sample_2.
+        - \( n \) is the number of observations.
+
+        :param np.ndarray sample_1: First 1D array containing feature values.
+        :param np.ndarray sample_2: Second 1D array containing feature values.
+        :return float: Spearman's rank correlation coefficient.
+
         :example:
         >>> sample_1 = np.array([7, 2, 9, 4, 5, 6, 7, 8, 9]).astype(np.float32)
         >>> sample_2 = np.array([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 9.5]).astype(np.float32)
@@ -1563,11 +1648,15 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64, float64, float64)")
-    def sliding_autocorrelation(
-        data: np.ndarray, max_lag: float, time_window: float, fps: float
-    ):
+    def sliding_autocorrelation(data: np.ndarray, max_lag: float, time_window: float, fps: float):
         """
-        Jitted compute of sliding auto-correlations (the correlation of a feature with itself using lagged windows).
+        Jitted computation of sliding autocorrelations, which measures the correlation of a feature with itself using lagged windows.
+
+        :param np.ndarray data: 1D array containing feature values.
+        :param float max_lag: Maximum lag in seconds for the autocorrelation window.
+        :param float time_window: Length of the sliding time window in seconds.
+        :param float fps: Frames per second, used to convert time-related parameters into frames.
+        :return np.ndarray: 1D array containing the sliding autocorrelation values.
 
         :example:
         >>> data = np.array([0,1,2,3,4, 5,6,7,8,1,10,11,12,13,14]).astype(np.float32)
@@ -1632,8 +1721,21 @@ class Statistics(FeatureExtractionMixin):
     @njit("(float32[:], float32[:])")
     def kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray) -> Tuple[float, float]:
         """
-        Jitted Kendall Tau (rank correlation coefficient). Non-parametric method for computing correlation
+        Jitted compute of Kendall Tau (rank correlation coefficient). Non-parametric method for computing correlation
         between two time-series features. Returns tau and associated z-score.
+
+        Kendall Tau is a measure of the correspondence between two rankings. It compares the number of concordant
+        pairs (pairs of elements that are in the same order in both rankings) to the number of discordant pairs
+        (pairs of elements that are in different orders in the rankings).
+
+        Kendall Tau is calculated using the following formula:
+
+        .. math::
+
+           \\tau = \\frac{{\\sum C - \\sum D}}{{\\sum C + \\sum D}}
+
+        where :math:`C` is the count of concordant pairs and :math:`D` is the count of discordant pairs.
+
 
         :parameter ndarray sample_1: First 1D array with feature values.
         :parameter ndarray sample_1: Second 1D array with feature values.
@@ -2294,7 +2396,9 @@ class Statistics(FeatureExtractionMixin):
         The formula for the phi coefficient is defined as:
 
         .. math::
-           \phi = \frac{(BC - AD)}{\sqrt{(C_1 + C_2)(R_1 + R_2)(C_1 + R_1)(C_2 + R_2)}}
+
+           \\phi = \\frac{{(BC - AD)}}{{\sqrt{{(C\_1 + C\_2)(R\_1 + R\_2)(C\_1 + R\_1)(C\_2 + R\_2)}}}}
+
 
         where:
         - BC: Hit rate (reponse and truth is both 1)
@@ -2415,7 +2519,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           \\text{Cohen's h} = 2 \\arcsin\\left(\\sqrt{\\frac{\\sum{sample_1}}{N_1}}\\right) - 2 \\arcsin\left(\\sqrt{\frac{\\sum{sample_2}}{N_2}}\\right)
+           \\text{Cohen's h} = 2 \\arcsin\\left(\\sqrt{\\frac{\\sum\\text{sample\_1}}{N\_1}}\\right) - 2 \\arcsin\\left(\\sqrt{\\frac{\\sum\\text{sample\_2}}{N\_2}}\\right)
 
         Where N_1 and N_2 are the sample sizes of sample_1 and sample_2, respectively.
 
@@ -2469,8 +2573,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit("(float32[:], float64[:], int64,)")
-    def sliding_kurtosis(
-        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
+    def sliding_kurtosis(data: np.ndarray, time_windows: np.ndarray, sample_rate: int
     ) -> np.ndarray:
         """
         Compute the kurtosis of a 1D array within sliding time windows.
@@ -2495,12 +2598,12 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    # @njit([(float32[:], float64, int64, boolean),])
-    def kmeans_1d(
-        data: np.ndarray, k: int, max_iters: int, calc_medians: bool
-    ) -> Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]:
+    def kmeans_1d(data: np.ndarray, k: int, max_iters: int, calc_medians: bool) -> Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]:
         """
         Perform k-means clustering on a 1-dimensional dataset.
+
+        .. note:
+           - If calc_medians is True, the function returns cluster medians in addition to centroids and labels.
 
         :parameter np.ndarray data: 1d array containing feature values.
         :parameter int k: Number of clusters.
@@ -2572,9 +2675,12 @@ class Statistics(FeatureExtractionMixin):
         w: Optional[np.ndarray] = None,
     ) -> float:
         """
-        Jitted calculate of the Hamming similarity between two vectors.
+        Jitted compute of the Hamming similarity between two vectors.
+
+        The Hamming similarity measures the similarity between two binary vectors by counting the number of positions at which the corresponding elements are different.
 
         .. note::
+           If w is not provided, equal weights are assumed.
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
 
         :parameter np.ndarray x: First binary vector.
@@ -2609,6 +2715,9 @@ class Statistics(FeatureExtractionMixin):
         """
         Jitted calculate of the yule coefficient between two binary vectors (e.g., to classified behaviors). 0 represent independence, 2 represents
         complete interdependence.
+
+        .. math::
+           Yule Coefficient = \\frac{{2 \cdot t_f \cdot f_t}}{{t_t \cdot f_f + t_f \cdot f_t}}
 
         .. note::
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
@@ -2656,12 +2765,15 @@ class Statistics(FeatureExtractionMixin):
         """
         Jitted calculate of the sokal sneath coefficient between two binary vectors (e.g., to classified behaviors). 0 represent independence, 1 represents complete interdependence.
 
-        :parameter np.ndarray x: First binary vector.
-        :parameter np.ndarray x: Second binary vector.
-        :parameter Optional[np.ndarray] w: Optional weights for each element. Can be classification probabilities. If not provided, equal weights are assumed.
+        .. math::
+           Sokal-Sneath = \\frac{{f_t + t_f}}{{2 \cdot (t_{{cnt}} + f_{{cnt}}) + f_t + t_f}}
 
         .. note::
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
+
+        :parameter np.ndarray x: First binary vector.
+        :parameter np.ndarray x: Second binary vector.
+        :parameter Optional[np.ndarray] w: Optional weights for each element. Can be classification probabilities. If not provided, equal weights are assumed.
 
         :example:
         >>> x = np.array([0, 1, 0, 0, 1]).astype(np.int8)
@@ -2689,11 +2801,12 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit([(float32[:, :], float32[:, :]), (float32[:, :], types.misc.Omitted(None))])
-    def bray_curtis_dissimilarity(
-        x: np.ndarray, w: Optional[np.ndarray] = None
-    ) -> np.ndarray:
+    def bray_curtis_dissimilarity(x: np.ndarray, w: Optional[np.ndarray] = None) -> np.ndarray:
         """
-        Jitted calculate of the Bray-Curtis dissimilarity matrix between samples based on feature values.
+        Jitted compute of the Bray-Curtis dissimilarity matrix between samples based on feature values.
+
+        The Bray-Curtis dissimilarity measures the dissimilarity between two samples based on their feature values.
+        It is useful for finding similar frames based on behavior.
 
         Useful for finding similar frames based on behavior.
 
@@ -2812,19 +2925,20 @@ class Statistics(FeatureExtractionMixin):
         )
 
     @staticmethod
-    @njit("(int64[:],int64[:])")
+    @njit("(int64[:], int64[:])")
     def cohens_kappa(sample_1: np.ndarray, sample_2: np.ndarray):
         """
         Jitted compute Cohen's Kappa coefficient for two binary samples.
 
-        Cohen's Kappa coefficient between classifications and ground truth taking into account agreement between classifications and ground truth occurring by chance.
-        Interpretation: >0.8	Almost Perfect, >0.6	Substantial,  >0.4	Moderate >0.2	Fair, 0-0,2	Slight, <0	Poor ( Landis & Koch (1977)).
+        Cohen's Kappa coefficient measures the agreement between two sets of binary ratings, taking into account agreement occurring by chance.
+        It ranges from -1 to 1, where 1 indicates perfect agreement, 0 indicates agreement by chance, and -1 indicates complete disagreement.
 
         :example:
         >>> sample_1 = np.random.randint(0, 2, size=(10000,))
         >>> sample_2 = np.random.randint(0, 2, size=(10000,))
         >>> Statistics.cohens_kappa(sample_1=sample_1, sample_2=sample_2))
         """
+
         sample_1 = np.ascontiguousarray(sample_1)
         sample_2 = np.ascontiguousarray(sample_2)
         data = np.hstack((sample_1.reshape(-1, 1), sample_2.reshape(-1, 1)))
@@ -2850,6 +2964,9 @@ class Statistics(FeatureExtractionMixin):
     ) -> float:
         """
         Computes d-prime from two Boolean 1d arrays, e.g., between classifications and ground truth.
+
+        D-prime (d') is a measure of signal detection performance, indicating the ability to discriminate between signal and noise.
+        It is computed as the difference between the inverse cumulative distribution function (CDF) of the hit rate and the false alarm rate.
 
         :param np.ndarray x: Boolean 1D array of response values, where 1 represents presence, and 0 representing absence.
         :param np.ndarray y: Boolean 1D array of ground truth, where 1 represents presence, and 0 representing absence.
@@ -2913,7 +3030,7 @@ class Statistics(FeatureExtractionMixin):
         E.g., can be used to compute if the accuracy of two classifiers are significantly different when transforming the same data.
 
         .. note::
-           `mlextend <https://github.com/rasbt/mlxtend/blob/master/mlxtend/evaluate/mcnemar.py>`__.
+           Adapted from `mlextend <https://github.com/rasbt/mlxtend/blob/master/mlxtend/evaluate/mcnemar.py>`__.
 
         :param np.ndarray x: 1-dimensional Boolean array with predictions of the first model.
         :param np.ndarray x: 1-dimensional Boolean array with predictions of the second model.
@@ -2980,11 +3097,13 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute Cochrans Q for 2-dimensional boolean array.
 
-        Can be used to evaluate if the performance of multiple (>=2) classifiers on the same data is the same or significantly different.
+        Cochran's Q statistic is used to test for significant differences between more than two proportions.
+        It can be used to evaluate if the performance of multiple (>=2) classifiers on the same data is the same or significantly different.
 
         .. note::
            If two classifiers, consider ``simba.mixins.statistics.Statistics.mcnemar``.
-           `Useful background  <https://psych.unl.edu/psycrs/handcomp/hccochran.PDF>`__.
+
+           Useful background: https://psych.unl.edu/psycrs/handcomp/hccochran.PDF
 
         :param np.ndarray data: Two dimensional array of boolean values where axis 1 represents classifiers or features and rows represent frames.
         :return Tuple[float, float]: Cochran's Q statistic signidicance value.
@@ -3016,11 +3135,13 @@ class Statistics(FeatureExtractionMixin):
             return q, stats.chi2.sf(q, k - 1)
 
     @staticmethod
-    def hartley_fmax(x: np.ndarray, y: np.ndarray):
+    def hartley_fmax(x: np.ndarray, y: np.ndarray) -> float:
         """
         Compute Hartley's Fmax statistic to test for equality of variances between two features or groups.
 
-        Values close to one represents closer to equal variance.
+        Hartley's Fmax statistic is used to test whether two samples have equal variances.
+        It is calculated as the ratio of the largest sample variance to the smallest sample variance.
+        Values close to one represent closer to equal variance.
 
         :param np.ndarray x: 1D array representing numeric data of the first group/feature.
         :param np.ndarray x: 1D array representing numeric data of the second group/feature.
@@ -3053,6 +3174,11 @@ class Statistics(FeatureExtractionMixin):
         """
         Perform Grubbs' test to detect outliers if the minimum or maximum value in a feature series is an outlier.
 
+
+        Grubbs' test is a statistical test used to detect outliers in a univariate data set.
+        It calculates the Grubbs' test statistic as the absolute difference between the
+        extreme value (either the minimum or maximum) and the sample mean, divided by the sample standard deviation.
+
         :param np.ndarray x: 1D array representing numeric data.
         :param Optional[bool] left_tail: If True, the test calculates the Grubbs' test statistic for the left tail (minimum value). If False (default), it calculates the statistic for the right tail (maximum value).
         :return float: The computed Grubbs' test statistic.
@@ -3074,8 +3200,21 @@ class Statistics(FeatureExtractionMixin):
             return (np.max(x) - np.mean(x)) / np.std(x)
 
     @staticmethod
-    def wilcoxon(x: np.ndarray, y: np.ndarray):
-        """Non-parametric two-way within-subjects test"""
+    def wilcoxon(x: np.ndarray, y: np.ndarray) -> Tuple[float, float]:
+        """
+        Perform the Wilcoxon signed-rank test for paired samples.
+
+        Wilcoxon signed-rank test is a non-parametric statistical hypothesis test used
+        to compare two related samples, matched samples, or repeated measurements on a single sample
+        to assess whether their population mean ranks differ.
+
+        :param np.ndarray x: 1D array representing the observations for the first sample.
+        :param np.ndarray y: 1D array representing the observations for the second sample.
+        :return: A tuple containing the test statistic (z-score) and the effect size (r).
+        - The test statistic (z-score) measures the deviation of the observed ranks sum from the expected sum.
+        - The effect size (r) measures the strength of association between the variables.
+        """
+
         data = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))
         n = data.shape[0]
         diff = np.diff(data).flatten()
@@ -3136,14 +3275,14 @@ class Statistics(FeatureExtractionMixin):
         return cov
 
     @staticmethod
-    @njit("(float32[:], float64,)")
+    @njit("(float32[:], int64,)")
     def mad_median_rule(data: np.ndarray, k: int) -> np.ndarray:
         """
         Detect outliers using the MAD-Median Rule. Returns 1d array of size data.shape[0] with 1 representing outlier and 0 representing inlier.
 
         :example:
         >>> data = np.random.randint(0, 600, (9000000,)).astype(np.float32)
-        >>> Statistics.mad_median_rule(data=data, k=1.0)
+        >>> Statistics.mad_median_rule(data=data, k=1)
         """
 
         median = np.median(data)
@@ -3153,12 +3292,15 @@ class Statistics(FeatureExtractionMixin):
         return outliers * 1
 
     @staticmethod
-    @njit("(float32[:], float64, float64[:], float64)")
+    @njit("(float32[:], int64, float64[:], float64)")
     def sliding_mad_median_rule(
         data: np.ndarray, k: int, time_windows: np.ndarray, fps: float
     ) -> np.ndarray:
         """
         Count the number of outliers in a sliding time-window using the MAD-Median Rule.
+
+        The MAD-Median Rule is a robust method for outlier detection. It calculates the median absolute deviation (MAD)
+        and uses it to identify outliers based on a threshold defined as k times the MAD.
 
         :param np.ndarray data: 1D numerical array representing feature.
         :param int k: The outlier threshold defined as k * median absolute deviation in each time window.
@@ -3193,7 +3335,9 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            Modified from `jqmviegas <https://github.com/jqmviegas/jqm_cvi/>`_
+
            Wiki `https://en.wikipedia.org/wiki/Dunn_index <https://en.wikipedia.org/wiki/Dunn_index>`_
+
            Uses Euclidean distances.
 
         :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features).
@@ -3303,6 +3447,9 @@ class Statistics(FeatureExtractionMixin):
         It is calculated as the ratio of the between-cluster dispersion to the
         within-cluster dispersion. A higher score indicates better clustering.
 
+        .. note::
+           Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_unsupervised.py#L326>`_
+
         :param x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
         :param y: 2D array representing cluster labels for each data point. Shape (n_samples,).
         :return float: Calinski-Harabasz score.
@@ -3338,9 +3485,28 @@ class Statistics(FeatureExtractionMixin):
         """
         Calculate the Adjusted Rand Index (ARI) between two clusterings.
 
+        The Adjusted Rand Index (ARI) is a measure of the similarity between two clusterings. It considers all pairs of samples and counts pairs that are assigned to the same or different clusters in both the true and predicted clusterings.
+
+        The ARI is defined as:
+
+        .. math::
+           ARI = \\frac{TP + TN}{TP + FP + FN + TN}
+
+        where:
+        - TP (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
+        - FP (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
+        - FN (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y,
+        - TN (True Negative) is the number of pairs of elements that are in different clusters in both x and y.
+
+        The ARI value ranges from -1 to 1. A value of 1 indicates perfect clustering agreement, 0 indicates random clustering, and negative values indicate disagreement between the clusterings.
+
+        .. note::
+           Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_supervised.py#L353>`_
+
+
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.
-        :return float: 1 indicates perfect clustering agreement, 0 indicates random clustering, and negative values indicate disagreement between the clusterings.
+        :return float: A value of 1 indicates perfect clustering agreement, a value of 0 indicates random clustering, and negative values indicate disagreement between the clusterings.
 
         :example:
         >>> x = np.array([0, 0, 0, 0, 0])
@@ -3370,10 +3536,23 @@ class Statistics(FeatureExtractionMixin):
         """
         Calculate the Fowlkes-Mallows Index (FMI) between two clusterings.
 
+        The Fowlkes-Mallows index (FMI) is a measure of similarity between two clusterings. It compares the similarity of the clusters obtained by two different clustering algorithms or procedures.
+
+        The index is defined as the geometric mean of the pairwise precision and recall:
+
+        .. math::
+           FMI = \\sqrt{\\frac{TP}{TP + FP} \\times \\frac{TP}{TP + FN}}
+
+        where:
+        - TP (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
+        - FP (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
+        - FN (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y.
+
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.
         :return float: Score between 0 and 1. 1 indicates perfect clustering agreement, 0 indicates random clustering.
         """
+
         check_valid_array(
             data=x,
             source=Statistics.fowlkes_mallows.__name__,
@@ -3393,8 +3572,8 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     def adjusted_mutual_info(x: np.ndarray, y: np.ndarray) -> float:
         """
-        Calculate the Adjusted Mutual Information (AMI) between two clusterings as a meassure of similarity.
-        clusterings.
+        Calculate the Adjusted Mutual Information (AMI) between two clusterings as a measure of similarity.
+
 
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.
