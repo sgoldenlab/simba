@@ -18,7 +18,7 @@ import plotly.io as pio
 import seaborn as sns
 from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from numba import njit
+from numba import njit, uint8, bool_
 from PIL import Image
 
 try:
@@ -1671,17 +1671,29 @@ class PlottingMixin(object):
         )
 
     @staticmethod
-    @njit("(uint8[:,:,:],)")
-    def rotate_img(img: np.ndarray):
+    @njit([(uint8[:, :, :], bool_)])
+    def rotate_img(img: np.ndarray, right: bool) -> np.ndarray:
         """
-        Jitted helper to flip image 90 degrees.
+        Flip a color image 90 degrees to the left or right
+
+        .. image:: _static/img/rotate_img.png
+           :width: 600
+           :align: center
+
+        :param np.ndarray img: Input image as numpy array in uint8 format.
+        :param bool right: If True, flips to the right. If False, flips to the left.
+        :returns: The rotated image as a numpy array of uint8 format.
 
         :example:
-        >>> img = cv2.imread('/Users/simon/Desktop/sliding_line_length.png')
-        >>> rotated_img = PlottingMixin().rotate_img(img)
+        >>> img = cv2.imread('/Users/simon/Desktop/test.png')
+        >>> rotated_img = PlottingMixin.rotate_img(img=img, right=False)
         """
-        rotated_image = np.transpose(img, (1, 0, 2))
-        return np.ascontiguousarray(np.fliplr(rotated_image).astype(np.uint8))
+
+        if right:
+            img = np.transpose(img[:, ::-1, :], axes=(1, 0, 2))
+        else:
+            img = np.transpose(img[::-1, :, :], axes=(1, 0, 2))
+        return np.ascontiguousarray(img).astype(np.uint8)
 
     @staticmethod
     def continuous_scatter(
@@ -1750,16 +1762,29 @@ class PlottingMixin(object):
             return plot
 
     @staticmethod
-    def categorical_scatter(
-        data: Union[np.ndarray, pd.DataFrame],
-        columns: Optional[List[str]] = ("X", "Y", "Cluster"),
-        palette: Optional[str] = "Set1",
-        show_box: Optional[bool] = False,
-        size: Optional[int] = 10,
-        title: Optional[str] = None,
-        save_path: Optional[Union[str, os.PathLike]] = None,
-    ):
-        """Create a 2D scatterplot with a categorical legend"""
+    def categorical_scatter(data: Union[np.ndarray, pd.DataFrame],
+                            columns: Optional[List[str]] = ("X", "Y", "Cluster"),
+                            palette: Optional[str] = "Set1",
+                            show_box: Optional[bool] = False,
+                            size: Optional[int] = 10,
+                            title: Optional[str] = None,
+                            save_path: Optional[Union[str, os.PathLike]] = None):
+        """
+        Create a 2D scatterplot with a categorical legend.
+
+        .. image:: _static/img/categorical_scatter.png
+           :width: 400
+           :align: center
+
+        :param Union[np.ndarray, pd.DataFrame] data: Input data, either a NumPy array or a pandas DataFrame.
+        :param Optional[List[str]] columns: A list of column names for the x-axis, y-axis, and the categorical variable respectively. Default is ["X", "Y", "Cluster"].
+        :param Optional[str] palette: The color palette to be used for the categorical variable. Default is "Set1".
+        :param Optional[bool] show_box: Whether to display the plot axis. Default is False.
+        :param Optional[int] size: Size of markers in the scatterplot. Default is 10.
+        :param Optional[str] title: Title for the plot. Default is None.
+        :param Optional[Union[str, os.PathLike]] save_path: The path where the plot will be saved. Default is None which returns the image.
+        :returns matplotlib.axes._subplots.AxesSubplot or None: The scatterplot if 'save_path' is not provided, otherwise None.
+        """
         cmaps = get_categorical_palettes()
         if palette not in cmaps:
             raise InvalidInputError(
@@ -1790,10 +1815,10 @@ class PlottingMixin(object):
 
         if not show_box:
             plt.axis("off")
-        pct_x = np.percentile(data[columns[0]].values, 75)
-        pct_y = np.percentile(data[columns[1]].values, 75)
-        plt.xlim(data[columns[0]].min() - pct_x, data[columns[0]].max() + pct_x)
-        plt.ylim(data[columns[1]].min() - pct_y, data[columns[1]].max() + pct_y)
+        # pct_x = np.percentile(data[columns[0]].values, 75)
+        # pct_y = np.percentile(data[columns[1]].values, 75)
+        # plt.xlim(data[columns[0]].min() - pct_x, data[columns[0]].max() + pct_x)
+        # plt.ylim(data[columns[1]].min() - pct_y, data[columns[1]].max() + pct_y)
 
         plot = sns.scatterplot(
             data=data,
@@ -1818,20 +1843,35 @@ class PlottingMixin(object):
             return plot
 
     @staticmethod
-    def joint_plot(
-        data: Union[np.ndarray, pd.DataFrame],
-        columns: Optional[List[str]] = ("X", "Y", "Cluster"),
-        palette: Optional[str] = "Set1",
-        kind: Optional[str] = "scatter",
-        size: Optional[int] = 10,
-        title: Optional[str] = None,
-        save_path: Optional[Union[str, os.PathLike]] = None,
-    ):
+    def joint_plot(data: Union[np.ndarray, pd.DataFrame],
+                   columns: Optional[List[str]] = ("X", "Y", "Cluster"),
+                   palette: Optional[str] = "Set1",
+                   kind: Optional[str] = "scatter",
+                   size: Optional[int] = 10,
+                   title: Optional[str] = None,
+                   save_path: Optional[Union[str, os.PathLike]] = None):
         """
+        Generate a joint plot.
+
+        Useful when visualizing embedded behavior data latent spaces with dense and overlapping scatters.
+
+        .. image:: _static/img/joint_plot.png
+           :width: 700
+           :align: center
+
+        :param Union[np.ndarray, pd.DataFrame] data: Input data, either a NumPy array or a pandas DataFrame.
+        :param Optional[List[str]] columns: Names of columns if input is dataframe, default is ["X", "Y", "Cluster"].
+        :param Optional[str] palette: Palette for the plot, default is "Set1".
+        :param Optional[str] kind: Type of plot ("scatter", "kde", "hist", or "reg"), default is "scatter".
+        :param Optional[int] size: Size of markers for scatter plot, default is 10.
+        :param Optional[str] title: Title of the plot, default is None.
+        :param Optional[Union[str, os.PathLike]] save_path: Path to save the plot image, default is None.
+        :returns sns.JointGrid or None: JointGrid object if save_path is None, else None.
+
         :example:
-        >>> x = np.hstack([np.random.normal(loc=10, scale=4, size=(100, 2)), np.random.randint(0, 1, size=(100, 1))])
-        >>> y = np.hstack([np.random.normal(loc=25, scale=4, size=(100, 2)), np.random.randint(1, 2, size=(100, 1))])
-        >>> plot = PlottingMixin.joint_plot(data=np.vstack([x, y]), columns=['X', 'Y', 'Cluster'], title='The plot')
+        >>> data, lbls = make_blobs(n_samples=100000, n_features=2, centers=10, random_state=42)
+        >>> data = np.hstack((data, lbls.reshape(-1, 1)))
+        >>> PlottingMixin.joint_plot(data=data, columns=['X', 'Y', 'Cluster'], title='The plot')
         """
 
         cmaps = get_categorical_palettes()
@@ -2057,6 +2097,10 @@ class PlottingMixin(object):
            If **not** called though multiprocessing, consider using ``simba.mixins.plotting_mixin.PlottingMixin.make_line_plot()``
 
            Uses ``kaleido`` for transform image to numpy array or save to disk.
+
+        .. image:: _static/img/make_line_plot_plotly.png
+           :width: 500
+           :align: center
 
         :param List[np.ndarray] data: List of 1D numpy arrays representing lines.
         :param List[str] colors: List of named colors of size len(data).
@@ -2317,3 +2361,11 @@ class PlottingMixin(object):
             )
         else:
             return img
+
+# from sklearn.datasets import make_blobs
+# #from sklearn.datasets import ma
+#
+# x, lbls = make_blobs(n_samples=10000, n_features=2, centers=10, random_state=42)
+# x = np.hstack((x, lbls.reshape(-1, 1)))
+#
+# PlottingMixin.categorical_scatter(data=x, columns=('X', 'Y', 'MY CLUSTERS'), save_path='/Users/simon/Desktop/make_line_plot_plotly.png', show_box=True)
