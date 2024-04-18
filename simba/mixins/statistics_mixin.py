@@ -1358,7 +1358,7 @@ class Statistics(FeatureExtractionMixin):
         .. math::
            ρ = 1 - \\frac{{6 ∑(d_i^2)}}{{n(n^2 - 1)}}
 
-            where:
+        where:
         - \( d_i \) is the difference between the ranks of corresponding elements in sample_1 and sample_2.
         - \( n \) is the number of observations.
 

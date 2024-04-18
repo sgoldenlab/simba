@@ -29,7 +29,7 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
        Requires the pose-estimation data for the left ear, right ears and nose of individual animals.
 
     .. note::
-        `Example of expected output <https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22`_.
+        Example of expected output https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22
 
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>_.
 

@@ -177,7 +177,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
     Plot classification results on videos. Results are stored in the
     `project_folder/frames/output/sklearn_results` directory of the SimBA project.
 
-    .. seelalso::
+    .. seealso::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
         For non-multiptocess class, see :meth:`simba.plotting.plot_clf_results.PlotSklearnResultsSingleCore`.
 
