@@ -526,14 +526,13 @@ class ImageMixin(object):
         pass
 
     @staticmethod
-    def img_to_bw(
-        img: np.ndarray,
-        lower_thresh: Optional[int] = 20,
-        upper_thresh: Optional[int] = 250,
-        invert: Optional[bool] = True,
-    ) -> np.ndarray:
+    def img_to_bw(img: np.ndarray, lower_thresh: Optional[int] = 20, upper_thresh: Optional[int] = 250, invert: Optional[bool] = True) -> np.ndarray:
         """
         Convert an image to black and white (binary).
+
+        .. image:: _static/img/img_to_bw.png
+           :width: 600
+           :align: center
 
         :param np.ndarray img: Input image as a NumPy array.
         :param Optional[int] lower_thresh: Lower threshold value for binary conversion. Pixels below this value become black. Default is 20.
@@ -542,16 +541,16 @@ class ImageMixin(object):
         :return np.ndarray: Binary black and white image.
         """
         check_if_valid_img(
-            data=img, source=ImageMixin().segment_img_horizontal.__name__
+            data=img, source=ImageMixin().img_to_bw.__name__
         )
         check_int(
-            name=f"{ImageMixin().segment_img_horizontal.__name__} lower_thresh",
+            name=f"{ImageMixin().img_to_bw.__name__} lower_thresh",
             value=lower_thresh,
             max_value=255,
             min_value=1,
         )
         check_int(
-            name=f"{ImageMixin().segment_img_horizontal.__name__} upper_thresh",
+            name=f"{ImageMixin().img_to_bw.__name__} upper_thresh",
             value=upper_thresh,
             max_value=255,
             min_value=1,
@@ -564,21 +563,26 @@ class ImageMixin(object):
             return ~cv2.threshold(img, lower_thresh, upper_thresh, cv2.THRESH_BINARY)[1]
 
     @staticmethod
-    def segment_img_horizontal(
-        img: np.ndarray,
-        pct: int,
-        lower: Optional[bool] = True,
-        both: Optional[bool] = False,
-    ) -> np.ndarray:
+    def segment_img_horizontal(img: np.ndarray, pct: int, lower: Optional[bool] = True, both: Optional[bool] = False) -> np.ndarray:
+
         """
         Segment a horizontal part of the input image.
 
         This function segments either the lower, upper, or both lower and upper part of the input image based on the specified percentage.
 
+        .. image:: _static/img/segment_img_horizontal.png
+           :width: 800
+           :align: center
+
         :param np.ndarray img: Input image as a NumPy array.
         :param int pct: Percentage of the image to be segmented. If `lower` is True, it represents the lower part; if False, it represents the upper part.
         :param Optional[bool] lower: Flag indicating whether to segment the lower part (True) or upper part (False) of the image. Default is True.
+        :param Optional[bool] both: If True, **removes** both the upper pct and lower pct and keeps middle part.
         :return np.array: Segmented part of the image.
+
+        :example:
+        >>> img = cv2.imread('/Users/simon/Desktop/test.png')
+        >>> img = ImageMixin.segment_img_horizontal(img=img, pct=10, both=True)
         """
 
         check_if_valid_img(
@@ -610,9 +614,14 @@ class ImageMixin(object):
 
         This function segments either the left, right or both the left and right part of  input image based on the specified percentage.
 
+        .. image:: _static/img/segment_img_vertical.png
+           :width: 800
+           :align: center
+
         :param np.ndarray img: Input image as a NumPy array.
         :param int pct: Percentage of the image to be segmented. If `lower` is True, it represents the lower part; if False, it represents the upper part.
         :param Optional[bool] lower: Flag indicating whether to segment the lower part (True) or upper part (False) of the image. Default is True.
+        :param Optional[bool] both: If True, **removes** both the left pct and right pct and keeps middle part.
         :return np.array: Segmented part of the image.
         """
 
@@ -1213,7 +1222,22 @@ class ImageMixin(object):
             source=self.__class__.__name__,
         )
         return results
+    #
+    # def segment_img_horizontal(img: np.ndarray, pct: int, lower: Optional[bool] = True,
+    #                            both: Optional[bool] = False
 
+
+img = cv2.imread('/Users/simon/Desktop/test.png')
+img = ImageMixin.segment_img_vertical(img=img, pct=20, both=True)
+cv2.imshow('sdsdf', img)
+cv2.waitKey(5000)
+
+
+
+
+# bw_img = ImageMixin.img_to_bw(img=img, invert=False)
+# cv2.imshow('sdsdf', bw_img)
+# cv2.waitKey(5000)
 
 # imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1.mp4', start_frm=0, end_frm=10)
 # imgs = np.stack(list(imgs.values()))
