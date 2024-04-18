@@ -413,6 +413,8 @@ class FSTTCCalculator(ConfigReader, PlottingMixin):
             elapsed_time=self.timer.elapsed_time_str,
             source=self.__class__.__name__,
         )
+
+
 #
 #
 # test = FSTTCCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
@@ -421,9 +423,6 @@ class FSTTCCalculator(ConfigReader, PlottingMixin):
 #                         create_graphs=True)
 # test.run()
 #
-
-
-
 
 
 # test = FSTTCCalculator(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
