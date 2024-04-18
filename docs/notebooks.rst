@@ -20,7 +20,7 @@ Visualizations
 .. toctree::
    :maxdepth: 1
 
-   nb/create_path_plot
+   nb/path_plots
    nb/classifier_validation_videos
    nb/gantt_plots
    nb/distance_plotter
