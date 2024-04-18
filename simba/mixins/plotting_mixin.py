@@ -18,7 +18,7 @@ import plotly.io as pio
 import seaborn as sns
 from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from numba import njit, uint8, bool_
+from numba import bool_, njit, uint8
 from PIL import Image
 
 try:
@@ -1762,13 +1762,15 @@ class PlottingMixin(object):
             return plot
 
     @staticmethod
-    def categorical_scatter(data: Union[np.ndarray, pd.DataFrame],
-                            columns: Optional[List[str]] = ("X", "Y", "Cluster"),
-                            palette: Optional[str] = "Set1",
-                            show_box: Optional[bool] = False,
-                            size: Optional[int] = 10,
-                            title: Optional[str] = None,
-                            save_path: Optional[Union[str, os.PathLike]] = None):
+    def categorical_scatter(
+        data: Union[np.ndarray, pd.DataFrame],
+        columns: Optional[List[str]] = ("X", "Y", "Cluster"),
+        palette: Optional[str] = "Set1",
+        show_box: Optional[bool] = False,
+        size: Optional[int] = 10,
+        title: Optional[str] = None,
+        save_path: Optional[Union[str, os.PathLike]] = None,
+    ):
         """
         Create a 2D scatterplot with a categorical legend.
 
@@ -1843,13 +1845,15 @@ class PlottingMixin(object):
             return plot
 
     @staticmethod
-    def joint_plot(data: Union[np.ndarray, pd.DataFrame],
-                   columns: Optional[List[str]] = ("X", "Y", "Cluster"),
-                   palette: Optional[str] = "Set1",
-                   kind: Optional[str] = "scatter",
-                   size: Optional[int] = 10,
-                   title: Optional[str] = None,
-                   save_path: Optional[Union[str, os.PathLike]] = None):
+    def joint_plot(
+        data: Union[np.ndarray, pd.DataFrame],
+        columns: Optional[List[str]] = ("X", "Y", "Cluster"),
+        palette: Optional[str] = "Set1",
+        kind: Optional[str] = "scatter",
+        size: Optional[int] = 10,
+        title: Optional[str] = None,
+        save_path: Optional[Union[str, os.PathLike]] = None,
+    ):
         """
         Generate a joint plot.
 
@@ -2361,6 +2365,7 @@ class PlottingMixin(object):
             )
         else:
             return img
+
 
 # from sklearn.datasets import make_blobs
 # #from sklearn.datasets import ma
