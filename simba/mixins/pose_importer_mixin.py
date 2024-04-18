@@ -122,7 +122,7 @@ class PoseImporterMixin(object):
         return results
 
     def get_x_y_loc_of_mouse_click(self, event, x, y, flags, param):
-        if event == 7:
+        if event == cv2.EVENT_LBUTTONDOWN:
             self.click_loc = (x, y)
             self.id_cords[self.cnt] = {}
             self.id_cords[self.cnt]["cord"] = self.click_loc
@@ -248,7 +248,6 @@ class PoseImporterMixin(object):
                 break
 
     def choose_animal_ui(self):
-        print("s")
         self.id_cords = {}
         for cnt, animal in enumerate(self.animal_bp_dict.keys()):
             self.animal_name, self.cnt = animal, cnt
@@ -259,7 +258,7 @@ class PoseImporterMixin(object):
             )
             cv2.putText(
                 self.side_img,
-                "Double left mouse click on:",
+                "Left mouse click on:",
                 (10, self.scalers["space"]),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 self.scalers["font"],
@@ -366,13 +365,13 @@ class PoseImporterMixin(object):
                     )
                 else:
                     cv2.destroyWindow("Define animal IDs")
-                    cv2.waitKey(0)
+                    cv2.waitKey(1)
                     self.frame_no += 50
                     self.multianimal_identification()
                     break
             elif (k == ord("c")) or (k == ord("C")):
                 cv2.destroyAllWindows()
-                cv2.waitKey(0)
+                cv2.waitKey(1)
                 self.cap.release()
                 self.find_closest_animals()
                 break
