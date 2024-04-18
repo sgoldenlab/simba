@@ -1319,13 +1319,13 @@ class Statistics(FeatureExtractionMixin):
 
         Pearson's r is calculated using the formula:
 
-        .. math::
-
-           r = \frac{\sum{(x_i - \bar{x})(y_i - \bar{y})}}{\sqrt{\sum{(x_i - \bar{x})^2}\sum{(y_i - \bar{y})^2}}}
-
-        where:
-           - \( x_i \) and \( y_i \) are individual data points in sample_1 and sample_2, respectively.
-           - \( \bar{x} \) and \( \bar{y} \) are the means of sample_1 and sample_2, respectively.
+        # .. math::
+        #
+        #    r = \frac{\sum{(x_i - \bar{x})(y_i - \bar{y})}}{\sqrt{\sum{(x_i - \bar{x})^2}\sum{(y_i - \bar{y})^2}}}
+        #
+        # where:
+        #    - \( x_i \) and \( y_i \) are individual data points in sample_1 and sample_2, respectively.
+        #    - \( \bar{x} \) and \( \bar{y} \) are the means of sample_1 and sample_2, respectively.
 
         :param np.ndarray sample_1: First numeric sample.
         :param np.ndarray sample_2: Second numeric sample.
@@ -1355,12 +1355,12 @@ class Statistics(FeatureExtractionMixin):
         Spearman's rank correlation coefficient assesses how well the relationship between two variables can be described using a monotonic function.
         It computes the strength and direction of the monotonic relationship between ranked variables.
 
-        .. math::
-           ρ = 1 - \\frac{{6 ∑(d_i^2)}}{{n(n^2 - 1)}}
-
-        where:
-        - \( d_i \) is the difference between the ranks of corresponding elements in sample_1 and sample_2.
-        - \( n \) is the number of observations.
+        # .. math::
+        #    ρ = 1 - \\frac{{6 ∑(d_i^2)}}{{n(n^2 - 1)}}
+        #
+        # where:
+        # - \( d_i \) is the difference between the ranks of corresponding elements in sample_1 and sample_2.
+        # - \( n \) is the number of observations.
 
         :param np.ndarray sample_1: First 1D array containing feature values.
         :param np.ndarray sample_2: Second 1D array containing feature values.
