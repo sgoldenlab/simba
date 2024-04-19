@@ -1042,6 +1042,17 @@ class Statistics(FeatureExtractionMixin):
         The Kruskal-Wallis test is a non-parametric method for testing whether samples originate from the same distribution.
         It ranks all the values from the combined samples, then calculates the H statistic based on the ranks.
 
+
+        .. math::
+
+           H = \\frac{{12}}{{n(n + 1)}} \\left(\\frac{{(\\sum R_{\text{sample1}})^2}}{{n_1}} + \\frac{{(\\sum R_{\text{sample2}})^2}}{{n_2}}\\right) - 3(n + 1)
+
+        where:
+            - \( n \) is the total number of observations,
+            - \( n_1 \) and \( n_2 \) are the number of observations in sample 1 and sample 2 respectively,
+            - \( R_{\text{sample1}} \) and \( R_{\text{sample2}} \) are the sums of ranks for sample 1 and sample 2 respectively.
+
+
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
         :returns float: Kruskal-Wallis H statistic.
@@ -1246,12 +1257,22 @@ class Statistics(FeatureExtractionMixin):
         for comparing the distribution of a continuous variable between two groups, especially when the assumptions of
         parametric tests like the t-test are violated.
 
+        .. note::
+           Modified from `scipy.stats.brunnermunzel <https://github.com/scipy/scipy/blob/7dcd8c59933524986923cde8e9126f5fc2e6b30b/scipy/stats/_stats_py.py#L9387>`_
+
+        .. math::
+
+           W = -\\frac{{n_x \\cdot n_y \\cdot (\\bar{R}_y - \\bar{R}_x)}}{{(n_x + n_y) \\cdot \\sqrt{{n_x \\cdot S_x + n_y \\cdot S_y}}}}
+
+        where:
+            - \( n_x \) and \( n_y \) are the sizes of sample_1 and sample_2 respectively,
+            - \( \bar{R}_x \) and \( \bar{R}_y \) are the mean ranks of sample_1 and sample_2 respectively,
+            - \( S_x \) and \( S_y \) are the dispersion statistics of sample_1 and sample_2 respectively.
+
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
         :returns float: Brunner-Munzel W.
 
-        .. note::
-           Modified from `scipy.stats.brunnermunzel <https://github.com/scipy/scipy/blob/7dcd8c59933524986923cde8e9126f5fc2e6b30b/scipy/stats/_stats_py.py#L9387>`_
 
         :example:
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
@@ -2401,12 +2422,11 @@ class Statistics(FeatureExtractionMixin):
 
            \\phi = \\frac{{(BC - AD)}}{{\sqrt{{(C\_1 + C\_2)(R\_1 + R\_2)(C\_1 + R\_1)(C\_2 + R\_2)}}}}
 
-
         where:
-        - BC: Hit rate (reponse and truth is both 1)
-        - AD: Correct rejections (response and truth are both 0)
-        - C1, C2: Counts of occurrences where the response is 1 and 0, respectively.
-        - R1, R2: Counts of occurrences where the truth is 1 and 0, respectively.
+            - BC: Hit rate (reponse and truth is both 1)
+            - AD: Correct rejections (response and truth are both 0)
+            - C1, C2: Counts of occurrences where the response is 1 and 0, respectively.
+            - R1, R2: Counts of occurrences where the truth is 1 and 0, respectively.
 
         :param np.ndarray data: A NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables. Columns represent two features or two binary classification results.
         :param float: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
@@ -2601,9 +2621,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def kmeans_1d(
-        data: np.ndarray, k: int, max_iters: int, calc_medians: bool
-    ) -> Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]:
+    def kmeans_1d(data: np.ndarray, k: int, max_iters: int, calc_medians: bool) -> Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]:
         """
         Perform k-means clustering on a 1-dimensional dataset.
 
@@ -2685,8 +2703,15 @@ class Statistics(FeatureExtractionMixin):
         The Hamming similarity measures the similarity between two binary vectors by counting the number of positions at which the corresponding elements are different.
 
         .. note::
-           If w is not provided, equal weights are assumed.
-           Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
+           If w is not provided, equal weights are assumed. Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
+
+        .. math::
+
+           \\text{Hamming distance}(x, y) = \\frac{{\\sum_{i=1}^{n} w_i}}{{n}}
+
+        where:
+           - \( n \) is the length of the vectors,
+           - \( w_i \) is the weight associated with the \( i \)th element of the vectors.
 
         :parameter np.ndarray x: First binary vector.
         :parameter np.ndarray x: Second binary vector.
@@ -2940,6 +2965,16 @@ class Statistics(FeatureExtractionMixin):
         Cohen's Kappa coefficient measures the agreement between two sets of binary ratings, taking into account agreement occurring by chance.
         It ranges from -1 to 1, where 1 indicates perfect agreement, 0 indicates agreement by chance, and -1 indicates complete disagreement.
 
+        .. math::
+
+           \kappa = 1 - \frac{\sum{w_{ij} \cdot D_{ij}}}{\sum{w_{ij} \cdot E_{ij}}}
+
+        where:
+            - \( \kappa \) is Cohen's Kappa coefficient,
+            - \( w_{ij} \) are the weights,
+            - \( D_{ij} \) are the observed frequencies,
+            - \( E_{ij} \) are the expected frequencies.
+
         :example:
         >>> sample_1 = np.random.randint(0, 2, size=(10000,))
         >>> sample_2 = np.random.randint(0, 2, size=(10000,))
@@ -3150,6 +3185,14 @@ class Statistics(FeatureExtractionMixin):
         It is calculated as the ratio of the largest sample variance to the smallest sample variance.
         Values close to one represent closer to equal variance.
 
+        .. math::
+
+           \text{Hartley's Fmax} = \frac{\max(\text{Var}(x), \text{Var}(y))}{\min(\text{Var}(x), \text{Var}(y))}
+
+        where:
+            - Var(x) is the variance of sample x,
+            - Var(y) is the variance of sample y.
+
         :param np.ndarray x: 1D array representing numeric data of the first group/feature.
         :param np.ndarray x: 1D array representing numeric data of the second group/feature.
 
@@ -3181,10 +3224,18 @@ class Statistics(FeatureExtractionMixin):
         """
         Perform Grubbs' test to detect outliers if the minimum or maximum value in a feature series is an outlier.
 
-
         Grubbs' test is a statistical test used to detect outliers in a univariate data set.
         It calculates the Grubbs' test statistic as the absolute difference between the
         extreme value (either the minimum or maximum) and the sample mean, divided by the sample standard deviation.
+
+        .. math::
+
+           \text{Grubbs' Test Statistic} = \frac{|\bar{x} - x_{\text{min/max}}|}{s}
+
+        where:
+            - \( \bar{x} \) is the sample mean,
+            - \( x_{\text{min/max}} \) is the minimum or maximum value of the sample (depending on the tail being tested),
+            - \( s \) is the sample standard deviation.
 
         :param np.ndarray x: 1D array representing numeric data.
         :param Optional[bool] left_tail: If True, the test calculates the Grubbs' test statistic for the left tail (minimum value). If False (default), it calculates the statistic for the right tail (maximum value).
@@ -3555,6 +3606,10 @@ class Statistics(FeatureExtractionMixin):
         - FP (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
         - FN (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y.
 
+        .. note::
+           Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_supervised.py#L1184>`_
+
+
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.
         :return float: Score between 0 and 1. 1 indicates perfect clustering agreement, 0 indicates random clustering.
@@ -3581,6 +3636,18 @@ class Statistics(FeatureExtractionMixin):
         """
         Calculate the Adjusted Mutual Information (AMI) between two clusterings as a measure of similarity.
 
+        Calculates the Adjusted Mutual Information (AMI) between two sets of cluster labels.
+        AMI measures the agreement between two clustering results, accounting for chance agreement.
+        The value of AMI ranges from 0 (indicating no agreement) to 1 (perfect agreement).
+
+        .. math::
+
+           \text{AMI}(x, y) = \frac{\text{MI}(x, y) - E(\text{MI}(x, y))}{\max(H(x), H(y)) - E(\text{MI}(x, y))}
+
+        where:
+            - \text{MI}(x, y) \text{ is the mutual information between } x \text{ and } y.
+            - E(\text{MI}(x, y)) \text{ is the expected mutual information.}
+            - H(x) \text{ and } H(y) \text{ are the entropies of } x \text{ and } y, \text{ respectively.}
 
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.

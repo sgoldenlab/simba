@@ -499,10 +499,21 @@ class NetworkMixin(object):
         Calculate Simpson's diversity index for a given array of values.
 
         Simpson's diversity index is a measure of diversity that takes into account the number of different categories
-        present in the input data as well as the relative abundance of each category.
+        present in the input data as well as the relative abundance of each category. Answer how homogenous a cluster or community is
+        for categorical input variable.
+
+        .. math::
+
+           D = \frac{\sum(n(n-1))}{N(N-1)}
+
+        where:
+        - \( n \) is the number of individuals of a particular category,
+        - \( N \) is the total number of individuals,
+        - \( \sum \) represents the sum over all categories.
 
         :param np.ndarray x: 1-dimensional numpy array containing the values representing categories for which Simpson's index is calculated.
         :return float: Simpson's diversity index value for the input array `x`
+
         """
 
         unique_v = np.unique(x)
@@ -520,7 +531,21 @@ class NetworkMixin(object):
         """
         Berger-Parker index for the given one-dimensional array.
         The Berger-Parker index is a measure of category dominance, calculated as the ratio of
-        the frequency of the most abundant category to the total number of observations
+        the frequency of the most abundant category to the total number of observations. Answer how dominated a cluster or community is
+        by categorical variable.
+
+        The Berger-Parker index (BP) is calculated using the formula:
+
+        .. math::
+
+           BP = \\frac{f_{\max}}{N}
+
+        where:
+        - \( f_{\max} \) is the frequency of the most abundant category,
+        - \( N \) is the total number of observations.
+
+        :param np.ndarray x: One-dimensional numpy array containing the values for which the Berger-Parker index is calculated.
+        :return float: Berger-Parker index value for the input array `x`
 
         :example:
         >>> x = np.random.randint(0, 25, (100,)).astype(np.float32)
@@ -540,7 +565,19 @@ class NetworkMixin(object):
         """
         Calculate the Shannon Diversity Index for a given array of categories. The Shannon Diversity Index is a measure of diversity in a
         categorical feature, taking into account both the number of different categories (richness)
-        and their relative abundances (evenness).
+        and their relative abundances (evenness). Answer how homogenous a cluster or community is
+        for categorical variable. A low value indicates that one or a few categories dominate.
+
+        .. math::
+
+           H = -\sum_{i=1}^{n} (p_i \cdot \log(p_i))
+
+        where:
+        - \( p_i \) is the proportion of individuals belonging to the i-th category,
+        - \( n \) is the total number of categories.
+
+        :param np.ndarray x: One-dimensional numpy array containing the categories for which the Shannon Diversity Index is calculated.
+        :return float: Shannon Diversity Index value for the input array `x`
 
         :example:
         >>> x = np.random.randint(0, 100, (100, ))
@@ -562,8 +599,23 @@ class NetworkMixin(object):
         """
         Calculate the Margalef Diversification Index for a given array of values.
 
-        The Margalef Diversification Index is a measure of category diversity. It quantifies the richness of a community
-        relative to the number of individuals.
+        The Margalef Diversification Index is a measure of category diversity. It quantifies the richness of a community/cluster
+        relative to the number of individuals. A high Margalef Diversification Index indicates a high diversity of categories relative to the number of observations.
+        A low Margalef Diversification Index suggests a lower diversity of categories relative to the number of observations.
+
+        The Margalef Diversification Index (D) is calculated using the formula:
+
+        .. math::
+
+           D = \\frac{(S - 1)}{\\log(N)}
+
+        where:
+        - \( S \) is the number of unique categories,
+        - \( N \) is the total number of individuals.
+
+        :param np.array x: One-dimensional numpy array containing ordinal values for which the Margalef Diversification Index is calculated.
+        :return float: Margalef Diversification Index value for the input array `x`
+
 
         :example:
         >>> x = np.random.randint(0, 100, (100,))
@@ -584,8 +636,22 @@ class NetworkMixin(object):
         """
         Calculate the Menhinick's Index for a given array of values.
 
-        Menhinick's Index is a measure of category richness.
-        It quantifies the number of categories relative to the square root of the total number of observations.
+        Menhinick's Index is a measure of category richness. It quantifies the number of categories relative to the square root of the total number of observations.
+        A high Menhinick's Index suggests a high diversity of categories relative to the number of observations.
+        A low Menhinick's Index indicates a lower diversity of categories relative to the number of observations.
+
+        Menhinick's Index (D) is calculated using the formula:
+
+        .. math::
+
+           D = \\frac{S}{\\sqrt{N}}
+
+        where:
+        - \( S \) is the number of unique categories,
+        - \( N \) is the total number of observations.
+
+         :param np.array x: One-dimensional numpy array containing the integer values representing ordinal values for which Menhinick's Index is calculated.
+         :return float: Menhinick's Index value for the input array `x`
 
         :example:
         >>> x = np.random.randint(0, 5, (1000,))
@@ -599,6 +665,93 @@ class NetworkMixin(object):
             min_axis_0=2,
         )
         return np.unique(x).shape[0] / np.sqrt(x.shape[0])
+
+    @staticmethod
+    def brillouins_index(x: np.array) -> float:
+        """
+        Calculate Brillouin's Diversity Index for a given array of values.
+
+        Brillouin's Diversity Index is a measure of cluster/community diversity that accounts for both richness
+        and evenness of distribution.
+
+        Brillouin's Diversity Index (H) is calculated using the formula:
+
+        .. math::
+
+           H = \\frac{1}{\\log(S)} \\sum_{i=1}^{S} \\frac{N_i(N_i - 1)}{n(n-1)}
+
+        where:
+        - \( H \) is Brillouin's Diversity Index,
+        - \( S \) is the total number of unique species,
+        - \( N_i \) is the count of individuals in the i-th species,
+        - \( n \) is the total number of individuals.
+
+        :param np.array x: One-dimensional numpy array containing the values for which Brillouin's Index is calculated.
+        :return float: Brillouin's Diversity Index value for the input array `x`
+
+        :example:
+        >>> x = np.random.randint(0, 10, (100,))
+        >>> NetworkMixin.brillouins_index(x)
+        """
+
+        check_valid_array(
+            source=f"{NetworkMixin.brillouins_index.__name__} x",
+            accepted_ndims=(1,),
+            data=x,
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8),
+            min_axis_0=2,
+        )
+        n_total = x.shape[0]
+        n_unique = np.unique(x, return_counts=True)[1]
+        if n_unique.shape[0] == 1:
+            return 1.0
+        else:
+            S = len(n_unique)
+            h = 0
+            for count in n_unique:
+                h += count * (count - 1)
+            h /= (n_total * (n_total - 1))
+            h /= np.log(S)
+            return h
+
+    @staticmethod
+    def sorensen_dice_coefficient(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Calculate Sørensen's Similarity Index between two communities/clusters.
+
+        The Sørensen similarity index, also known as the overlap index, quantifies the overlap between two populations by comparing the number of shared categories to the total number of categories in both populations. It ranges from zero, indicating no overlap, to one, representing perfect overlap
+
+        Sørensen's Similarity Index (S) is calculated using the formula:
+
+        .. math::
+
+            S = \\frac{2 \times |X \cap Y|}{|X| + |Y|}
+
+        where:
+        - \( S \) is Sørensen's Similarity Index,
+        - \( X \) and \( Y \) are the sets representing the categories in the first and second communities, respectively,
+        - \( |X \cap Y| \) is the number of shared categories between the two communities,
+        - \( |X| \) and \( |Y| \) are the total number of categories in the first and second communities, respectively.
+
+
+        :param x: 1D numpy array with ordinal values for the first cluster/community.
+        :param y: 1D numpy array with ordinal values for the second cluster/community.
+        :return: Sørensen's Similarity Index between x and y.
+
+        :example:
+        >>> x = np.random.randint(0, 10, (100,))
+        >>> y = np.random.randint(0, 10, (100,))
+        >>> NetworkMixin.sorensen_dice_coefficient(x=x, y=y)
+        """
+
+        check_valid_array(source=f"{NetworkMixin.sorensen_dice_coefficient.__name__} x", accepted_ndims=(1,), data=x,
+                          accepted_dtypes=(np.int32, np.int64, np.int8, int), min_axis_0=2)
+        check_valid_array(source=f"{NetworkMixin.sorensen_dice_coefficient.__name__} y", accepted_ndims=(1,), data=y,
+                          accepted_dtypes=(np.int32, np.int64, np.int8, int), min_axis_0=2)
+        x, y = set(x), set(y)
+        return 2 * len(x.intersection(y)) / (len(x) + len(y))
+
+
 
 
 # graph = NetworkMixin.create_graph(

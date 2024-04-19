@@ -535,6 +535,10 @@ class ImageMixin(object):
            :width: 600
            :align: center
 
+        .. note::
+           If converting multiple images from colour to black and white, consider ``simba.mixins.image_mixin.ImageMixin.img_stack_to_bw()``
+
+
         :param np.ndarray img: Input image as a NumPy array.
         :param Optional[int] lower_thresh: Lower threshold value for binary conversion. Pixels below this value become black. Default is 20.
         :param Optional[int] upper_thresh: Upper threshold value for binary conversion. Pixels above this value become white. Default is 250.
@@ -562,6 +566,49 @@ class ImageMixin(object):
             return cv2.threshold(img, lower_thresh, upper_thresh, cv2.THRESH_BINARY)[1]
         else:
             return ~cv2.threshold(img, lower_thresh, upper_thresh, cv2.THRESH_BINARY)[1]
+
+    @staticmethod
+    @jit(nopython=True)
+    def img_stack_to_bw(imgs: np.ndarray,
+                        lower_thresh: int,
+                        upper_thresh: int,
+                        invert: bool):
+        """
+        Convert a stack of color images into black and white format.
+
+        .. note::
+           If converting a single image, consider ``simba.mixins.image_mixin.ImageMixin.img_to_bw()``
+
+        :param np.ndarray img: 4-dimensional array of color images.
+        :param Optional[int] lower_thresh: Lower threshold value for binary conversion. Pixels below this value become black. Default is 20.
+        :param Optional[int] upper_thresh: Upper threshold value for binary conversion. Pixels above this value become white. Default is 250.
+        :param Optional[bool] invert: Flag indicating whether to invert the binary image (black becomes white and vice versa). Default is True.
+        :return np.ndarray: 4-dimensional array with black and white image.
+
+        :example:
+        >>> imgs = ImageMixin.read_img_batch_from_video(video_path='/Users/simon/Downloads/3A_Mouse_5-choice_MouseTouchBasic_a1.mp4', start_frm=0, end_frm=100)
+        >>> imgs = np.stack(imgs.values(), axis=0)
+        >>> bw_imgs = ImageMixin.img_stack_to_bw(imgs=imgs, upper_thresh=255, lower_thresh=20, invert=False)
+        """
+
+        results = np.full((imgs.shape[:3]), np.nan)
+        for cnt in range(imgs.shape[0]):
+            arr = imgs[cnt]
+            m, n, _ = arr.shape
+            img_mean = np.zeros((m, n))
+            for i in range(m):
+                for j in range(n):
+                    total = 0.0
+                    for k in range(arr.shape[2]):
+                        total += arr[i, j, k]
+                    img_mean[i, j] = total / arr.shape[2]
+            img = np.where(img_mean < lower_thresh, 0, img_mean)
+            img = np.where(img > upper_thresh, 1, img)
+            if invert:
+                img = 1 - img
+            results[cnt] = img
+        return results
+
 
     @staticmethod
     def segment_img_horizontal(img: np.ndarray, pct: int, lower: Optional[bool] = True, both: Optional[bool] = False) -> np.ndarray:
@@ -602,6 +649,32 @@ class ImageMixin(object):
             return img[img.shape[0] - sliced_height :, :]
         else:
             return img[:sliced_height, :]
+
+    @staticmethod
+    @jit(nopython=True, parallel=True)
+    def segment_img_stack_horizontal(imgs: np.ndarray, pct: int, lower: bool, both: bool) -> np.ndarray:
+        """
+        Segment a horizontal part of all images in stack.
+
+        :example:
+        >>> imgs = ImageMixin.read_img_batch_from_video(video_path='/Users/simon/Downloads/3A_Mouse_5-choice_MouseTouchBasic_a1.mp4', start_frm=0, end_frm=400)
+        >>> imgs = np.stack(imgs.values(), axis=0)
+        >>> sliced_imgs = ImageMixin.segment_img_stack_horizontal(imgs=imgs, pct=50, lower=True, both=False)
+        """
+        results = []
+        for cnt in range(imgs.shape[0]):
+            img = imgs[cnt]
+            sliced_height = int(img.shape[0] * pct / 100)
+            if both:
+                sliced_img = img[sliced_height: img.shape[0] - sliced_height, :]
+            elif lower:
+                sliced_img = img[img.shape[0] - sliced_height:, :]
+            else:
+                sliced_img = img[:sliced_height, :]
+            results.append(sliced_img)
+        stacked_results = np.full((len(results), results[0].shape[0], results[0].shape[1], 3), np.nan)
+        for i in prange(len(results)): stacked_results[i] = results[i]
+        return results
 
     @staticmethod
     def segment_img_vertical(
@@ -746,7 +819,9 @@ class ImageMixin(object):
         Pairwise comparison of images in two stacks of equal length using mean squared errors.
 
         .. note::
-           Images has to be in uint8 format.
+           Useful for noting subtle changes, each imgs_2 equals imgs_1 with images shifted by 1. Images has to be in uint8 format.
+           Also see ``img_sliding_mse``.
+
 
         :param np.ndarray imgs_1: First three (non-color) or four (color) dimensional stack of images in array format.
         :param np.ndarray imgs_1: Second three (non-color) or four (color) dimensional stack of images in array format.
@@ -917,7 +992,14 @@ class ImageMixin(object):
     @jit(nopython=True)
     def img_matrix_mse(imgs: np.ndarray) -> np.ndarray:
         """
-        Jitted compute mean squared error matrix table for a stack of images.
+        Compute the mean squared error (MSE) matrix table for a stack of images.
+
+        This function calculates the MSE between each pair of images in the input array
+        and returns a symmetric matrix where each element (i, j) represents the MSE
+        between the i-th and j-th images. Useful for image similarities and anomalities.
+
+        :param np.ndarray imgs: A stack of images represented as a numpy array.
+        :return np.ndarray: The MSE matrix table.
 
         :example:
         >>> imgs = ImageMixin().read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=50)
@@ -927,9 +1009,7 @@ class ImageMixin(object):
         results = np.full((imgs.shape[0], imgs.shape[0]), 0.0)
         for i in prange(imgs.shape[0]):
             for j in range(i + 1, imgs.shape[0]):
-                val = np.sum((imgs[i] - imgs[j]) ** 2) / float(
-                    imgs[i].shape[0] * imgs[j].shape[1]
-                )
+                val = np.sum((imgs[i] - imgs[j]) ** 2) / float(imgs[i].shape[0] * imgs[j].shape[1])
                 results[i, j] = val
                 results[j, i] = val
         return results.astype(np.int32)
@@ -940,13 +1020,17 @@ class ImageMixin(object):
         """
         Jitted conversion of a 4D stack of color images (RGB format) to grayscale.
 
+        .. image:: _static/img/img_stack_to_greyscale.png
+           :width: 600
+           :align: center
+
         :parameter np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
         :returns np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
 
         :example:
         >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
         >>> imgs = np.stack(list(imgs.values()))
-        >>> imgs_gray = img_stack_to_greyscale(imgs=imgs)
+        >>> imgs_gray = ImageMixin.img_stack_to_greyscale(imgs=imgs)
         """
         results = np.full((imgs.shape[0], imgs.shape[1], imgs.shape[2]), np.nan).astype(
             np.uint8
