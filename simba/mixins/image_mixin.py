@@ -526,7 +526,8 @@ class ImageMixin(object):
         pass
 
     @staticmethod
-    def img_to_bw(img: np.ndarray, lower_thresh: Optional[int] = 20, upper_thresh: Optional[int] = 250, invert: Optional[bool] = True) -> np.ndarray:
+    def img_to_bw(img: np.ndarray,
+                  lower_thresh: Optional[int] = 20, upper_thresh: Optional[int] = 250, invert: Optional[bool] = True) -> np.ndarray:
         """
         Convert an image to black and white (binary).
 
