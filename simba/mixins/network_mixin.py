@@ -710,7 +710,7 @@ class NetworkMixin(object):
             h = 0
             for count in n_unique:
                 h += count * (count - 1)
-            h /= (n_total * (n_total - 1))
+            h /= n_total * (n_total - 1)
             h /= np.log(S)
             return h
 
@@ -744,14 +744,22 @@ class NetworkMixin(object):
         >>> NetworkMixin.sorensen_dice_coefficient(x=x, y=y)
         """
 
-        check_valid_array(source=f"{NetworkMixin.sorensen_dice_coefficient.__name__} x", accepted_ndims=(1,), data=x,
-                          accepted_dtypes=(np.int32, np.int64, np.int8, int), min_axis_0=2)
-        check_valid_array(source=f"{NetworkMixin.sorensen_dice_coefficient.__name__} y", accepted_ndims=(1,), data=y,
-                          accepted_dtypes=(np.int32, np.int64, np.int8, int), min_axis_0=2)
+        check_valid_array(
+            source=f"{NetworkMixin.sorensen_dice_coefficient.__name__} x",
+            accepted_ndims=(1,),
+            data=x,
+            accepted_dtypes=(np.int32, np.int64, np.int8, int),
+            min_axis_0=2,
+        )
+        check_valid_array(
+            source=f"{NetworkMixin.sorensen_dice_coefficient.__name__} y",
+            accepted_ndims=(1,),
+            data=y,
+            accepted_dtypes=(np.int32, np.int64, np.int8, int),
+            min_axis_0=2,
+        )
         x, y = set(x), set(y)
         return 2 * len(x.intersection(y)) / (len(x) + len(y))
-
-
 
 
 # graph = NetworkMixin.create_graph(
