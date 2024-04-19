@@ -1227,10 +1227,10 @@ class ImageMixin(object):
     #                            both: Optional[bool] = False
 
 
-img = cv2.imread('/Users/simon/Desktop/test.png')
-img = ImageMixin.segment_img_vertical(img=img, pct=20, both=True)
-cv2.imshow('sdsdf', img)
-cv2.waitKey(5000)
+# img = cv2.imread('/Users/simon/Desktop/test.png')
+# img = ImageMixin.segment_img_vertical(img=img, pct=20, both=True)
+# cv2.imshow('sdsdf', img)
+# cv2.waitKey(5000)
 
 
 
