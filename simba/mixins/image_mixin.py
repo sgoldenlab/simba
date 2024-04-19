@@ -526,8 +526,12 @@ class ImageMixin(object):
         pass
 
     @staticmethod
-    def img_to_bw(img: np.ndarray,
-                  lower_thresh: Optional[int] = 20, upper_thresh: Optional[int] = 250, invert: Optional[bool] = True) -> np.ndarray:
+    def img_to_bw(
+        img: np.ndarray,
+        lower_thresh: Optional[int] = 20,
+        upper_thresh: Optional[int] = 250,
+        invert: Optional[bool] = True,
+    ) -> np.ndarray:
         """
         Convert an image to black and white (binary).
 
@@ -541,9 +545,7 @@ class ImageMixin(object):
         :param Optional[bool] invert: Flag indicating whether to invert the binary image (black becomes white and vice versa). Default is True.
         :return np.ndarray: Binary black and white image.
         """
-        check_if_valid_img(
-            data=img, source=ImageMixin().img_to_bw.__name__
-        )
+        check_if_valid_img(data=img, source=ImageMixin().img_to_bw.__name__)
         check_int(
             name=f"{ImageMixin().img_to_bw.__name__} lower_thresh",
             value=lower_thresh,
@@ -564,8 +566,12 @@ class ImageMixin(object):
             return ~cv2.threshold(img, lower_thresh, upper_thresh, cv2.THRESH_BINARY)[1]
 
     @staticmethod
-    def segment_img_horizontal(img: np.ndarray, pct: int, lower: Optional[bool] = True, both: Optional[bool] = False) -> np.ndarray:
-
+    def segment_img_horizontal(
+        img: np.ndarray,
+        pct: int,
+        lower: Optional[bool] = True,
+        both: Optional[bool] = False,
+    ) -> np.ndarray:
         """
         Segment a horizontal part of the input image.
 
@@ -1223,6 +1229,7 @@ class ImageMixin(object):
             source=self.__class__.__name__,
         )
         return results
+
     #
     # def segment_img_horizontal(img: np.ndarray, pct: int, lower: Optional[bool] = True,
     #                            both: Optional[bool] = False
@@ -1232,8 +1239,6 @@ class ImageMixin(object):
 # img = ImageMixin.segment_img_vertical(img=img, pct=20, both=True)
 # cv2.imshow('sdsdf', img)
 # cv2.waitKey(5000)
-
-
 
 
 # bw_img = ImageMixin.img_to_bw(img=img, invert=False)
