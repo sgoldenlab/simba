@@ -613,7 +613,7 @@ class NetworkMixin(object):
         - \( S \) is the number of unique categories,
         - \( N \) is the total number of individuals.
 
-        :param np.array x: One-dimensional numpy array containing ordinal values for which the Margalef Diversification Index is calculated.
+        :param np.array x: One-dimensional numpy array containing nominal values for which the Margalef Diversification Index is calculated.
         :return float: Margalef Diversification Index value for the input array `x`
 
 
@@ -650,7 +650,7 @@ class NetworkMixin(object):
         - \( S \) is the number of unique categories,
         - \( N \) is the total number of observations.
 
-         :param np.array x: One-dimensional numpy array containing the integer values representing ordinal values for which Menhinick's Index is calculated.
+         :param np.array x: One-dimensional numpy array containing the integer values representing nominal values for which Menhinick's Index is calculated.
          :return float: Menhinick's Index value for the input array `x`
 
         :example:
@@ -734,8 +734,8 @@ class NetworkMixin(object):
         - \( |X| \) and \( |Y| \) are the total number of categories in the first and second communities, respectively.
 
 
-        :param x: 1D numpy array with ordinal values for the first cluster/community.
-        :param y: 1D numpy array with ordinal values for the second cluster/community.
+        :param x: 1D numpy array with nominal values for the first cluster/community.
+        :param y: 1D numpy array with nominal values for the second cluster/community.
         :return: Sørensen's Similarity Index between x and y.
 
         :example:

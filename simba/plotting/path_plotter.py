@@ -45,12 +45,14 @@ STYLE_KEYS = [
 
 class PathPlotterSingleCore(ConfigReader, PlottingMixin):
     """
-    Create "path plots" videos and/or images detailing the movement paths of
-    individual animals in SimBA.
+    Create "path plots" videos and/or images detailing the movement paths of individual animals in SimBA.
 
     .. note::
         For improved run-time, see :meth:`simba.path_plotter_mp.PathPlotterMulticore` for multiprocess class.
+
        `Visualization tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
+
+       `Notebook example <https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/path_plots.html>`__.
 
     .. image:: _static/img/path_plot.png
        :width: 300
@@ -391,11 +393,7 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
                 )
 
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"Path visualizations for {len(self.files_found)} video(s) saved in {self.path_plot_dir} directory",
-            elapsed_time=self.timer.elapsed_time_str,
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg=f"Path visualizations for {len(self.files_found)} video(s) saved in {self.path_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
 #

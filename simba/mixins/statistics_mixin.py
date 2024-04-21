@@ -155,9 +155,9 @@ class Statistics(FeatureExtractionMixin):
            t = \frac{\bar{x}_1 - \bar{x}_2}{s_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}
 
         where:
-        - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
-        - \\(s_p\\) is the pooled standard deviation,
-        - \\(n_1\\) and \\(n_2\\) are the sample sizes of sample_1 and sample_2 respectively.
+            - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
+            - \\(s_p\\) is the pooled standard deviation,
+            - \\(n_1\\) and \\(n_2\\) are the sample sizes of sample_1 and sample_2 respectively.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
@@ -209,8 +209,8 @@ class Statistics(FeatureExtractionMixin):
            d = \\frac{{\\bar{x}_1 - \\bar{x}_2}}{{\\sqrt{{\\frac{{s_1^2 + s_2^2}}{2}}}}}
 
         where:
-        - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
-        - \\(s_1\\) and \\(s_2\\) are the standard deviations of sample_1 and sample_2 respectively.
+            - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
+            - \\(s_1\\) and \\(s_2\\) are the standard deviations of sample_1 and sample_2 respectively.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
@@ -467,6 +467,9 @@ class Statistics(FeatureExtractionMixin):
 
            Its range is from 0 to positive infinity. When the KL divergence is zero, it indicates that the two distributions are identical. As the KL divergence increases, it signifies an increasing difference between the distributions.
 
+           .. math::
+              \text{KL}(P || Q) = \sum{P(x) \log{\left(\frac{P(x)}{Q(x)}\right)}}
+
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
         :parameter Optional[int] fill_value: Optional pseudo-value to use to fill empty buckets in ``sample_2`` histogram
@@ -599,6 +602,9 @@ class Statistics(FeatureExtractionMixin):
            JSD = 0: Indicates that the two distributions are identical.
            0 < JSD < 1: Indicates a degree of dissimilarity between the distributions, with values closer to 1 indicating greater dissimilarity.
            JSD = 1: Indicates that the two distributions are maximally dissimilar.
+
+        .. math::
+           JSD = \frac{{KL(P_1 || M) + KL(P_2 || M)}}{2}
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
@@ -929,6 +935,15 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            Empty bins (0 observations in bin) in is replaced with ``fill_value``. The PSI value ranges from 0 to positive infinity.
+
+        The Population Stability Index (PSI) is calculated as:
+
+        .. math::
+
+           PSI = \\sum \\left(\\frac{{p_2 - p_1}}{{ln(p_2 / p_1)}}\\right)
+
+        where:
+            - \( p_1 \) and \( p_2 \) are the proportions of observations in the bins for sample 1 and sample 2 respectively.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
@@ -1625,6 +1640,29 @@ class Statistics(FeatureExtractionMixin):
 
     def chow_test(self):
         pass
+
+    @staticmethod
+    @njit('(int64[:, :]), bool_')
+    def concordance_ratio(x: np.ndarray, invert: bool) -> float:
+        """
+        Calculate the concordance ratio of a 2D numpy array.
+
+        :param np.ndarray x: A 2D numpy array with ordinals represented as integers.
+        :param bool invert: If True, the concordance ratio is inverted, and disconcordance ratio is returned
+        :return float: The concordance ratio, representing the count of rows with only one unique value divided by the total number of rows in the array.
+
+        :example:
+        >>> x = np.random.randint(0, 2, (5000, 4))
+        >>> results = Statistics.concordance_ratio(x=x, invert=False)
+        """
+        conc_count = 0
+        for i in prange(x.shape[0]):
+            unique_cnt = np.unique((x[i])).shape[0]
+            if unique_cnt == 1:
+                conc_count += 1
+        if invert:
+            conc_count = x.shape[0] - conc_count
+        return conc_count / x.shape[0]
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
@@ -2967,7 +3005,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           \kappa = 1 - \frac{\sum{w_{ij} \cdot D_{ij}}}{\sum{w_{ij} \cdot E_{ij}}}
+           \\kappa = 1 - \\frac{\sum{w_{ij} \\cdot D_{ij}}}{\\sum{w_{ij} \\cdot E_{ij}}}
 
         where:
             - \( \kappa \) is Cohen's Kappa coefficient,
@@ -3551,10 +3589,10 @@ class Statistics(FeatureExtractionMixin):
            ARI = \\frac{TP + TN}{TP + FP + FN + TN}
 
         where:
-        - TP (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
-        - FP (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
-        - FN (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y,
-        - TN (True Negative) is the number of pairs of elements that are in different clusters in both x and y.
+            - TP (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
+            - FP (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
+            - FN (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y,
+            - TN (True Negative) is the number of pairs of elements that are in different clusters in both x and y.
 
         The ARI value ranges from -1 to 1. A value of 1 indicates perfect clustering agreement, 0 indicates random clustering, and negative values indicate disagreement between the clusterings.
 

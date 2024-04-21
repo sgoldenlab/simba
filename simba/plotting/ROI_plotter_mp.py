@@ -34,17 +34,15 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
 
     .. note::
        `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
-        .. image:: _static/img/roi_visualize.png
-           :width: 400
-           :align: center
+
+    .. image:: _static/img/roi_visualize.png
+        :width: 400
+        :align: center
 
     :param str config_path: Path to SimBA project config file in Configparser format
     :param str video_path: Name of video to create ROI visualizations for
     :param dict style_attr: User-defined visualization settings.
     :param int core_cnt: Number of cores to use.
-
-
-
 
     Examples
     ----------
@@ -52,14 +50,13 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
     >>> roi_visualizer.run()
     """
 
-    def __init__(
-        self,
-        ini_path: Union[str, os.PathLike],
-        video_path: Union[str, os.PathLike],
-        core_cnt: int,
-        style_attr: dict,
-        body_parts: Optional[dict] = None,
-        threshold: Optional[float] = None,
+    def __init__(self,
+                 ini_path: Union[str, os.PathLike],
+                 video_path: Union[str, os.PathLike],
+                 style_attr: dict,
+                 body_parts: Optional[dict] = None,
+                 threshold: Optional[float] = None,
+                 core_cnt: Optional[int] = -1,
     ):
 
         ConfigReader.__init__(self, config_path=ini_path)
