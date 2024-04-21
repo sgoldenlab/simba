@@ -393,7 +393,11 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
                 )
 
         self.timer.stop_timer()
-        stdout_success(msg=f"Path visualizations for {len(self.files_found)} video(s) saved in {self.path_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(
+            msg=f"Path visualizations for {len(self.files_found)} video(s) saved in {self.path_plot_dir} directory",
+            elapsed_time=self.timer.elapsed_time_str,
+            source=self.__class__.__name__,
+        )
 
 
 #
