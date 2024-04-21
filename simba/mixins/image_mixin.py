@@ -526,8 +526,12 @@ class ImageMixin(object):
         pass
 
     @staticmethod
-    def img_to_bw(img: np.ndarray,
-                  lower_thresh: Optional[int] = 20, upper_thresh: Optional[int] = 250, invert: Optional[bool] = True) -> np.ndarray:
+    def img_to_bw(
+        img: np.ndarray,
+        lower_thresh: Optional[int] = 20,
+        upper_thresh: Optional[int] = 250,
+        invert: Optional[bool] = True,
+    ) -> np.ndarray:
         """
         Convert an image to black and white (binary).
 
@@ -545,9 +549,7 @@ class ImageMixin(object):
         :param Optional[bool] invert: Flag indicating whether to invert the binary image (black becomes white and vice versa). Default is True.
         :return np.ndarray: Binary black and white image.
         """
-        check_if_valid_img(
-            data=img, source=ImageMixin().img_to_bw.__name__
-        )
+        check_if_valid_img(data=img, source=ImageMixin().img_to_bw.__name__)
         check_int(
             name=f"{ImageMixin().img_to_bw.__name__} lower_thresh",
             value=lower_thresh,
@@ -569,10 +571,9 @@ class ImageMixin(object):
 
     @staticmethod
     @jit(nopython=True)
-    def img_stack_to_bw(imgs: np.ndarray,
-                        lower_thresh: int,
-                        upper_thresh: int,
-                        invert: bool):
+    def img_stack_to_bw(
+        imgs: np.ndarray, lower_thresh: int, upper_thresh: int, invert: bool
+    ):
         """
         Convert a stack of color images into black and white format.
 
@@ -609,10 +610,13 @@ class ImageMixin(object):
             results[cnt] = img
         return results
 
-
     @staticmethod
-    def segment_img_horizontal(img: np.ndarray, pct: int, lower: Optional[bool] = True, both: Optional[bool] = False) -> np.ndarray:
-
+    def segment_img_horizontal(
+        img: np.ndarray,
+        pct: int,
+        lower: Optional[bool] = True,
+        both: Optional[bool] = False,
+    ) -> np.ndarray:
         """
         Segment a horizontal part of the input image.
 
@@ -652,7 +656,9 @@ class ImageMixin(object):
 
     @staticmethod
     @jit(nopython=True, parallel=True)
-    def segment_img_stack_horizontal(imgs: np.ndarray, pct: int, lower: bool, both: bool) -> np.ndarray:
+    def segment_img_stack_horizontal(
+        imgs: np.ndarray, pct: int, lower: bool, both: bool
+    ) -> np.ndarray:
         """
         Segment a horizontal part of all images in stack.
 
@@ -666,14 +672,17 @@ class ImageMixin(object):
             img = imgs[cnt]
             sliced_height = int(img.shape[0] * pct / 100)
             if both:
-                sliced_img = img[sliced_height: img.shape[0] - sliced_height, :]
+                sliced_img = img[sliced_height : img.shape[0] - sliced_height, :]
             elif lower:
-                sliced_img = img[img.shape[0] - sliced_height:, :]
+                sliced_img = img[img.shape[0] - sliced_height :, :]
             else:
                 sliced_img = img[:sliced_height, :]
             results.append(sliced_img)
-        stacked_results = np.full((len(results), results[0].shape[0], results[0].shape[1], 3), np.nan)
-        for i in prange(len(results)): stacked_results[i] = results[i]
+        stacked_results = np.full(
+            (len(results), results[0].shape[0], results[0].shape[1], 3), np.nan
+        )
+        for i in prange(len(results)):
+            stacked_results[i] = results[i]
         return results
 
     @staticmethod
@@ -1009,7 +1018,9 @@ class ImageMixin(object):
         results = np.full((imgs.shape[0], imgs.shape[0]), 0.0)
         for i in prange(imgs.shape[0]):
             for j in range(i + 1, imgs.shape[0]):
-                val = np.sum((imgs[i] - imgs[j]) ** 2) / float(imgs[i].shape[0] * imgs[j].shape[1])
+                val = np.sum((imgs[i] - imgs[j]) ** 2) / float(
+                    imgs[i].shape[0] * imgs[j].shape[1]
+                )
                 results[i, j] = val
                 results[j, i] = val
         return results.astype(np.int32)
@@ -1307,6 +1318,7 @@ class ImageMixin(object):
             source=self.__class__.__name__,
         )
         return results
+
     #
     # def segment_img_horizontal(img: np.ndarray, pct: int, lower: Optional[bool] = True,
     #                            both: Optional[bool] = False
@@ -1316,8 +1328,6 @@ class ImageMixin(object):
 # img = ImageMixin.segment_img_vertical(img=img, pct=20, both=True)
 # cv2.imshow('sdsdf', img)
 # cv2.waitKey(5000)
-
-
 
 
 # bw_img = ImageMixin.img_to_bw(img=img, invert=False)

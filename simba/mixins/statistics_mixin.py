@@ -2659,7 +2659,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def kmeans_1d(data: np.ndarray, k: int, max_iters: int, calc_medians: bool) -> Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]:
+    def kmeans_1d(
+        data: np.ndarray, k: int, max_iters: int, calc_medians: bool
+    ) -> Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]:
         """
         Perform k-means clustering on a 1-dimensional dataset.
 
