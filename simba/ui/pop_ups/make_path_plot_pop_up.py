@@ -20,18 +20,18 @@ class MakePathPlotPopUp(PopUpMixin):
             settings_frm, "DATA PATH (e.g., H5 or CSV file): ", lblwidth="30"
         )
         color_lst = list(get_color_dict().keys())
-        self.background_color = DropDownMenu(settings_frm, "BACKGROUND COLOR: ", color_lst, "18"
+        self.background_color = DropDownMenu(settings_frm, "BACKGROUND COLOR: ", color_lst, "30"
         )
         self.background_color.setChoices(choice="White")
-        self.line_color = DropDownMenu(settings_frm, "LINE COLOR: ", color_lst, "18")
+        self.line_color = DropDownMenu(settings_frm, "LINE COLOR: ", color_lst, "30")
         self.line_color.setChoices(choice="Red")
         self.line_thickness = DropDownMenu(
-            settings_frm, "LINE THICKNESS: ", list(range(1, 11)), "18"
+            settings_frm, "LINE THICKNESS: ", list(range(1, 11)), "30"
         )
         self.line_thickness.setChoices(choice=1)
-        self.circle_size = DropDownMenu(
-            settings_frm, "CIRCLE SIZE: ", list(range(1, 11)), "18"
-        )
+        self.circle_size = DropDownMenu(settings_frm, "CIRCLE SIZE: ", list(range(1, 11)), "30")
+        self.last_frm_only_dropdown = DropDownMenu(settings_frm, "LAST FRAME ONLY: ", ['TRUE', 'FALSE'], "30")
+        self.last_frm_only_dropdown.setChoices('FALSE')
         self.circle_size.setChoices(choice=5)
         settings_frm.grid(row=0, sticky=W)
         self.video_path.grid(row=0, sticky=W)
@@ -41,7 +41,8 @@ class MakePathPlotPopUp(PopUpMixin):
         self.line_color.grid(row=4, sticky=W)
         self.line_thickness.grid(row=5, sticky=W)
         self.circle_size.grid(row=6, sticky=W)
-        Label(settings_frm, fg='green', text=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab after loading your SimBA project").grid(row=7, sticky=W)
+        self.last_frm_only_dropdown.grid(row=7, sticky=W)
+        Label(settings_frm, fg='green', text=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab after loading your SimBA project").grid(row=8, sticky=W)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -59,14 +60,19 @@ class MakePathPlotPopUp(PopUpMixin):
         check_if_valid_rgb_tuple(data=background_color)
         check_if_valid_rgb_tuple(data=line_color)
         check_str(name=f'{self.__class__.__name__} body-part', value=bp)
+        last_frm = self.last_frm_only_dropdown.getChoices()
+        if last_frm == 'TRUE':
+            last_frm = True
+        else:
+            last_frm = False
         plotter = EzPathPlot(data_path=data_path,
                              video_path=video_path,
                              body_part=bp,
                              bg_color=background_color,
                              line_color=line_color,
                              line_thickness=int(line_thickness),
-                             circle_size=int(circle_size))
-
+                             circle_size=int(circle_size),
+                             last_frm_only=last_frm)
         threading.Thread(target=plotter.run).start()
 
 #MakePathPlotPopUp()

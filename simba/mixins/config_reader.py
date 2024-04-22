@@ -251,7 +251,6 @@ class ConfigReader(object):
             self.shape_names = list(
                 itertools.chain(
                     self.rectangles_df["Name"].unique(),
-                    self.circles_df["Name"].unique(),
                     self.polygon_df["Name"].unique(),
                 )
             )

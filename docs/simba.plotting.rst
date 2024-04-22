@@ -86,10 +86,10 @@ Distance plotter - multiprocess
    :members:
    :show-inheritance:
 
-Quick path plot
+Quick path plot (Ez path plot)
 ----------------------------------
 
-.. automodule:: simba.plotting.ez_lineplot
+.. automodule:: simba.plotting.ez_path_plot
    :members:
    :show-inheritance:
 

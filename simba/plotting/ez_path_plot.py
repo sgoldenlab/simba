@@ -27,13 +27,14 @@ class EzPathPlot(object):
                  fps: Optional[int] = None,
                  line_thickness: Optional[int] = 10,
                  circle_size: Optional[int] = 5,
+                 last_frm_only: Optional[bool] = False,
                  save_path: Optional[Union[str, os.PathLike]] = None):
 
         """
-        Create a simple path plot for a single path in a single video.
+        Create a simpler path plot for a single path in a single video.
 
         .. note::
-           For more complex path plots with/without multiprocessing, see ``simba.plotting.path_plotter.PathPlotterSingleCore`` and ``simba.plotting.path_plotter_mp.PathPlotterMulticore``.
+           For more refined / complex path plots with/without multiprocessing for inproved speed, see ``simba.plotting.path_plotter.PathPlotterSingleCore`` and ``simba.plotting.path_plotter_mp.PathPlotterMulticore``.
 
         .. image:: _static/img/EzPathPlot.gif
            :width: 500
@@ -48,6 +49,7 @@ class EzPathPlot(object):
         :param Optional[Tuple[int, int]] size: Size of the path plot (width, height). Used if video_path is None.
         :param Optional[int] fps: The FPS of the path plot. Used if video_path is None.
         :param str body_part: The specific body part to plot the path for.
+        :param Optional[bool] last_frm_only: If True, creates just a single .png image representing the full path in last image in the video.
         :param Optional[Tuple[int, int, int]] bg_color: The background color of the plot. Defaults to (255, 255, 255).
         :param Optional[Tuple[int, int, int]] line_color: The color of the path line. Defaults to (147, 20, 255).
         :param Optional[int] line_thickness: The thickness of the path line. Defaults to 10.
@@ -111,29 +113,46 @@ class EzPathPlot(object):
         if (bps[0] not in self.data.columns) or (bps[1] not in self.data.columns):
             raise DataHeaderError(msg=f"Could not finc column {bps[0]} and/or column {bps[1]} in the data file {data_path}", source=self.__class__.__name__)
         self.data = self.data[bps].fillna(method="ffill").astype(int).reset_index(drop=True).values
-        if save_path is None:
+        if (save_path is None) and (not last_frm_only):
             self.save_name = os.path.join(dir, f"{file_name}_line_plot.mp4")
+        elif (save_path is None) and (last_frm_only):
+            self.save_name = os.path.join(dir, f"{file_name}_line_plot.png")
         else:
             self.save_name = save_path
-        self.writer = cv2.VideoWriter(self.save_name, 0x7634706D, self.fps, (self.width, self.height))
         self.bg_img = np.zeros([self.height, self.width, 3])
         self.bg_img[:] = [bg_color]
-        self.line_color, self.line_thickness, self.circle_size  = line_color, line_thickness, circle_size
+        self.line_color, self.line_thickness, self.circle_size, self.last_frm = line_color, line_thickness, circle_size, last_frm_only
         self.timer = SimbaTimer(start=True)
+
     def run(self):
-        for i in range(1, self.data.shape[0]):
-            line_data = self.data[:i+1]
+        if not self.last_frm:
+            self.writer = cv2.VideoWriter(self.save_name, 0x7634706D, self.fps, (self.width, self.height))
+            for i in range(1, self.data.shape[0]+1):
+                line_data = self.data[:i+1]
+                img = deepcopy(self.bg_img)
+                for j in range(1, line_data.shape[0]):
+                    x1, y1 = line_data[j-1][0], line_data[j-1][1]
+                    x2, y2 = line_data[j][0], line_data[j][1]
+                    cv2.line(img, (x1, y1), (x2, y2), self.line_color, self.line_thickness)
+                cv2.circle(img, (line_data[-1][0], line_data[-1][1]), self.circle_size, self.line_color, -1)
+                self.writer.write(img.astype(np.uint8))
+                print(f"Frame {i}/{len(self.data)} complete...")
+            self.writer.release()
+        else:
             img = deepcopy(self.bg_img)
-            for j in range(1, line_data.shape[0]):
-                x1, y1 = line_data[j-1][0], line_data[j-1][1]
-                x2, y2 = line_data[j][0], line_data[j][1]
+            for j in range(1, self.data.shape[0]):
+                x1, y1 = self.data[j - 1][0], self.data[j - 1][1]
+                x2, y2 = self.data[j][0], self.data[j][1]
                 cv2.line(img, (x1, y1), (x2, y2), self.line_color, self.line_thickness)
-            cv2.circle(img, (line_data[-1][0], line_data[-1][1]), self.circle_size, self.line_color, -1)
-            self.writer.write(img.astype(np.uint8))
-            print(f"Frame {i}/{len(self.data)} complete...")
-        self.writer.release()
+            cv2.imwrite(filename=self.save_name, img=img)
         self.timer.stop_timer()
         stdout_success(msg=f"Path plot saved at {self.save_name}", elapsed_time=self.timer.elapsed_time_str)
 
-# path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5', size=(2056, 1549), fps=30, body_part='Mouse_1_Nose', bg_color=(255, 255, 255), line_color=(147,20,255))
+# path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5',
+#                           size=(2056, 1549),
+#                           fps=30,
+#                           body_part='Mouse_1_Nose',
+#                           bg_color=(255, 255, 255),
+#                           last_frm_only=False,
+#                           line_color=(147,20,255))
 # path_plotter.run()

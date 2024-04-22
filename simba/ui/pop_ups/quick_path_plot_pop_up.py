@@ -42,7 +42,8 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         self.line_thickness.setChoices(choice=1)
         self.circle_size = DropDownMenu(settings_frm, "CIRCLE SIZE: ", list(range(1, 11)), "18")
         self.circle_size.setChoices(choice=5)
-
+        self.last_frm_only_dropdown = DropDownMenu(settings_frm, "LAST FRAME ONLY: ", ['TRUE', 'FALSE'], "18")
+        self.last_frm_only_dropdown.setChoices('FALSE')
         settings_frm.grid(row=0, sticky=W)
         self.video_dropdown.grid(row=0, sticky=W)
         self.bp_dropdown.grid(row=2, sticky=W)
@@ -50,7 +51,8 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         self.line_color.grid(row=4, sticky=W)
         self.line_thickness.grid(row=5, sticky=W)
         self.circle_size.grid(row=6, sticky=W)
-        Label(settings_frm, fg='green', text=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab").grid(row=7, sticky=W)
+        self.last_frm_only_dropdown.grid(row=7, sticky=W)
+        Label(settings_frm, fg='green', text=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab").grid(row=8, sticky=W)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -59,7 +61,13 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         data_path = self.video_filepaths[video_name]
         meta_data, _, fps = read_video_info(vid_info_df=self.video_info_df, video_name=video_name)
         size = (int(meta_data['Resolution_width']), int(meta_data['Resolution_height']))
-        save_path = os.path.join(self.path_plot_dir, f'{video_name}_simple_path_plot.mp4')
+        last_frm = self.last_frm_only_dropdown.getChoices()
+        if last_frm == 'TRUE':
+            save_path = os.path.join(self.path_plot_dir, f'{video_name}_simple_path_plot.png')
+            last_frm = True
+        else:
+            save_path = os.path.join(self.path_plot_dir, f'{video_name}_simple_path_plot.mp4')
+            last_frm = False
         if not os.path.isdir(self.path_plot_dir):
             os.makedirs(self.path_plot_dir)
         background_color = get_color_dict()[self.background_color.getChoices()]
@@ -80,10 +88,9 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
                              line_color=line_color,
                              line_thickness=int(line_thickness),
                              circle_size=int(circle_size),
+                             last_frm_only=last_frm,
                              save_path=save_path)
         threading.Thread(target=plotter.run).start()
 
 #_ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
-
-
 # _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
