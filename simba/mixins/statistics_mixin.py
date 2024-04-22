@@ -1642,7 +1642,7 @@ class Statistics(FeatureExtractionMixin):
         pass
 
     @staticmethod
-    @njit('(int64[:, :]), bool_')
+    @njit("(int64[:, :]), bool_")
     def concordance_ratio(x: np.ndarray, invert: bool) -> float:
         """
         Calculate the concordance ratio of a 2D numpy array.

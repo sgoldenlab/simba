@@ -50,13 +50,14 @@ class ROIPlotMultiprocess(ConfigReader, PlottingMixin):
     >>> roi_visualizer.run()
     """
 
-    def __init__(self,
-                 ini_path: Union[str, os.PathLike],
-                 video_path: Union[str, os.PathLike],
-                 style_attr: dict,
-                 body_parts: Optional[dict] = None,
-                 threshold: Optional[float] = None,
-                 core_cnt: Optional[int] = -1,
+    def __init__(
+        self,
+        ini_path: Union[str, os.PathLike],
+        video_path: Union[str, os.PathLike],
+        style_attr: dict,
+        body_parts: Optional[dict] = None,
+        threshold: Optional[float] = None,
+        core_cnt: Optional[int] = -1,
     ):
 
         ConfigReader.__init__(self, config_path=ini_path)
