@@ -17,6 +17,42 @@ H5 = '.h5'
 CSV = '.csv'
 
 class EzPathPlot(object):
+    """
+    Create a simpler path plot for a single path in a single video.
+
+    .. note::
+       For more refined / complex path plots with/without multiprocessing for inproved speed, see ``simba.plotting.path_plotter.PathPlotterSingleCore`` and ``simba.plotting.path_plotter_mp.PathPlotterMulticore``.
+
+    .. image:: _static/img/EzPathPlot.gif
+       :width: 500
+       :align: center
+
+    .. image:: _static/img/EzPathPlot_2.gif
+       :width: 500
+       :align: center
+
+    :param Union[str, os.PathLike] data_path: The path to the data file in H5c or CSV format containing the pose estimation coordinates.
+    :param Optional[Union[str, os.PathLike]] video_path: The path to the video file. Optional. If provided, the FPS and size is grabbed from the metadata of the video file. If None, then pass ``fps`` and ``size``.
+    :param Optional[Tuple[int, int]] size: Size of the path plot (width, height). Used if video_path is None.
+    :param Optional[int] fps: The FPS of the path plot. Used if video_path is None.
+    :param str body_part: The specific body part to plot the path for.
+    :param Optional[bool] last_frm_only: If True, creates just a single .png image representing the full path in last image in the video.
+    :param Optional[Tuple[int, int, int]] bg_color: The background color of the plot. Defaults to (255, 255, 255).
+    :param Optional[Tuple[int, int, int]] line_color: The color of the path line. Defaults to (147, 20, 255).
+    :param Optional[int] line_thickness: The thickness of the path line. Defaults to 10.
+    :param Optional[int] circle_size: The size of the circle indicating each data point. Defaults to 5.
+    :param Optional[Union[str, os.PathLike]] save_path: The location to store the path plot. If None, then use the same path as the data path with ``_line_plot`` suffix.
+
+
+    :example I:
+    >>> path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5', video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi', body_part='Mouse_1_Nose', bg_color=(255, 255, 255), line_color=(147,20,255))
+    >>> path_plotter.run()
+
+    :example II:
+    >>> path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5', size=(2056, 1549), fps=30, body_part='Mouse_1_Nose', bg_color=(255, 255, 255), line_color=(147,20,255))
+    >>> path_plotter.run()
+    """
+
     def __init__(self,
                  data_path: Union[str, os.PathLike],
                  body_part: str,
@@ -29,43 +65,6 @@ class EzPathPlot(object):
                  circle_size: Optional[int] = 5,
                  last_frm_only: Optional[bool] = False,
                  save_path: Optional[Union[str, os.PathLike]] = None):
-
-        """
-        Create a simpler path plot for a single path in a single video.
-
-        .. note::
-           For more refined / complex path plots with/without multiprocessing for inproved speed, see ``simba.plotting.path_plotter.PathPlotterSingleCore`` and ``simba.plotting.path_plotter_mp.PathPlotterMulticore``.
-
-        .. image:: _static/img/EzPathPlot.gif
-           :width: 500
-           :align: center
-
-        .. image:: _static/img/EzPathPlot_2.gif
-           :width: 500
-           :align: center
-
-        :param Union[str, os.PathLike] data_path: The path to the data file in H5c or CSV format containing the pose estimation coordinates.
-        :param Optional[Union[str, os.PathLike]] video_path: The path to the video file. Optional. If provided, the FPS and size is grabbed from the metadata of the video file. If None, then pass ``fps`` and ``size``.
-        :param Optional[Tuple[int, int]] size: Size of the path plot (width, height). Used if video_path is None.
-        :param Optional[int] fps: The FPS of the path plot. Used if video_path is None.
-        :param str body_part: The specific body part to plot the path for.
-        :param Optional[bool] last_frm_only: If True, creates just a single .png image representing the full path in last image in the video.
-        :param Optional[Tuple[int, int, int]] bg_color: The background color of the plot. Defaults to (255, 255, 255).
-        :param Optional[Tuple[int, int, int]] line_color: The color of the path line. Defaults to (147, 20, 255).
-        :param Optional[int] line_thickness: The thickness of the path line. Defaults to 10.
-        :param Optional[int] circle_size: The size of the circle indicating each data point. Defaults to 5.
-        :param Optional[Union[str, os.PathLike]] save_path: The location to store the path plot. If None, then use the same path as the data path with ``_line_plot`` suffix.
-
-
-        :example I:
-        >>> path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5', video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi', body_part='Mouse_1_Nose', bg_color=(255, 255, 255), line_color=(147,20,255))
-        >>> path_plotter.run()
-
-        :example II:
-        >>> path_plotter = EzPathPlot(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/h5/Together_1DLC_resnet50_two_black_mice_DLC_052820May27shuffle1_150000_el.h5', size=(2056, 1549), fps=30, body_part='Mouse_1_Nose', bg_color=(255, 255, 255), line_color=(147,20,255))
-        >>> path_plotter.run()
-        """
-
 
         check_file_exist_and_readable(file_path=data_path)
         check_if_valid_rgb_tuple(data=bg_color)
