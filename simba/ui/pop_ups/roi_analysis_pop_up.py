@@ -83,23 +83,30 @@ class ROIAnalysisPopUp(ConfigReader, PopUpMixin):
 
     def run(self):
         settings = {}
-        check_float(name="Probability threshold", value=self.probability_entry.entry_get, min_value=0.00, max_value=1.00)
+        check_float(
+            name="Probability threshold",
+            value=self.probability_entry.entry_get,
+            min_value=0.00,
+            max_value=1.00,
+        )
         settings["threshold"] = float(self.probability_entry.entry_get)
         body_parts = []
         for cnt, dropdown in self.body_parts_dropdowns.items():
             body_parts.append(dropdown.getChoices())
-        roi_analyzer = ROIAnalyzer(config_path=self.config_path,
-                                   data_path=None,
-                                   calculate_distances=self.calculate_distance_moved_var.get(),
-                                   detailed_bout_data=self.detailed_roi_var.get(),
-                                   threshold=float(self.probability_entry.entry_get),
-                                   body_parts=body_parts)
+        roi_analyzer = ROIAnalyzer(
+            config_path=self.config_path,
+            data_path=None,
+            calculate_distances=self.calculate_distance_moved_var.get(),
+            detailed_bout_data=self.detailed_roi_var.get(),
+            threshold=float(self.probability_entry.entry_get),
+            body_parts=body_parts,
+        )
         roi_analyzer.run()
         roi_analyzer.save()
         self.root.destroy()
 
 
-#_ = ROIAnalysisPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini')
+# _ = ROIAnalysisPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini')
 
 
 # ROIAnalysisPopUp(config_path='/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/mouse_open_field/project_folder/project_config.ini')

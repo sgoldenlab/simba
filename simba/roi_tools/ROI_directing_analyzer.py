@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import Union, Optional
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -9,11 +9,12 @@ from numba import jit, prange
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.read_write import get_fn_ext, read_df, read_data_paths
-from simba.utils.errors import ROICoordinatesNotFoundError, InvalidInputError
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.data import slice_roi_dict_for_video
+from simba.utils.errors import InvalidInputError, ROICoordinatesNotFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
+
 
 class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     """
@@ -33,37 +34,57 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     >>> test.save()
     """
 
-    def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 data_path: Optional[Union[str, os.PathLike]] = None):
+    def __init__(
+        self,
+        config_path: Union[str, os.PathLike],
+        data_path: Optional[Union[str, os.PathLike]] = None,
+    ):
 
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self, config_path=config_path)
-        self.data_paths = read_data_paths(path=data_path, default=self.outlier_corrected_paths, default_name=self.outlier_corrected_dir, file_type=self.file_type)
+        self.data_paths = read_data_paths(
+            path=data_path,
+            default=self.outlier_corrected_paths,
+            default_name=self.outlier_corrected_dir,
+            file_type=self.file_type,
+        )
         if not os.path.isfile(self.roi_coordinates_path):
-            raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
+            raise ROICoordinatesNotFoundError(
+                expected_file_path=self.roi_coordinates_path
+            )
         if not self.check_directionality_viable()[0]:
-            raise InvalidInputError(msg='Cannot compute directionality towards ROIs. The ear and nose data is tracked in the project', source=self.__class__.__name__)
+            raise InvalidInputError(
+                msg="Cannot compute directionality towards ROIs. The ear and nose data is tracked in the project",
+                source=self.__class__.__name__,
+            )
         self.read_roi_data()
         self.direct_bp_dict = self.check_directionality_cords()
 
-    def __format_direction_data(self,
-                                direction_data: np.ndarray,
-                                nose_arr: np.ndarray,
-                                roi_center: np.ndarray,
-                                animal_name: str,
-                                shape_name: str) -> pd.DataFrame:
+    def __format_direction_data(
+        self,
+        direction_data: np.ndarray,
+        nose_arr: np.ndarray,
+        roi_center: np.ndarray,
+        animal_name: str,
+        shape_name: str,
+    ) -> pd.DataFrame:
 
         x_min = np.minimum(direction_data[:, 1], nose_arr[:, 0])
         y_min = np.minimum(direction_data[:, 2], nose_arr[:, 1])
         delta_x = abs((direction_data[:, 1] - nose_arr[:, 0]) / 2)
         delta_y = abs((direction_data[:, 2] - nose_arr[:, 1]) / 2)
         x_middle, y_middle = np.add(x_min, delta_x), np.add(y_min, delta_y)
-        direction_data = np.concatenate((y_middle.reshape(-1, 1), direction_data), axis=1)
-        direction_data = np.concatenate((x_middle.reshape(-1, 1), direction_data), axis=1)
+        direction_data = np.concatenate(
+            (y_middle.reshape(-1, 1), direction_data), axis=1
+        )
+        direction_data = np.concatenate(
+            (x_middle.reshape(-1, 1), direction_data), axis=1
+        )
         direction_data = np.delete(direction_data, [2, 3, 4], 1)
-        bp_data = pd.DataFrame(direction_data, columns=["Eye_x", "Eye_y", "Directing_BOOL"])
+        bp_data = pd.DataFrame(
+            direction_data, columns=["Eye_x", "Eye_y", "Directing_BOOL"]
+        )
         bp_data["ROI_x"] = roi_center[0]
         bp_data["ROI_y"] = roi_center[1]
         bp_data = bp_data[["Eye_x", "Eye_y", "ROI_x", "ROI_y", "Directing_BOOL"]]
@@ -119,18 +140,21 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
 
         return results
 
-    def __find_roi_intersections(self,
-                                 bp_data: pd.DataFrame,
-                                 shape_info: dict):
-
+    def __find_roi_intersections(self, bp_data: pd.DataFrame, shape_info: dict):
 
         eye_lines = bp_data[["Eye_x", "Eye_y", "ROI_x", "ROI_y"]].values.astype(int)
         roi_lines = None
         if shape_info["Shape_type"] == "Rectangle":
             top_left_x, top_left_y = (shape_info["topLeftX"], shape_info["topLeftY"])
-            bottom_right_x, bottom_right_y = (shape_info["Bottom_right_X"], shape_info["Bottom_right_Y"])
+            bottom_right_x, bottom_right_y = (
+                shape_info["Bottom_right_X"],
+                shape_info["Bottom_right_Y"],
+            )
             top_right_x, top_right_y = top_left_x + shape_info["width"], top_left_y
-            bottom_left_x, bottom_left_y = (bottom_right_x - shape_info["width"], bottom_right_y)
+            bottom_left_x, bottom_left_y = (
+                bottom_right_x - shape_info["width"],
+                bottom_right_y,
+            )
             roi_lines = np.array(
                 [
                     [top_left_x, top_left_y, bottom_left_x, bottom_left_y],
@@ -181,43 +205,72 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
         for file_cnt, file_path in enumerate(self.data_paths):
             _, self.video_name, _ = get_fn_ext(file_path)
             video_timer = SimbaTimer(start=True)
-            print(f'Analyzing ROI directionality in video {self.video_name}...')
+            print(f"Analyzing ROI directionality in video {self.video_name}...")
             data_df = read_df(file_path=file_path, file_type=self.file_type)
-            video_roi_dict, shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
+            video_roi_dict, shape_names = slice_roi_dict_for_video(
+                data=self.roi_dict, video_name=self.video_name
+            )
             for animal_name, bps in self.direct_bp_dict.items():
-                ear_left_arr = data_df[[bps["Ear_left"]["X_bps"], bps["Ear_left"]["Y_bps"]]].values
-                ear_right_arr = data_df[[bps["Ear_right"]["X_bps"], bps["Ear_right"]["Y_bps"]]].values
+                ear_left_arr = data_df[
+                    [bps["Ear_left"]["X_bps"], bps["Ear_left"]["Y_bps"]]
+                ].values
+                ear_right_arr = data_df[
+                    [bps["Ear_right"]["X_bps"], bps["Ear_right"]["Y_bps"]]
+                ].values
                 nose_arr = data_df[[bps["Nose"]["X_bps"], bps["Nose"]["Y_bps"]]].values
                 for roi_type, roi_type_data in video_roi_dict.items():
                     for _, row in roi_type_data.iterrows():
                         roi_center = np.array([row["Center_X"], row["Center_Y"]])
                         roi_name = row["Name"]
-                        direction_data = FeatureExtractionMixin.jitted_line_crosses_to_static_targets(left_ear_array=ear_left_arr,
-                                                                                                      right_ear_array=ear_right_arr,
-                                                                                                      nose_array=nose_arr,
-                                                                                                      target_array=roi_center)
-                        bp_data = self.__format_direction_data(direction_data=direction_data,
-                                                               nose_arr=nose_arr,
-                                                               roi_center=roi_center,
-                                                               animal_name=animal_name,
-                                                               shape_name=roi_name)
+                        direction_data = FeatureExtractionMixin.jitted_line_crosses_to_static_targets(
+                            left_ear_array=ear_left_arr,
+                            right_ear_array=ear_right_arr,
+                            nose_array=nose_arr,
+                            target_array=roi_center,
+                        )
+                        bp_data = self.__format_direction_data(
+                            direction_data=direction_data,
+                            nose_arr=nose_arr,
+                            roi_center=roi_center,
+                            animal_name=animal_name,
+                            shape_name=roi_name,
+                        )
 
-                        eye_roi_intersections = pd.DataFrame(self.__find_roi_intersections(bp_data=bp_data, shape_info=row), columns=["ROI_edge_1_x", "ROI_edge_1_y", "ROI_edge_2_x", "ROI_edge_2_y"])
-                        self.results.append(pd.concat([bp_data, eye_roi_intersections], axis=1))
+                        eye_roi_intersections = pd.DataFrame(
+                            self.__find_roi_intersections(
+                                bp_data=bp_data, shape_info=row
+                            ),
+                            columns=[
+                                "ROI_edge_1_x",
+                                "ROI_edge_1_y",
+                                "ROI_edge_2_x",
+                                "ROI_edge_2_y",
+                            ],
+                        )
+                        self.results.append(
+                            pd.concat([bp_data, eye_roi_intersections], axis=1)
+                        )
             video_timer.stop_timer()
-            print(f'ROI directionality analyzed in video {self.video_name}... (elapsed time: {video_timer.elapsed_time_str}s)')
+            print(
+                f"ROI directionality analyzed in video {self.video_name}... (elapsed time: {video_timer.elapsed_time_str}s)"
+            )
         self.results_df = pd.concat(self.results, axis=0)
 
     def save(self, path: Optional[Union[str, os.PathLike]] = None):
-        if not hasattr(self, 'results_df'):
-            raise InvalidInputError(msg='Run the ROI direction analyzer before saving')
+        if not hasattr(self, "results_df"):
+            raise InvalidInputError(msg="Run the ROI direction analyzer before saving")
         if path is None:
-            path = os.path.join(self.logs_path, f'ROI_directionality_summary_{self.datetime}.csv')
+            path = os.path.join(
+                self.logs_path, f"ROI_directionality_summary_{self.datetime}.csv"
+            )
         self.results_df.to_csv(path)
-        stdout_success(msg=f'Detailed ROI directionality data saved in {path}', source=self.__class__.__name__)
+        stdout_success(
+            msg=f"Detailed ROI directionality data saved in {path}",
+            source=self.__class__.__name__,
+        )
+
 
 #
 # test = DirectingROIAnalyzer(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini')
 # test.run()
 # test.save()
-

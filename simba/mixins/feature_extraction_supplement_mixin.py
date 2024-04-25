@@ -740,14 +740,31 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> sum_movement, avg_velocity = FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)
         """
 
-        check_valid_array(data=x, source=FeatureExtractionSupplemental.distance_and_velocity.__name__, accepted_ndims=(1, 2), accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float))
-        check_float(name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} fps",value=fps,min_value=1)
-        check_float(name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} pixels_per_mm",value=pixels_per_mm,min_value=10e-6)
+        check_valid_array(
+            data=x,
+            source=FeatureExtractionSupplemental.distance_and_velocity.__name__,
+            accepted_ndims=(1, 2),
+            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+        )
+        check_float(
+            name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} fps",
+            value=fps,
+            min_value=1,
+        )
+        check_float(
+            name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} pixels_per_mm",
+            value=pixels_per_mm,
+            min_value=10e-6,
+        )
         if x.ndim == 2:
-            check_valid_array(data=x, source=FeatureExtractionSupplemental.distance_and_velocity.__name__, accepted_axis_1_shape=(2,))
+            check_valid_array(
+                data=x,
+                source=FeatureExtractionSupplemental.distance_and_velocity.__name__,
+                accepted_axis_1_shape=(2,),
+            )
             t = np.full((x.shape[0]), 0.0)
             for i in range(1, x.shape[0]):
-                t[i] = np.linalg.norm(x[i] - x[i-1])
+                t[i] = np.linalg.norm(x[i] - x[i - 1])
             x = np.copy(t) / pixels_per_mm
         movement = np.sum(x) / pixels_per_mm
         v = []
@@ -761,9 +778,10 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
 
 x = np.random.randint(0, 100, (100, 2))
-FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)
+FeatureExtractionSupplemental.distance_and_velocity(
+    x=x, fps=10, pixels_per_mm=10, centimeters=True
+)
 # # sum_movement, avg_velocity =
-
 
 
 # df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/targets_inserted/Together_1.csv', file_type='csv')
