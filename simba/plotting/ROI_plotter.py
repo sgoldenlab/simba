@@ -7,7 +7,7 @@ import itertools
 import cv2
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.sandbox.ROI_analyzer import ROIAnalyzer
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.utils.data import create_color_palettes, slice_roi_dict_for_video, detect_bouts
 from simba.utils.checks import check_float, check_if_keys_exist_in_dict, check_file_exist_and_readable, check_video_and_data_frm_count_align, check_valid_lst
 from simba.utils.enums import Formats, Paths, TagNames, TextOptions, Keys

@@ -14,8 +14,7 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-#from simba.roi_tools.ROI_analyzer import ROIAnalyzer
-from simba.sandbox.ROI_analyzer import ROIAnalyzer
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.utils.data import create_color_palettes, detect_bouts, slice_roi_dict_for_video
 from simba.utils.enums import Paths, TagNames, TextOptions, Formats, Keys
 from simba.utils.errors import NoFilesFoundError, CountError, BodypartColumnNotFoundError, ROICoordinatesNotFoundError
