@@ -58,6 +58,16 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
        :width: 300
        :align: center
 
+    .. image:: _static/img/path_plot_mp.gif
+       :width: 500
+       :align: center
+
+    .. image:: _static/img/path_plot_1.png
+       :width: 500
+       :align: center
+
+
+
     :param str config_path: Path to SimBA project config file in Configparser format
     :param bool frame_setting: If True, individual frames will be created.
     :param bool video_setting: If True, compressed videos will be created.

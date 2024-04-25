@@ -27,7 +27,7 @@ class HeatMapperClfSingleCore(ConfigReader, PlottingMixin):
        For improved run-time, see :meth:`simba.heat_mapper_clf_mp.HeatMapperClfMultiprocess` for multiprocess class.
 
     .. image:: _static/img/heatmap.png
-       :width: 300
+       :width: 500
        :align: center
 
     :param str config_path: path to SimBA project config file in Configparser format

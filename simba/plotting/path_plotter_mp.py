@@ -132,6 +132,10 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
        :width: 500
        :align: center
 
+    .. image:: _static/img/path_plot_1.png
+       :width: 500
+       :align: center
+
     :example:
     >>> input_style_attr = {'width': 'As input', 'height': 'As input', 'line width': 5, 'font size': 5, 'font thickness': 2, 'circle size': 5, 'bg color': 'White', 'max lines': 100}
     >>> animal_attr = {0: ['Ear_right_1', 'Red']}

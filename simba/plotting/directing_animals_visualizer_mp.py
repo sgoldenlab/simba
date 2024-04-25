@@ -148,10 +148,9 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
 
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>_.
 
-        .. image:: _static/img/directing_other_animals.png
-           :width: 450
-           :align: center
-
+    .. image:: _static/img/directing_other_animals.png
+       :width: 450
+       :align: center
 
     :parameter Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
     :parameter Union[str, os.PathLike] video_path: Path to video for to visualize directionality.

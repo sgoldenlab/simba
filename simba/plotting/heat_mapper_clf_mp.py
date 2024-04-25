@@ -80,7 +80,7 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
        `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
         .. image:: _static/img/heatmap.png
-           :width: 300
+           :width: 500
            :align: center
 
     :param str config_path: path to SimBA project config file in Configparser format

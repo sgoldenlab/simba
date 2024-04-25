@@ -52,9 +52,13 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
 
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>_.
 
-        .. image:: _static/img/directing_other_animals.png
-           :width: 450
-           :align: center
+    .. image:: _static/img/directing_other_animals.png
+       :width: 500
+       :align: center
+
+    .. image:: _static/img/DirectingOtherAnimalsVisualizer.png
+       :width: 500
+       :align: center
 
     :parameter Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
     :parameter Union[str, os.PathLike] video_path: Path to video for to visualize directionality.
@@ -234,8 +238,8 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
 
 # style_attr = {SHOW_POSE: True,
 #               ANIMAL_NAMES: True,
-#               CIRCLE_SIZE: 3,
-#               DIRECTIONALITY_COLOR: [(255, 0, 0), (0, 0, 255)],
+#               CIRCLE_SIZE: 10,
+#               DIRECTIONALITY_COLOR: (0, 255, 0),
 #               DIRECTION_THICKNESS: 10,
 #               HIGHLIGHT_ENDPOINTS: True}
 #
