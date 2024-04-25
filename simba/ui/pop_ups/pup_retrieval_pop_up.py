@@ -32,7 +32,7 @@ class PupRetrievalPopUp(object):
                 source=self.__class__.__name__,
             )
 
-        self.roi_analyzer = ROIAnalyzer(ini_path=config_path, data_path=None)
+        self.roi_analyzer = ROIAnalyzer(config_path=config_path, data_path=None)
         self.roi_analyzer.run()
         self.shape_names = self.roi_analyzer.shape_names
         self.animal_names = self.roi_analyzer.multi_animal_id_list

@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import ast
 import glob
 import os
+import cv2
 import re
 import subprocess
 from pathlib import Path
@@ -20,9 +21,8 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 InvalidInputError, NoDataError,
                                 NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
-                                StringError)
-from simba.utils.warnings import NoDataFoundWarning
-
+                                StringError, FrameRangeError)
+from simba.utils.warnings import NoDataFoundWarning, FrameRangeWarning
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
     """
@@ -1284,3 +1284,48 @@ def check_valid_tuple(
                 msg=f"The tuple {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}",
                 source=source,
             )
+
+def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.VideoCapture],
+                                         data: Union[str, os.PathLike, pd.DataFrame],
+                                         name: Optional[str] = '',
+                                         raise_error: Optional[bool] = True) -> None:
+    """
+    Check if the frame count of a video matches the row count of a data file.
+
+    :param Union[str, os.PathLike, cv2.VideoCapture] video: Path to the video file or cv2.VideoCapture object.
+    :param Union[str, os.PathLike, pd.DataFrame] data: Path to the data file or DataFrame containing the data.
+    :param Optional[str] name: Name of the video (optional for interpretable error msgs).
+    :param Optional[bool] raise_error: Whether to raise an error if the counts don't align (default is True). If False, prints warning.
+    :return None:
+
+    :example:
+    >>> data_1 = '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv'
+    >>> video_1 = '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/frames/output/ROI_analysis/SI_DAY3_308_CD1_PRESENT.mp4'
+    >>> check_video_and_data_frm_count_align(video=video_1, data=data_1, raise_error=True)
+    """
+
+    def _count_generator(reader):
+        b = reader(1024 * 1024)
+        while b:
+            yield b
+            b = reader(1024 * 1024)
+
+    check_instance(source=f'{check_video_and_data_frm_count_align.__name__} video', instance=video, accepted_types=(str, cv2.VideoCapture))
+    check_instance(source=f'{check_video_and_data_frm_count_align.__name__} data', instance=data, accepted_types=(str, pd.DataFrame))
+    check_str(name=f'{check_video_and_data_frm_count_align.__name__} name', value=name, allow_blank=True)
+    if isinstance(video, str):
+        check_file_exist_and_readable(file_path=video)
+        video = cv2.VideoCapture(video)
+    video_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    if isinstance(data, str):
+        check_file_exist_and_readable(file_path=data)
+        with open(data, 'rb') as fp:
+            c_generator = _count_generator(fp.raw.read)
+            data_count = (sum(buffer.count(b'\n') for buffer in c_generator)) - 1
+    else:
+        data_count = len(data)
+    if data_count != video_count:
+        if not raise_error:
+            FrameRangeWarning(msg=f'The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows', source=check_video_and_data_frm_count_align.__name__)
+        else:
+            raise FrameRangeError(msg=f'The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows', source=check_video_and_data_frm_count_align.__name__)

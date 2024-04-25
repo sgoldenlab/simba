@@ -1951,3 +1951,41 @@ def seconds_to_timestamp(seconds: int) -> str:
     minutes = int((seconds % 3600) / 60)
     seconds = int(seconds % 60)
     return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+
+
+def read_data_paths(path: Union[str, os.PathLike],
+                    default: List[Union[str, os.PathLike]],
+                    default_name: Optional[str] = '',
+                    file_type: Optional[str] = 'csv') -> List[str]:
+
+    if path is None:
+        if len(default) == 0:
+            raise NoFilesFoundError(msg = f"No files in format found in {default_name}", source=read_data_paths.__name__)
+        else:
+            for i in default:
+                check_file_exist_and_readable(file_path=i)
+            data_paths = default
+    elif isinstance(path, str):
+        if os.path.isfile(path):
+            check_file_exist_and_readable(file_path=path)
+            data_paths = [path]
+        elif os.path.isdir(s=path):
+            data_paths = find_files_of_filetypes_in_directory(directory=path, extensions=[f'.{file_type}'], raise_error=True)
+            if len(data_paths) == 0:
+                raise NoFilesFoundError(msg=f"No files in format {file_type} found in {default_name}", source=read_data_paths.__name__)
+        else:
+            raise NoFilesFoundError(msg=f"{path} is not a valid path string", source=read_data_paths.__name__)
+    elif isinstance(path, (list, tuple)):
+        check_valid_lst(data=path, source=f'{read_data_paths.__name__} path', valid_dtypes=(str,), min_len=1)
+        data_paths = []
+        for i in path:
+            check_file_exist_and_readable(file_path=i)
+            data_paths.append(i)
+    else:
+        raise NoFilesFoundError(msg=f"{type(path)} is not a valid type for path", source=read_data_paths.__name__)
+
+    return data_paths
+
+
+
+

@@ -72,7 +72,7 @@ class CueLightMovementAnalyzer(ConfigReader):
 
         if roi_setting:
             self.roi_analyzer = ROIAnalyzer(
-                ini_path=self.config_path,
+                config_path=self.config_path,
                 data_path=os.path.join(
                     self.project_path, "csv", "outlier_corrected_movement_location"
                 ),

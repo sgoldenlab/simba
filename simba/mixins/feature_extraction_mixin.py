@@ -268,7 +268,7 @@ class FeatureExtractionMixin(object):
            :align: center
 
         :parameter np.ndarray bp_location:  2d numeric np.ndarray size len(frames) x 2
-        :parameter np.ndarray roi_coords: 2d numeric np.ndarray size 1x2 (top left[x, y], bottom right[x, y)
+        :parameter np.ndarray roi_coords: 2d numeric np.ndarray size 2x2 (top left[x, y], bottom right[x, y)
         :return ndarray: 2d numeric boolean np.ndarray size len(frames) x 1 with 0 representing outside the rectangle and 1 representing inside the rectangle
 
         :example:

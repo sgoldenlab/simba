@@ -32,8 +32,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_rgb_tuple, check_instance,
                                 check_int, check_str, check_that_column_exist,
-                                check_valid_array, check_valid_lst)
-from simba.utils.enums import Formats, Options, TextOptions
+                                check_valid_array, check_valid_lst, check_valid_dataframe)
+from simba.utils.enums import Formats, Options, TextOptions, Keys
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
                                  get_named_colors)
@@ -591,524 +591,6 @@ class PlottingMixin(object):
         return imutils.resize(gantt_img, height=img_height)
 
     @staticmethod
-    def roi_feature_visualizer_mp(
-        data: pd.DataFrame,
-        text_locations: dict,
-        scalers: dict,
-        save_temp_dir: str,
-        video_meta_data: dict,
-        shape_info: dict,
-        style_attr: dict,
-        directing_viable: bool,
-        video_path: str,
-        animal_names: list,
-        tracked_bps: dict,
-        animal_bps: dict,
-        directing_data: pd.DataFrame,
-    ):
-
-        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        font = cv2.FONT_HERSHEY_COMPLEX
-
-        def __insert_texts(shape_info: dict, img: np.array):
-            for shape_name, shape_info in shape_info.items():
-                for animal_name in animal_names:
-                    shape_color = shape_info["Color BGR"]
-                    cv2.putText(
-                        img,
-                        text_locations[animal_name][shape_name]["in_zone_text"],
-                        text_locations[animal_name][shape_name]["in_zone_text_loc"],
-                        font,
-                        scalers["font_size"],
-                        shape_color,
-                        1,
-                    )
-                    cv2.putText(
-                        img,
-                        text_locations[animal_name][shape_name]["distance_text"],
-                        text_locations[animal_name][shape_name]["distance_text_loc"],
-                        font,
-                        scalers["font_size"],
-                        shape_color,
-                        1,
-                    )
-                    if directing_viable and style_attr["Directionality"]:
-                        cv2.putText(
-                            img,
-                            text_locations[animal_name][shape_name]["directing_text"],
-                            text_locations[animal_name][shape_name][
-                                "directing_text_loc"
-                            ],
-                            font,
-                            scalers["font_size"],
-                            shape_color,
-                            1,
-                        )
-            return img
-
-        def __insert_shapes(img: np.array, shape_info: dict):
-            for shape_name, shape_info in shape_info.items():
-                if shape_info["Shape_type"] == "Rectangle":
-                    cv2.rectangle(
-                        img,
-                        (int(shape_info["topLeftX"]), int(shape_info["topLeftY"])),
-                        (
-                            int(shape_info["Bottom_right_X"]),
-                            int(shape_info["Bottom_right_Y"]),
-                        ),
-                        shape_info["Color BGR"],
-                        int(shape_info["Thickness"]),
-                    )
-                    if style_attr["ROI_centers"]:
-                        center_cord = (
-                            (int(shape_info["topLeftX"] + (shape_info["width"] / 2))),
-                            (int(shape_info["topLeftY"] + (shape_info["height"] / 2))),
-                        )
-                        cv2.circle(
-                            img,
-                            center_cord,
-                            scalers["circle_size"],
-                            shape_info["Color BGR"],
-                            -1,
-                        )
-                    if style_attr["ROI_ear_tags"]:
-                        for tag_data in shape_info["Tags"].values():
-                            cv2.circle(
-                                img,
-                                tag_data,
-                                scalers["circle_size"],
-                                shape_info["Color BGR"],
-                                -1,
-                            )
-
-                if shape_info["Shape_type"] == "Circle":
-                    cv2.circle(
-                        img,
-                        (int(shape_info["centerX"]), int(shape_info["centerY"])),
-                        shape_info["radius"],
-                        shape_info["Color BGR"],
-                        int(shape_info["Thickness"]),
-                    )
-                    if style_attr["ROI_centers"]:
-                        cv2.circle(
-                            img,
-                            (int(shape_info["centerX"]), int(shape_info["centerY"])),
-                            scalers["circle_size"],
-                            shape_info["Color BGR"],
-                            -1,
-                        )
-                    if style_attr["ROI_ear_tags"]:
-                        for tag_data in shape_info["Tags"].values():
-                            cv2.circle(
-                                img,
-                                tag_data,
-                                scalers["circle_size"],
-                                shape_info["Color BGR"],
-                                -1,
-                            )
-
-                if shape_info["Shape_type"] == "Polygon":
-                    cv2.polylines(
-                        img,
-                        [shape_info["vertices"]],
-                        True,
-                        shape_info["Color BGR"],
-                        thickness=int(shape_info["Thickness"]),
-                    )
-                    if style_attr["ROI_centers"]:
-                        cv2.circle(
-                            img,
-                            shape_info["Tags"]["Center_tag"],
-                            scalers["circle_size"],
-                            shape_info["Color BGR"],
-                            -1,
-                        )
-                    if style_attr["ROI_ear_tags"]:
-                        for tag_data in shape_info["Tags"].values():
-                            cv2.circle(
-                                img,
-                                tuple(tag_data),
-                                scalers["circle_size"],
-                                shape_info["Color BGR"],
-                                -1,
-                            )
-
-            return img
-
-        def __insert_directing_line(
-            directing_data: pd.DataFrame,
-            shape_name: str,
-            frame_cnt: int,
-            shape_info: dict,
-            img: np.array,
-            video_name: str,
-            style_attr: dict,
-        ):
-
-            r = directing_data.loc[
-                (directing_data["Video"] == video_name)
-                & (directing_data["ROI"] == shape_name)
-                & (directing_data["Animal"] == animal_name)
-                & (directing_data["Frame"] == frame_cnt)
-            ]
-            if len(r) > 0:
-                clr = shape_info[shape_name]["Color BGR"]
-                thickness = shape_info[shape_name]["Thickness"]
-                if style_attr["Directionality_style"] == "Funnel":
-                    convex_hull_arr = (
-                        np.array(
-                            [
-                                [r["ROI_edge_1_x"], r["ROI_edge_1_y"]],
-                                [r["ROI_edge_2_x"], r["ROI_edge_2_y"]],
-                                [r["Eye_x"], r["Eye_y"]],
-                            ]
-                        )
-                        .reshape(-1, 2)
-                        .astype(int)
-                    )
-                    cv2.fillPoly(img, [convex_hull_arr], clr)
-
-                if style_attr["Directionality_style"] == "Lines":
-                    cv2.line(
-                        img,
-                        (int(r["Eye_x"]), int(r["Eye_y"])),
-                        (int(r["ROI_x"]), int(r["ROI_y"])),
-                        clr,
-                        int(thickness),
-                    )
-
-            return img
-
-        group_cnt = int(data["group"].values[0])
-        start_frm, current_frm, end_frm = data.index[0], data.index[0], data.index[-1]
-        save_path = os.path.join(save_temp_dir, "{}.mp4".format(str(group_cnt)))
-        _, video_name, _ = get_fn_ext(filepath=video_path)
-        writer = cv2.VideoWriter(
-            save_path,
-            fourcc,
-            video_meta_data["fps"],
-            (video_meta_data["width"] * 2, video_meta_data["height"]),
-        )
-
-        cap = cv2.VideoCapture(video_path)
-        cap.set(1, start_frm)
-
-        while current_frm < end_frm:
-            ret, img = cap.read()
-            img = cv2.copyMakeBorder(
-                img,
-                0,
-                0,
-                0,
-                int(video_meta_data["width"]),
-                borderType=cv2.BORDER_CONSTANT,
-                value=style_attr["Border_color"],
-            )
-            img = __insert_texts(shape_info=shape_info, img=img)
-            if style_attr["Pose_estimation"]:
-                for animal, animal_bp_name in tracked_bps.items():
-                    bp_cords = data.loc[current_frm, animal_bp_name].values
-                    cv2.circle(
-                        img,
-                        (int(bp_cords[0]), int(bp_cords[1])),
-                        0,
-                        animal_bps[animal]["colors"][0],
-                        scalers["circle_size"],
-                    )
-                    cv2.putText(
-                        img,
-                        animal,
-                        (int(bp_cords[0]), int(bp_cords[1])),
-                        font,
-                        scalers["font_size"],
-                        animal_bps[animal]["colors"][0],
-                        1,
-                    )
-
-            img = __insert_shapes(img=img, shape_info=shape_info)
-            #
-            for animal_name, shape_name in itertools.product(animal_names, shape_info):
-                in_zone_col_name = f'{shape_name} {animal_name} {"in zone"}'
-                distance_col_name = f'{shape_name} {animal_name} {"distance"}'
-                in_zone_value = str(bool(data.loc[current_frm, in_zone_col_name]))
-                distance_value = str(round(data.loc[current_frm, distance_col_name], 2))
-                cv2.putText(
-                    img,
-                    in_zone_value,
-                    text_locations[animal_name][shape_name]["in_zone_data_loc"],
-                    font,
-                    scalers["font_size"],
-                    shape_info[shape_name]["Color BGR"],
-                    1,
-                )
-                cv2.putText(
-                    img,
-                    distance_value,
-                    text_locations[animal_name][shape_name]["distance_data_loc"],
-                    font,
-                    scalers["font_size"],
-                    shape_info[shape_name]["Color BGR"],
-                    1,
-                )
-                if directing_viable and style_attr["Directionality"]:
-                    facing_col_name = "{} {} {}".format(
-                        shape_name, animal_name, "facing"
-                    )
-                    facing_value = bool(data.loc[current_frm, facing_col_name])
-                    cv2.putText(
-                        img,
-                        str(facing_value),
-                        text_locations[animal_name][shape_name]["directing_data_loc"],
-                        font,
-                        scalers["font_size"],
-                        shape_info[shape_name]["Color BGR"],
-                        1,
-                    )
-                    if facing_value:
-                        img = __insert_directing_line(
-                            directing_data=directing_data,
-                            shape_name=shape_name,
-                            frame_cnt=current_frm,
-                            shape_info=shape_info,
-                            img=img,
-                            video_name=video_name,
-                            style_attr=style_attr,
-                        )
-            writer.write(img)
-            current_frm += 1
-            print(
-                "Multi-processing video frame {} on core {}...".format(
-                    str(current_frm), str(group_cnt)
-                )
-            )
-        cap.release()
-        writer.release()
-
-        return group_cnt
-
-    @staticmethod
-    def directing_animals_mp(
-        data: pd.DataFrame,
-        directionality_data: pd.DataFrame,
-        bp_names: dict,
-        style_attr: dict,
-        save_temp_dir: str,
-        video_path: str,
-        video_meta_data: dict,
-        colors: list,
-    ):
-
-        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        group_cnt = int(data.iloc[0]["group"])
-        start_frm, current_frm, end_frm = data.index[0], data.index[0], data.index[-1]
-        save_path = os.path.join(save_temp_dir, "{}.mp4".format(str(group_cnt)))
-        _, video_name, _ = get_fn_ext(filepath=video_path)
-        writer = cv2.VideoWriter(
-            save_path,
-            fourcc,
-            video_meta_data["fps"],
-            (video_meta_data["width"], video_meta_data["height"]),
-        )
-        cap = cv2.VideoCapture(video_path)
-        cap.set(1, start_frm)
-        color = colors[0]
-
-        def __draw_individual_lines(animal_img_data: pd.DataFrame, img: np.array):
-            color = colors[0]
-            for cnt, (i, r) in enumerate(animal_img_data.iterrows()):
-                if style_attr["Direction_color"] == "Random":
-                    color = random.sample(colors[0], 1)[0]
-                cv2.line(
-                    img,
-                    (int(r["Eye_x"]), int(r["Eye_y"])),
-                    (int(r["Animal_2_bodypart_x"]), int(r["Animal_2_bodypart_y"])),
-                    color,
-                    style_attr["Direction_thickness"],
-                )
-                if style_attr["Highlight_endpoints"]:
-                    cv2.circle(
-                        img,
-                        (int(r["Eye_x"]), int(r["Eye_y"])),
-                        style_attr["Pose_circle_size"] + 2,
-                        color,
-                        style_attr["Pose_circle_size"],
-                    )
-                    cv2.circle(
-                        img,
-                        (int(r["Animal_2_bodypart_x"]), int(r["Animal_2_bodypart_y"])),
-                        style_attr["Pose_circle_size"] + 1,
-                        color,
-                        style_attr["Pose_circle_size"],
-                    )
-
-            return img
-
-        while current_frm < end_frm:
-            ret, img = cap.read()
-            try:
-                if ret:
-                    if style_attr["Show_pose"]:
-                        bp_data = data.loc[current_frm]
-                        for cnt, (animal_name, animal_bps) in enumerate(
-                            bp_names.items()
-                        ):
-                            for bp in zip(animal_bps["X_bps"], animal_bps["Y_bps"]):
-                                x_bp, y_bp = bp_data[bp[0]], bp_data[bp[1]]
-                                cv2.circle(
-                                    img,
-                                    (int(x_bp), int(y_bp)),
-                                    style_attr["Pose_circle_size"],
-                                    bp_names[animal_name]["colors"][cnt],
-                                    style_attr["Direction_thickness"],
-                                )
-
-                    if current_frm in list(directionality_data["Frame_#"].unique()):
-                        img_data = directionality_data[
-                            directionality_data["Frame_#"] == current_frm
-                        ]
-                        unique_animals = img_data["Animal_1"].unique()
-                        for animal in unique_animals:
-                            animal_img_data = img_data[
-                                img_data["Animal_1"] == animal
-                            ].reset_index(drop=True)
-                            if style_attr["Polyfill"]:
-                                convex_hull_arr = animal_img_data.loc[
-                                    0, ["Eye_x", "Eye_y"]
-                                ].values.reshape(-1, 2)
-                                for animal_2 in animal_img_data["Animal_2"].unique():
-                                    convex_hull_arr = np.vstack(
-                                        (
-                                            convex_hull_arr,
-                                            animal_img_data[
-                                                [
-                                                    "Animal_2_bodypart_x",
-                                                    "Animal_2_bodypart_y",
-                                                ]
-                                            ][
-                                                animal_img_data["Animal_2"] == animal_2
-                                            ].values,
-                                        )
-                                    ).astype("int")
-                                    convex_hull_arr = np.unique(convex_hull_arr, axis=0)
-                                    if convex_hull_arr.shape[0] >= 3:
-                                        if style_attr["Direction_color"] == "Random":
-                                            color = random.sample(colors[0], 1)[0]
-                                        cv2.fillPoly(img, [convex_hull_arr], color)
-                                    else:
-                                        img = __draw_individual_lines(
-                                            animal_img_data=animal_img_data, img=img
-                                        )
-
-                            else:
-                                img = __draw_individual_lines(
-                                    animal_img_data=animal_img_data, img=img
-                                )
-
-                    img = np.uint8(img)
-
-                    current_frm += 1
-                    writer.write(img)
-                    print(
-                        "Multi-processing video frame {} on core {}...".format(
-                            str(current_frm), str(group_cnt)
-                        )
-                    )
-
-                else:
-                    cap.release()
-                    writer.release()
-                    break
-
-            except IndexError:
-                cap.release()
-                writer.release()
-                break
-
-        return group_cnt
-
-    @staticmethod
-    def distance_plotter_mp(
-        data: np.array,
-        video_setting: bool,
-        frame_setting: bool,
-        video_name: str,
-        video_save_dir: str,
-        frame_folder_dir: str,
-        style_attr: dict,
-        line_attr: dict,
-        fps: int,
-    ):
-
-        group = int(data[0][0])
-        line_data = data[:, 2:]
-        color_dict = get_color_dict()
-        video_writer = None
-        if video_setting:
-            fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-            video_save_path = os.path.join(video_save_dir, "{}.mp4".format(str(group)))
-            video_writer = cv2.VideoWriter(
-                video_save_path,
-                fourcc,
-                fps,
-                (style_attr["width"], style_attr["height"]),
-            )
-
-        for i in range(line_data.shape[0]):
-            frame_id = int(data[i][1])
-            for j in range(line_data.shape[1]):
-                color = color_dict[line_attr[j][-1]][::-1]
-                color = tuple(x / 255 for x in color)
-                plt.plot(
-                    line_data[0:i, j],
-                    color=color,
-                    linewidth=style_attr["line width"],
-                    alpha=style_attr["opacity"],
-                )
-
-            x_ticks_locs = x_lbls = np.round(np.linspace(0, i, 5))
-            x_lbls = np.round((x_lbls / fps), 1)
-            plt.ylim(0, style_attr["max_y"])
-            plt.xlabel("time (s)")
-            plt.ylabel("distance (cm)")
-            plt.xticks(
-                x_ticks_locs,
-                x_lbls,
-                rotation="horizontal",
-                fontsize=style_attr["font size"],
-            )
-            plt.yticks(
-                style_attr["y_ticks_locs"],
-                style_attr["y_ticks_lbls"],
-                fontsize=style_attr["font size"],
-            )
-            plt.suptitle(
-                "Animal distances", x=0.5, y=0.92, fontsize=style_attr["font size"] + 4
-            )
-
-            buffer_ = io.BytesIO()
-            plt.savefig(buffer_, format="png")
-            buffer_.seek(0)
-            img = PIL.Image.open(buffer_)
-            img = np.uint8(cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR))
-            buffer_.close()
-            plt.close()
-
-            img = cv2.resize(img, (style_attr["width"], style_attr["height"]))
-            if video_setting:
-                video_writer.write(np.uint8(img))
-            if frame_setting:
-                frm_name = os.path.join(frame_folder_dir, str(frame_id) + ".png")
-                cv2.imwrite(frm_name, np.uint8(img))
-
-            print(
-                "Distance frame created: {}, Video: {}, Processing core: {}".format(
-                    str(frame_id + 1), video_name, str(group + 1)
-                )
-            )
-
-        return group
-
-    @staticmethod
     def gantt_creator_mp(
         data: np.array,
         frame_setting: bool,
@@ -1187,183 +669,6 @@ class PlottingMixin(object):
             video_writer.release()
 
         return group
-
-    @staticmethod
-    def roi_plotter_mp(
-        data: pd.DataFrame,
-        loc_dict: dict,
-        scalers: dict,
-        video_meta_data: dict,
-        save_temp_directory: str,
-        shape_meta_data: dict,
-        video_shape_names: list,
-        input_video_path: str,
-        body_part_dict: dict,
-        roi_analyzer_data: object,
-        colors: list,
-        style_attr: dict,
-        animal_ids: list,
-        threshold: float,
-    ):
-
-        def __insert_texts(shape_df):
-            for animal_name in animal_ids:
-                for _, shape in shape_df.iterrows():
-                    shape_name, shape_color = shape["Name"], shape["Color BGR"]
-                    cv2.putText(
-                        border_img,
-                        loc_dict[animal_name][shape_name]["timer_text"],
-                        loc_dict[animal_name][shape_name]["timer_text_loc"],
-                        font,
-                        scalers["font_size"],
-                        shape_color,
-                        TextOptions.TEXT_THICKNESS.value,
-                    )
-                    cv2.putText(
-                        border_img,
-                        loc_dict[animal_name][shape_name]["entries_text"],
-                        loc_dict[animal_name][shape_name]["entries_text_loc"],
-                        font,
-                        scalers["font_size"],
-                        shape_color,
-                        TextOptions.TEXT_THICKNESS.value,
-                    )
-
-            return border_img
-
-        font = cv2.FONT_HERSHEY_TRIPLEX
-        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        group_cnt = int(data["group"].values[0])
-        start_frm, current_frm, end_frm = data.index[0], data.index[0], data.index[-1]
-        save_path = os.path.join(save_temp_directory, "{}.mp4".format(str(group_cnt)))
-        writer = cv2.VideoWriter(
-            save_path,
-            fourcc,
-            video_meta_data["fps"],
-            (video_meta_data["width"] * 2, video_meta_data["height"]),
-        )
-        cap = cv2.VideoCapture(input_video_path)
-        cap.set(1, start_frm)
-
-        while current_frm <= end_frm:
-            ret, img = cap.read()
-            border_img = cv2.copyMakeBorder(
-                img,
-                0,
-                0,
-                0,
-                int(video_meta_data["width"]),
-                borderType=cv2.BORDER_CONSTANT,
-                value=[0, 0, 0],
-            )
-            border_img = __insert_texts(roi_analyzer_data.video_recs)
-            border_img = __insert_texts(roi_analyzer_data.video_circs)
-            border_img = __insert_texts(roi_analyzer_data.video_polys)
-
-            for _, row in roi_analyzer_data.video_recs.iterrows():
-                top_left_x, top_left_y, shape_name = (
-                    row["topLeftX"],
-                    row["topLeftY"],
-                    row["Name"],
-                )
-                bottom_right_x, bottom_right_y = (
-                    row["Bottom_right_X"],
-                    row["Bottom_right_Y"],
-                )
-                thickness, color = row["Thickness"], row["Color BGR"]
-                cv2.rectangle(
-                    border_img,
-                    (int(top_left_x), int(top_left_y)),
-                    (int(bottom_right_x), int(bottom_right_y)),
-                    color,
-                    int(thickness),
-                )
-
-            for _, row in roi_analyzer_data.video_circs.iterrows():
-                center_x, center_y, radius, shape_name = (
-                    row["centerX"],
-                    row["centerY"],
-                    row["radius"],
-                    row["Name"],
-                )
-                thickness, color = row["Thickness"], row["Color BGR"]
-                cv2.circle(
-                    border_img, (center_x, center_y), radius, color, int(thickness)
-                )
-
-            for _, row in roi_analyzer_data.video_polys.iterrows():
-                vertices, shape_name = row["vertices"], row["Name"]
-                thickness, color = row["Thickness"], row["Color BGR"]
-                cv2.polylines(
-                    border_img, [vertices], True, color, thickness=int(thickness)
-                )
-
-            for animal_cnt, animal_name in enumerate(animal_ids):
-                if style_attr["Show_body_part"] or style_attr["Show_animal_name"]:
-                    bp_data = data.loc[current_frm, body_part_dict[animal_name]].values
-                    if threshold < bp_data[2]:
-                        if style_attr["Show_body_part"]:
-                            cv2.circle(
-                                border_img,
-                                (int(bp_data[0]), int(bp_data[1])),
-                                scalers["circle_size"],
-                                colors[animal_cnt],
-                                -1,
-                            )
-                        if style_attr["Show_animal_name"]:
-                            cv2.putText(
-                                border_img,
-                                animal_name,
-                                (int(bp_data[0]), int(bp_data[1])),
-                                font,
-                                scalers["font_size"],
-                                colors[animal_cnt],
-                                TextOptions.TEXT_THICKNESS.value,
-                            )
-
-                for shape_name in video_shape_names:
-                    timer = round(
-                        data.loc[
-                            current_frm,
-                            "{}_{}_cum_sum_time".format(animal_name, shape_name),
-                        ],
-                        2,
-                    )
-                    entries = data.loc[
-                        current_frm,
-                        "{}_{}_cum_sum_entries".format(animal_name, shape_name),
-                    ]
-                    cv2.putText(
-                        border_img,
-                        str(timer),
-                        loc_dict[animal_name][shape_name]["timer_data_loc"],
-                        font,
-                        scalers["font_size"],
-                        shape_meta_data[shape_name]["Color BGR"],
-                        TextOptions.TEXT_THICKNESS.value,
-                    )
-                    cv2.putText(
-                        border_img,
-                        str(entries),
-                        loc_dict[animal_name][shape_name]["entries_data_loc"],
-                        font,
-                        scalers["font_size"],
-                        shape_meta_data[shape_name]["Color BGR"],
-                        TextOptions.TEXT_THICKNESS.value,
-                    )
-
-            writer.write(border_img)
-            current_frm += 1
-            print(
-                "Multi-processing video frame {} on core {}...".format(
-                    str(current_frm), str(group_cnt)
-                )
-            )
-
-        cap.release()
-        writer.release()
-
-        return group_cnt
 
     @staticmethod
     def bbox_mp(
@@ -2365,6 +1670,158 @@ class PlottingMixin(object):
             )
         else:
             return img
+
+
+
+    @staticmethod
+    def rectangles_onto_image(img: np.ndarray,
+                              rectangles: pd.DataFrame,
+                              show_center: Optional[bool] = False,
+                              show_tags: Optional[bool] = False,
+                              circle_size: Optional[int] = 2) -> np.ndarray:
+
+        check_valid_array(data=img, source=PlottingMixin.rectangles_onto_image.__name__)
+        check_valid_dataframe(df=rectangles, source=PlottingMixin.rectangles_onto_image.__name__, required_fields=['topLeftX', 'topLeftY', 'Bottom_right_X', 'Bottom_right_Y', 'Color BGR', 'Thickness', 'Center_X', 'Center_Y', 'Tags'])
+        check_int(name=PlottingMixin.rectangles_onto_image.__name__, value=circle_size, min_value=1)
+        for _, row in rectangles.iterrows():
+            img = cv2.rectangle(img, (int(row["topLeftX"]), int(row["topLeftY"])), (int(row["Bottom_right_X"]), int(row["Bottom_right_Y"])), row["Color BGR"], int(row["Thickness"]))
+            if show_center:
+                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), circle_size, row["Color BGR"], -1)
+            if show_tags:
+                for tag_name, tag_data in row["Tags"].items():
+                    img = cv2.circle(img, tuple(tag_data), circle_size,  row["Color BGR"], -1)
+        return img
+
+    @staticmethod
+    def circles_onto_image(img: np.ndarray,
+                           circles: pd.DataFrame,
+                           show_center: Optional[bool] = False,
+                           show_tags: Optional[bool] = False,
+                           circle_size: Optional[int] = 2) -> np.ndarray:
+
+        check_valid_array(data=img, source=PlottingMixin.circles_onto_image.__name__)
+        check_valid_dataframe(df=circles, source=PlottingMixin.circles_onto_image.__name__, required_fields=['centerX', 'centerY', 'radius', 'Color BGR', 'Thickness', 'Tags'])
+        check_int(name=PlottingMixin.circles_onto_image.__name__, value=circle_size, min_value=1)
+        for _, row in circles.iterrows():
+            img = cv2.circle(img, (int(row["centerX"]), int(row["centerY"])), row["radius"], row["Color BGR"], int(row["Thickness"]))
+            if show_center:
+                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), circle_size, row["Color BGR"], -1)
+            if show_tags:
+                for tag_data in row["Tags"].values():
+                    img = cv2.circle(img, tuple(tag_data), circle_size,  row["Color BGR"], -1)
+        return img
+
+    @staticmethod
+    def polygons_onto_image(img: np.ndarray,
+                            polygons: pd.DataFrame,
+                            show_center: Optional[bool] = False,
+                            show_tags: Optional[bool] = False,
+                            circle_size: Optional[int] = 2) -> np.ndarray:
+
+        """
+        Helper to insert polygon overlays onto an image.
+
+        :param np.ndarray img:
+        :param polygons:
+        :param show_center:
+        :param show_tags:
+        :param circle_size:
+        :return:
+        """
+
+        check_valid_array(data=img, source=f'{PlottingMixin.polygons_onto_image.__name__} img')
+        check_valid_dataframe(df=polygons, source=f'{PlottingMixin.polygons_onto_image.__name__} polygons', required_fields=['vertices', 'Center_X', 'Center_Y', 'Color BGR', 'Thickness', 'Tags'])
+        check_int(name=PlottingMixin.polygons_onto_image.__name__, value=circle_size, min_value=1)
+        for _, row in polygons.iterrows():
+            img = cv2.polylines(img, [row["vertices"].astype(int)], True, row["Color BGR"], thickness=int(row["Thickness"]))
+            if show_center:
+                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), circle_size, row["Color BGR"], -1)
+            if show_tags:
+                for tag_data in row["vertices"]:
+                    img = cv2.circle(img, tuple(tag_data), circle_size, row["Color BGR"], -1)
+        return img
+
+    @staticmethod
+    def roi_dict_onto_img(img: np.ndarray,
+                          roi_dict: Dict[str, pd.DataFrame],
+                          circle_size: Optional[int] = 2,
+                          show_center: Optional[bool] = False,
+                          show_tags: Optional[bool] = False) -> np.ndarray:
+
+        check_valid_array(data=img, source=f'{PlottingMixin.roi_dict_onto_img.__name__} img')
+        check_if_keys_exist_in_dict(data=roi_dict, key=[Keys.ROI_POLYGONS.value, Keys.ROI_CIRCLES.value, Keys.ROI_RECTANGLES.value], name=PlottingMixin.roi_dict_onto_img.__name__)
+        img = PlottingMixin.rectangles_onto_image(img=img, rectangles=roi_dict[Keys.ROI_RECTANGLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
+        img = PlottingMixin.circles_onto_image(img=img, circles=roi_dict[Keys.ROI_CIRCLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
+        img = PlottingMixin.polygons_onto_image(img=img, polygons=roi_dict[Keys.ROI_POLYGONS.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
+        return img
+
+    @staticmethod
+    def insert_directing_line(directing_df: pd.DataFrame,
+                              img: np.ndarray,
+                              shape_name: str,
+                              animal_name: str,
+                              frame_id: int,
+                              color: Optional[Tuple[int]] = (0, 0, 255),
+                              thickness: Optional[int] = 2,
+                              style: Optional[str] = 'lines') -> np.ndarray:
+
+        """
+        Helper to insert lines between the actor 'eye' and the ROI centers.
+
+        :param directing_df: Dataframe containing eye and ROI locations. Stored as ``results`` in  instance of ``simba.roi_tools.ROI_directing_analyzer.DirectingROIAnalyzer``.
+        :param np.ndarray img: The image to draw the line on.
+        :param str shape_name: The name of the shape to draw the line to.
+        :param str animal_name: The name of the animal
+        :param int frame_id: The frame number in the video
+        :param Optional[Tuple[int]] color: The color of the line
+        :param Optional[int] thickness: The thickness of the line.
+        :param Optional[str] style: The style of the line. "lines" or "funnel".
+        :return np.ndarray: The input image with the line.
+        """
+
+
+        check_valid_array(data=img, source=PlottingMixin.insert_directing_line.__name__)
+        check_valid_dataframe(df=directing_df, source=PlottingMixin.rectangles_onto_image.__name__, required_fields=['ROI', 'Animal', 'Frame', 'ROI_edge_1_x', 'ROI_edge_1_y', 'ROI_edge_2_x', 'ROI_edge_2_y'])
+        r = directing_df.loc[(directing_df["ROI"] == shape_name) & (directing_df["Animal"] == animal_name) & (directing_df["Frame"] == frame_id)].reset_index(drop=True)
+        if style == 'funnel':
+            convex_hull_arr = (np.array([[r["ROI_edge_1_x"], r["ROI_edge_1_y"]], [r["ROI_edge_2_x"], r["ROI_edge_2_y"]], [r["Eye_x"], r["Eye_y"]]]).reshape(-1, 2).astype(int))
+            img = cv2.fillPoly(img, [convex_hull_arr], color)
+        else:
+            img = cv2.line(img, (int(r["Eye_x"]), int(r["Eye_y"])), (int(r["ROI_x"]), int(r["ROI_y"])), color, thickness)
+        return img
+
+
+    @staticmethod
+    def draw_lines_on_img(img: np.ndarray,
+                          start_positions: np.ndarray,
+                          end_positions: np.ndarray,
+                          color: Tuple[int, int, int],
+                          highlight_endpoint: Optional[bool] = False,
+                          thickness: Optional[int] = 2,
+                          circle_size: Optional[int] = 2) -> np.ndarray:
+        """
+        Helper to draw a set of lines onto an image.
+
+        :param np.ndarray img: The image to draw the lines on.
+        :param np.ndarray start_positions: 2D numpy array representing the start positions of the lines in x, y format.
+        :param np.ndarray end_positions: 2D numpy array representing the end positions of the lines in x, y format.
+        :param Tuple[int, int, int] color: The color of the lines in BGR format.
+        :param Optional[bool] highlight_endpoint: If True, highlights the ends of the lines with circles.
+        :param Optional[int] thickness: The thickness of the lines.
+        :param Optional[int] circle_size: If ``highlight_endpoint`` is True, the size of the highlighted points.
+
+        :return np.ndarray: The image with the lines overlayed.
+        """
+
+        check_valid_array(data=start_positions, source=f'{PlottingMixin.draw_lines_on_img.__name__} img')
+        check_valid_array(data=start_positions, source=f'{PlottingMixin.draw_lines_on_img.__name__} start_positions', accepted_ndims=(2,), accepted_dtypes=(np.int64,), min_axis_0=1)
+        check_valid_array(data=end_positions, source=f'{PlottingMixin.draw_lines_on_img.__name__} end_positions', accepted_shapes=[(start_positions.shape[0], 2),])
+        check_if_valid_rgb_tuple(data=color)
+        for i in range(start_positions.shape[0]):
+            cv2.line(img, (start_positions[i][0], start_positions[i][1]), (end_positions[i][0], end_positions[i][1]), color, thickness)
+            if highlight_endpoint:
+                cv2.circle(img, (end_positions[i][0], end_positions[i][1]), circle_size, color, -1)
+        return img
 
 
 # from sklearn.datasets import make_blobs

@@ -225,13 +225,8 @@ class ConfigReader(object):
                 source=self.__class__.__name__,
             )
         else:
-
-            self.rectangles_df = pd.read_hdf(
-                self.roi_coordinates_path, key=Keys.ROI_RECTANGLES.value
-            )
-            if ("Center_X" in self.rectangles_df.columns) and (
-                self.rectangles_df["Center_X"].isnull().values.any()
-            ):
+            self.rectangles_df = pd.read_hdf(self.roi_coordinates_path, key=Keys.ROI_RECTANGLES.value)
+            if ("Center_X" in self.rectangles_df.columns) and (self.rectangles_df["Center_X"].isnull().values.any()):
                 for idx, row in self.rectangles_df.iterrows():
                     self.rectangles_df.loc[idx]["Center_X"] = row["Tags"]["Center tag"][
                         0
@@ -269,31 +264,11 @@ class ConfigReader(object):
             self.roi_types_names_lst = list(self.roi_types_names_lst)
             for shape_type, shape_data in self.roi_dict.items():
                 if shape_type == Keys.ROI_CIRCLES.value:
-                    self.roi_dict[Keys.ROI_CIRCLES.value]["Center_X"] = self.roi_dict[
-                        Keys.ROI_CIRCLES.value
-                    ]["centerX"]
-                    self.roi_dict[Keys.ROI_CIRCLES.value]["Center_Y"] = self.roi_dict[
-                        Keys.ROI_CIRCLES.value
-                    ]["centerY"]
+                    self.roi_dict[Keys.ROI_CIRCLES.value]["Center_X"] = self.roi_dict[ Keys.ROI_CIRCLES.value]["centerX"]
+                    self.roi_dict[Keys.ROI_CIRCLES.value]["Center_Y"] = self.roi_dict[Keys.ROI_CIRCLES.value]["centerY"]
                 elif shape_type == Keys.ROI_RECTANGLES.value:
-                    self.roi_dict[Keys.ROI_RECTANGLES.value][
-                        "Center_X"
-                    ] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_X"] - (
-                        (
-                            self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_X"]
-                            - self.roi_dict[Keys.ROI_RECTANGLES.value]["width"]
-                        )
-                        / 2
-                    )
-                    self.roi_dict[Keys.ROI_RECTANGLES.value][
-                        "Center_Y"
-                    ] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_Y"] - (
-                        (
-                            self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_Y"]
-                            - self.roi_dict[Keys.ROI_RECTANGLES.value]["height"]
-                        )
-                        / 2
-                    )
+                    self.roi_dict[Keys.ROI_RECTANGLES.value]["Center_X"] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_X"] - (self.roi_dict[Keys.ROI_RECTANGLES.value]["width"] / 2)
+                    self.roi_dict[Keys.ROI_RECTANGLES.value]["Center_Y"] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_Y"] - (self.roi_dict[Keys.ROI_RECTANGLES.value]["height"] / 2)
                 elif shape_type == Keys.ROI_POLYGONS.value:
                     try:
                         self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"] = (

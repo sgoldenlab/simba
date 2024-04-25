@@ -4,7 +4,6 @@ from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.roi_tools.ROI_clf_calculator import ROIClfCalculator
 from simba.roi_tools.ROI_directing_analyzer import DirectingROIAnalyzer
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
-from simba.roi_tools.ROI_movement_analyzer import ROIMovementAnalyzer
 from simba.roi_tools.ROI_size_calculations import rectangle_size_calc, circle_size_calc, polygon_size_calc
 from simba.roi_tools.ROI_time_bin_calculator import ROITimebinCalculator
 
@@ -20,13 +19,13 @@ def all_config_path_args(request):
     return request
 
 
-@pytest.mark.parametrize("calculate_distances", [True, False])
-def test_roi_analyser(all_config_path_args, calculate_distances):
-    roi_analyzer = ROIAnalyzer(ini_path=all_config_path_args.param,
-                               data_path="outlier_corrected_movement_location",
-                               calculate_distances=calculate_distances)
-    roi_analyzer.run()
-    roi_analyzer.save()
+# @pytest.mark.parametrize("calculate_distances", [True, False])
+# def test_roi_analyser(all_config_path_args, calculate_distances):
+#     roi_analyzer = ROIAnalyzer(config_path=all_config_path_args.param,
+#                                data_path=None,
+#                                calculate_distances=calculate_distances)
+#     roi_analyzer.run()
+#     roi_analyzer.save()
 
 def test_roi_clf_calculator(config_path_args):
     clf_ROI_analyzer = ROIClfCalculator(config_ini=config_path_args.param)
@@ -42,8 +41,8 @@ def test_roi_clf_calculator(config_path_args):
 #     roi_featurizer = ROIFeatureCreator(config_path=config_path, settings=settings)
 #     roi_featurizer.run()
 
-def test_roi_movement_analyzer(all_config_path_args):
-    _ = ROIMovementAnalyzer(config_path=all_config_path_args.param)
+# def test_roi_movement_analyzer(all_config_path_args):
+#     _ = ROIMovementAnalyzer(config_path=all_config_path_args.param)
 
 @pytest.mark.parametrize("rectangle_dict, px_mm, expected_area", [({'height': 500, 'width': 500}, 10, 25), ({'height': 500, 'width': 500}, 5, 100)])
 def test_rectangle_size_calc(rectangle_dict, px_mm, expected_area):

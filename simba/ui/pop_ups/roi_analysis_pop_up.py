@@ -83,40 +83,23 @@ class ROIAnalysisPopUp(ConfigReader, PopUpMixin):
 
     def run(self):
         settings = {}
-        check_float(
-            name="Probability threshold",
-            value=self.probability_entry.entry_get,
-            min_value=0.00,
-            max_value=1.00,
-        )
+        check_float(name="Probability threshold", value=self.probability_entry.entry_get, min_value=0.00, max_value=1.00)
         settings["threshold"] = float(self.probability_entry.entry_get)
-        settings["body_parts"] = {}
-        self.config.set(
-            ConfigKey.ROI_SETTINGS.value,
-            ConfigKey.ROI_ANIMAL_CNT.value,
-            str(self.animal_cnt_dropdown.getChoices()),
-        )
-        self.config.set(
-            ConfigKey.ROI_SETTINGS.value,
-            ConfigKey.PROBABILITY_THRESHOLD.value,
-            str(self.probability_entry.entry_get),
-        )
+        body_parts = []
         for cnt, dropdown in self.body_parts_dropdowns.items():
-            settings["body_parts"][f"animal_{cnt + 1}_bp"] = dropdown.getChoices()
-            self.config.set(
-                "ROI settings", f"animal_{cnt + 1}_bp", str(dropdown.getChoices())
-            )
-        self.update_config()
-        roi_analyzer = ROIAnalyzer(
-            ini_path=self.config_path,
-            data_path="outlier_corrected_movement_location",
-            calculate_distances=self.calculate_distance_moved_var.get(),
-            detailed_bout_data=self.detailed_roi_var.get(),
-            settings=settings,
-        )
+            body_parts.append(dropdown.getChoices())
+        roi_analyzer = ROIAnalyzer(config_path=self.config_path,
+                                   data_path=None,
+                                   calculate_distances=self.calculate_distance_moved_var.get(),
+                                   detailed_bout_data=self.detailed_roi_var.get(),
+                                   threshold=float(self.probability_entry.entry_get),
+                                   body_parts=body_parts)
         roi_analyzer.run()
         roi_analyzer.save()
         self.root.destroy()
+
+
+#_ = ROIAnalysisPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini')
 
 
 # ROIAnalysisPopUp(config_path='/Users/simon/Desktop/envs/simba_dev/tests/data/test_projects/mouse_open_field/project_folder/project_config.ini')
