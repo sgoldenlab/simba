@@ -13,7 +13,6 @@ jobs:
         run: |
           pip install black isort
           cd simba
-          black .
           isort .
       - name: Commit changes
         uses: EndBug/add-and-commit@v4
