@@ -25,13 +25,14 @@ except:
 
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
+                                check_if_keys_exist_in_dict,
                                 check_if_module_has_import,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int, check_str,
                                 check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_dataframe, check_if_keys_exist_in_dict)
-from simba.utils.enums import ConfigKey, Dtypes, Options, Keys
+                                check_valid_array, check_valid_dataframe)
+from simba.utils.enums import ConfigKey, Dtypes, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
                                 NoFilesFoundError)
@@ -646,21 +647,41 @@ def convert_roi_definitions(
                 source=convert_roi_definitions.__name__,
             )
 
-def slice_roi_dict_for_video(data: Dict[str, pd.DataFrame], video_name: str) -> Tuple[Dict[str, pd.DataFrame], List[str]]:
+
+def slice_roi_dict_for_video(
+    data: Dict[str, pd.DataFrame], video_name: str
+) -> Tuple[Dict[str, pd.DataFrame], List[str]]:
     """
     Given a dictionary of dataframes representing different ROIs (created by ``simba.mixins.config_reader.ConfigReader.read_roi_data``),
     retain only the ROIs belonging to the specified video.
     """
-    check_if_keys_exist_in_dict(data=data, key=[Keys.ROI_RECTANGLES.value, Keys.ROI_CIRCLES.value, Keys.ROI_POLYGONS.value], name=slice_roi_dict_for_video.__name__)
+    check_if_keys_exist_in_dict(
+        data=data,
+        key=[
+            Keys.ROI_RECTANGLES.value,
+            Keys.ROI_CIRCLES.value,
+            Keys.ROI_POLYGONS.value,
+        ],
+        name=slice_roi_dict_for_video.__name__,
+    )
     new_data, shape_names = {}, []
     for k, v in data.items():
-        check_instance(source=f'{slice_roi_dict_for_video.__name__} {k}', instance=v, accepted_types=(pd.DataFrame,))
-        check_that_column_exist(df=v, column_name='Video', file_name=slice_roi_dict_for_video.__name__)
-        check_that_column_exist(df=v, column_name='Name', file_name=slice_roi_dict_for_video.__name__)
-        v = v[v['Video'] == video_name]
+        check_instance(
+            source=f"{slice_roi_dict_for_video.__name__} {k}",
+            instance=v,
+            accepted_types=(pd.DataFrame,),
+        )
+        check_that_column_exist(
+            df=v, column_name="Video", file_name=slice_roi_dict_for_video.__name__
+        )
+        check_that_column_exist(
+            df=v, column_name="Name", file_name=slice_roi_dict_for_video.__name__
+        )
+        v = v[v["Video"] == video_name]
         new_data[k] = v.reset_index(drop=True)
-        shape_names.extend((list(v['Name'].unique())))
+        shape_names.extend((list(v["Name"].unique())))
     return new_data, shape_names
+
 
 def freedman_diaconis(data: np.array) -> (float, int):
     """

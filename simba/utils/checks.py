@@ -3,12 +3,12 @@ __author__ = "Simon Nilsson"
 import ast
 import glob
 import os
-import cv2
 import re
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
+import cv2
 import numpy as np
 import pandas as pd
 import trafaret as t
@@ -17,12 +17,13 @@ from simba.utils.enums import Keys, Options, UMAPParam
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 CorruptedFileError, CountError,
                                 DirectoryNotEmptyError, FFMPEGNotFoundError,
-                                FloatError, IntegerError, InvalidFilepathError,
-                                InvalidInputError, NoDataError,
-                                NoFilesFoundError, NoROIDataError,
+                                FloatError, FrameRangeError, IntegerError,
+                                InvalidFilepathError, InvalidInputError,
+                                NoDataError, NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
-                                StringError, FrameRangeError)
-from simba.utils.warnings import NoDataFoundWarning, FrameRangeWarning
+                                StringError)
+from simba.utils.warnings import FrameRangeWarning, NoDataFoundWarning
+
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
     """
@@ -1285,10 +1286,13 @@ def check_valid_tuple(
                 source=source,
             )
 
-def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.VideoCapture],
-                                         data: Union[str, os.PathLike, pd.DataFrame],
-                                         name: Optional[str] = '',
-                                         raise_error: Optional[bool] = True) -> None:
+
+def check_video_and_data_frm_count_align(
+    video: Union[str, os.PathLike, cv2.VideoCapture],
+    data: Union[str, os.PathLike, pd.DataFrame],
+    name: Optional[str] = "",
+    raise_error: Optional[bool] = True,
+) -> None:
     """
     Check if the frame count of a video matches the row count of a data file.
 
@@ -1310,22 +1314,40 @@ def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.Vide
             yield b
             b = reader(1024 * 1024)
 
-    check_instance(source=f'{check_video_and_data_frm_count_align.__name__} video', instance=video, accepted_types=(str, cv2.VideoCapture))
-    check_instance(source=f'{check_video_and_data_frm_count_align.__name__} data', instance=data, accepted_types=(str, pd.DataFrame))
-    check_str(name=f'{check_video_and_data_frm_count_align.__name__} name', value=name, allow_blank=True)
+    check_instance(
+        source=f"{check_video_and_data_frm_count_align.__name__} video",
+        instance=video,
+        accepted_types=(str, cv2.VideoCapture),
+    )
+    check_instance(
+        source=f"{check_video_and_data_frm_count_align.__name__} data",
+        instance=data,
+        accepted_types=(str, pd.DataFrame),
+    )
+    check_str(
+        name=f"{check_video_and_data_frm_count_align.__name__} name",
+        value=name,
+        allow_blank=True,
+    )
     if isinstance(video, str):
         check_file_exist_and_readable(file_path=video)
         video = cv2.VideoCapture(video)
     video_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
     if isinstance(data, str):
         check_file_exist_and_readable(file_path=data)
-        with open(data, 'rb') as fp:
+        with open(data, "rb") as fp:
             c_generator = _count_generator(fp.raw.read)
-            data_count = (sum(buffer.count(b'\n') for buffer in c_generator)) - 1
+            data_count = (sum(buffer.count(b"\n") for buffer in c_generator)) - 1
     else:
         data_count = len(data)
     if data_count != video_count:
         if not raise_error:
-            FrameRangeWarning(msg=f'The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows', source=check_video_and_data_frm_count_align.__name__)
+            FrameRangeWarning(
+                msg=f"The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows",
+                source=check_video_and_data_frm_count_align.__name__,
+            )
         else:
-            raise FrameRangeError(msg=f'The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows', source=check_video_and_data_frm_count_align.__name__)
+            raise FrameRangeError(
+                msg=f"The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows",
+                source=check_video_and_data_frm_count_align.__name__,
+            )

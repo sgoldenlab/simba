@@ -32,8 +32,9 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_rgb_tuple, check_instance,
                                 check_int, check_str, check_that_column_exist,
-                                check_valid_array, check_valid_lst, check_valid_dataframe)
-from simba.utils.enums import Formats, Options, TextOptions, Keys
+                                check_valid_array, check_valid_dataframe,
+                                check_valid_lst)
+from simba.utils.enums import Formats, Keys, Options, TextOptions
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
                                  get_named_colors)
@@ -1671,53 +1672,117 @@ class PlottingMixin(object):
         else:
             return img
 
-
-
     @staticmethod
-    def rectangles_onto_image(img: np.ndarray,
-                              rectangles: pd.DataFrame,
-                              show_center: Optional[bool] = False,
-                              show_tags: Optional[bool] = False,
-                              circle_size: Optional[int] = 2) -> np.ndarray:
+    def rectangles_onto_image(
+        img: np.ndarray,
+        rectangles: pd.DataFrame,
+        show_center: Optional[bool] = False,
+        show_tags: Optional[bool] = False,
+        circle_size: Optional[int] = 2,
+    ) -> np.ndarray:
 
         check_valid_array(data=img, source=PlottingMixin.rectangles_onto_image.__name__)
-        check_valid_dataframe(df=rectangles, source=PlottingMixin.rectangles_onto_image.__name__, required_fields=['topLeftX', 'topLeftY', 'Bottom_right_X', 'Bottom_right_Y', 'Color BGR', 'Thickness', 'Center_X', 'Center_Y', 'Tags'])
-        check_int(name=PlottingMixin.rectangles_onto_image.__name__, value=circle_size, min_value=1)
+        check_valid_dataframe(
+            df=rectangles,
+            source=PlottingMixin.rectangles_onto_image.__name__,
+            required_fields=[
+                "topLeftX",
+                "topLeftY",
+                "Bottom_right_X",
+                "Bottom_right_Y",
+                "Color BGR",
+                "Thickness",
+                "Center_X",
+                "Center_Y",
+                "Tags",
+            ],
+        )
+        check_int(
+            name=PlottingMixin.rectangles_onto_image.__name__,
+            value=circle_size,
+            min_value=1,
+        )
         for _, row in rectangles.iterrows():
-            img = cv2.rectangle(img, (int(row["topLeftX"]), int(row["topLeftY"])), (int(row["Bottom_right_X"]), int(row["Bottom_right_Y"])), row["Color BGR"], int(row["Thickness"]))
+            img = cv2.rectangle(
+                img,
+                (int(row["topLeftX"]), int(row["topLeftY"])),
+                (int(row["Bottom_right_X"]), int(row["Bottom_right_Y"])),
+                row["Color BGR"],
+                int(row["Thickness"]),
+            )
             if show_center:
-                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), circle_size, row["Color BGR"], -1)
+                img = cv2.circle(
+                    img,
+                    (int(row["Center_X"]), int(row["Center_Y"])),
+                    circle_size,
+                    row["Color BGR"],
+                    -1,
+                )
             if show_tags:
                 for tag_name, tag_data in row["Tags"].items():
-                    img = cv2.circle(img, tuple(tag_data), circle_size,  row["Color BGR"], -1)
+                    img = cv2.circle(
+                        img, tuple(tag_data), circle_size, row["Color BGR"], -1
+                    )
         return img
 
     @staticmethod
-    def circles_onto_image(img: np.ndarray,
-                           circles: pd.DataFrame,
-                           show_center: Optional[bool] = False,
-                           show_tags: Optional[bool] = False,
-                           circle_size: Optional[int] = 2) -> np.ndarray:
+    def circles_onto_image(
+        img: np.ndarray,
+        circles: pd.DataFrame,
+        show_center: Optional[bool] = False,
+        show_tags: Optional[bool] = False,
+        circle_size: Optional[int] = 2,
+    ) -> np.ndarray:
 
         check_valid_array(data=img, source=PlottingMixin.circles_onto_image.__name__)
-        check_valid_dataframe(df=circles, source=PlottingMixin.circles_onto_image.__name__, required_fields=['centerX', 'centerY', 'radius', 'Color BGR', 'Thickness', 'Tags'])
-        check_int(name=PlottingMixin.circles_onto_image.__name__, value=circle_size, min_value=1)
+        check_valid_dataframe(
+            df=circles,
+            source=PlottingMixin.circles_onto_image.__name__,
+            required_fields=[
+                "centerX",
+                "centerY",
+                "radius",
+                "Color BGR",
+                "Thickness",
+                "Tags",
+            ],
+        )
+        check_int(
+            name=PlottingMixin.circles_onto_image.__name__,
+            value=circle_size,
+            min_value=1,
+        )
         for _, row in circles.iterrows():
-            img = cv2.circle(img, (int(row["centerX"]), int(row["centerY"])), row["radius"], row["Color BGR"], int(row["Thickness"]))
+            img = cv2.circle(
+                img,
+                (int(row["centerX"]), int(row["centerY"])),
+                row["radius"],
+                row["Color BGR"],
+                int(row["Thickness"]),
+            )
             if show_center:
-                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), circle_size, row["Color BGR"], -1)
+                img = cv2.circle(
+                    img,
+                    (int(row["Center_X"]), int(row["Center_Y"])),
+                    circle_size,
+                    row["Color BGR"],
+                    -1,
+                )
             if show_tags:
                 for tag_data in row["Tags"].values():
-                    img = cv2.circle(img, tuple(tag_data), circle_size,  row["Color BGR"], -1)
+                    img = cv2.circle(
+                        img, tuple(tag_data), circle_size, row["Color BGR"], -1
+                    )
         return img
 
     @staticmethod
-    def polygons_onto_image(img: np.ndarray,
-                            polygons: pd.DataFrame,
-                            show_center: Optional[bool] = False,
-                            show_tags: Optional[bool] = False,
-                            circle_size: Optional[int] = 2) -> np.ndarray:
-
+    def polygons_onto_image(
+        img: np.ndarray,
+        polygons: pd.DataFrame,
+        show_center: Optional[bool] = False,
+        show_tags: Optional[bool] = False,
+        circle_size: Optional[int] = 2,
+    ) -> np.ndarray:
         """
         Helper to insert polygon overlays onto an image.
 
@@ -1729,42 +1794,104 @@ class PlottingMixin(object):
         :return:
         """
 
-        check_valid_array(data=img, source=f'{PlottingMixin.polygons_onto_image.__name__} img')
-        check_valid_dataframe(df=polygons, source=f'{PlottingMixin.polygons_onto_image.__name__} polygons', required_fields=['vertices', 'Center_X', 'Center_Y', 'Color BGR', 'Thickness', 'Tags'])
-        check_int(name=PlottingMixin.polygons_onto_image.__name__, value=circle_size, min_value=1)
+        check_valid_array(
+            data=img, source=f"{PlottingMixin.polygons_onto_image.__name__} img"
+        )
+        check_valid_dataframe(
+            df=polygons,
+            source=f"{PlottingMixin.polygons_onto_image.__name__} polygons",
+            required_fields=[
+                "vertices",
+                "Center_X",
+                "Center_Y",
+                "Color BGR",
+                "Thickness",
+                "Tags",
+            ],
+        )
+        check_int(
+            name=PlottingMixin.polygons_onto_image.__name__,
+            value=circle_size,
+            min_value=1,
+        )
         for _, row in polygons.iterrows():
-            img = cv2.polylines(img, [row["vertices"].astype(int)], True, row["Color BGR"], thickness=int(row["Thickness"]))
+            img = cv2.polylines(
+                img,
+                [row["vertices"].astype(int)],
+                True,
+                row["Color BGR"],
+                thickness=int(row["Thickness"]),
+            )
             if show_center:
-                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), circle_size, row["Color BGR"], -1)
+                img = cv2.circle(
+                    img,
+                    (int(row["Center_X"]), int(row["Center_Y"])),
+                    circle_size,
+                    row["Color BGR"],
+                    -1,
+                )
             if show_tags:
                 for tag_data in row["vertices"]:
-                    img = cv2.circle(img, tuple(tag_data), circle_size, row["Color BGR"], -1)
+                    img = cv2.circle(
+                        img, tuple(tag_data), circle_size, row["Color BGR"], -1
+                    )
         return img
 
     @staticmethod
-    def roi_dict_onto_img(img: np.ndarray,
-                          roi_dict: Dict[str, pd.DataFrame],
-                          circle_size: Optional[int] = 2,
-                          show_center: Optional[bool] = False,
-                          show_tags: Optional[bool] = False) -> np.ndarray:
+    def roi_dict_onto_img(
+        img: np.ndarray,
+        roi_dict: Dict[str, pd.DataFrame],
+        circle_size: Optional[int] = 2,
+        show_center: Optional[bool] = False,
+        show_tags: Optional[bool] = False,
+    ) -> np.ndarray:
 
-        check_valid_array(data=img, source=f'{PlottingMixin.roi_dict_onto_img.__name__} img')
-        check_if_keys_exist_in_dict(data=roi_dict, key=[Keys.ROI_POLYGONS.value, Keys.ROI_CIRCLES.value, Keys.ROI_RECTANGLES.value], name=PlottingMixin.roi_dict_onto_img.__name__)
-        img = PlottingMixin.rectangles_onto_image(img=img, rectangles=roi_dict[Keys.ROI_RECTANGLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
-        img = PlottingMixin.circles_onto_image(img=img, circles=roi_dict[Keys.ROI_CIRCLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
-        img = PlottingMixin.polygons_onto_image(img=img, polygons=roi_dict[Keys.ROI_POLYGONS.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
+        check_valid_array(
+            data=img, source=f"{PlottingMixin.roi_dict_onto_img.__name__} img"
+        )
+        check_if_keys_exist_in_dict(
+            data=roi_dict,
+            key=[
+                Keys.ROI_POLYGONS.value,
+                Keys.ROI_CIRCLES.value,
+                Keys.ROI_RECTANGLES.value,
+            ],
+            name=PlottingMixin.roi_dict_onto_img.__name__,
+        )
+        img = PlottingMixin.rectangles_onto_image(
+            img=img,
+            rectangles=roi_dict[Keys.ROI_RECTANGLES.value],
+            circle_size=circle_size,
+            show_center=show_center,
+            show_tags=show_tags,
+        )
+        img = PlottingMixin.circles_onto_image(
+            img=img,
+            circles=roi_dict[Keys.ROI_CIRCLES.value],
+            circle_size=circle_size,
+            show_center=show_center,
+            show_tags=show_tags,
+        )
+        img = PlottingMixin.polygons_onto_image(
+            img=img,
+            polygons=roi_dict[Keys.ROI_POLYGONS.value],
+            circle_size=circle_size,
+            show_center=show_center,
+            show_tags=show_tags,
+        )
         return img
 
     @staticmethod
-    def insert_directing_line(directing_df: pd.DataFrame,
-                              img: np.ndarray,
-                              shape_name: str,
-                              animal_name: str,
-                              frame_id: int,
-                              color: Optional[Tuple[int]] = (0, 0, 255),
-                              thickness: Optional[int] = 2,
-                              style: Optional[str] = 'lines') -> np.ndarray:
-
+    def insert_directing_line(
+        directing_df: pd.DataFrame,
+        img: np.ndarray,
+        shape_name: str,
+        animal_name: str,
+        frame_id: int,
+        color: Optional[Tuple[int]] = (0, 0, 255),
+        thickness: Optional[int] = 2,
+        style: Optional[str] = "lines",
+    ) -> np.ndarray:
         """
         Helper to insert lines between the actor 'eye' and the ROI centers.
 
@@ -1779,26 +1906,58 @@ class PlottingMixin(object):
         :return np.ndarray: The input image with the line.
         """
 
-
         check_valid_array(data=img, source=PlottingMixin.insert_directing_line.__name__)
-        check_valid_dataframe(df=directing_df, source=PlottingMixin.rectangles_onto_image.__name__, required_fields=['ROI', 'Animal', 'Frame', 'ROI_edge_1_x', 'ROI_edge_1_y', 'ROI_edge_2_x', 'ROI_edge_2_y'])
-        r = directing_df.loc[(directing_df["ROI"] == shape_name) & (directing_df["Animal"] == animal_name) & (directing_df["Frame"] == frame_id)].reset_index(drop=True)
-        if style == 'funnel':
-            convex_hull_arr = (np.array([[r["ROI_edge_1_x"], r["ROI_edge_1_y"]], [r["ROI_edge_2_x"], r["ROI_edge_2_y"]], [r["Eye_x"], r["Eye_y"]]]).reshape(-1, 2).astype(int))
+        check_valid_dataframe(
+            df=directing_df,
+            source=PlottingMixin.rectangles_onto_image.__name__,
+            required_fields=[
+                "ROI",
+                "Animal",
+                "Frame",
+                "ROI_edge_1_x",
+                "ROI_edge_1_y",
+                "ROI_edge_2_x",
+                "ROI_edge_2_y",
+            ],
+        )
+        r = directing_df.loc[
+            (directing_df["ROI"] == shape_name)
+            & (directing_df["Animal"] == animal_name)
+            & (directing_df["Frame"] == frame_id)
+        ].reset_index(drop=True)
+        if style == "funnel":
+            convex_hull_arr = (
+                np.array(
+                    [
+                        [r["ROI_edge_1_x"], r["ROI_edge_1_y"]],
+                        [r["ROI_edge_2_x"], r["ROI_edge_2_y"]],
+                        [r["Eye_x"], r["Eye_y"]],
+                    ]
+                )
+                .reshape(-1, 2)
+                .astype(int)
+            )
             img = cv2.fillPoly(img, [convex_hull_arr], color)
         else:
-            img = cv2.line(img, (int(r["Eye_x"]), int(r["Eye_y"])), (int(r["ROI_x"]), int(r["ROI_y"])), color, thickness)
+            img = cv2.line(
+                img,
+                (int(r["Eye_x"]), int(r["Eye_y"])),
+                (int(r["ROI_x"]), int(r["ROI_y"])),
+                color,
+                thickness,
+            )
         return img
 
-
     @staticmethod
-    def draw_lines_on_img(img: np.ndarray,
-                          start_positions: np.ndarray,
-                          end_positions: np.ndarray,
-                          color: Tuple[int, int, int],
-                          highlight_endpoint: Optional[bool] = False,
-                          thickness: Optional[int] = 2,
-                          circle_size: Optional[int] = 2) -> np.ndarray:
+    def draw_lines_on_img(
+        img: np.ndarray,
+        start_positions: np.ndarray,
+        end_positions: np.ndarray,
+        color: Tuple[int, int, int],
+        highlight_endpoint: Optional[bool] = False,
+        thickness: Optional[int] = 2,
+        circle_size: Optional[int] = 2,
+    ) -> np.ndarray:
         """
         Helper to draw a set of lines onto an image.
 
@@ -1813,14 +1972,41 @@ class PlottingMixin(object):
         :return np.ndarray: The image with the lines overlayed.
         """
 
-        check_valid_array(data=start_positions, source=f'{PlottingMixin.draw_lines_on_img.__name__} img')
-        check_valid_array(data=start_positions, source=f'{PlottingMixin.draw_lines_on_img.__name__} start_positions', accepted_ndims=(2,), accepted_dtypes=(np.int64,), min_axis_0=1)
-        check_valid_array(data=end_positions, source=f'{PlottingMixin.draw_lines_on_img.__name__} end_positions', accepted_shapes=[(start_positions.shape[0], 2),])
+        check_valid_array(
+            data=start_positions,
+            source=f"{PlottingMixin.draw_lines_on_img.__name__} img",
+        )
+        check_valid_array(
+            data=start_positions,
+            source=f"{PlottingMixin.draw_lines_on_img.__name__} start_positions",
+            accepted_ndims=(2,),
+            accepted_dtypes=(np.int64,),
+            min_axis_0=1,
+        )
+        check_valid_array(
+            data=end_positions,
+            source=f"{PlottingMixin.draw_lines_on_img.__name__} end_positions",
+            accepted_shapes=[
+                (start_positions.shape[0], 2),
+            ],
+        )
         check_if_valid_rgb_tuple(data=color)
         for i in range(start_positions.shape[0]):
-            cv2.line(img, (start_positions[i][0], start_positions[i][1]), (end_positions[i][0], end_positions[i][1]), color, thickness)
+            cv2.line(
+                img,
+                (start_positions[i][0], start_positions[i][1]),
+                (end_positions[i][0], end_positions[i][1]),
+                color,
+                thickness,
+            )
             if highlight_endpoint:
-                cv2.circle(img, (end_positions[i][0], end_positions[i][1]), circle_size, color, -1)
+                cv2.circle(
+                    img,
+                    (end_positions[i][0], end_positions[i][1]),
+                    circle_size,
+                    color,
+                    -1,
+                )
         return img
 
 
