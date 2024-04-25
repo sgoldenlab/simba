@@ -12,9 +12,10 @@ from simba.mixins.feature_extraction_supplement_mixin import \
     FeatureExtractionSupplemental
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.utils.checks import check_float, check_if_filepath_list_is_empty
-from simba.utils.errors import FrameRangeError, ROICoordinatesNotFoundError, BodypartColumnNotFoundError, DuplicationError
+from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
+                                FrameRangeError, ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, read_data_paths
+from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 
 
 class ROITimebinCalculator(ConfigReader):
