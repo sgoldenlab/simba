@@ -1,9 +1,9 @@
 __author__ = "Simon Nilsson"
 
 import os
+import threading
 from tkinter import *
 from typing import Union
-import threading
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
@@ -15,10 +15,9 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box)
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links, Paths
-from simba.utils.read_write import (check_if_filepath_list_is_empty, get_file_name_info_in_directory)
 from simba.utils.lookups import get_color_dict
-
-
+from simba.utils.read_write import (check_if_filepath_list_is_empty,
+                                    get_file_name_info_in_directory)
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'

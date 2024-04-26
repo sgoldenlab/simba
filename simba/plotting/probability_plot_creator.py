@@ -1,18 +1,21 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import Dict, List, Union, Optional, Any
+from typing import Any, Dict, List, Optional, Union
+
 import cv2
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_that_column_exist, check_file_exist_and_readable, check_valid_lst, check_if_keys_exist_in_dict, check_str, check_all_file_names_are_represented_in_video_log)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_if_keys_exist_in_dict, check_str,
+    check_that_column_exist, check_valid_lst)
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'

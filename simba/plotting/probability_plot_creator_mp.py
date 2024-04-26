@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import platform
 import shutil
-from typing import Any, Dict, List, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -14,14 +14,14 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_int, check_str,
-    check_that_column_exist, check_valid_lst, check_if_keys_exist_in_dict)
+    check_all_file_names_are_represented_in_video_log,
+    check_if_keys_exist_in_dict, check_int, check_str, check_that_column_exist,
+    check_valid_lst)
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext, read_df)
-
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'
