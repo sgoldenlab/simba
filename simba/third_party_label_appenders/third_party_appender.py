@@ -2,41 +2,39 @@ __author__ = "Simon Nilsson"
 
 import os
 from copy import deepcopy
-from typing import Union, Dict, Optional
+from typing import Dict, Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
 import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
-from simba.third_party_label_appenders.tools import (check_stop_events_prior_to_start_events,
-                                                     fix_uneven_start_stop_count,
-                                                     read_bento_files,
-                                                     read_boris_annotation_files,
-                                                     read_deepethogram_files,
-                                                     read_ethovision_files,
-                                                     read_observer_files,
-                                                     read_solomon_files)
-from simba.utils.checks import (check_if_dir_exists,check_if_filepath_list_is_empty, check_str, check_instance)
+from simba.third_party_label_appenders.tools import (
+    check_stop_events_prior_to_start_events, fix_uneven_start_stop_count,
+    read_bento_files, read_boris_annotation_files, read_deepethogram_files,
+    read_ethovision_files, read_observer_files, read_solomon_files)
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_filepath_list_is_empty,
+                                check_instance, check_str)
 from simba.utils.enums import Methods
-from simba.utils.errors import (ThirdPartyAnnotationEventCountError,
-                                ThirdPartyAnnotationFileNotFoundError,
-                                ThirdPartyAnnotationOverlapError,
-                                ThirdPartyAnnotationsAdditionalClfError,
-                                ThirdPartyAnnotationsMissingAnnotationsError,
-                                ThirdPartyAnnotationsOutsidePoseEstimationDataError)
+from simba.utils.errors import (
+    ThirdPartyAnnotationEventCountError, ThirdPartyAnnotationFileNotFoundError,
+    ThirdPartyAnnotationOverlapError, ThirdPartyAnnotationsAdditionalClfError,
+    ThirdPartyAnnotationsMissingAnnotationsError,
+    ThirdPartyAnnotationsOutsidePoseEstimationDataError)
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (get_fn_ext,
-                                    read_df,
-                                    write_df,
-                                    find_files_of_filetypes_in_directory)
-from simba.utils.warnings import (ThirdPartyAnnotationEventCountWarning,
-                                  ThirdPartyAnnotationFileNotFoundWarning,
-                                  ThirdPartyAnnotationOverlapWarning,
-                                  ThirdPartyAnnotationsAdditionalClfWarning,
-                                  ThirdPartyAnnotationsMissingAnnotationsWarning,
-                                  ThirdPartyAnnotationsOutsidePoseEstimationDataWarning)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, write_df)
+from simba.utils.warnings import (
+    ThirdPartyAnnotationEventCountWarning,
+    ThirdPartyAnnotationFileNotFoundWarning,
+    ThirdPartyAnnotationOverlapWarning,
+    ThirdPartyAnnotationsAdditionalClfWarning,
+    ThirdPartyAnnotationsMissingAnnotationsWarning,
+    ThirdPartyAnnotationsOutsidePoseEstimationDataWarning)
 
 BORIS = "BORIS"
 DEEPETHOGRAM = "DEEPETHOGRAM"
