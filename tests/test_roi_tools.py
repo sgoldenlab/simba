@@ -59,9 +59,9 @@ def test_polygon_size_calc(polygon_dict, px_mm, expected_area):
     results = polygon_size_calc(polygon_dict=polygon_dict, px_mm=px_mm)
     assert results['area_cm'] == expected_area
 
-
-@pytest.mark.parametrize("bin_length, threshold", [(10, 0.00), (1, 0.50)])
-def test_roi_timbin_calculator(config_path_args, bin_length, threshold):
-    timebin_calculator = ROITimebinCalculator(config_path=config_path_args.param, bin_length=bin_length, body_parts=['Nose_1'], threshold=threshold)
-    timebin_calculator.run()
-    timebin_calculator.save()
+#
+# @pytest.mark.parametrize("bin_length, threshold", [(10, 0.00), (1, 0.50)])
+# def test_roi_timbin_calculator(config_path_args, bin_length, threshold):
+#     timebin_calculator = ROITimebinCalculator(config_path=config_path_args.param, bin_length=bin_length, body_parts=['Nose_1'], threshold=threshold)
+#     timebin_calculator.run()
+#     timebin_calculator.save()

@@ -997,7 +997,7 @@ def sample_df_n_by_unique(df: pd.DataFrame, field: str, n: int) -> pd.DataFrame:
 
 
 def get_mode(x: np.ndarray) -> Union[float, int]:
-    """Get the mode (most frequent value) within an aarray"""
+    """Get the mode (most frequent value) within an array"""
     check_valid_array(
         source=f"{get_mode.__name__} x",
         data=x,
