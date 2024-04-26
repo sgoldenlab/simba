@@ -12,6 +12,7 @@ from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import NoROIDataError
 
+
 class AppendROIFeaturesByAnimalPopUp(ConfigReader, PopUpMixin):
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)

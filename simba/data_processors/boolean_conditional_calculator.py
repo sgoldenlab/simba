@@ -1,14 +1,18 @@
 import os
 from copy import deepcopy
-from typing import Dict
-from typing import Union, Optional
+from typing import Dict, Optional, Union
 
 import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_if_filepath_list_is_empty, check_instance, check_all_file_names_are_represented_in_video_log, check_if_df_field_is_boolean
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_if_df_field_is_boolean, check_if_filepath_list_is_empty,
+    check_instance)
 from simba.utils.errors import InvalidInputError, MissingColumnsError
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (get_fn_ext, read_df, read_video_info, str_2_bool, read_data_paths)
+from simba.utils.read_write import (get_fn_ext, read_data_paths, read_df,
+                                    read_video_info, str_2_bool)
 
 
 class BooleanConditionalCalculator(ConfigReader):
