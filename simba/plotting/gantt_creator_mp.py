@@ -146,9 +146,6 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
             self.bouts_df = detect_bouts(
                 data_df=self.data_df, target_lst=list(self.clf_names), fps=int(self.fps)
             )
-            self.bouts_df.to_csv(
-                "/Users/simon/Desktop/envs/simba/simba/simba/sandbox/bouts_df"
-            )
             self.temp_folder = os.path.join(
                 self.gantt_plot_dir, self.video_name, "temp"
             )

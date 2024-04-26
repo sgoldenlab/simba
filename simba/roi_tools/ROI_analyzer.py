@@ -180,32 +180,16 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                         ]
                     for _, row in self.roi_dict[Keys.ROI_CIRCLES.value].iterrows():
                         center_x, center_y = row["centerX"], row["centerY"]
-                        animal_df[f'{row["Name"]}_distance'] = (
-                            FeatureExtractionMixin.framewise_euclidean_distance_roi(
-                                location_1=animal_df.values[:, 0:2],
-                                location_2=np.array([center_x, center_y]),
-                            )
-                        )
+                        animal_df[f'{row["Name"]}_distance'] = (FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=animal_df.values[:, 0:2], location_2=np.array([center_x, center_y]), px_per_mm=1))
                         animal_df[row["Name"]] = 0
-                        animal_df.loc[
-                            animal_df[row["Name"]] <= row["radius"], row["Name"]
-                        ] = 1
-                        animal_df.loc[
-                            animal_df[bp_names[2]] < self.threshold, row["Name"]
-                        ] = 0
-                        roi_bouts = detect_bouts(
-                            data_df=animal_df, target_lst=[row["Name"]], fps=self.fps
-                        )
+                        animal_df.loc[animal_df[f'{row["Name"]}_distance'] <= row["radius"], row["Name"]] = 1
+                        animal_df.loc[animal_df[bp_names[2]] < self.threshold, row["Name"]] = 0
+                        roi_bouts = detect_bouts(data_df=animal_df, target_lst=[row["Name"]], fps=self.fps)
                         roi_bouts["ANIMAL"] = animal_name
                         roi_bouts["VIDEO"] = video_name
                         self.roi_bout_results.append(roi_bouts)
                         animal_bout_results[row["Name"]] = roi_bouts
-                        self.entry_results.loc[len(self.entry_results)] = [
-                            video_name,
-                            animal_name,
-                            row["Name"],
-                            len(roi_bouts),
-                        ]
+                        self.entry_results.loc[len(self.entry_results)] = [video_name, animal_name, row["Name"], len(roi_bouts)]
                         self.time_results.loc[len(self.time_results)] = [
                             video_name,
                             animal_name,

@@ -145,9 +145,9 @@ class ROIPlotMultiprocess(ConfigReader):
                  style_attr: Dict[str, bool],
                  threshold: Optional[float] = 0.0,
                  core_cnt: Optional[int] = -1):
-        #
-        if platform.system() == "Darwin":
-            multiprocessing.set_start_method("spawn", force=True)
+
+        # if platform.system() == "Darwin":
+        #     multiprocessing.set_start_method("spawn", force=True)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1)
         if core_cnt == -1: core_cnt = find_core_cnt()[0]
@@ -244,7 +244,7 @@ class ROIPlotMultiprocess(ConfigReader):
         for shape, df in self.roi_dict.items():
             if not df["Name"].is_unique:
                 df = df.drop_duplicates(subset=["Name"], keep="first")
-                DuplicateNamesWarning(f'Some of your ROIs with the same shape ({shape}) has the same names for video {self.video_name}. E.g., you have two rectangles named "My rectangle". SimBA prefers ROI shapes with unique names. SimBA will keep one of the unique shape names and drop the rest.', source=self.__class__.__name__)
+                DuplicateNamesWarning(msg=f'Some of your ROIs with the same shape ({shape}) has the same names for video {self.video_name}. E.g., you have two rectangles named "My rectangle". SimBA prefers ROI shapes with unique names. SimBA will keep one of the unique shape names and drop the rest.', source=self.__class__.__name__)
             d = df.set_index("Name").to_dict(orient="index")
             shape_dicts = {**shape_dicts, **d}
         return shape_dicts
@@ -275,7 +275,7 @@ class ROIPlotMultiprocess(ConfigReader):
         for cnt in range(len(data_lst)):
             data_lst[cnt]["group"] = cnt
 
-        print(f"Creating ROI images, multiprocessing (determined chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+        print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
         del self.roi_analyzer.logger
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_roi_plotter_mp,

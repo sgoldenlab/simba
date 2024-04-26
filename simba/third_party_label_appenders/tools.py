@@ -35,12 +35,7 @@ def is_new_boris_version(pd_df: pd.DataFrame):
     return "Media file name" in list(pd_df.columns)
 
 
-def read_boris_annotation_files(
-    data_paths: List[str],
-    error_setting: str,
-    video_info_df: pd.DataFrame,
-    log_setting: bool = False,
-) -> Dict[str, pd.DataFrame]:
+def read_boris_annotation_files(data_paths: List[str], error_setting: str, video_info_df: pd.DataFrame, log_setting: bool = False) -> Dict[str, pd.DataFrame]:
     MEDIA_FILE_PATH = "Media file path"
     OBSERVATION_ID = "Observation id"
     TIME = "Time"

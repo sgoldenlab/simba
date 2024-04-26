@@ -26,7 +26,7 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
        `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
 
     .. image:: _static/img/heatmap_location.gif
-       :width: 500
+       :width: 1000
        :align: center
 
     :param str config_path: path to SimBA project config file in Configparser format

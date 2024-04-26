@@ -322,7 +322,7 @@ class PlottingMixin(object):
         timer.stop_timer()
         cv2.imwrite(save_path, img)
         stdout_success(
-            msg=f"Final distance plot saved at {save_path}",
+            msg=f"Final probability plot saved at {save_path}",
             elapsed_time=timer.elapsed_time_str,
             source=self.__class__.__name__,
         )
@@ -865,85 +865,6 @@ class PlottingMixin(object):
             )
         if video_setting:
             video_writer.release()
-        return group
-
-    @staticmethod
-    def probability_plot_mp(
-        data: list,
-        probability_lst: list,
-        clf_name: str,
-        video_setting: bool,
-        frame_setting: bool,
-        video_dir: str,
-        frame_dir: str,
-        highest_p: float,
-        fps: int,
-        style_attr: dict,
-        video_name: str,
-    ):
-
-        group, data = data[0], data[1:]
-        start_frm, end_frm, current_frm = data[0], data[-1], data[0]
-
-        if video_setting:
-            fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-            video_save_path = os.path.join(video_dir, "{}.mp4".format(str(group)))
-            video_writer = cv2.VideoWriter(
-                video_save_path,
-                fourcc,
-                fps,
-                (style_attr["width"], style_attr["height"]),
-            )
-
-        while current_frm < end_frm:
-            fig, ax = plt.subplots()
-            current_lst = probability_lst[0 : current_frm + 1]
-            ax.plot(
-                current_lst,
-                color=style_attr["color"],
-                linewidth=style_attr["line width"],
-            )
-            ax.plot(
-                current_frm,
-                current_lst[-1],
-                "o",
-                markersize=style_attr["circle size"],
-                color=style_attr["color"],
-            )
-            ax.set_ylim([0, highest_p])
-            x_ticks_locs = x_lbls = np.linspace(0, current_frm, 5)
-            x_lbls = np.round((x_lbls / fps), 1)
-            ax.xaxis.set_ticks(x_ticks_locs)
-            ax.set_xticklabels(x_lbls, fontsize=style_attr["font size"])
-            ax.set_xlabel("Time (s)", fontsize=style_attr["font size"])
-            ax.set_ylabel(
-                "{} {}".format(clf_name, "probability"),
-                fontsize=style_attr["font size"],
-            )
-            plt.suptitle(clf_name, x=0.5, y=0.92, fontsize=style_attr["font size"] + 4)
-            canvas = FigureCanvas(fig)
-            canvas.draw()
-            mat = np.array(canvas.renderer._renderer)
-            image = cv2.cvtColor(mat, cv2.COLOR_RGB2BGR)
-            image = np.uint8(
-                cv2.resize(image, (style_attr["width"], style_attr["height"]))
-            )
-            if video_setting:
-                video_writer.write(image)
-            if frame_setting:
-                frame_save_name = os.path.join(
-                    frame_dir, "{}.png".format(str(current_frm))
-                )
-                cv2.imwrite(frame_save_name, image)
-            plt.close()
-            current_frm += 1
-
-            print(
-                "Probability frame created: {}, Video: {}, Processing core: {}".format(
-                    str(current_frm + 1), video_name, str(group + 1)
-                )
-            )
-
         return group
 
     def violin_plot(
@@ -1502,14 +1423,14 @@ class PlottingMixin(object):
 
         if bg_clr is not None:
             fig.update_layout(plot_bgcolor=bg_clr)
+        img_bytes = fig.to_image(format="png")
+        img = PIL.Image.open(io.BytesIO(img_bytes))
+        img = np.array(img)
         if save_path is not None:
-            pio.write_image(fig, save_path)
+            cv2.imwrite(save_path, img)
             stdout_success(msg=f"Line plot saved at {save_path}")
         else:
-            img_bytes = fig.to_image(format="png")
-            img = PIL.Image.open(io.BytesIO(img_bytes))
-            fig = None
-            return np.array(img).astype(np.uint8)
+            return img
 
     @staticmethod
     def make_path_plot(

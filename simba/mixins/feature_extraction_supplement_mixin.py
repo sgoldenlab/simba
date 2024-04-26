@@ -437,9 +437,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         )
 
     @staticmethod
-    def spontaneous_alternations(
-        data: pd.DataFrame, arm_names: List[str], center_name: str
-    ) -> Tuple[Dict[Union[str, Tuple[int]], int]]:
+    def spontaneous_alternations(data: pd.DataFrame, arm_names: List[str], center_name: str) -> Tuple[Dict[Union[str, Tuple[int]], int]]:
         """
         Detects spontaneous alternations between a set of user-defined ROIs.
 
@@ -449,10 +447,9 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         :param pd.DataFrame data: DataFrame containing shape data where each row represents a frame and each column represents a shape where 0 represents not in ROI and 1 represents inside the ROI
         :param List[str] shape_names: List of column names in the DataFrame corresponding to shape names.
-        :returns Dict[Union[str, Tuple[str], Union[int, float, List[int]]]]:
-            Dict with the following keys and values:
+        :returns Dict[Union[str, Tuple[str], Union[int, float, List[int]]]]: Dict with the following keys and values:
 
-                Dict with the following keys and values:
+        Dict with the following keys and values:
 
         - 'pct_alternation': Percent alternation computed as `(spontaneous alternation cnt / (total number of arm entries - (number of arms - 1))) × 100`
         - 'alternation_cnt': The sliding count of ROI entry sequences of length `len(shape_names)` that are all unique.
@@ -462,7 +459,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         - 'same_arm_returns_dict': Dictionary with the keys being the name of the ROI and values are a list of frames when the same-arm-return errors were committed.
         - 'alternate_arm_returns_cnt': Dictionary with the keys being the name of the ROI and values are a list of frames when the alternate-arm-return errors were committed.
         - 'alternations_dict': Dictionary with the keys being unique ROI name tuple sequences of length `len(shape_names)` and values are a list of frames when the sequence was completed.
-        - 'arm_entry_sequence': List of strings representing the sequence of arm entries.
+        - 'arm_entry_sequence': Pandas dataframe with two columns: sequence of arm names entered, the frame the animal entered the arm, the frame that the animal left the arm.
 
         :example:
         >>> data = np.zeros((100, 4), dtype=int)
@@ -512,69 +509,29 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                 alternation_cnt,
             )
 
-        check_instance(
-            source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            instance=data,
-            accepted_types=(pd.DataFrame,),
-        )
-        check_valid_lst(
-            data=arm_names,
-            source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            valid_dtypes=(str,),
-            valid_values=data.columns,
-        )
+        check_instance(source=FeatureExtractionSupplemental.spontaneous_alternations.__name__, instance=data, accepted_types=(pd.DataFrame,))
+        check_valid_lst(data=arm_names,source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,valid_dtypes=(str,),valid_values=data.columns)
         check_str(name="center name", value=center_name, options=data.columns)
-        if center_name in arm_names:
-            InvalidInputError(
-                msg="One ROI is defined both as an arm ans as the center",
-                source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            )
-        if len(list(set(arm_names))) != len(arm_names):
-            InvalidInputError(
-                msg=f"Each arm has to be unique but got {arm_names}",
-                source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            )
+        if center_name in arm_names: InvalidInputError(msg="One ROI is defined both as an arm ans as the center", source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
+        if len(list(set(arm_names))) != len(arm_names): InvalidInputError(msg=f"Each arm has to be unique but got {arm_names}", source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
         roi_names = arm_names + [center_name]
         data_df = data[roi_names]
         invalid_vals = list(set(np.unique(data_df.values.flatten())) - {0, 1})
         if len(invalid_vals) > 0:
-            raise CountError(
-                msg=f"When computing spontaneous alternation, ROI fields can only be 0 or 1. Found {invalid_vals}",
-                source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            )
+            raise CountError(msg=f"When computing spontaneous alternation, ROI fields can only be 0 or 1. Found the value(s): {invalid_vals}", source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
         multiple_rois_frm_idx = np.argwhere(np.sum(data_df.values, axis=1) > 1)
         if multiple_rois_frm_idx.shape[0] > 0:
-            raise CountError(
-                msg=f"When computing spontaneous alternation, animals should only exist in <=1 ROIs in any one frame. In {multiple_rois_frm_idx.shape[0]} frames, the animal exist in more than one ROI.",
-                source=FeatureExtractionSupplemental.spontaneous_alternations.__name__,
-            )
-        bout_df = (
-            detect_bouts(data_df=data_df, target_lst=data_df.columns, fps=1)[
-                ["Event", "Start_frame"]
-            ]
-            .sort_values(["Start_frame"])
-            .reset_index(drop=True)
-        )
-        shifted_ = pd.concat(
-            [bout_df, bout_df.shift(-1).add_suffix("_shifted").reset_index(drop=True)],
-            axis=1,
-        )[["Event", "Event_shifted"]].values
+            raise CountError(msg=f"When computing spontaneous alternation, animals should only exist in <=1 ROIs in any one frame. In {multiple_rois_frm_idx.shape[0]} frames, the animal exist in more than one ROI.", source=FeatureExtractionSupplemental.spontaneous_alternations.__name__)
+        bout_df = (detect_bouts(data_df=data_df, target_lst=data_df.columns, fps=1)[["Event", "Start_frame", "End_frame"]].sort_values(["Start_frame"]).reset_index(drop=True))
+        shifted_ = pd.concat([bout_df, bout_df.shift(-1).add_suffix("_shifted").reset_index(drop=True)], axis=1)[["Event", "Event_shifted"]].values
         unique_counts = [len(list(set(list(x)))) for x in shifted_]
         drop_idx = np.argwhere(np.array(unique_counts) == 1) + 1
         bout_df = bout_df.drop(drop_idx.flatten(), axis=0).reset_index(drop=True)
-        arm_entry_sequence = bout_df[bout_df["Event"] != center_name].values
-        (
-            alternate_arm_returns,
-            same_arm_returns,
-            alternations,
-            alternate_arm_return_cnt,
-            same_arm_return_cnt,
-            alternation_cnt,
-        ) = get_sliding_alternation(data=arm_entry_sequence)
+        arm_entry_sequence = bout_df[bout_df["Event"] != center_name]
 
-        pct_alternation = alternation_cnt / (
-            arm_entry_sequence.shape[0] - (len(arm_names) - 1)
-        )
+        alternate_arm_returns, same_arm_returns, alternations, alternate_arm_return_cnt, same_arm_return_cnt, alternation_cnt = get_sliding_alternation(data=arm_entry_sequence[["Event", "Start_frame"]].values)
+
+        pct_alternation = alternation_cnt / (len(arm_entry_sequence) - (len(arm_names) - 1))
 
         return {
             "pct_alternation": pct_alternation * 100,
@@ -585,7 +542,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             "same_arm_returns_dict": same_arm_returns,
             "alternate_arm_returns_dict": alternate_arm_returns,
             "alternations_dict": alternations,
-            "arm_entry_sequence": arm_entry_sequence[:, 0].flatten(),
+            "arm_entry_sequence": arm_entry_sequence,
         }
 
     @staticmethod

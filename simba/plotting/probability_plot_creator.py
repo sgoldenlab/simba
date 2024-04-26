@@ -1,22 +1,27 @@
 __author__ = "Simon Nilsson"
 
-import io
 import os
-from typing import Dict, List
-
+from typing import Dict, List, Union, Optional, Any
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-import PIL
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import check_that_column_exist
+from simba.utils.checks import (check_that_column_exist, check_file_exist_and_readable, check_valid_lst, check_if_keys_exist_in_dict, check_str, check_all_file_names_are_represented_in_video_log)
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 
+
+STYLE_WIDTH = 'width'
+STYLE_HEIGHT = 'height'
+STYLE_FONT_SIZE = 'font size'
+STYLE_LINE_WIDTH = 'line width'
+STYLE_YMAX = 'y_max'
+STYLE_COLOR = 'color'
+
+STYLE_ATTR = [STYLE_WIDTH, STYLE_HEIGHT, STYLE_FONT_SIZE, STYLE_LINE_WIDTH, STYLE_COLOR, STYLE_YMAX]
 
 class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
     """
@@ -48,179 +53,105 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
     >>> threshold_plot_creator.run()
     """
 
-    def __init__(
-        self,
-        config_path: str,
-        clf_name: str,
-        frame_setting: bool,
-        video_setting: bool,
-        last_image: bool,
-        style_attr: Dict[str, int],
-        files_found: List[str],
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 files_found: List[Union[str, os.PathLike]],
+                 clf_name: str,
+                 style_attr: Dict[str, Any],
+                 frame_setting: Optional[bool] = False,
+                 video_setting: Optional[bool] = False,
+                 last_image: Optional[bool] = True):
+
+        if ((not frame_setting) and (not video_setting) and (not last_image)):
+            raise NoSpecifiedOutputError(msg="Please choose to either probability videos, probability frames, and/or last frame.")
+
+        check_file_exist_and_readable(file_path=config_path)
+        check_valid_lst(data=files_found, source=self.__class__.__name__, valid_dtypes=(str,))
+        print(style_attr)
+        check_if_keys_exist_in_dict(data=style_attr, key=STYLE_ATTR, name=f'{self.__class__.__name__} style_attr')
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
-        self.frame_setting, self.video_setting, self.style_attr, self.last_image = (
-            frame_setting,
-            video_setting,
-            style_attr,
-            last_image,
-        )
-        if (
-            (not self.frame_setting)
-            and (not self.video_setting)
-            and (not self.last_image)
-        ):
-            raise NoSpecifiedOutputError(
-                msg="Please choose to either probability videos, probability frames, or both probability frames and videos."
-            )
-
+        check_str(name=f"{self.__class__.__name__} clf_name", value=clf_name, options=(self.clf_names))
+        self.frame_setting, self.video_setting, self.style_attr, self.last_image = (frame_setting,video_setting,style_attr,last_image)
         self.files_found = files_found
         self.orginal_clf_name = clf_name
-        self.clf_name = "Probability_" + self.orginal_clf_name
-        self.out_width, self.out_height = (
-            self.style_attr["width"],
-            self.style_attr["height"],
-        )
+        self.clf_name = f"Probability_{self.orginal_clf_name}"
+        self.out_width, self.out_height = (self.style_attr[STYLE_WIDTH], self.style_attr[STYLE_HEIGHT])
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         if not os.path.exists(self.probability_plot_dir):
             os.makedirs(self.probability_plot_dir)
-        print("Processing {} video(s)...".format(str(len(self.files_found))))
-        self.timer = SimbaTimer()
-        self.timer.start_timer()
+        print(f"Processing {len(self.files_found)} video(s)...")
+        self.timer = SimbaTimer(start=True)
 
     def run(self):
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.files_found)
         for file_cnt, file_path in enumerate(self.files_found):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
-            video_info, self.px_per_mm, fps = self.read_video_info(
-                video_name=self.video_name
-            )
+            video_info, self.px_per_mm, fps = self.read_video_info(video_name=self.video_name)
             data_df = read_df(file_path, self.file_type)
-            check_that_column_exist(
-                df=data_df, column_name=self.clf_name, file_name=self.video_name
-            )
+            check_that_column_exist(df=data_df, column_name=self.clf_name, file_name=self.video_name)
             if self.frame_setting:
-                self.save_frame_folder_dir = os.path.join(
-                    self.probability_plot_dir,
-                    self.video_name + "_" + self.orginal_clf_name,
-                )
+                self.save_frame_folder_dir = os.path.join(self.probability_plot_dir, f"{self.video_name}_{self.orginal_clf_name}")
                 if not os.path.exists(self.save_frame_folder_dir):
                     os.makedirs(self.save_frame_folder_dir)
             if self.video_setting:
-                self.save_video_path = os.path.join(
-                    self.probability_plot_dir,
-                    "{}_{}.mp4".format(self.video_name, self.orginal_clf_name),
-                )
-                self.writer = cv2.VideoWriter(
-                    self.save_video_path,
-                    self.fourcc,
-                    fps,
-                    (self.out_width, self.out_height),
-                )
+                self.save_video_path = os.path.join(self.probability_plot_dir, f"{self.video_name}_{self.orginal_clf_name}.mp4")
+                self.writer = cv2.VideoWriter(self.save_video_path, self.fourcc, fps, (self.out_width, self.out_height))
 
-            data_df = data_df[self.clf_name]
 
+            clf_data = data_df[self.clf_name].values
+            if self.style_attr[STYLE_YMAX] == 'auto': self.style_attr[STYLE_YMAX] = np.max(clf_data)
             if self.last_image:
-                self.make_probability_plot(
-                    data=data_df,
-                    style_attr=self.style_attr,
-                    clf_name=self.clf_name,
-                    fps=fps,
-                    save_path=os.path.join(
-                        self.probability_plot_dir,
-                        self.video_name
-                        + "_{}_{}.png".format(self.orginal_clf_name, "final_image"),
-                    ),
-                )
+                final_frm_save_path = os.path.join(self.probability_plot_dir, f'{self.video_name}_{self.orginal_clf_name}_final_frm_{self.datetime}.png')
+                _ = PlottingMixin.make_line_plot_plotly(data=[clf_data],
+                                                          colors=[self.style_attr[STYLE_COLOR]],
+                                                          width=self.style_attr[STYLE_WIDTH],
+                                                          height=self.style_attr[STYLE_HEIGHT],
+                                                          line_width=self.style_attr[STYLE_LINE_WIDTH],
+                                                          font_size=self.style_attr[STYLE_FONT_SIZE],
+                                                          y_lbl=f"{self.clf_name} probability",
+                                                          y_max= self.style_attr[STYLE_YMAX],
+                                                          x_lbl='frame count',
+                                                          title=self.clf_name,
+                                                          save_path=final_frm_save_path)
 
             if self.video_setting or self.frame_setting:
-                if self.style_attr["y_max"] == "auto":
-                    max_y = np.amax(data_df)
-                else:
-                    max_y = float(self.style_attr["y_max"])
-
-                y_ticks_locs = y_lbls = np.round(np.linspace(0, max_y, 10), 2)
-                for i in range(len(data_df)):
-                    p_values = list(data_df.loc[0:i])
-                    plt.plot(
-                        p_values,
-                        color=self.style_attr["color"],
-                        linewidth=self.style_attr["line width"],
-                    )
-                    plt.plot(
-                        i,
-                        p_values[-1],
-                        "o",
-                        markersize=self.style_attr["circle size"],
-                        color=self.style_attr["color"],
-                    )
-                    plt.ylim([0, max_y])
-                    plt.ylabel(
-                        "{} {}".format(self.orginal_clf_name, "probability"),
-                        fontsize=self.style_attr["font size"],
-                    )
-                    x_ticks_locs = x_lbls = np.linspace(0, len(p_values), 5)
-                    x_lbls = np.round((x_lbls / fps), 1)
-                    plt.xlabel("Time (s)", fontsize=self.style_attr["font size"] + 4)
-                    plt.grid()
-                    plt.xticks(
-                        x_ticks_locs,
-                        x_lbls,
-                        rotation="horizontal",
-                        fontsize=self.style_attr["font size"],
-                    )
-                    plt.yticks(
-                        y_ticks_locs, y_lbls, fontsize=self.style_attr["font size"]
-                    )
-                    plt.suptitle(
-                        self.orginal_clf_name,
-                        x=0.5,
-                        y=0.92,
-                        fontsize=self.style_attr["font size"] + 4,
-                    )
-                    buffer_ = io.BytesIO()
-                    plt.savefig(buffer_, format="png")
-                    buffer_.seek(0)
-                    image = PIL.Image.open(buffer_)
-                    ar = np.asarray(image)
-                    open_cv_image = cv2.cvtColor(ar, cv2.COLOR_RGB2BGR)
-                    open_cv_image = cv2.resize(
-                        open_cv_image, (self.out_width, self.out_height)
-                    )
-                    frame = np.uint8(open_cv_image)
-                    buffer_.close()
-                    plt.close()
+                for i in range(1, clf_data.shape[0]):
+                    frm_data = clf_data[0:i]
+                    img = PlottingMixin.make_line_plot_plotly(data=[frm_data],
+                                                              colors=[self.style_attr[STYLE_COLOR]],
+                                                              width=self.style_attr[STYLE_WIDTH],
+                                                              height=self.style_attr[STYLE_HEIGHT],
+                                                              line_width=self.style_attr[STYLE_LINE_WIDTH],
+                                                              font_size=self.style_attr[STYLE_FONT_SIZE],
+                                                              y_lbl=f"{self.clf_name} probability",
+                                                              y_max=self.style_attr[STYLE_YMAX],
+                                                              x_lbl='frame count',
+                                                              title=self.clf_name,
+                                                              save_path=None)
                     if self.frame_setting:
-                        frame_save_path = os.path.join(
-                            self.save_frame_folder_dir, str(i) + ".png"
-                        )
-                        cv2.imwrite(frame_save_path, frame)
+                        frame_save_path = os.path.join(self.save_frame_folder_dir, f"{i}.png")
+                        cv2.imwrite(frame_save_path, img)
                     if self.video_setting:
-                        self.writer.write(frame)
-                    print(
-                        "Probability frame: {} / {}. Video: {} ({}/{})".format(
-                            str(i + 1),
-                            str(len(data_df)),
-                            self.video_name,
-                            str(file_cnt + 1),
-                            len(self.files_found),
-                        )
-                    )
+                        self.writer.write(img.astype(np.uint8)[:, :, :3])
+                    print(f"Probability frame: {i+1} / {len(data_df)}. Video: {self.video_name} (File {file_cnt + 1}/{len(self.files_found)})")
                 if self.video_setting:
                     self.writer.release()
                 video_timer.stop_timer()
-                print(
-                    "Probability plot for video {} saved (elapsed time: {}s)...".format(
-                        self.video_name, video_timer.elapsed_time_str
-                    )
-                )
+                print(f"Probability plot for video {self.video_name} saved (elapsed time: {video_timer.elapsed_time_str}s)...")
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"All probability visualizations created in project_folder/frames/output/probability_plots directory",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"All probability visualizations created in {self.probability_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str)
 
+
+# test = TresholdPlotCreatorSingleProcess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+#                                         frame_setting=False,
+#                                         video_setting=True,
+#                                         last_image=True,
+#                                         clf_name='Attack',
+#                                         files_found=['/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'],
+#                                         style_attr={'width': 640, 'height': 480, 'font size': 10, 'line width': 10, 'color': 'Orange', 'circle size': 20, 'y_max': 'auto'})
+# test.run()
 
 # test = TresholdPlotCreatorSingleProcess(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                                         frame_setting=False,

@@ -34,7 +34,7 @@ def ThirdPartyAnnotationsOutsidePoseEstimationDataWarning(
             f"SIMBA THIRD-PARTY ANNOTATION WARNING: SimBA found THIRD-PARTY annotations for behavior {clf_name} in video "
             f"{video_name} that are annotated to occur at times which is not present in the "
             f"video data you imported into SIMBA. The video you imported to SimBA has {str(frm_cnt)} frames. "
-            f"However, in BORIS, you have annotated {clf_name} to happen at frame number {str(first_error_frm)}. "
+            f"However, you have annotated {clf_name} to happen at frame number {str(first_error_frm)}. "
             f"These ambiguous annotations occur in {str(ambiguous_cnt)} different frames for video {video_name} that SimBA will **remove** by default. "
             f"Please make sure you imported the same video as you annotated in BORIS into SimBA and the video is registered with the correct frame rate. "
             f"SimBA will only append annotations made to the frames present in the pose estimation data."
