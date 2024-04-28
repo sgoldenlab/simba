@@ -10,12 +10,9 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_int,
-                                check_that_column_exist,
-                                check_valid_lst,
-                                check_float,
-                                check_str,
-                                check_if_valid_rgb_tuple)
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
+                                check_int, check_str, check_that_column_exist,
+                                check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
