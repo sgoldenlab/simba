@@ -223,8 +223,6 @@ class ROIPlot(ConfigReader):
         video_timer.stop_timer()
         stdout_success(msg=f"Video {self.video_name} created. Video saved at {self.video_save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
 
-
-
 # test = ROIPlot(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
 #                video_path="/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4",
 #                body_parts=['Nose'],

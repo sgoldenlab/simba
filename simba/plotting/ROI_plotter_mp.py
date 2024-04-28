@@ -37,20 +37,21 @@ SHOW_ANIMAL_NAMES = 'show_animal_name'
 STYLE_KEYS = [SHOW_BODY_PARTS, SHOW_ANIMAL_NAMES]
 
 
-def _roi_plotter_mp(data: pd.DataFrame,
-                   loc_dict: dict,
-                   scalers: dict,
-                   video_meta_data: dict,
-                   save_temp_directory: str,
-                   shape_meta_data: dict,
-                   video_shape_names: list,
-                   input_video_path: str,
-                   body_part_dict: dict,
-                   roi_dict: Dict[str, pd.DataFrame],
-                   colors: list,
-                   style_attr: dict,
-                   animal_ids: list,
-                   threshold: float):
+def _roi_plotter_mp(frame_range: Tuple[int, np.ndarray],
+                    data_df: pd.DataFrame,
+                    loc_dict: dict,
+                    scalers: dict,
+                    video_meta_data: dict,
+                    save_temp_directory: str,
+                    shape_meta_data: dict,
+                    video_shape_names: list,
+                    input_video_path: str,
+                    body_part_dict: dict,
+                    roi_dict: Dict[str, pd.DataFrame],
+                    colors: list,
+                    style_attr: dict,
+                    animal_ids: list,
+                    threshold: float):
 
     def __insert_texts(shape_df):
         for animal_name in animal_ids:
@@ -61,14 +62,14 @@ def _roi_plotter_mp(data: pd.DataFrame,
         return border_img
 
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-    group_cnt = int(data["group"].values[0])
-    start_frm, current_frm, end_frm = data.index[0], data.index[0], data.index[-1]
+    group_cnt, frame_range = frame_range[0], frame_range[1]
+    start_frm, current_frm, end_frm = frame_range[0], frame_range[0], frame_range[-1]
     save_path = os.path.join(save_temp_directory, f"{group_cnt}.mp4")
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"] * 2, video_meta_data["height"]))
     cap = cv2.VideoCapture(input_video_path)
     cap.set(1, start_frm)
 
-    while current_frm < end_frm:
+    while current_frm <= end_frm:
         ret, img = cap.read()
         if ret:
             border_img = cv2.copyMakeBorder(img, 0, 0, 0, int(video_meta_data["width"]), borderType=cv2.BORDER_CONSTANT, value=[0, 0, 0])
@@ -80,7 +81,7 @@ def _roi_plotter_mp(data: pd.DataFrame,
 
             for animal_cnt, animal_name in enumerate(animal_ids):
                 if style_attr[SHOW_BODY_PARTS] or style_attr[SHOW_ANIMAL_NAMES]:
-                    bp_data = data.loc[current_frm, body_part_dict[animal_name]].values
+                    bp_data = data_df.loc[current_frm, body_part_dict[animal_name]].values
                     if threshold < bp_data[2]:
                         if style_attr[SHOW_BODY_PARTS]:
                             cv2.circle(border_img, (int(bp_data[0]), int(bp_data[1])), scalers["circle_size"], colors[animal_cnt], -1)
@@ -88,8 +89,8 @@ def _roi_plotter_mp(data: pd.DataFrame,
                             cv2.putText(border_img, animal_name, (int(bp_data[0]), int(bp_data[1])), TextOptions.FONT.value, scalers["font_size"], colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
 
                 for shape_name in video_shape_names:
-                    timer = round(data.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
-                    entries = data.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_entries"]
+                    timer = round(data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
+                    entries = data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_entries"]
                     cv2.putText(border_img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, scalers["font_size"], shape_meta_data[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
                     cv2.putText(border_img, str(entries), loc_dict[animal_name][shape_name]["entries_data_loc"], TextOptions.FONT.value, scalers["font_size"], shape_meta_data[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
             writer.write(border_img)
@@ -99,9 +100,7 @@ def _roi_plotter_mp(data: pd.DataFrame,
             break
     cap.release()
     writer.release()
-
     return group_cnt
-
 
 class ROIPlotMultiprocess(ConfigReader):
     """
@@ -271,14 +270,15 @@ class ROIPlotMultiprocess(ConfigReader):
         self.shape_dicts = self.__create_shape_dicts()
         self.__calculate_cumulative()
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
-        data_lst = np.array_split(self.data_df.fillna(0), self.core_cnt)
-        for cnt in range(len(data_lst)):
-            data_lst[cnt]["group"] = cnt
-
-        print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+        frm_lst = np.arange(0, len(self.data_df) + 1)
+        frm_lst = np.array_split(frm_lst, self.core_cnt)
+        frame_range = []
+        for i in range(len(frm_lst)): frame_range.append((i, frm_lst[i]))
         del self.roi_analyzer.logger
+        print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_roi_plotter_mp,
+                                          data_df = self.data_df,
                                           loc_dict=self.loc_dict,
                                           scalers=self.scalers,
                                           video_meta_data=self.video_meta_data,
@@ -293,8 +293,8 @@ class ROIPlotMultiprocess(ConfigReader):
                                           animal_ids=self.animal_names,
                                           threshold=self.threshold)
 
-            for cnt, result in enumerate(pool.imap(constants, data_lst, chunksize=self.multiprocess_chunksize)):
-                print(f'Image batch {result+1} / {len(data_lst)} complete...')
+            for cnt, result in enumerate(pool.imap(constants, frame_range, chunksize=self.multiprocess_chunksize)):
+                print(f'Image batch {result+1} / {self.core_cnt} complete...')
             print(f"Joining {self.video_name} multi-processed ROI video...")
             concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.video_save_path, video_format="mp4")
             video_timer.stop_timer()
@@ -303,6 +303,12 @@ class ROIPlotMultiprocess(ConfigReader):
             stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.video_save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
 
 
+
+# test = ROIPlotMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
+#                           video_path="/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4",
+#                           body_parts=['Nose'],
+#                           style_attr={'show_body_part': True, 'show_animal_name': False})
+# test.run()
 
 # test = ROIPlotMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini',
 #                           video_path="/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/videos/raw_clip1.mp4",
