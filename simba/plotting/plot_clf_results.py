@@ -13,14 +13,12 @@ from PIL import Image
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
-                                    read_config_entry, read_df)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_config_entry, read_df)
 
 
 class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin):
@@ -44,22 +42,22 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
     :param Optional[dict] text_settings:
     :param str video_file_path: path to video file to create classification visualizations for.
 
-    Examples
-    ----------
+    :example:
     >>> clf_plotter = PlotSklearnResultsSingleCore(config_path='MyProjectConfig', video_setting=True, frame_setting=False, rotate=False, video_file_path='VideoPath')
     >>> clf_plotter.run()
     """
 
-    def __init__(
-        self,
-        config_path: str,
-        video_setting: bool,
-        frame_setting: bool,
-        text_settings: Optional[Union[Dict[str, float], bool]] = False,
-        video_file_path: Optional[List] = None,
-        rotate: bool = False,
-        print_timers: bool = True,
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 video_setting: Optional[bool] = True,
+                 frame_setting: Optional[bool] = False,
+                 text_settings: Optional[Union[Dict[str, float], bool]] = False,
+                 video_file_path: Optional[List] = None,
+                 rotate: bool = False,
+                 print_timers: bool = True):
+
+
+
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
         PlottingMixin.__init__(self)

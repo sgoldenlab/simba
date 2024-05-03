@@ -205,6 +205,9 @@ class Statistics(FeatureExtractionMixin):
 
         Cohen's d is a measure of effect size that quantifies the difference between the means of two distributions in terms of their standard deviation. It is calculated as the difference between the means of the two distributions divided by the pooled standard deviation.
 
+        Higher values indicate a larger effect size, with 0.2 considered a small effect, 0.5 a medium effect, and 0.8 or above a large effect. Negative values indicate that the mean of sample 2 is larger than the mean of sample 1.
+
+
         .. math::
            d = \\frac{{\\bar{x}_1 - \\bar{x}_2}}{{\\sqrt{{\\frac{{s_1^2 + s_2^2}}{2}}}}}
 
@@ -228,9 +231,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float64[:], float64[:], float64)", cache=True)
-    def rolling_cohens_d(
-        data: np.ndarray, time_windows: np.ndarray, fps: float
-    ) -> np.ndarray:
+    def rolling_cohens_d(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Jitted compute of rolling Cohen's D statistic comparing the current time-window of
         size N to the preceding window of size N.
@@ -2503,10 +2504,77 @@ class Statistics(FeatureExtractionMixin):
             )
 
     @staticmethod
+    def eta_squared(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Calculate eta-squared, a measure of between-subjects effect size.
+
+        Eta-squared (\(\eta^2\)) is calculated as the ratio of the sum of squares between groups to the total sum of squares. Range from 0 to 1, where larger values indicate
+        a stronger effect size.
+
+        .. math::
+           \eta^2 = \frac{SS_{between}}{SS_{between} + SS_{within}}
+
+        where:
+        - \( SS_{between} \) is the sum of squares between groups.
+        - \( SS_{within} \) is the sum of squares within groups.
+
+        :param np.ndarray x: 1D array containing the dependent variable data.
+        :param np.ndarray y: 1d array containing the grouping variable (categorical) data of same size as ``x``.
+        :return float: The eta-squared value representing the proportion of variance in the dependent variable that is attributable to the grouping variable.
+        """
+
+        check_valid_array(data=x, source=f'{Statistics.eta_squared.__name__} x', accepted_ndims=(1,), accepted_dtypes=(np.float64, np.int64, np.int32, np.float32, int, float))
+        check_valid_array(data=y, source=f'{Statistics.eta_squared.__name__} y', accepted_shapes=[x.shape])
+        sum_square_within, sum_square_between = 0, 0
+        for lbl in np.unique(y):
+            g = x[np.argwhere(y == lbl)]
+            sum_square_within += np.sum((g - np.mean(g)) ** 2)
+            sum_square_between += len(g) * (np.mean(g) - np.mean(x)) ** 2
+        if sum_square_between + sum_square_within == 0:
+            return 0.0
+        else:
+            return (sum_square_between / (sum_square_between + sum_square_within)) ** .5
+
+    @staticmethod
+    @jit(nopython=True)
+    def sliding_eta_squared(x: np.ndarray, y: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
+        """
+        Calculate sliding window eta-squared, a measure of effect size for between-subjects designs,
+        over multiple window sizes.
+
+        :param np.ndarray x: The array containing the dependent variable data.
+        :param np.ndarray y: The array containing the grouping variable (categorical) data.
+        :param np.ndarray window_sizes: 1D array of window sizes in seconds.
+        :param int sample_rate: The sampling rate of the data in frames per second.
+        :return np.ndarray: Array of size  x.shape[0] x window_sizes.shape[0] with sliding eta squared values.
+
+        :example:
+        >>> x = np.random.randint(0, 10, (10000,))
+        >>> y = np.random.randint(0, 2, (10000,))
+        >>> Statistics.sliding_eta_squared(x=x, y=y, window_sizes=np.array([1.0, 2.0]), sample_rate=10)
+
+        """
+        results = np.full((x.shape[0], window_sizes.shape[0]), -1.0)
+        for i in range(window_sizes.shape[0]):
+            window_size = int(window_sizes[i] * sample_rate)
+            for l, r in zip(range(0, x.shape[0] + 1), range(window_size, x.shape[0] + 1)):
+                sample_x = x[l:r]
+                sample_y = y[l:r]
+                sum_square_within, sum_square_between = 0, 0
+                for lbl in np.unique(sample_y):
+                    g = sample_x[np.argwhere(sample_y == lbl).flatten()]
+                    sum_square_within += np.sum((g - np.mean(g)) ** 2)
+                    sum_square_between += len(g) * (np.mean(g) - np.mean(sample_x)) ** 2
+                if sum_square_between + sum_square_within == 0:
+                    results[r - 1, i] = 0.0
+                else:
+                    results[r - 1, i] = (sum_square_between / (sum_square_between + sum_square_within)) ** .5
+        return results
+
+
+    @staticmethod
     @njit("(int32[:, :], float64[:], int64)")
-    def sliding_phi_coefficient(
-        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    def sliding_phi_coefficient(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Calculate sliding phi coefficients for a 2x2 contingency table derived from binary data.
 
@@ -2527,9 +2595,7 @@ class Statistics(FeatureExtractionMixin):
         results = np.full((data.shape[0], window_sizes.shape[0]), -1.0)
         for i in prange(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                range(0, data.shape[0] + 1), range(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(range(0, data.shape[0] + 1), range(window_size, data.shape[0] + 1)):
                 sample = data[l:r, :]
                 cnt_0_0 = len(
                     np.argwhere((sample[:, 0] == 0) & (sample[:, 1] == 0)).flatten()
@@ -2565,6 +2631,59 @@ class Statistics(FeatureExtractionMixin):
                     )
 
         return results.astype(np.float32)
+
+    @staticmethod
+    def relative_risk(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Calculate the relative risk between two binary arrays.
+
+        Relative risk (RR) is the ratio of the probability of an event occurring in one group/feature/cluster/variable (x)
+        to the probability of the event occurring in another group/feature/cluster/variable (y).
+
+        :param np.ndarray x: The first 1D binary array.
+        :param np.ndarray y: The second 1D binary array.
+        :return float: The relative risk between arrays x and y.
+
+        :example:
+        >>> Statistics.relative_risk(x=np.array([0, 1, 1]), y=np.array([0, 1, 0]))
+        >>> 2.0
+        """
+        check_valid_array(data=x, source=f'{Statistics.relative_risk.__name__} x', accepted_ndims=(1,), accepted_values=[0, 1])
+        check_valid_array(data=y, source=f'{Statistics.relative_risk.__name__} y', accepted_ndims=(1,), accepted_values=[0, 1])
+        if np.sum(y) == 0:
+            return -1.0
+        elif np.sum(x) == 0:
+            return 0.0
+        else:
+            return (np.sum(x) / x.shape[0]) / (np.sum(y) / y.shape[0])
+
+    @staticmethod
+    @jit(nopython=True)
+    def sliding_relative_risk(x: np.ndarray, y: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
+        """
+        Calculate sliding relative risk values between two binary arrays using different window sizes.
+
+        :param np.ndarray x: The first 1D binary array.
+        :param np.ndarray y: The second 1D binary array.
+        :param np.ndarray window_sizes:
+        :param int sample_rate:
+        :return np.ndarray: Array of size  x.shape[0] x window_sizes.shape[0] with sliding eta squared values.
+
+        :example:
+        >>> Statistics.sliding_relative_risk(x=np.array([0, 1, 1, 0]), y=np.array([0, 1, 0, 0]), window_sizes=np.array([1.0]), sample_rate=2)
+        """
+        results = np.full((x.shape[0], window_sizes.shape[0]), -1.0)
+        for i in range(window_sizes.shape[0]):
+            window_size = int(window_sizes[i] * sample_rate)
+            for l, r in zip(range(0, x.shape[0] + 1), range(window_size, x.shape[0] + 1)):
+                sample_x, sample_y = x[l:r], y[l:r]
+                if np.sum(sample_y) == 0:
+                    results[r - 1, i] = -1.0
+                elif np.sum(sample_x) == 0:
+                    results[r - 1, i] = 0.0
+                else:
+                    results[r - 1, i] = (np.sum(sample_x) / sample_x.shape[0]) / (np.sum(sample_y) / sample_y.shape[0])
+        return results
 
     @staticmethod
     @njit("int64[:], int64[:],")
@@ -2995,6 +3114,77 @@ class Statistics(FeatureExtractionMixin):
         return self._hellinger_helper(
             x=s1_h.astype(np.float32), y=s2_h.astype(np.float32)
         )
+
+    @staticmethod
+    def youden_j(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
+        """
+        Calculate Youden's J statistic from two binary arrays.
+
+        Youden's J statistic is a measure of the overall performance of a binary classification test, taking into account both sensitivity (true positive rate) and specificity (true negative rate).
+
+        :param sample_1: The first binary array.
+        :param sample_2: The second binary array.
+        :return float: Youden's J statistic.
+        """
+
+        check_valid_array(data=sample_1, source=f'{Statistics.youden_j.__name__} sample_1', accepted_ndims=(1,), accepted_values=[0, 1])
+        check_valid_array(data=sample_2, source=f'{Statistics.youden_j.__name__} sample_2', accepted_ndims=(1,), accepted_shapes=[(sample_1.shape)], accepted_values=[0, 1])
+        tp = np.sum((sample_1 == 1) & (sample_2 == 1))
+        tn = np.sum((sample_1 == 0) & (sample_2 == 0))
+        fp = np.sum((sample_1 == 0) & (sample_2 == 1))
+        fn = np.sum((sample_1 == 1) & (sample_2 == 0))
+        if tp + fn == 0 or tn + fp == 0:
+            return np.nan
+        else:
+            sensitivity = tp / (tp + fn)
+            specificity = tn / (tn + fp)
+            return sensitivity + specificity - 1
+
+    @staticmethod
+    def jaccard_distance(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Calculate the Jaccard distance between two 1D NumPy arrays.
+
+        The Jaccard distance is a measure of dissimilarity between two sets. It is defined as the size of the
+        intersection of the sets divided by the size of the union of the sets.
+
+        :param np.ndarray x: The first 1D NumPy array.
+        :param np.ndarray y: The second 1D NumPy array.
+        :return float: The Jaccard distance between arrays x and y.
+
+        :example:
+        >>> x = np.random.randint(0, 5, (100))
+        >>> y = np.random.randint(0, 7, (100))
+        >>> Statistics.jaccard_distance(x=x, y=y)
+        >>> 0.2857143
+        """
+        check_valid_array(data=x, source=f'{Statistics.jaccard_distance.__name__} x', accepted_ndims=(1,))
+        check_valid_array(data=y, source=f'{Statistics.jaccard_distance.__name__} y', accepted_ndims=(1,), accepted_dtypes=[x.dtype.type])
+        u_x, u_y = np.unique(x), np.unique(y)
+        return np.float32(1 -(len(np.intersect1d(u_x, u_y)) / len(np.unique(np.hstack((u_x, u_y))))))
+
+    @staticmethod
+    def manhattan_distance_cdist(data: np.ndarray) -> np.ndarray:
+        """
+        Compute the pairwise Manhattan distance matrix between points in a 2D array.
+
+        Can be preferred over Euclidean distance in scenarios where the movement is restricted
+        to grid-based paths and/or the data is high dimensional.
+
+        .. math::
+           D_{\text{Manhattan}} = |x_2 - x_1| + |y_2 - y_1|
+
+        :param data: 2D array where each row represents a featurized observation (e.g., frame)
+        :return np.ndarray: Pairwise Manhattan distance matrix where element (i, j) represents the distance between points i and j.
+
+        :example:
+        >>> data = np.random.randint(0, 50, (10000, 2))
+        >>> Statistics.manhattan_distance_cdist(data=data)
+        """
+        check_valid_array(data=data, source=f'{Statistics.manhattan_distance_cdist} data', accepted_ndims=(2,), accepted_dtypes=(np.float32, np.float64, np.int64, np.int32, int, float, np.float16, np.int8, np.int16))
+        differences = np.abs(data[:, np.newaxis, :] - data)
+        results = np.sum(differences, axis=-1)
+        return results
 
     @staticmethod
     @njit("(int64[:], int64[:])")

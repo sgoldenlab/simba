@@ -800,19 +800,18 @@ def check_that_dir_has_list_of_filenames(
             )
 
 
-def check_valid_array(
-    data: np.ndarray,
-    source: Optional[str] = "",
-    accepted_ndims: Optional[List[Tuple[int]]] = None,
-    accepted_sizes: Optional[List[int]] = None,
-    accepted_axis_0_shape: Optional[List[int]] = None,
-    accepted_axis_1_shape: Optional[List[int]] = None,
-    accepted_dtypes: Optional[List[str]] = None,
-    accepted_shapes: Optional[List[Tuple[int]]] = None,
-    min_axis_0: Optional[int] = None,
-    max_axis_1: Optional[int] = None,
-    min_axis_1: Optional[int] = None,
-) -> None:
+def check_valid_array(data: np.ndarray,
+                      source: Optional[str] = "",
+                      accepted_ndims: Optional[List[Tuple[int]]] = None,
+                      accepted_sizes: Optional[List[int]] = None,
+                      accepted_axis_0_shape: Optional[List[int]] = None,
+                      accepted_axis_1_shape: Optional[List[int]] = None,
+                      accepted_dtypes: Optional[List[str]] = None,
+                      accepted_values: Optional[List[Any]] = None,
+                      accepted_shapes: Optional[List[Tuple[int]]] = None,
+                      min_axis_0: Optional[int] = None,
+                      max_axis_1: Optional[int] = None,
+                      min_axis_1: Optional[int] = None) -> None:
     """
     Check if the given  array satisfies specified criteria regarding its dimensions, shape, and data type.
 
@@ -900,6 +899,12 @@ def check_valid_array(
                 msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}",
                 source=check_valid_array.__name__,
             )
+
+    if accepted_values is not None:
+        check_valid_lst(data=accepted_values, source=f"{source} accepted_values")
+        additional_vals = list(set(np.unique(data)) - set(accepted_values))
+        if len(additional_vals) > 0:
+            raise ArrayError(msg=f"Array contains unacceptable values. Found  {additional_vals}, accepted: {accepted_values}, {source}", source=check_valid_array.__name__,)
 
 
 def check_valid_lst(
@@ -1330,15 +1335,12 @@ def check_video_and_data_frm_count_align(
         check_file_exist_and_readable(file_path=data)
         with open(data, "rb") as fp:
             c_generator = _count_generator(fp.raw.read)
-            data_count = (sum(buffer.count(b"\n") for buffer in c_generator)) - 1
+            data_count = (sum(buffer.count(b"\n") for buffer in c_generator))
     else:
         data_count = len(data)
     if data_count != video_count:
         if not raise_error:
-            FrameRangeWarning(
-                msg=f"The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows",
-                source=check_video_and_data_frm_count_align.__name__,
-            )
+            FrameRangeWarning(msg=f"The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows", source=check_video_and_data_frm_count_align.__name__)
         else:
             raise FrameRangeError(
                 msg=f"The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows",

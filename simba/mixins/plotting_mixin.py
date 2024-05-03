@@ -1,8 +1,6 @@
 __author__ = "Simon Nilsson"
 import io
-import itertools
 import os
-import random
 import shutil
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -14,10 +12,10 @@ import numpy as np
 import pandas as pd
 import PIL
 import plotly.graph_objs as go
-import plotly.io as pio
 import seaborn as sns
 from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
 from numba import bool_, njit, uint8
 from PIL import Image
 
@@ -327,16 +325,14 @@ class PlottingMixin(object):
             source=self.__class__.__name__,
         )
 
-    def make_gantt_plot(
-        self,
-        data_df: pd.DataFrame,
-        bouts_df: pd.DataFrame,
-        clf_names: List[str],
-        fps: int,
-        style_attr: dict,
-        video_name: str,
-        save_path: str,
-    ) -> None:
+    def make_gantt_plot(self,
+                        data_df: pd.DataFrame,
+                        bouts_df: pd.DataFrame,
+                        clf_names: List[str],
+                        fps: int,
+                        style_attr: dict,
+                        video_name: str,
+                        save_path: Optional[str] = None) -> Union[None, np.ndarray]:
 
         video_timer = SimbaTimer(start=True)
         colours = get_named_colors()
@@ -347,11 +343,7 @@ class PlottingMixin(object):
                 if event[0] == x:
                     ix = clf_names.index(x)
                     data_event = event[1][["Start_time", "Bout_time"]]
-                    ax.broken_barh(
-                        data_event.values,
-                        (colour_tuple_x[ix], 3),
-                        facecolors=colours[ix],
-                    )
+                    ax.broken_barh(data_event.values, (colour_tuple_x[ix], 3), facecolors=colours[ix])
 
         x_ticks_locs = x_lbls = np.round(np.linspace(0, len(data_df) / fps, 6))
         ax.set_xticks(x_ticks_locs)
@@ -368,19 +360,16 @@ class PlottingMixin(object):
         image = PIL.Image.open(buffer_)
         ar = np.asarray(image)
         open_cv_image = cv2.cvtColor(ar, cv2.COLOR_RGB2BGR)
-        open_cv_image = cv2.resize(
-            open_cv_image, (style_attr["width"], style_attr["height"])
-        )
+        open_cv_image = cv2.resize(open_cv_image, (style_attr["width"], style_attr["height"]))
         frame = np.uint8(open_cv_image)
         buffer_.close()
-        plt.close(fig)
-        cv2.imwrite(save_path, frame)
-        video_timer.stop_timer()
-        stdout_success(
-            msg=f"Final gantt frame for video {video_name} saved at {save_path}",
-            elapsed_time=video_timer.elapsed_time_str,
-            source=self.__class__.__name__,
-        )
+        plt.close('all')
+        if save_path is not None:
+            cv2.imwrite(save_path, frame)
+            video_timer.stop_timer()
+            stdout_success(msg=f"Final gantt frame for video {video_name} saved at {save_path}",elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+        else:
+            return frame
 
     @staticmethod
     def make_clf_heatmap_plot(
@@ -463,56 +452,35 @@ class PlottingMixin(object):
             return image
 
     @staticmethod
-    def make_location_heatmap_plot(
-        frm_data: np.array,
-        max_scale: float,
-        palette: Literal[Options.PALETTE_OPTIONS],
-        aspect_ratio: float,
-        shading: str,
-        img_size: Tuple[int, int],
-        file_name: str or None = None,
-        final_img: bool = False,
-    ):
+    def make_location_heatmap_plot(frm_data: np.array,
+                                   max_scale: float,
+                                   palette: Literal[Options.PALETTE_OPTIONS],
+                                   aspect_ratio: float,
+                                   shading: str,
+                                   img_size: Tuple[int, int],
+                                   file_name: Optional[Union[str, os.PathLike]] = None):
 
         cum_df = pd.DataFrame(frm_data).reset_index()
-        cum_df = cum_df.melt(
-            id_vars="index",
-            value_vars=None,
-            var_name=None,
-            value_name="seconds",
-            col_level=None,
-        ).rename(columns={"index": "vertical_idx", "variable": "horizontal_idx"})
-        cum_df["color"] = (
-            (cum_df["seconds"].astype(float) / float(max_scale))
-            .round(2)
-            .clip(upper=100)
-        )
-        color_array = np.zeros(
-            (
-                len(cum_df["vertical_idx"].unique()),
-                len(cum_df["horizontal_idx"].unique()),
-            )
-        )
+        cum_df = cum_df.melt(id_vars="index", value_vars=None, var_name=None, value_name="seconds", col_level=None).rename(columns={"index": "vertical_idx", "variable": "horizontal_idx"})
+        cum_df["color"] = ((cum_df["seconds"].astype(float) / float(max_scale)).round(2).clip(upper=100))
+        color_array = np.zeros((len(cum_df["vertical_idx"].unique()), len(cum_df["horizontal_idx"].unique())))
         for i in range(color_array.shape[0]):
             for j in range(color_array.shape[1]):
-                value = cum_df["color"][
-                    (cum_df["horizontal_idx"] == j) & (cum_df["vertical_idx"] == i)
-                ].values[0]
+                value = cum_df["color"][(cum_df["horizontal_idx"] == j) & (cum_df["vertical_idx"] == i)].values[0]
                 color_array[i, j] = value
         color_array = color_array * max_scale
         matplotlib.font_manager._get_font.cache_clear()
         plt.close("all")
         fig = plt.figure()
         im_ratio = color_array.shape[0] / color_array.shape[1]
-        plt.pcolormesh(
-            color_array,
-            shading=shading,
-            cmap=palette,
-            rasterized=True,
-            alpha=1,
-            vmin=0.0,
-            vmax=max_scale,
-        )
+        plt.pcolormesh(color_array,
+                       shading=shading,
+                       cmap=palette,
+                       rasterized=True,
+                       alpha=1,
+                       vmin=0.0,
+                       vmax=max_scale)
+
         plt.gca().invert_yaxis()
         plt.xticks([])
         plt.yticks([])
@@ -528,18 +496,14 @@ class PlottingMixin(object):
         canvas.draw()
         mat = np.array(canvas.renderer._renderer)
         image = cv2.cvtColor(mat, cv2.COLOR_RGB2BGR)
-        image = cv2.resize(image, img_size)
+        image = cv2.resize(mat, img_size)
         image = np.uint8(image)
         plt.close("all")
-        if final_img:
+        if file_name is not None:
             cv2.imwrite(file_name, image)
-            stdout_success(
-                msg=f"Final location heatmap image saved at at {file_name}",
-                source=PlottingMixin.make_location_heatmap_plot.__class__.__name__,
-            )
+            stdout_success(msg=f"Location heatmap image saved at at {file_name}", source=PlottingMixin.make_location_heatmap_plot.__class__.__name__)
         else:
             return image
-        return None
 
     def get_bouts_for_gantt(
         self, data_df: pd.DataFrame, clf_name: str, fps: int
@@ -590,86 +554,6 @@ class PlottingMixin(object):
         """
 
         return imutils.resize(gantt_img, height=img_height)
-
-    @staticmethod
-    def gantt_creator_mp(
-        data: np.array,
-        frame_setting: bool,
-        video_setting: bool,
-        video_save_dir: str,
-        frame_folder_dir: str,
-        bouts_df: pd.DataFrame,
-        clf_names: list,
-        colors: list,
-        color_tuple: tuple,
-        fps: int,
-        rotation: int,
-        font_size: int,
-        width: int,
-        height: int,
-        video_name: str,
-    ):
-
-        group, frame_rng = data[0], data[1:]
-        start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
-        video_writer = None
-        if video_setting:
-            fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-            video_save_path = os.path.join(video_save_dir, f"{group}.mp4")
-            video_writer = cv2.VideoWriter(
-                video_save_path, fourcc, fps, (width, height)
-            )
-
-        while current_frm < end_frm:
-            fig, ax = plt.subplots()
-            bout_rows = bouts_df.loc[bouts_df["End_frame"] <= current_frm]
-            for i, event in enumerate(bout_rows.groupby("Event")):
-                for x in clf_names:
-                    if event[0] == x:
-                        ix = clf_names.index(x)
-                        data_event = event[1][["Start_time", "Bout_time"]]
-                        ax.broken_barh(
-                            data_event.values,
-                            (color_tuple[ix], 3),
-                            facecolors=colors[ix],
-                        )
-
-            x_ticks_locs = x_lbls = np.round(
-                np.linspace(0, round((current_frm / fps), 3), 6)
-            )
-            ax.set_xticks(x_ticks_locs)
-            ax.set_xticklabels(x_lbls)
-            ax.set_ylim(0, color_tuple[len(clf_names)])
-            ax.set_yticks(np.arange(5, 5 * len(clf_names) + 1, 5))
-            ax.tick_params(axis="both", labelsize=font_size)
-            ax.set_yticklabels(clf_names, rotation=rotation)
-            ax.set_xlabel("Session (s)", fontsize=font_size)
-            ax.yaxis.grid(True)
-            canvas = FigureCanvas(fig)
-            canvas.draw()
-            mat = np.array(canvas.renderer._renderer)
-            img = cv2.cvtColor(mat, cv2.COLOR_RGB2BGR)
-            img = np.uint8(cv2.resize(img, (width, height)))
-            if video_setting:
-                video_writer.write(img)
-            if frame_setting:
-                frame_save_name = os.path.join(
-                    frame_folder_dir, "{}.png".format(str(current_frm))
-                )
-                cv2.imwrite(frame_save_name, img)
-            plt.close(fig)
-            current_frm += 1
-
-            print(
-                "Gantt frame created: {}, Video: {}, Processing core: {}".format(
-                    str(current_frm + 1), video_name, str(group + 1)
-                )
-            )
-
-        if video_setting:
-            video_writer.release()
-
-        return group
 
     @staticmethod
     def bbox_mp(

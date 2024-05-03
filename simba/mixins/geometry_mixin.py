@@ -3163,8 +3163,7 @@ class GeometryMixin(object):
         return polygons, round((v_hex_cnt[0] / h_hex_cnt[0]), 3)
 
     @staticmethod
-    def _cumsum_coord_geometries_helper(
-        data: np.ndarray, geometries: Dict[Tuple[int, int], Polygon], verbose: bool
+    def _cumsum_coord_geometries_helper(data: np.ndarray, geometries: Dict[Tuple[int, int], Polygon], verbose: bool
     ):
         data_point = Point(data[1:])
         if verbose:
@@ -3174,14 +3173,13 @@ class GeometryMixin(object):
                 return (int(data[0]), k[0], k[1])
         return (int(data[0]), -1, -1)
 
-    def cumsum_coord_geometries(
-        self,
-        data: np.ndarray,
-        geometries: Dict[Tuple[int, int], Polygon],
-        fps: Optional[int] = None,
-        core_cnt: Optional[int] = -1,
-        verbose: Optional[bool] = True,
-    ):
+    def cumsum_coord_geometries(self,
+                                data: np.ndarray,
+                                geometries: Dict[Tuple[int, int], Polygon],
+                                fps: Optional[int] = None,
+                                core_cnt: Optional[int] = -1,
+                                verbose: Optional[bool] = True):
+
         """
         Compute the cumulative time a body-part has spent inside a grid of geometries using multiprocessing.
 
@@ -3220,7 +3218,7 @@ class GeometryMixin(object):
         data = np.hstack((frm_id, data))
         img_arr = np.zeros((data.shape[0], h + 1, w + 1))
         with multiprocessing.Pool(
-            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
+            core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value
         ) as pool:
             constants = functools.partial(
                 self._cumsum_coord_geometries_helper,

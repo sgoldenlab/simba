@@ -100,7 +100,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             print(f"Analysing ROI data for video {video_name}...")
             video_settings, pix_per_mm, self.fps = self.read_video_info(video_name=video_name)
             self.sliced_roi_dict, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=video_name)
-            if video_shape_names == 0:
+            if len(video_shape_names) == 0:
                 NoDataFoundWarning(msg=f"Skipping video {video_name}: No user-defined ROI data found for this video...")
                 continue
             else:

@@ -29,7 +29,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
             filepaths=list(self.files_found_dict.keys()),
             error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/outlier_corrected_movement_location directory. ",
         )
-        max_scales = list(np.linspace(5, 600, 5))
+        max_scales = list(np.arange(5, 105, 5))
         max_scales.insert(0, "Auto-compute")
         self.style_settings_frm = CreateLabelFrameWithIcon(
             parent=self.main_frm,
@@ -199,7 +199,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
                 video_setting=self.heatmap_videos_var.get(),
                 frame_setting=self.heatmap_frames_var.get(),
                 bodypart=self.bp_dropdown.getChoices(),
-                files_found=data_paths,
+                data_paths=data_paths,
             )
 
             heatmapper_clf_processor = multiprocessing.Process(heatmapper_clf.run())
@@ -213,7 +213,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
                 video_setting=self.heatmap_videos_var.get(),
                 frame_setting=self.heatmap_frames_var.get(),
                 bodypart=self.bp_dropdown.getChoices(),
-                files_found=data_paths,
+                data_paths=data_paths,
                 core_cnt=int(self.multiprocess_dropdown.getChoices()),
             )
 

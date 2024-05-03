@@ -51,11 +51,11 @@ class ImageMixin(object):
         pass
 
     @staticmethod
-    def brightness_intensity(
-        imgs: List[np.ndarray], ignore_black: Optional[bool] = True
-    ) -> List[float]:
+    def brightness_intensity(imgs: List[np.ndarray], ignore_black: Optional[bool] = True) -> List[float]:
         """
         Compute the average brightness intensity within each image within a list.
+
+        For example, (i) create a list of images containing a light cue ROI, (ii) compute brightness in each image, (iii) perform kmeans on brightness, and get the frames when the light cue is on vs off.
 
         :param List[np.ndarray] imgs: List of images as arrays to calculate average brightness intensity within.
         :param Optional[bool] ignore_black: If True, ignores black pixels. If the images are sliced non-rectangular geometric shapes created by ``slice_shapes_in_img``, then pixels that don't belong to the shape has been masked in black.
@@ -90,17 +90,8 @@ class ImageMixin(object):
     @staticmethod
     def gaussian_blur(img: np.ndarray, kernel_size: Optional[Tuple] = (9, 9)):
         check_if_valid_img(data=img, source=ImageMixin.gaussian_blur.__name__)
-        check_instance(
-            source=ImageMixin.gaussian_blur.__name__,
-            instance=kernel_size,
-            accepted_types=(tuple,),
-        )
-        check_valid_lst(
-            data=list(kernel_size),
-            source=ImageMixin.gaussian_blur.__name__,
-            valid_dtypes=(int,),
-            exact_len=2,
-        )
+        check_instance(source=ImageMixin.gaussian_blur.__name__, instance=kernel_size, accepted_types=(tuple,))
+        check_valid_lst(data=list(kernel_size), source=ImageMixin.gaussian_blur.__name__, valid_dtypes=(int,), exact_len=2,)
         return cv2.GaussianBlur(img, kernel_size, 0)
 
     @staticmethod
@@ -171,13 +162,12 @@ class ImageMixin(object):
             )
 
     @staticmethod
-    def get_contourmatch(
-        img_1: np.ndarray,
-        img_2: np.ndarray,
-        mode: Optional[Literal["all", "exterior"]] = "all",
-        method: Optional[Literal["simple", "none", "l2", "kcos"]] = "simple",
-        canny: Optional[bool] = True,
-    ) -> float:
+    def get_contourmatch(img_1: np.ndarray,
+                         img_2: np.ndarray,
+                         mode: Optional[Literal["all", "exterior"]] = "all",
+                         method: Optional[Literal["simple", "none", "l2", "kcos"]] = "simple",
+                         canny: Optional[bool] = True) -> float:
+
         """
         Calculate contour similarity between two images.
 
@@ -396,13 +386,13 @@ class ImageMixin(object):
                     interior_contours.append(cnts[i])
 
     @staticmethod
-    def orb_matching_similarity_(
-        img_1: np.ndarray,
-        img_2: np.ndarray,
-        method: Literal["knn", "match", "radius"] = "knn",
-        mask: Optional[np.ndarray] = None,
-        threshold: Optional[int] = 0.75,
-    ) -> int:
+    def orb_matching_similarity_(img_1: np.ndarray,
+                                 img_2: np.ndarray,
+                                 method: Literal["knn", "match", "radius"] = "knn",
+                                 mask: Optional[np.ndarray] = None,
+                                 threshold: Optional[int] = 0.75) -> int:
+
+
         """Perform ORB feature matching between two sets of images.
 
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/0.png').astype(np.uint8)
@@ -416,9 +406,7 @@ class ImageMixin(object):
         sliced_matches = None
         if method == "knn":
             matches = cv2.BFMatcher().knnMatch(des1, des2, k=2)
-            sliced_matches = [
-                m for m, n in matches if m.distance < threshold * n.distance
-            ]
+            sliced_matches = [m for m, n in matches if m.distance < threshold * n.distance]
         if method == "match":
             matches = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True).match(des1, des2)
             sliced_matches = [match for match in matches if match.distance <= threshold]

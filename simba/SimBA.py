@@ -1953,9 +1953,7 @@ class App(object):
             wrap="none",
             borderwidth=0,
         )
-        self.txt.insert(
-            INSERT, Defaults.WELCOME_MSG.value + emojis["relaxed"] + "\n" * 2
-        )
+        self.txt.insert(INSERT, Defaults.WELCOME_MSG.value + emojis["relaxed"] + "\n" * 2)
         self.txt.tag_add(TagNames.GREETING.value, "1.0", "3.25")
         y_sb.pack(side=RIGHT, fill=Y)
         self.txt.pack(expand=True, fill="both")

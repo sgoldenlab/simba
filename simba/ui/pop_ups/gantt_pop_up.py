@@ -200,29 +200,23 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         if multiple_videos:
             data_paths = list(self.files_found_dict.values())
         else:
-            data_paths = [
-                self.files_found_dict[self.single_video_dropdown.getChoices()]
-            ]
+            data_paths = [self.files_found_dict[self.single_video_dropdown.getChoices()]]
 
         if self.gantt_multiprocess_var.get():
-            gantt_creator = GanttCreatorMultiprocess(
-                config_path=self.config_path,
-                frame_setting=self.gantt_frames_var.get(),
-                video_setting=self.gantt_videos_var.get(),
-                last_frm_setting=self.gantt_last_frame_var.get(),
-                files_found=data_paths,
-                cores=int(self.multiprocess_dropdown.getChoices()),
-                style_attr=style_attr,
-            )
+            gantt_creator = GanttCreatorMultiprocess(config_path=self.config_path,
+                                                     frame_setting=self.gantt_frames_var.get(),
+                                                     video_setting=self.gantt_videos_var.get(),
+                                                     last_frm_setting=self.gantt_last_frame_var.get(),
+                                                     data_paths=data_paths,
+                                                     cores=int(self.multiprocess_dropdown.getChoices()),
+                                                     style_attr=style_attr)
         else:
-            gantt_creator = GanttCreatorSingleProcess(
-                config_path=self.config_path,
-                frame_setting=self.gantt_frames_var.get(),
-                video_setting=self.gantt_videos_var.get(),
-                last_frm_setting=self.gantt_last_frame_var.get(),
-                files_found=data_paths,
-                style_attr=style_attr,
-            )
+            gantt_creator = GanttCreatorSingleProcess(config_path=self.config_path,
+                                                      frame_setting=self.gantt_frames_var.get(),
+                                                      video_setting=self.gantt_videos_var.get(),
+                                                      last_frm_setting=self.gantt_last_frame_var.get(),
+                                                      data_paths=data_paths,
+                                                      style_attr=style_attr)
         gantt_creator.run()
 
 

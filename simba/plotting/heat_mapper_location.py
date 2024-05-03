@@ -1,12 +1,13 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import List
+from typing import List, Union, Optional, Any, Dict
 
 import cv2
 import numpy as np
 import pandas as pd
 from numba import jit, prange
+import shutil
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
@@ -15,7 +16,14 @@ from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
+from simba.utils.checks import check_file_exist_and_readable, check_valid_lst, check_if_keys_exist_in_dict, check_int, check_all_file_names_are_represented_in_video_log, check_float
 
+STYLE_PALETTE = 'palette'
+STYLE_SHADING = 'shading'
+STYLE_BIN_SIZE = 'bin_size'
+STYLE_MAX_SCALE = 'max_scale'
+
+STYLE_ATTR = [STYLE_PALETTE, STYLE_SHADING, STYLE_BIN_SIZE, STYLE_MAX_SCALE]
 
 class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
     """
@@ -24,6 +32,7 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
 
     ..note::
        `GitHub visualizations tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations>`__.
+        For improved run-time of videos, see :meth:`simba.heat_mapper_location_mp.HeatMapperLocationMultiprocess` for multiprocess class.
 
     .. image:: _static/img/heatmap_location.gif
        :width: 1000
@@ -44,41 +53,34 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
     >>> heatmapper.run()
     """
 
-    def __init__(
-        self,
-        config_path: str,
-        bodypart: str,
-        style_attr: dict,
-        final_img_setting: bool,
-        video_setting: bool,
-        frame_setting: bool,
-        files_found: List[str],
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_paths: List[Union[str, os.PathLike]],
+                 bodypart: str,
+                 style_attr: Dict[str, Any],
+                 final_img_setting: Optional[bool] = True,
+                 video_setting: Optional[bool] = False,
+                 frame_setting: Optional[bool] = False):
 
+
+        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
+        if (not frame_setting) and (not video_setting) and (not final_img_setting):
+            raise NoSpecifiedOutputError(msg="Please choose to select either heatmap videos, frames, and/or final image.", source=self.__class__.__name__)
+
+        check_file_exist_and_readable(file_path=config_path)
+        check_valid_lst(data=data_paths, valid_dtypes=(str,), min_len=1)
+        check_if_keys_exist_in_dict(data=style_attr, key=STYLE_ATTR, name=f'{self.__class__.__name__} style_attr')
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
-        log_event(
-            logger_name=str(__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
-        if (not frame_setting) and (not video_setting) and (not final_img_setting):
-            raise NoSpecifiedOutputError(
-                msg="Please choose to select either heatmap videos, frames, and/or final image.",
-                source=self.__class__.__name__,
-            )
-
         self.frame_setting, self.video_setting = frame_setting, video_setting
         self.final_img_setting, self.bp = final_img_setting, bodypart
         self.style_attr = style_attr
         if not os.path.exists(self.heatmap_location_dir):
             os.makedirs(self.heatmap_location_dir)
-        self.files_found = files_found
+        self.data_paths = data_paths
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        self.bp_lst = [self.bp + "_x", self.bp + "_y"]
-        print(
-            "Processing heatmaps for {} video(s)...".format(str(len(self.files_found)))
-        )
+        self.bp_lst = [f"{self.bp}_x", f"{self.bp}_y"]
+        print(f"Processing heatmaps for {len(self.data_paths)} video(s)...")
 
     @staticmethod
     @jit(nopython=True)
@@ -157,111 +159,79 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
         return cum_sum_arr / fps
 
     def run(self):
-        for file_cnt, file_path in enumerate(self.files_found):
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
-            self.video_info, self.px_per_mm, self.fps = self.read_video_info(
-                video_name=self.video_name
-            )
-            self.width, self.height = int(
-                self.video_info["Resolution_width"].values[0]
-            ), int(self.video_info["Resolution_height"].values[0])
+            self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=self.video_name)
+            self.width, self.height = int(self.video_info["Resolution_width"].values[0]), int(self.video_info["Resolution_height"].values[0])
             if self.video_setting:
-                self.video_save_path = os.path.join(
-                    self.heatmap_location_dir, self.video_name + ".mp4"
-                )
-                self.writer = cv2.VideoWriter(
-                    self.video_save_path,
-                    self.fourcc,
-                    self.fps,
-                    (self.width, self.height),
-                )
+                self.video_save_path = os.path.join(self.heatmap_location_dir, f"{self.video_name}.mp4")
+                self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (self.width, self.height),)
             if self.frame_setting | self.final_img_setting:
-                self.save_video_folder = os.path.join(
-                    self.heatmap_location_dir, self.video_name
-                )
-                if not os.path.exists(self.save_video_folder):
-                    os.makedirs(self.save_video_folder)
+                self.save_video_folder = os.path.join(self.heatmap_location_dir, self.video_name)
+                if os.path.exists(self.save_video_folder):
+                    shutil.rmtree(self.save_video_folder)
+                os.makedirs(self.save_video_folder)
             self.data_df = read_df(file_path, self.file_type)[self.bp_lst]
-            squares, aspect_ratio = GeometryMixin().bucket_img_into_grid_square(
-                bucket_grid_size_mm=self.style_attr["bin_size"],
-                img_size=(self.width, self.height),
-                px_per_mm=self.px_per_mm,
-            )
-            location_array = GeometryMixin().cumsum_coord_geometries(
-                data=self.data_df.values, fps=self.fps, geometries=squares
-            )
+            squares, aspect_ratio = GeometryMixin().bucket_img_into_grid_square(bucket_grid_size_mm=self.style_attr[STYLE_BIN_SIZE], img_size=(self.width, self.height), px_per_mm=self.px_per_mm)
+            location_array = GeometryMixin().cumsum_coord_geometries(data=self.data_df.values, fps=self.fps, geometries=squares)
 
-            if self.style_attr["max_scale"] == "auto":
+            if self.style_attr[STYLE_MAX_SCALE] == "auto":
                 self.max_scale = np.round(np.max(np.max(location_array[-1], axis=0)), 3)
-                if self.max_scale == 0:
-                    self.max_scale = 1
+                if self.max_scale == 0: self.max_scale = 1
             else:
-                self.max_scale = self.style_attr["max_scale"]
+                check_float(name=f'{self.__class__.__name__} style max scale', value=self.style_attr[STYLE_MAX_SCALE], min_value=10e-6)
+                self.max_scale = self.style_attr[STYLE_MAX_SCALE]
 
             if self.final_img_setting:
-                self.make_location_heatmap_plot(
-                    frm_data=location_array[-1:, :, :][0],
-                    max_scale=self.max_scale,
-                    palette=self.style_attr["palette"],
-                    aspect_ratio=aspect_ratio,
-                    file_name=os.path.join(
-                        self.heatmap_location_dir, self.video_name + "_final_frm.png"
-                    ),
-                    shading=self.style_attr["shading"],
-                    img_size=(self.width, self.height),
-                    final_img=True,
-                )
-                print(
-                    "Final heatmap image saved at {}".format(
-                        os.path.join(self.save_video_folder, "_final_img.png")
-                    )
-                )
+                final_img_save_name = os.path.join(self.heatmap_location_dir, f"{self.video_name}_final_frm.png")
+                self.make_location_heatmap_plot(frm_data=location_array[-1:, :, :][0],
+                                                max_scale=self.max_scale,
+                                                palette=self.style_attr[STYLE_PALETTE],
+                                                aspect_ratio=aspect_ratio,
+                                                file_name=final_img_save_name,
+                                                shading=self.style_attr[STYLE_SHADING],
+                                                img_size=(self.width, self.height))
+                print(f"Final heatmap image saved at {final_img_save_name}")
 
             if (self.frame_setting) or (self.video_setting):
-                for frm_cnt, cumulative_frm in enumerate(
-                    range(location_array.shape[0])
-                ):
-                    img = self.make_location_heatmap_plot(
-                        frm_data=location_array[cumulative_frm, :, :],
-                        max_scale=self.max_scale,
-                        palette=self.style_attr["palette"],
-                        aspect_ratio=aspect_ratio,
-                        file_name=None,
-                        shading=self.style_attr["shading"],
-                        img_size=(self.width, self.height),
-                        final_img=False,
-                    )
+                for frm_cnt, cumulative_frm in enumerate(range(location_array.shape[0])):
+                    img = self.make_location_heatmap_plot(frm_data=location_array[cumulative_frm, :, :],
+                                                          max_scale=self.max_scale,
+                                                          palette=self.style_attr["palette"],
+                                                          aspect_ratio=aspect_ratio,
+                                                          file_name=None,
+                                                          shading=self.style_attr["shading"],
+                                                          img_size=(self.width, self.height))
                     if self.video_setting:
-                        self.writer.write(img)
+                        self.writer.write(img[:, :, :3])
                     if self.frame_setting:
-                        frame_save_path = os.path.join(
-                            self.save_video_folder, str(frm_cnt) + ".png"
-                        )
+                        frame_save_path = os.path.join(self.save_video_folder, f"{frm_cnt}.png")
                         cv2.imwrite(frame_save_path, img)
 
-                    print(
-                        "Heatmap frame: {} / {}. Video: {} ({}/{})".format(
-                            str(frm_cnt + 1),
-                            str(len(self.data_df)),
-                            self.video_name,
-                            str(file_cnt + 1),
-                            len(self.files_found),
-                        )
-                    )
+                    print(f"Heatmap frame: {frm_cnt + 1} / {len(self.data_df)}. Video: {self.video_name} ({file_cnt + 1}/{len(self.data_paths)})")
 
             if self.video_setting:
                 self.writer.release()
             video_timer.stop_timer()
-            print(
-                f"Heatmap plot for video {self.video_name} saved (elapsed time: {video_timer.elapsed_time_str}s"
-            )
+            print(f"Heatmap plot for video {self.video_name} saved (elapsed time: {video_timer.elapsed_time_str}s")
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"Created heatmaps for {str(len(self.files_found))} videos",
-            elapsed_time=self.timer.elapsed_time_str,
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg=f"Created heatmaps for {len(self.data_paths)} videos", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__,)
+
+
+
+
+# test = HeatmapperLocationSingleCore(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini',
+#                                       style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 100, 'max_scale': 10},
+#                                       final_img_setting=True,
+#                                       video_setting=True,
+#                                       frame_setting=False,
+#                                       bodypart='Snout',
+#                                       data_paths=['/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/csv/outlier_corrected_movement_location/raw_clip1.csv'])
+# test.run()
+
+
 
 
 #

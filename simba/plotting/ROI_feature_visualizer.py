@@ -157,7 +157,7 @@ class ROIfeatureVisualizer(ConfigReader):
         )
         self.style_attr = style_attr
         self.direct_viable = self.roi_feature_creator.roi_directing_viable
-        self.data_df = read_df(file_path=self.data_path, file_type=self.file_type)
+        self.data_df = read_df(file_path=self.data_path, file_type=self.file_type).reset_index(drop=True)
         self.shape_dicts = self.__create_shape_dicts()
         self.directing_df = self.roi_feature_creator.dr
 
@@ -287,38 +287,18 @@ class ROIfeatureVisualizer(ConfigReader):
         while self.cap.isOpened():
             ret, self.img = self.cap.read()
             if ret:
-                self.img_w_border = cv2.copyMakeBorder(
-                    self.img,
-                    0,
-                    0,
-                    0,
-                    self.video_meta_data["width"],
-                    borderType=cv2.BORDER_CONSTANT,
-                    value=self.style_attr[BORDER_COLOR],
-                )
+                self.img_w_border = cv2.copyMakeBorder(self.img, 0, 0, 0, self.video_meta_data["width"], borderType=cv2.BORDER_CONSTANT, value=self.style_attr[BORDER_COLOR])
                 if self.frame_cnt == 0:
-                    self.img_w_border_h, self.img_w_border_w = (
-                        self.img_w_border.shape[0],
-                        self.img_w_border.shape[1],
-                    )
+                    self.img_w_border_h, self.img_w_border_w = (self.img_w_border.shape[0], self.img_w_border.shape[1])
                     self.__calc_text_locs()
-                    self.writer = cv2.VideoWriter(
-                        self.save_path,
-                        self.fourcc,
-                        self.video_meta_data["fps"],
-                        (self.img_w_border_w, self.img_w_border_h),
-                    )
+                    self.writer = cv2.VideoWriter(self.save_path, self.fourcc, self.video_meta_data["fps"], (self.img_w_border_w, self.img_w_border_h))
                 self.__insert_texts(self.roi_dict[Keys.ROI_RECTANGLES.value])
                 self.__insert_texts(self.roi_dict[Keys.ROI_CIRCLES.value])
                 self.__insert_texts(self.roi_dict[Keys.ROI_POLYGONS.value])
                 if self.style_attr[POSE]:
                     for animal_name, bp_data in self.animal_bp_dict.items():
-                        for bp_cnt, bp in enumerate(
-                            zip(bp_data["X_bps"], bp_data["Y_bps"])
-                        ):
-                            bp_cords = self.data_df.loc[
-                                self.frame_cnt, list(bp)
-                            ].values.astype(np.int64)
+                        for bp_cnt, bp in enumerate(zip(bp_data["X_bps"], bp_data["Y_bps"])):
+                            bp_cords = self.data_df.loc[self.frame_cnt, list(bp)].values.astype(np.int64)
                             cv2.circle(
                                 self.img_w_border,
                                 (bp_cords[0], bp_cords[1]),
