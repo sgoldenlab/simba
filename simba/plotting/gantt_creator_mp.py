@@ -5,31 +5,36 @@ import warnings
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 import functools
+import io
 import multiprocessing
 import os
-import io
-import PIL
 import platform
 import shutil
-import cv2
-import pandas as pd
 from typing import Dict, List, Optional, Union
-import numpy as np
-import matplotlib.pyplot as plt
+
+import cv2
 import matplotlib
-from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import PIL
 #matplotlib.use('agg')
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_if_keys_exist_in_dict, check_int, check_that_column_exist, check_valid_lst)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_if_keys_exist_in_dict, check_int,
+    check_that_column_exist, check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_named_colors
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, read_df)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext, read_df)
 
 HEIGHT = "height"
 WIDTH = "width"

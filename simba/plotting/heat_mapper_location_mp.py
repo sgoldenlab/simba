@@ -2,7 +2,7 @@ import functools
 import multiprocessing
 import os
 import platform
-from typing import List, Optional, Union, Any, Dict
+from typing import Any, Dict, List, Optional, Union
 
 import cv2
 import numpy as np
@@ -11,12 +11,16 @@ from numba import jit, prange
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_float, check_if_keys_exist_in_dict,
+    check_int, check_valid_lst)
 from simba.utils.enums import Defaults, Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, read_df, remove_a_folder)
-from simba.utils.checks import check_file_exist_and_readable, check_valid_lst, check_if_keys_exist_in_dict, check_int, check_all_file_names_are_represented_in_video_log, check_float
-
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext, read_df,
+                                    remove_a_folder)
 
 STYLE_PALETTE = 'palette'
 STYLE_SHADING = 'shading'
