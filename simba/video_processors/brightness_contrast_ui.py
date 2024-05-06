@@ -1,11 +1,14 @@
-from typing import Union, Tuple
 import os
-import numpy as np
-import cv2
+from typing import Tuple, Union
 
+import cv2
+import numpy as np
+
+from simba.utils.checks import check_if_valid_img, check_instance
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import InValidUserInputWarning
-from simba.utils.checks import check_if_valid_img, check_instance
+
+
 def brightness_contrast_ui(data: Union[str, os.PathLike, np.ndarray]) -> Tuple[float, float]:
     """
     Create a user interface using OpenCV to explore and change the brightness and contrast of a video.
