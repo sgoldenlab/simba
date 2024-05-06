@@ -2,12 +2,12 @@ __author__ = "Simon Nilsson"
 
 import glob
 import os
+import subprocess
 import sys
 import threading
+from datetime import datetime
 from tkinter import *
 from typing import Optional, Union
-import subprocess
-from datetime import datetime
 
 from PIL import Image, ImageTk
 
@@ -16,8 +16,6 @@ from simba.labelling.extract_labelled_frames import AnnotationFrameExtractor
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
-from simba.video_processors.brightness_contrast_ui import brightness_contrast_ui
-from simba.video_processors.clahe_ui import interactive_clahe_ui
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect)
@@ -35,8 +33,12 @@ from simba.utils.errors import (CountError, FrameRangeError, MixedMosaicError,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
-    concatenate_videos_in_folder, find_all_videos_in_directory, get_fn_ext,
-    get_video_meta_data, seconds_to_timestamp, find_files_of_filetypes_in_directory)
+    concatenate_videos_in_folder, find_all_videos_in_directory,
+    find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
+    seconds_to_timestamp)
+from simba.video_processors.brightness_contrast_ui import \
+    brightness_contrast_ui
+from simba.video_processors.clahe_ui import interactive_clahe_ui
 from simba.video_processors.extract_seqframes import extract_seq_frames
 from simba.video_processors.multi_cropper import MultiCropper
 from simba.video_processors.px_to_mm import get_coordinates_nilsson

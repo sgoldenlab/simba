@@ -120,18 +120,19 @@ from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
-    CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
-    ChangeFpsSingleVideoPopUp, ChangeImageFormatPopUp, CLAHEPopUp,
-    ClipSingleVideoByFrameNumbers, ClipVideoPopUp, ConcatenatingVideosPopUp,
-    ConcatenatorPopUp, ConvertROIDefinitionsPopUp, ConvertVideoPopUp,
-    CreateGIFPopUP, CropVideoCirclesPopUp, CropVideoPolygonsPopUp,
-    CropVideoPopUp, DownsampleVideoPopUp, ExtractAllFramesPopUp,
-    ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
-    ExtractSpecificFramesPopUp, GreyscaleSingleVideoPopUp,
-    ImportFrameDirectoryPopUp, InitiateClipMultipleVideosByFrameNumbersPopUp,
-    InitiateClipMultipleVideosByTimestampsPopUp, MergeFrames2VideoPopUp,
-    MultiCropPopUp, MultiShortenPopUp, SuperImposeFrameCountPopUp,
-    VideoRotatorPopUp, VideoTemporalJoinPopUp, BrightnessContrastPopUp, InteractiveClahePopUp)
+    BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
+    ChangeFpsMultipleVideosPopUp, ChangeFpsSingleVideoPopUp,
+    ChangeImageFormatPopUp, CLAHEPopUp, ClipSingleVideoByFrameNumbers,
+    ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
+    ConvertROIDefinitionsPopUp, ConvertVideoPopUp, CreateGIFPopUP,
+    CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
+    DownsampleVideoPopUp, ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp,
+    ExtractSEQFramesPopUp, ExtractSpecificFramesPopUp,
+    GreyscaleSingleVideoPopUp, ImportFrameDirectoryPopUp,
+    InitiateClipMultipleVideosByFrameNumbersPopUp,
+    InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
+    MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
+    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect

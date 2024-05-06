@@ -45,7 +45,8 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     find_all_videos_in_directory, find_core_cnt, get_fn_ext,
-    get_video_meta_data, read_config_entry, read_config_file, read_frm_of_video)
+    get_video_meta_data, read_config_entry, read_config_file,
+    read_frm_of_video)
 from simba.utils.warnings import (FileExistWarning, InValidUserInputWarning,
                                   SameInputAndOutputWarning)
 from simba.video_processors.extract_frames import video_to_frames
