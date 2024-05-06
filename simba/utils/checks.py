@@ -1335,7 +1335,7 @@ def check_video_and_data_frm_count_align(
         check_file_exist_and_readable(file_path=data)
         with open(data, "rb") as fp:
             c_generator = _count_generator(fp.raw.read)
-            data_count = (sum(buffer.count(b"\n") for buffer in c_generator))
+            data_count = (sum(buffer.count(b"\n") for buffer in c_generator)) - 1
     else:
         data_count = len(data)
     if data_count != video_count:

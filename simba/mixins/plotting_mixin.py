@@ -1598,26 +1598,9 @@ class PlottingMixin(object):
         :return:
         """
 
-        check_valid_array(
-            data=img, source=f"{PlottingMixin.polygons_onto_image.__name__} img"
-        )
-        check_valid_dataframe(
-            df=polygons,
-            source=f"{PlottingMixin.polygons_onto_image.__name__} polygons",
-            required_fields=[
-                "vertices",
-                "Center_X",
-                "Center_Y",
-                "Color BGR",
-                "Thickness",
-                "Tags",
-            ],
-        )
-        check_int(
-            name=PlottingMixin.polygons_onto_image.__name__,
-            value=circle_size,
-            min_value=1,
-        )
+        check_valid_array(data=img, source=f"{PlottingMixin.polygons_onto_image.__name__} img")
+        check_valid_dataframe(df=polygons, source=f"{PlottingMixin.polygons_onto_image.__name__} polygons", required_fields=["vertices", "Color BGR", "Thickness", "Tags"])
+        check_int(name=PlottingMixin.polygons_onto_image.__name__, value=circle_size, min_value=1)
         for _, row in polygons.iterrows():
             img = cv2.polylines(
                 img,

@@ -36,15 +36,7 @@ DIRECTIONALITY_STYLE = "directionality_style"
 BORDER_COLOR = "border_color"
 POSE = "pose_estimation"
 ANIMAL_NAMES = "animal_names"
-STYLE_KEYS = [
-    ROI_CENTERS,
-    ROI_EAR_TAGS,
-    DIRECTIONALITY,
-    BORDER_COLOR,
-    POSE,
-    DIRECTIONALITY_STYLE,
-    ANIMAL_NAMES,
-]
+STYLE_KEYS = [ROI_CENTERS,ROI_EAR_TAGS,DIRECTIONALITY,BORDER_COLOR,POSE,DIRECTIONALITY_STYLE,ANIMAL_NAMES,]
 
 
 def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
@@ -420,6 +412,15 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             pool.terminate()
             pool.join()
             stdout_success(msg=f"Video {self.video_name} complete. Video saved in project_folder/frames/output/ROI_features.", elapsed_time=self.timer.elapsed_time_str)
+
+
+
+# style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'funnel', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}
+# test = ROIfeatureVisualizerMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',
+#                             video_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/videos/NOR ENCODING FExMP8.mp4',
+#                             style_attr=style_attr,
+#                             body_parts=['Center'], core_cnt=-1)
+# test.run()
 
 
 # style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'funnel', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}

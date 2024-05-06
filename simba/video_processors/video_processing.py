@@ -106,6 +106,10 @@ def clahe_enhance_video(
     Convert a single video file to clahe-enhanced greyscale .avi file. The result is saved with prefix
     ``CLAHE_`` in the same directory as in the input file if out_path is not passed. Else saved at the out_path.
 
+    .. image:: _static/img/clahe_enhance_video.gif
+       :width: 800
+       :align: center
+
     :parameter Union[str, os.PathLike] file_path: Path to video file.
     :parameter Optional[int] clip_limit: CLAHE amplification limit. Inccreased clip limit reduce noise in output. Default: 2.
     :parameter Optional[Tuple[int]] tile_grid_size: The histogram kernel size.
@@ -432,12 +436,14 @@ def convert_to_mp4(
     )
 
 
-def video_to_greyscale(
-    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
-) -> None:
+def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
     Convert a video file to greyscale mp4 format. The result is stored in the same directory as the
     input file with the ``_grayscale.mp4`` suffix.
+
+    .. image:: _static/img/to_greyscale.gif
+       :width: 700
+       :align: center
 
     :parameter Union[str, os.PathLike] file_path: Path to video file.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
@@ -476,12 +482,14 @@ def video_to_greyscale(
     )
 
 
-def batch_video_to_greyscale(
-    directory: Union[str, os.PathLike], gpu: Optional[bool] = False
-) -> None:
+def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
     Convert a directory of video file to greyscale mp4 format. The results are stored in the same directory as the
     input files with the ``_grayscale.mp4`` suffix.
+
+    .. image:: _static/img/to_greyscale.gif
+       :width: 700
+       :align: center
 
     :parameter Union[str, os.PathLike] directory: Path to directory holding video files in color.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
@@ -525,12 +533,18 @@ def batch_video_to_greyscale(
     )
 
 
-def superimpose_frame_count(
-    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
-) -> None:
+def superimpose_frame_count(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
     Superimpose frame count on a video file. The result is stored in the same directory as the
     input file with the ``_frame_no.mp4`` suffix.
+
+    .. image:: _static/img/superimpose_frame_count.png
+       :width: 700
+       :align: center
+
+    .. image:: _static/img/superimpose_frame_count.gif
+       :width: 500
+       :align: center
 
     :parameter Union[str, os.PathLike] file_path: Path to video file.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
@@ -1065,12 +1079,14 @@ def multi_split_video(
 # multi_split_video(file_path=r'/Users/simon/Desktop/time_s_converted.mp4', start_times=['00:00:01', '00:00:02'], end_times=['00:00:04', '00:00:05'], gpu=False)
 
 
-def crop_single_video(
-    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
-) -> None:
+def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
     Crop a single video using ``simba.video_processors.roi_selector.ROISelector`` interface. Results is saved in the same directory as input video with the
     ``_cropped.mp4`` suffix`.
+
+    .. image:: _static/img/crop_single_video.gif
+       :width: 700
+       :align: center
 
     :parameter str file_path: Path to video file.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
@@ -1387,10 +1403,18 @@ class VideoRotator(ConfigReader):
     """
     GUI Tool for rotating video. Rotated video is saved with the ``_rotated_DATETIME.mp4`` suffix.
 
+
+    .. image:: _static/img/VideoRotator.gif
+       :width: 700
+       :align: center
+
     :parameter str input_path: Path to video to rotate.
     :parameter str output_dir: Directory where to save the rotated video.
     :parameter Optional[bool] gpu: If True, use FFMPEG NVIDEA GPU codecs. Else CPU codecs.
     :parameter Optional[bool] gpu: If True, use FFPMPEG. Else, OpenCV.
+
+
+
 
     :example:
     >>> VideoRotator(input_path='project_folder/videos/Video_1.mp4', output_dir='project_folder/videos')
@@ -1747,13 +1771,16 @@ def crop_single_video_circle(file_path: Union[str, os.PathLike]) -> None:
     """
     Crop a video based on circular regions of interest (ROIs) selected by the user.
 
-    :param  Union[str, os.PathLike] file_path: The path to the input video file.
-
+    .. image:: _static/img/crop_single_video_circle.gif
+       :width: 600
+       :align: center
     .. note::
        This function crops the input video based on circular regions of interest (ROIs) selected by the user.
        The user is prompted to select a circular ROI on the video frame, and the function then crops the video
        based on the selected ROI. The cropped video is saved with "_circle_cropped" suffix in the same directory
        as the input video file.
+
+    :param  Union[str, os.PathLike] file_path: The path to the input video file.
 
     :example:
     >>> crop_single_video_circle(file_path='/Users/simon/Desktop/AGGRESSIVITY_4_11_21_Trial_2_camera1_rotated_20240211143355.mp4')
@@ -1791,20 +1818,26 @@ def crop_single_video_circle(file_path: Union[str, os.PathLike]) -> None:
     )
 
 
-def crop_multiple_videos_circles(
-    in_dir: Union[str, os.PathLike], out_dir: Union[str, os.PathLike]
-) -> None:
+def crop_multiple_videos_circles(in_dir: Union[str, os.PathLike], out_dir: Union[str, os.PathLike]) -> None:
     """
     Crop multiple videos based on circular regions of interest (ROIs) selected by the user.
 
-    :param  Union[str, os.PathLike] in_dir: The directory containing input video files.
-    :param  Union[str, os.PathLike] out_dir: The directory to save the cropped video files.
+
+    .. image:: _static/img/crop_single_video_circle.gif
+       :width: 600
+       :align: center
 
     .. note::
        This function crops multiple videos based on circular ROIs selected by the user.
        The user is asked to define a circle manually in one video within the input directory.
        The function then crops all the video in the input directory according to the shape defined
        using the first video and saves the videos in the ``out_dir`` with the same filenames as the original videos..
+
+
+
+    :param  Union[str, os.PathLike] in_dir: The directory containing input video files.
+    :param  Union[str, os.PathLike] out_dir: The directory to save the cropped video files.
+
 
     :example:
     >>> crop_multiple_videos_circles(in_dir='/Users/simon/Desktop/edited/tests', out_dir='/Users/simon/Desktop')
@@ -1852,6 +1885,10 @@ def crop_multiple_videos_circles(
 def crop_single_video_polygon(file_path: Union[str, os.PathLike]) -> None:
     """
     Crop a video based on polygonal regions of interest (ROIs) selected by the user.
+
+    .. image:: _static/img/roi_selector_polygon.gif
+       :width: 400
+       :align: center
 
     :param  Union[str, os.PathLike] file_path: The path to the input video file.
 
@@ -2160,7 +2197,7 @@ def horizontal_video_concatenator(
     Concatenates multiple videos horizontally.
 
     .. image:: _static/img/horizontal_video_concatenator.gif
-       :width: 600
+       :width: 1000
        :align: center
 
     :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
