@@ -45,7 +45,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     find_all_videos_in_directory, find_core_cnt, get_fn_ext,
-    get_video_meta_data, read_config_entry, read_config_file)
+    get_video_meta_data, read_config_entry, read_config_file, read_frm_of_video)
 from simba.utils.warnings import (FileExistWarning, InValidUserInputWarning,
                                   SameInputAndOutputWarning)
 from simba.video_processors.extract_frames import video_to_frames
@@ -99,10 +99,11 @@ def clahe_enhance_video(
     file_path: Union[str, os.PathLike],
     clip_limit: Optional[int] = 2,
     tile_grid_size: Optional[Tuple[int]] = (16, 16),
-) -> None:
+    out_path: Optional[Union[str, os.PathLike]] = None) -> None:
+
     """
     Convert a single video file to clahe-enhanced greyscale .avi file. The result is saved with prefix
-    ``CLAHE_`` in the same directory as in the input file.
+    ``CLAHE_`` in the same directory as in the input file if out_path is not passed. Else saved at the out_path.
 
     :parameter Union[str, os.PathLike] file_path: Path to video file.
     :parameter Optional[int] clip_limit: CLAHE amplification limit. Inccreased clip limit reduce noise in output. Default: 2.
@@ -113,13 +114,11 @@ def clahe_enhance_video(
     """
 
     check_file_exist_and_readable(file_path=file_path)
-    check_int(
-        name=f"{clahe_enhance_video.__name__} clip_limit", value=clip_limit, min_value=0
-    )
+    check_int(name=f"{clahe_enhance_video.__name__} clip_limit", value=clip_limit, min_value=0)
     video_meta_data = get_video_meta_data(file_path)
     check_valid_tuple(
         x=tile_grid_size,
-        source=clahe_enhance_video.__name__,
+        source=f'{clahe_enhance_video.__name__} tile_grid_size',
         accepted_lengths=(2,),
         valid_dtypes=(int,),
     )
@@ -131,7 +130,11 @@ def clahe_enhance_video(
             source=clahe_enhance_video.__name__,
         )
     dir, file_name, file_ext = get_fn_ext(filepath=file_path)
-    save_path = os.path.join(dir, f"CLAHE_{file_name}.avi")
+    if out_path is None:
+        save_path = os.path.join(dir, f"CLAHE_{file_name}.avi")
+    else:
+        check_if_dir_exists(in_dir=os.path.dirname(out_path), source=f'{clahe_enhance_video.__name__} out_path')
+        save_path = out_path
     fourcc = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
     print(f"Applying CLAHE on video {file_name}, this might take awhile...")
     cap = cv2.VideoCapture(file_path)
@@ -155,7 +158,7 @@ def clahe_enhance_video(
                 clahe_frm = clahe_filter.apply(img)
                 writer.write(clahe_frm)
                 print(
-                    f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']}"
+                    f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']} ({file_name})..."
                 )
             else:
                 break

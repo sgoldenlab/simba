@@ -131,7 +131,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ImportFrameDirectoryPopUp, InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, MergeFrames2VideoPopUp,
     MultiCropPopUp, MultiShortenPopUp, SuperImposeFrameCountPopUp,
-    VideoRotatorPopUp, VideoTemporalJoinPopUp)
+    VideoRotatorPopUp, VideoTemporalJoinPopUp, BrightnessContrastPopUp, InteractiveClahePopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1678,31 +1678,16 @@ class App(object):
         )
 
         format_menu = Menu(video_process_menu)
-        format_menu.add_command(
-            label="Change image file formats", command=ChangeImageFormatPopUp
-        )
-        format_menu.add_command(
-            label="Change video file formats", command=ConvertVideoPopUp
-        )
-        video_process_menu.add_cascade(
-            label="Change formats...",
-            compound="left",
-            image=self.menu_icons["convert"]["img"],
-            menu=format_menu,
-        )
-        video_process_menu.add_command(
-            label="CLAHE enhance video",
-            compound="left",
-            image=self.menu_icons["clahe"]["img"],
-            command=CLAHEPopUp,
-        )
+        format_menu.add_command(label="Change image file formats", command=ChangeImageFormatPopUp)
+        format_menu.add_command(label="Change video file formats", command=ConvertVideoPopUp)
+        video_process_menu.add_cascade(label="Change formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu)
 
-        video_process_menu.add_cascade(
-            label="Concatenate multiple videos",
-            compound="left",
-            image=self.menu_icons["concat"]["img"],
-            command=lambda: ConcatenatorPopUp(config_path=None),
-        )
+        clahe_menu = Menu(video_process_menu)
+        clahe_menu.add_command(label="CLAHE enhance videos", command=CLAHEPopUp)
+        clahe_menu.add_command(label="Interactively CLAHE enhance videos", command=InteractiveClahePopUp)
+        video_process_menu.add_cascade(label="CLAHE enhance videos...", compound="left", image=self.menu_icons["clahe"]["img"], menu=clahe_menu)
+
+        video_process_menu.add_cascade(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat"]["img"], command=lambda: ConcatenatorPopUp(config_path=None))
         video_process_menu.add_cascade(
             label="Concatenate two videos",
             compound="left",
@@ -1722,12 +1707,9 @@ class App(object):
             command=lambda: ConvertROIDefinitionsPopUp(),
         )
         convert_data_menu = Menu(video_process_menu)
-        convert_data_menu.add_command(
-            label="Convert CSV to parquet", command=Csv2ParquetPopUp
-        )
-        convert_data_menu.add_command(
-            label="Convert parquet o CSV", command=Parquet2CsvPopUp
-        )
+        convert_data_menu.add_command(label="Convert CSV to parquet", command=Csv2ParquetPopUp)
+        convert_data_menu.add_command(label="Convert parquet o CSV", command=Parquet2CsvPopUp)
+
         video_process_menu.add_cascade(
             label="Convert working file type...",
             compound="left",
@@ -1784,6 +1766,10 @@ class App(object):
             image=self.menu_icons["calipher"]["img"],
             command=CalculatePixelsPerMMInVideoPopUp,
         )
+
+        video_process_menu.add_command(label="Change video brightness / contrast", compound="left", image=self.menu_icons["brightness"]["img"], command=BrightnessContrastPopUp)
+
+
         video_process_menu.add_command(
             label="Merge frames to video",
             compound="left",

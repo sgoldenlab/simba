@@ -6,6 +6,8 @@ import sys
 import threading
 from tkinter import *
 from typing import Optional, Union
+import subprocess
+from datetime import datetime
 
 from PIL import Image, ImageTk
 
@@ -14,6 +16,8 @@ from simba.labelling.extract_labelled_frames import AnnotationFrameExtractor
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
+from simba.video_processors.brightness_contrast_ui import brightness_contrast_ui
+from simba.video_processors.clahe_ui import interactive_clahe_ui
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect)
@@ -32,7 +36,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory, get_fn_ext,
-    get_video_meta_data, seconds_to_timestamp)
+    get_video_meta_data, seconds_to_timestamp, find_files_of_filetypes_in_directory)
 from simba.video_processors.extract_seqframes import extract_seq_frames
 from simba.video_processors.multi_cropper import MultiCropper
 from simba.video_processors.px_to_mm import get_coordinates_nilsson
@@ -55,33 +59,47 @@ sys.setrecursionlimit(10**7)
 class CLAHEPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLAHE VIDEO CONVERSION")
-        clahe_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="Contrast Limited Adaptive Histogram Equalization",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        selected_video = FileSelect(
-            clahe_frm,
-            "Video path ",
-            title="Select a video file",
-            file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        button_clahe = Button(
-            clahe_frm,
-            text="Apply CLAHE",
-            command=lambda: threading.Thread(
-                target=clahe_enhance_video(file_path=selected_video.file_path)
-            ).start(),
-        )
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm,
+                                                    header="SINGLE VIDEO - Contrast Limited Adaptive Histogram Equalization",
+                                                    icon_name=Keys.DOCUMENTATION.value,
+                                                    icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
+        run_single_video_btn = Button(single_video_frm, text="Apply CLAHE on VIDEO", command=lambda: self.run_single_video(),  fg="blue")
 
-        clahe_frm.grid(row=0, sticky=W)
-        selected_video.grid(row=0, sticky=W)
-        button_clahe.grid(row=1, pady=5)
-        # self.main_frm.mainloop()
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm,
+                                                       header="MULTIPLE VIDEOs - Contrast Limited Adaptive Histogram Equalization",
+                                                       icon_name=Keys.DOCUMENTATION.value,
+                                                       icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
+        run_multiple_btn = Button(multiple_videos_frm, text="Apply CLAHE on DIRECTORY", command=lambda: self.run_directory(), fg="blue")
+
+        single_video_frm.grid(row=0, column=0, sticky=NW)
+        self.selected_video.grid(row=0, column=0, sticky=NW)
+        run_single_video_btn.grid(row=1, column=0, sticky=NW)
+
+        multiple_videos_frm.grid(row=1, column=0, sticky=NW)
+        self.selected_dir.grid(row=0, column=0, sticky=NW)
+        run_multiple_btn.grid(row=1, column=0, sticky=NW)
+        #self.main_frm.mainloop()
 
 
-# _ = CLAHEPopUp()
+    def run_single_video(self):
+        selected_video = self.selected_video.file_path
+        check_file_exist_and_readable(file_path=selected_video)
+        threading.Thread(target=clahe_enhance_video(file_path=selected_video)).start()
+
+    def run_directory(self):
+        timer = SimbaTimer(start=True)
+        video_dir = self.selected_dir.folder_path
+        check_if_dir_exists(in_dir=video_dir, source=self.__class__.__name__)
+        self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+        for file_path in self.video_paths:
+            threading.Thread(target=clahe_enhance_video(file_path=file_path)).start()
+        timer.stop_timer()
+        stdout_success(msg=f'CLAHE enhanced {len(self.video_paths)} video(s)', elapsed_time=timer.elapsed_time_str)
+
+
+#_ = CLAHEPopUp()
 
 
 class CropVideoPopUp(PopUpMixin):
@@ -2046,6 +2064,110 @@ class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
             data_dir=self.input_folder.folder_path,
             save_dir=self.output_folder.folder_path,
         )
+
+class BrightnessContrastPopUp(PopUpMixin):
+    def __init__(self):
+        super().__init__(title="CHANGE BRIGHTNESS / CONTRAST")
+        self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHANGE BRIGHTNESS / CONTRAST SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
+        run_video_btn = Button(single_video_frm, text="RUN SINGLE VIDEO", command=lambda: self.run_video(), fg="blue")
+
+        single_video_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        run_video_btn.grid(row=1, column=0, sticky="NW")
+
+        video_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHANGE BRIGHTNESS / CONTRAST MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
+        run_dir_btn = Button(video_dir_frm, text="RUN VIDEO DIRECTORY", command=lambda: self.run_directory(), fg="blue")
+
+        video_dir_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_dir.grid(row=0, column=0, sticky="NW")
+        run_dir_btn.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run_video(self):
+        video_path = self.selected_video.file_path
+        check_file_exist_and_readable(file_path=video_path)
+        self.brightness, self.contrast = brightness_contrast_ui(video_path=video_path)
+        self.video_paths = [video_path]
+        self.apply()
+
+    def run_directory(self):
+        video_dir = self.selected_dir.folder_path
+        check_if_dir_exists(in_dir=video_dir, source=self.__class__.__name__)
+        self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+        self.brightness, self.contrast = brightness_contrast_ui(video_path=self.video_paths[0])
+        self.apply()
+
+    def apply(self):
+        timer = SimbaTimer(start=True)
+        for file_cnt, file_path in enumerate(self.video_paths):
+            video_timer = SimbaTimer(start=True)
+            dir, video_name, ext = get_fn_ext(filepath=file_path)
+            print(f'Creating copy of {video_name}...')
+            out_path = os.path.join(dir, f'{video_name}_eq_{self.datetime}{ext}')
+            cmd = f'ffmpeg -i "{file_path}" -vf "eq=brightness={self.brightness}:contrast={self.contrast}" -loglevel error -stats "{out_path}" -y'
+            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+            video_timer.stop_timer()
+            stdout_success(msg=f'Video {out_path} complete!', elapsed_time=video_timer.elapsed_time_str)
+        timer.stop_timer()
+        stdout_success(f'{len(self.video_paths)} video(s) converted.', elapsed_time=timer.elapsed_time_str)
+
+
+class InteractiveClahePopUp(PopUpMixin):
+    """
+    .. image:: _static/img/interactive_clahe_ui.gif
+       :width: 500
+       :align: center
+    """
+
+    def __init__(self):
+        super().__init__(title="INTERACTIVE CLAHE")
+        self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INTERACTIVE CLAHE - SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
+        run_video_btn = Button(single_video_frm, text="RUN SINGLE VIDEO", command=lambda: self.run_video(), fg="blue")
+
+        single_video_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        run_video_btn.grid(row=1, column=0, sticky="NW")
+
+        video_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INTERACTIVE CLAHE - MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
+        run_dir_btn = Button(video_dir_frm, text="RUN VIDEO DIRECTORY", command=lambda: self.run_directory(), fg="blue")
+
+        video_dir_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_dir.grid(row=0, column=0, sticky="NW")
+        run_dir_btn.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run_video(self):
+        video_path = self.selected_video.file_path
+        check_file_exist_and_readable(file_path=video_path)
+        self.clip_limit, self.tile_size = interactive_clahe_ui(data=video_path)
+        self.video_paths = [video_path]
+        self.apply()
+
+    def run_directory(self):
+        video_dir = self.selected_dir.folder_path
+        check_if_dir_exists(in_dir=video_dir, source=self.__class__.__name__)
+        self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+        self.clip_limit, self.tile_size = interactive_clahe_ui(data=self.video_paths[0])
+        self.apply()
+
+    def apply(self):
+        timer = SimbaTimer(start=True)
+        for file_cnt, file_path in enumerate(self.video_paths):
+            dir, video_name, ext = get_fn_ext(filepath=file_path)
+            print(f'Creating CLAHE copy of {video_name}...')
+            out_path = os.path.join(dir, f'{video_name}_CLAHE_CLIPLIMIT_{int(self.clip_limit)}_TILESIZE_{int(self.tile_size)}_{self.datetime}{ext}')
+            clahe_enhance_video(file_path=file_path, clip_limit=int(self.clip_limit), tile_grid_size=(int(self.tile_size), int(self.tile_size)), out_path=out_path)
+        timer.stop_timer()
+        stdout_success(f'{len(self.video_paths)} video(s) converted.', elapsed_time=timer.elapsed_time_str)
+
+
+
 
 
 # ClipMultipleVideosByFrameNumbers
