@@ -1,11 +1,13 @@
-import numpy as np
-from typing import Union, Tuple
 import os
-import cv2
+from typing import Tuple, Union
 
+import cv2
+import numpy as np
+
+from simba.utils.checks import check_if_valid_img, check_instance
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import InValidUserInputWarning
-from simba.utils.checks import check_instance, check_if_valid_img
+
 
 def interactive_clahe_ui(data: Union[str, os.PathLike, np.ndarray]) -> Tuple[float, int]:
     """

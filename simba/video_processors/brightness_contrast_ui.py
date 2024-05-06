@@ -1,10 +1,12 @@
-from typing import Union, Tuple
 import os
-import numpy as np
+from typing import Tuple, Union
+
 import cv2
+import numpy as np
 
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import InValidUserInputWarning
+
 
 def brightness_contrast_ui(video_path: Union[str, os.PathLike]) -> Tuple[float, float]:
     """
