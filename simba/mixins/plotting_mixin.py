@@ -15,7 +15,6 @@ import plotly.graph_objs as go
 import seaborn as sns
 from matplotlib import cm
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-
 from numba import bool_, njit, uint8
 from PIL import Image
 
