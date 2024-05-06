@@ -5,23 +5,28 @@ import cv2
 
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import InValidUserInputWarning
-
-def brightness_contrast_ui(video_path: Union[str, os.PathLike]) -> Tuple[float, float]:
+from simba.utils.checks import check_if_valid_img, check_instance
+def brightness_contrast_ui(data: Union[str, os.PathLike, np.ndarray]) -> Tuple[float, float]:
     """
     Create a user interface using OpenCV to explore and change the brightness and contrast of a video.
 
     .. note::
        Adapted from `geeksforgeeks <https://www.geeksforgeeks.org/changing-the-contrast-and-brightness-of-an-image-using-python-opencv/>`_.
 
-    .. image:: _static/img/brightness_contrast_ui.png
+    .. image:: _static/img/brightness_contrast_ui.gif
        :width: 700
        :align: center
 
-    :param Union[str, os.PathLike] video_path: Path to the video file.
-    :return Tuple: The scaled brightness and scaled contrast values on scale -1 to +1 suitable for FFmpeg conversion
+    :param Union[str, os.PathLike] video_path: Path to the video file or an image in numpy array format.
+    :return Tuple: The scaled brightness and scaled contrast values on scale -1 to +1 and 0-2 respectively, suitable for FFmpeg conversion
 
-    :example:
+    :example I:
     >>> brightness_contrast_ui(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/frames/output/ROI_features/2022-06-20_NOB_DOT_4.mp4')
+
+    :example II:
+    >>> img = cv2.imread('/Users/simon/Downloads/PXL_20240429_222923838.jpg')
+    >>> brightness_contrast_ui(data=img)
+
     """
     def _get_trackbar_values(v):
         brightness = cv2.getTrackbarPos('Brightness', 'Contrast / Brightness')
@@ -43,8 +48,13 @@ def brightness_contrast_ui(video_path: Union[str, os.PathLike]) -> Tuple[float, 
         img = np.copy(cal)
         cv2.imshow('Contrast / Brightness', img)
 
-    _ = get_video_meta_data(video_path=video_path)
-    original_img = read_frm_of_video(video_path=video_path, frame_index=0)
+    check_instance(source=brightness_contrast_ui.__name__, instance=data, accepted_types=(np.ndarray, str))
+    if isinstance(data, str):
+        _ = get_video_meta_data(video_path=data)
+        original_img = read_frm_of_video(video_path=data, frame_index=0)
+    else:
+        check_if_valid_img(data=data, source=brightness_contrast_ui.__name__)
+        original_img = data
     img = np.copy(original_img)
     cv2.namedWindow('Contrast / Brightness', cv2.WINDOW_NORMAL)
     cv2.imshow('Contrast / Brightness', img)
@@ -62,3 +72,4 @@ def brightness_contrast_ui(video_path: Union[str, os.PathLike]) -> Tuple[float, 
             else:
                 cv2.destroyAllWindows()
                 return scaled_brightness, scaled_contrast
+

@@ -2066,6 +2066,11 @@ class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
         )
 
 class BrightnessContrastPopUp(PopUpMixin):
+    """
+    .. image:: _static/img/brightness_contrast_ui.gif
+       :width: 700
+       :align: center
+    """
     def __init__(self):
         super().__init__(title="CHANGE BRIGHTNESS / CONTRAST")
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
