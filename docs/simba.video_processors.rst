@@ -73,3 +73,18 @@ Crop ROI selector (polygons)
 .. automodule:: simba.video_processors.roi_selector_polygon
    :members:
    :show-inheritance:
+
+Interactive CLAHE interface
+------------------------------------------------
+
+.. automodule:: simba.video_processors.clahe_ui
+   :members:
+   :show-inheritance:
+
+
+Interactive brightness / contrast interface
+------------------------------------------------
+
+.. automodule:: simba.video_processors.brightness_contrast_ui
+   :members:
+   :show-inheritance:
