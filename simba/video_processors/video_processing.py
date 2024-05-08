@@ -227,8 +227,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: O
     .. note::
        To change the FPS of all videos in a directory, use ``simba.video_processors.video_processing.change_fps_of_multiple_videos``.
 
-    .. video:: _static/img/change_single_video_fps.mp4
-       :nocontrols:
+    .. video:: _static/img/change_single_video_fps.webm
        :loop:
 
     :parameter Union[str, os.PathLike] file_path: Path to video file
