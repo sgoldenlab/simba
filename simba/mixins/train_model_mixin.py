@@ -11,6 +11,7 @@ import configparser
 import os
 import pickle
 import platform
+import subprocess
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from copy import deepcopy
@@ -324,18 +325,16 @@ class TrainModelMixin(object):
         else:
             return smt.fit_resample(x_train, y_train)
 
-    def calc_permutation_importance(
-        self,
-        x_test: np.ndarray,
-        y_test: np.ndarray,
-        clf: RandomForestClassifier,
-        feature_names: List[str],
-        clf_name: str,
-        save_dir: Union[str, os.PathLike],
-        save_file_no: Optional[int] = None,
-    ) -> None:
+    def calc_permutation_importance(self,
+                                    x_test: np.ndarray,
+                                    y_test: np.ndarray,
+                                    clf: RandomForestClassifier,
+                                    feature_names: List[str],
+                                    clf_name: str,
+                                    save_dir: Union[str, os.PathLike],
+                                    save_file_no: Optional[int] = None) -> None:
         """
-        Helper to calculate feature permutation importance scores.
+        Computes feature permutation importance scores.
 
         :parameter np.ndarray x_test: 2d feature test data of shape len(frames) x len(features)
         :parameter np.ndarray y_test: 2d feature target test data of shape len(frames) x 1
@@ -343,66 +342,37 @@ class TrainModelMixin(object):
         :parameter List[str] feature_names: Names of features in x_test
         :parameter str clf_name: Name of classifier in y_test
         :parameter str save_dir: Directory where to save results in CSV format
-        :parameter Optional[int] save_file_no: If permutation importance calculation is part of a grid search, provide integer representing sequence.
+        :parameter Optional[int] save_file_no: If permutation importance calculation is part of a grid search, provide integer identifier representing the model in the grid serach sequence. Will be used as suffix in output filename.
         """
 
         print("Calculating feature permutation importances...")
         timer = SimbaTimer(start=True)
-        p_importances = permutation_importance(
-            clf, x_test, y_test, n_repeats=10, random_state=0
-        )
-        df = pd.DataFrame(
-            np.column_stack(
-                [
-                    feature_names,
-                    p_importances.importances_mean,
-                    p_importances.importances_std,
-                ]
-            ),
-            columns=[
-                "FEATURE_NAME",
-                "FEATURE_IMPORTANCE_MEAN",
-                "FEATURE_IMPORTANCE_STDEV",
-            ],
-        )
+        p_importances = permutation_importance(clf, x_test, y_test, n_repeats=10, random_state=0)
+        df = pd.DataFrame(np.column_stack([feature_names, p_importances.importances_mean, p_importances.importances_std]), columns=["FEATURE_NAME","FEATURE_IMPORTANCE_MEAN","FEATURE_IMPORTANCE_STDEV"])
         df = df.sort_values(by=["FEATURE_IMPORTANCE_MEAN"], ascending=False)
         if save_file_no != None:
-            save_file_path = os.path.join(
-                save_dir,
-                clf_name
-                + "_"
-                + str(save_file_no + 1)
-                + "_permutations_importances.csv",
-            )
+            save_file_path = os.path.join(save_dir, f'{clf_name}_{save_file_no}_permutations_importances.csv')
         else:
-            save_file_path = os.path.join(
-                save_dir, clf_name + "_permutations_importances.csv"
-            )
+            save_file_path = os.path.join(save_dir, f"{clf_name}_permutations_importances.csv")
         df.to_csv(save_file_path, index=False)
         timer.stop_timer()
-        print(
-            "Permutation importance calculation complete (elapsed time: {}s) ...".format(
-                timer.elapsed_time_str
-            )
-        )
+        print(f"Permutation importance calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
 
-    def calc_learning_curve(
-        self,
-        x_y_df: pd.DataFrame,
-        clf_name: str,
-        shuffle_splits: int,
-        dataset_splits: int,
-        tt_size: float,
-        rf_clf: RandomForestClassifier,
-        save_dir: str,
-        save_file_no: Optional[int] = None,
-        multiclass: bool = False,
-    ) -> None:
+    def calc_learning_curve(self,
+                            x_y_df: pd.DataFrame,
+                            clf_name: str,
+                            shuffle_splits: int,
+                            dataset_splits: int,
+                            tt_size: float,
+                            rf_clf: RandomForestClassifier,
+                            save_dir: str,
+                            save_file_no: Optional[int] = None,
+                            multiclass: bool = False) -> None:
         """
         Helper to compute random forest learning curves with cross-validation.
 
         .. image:: _static/img/learning_curves.png
-           :width: 400
+           :width: 600
            :align: center
 
         :parameter pd.DataFrame x_y_df: Dataframe holding features and target.
@@ -419,36 +389,17 @@ class TrainModelMixin(object):
         print("Calculating learning curves...")
         timer = SimbaTimer(start=True)
         x_df, y_df = self.split_df_to_x_y(x_y_df, clf_name)
+        check_int(name=f'calc_learning_curve shuffle_splits', value=shuffle_splits, min_value=2)
+        check_int(name=f'calc_learning_curve dataset_splits', value=dataset_splits, min_value=2)
         cv = ShuffleSplit(n_splits=shuffle_splits, test_size=tt_size)
         scoring = "f1"
         if multiclass:
             scoring = None
         if platform.system() == "Darwin":
             with parallel_backend("threading", n_jobs=-2):
-                train_sizes, train_scores, test_scores = learning_curve(
-                    estimator=rf_clf,
-                    X=x_df,
-                    y=y_df,
-                    cv=cv,
-                    scoring=scoring,
-                    shuffle=False,
-                    verbose=0,
-                    train_sizes=np.linspace(0.01, 1.0, dataset_splits),
-                    error_score="raise",
-                )
+                train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf, X=x_df, y=y_df, cv=cv, scoring=scoring, shuffle=False, verbose=0, train_sizes=np.linspace(0.01, 1.0, dataset_splits), error_score="raise")
         else:
-            train_sizes, train_scores, test_scores = learning_curve(
-                estimator=rf_clf,
-                X=x_df,
-                y=y_df,
-                cv=cv,
-                scoring=scoring,
-                shuffle=False,
-                n_jobs=-1,
-                verbose=0,
-                train_sizes=np.linspace(0.01, 1.0, dataset_splits),
-                error_score="raise",
-            )
+            train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf, X=x_df, y=y_df, cv=cv, scoring=scoring, shuffle=False, n_jobs=-1, verbose=0, train_sizes=np.linspace(0.01, 1.0, dataset_splits), error_score="raise")
         results_df = pd.DataFrame()
         results_df["FRACTION TRAIN SIZE"] = np.linspace(0.01, 1.0, dataset_splits)
         results_df["TRAIN_MEAN_F1"] = np.mean(train_scores, axis=1)
@@ -456,32 +407,22 @@ class TrainModelMixin(object):
         results_df["TRAIN_STDEV_F1"] = np.std(train_scores, axis=1)
         results_df["TEST_STDEV_F1"] = np.std(test_scores, axis=1)
         if save_file_no != None:
-            self.learning_curve_save_path = os.path.join(
-                save_dir, clf_name + "_" + str(save_file_no + 1) + "_learning_curve.csv"
-            )
+            self.learning_curve_save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_learning_curve.csv")
         else:
-            self.learning_curve_save_path = os.path.join(
-                save_dir, clf_name + "_learning_curve.csv"
-            )
+            self.learning_curve_save_path = os.path.join(save_dir, f"{clf_name}_learning_curve.csv")
         results_df.to_csv(self.learning_curve_save_path, index=False)
         timer.stop_timer()
-        print(
-            "Learning curve calculation complete (elapsed time: {}s) ...".format(
-                timer.elapsed_time_str
-            )
-        )
+        print(f"Learning curve calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
 
-    def calc_pr_curve(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.DataFrame,
-        clf_name: str,
-        save_dir: str,
-        multiclass: bool = False,
-        classifier_map: Dict[int, str] = None,
-        save_file_no: Optional[int] = None,
-    ) -> None:
+    def calc_pr_curve(self,
+                      rf_clf: RandomForestClassifier,
+                      x_df: pd.DataFrame,
+                      y_df: pd.DataFrame,
+                      clf_name: str,
+                      save_dir: str,
+                      multiclass: bool = False,
+                      classifier_map: Dict[int, str] = None,
+                      save_file_no: Optional[int] = None) -> None:
         """
         Helper to compute random forest precision-recall curve.
 
@@ -500,9 +441,7 @@ class TrainModelMixin(object):
         """
 
         if multiclass and classifier_map is None:
-            raise InvalidInputError(
-                msg="Creating PR curve for multi-classifier but classifier_map not defined. Add classifier_map argument"
-            )
+            raise InvalidInputError(msg="Creating PR curve for multi-classifier but classifier_map not defined. Pass classifier_map argument")
         print("Calculating PR curves...")
         timer = SimbaTimer(start=True)
         if not multiclass:
@@ -511,31 +450,19 @@ class TrainModelMixin(object):
             pr_df = pd.DataFrame()
             pr_df["PRECISION"] = precision
             pr_df["RECALL"] = recall
-            pr_df["F1"] = (
-                2
-                * (pr_df["RECALL"] * pr_df["PRECISION"])
-                / (pr_df["RECALL"] + pr_df["PRECISION"])
-            )
+            pr_df["F1"] = (2 * (pr_df["RECALL"] * pr_df["PRECISION"]) / (pr_df["RECALL"] + pr_df["PRECISION"]))
             thresholds = list(thresholds)
             thresholds.insert(0, 0.00)
             pr_df["DISCRIMINATION THRESHOLDS"] = thresholds
         else:
             pr_df_lst = []
-            p = self.clf_predict_proba(
-                clf=rf_clf, x_df=x_df, multiclass=True, model_name=clf_name
-            )
+            p = self.clf_predict_proba(clf=rf_clf, x_df=x_df, multiclass=True, model_name=clf_name)
             for i in range(p.shape[1]):
-                precision, recall, thresholds = precision_recall_curve(
-                    y_df, p[:, i], pos_label=i
-                )
+                precision, recall, thresholds = precision_recall_curve(y_df, p[:, i], pos_label=i)
                 df = pd.DataFrame()
                 df["PRECISION"] = precision
                 df["RECALL"] = recall
-                df["F1"] = (
-                    2
-                    * (df["RECALL"] * df["PRECISION"])
-                    / (df["RECALL"] + df["PRECISION"])
-                )
+                df["F1"] = (2* (df["RECALL"] * df["PRECISION"]) / (df["RECALL"] + df["PRECISION"]))
                 thresholds = list(thresholds)
                 thresholds.insert(0, 0.00)
                 df["DISCRIMINATION THRESHOLDS"] = thresholds
@@ -543,83 +470,81 @@ class TrainModelMixin(object):
                 pr_df_lst.append(df)
             pr_df = pd.concat(pr_df_lst, axis=0).reset_index(drop=True)
         if save_file_no != None:
-            self.pr_save_path = os.path.join(
-                save_dir, clf_name + "_" + str(save_file_no + 1) + "_pr_curve.csv"
-            )
+            self.pr_save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_pr_curve.csv")
         else:
-            self.pr_save_path = os.path.join(save_dir, clf_name + "_pr_curve.csv")
+            self.pr_save_path = os.path.join(save_dir, f"{clf_name}_pr_curve.csv")
         pr_df.to_csv(self.pr_save_path, index=False)
         timer.stop_timer()
-        print(
-            "Precision-recall curve calculation complete (elapsed time: {}s) ...".format(
-                timer.elapsed_time_str
-            )
-        )
+        print(f"Precision-recall curve calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
 
-    def create_example_dt(
-        self,
-        rf_clf: RandomForestClassifier,
-        clf_name: str,
-        feature_names: List[str],
-        class_names: List[str],
-        save_dir: str,
-        save_file_no: Optional[int] = None,
-    ) -> None:
+    def create_example_dt(self,
+                          rf_clf: RandomForestClassifier,
+                          clf_name: str,
+                          feature_names: List[str],
+                          class_names: List[str],
+                          save_dir: str,
+                          tree_id: Optional[int] = 3,
+                          save_file_no: Optional[int] = None) -> None:
         """
         Helper to produce visualization of random forest decision tree using graphviz.
+
+        .. image:: _static/img/create_example_dt.png
+           :width: 700
+           :align: center
+
+        .. note::
+           `Example expected output  <https://github.com/sgoldenlab/simba/blob/master/misc/create_example_dt.pdf>`__.
 
         :parameter RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
         :parameter str clf_name: Classifier name.
         :parameter List[str] feature_names: List of feature names.
         :parameter List[str] class_names: List of classes. E.g., ['Attack absent', 'Attack present']
         :parameter str save_dir: Directory where to save output in csv file format.
-        :parameter Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not
-            part of a grid search.
+        :parameter Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
         """
 
         print("Visualizing example decision tree using graphviz...")
-        estimator = rf_clf.estimators_[3]
+        timer = SimbaTimer(start=True)
+        estimator = rf_clf.estimators_[tree_id]
         if save_file_no != None:
-            dot_name = os.path.join(
-                save_dir, str(clf_name) + "_" + str(save_file_no) + "_tree.dot"
-            )
-            file_name = os.path.join(
-                save_dir, str(clf_name) + "_" + str(save_file_no) + "_tree.pdf"
-            )
+            dot_name = os.path.join(save_dir, f"{clf_name}_{save_file_no}_tree.dot")
+            file_name = os.path.join(save_dir, f"{clf_name}_{save_file_no}_tree.pdf")
         else:
-            dot_name = os.path.join(save_dir, str(clf_name) + "_tree.dot")
-            file_name = os.path.join(save_dir, str(clf_name) + "_tree.pdf")
-        export_graphviz(
-            estimator,
-            out_file=dot_name,
-            filled=True,
-            rounded=True,
-            special_characters=False,
-            impurity=False,
-            class_names=class_names,
-            feature_names=feature_names,
-        )
-        command = "dot " + str(dot_name) + " -T pdf -o " + str(file_name) + " -Gdpi=600"
-        call(command, shell=True)
+            dot_name = os.path.join(save_dir, f"{clf_name}_tree.dot")
+            file_name = os.path.join(save_dir, f"{clf_name}_tree.pdf")
+        export_graphviz(estimator,
+                        out_file=dot_name,
+                        filled=True,
+                        rounded=True,
+                        special_characters=False,
+                        impurity=False,
+                        class_names=class_names,
+                        feature_names=feature_names)
 
-    def create_clf_report(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.DataFrame,
-        class_names: List[str],
-        save_dir: str,
-        clf_name: Optional[str] = None,
-        save_file_no: Optional[int] = None,
-    ) -> None:
+        command = f"dot {dot_name} -T pdf -o {file_name} -Gdpi=600"
+        call(command, shell=True)
+        timer.stop_timer()
+        print(f'Example tree saved at {file_name} (elapsed time: {timer.elapsed_time_str}s)')
+
+    def create_clf_report(self,
+                          rf_clf: RandomForestClassifier,
+                          x_df: pd.DataFrame,
+                          y_df: pd.DataFrame,
+                          class_names: List[str],
+                          save_dir: str,
+                          clf_name: Optional[str] = None,
+                          save_file_no: Optional[int] = None) -> None:
+
+
         """
         Helper to create classifier truth table report.
 
         .. seealso::
            `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
-            .. image:: _static/img/clf_report.png
-               :width: 400
-               :align: center
+
+        .. image:: _static/img/clf_report.png
+           :width: 500
+           :align: center
 
         :parameter RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
         :parameter pd.DataFrame x_df: dataframe holding test features
@@ -632,145 +557,107 @@ class TrainModelMixin(object):
         """
 
         print("Creating classification report visualization...")
+        timer = SimbaTimer(start=True)
         try:
             visualizer = ClassificationReport(rf_clf, classes=class_names, support=True)
             visualizer.score(x_df, y_df)
             if save_file_no != None:
                 if not clf_name:
-                    save_path = os.path.join(
-                        save_dir,
-                        class_names[1]
-                        + "_"
-                        + str(save_file_no)
-                        + "_classification_report.png",
-                    )
+                    save_path = os.path.join(save_dir, f'{class_names[1]}_{save_file_no}_classification_report.png')
                 else:
-                    save_path = os.path.join(
-                        save_dir, f"{clf_name}_{save_file_no}_classification_report.png"
-                    )
+                    save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_classification_report.png")
             else:
                 if not clf_name:
-                    save_path = os.path.join(
-                        save_dir, class_names[1] + "_classification_report.png"
-                    )
+                    save_path = os.path.join(save_dir, f"{class_names[1]}_classification_report.png")
                 else:
-                    save_path = os.path.join(
-                        save_dir, f"{clf_name}_classification_report.png"
-                    )
+                    save_path = os.path.join(save_dir, f"{clf_name}_classification_report.png")
             visualizer.poof(outpath=save_path, clear_figure=True)
+            timer.stop_timer()
+            print(f'Classification report saved at {save_path} (elapsed time: {timer.elapsed_time_str}s)')
         except KeyError as e:
+            print(e.args)
             if not clf_name:
-                NotEnoughDataWarning(
-                    msg=f"Not enough data to create classification report, consider changing sampling settings or create more annotations: {class_names[1]}",
-                    source=self.__class__.__name__,
-                )
+                NotEnoughDataWarning(msg=f"Not enough data to create classification report, consider changing sampling settings or create more annotations: {class_names[1]}",source=self.__class__.__name__)
             else:
-                NotEnoughDataWarning(
-                    msg=f"Not enough data to create classification report, consider changing sampling settings or create more annotations: {clf_name}",
-                    source=self.__class__.__name__,
-                )
+                NotEnoughDataWarning(msg=f"Not enough data to create classification report, consider changing sampling settings or create more annotations: {clf_name}", source=self.__class__.__name__)
 
-    def create_x_importance_log(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_names: List[str],
-        clf_name: str,
-        save_dir: str,
-        save_file_no: Optional[int] = None,
-    ) -> None:
+    def create_x_importance_log(self,
+                                rf_clf: RandomForestClassifier,
+                                x_names: List[str],
+                                clf_name: str,
+                                save_dir: str,
+                                save_file_no: Optional[int] = None) -> None:
         """
         Helper to save gini or entropy based feature importance scores.
+
+        .. note::
+           `Example expected output  <https://github.com/sgoldenlab/simba/blob/master/images/BtWGaNP_feature_importance_log.csv>`__.
 
         :parameter RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
         :parameter List[str] x_names: Names of features.
         :parameter str clf_name: Name of classifier
         :parameter str save_dir: Directory where to save output in csv file format.
-        :parameter Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not
-            part of a grid search.
+        :parameter Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
         """
 
         print("Creating feature importance log...")
+        timer = SimbaTimer(start=True)
         importances = list(rf_clf.feature_importances_)
-        feature_importances = [
-            (feature, round(importance, 2))
-            for feature, importance in zip(x_names, importances)
-        ]
-        df = pd.DataFrame(
-            feature_importances, columns=["FEATURE", "FEATURE_IMPORTANCE"]
-        ).sort_values(by=["FEATURE_IMPORTANCE"], ascending=False)
+        feature_importances = [(feature, round(importance, 2)) for feature, importance in zip(x_names, importances)]
+        df = pd.DataFrame(feature_importances, columns=["FEATURE", "FEATURE_IMPORTANCE"]).sort_values(by=["FEATURE_IMPORTANCE"], ascending=False)
         if save_file_no != None:
-            self.f_importance_save_path = os.path.join(
-                save_dir,
-                clf_name + "_" + str(save_file_no) + "_feature_importance_log.csv",
-            )
+            self.f_importance_save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_feature_importance_log.csv")
         else:
-            self.f_importance_save_path = os.path.join(
-                save_dir, clf_name + "_feature_importance_log.csv"
-            )
+            self.f_importance_save_path = os.path.join(save_dir, f"{clf_name}_feature_importance_log.csv")
         df.to_csv(self.f_importance_save_path, index=False)
+        timer.stop_timer()
+        print(f'Feature importance log saved at {self.f_importance_save_path} (elapsed time: {timer.elapsed_time_str}s)')
 
-    def create_x_importance_bar_chart(
-        self,
-        rf_clf: RandomForestClassifier,
-        x_names: list,
-        clf_name: str,
-        save_dir: str,
-        n_bars: int,
-        save_file_no: Optional[int] = None,
-    ) -> None:
+    def create_x_importance_bar_chart(self,
+                                      rf_clf: RandomForestClassifier,
+                                      x_names: list,
+                                      clf_name: str,
+                                      save_dir: str,
+                                      n_bars: int,
+                                      palette: Optional[str] = 'hot',
+                                      save_file_no: Optional[int] = None) -> None:
         """
         Helper to create a bar chart displaying the top N gini or entropy feature importance scores.
 
         .. seealso::
            `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
-            .. image:: _static/img/gini_bar_chart.png
-               :width: 400
-               :align: center
+        
+        .. image:: _static/img/gini_bar_chart.png
+           :width: 600
+           :align: center
 
         :parameter RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
         :parameter List[str] x_names: Names of features.
         :parameter str clf_name: Name of classifier.
         :parameter str save_dir: Directory where to save output in csv file format.
         :parameter int n_bars: Number of bars in the plot.
-        :parameter Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not
-            part of a grid search
+        :parameter Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search
         """
 
         check_int(name="FEATURE IMPORTANCE BAR COUNT", value=n_bars, min_value=1)
         print("Creating feature importance bar chart...")
+        timer = SimbaTimer(start=True)
         self.create_x_importance_log(rf_clf, x_names, clf_name, save_dir)
-        importances_df = pd.read_csv(
-            os.path.join(save_dir, clf_name + "_feature_importance_log.csv")
-        )
+        importances_df = pd.read_csv(os.path.join(save_dir, f"{clf_name}_feature_importance_log.csv"))
         importances_head = importances_df.head(n_bars)
-        colors = create_color_palette(
-            pallete_name="hot", increments=n_bars, as_rgb_ratio=True
-        )
+        colors = create_color_palette(pallete_name=palette, increments=n_bars, as_rgb_ratio=True)
         colors = [x[::-1] for x in colors]
-        ax = importances_head.plot.bar(
-            x="FEATURE",
-            y="FEATURE_IMPORTANCE",
-            legend=False,
-            rot=90,
-            fontsize=6,
-            color=colors,
-        )
+        ax = importances_head.plot.bar(x="FEATURE", y="FEATURE_IMPORTANCE", legend=False, rot=90, fontsize=6, color=colors)
         plt.ylabel("Feature importances' (mean decrease impurity)", fontsize=6)
         plt.tight_layout()
         if save_file_no != None:
-            save_file_path = os.path.join(
-                save_dir,
-                clf_name
-                + "_"
-                + str(save_file_no)
-                + "_feature_importance_bar_graph.png",
-            )
+            save_file_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_feature_importance_bar_graph.png")
         else:
-            save_file_path = os.path.join(
-                save_dir, clf_name + "_feature_importance_bar_graph.png"
-            )
+            save_file_path = os.path.join(save_dir, f"{clf_name}_feature_importance_bar_graph.png")
         plt.savefig(save_file_path, dpi=600)
         plt.close("all")
+        timer.stop_timer()
+        print(f'Feature importance bar chart complete, saved at {save_file_path} (elapsed time: {timer.elapsed_time_str}s)')
 
     def dviz_classification_visualization(
         self,
@@ -819,9 +706,7 @@ class TrainModelMixin(object):
             )
 
     @staticmethod
-    def split_and_group_df(
-        df: pd.DataFrame, splits: int, include_split_order: bool = True
-    ) -> (List[pd.DataFrame], int):
+    def split_and_group_df(df: pd.DataFrame, splits: int, include_split_order: bool = True) -> (List[pd.DataFrame], int):
         """
         Helper to split a dataframe for multiprocessing. If include_split_order, then include the group number
         in split data as a column. Returns split data and approximations of number of observations per split.
@@ -853,9 +738,9 @@ class TrainModelMixin(object):
         .. seealso::
            `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-settings>`_
 
-           .. image:: _static/img/shap.png
-              :width: 400
-              :align: center
+        .. image:: _static/img/shap.png
+           :width: 600
+           :align: center
 
         .. note::
            For improved run-times, use multiprocessing through :meth:`simba.mixins.train_model_mixins.TrainModelMixin.create_shap_log_mp`
@@ -1005,9 +890,8 @@ class TrainModelMixin(object):
         table = tabulate(table_view, ["Setting", "value"], tablefmt="grid")
         print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")
 
-    def create_meta_data_csv_training_one_model(
-        self, meta_data_lst: list, clf_name: str, save_dir: Union[str, os.PathLike]
-    ) -> None:
+    def create_meta_data_csv_training_one_model(self, meta_data_lst: list, clf_name: str, save_dir: Union[str, os.PathLike]) -> None:
+
         """
         Helper to save single model meta data (hyperparameters, sampling settings etc.) from list format into SimBA
         compatible CSV config file.
@@ -1023,21 +907,17 @@ class TrainModelMixin(object):
         out_df.loc[len(out_df)] = meta_data_lst
         out_df.to_csv(save_path)
 
-    def create_meta_data_csv_training_multiple_models(
-        self, meta_data, clf_name, save_dir, save_file_no: Optional[int] = None
-    ) -> None:
+    def create_meta_data_csv_training_multiple_models(self, meta_data, clf_name, save_dir, save_file_no: Optional[int] = None) -> None:
         print("Saving model meta data file...")
         save_path = os.path.join(save_dir, f"{clf_name}_{str(save_file_no)}_meta.csv")
         out_df = pd.DataFrame.from_dict(meta_data, orient="index").T
         out_df.to_csv(save_path)
 
-    def save_rf_model(
-        self,
-        rf_clf: RandomForestClassifier,
-        clf_name: str,
-        save_dir: Union[str, os.PathLike],
-        save_file_no: Optional[int] = None,
-    ) -> None:
+    def save_rf_model(self,
+                      rf_clf: RandomForestClassifier,
+                      clf_name: str,
+                      save_dir: Union[str, os.PathLike],
+                      save_file_no: Optional[int] = None) -> None:
         """
         Helper to save pickled classifier object to disk.
 
@@ -1048,16 +928,12 @@ class TrainModelMixin(object):
             part of a grid search.
         """
         if save_file_no != None:
-            save_path = os.path.join(
-                save_dir, clf_name + "_" + str(save_file_no) + ".sav"
-            )
+            save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}.sav")
         else:
-            save_path = os.path.join(save_dir, clf_name + ".sav")
+            save_path = os.path.join(save_dir, f"{clf_name}.sav")
         pickle.dump(rf_clf, open(save_path, "wb"))
 
-    def get_model_info(
-        self, config: configparser.ConfigParser, model_cnt: int
-    ) -> Dict[int, Any]:
+    def get_model_info(self, config: configparser.ConfigParser, model_cnt: int) -> Dict[int, Any]:
         """
         Helper to read in N SimBA random forest config meta files to python dict memory.
 

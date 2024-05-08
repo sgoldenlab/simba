@@ -29,49 +29,30 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
 
     :example:
     >>> model_trainer = TrainRandomForestClassifier(config_path='MyConfigPath')
-    >>> model_trainer.perform_sampling()
-    >>> model_trainer.train_model()
-    >>> model_trainer.save_model()
+    >>> model_trainer.run()
+    >>> model_trainer.save()
     """
 
-    def __init__(self, config_path: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
 
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         TrainModelMixin.__init__(self)
         self.read_model_settings_from_config(config=self.config)
-        check_if_filepath_list_is_empty(
-            filepaths=self.target_file_paths,
-            error_msg="Zero annotation files found in project_folder/csv/targets_inserted directory, cannot create model.",
-        )
+        check_if_filepath_list_is_empty(filepaths=self.target_file_paths, error_msg=f"Zero annotation files found in directory {self.targets_folder}, cannot create model.")
         print(f"Reading in {len(self.target_file_paths)} annotated files...")
-        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp(
-            self.target_file_paths, self.file_type, [self.clf_name]
-        )
-        self.frm_idx = pd.DataFrame(
-            {"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx}
-        )
-        self.data_df = self.check_raw_dataset_integrity(
-            df=self.data_df, logs_path=self.logs_path
-        )
+        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp(self.target_file_paths, self.file_type, [self.clf_name])
+        self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
+        self.data_df = self.check_raw_dataset_integrity(df=self.data_df, logs_path=self.logs_path)
         self.data_df_wo_cords = self.drop_bp_cords(df=self.data_df)
-        annotation_cols_to_remove = self.read_in_all_model_names_to_remove(
-            self.config, self.clf_cnt, self.clf_name
-        )
-        self.x_y_df = self.delete_other_annotation_columns(
-            self.data_df_wo_cords, list(annotation_cols_to_remove)
-        )
+        annotation_cols_to_remove = self.read_in_all_model_names_to_remove(self.config, self.clf_cnt, self.clf_name)
+        self.x_y_df = self.delete_other_annotation_columns(self.data_df_wo_cords, list(annotation_cols_to_remove))
         self.class_names = ["Not_" + self.clf_name, self.clf_name]
         self.x_df, self.y_df = self.split_df_to_x_y(self.x_y_df, self.clf_name)
         self.feature_names = self.x_df.columns
         self.check_sampled_dataset_integrity(x_df=self.x_df, y_df=self.y_df)
-        print("Number of features in dataset: " + str(len(self.x_df.columns)))
-        print(
-            "Number of {} frames in dataset: {} ({}%)".format(
-                self.clf_name,
-                str(self.y_df.sum()),
-                str(round(self.y_df.sum() / len(self.y_df), 4) * 100),
-            )
-        )
+        print(f"Number of features in dataset: {len(self.x_df.columns)}")
+        print(f"Number of {self.clf_name} frames in dataset: {self.y_df.sum()} ({str(round(self.y_df.sum() / len(self.y_df), 4) * 100)}%)")
 
     def perform_sampling(self):
         """
@@ -131,122 +112,29 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         self.timer = SimbaTimer(start=True)
         self.perform_sampling()
         if self.algo == "RF":
-            n_estimators = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.RF_ESTIMATORS.value,
-                data_type=Dtypes.INT.value,
-            )
-            max_features = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.RF_MAX_FEATURES.value,
-                data_type=Dtypes.STR.value,
-            )
+            n_estimators = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.RF_ESTIMATORS.value,data_type=Dtypes.INT.value)
+            max_features = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.RF_MAX_FEATURES.value,data_type=Dtypes.STR.value)
             if max_features == "None":
                 max_features = None
-            criterion = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.RF_CRITERION.value,
-                data_type=Dtypes.STR.value,
-                options=Options.CLF_CRITERION.value,
-            )
-            min_sample_leaf = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.MIN_LEAF.value,
-                data_type=Dtypes.INT.value,
-            )
-            compute_permutation_importance = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.PERMUTATION_IMPORTANCE.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            generate_learning_curve = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.LEARNING_CURVE.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            generate_precision_recall_curve = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.PRECISION_RECALL.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            generate_example_decision_tree = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.EX_DECISION_TREE.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            generate_classification_report = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.CLF_REPORT.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            generate_features_importance_log = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.IMPORTANCE_LOG.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            generate_features_importance_bar_graph = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.IMPORTANCE_LOG.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            generate_example_decision_tree_fancy = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.EX_DECISION_TREE_FANCY.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            generate_shap_scores = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.SHAP_SCORES.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            save_meta_data = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.RF_METADATA.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-            compute_partial_dependency = read_config_entry(
-                self.config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.PARTIAL_DEPENDENCY.value,
-                data_type=Dtypes.STR.value,
-                default_value=False,
-            )
-
-            if self.config.has_option(
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.CLASS_WEIGHTS.value,
-            ):
-                class_weights = read_config_entry(
-                    self.config,
-                    ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                    MLParamKeys.CLASS_WEIGHTS.value,
-                    data_type=Dtypes.STR.value,
-                    default_value=Dtypes.NONE.value,
-                )
+            criterion = read_config_entry(self.config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.RF_CRITERION.value, data_type=Dtypes.STR.value, options=Options.CLF_CRITERION.value)
+            min_sample_leaf = read_config_entry(self.config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.MIN_LEAF.value, data_type=Dtypes.INT.value)
+            compute_permutation_importance = read_config_entry(self.config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.PERMUTATION_IMPORTANCE.value, data_type=Dtypes.STR.value, default_value=False)
+            generate_learning_curve = read_config_entry(self.config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.LEARNING_CURVE.value, data_type=Dtypes.STR.value, default_value=False)
+            generate_precision_recall_curve = read_config_entry(self.config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.PRECISION_RECALL.value, data_type=Dtypes.STR.value, default_value=False)
+            generate_example_decision_tree = read_config_entry(self.config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.EX_DECISION_TREE.value, data_type=Dtypes.STR.value, default_value=False)
+            generate_classification_report = read_config_entry(self.config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.CLF_REPORT.value, data_type=Dtypes.STR.value, default_value=False)
+            generate_features_importance_log = read_config_entry(self.config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.IMPORTANCE_LOG.value, data_type=Dtypes.STR.value, default_value=False)
+            generate_features_importance_bar_graph = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.IMPORTANCE_LOG.value,data_type=Dtypes.STR.value,default_value=False)
+            generate_example_decision_tree_fancy = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.EX_DECISION_TREE_FANCY.value,data_type=Dtypes.STR.value,default_value=False)
+            generate_shap_scores = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.SHAP_SCORES.value,data_type=Dtypes.STR.value,default_value=False)
+            save_meta_data = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.RF_METADATA.value,data_type=Dtypes.STR.value,default_value=False)
+            compute_partial_dependency = read_config_entry(self.config,ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,MLParamKeys.PARTIAL_DEPENDENCY.value,data_type=Dtypes.STR.value,default_value=False)
+            if self.config.has_option(ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.CLASS_WEIGHTS.value):
+                class_weights = read_config_entry(self.config,
+                                                  ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
+                                                  MLParamKeys.CLASS_WEIGHTS.value,
+                                                  data_type=Dtypes.STR.value,
+                                                  default_value=Dtypes.NONE.value)
                 if class_weights == "custom":
                     class_weights = ast.literal_eval(
                         read_config_entry(
