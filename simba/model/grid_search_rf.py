@@ -28,8 +28,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
 
     :param str config_path: path to SimBA project config file in Configparser format
 
-    Example
-    ----------
+   :example:
     >>> _ = GridSearchRandomForestClassifier(config_path='MyConfigPath').run()
     """
 
@@ -295,37 +294,30 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                 if MLParamKeys.SHAP_MULTIPROCESS.value in meta_dict.keys():
                     shap_multiprocess = meta_dict[MLParamKeys.SHAP_MULTIPROCESS.value]
 
-                if (
-                    meta_dict[MLParamKeys.SHAP_SCORES.value]
-                    in Options.PERFORM_FLAGS.value
-                ):
+                if (meta_dict[MLParamKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value):
                     if not shap_multiprocess in Options.PERFORM_FLAGS.value:
-                        self.create_shap_log(
-                            ini_file_path=self.config_path,
-                            rf_clf=self.rf_clf,
-                            x_df=self.x_train,
-                            y_df=self.y_train,
-                            x_names=self.feature_names,
-                            clf_name=self.clf_name,
-                            cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
-                            cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
-                            save_path=self.model_dir_out,
-                            save_it=save_n,
-                            save_file_no=config_cnt,
-                        )
+                        self.create_shap_log(ini_file_path=self.config_path,
+                                             rf_clf=self.rf_clf,
+                                             x_df=self.x_train,
+                                             y_df=self.y_train,
+                                             x_names=self.feature_names,
+                                             clf_name=self.clf_name,
+                                             cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
+                                             cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
+                                             save_path=self.model_dir_out,
+                                             save_it=save_n,
+                                             save_file_no=config_cnt)
                     else:
-                        self.create_shap_log_mp(
-                            ini_file_path=self.config_path,
-                            rf_clf=self.rf_clf,
-                            x_df=self.x_train,
-                            y_df=self.y_train,
-                            x_names=self.feature_names,
-                            clf_name=self.clf_name,
-                            cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
-                            cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
-                            save_path=self.model_dir_out,
-                            save_file_no=config_cnt,
-                        )
+                        self.create_shap_log_mp(ini_file_path=self.config_path,
+                                                rf_clf=self.rf_clf,
+                                                x_df=self.x_train,
+                                                y_df=self.y_train,
+                                                x_names=self.feature_names,
+                                                clf_name=self.clf_name,
+                                                cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
+                                                cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
+                                                save_path=self.model_dir_out,
+                                                save_file_no=config_cnt)
 
             if MLParamKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
                 if (
@@ -354,6 +346,11 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             source=self.__class__.__name__,
         )
 
+
+
+
+# test = GridSearchRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini')
+# test.run()
 
 # test = GridSearchRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # test.run()

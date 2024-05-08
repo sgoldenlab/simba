@@ -45,15 +45,13 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
     >>> _ = ShapAggregateStatisticsVisualizer(config_path='SimBAConfigFilePath', classifier_name='Attack', shap_df='tests/test_data/test_shap/data/test_shap.csv', shap_baseline_value=4, save_path='SaveDirectory')
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        shap_df: pd.DataFrame,
-        classifier_name: str,
-        shap_baseline_value: int,
-        visualization: Optional[bool] = True,
-        save_path: Optional[Union[str, os.PathLike]] = None,
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 shap_df: pd.DataFrame,
+                 classifier_name: str,
+                 shap_baseline_value: int,
+                 visualization: Optional[bool] = True,
+                 save_path: Optional[Union[str, os.PathLike]] = None):
 
         check_file_exist_and_readable(file_path=config_path)
         check_instance(
@@ -77,9 +75,7 @@ class ShapAggregateStatisticsVisualizer(ConfigReader):
 
         ConfigReader.__init__(self, config_path=config_path)
         if (self.pose_setting != "14") and (self.pose_setting != "16"):
-            ShapWarning(
-                "SHAP visualizations/aggregate stats skipped (only viable for projects with two animals and default 7 or 8 body-parts per animal) ..."
-            )
+            ShapWarning(msg="SHAP visualizations/aggregate stats skipped (only viable for projects with two animals and default 7 or 8 body-parts per animal) ...", source=self.__class__.__name__)
         else:
             self.classifier_name, self.shap_df, self.shap_baseline_value = (
                 classifier_name,

@@ -833,20 +833,18 @@ class TrainModelMixin(object):
         obs_per_split = len(data_arr[0])
         return data_arr, obs_per_split
 
-    def create_shap_log(
-        self,
-        ini_file_path: str,
-        rf_clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        y_df: pd.Series,
-        x_names: List[str],
-        clf_name: str,
-        cnt_present: int,
-        cnt_absent: int,
-        save_it: int = 100,
-        save_path: Optional[Union[str, os.PathLike]] = None,
-        save_file_no: Optional[int] = None,
-    ) -> Union[None, Tuple[pd.DataFrame]]:
+    def create_shap_log(self,
+                        ini_file_path: str,
+                        rf_clf: RandomForestClassifier,
+                        x_df: pd.DataFrame,
+                        y_df: pd.Series,
+                        x_names: List[str],
+                        clf_name: str,
+                        cnt_present: int,
+                        cnt_absent: int,
+                        save_it: int = 100,
+                        save_path: Optional[Union[str, os.PathLike]] = None,
+                        save_file_no: Optional[int] = None) -> Union[None, Tuple[pd.DataFrame]]:
         """
         Compute SHAP values for a random forest classifier.
 
@@ -1867,12 +1865,8 @@ class TrainModelMixin(object):
             batch_size = 1
         if len(shap_data_df) > 100:
             batch_size = 100
-        print(
-            f"Computing {len(shap_data_df)} SHAP values (MULTI-CORE BATCH SIZE: {batch_size}, FOLLOW PROGRESS IN OS TERMINAL)..."
-        )
-        shap_data, _ = self.split_and_group_df(
-            df=shap_data_df, splits=int(len(shap_data_df) / batch_size)
-        )
+        print(f"Computing {len(shap_data_df)} SHAP values (MULTI-CORE BATCH SIZE: {batch_size}, FOLLOW PROGRESS IN OS TERMINAL)...")
+        shap_data, _ = self.split_and_group_df(df=shap_data_df, splits=int(len(shap_data_df) / batch_size))
         shap_results, shap_raw = [], []
         try:
             with multiprocessing.Pool(cores, maxtasksperchild=10) as pool:
@@ -1930,7 +1924,8 @@ class TrainModelMixin(object):
             else:
                 return (shap_save_df, raw_save_df, int(expected_value * 100))
 
-        except:
+        except Exception as e:
+            print(e.args)
             ShapWarning(
                 msg="Multiprocessing SHAP values failed. Revert to single core. This will negatively affect run-time. ",
                 source=self.__class__.__name__,
