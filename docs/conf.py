@@ -27,7 +27,8 @@ extensions = ['sphinx.ext.napoleon',
               #'sphinx_autodoc_typehints',
               'sphinx_togglebutton',
               'nbsphinx',
-              'sphinx.ext.intersphinx']
+              'sphinx.ext.intersphinx',
+              'sphinxcontrib.video']
 intersphinx_mapping = {
   'python': ('https://docs.python.org/3', None),
   }

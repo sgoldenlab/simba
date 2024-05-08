@@ -252,7 +252,6 @@ def SamplingWarning(msg: str, source: str = ""):
 def CropWarning(msg: str, source: str = ""):
     pass
 
-
 @log_warning
-def CountWarning(msg: str, source: str = ""):
+def CorruptedFileWarning(msg: str, source: str = ""):
     pass

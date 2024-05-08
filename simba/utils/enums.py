@@ -208,6 +208,7 @@ class Options(Enum):
         "1980×1080",
     ]
     DPI_OPTIONS = [100, 200, 400, 800, 1600, 3200]
+    RESOLUTION_OPTIONS_2 = ["AUTO", 240, 320, 480, 640, 720, 800, 960, 1120, 1080, 1980]
     SPEED_OPTIONS = [round(x, 1) for x in list(np.arange(0.1, 2.1, 0.1))]
     PERFORM_FLAGS = ["yes", True, "True"]
     RUN_OPTIONS_FLAGS = ["yes", True, "True", "False", "no", False, "true", "false"]

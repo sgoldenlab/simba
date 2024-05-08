@@ -64,34 +64,10 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
             for cnt, animal_data in bp_lk.items():
                 animal, animal_bp, _ = animal_data
                 animal_name = f"{animal} {animal_bp}"
-                cv2.putText(
-                    img,
-                    text_locations[animal_name][shape_name]["in_zone_text"],
-                    text_locations[animal_name][shape_name]["in_zone_text_loc"],
-                    font,
-                    font_size,
-                    shape_color,
-                    1,
-                )
-                cv2.putText(
-                    img,
-                    text_locations[animal_name][shape_name]["distance_text"],
-                    text_locations[animal_name][shape_name]["distance_text_loc"],
-                    font,
-                    font_size,
-                    shape_color,
-                    1,
-                )
+                cv2.putText(img, text_locations[animal_name][shape_name]["in_zone_text"], text_locations[animal_name][shape_name]["in_zone_text_loc"], font, font_size, shape_color, 1)
+                cv2.putText(img, text_locations[animal_name][shape_name]["distance_text"], text_locations[animal_name][shape_name]["distance_text_loc"], font, font_size, shape_color, 1)
                 if directing_data is not None and style_attr[DIRECTIONALITY]:
-                    cv2.putText(
-                        img,
-                        text_locations[animal][shape_name]["directing_text"],
-                        text_locations[animal][shape_name]["directing_text_loc"],
-                        font,
-                        font_size,
-                        shape_color,
-                        1,
-                    )
+                    cv2.putText(img, text_locations[animal][shape_name]["directing_text"], text_locations[animal][shape_name]["directing_text_loc"], font, font_size, shape_color, 1)
         return img
 
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
@@ -101,7 +77,7 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
     save_path = os.path.join(save_temp_dir, f"{group_cnt}.mp4")
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"] * 2, video_meta_data["height"]))
     cap = cv2.VideoCapture(video_path)
-    cap.set(1, start_frm)
+    cap.set(1, current_frm)
     while current_frm <= end_frm:
         ret, img = cap.read()
         if ret:
@@ -141,9 +117,9 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                                                   color=shape_info[shape_name]["Color BGR"],
                                                                   thickness=shape_info[shape_name]["Thickness"],
                                                                   style=style_attr[DIRECTIONALITY_STYLE])
-            current_frm += 1
             writer.write(np.uint8(img))
             print(f"Multiprocessing frame: {current_frm} / {video_meta_data['frame_count']}  on core {group_cnt}...")
+            current_frm += 1
         else:
             break
     writer.release()
@@ -191,7 +167,8 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
         check_int(name=f"{self.__class__.__name__} core_cnt",value=core_cnt,min_value=-1,max_value=find_core_cnt()[0])
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        if core_cnt == -1:
+            core_cnt = find_core_cnt()[0]
         check_file_exist_and_readable(file_path=video_path)
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
@@ -206,18 +183,14 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             data=self.roi_dict, video_name=self.video_name
         )
         self.core_cnt, self.style_attr = core_cnt, style_attr
-        self.save_path = os.path.join(
-            self.roi_features_save_dir, f"{self.video_name}.mp4"
-        )
+        self.save_path = os.path.join(self.roi_features_save_dir, f"{self.video_name}.mp4")
         if not os.path.exists(self.roi_features_save_dir):
             os.makedirs(self.roi_features_save_dir)
         self.save_temp_dir = os.path.join(self.roi_features_save_dir, "temp")
         if os.path.exists(self.save_temp_dir):
             remove_a_folder(folder_dir=self.save_temp_dir)
         os.makedirs(self.save_temp_dir)
-        self.data_path = os.path.join(
-            self.outlier_corrected_dir, f"{self.video_name}.{self.file_type}"
-        )
+        self.data_path = os.path.join(self.outlier_corrected_dir, f"{self.video_name}.{self.file_type}")
         if not os.path.isfile(self.data_path):
             raise NoFilesFoundError(
                 msg=f"SIMBA ERROR: Could not find the file at path {self.data_path}. Make sure the data file exist to create ROI visualizations",
@@ -379,7 +352,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
     def run(self):
         self.img_w_border_h, self.img_w_border_w = self.__get_border_img_size(video_path=self.video_path)
         self.__calc_text_locs()
-        frm_lst = np.arange(0, len(self.data_df)+1)
+        frm_lst = np.arange(0, len(self.data_df) + 1)
         frm_lst = np.array_split(frm_lst, self.core_cnt)
         frame_range = []
         for i in range(len(frm_lst)): frame_range.append((i, frm_lst[i]))
@@ -405,7 +378,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                                           roi_features_df=self.roi_features_df,
                                           animal_bps=self.animal_bp_dict)
             for cnt, result in enumerate(pool.imap(constants, frame_range, chunksize=self.multiprocess_chunksize)):
-                print(f"Batch core {result+1}/{self.core_cnt} complete...")
+               print(f"Batch core {result+1}/{self.core_cnt} complete...")
             print(f"Joining {self.video_name} multi-processed video...")
             concatenate_videos_in_folder(in_folder=self.save_temp_dir, save_path=self.save_path, video_format="mp4", remove_splits=True)
             self.timer.stop_timer()

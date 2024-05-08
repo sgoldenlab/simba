@@ -132,13 +132,12 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
     MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
-    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp)
+    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp, DownsampleMultipleVideosPopUp, DownsampleSingleVideoPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
 from simba.ui.video_info_ui import VideoInfoTable
-from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable, check_int)
+from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import OS, Defaults, Formats, Paths, TagNames
 from simba.utils.errors import InvalidInputError
@@ -1613,12 +1612,7 @@ class App(object):
         )
 
         menu.add_cascade(label="Tools", menu=video_process_menu)
-        video_process_menu.add_cascade(
-            label="Change fps...",
-            compound="left",
-            image=self.menu_icons["fps"]["img"],
-            menu=fps_menu,
-        )
+        video_process_menu.add_cascade(label="Change fps...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu)
 
         clip_video_menu = Menu(menu)
         clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp)
@@ -1647,36 +1641,11 @@ class App(object):
         )
 
         crop_video_menu = Menu(menu)
-        crop_video_menu.add_command(
-            label="Crop videos",
-            compound="left",
-            image=self.menu_icons["crop"]["img"],
-            command=CropVideoPopUp,
-        )
-        crop_video_menu.add_command(
-            label="Crop videos (circles)",
-            compound="left",
-            image=self.menu_icons["circle"]["img"],
-            command=CropVideoCirclesPopUp,
-        )
-        crop_video_menu.add_command(
-            label="Crop videos (polygons)",
-            compound="left",
-            image=self.menu_icons["polygon"]["img"],
-            command=CropVideoPolygonsPopUp,
-        )
-        crop_video_menu.add_command(
-            label="Multi-crop",
-            compound="left",
-            image=self.menu_icons["crop"]["img"],
-            command=MultiCropPopUp,
-        )
-        video_process_menu.add_cascade(
-            label="Crop videos...",
-            compound="left",
-            image=self.menu_icons["crop"]["img"],
-            menu=crop_video_menu,
-        )
+        crop_video_menu.add_command(label="Crop videos", compound="left", image=self.menu_icons["crop"]["img"], command=CropVideoPopUp)
+        crop_video_menu.add_command(label="Crop videos (circles)", compound="left", image=self.menu_icons["circle"]["img"], command=CropVideoCirclesPopUp)
+        crop_video_menu.add_command(label="Crop videos (polygons)", compound="left", image=self.menu_icons["polygon"]["img"], command=CropVideoPolygonsPopUp)
+        crop_video_menu.add_command(label="Multi-crop", compound="left", image=self.menu_icons["crop"]["img"], command=MultiCropPopUp)
+        video_process_menu.add_cascade(label="Crop videos...", compound="left", image=self.menu_icons["crop"]["img"], menu=crop_video_menu)
 
         format_menu = Menu(video_process_menu)
         format_menu.add_command(label="Change image file formats", command=ChangeImageFormatPopUp)
@@ -1725,12 +1694,16 @@ class App(object):
             command=MakePathPlotPopUp,
         )
 
-        video_process_menu.add_command(
-            label="Down-sample videos",
-            compound="left",
-            image=self.menu_icons["sample"]["img"],
-            command=DownsampleVideoPopUp,
-        )
+        downsample_video_menu = Menu(video_process_menu)
+        downsample_video_menu.add_command(label="Down-sample single video", command=DownsampleSingleVideoPopUp)
+        downsample_video_menu.add_command(label="Down-sample multiple videos", command=DownsampleMultipleVideosPopUp)
+        video_process_menu.add_cascade(label="Down-sample video...", compound="left", image=self.menu_icons["sample"]["img"], menu=downsample_video_menu)
+
+
+        #video_process_menu.add_command(label="Down-sample videos",compound="left",image=self.menu_icons["sample"]["img"],command=DownsampleVideoPopUp)
+
+
+
         video_process_menu.add_cascade(
             label="Drop body-parts from tracking data",
             compound="left",

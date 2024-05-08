@@ -33,7 +33,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_lst, check_valid_tuple)
+                                check_valid_lst, check_valid_tuple, check_str)
 from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
@@ -57,12 +57,10 @@ from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
 MAX_FRM_SIZE = 1080, 650
 
 
-def change_img_format(
-    directory: Union[str, os.PathLike],
-    file_type_in: str,
-    file_type_out: str,
-    verbose: Optional[bool] = False,
-) -> None:
+def change_img_format(directory: Union[str, os.PathLike],
+                      file_type_in: str,
+                      file_type_out: str,
+                      verbose: Optional[bool] = False) -> None:
     """
     Convert the file type of all image files within a directory.
 
@@ -220,15 +218,17 @@ def extract_frame_range(
     )
 
 
-def change_single_video_fps(
-    file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False
-) -> None:
+def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False) -> None:
     """
     Change the fps of a single video file. Results are stored in the same directory as in the input file with
     the suffix ``_fps_new_fps``.
 
     .. note::
        To change the FPS of all videos in a directory, use ``simba.video_processors.video_processing.change_fps_of_multiple_videos``.
+
+    .. video:: _static/change_single_video_fps.mp4
+       :nocontrols:
+       :loop:
 
     :parameter Union[str, os.PathLike] file_path: Path to video file
     :parameter int fps: Fps of the new video file.
@@ -276,9 +276,7 @@ def change_single_video_fps(
     )
 
 
-def change_fps_of_multiple_videos(
-    directory: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False
-) -> None:
+def change_fps_of_multiple_videos(directory: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False) -> None:
     """
     Change the fps of all video files in a folder. Results are stored in the same directory as in the input files with
     the suffix ``_fps_new_fps``.
@@ -341,9 +339,7 @@ def change_fps_of_multiple_videos(
     )
 
 
-def convert_video_powerpoint_compatible_format(
-    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
-) -> None:
+def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
     Create MS PowerPoint compatible copy of a video file. The result is stored in the same directory as the
     input file with the ``_powerpointready`` suffix.
@@ -389,9 +385,7 @@ def convert_video_powerpoint_compatible_format(
 # convert_video_powerpoint_compatible_format(file_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test/SI_DAY3_308_CD1_PRESENT_fps_10_fps_15.mp4", gpu=False)
 
 
-def convert_to_mp4(
-    file_path: Union[str, os.PathLike], gpu: Optional[bool] = False
-) -> None:
+def convert_to_mp4(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
     Convert a video file to mp4 format. The result is stored in the same directory as the
     input file with the ``_converted.mp4`` suffix.
@@ -533,7 +527,9 @@ def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[b
     )
 
 
-def superimpose_frame_count(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def superimpose_frame_count(file_path: Union[str, os.PathLike],
+                            gpu: Optional[bool] = False,
+                            fontsize: Optional[int] = 20) -> None:
     """
     Superimpose frame count on a video file. The result is stored in the same directory as the
     input file with the ``_frame_no.mp4`` suffix.
@@ -552,7 +548,9 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike], gpu: Optional[bo
     :example:
     >>> _ = superimpose_frame_count(file_path='project_folder/videos/Video_1.avi')
     """
+
     check_ffmpeg_available(raise_error=True)
+    check_int(name=f'{superimpose_frame_count.__name__} fontsize', value=fontsize, min_value=1)
     simba_cw = os.path.dirname(simba.__file__)
     simba_font_path = os.path.join(simba_cw, "assets", "UbuntuMono-Regular.ttf")
     timer = SimbaTimer(start=True)
@@ -563,7 +561,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike], gpu: Optional[bo
                 simba_font_path = os.listdir(r"C:/Windows/fonts")[0]
             simba_font_path = simba_font_path[2:].replace("\\", "/")
         elif (platform.system() == OS.MAC.value) or (
-            platform.system() == OS.LINUX.value
+                platform.system() == OS.LINUX.value
         ):
             simba_font_path = "Arial.ttf"
     else:
@@ -575,27 +573,21 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike], gpu: Optional[bo
     print(f"Superimposing frame numbers using font path {simba_font_path}...... ")
     try:
         if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy "{save_name}" -y'
+            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:fontsize={fontsize}:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'
         else:
-            command = f'ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}: text=\'%{{frame_num}}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize=20: box=1: boxcolor=white: boxborderw=5" -c:a copy "{save_name}" -y'
+            command = f'ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}: text=\'%{{frame_num}}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize={fontsize}: box=1: boxcolor=white: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'
         print(f"Using font path {simba_font_path}...")
         subprocess.check_output(command, shell=True)
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     except subprocess.CalledProcessError as e:
         if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontsize=24:fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy "{save_name}" -y'
+            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontsize={fontsize}:fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'
         else:
-            command = f'ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5" -c:a copy "{save_name}" -y'
+            command = f'ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize={fontsize}:box=1:boxcolor=white:boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'
         print(f"Using font path {simba_font_path}...")
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(
-        msg=f"Superimposed video converted! {save_name} generated!",
-        elapsed_time=timer.elapsed_time_str,
-    )
-
-
-# _ = superimpose_frame_count(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', gpu=False)
+    stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
 
 
 def remove_beginning_of_video(
@@ -755,7 +747,7 @@ def downsample_video(
     if gpu:
         command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc "{save_name}"'
     else:
-        command = f'ffmpeg -i "{file_path}" -vf scale={video_width}:{video_height} -c:v libx264 "{save_name}" -hide_banner'
+        command = f'ffmpeg -i "{file_path}" -vf scale={video_width}:{video_height} -c:v libx264 "{save_name}" -loglevel error -stats -hide_banner'
     print("Down-sampling video... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
@@ -1926,6 +1918,7 @@ def crop_single_video_polygon(file_path: Union[str, os.PathLike]) -> None:
         elapsed_time=timer.elapsed_time_str,
     )
 
+#crop_single_video_polygon(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/videos/F1 HAB.mp4')
 
 def crop_multiple_videos_polygons(
     in_dir: Union[str, os.PathLike], out_dir: Union[str, os.PathLike]
@@ -1976,14 +1969,13 @@ def crop_multiple_videos_polygons(
     )
 
 
-def resize_videos_by_height(
-    video_paths: List[Union[str, os.PathLike]],
-    height: Union[int, str],
-    overwrite: Optional[bool] = False,
-    save_dir: Optional[Union[str, os.PathLike]] = None,
-    gpu: Optional[bool] = False,
-    verbose: Optional[bool] = True,
-) -> Union[None, List[Union[None, str, os.PathLike]]]:
+def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
+                            height: Union[int, str],
+                            overwrite: Optional[bool] = False,
+                            save_dir: Optional[Union[str, os.PathLike]] = None,
+                            gpu: Optional[bool] = False,
+                            suffix: Optional[str] = None,
+                            verbose: Optional[bool] = True) -> Union[None, List[Union[None, str, os.PathLike]]]:
     """
     Re-size a list of videos to a specified height while retaining their aspect ratios.
 
@@ -1992,6 +1984,7 @@ def resize_videos_by_height(
     :param Optional[bool] overwrite: If True, then overwrites the original videos. Default False.
     :param Optional[Union[str, os.PathLike]] save_dir: If not None, then the directory where to store the re-sized videos.
     :param Optional[bool] gpu: If True, then use FFmpeg GPU codecs. Default False.
+    :param Optional[bool] suffix: If not None, then stores the resized videos in the same directory as the input videos with the provided suffix.
     :param Optional[bool] verbose: If True, prints progress. Default True.
     :return Union[None, List[Union[str, os.PathLike]]]: If save_dir is not None, returns the paths of the re-sized videos. Else returns empty list.
 
@@ -2000,16 +1993,14 @@ def resize_videos_by_height(
     >>> _ = resize_videos_by_height(video_paths=video_paths, height=300, overwrite=False, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new')
     """
     timer = SimbaTimer(start=True)
-    if (not overwrite) and (save_dir is None):
-        raise InvalidInputError(
-            msg="Pass a save_dir OR set overwrite to True",
-            source=resize_videos_by_height.__name__,
-        )
+    if (not overwrite) and (save_dir is None) and (suffix is None):
+        raise InvalidInputError(msg="Provide a save_dir, OR set overwrite to True, OR provide a suffix", source=resize_videos_by_height.__name__)
     elif (overwrite) and (save_dir is not None):
-        raise InvalidInputError(
-            msg="Pass EITHER overwrite as True OR pass a save_dir",
-            source=resize_videos_by_height.__name__,
-        )
+        raise InvalidInputError(msg="Provide a save_dir, OR set overwrite to True, OR provide a suffix", source=resize_videos_by_height.__name__)
+    elif (overwrite) and (suffix is not None):
+        raise InvalidInputError(msg="Provide a save_dir, OR set overwrite to True, OR provide a suffix", source=resize_videos_by_height.__name__)
+    elif (save_dir is not None) and (suffix is not None):
+        raise InvalidInputError(msg="Provide a save_dir, OR set overwrite to True, OR provide a suffix", source=resize_videos_by_height.__name__)
     if save_dir is not None:
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir)
@@ -2019,12 +2010,7 @@ def resize_videos_by_height(
     _ = [check_file_exist_and_readable(x) for x in video_paths]
     new_video_paths = []
     if isinstance(height, str):
-        check_int(
-            name=f"{resize_videos_by_height.__name__} height",
-            value=height,
-            min_value=0,
-            max_value=len(video_paths),
-        )
+        check_int(name=f"{resize_videos_by_height.__name__} height",value=height,min_value=0,max_value=len(video_paths))
         video_heights = []
         for i in video_paths:
             video_heights.append(get_video_meta_data(video_path=i)["height"])
@@ -2032,39 +2018,40 @@ def resize_videos_by_height(
     for cnt, video_path in enumerate(video_paths):
         dir_name, video_name, ext = get_fn_ext(video_path)
         if verbose:
-            print(
-                f"Resizing height video {video_name} (Video {cnt+1}/{len(video_paths)})..."
-            )
+            print(f"Resizing height video {video_name} (Video {cnt+1}/{len(video_paths)})...")
         if overwrite:
             dt = datetime.now().strftime("%Y%m%d%H%M%S")
             save_path = os.path.join(dir_name, f"{video_name}_{dt}.mp4")
-        else:
+        if suffix is None:
             save_path = os.path.join(save_dir, f"{video_name}.mp4")
+            new_video_paths.append(save_path)
+        else:
+            check_str(name=f'{resize_videos_by_height.__name__} suffix', value=suffix)
+            save_path = os.path.join(dir_name, f"{video_name}_{suffix}.mp4")
             new_video_paths.append(save_path)
         if gpu:
             cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf scale_npp=-2:{height} -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -y'
         else:
-            cmd = f'ffmpeg -y -i "{video_path}" -vf scale=-2:{height} "{save_path}" -hide_banner -loglevel error -y'
+            cmd = f'ffmpeg -y -i "{video_path}" -vf scale=-2:{height} "{save_path}" -hide_banner -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if overwrite:
             shutil.copy(save_path, video_path)
             os.remove(save_path)
+        if verbose:
+            print(f"Resized video {save_path}...")
     timer.stop_timer()
     if verbose:
-        print(
-            f"Resized height {len(video_paths)} video(s). Elapsed time: {timer.elapsed_time_str}s."
-        )
+        print(f"Resized height {len(video_paths)} video(s). Elapsed time: {timer.elapsed_time_str}s.")
     return new_video_paths
 
 
-def resize_videos_by_width(
-    video_paths: List[Union[str, os.PathLike]],
-    width: Union[int, str],
-    overwrite: Optional[bool] = False,
-    save_dir: Optional[Union[str, os.PathLike]] = None,
-    gpu: Optional[bool] = False,
-    verbose: Optional[bool] = True,
-) -> Union[None, List[Union[None, str, os.PathLike]]]:
+def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
+                           width: Union[int, str],
+                           overwrite: Optional[bool] = False,
+                           save_dir: Optional[Union[str, os.PathLike]] = None,
+                           gpu: Optional[bool] = False,
+                           suffix: Optional[str] = None,
+                           verbose: Optional[bool] = True) -> Union[None, List[Union[None, str, os.PathLike]]]:
     """
     Re-size a list of videos to a specified width while retaining their aspect ratios.
 
@@ -2073,6 +2060,7 @@ def resize_videos_by_width(
     :param Optional[bool] overwrite: If True, then overwrites the original videos. Default False.
     :param Optional[Union[str, os.PathLike]] save_dir: If not None, then the directory where to store the re-sized videos.
     :param Optional[bool] gpu: If True, then use FFmpeg GPU codecs. Default False.
+    :param Optional[bool] suffix: If not None, then stores the resized videos in the same directory as the input videos with the provided suffix.
     :param Optional[bool] verbose: If True, prints progress. Default True.
     :return Union[None, List[Union[str, os.PathLike]]]: If save_dir is not None, returns the paths of the re-sized videos. Else returns empty list.
 
@@ -2082,16 +2070,14 @@ def resize_videos_by_width(
     """
 
     timer = SimbaTimer(start=True)
-    if (not overwrite) and (save_dir is None):
-        raise InvalidInputError(
-            msg="Provide a save_dir or set overwrite to True",
-            source=resize_videos_by_width.__name__,
-        )
+    if (not overwrite) and (save_dir is None) and (suffix is None):
+        raise InvalidInputError(msg="Provide a save_dir, OR set overwrite to True, OR provide a suffix", source=resize_videos_by_width.__name__)
     elif (overwrite) and (save_dir is not None):
-        raise InvalidInputError(
-            msg="Set EITHER overwrite to True OR Provide a save_dir",
-            source=resize_videos_by_width.__name__,
-        )
+        raise InvalidInputError(msg="Provide a save_dir, OR set overwrite to True, OR provide a suffix", source=resize_videos_by_width.__name__)
+    elif (overwrite) and (suffix is not None):
+        raise InvalidInputError(msg="Provide a save_dir, OR set overwrite to True, OR provide a suffix", source=resize_videos_by_width.__name__)
+    elif (save_dir is not None) and (suffix is not None):
+        raise InvalidInputError(msg="Provide a save_dir, OR set overwrite to True, OR provide a suffix", source=resize_videos_by_width.__name__)
     if save_dir is not None:
         if not os.path.isdir(save_dir):
             os.makedirs(save_dir)
@@ -2118,22 +2104,27 @@ def resize_videos_by_width(
         if overwrite:
             dt = datetime.now().strftime("%Y%m%d%H%M%S")
             save_path = os.path.join(dir_name, f"{video_name}_{dt}.mp4")
-        else:
+        if suffix is None:
             save_path = os.path.join(save_dir, f"{video_name}.mp4")
+            new_video_paths.append(save_path)
+        else:
+            check_str(name=f'{resize_videos_by_width.__name__} suffix', value=suffix)
+            save_path = os.path.join(dir_name, f"{video_name}_{suffix}.mp4")
             new_video_paths.append(save_path)
         if gpu:
             cmd = f'ffmpeg -y -hwaccel auto -i "{video_path}" -vf scale_npp={width}:-2 -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -y'
         else:
-            cmd = f'ffmpeg -y -i "{video_path}" -vf scale={width}:-2 "{save_path}" -hide_banner -loglevel error -y'
+            cmd = f'ffmpeg -y -i "{video_path}" -vf scale={width}:-2 "{save_path}" -hide_banner -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if overwrite:
+
             shutil.copy(save_path, video_path)
             os.remove(save_path)
+        if verbose:
+            print(f"Resized video {save_path}...")
     timer.stop_timer()
     if verbose:
-        print(
-            f"Resized width {len(video_paths)} video(s). Elapsed time: {timer.elapsed_time_str}s."
-        )
+        print(f"Resized width {len(video_paths)} video(s). Elapsed time: {timer.elapsed_time_str}s.")
     return new_video_paths
 
 

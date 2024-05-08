@@ -31,7 +31,6 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
     .. note::
         `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
-
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
     :param List[str] body_parts: List of the body-parts to use as proxy for animal location(s).
     :param Optional[Union[str, os.PathLike]] data_path: Path to folder or file holding the data used to calculate ROI aggregate statistics. If None, then defaults to the `project_folder/csv/outlier_corrected_movement_location` directory of the SimBA project. Default: None.

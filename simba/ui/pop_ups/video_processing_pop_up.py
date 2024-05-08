@@ -24,12 +24,14 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int,
-                                check_that_hhmmss_start_is_before_end)
+                                check_that_hhmmss_start_is_before_end,
+                                check_ffmpeg_available,
+                                check_nvidea_gpu_available)
 from simba.utils.data import convert_roi_definitions
 from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
 from simba.utils.errors import (CountError, FrameRangeError, MixedMosaicError,
                                 NoChoosenClassifierError, NoFilesFoundError,
-                                NotDirectoryError)
+                                NotDirectoryError, InvalidInputError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -53,7 +55,7 @@ from simba.video_processors.video_processing import (
     crop_single_video_polygon, downsample_video, extract_frame_range,
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, superimpose_frame_count,
-    video_concatenator, video_to_greyscale)
+    video_concatenator, video_to_greyscale, resize_videos_by_width, resize_videos_by_height)
 
 sys.setrecursionlimit(10**7)
 
@@ -83,7 +85,6 @@ class CLAHEPopUp(PopUpMixin):
         self.selected_dir.grid(row=0, column=0, sticky=NW)
         run_multiple_btn.grid(row=1, column=0, sticky=NW)
         #self.main_frm.mainloop()
-
 
     def run_single_video(self):
         selected_video = self.selected_video.file_path
@@ -331,35 +332,55 @@ class GreyscaleSingleVideoPopUp(PopUpMixin):
 
 class SuperImposeFrameCountPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="SUPERIMPOSE FRAME COUNT ON VIDEO")
-        settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SUPERIMPOSE FRAME COUNT ON VIDEO",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        self.selected_video = FileSelect(
-            settings_frm,
-            "VIDEO PATH",
-            title="Select a video file",
-            lblwidth=10,
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
+        super().__init__(title="SUPERIMPOSE FRAME COUNT")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(
-            settings_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var
-        )
-
+        use_gpu_cb = Checkbutton(settings_frm, text="USE GPU (reduced runtime)", variable=self.use_gpu_var)
+        self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(1, 101, 2)), labelwidth=25)
         settings_frm.grid(row=0, column=0, sticky="NW")
-        self.selected_video.grid(row=0, column=0, sticky="NW")
+        self.font_size_dropdown.grid(row=0, column=0, sticky="NW")
+        self.font_size_dropdown.setChoices('20')
         use_gpu_cb.grid(row=1, column=0, sticky="NW")
-        self.create_run_frm(run_function=self.run)
 
-    def run(self):
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE FRAME COUNT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run_single_video())
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE FRAME COUNT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run_multiple_videos())
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run_single_video(self):
+        video_path = self.selected_video.file_path
         check_file_exist_and_readable(file_path=self.selected_video.file_path)
-        superimpose_frame_count(
-            file_path=self.selected_video.file_path, gpu=self.use_gpu_var.get()
-        )
+        self.video_paths = [video_path]
+        self.apply()
+
+    def run_multiple_videos(self):
+        video_dir = self.selected_video_dir.folder_path
+        check_if_dir_exists(in_dir=video_dir, source=self.__class__.__name__)
+        self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+        self.apply()
+
+    def apply(self):
+        check_ffmpeg_available(raise_error=True)
+        timer = SimbaTimer(start=True)
+        use_gpu = self.use_gpu_var.get()
+        font_size = int(self.font_size_dropdown.getChoices())
+        for file_cnt, file_path in enumerate(self.video_paths):
+            check_file_exist_and_readable(file_path=file_path)
+            superimpose_frame_count(file_path=file_path, gpu=use_gpu, fontsize=font_size)
+        timer.stop_timer()
+        stdout_success(msg=f'Frame counts superimposed on {len(self.video_paths)} video(s)', elapsed_time=timer.elapsed_time_str)
 
 
 class MultiShortenPopUp(PopUpMixin):
@@ -2174,6 +2195,138 @@ class InteractiveClahePopUp(PopUpMixin):
         stdout_success(f'{len(self.video_paths)} video(s) converted.', elapsed_time=timer.elapsed_time_str)
 
 
+class DownsampleSingleVideoPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self,title="DOWN-SAMPLE SINGLE VIDEO RESOLUTION")
+        choose_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DOWNSAMPLE.value)
+        self.video_path_selected = FileSelect(choose_video_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        choose_video_frm.grid(row=0, column=0, sticky=NW)
+        self.video_path_selected.grid(row=0, column=0, sticky=NW)
+
+        gpu_frm = LabelFrame(self.main_frm, text="GPU (REDUCED RUNTIMES)", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", padx=5, pady=5)
+        self.use_gpu_var = BooleanVar(value=False)
+        use_gpu_cb = Checkbutton(gpu_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var)
+        choose_video_frm.grid(row=1, column=0, sticky=NW)
+        use_gpu_cb.grid(row=0, column=0, sticky=NW)
+
+        custom_size_frm = LabelFrame(self.main_frm, text="CUSTOM RESOLUTION",font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black",padx=5,pady=5)
+        self.entry_width = Entry_Box(custom_size_frm, "Width", "10", validation="numeric")
+        self.entry_height = Entry_Box(custom_size_frm, "Height", "10", validation="numeric")
+        self.custom_downsample_btn = Button(custom_size_frm, text="DOWN-SAMPLE USING CUSTOM RESOLUTION", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", command=lambda: self.downsample_custom())
+
+        custom_size_frm.grid(row=2, column=0, sticky=NW)
+        self.entry_width.grid(row=0, column=0, sticky=NW)
+        self.entry_height.grid(row=1, column=0, sticky=NW)
+        self.custom_downsample_btn.grid(row=2, column=0, sticky=NW)
+
+        default_size_frm = LabelFrame(self.main_frm, text="DEFAULT RESOLUTION",font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black",padx=5,pady=5)
+        self.width_dropdown = DropDownMenu(default_size_frm, "WIDTH:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
+        self.height_dropdown = DropDownMenu(default_size_frm, "HEIGHT:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
+        self.width_dropdown.setChoices(640)
+        self.height_dropdown.setChoices("AUTO")
+        self.default_downsample_btn = Button(default_size_frm, text="DOWN-SAMPLE USING DEFAULT RESOLUTION", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", command=lambda: self.downsample_default())
+
+        default_size_frm.grid(row=3, column=0, sticky=NW)
+        self.width_dropdown.grid(row=0, column=0, sticky=NW)
+        self.height_dropdown.grid(row=1, column=0, sticky=NW)
+        self.default_downsample_btn.grid(row=2, column=0, sticky=NW)
+        self.main_frm.mainloop()
+
+    def _checks(self):
+        check_ffmpeg_available(raise_error=True)
+        self.gpu = self.use_gpu_var.get()
+        if self.gpu:
+            check_nvidea_gpu_available()
+        self.file_path = self.video_path_selected.file_path
+        check_file_exist_and_readable(file_path=self.file_path)
+        _ = get_video_meta_data(video_path=self.file_path)
+
+    def downsample_custom(self):
+        self._checks()
+        width, height = self.entry_width.entry_get, self.entry_height.entry_get
+        check_int(name=f'{self.__class__.__name__} width', value=width, min_value=1)
+        check_int(name=f'{self.__class__.__name__} height', value=height, min_value=1)
+        threading.Thread(target=downsample_video(file_path=self.file_path, video_height=height, video_width=width, gpu=self.gpu)).start()
+
+    def downsample_default(self):
+        self._checks()
+        width, height = self.width_dropdown.getChoices(), self.height_dropdown.getChoices()
+        if width == 'AUTO' and height == 'AUTO':
+            raise InvalidInputError(msg='Both width and height cannot be AUTO', source=self.__class__.__name__)
+        elif width == 'AUTO':
+            resize_videos_by_height(video_paths=[self.file_path], height=int(height), overwrite=False, save_dir=None, gpu=self.gpu, suffix='downsampled', verbose=True)
+        elif height == 'AUTO':
+            resize_videos_by_width(video_paths=[self.file_path], width=int(width), overwrite=False, save_dir=None, gpu=self.gpu, suffix='downsampled', verbose=True)
+        else:
+            threading.Thread(target=downsample_video(file_path=self.file_path, video_height=height, video_width=width, gpu=self.gpu)).start()
+
+class DownsampleMultipleVideosPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self,title="DOWN-SAMPLE MULTIPLE VIDEO RESOLUTION")
+        choose_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DOWNSAMPLE.value)
+
+        self.video_dir_selected = FolderSelect(choose_video_frm, "VIDEO DIRECTORY:",title="Select Folder with videos", lblwidth=20)
+        choose_video_frm.grid(row=0, column=0, sticky=NW)
+        self.video_dir_selected.grid(row=0, column=0, sticky=NW)
+
+        gpu_frm = LabelFrame(self.main_frm, text="GPU (REDUCED RUNTIMES)", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", padx=5, pady=5)
+        self.use_gpu_var = BooleanVar(value=False)
+        use_gpu_cb = Checkbutton(gpu_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var)
+        choose_video_frm.grid(row=1, column=0, sticky=NW)
+        use_gpu_cb.grid(row=0, column=0, sticky=NW)
+
+        custom_size_frm = LabelFrame(self.main_frm, text="CUSTOM RESOLUTION",font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black",padx=5,pady=5)
+        self.entry_width = Entry_Box(custom_size_frm, "Width", "10", validation="numeric")
+        self.entry_height = Entry_Box(custom_size_frm, "Height", "10", validation="numeric")
+        self.custom_downsample_btn = Button(custom_size_frm, text="DOWN-SAMPLE USING CUSTOM RESOLUTION", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", command=lambda: self.downsample_custom())
+
+        custom_size_frm.grid(row=2, column=0, sticky=NW)
+        self.entry_width.grid(row=0, column=0, sticky=NW)
+        self.entry_height.grid(row=1, column=0, sticky=NW)
+        self.custom_downsample_btn.grid(row=2, column=0, sticky=NW)
+
+        default_size_frm = LabelFrame(self.main_frm, text="DEFAULT RESOLUTION",font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black",padx=5,pady=5)
+        self.width_dropdown = DropDownMenu(default_size_frm, "WIDTH:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
+        self.height_dropdown = DropDownMenu(default_size_frm, "HEIGHT:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
+        self.width_dropdown.setChoices(640)
+        self.height_dropdown.setChoices("AUTO")
+        self.default_downsample_btn = Button(default_size_frm, text="DOWN-SAMPLE USING DEFAULT RESOLUTION", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", command=lambda: self.downsample_default())
+
+        default_size_frm.grid(row=3, column=0, sticky=NW)
+        self.width_dropdown.grid(row=0, column=0, sticky=NW)
+        self.height_dropdown.grid(row=1, column=0, sticky=NW)
+        self.default_downsample_btn.grid(row=2, column=0, sticky=NW)
+        self.main_frm.mainloop()
+
+    def _checks(self):
+        check_ffmpeg_available(raise_error=True)
+        self.gpu = self.use_gpu_var.get()
+        if self.gpu:
+            check_nvidea_gpu_available()
+        self.video_directory = self.video_dir_selected.folder_path
+        check_if_dir_exists(in_dir=self.video_directory)
+        self.video_paths = find_all_videos_in_directory(directory=self.video_directory, raise_error=True, as_dict=True)
+
+    def downsample_custom(self):
+        self._checks()
+        width, height = self.entry_width.entry_get, self.entry_height.entry_get
+        check_int(name=f'{self.__class__.__name__} width', value=width, min_value=1)
+        check_int(name=f'{self.__class__.__name__} height', value=height, min_value=1)
+        for file_path in self.video_paths.values():
+            threading.Thread(target=downsample_video(file_path=file_path, video_height=height, video_width=width, gpu=self.gpu)).start()
+
+    def downsample_default(self):
+        self._checks()
+        width, height = self.width_dropdown.getChoices(), self.height_dropdown.getChoices()
+        if width == 'AUTO' and height == 'AUTO':
+            raise InvalidInputError(msg='Both width and height cannot be AUTO', source=self.__class__.__name__)
+        elif width == 'AUTO':
+            resize_videos_by_height(video_paths=list(self.video_paths.values()), height=int(height), overwrite=False, save_dir=None, gpu=self.gpu, suffix='downsampled', verbose=True)
+        elif height == 'AUTO':
+            resize_videos_by_width(video_paths=list(self.video_paths.values()), width=int(width), overwrite=False, save_dir=None, gpu=self.gpu, suffix='downsampled', verbose=True)
+        else:
+            for file_path in self.video_paths.values():
+                threading.Thread(target=downsample_video(file_path=file_path, video_height=height, video_width=width, gpu=self.gpu)).start()
 
 
 

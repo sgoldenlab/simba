@@ -11,6 +11,7 @@ dependencies:
   - pip:
       - pip==21.2.2
       - sphinx-autodoc-typehints
+      - sphinxcontrib-video
       - sphinx-togglebutton==0.3.2
       - sphinx_rtd_theme
       - simba-uw-tf-dev
