@@ -19,19 +19,18 @@ from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect)
-from simba.utils.checks import (check_file_exist_and_readable,
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_int,
-                                check_that_hhmmss_start_is_before_end,
-                                check_ffmpeg_available,
-                                check_nvidea_gpu_available)
+                                check_int, check_nvidea_gpu_available,
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.data import convert_roi_definitions
 from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
-from simba.utils.errors import (CountError, FrameRangeError, MixedMosaicError,
-                                NoChoosenClassifierError, NoFilesFoundError,
-                                NotDirectoryError, InvalidInputError)
+from simba.utils.errors import (CountError, FrameRangeError, InvalidInputError,
+                                MixedMosaicError, NoChoosenClassifierError,
+                                NoFilesFoundError, NotDirectoryError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -54,8 +53,9 @@ from simba.video_processors.video_processing import (
     crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
     crop_single_video_polygon, downsample_video, extract_frame_range,
     extract_frames_single_video, frames_to_movie, gif_creator,
-    multi_split_video, remove_beginning_of_video, superimpose_frame_count,
-    video_concatenator, video_to_greyscale, resize_videos_by_width, resize_videos_by_height)
+    multi_split_video, remove_beginning_of_video, resize_videos_by_height,
+    resize_videos_by_width, superimpose_frame_count, video_concatenator,
+    video_to_greyscale)
 
 sys.setrecursionlimit(10**7)
 

@@ -126,18 +126,20 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
     ConvertROIDefinitionsPopUp, ConvertVideoPopUp, CreateGIFPopUP,
     CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
+    DownsampleMultipleVideosPopUp, DownsampleSingleVideoPopUp,
     DownsampleVideoPopUp, ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp,
     ExtractSEQFramesPopUp, ExtractSpecificFramesPopUp,
     GreyscaleSingleVideoPopUp, ImportFrameDirectoryPopUp,
     InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
     MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
-    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp, DownsampleMultipleVideosPopUp, DownsampleSingleVideoPopUp)
+    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
 from simba.ui.video_info_ui import VideoInfoTable
-from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_int)
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import OS, Defaults, Formats, Paths, TagNames
 from simba.utils.errors import InvalidInputError
