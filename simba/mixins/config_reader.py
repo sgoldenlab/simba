@@ -247,12 +247,7 @@ class ConfigReader(object):
             if "Center_XCenter_Y" in self.polygon_df.columns:
                 self.polygon_df = self.polygon_df.drop(["Center_XCenter_Y"], axis=1)
             self.polygon_df = self.polygon_df.dropna(how="any")
-            self.shape_names = list(
-                itertools.chain(
-                    self.rectangles_df["Name"].unique(),
-                    self.polygon_df["Name"].unique(),
-                )
-            )
+            self.shape_names = list(itertools.chain(self.rectangles_df["Name"].unique(), self.polygon_df["Name"].unique(), self.circles_df["Name"].unique()))
             self.roi_dict = {
                 Keys.ROI_RECTANGLES.value: self.rectangles_df,
                 Keys.ROI_CIRCLES.value: self.circles_df,

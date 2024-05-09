@@ -104,11 +104,9 @@ class ROITimebinCalculator(ConfigReader):
                     entry_roi_in_timebin = [x for x in entry_frms if x in bin_frms]
                     self.results_time.loc[len(self.results_time)] = [self.video_name,shape_name,animal_name,body_part,bin_cnt,len(frms_inside_roi_in_timebin) / fps]
                     self.results_entries.loc[len(self.results_entries)] = [self.video_name,shape_name,animal_name,body_part,bin_cnt,len(entry_roi_in_timebin)]
-
                     if self.movement:
                         if len(frms_inside_roi_in_timebin) > 0:
                             bin_move = (self.movement_timebins.movement_dict[self.video_name].iloc[frms_inside_roi_in_timebin].values.flatten().astype(np.float32))
-                            print(bin_move)
                             _, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=bin_move,fps=fps, pixels_per_mm=1, centimeters=True))
                             self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name,
                                                                                                        shape_name,
@@ -129,21 +127,11 @@ class ROITimebinCalculator(ConfigReader):
             print(f"Video {self.video_name} complete (elapsed time {video_timer.elapsed_time_str}s)")
 
     def save(self):
-        self.results_time.sort_values(
-            by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]
-        ).set_index("VIDEO").to_csv(self.save_path_time)
-        self.results_entries.sort_values(
-            by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]
-        ).set_index("VIDEO").to_csv(self.save_path_entries)
+        self.results_time.sort_values(by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]).set_index("VIDEO").to_csv(self.save_path_time)
+        self.results_entries.sort_values(by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]).set_index("VIDEO").to_csv(self.save_path_entries)
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"ROI time bin entry data saved at {self.save_path_entries}",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
-        stdout_success(
-            msg=f"ROI time bin time data saved at {self.save_path_time}",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"ROI time bin entry data saved at {self.save_path_entries}", elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(msg=f"ROI time bin time data saved at {self.save_path_time}", elapsed_time=self.timer.elapsed_time_str)
         if self.movement:
             self.results_movement_velocity.sort_values(
                 by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]
