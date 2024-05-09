@@ -31,8 +31,7 @@ from simba.utils.checks import (check_float,
                                 check_instance, check_int,
                                 check_iterable_length, check_str,
                                 check_that_column_exist, check_valid_array,
-                                check_valid_lst,
-                                check_valid_tuple)
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette, create_color_palettes
 from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions
 from simba.utils.errors import CountError, InvalidInputError

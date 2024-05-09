@@ -5,16 +5,17 @@ import cv2
 import numpy as np
 
 from simba.feature_extractors.perimeter_jit import jitted_hull
+from simba.mixins.circular_statistics import CircularStatisticsMixin
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.mixins.circular_statistics import CircularStatisticsMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int)
 from simba.utils.enums import Formats, TextOptions
 from simba.utils.lookups import integer_to_cardinality_lookup
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (find_video_of_file, get_fn_ext, get_video_meta_data, read_df)
+from simba.utils.read_write import (find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df)
 
 FONT_SIZE = 'font_size'
 SPACE_SIZE = 'space_size'

@@ -1,10 +1,11 @@
 import os
 from typing import Optional, Union
 
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.pyplot import cm, figure
+
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import read_df
