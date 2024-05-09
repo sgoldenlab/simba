@@ -104,14 +104,15 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         time-period represented of ``bin_size_s`` seconds. Peak is defined as value is higher than
         in the prior observation (i.e., no future data is involved in comparison).
 
+        .. image:: _static/img/peak_cnt.png
+           :width: 700
+           :align: center
+
         :parameter ndarray data: 1D array of size len(frames) representing feature values.
         :parameter int bin_size_s: The size of the buckets in seconds.
         :parameter int fps: Frame-rate of recorded video.
         :return np.ndarray: Array of size data.shape[0] with peak counts as ratio of len(frames).
 
-        .. image:: _static/img/peak_cnt.png
-           :width: 700
-           :align: center
 
         :example:
         >>> data = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -551,7 +552,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         Compute the loops detected within a 2-dimensional path.
 
         .. image:: _static/img/find_path_loops.png
-           :width: 500
+           :width: 700
            :align: center
 
         :param np.ndarray data: Nx2 2-dimensional array with the x and y coordinated represented on axis 1.
@@ -734,10 +735,10 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         return movement, np.mean(v)
 
 
-x = np.random.randint(0, 100, (100, 2))
-FeatureExtractionSupplemental.distance_and_velocity(
-    x=x, fps=10, pixels_per_mm=10, centimeters=True
-)
+# x = np.random.randint(0, 100, (100, 2))
+# FeatureExtractionSupplemental.distance_and_velocity(
+#     x=x, fps=10, pixels_per_mm=10, centimeters=True
+# )
 # # sum_movement, avg_velocity =
 
 

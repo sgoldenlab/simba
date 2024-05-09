@@ -95,9 +95,7 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
-    def sliding_hjort_parameters(
-        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    def sliding_hjort_parameters(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Jitted compute of Hjorth parameters, including mobility, complexity, and activity, for
         sliding windows of varying sizes applied to the input data array.
@@ -143,6 +141,11 @@ class TimeseriesFeatureMixin(object):
         Jitted compute of the local maxima or minima defined as values which are higher or lower than immediately preceding and proceeding time-series neighbors, repectively.
         Returns 2D np.ndarray with columns representing idx and values of local maxima.
 
+        .. image:: _static/img/local_maxima_minima.png
+           :width: 600
+           :align: center
+
+
         :param np.ndarray data: Time-series data.
         :param bool maxima: If True, returns maxima. Else, minima.
         :return np.ndarray: 2D np.ndarray with columns representing idx in input data in first column and values of local maxima in second column
@@ -153,10 +156,6 @@ class TimeseriesFeatureMixin(object):
         >>> [[1, 7.5], [4, 7.5], [9, 9.5]]
         >>> TimeseriesFeatureMixin().local_maxima_minima(data=data, maxima=False)
         >>> [[0, 3.9], [2, 4.2], [5, 3.9]]
-
-        .. image:: _static/img/local_maxima_minima.png
-           :width: 600
-           :align: center
 
         """
         if not maxima:
@@ -187,7 +186,6 @@ class TimeseriesFeatureMixin(object):
         """
         Jitted compute of the count in time-series where sequential values crosses a defined value.
 
-
         .. image:: _static/img/crossings.png
            :width: 600
            :align: center
@@ -217,9 +215,7 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64,  float64[:], int64,)")
-    def sliding_crossings(
-        data: np.ndarray, val: float, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_crossings(data: np.ndarray, val: float, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the number of crossings over sliding windows in a data array.
 
@@ -1065,8 +1061,6 @@ class TimeseriesFeatureMixin(object):
         .. image:: _static/img/time_since_previous_threshold.png
            :width: 600
            :align: center
-
-
 
         :param np.ndarray data: The input 1D array containing the time series data.
         :param int threshold: The threshold value used for the comparison.

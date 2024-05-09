@@ -31,7 +31,8 @@ from simba.utils.checks import (check_float,
                                 check_instance, check_int,
                                 check_iterable_length, check_str,
                                 check_that_column_exist, check_valid_array,
-                                check_valid_lst)
+                                check_valid_lst,
+                                check_valid_tuple)
 from simba.utils.data import create_color_palette, create_color_palettes
 from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions
 from simba.utils.errors import CountError, InvalidInputError
@@ -2892,49 +2893,53 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def adjust_geometries(
-        geometries: List[Polygon], shift: Tuple[int, int]
-    ) -> List[Polygon]:
+    def adjust_geometry_locations(geometries: List[Polygon],
+                                  shift: Tuple[int, int],
+                                  minimum: Optional[Tuple[int, int]] = (0, 0),
+                                  maximum: Optional[Tuple[int, int]] = (np.inf, np.inf)) -> List[Polygon]:
         """
-        Shift geometries specified distance in the x and/or y-axis
+        Shift a set of geometries specified distance in the x and/or y-axis.
+
+        .. image:: _static/img/adjust_geometry_locations.png
+           :width: 600
+           :align: center
 
         :param  List[Polygon] geometries: List of input polygons to be adjusted.
         :param Tuple[int, int] shift: Tuple specifying the shift distances in the x and y-axis.
+        :param Optional[Tuple[int, int]] minimum: Minimim allowed coordinates of Polygon points on x and y axes. Default: (0,0).
+        :param Optional[Tuple[int, int]] maximum: Maximum allowed coordinates of Polygon points on x and y axes. Default: (np.inf, np.inf).
         :return List[Polygon]: List of adjusted polygons.
 
         :example:
-        >>> shapes = GeometryMixin().adjust_geometries(geometries=shapes, shift=(0, 333))
+        >>> shapes = GeometryMixin().adjust_geometry_locations(geometries=shapes, shift=(0, 333))
         """
-        check_valid_lst(
-            data=geometries,
-            source=f"{GeometryMixin().adjust_geometries.__name__} geometries",
-            valid_dtypes=(Polygon,),
-            min_len=1,
-        )
+
+        check_valid_tuple(x=shift, source=f"{GeometryMixin.adjust_geometry_locations.__name__} shift", accepted_lengths=(2,), valid_dtypes=(int,))
+        check_valid_tuple(x=shift, source=f"{GeometryMixin.adjust_geometry_locations.__name__} minimum", accepted_lengths=(2,), valid_dtypes=(int,))
+        check_valid_tuple(x=shift, source=f"{GeometryMixin.adjust_geometry_locations.__name__} maximum", accepted_lengths=(2,), valid_dtypes=(int,))
+        check_valid_lst(data=geometries, source=f"{GeometryMixin.adjust_geometry_locations.__name__} geometries", valid_dtypes=(Polygon,), min_len=1)
         results = []
         for shape_cnt, shape in enumerate(geometries):
-            results.append(
-                Polygon(
-                    [
-                        (int(abs(x + shift[0])), int(abs(y + shift[1])))
-                        for x, y in list(shape.exterior.coords)
-                    ]
-                )
-            )
+            shape_results = []
+            for x, y in list(shape.exterior.coords):
+                x_shift, y_shift = int(np.ceil(y + shift[1])), int(np.ceil(x + shift[0]))
+                x_shift, y_shift = max(minimum[0], x_shift), max(minimum[1], y_shift)
+                x_shift, y_shift = min(maximum[0], x_shift), min(maximum[1], y_shift)
+                shape_results.append([y_shift, x_shift])
+            results.append(Polygon(shape_results))
         return results
 
     @staticmethod
-    def bucket_img_into_grid_points(
-        point_distance: int,
-        px_per_mm: float,
-        img_size: Tuple[int, int],
-        border_sites: Optional[bool] = True,
-    ) -> Dict[Tuple[int, int], Point]:
+    def bucket_img_into_grid_points(point_distance: int,
+                                    px_per_mm: float,
+                                    img_size: Tuple[int, int],
+                                    border_sites: Optional[bool] = True) -> Dict[Tuple[int, int], Point]:
+
         """
         Generate a grid of evenly spaced points within an image. Use for creating spatial markers within an arena.
 
         .. image:: _static/img/bucket_img_into_grid_points.png
-           :width: 500
+           :width: 800
            :align: center
 
         :param int point_distance: Distance between adjacent points in millimeters.
@@ -2944,13 +2949,11 @@ class GeometryMixin(object):
         :returns Dict[Tuple[int, int], Point]: Dictionary where keys are (row, column) indices of the point, and values are Shapely Point objects.
 
         :example:
-        >>> point_grid(point_distance=20, px_per_mm=4, img_size=img.shape, border_sites=False)
+        >>> GeometryMixin.bucket_img_into_grid_points(point_distance=20, px_per_mm=4, img_size=img.shape, border_sites=False)
         """
 
         point_distance = int(point_distance * px_per_mm)
-        v_bin_cnt, h_bin_cnt = divmod(img_size[0], point_distance), divmod(
-            img_size[1], point_distance
-        )
+        v_bin_cnt, h_bin_cnt = divmod(img_size[0], point_distance), divmod(img_size[1], point_distance)
         if h_bin_cnt[1] != 0:
             h_bin_cnt = (h_bin_cnt[0] + 1, h_bin_cnt[1])
         if v_bin_cnt[1] != 0:
@@ -2981,6 +2984,10 @@ class GeometryMixin(object):
     ) -> Tuple[Dict[Tuple[int, int], Polygon], float]:
         """
         Bucketize an image into squares and return a dictionary of polygons representing the bucket locations.
+
+        .. image:: _static/img/bucket_img_into_grid_square_3.png
+           :width: 800
+           :align: center
 
         :param Iterable[int] img_size: 2-value tuple, list or array representing the width and height of the image in pixels.
         :param Optional[float] bucket_grid_size_mm: The width/height of each square bucket in millimeters. E.g., 50 will create 5cm by 5cm squares. If None, then buckets will by defined by ``bucket_grid_size`` argument.

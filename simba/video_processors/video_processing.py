@@ -544,6 +544,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
 
     :parameter Union[str, os.PathLike] file_path: Path to video file.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :parameter Optional[int] fontsize: The size of the font represetnting the current frame. Default: 20.
 
     :example:
     >>> _ = superimpose_frame_count(file_path='project_folder/videos/Video_1.avi')
