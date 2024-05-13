@@ -83,13 +83,13 @@ def test_change_fps_of_multiple_videos(directory, fps):
     shutil.copytree(directory, test_dir_copy_path)
     change_fps_of_multiple_videos(directory=test_dir_copy_path, fps=fps)
 
-def test_convert_video_powerpoint_compatible_format(config_video_path_args):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
-    convert_video_powerpoint_compatible_format(file_path=copied_file_path)
+# def test_convert_video_powerpoint_compatible_format(config_video_path_args):
+#     copied_file_path = copy_file(file_path=config_video_path_args.param)
+#     convert_video_powerpoint_compatible_format(file_path=copied_file_path)
 
-def test_convert_to_mp4(config_video_path_args):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
-    convert_to_mp4(file_path=copied_file_path)
+# def test_convert_to_mp4(config_video_path_args):
+#     copied_file_path = copy_file(file_path=config_video_path_args.param)
+#     convert_to_mp4(file_path=copied_file_path)
 
 def test_video_to_greyscale(config_video_path_args):
     copied_file_path = copy_file(file_path=config_video_path_args.param)

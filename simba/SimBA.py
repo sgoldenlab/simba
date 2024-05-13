@@ -121,10 +121,9 @@ from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
-    ChangeFpsMultipleVideosPopUp, ChangeFpsSingleVideoPopUp,
-    ChangeImageFormatPopUp, CLAHEPopUp, ClipSingleVideoByFrameNumbers,
+    ChangeFpsMultipleVideosPopUp, ChangeFpsSingleVideoPopUp, CLAHEPopUp, ClipSingleVideoByFrameNumbers,
     ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
-    ConvertROIDefinitionsPopUp, ConvertVideoPopUp, CreateGIFPopUP,
+    ConvertROIDefinitionsPopUp, CreateGIFPopUP,
     CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
     DownsampleMultipleVideosPopUp, DownsampleSingleVideoPopUp,
     DownsampleVideoPopUp, ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp,
@@ -133,7 +132,9 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
     MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
-    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp)
+    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp,
+    Convert2TIFFPopUp, Convert2bmpPopUp, Convert2WEBPPopUp, Convert2jpegPopUp, Convert2PNGPopUp,
+    Convert2MP4PopUp, Convert2MOVPopUp, Convert2WEBMPopUp, Convert2AVIPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1650,10 +1651,20 @@ class App(object):
         video_process_menu.add_cascade(label="Crop videos...", compound="left", image=self.menu_icons["crop"]["img"], menu=crop_video_menu)
 
         format_menu = Menu(video_process_menu)
-        format_menu.add_command(label="Change image file formats", command=ChangeImageFormatPopUp)
-        format_menu.add_command(label="Change video file formats", command=ConvertVideoPopUp)
+        img_format_menu = Menu(format_menu)
+        video_format_menu = Menu(format_menu)
+        img_format_menu.add_command(label="Convert image directory to PNG", command=Convert2PNGPopUp)
+        img_format_menu.add_command(label="Convert image directory to JPEG", command=Convert2jpegPopUp)
+        img_format_menu.add_command(label="Convert image directory to BMP", command=Convert2bmpPopUp)
+        img_format_menu.add_command(label="Convert image directory to TIFF", command=Convert2TIFFPopUp)
+        img_format_menu.add_command(label="Convert image directory to WEBP", command=Convert2WEBPPopUp)
+        video_format_menu.add_command(label="Convert videos to MP4", command=Convert2MP4PopUp)
+        video_format_menu.add_command(label="Convert videos to AVI", command=Convert2AVIPopUp)
+        video_format_menu.add_command(label="Convert videos to WEBM", command=Convert2WEBMPopUp)
+        video_format_menu.add_command(label="Convert videos to MOV", command=Convert2MOVPopUp)
+        format_menu.add_cascade(label="Change image formats...", compound="left", menu=img_format_menu)
+        format_menu.add_cascade(label="Change video formats...", compound="left", menu=video_format_menu)
         video_process_menu.add_cascade(label="Change formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu)
-
         clahe_menu = Menu(video_process_menu)
         clahe_menu.add_command(label="CLAHE enhance videos", command=CLAHEPopUp)
         clahe_menu.add_command(label="Interactively CLAHE enhance videos", command=InteractiveClahePopUp)
@@ -1700,12 +1711,6 @@ class App(object):
         downsample_video_menu.add_command(label="Down-sample single video", command=DownsampleSingleVideoPopUp)
         downsample_video_menu.add_command(label="Down-sample multiple videos", command=DownsampleMultipleVideosPopUp)
         video_process_menu.add_cascade(label="Down-sample video...", compound="left", image=self.menu_icons["sample"]["img"], menu=downsample_video_menu)
-
-
-        #video_process_menu.add_command(label="Down-sample videos",compound="left",image=self.menu_icons["sample"]["img"],command=DownsampleVideoPopUp)
-
-
-
         video_process_menu.add_cascade(
             label="Drop body-parts from tracking data",
             compound="left",

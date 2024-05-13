@@ -450,6 +450,24 @@ def percent_to_crf_lookup() -> Dict[str, int]:
         "100": 10,
     }
 
+def percent_to_qv_lk():
+    """
+    Create dictionary that matches human-readable percent values to FFmpeg regulates video quality in CPU codecs.
+    Higher FFmpeg quality scores maps to smaller, lower quality videos. Used in some AVI codecs such as 'divx' and 'mjpeg'.
+    """
+    return {100: 3,
+            90: 5,
+            80: 7,
+            70: 9,
+            60: 11,
+            50: 13,
+            40: 15,
+            30: 17,
+            20: 19,
+            10: 21}
+
+
+
 
 def video_quality_to_preset_lookup() -> Dict[str, str]:
     """

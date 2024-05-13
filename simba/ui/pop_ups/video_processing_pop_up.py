@@ -36,7 +36,7 @@ from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    seconds_to_timestamp)
+    seconds_to_timestamp, str_2_bool)
 from simba.video_processors.brightness_contrast_ui import \
     brightness_contrast_ui
 from simba.video_processors.clahe_ui import interactive_clahe_ui
@@ -55,7 +55,8 @@ from simba.video_processors.video_processing import (
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, resize_videos_by_height,
     resize_videos_by_width, superimpose_frame_count, video_concatenator,
-    video_to_greyscale)
+    video_to_greyscale, convert_to_jpeg, convert_to_bmp, convert_to_webp, convert_to_tiff, convert_to_png,
+    convert_to_mov, convert_to_avi, convert_to_webm)
 
 sys.setrecursionlimit(10**7)
 
@@ -693,23 +694,12 @@ class ConvertVideoPopUp(PopUpMixin):
 
 class ExtractSpecificFramesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="EXTRACT DEFINED FRAMES", size=(200, 200))
-        self.video_file_selected = FileSelect(
-            self.main_frm,
-            "Video path",
-            title="Select a video file",
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        select_frames_frm = LabelFrame(
-            self.main_frm, text="Frames to be extracted", padx=5, pady=5
-        )
-        self.start_frm = Entry_Box(select_frames_frm, "Start Frame:", "10")
-        self.end_frm = Entry_Box(select_frames_frm, "End Frame:", "10")
-        run_btn = Button(
-            select_frames_frm,
-            text="Extract Frames",
-            command=lambda: self.start_frm_extraction(),
-        )
+        PopUpMixin.__init__(self, title="EXTRACT DEFINED FRAME RANGE FROM VIDEO")
+        self.video_file_selected = FileSelect(self.main_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=15)
+        select_frames_frm = LabelFrame(self.main_frm, text="FRAME RANGE TO BE EXTRACTED", padx=5, pady=5)
+        self.start_frm = Entry_Box(select_frames_frm, "START FRAME:", "15", validation='numeric')
+        self.end_frm = Entry_Box(select_frames_frm, "END FRAME:", "15", validation='numeric')
+        run_btn = Button(select_frames_frm,text="RUN", command=lambda: self.start_frm_extraction())
 
         self.video_file_selected.grid(row=0, column=0, sticky=NW, pady=10)
         select_frames_frm.grid(row=1, column=0, sticky=NW)
@@ -720,51 +710,34 @@ class ExtractSpecificFramesPopUp(PopUpMixin):
     def start_frm_extraction(self):
         start_frame = self.start_frm.entry_get
         end_frame = self.end_frm.entry_get
+        video_path = self.video_file_selected.file_path
+        check_file_exist_and_readable(file_path=video_path)
         check_int(name="Start frame", value=start_frame)
         check_int(name="End frame", value=end_frame)
         if int(end_frame) < int(start_frame):
-            raise FrameRangeError(
-                msg="SIMBA ERROR: The end frame ({}) cannot come before the start frame ({})".format(
-                    str(end_frame), str(start_frame)
-                ),
-                source=self.__class__.__name__,
-            )
-        video_meta_data = get_video_meta_data(
-            video_path=self.video_file_selected.file_path
-        )
+            raise FrameRangeError(msg=f"SIMBA ERROR: The end frame ({end_frame}) cannot come before the start frame ({start_frame})", source=self.__class__.__name__)
+        video_meta_data = get_video_meta_data(video_path=self.video_file_selected.file_path)
         if int(start_frame) > video_meta_data["frame_count"]:
-            raise FrameRangeError(
-                msg="SIMBA ERROR: The start frame ({}) is larger than the number of frames in the video ({})".format(
-                    str(start_frame), str(video_meta_data["frame_count"])
-                ),
-                source=self.__class__.__name__,
-            )
+            raise FrameRangeError(msg=f"SIMBA ERROR: The start frame ({start_frame}) is larger than the number of frames in the video ({video_meta_data['frame_count']})", source=self.__class__.__name__)
         if int(end_frame) > video_meta_data["frame_count"]:
-            raise FrameRangeError(
-                msg="SIMBA ERROR: The end frame ({}) is larger than the number of frames in the video ({})".format(
-                    str(end_frame), str(video_meta_data["frame_count"])
-                ),
-                source=self.__class__.__name__,
-            )
-        extract_frame_range(
-            file_path=self.video_file_selected.file_path,
-            start_frame=int(start_frame),
-            end_frame=int(end_frame),
-        )
+            raise FrameRangeError(msg=f"SIMBA ERROR: The end frame ({end_frame}) is larger than the number of frames in the video ({video_meta_data['frame_count']})", source=self.__class__.__name__)
+        extract_frame_range(file_path=video_path,
+                            start_frame=int(start_frame),
+                            end_frame=int(end_frame))
 
 
 class ExtractAllFramesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="EXTRACT ALL FRAMES", size=(200, 200))
+        PopUpMixin.__init__(self, title="EXTRACT ALL FRAMES")
         single_video_frm = CreateLabelFrameWithIcon(
             parent=self.main_frm,
-            header="Single video",
+            header="SINGLE VIDEO",
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.VIDEO_TOOLS.value,
         )
         video_path = FileSelect(
             single_video_frm,
-            "Video path",
+            "VIDEO PATH:",
             title="Select a video file",
             file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
         )
@@ -773,11 +746,16 @@ class ExtractAllFramesPopUp(PopUpMixin):
             text="Extract Frames (Single video)",
             command=lambda: extract_frames_single_video(file_path=video_path.file_path),
         )
-        multiple_videos_frm = LabelFrame(
-            self.main_frm, text="Multiple videos", padx=5, pady=5, font="bold"
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(
+            parent=self.main_frm,
+            header="MULTIPLE VIDEOS",
+            icon_name=Keys.DOCUMENTATION.value,
+            icon_link=Links.VIDEO_TOOLS.value,
         )
+
         folder_path = FolderSelect(
-            multiple_videos_frm, "Folder path", title=" Select video folder"
+            multiple_videos_frm, "DIRECTORY PATH:", title=" Select video folder"
         )
         multiple_video_btn = Button(
             multiple_videos_frm,
@@ -923,49 +901,34 @@ class ExtractSEQFramesPopUp(PopUpMixin):
 
 class MergeFrames2VideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="MERGE IMAGES TO VIDEO", size=(250, 250))
-        self.folder_path = FolderSelect(
-            self.main_frm, "IMAGE DIRECTORY", title="Select directory with frames: "
-        )
-        settings_frm = LabelFrame(
-            self.main_frm,
-            text="SETTINGS",
-            padx=5,
-            pady=5,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        self.img_format_entry_box = Entry_Box(
-            settings_frm, "IMAGE FORMAT (e.g. png): ", "20"
-        )
-        self.bitrate_entry_box = Entry_Box(
-            settings_frm, "BITRATE (e.g. 8000): ", "20", validation="numeric"
-        )
-        self.fps_entry = Entry_Box(settings_frm, "FPS: ", "20", validation="numeric")
+        PopUpMixin.__init__(self, title="MERGE IMAGE DIRECTORY TO VIDEO")
+        self.folder_path = FolderSelect(self.main_frm, "IMAGE DIRECTORY: ", title="Select directory with frames: ", lblwidth=25)
+        settings_frm = LabelFrame(self.main_frm, text="SETTINGS", padx=5, pady=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
+        self.fps_entry = Entry_Box(settings_frm, "VIDEO FPS: ", "25", validation="numeric")
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.quality_dropdown.setChoices(60)
+        self.format_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO FORMAT:", ['mp4', 'avi', 'mov'], labelwidth=25)
+        self.format_dropdown.setChoices('mp4')
         self.gpu_var = BooleanVar(value=False)
-        gpu_cb = Checkbutton(
-            settings_frm, text="Use GPU (decreased runtime)", variable=self.gpu_var
-        )
+        gpu_cb = Checkbutton(settings_frm, text="Use GPU (decreased runtime)", variable=self.gpu_var)
         run_btn = Button(settings_frm, text="Create Video", command=lambda: self.run())
-        settings_frm.grid(row=1, pady=10)
-        self.folder_path.grid(row=0, column=0, pady=10)
-        self.img_format_entry_box.grid(row=1, column=0, sticky=W)
-        self.fps_entry.grid(row=2, column=0, sticky=W, pady=5)
-        self.bitrate_entry_box.grid(row=3, column=0, sticky=W, pady=5)
-        gpu_cb.grid(row=4, column=0, sticky=W, pady=5)
-        run_btn.grid(row=5, column=1, sticky=E, pady=10)
+        settings_frm.grid(row=1, pady=10, sticky=NW)
+        self.folder_path.grid(row=0, column=0, pady=10, sticky=NW)
+        self.fps_entry.grid(row=1, column=0, sticky=NW, pady=5)
+        self.format_dropdown.grid(row=2, column=0, sticky=NW, pady=5)
+        self.quality_dropdown.grid(row=3, column=0, sticky=NW, pady=5)
+        gpu_cb.grid(row=4, column=0, sticky=NW, pady=5)
+        run_btn.grid(row=5, column=1, sticky=NW, pady=10)
 
     def run(self):
-        img_format = self.img_format_entry_box.entry_get
-        bitrate = self.bitrate_entry_box.entry_get
         fps = self.fps_entry.entry_get
-        _ = frames_to_movie(
-            directory=self.folder_path.folder_path,
-            fps=fps,
-            bitrate=bitrate,
-            img_format=img_format,
-            gpu=self.gpu_var.get(),
-        )
+        check_int(name='FPS', value=fps, min_value=1)
+        quality = int(self.quality_dropdown.getChoices())
+        frames_to_movie(directory=self.folder_path.folder_path,
+                                  fps=fps,
+                                  quality=quality,
+                                  out_format=self.format_dropdown.getChoices(),
+                                  gpu=self.gpu_var.get())
 
 
 class CreateGIFPopUP(PopUpMixin):
@@ -2327,6 +2290,278 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
         else:
             for file_path in self.video_paths.values():
                 threading.Thread(target=downsample_video(file_path=file_path, video_height=height, video_width=width, gpu=self.gpu)).start()
+
+class Convert2jpegPopUp(PopUpMixin):
+    def __init__(self):
+        super().__init__(title="CONVERT IMAGE DIRECTORY TO JPEG")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.quality_lbl = Label(settings_frm, text="JPEG QUALITY: ")
+        self.quality_scale = Scale(settings_frm, from_=1, to=100, orient=HORIZONTAL, length=200, label='JPEG QUALITY', fg='blue')
+        self.quality_scale.set(95)
+        self.create_run_frm(run_function=self.run, title='RUN JPEG CONVERSION')
+        settings_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
+        self.quality_scale.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self):
+        folder_path = self.selected_frame_dir.folder_path
+        check_if_dir_exists(in_dir=folder_path)
+        _ = convert_to_jpeg(directory=folder_path, quality=int(self.quality_scale.get()), verbose=True)
+
+class Convert2bmpPopUp(PopUpMixin):
+    def __init__(self):
+        super().__init__(title="CONVERT IMAGE DIRECTORY TO BMP")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.create_run_frm(run_function=self.run, title='RUN BMP CONVERSION')
+        settings_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self):
+        folder_path = self.selected_frame_dir.folder_path
+        check_if_dir_exists(in_dir=folder_path)
+        _ = convert_to_bmp(directory=folder_path, verbose=True)
+
+
+class Convert2WEBPPopUp(PopUpMixin):
+    def __init__(self):
+        super().__init__(title="CONVERT IMAGE DIRECTORY TO WEBP")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.quality_lbl = Label(settings_frm, text="WEBP QUALITY: ")
+        self.quality_scale = Scale(settings_frm, from_=1, to=100, orient=HORIZONTAL, length=200, label='WEBP QUALITY', fg='blue')
+        self.quality_scale.set(95)
+        self.create_run_frm(run_function=self.run, title='RUN WEBP CONVERSION')
+        settings_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
+        self.quality_scale.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self):
+        folder_path = self.selected_frame_dir.folder_path
+        check_if_dir_exists(in_dir=folder_path)
+        _ = convert_to_webp(directory=folder_path, quality=int(self.quality_scale.get()), verbose=True)
+
+class Convert2TIFFPopUp(PopUpMixin):
+    def __init__(self):
+        super().__init__(title="CONVERT IMAGE DIRECTORY TO TIFF")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.compression_dropdown = DropDownMenu(settings_frm, "COMPRESSION:", ['raw', 'tiff_deflate', 'tiff_lzw'], labelwidth=25)
+        self.compression_dropdown.setChoices('raw')
+        self.stack_dropdown = DropDownMenu(settings_frm, "STACK:", ['FALSE', 'TRUE'], labelwidth=25)
+        self.stack_dropdown.setChoices('FALSE')
+        self.create_run_frm(run_function=self.run, title='RUN TIFF CONVERSION')
+
+        settings_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
+        self.compression_dropdown.grid(row=1, column=0, sticky="NW")
+        self.stack_dropdown.grid(row=2, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self):
+        folder_path = self.selected_frame_dir.folder_path
+        check_if_dir_exists(in_dir=folder_path)
+        stack = str_2_bool(self.stack_dropdown.getChoices())
+        convert_to_tiff(directory=folder_path, compression=self.compression_dropdown.getChoices(), verbose=True, stack=stack)
+
+class Convert2PNGPopUp(PopUpMixin):
+    def __init__(self):
+        super().__init__(title="CONVERT IMAGE DIRECTORY TO PNG")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.create_run_frm(run_function=self.run, title='RUN PNG CONVERSION')
+        settings_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self):
+        folder_path = self.selected_frame_dir.folder_path
+        check_if_dir_exists(in_dir=folder_path)
+        _ = convert_to_png(directory=folder_path, verbose=True)
+
+
+
+class Convert2MP4PopUp(PopUpMixin):
+    """
+    :example:
+    >>> Convert2MP4PopUp()
+    """
+    def __init__(self):
+        super().__init__(title="CONVERT VIDEOS TO MP4")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.MP4_CODEC_LK = {'HEVC (H.265)': 'libx265', 'H.264 (AVC)': 'libx264', 'VP9': 'vp9', 'Guranteed powerpoint compatible': 'powerpoint'}
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.quality_dropdown.setChoices(60)
+        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MP4_CODEC_LK.keys()), labelwidth=25)
+        self.codec_dropdown.setChoices('HEVC (H.265)')
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.quality_dropdown.grid(row=0, column=0, sticky=NW)
+        self.codec_dropdown.grid(row=1, column=0, sticky=NW)
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+        single_video_frm.grid(row=1, column=0, sticky=NW)
+        self.selected_video.grid(row=0, column=0, sticky=NW)
+        single_video_run.grid(row=1, column=0, sticky=NW)
+
+        multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_video_run = Button(multiple_video_frm, text="RUN - VIDEO DIRECTORY", command=lambda: self.run(multiple=True))
+        multiple_video_frm.grid(row=2, column=0, sticky=NW)
+        self.selected_video_dir.grid(row=0, column=0, sticky=NW)
+        multiple_video_run.grid(row=1, column=0, sticky=NW)
+
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        if not multiple:
+            video_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=video_path)
+        else:
+            video_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=video_path, source=self.__class__.__name__)
+        codec = self.MP4_CODEC_LK[self.codec_dropdown.getChoices()]
+        quality = int(self.quality_dropdown.getChoices())
+        threading.Thread(target=convert_to_mp4(path=video_path, codec=codec, quality=quality))
+
+class Convert2AVIPopUp(PopUpMixin):
+    """
+    :example:
+    >>> Convert2AVIPopUp()
+    """
+
+    def __init__(self):
+        super().__init__(title="CONVERT VIDEOS TO AVI")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.AVI_CODEC_LK = {'XviD': 'xvid', 'DivX': 'divx', 'MJPEG': 'mjpeg'}
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.quality_dropdown.setChoices(60)
+        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.AVI_CODEC_LK.keys()), labelwidth=25)
+        self.codec_dropdown.setChoices('DivX')
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.quality_dropdown.grid(row=0, column=0, sticky=NW)
+        self.codec_dropdown.grid(row=1, column=0, sticky=NW)
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+        single_video_frm.grid(row=1, column=0, sticky=NW)
+        self.selected_video.grid(row=0, column=0, sticky=NW)
+        single_video_run.grid(row=1, column=0, sticky=NW)
+
+        multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_video_run = Button(multiple_video_frm, text="RUN - VIDEO DIRECTORY", command=lambda: self.run(multiple=True))
+        multiple_video_frm.grid(row=2, column=0, sticky=NW)
+        self.selected_video_dir.grid(row=0, column=0, sticky=NW)
+        multiple_video_run.grid(row=1, column=0, sticky=NW)
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        if not multiple:
+            video_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=video_path)
+        else:
+            video_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=video_path, source=self.__class__.__name__)
+        codec = self.AVI_CODEC_LK[self.codec_dropdown.getChoices()]
+        quality = int(self.quality_dropdown.getChoices())
+        threading.Thread(target=convert_to_avi(path=video_path, codec=codec, quality=quality))
+
+class Convert2WEBMPopUp(PopUpMixin):
+    """
+    :example:
+    >>> Convert2WEBMPopUp()
+    """
+
+    def __init__(self):
+        super().__init__(title="CONVERT VIDEOS TO WEBM")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.WEBM_CODEC_LK = {'VP8': 'vp8', 'VP9': 'vp9'}
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.quality_dropdown.setChoices(60)
+        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.WEBM_CODEC_LK.keys()), labelwidth=25)
+        self.codec_dropdown.setChoices('VP9')
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.quality_dropdown.grid(row=0, column=0, sticky=NW)
+        self.codec_dropdown.grid(row=1, column=0, sticky=NW)
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+        single_video_frm.grid(row=1, column=0, sticky=NW)
+        self.selected_video.grid(row=0, column=0, sticky=NW)
+        single_video_run.grid(row=1, column=0, sticky=NW)
+
+        multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_video_run = Button(multiple_video_frm, text="RUN - VIDEO DIRECTORY", command=lambda: self.run(multiple=True))
+        multiple_video_frm.grid(row=2, column=0, sticky=NW)
+        self.selected_video_dir.grid(row=0, column=0, sticky=NW)
+        multiple_video_run.grid(row=1, column=0, sticky=NW)
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        if not multiple:
+            video_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=video_path)
+        else:
+            video_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=video_path, source=self.__class__.__name__)
+        codec = self.WEBM_CODEC_LK[self.codec_dropdown.getChoices()]
+        quality = int(self.quality_dropdown.getChoices())
+        threading.Thread(target=convert_to_webm(path=video_path, codec=codec, quality=quality))
+
+class Convert2MOVPopUp(PopUpMixin):
+    """
+    :example:
+    >>> Convert2MOVPopUp()
+    """
+
+    def __init__(self):
+        super().__init__(title="CONVERT VIDEOS TO MOV")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.MOV_CODEC_LK = {'ProRes Kostya Samanta': 'prores',
+                             'Animation': 'animation',
+                             'CineForm': 'cineform',
+                             'DNxHD/DNxHR': 'dnxhd'}
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.quality_dropdown.setChoices(60)
+        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MOV_CODEC_LK.keys()), labelwidth=25)
+        self.codec_dropdown.setChoices('ProRes Kostya Samanta')
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.quality_dropdown.grid(row=0, column=0, sticky=NW)
+        self.codec_dropdown.grid(row=1, column=0, sticky=NW)
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+        single_video_frm.grid(row=1, column=0, sticky=NW)
+        self.selected_video.grid(row=0, column=0, sticky=NW)
+        single_video_run.grid(row=1, column=0, sticky=NW)
+
+        multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_video_run = Button(multiple_video_frm, text="RUN - VIDEO DIRECTORY", command=lambda: self.run(multiple=True))
+        multiple_video_frm.grid(row=2, column=0, sticky=NW)
+        self.selected_video_dir.grid(row=0, column=0, sticky=NW)
+        multiple_video_run.grid(row=1, column=0, sticky=NW)
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        if not multiple:
+            video_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=video_path)
+        else:
+            video_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=video_path, source=self.__class__.__name__)
+        codec = self.MOV_CODEC_LK[self.codec_dropdown.getChoices()]
+        quality = int(self.quality_dropdown.getChoices())
+        threading.Thread(target=convert_to_mov(path=video_path, codec=codec, quality=quality))
+
+
 
 
 
