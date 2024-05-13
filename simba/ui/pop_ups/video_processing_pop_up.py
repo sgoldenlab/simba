@@ -47,7 +47,9 @@ from simba.video_processors.video_processing import (
     VideoRotator, batch_convert_video_format, batch_create_frames,
     batch_video_to_greyscale, change_fps_of_multiple_videos, change_img_format,
     change_single_video_fps, clahe_enhance_video, clip_video_in_range,
-    clip_videos_by_frame_ids, convert_to_mp4,
+    clip_videos_by_frame_ids, convert_to_avi, convert_to_bmp, convert_to_jpeg,
+    convert_to_mov, convert_to_mp4, convert_to_png, convert_to_tiff,
+    convert_to_webm, convert_to_webp,
     convert_video_powerpoint_compatible_format, copy_img_folder,
     crop_multiple_videos, crop_multiple_videos_circles,
     crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
@@ -55,8 +57,7 @@ from simba.video_processors.video_processing import (
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, resize_videos_by_height,
     resize_videos_by_width, superimpose_frame_count, video_concatenator,
-    video_to_greyscale, convert_to_jpeg, convert_to_bmp, convert_to_webp, convert_to_tiff, convert_to_png,
-    convert_to_mov, convert_to_avi, convert_to_webm)
+    video_to_greyscale)
 
 sys.setrecursionlimit(10**7)
 
