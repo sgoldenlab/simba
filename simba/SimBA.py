@@ -121,20 +121,20 @@ from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
-    ChangeFpsMultipleVideosPopUp, ChangeFpsSingleVideoPopUp, CLAHEPopUp, ClipSingleVideoByFrameNumbers,
-    ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
-    ConvertROIDefinitionsPopUp, CreateGIFPopUP,
-    CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
-    DownsampleMultipleVideosPopUp, DownsampleSingleVideoPopUp,
+    ChangeFpsMultipleVideosPopUp, ChangeFpsSingleVideoPopUp, CLAHEPopUp,
+    ClipSingleVideoByFrameNumbers, ClipVideoPopUp, ConcatenatingVideosPopUp,
+    ConcatenatorPopUp, Convert2AVIPopUp, Convert2bmpPopUp, Convert2jpegPopUp,
+    Convert2MOVPopUp, Convert2MP4PopUp, Convert2PNGPopUp, Convert2TIFFPopUp,
+    Convert2WEBMPopUp, Convert2WEBPPopUp, ConvertROIDefinitionsPopUp,
+    CreateGIFPopUP, CropVideoCirclesPopUp, CropVideoPolygonsPopUp,
+    CropVideoPopUp, DownsampleMultipleVideosPopUp, DownsampleSingleVideoPopUp,
     DownsampleVideoPopUp, ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp,
     ExtractSEQFramesPopUp, ExtractSpecificFramesPopUp,
     GreyscaleSingleVideoPopUp, ImportFrameDirectoryPopUp,
     InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
     MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
-    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp,
-    Convert2TIFFPopUp, Convert2bmpPopUp, Convert2WEBPPopUp, Convert2jpegPopUp, Convert2PNGPopUp,
-    Convert2MP4PopUp, Convert2MOVPopUp, Convert2WEBMPopUp, Convert2AVIPopUp)
+    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
