@@ -3163,7 +3163,7 @@ def crossfade_two_videos(video_path_1: Union[str, os.PathLike],
     """
     Cross-fade two videos.
 
-    .. video:: _static/img/overlay_video_progressbar.webm
+    .. video:: _static/img/crossfade_two_videos.webm
        :loop:
 
     .. note::
