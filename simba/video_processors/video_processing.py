@@ -42,7 +42,8 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 InvalidFileTypeError, InvalidInputError,
                                 InvalidVideoFileError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError)
-from simba.utils.lookups import percent_to_crf_lookup, percent_to_qv_lk, get_ffmpeg_crossfade_methods
+from simba.utils.lookups import (get_ffmpeg_crossfade_methods,
+                                 percent_to_crf_lookup, percent_to_qv_lk)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
