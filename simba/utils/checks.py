@@ -746,9 +746,7 @@ def check_valid_extension(
         )
 
 
-def check_if_valid_img(
-    data: np.ndarray, source: Optional[str] = "", raise_error: Optional[bool] = True
-) -> Union[bool, None]:
+def check_if_valid_img(data: np.ndarray, source: Optional[str] = "", raise_error: Optional[bool] = True) -> Union[bool, None]:
     """
     Check if a variable is a valid image.
 
@@ -757,9 +755,7 @@ def check_if_valid_img(
     :parameter Optional[bool] raise_error: If True, raise InvalidInputError if invalid image representation. Else, return bool.
     """
 
-    check_instance(
-        source=check_if_valid_img.__name__, instance=data, accepted_types=np.ndarray
-    )
+    check_instance(source=check_if_valid_img.__name__, instance=data, accepted_types=np.ndarray)
     if (data.ndim != 2) and (data.ndim != 3):
         if raise_error:
             raise InvalidInputError(
