@@ -2081,7 +2081,7 @@ class BrightnessContrastPopUp(PopUpMixin):
     def run_video(self):
         video_path = self.selected_video.file_path
         check_file_exist_and_readable(file_path=video_path)
-        self.brightness, self.contrast = brightness_contrast_ui(video_path=video_path)
+        self.brightness, self.contrast = brightness_contrast_ui(data=video_path)
         self.video_paths = [video_path]
         self.apply()
 
@@ -2089,7 +2089,7 @@ class BrightnessContrastPopUp(PopUpMixin):
         video_dir = self.selected_dir.folder_path
         check_if_dir_exists(in_dir=video_dir, source=self.__class__.__name__)
         self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
-        self.brightness, self.contrast = brightness_contrast_ui(video_path=self.video_paths[0])
+        self.brightness, self.contrast = brightness_contrast_ui(data=self.video_paths[0])
         self.apply()
 
     def apply(self):
@@ -2106,6 +2106,7 @@ class BrightnessContrastPopUp(PopUpMixin):
         timer.stop_timer()
         stdout_success(f'{len(self.video_paths)} video(s) converted.', elapsed_time=timer.elapsed_time_str)
 
+#BrightnessContrastPopUp()
 
 class InteractiveClahePopUp(PopUpMixin):
     """
