@@ -37,7 +37,7 @@ class MultiCropper(object):
 
        `Expected GPU timesavings <https://github.com/sgoldenlab/simba/blob/master/docs/gpu_vs_cpu_video_processing_runtimes.md>`__.
 
-    .. image:: _static/img/multicrop.png
+    .. image:: _static/img/multicrop.gif
        :width: 700
        :align: center
 

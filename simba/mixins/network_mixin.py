@@ -137,12 +137,11 @@ class NetworkMixin(object):
         return G
 
     @staticmethod
-    def graph_page_rank(
-        graph: nx.Graph,
-        weights: Optional[str] = "weight",
-        alpha: Optional[float] = 0.85,
-        max_iter: Optional[int] = 100,
-    ) -> Dict[str, float]:
+    def graph_page_rank(graph: nx.Graph,
+                            weights: Optional[str] = "weight",
+                            alpha: Optional[float] = 0.85,
+                            max_iter: Optional[int] = 100) -> Dict[str, float]:
+
         """
         Calculate the PageRank of nodes in a graph.
 
@@ -181,11 +180,7 @@ class NetworkMixin(object):
         return nx.pagerank(graph, alpha=alpha, max_iter=max_iter, weight=weights)
 
     @staticmethod
-    def graph_katz_centrality(
-        graph: nx.Graph,
-        weights: Optional[str] = "weight",
-        alpha: Optional[float] = 0.85,
-    ):
+    def graph_katz_centrality(graph: nx.Graph, weights: Optional[str] = "weight", alpha: Optional[float] = 0.85,):
         """
         Katz centrality is an algorithm in NetworkX that measures the relative influence of a node in a network.
 
@@ -195,17 +190,9 @@ class NetworkMixin(object):
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> NetworkMixin().graph_katz_centrality(graph=graph)
         """
-        check_instance(
-            source=NetworkMixin.graph_katz_centrality.__name__,
-            instance=graph,
-            accepted_types=nx.Graph,
-        )
-        check_str(
-            name=f"{NetworkMixin.graph_katz_centrality.__name__} weights", value=weights
-        )
-        check_float(
-            name=f"{NetworkMixin.graph_katz_centrality.__name__} alpha", value=alpha
-        )
+        check_instance(source=NetworkMixin.graph_katz_centrality.__name__, instance=graph, accepted_types=nx.Graph,)
+        check_str(name=f"{NetworkMixin.graph_katz_centrality.__name__} weights", value=weights)
+        check_float(name=f"{NetworkMixin.graph_katz_centrality.__name__} alpha", value=alpha)
         edge_weights = tuple(
             set(
                 itertools.chain.from_iterable(
@@ -222,11 +209,9 @@ class NetworkMixin(object):
         return nx.katz_centrality_numpy(graph, alpha=alpha, weight=weights)
 
     @staticmethod
-    def graph_current_flow_closeness_centrality(
-        graph: nx.Graph, weights: Optional[str] = "weight"
-    ):
-        """
+    def graph_current_flow_closeness_centrality(graph: nx.Graph, weights: Optional[str] = "weight"):
 
+        """
         :example:
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)

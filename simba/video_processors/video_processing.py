@@ -2300,17 +2300,18 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
     return new_video_paths
 
 
-def create_blank_video(
-    path: Union[str, os.PathLike],
-    length: int,
-    width: int,
-    height: int,
-    color: Optional[str] = "black",
-    gpu: Optional[bool] = False,
-    verbose: Optional[bool] = False,
-) -> None:
+def create_blank_video(path: Union[str, os.PathLike],
+                       length: int,
+                       width: int,
+                       height: int,
+                       color: Optional[str] = "black",
+                       gpu: Optional[bool] = False,
+                       verbose: Optional[bool] = False) -> None:
     """
     Create a "blank" uni-colored video of specified size and length.
+
+    .. note::
+       Useful for when creating image mosaics with un-even number of videos and need a "fill" video in e.g. black color.
 
     :param Union[str, os.PathLike] path: Location where to store the blank video.
     :param int length: Length of the blank video in seconds.
@@ -3110,6 +3111,7 @@ def convert_to_mov(path: Union[str, os.PathLike],
 def overlay_video_progressbar(video_path: Union[str, os.PathLike],
                               bar_height: Optional[int] = 10,
                               color: Optional[str] = 'red',
+                              position: Optional[Literal['top', 'bottom']] = 'bottom',
                               save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
 
     """
@@ -3121,6 +3123,7 @@ def overlay_video_progressbar(video_path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] video_path: Directory containing video files or a single video file
     :param Optional[int] bar_height: The height of the progressbar in percent of the video height.
     :param Optional[str] color: The color of the progress bar. See simba.utils.lookups.get_color_dict keys for accepted names.
+    :param Optional[str] position: The position of the progressbar. Options: 'top', 'bottom'.
     :param Optional[Union[str, os.PathLike]] save_dir: If not None, then saves the videos in the passed directory. Else, in the same directry with the ``_progress_bar`` suffix.
     :return: None.
     """
@@ -3149,7 +3152,10 @@ def overlay_video_progressbar(video_path: Union[str, os.PathLike],
         print(f'Inserting progress bar on video {video_name}...')
         save_path = os.path.join(save_dir, f'{video_name}_progress_bar{ext}')
         check_int(name=f'{overlay_video_progressbar} height', value=bar_height, max_value=height, min_value=1)
-        cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:H-h:shortest=1" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+        if position == 'bottom':
+            cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:H-h:shortest=1" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+        else:
+            cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:{bar_height}-h:shortest=1" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(video_paths)} video(s) saved with progressbar in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=overlay_video_progressbar.__name__, )
@@ -3326,6 +3332,118 @@ def inset_overlay_video(video_path: Union[str, os.PathLike],
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'{len(video_paths)} overlay video(s) saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
+
+def roi_blurbox(video_path: Union[str, os.PathLike],
+                blur_level: Optional[float] = 0.02,
+                invert: Optional[bool] = False,
+                save_path: Optional[Union[str, os.PathLike]] = None) -> None:
+
+    """
+    Blurs either the selected or unselected portion of a user-specified region-of-interest according to the passed blur level.
+    Higher blur levels produces more opaque regions.
+
+    .. video:: _static/img/roi_blurbox.webm
+       :loop:
+
+    :param Union[str, os.PathLike] video_path: The path to the video on disk
+    :param Optional[float] blur_level: The level of the blur as a ratio 0-1.0.
+    :param Optional[bool] invert: If True, blurs the unselected region. If False, blurs the selected region.
+    :param Optional[Union[str, os.PathLike]] save_path: The location where to save the blurred video. If None, then saves the blurred video in the same directory as the input video with the ``_blurred`` suffix.
+    :return: None
+
+    :example:
+    >>> roi_blurbox(video_path='/Users/simon/Downloads/1_LH_clipped_downsampled.mp4', blur_level=0.2, invert=True)
+    """
+
+    check_ffmpeg_available(raise_error=True)
+    timer = SimbaTimer(start=True)
+    check_float(name=f'{roi_blurbox.__name__} blur_level', value=blur_level, min_value=0.001, max_value=1.0)
+    check_file_exist_and_readable(file_path=video_path)
+    dir, video_name, ext = get_fn_ext(video_path)
+    _ = get_video_meta_data(video_path=video_path)
+    if save_path is not None:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=roi_blurbox.__name__)
+    else:
+        save_path = os.path.join(dir, f'{video_name}_blurred{ext}')
+    roi_selector = ROISelector(path=video_path)
+    roi_selector.run()
+    w, h = roi_selector.width, roi_selector.height
+    top_left_x, top_left_y = roi_selector.top_left
+    max_blur_value = int(min(w, h) / 2) / 2
+    blur_level = int(max_blur_value * blur_level)
+    if not invert:
+        cmd = f'ffmpeg -i "{video_path}" -filter_complex "[0:v]crop={w}:{h}:{top_left_x}:{top_left_y},boxblur={int(blur_level)}:10[fg]; [0:v][fg]overlay={top_left_x}:{top_left_y}[v]" -map "[v]" "{save_path}" -loglevel error -stats -hide_banner -y'
+    else:
+        cmd = f'ffmpeg -i "{video_path}" -filter_complex "[0:v]boxblur={blur_level}[bg];[0:v]crop={w}:{h}:{top_left_x}:{top_left_y}[fg];[bg][fg]overlay={top_left_x}:{top_left_y}" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    stdout_success(msg=f'Blurred {video_name} video saved in {save_path}', elapsed_time=timer.elapsed_time_str)
+
+
+def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
+                             font_size: Optional[int] = 30,
+                             font_color: Optional[str] = 'white',
+                             font_border_color: Optional[str] = 'black',
+                             font_border_width: Optional[int] = 2,
+                             position: Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']] = 'top_left',
+                             save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
+    """
+    Superimposes elapsed time on the given video file(s) and saves the modified video(s).
+
+    .. video:: _static/img/superimpose_elapsed_time.webm
+       :loop:
+
+    :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
+    :param Optional[int] font_size: Font size for the elapsed time text. Default 30.
+    :param Optional[str] font_color:  Font color for the elapsed time text. Default white
+    :param Optional[str] font_border_color: Font border color for the elapsed time text. Default black.
+    :param Optional[int] font_border_width: Font border width for the elapsed time text in pixels. Default 2.
+    :param Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']] position: Position where the elapsed time text will be superimposed. Default ``top_left``.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory where the modified video(s) will be saved. If not provided, the directory of the input video(s) will be used.
+    :return: None
+
+    :example:
+    >>> superimpose_elapsed_time(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_4/1.mp4', position='middle_top', font_color='black', font_border_color='pink', font_border_width=5, font_size=30)
+    """
+
+    check_ffmpeg_available(raise_error=True)
+    timer = SimbaTimer(start=True)
+    POSITIONS = ['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']
+    check_str(name=f'{superimpose_elapsed_time.__name__} position', value=position, options=POSITIONS)
+    check_int(name=f'{superimpose_elapsed_time.__name__} font_size', value=font_size, min_value=1)
+    check_int(name=f'{superimpose_elapsed_time.__name__} font_border_width', value=font_border_width, min_value=1)
+    font_color = ''.join(filter(str.isalnum, font_color)).lower()
+    font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
+    if os.path.isfile(video_path):
+        video_paths = [video_path]
+    elif os.path.isdir(video_path):
+        video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
+    else:
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path',
+                                source=superimpose_elapsed_time.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir)
+    else:
+        save_dir = os.path.dirname(video_paths[0])
+    for file_cnt, video_path in enumerate(video_paths):
+        _, video_name, ext = get_fn_ext(video_path)
+        print(f'Superimposing time {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
+        save_path = os.path.join(save_dir, f'{video_name}_time_superimposed{ext}')
+        if position == POSITIONS[0]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[1]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[2]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[3]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[4]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        else:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    stdout_success(msg=f'Super-imposed time on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',
