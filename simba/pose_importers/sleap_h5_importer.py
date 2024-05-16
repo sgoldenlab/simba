@@ -1,7 +1,8 @@
 #### MODIFIED FROM @Toshea111 - https://github.com/Toshea111/sleap/blob/develop/docs/notebooks/Convert_HDF5_to_CSV_updated.ipynb
-from typing import Union, List, Dict, Any
 import io
 import os
+from typing import Any, Dict, List, Union
+
 import h5py
 import numpy as np
 import pandas as pd
@@ -9,13 +10,16 @@ import pandas as pd
 from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.utils.enums import Methods, TagNames, Options
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_str)
+from simba.utils.enums import Methods, Options, TagNames
 from simba.utils.errors import BodypartColumnNotFoundError
-from simba.utils.printing import (SimbaTimer, log_event, stdout_success, stdout_warning)
+from simba.utils.printing import (SimbaTimer, log_event, stdout_success,
+                                  stdout_warning)
 from simba.utils.read_write import (clean_sleap_file_name,
                                     find_all_videos_in_project, get_fn_ext,
                                     get_video_meta_data, write_df)
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists, check_str, check_if_keys_exist_in_dict
 
 
 class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
