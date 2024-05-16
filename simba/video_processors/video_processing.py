@@ -3555,9 +3555,8 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     """
     Subtract the background from a video.
 
-    .. image:: _static/img/video_bg_subtraction.webm
-       :width: 1000
-       :align: center
+    .. video:: _static/img/video_bg_subtraction.webm
+       :loop:
 
     .. note::
        If  ``bg_video_path`` is passed, that video will be used to parse the background. If None, ``video_path`` will be use dto parse background.
@@ -3581,7 +3580,7 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     :return: None.
 
     :example:
-    >>> video_bg_substraction(video_path='/Users/simon/Downloads/1_LH_cropped.mp4', bg_start_time='00:00:00', bg_end_time='00:00:10', bg_color=(0, 106, 167), fg_color=(254, 204, 2))
+    >>> video_bg_subtraction(video_path='/Users/simon/Downloads/1_LH_cropped.mp4', bg_start_time='00:00:00', bg_end_time='00:00:10', bg_color=(0, 106, 167), fg_color=(254, 204, 2))
     """
 
     timer = SimbaTimer(start=True)
