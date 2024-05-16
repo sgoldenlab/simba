@@ -1571,10 +1571,9 @@ def find_max_vertices_coordinates(
 
     return int(max_x), int(max_y)
 
-
 def clean_sleap_file_name(filename: str) -> str:
     """
-    Clean a SLEAP input filename by removing '.analysis' suffix and project name prefix to match orginal video name.
+    Clean a SLEAP input filename by removing '.analysis' suffix, the video number, and project name prefix, to match orginal video name.
 
      .. note::
        Modified from `vtsai881 <https://github.com/vtsai881>`_.
@@ -1589,11 +1588,13 @@ def clean_sleap_file_name(filename: str) -> str:
     >>> 'videoname.h5'
     """
 
-    SLEAP_CSV_SUBSTR = ".analysis"
-    if (SLEAP_CSV_SUBSTR in filename) and ("_" in filename):
-        return filename.replace(filename.split("_")[0] + "_", "").replace(
-            SLEAP_CSV_SUBSTR, ""
-        )
+    if (".analysis" in filename.lower()) and ("_" in filename) and (filename.count('.') >= 3):
+        filename_parts = filename.split('.')
+        video_num_name = filename_parts[2]
+        if '_' in video_num_name:
+            return video_num_name.split('_', 1)[1]
+        else:
+            return filename
     else:
         return filename
 

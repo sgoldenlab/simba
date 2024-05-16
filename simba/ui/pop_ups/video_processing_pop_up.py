@@ -1916,16 +1916,10 @@ class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
 
 class ClipMultipleVideosByTimestamps(PopUpMixin):
 
-    def __init__(
-        self, data_dir: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]
-    ):
+    def __init__(self, data_dir: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]):
 
-        check_if_dir_exists(
-            in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False
-        )
-        check_if_dir_exists(
-            in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True
-        )
+        check_if_dir_exists(in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False)
+        check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
         self.video_paths = find_all_videos_in_directory(
             directory=data_dir, as_dict=True, raise_error=True
         )
