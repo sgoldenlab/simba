@@ -3542,7 +3542,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
         return img
 
 
-def video_bg_substraction(video_path: Union[str, os.PathLike],
+def video_bg_subtraction(video_path: Union[str, os.PathLike],
                           bg_video_path: Optional[Union[str, os.PathLike]] = None,
                           bg_start_frm: Optional[int] = None,
                           bg_end_frm: Optional[int] = None,
@@ -3554,7 +3554,7 @@ def video_bg_substraction(video_path: Union[str, os.PathLike],
     """
     Subtract the background from a video.
 
-    .. image:: _static/img/video_bg_substraction.gif
+    .. image:: _static/img/video_bg_subtraction.webm
        :width: 1000
        :align: center
 
