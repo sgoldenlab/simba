@@ -2174,7 +2174,7 @@ class Statistics(FeatureExtractionMixin):
         """
         An implementation of the Isolation Forest algorithm for outlier detection.
 
-        .. image:: _static/img/isolation_forest.png.png
+        .. image:: _static/img/isolation_forest.png
            :width: 700
            :align: center
 
