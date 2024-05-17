@@ -1,9 +1,9 @@
 __author__ = "Simon Nilsson"
 
 
+import functools
 import glob
 import multiprocessing
-import functools
 import os
 import platform
 import shutil
@@ -12,7 +12,7 @@ import time
 from copy import deepcopy
 from datetime import datetime
 from tkinter import *
-from typing import List, Optional, Tuple, Union, Dict, Any
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -49,9 +49,9 @@ from simba.utils.lookups import (get_ffmpeg_crossfade_methods,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
-    find_all_videos_in_directory, find_core_cnt,
+    concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    read_config_entry, read_config_file, read_frm_of_video, concatenate_videos_in_folder)
+    read_config_entry, read_config_file, read_frm_of_video)
 from simba.utils.warnings import (FileExistWarning, InValidUserInputWarning,
                                   SameInputAndOutputWarning)
 from simba.video_processors.extract_frames import video_to_frames
