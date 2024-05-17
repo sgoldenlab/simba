@@ -3079,6 +3079,7 @@ def overlay_video_progressbar(video_path: Union[str, os.PathLike],
     Overlay a progress bar on a directory of videos or a single video.
 
     .. video:: _static/img/overlay_video_progressbar.webm
+       :width: 700
        :loop:
 
     :param Union[str, os.PathLike] video_path: Directory containing video files or a single video file
@@ -3181,6 +3182,7 @@ def watermark_video(video_path: Union[str, os.PathLike],
     Watermark a video file or a directory of video files with specified watermark size, opacity, and location.
 
     .. video:: _static/img/watermark_video.webm
+       :width: 900
        :loop:
 
     :param Union[str, os.PathLike] video_path: The path to the video file.
@@ -3353,6 +3355,7 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     Superimposes elapsed time on the given video file(s) and saves the modified video(s).
 
     .. video:: _static/img/superimpose_elapsed_time.webm
+       :width: 900
        :loop:
 
     :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
