@@ -3643,10 +3643,9 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
     """
     Subtract the background from a video using multiprocessing.
 
-    .. video:: _static/img/video_bg_subtraction.webm
+    .. video:: _static/img/video_bg_substraction_mp.webm
        :width: 900
        :autoplay:
-       :nocontrols:
        :loop:
 
     .. note::
