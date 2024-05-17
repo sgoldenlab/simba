@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 
 import glob
 import multiprocessing
+import functools
 import os
 import platform
 import shutil
@@ -10,9 +11,8 @@ import subprocess
 import time
 from copy import deepcopy
 from datetime import datetime
-from pathlib import Path
 from tkinter import *
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Dict, Any
 
 import cv2
 import numpy as np
@@ -51,7 +51,7 @@ from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    read_config_entry, read_config_file, read_frm_of_video)
+    read_config_entry, read_config_file, read_frm_of_video, concatenate_videos_in_folder)
 from simba.utils.warnings import (FileExistWarning, InValidUserInputWarning,
                                   SameInputAndOutputWarning)
 from simba.video_processors.extract_frames import video_to_frames
@@ -3584,6 +3584,139 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     cap.release()
     timer.stop_timer()
     stdout_success(msg=f'Background subtracted from {video_name} and saved at {save_path}', elapsed_time=timer.elapsed_time)
+
+def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
+                   video_path: Union[str, os.PathLike],
+                   bg_frm: np.ndarray,
+                   bg_clr: Tuple[int, int, int],
+                   fg_clr: Tuple[int, int, int],
+                   video_meta_data: Dict[str, Any],
+                   temp_dir: Union[str, os.PathLike]):
+
+    batch, frm_range = frm_range[0], frm_range[1]
+    start_frm, current_frm, end_frm = frm_range[0], frm_range[0], frm_range[-1]
+    cap = cv2.VideoCapture(video_path)
+    fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+    save_path = os.path.join(temp_dir, f"{batch}.mp4")
+    cap.set(1, start_frm)
+    writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'], (video_meta_data['width'], video_meta_data['height']))
+    bg = np.full_like(bg_frm, bg_clr)
+    bg = bg[:, :, ::-1]
+    dir, video_name, ext = get_fn_ext(filepath=video_path)
+    while current_frm <= end_frm:
+        ret, frm = cap.read()
+        if not ret:
+            break
+        diff = cv2.absdiff(frm, bg_frm)
+        b, g, r = diff[:, :, 0], diff[:, :, 1], diff[:, :, 2]
+        gray_diff = 0.2989 * r + 0.5870 * g + 0.1140 * b
+        gray_diff = gray_diff.astype(np.uint8)  # Ensure the type is uint8
+        mask = np.where(gray_diff > 50, 255, 0).astype(np.uint8)
+        if fg_clr is None:
+            fg = cv2.bitwise_and(frm, frm, mask=mask)
+            result = cv2.add(bg, fg)
+        else:
+            mask_inv = cv2.bitwise_not(mask)
+            fg_clr_img = np.full_like(frm, fg_clr)
+            fg_clr_img = fg_clr_img[:, :, ::-1]
+            fg_clr_img = cv2.bitwise_and(fg_clr_img, fg_clr_img, mask=mask)
+            result = cv2.bitwise_and(bg, bg, mask=mask_inv)
+            result = cv2.add(result, fg_clr_img)
+        writer.write(result)
+        current_frm += 1
+        print(f'Background subtraction frame {current_frm}/{video_meta_data["frame_count"]} (Video: {video_name})')
+    writer.release()
+    cap.release()
+    return batch
+
+def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
+                             bg_video_path: Optional[Union[str, os.PathLike]] = None,
+                             bg_start_frm: Optional[int] = None,
+                             bg_end_frm: Optional[int] = None,
+                             bg_start_time: Optional[str] = None,
+                             bg_end_time: Optional[str] = None,
+                             bg_color: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                             fg_color: Optional[Tuple[int, int, int]] = None,
+                             save_path: Optional[Union[str, os.PathLike]] = None,
+                             core_cnt: Optional[int] = -1) -> None:
+
+    """
+    Subtract the background from a video using multiprocessing.
+
+    .. video:: _static/img/video_bg_subtraction.webm
+       :width: 900
+       :autoplay:
+       :nocontrols:
+       :loop:
+
+    .. note::
+        For single core alternative, see ``simba.video_processors.video_processing.video_bg_subtraction``
+
+       If  ``bg_video_path`` is passed, that video will be used to parse the background. If None, ``video_path`` will be use dto parse background.
+       Either pass ``start_frm`` and ``end_frm`` OR ``start_time`` and ``end_time`` OR pass all four arguments as None.
+       Those two arguments will be used to slice the background video, and the sliced part is used to parse the background.
+
+       For example, in the scenario where there is **no** animal in the ``video_path`` video for the first 20s, then the first 20s can be used to parse the background.
+       In this scenario, ``bg_video_path`` can be passed as ``None`` and bg_start_time and bg_end_time can be ``00:00:00`` and ``00:00:20``, repectively.
+
+       In the scenario where there **is** animal(s) in the entire ``video_path`` video, pass ``bg_video_path`` as a path to a video recording the arena without the animals.
+
+    :param Union[str, os.PathLike] video_path: The path to the video to remove the background from.
+    :param Optional[Union[str, os.PathLike]] bg_video_path: Path to the video which contains a segment with the background only. If None, then ``video_path`` will be used.
+    :param Optional[int] bg_start_frm: The first frame in the background video to use when creating a representative background image. Default: None.
+    :param Optional[int] bg_end_frm: The last frame in the background video to use when creating a representative background image. Default: None.
+    :param Optional[str] bg_start_time: The start timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
+    :param Optional[str] bg_end_time: The end timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
+    :param Optional[Tuple[int, int, int]] bg_color: The RGB color of the moving objects in the output video. Defaults to None, which represents the original colors of the moving objects.
+    :param Optional[Tuple[int, int, int]] fg_color: The RGB color of the background output video. Defaults to black (0, 0, 0).
+    :param Optional[Union[str, os.PathLike]] save_path: The patch to where to save the output video where the background is removed. If None, saves the output video in the same directory as the input video with the ``_bg_subtracted`` suffix. Default: None.
+    :param Optional[int] core_cnt: The number of cores to use. Defaults to -1 representing all available cores.
+    :return: None.
+
+    :example:
+    >>> video_bg_substraction_mp(video_path='/Users/simon/Downloads/1_LH.mp4', bg_start_time='00:00:00', bg_end_time='00:00:10', bg_color=(0, 0, 0), fg_color=(255, 255, 255))
+    """
+
+    timer = SimbaTimer(start=True)
+    check_file_exist_and_readable(file_path=video_path)
+    if bg_video_path is None:
+        bg_video_path = deepcopy(video_path)
+    video_meta_data = get_video_meta_data(video_path=video_path)
+    dir, video_name, ext = get_fn_ext(filepath=video_path)
+    if save_path is None:
+        save_path = os.path.join(dir, f'{video_name}_bg_subtracted{ext}')
+    dt = datetime.now().strftime("%Y%m%d%H%M%S")
+    temp_dir = os.path.join(dir, f'temp_{video_name}_{dt}')
+    os.makedirs(temp_dir)
+    check_int(name=f'{video_bg_substraction_mp.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0])
+    if core_cnt == -1: core_cnt = find_core_cnt()[0]
+    bg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
+    bg_frm = cv2.resize(bg_frm, (video_meta_data['width'], video_meta_data['height']))
+    bg_frm = bg_frm[:, :, ::-1]
+    frm_list = np.array_split(list(range(0, video_meta_data['frame_count'])), core_cnt)
+    frm_data = []
+    for c, i in enumerate(frm_list):
+        frm_data.append((c, i))
+    with multiprocessing.Pool(core_cnt, maxtasksperchild=9000) as pool:
+        constants = functools.partial(_bg_remover_mp,
+                                      video_path=video_path,
+                                      bg_frm=bg_frm,
+                                      bg_clr=bg_color,
+                                      fg_clr=fg_color,
+                                      video_meta_data=video_meta_data,
+                                      temp_dir=temp_dir)
+        for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=1)):
+            print(f'Frame batch {result+1} completed...')
+        pool.terminate()
+        pool.join()
+
+    print(f"Joining {video_name} multiprocessed video...")
+    concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True)
+    timer.stop_timer()
+    stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
+
+
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',

@@ -468,8 +468,8 @@ class Statistics(FeatureExtractionMixin):
 
            Its range is from 0 to positive infinity. When the KL divergence is zero, it indicates that the two distributions are identical. As the KL divergence increases, it signifies an increasing difference between the distributions.
 
-           .. math::
-              \text{KL}(P || Q) = \sum{P(x) \log{\left(\frac{P(x)}{Q(x)}\right)}}
+        .. math::
+           \text{KL}(P || Q) = \sum{P(x) \log{\left(\frac{P(x)}{Q(x)}\right)}}
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
