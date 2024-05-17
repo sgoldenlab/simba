@@ -18,12 +18,10 @@ from simba.utils.read_write import get_fn_ext, read_config_file
 
 class ROI_image_class:
 
-    def __init__(
-        self,
-        config_path: str,
-        video_path: str,
-        ROI_define_instance: object,
-    ):
+    def __init__(self,
+                 config_path: str,
+                 video_path: str,
+                 ROI_define_instance: object):
 
         config = read_config_file(config_path=config_path)
         self.roi_define = ROI_define_instance
@@ -66,6 +64,7 @@ class ROI_image_class:
         self.working_frame = deepcopy(self.orig_frame)
         cv2.namedWindow("Define shape", cv2.WINDOW_NORMAL)
         cv2.imshow("Define shape", self.working_frame)
+        cv2.waitKey(100)
         self.out_rectangles = []
         self.out_circles = []
         self.out_polygon = []
@@ -184,7 +183,7 @@ class ROI_image_class:
                     )
                     self.center_status = True
                     cv2.imshow("Define shape", self.working_frame)
-                    cv2.waitKey(1000)
+                    cv2.waitKey(100)
                 else:
                     self.border_x, self.border_y = int(x), int(y)
                     self.radius = int(
@@ -214,15 +213,17 @@ class ROI_image_class:
                             "Ear_tag_size": int(circle_info["Shape_ear_tag_size"]),
                         }
                     )
-                    self.insert_all_ROIs_into_image()
                     self.not_done = False
-                    cv2.waitKey(33)
+            else:
+                pass
 
-        while True:
-            cv2.setMouseCallback("Define shape", draw_circle_callback)
-            cv2.waitKey(800)
-            if self.not_done == False:
+        cv2.setMouseCallback("Define shape", draw_circle_callback)
+        cv2.waitKey(400)
+        while self.not_done:
+            cv2.waitKey(1)
+            if not self.not_done:
                 break
+        self.insert_all_ROIs_into_image()
 
     def draw_polygon(self):
         self.polygon_pts = []
@@ -239,7 +240,7 @@ class ROI_image_class:
                 )
                 self.polygon_pts.append([int(x), int(y)])
                 cv2.imshow("Define shape", self.working_frame)
-                cv2.waitKey(33)
+                cv2.waitKey(100)
 
         def initiate_x_y_callback():
             while True:
@@ -447,6 +448,7 @@ class ROI_image_class:
                 self.closest_roi["Thickness"],
             )
             cv2.imshow("Define shape", self.working_frame)
+            cv2.waitKey(100)
 
         def find_closest_ROI_tag():
             self.closest_roi, self.closest_tag, self.closest_dist = {}, {}, np.inf
@@ -502,6 +504,7 @@ class ROI_image_class:
             self.zoomed_img = self.orig_frame
             self.current_zoom = 100
             cv2.imshow("Define shape", self.orig_frame)
+            cv2.waitKey(100)
 
         if interact_method == "move_shape":
             self.insert_all_ROIs_into_image(ROI_ear_tags=True)
@@ -725,6 +728,7 @@ class ROI_image_class:
 
         cv2.namedWindow("Define shape", cv2.WINDOW_NORMAL)
         cv2.imshow("Define shape", self.working_frame)
+        cv2.waitKey(100)
 
     def destroy_windows(self):
         cv2.destroyAllWindows()

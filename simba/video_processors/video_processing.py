@@ -838,15 +838,13 @@ def remove_beginning_of_video(
 # remove_beginning_of_video(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_frame_no.mp4', time=10, gpu=False)
 
 
-def clip_video_in_range(
-    file_path: Union[str, os.PathLike],
-    start_time: str,
-    end_time: str,
-    out_dir: Optional[Union[str, os.PathLike]] = None,
-    overwrite: Optional[bool] = False,
-    include_clip_time_in_filename: Optional[bool] = False,
-    gpu: Optional[bool] = False,
-) -> None:
+def clip_video_in_range(file_path: Union[str, os.PathLike],
+                        start_time: str,
+                        end_time: str,
+                        out_dir: Optional[Union[str, os.PathLike]] = None,
+                        overwrite: Optional[bool] = False,
+                        include_clip_time_in_filename: Optional[bool] = False,
+                        gpu: Optional[bool] = False) -> None:
     """
     Clip video within a specific range. The result is stored in the same directory as the
     input file with the ``_clipped.mp4`` suffix.
@@ -2798,11 +2796,7 @@ def mixed_mosaic_concatenator(
         )
 
 
-def clip_videos_by_frame_ids(
-    file_paths: List[Union[str, os.PathLike]],
-    frm_ids: List[List[int]],
-    save_dir: Optional[Union[str, os.PathLike]] = None,
-):
+def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]], frm_ids: List[List[int]], save_dir: Optional[Union[str, os.PathLike]] = None):
     """
     Clip videos specified by frame IDs (numbers).
 
@@ -2818,50 +2812,20 @@ def clip_videos_by_frame_ids(
     """
 
     timer = SimbaTimer(start=True)
-    check_valid_lst(
-        data=file_paths,
-        source=clip_videos_by_frame_ids.__name__,
-        valid_dtypes=(str,),
-        min_len=1,
-    )
-    check_valid_lst(
-        data=frm_ids,
-        source=clip_videos_by_frame_ids.__name__,
-        valid_dtypes=(list,),
-        exact_len=len(file_paths),
-    )
+    check_valid_lst(data=file_paths,source=clip_videos_by_frame_ids.__name__,valid_dtypes=(str,),min_len=1)
+    check_valid_lst(data=frm_ids,source=clip_videos_by_frame_ids.__name__,valid_dtypes=(list,), exact_len=len(file_paths))
     for cnt, i in enumerate(frm_ids):
-        check_valid_lst(
-            data=i,
-            source=f"clip_videos_by_frame_count.__name_ frm_ids {cnt}",
-            valid_dtypes=(int,),
-            exact_len=2,
-        )
+        check_valid_lst(data=i, source=f"clip_videos_by_frame_count.__name_ frm_ids {cnt}", valid_dtypes=(int,), exact_len=2)
         if i[0] >= i[1]:
-            raise FrameRangeError(
-                msg=f"Start frame for video {i} is after or the same as the end frame ({i[0]}, {i[1]})",
-                source=clip_videos_by_frame_ids.__name__,
-            )
+            raise FrameRangeError( msg=f"Start frame for video {i} is after or the same as the end frame ({i[0]}, {i[1]})", source=clip_videos_by_frame_ids.__name__)
         if (i[0] < 0) or (i[1] < 1):
-            raise FrameRangeError(
-                msg=f"Start frame has to be at least 0 and end frame has to be at least 1",
-                source=clip_videos_by_frame_ids.__name__,
-            )
+            raise FrameRangeError(msg=f"Start frame has to be at least 0 and end frame has to be at least 1", source=clip_videos_by_frame_ids.__name__)
     video_meta_data = [get_video_meta_data(video_path=x) for x in file_paths]
     for i in range(len(video_meta_data)):
-        if (frm_ids[i][0] > video_meta_data[i]["frame_count"]) or (
-            frm_ids[i][1] > video_meta_data[i]["frame_count"]
-        ):
-            raise FrameRangeError(
-                msg=f'Video {i+1} has {video_meta_data[i]["frame_count"]} frames, cannot use start and end frame {frm_ids[i]}',
-                source=clip_videos_by_frame_ids.__name__,
-            )
+        if (frm_ids[i][0] > video_meta_data[i]["frame_count"]) or (frm_ids[i][1] > video_meta_data[i]["frame_count"]):
+            raise FrameRangeError(msg=f'Video {i+1} has {video_meta_data[i]["frame_count"]} frames, cannot use start and end frame {frm_ids[i]}', source=clip_videos_by_frame_ids.__name__)
     if save_dir is not None:
-        check_if_dir_exists(
-            in_dir=save_dir,
-            source=clip_videos_by_frame_ids.__name__,
-            create_if_not_exist=True,
-        )
+        check_if_dir_exists(in_dir=save_dir, source=clip_videos_by_frame_ids.__name__, create_if_not_exist=True)
     for cnt, file_path in enumerate(file_paths):
         video_timer = SimbaTimer(start=True)
         dir, video_name, ext = get_fn_ext(filepath=file_path)
@@ -2871,24 +2835,19 @@ def clip_videos_by_frame_ids(
             out_path = os.path.join(save_dir, os.path.basename(file_path))
         else:
             out_path = os.path.join(dir, f"{video_name}_{s_f}_{e_f}{ext}")
-        cmd = f'ffmpeg -i "{file_path}" -vf "trim={s_f}:{e_f},setpts=PTS-STARTPTS" -c:v libx264 -c:a aac -loglevel error -stats "{out_path}" -y'
+        cmd = f'ffmpeg -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -an "{out_path}" -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         video_timer.stop_timer()
-        print(
-            f"Video {video_name} complete (elapsed time {video_timer.elapsed_time_str}s)"
-        )
+        print(f"Video {video_name} complete (elapsed time {video_timer.elapsed_time_str}s)")
     timer.stop_timer()
     if save_dir is None:
-        stdout_success(
-            msg=f"{len(file_paths)} video(s) clipped by frame",
-            elapsed_time=timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"{len(file_paths)} video(s) clipped by frame", elapsed_time=timer.elapsed_time_str)
     else:
-        stdout_success(
-            msg=f"{len(file_paths)} video(s) clipped by frame and saved in {save_dir}",
-            elapsed_time=timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"{len(file_paths)} video(s) clipped by frame and saved in {save_dir}", elapsed_time=timer.elapsed_time_str)
 
+# file_paths = ['/Users/simon/Downloads/1_LH.mp4']
+# frm_ids = [[1, 10]]
+# clip_videos_by_frame_ids(file_paths=file_paths, frm_ids=frm_ids)
 
 
 def convert_to_mp4(path: Union[str, os.PathLike],
@@ -3282,6 +3241,7 @@ def inset_overlay_video(video_path: Union[str, os.PathLike],
     Inset a video overlay on a second video with specified size, opacity, and location.
 
     .. video:: _static/img/inset_overlay_video.webm
+       :width: 700
        :loop:
 
     :param Union[str, os.PathLike] video_path: The path to the video file.
@@ -3623,8 +3583,7 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     writer.release()
     cap.release()
     timer.stop_timer()
-    stdout_success(msg=f'Background subtracted from {video_name} and saved at {save_path}',
-                   elapsed_time=timer.elapsed_time)
+    stdout_success(msg=f'Background subtracted from {video_name} and saved at {save_path}', elapsed_time=timer.elapsed_time)
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',

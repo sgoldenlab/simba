@@ -1775,14 +1775,21 @@ class ClipSingleVideoByFrameNumbers(PopUpMixin):
         )
 
 
-# ClipSingleVideoByFrameNumbers()
+#ClipSingleVideoByFrameNumbers()
 
 
 class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
 
-    def __init__(
-        self, data_dir: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]
-    ):
+    def __init__(self,
+                 data_dir: Union[str, os.PathLike],
+                 save_dir: Union[str, os.PathLike]):
+        """
+        :param data_dir: Directory containing video files to be clipped.
+        :param save_dir: Directory where to save the clipped videos.
+
+        :example:
+        >>> ClipMultipleVideosByFrameNumbersPopUp(data_dir='/Users/simon/Downloads/test__/test__', save_dir='/Users/simon/Downloads/test__/res')
+        """
 
         check_if_dir_exists(
             in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False
@@ -1831,6 +1838,7 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
             self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
+        self.main_frm.mainloop()
 
     def run(self):
         video_paths, frame_ids = [], []
