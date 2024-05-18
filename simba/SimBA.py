@@ -1939,14 +1939,10 @@ class App(object):
         sys.stdout = StdRedirector(self.txt)
 
         if OS.PYTHON_VER.value != "3.6":
-            PythonVersionWarning(
-                msg=f"SimBA is not extensively tested beyond python 3.6. You are using python {OS.PYTHON_VER.value}. If you encounter errors in python>3.6, please report them on GitHub or Gitter and we will fix! (links in the help toolbar)",
-                source=self.__class__.__name__,
-            )
+            PythonVersionWarning(msg=f"SimBA is not extensively tested beyond python 3.6. You are using python {OS.PYTHON_VER.value}. If you encounter errors in python>3.6, please report them on GitHub or Gitter (links in the help toolbar) and we will work together to fix the issues!", source=self.__class__.__name__)
 
         if not check_ffmpeg_available():
-            FFMpegNotFoundWarning(
-                msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer',
+            FFMpegNotFoundWarning(msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer',
                 source=self.__class__.__name__,
             )
 
