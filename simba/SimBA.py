@@ -134,7 +134,8 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
     MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
-    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp)
+    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp,
+    SuperimposeTimerPopUp, SuperimposeWatermarkPopUp, SuperimposeProgressBarPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1777,18 +1778,14 @@ class App(object):
             command=VideoRotatorPopUp,
         )
 
-        video_process_menu.add_command(
-            label="Superimpose frame numbers on video",
-            compound="left",
-            image=self.menu_icons["trash"]["img"],
-            command=lambda: SuperImposeFrameCountPopUp(),
-        )
-        video_process_menu.add_command(
-            label="Temporal join videos",
-            compound="left",
-            image=self.menu_icons["stopwatch"]["img"],
-            command=VideoTemporalJoinPopUp,
-        )
+        superimpose_menu = Menu(menu)
+        superimpose_menu.add_command(label="Superimpose frame numbers on videos", command=SuperImposeFrameCountPopUp)
+        superimpose_menu.add_command(label="Superimpose watermark on videos", command=SuperimposeWatermarkPopUp)
+        superimpose_menu.add_command(label="Superimpose timer on videos", command=SuperimposeTimerPopUp)
+        superimpose_menu.add_command(label="Superimpose progress-bar on videos", command=SuperimposeProgressBarPopUp)
+        video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu)
+
+        video_process_menu.add_command(label="Temporal join videos", compound="left", image=self.menu_icons["stopwatch"]["img"], command=VideoTemporalJoinPopUp)
 
         video_process_menu.add_cascade(
             label="Visualize pose-estimation in folder...",

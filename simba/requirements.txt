@@ -1,16 +1,19 @@
+pip==21.2.2;python_version=="3.6"
+pip==24.0;python_version>="3.9"
+setuptools==58.0.4;python_version=="3.6"
+setuptools==69.5.1;python_version>="3.9"
 Pillow
 pyyaml == 5.3.1
-shapely == 1.7.1;python_version=="3.6"
+shapely == 1.8.0;python_version=="3.6"
 shapely;python_version>="3.9"
 dtreeviz == 0.8.1
 eli5 == 0.10.1
-graphviz == 0.11
 imblearn == 0.0
 imgaug == 0.4.0
 imutils == 0.5.2
-matplotlib >= 3.0.3
+matplotlib == 3.3.4
 numpy==1.18.1;python_version=="3.6"
-numpy;python_version>="3.9"
+numpy==1.26.4;python_version>="3.9"
 opencv-python == 3.4.5.20;python_version=="3.6"
 opencv-python;python_version>="3.9"
 pandas==0.25.3;python_version=="3.6"
@@ -18,7 +21,7 @@ pandas;python_version>="3.9"
 scikit-image
 scipy
 kaleido
-seaborn == 0.9.0
+seaborn == 0.11.0
 scikit-learn
 tabulate == 0.8.3;python_version=="3.6"
 tabulate == 0.9.0;python_version>="3.9"

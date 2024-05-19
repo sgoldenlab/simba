@@ -3069,7 +3069,7 @@ def convert_to_mov(path: Union[str, os.PathLike],
     stdout_success(msg=f"{len(file_paths)} video(s) converted to MOV and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_mov.__name__, )
 
 
-def overlay_video_progressbar(video_path: Union[str, os.PathLike],
+def superimpose_video_progressbar(video_path: Union[str, os.PathLike],
                               bar_height: Optional[int] = 10,
                               color: Optional[str] = 'red',
                               position: Optional[Literal['top', 'bottom']] = 'bottom',
@@ -3100,7 +3100,7 @@ def overlay_video_progressbar(video_path: Union[str, os.PathLike],
         video_path = find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True)
         video_paths = list(video_path.values())
     else:
-        raise InvalidInputError(msg='{} is not a valid file path or directory path.', source=overlay_video_progressbar.__name__)
+        raise InvalidInputError(msg='{} is not a valid file path or directory path.', source=superimpose_video_progressbar.__name__)
     if save_dir is not None:
         check_if_dir_exists(in_dir=save_dir)
     else:
@@ -3113,14 +3113,14 @@ def overlay_video_progressbar(video_path: Union[str, os.PathLike],
         _, video_name, ext = get_fn_ext(filepath=video_path)
         print(f'Inserting progress bar on video {video_name}...')
         save_path = os.path.join(save_dir, f'{video_name}_progress_bar{ext}')
-        check_int(name=f'{overlay_video_progressbar} height', value=bar_height, max_value=height, min_value=1)
+        check_int(name=f'{superimpose_video_progressbar} height', value=bar_height, max_value=height, min_value=1)
         if position == 'bottom':
             cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:H-h:shortest=1" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         else:
             cmd = f'ffmpeg -i "{video_path}" -filter_complex "color=c={color}:s={width}x{bar_height}[bar];[0][bar]overlay=-w+(w/{video_length})*t:{bar_height}-h:shortest=1" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(msg=f"{len(video_paths)} video(s) saved with progressbar in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=overlay_video_progressbar.__name__, )
+    stdout_success(msg=f"{len(video_paths)} video(s) saved with progressbar in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=superimpose_video_progressbar.__name__, )
 
 def crossfade_two_videos(video_path_1: Union[str, os.PathLike],
                          video_path_2: Union[str, os.PathLike],
@@ -3185,7 +3185,7 @@ def watermark_video(video_path: Union[str, os.PathLike],
        :width: 900
        :loop:
 
-    :param Union[str, os.PathLike] video_path: The path to the video file.
+    :param Union[str, os.PathLike] video_path: The path to the video file or path to directory with video files.
     :param Union[str, os.PathLike] watermark_path: The path to the watermark .png file.
     :param Optional[str] position: The position of the watermark. Options: 'top_left', 'bottom_right', 'top_right', 'bottom_left', 'center'
     :param Optional[float] opacity: The opacity of the watermark as a value between 0-1.0. 1.0 meaning the same as input image. Default: 0.5.
@@ -3373,7 +3373,7 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
 
     check_ffmpeg_available(raise_error=True)
     timer = SimbaTimer(start=True)
-    POSITIONS = ['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']
+    POSITIONS = ['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']
     check_str(name=f'{superimpose_elapsed_time.__name__} position', value=position, options=POSITIONS)
     check_int(name=f'{superimpose_elapsed_time.__name__} font_size', value=font_size, min_value=1)
     check_int(name=f'{superimpose_elapsed_time.__name__} font_border_width', value=font_border_width, min_value=1)
