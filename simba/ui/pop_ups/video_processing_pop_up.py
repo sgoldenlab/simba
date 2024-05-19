@@ -5,11 +5,11 @@ import os
 import subprocess
 import sys
 import threading
-import numpy as np
 from datetime import datetime
 from tkinter import *
 from typing import Optional, Union
 
+import numpy as np
 from PIL import Image, ImageTk
 
 import simba
@@ -58,8 +58,9 @@ from simba.video_processors.video_processing import (
     crop_single_video_polygon, downsample_video, extract_frame_range,
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, resize_videos_by_height,
-    resize_videos_by_width, superimpose_frame_count, video_concatenator,
-    video_to_greyscale, watermark_video, superimpose_video_progressbar, superimpose_elapsed_time)
+    resize_videos_by_width, superimpose_elapsed_time, superimpose_frame_count,
+    superimpose_video_progressbar, video_concatenator, video_to_greyscale,
+    watermark_video)
 
 sys.setrecursionlimit(10**7)
 
