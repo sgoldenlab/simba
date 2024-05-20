@@ -26,13 +26,13 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
-                                check_that_hhmmss_start_is_before_end)
+                                check_that_hhmmss_start_is_before_end, check_str)
 from simba.utils.data import convert_roi_definitions
 from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
 from simba.utils.errors import (CountError, FrameRangeError, InvalidInputError,
                                 MixedMosaicError, NoChoosenClassifierError,
                                 NoFilesFoundError, NotDirectoryError)
-from simba.utils.lookups import get_color_dict
+from simba.utils.lookups import get_color_dict, get_fonts
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -2635,8 +2635,9 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
-
+        self.font_dict = get_fonts()
         self.location_dropdown = DropDownMenu(settings_frm, "TIMER LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
+        self.font_dropdown = DropDownMenu(settings_frm, "TIMER FONT:", list(self.font_dict.keys()), labelwidth=25)
         self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(20, 100, 5)), labelwidth=25)
         self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
@@ -2644,16 +2645,18 @@ class SuperimposeTimerPopUp(PopUpMixin):
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.font_size_dropdown.setChoices(20)
+        self.font_dropdown.setChoices('Arial')
         self.font_color_dropdown.setChoices('White')
         self.font_border_dropdown.setChoices('Black')
         self.font_border_width_dropdown.setChoices(2)
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
-        self.font_size_dropdown.grid(row=1, column=0, sticky=NW)
-        self.font_color_dropdown.grid(row=2, column=0, sticky=NW)
-        self.font_border_dropdown.grid(row=3, column=0, sticky=NW)
-        self.font_border_width_dropdown.grid(row=4, column=0, sticky=NW)
+        self.font_dropdown.grid(row=1, column=0, sticky=NW)
+        self.font_size_dropdown.grid(row=2, column=0, sticky=NW)
+        self.font_color_dropdown.grid(row=3, column=0, sticky=NW)
+        self.font_border_dropdown.grid(row=4, column=0, sticky=NW)
+        self.font_border_width_dropdown.grid(row=5, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TIMER", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2676,6 +2679,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         loc = self.location_dropdown.getChoices()
         loc = self.LOCATIONS[loc]
         font_size = int(self.font_size_dropdown.getChoices())
+        font = self.font_dropdown.getChoices()
         font_clr = self.font_color_dropdown.getChoices()
         font_border_clr = self.font_border_dropdown.getChoices()
         font_border_width = int(self.font_border_width_dropdown.getChoices())
@@ -2687,6 +2691,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
             check_if_dir_exists(in_dir=data_path)
 
         threading.Thread(target=superimpose_elapsed_time(video_path=data_path,
+                                                         font=font,
                                                          font_size=font_size,
                                                          font_color=font_clr,
                                                          font_border_color=font_border_clr,
@@ -2795,8 +2800,10 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
+        self.font_dict = get_fonts()
 
         self.location_dropdown = DropDownMenu(settings_frm, "VIDEO NAME TEXT LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
+        self.font_dropdown = DropDownMenu(settings_frm, "FONT:", list(self.font_dict.keys()), labelwidth=25)
         self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(5, 105, 5)), labelwidth=25)
         self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
@@ -2804,16 +2811,18 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.font_size_dropdown.setChoices(20)
+        self.font_dropdown.setChoices('Arial')
         self.font_color_dropdown.setChoices('White')
         self.font_border_dropdown.setChoices('Black')
         self.font_border_width_dropdown.setChoices(2)
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
-        self.font_size_dropdown.grid(row=1, column=0, sticky=NW)
-        self.font_color_dropdown.grid(row=2, column=0, sticky=NW)
-        self.font_border_dropdown.grid(row=3, column=0, sticky=NW)
-        self.font_border_width_dropdown.grid(row=4, column=0, sticky=NW)
+        self.font_dropdown.grid(row=1, column=0, sticky=NW)
+        self.font_size_dropdown.grid(row=2, column=0, sticky=NW)
+        self.font_color_dropdown.grid(row=3, column=0, sticky=NW)
+        self.font_border_dropdown.grid(row=4, column=0, sticky=NW)
+        self.font_border_width_dropdown.grid(row=5, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE VIDEO NAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2836,6 +2845,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         loc = self.location_dropdown.getChoices()
         loc = self.LOCATIONS[loc]
         font_size = int(self.font_size_dropdown.getChoices())
+        font = self.font_dropdown.getChoices()
         font_clr = self.font_color_dropdown.getChoices()
         font_border_clr = self.font_border_dropdown.getChoices()
         font_border_width = int(self.font_border_width_dropdown.getChoices())
@@ -2847,11 +2857,12 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
             check_if_dir_exists(in_dir=data_path)
 
         threading.Thread(target=superimpose_video_names(video_path=data_path,
-                                                         font_size=font_size,
-                                                         font_color=font_clr,
-                                                         font_border_color=font_border_clr,
-                                                         font_border_width=font_border_width,
-                                                         position=loc)).start()
+                                                        font=font,
+                                                        font_size=font_size,
+                                                        font_color=font_clr,
+                                                        font_border_color=font_border_clr,
+                                                        font_border_width=font_border_width,
+                                                        position=loc)).start()
 
 class SuperimposeTextPopUp(PopUpMixin):
     def __init__(self):
@@ -2859,9 +2870,11 @@ class SuperimposeTextPopUp(PopUpMixin):
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
+        self.font_dict = get_fonts()
 
         self.location_dropdown = DropDownMenu(settings_frm, "TEXT LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
         self.text_eb = Entry_Box(parent=settings_frm, labelwidth=25, entry_box_width=50, fileDescription='TEXT:')
+        self.font_dropdown = DropDownMenu(settings_frm, "FONT:", list(self.font_dict.keys()), labelwidth=25)
         self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(5, 105, 5)), labelwidth=25)
         self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
@@ -2869,6 +2882,7 @@ class SuperimposeTextPopUp(PopUpMixin):
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.font_size_dropdown.setChoices(20)
+        self.font_dropdown.setChoices('Arial')
         self.font_color_dropdown.setChoices('White')
         self.font_border_dropdown.setChoices('Black')
         self.font_border_width_dropdown.setChoices(2)
@@ -2876,10 +2890,11 @@ class SuperimposeTextPopUp(PopUpMixin):
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
         self.text_eb.grid(row=1, column=0, sticky=NW)
-        self.font_size_dropdown.grid(row=2, column=0, sticky=NW)
-        self.font_color_dropdown.grid(row=3, column=0, sticky=NW)
-        self.font_border_dropdown.grid(row=4, column=0, sticky=NW)
-        self.font_border_width_dropdown.grid(row=5, column=0, sticky=NW)
+        self.font_dropdown.grid(row=2, column=0, sticky=NW)
+        self.font_size_dropdown.grid(row=3, column=0, sticky=NW)
+        self.font_color_dropdown.grid(row=4, column=0, sticky=NW)
+        self.font_border_dropdown.grid(row=5, column=0, sticky=NW)
+        self.font_border_width_dropdown.grid(row=6, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TEXT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2903,6 +2918,7 @@ class SuperimposeTextPopUp(PopUpMixin):
         loc = self.LOCATIONS[loc]
         text = self.text_eb.entry_get
         check_str(name='text', value=text)
+        font = self.font_dropdown.getChoices()
         font_size = int(self.font_size_dropdown.getChoices())
         font_clr = self.font_color_dropdown.getChoices()
         font_border_clr = self.font_border_dropdown.getChoices()
@@ -2916,6 +2932,7 @@ class SuperimposeTextPopUp(PopUpMixin):
 
         threading.Thread(target=superimpose_freetext(video_path=data_path,
                                                      text=text,
+                                                     font=font,
                                                      font_size=font_size,
                                                      font_color=font_clr,
                                                      font_border_color=font_border_clr,

@@ -45,7 +45,7 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 InvalidVideoFileError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError)
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods,
-                                 percent_to_crf_lookup, percent_to_qv_lk)
+                                 percent_to_crf_lookup, percent_to_qv_lk, get_fonts)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -3344,6 +3344,7 @@ def roi_blurbox(video_path: Union[str, os.PathLike],
 
 
 def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
+                             font: Optional[str] = 'Arial',
                              font_size: Optional[int] = 30,
                              font_color: Optional[str] = 'white',
                              font_border_color: Optional[str] = 'black',
@@ -3378,6 +3379,9 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     check_int(name=f'{superimpose_elapsed_time.__name__} font_border_width', value=font_border_width, min_value=1)
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
+    font_dict = get_fonts()
+    check_str(name='font', value=font, options=tuple(font_dict.keys()))
+    font_path = font_dict[font]
     if os.path.isfile(video_path):
         video_paths = [video_path]
     elif os.path.isdir(video_path):
@@ -3394,17 +3398,17 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
         print(f'Superimposing time {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
         save_path = os.path.join(save_dir, f'{video_name}_time_superimposed{ext}')
         if position == POSITIONS[0]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[1]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[2]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[3]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[4]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         else:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed time on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
@@ -3718,6 +3722,7 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
 
 
 def superimpose_video_names(video_path: Union[str, os.PathLike],
+                            font: Optional[str] = 'Arial',
                             font_size: Optional[int] = 30,
                             font_color: Optional[str] = 'white',
                             font_border_color: Optional[str] = 'black',
@@ -3750,6 +3755,9 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
     check_str(name=f'{superimpose_video_names.__name__} position', value=position, options=POSITIONS)
     check_int(name=f'{superimpose_video_names.__name__} font_size', value=font_size, min_value=1)
     check_int(name=f'{superimpose_video_names.__name__} font_border_width', value=font_border_width, min_value=1)
+    font_dict = get_fonts()
+    check_str(name='font', value=font, options=tuple(font_dict.keys()))
+    font_path = font_dict[font]
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
     if os.path.isfile(video_path):
@@ -3767,23 +3775,24 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
         print(f'Superimposing video name on {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
         save_path = os.path.join(save_dir, f'{video_name}_video_name_superimposed{ext}')
         if position == POSITIONS[0]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={video_name}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[1]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[2]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={video_name}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[3]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[4]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         else:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed video name on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
 def superimpose_freetext(video_path: Union[str, os.PathLike],
                          text: str,
+                         font: Optional[str] = 'Arial',
                          font_size: Optional[int] = 30,
                          font_color: Optional[str] = 'white',
                          font_border_color: Optional[str] = 'black',
@@ -3815,6 +3824,9 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
     check_int(name=f'{superimpose_freetext.__name__} font_size', value=font_size, min_value=1)
     check_int(name=f'{superimpose_freetext.__name__} font_border_width', value=font_border_width, min_value=1)
     check_str(name=f'{superimpose_freetext.__name__} text', value=text)
+    font_dict = get_fonts()
+    check_str(name='font', value=font, options=tuple(font_dict.keys()))
+    font_path = font_dict[font]
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
     if os.path.isfile(video_path):
@@ -3832,17 +3844,17 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
         print(f'Superimposing video name on {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
         save_path = os.path.join(save_dir, f'{video_name}_text_superimposed{ext}')
         if position == POSITIONS[0]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={text}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[1]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[2]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={text}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[3]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         elif position == POSITIONS[4]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         else:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed free-text on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)

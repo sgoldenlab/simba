@@ -5,17 +5,21 @@ import os
 import re
 import struct
 import sys
+from pathlib import Path
+import platform
 from multiprocessing import Lock, Process, Value
 from typing import Dict, List, Tuple, Union
 
 import pandas as pd
 from matplotlib import cm
+import  matplotlib.font_manager
 
 import simba
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists)
-from simba.utils.enums import Methods, Paths
+from simba.utils.enums import Methods, Paths, OS
 from simba.utils.read_write import get_fn_ext
+from simba.utils.warnings import NoDataFoundWarning
 
 
 class SharedCounter(object):
@@ -531,6 +535,14 @@ def video_quality_to_preset_lookup() -> Dict[str, str]:
     """
     return {"Low": "fast", "Medium": "medium", "High": "slow"}
 
+def get_fonts():
+    """ Returns a dictionary with all fonts available in OS, with the font name as key and font path as value"""
+    font_dict = {f.name: f.fname for f in matplotlib.font_manager.fontManager.ttflist if not f.name.startswith('.')}
+    if len(font_dict) == 0:
+        NoDataFoundWarning(msg='No fonts found on disk using matplotlib.font_manager', source=get_fonts.__name__)
+    if platform.system() == OS.WINDOWS.value:
+        font_dict = {key: str(Path(value.replace('C:', '')).as_posix()) for key, value in font_dict.items()}
+    return font_dict
 
 def get_log_config():
     return {
