@@ -3732,7 +3732,7 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
     """
     Superimposes the video name on the given video file(s) and saves the modified video(s).
 
-    .. video:: _static/img/superimpose_elapsed_time.webm
+    .. video:: _static/img/superimpose_video_names.webm
        :width: 900
        :loop:
 
@@ -3802,7 +3802,7 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
     """
     Superimposes passed text on the given video file(s) and saves the modified video(s).
 
-    .. video:: _static/img/superimpose_elapsed_time.webm
+    .. video:: _static/img/superimpose_freetext.webm
        :width: 900
        :loop:
 
