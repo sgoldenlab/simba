@@ -120,7 +120,7 @@ from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
-    BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
+    BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
     ChangeFpsMultipleVideosPopUp, ChangeFpsSingleVideoPopUp, CLAHEPopUp,
     ClipSingleVideoByFrameNumbers, ClipVideoPopUp, ConcatenatingVideosPopUp,
     ConcatenatorPopUp, Convert2AVIPopUp, Convert2bmpPopUp, Convert2jpegPopUp,
@@ -134,9 +134,10 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
     MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
-    SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp,
-    SuperimposeTimerPopUp, SuperimposeWatermarkPopUp, SuperimposeProgressBarPopUp, SuperimposeVideoPopUp, SuperimposeVideoNamesPopUp,
-    SuperimposeTextPopUp, BoxBlurPopUp)
+    SuperImposeFrameCountPopUp, SuperimposeProgressBarPopUp,
+    SuperimposeTextPopUp, SuperimposeTimerPopUp, SuperimposeVideoNamesPopUp,
+    SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, VideoRotatorPopUp,
+    VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
