@@ -26,7 +26,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
-                                check_that_hhmmss_start_is_before_end, check_str)
+                                check_str,
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.data import convert_roi_definitions
 from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
 from simba.utils.errors import (CountError, FrameRangeError, InvalidInputError,
