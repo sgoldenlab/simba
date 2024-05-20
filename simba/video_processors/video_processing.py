@@ -3233,12 +3233,12 @@ def watermark_video(video_path: Union[str, os.PathLike],
     timer.stop_timer()
     stdout_success(msg=f'{len(video_paths)} watermarked video(s) saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
-def inset_overlay_video(video_path: Union[str, os.PathLike],
-                        overlay_video_path: Union[str, os.PathLike],
-                        position: Optional[Literal['top_left', 'bottom_right', 'top_right', 'bottom_left', 'center']] = 'top_left',
-                        opacity: Optional[float] = 0.5,
-                        scale: Optional[float] = 0.05,
-                        save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
+def superimpose_overlay_video(video_path: Union[str, os.PathLike],
+                              overlay_video_path: Union[str, os.PathLike],
+                              position: Optional[Literal['top_left', 'bottom_right', 'top_right', 'bottom_left', 'center']] = 'top_left',
+                              opacity: Optional[float] = 0.5,
+                              scale: Optional[float] = 0.05,
+                              save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
     """
     Inset a video overlay on a second video with specified size, opacity, and location.
 
@@ -3255,14 +3255,14 @@ def inset_overlay_video(video_path: Union[str, os.PathLike],
     :return: None
 
     :example:
-    >>> inset_overlay_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/multi_animal_dlc_two_c57/project_folder/videos/watermark/Together_1_powerpointready.mp4', overlay_video_path='/Users/simon/Desktop/splash.png', position='top_left', opacity=1.0, scale=0.2)
+    >>> superimpose_overlay_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/multi_animal_dlc_two_c57/project_folder/videos/watermark/Together_1_powerpointready.mp4', overlay_video_path='/Users/simon/Desktop/splash.png', position='top_left', opacity=1.0, scale=0.2)
     """
 
     timer = SimbaTimer(start=True)
     POSITIONS = ['top_left', 'bottom_right', 'top_right', 'bottom_left', 'center']
-    check_float(name=f'{inset_overlay_video.__name__} opacity', value=opacity, min_value=0.001, max_value=1.0)
-    check_float(name=f'{inset_overlay_video.__name__} scale', value=scale, min_value=0.001, max_value=0.999)
-    check_str(name=f'{inset_overlay_video.__name__} position', value=position, options=POSITIONS)
+    check_float(name=f'{superimpose_overlay_video.__name__} opacity', value=opacity, min_value=0.001, max_value=1.0)
+    check_float(name=f'{superimpose_overlay_video.__name__} scale', value=scale, min_value=0.001, max_value=0.999)
+    check_str(name=f'{superimpose_overlay_video.__name__} position', value=position, options=POSITIONS)
     check_file_exist_and_readable(file_path=video_path)
     check_file_exist_and_readable(file_path=overlay_video_path)
 
@@ -3272,7 +3272,7 @@ def inset_overlay_video(video_path: Union[str, os.PathLike],
         video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
     else:
         raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path',
-                                source=inset_overlay_video.__name__)
+                                source=superimpose_overlay_video.__name__)
     if save_dir is not None:
         check_if_dir_exists(in_dir=save_dir)
     else:
@@ -3282,17 +3282,16 @@ def inset_overlay_video(video_path: Union[str, os.PathLike],
         _ = get_video_meta_data(video_path=video_path)
         print(f'Inserting overlay onto {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
         out_path = os.path.join(save_dir, f'{video_name}_inset_overlay{video_ext}')
-        print(out_path)
         if position == POSITIONS[0]:
-            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=0:0" "{out_path}" -y'
+            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=0:0" "{out_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[1]:
-            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=W-w:H-h" "{out_path}" -y'
+            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=W-w:H-h" "{out_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[2]:
-            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=W-w:0" "{out_path}" -y'
+            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=W-w:0" "{out_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[3]:
-            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=0:H-h" "{out_path}" -y'
+            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=0:H-h" "{out_path}" -loglevel error -stats -hide_banner -y'
         else:
-            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=(W-w)/2:(H-h)/2" "{out_path}" -y'
+            cmd = f'ffmpeg -i "{video_path}" -i "{overlay_video_path}" -filter_complex "[1:v]scale=iw*{scale}:-1,format=rgba,colorchannelmixer=aa={opacity}[inset];[0:v][inset]overlay=(W-w)/2:(H-h)/2" "{out_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'{len(video_paths)} overlay video(s) saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
@@ -3718,6 +3717,135 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
 
+def superimpose_video_names(video_path: Union[str, os.PathLike],
+                            font_size: Optional[int] = 30,
+                            font_color: Optional[str] = 'white',
+                            font_border_color: Optional[str] = 'black',
+                            font_border_width: Optional[int] = 2,
+                            position: Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']] = 'top_left',
+                            save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
+    """
+    Superimposes the video name on the given video file(s) and saves the modified video(s).
+
+    .. video:: _static/img/superimpose_elapsed_time.webm
+       :width: 900
+       :loop:
+
+    :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
+    :param Optional[int] font_size: Font size for the video name text. Default 30.
+    :param Optional[str] font_color:  Font color for the video name text. Default white
+    :param Optional[str] font_border_color: Font border color for the video name text. Default black.
+    :param Optional[int] font_border_width: Font border width for the video name text in pixels. Default 2.
+    :param Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']] position: Position where the video name will be superimposed. Default ``top_left``.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory where the modified video(s) will be saved. If not provided, the directory of the input video(s) will be used.
+    :return: None
+
+    :example:
+    >>> superimpose_video_names(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_4/1.mp4', position='middle_top', font_color='black', font_border_color='pink', font_border_width=5, font_size=30)
+    """
+
+    check_ffmpeg_available(raise_error=True)
+    timer = SimbaTimer(start=True)
+    POSITIONS = ['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']
+    check_str(name=f'{superimpose_video_names.__name__} position', value=position, options=POSITIONS)
+    check_int(name=f'{superimpose_video_names.__name__} font_size', value=font_size, min_value=1)
+    check_int(name=f'{superimpose_video_names.__name__} font_border_width', value=font_border_width, min_value=1)
+    font_color = ''.join(filter(str.isalnum, font_color)).lower()
+    font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
+    if os.path.isfile(video_path):
+        video_paths = [video_path]
+    elif os.path.isdir(video_path):
+        video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
+    else:
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path', source=superimpose_video_names.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir)
+    else:
+        save_dir = os.path.dirname(video_paths[0])
+    for file_cnt, video_path in enumerate(video_paths):
+        _, video_name, ext = get_fn_ext(video_path)
+        print(f'Superimposing video name on {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
+        save_path = os.path.join(save_dir, f'{video_name}_video_name_superimposed{ext}')
+        if position == POSITIONS[0]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[1]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[2]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[3]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[4]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        else:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={video_name}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    stdout_success(msg=f'Super-imposed video name on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
+
+def superimpose_freetext(video_path: Union[str, os.PathLike],
+                         text: str,
+                         font_size: Optional[int] = 30,
+                         font_color: Optional[str] = 'white',
+                         font_border_color: Optional[str] = 'black',
+                         font_border_width: Optional[int] = 2,
+                         position: Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']] = 'top_left',
+                         save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
+    """
+    Superimposes passed text on the given video file(s) and saves the modified video(s).
+
+    .. video:: _static/img/superimpose_elapsed_time.webm
+       :width: 900
+       :loop:
+
+    :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
+    :param str text: The text to overlay on the video
+    :param Optional[int] font_size: Font size for the text. Default 30.
+    :param Optional[str] font_color:  Font color for text. Default white
+    :param Optional[str] font_border_color: Font border color for the text. Default black.
+    :param Optional[int] font_border_width: Font border width for the text in pixels. Default 2.
+    :param Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']] position: Position where the text will be superimposed. Default ``top_left``.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory where the modified video(s) will be saved. If not provided, the directory of the input video(s) will be used.
+    :return: None
+    """
+
+    check_ffmpeg_available(raise_error=True)
+    timer = SimbaTimer(start=True)
+    POSITIONS = ['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']
+    check_str(name=f'{superimpose_freetext.__name__} position', value=position, options=POSITIONS)
+    check_int(name=f'{superimpose_freetext.__name__} font_size', value=font_size, min_value=1)
+    check_int(name=f'{superimpose_freetext.__name__} font_border_width', value=font_border_width, min_value=1)
+    check_str(name=f'{superimpose_freetext.__name__} text', value=text)
+    font_color = ''.join(filter(str.isalnum, font_color)).lower()
+    font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
+    if os.path.isfile(video_path):
+        video_paths = [video_path]
+    elif os.path.isdir(video_path):
+        video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
+    else:
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path', source=superimpose_video_names.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir)
+    else:
+        save_dir = os.path.dirname(video_paths[0])
+    for file_cnt, video_path in enumerate(video_paths):
+        _, video_name, ext = get_fn_ext(video_path)
+        print(f'Superimposing video name on {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
+        save_path = os.path.join(save_dir, f'{video_name}_text_superimposed{ext}')
+        if position == POSITIONS[0]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[1]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[2]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[3]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        elif position == POSITIONS[4]:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        else:
+            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile=Arial.ttf:text={text}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    stdout_success(msg=f'Super-imposed free-text on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',

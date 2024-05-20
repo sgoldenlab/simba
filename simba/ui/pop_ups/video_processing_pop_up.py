@@ -59,7 +59,7 @@ from simba.video_processors.video_processing import (
     extract_frames_single_video, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, resize_videos_by_height,
     resize_videos_by_width, superimpose_frame_count, video_concatenator,
-    video_to_greyscale, watermark_video, superimpose_video_progressbar, superimpose_elapsed_time)
+    video_to_greyscale, watermark_video, superimpose_video_progressbar, superimpose_elapsed_time, superimpose_overlay_video, superimpose_video_names, superimpose_freetext, roi_blurbox)
 
 sys.setrecursionlimit(10**7)
 
@@ -2581,7 +2581,7 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         self.size_dropdown = DropDownMenu(settings_frm, "WATERMARK SCALE %:", list(range(5, 100, 5)), labelwidth=25)
 
         self.location_dropdown.setChoices('TOP LEFT')
-        self.opacity_dropdown.setChoices(50)
+        self.opacity_dropdown.setChoices(0.5)
         self.size_dropdown.setChoices(5)
 
         settings_frm.grid(row=0, column=0, sticky=NW)
@@ -2747,6 +2747,212 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
                                                               bar_height=bar_size,
                                                               color=bar_clr,
                                                               position=loc)).start()
+
+class SuperimposeVideoPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="SUPER-IMPOSE VIDEO ON VIDEO")
+        self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'CENTER': 'center'}
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        opacities = [round(x, 1) for x in list(np.arange(0.1, 1.1, 0.1))]
+        scales = [round(x, 2) for x in list(np.arange(0.05, 1.0, 0.05))]
+        self.main_video_path = FileSelect(settings_frm, "MAIN VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25)
+        self.overlay_video_path = FileSelect(settings_frm, "OVERLAY VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25)
+        self.location_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
+        self.opacity_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO OPACITY:", opacities, labelwidth=25)
+        self.size_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO SCALE (%):", scales, labelwidth=25)
+
+        self.location_dropdown.setChoices('TOP LEFT')
+        self.opacity_dropdown.setChoices(0.5)
+        self.size_dropdown.setChoices(0.05)
+
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.main_video_path.grid(row=0, column=0, sticky=NW)
+        self.overlay_video_path.grid(row=1, column=0, sticky=NW)
+        self.location_dropdown.grid(row=2, column=0, sticky=NW)
+        self.opacity_dropdown.grid(row=3, column=0, sticky=NW)
+        self.size_dropdown.grid(row=4, column=0, sticky=NW)
+        self.create_run_frm(run_function=self.run)
+        self.main_frm.mainloop()
+
+    def run(self):
+        loc = self.location_dropdown.getChoices()
+        loc = self.LOCATIONS[loc]
+        opacity = float(self.opacity_dropdown.getChoices())
+        size = float(self.size_dropdown.getChoices())
+        video_path = self.main_video_path.file_path
+        overlay_path = self.overlay_video_path.file_path
+        check_file_exist_and_readable(file_path=video_path)
+        check_file_exist_and_readable(file_path=overlay_path)
+        threading.Thread(target=superimpose_overlay_video(video_path=video_path,
+                                                          overlay_video_path=overlay_path,
+                                                          position=loc,
+                                                          opacity=opacity,
+                                                          scale=size)).start()
+
+class SuperimposeVideoNamesPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="SUPER-IMPOSE VIDEO NAMES ON VIDEOS")
+        self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.color_dict = get_color_dict()
+
+        self.location_dropdown = DropDownMenu(settings_frm, "VIDEO NAME TEXT LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
+        self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(5, 105, 5)), labelwidth=25)
+        self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
+        self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
+        self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
+
+        self.location_dropdown.setChoices('TOP LEFT')
+        self.font_size_dropdown.setChoices(20)
+        self.font_color_dropdown.setChoices('White')
+        self.font_border_dropdown.setChoices('Black')
+        self.font_border_width_dropdown.setChoices(2)
+
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.location_dropdown.grid(row=0, column=0, sticky=NW)
+        self.font_size_dropdown.grid(row=1, column=0, sticky=NW)
+        self.font_color_dropdown.grid(row=2, column=0, sticky=NW)
+        self.font_border_dropdown.grid(row=3, column=0, sticky=NW)
+        self.font_border_width_dropdown.grid(row=4, column=0, sticky=NW)
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE VIDEO NAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE VIDEO NAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run(multiple=True))
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        loc = self.location_dropdown.getChoices()
+        loc = self.LOCATIONS[loc]
+        font_size = int(self.font_size_dropdown.getChoices())
+        font_clr = self.font_color_dropdown.getChoices()
+        font_border_clr = self.font_border_dropdown.getChoices()
+        font_border_width = int(self.font_border_width_dropdown.getChoices())
+        if not multiple:
+            data_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=data_path)
+        else:
+            data_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=data_path)
+
+        threading.Thread(target=superimpose_video_names(video_path=data_path,
+                                                         font_size=font_size,
+                                                         font_color=font_clr,
+                                                         font_border_color=font_border_clr,
+                                                         font_border_width=font_border_width,
+                                                         position=loc)).start()
+
+class SuperimposeTextPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="SUPER-IMPOSE TEXT ON VIDEOS")
+        self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.color_dict = get_color_dict()
+
+        self.location_dropdown = DropDownMenu(settings_frm, "TEXT LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
+        self.text_eb = Entry_Box(parent=settings_frm, labelwidth=25, entry_box_width=50, fileDescription='TEXT:')
+        self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(5, 105, 5)), labelwidth=25)
+        self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
+        self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
+        self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
+
+        self.location_dropdown.setChoices('TOP LEFT')
+        self.font_size_dropdown.setChoices(20)
+        self.font_color_dropdown.setChoices('White')
+        self.font_border_dropdown.setChoices('Black')
+        self.font_border_width_dropdown.setChoices(2)
+
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.location_dropdown.grid(row=0, column=0, sticky=NW)
+        self.text_eb.grid(row=1, column=0, sticky=NW)
+        self.font_size_dropdown.grid(row=2, column=0, sticky=NW)
+        self.font_color_dropdown.grid(row=3, column=0, sticky=NW)
+        self.font_border_dropdown.grid(row=4, column=0, sticky=NW)
+        self.font_border_width_dropdown.grid(row=5, column=0, sticky=NW)
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TEXT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE TEXT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run(multiple=True))
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        loc = self.location_dropdown.getChoices()
+        loc = self.LOCATIONS[loc]
+        text = self.text_eb.entry_get
+        check_str(name='text', value=text)
+        font_size = int(self.font_size_dropdown.getChoices())
+        font_clr = self.font_color_dropdown.getChoices()
+        font_border_clr = self.font_border_dropdown.getChoices()
+        font_border_width = int(self.font_border_width_dropdown.getChoices())
+        if not multiple:
+            data_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=data_path)
+        else:
+            data_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=data_path)
+
+        threading.Thread(target=superimpose_freetext(video_path=data_path,
+                                                     text=text,
+                                                     font_size=font_size,
+                                                     font_color=font_clr,
+                                                     font_border_color=font_border_clr,
+                                                     font_border_width=font_border_width,
+                                                     position=loc)).start()
+
+
+class BoxBlurPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="BOX BLUR VIDEOS")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        blur_lvl = [round(x, 2) for x in list(np.arange(0.05, 1.0, 0.05))]
+        self.blur_lvl_dropdown = DropDownMenu(settings_frm, "BLUR LEVEL:", blur_lvl, labelwidth=25)
+        self.invert_dropdown = DropDownMenu(settings_frm, "INVERT BLUR REGION:", ['TRUE', 'FALSE'], labelwidth=25)
+
+        self.blur_lvl_dropdown.setChoices(0.02)
+        self.invert_dropdown.setChoices('FALSE')
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.blur_lvl_dropdown.grid(row=0, column=0, sticky=NW)
+        self.invert_dropdown.grid(row=1, column=0, sticky=NW)
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="APPLY BOX-BLUR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN", command=lambda: self.run())
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        self.main_frm.mainloop()
+
+    def run(self):
+        video_path = self.selected_video.file_path
+        check_file_exist_and_readable(file_path=video_path)
+        blur_lvl = float(self.blur_lvl_dropdown.getChoices())
+        invert = str_2_bool(self.invert_dropdown.getChoices())
+        threading.Thread(target=roi_blurbox(video_path=video_path, blur_level=blur_lvl, invert=invert)).start()
 
 
 

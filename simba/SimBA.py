@@ -135,7 +135,8 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
     MergeFrames2VideoPopUp, MultiCropPopUp, MultiShortenPopUp,
     SuperImposeFrameCountPopUp, VideoRotatorPopUp, VideoTemporalJoinPopUp,
-    SuperimposeTimerPopUp, SuperimposeWatermarkPopUp, SuperimposeProgressBarPopUp)
+    SuperimposeTimerPopUp, SuperimposeWatermarkPopUp, SuperimposeProgressBarPopUp, SuperimposeVideoPopUp, SuperimposeVideoNamesPopUp,
+    SuperimposeTextPopUp, BoxBlurPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1783,17 +1784,14 @@ class App(object):
         superimpose_menu.add_command(label="Superimpose watermark on videos", command=SuperimposeWatermarkPopUp)
         superimpose_menu.add_command(label="Superimpose timer on videos", command=SuperimposeTimerPopUp)
         superimpose_menu.add_command(label="Superimpose progress-bar on videos", command=SuperimposeProgressBarPopUp)
+        superimpose_menu.add_command(label="Superimpose video on video", command=SuperimposeVideoPopUp)
+        superimpose_menu.add_command(label="Superimpose video names on video", command=SuperimposeVideoNamesPopUp)
+        superimpose_menu.add_command(label="Superimpose free-text on video", command=SuperimposeTextPopUp)
         video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu)
 
         video_process_menu.add_command(label="Temporal join videos", compound="left", image=self.menu_icons["stopwatch"]["img"], command=VideoTemporalJoinPopUp)
-
-        video_process_menu.add_cascade(
-            label="Visualize pose-estimation in folder...",
-            compound="left",
-            image=self.menu_icons["visualize"]["img"],
-            command=VisualizePoseInFolderPopUp,
-        )
-
+        video_process_menu.add_cascade(label="Box blur videos...", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp)
+        video_process_menu.add_cascade(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp)
         help_menu = Menu(menu)
         menu.add_cascade(label="Help", menu=help_menu)
 
