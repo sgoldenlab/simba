@@ -726,6 +726,9 @@ def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[b
 
 def superimpose_frame_count(file_path: Union[str, os.PathLike],
                             gpu: Optional[bool] = False,
+                            font: Optional[str] = 'Arial',
+                            font_color: Optional[str] = 'black',
+                            bg_color: Optional[str] = 'white',
                             fontsize: Optional[int] = 20) -> None:
     """
     Superimpose frame count on a video file. The result is stored in the same directory as the
@@ -742,51 +745,35 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     :parameter Union[str, os.PathLike] file_path: Path to video file.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :parameter Optional[int] fontsize: The size of the font represetnting the current frame. Default: 20.
+    :parameter Optional[str] font_color: The color of frame number text. Default: 'Black'.
+    :parameter Optional[str] bg_color: The color of the box which the frame number is printed in. Default: 'White'.
+    :parameter Optional[str] font: The font to use for the frame number. Default Arial.
+
 
     :example:
     >>> _ = superimpose_frame_count(file_path='project_folder/videos/Video_1.avi')
     """
 
+    timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
     check_int(name=f'{superimpose_frame_count.__name__} fontsize', value=fontsize, min_value=1)
-    simba_cw = os.path.dirname(simba.__file__)
-    simba_font_path = os.path.join(simba_cw, "assets", "UbuntuMono-Regular.ttf")
-    timer = SimbaTimer(start=True)
-    if not os.path.isfile(simba_font_path):
-        if platform.system() == OS.WINDOWS.value:
-            simba_font_path = "C:/Windows/fonts/arial.ttf"
-            if not os.path.isfile(simba_font_path):
-                simba_font_path = os.listdir(r"C:/Windows/fonts")[0]
-            simba_font_path = simba_font_path[2:].replace("\\", "/")
-        elif (platform.system() == OS.MAC.value) or (
-                platform.system() == OS.LINUX.value
-        ):
-            simba_font_path = "Arial.ttf"
-    else:
-        if platform.system() == OS.WINDOWS.value:
-            simba_font_path = str(simba_font_path[2:].replace("\\", "/"))
+    font_color = ''.join(filter(str.isalnum, font_color)).lower()
+    bg_color = ''.join(filter(str.isalnum, bg_color)).lower()
+    font_dict = get_fonts()
+    check_str(name='font', value=font, options=tuple(font_dict.keys()))
+    font_path = font_dict[font]
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
-    save_name = os.path.join(dir, file_name + "_frame_no.mp4")
-    print(f"Superimposing frame numbers using font path {simba_font_path}...... ")
-    try:
-        if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:fontsize={fontsize}:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'
-        else:
-            command = f'ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}: text=\'%{{frame_num}}\': start_number=0: x=(w-tw)/2: y=h-(2*lh): fontcolor=black: fontsize={fontsize}: box=1: boxcolor=white: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'
-        print(f"Using font path {simba_font_path}...")
-        subprocess.check_output(command, shell=True)
-        subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-    except subprocess.CalledProcessError as e:
-        if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontsize={fontsize}:fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'
-        else:
-            command = f'ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize={fontsize}:box=1:boxcolor=white:boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'
-        print(f"Using font path {simba_font_path}...")
-        subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+    save_name = os.path.join(dir, f"{file_name}_frame_no.mp4")
+    if gpu:
+        cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+    else:
+        cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}"'''
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
 
+#superimpose_frame_count(file_path='/Users/simon/Downloads/1_LH_0_3.mp4', fontsize=90)
 
 def remove_beginning_of_video(
     file_path: Union[str, os.PathLike], time: int, gpu: Optional[bool] = False
@@ -3413,6 +3400,56 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed time on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
+def reverse_videos(path: Union[str, os.PathLike],
+                   save_dir: Optional[Union[str, os.PathLike]] = None,
+                   quality: Optional[int] = 60) -> None:
+    """
+    Reverses one or more video files located at the specified path and saves the reversed videos in the specified
+    directory.
+
+    .. video:: _static/img/reverse_videos.webm
+       :width: 800
+       :loop:
+
+    :param Union[str, os.PathLike] path: Path to the video file or directory containing video files to be reversed.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the reversed videos. If not provided, reversed videos will be saved in a subdirectory named 'reversed_<timestamp>' in the same directory as the input file(s).
+    :param Optional[int] quality: Output video quality expressed as a percentage. Default is 60. Values range from 1 (low quality, high compression) to 100 (high quality, low compression).
+    :return: None
+
+    :example:
+    >>> reverse_videos(path='/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/videos/reverse/TheVideoName_video_name_2_frame_no.mp4')
+    """
+
+    timer = SimbaTimer(start=True)
+    check_ffmpeg_available(raise_error=True)
+    check_instance(source=f'{reverse_videos.__name__} path', instance=path, accepted_types=(str,))
+    check_int(name=f'{reverse_videos.__name__} quality', value=quality)
+    datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
+    crf_lk = percent_to_crf_lookup()
+    crf = crf_lk[str(quality)]
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir, source=reverse_videos.__name__)
+    if os.path.isfile(path):
+        file_paths = [path]
+        if save_dir is None:
+            save_dir = os.path.join(os.path.dirname(path), f'reversed_{datetime_}')
+            os.makedirs(save_dir)
+    elif os.path.isdir(path):
+        file_paths = find_files_of_filetypes_in_directory(directory=path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+        if save_dir is None:
+            save_dir = os.path.join(path, f'mp4_{datetime_}')
+            os.makedirs(save_dir)
+    else:
+        raise InvalidInputError(msg=f'Path is not a valid file or directory path.', source=reverse_videos.__name__)
+    for file_cnt, file_path in enumerate(file_paths):
+        _, video_name, ext = get_fn_ext(filepath=file_path)
+        print(f'Reversing video {video_name} (Video {file_cnt+1}/{len(file_paths)})...')
+        _ = get_video_meta_data(video_path=file_path)
+        out_path = os.path.join(save_dir, f'{video_name}{ext}')
+        cmd = f'ffmpeg -i "{file_path}" -vf reverse -af areverse -c:v libx264 -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    stdout_success(msg=f"{len(file_paths)} video(s) reversed and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=reverse_videos.__name__)
 
 def video_to_bw(video_path: Union[str, os.PathLike],
                 threshold: Optional[float] = 0.5) -> None:

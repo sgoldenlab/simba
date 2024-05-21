@@ -106,12 +106,13 @@ class ROIPlot(ConfigReader):
         self.threshold, self.body_parts = threshold, body_parts
 
     def __insert_data(self):
-        roi_entries_dict = self.roi_entries_df[["ANIMAL", "SHAPE NAME", "START FRAME", "END FRAME"]].to_dict(orient="records")
-        for entry_dict in roi_entries_dict:
-            entry, exit = int(entry_dict["START FRAME"]), int(entry_dict["END FRAME"])
-            entry_dict["frame_range"] = list(range(entry, exit + 1))
-            col_name =  f'{entry_dict["ANIMAL"]}_{entry_dict["SHAPE NAME"]}'
-            self.data_df[col_name][self.data_df.index.isin(entry_dict["frame_range"])] = 1
+        if self.roi_entries_df is not None:
+            roi_entries_dict = self.roi_entries_df[["ANIMAL", "SHAPE NAME", "START FRAME", "END FRAME"]].to_dict(orient="records")
+            for entry_dict in roi_entries_dict:
+                entry, exit = int(entry_dict["START FRAME"]), int(entry_dict["END FRAME"])
+                entry_dict["frame_range"] = list(range(entry, exit + 1))
+                col_name =  f'{entry_dict["ANIMAL"]}_{entry_dict["SHAPE NAME"]}'
+                self.data_df[col_name][self.data_df.index.isin(entry_dict["frame_range"])] = 1
 
     def __calc_text_locs(self) -> dict:
         loc_dict = {}

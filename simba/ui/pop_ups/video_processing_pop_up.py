@@ -341,13 +341,26 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="SUPERIMPOSE FRAME COUNT")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        color_dict = list(get_color_dict().keys())
+        font_dict = get_fonts()
         self.use_gpu_var = BooleanVar(value=False)
         use_gpu_cb = Checkbutton(settings_frm, text="USE GPU (reduced runtime)", variable=self.use_gpu_var)
         self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(1, 101, 2)), labelwidth=25)
+        self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", color_dict, labelwidth=25)
+        self.font_bg_color_dropdown = DropDownMenu(settings_frm, "FONT BACKGROUND COLOR:", color_dict, labelwidth=25)
+        self.font_dropdown = DropDownMenu(settings_frm, "FONT:", list(font_dict.keys()), labelwidth=25)
+
+        self.font_size_dropdown.setChoices('20')
+        self.font_color_dropdown.setChoices('Black')
+        self.font_bg_color_dropdown.setChoices('White')
+        self.font_dropdown.setChoices('Arial')
+
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.font_size_dropdown.grid(row=0, column=0, sticky="NW")
-        self.font_size_dropdown.setChoices('20')
-        use_gpu_cb.grid(row=1, column=0, sticky="NW")
+        self.font_color_dropdown.grid(row=1, column=0, sticky="NW")
+        self.font_bg_color_dropdown.grid(row=2, column=0, sticky="NW")
+        self.font_dropdown.grid(row=3, column=0, sticky="NW")
+        use_gpu_cb.grid(row=4, column=0, sticky="NW")
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE FRAME COUNT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -382,13 +395,22 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         check_ffmpeg_available(raise_error=True)
         timer = SimbaTimer(start=True)
         use_gpu = self.use_gpu_var.get()
+        font = self.font_dropdown.getChoices()
+        font_clr = self.font_color_dropdown.getChoices()
+        font_bg_clr = self.font_bg_color_dropdown.getChoices()
         font_size = int(self.font_size_dropdown.getChoices())
         for file_cnt, file_path in enumerate(self.video_paths):
             check_file_exist_and_readable(file_path=file_path)
-            superimpose_frame_count(file_path=file_path, gpu=use_gpu, fontsize=font_size)
+            superimpose_frame_count(file_path=file_path,
+                                    gpu=use_gpu,
+                                    fontsize=font_size,
+                                    font_color=font_clr,
+                                    font=font,
+                                    bg_color=font_bg_clr)
         timer.stop_timer()
         stdout_success(msg=f'Frame counts superimposed on {len(self.video_paths)} video(s)', elapsed_time=timer.elapsed_time_str)
 
+#SuperImposeFrameCountPopUp()
 
 class MultiShortenPopUp(PopUpMixin):
     def __init__(self):
