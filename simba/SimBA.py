@@ -137,7 +137,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperImposeFrameCountPopUp, SuperimposeProgressBarPopUp,
     SuperimposeTextPopUp, SuperimposeTimerPopUp, SuperimposeVideoNamesPopUp,
     SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, VideoRotatorPopUp,
-    VideoTemporalJoinPopUp)
+    VideoTemporalJoinPopUp, BackgroundRemoverPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1792,6 +1792,7 @@ class App(object):
 
         video_process_menu.add_command(label="Temporal join videos", compound="left", image=self.menu_icons["stopwatch"]["img"], command=VideoTemporalJoinPopUp)
         video_process_menu.add_cascade(label="Box blur videos...", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp)
+        video_process_menu.add_cascade(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp)
         video_process_menu.add_cascade(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp)
         help_menu = Menu(menu)
         menu.add_cascade(label="Help", menu=help_menu)
