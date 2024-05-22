@@ -120,14 +120,15 @@ from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
-    BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
-    ChangeFpsMultipleVideosPopUp, ChangeFpsSingleVideoPopUp, CLAHEPopUp,
-    ClipSingleVideoByFrameNumbers, ClipVideoPopUp, ConcatenatingVideosPopUp,
-    ConcatenatorPopUp, Convert2AVIPopUp, Convert2bmpPopUp, Convert2jpegPopUp,
-    Convert2MOVPopUp, Convert2MP4PopUp, Convert2PNGPopUp, Convert2TIFFPopUp,
-    Convert2WEBMPopUp, Convert2WEBPPopUp, ConvertROIDefinitionsPopUp,
-    CreateGIFPopUP, CropVideoCirclesPopUp, CropVideoPolygonsPopUp,
-    CropVideoPopUp, DownsampleMultipleVideosPopUp, DownsampleSingleVideoPopUp,
+    BackgroundRemoverPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
+    CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
+    ChangeFpsSingleVideoPopUp, CLAHEPopUp, ClipSingleVideoByFrameNumbers,
+    ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
+    Convert2AVIPopUp, Convert2bmpPopUp, Convert2jpegPopUp, Convert2MOVPopUp,
+    Convert2MP4PopUp, Convert2PNGPopUp, Convert2TIFFPopUp, Convert2WEBMPopUp,
+    Convert2WEBPPopUp, ConvertROIDefinitionsPopUp, CreateGIFPopUP,
+    CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
+    DownsampleMultipleVideosPopUp, DownsampleSingleVideoPopUp,
     DownsampleVideoPopUp, ExtractAllFramesPopUp, ExtractAnnotationFramesPopUp,
     ExtractSEQFramesPopUp, ExtractSpecificFramesPopUp,
     GreyscaleSingleVideoPopUp, ImportFrameDirectoryPopUp,
@@ -137,7 +138,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperImposeFrameCountPopUp, SuperimposeProgressBarPopUp,
     SuperimposeTextPopUp, SuperimposeTimerPopUp, SuperimposeVideoNamesPopUp,
     SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, VideoRotatorPopUp,
-    VideoTemporalJoinPopUp, BackgroundRemoverPopUp)
+    VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect

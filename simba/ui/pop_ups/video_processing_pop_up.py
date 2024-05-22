@@ -5,10 +5,10 @@ import os
 import subprocess
 import sys
 import threading
+from copy import deepcopy
 from datetime import datetime
 from tkinter import *
 from typing import Optional, Union
-from copy import deepcopy
 
 import numpy as np
 from PIL import Image, ImageTk
@@ -31,9 +31,10 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.data import convert_roi_definitions
 from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
-from simba.utils.errors import (CountError, FrameRangeError, InvalidInputError,
-                                MixedMosaicError, NoChoosenClassifierError,
-                                NoFilesFoundError, NotDirectoryError, DuplicationError)
+from simba.utils.errors import (CountError, DuplicationError, FrameRangeError,
+                                InvalidInputError, MixedMosaicError,
+                                NoChoosenClassifierError, NoFilesFoundError,
+                                NotDirectoryError)
 from simba.utils.lookups import get_color_dict, get_fonts
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
@@ -62,8 +63,9 @@ from simba.video_processors.video_processing import (
     multi_split_video, remove_beginning_of_video, resize_videos_by_height,
     resize_videos_by_width, roi_blurbox, superimpose_elapsed_time,
     superimpose_frame_count, superimpose_freetext, superimpose_overlay_video,
-    superimpose_video_names, superimpose_video_progressbar, video_concatenator,
-    video_to_greyscale, watermark_video, video_bg_substraction_mp, video_bg_subtraction)
+    superimpose_video_names, superimpose_video_progressbar,
+    video_bg_substraction_mp, video_bg_subtraction, video_concatenator,
+    video_to_greyscale, watermark_video)
 
 sys.setrecursionlimit(10**7)
 
