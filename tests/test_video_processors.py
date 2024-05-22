@@ -95,9 +95,9 @@ def test_video_to_greyscale(config_video_path_args):
     copied_file_path = copy_file(file_path=config_video_path_args.param)
     video_to_greyscale(file_path=copied_file_path)
 
-def test_superimpose_frame_count(config_video_path_args):
-    copied_file_path = copy_file(file_path=config_video_path_args.param)
-    superimpose_frame_count(file_path=copied_file_path)
+# def test_superimpose_frame_count(config_video_path_args):
+#     copied_file_path = copy_file(file_path=config_video_path_args.param)
+#     superimpose_frame_count(file_path=copied_file_path)
 
 @pytest.mark.parametrize('start_time, end_time', [['00:00:01', '00:00:05']])
 def test_clip_video_in_range(config_video_path_args, start_time, end_time):

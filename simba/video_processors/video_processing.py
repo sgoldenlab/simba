@@ -24,7 +24,6 @@ try:
 except:
     from typing_extensions import Literal
 
-import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_ffmpeg_available,
@@ -3560,14 +3559,17 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
 
     .. video:: _static/img/video_bg_subtraction.webm
        :width: 800
+       :autoplay:
        :loop:
 
     .. video:: _static/img/bg_remover_example_1.webm
        :width: 800
+       :autoplay:
        :loop:
 
     .. video:: _static/img/bg_remover_example_2.webm
        :width: 800
+       :autoplay:
        :loop:
 
     .. note::
@@ -3701,11 +3703,13 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
        :loop:
 
     .. video:: _static/img/bg_remover_example_3.webm
-       :width: 800
+       :width: 900
+       :autoplay:
        :loop:
 
     .. video:: _static/img/bg_remover_example_4.webm
-       :width: 800
+       :width: 900
+       :autoplay:
        :loop:
 
     .. note::
