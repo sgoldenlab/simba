@@ -37,12 +37,12 @@ from simba.utils.errors import (CountError, DuplicationError, FrameRangeError,
                                 NotDirectoryError)
 from simba.utils.lookups import get_color_dict, get_fonts
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.warnings import FrameRangeWarning
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
     seconds_to_timestamp, str_2_bool)
+from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.brightness_contrast_ui import \
     brightness_contrast_ui
 from simba.video_processors.clahe_ui import interactive_clahe_ui
