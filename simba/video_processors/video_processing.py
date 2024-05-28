@@ -954,11 +954,13 @@ def gif_creator(file_path: Union[str, os.PathLike],
     .. note::
        The height is auto-computed to retain aspect ratio
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file.
-    :parameter int start_time: Start time of the gif in relation to the video in seconds.
-    :parameter int duration: Duration of the gif.
-    :parameter int width: Width of the gif.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[str, os.PathLike] file_path: Path to video file.
+    :param int start_time: Start time of the gif in relation to the video in seconds.
+    :param int duration: Duration of the gif.
+    :param int width: Width of the gif. If None, then retains the width and height of the input video.
+    :param int fps: FPS of the gif. Defaults to 15.
+    :param int quality: Quality of the GIF on scale 1-100. Smaller values gives smaller GIFs by filesize with worse quality. Default: 100.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
     >>> _ = gif_creator(file_path='project_folder/videos/Video_1.avi', start_time=5, duration=10, width=600)
