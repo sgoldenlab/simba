@@ -37,6 +37,7 @@ from simba.utils.errors import (CountError, DuplicationError, FrameRangeError,
                                 NotDirectoryError)
 from simba.utils.lookups import get_color_dict, get_fonts
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.warnings import FrameRangeWarning
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory,
@@ -960,61 +961,63 @@ class MergeFrames2VideoPopUp(PopUpMixin):
 
 class CreateGIFPopUP(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CREATE GIF FROM VIDEO", size=(250, 250))
-        settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        selected_video = FileSelect(
-            settings_frm,
-            "Video path: ",
-            title="Select a video file",
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        start_time_entry_box = Entry_Box(
-            settings_frm, "Start time (s): ", "16", validation="numeric"
-        )
-        duration_entry_box = Entry_Box(
-            settings_frm, "Duration (s): ", "16", validation="numeric"
-        )
-        width_entry_box = Entry_Box(settings_frm, "Width: ", "16", validation="numeric")
-        gpu_var = BooleanVar()
-        gpu_cb = Checkbutton(
-            settings_frm, text="Use GPU (decreased runtime)", variable=gpu_var
-        )
-        width_instructions_1 = Label(
-            settings_frm,
-            text="Example Width: 240, 360, 480, 720, 1080",
-            font=("Times", 12, "italic"),
-        )
-        width_instructions_2 = Label(
-            settings_frm,
-            text="Aspect ratio is kept (i.e., height is automatically computed)",
-            font=("Times", 12, "italic"),
-        )
-        run_btn = Button(
-            settings_frm,
-            text="CREATE GIF",
-            command=lambda: gif_creator(
-                file_path=selected_video.file_path,
-                start_time=start_time_entry_box.entry_get,
-                duration=duration_entry_box.entry_get,
-                width=width_entry_box.entry_get,
-                gpu=gpu_var.get(),
-            ),
-        )
+        PopUpMixin.__init__(self, title="CREATE GIF FROM VIDEO", size=(600, 400))
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(settings_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=40)
+        self.start_time_entry_box = Entry_Box(settings_frm, "START TIME (s):", "40", validation="numeric")
+        self.duration_entry_box = Entry_Box(settings_frm, "DURATION (s): ", "40", validation="numeric")
+        resolution_widths = Options.RESOLUTION_OPTIONS_2.value
+        self.resolution_dropdown = DropDownMenu(settings_frm, "GIF WIDTH (ASPECT RATIO RETAINED):", resolution_widths, "40")
+        self.quality_dropdown = DropDownMenu(settings_frm, "GIF QUALITY (%):", list(range(1, 101, 1)), "40")
+        fps_lst = list(range(1, 101, 1))
+        fps_lst.insert(0, 'AUTO')
+        self.fps_dropdown = DropDownMenu(settings_frm, "GIF FPS:", fps_lst, "40")
+        self.gpu_var = BooleanVar()
+        gpu_cb = Checkbutton(settings_frm, text="USE GPU (decreased runtime)", variable=self.gpu_var)
+        self.quality_dropdown.setChoices(100)
+        self.resolution_dropdown.setChoices('AUTO')
+        self.fps_dropdown.setChoices('AUTO')
         settings_frm.grid(row=0, sticky=NW)
-        selected_video.grid(row=0, sticky=NW, pady=5)
-        start_time_entry_box.grid(row=1, sticky=NW)
-        duration_entry_box.grid(row=2, sticky=NW)
-        width_entry_box.grid(row=3, sticky=NW)
-        gpu_cb.grid(row=4, column=0, sticky=NW)
-        width_instructions_1.grid(row=5, sticky=NW)
-        width_instructions_2.grid(row=6, sticky=NW)
-        run_btn.grid(row=7, sticky=NW, pady=10)
+        self.selected_video.grid(row=0, sticky=NW, pady=5)
+        self.start_time_entry_box.grid(row=1, sticky=NW)
+        self.duration_entry_box.grid(row=2, sticky=NW)
+        self.resolution_dropdown.grid(row=3, sticky=NW)
+        self.quality_dropdown.grid(row=4, sticky=NW)
+        self.fps_dropdown.grid(row=5, sticky=NW)
+        gpu_cb.grid(row=6, column=0, sticky=NW)
+        self.create_run_frm(run_function=self.run)
+        self.main_frm.mainloop()
 
+    def run(self):
+        video_path = self.selected_video.file_path
+        width = self.resolution_dropdown.getChoices()
+        start_time = self.start_time_entry_box.entry_get
+        duration = self.duration_entry_box.entry_get
+        fps = self.fps_dropdown.getChoices()
+        quality = int(self.quality_dropdown.getChoices())
+        gpu = self.gpu_var.get()
+        check_ffmpeg_available()
+        if gpu: check_nvidea_gpu_available()
+        check_file_exist_and_readable(file_path=video_path)
+        video_meta_data = get_video_meta_data(video_path=video_path)
+        if width == 'AUTO': width = video_meta_data['width']
+        else: width = int(width)
+        if fps == 'AUTO': fps = int(video_meta_data['fps'])
+        else: fps = int(fps)
+        if fps > int(video_meta_data['fps']):
+            FrameRangeWarning(msg=f'The chosen FPS ({fps}) is higher than the video FPS ({video_meta_data["fps"]}). The video FPS will be used', source=self.__class__.__name__)
+            fps = int(video_meta_data['fps'])
+        max_duration = video_meta_data['video_length_s'] - int(start_time)
+        check_int(name='start_time', value=start_time, max_value=video_meta_data['video_length_s'], min_value=0)
+        check_int(name='duration', value=duration, max_value=max_duration, min_value=1)
+
+        threading.Thread(target=gif_creator(file_path=video_path,
+                                            start_time=int(start_time),
+                                            duration=int(duration),
+                                            width=width,
+                                            gpu=gpu,
+                                            fps=fps,
+                                            quality=int(quality))).start()
 
 class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
     def __init__(self):

@@ -940,13 +940,13 @@ def downsample_video(
     )
 
 
-def gif_creator(
-    file_path: Union[str, os.PathLike],
-    start_time: int,
-    duration: int,
-    width: int,
-    gpu: Optional[bool] = False,
-) -> None:
+def gif_creator(file_path: Union[str, os.PathLike],
+                start_time: int,
+                duration: int,
+                width: Optional[int] = None,
+                quality: Optional[int] = 100,
+                fps: Optional[int] = 15,
+                gpu: Optional[bool] = False) -> None:
     """
     Create a sample gif from a video file. The result is stored in the same directory as the
     input file with the ``.gif`` file-ending.
@@ -966,41 +966,32 @@ def gif_creator(
 
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
-            source=gif_creator.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=gif_creator.__name__)
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
     check_int(name="Start time", value=start_time, min_value=0)
     check_int(name="Duration", value=duration, min_value=1)
-    check_int(name="Width", value=width)
     video_meta_data = get_video_meta_data(file_path)
+    if width is None:
+        width = video_meta_data['width']
+    check_int(name="Width", value=width, min_value=2)
+    check_int(name="FPS", value=fps, min_value=1)
+    check_int(name="QUALITY", value=quality, min_value=1, max_value=100)
+    quality = int((quality - 1) / (100 - 1) * (256 - 1) + 1)
+    if width % 2 != 0: width -= 1
+    if quality == 1: quality += 1
     if (int(start_time) + int(duration)) > video_meta_data["video_length_s"]:
-        raise FrameRangeError(
-            msg=f'The end of the gif (start time: {start_time} + duration: {duration}) is longer than the {file_path} video: {video_meta_data["video_length_s"]}s',
-            source=gif_creator.__name__,
-        )
-
+        raise FrameRangeError(msg=f'The end of the gif (start time: {start_time} + duration: {duration}) is longer than the {file_path} video: {video_meta_data["video_length_s"]}s', source=gif_creator.__name__)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
-    save_name = os.path.join(dir, file_name + ".gif")
-    if os.path.isfile(save_name):
-        raise FileExistError(
-            "SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
-            source=gif_creator.__name__,
-        )
+    save_name = os.path.join(dir, f"{file_name}.gif")
     if gpu:
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {start_time} -i "{file_path}" -to {duration} -vf "fps=10,scale={width}:-1" -c:v gif -pix_fmt rgb24 -y "{save_name}" -y'
     else:
-        command = f'ffmpeg -ss {start_time} -t {duration} -i "{file_path}" -filter_complex "[0:v] fps=15,scale=w={width}:h=-1,split [a][b];[a] palettegen=stats_mode=single [p];[b][p] paletteuse=new=1" "{save_name}"'
+        command = f'ffmpeg -ss {start_time} -t {duration} -i "{file_path}" -filter_complex "[0:v] fps={fps},scale=w={width}:h=-1:flags=lanczos,split [a][b];[a] palettegen=stats_mode=single:max_colors={quality} [p];[b][p] paletteuse=dither=bayer:bayer_scale=3" "{save_name}" -loglevel error -stats -hide_banner -y'
     print("Creating gif sample... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(
-        msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
-        elapsed_time=timer.elapsed_time_str,
-        source=gif_creator.__name__,
-    )
+    stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=gif_creator.__name__)
 
 
 # gif_creator(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', start_time=5, duration=15, width=600, gpu=False)
