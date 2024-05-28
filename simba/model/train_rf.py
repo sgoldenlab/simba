@@ -41,7 +41,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         self.read_model_settings_from_config(config=self.config)
         check_if_filepath_list_is_empty(filepaths=self.target_file_paths, error_msg=f"Zero annotation files found in directory {self.targets_folder}, cannot create model.")
         print(f"Reading in {len(self.target_file_paths)} annotated files...")
-        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp(self.target_file_paths, self.file_type, [self.clf_name])
+        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type, [self.clf_name])
         self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
         self.data_df = self.check_raw_dataset_integrity(df=self.data_df, logs_path=self.logs_path)
         self.data_df_wo_cords = self.drop_bp_cords(df=self.data_df)

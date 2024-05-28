@@ -65,10 +65,10 @@ from simba.video_processors.video_processing import (
     superimpose_frame_count, superimpose_freetext, superimpose_overlay_video,
     superimpose_video_names, superimpose_video_progressbar,
     video_bg_substraction_mp, video_bg_subtraction, video_concatenator,
-    video_to_greyscale, watermark_video)
+    video_to_greyscale, watermark_video, rotate_video, flip_videos,
+    upsample_fps, reverse_videos, video_to_bw, create_average_frm)
 
 sys.setrecursionlimit(10**7)
-
 
 class CLAHEPopUp(PopUpMixin):
     def __init__(self):
@@ -94,7 +94,6 @@ class CLAHEPopUp(PopUpMixin):
         multiple_videos_frm.grid(row=1, column=0, sticky=NW)
         self.selected_dir.grid(row=0, column=0, sticky=NW)
         run_multiple_btn.grid(row=1, column=0, sticky=NW)
-        #self.main_frm.mainloop()
 
     def run_single_video(self):
         selected_video = self.selected_video.file_path
@@ -325,7 +324,6 @@ class GreyscaleSingleVideoPopUp(PopUpMixin):
         use_gpu_dir_cb.grid(row=1, column=0, sticky="NW")
         run_dir_btn.grid(row=2, column=0, sticky="NW")
 
-        self.main_frm.mainloop()
 
     def run_video(self):
         check_file_exist_and_readable(file_path=self.selected_video.file_path)
@@ -380,7 +378,6 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
         multiple_videos_run.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
 
     def run_single_video(self):
         video_path = self.selected_video.file_path
@@ -828,7 +825,6 @@ class MultiCropPopUp(PopUpMixin):
         self.crop_cnt_dropdown.grid(row=3, sticky=NW)
         self.use_gpu_cb.grid(row=4, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        self.main_frm.mainloop()
 
     def run(self):
         check_if_dir_exists(in_dir=self.input_folder.folder_path)
@@ -1143,7 +1139,6 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         self.select_video_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.select_video_cnt_dropdown.grid(row=0, column=0, sticky=NW)
         self.select_video_cnt_btn.grid(row=0, column=1, sticky=NW)
-        self.main_frm.mainloop()
 
     def populate_table(self):
         if hasattr(self, "video_table_frm"):
@@ -1453,7 +1448,6 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
         self.settings_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
         self.resolution_downsample_dropdown.grid(row=0, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        self.main_frm.mainloop()
 
     def run(self):
         check_if_filepath_list_is_empty(
@@ -1676,7 +1670,6 @@ class CropVideoCirclesPopUp(PopUpMixin):
         input_folder.grid(row=0, sticky=NW)
         output_folder.grid(row=1, sticky=NW)
         button_crop_video_multiple.grid(row=3, sticky=NW)
-        self.main_frm.mainloop()
 
 
 # _ = CropVideoCirclesPopUp()
@@ -1739,7 +1732,6 @@ class CropVideoPolygonsPopUp(PopUpMixin):
         input_folder.grid(row=0, sticky=NW)
         output_folder.grid(row=1, sticky=NW)
         button_crop_video_multiple.grid(row=3, sticky=NW)
-        self.main_frm.mainloop()
 
 
 class ClipSingleVideoByFrameNumbers(PopUpMixin):
@@ -1770,7 +1762,6 @@ class ClipSingleVideoByFrameNumbers(PopUpMixin):
         self.start_frm_eb.grid(row=1, column=0, sticky=NW)
         self.end_frm_eb.grid(row=2, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        self.main_frm.mainloop()
 
     def run(self):
         check_file_exist_and_readable(file_path=self.selected_video.file_path)
@@ -1868,7 +1859,6 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
             self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
-        self.main_frm.mainloop()
 
     def run(self):
         video_paths, frame_ids = [], []
@@ -1929,7 +1919,6 @@ class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         self.input_folder.grid(row=0, column=0, sticky=NW)
         self.output_folder.grid(row=1, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        self.main_frm.mainloop()
 
     def run(self):
         check_if_dir_exists(
@@ -2005,7 +1994,6 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
             self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
-        self.main_frm.mainloop()
 
     def run(self):
         timer = SimbaTimer(start=True)
@@ -2108,7 +2096,6 @@ class BrightnessContrastPopUp(PopUpMixin):
         video_dir_frm.grid(row=1, column=0, sticky="NW")
         self.selected_dir.grid(row=0, column=0, sticky="NW")
         run_dir_btn.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
 
     def run_video(self):
         video_path = self.selected_video.file_path
@@ -2165,7 +2152,6 @@ class InteractiveClahePopUp(PopUpMixin):
         video_dir_frm.grid(row=1, column=0, sticky="NW")
         self.selected_dir.grid(row=0, column=0, sticky="NW")
         run_dir_btn.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
 
     def run_video(self):
         video_path = self.selected_video.file_path
@@ -2227,7 +2213,6 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
         self.width_dropdown.grid(row=0, column=0, sticky=NW)
         self.height_dropdown.grid(row=1, column=0, sticky=NW)
         self.default_downsample_btn.grid(row=2, column=0, sticky=NW)
-        self.main_frm.mainloop()
 
     def _checks(self):
         check_ffmpeg_available(raise_error=True)
@@ -2293,7 +2278,6 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
         self.width_dropdown.grid(row=0, column=0, sticky=NW)
         self.height_dropdown.grid(row=1, column=0, sticky=NW)
         self.default_downsample_btn.grid(row=2, column=0, sticky=NW)
-        self.main_frm.mainloop()
 
     def _checks(self):
         check_ffmpeg_available(raise_error=True)
@@ -2337,7 +2321,7 @@ class Convert2jpegPopUp(PopUpMixin):
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
         self.quality_scale.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         folder_path = self.selected_frame_dir.folder_path
@@ -2352,7 +2336,7 @@ class Convert2bmpPopUp(PopUpMixin):
         self.create_run_frm(run_function=self.run, title='RUN BMP CONVERSION')
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         folder_path = self.selected_frame_dir.folder_path
@@ -2372,7 +2356,7 @@ class Convert2WEBPPopUp(PopUpMixin):
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
         self.quality_scale.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         folder_path = self.selected_frame_dir.folder_path
@@ -2394,7 +2378,7 @@ class Convert2TIFFPopUp(PopUpMixin):
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
         self.compression_dropdown.grid(row=1, column=0, sticky="NW")
         self.stack_dropdown.grid(row=2, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         folder_path = self.selected_frame_dir.folder_path
@@ -2410,7 +2394,7 @@ class Convert2PNGPopUp(PopUpMixin):
         self.create_run_frm(run_function=self.run, title='RUN PNG CONVERSION')
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         folder_path = self.selected_frame_dir.folder_path
@@ -2450,7 +2434,7 @@ class Convert2MP4PopUp(PopUpMixin):
         self.selected_video_dir.grid(row=0, column=0, sticky=NW)
         multiple_video_run.grid(row=1, column=0, sticky=NW)
 
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         if not multiple:
@@ -2493,7 +2477,7 @@ class Convert2AVIPopUp(PopUpMixin):
         multiple_video_frm.grid(row=2, column=0, sticky=NW)
         self.selected_video_dir.grid(row=0, column=0, sticky=NW)
         multiple_video_run.grid(row=1, column=0, sticky=NW)
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         if not multiple:
@@ -2536,7 +2520,7 @@ class Convert2WEBMPopUp(PopUpMixin):
         multiple_video_frm.grid(row=2, column=0, sticky=NW)
         self.selected_video_dir.grid(row=0, column=0, sticky=NW)
         multiple_video_run.grid(row=1, column=0, sticky=NW)
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         if not multiple:
@@ -2582,7 +2566,7 @@ class Convert2MOVPopUp(PopUpMixin):
         multiple_video_frm.grid(row=2, column=0, sticky=NW)
         self.selected_video_dir.grid(row=0, column=0, sticky=NW)
         multiple_video_run.grid(row=1, column=0, sticky=NW)
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         if not multiple:
@@ -2633,7 +2617,7 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
         multiple_videos_run.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         img_path = self.selected_img.file_path
@@ -2670,6 +2654,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
+        self.timer_format_dropdown = DropDownMenu(settings_frm, "TIME FORMAT:", ['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'], labelwidth=25)
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.font_size_dropdown.setChoices(20)
@@ -2677,6 +2662,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_color_dropdown.setChoices('White')
         self.font_border_dropdown.setChoices('Black')
         self.font_border_width_dropdown.setChoices(2)
+        self.timer_format_dropdown.setChoices('HH:MM:SS.MMMM')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2685,6 +2671,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_color_dropdown.grid(row=3, column=0, sticky=NW)
         self.font_border_dropdown.grid(row=4, column=0, sticky=NW)
         self.font_border_width_dropdown.grid(row=5, column=0, sticky=NW)
+        self.timer_format_dropdown.grid(row=6, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TIMER", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2701,7 +2688,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
         multiple_videos_run.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         loc = self.location_dropdown.getChoices()
@@ -2711,6 +2698,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         font_clr = self.font_color_dropdown.getChoices()
         font_border_clr = self.font_border_dropdown.getChoices()
         font_border_width = int(self.font_border_width_dropdown.getChoices())
+        timer_format = self.timer_format_dropdown.getChoices()
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -2724,6 +2712,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
                                                          font_color=font_clr,
                                                          font_border_color=font_border_clr,
                                                          font_border_width=font_border_width,
+                                                         time_format=timer_format,
                                                          position=loc)).start()
 
 
@@ -2762,7 +2751,7 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
         multiple_videos_run.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         loc = self.bar_loc_dropdown.getChoices()
@@ -2805,7 +2794,7 @@ class SuperimposeVideoPopUp(PopUpMixin):
         self.opacity_dropdown.grid(row=3, column=0, sticky=NW)
         self.size_dropdown.grid(row=4, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         loc = self.location_dropdown.getChoices()
@@ -2867,7 +2856,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
         multiple_videos_run.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         loc = self.location_dropdown.getChoices()
@@ -2939,7 +2928,7 @@ class SuperimposeTextPopUp(PopUpMixin):
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
         multiple_videos_run.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         loc = self.location_dropdown.getChoices()
@@ -2990,7 +2979,7 @@ class BoxBlurPopUp(PopUpMixin):
         self.selected_video.grid(row=0, column=0, sticky="NW")
         single_video_run.grid(row=1, column=0, sticky="NW")
 
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         video_path = self.selected_video.file_path
@@ -2998,7 +2987,6 @@ class BoxBlurPopUp(PopUpMixin):
         blur_lvl = float(self.blur_lvl_dropdown.getChoices())
         invert = str_2_bool(self.invert_dropdown.getChoices())
         threading.Thread(target=roi_blurbox(video_path=video_path, blur_level=blur_lvl, invert=invert)).start()
-
 
 class BackgroundRemoverPopUp(PopUpMixin):
     def __init__(self):
@@ -3031,7 +3019,7 @@ class BackgroundRemoverPopUp(PopUpMixin):
         self.multiprocess_cb.grid(row=6, column=0, sticky=NW)
         self.multiprocess_dropdown.grid(row=6, column=1, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         video_path = self.video_path.file_path
@@ -3082,6 +3070,307 @@ class BackgroundRemoverPopUp(PopUpMixin):
                                      bg_color=bg_clr,
                                      fg_color=fg_clr,
                                      core_cnt=core_cnt)
+
+
+class RotateVideoSetDegreesPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="ROTATE VIDEOS")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.degrees_dropdown = DropDownMenu(settings_frm, "CLOCKWISE DEGREES:", list(range(1, 360, 1)), labelwidth=25)
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY (%):", list(range(10, 110, 10)), labelwidth=25)
+        self.quality_dropdown.setChoices(60)
+        self.degrees_dropdown.setChoices('90')
+        self.degrees_dropdown.grid(row=0, column=0, sticky=NW)
+
+        settings_frm.grid(row=0, column=0, sticky="NW")
+        self.degrees_dropdown.grid(row=0, column=0, sticky="NW")
+        self.quality_dropdown.grid(row=1, column=0, sticky="NW")
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - ROTATE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - ROTATE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run(multiple=True))
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+
+
+    def run(self, multiple: bool):
+        degrees = int(self.degrees_dropdown.getChoices())
+        quality = int(self.quality_dropdown.getChoices())
+        if not multiple:
+            data_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=data_path)
+        else:
+            data_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=data_path)
+
+        threading.Thread(target=rotate_video(video_path=data_path,
+                                             degrees=degrees,
+                                             quality=quality)).start()
+
+
+class FlipVideosPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="FLIP VIDEOS")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.horizontal_dropdown = DropDownMenu(settings_frm, "HORIZONTAL FLIP:", ['TRUE', 'FALSE'], labelwidth=25)
+        self.vertical_dropdown = DropDownMenu(settings_frm, "VERTICAL FLIP:", ['TRUE', 'FALSE'], labelwidth=25)
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY (%):", list(range(10, 110, 10)), labelwidth=25)
+
+        self.horizontal_dropdown.setChoices('FALSE')
+        self.vertical_dropdown.setChoices('FALSE')
+        self.quality_dropdown.setChoices(60)
+
+        settings_frm.grid(row=0, column=0, sticky="NW")
+        self.vertical_dropdown.grid(row=0, column=0, sticky="NW")
+        self.horizontal_dropdown.grid(row=1, column=0, sticky="NW")
+        self.quality_dropdown.grid(row=2, column=0, sticky="NW")
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - FLIP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - FLIP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run(multiple=True))
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+
+    def run(self, multiple: bool):
+        vertical_flip = str_2_bool(self.vertical_dropdown.getChoices())
+        horizontal_flip = str_2_bool(self.horizontal_dropdown.getChoices())
+        if not vertical_flip and not horizontal_flip:
+            raise InvalidInputError(msg='Flip videos vertically and/or horizontally. Got both as False', source=self.__class__.__name__)
+        quality = int(self.quality_dropdown.getChoices())
+        if not multiple:
+            data_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=data_path)
+        else:
+            data_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=data_path)
+
+        threading.Thread(target=flip_videos(video_path=data_path,
+                                            vertical_flip=vertical_flip,
+                                            horizontal_flip=horizontal_flip,
+                                            quality=quality)).start()
+
+
+class UpsampleVideosPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="UPSAMPLE VIDEOS USING INTERPOLATION (WARNING: LONG RUN-TIMES)")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.fps_dropdown = DropDownMenu(settings_frm, "NEW FRAME-RATE (FPS):", list(range(1, 500)), labelwidth=25)
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY (%):", list(range(10, 110, 10)), labelwidth=25)
+
+        self.fps_dropdown.setChoices(60)
+        self.quality_dropdown.setChoices(60)
+        settings_frm.grid(row=0, column=0, sticky="NW")
+        self.fps_dropdown.grid(row=0, column=0, sticky="NW")
+        self.quality_dropdown.grid(row=1, column=0, sticky="NW")
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - UP-SAMPLE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS -  UP-SAMPLE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run(multiple=True))
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        target_fps = int(self.fps_dropdown.getChoices())
+        target_quality = int(self.quality_dropdown.getChoices())
+        if not multiple:
+            data_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=data_path)
+        else:
+            data_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=data_path)
+
+        threading.Thread(target=upsample_fps(video_path=data_path,
+                                             fps=target_fps,
+                                             quality=target_quality)).start()
+
+
+
+class ReverseVideoPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="REVERSE VIDEOS")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.MP4_CODEC_LK = {'HEVC (H.265)': 'libx265', 'H.264 (AVC)': 'libx264', 'VP9': 'vp9'}
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.quality_dropdown.setChoices(60)
+        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MP4_CODEC_LK.keys()), labelwidth=25)
+        self.codec_dropdown.setChoices('HEVC (H.265)')
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.quality_dropdown.grid(row=0, column=0, sticky=NW)
+        self.codec_dropdown.grid(row=1, column=0, sticky=NW)
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - REVERSE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - REVERSE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run(multiple=True))
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+        #self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        target_quality = int(self.quality_dropdown.getChoices())
+        codec = self.MP4_CODEC_LK[self.codec_dropdown.getChoices()]
+        if not multiple:
+            data_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=data_path)
+        else:
+            data_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=data_path)
+
+        reverse_videos(path=data_path, quality=target_quality, codec=codec)
+
+class Convert2BlackWhitePopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="CONVERT VIDEOS TO BLACK AND WHITE (NOTE: NOT GRAYSCALE)")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        threshold = [round(x, 2) for x in list(np.arange(0.01, 1.01, 0.01))]
+        self.threshold_dropdown = DropDownMenu(settings_frm, "BLACK THRESHOLD:", threshold, labelwidth=25)
+        self.threshold_dropdown.setChoices(0.5)
+
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.threshold_dropdown.grid(row=0, column=0, sticky=NW)
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - CONVERT TO BLACK & WHITE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - CONVERT TO BLACK & WHITE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run(multiple=True))
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        threshold = float(self.threshold_dropdown.getChoices())
+        if not multiple:
+            data_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=data_path)
+        else:
+            data_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=data_path)
+
+        threading.Thread(target=video_to_bw(video_path=data_path,
+                                            threshold=threshold)).start()
+
+
+class CreateAverageFramePopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="CREATE AVERAGE VIDEO FRAME")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.save_dir = FolderSelect(settings_frm, "AVERAGE FRAME SAVE DIRECTORY:", title="Select a video directory", lblwidth=25)
+        self.section_start_time_eb = Entry_Box(settings_frm, "START TIME:", "25")
+        self.section_end_time_eb = Entry_Box(settings_frm, "END TIME:", "25")
+        self.section_start_time_eb.entry_set('00:00:00')
+        self.section_end_time_eb.entry_set('00:00:00')
+
+        settings_frm.grid(row=0, column=0, sticky=NW, pady=10)
+        self.save_dir.grid(row=0, column=0, sticky=NW)
+        self.section_start_time_eb.grid(row=1, column=0, sticky=NW)
+        self.section_end_time_eb.grid(row=2, column=0, sticky=NW)
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - CREATE AVERAGE FRAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", command=lambda: self.run(multiple=False))
+
+        single_video_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_video.grid(row=0, column=0, sticky="NW")
+        single_video_run.grid(row=1, column=0, sticky="NW")
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - CREATE AVERAGE FRAMES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", command=lambda: self.run(multiple=True))
+
+        multiple_videos_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_video_dir.grid(row=0, column=0, sticky="NW")
+        multiple_videos_run.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run(self, multiple: bool):
+        start_time = self.section_start_time_eb.entry_get.strip()
+        end_time = self.section_end_time_eb.entry_get.strip()
+        save_dir = self.save_dir.folder_path
+        check_if_dir_exists(in_dir=save_dir)
+        if (start_time != '' and end_time == '') or (start_time == '' and end_time != ''):
+            raise InvalidInputError(msg=f'Both start time and end time have to be either time-stamps or blank.', source=self.__class__.__name__)
+        if start_time != '' and end_time != '':
+            check_if_string_value_is_valid_video_timestamp(value=start_time, name='start_time')
+            check_if_string_value_is_valid_video_timestamp(value=end_time, name='end_time')
+            check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=self.__class__.__name__)
+        else:
+            start_time, end_time = None, None
+        if not multiple:
+            data_path = self.selected_video.file_path
+            check_file_exist_and_readable(file_path=data_path)
+            data_path = [data_path]
+        else:
+            data_path = self.selected_video_dir.folder_path
+            check_if_dir_exists(in_dir=data_path)
+            data_path = list(find_all_videos_in_directory(directory=data_path, as_dict=True, raise_error=True).values())
+
+        for video_cnt, video_path in enumerate(data_path):
+            _, video_name, _ = get_fn_ext(filepath=video_path)
+            save_path = os.path.join(save_dir, save_dir, f'{video_name}_avg_frm.png')
+            _ = get_video_meta_data(video_path=video_path)
+            if start_time != None and end_time != None:
+                check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=video_path)
+                check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end_time, video_path=video_path)
+
+            threading.Thread(target=create_average_frm(video_path=video_path,
+                                                       start_time=start_time,
+                                                       end_time=end_time,
+                                                       save_path=save_path,
+                                                       verbose=True)).start()
+
+
+
+
+#FlipVideosPopUp()
 
 # ClipMultipleVideosByFrameNumbers
 # ClipMultipleVideosByFrameNumbers(data_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/test', save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/clipped')

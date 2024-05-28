@@ -51,15 +51,13 @@ from simba.utils.read_write import (
     concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
     read_config_entry, read_config_file, read_frm_of_video)
-from simba.utils.warnings import (FileExistWarning, InValidUserInputWarning,
-                                  SameInputAndOutputWarning)
+from simba.utils.warnings import (FileExistWarning, InValidUserInputWarning, SameInputAndOutputWarning, FrameRangeWarning)
 from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
 
 MAX_FRM_SIZE = 1080, 650
-
 
 def change_img_format(directory: Union[str, os.PathLike],
                       file_type_in: str,
@@ -3334,8 +3332,9 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
                              font_size: Optional[int] = 30,
                              font_color: Optional[str] = 'white',
                              font_border_color: Optional[str] = 'black',
+                             time_format: Optional[Literal['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM']] = 'HH:MM:SS.MMMM',
                              font_border_width: Optional[int] = 2,
-                             position: Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']] = 'top_left',
+                             position: Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']] = 'top_left',
                              save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
     """
     Superimposes elapsed time on the given video file(s) and saves the modified video(s).
@@ -3361,6 +3360,7 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     timer = SimbaTimer(start=True)
     POSITIONS = ['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']
     check_str(name=f'{superimpose_elapsed_time.__name__} position', value=position, options=POSITIONS)
+    check_str(name=f'{superimpose_elapsed_time.__name__} time_format', value=time_format, options=['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'])
     check_int(name=f'{superimpose_elapsed_time.__name__} font_size', value=font_size, min_value=1)
     check_int(name=f'{superimpose_elapsed_time.__name__} font_border_width', value=font_border_width, min_value=1)
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
@@ -3368,13 +3368,20 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     font_dict = get_fonts()
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
     font_path = font_dict[font]
+    time_format_map = {'MM:SS': '%{pts\\:mks}',
+                       'HH:MM:SS': '%{pts\\:hms}',
+                       'SS.MMMMMM': '%{pts}',
+                       'HH:MM:SS.MMMM': '%{pts\\:hms}.%{eif\\:mod(n\\,1000)\\:d\\:4}'}
+    position_map = { 'top_left': 'x=5:y=5', 'top_right': 'x=(w-tw-5):y=5', 'bottom_left': 'x=5:y=(h-th-5)', 'bottom_right': 'x=(w-tw-5):y=(h-th-5)', 'top_middle': 'x=(w-tw)/2:y=10', 'bottom_middle': 'x=(w-tw)/2:y=(h-th-10)'}
+    time_text = time_format_map[time_format]
+    pos = position_map[position]
+
     if os.path.isfile(video_path):
         video_paths = [video_path]
     elif os.path.isdir(video_path):
         video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
     else:
-        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path',
-                                source=superimpose_elapsed_time.__name__)
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path', source=superimpose_elapsed_time.__name__)
     if save_dir is not None:
         check_if_dir_exists(in_dir=save_dir)
     else:
@@ -3383,25 +3390,16 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
         _, video_name, ext = get_fn_ext(video_path)
         print(f'Superimposing time {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
         save_path = os.path.join(save_dir, f'{video_name}_time_superimposed{ext}')
-        if position == POSITIONS[0]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
-        elif position == POSITIONS[1]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
-        elif position == POSITIONS[2]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
-        elif position == POSITIONS[3]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
-        elif position == POSITIONS[4]:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
-        else:
-            cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='%{{pts\:hms}}.%{{eif\:mod(n\\,1000)\\:d\\:3}}':x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
+        cmd = f"ffmpeg -i '{video_path}' -vf \"drawtext=fontfile={font_path}:text='{time_text}':{pos}:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy '{save_path}' -loglevel error -stats -hide_banner -y"
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed time on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
 def reverse_videos(path: Union[str, os.PathLike],
                    save_dir: Optional[Union[str, os.PathLike]] = None,
+                   codec: Literal['libx265', 'libx264', 'vp9'] = 'libx265',
                    quality: Optional[int] = 60) -> None:
+
     """
     Reverses one or more video files located at the specified path and saves the reversed videos in the specified
     directory.
@@ -3423,6 +3421,7 @@ def reverse_videos(path: Union[str, os.PathLike],
     check_ffmpeg_available(raise_error=True)
     check_instance(source=f'{reverse_videos.__name__} path', instance=path, accepted_types=(str,))
     check_int(name=f'{reverse_videos.__name__} quality', value=quality)
+    check_str(name='codec', value=codec, options=('libx265', 'libx264', 'vp9'))
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
     crf_lk = percent_to_crf_lookup()
     crf = crf_lk[str(quality)]
@@ -3445,17 +3444,20 @@ def reverse_videos(path: Union[str, os.PathLike],
         print(f'Reversing video {video_name} (Video {file_cnt+1}/{len(file_paths)})...')
         _ = get_video_meta_data(video_path=file_path)
         out_path = os.path.join(save_dir, f'{video_name}{ext}')
-        cmd = f'ffmpeg -i "{file_path}" -vf reverse -af areverse -c:v libx264 -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -i "{file_path}" -vf reverse -af areverse -c:v {codec} -crf {crf} "{out_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) reversed and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=reverse_videos.__name__)
 
 def video_to_bw(video_path: Union[str, os.PathLike],
-                threshold: Optional[float] = 0.5) -> None:
+                threshold: Optional[float] = 0.5,
+                save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
     """
     Convert video to black and white using passed threshold.
 
     .. video:: _static/img/video_to_bw.webm
+       :width: 800
+       :autoplay:
        :loop:
 
     :param Union[str, os.PathLike] video_path: Path to the video
@@ -3467,16 +3469,33 @@ def video_to_bw(video_path: Union[str, os.PathLike],
     """
 
     check_float(name=f'{video_to_bw.__name__} threshold', value=threshold, min_value=0, max_value=1.0)
+    if os.path.isfile(video_path):
+        video_paths = [video_path]
+    elif os.path.isdir(video_path):
+        video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
+    else:
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path', source=video_to_bw.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir)
+    else:
+        save_dir = os.path.dirname(video_paths[0])
+    for file_cnt, video_path in enumerate(video_paths):
+        _, video_name, ext = get_fn_ext(video_path)
     threshold = int(255 * threshold)
     check_ffmpeg_available(raise_error=True)
     timer = SimbaTimer(start=True)
-    _ = get_video_meta_data(video_path=video_path)
-    dir, video_name, ext = get_fn_ext(video_path)
-    save_path = os.path.join(dir, f'{video_name}_bw{ext}')
-    cmd = f"ffmpeg -i '{video_path}' -vf \"format=gray,geq=lum_expr='if(lt(lum(X,Y),{threshold}),0,255)'\" -pix_fmt yuv420p '{save_path}' -y"
-    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-    timer.stop_timer()
-    stdout_success(msg=f'Video {video_name} converted.', elapsed_time=timer.elapsed_time_str)
+    for file_cnt, video_path in enumerate(video_paths):
+        _, video_name, ext = get_fn_ext(video_path)
+        print(f'Converting video {video_name} to black and white (Video {file_cnt + 1}/{len(video_paths)})...')
+        _ = get_video_meta_data(video_path=video_path)
+        _, video_name, ext = get_fn_ext(video_path)
+        save_path = os.path.join(save_dir, f'{video_name}_bw{ext}')
+        cmd = f"ffmpeg -i '{video_path}' -vf \"format=gray,geq=lum_expr='if(lt(lum(X,Y),{threshold}),0,255)'\" -pix_fmt yuv420p '{save_path}' -loglevel error -stats -hide_banner -y"
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        timer.stop_timer()
+        stdout_success(msg=f'Video {video_name} converted to black and white.', elapsed_time=timer.elapsed_time_str)
+
+#video_to_bw(video_path='/Users/simon/Desktop/Screen Recording 2024-05-08 at 10.57.59 AM_upsampled_time_superimposed.mov', threshold=0.5)
 
 
 def create_average_frm(video_path: Union[str, os.PathLike],
@@ -3484,7 +3503,9 @@ def create_average_frm(video_path: Union[str, os.PathLike],
                        end_frm: Optional[int] = None,
                        start_time: Optional[str] = None,
                        end_time: Optional[str] = None,
-                       save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, np.ndarray]:
+                       save_path: Optional[Union[str, os.PathLike]] = None,
+                       verbose: Optional[bool] = False) -> Union[None, np.ndarray]:
+
     """
     Create an image representing the average frame of a segment in a video or an entire video.
 
@@ -3498,13 +3519,12 @@ def create_average_frm(video_path: Union[str, os.PathLike],
     :param Optional[int] end_frm: The last frame in the segment to create the average frame from. Default: None.
     :param Optional[str] start_time: The start timestamp in `HH:MM:SS` format in the segment to create the average frame from. Default: None.
     :param Optional[str] end_time: The end timestamp in `HH:MM:SS` format in the segment to create the average frame from. Default: None.
-    :param Optional[Union[str, os.PathLike]] save_path: The path to where to save the average image. If None, then reaturens the average image in np,ndarray format. Default: None.
+    :param Optional[Union[str, os.PathLike]] save_path: The path to where to save the average image. If None, then returns the average image in np,ndarray format. Default: None.
     :return Union[None, np.ndarray]: The average image (if ``save_path`` is not None) or None if  ``save_path`` is passed.
     """
 
     if ((start_frm is not None) or (end_frm is not None)) and ((start_time is not None) or (end_time is not None)):
-        raise InvalidInputError(msg=f'Pass start_frm and end_frm OR start_time and end_time',
-                                source=create_average_frm.__name__)
+        raise InvalidInputError(msg=f'Pass start_frm and end_frm OR start_time and end_time', source=create_average_frm.__name__)
     elif type(start_frm) != type(end_frm):
         raise InvalidInputError(msg=f'Pass start frame and end frame', source=create_average_frm.__name__)
     elif type(start_time) != type(end_time):
@@ -3512,35 +3532,43 @@ def create_average_frm(video_path: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=video_path)
     video_meta_data = get_video_meta_data(video_path=video_path)
     cap = cv2.VideoCapture(video_path)
+    if verbose:
+        print(f'Getting average frame from {video_path}...')
     if (start_frm is not None) and (end_frm is not None):
         check_int(name='start_frm', value=start_frm, min_value=0, max_value=video_meta_data['frame_count'])
         check_int(name='end_frm', value=end_frm, min_value=0, max_value=video_meta_data['frame_count'])
         if start_frm > end_frm:
-            raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).',
-                                    source=create_average_frm.__name__)
+            raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).', source=create_average_frm.__name__)
         frame_ids = list(range(start_frm, end_frm + 1))
     elif (start_time is not None) and (end_time is not None):
         check_if_string_value_is_valid_video_timestamp(value=start_time, name=create_average_frm.__name__)
         check_if_string_value_is_valid_video_timestamp(value=end_time, name=create_average_frm.__name__)
-        check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time,
-                                              name=create_average_frm.__name__)
+        check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=create_average_frm.__name__)
         check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=video_path)
-        frame_ids = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time,
-                                                       fps=video_meta_data['fps'])
+        frame_ids = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time, fps=video_meta_data['fps'])
     else:
         frame_ids = list(range(0, video_meta_data['frame_count']))
     cap.set(0, frame_ids[0])
     bg_sum, frm_cnt, frm_len = None, 0, len(frame_ids)
-    while frm_cnt <= frm_len:
+    while frm_cnt < frm_len:
+        if verbose:
+            print(f'Reading frame {frm_cnt} / {frm_len} ({video_path})...')
         ret, frm = cap.read()
-        if bg_sum is None: bg_sum = np.float32(frm)
-        else: cv2.accumulate(frm, bg_sum)
-        frm_cnt += 1
+        if ret:
+            if bg_sum is None:
+                bg_sum = np.float32(frm)
+            else:
+                cv2.accumulate(frm, bg_sum)
+            frm_cnt += 1
+        else:
+            break
     img = cv2.convertScaleAbs(bg_sum / frm_len)
     cap.release()
     if save_path is not None:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), source=create_average_frm.__name__)
         cv2.imwrite(save_path, img)
+        if verbose:
+            stdout_success(msg=f'Saved average frame at {save_path}', source=create_average_frm.__name__)
     else:
         return img
 
@@ -3916,6 +3944,163 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed free-text on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
+
+
+def rotate_video(video_path: Union[str, os.PathLike],
+                 degrees: int,
+                 gpu: Optional[bool] = False,
+                 quality: Optional[int] = 60,
+                 save_dir: Optional[Union[str, os.PathLike]] = None):
+
+    """
+    Rotate a video or a directory of videos by a specified number of degrees.
+
+    :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
+    :param int degrees: Number of degrees (between 1 and 359, inclusive) to rotate the video clockwise.
+    :param Optional[bool] gpu: If True, attempt to use GPU acceleration for rotation (default is False).
+    :param Optional[int] quality: Quality of the output video, an integer between 1 and 100 (default is 60).
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the rotated video(s). If None, the directory of the input video(s) will be used.
+    :return: None.
+
+    :example:
+    >>> rotate_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/rot_test.mp4', degrees=180)
+    """
+
+    check_ffmpeg_available(raise_error=True)
+    timer = SimbaTimer(start=True)
+    check_int(name=f'{rotate_video.__name__} font_size', value=degrees, min_value=1, max_value=359)
+    check_int(name=f'{rotate_video.__name__} quality', value=quality, min_value=1, max_value=100)
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=rotate_video.__name__)
+    crf_lk = percent_to_crf_lookup()
+    crf = crf_lk[str(quality)]
+    if os.path.isfile(video_path):
+        video_paths = [video_path]
+    elif os.path.isdir(video_path):
+        video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
+    else:
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path', source=rotate_video.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir)
+    else:
+        save_dir = os.path.dirname(video_paths[0])
+    for file_cnt, video_path in enumerate(video_paths):
+        _, video_name, ext = get_fn_ext(video_path)
+        print(f'Rotating video {video_name} {degrees} degrees (Video {file_cnt + 1}/{len(video_paths)})...')
+        save_path = os.path.join(save_dir, f'{video_name}_rotated{ext}')
+        if gpu:
+            cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "hwupload_cuda,rotate={degrees}*(PI/180),format=nv12|cuda" -c:v h264_nvenc "{save_path}" -loglevel error -stats -y'
+        else:
+            cmd = f'ffmpeg -i "{video_path}" -vf "rotate={degrees}*(PI/180)" -c:v libx264 -crf {crf} "{save_path}" -loglevel error -stats -y'
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    stdout_success(msg=f"{len(video_paths)} video(s) ratated {degrees} and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=rotate_video.__name__,)
+
+
+def flip_videos(video_path: Union[str, os.PathLike],
+                horizontal_flip: Optional[bool] = False,
+                vertical_flip: Optional[bool] = False,
+                quality: Optional[int] = 60,
+                save_dir: Optional[Union[str, os.PathLike]] = None):
+    """
+    Flip a video or directory of videos horizontally, vertically, or both, and save them to the specified directory.
+
+    .. video:: _static/img/flip_videos.webm
+       :width: 900
+       :loop:
+       :autoplay:
+
+    :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
+    :param Optional[bool] horizontal_flip: If True, flip the video(s) horizontally (default is False).
+    :param Optional[bool] vertical_flip: If True, flip the video(s) vertically (default is False).
+    :param Optional[int] quality: Quality of the output video, an integer between 1 and 100 (default is 60).
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the flipped video(s). If None, the directory of the input video(s) will be used.
+    :return: None.
+    """
+
+
+    check_ffmpeg_available(raise_error=True)
+    timer = SimbaTimer(start=True)
+    check_int(name=f'{rotate_video.__name__} quality', value=quality, min_value=1, max_value=100)
+    if not horizontal_flip and not vertical_flip: raise InvalidInputError(msg='Flip videos vertically and/or horizontally. Got both as False', source=flip_videos.__name__)
+    crf_lk = percent_to_crf_lookup()
+    crf = crf_lk[str(quality)]
+    if os.path.isfile(video_path):
+        video_paths = [video_path]
+    elif os.path.isdir(video_path):
+        video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
+    else:
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path', source=flip_videos.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir)
+    else:
+        save_dir = os.path.dirname(video_paths[0])
+    for file_cnt, video_path in enumerate(video_paths):
+        _, video_name, ext = get_fn_ext(video_path)
+        print(f'Flipping video {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
+        save_path = os.path.join(save_dir, f'{video_name}_flipped{ext}')
+        if vertical_flip and not horizontal_flip:
+            cmd = f'ffmpeg -i "{video_path}" -vf "vflip" -c:v libx264 -crf {crf} "{save_path}" -loglevel error -stats -y'
+        elif horizontal_flip and not vertical_flip:
+            cmd = f'ffmpeg -i "{video_path}" -vf "hflip" -c:v libx264 -crf {crf} "{save_path}" -loglevel error -stats -y'
+        else:
+            cmd = f'ffmpeg -i "{video_path}" -vf "hflip,vflip" -c:v libx264 -crf {crf} "{save_path}" -loglevel error -stats -y'
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+    timer.stop_timer()
+    stdout_success(msg=f"{len(video_paths)} video(s) flipped and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=flip_videos.__name__)
+
+
+
+def upsample_fps(video_path: Union[str, os.PathLike],
+                 fps: int,
+                 quality: Optional[int] = 60,
+                 save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
+    """
+    Upsample the frame rate of a video or all videos in a directory to a specified fps with a given quality.
+
+    .. note::
+       Uses ``ffmpeg minterpolate``
+
+    .. warning::
+       Long run-times for higher resolution videos.
+
+    :param Union[str, os.PathLike] video_path: The path to the input video file or directory containing video files.
+    :param int fps: The target frame rate to upsample the video(s) to.
+    :param Optional[int] quality: The quality level of the output video(s), represented as a percentage (1-100). Lower values indicate higher quality. Default is 60.
+    :param Optional[Union[str, os.PathLike]] save_dir: The directory to save the upsampled video(s). If None, the videos will be saved in the same directory as the input video(s).
+    :return: None. The function saves the upsampled video(s) to the specified directory.
+
+    :example:
+    >>> upsample_fps(video_path='/Users/simon/Desktop/Box2_IF19_7_20211109T173625_4_851_873_1_cropped.mp4', fps=100, quality=100)
+    """
+
+    timer = SimbaTimer(start=True)
+    check_ffmpeg_available(raise_error=True)
+    check_int(name=f'{upsample_fps.__name__} quality', value=quality, min_value=1, max_value=100)
+    check_float(name=f'{upsample_fps.__name__} fps', value=quality, min_value=10e-16)
+    crf_lk = percent_to_crf_lookup()
+    crf = crf_lk[str(quality)]
+    if os.path.isfile(video_path):
+        video_paths = [video_path]
+    elif os.path.isdir(video_path):
+        video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
+    else:
+        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path', source=rotate_video.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir)
+    else:
+        save_dir = os.path.dirname(video_paths[0])
+    for file_cnt, video_path in enumerate(video_paths):
+        _, video_name, ext = get_fn_ext(video_path)
+        input_video_meta = get_video_meta_data(video_path=video_path)
+        if input_video_meta['fps'] >= fps:
+            FrameRangeWarning(msg=f"The FPS of the input video named {video_name} ({input_video_meta['fps']}) is the same or larger than the upscaled target FPS ({fps})", source=upsample_fps.__name__)
+        print(f'Up-sampling video {video_name} to {fps} FPS (Video {file_cnt + 1}/{len(video_paths)})...')
+        save_path = os.path.join(save_dir, f'{video_name}_upsampled{ext}')
+        cmd = f"""ffmpeg -i "{video_path}" -filter:v "minterpolate='fps={fps}:scd=none:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:me=epzs:search_param=16:vsbmc=1'" -c:v libx264 -crf {crf} "{save_path}" -loglevel error -stats -y"""
+        subprocess.call(cmd, shell=True)
+    timer.stop_timer()
+    stdout_success(msg=f"{len(video_paths)} video(s) upsampled to {fps} and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=upsample_fps.__name__, )
 
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',

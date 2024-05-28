@@ -138,7 +138,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperImposeFrameCountPopUp, SuperimposeProgressBarPopUp,
     SuperimposeTextPopUp, SuperimposeTimerPopUp, SuperimposeVideoNamesPopUp,
     SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, VideoRotatorPopUp,
-    VideoTemporalJoinPopUp)
+    VideoTemporalJoinPopUp, RotateVideoSetDegreesPopUp, FlipVideosPopUp, UpsampleVideosPopUp, ReverseVideoPopUp, Convert2BlackWhitePopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1611,12 +1611,9 @@ class App(object):
 
         video_process_menu = Menu(menu)
         fps_menu = Menu(video_process_menu)
-        fps_menu.add_command(
-            label="Change fps for single video", command=ChangeFpsSingleVideoPopUp
-        )
-        fps_menu.add_command(
-            label="Change fps for multiple videos", command=ChangeFpsMultipleVideosPopUp
-        )
+        fps_menu.add_command(label="Change fps for single video", command=ChangeFpsSingleVideoPopUp)
+        fps_menu.add_command(label="Change fps for multiple videos", command=ChangeFpsMultipleVideosPopUp)
+        fps_menu.add_command(label="Up-sample fps with interpolation", command=UpsampleVideosPopUp)
 
         menu.add_cascade(label="Tools", menu=video_process_menu)
         video_process_menu.add_cascade(label="Change fps...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu)
@@ -1657,6 +1654,7 @@ class App(object):
         format_menu = Menu(video_process_menu)
         img_format_menu = Menu(format_menu)
         video_format_menu = Menu(format_menu)
+
         img_format_menu.add_command(label="Convert image directory to PNG", command=Convert2PNGPopUp)
         img_format_menu.add_command(label="Convert image directory to JPEG", command=Convert2jpegPopUp)
         img_format_menu.add_command(label="Convert image directory to BMP", command=Convert2bmpPopUp)
@@ -1669,30 +1667,17 @@ class App(object):
         format_menu.add_cascade(label="Change image formats...", compound="left", menu=img_format_menu)
         format_menu.add_cascade(label="Change video formats...", compound="left", menu=video_format_menu)
         video_process_menu.add_cascade(label="Change formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu)
-        clahe_menu = Menu(video_process_menu)
-        clahe_menu.add_command(label="CLAHE enhance videos", command=CLAHEPopUp)
-        clahe_menu.add_command(label="Interactively CLAHE enhance videos", command=InteractiveClahePopUp)
-        video_process_menu.add_cascade(label="CLAHE enhance videos...", compound="left", image=self.menu_icons["clahe"]["img"], menu=clahe_menu)
+
+        rm_clr_menu = Menu(video_process_menu)
+        rm_clr_menu.add_command(label="Convert to grayscale", compound="left", image=self.menu_icons["greyscale"]["img"], command=lambda: GreyscaleSingleVideoPopUp())
+        rm_clr_menu.add_command(label="Convert to black and white", compound="left", image=self.menu_icons["bw"]["img"],  command=Convert2BlackWhitePopUp)
+        rm_clr_menu.add_command(label="CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=CLAHEPopUp)
+        rm_clr_menu.add_command(label="Interactively CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=InteractiveClahePopUp)
+        video_process_menu.add_cascade(label="Remove color from videos...", compound="left", image=self.menu_icons["clahe"]["img"], menu=rm_clr_menu)
 
         video_process_menu.add_cascade(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat"]["img"], command=lambda: ConcatenatorPopUp(config_path=None))
-        video_process_menu.add_cascade(
-            label="Concatenate two videos",
-            compound="left",
-            image=self.menu_icons["concat"]["img"],
-            command=ConcatenatingVideosPopUp,
-        )
-        video_process_menu.add_command(
-            label="Convert to grayscale",
-            compound="left",
-            image=self.menu_icons["grey"]["img"],
-            command=lambda: GreyscaleSingleVideoPopUp(),
-        )
-        video_process_menu.add_command(
-            label="Convert ROI definitions",
-            compound="left",
-            image=self.menu_icons["roi"]["img"],
-            command=lambda: ConvertROIDefinitionsPopUp(),
-        )
+        video_process_menu.add_cascade(label="Concatenate two videos", compound="left", image=self.menu_icons["concat"]["img"], command=ConcatenatingVideosPopUp)
+        video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp())
         convert_data_menu = Menu(video_process_menu)
         convert_data_menu.add_command(label="Convert CSV to parquet", command=Csv2ParquetPopUp)
         convert_data_menu.add_command(label="Convert parquet o CSV", command=Parquet2CsvPopUp)
@@ -1774,21 +1759,22 @@ class App(object):
             image=self.menu_icons["reorganize"]["img"],
             command=PoseReorganizerPopUp,
         )
-        video_process_menu.add_command(
-            label="Rotate videos",
-            compound="left",
-            image=self.menu_icons["rotate"]["img"],
-            command=VideoRotatorPopUp,
-        )
+
+        rotate_menu = Menu(menu)
+        rotate_menu.add_command(label="Rotate videos", command=RotateVideoSetDegreesPopUp)
+        rotate_menu.add_command(label="Interactively rotate videos", command=VideoRotatorPopUp)
+        rotate_menu.add_command(label="Flip videos", command=FlipVideosPopUp)
+        rotate_menu.add_command(label="Reverse videos", command=ReverseVideoPopUp)
+        video_process_menu.add_cascade(label="Rotate / flip / reverse videos...", compound="left", image=self.menu_icons["rotate"]["img"], menu=rotate_menu)
 
         superimpose_menu = Menu(menu)
-        superimpose_menu.add_command(label="Superimpose frame numbers on videos", command=SuperImposeFrameCountPopUp)
-        superimpose_menu.add_command(label="Superimpose watermark on videos", command=SuperimposeWatermarkPopUp)
-        superimpose_menu.add_command(label="Superimpose timer on videos", command=SuperimposeTimerPopUp)
-        superimpose_menu.add_command(label="Superimpose progress-bar on videos", command=SuperimposeProgressBarPopUp)
+        superimpose_menu.add_command(label="Superimpose frame numbers", command=SuperImposeFrameCountPopUp)
+        superimpose_menu.add_command(label="Superimpose watermark", command=SuperimposeWatermarkPopUp)
+        superimpose_menu.add_command(label="Superimpose timer", command=SuperimposeTimerPopUp)
+        superimpose_menu.add_command(label="Superimpose progress-bar", command=SuperimposeProgressBarPopUp)
         superimpose_menu.add_command(label="Superimpose video on video", command=SuperimposeVideoPopUp)
-        superimpose_menu.add_command(label="Superimpose video names on video", command=SuperimposeVideoNamesPopUp)
-        superimpose_menu.add_command(label="Superimpose free-text on video", command=SuperimposeTextPopUp)
+        superimpose_menu.add_command(label="Superimpose video names", command=SuperimposeVideoNamesPopUp)
+        superimpose_menu.add_command(label="Superimpose free-text", command=SuperimposeTextPopUp)
         video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu)
 
         video_process_menu.add_command(label="Temporal join videos", compound="left", image=self.menu_icons["stopwatch"]["img"], command=VideoTemporalJoinPopUp)

@@ -237,9 +237,7 @@ def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
     try:
         file_name = os.path.basename(filepath.rsplit(file_extension, 1)[0])
     except ValueError:
-        raise InvalidFilepathError(
-            msg=f"{filepath} is not a valid filepath", source=get_fn_ext.__name__
-        )
+        raise InvalidFilepathError(msg=f"{filepath} is not a valid filepath", source=get_fn_ext.__name__)
     dir_name = os.path.dirname(filepath)
     return dir_name, file_name, file_extension
 
