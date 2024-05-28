@@ -3509,6 +3509,26 @@ def create_average_frm(video_path: Union[str, os.PathLike],
     """
     Create an image representing the average frame of a segment in a video or an entire video.
 
+    .. video:: _static/img/create_average_frm_1.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    .. video:: _static/img/create_average_frm_2.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    .. video:: _static/img/create_average_frm_3.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    .. video:: _static/img/create_average_frm_4.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     .. note::
        Useful helper for e.g., video background subtraction ``simba.video_processors.video_processing.video_bg_substraction()``
        Either pass ``start_frm`` and ``end_frm`` OR ``start_time`` and ``end_time`` OR pass all four arguments as None.

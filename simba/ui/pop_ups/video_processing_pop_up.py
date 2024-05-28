@@ -3370,6 +3370,8 @@ class CreateAverageFramePopUp(PopUpMixin):
 
 
 
+
+
 #FlipVideosPopUp()
 
 # ClipMultipleVideosByFrameNumbers
