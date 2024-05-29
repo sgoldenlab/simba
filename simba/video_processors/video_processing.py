@@ -3091,6 +3091,8 @@ def crossfade_two_videos(video_path_1: Union[str, os.PathLike],
                          crossfade_duration: Optional[int] = 2,
                          crossfade_method: Optional[str] = 'fade',
                          crossfade_offset: Optional[int] = 2,
+                         quality: Optional[int] = 60,
+                         out_format: Optional[Literal['mp4', 'avi', 'webm']] = 'mp4',
                          save_path: Optional[Union[str, os.PathLike]] = None):
     """
     Cross-fade two videos.
@@ -3123,15 +3125,25 @@ def crossfade_two_videos(video_path_1: Union[str, os.PathLike],
         raise InvalidInputError(msg=f'Video 1 and Video 2 needs to be the same resolution, got {video_2_meta["resolution_str"]} and {video_1_meta["resolution_str"]}', source=crossfade_two_videos.__name__)
     crossfade_offset_methods = get_ffmpeg_crossfade_methods()
     check_str(name=f'{crossfade_method} crossfade_method', value=crossfade_method, options=crossfade_offset_methods)
+    check_str(name=f'{crossfade_method} out_format', value=out_format, options=['mp4', 'avi', 'webm'])
     check_int(name=f'{crossfade_two_videos.__name__} crossfade_duration', value=crossfade_duration, min_value=1, max_value=video_2_meta['video_length_s'])
     check_int(name=f'{crossfade_two_videos.__name__} crossfade_offset', value=crossfade_offset, min_value=0, max_value=video_1_meta['video_length_s'])
+    check_int(name=f'{reverse_videos.__name__} quality', value=quality)
+    crf_lk = percent_to_crf_lookup()
+    crf = crf_lk[str(quality)]
+    for video_path in [video_path_1, video_path_2]:
+        video_meta_data = get_video_meta_data(video_path=video_path)
+        if video_meta_data['video_length_s'] < crossfade_duration:
+            raise FrameRangeError(msg=f'Video {video_meta_data["video_name"]} is shorter {video_meta_data["video_length_s"]} than the crossfade duration {crossfade_duration}.', source=crossfade_two_videos.__name__)
+        if video_meta_data['video_length_s'] < crossfade_offset:
+            raise FrameRangeError(msg=f'Video {video_meta_data["video_name"]} is shorter {video_meta_data["video_length_s"]} than the crossfade offset {crossfade_offset}.', source=crossfade_two_videos.__name__)
     dir_1, video_name_1, ext_1 = get_fn_ext(filepath=video_path_1)
     dir_2, video_name_2, ext_2 = get_fn_ext(filepath=video_path_2)
     if save_path is not None:
         check_if_dir_exists(in_dir=os.path.dirname(save_path))
     else:
-        save_path = os.path.join(dir_1, f'{video_name_1}_{video_name_2}_crossfade{ext_1}')
-    cmd = f'ffmpeg -i "{video_path_1}" -i "{video_path_2}" -filter_complex "xfade=transition={crossfade_method}:offset={crossfade_offset}:duration={crossfade_duration}" "{save_path}" -loglevel error -stats -hide_banner -y'
+        save_path = os.path.join(dir_1, f'{video_name_1}_{video_name_2}_crossfade.{out_format}')
+    cmd = f'ffmpeg -i "{video_path_1}" -i "{video_path_2}" -filter_complex "xfade=transition={crossfade_method}:offset={crossfade_offset}:duration={crossfade_duration}" -crf {crf} "{save_path}" -loglevel error -stats -hide_banner -y'
     subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'Cross-faded video saved at {save_path}', elapsed_time=timer.elapsed_time_str)

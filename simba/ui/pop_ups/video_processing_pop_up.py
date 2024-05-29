@@ -35,13 +35,13 @@ from simba.utils.errors import (CountError, DuplicationError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
                                 NoChoosenClassifierError, NoFilesFoundError,
                                 NotDirectoryError, ResolutionError)
-from simba.utils.lookups import get_color_dict, get_fonts
+from simba.utils.lookups import get_color_dict, get_fonts, get_ffmpeg_crossfade_methods
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    seconds_to_timestamp, str_2_bool)
+    seconds_to_timestamp, str_2_bool, timestamp_to_seconds)
 from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.brightness_contrast_ui import \
     brightness_contrast_ui
@@ -67,7 +67,7 @@ from simba.video_processors.video_processing import (
     superimpose_overlay_video, superimpose_video_names,
     superimpose_video_progressbar, temporal_concatenation, upsample_fps,
     video_bg_substraction_mp, video_bg_subtraction, video_concatenator,
-    video_to_bw, video_to_greyscale, watermark_video)
+    video_to_bw, video_to_greyscale, watermark_video, crossfade_two_videos)
 
 sys.setrecursionlimit(10**7)
 
@@ -3259,8 +3259,8 @@ class CreateAverageFramePopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="CREATE AVERAGE VIDEO FRAME")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.save_dir = FolderSelect(settings_frm, "AVERAGE FRAME SAVE DIRECTORY:", title="Select a video directory", lblwidth=25)
-        self.section_start_time_eb = Entry_Box(settings_frm, "START TIME:", "25")
-        self.section_end_time_eb = Entry_Box(settings_frm, "END TIME:", "25")
+        self.section_start_time_eb = Entry_Box(settings_frm, "SAMPLE START TIME:", "25")
+        self.section_end_time_eb = Entry_Box(settings_frm, "SAMPLE END TIME:", "25")
         self.section_start_time_eb.entry_set('00:00:00')
         self.section_end_time_eb.entry_set('00:00:00')
 
@@ -3369,6 +3369,62 @@ class ManualTemporalJoinPopUp(PopUpMixin):
         if len(unique_res) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique resolutions: {unique_res}', source=self.__class__.__name__)
         threading.Thread(temporal_concatenation(video_paths=video_file_paths, save_format=format[1:], quality=quality)).start()
 
+class CrossfadeVideosPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="CROSS-FADE VIDEOS")
+        crossfade_methods = get_ffmpeg_crossfade_methods()
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO JOIN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.video_path_1 = FileSelect(settings_frm, f"VIDEO PATH 1:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.video_path_2 = FileSelect(settings_frm, f"VIDEO PATH 2:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.out_format_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO FORMAT:", ['mp4', 'avi', 'webm'], labelwidth=25)
+        self.fade_method_dropdown = DropDownMenu(settings_frm, "CROSS-FADE METHOD:", crossfade_methods, labelwidth=25)
+        self.duration_dropdown = DropDownMenu(settings_frm, "CROSS-FADE DURATION:", list(range(2, 22, 2)), labelwidth=25)
+        self.offset_eb = Entry_Box(settings_frm, "CROSS-FADE OFFSET:", "25")
+
+        self.offset_eb.entry_set('00:00:00')
+        self.quality_dropdown.setChoices(60)
+        self.out_format_dropdown.setChoices('mp4')
+        self.fade_method_dropdown.setChoices('fade')
+        self.duration_dropdown.setChoices(6)
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.video_path_1.grid(row=0, column=0, sticky=NW)
+        self.video_path_2.grid(row=1, column=0, sticky=NW)
+        self.quality_dropdown.grid(row=2, column=0, sticky=NW)
+        self.out_format_dropdown.grid(row=3, column=0, sticky=NW)
+        self.fade_method_dropdown.grid(row=4, column=0, sticky=NW)
+        self.duration_dropdown.grid(row=5, column=0, sticky=NW)
+        self.offset_eb.grid(row=6, column=0, sticky=NW)
+        self.create_run_frm(run_function=self.run)
+        self.main_frm.mainloop()
+
+    def run(self):
+        video_1_path, video_2_path = self.video_path_1.file_path, self.video_path_2.file_path
+        quality = int(self.quality_dropdown.getChoices())
+        format = self.out_format_dropdown.getChoices()
+        fade_method = self.fade_method_dropdown.getChoices()
+        offset = self.offset_eb.entry_get
+        check_if_string_value_is_valid_video_timestamp(value=offset, name='offset')
+        duration = int(self.duration_dropdown.getChoices())
+        check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=offset, video_path=video_1_path)
+        offset = timestamp_to_seconds(timestamp=offset)
+        for video_path in [video_1_path, video_2_path]:
+            video_meta_data = get_video_meta_data(video_path=video_path)
+            if video_meta_data['video_length_s'] < duration:
+                raise FrameRangeError(msg=f'Video {video_meta_data["video_name"]} is shorter {video_meta_data["video_length_s"]} than the crossfade duration {duration}.', source=self.__class__.__name__)
+            if video_meta_data['video_length_s'] < offset:
+                raise FrameRangeError(msg=f'Video {video_meta_data["video_name"]} is shorter {video_meta_data["video_length_s"]} than the crossfade offset {offset}.',source=self.__class__.__name__)
+
+
+        threading.Thread(crossfade_two_videos(video_path_1=video_1_path,
+                                              video_path_2=video_2_path,
+                                              crossfade_duration=duration,
+                                              crossfade_method=fade_method,
+                                              crossfade_offset=offset,
+                                              out_format=format,
+                                              quality=quality)).start()
+
+#CrossfadeVideosPopUp()
 
 # FlipVideosPopUp()
 

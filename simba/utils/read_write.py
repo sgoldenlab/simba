@@ -1408,9 +1408,7 @@ def find_all_videos_in_project(
         return video_paths
 
 
-def check_if_hhmmss_timestamp_is_valid_part_of_video(
-    timestamp: str, video_path: Union[str, os.PathLike]
-) -> None:
+def check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp: str, video_path: Union[str, os.PathLike]) -> None:
     """
     Helper to check that a timestamp in HH:MM:SS format is a valid timestamp in a video file.
 
@@ -1434,6 +1432,22 @@ def check_if_hhmmss_timestamp_is_valid_part_of_video(
             msg=f'The timestamp {timestamp} does not occur in video {video_meta_data["video_name"]}, the video has length {video_length_str}',
             source=check_if_hhmmss_timestamp_is_valid_part_of_video.__name__,
         )
+
+def timestamp_to_seconds(timestamp: str) -> int:
+    """
+    Returns the number of seconds into the video given a timestamp in HH:MM:SS format.
+    :raises FrameRangeError: If timestamp is not a valid format.
+
+    :example:
+    >>> timestamp_to_seconds(timestamp='00:00:05')
+    >>> 5
+    """
+
+    check_if_string_value_is_valid_video_timestamp(value=timestamp, name="Timestamp")
+    h, m, s = timestamp.split(":")
+    return int(h) * 3600 + int(m) * 60 + int(s)
+
+
 
 
 def find_time_stamp_from_frame_numbers(
@@ -1939,9 +1953,7 @@ def seconds_to_timestamp(seconds: int) -> str:
     """
     Convert an integer number representing seconds to a HH:MM:SS format.
     """
-    check_int(
-        name=f"{seconds_to_timestamp.__name__} seconds", value=seconds, min_value=0
-    )
+    check_int(name=f"{seconds_to_timestamp.__name__} seconds", value=seconds, min_value=0)
     hours = int(seconds / 3600)
     minutes = int((seconds % 3600) / 60)
     seconds = int(seconds % 60)

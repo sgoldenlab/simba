@@ -139,7 +139,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperImposeFrameCountPopUp, SuperimposeProgressBarPopUp,
     SuperimposeTextPopUp, SuperimposeTimerPopUp, SuperimposeVideoNamesPopUp,
     SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, UpsampleVideosPopUp,
-    VideoRotatorPopUp, VideoTemporalJoinPopUp)
+    VideoRotatorPopUp, VideoTemporalJoinPopUp, CreateAverageFramePopUp, CrossfadeVideosPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1667,12 +1667,7 @@ class App(object):
         convert_data_menu.add_command(label="Convert CSV to parquet", command=Csv2ParquetPopUp)
         convert_data_menu.add_command(label="Convert parquet o CSV", command=Parquet2CsvPopUp)
 
-        video_process_menu.add_cascade(
-            label="Convert working file type...",
-            compound="left",
-            image=self.menu_icons["change"]["img"],
-            menu=convert_data_menu,
-        )
+        video_process_menu.add_cascade(label="Convert working file type...", compound="left", image=self.menu_icons["change"]["img"], menu=convert_data_menu,)
 
         video_process_menu.add_command(
             label="Create path plot",
@@ -1758,7 +1753,9 @@ class App(object):
         temporal_join_videos.add_command(label="Temporal join all videos in directory", command=VideoTemporalJoinPopUp)
         temporal_join_videos.add_command(label="Temporal join selected videos", command=ManualTemporalJoinPopUp)
         video_process_menu.add_cascade(label="Temporal join videos...", compound="left", image=self.menu_icons["stopwatch"]["img"], menu=temporal_join_videos)
-        video_process_menu.add_cascade(label="Box blur videos...", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp)
+        video_process_menu.add_cascade(label="Box blur videos", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp)
+        video_process_menu.add_cascade(label="Cross-fade videos", compound="left", image=self.menu_icons["crossfade"]["img"], command=CrossfadeVideosPopUp)
+        video_process_menu.add_cascade(label="Create average frames from videos", compound="left", image=self.menu_icons["average"]["img"], command=CreateAverageFramePopUp)
         video_process_menu.add_cascade(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp)
         video_process_menu.add_cascade(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp)
         help_menu = Menu(menu)
