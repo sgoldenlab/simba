@@ -2850,12 +2850,9 @@ class Statistics(FeatureExtractionMixin):
             (int8[:], int8[:], bool_, types.misc.Omitted(None)),
         ]
     )
-    def hamming_distance(
-        x: np.ndarray,
-        y: np.ndarray,
-        sort: Optional[bool] = False,
-        w: Optional[np.ndarray] = None,
-    ) -> float:
+    def hamming_distance(x: np.ndarray,
+                         y: np.ndarray,
+                         sort: Optional[bool] = False,w: Optional[np.ndarray] = None) -> float:
         """
         Jitted compute of the Hamming similarity between two vectors.
 

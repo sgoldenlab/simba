@@ -139,7 +139,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperimposeProgressBarPopUp, SuperimposeTextPopUp, SuperimposeTimerPopUp,
     SuperimposeVideoNamesPopUp, SuperimposeVideoPopUp,
     SuperimposeWatermarkPopUp, UpsampleVideosPopUp, VideoRotatorPopUp,
-    VideoTemporalJoinPopUp)
+    VideoTemporalJoinPopUp, ManualTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
@@ -1725,22 +1725,14 @@ class App(object):
         )
 
         video_process_menu.add_command(
-            label="Generate gifs",
+            label="Create GIFs",
             compound="left",
             image=self.menu_icons["gif"]["img"],
             command=CreateGIFPopUP,
         )
 
-        video_process_menu.add_command(
-            label="Get mm/ppx",
-            compound="left",
-            image=self.menu_icons["calipher"]["img"],
-            command=CalculatePixelsPerMMInVideoPopUp,
-        )
-
+        video_process_menu.add_command(label="Get metric conversion factor (pixels/millimeter)", compound="left", image=self.menu_icons["calipher"]["img"], command=CalculatePixelsPerMMInVideoPopUp)
         video_process_menu.add_command(label="Change video brightness / contrast", compound="left", image=self.menu_icons["brightness"]["img"], command=BrightnessContrastPopUp)
-
-
         video_process_menu.add_command(
             label="Merge frames to video",
             compound="left",
@@ -1778,7 +1770,10 @@ class App(object):
         superimpose_menu.add_command(label="Superimpose free-text", command=SuperimposeTextPopUp)
         video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu)
 
-        video_process_menu.add_command(label="Temporal join videos", compound="left", image=self.menu_icons["stopwatch"]["img"], command=VideoTemporalJoinPopUp)
+        temporal_join_videos = Menu(menu)
+        temporal_join_videos.add_command(label="Temporal join all videos in directory", command=VideoTemporalJoinPopUp)
+        temporal_join_videos.add_command(label="Temporal join selected videos", command=ManualTemporalJoinPopUp)
+        video_process_menu.add_cascade(label="Temporal join videos...", compound="left", image=self.menu_icons["stopwatch"]["img"], menu=temporal_join_videos)
         video_process_menu.add_cascade(label="Box blur videos...", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp)
         video_process_menu.add_cascade(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp)
         video_process_menu.add_cascade(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp)

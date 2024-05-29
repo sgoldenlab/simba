@@ -409,6 +409,11 @@ class ArrayError(SimbaError):
         msg = f"SIMBA ARRAY SIZE ERROR: {msg}"
         super().__init__(msg=msg, source=source, show_window=show_window)
 
+class ResolutionError(SimbaError):
+    def __init__(self, msg: str, source: str = "", show_window: bool = False):
+        msg = f"SIMBA RESOLUTION ERROR: {msg}"
+        super().__init__(msg=msg, source=source, show_window=show_window)
+
 
 # test = NoSpecifiedOutputError(msg='test', source='test.method')
 # test = FFMPEGNotFoundError(msg='323')

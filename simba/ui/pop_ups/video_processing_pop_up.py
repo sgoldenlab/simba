@@ -34,7 +34,7 @@ from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
 from simba.utils.errors import (CountError, DuplicationError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
                                 NoChoosenClassifierError, NoFilesFoundError,
-                                NotDirectoryError)
+                                NotDirectoryError, ResolutionError)
 from simba.utils.lookups import get_color_dict, get_fonts
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
@@ -67,7 +67,7 @@ from simba.video_processors.video_processing import (
     superimpose_overlay_video, superimpose_video_names,
     superimpose_video_progressbar, upsample_fps, video_bg_substraction_mp,
     video_bg_subtraction, video_concatenator, video_to_bw, video_to_greyscale,
-    watermark_video)
+    watermark_video, temporal_concatenation)
 
 sys.setrecursionlimit(10**7)
 
@@ -1021,35 +1021,23 @@ class CreateGIFPopUP(PopUpMixin):
 
 class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(
-            self, title="CALCULATE PIXELS PER MILLIMETER IN VIDEO", size=(200, 200)
-        )
-        self.video_path = FileSelect(
-            self.main_frm,
-            "Select a video file: ",
-            title="Select a video file",
-            file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        self.known_distance = Entry_Box(
-            self.main_frm, "Known length in real life (mm): ", "0", validation="numeric"
-        )
-        run_btn = Button(
-            self.main_frm, text="GET PIXELS PER MILLIMETER", command=lambda: self.run()
-        )
-        self.video_path.grid(row=0, column=0, pady=10, sticky=W)
-        self.known_distance.grid(row=1, column=0, pady=10, sticky=W)
-        run_btn.grid(row=2, column=0, pady=10)
+        PopUpMixin.__init__(self, title="CALCULATE PIXELS PER MILLIMETER IN VIDEO", size=(550, 550))
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.video_path = FileSelect(settings_frm, "Select a video file: ",  title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=30)
+        self.known_distance = Entry_Box(settings_frm, "Known real-life metric distance (mm): ", "30", validation="numeric")
+        run_btn = Button(settings_frm, text="GET PIXELS PER MILLIMETER", command=lambda: self.run())
+        settings_frm.grid(row=0, column=0, pady=10, sticky=NW)
+        self.video_path.grid(row=0, column=0, pady=10, sticky=NW)
+        self.known_distance.grid(row=1, column=0, pady=10, sticky=NW)
+        run_btn.grid(row=2, column=0, pady=10, sticky=NW)
+        #self.main_frm.mainloop()
 
     def run(self):
         check_file_exist_and_readable(file_path=self.video_path.file_path)
         check_int(name="Distance", value=self.known_distance.entry_get, min_value=1)
         _ = get_video_meta_data(video_path=self.video_path.file_path)
-        mm_cnt = get_coordinates_nilsson(
-            self.video_path.file_path, self.known_distance.entry_get
-        )
-        print(
-            f"1 PIXEL REPRESENTS {round(mm_cnt, 4)} MILLIMETERS IN VIDEO {os.path.basename(self.video_path.file_path)}."
-        )
+        mm_cnt = get_coordinates_nilsson(self.video_path.file_path, self.known_distance.entry_get)
+        print(f"ONE (1) PIXEL REPRESENTS {round(mm_cnt, 4)} MILLIMETERS IN VIDEO {os.path.basename(self.video_path.file_path)}.")
 
 
 class ConcatenatingVideosPopUp(PopUpMixin):
@@ -3370,12 +3358,55 @@ class CreateAverageFramePopUp(PopUpMixin):
                                                        save_path=save_path,
                                                        verbose=True)).start()
 
+class ManualTemporalJoinPopUp(PopUpMixin):
+    def __init__(self):
+        PopUpMixin.__init__(self, title="MANUAL TEMPORAL JOIN VIDEOS")
+        video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO JOIN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.video_cnt_dropdown = DropDownMenu(video_cnt_frm, "NUMBER OF VIDEOS:", list(range(2, 101, 1)), labelwidth=25)
+        self.select_video_cnt_btn = Button(video_cnt_frm, text="SELECT", command=lambda: self.select())
+        self.quality_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.quality_dropdown.setChoices(60)
+        self.out_format_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO FORMAT:", Options.ALL_VIDEO_FORMAT_OPTIONS.value, labelwidth=25)
+        self.out_format_dropdown.setChoices('.mp4')
+        self.video_cnt_dropdown.setChoices(2)
+        video_cnt_frm.grid(row=0, column=0, sticky=NW)
+        self.video_cnt_dropdown.grid(row=0, column=0, sticky=NW)
+        self.select_video_cnt_btn.grid(row=0, column=1, sticky=NW)
+        self.quality_dropdown.grid(row=1, column=0, sticky=NW)
+        self.out_format_dropdown.grid(row=2, column=0, sticky=NW)
+        self.main_frm.mainloop()
+
+    def select(self):
+        video_cnt = int(self.video_cnt_dropdown.getChoices())
+        if hasattr(self, 'video_paths_frm'):
+            self.video_paths_frm.destroy()
+            self.run_frm.destroy()
+        self.video_paths_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO PATHS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.video_paths_frm.grid(row=1, column=0, sticky=NW)
+        self.video_paths = {}
+        for video_cnt in range(video_cnt):
+            self.video_paths[video_cnt] = FileSelect(self.video_paths_frm, f"VIDEO PATH {video_cnt+1}:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+            self.video_paths[video_cnt].grid(row=video_cnt, column=0, sticky=NW)
+        self.create_run_frm(run_function=self.run)
+
+    def run(self):
+        video_file_paths, meta = [], []
+        for cnt, video_file_select in self.video_paths.items():
+            video_path = video_file_select.file_path
+            check_file_exist_and_readable(file_path=video_path)
+            video_meta = get_video_meta_data(video_path=video_path)
+            video_file_paths.append(video_path)
+            meta.append(video_meta)
+        fps, resolutions = [v['fps'] for v in meta], [v['resolution_str'] for v in meta]
+        unique_fps, unique_res = list(set(fps)), list(set(resolutions))
+        format = self.out_format_dropdown.getChoices()
+        quality = self.quality_dropdown.getChoices()
+        if len(unique_fps) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique FPS: {unique_fps}', source=self.__class__.__name__)
+        if len(unique_res) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique resolutions: {unique_res}', source=self.__class__.__name__)
+        threading.Thread(temporal_concatenation(video_paths=video_file_paths, save_format=format[1:], quality=quality)).start()
 
 
-
-
-
-#FlipVideosPopUp()
+# FlipVideosPopUp()
 
 # ClipMultipleVideosByFrameNumbers
 # ClipMultipleVideosByFrameNumbers(data_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/test', save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/videos/clipped')

@@ -42,7 +42,7 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 FileExistError, FrameRangeError,
                                 InvalidFileTypeError, InvalidInputError,
                                 InvalidVideoFileError, NoDataError,
-                                NoFilesFoundError, NotDirectoryError)
+                                NoFilesFoundError, NotDirectoryError, ResolutionError)
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
                                  percent_to_crf_lookup, percent_to_qv_lk)
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -4116,6 +4116,50 @@ def upsample_fps(video_path: Union[str, os.PathLike],
         subprocess.call(cmd, shell=True)
     timer.stop_timer()
     stdout_success(msg=f"{len(video_paths)} video(s) upsampled to {fps} and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=upsample_fps.__name__, )
+
+def temporal_concatenation(video_paths: List[Union[str, os.PathLike]],
+                           save_path: Optional[Union[str, os.PathLike]] = None,
+                           save_format: Optional[Literal['mp4', 'mov', 'avi', 'webm']] = 'mp4',
+                           quality: Optional[int] = 60) -> None:
+
+    """
+    Concatenates multiple video files temporally into a single video.
+
+    :param List[Union[str, os.PathLike]] video_paths: List of paths to video files to be temporally joined. The videos will be joined in the order appearance in the list.
+    :param Optional[Union[str, os.PathLike]] save_path: The location where to save the temporally concatenated videos. If None, then the video is saved in the same directory as the first video in ``video_paths`` with the name ``temporal_concat_video``.
+    :param Optional[Literal['mp4', 'mov', 'avi', 'webm']] save_format: The video format of the concatenated video. Default: ``mp4``.
+    :param Optional[int] quality: Integer representing the quality: 10, 20, 30.. 100.
+    :return: None
+    """
+
+    timer = SimbaTimer(start=True)
+    check_valid_lst(data=video_paths, source=temporal_concatenation.__name__, valid_dtypes=(str,), min_len=2)
+    check_str(name='save_format', value=save_format.lower(), options=('mp4', 'mov', 'avi', 'webm'))
+    check_int(name='quality', value=quality, max_value=100, min_value=1)
+    crf_lk = percent_to_crf_lookup()
+    crf = crf_lk[str(quality)]
+    meta = []
+    for i in video_paths:
+        check_file_exist_and_readable(file_path=i); video_meta = get_video_meta_data(video_path=i)
+        meta.append(video_meta)
+    fps, resolutions = [v['fps'] for v in meta], [v['resolution_str'] for v in meta]
+    unique_fps, unique_res = list(set(fps)), list(set(resolutions))
+    if len(unique_fps) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique FPS: {unique_fps}', source=temporal_concatenation.__name__)
+    if len(unique_res) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique resolutions: {unique_res}', source=temporal_concatenation.__name__)
+    if save_path is None:
+        save_path = os.path.join(os.path.dirname(video_paths[0]), f'temporal_concat_video.{save_format}')
+    else:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path))
+    filter_complex = ""
+    for i, path in enumerate(video_paths):
+        filter_complex += f"[{i}:v]"
+    filter_complex += f"concat=n={len(video_paths)}:v=1[v]"
+    input_options = " ".join([f"-i \"{path}\"" for path in video_paths])
+    cmd = f'ffmpeg {input_options} -filter_complex "{filter_complex}" -crf {crf} -map "[v]" "{save_path}" -hide_banner -loglevel error -stats -y'
+    subprocess.call(cmd, shell=True)
+    timer.stop_timer()
+    stdout_success(msg=f'{len(video_paths)} videos temporally concatenated and saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
 
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
