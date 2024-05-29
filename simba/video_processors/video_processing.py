@@ -42,7 +42,8 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 FileExistError, FrameRangeError,
                                 InvalidFileTypeError, InvalidInputError,
                                 InvalidVideoFileError, NoDataError,
-                                NoFilesFoundError, NotDirectoryError, ResolutionError)
+                                NoFilesFoundError, NotDirectoryError,
+                                ResolutionError)
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
                                  percent_to_crf_lookup, percent_to_qv_lk)
 from simba.utils.printing import SimbaTimer, stdout_success
