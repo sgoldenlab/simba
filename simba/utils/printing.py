@@ -12,9 +12,7 @@ from typing import Optional
 from simba.utils.enums import Defaults, TagNames
 
 
-def stdout_success(
-    msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None
-) -> None:
+def stdout_success(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
     """
     Helper to parse msg of completed operation to SimBA main interface.
 
@@ -24,19 +22,11 @@ def stdout_success(
     :return None:
     """
 
-    log_event(
-        logger_name=f"{source}.{stdout_success.__name__}",
-        log_type=TagNames.COMPLETE.value,
-        msg=msg,
-    )
+    log_event(logger_name=f"{source}.{stdout_success.__name__}", log_type=TagNames.COMPLETE.value, msg=msg)
     if elapsed_time:
-        print(
-            f"SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.COMPLETE.value}"
-        )
+        print(f"SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.COMPLETE.value}")
     else:
-        print(
-            f"SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.COMPLETE.value}"
-        )
+        print(f"SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.COMPLETE.value}")
 
 
 def stdout_warning(msg: str, elapsed_time: Optional[str] = None) -> None:
@@ -50,18 +40,12 @@ def stdout_warning(msg: str, elapsed_time: Optional[str] = None) -> None:
     """
 
     if elapsed_time:
-        print(
-            f"SIMBA WARNING: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}"
-        )
+        print(f"SIMBA WARNING: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}")
     else:
-        print(
-            f"SIMBA WARNING: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}"
-        )
+        print(f"SIMBA WARNING: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.WARNING.value}")
 
 
-def stdout_trash(
-    msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None
-) -> None:
+def stdout_trash(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
     """
     Helper to parse msg of delete operation to SimBA main interface.
 
@@ -71,19 +55,11 @@ def stdout_trash(
     :return None:
     """
 
-    log_event(
-        logger_name=f"{source}.{stdout_trash.__name__}",
-        log_type=TagNames.TRASH.value,
-        msg=msg,
-    )
+    log_event(logger_name=f"{source}.{stdout_trash.__name__}", log_type=TagNames.TRASH.value, msg=msg)
     if elapsed_time:
-        print(
-            f"SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}"
-        )
+        print(f"SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}")
     else:
-        print(
-            f"SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}"
-        )
+        print(f"SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}")
 
 
 class SimbaTimer(object):
@@ -105,9 +81,7 @@ class SimbaTimer(object):
             self.elapsed_time_str = str(self.elapsed_time)
 
 
-def log_event(
-    logger_name: str, log_type: Literal["CLASS_INIT", "error", "warning"], msg: str
-):
+def log_event(logger_name: str, log_type: Literal["CLASS_INIT", "error", "warning"], msg: str):
     logger = logging.getLogger(str(logger_name))
     if log_type == TagNames.CLASS_INIT.value:
         logger.info(f"{TagNames.CLASS_INIT.value}||{msg}")

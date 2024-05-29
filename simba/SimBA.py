@@ -160,8 +160,8 @@ from simba.video_processors.video_processing import \
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 
-UNSUPERVISED = False
-
+PRINT_EMOJIS = True
+UNSUPERVISED_INTERFACE = False
 
 class LoadProjectPopUp(object):
     def __init__(self):
@@ -1309,15 +1309,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         cue_light_analyser_btn.grid(row=1, sticky=NW)
         anchored_roi_analysis_btn.grid(row=2, sticky=NW)
 
-        if UNSUPERVISED:
+        if UNSUPERVISED_INTERFACE:
             from simba.unsupervised.unsupervised_main import UnsupervisedGUI
-
-            unsupervised_btn = Button(
-                lbl_addon,
-                text="Unsupervised analysis",
-                fg="purple",
-                command=lambda: UnsupervisedGUI(config_path=self.config_path),
-            )
+            unsupervised_btn = Button(lbl_addon, text="Unsupervised analysis", fg="purple", command=lambda: UnsupervisedGUI(config_path=self.config_path))
             unsupervised_btn.grid(row=3, sticky=NW)
 
     def create_video_info_table(self):
@@ -1537,12 +1531,8 @@ class App(object):
     def __init__(self):
         bg_path = os.path.join(os.path.dirname(__file__), Paths.BG_IMG_PATH.value)
         emojis = get_emojis()
-        icon_path_windows = os.path.join(
-            os.path.dirname(__file__), Paths.LOGO_ICON_WINDOWS_PATH.value
-        )
-        icon_path_darwin = os.path.join(
-            os.path.dirname(__file__), Paths.LOGO_ICON_DARWIN_PATH.value
-        )
+        icon_path_windows = os.path.join(os.path.dirname(__file__), Paths.LOGO_ICON_WINDOWS_PATH.value)
+        icon_path_darwin = os.path.join(os.path.dirname(__file__), Paths.LOGO_ICON_DARWIN_PATH.value)
         self.menu_icons = get_icons_paths()
         self.root = Tk()
         self.root.title("SimBA")
@@ -1553,17 +1543,9 @@ class App(object):
         if currentPlatform == OS.WINDOWS.value:
             self.root.iconbitmap(icon_path_windows)
         if currentPlatform == OS.MAC.value:
-            self.root.iconphoto(
-                False, ImageTk.PhotoImage(PIL.Image.open(icon_path_darwin))
-            )
+            self.root.iconphoto(False, ImageTk.PhotoImage(PIL.Image.open(icon_path_darwin)))
         for k in self.menu_icons.keys():
-            self.menu_icons[k]["img"] = ImageTk.PhotoImage(
-                image=PIL.Image.open(
-                    os.path.join(
-                        os.path.dirname(__file__), self.menu_icons[k]["icon_path"]
-                    )
-                )
-            )
+            self.menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.menu_icons[k]["icon_path"])))
         bg_img = ImageTk.PhotoImage(file=bg_path)
         background = Label(self.root, image=bg_img, bd=0, bg="white")
         background.pack(fill="both", expand=True)
@@ -1612,12 +1594,12 @@ class App(object):
 
         video_process_menu = Menu(menu)
         fps_menu = Menu(video_process_menu)
-        fps_menu.add_command(label="Change fps for single video", command=ChangeFpsSingleVideoPopUp)
-        fps_menu.add_command(label="Change fps for multiple videos", command=ChangeFpsMultipleVideosPopUp)
+        fps_menu.add_command(label="Change FPS for single video", command=ChangeFpsSingleVideoPopUp)
+        fps_menu.add_command(label="Change FPS for multiple videos", command=ChangeFpsMultipleVideosPopUp)
         fps_menu.add_command(label="Up-sample fps with interpolation", command=UpsampleVideosPopUp)
 
         menu.add_cascade(label="Tools", menu=video_process_menu)
-        video_process_menu.add_cascade(label="Change fps...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu)
+        video_process_menu.add_cascade(label="Change FPS...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu)
 
         clip_video_menu = Menu(menu)
         clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp)
@@ -1665,9 +1647,9 @@ class App(object):
         video_format_menu.add_command(label="Convert videos to AVI", command=Convert2AVIPopUp)
         video_format_menu.add_command(label="Convert videos to WEBM", command=Convert2WEBMPopUp)
         video_format_menu.add_command(label="Convert videos to MOV", command=Convert2MOVPopUp)
-        format_menu.add_cascade(label="Change image formats...", compound="left", menu=img_format_menu)
-        format_menu.add_cascade(label="Change video formats...", compound="left", menu=video_format_menu)
-        video_process_menu.add_cascade(label="Change formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu)
+        format_menu.add_cascade(label="Convert image file formats...", compound="left", menu=img_format_menu)
+        format_menu.add_cascade(label="Change video file formats...", compound="left", menu=video_format_menu)
+        video_process_menu.add_cascade(label="Convert file formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu)
 
         rm_clr_menu = Menu(video_process_menu)
         rm_clr_menu.add_command(label="Convert to grayscale", compound="left", image=self.menu_icons["greyscale"]["img"], command=lambda: GreyscaleSingleVideoPopUp())
@@ -1676,8 +1658,10 @@ class App(object):
         rm_clr_menu.add_command(label="Interactively CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=InteractiveClahePopUp)
         video_process_menu.add_cascade(label="Remove color from videos...", compound="left", image=self.menu_icons["clahe"]["img"], menu=rm_clr_menu)
 
-        video_process_menu.add_cascade(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat"]["img"], command=lambda: ConcatenatorPopUp(config_path=None))
-        video_process_menu.add_cascade(label="Concatenate two videos", compound="left", image=self.menu_icons["concat"]["img"], command=ConcatenatingVideosPopUp)
+        concatenate_menu = Menu(video_process_menu)
+        concatenate_menu.add_command(label="Concatenate two videos", compound="left", image=self.menu_icons["concat"]["img"], command=ConcatenatingVideosPopUp)
+        concatenate_menu.add_command(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat_videos"]["img"], command=lambda: ConcatenatorPopUp(config_path=None))
+        video_process_menu.add_cascade(label="Concatenate (stack) videos...", compound="left", image=self.menu_icons["concat"]["img"], menu=concatenate_menu)
         video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp())
         convert_data_menu = Menu(video_process_menu)
         convert_data_menu.add_command(label="Convert CSV to parquet", command=Csv2ParquetPopUp)
@@ -1838,83 +1822,33 @@ class App(object):
 
         self.frame = Frame(background, bd=2, relief=SUNKEN, width=750, height=300)
         self.r_click_menu = Menu(self.root, tearoff=0)
-        self.r_click_menu.add_command(
-            label="Copy selection", command=lambda: self.copy_selection_to_clipboard()
-        )
-        self.r_click_menu.add_command(
-            label="Copy all", command=lambda: self.copy_all_to_clipboard()
-        )
-        self.r_click_menu.add_command(
-            label="Paste", command=lambda: self.paste_to_txt()
-        )
+        self.r_click_menu.add_command(label="Copy selection", command=lambda: self.copy_selection_to_clipboard())
+        self.r_click_menu.add_command(label="Copy all", command=lambda: self.copy_all_to_clipboard())
+        self.r_click_menu.add_command(label="Paste", command=lambda: self.paste_to_txt())
         self.r_click_menu.add_separator()
         self.r_click_menu.add_command(label="Clear", command=lambda: self.clean_txt())
         y_sb = Scrollbar(self.frame, orient=VERTICAL)
         self.frame.pack(expand=True)
-        self.txt = Text(
-            self.frame,
-            bg="white",
-            insertborderwidth=2,
-            height=30,
-            width=100,
-            yscrollcommand=y_sb,
-        )
-        if currentPlatform == OS.WINDOWS.value:
-            self.txt.bind("<Button-3>", self.show_right_click_pop_up)
-        if currentPlatform == OS.MAC.value:
-            self.txt.bind("<Button-2>", self.show_right_click_pop_up)
-        self.txt.tag_configure(
-            TagNames.GREETING.value,
-            justify="center",
-            foreground="blue",
-            font=("Rockwell", 16, "bold"),
-        )
-        self.txt.tag_configure(
-            TagNames.ERROR.value,
-            justify="left",
-            foreground="red",
-            font=Formats.TKINTER_FONT.value,
-        )
-        self.txt.tag_configure(
-            TagNames.STANDARD.value,
-            justify="left",
-            foreground="black",
-            font=Formats.TKINTER_FONT.value,
-        )
-        self.txt.tag_configure(
-            TagNames.COMPLETE.value,
-            justify="left",
-            foreground="darkgreen",
-            font=Formats.TKINTER_FONT.value,
-        )
-        self.txt.tag_configure(
-            TagNames.WARNING.value,
-            justify="left",
-            foreground="darkorange",
-            font=Formats.TKINTER_FONT.value,
-        )
-        self.txt.tag_configure(
-            "TABLE",
-            foreground="darkorange",
-            font=("Consolas", 10),
-            wrap="none",
-            borderwidth=0,
-        )
-        self.txt.insert(INSERT, Defaults.WELCOME_MSG.value + emojis["relaxed"] + "\n" * 2)
+        self.txt = Text(self.frame, bg="white", insertborderwidth=2, height=30, width=100, yscrollcommand=y_sb)
+        if currentPlatform == OS.WINDOWS.value: self.txt.bind("<Button-3>", self.show_right_click_pop_up)
+        elif currentPlatform == OS.MAC.value: self.txt.bind("<Button-2>", self.show_right_click_pop_up)
+        self.txt.tag_configure(TagNames.GREETING.value, justify="center", foreground="blue", font=("Rockwell", 16, "bold"))
+        self.txt.tag_configure(TagNames.ERROR.value, justify="left", foreground="red", font=Formats.TKINTER_FONT.value)
+        self.txt.tag_configure(TagNames.STANDARD.value, justify="left", foreground="black", font=Formats.TKINTER_FONT.value)
+        self.txt.tag_configure(TagNames.COMPLETE.value, justify="left", foreground="darkgreen", font=Formats.TKINTER_FONT.value)
+        self.txt.tag_configure(TagNames.WARNING.value, justify="left", foreground="darkorange", font=Formats.TKINTER_FONT.value)
+        self.txt.tag_configure("TABLE",foreground="darkorange", font=("Consolas", 10), wrap="none", borderwidth=0)
+        if PRINT_EMOJIS:
+            self.txt.insert(INSERT, Defaults.WELCOME_MSG.value + emojis["relaxed"] + "\n" * 2)
+        else:
+            self.txt.insert(INSERT, Defaults.WELCOME_MSG.value + "\n" * 2)
         self.txt.tag_add(TagNames.GREETING.value, "1.0", "3.25")
         y_sb.pack(side=RIGHT, fill=Y)
         self.txt.pack(expand=True, fill="both")
         y_sb.config(command=self.txt.yview)
         self.txt.config(state=DISABLED, font=Formats.TKINTER_FONT.value)
 
-        clear_txt_btn = Button(
-            self.frame,
-            text=" CLEAR",
-            compound=LEFT,
-            image=self.menu_icons["clean"]["img"],
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            command=lambda: self.clean_txt(),
-        )
+        clear_txt_btn = Button(self.frame, text=" CLEAR", compound=LEFT, image=self.menu_icons["clean"]["img"], font=Formats.LABELFRAME_HEADER_FORMAT.value, command=lambda: self.clean_txt())
         clear_txt_btn.pack(side=BOTTOM, fill=X)
         sys.stdout = StdRedirector(self.txt)
 
@@ -1922,14 +1856,10 @@ class App(object):
             PythonVersionWarning(msg=f"SimBA is not extensively tested beyond python 3.6. You are using python {OS.PYTHON_VER.value}. If you encounter errors in python>3.6, please report them on GitHub or Gitter (links in the help toolbar) and we will work together to fix the issues!", source=self.__class__.__name__)
 
         if not check_ffmpeg_available():
-            FFMpegNotFoundWarning(msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer',
-                source=self.__class__.__name__,
-            )
+            FFMpegNotFoundWarning(msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer', source=self.__class__.__name__)
 
     def restart(self):
-        confirm_restart = askyesno(
-            title="RESTART", message="Are you sure that you want restart SimBA?"
-        )
+        confirm_restart = askyesno(title="RESTART", message="Are you sure that you want restart SimBA?")
         if confirm_restart:
             self.root.destroy()
             os.execl(sys.executable, sys.executable, *sys.argv)
@@ -1976,7 +1906,10 @@ class StdRedirector(object):
         except ValueError:
             pass
         if (tag_name != TagNames.STANDARD.value) and (tag_name != "TABLE"):
-            s = s + " " + self.emojis[tag_name]
+            if PRINT_EMOJIS:
+                s = s + " " + self.emojis[tag_name]
+            else:
+                pass
         self.text_space.config(state=NORMAL)
         self.text_space.insert("end", s, (tag_name))
         self.text_space.update()
@@ -2058,7 +1991,6 @@ def terminate_children(children):
 def main():
     if currentPlatform == OS.WINDOWS.value:
         import ctypes
-
         myappid = "SimBA development wheel"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     SplashMovie()

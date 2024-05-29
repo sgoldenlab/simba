@@ -603,7 +603,7 @@ def find_all_videos_in_directory(
     directory: Union[str, os.PathLike],
     as_dict: Optional[bool] = False,
     raise_error: bool = False,
-    video_formats: Optional[Tuple[str]] = (".avi", ".mp4", ".mov", ".flv", ".m4v"),
+    video_formats: Optional[Tuple[str]] = (".avi", ".mp4", ".mov", ".flv", ".m4v", '.webm'),
 ) -> Union[dict, list]:
     """
     Get all video file paths within a directory

@@ -844,68 +844,50 @@ class MultiCropPopUp(PopUpMixin):
 
 class ChangeFpsSingleVideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(
-            self, title="CHANGE FRAME RATE: SINGLE VIDEO", size=(200, 200)
-        )
-        video_path = FileSelect(
-            self.main_frm,
-            "Video path",
-            title="Select a video file",
-            lblwidth=10,
-            file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        fps_entry_box = Entry_Box(
-            self.main_frm, "Output FPS:", "10", validation="numeric"
-        )
-        gpu_var = BooleanVar(value=False)
-        gpu_cb = Checkbutton(
-            self.main_frm, text="Use GPU (reduced runtime)", variable=gpu_var
-        )
-        run_btn = Button(
-            self.main_frm,
-            text="Convert",
-            command=lambda: change_single_video_fps(
-                file_path=video_path.file_path,
-                fps=fps_entry_box.entry_get,
-                gpu=gpu_var.get(),
-            ),
-        )
-        video_path.grid(row=0, sticky=NW)
-        fps_entry_box.grid(row=1, sticky=NW)
+        PopUpMixin.__init__(self, title="CHANGE FRAME RATE: SINGLE VIDEO", size=(500, 300))
+        self.video_path = FileSelect(self.main_frm, "VIDEO PATH:", title="Select a video file", lblwidth=15, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.new_fps_dropdown = DropDownMenu(self.main_frm, "NEW FPS:", list(range(1, 101, 1)), labelwidth=15)
+        self.new_fps_dropdown.setChoices(15)
+        self.gpu_var = BooleanVar(value=False)
+        gpu_cb = Checkbutton(self.main_frm, text="Use GPU (reduced runtime)", variable=self.gpu_var)
+        self.video_path.grid(row=0, sticky=NW)
+        self.new_fps_dropdown.grid(row=1, sticky=NW)
         gpu_cb.grid(row=2, sticky=NW)
-        run_btn.grid(row=3, sticky=NW)
+        self.create_run_frm(run_function=self.run)
+        #self.main_frm.mainloop()
+
+    def run(self):
+        video_path = self.video_path.file_path
+        video_meta_data = get_video_meta_data(video_path=video_path)
+        _, video_name, _ = get_fn_ext(filepath=video_path)
+        new_fps = int(self.new_fps_dropdown.getChoices())
+        gpu = self.gpu_var.get()
+        if video_meta_data['fps'] <= new_fps:
+            FrameRangeWarning(msg=f'For video {video_name}, the new FPS ({new_fps}) is higher or the same as the original FPS ({video_meta_data["fps"]})', source=self.__class__.__name__)
+        threading.Thread(change_single_video_fps(file_path=video_path, fps=new_fps, gpu=gpu)).start()
 
 
 class ChangeFpsMultipleVideosPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(
-            self, title="CHANGE FRAME RATE: MULTIPLE VIDEO", size=(400, 200)
-        )
-        folder_path = FolderSelect(
-            self.main_frm,
-            "Folder path",
-            title="Select folder with videos: ",
-            lblwidth="10",
-        )
-        fps_entry = Entry_Box(self.main_frm, "Output FPS: ", "10", validation="numeric")
-        gpu_var = BooleanVar(value=False)
-        gpu_cb = Checkbutton(
-            self.main_frm, text="Use GPU (reduced runtime)", variable=gpu_var
-        )
-        run_btn = Button(
-            self.main_frm,
-            text="Convert",
-            command=lambda: change_fps_of_multiple_videos(
-                directory=folder_path.folder_path,
-                fps=fps_entry.entry_get,
-                gpu=gpu_var.get(),
-            ),
-        )
-        folder_path.grid(row=0, sticky=NW)
-        fps_entry.grid(row=1, sticky=NW)
+        PopUpMixin.__init__(self, title="CHANGE FRAME RATE: MULTIPLE VIDEO", size=(500, 300))
+        self.directory_path = FolderSelect(self.main_frm, "VIDEO DIRECTORY PATH:", title="Select folder with videos: ", lblwidth="25")
+        self.new_fps_dropdown = DropDownMenu(self.main_frm, "NEW FPS:", list(range(1, 101, 1)), labelwidth=25)
+        self.new_fps_dropdown.setChoices(15)
+        self.gpu_var = BooleanVar(value=False)
+        gpu_cb = Checkbutton(self.main_frm, text="Use GPU (reduced runtime)", variable=self.gpu_var)
+        self.directory_path.grid(row=0, sticky=NW)
+        self.new_fps_dropdown.grid(row=1, sticky=NW)
         gpu_cb.grid(row=2, sticky=NW)
-        run_btn.grid(row=3, sticky=NW)
+        self.create_run_frm(run_function=self.run)
+        self.main_frm.mainloop()
 
+    def run(self):
+        video_dir = self.directory_path.folder_path
+        check_if_dir_exists(in_dir=video_dir)
+        _ = find_all_videos_in_directory(directory=video_dir, raise_error=True)
+        new_fps = int(self.new_fps_dropdown.getChoices())
+        gpu = self.gpu_var.get()
+        threading.Thread(change_fps_of_multiple_videos(directory=video_dir, fps=new_fps, gpu=gpu)).start()
 
 class ExtractSEQFramesPopUp(PopUpMixin):
     def __init__(self):
@@ -929,34 +911,40 @@ class ExtractSEQFramesPopUp(PopUpMixin):
 
 class MergeFrames2VideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="MERGE IMAGE DIRECTORY TO VIDEO")
-        self.folder_path = FolderSelect(self.main_frm, "IMAGE DIRECTORY: ", title="Select directory with frames: ", lblwidth=25)
-        settings_frm = LabelFrame(self.main_frm, text="SETTINGS", padx=5, pady=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
-        self.fps_entry = Entry_Box(settings_frm, "VIDEO FPS: ", "25", validation="numeric")
-        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
-        self.quality_dropdown.setChoices(60)
-        self.format_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO FORMAT:", ['mp4', 'avi', 'mov'], labelwidth=25)
-        self.format_dropdown.setChoices('mp4')
+        PopUpMixin.__init__(self, title="MERGE IMAGE DIRECTORY INTO VIDEO")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.folder_path = FolderSelect(settings_frm, "IMAGE DIRECTORY: ", title="Select directory with frames: ", lblwidth=25)
+        self.video_fps_dropdown = DropDownMenu(settings_frm, "VIDEO FPS:", list(range(1, 101, 1)), labelwidth=25)
+        self.video_quality_dropdown = DropDownMenu(settings_frm, "VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.video_format_dropdown = DropDownMenu(settings_frm, "VIDEO FORMAT:", ['mp4', 'avi', 'webm'], labelwidth=25)
         self.gpu_var = BooleanVar(value=False)
         gpu_cb = Checkbutton(settings_frm, text="Use GPU (decreased runtime)", variable=self.gpu_var)
-        run_btn = Button(settings_frm, text="Create Video", command=lambda: self.run())
-        settings_frm.grid(row=1, pady=10, sticky=NW)
-        self.folder_path.grid(row=0, column=0, pady=10, sticky=NW)
-        self.fps_entry.grid(row=1, column=0, sticky=NW, pady=5)
-        self.format_dropdown.grid(row=2, column=0, sticky=NW, pady=5)
-        self.quality_dropdown.grid(row=3, column=0, sticky=NW, pady=5)
-        gpu_cb.grid(row=4, column=0, sticky=NW, pady=5)
-        run_btn.grid(row=5, column=1, sticky=NW, pady=10)
+        self.video_quality_dropdown.setChoices(60)
+        self.video_format_dropdown.setChoices('mp4')
+        self.video_fps_dropdown.setChoices(30)
+
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.folder_path.grid(row=0, column=0, sticky=NW)
+        self.video_fps_dropdown.grid(row=1, column=0, sticky=NW)
+        self.video_quality_dropdown.grid(row=2, column=0, sticky=NW)
+        self.video_format_dropdown.grid(row=3, column=0, sticky=NW)
+        gpu_cb.grid(row=4, column=0, sticky=NW)
+        self.create_run_frm(run_function=self.run)
+        self.main_frm.mainloop()
+
 
     def run(self):
-        fps = self.fps_entry.entry_get
-        check_int(name='FPS', value=fps, min_value=1)
-        quality = int(self.quality_dropdown.getChoices())
-        frames_to_movie(directory=self.folder_path.folder_path,
-                                  fps=fps,
-                                  quality=quality,
-                                  out_format=self.format_dropdown.getChoices(),
-                                  gpu=self.gpu_var.get())
+        directory = self.folder_path.folder_path
+        _ = find_files_of_filetypes_in_directory(directory=directory, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True, raise_warning=False)
+        fps = int(self.video_fps_dropdown.getChoices())
+        quality = int(self.video_quality_dropdown.getChoices())
+        gpu = self.gpu_var.get()
+        format = self.video_format_dropdown.getChoices()
+        threading.Thread(frames_to_movie(directory=self.folder_path.folder_path,
+                                         fps=fps,
+                                         quality=quality,
+                                         out_format=format,
+                                         gpu=gpu)).start()
 
 
 class CreateGIFPopUP(PopUpMixin):
@@ -1039,74 +1027,50 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
         mm_cnt = get_coordinates_nilsson(self.video_path.file_path, self.known_distance.entry_get)
         print(f"ONE (1) PIXEL REPRESENTS {round(mm_cnt, 4)} MILLIMETERS IN VIDEO {os.path.basename(self.video_path.file_path)}.")
 
-
 class ConcatenatingVideosPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CONCATENATE VIDEOS", size=(300, 300))
-        settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        video_path_1 = FileSelect(
-            settings_frm,
-            "First video path: ",
-            title="Select a video file",
-            lblwidth=15,
-            file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        video_path_2 = FileSelect(
-            settings_frm,
-            "Second video path: ",
-            title="Select a video file",
-            lblwidth=15,
-            file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        resolutions = ["Video 1", "Video 2", 320, 640, 720, 1280, 1980]
-        resolution_dropdown = DropDownMenu(
-            settings_frm, "Resolution:", resolutions, "15"
-        )
-        resolution_dropdown.setChoices(resolutions[0])
-        use_gpu_var = BooleanVar(value=False)
-        horizontal = BooleanVar(value=False)
-        horizontal_radio_btn = Radiobutton(
-            settings_frm,
-            text="Horizontal concatenation",
-            variable=horizontal,
-            value=True,
-        )
-        use_gpu_cb = Checkbutton(
-            settings_frm, text="Use GPU (reduced runtime)", variable=use_gpu_var
-        )
-        vertical_radio_btn = Radiobutton(
-            settings_frm,
-            text="Vertical concatenation",
-            variable=horizontal,
-            value=False,
-        )
-        run_btn = Button(
-            self.main_frm,
-            text="RUN",
-            font=("Helvetica", 12, "bold"),
-            command=lambda: video_concatenator(
-                video_one_path=video_path_1.file_path,
-                video_two_path=video_path_2.file_path,
-                resolution=resolution_dropdown.getChoices(),
-                horizontal=horizontal.get(),
-                gpu=use_gpu_var.get(),
-            ),
-        )
-
+        PopUpMixin.__init__(self, title="CONCATENATE TWO VIDEOS", size=(600, 300))
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.video_path_1 = FileSelect(settings_frm, "FIRST VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.video_path_2 = FileSelect(settings_frm, "SECOND VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        resolutions = ["VIDEO 1", "VIDEO 2", 240, 320, 480, 640, 720, 800, 960, 1120, 1080, 1980]
+        self.resolution_dropdown = DropDownMenu(settings_frm, "RESOLUTION (ASPECT RATIO RETAINED):", resolutions, "35")
+        self.resolution_dropdown.setChoices(resolutions[0])
+        self.horizontal = BooleanVar(value=False)
+        horizontal_radio_btn = Radiobutton(settings_frm, text="HORIZONTAL concatenation", variable=self.horizontal, value=True)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU (REDUCED RUN-TIME):", ['TRUE', 'FALSE'], "35")
+        vertical_radio_btn = Radiobutton(settings_frm, text="VERTICAL concatenation", variable=self.horizontal, value=False)
+        self.gpu_dropdown.setChoices('FALSE')
         settings_frm.grid(row=0, column=0, sticky=NW)
-        video_path_1.grid(row=0, column=0, sticky=NW)
-        video_path_2.grid(row=1, column=0, sticky=NW)
-        resolution_dropdown.grid(row=2, column=0, sticky=NW)
-        use_gpu_cb.grid(row=3, column=0, sticky=NW)
+        self.video_path_1.grid(row=0, column=0, sticky=NW)
+        self.video_path_2.grid(row=1, column=0, sticky=NW)
+        self.resolution_dropdown.grid(row=2, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=3, column=0, sticky=NW)
         horizontal_radio_btn.grid(row=4, column=0, sticky=NW)
         vertical_radio_btn.grid(row=5, column=0, sticky=NW)
-        run_btn.grid(row=1, column=0, sticky=NW)
+        self.create_run_frm(run_function=self.run)
+        self.main_frm.mainloop()
 
+    def run(self):
+        video_1_path = self.video_path_1.file_path
+        video_2_path = self.video_path_2.file_path
+        resolution = self.resolution_dropdown.getChoices()
+        int_res, _ = check_int(name='resolution', value=resolution, raise_error=False)
+        if int_res:
+            resolution = int(resolution)
+        horizontal_bool = self.horizontal.get()
+        gpu_bool = str_2_bool(self.gpu_dropdown.getChoices())
+        check_file_exist_and_readable(file_path=video_1_path)
+        check_file_exist_and_readable(file_path=video_2_path)
+        video_1_meta = get_video_meta_data(video_path=video_1_path)
+        video_2_meta = get_video_meta_data(video_path=video_2_path)
+        if horizontal_bool and not int_res:
+            if not video_1_meta['height'] == video_2_meta['height']:
+                raise ResolutionError(f'For HORIZONTAL concatenation, the videos has to be the same height. Got Video 1 height: {video_1_meta["height"]}, Video 2 height: {video_2_meta["height"]}. Select a specific resolution or convert the video resolution heights of the two videos first to be the same.', source=self.__class__.__name__)
+        elif not horizontal_bool and not int_res:
+            if not video_1_meta['width'] == video_2_meta['width']:
+                raise ResolutionError(f'For VERTICAL concatenation, the videos has to be the same width. Got Video 1 width: {video_1_meta["width"]}, Video 2 width: {video_2_meta["width"]}. Select a specific resolution or convert the video resolution widths of the two videos first to be the same.', source=self.__class__.__name__)
+        threading.Thread(video_concatenator(video_one_path=video_1_path, video_two_path=video_2_path, resolution=resolution, horizontal=horizontal_bool, gpu=gpu_bool)).start()
 
 class ConcatenatorPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Optional[Union[str, os.PathLike]] = None):

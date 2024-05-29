@@ -415,7 +415,10 @@ def extract_frame_range(file_path: Union[str, os.PathLike],
     stdout_success(msg=f"{len(frame_range)-1} frames extracted for video {file_name} saved in {save_dir}", elapsed_time=timer.elapsed_time_str, source=extract_frame_range.__name__)
 
 
-def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False) -> None:
+def change_single_video_fps(file_path: Union[str, os.PathLike],
+                            fps: int,
+                            gpu: Optional[bool] = False) -> None:
+
     """
     Change the fps of a single video file. Results are stored in the same directory as in the input file with
     the suffix ``_fps_new_fps``.
@@ -426,9 +429,9 @@ def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: O
     .. video:: _static/img/change_single_video_fps.webm
        :loop:
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file
-    :parameter int fps: Fps of the new video file.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[str, os.PathLike] file_path: Path to video file
+    :param int fps: FPS of the new video file.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
     >>> _ = change_single_video_fps(file_path='project_folder/videos/Video_1.mp4', fps=15)
@@ -437,42 +440,35 @@ def change_single_video_fps(file_path: Union[str, os.PathLike], fps: int, gpu: O
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)",
-            source=change_single_video_fps.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=change_single_video_fps.__name__)
     check_file_exist_and_readable(file_path=file_path)
     check_int(name="New fps", value=fps)
     video_meta_data = get_video_meta_data(video_path=file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
     if int(fps) == int(video_meta_data["fps"]):
-        SameInputAndOutputWarning(
-            msg=f"The new fps is the same as the input fps for video {file_name} ({str(fps)})",
-            source=change_single_video_fps.__name__,
-        )
-    save_path = os.path.join(
-        dir_name, file_name + "_fps_{}{}".format(str(fps), str(ext))
-    )
+        SameInputAndOutputWarning(msg=f"The new fps is the same as the input fps for video {file_name} ({str(fps)})", source=change_single_video_fps.__name__)
+    save_path = os.path.join(dir_name, file_name + f"_fps_{fps}{ext}")
     print(f"Converting the FPS to {fps} for video {file_name} ...")
+    if ext.lower() == '.webm':
+        codec = 'libvpx-vp9'
+    elif ext.lower() == '.avi':
+        codec = 'mpeg4'
+    else:
+        codec = 'libx264'
     if os.path.isfile(save_path):
-        FileExistWarning(
-            msg=f"Overwriting existing file at {save_path}...",
-            source=change_single_video_fps.__name__,
-        )
+        FileExistWarning(msg=f"Overwriting existing file at {save_path}...", source=change_single_video_fps.__name__,)
     if gpu:
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
     else:
-        command = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v libx264 -c:a aac "{save_path}" -y'
+        command = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
     subprocess.call(command, shell=True)
     timer.stop_timer()
-    stdout_success(
-        msg=f'SIMBA COMPLETE: FPS of video {file_name} changed from {str(video_meta_data["fps"])} to {str(fps)} and saved in directory {save_path}',
-        elapsed_time=timer.elapsed_time_str,
-        source=change_single_video_fps.__name__,
-    )
+    stdout_success(msg=f'SIMBA COMPLETE: FPS of video {file_name} changed from {str(video_meta_data["fps"])} to {str(fps)} and saved in directory {save_path}', elapsed_time=timer.elapsed_time_str, source=change_single_video_fps.__name__)
 
 
-def change_fps_of_multiple_videos(directory: Union[str, os.PathLike], fps: int, gpu: Optional[bool] = False) -> None:
+def change_fps_of_multiple_videos(directory: Union[str, os.PathLike],
+                                  fps: int,
+                                  gpu: Optional[bool] = False) -> None:
     """
     Change the fps of all video files in a folder. Results are stored in the same directory as in the input files with
     the suffix ``_fps_new_fps``.
@@ -488,51 +484,33 @@ def change_fps_of_multiple_videos(directory: Union[str, os.PathLike], fps: int, 
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)",
-            source=change_fps_of_multiple_videos.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=change_fps_of_multiple_videos.__name__)
     if not os.path.isdir(directory):
-        raise NotDirectoryError(
-            msg=f"SIMBA ERROR: {directory} is not a valid directory",
-            source=change_fps_of_multiple_videos.__name__,
-        )
+        raise NotDirectoryError(msg=f"SIMBA ERROR: {directory} is not a valid directory", source=change_fps_of_multiple_videos.__name__,)
     check_int(name="New fps", value=fps)
-    video_paths = []
-    file_paths_in_folder = [f for f in glob.glob(directory + "/*") if os.path.isfile(f)]
-    for file_path in file_paths_in_folder:
-        _, _, ext = get_fn_ext(filepath=file_path)
-        if ext.lower() in [".avi", ".mp4", ".mov", ".flv"]:
-            video_paths.append(file_path)
-    if len(video_paths) < 1:
-        raise NoFilesFoundError(
-            msg="SIMBA ERROR: No files with .mp4, .avi, .mov, .flv file ending found in the {} directory".format(
-                directory
-            ),
-            source=change_fps_of_multiple_videos.__name__,
-        )
+    check_if_dir_exists(in_dir=directory)
+    video_paths = find_all_videos_in_directory(directory=directory, as_dict=True, raise_error=True).values()
+
     for file_cnt, file_path in enumerate(video_paths):
         video_timer = SimbaTimer(start=True)
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
-        print(f"Converting FPS for {file_name}...")
-        save_path = os.path.join(
-            dir_name, file_name + "_fps_{}{}".format(str(fps), str(ext))
-        )
+        video_meta_data = get_video_meta_data(video_path=file_path)
+        if int(fps) == int(video_meta_data["fps"]):
+            SameInputAndOutputWarning(msg=f"The new FPS ({fps}) is the same or lower than the original FPS ({video_meta_data['fps']}) for video {file_name}", source=change_fps_of_multiple_videos.__name__)
+        print(f"Converting FPS from {video_meta_data['fps']} to {fps} for {file_name}...")
+        save_path = os.path.join(dir_name, file_name + f"_fps_{fps}{ext}")
+        if ext.lower() == '.webm': codec = 'libvpx-vp9'
+        elif ext.lower() == '.avi': codec = 'mpeg4'
+        else: codec = 'libx264'
         if gpu:
             command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
         else:
-            command = f'ffmpeg -i {file_path} -filter:v fps=fps={fps} -c:v libx264 "{save_path}" -y'
+            command = f'ffmpeg -i {file_path} -filter:v fps=fps={fps} -c:v {codec} "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(command, shell=True)
         video_timer.stop_timer()
-        print(
-            f"Video {file_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)"
-        )
+        print(f"Video {file_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)")
     timer.stop_timer()
-    stdout_success(
-        msg=f"SIMBA COMPLETE: FPS of {len(video_paths)} video(s) changed to {fps}",
-        elapsed_time=timer.elapsed_time_str,
-        source=change_fps_of_multiple_videos.__name__,
-    )
+    stdout_success(msg=f"SIMBA COMPLETE: FPS of {len(video_paths)} video(s) changed to {fps}", elapsed_time=timer.elapsed_time_str, source=change_fps_of_multiple_videos.__name__,)
 
 
 def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
@@ -1406,7 +1384,7 @@ def crop_multiple_videos(
 def frames_to_movie(directory: Union[str, os.PathLike],
                     fps: int,
                     quality: int,
-                    out_format: Optional[Literal['mp4', 'avi', 'mov']] = 'mp4',
+                    out_format: Optional[Literal['mp4', 'avi', 'webm']] = 'mp4',
                     gpu: Optional[bool] = False) -> None:
     """
     Merge all image files in a folder to a mp4 video file. Video file is stored in the same directory as the
@@ -1433,9 +1411,15 @@ def frames_to_movie(directory: Union[str, os.PathLike],
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=frames_to_movie.__name__)
     check_if_dir_exists(in_dir=directory, source=frames_to_movie.__name__)
-    check_str(name='out_format', value=out_format, options=['mp4', 'avi', 'mov'])
+    check_str(name='out_format', value=out_format, options=['mp4', 'avi', 'webm'])
     check_int(name="FPS", value=fps, min_value=1)
     check_int(name="quality", value=quality, min_value=1)
+    if out_format == 'webm':
+        codec = 'libvpx-vp9'
+    elif out_format == 'avi':
+        codec = 'mpeg4'
+    else:
+        codec = 'libx264'
     crf_lk = percent_to_crf_lookup()
     crf = crf_lk[str(quality)]
     save_path = os.path.join(os.path.dirname(directory), f"{os.path.basename(directory)}.{out_format}")
@@ -1443,7 +1427,7 @@ def frames_to_movie(directory: Union[str, os.PathLike],
     sorted_filepaths = sorted(img_paths, key=natural_sort_key)
     _, start_id, _ = get_fn_ext(filepath=sorted_filepaths[0])
     if not gpu:
-        cmd = f'ffmpeg -framerate {fps} -start_number {start_id} -pattern_type glob -i "{directory}/*.png" -c:v libx265 -crf {crf} "{save_path}" -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -framerate {fps} -start_number {start_id} -pattern_type glob -i "{directory}/*.png" -c:v {codec} -crf {crf} "{save_path}" -loglevel error -stats -hide_banner -y'
     else:
         cmd = f'ffmpeg -framerate {fps} -start_number {start_id} -pattern_type glob -i "$(ls -v {directory}/*.png)" -c:v h264_nvenc -crf {crf} "{save_path}" -loglevel error -stats -hide_banner -y'
     subprocess.call(cmd, shell=True)
@@ -1451,15 +1435,22 @@ def frames_to_movie(directory: Union[str, os.PathLike],
     stdout_success(msg=f"Video created at {save_path}", source=frames_to_movie.__name__, elapsed_time=timer.elapsed_time_str)
 
 
-def video_concatenator(
-    video_one_path: Union[str, os.PathLike],
-    video_two_path: Union[str, os.PathLike],
-    resolution: Union[int, str],
-    horizontal: bool,
-    gpu: Optional[bool] = False,
-) -> None:
+def video_concatenator(video_one_path: Union[str, os.PathLike],
+                       video_two_path: Union[str, os.PathLike],
+                       resolution: Optional[Union[int, str]] = 'video 1',
+                       horizontal: Optional[bool] = True,
+                       gpu: Optional[bool] = False) -> None:
     """
-    Concatenate two videos to a single video
+    Concatenate two videos to a single video either horizontally or vertically
+
+    .. image:: _static/img/horizontal_video_concatenator.gif
+       :width: 1000
+       :align: center
+
+    .. video:: _static/img/vertical_concat.webm
+       :width: 800
+       :autoplay:
+       :loop:
 
     :param str video_one_path: Path to the first video in the concatenated video
     :param str video_two_path: Path to the second video in the concatenated video
@@ -1472,68 +1463,61 @@ def video_concatenator(
     """
 
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
-            source=video_concatenator.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=video_concatenator.__name__)
     if not check_ffmpeg_available():
-        raise FFMPEGNotFoundError(
-            msg="FFMPEG not found on the computer. Install FFMPEG to use the concatenation method.",
-            source=video_concatenator.__name__,
-        )
+        raise FFMPEGNotFoundError(msg="FFMPEG not found on the computer. Install FFMPEG to use the concatenation method.", source=video_concatenator.__name__)
     timer = SimbaTimer(start=True)
     for file_path in [video_one_path, video_two_path]:
         check_file_exist_and_readable(file_path=file_path)
         _ = get_video_meta_data(file_path)
+    check_instance(source=video_concatenator.__name__, instance=resolution, accepted_types=(str, int))
     if type(resolution) is int:
+        check_int(name='resolution', value=resolution, min_value=1)
         video_meta_data = {}
-        if horizontal:
-            video_meta_data["height"] = resolution
-        else:
-            video_meta_data["width"] = resolution
-    elif resolution is "Video 1":
+        video_meta_data["height"] = resolution
+        video_meta_data["width"] = resolution
+    elif resolution.lower() is "video 1":
         video_meta_data = get_video_meta_data(video_one_path)
     else:
-        video_meta_data = get_video_meta_data(video_one_path)
+        video_meta_data = get_video_meta_data(video_two_path)
+    if video_meta_data["height"] % 2 != 0:
+        video_meta_data["height"] = video_meta_data["height"] + 1
+    if video_meta_data["width"] % 2 != 0:
+        video_meta_data["width"] = video_meta_data["width"] + 1
     dir, file_name_1, _ = get_fn_ext(video_one_path)
     _, file_name_2, _ = get_fn_ext(video_two_path)
     print(f"Concatenating videos {file_name_1} and {file_name_2}...")
-    save_path = os.path.join(dir, file_name_1 + file_name_2 + "_concat.mp4")
+    save_path = os.path.join(dir, f"{file_name_1}_{file_name_2}_concat.mp4")
     if horizontal:
         if gpu:
-            command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale=-1:{video_meta_data["height"]}[v0];[v0][1:v]hstack=inputs=2" -c:v h264_nvenc "{save_path}"'
+            cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale=-1:{video_meta_data["height"]}[v0];[v0][1:v]hstack=inputs=2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -stats -y'
         else:
-            command = f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" -filter_complex "[0:v]scale=-1:{video_meta_data["height"]}[v0];[v0][1:v]hstack=inputs=2" "{save_path}"'
-
+            cmd = (f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" '
+                   f'-filter_complex "[0:v]scale=ceil(iw/2)*2:{video_meta_data["height"]}[v0];'
+                   f'[1:v]scale=ceil(iw/2)*2:{video_meta_data["height"]}[v1];'
+                   f'[v0][v1]hstack=inputs=2" "{save_path}" -hide_banner -loglevel error -stats -y')
     else:
         if gpu:
-            command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];[v0][1:v]vstack=inputs=2" -c:v h264_nvenc "{save_path}"'
+            cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];[v0][1:v]vstack=inputs=2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -stats -y'
         else:
-            command = f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" -filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];[v0][1:v]vstack=inputs=2" "{save_path}"'
+            cmd = (f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" '
+                   f'-filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];'
+                   f'[1:v]scale={video_meta_data["width"]}:-1[v1];'
+                   f'[v0][v1]vstack=inputs=2" "{save_path}" -hide_banner -loglevel error -stats -y')
     if gpu:
-        process = subprocess.Popen(command, shell=True)
+        process = subprocess.Popen(cmd, shell=True)
         output, error = process.communicate()
         if process.returncode != 0:
             if "Unknown decoder" in str(error.split(b"\n")[-2]):
-                raise FFMPEGCodecGPUError(
-                    msg="GPU codec not found: reverting to CPU. Properly configure FFMpeg and ensure you have GPU available or use CPU.",
-                    source=video_concatenator.__name__,
-                )
+                raise FFMPEGCodecGPUError(msg="GPU codec not found: reverting to CPU. Properly configure FFMpeg and ensure you have GPU available or use CPU.", source=video_concatenator.__name__)
             else:
-                raise FFMPEGCodecGPUError(
-                    msg="GPU error. Properly configure FFMpeg and ensure you have GPU available, or use CPU.",
-                    source=video_concatenator.__name__,
-                )
+                raise FFMPEGCodecGPUError(msg="GPU error. Properly configure FFMpeg and ensure you have GPU available, or use CPU.", source=video_concatenator.__name__)
         else:
             pass
     else:
-        subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(
-        msg=f"Videos concatenated and saved at {save_path}",
-        elapsed_time=timer.elapsed_time_str,
-        source=video_concatenator.__name__,
-    )
+    stdout_success(msg=f"Videos concatenated and saved at {save_path}", elapsed_time=timer.elapsed_time_str, source=video_concatenator.__name__)
 
 
 # video_concatenator(video_one_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4',

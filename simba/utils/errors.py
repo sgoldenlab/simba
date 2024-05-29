@@ -17,11 +17,7 @@ class SimbaError(Exception):
         return self.msg
 
     def print_and_log_error(self):
-        log_event(
-            logger_name=f"{self.source}.{self.__class__.__name__}",
-            log_type=TagNames.ERROR.value,
-            msg=self.msg,
-        )
+        log_event(logger_name=f"{self.source}.{self.__class__.__name__}", log_type=TagNames.ERROR.value,msg=self.msg)
         print(f"{self.msg}{Defaults.STR_SPLIT_DELIMITER.value}{TagNames.ERROR.value}")
         if self.show_window:
             mb.showerror(title=WINDOW_TITLE, message=self.msg)
@@ -33,9 +29,7 @@ class NoSpecifiedOutputError(SimbaError):
 
 
 class ROICoordinatesNotFoundError(SimbaError):
-    def __init__(
-        self, expected_file_path: str, source: str = "", show_window: bool = False
-    ):
+    def __init__(self, expected_file_path: str, source: str = "", show_window: bool = False):
         msg = f"SIMBA ROI COORDINATES ERROR: No ROI coordinates found. Please use the [ROI] tab to define ROIs. Expected at location {expected_file_path}"
         super().__init__(msg=msg, source=source, show_window=show_window)
 
