@@ -35,7 +35,8 @@ from simba.utils.errors import (CountError, DuplicationError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
                                 NoChoosenClassifierError, NoFilesFoundError,
                                 NotDirectoryError, ResolutionError)
-from simba.utils.lookups import get_color_dict, get_fonts, get_ffmpeg_crossfade_methods
+from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
+                                 get_fonts)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -59,15 +60,16 @@ from simba.video_processors.video_processing import (
     convert_video_powerpoint_compatible_format, copy_img_folder,
     create_average_frm, crop_multiple_videos, crop_multiple_videos_circles,
     crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
-    crop_single_video_polygon, downsample_video, extract_frame_range,
-    extract_frames_single_video, flip_videos, frames_to_movie, gif_creator,
-    multi_split_video, remove_beginning_of_video, resize_videos_by_height,
-    resize_videos_by_width, reverse_videos, roi_blurbox, rotate_video,
-    superimpose_elapsed_time, superimpose_frame_count, superimpose_freetext,
-    superimpose_overlay_video, superimpose_video_names,
-    superimpose_video_progressbar, temporal_concatenation, upsample_fps,
-    video_bg_substraction_mp, video_bg_subtraction, video_concatenator,
-    video_to_bw, video_to_greyscale, watermark_video, crossfade_two_videos)
+    crop_single_video_polygon, crossfade_two_videos, downsample_video,
+    extract_frame_range, extract_frames_single_video, flip_videos,
+    frames_to_movie, gif_creator, multi_split_video, remove_beginning_of_video,
+    resize_videos_by_height, resize_videos_by_width, reverse_videos,
+    roi_blurbox, rotate_video, superimpose_elapsed_time,
+    superimpose_frame_count, superimpose_freetext, superimpose_overlay_video,
+    superimpose_video_names, superimpose_video_progressbar,
+    temporal_concatenation, upsample_fps, video_bg_substraction_mp,
+    video_bg_subtraction, video_concatenator, video_to_bw, video_to_greyscale,
+    watermark_video)
 
 sys.setrecursionlimit(10**7)
 
