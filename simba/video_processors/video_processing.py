@@ -2757,11 +2757,11 @@ def convert_to_mp4(path: Union[str, os.PathLike],
     """
     Convert a directory containing videos, or a single video, to MP4 format using passed quality and codec.
 
-    .. image:: _static/img/convert_to_mp4_1.webm
+    .. image:: _static/img/convert_to_mp4_1.webp
        :width: 700
        :align: center
 
-    .. image:: _static/img/convert_to_mp4_2.webm
+    .. image:: _static/img/convert_to_mp4_2.webp
        :width: 700
        :align: center
 
