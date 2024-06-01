@@ -152,10 +152,11 @@ class Statistics(FeatureExtractionMixin):
         The t-statistic for independent samples t-test is calculated using the following formula:
 
         .. math::
+
            t = \frac{\bar{x}_1 - \bar{x}_2}{s_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}
 
         where:
-            - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
+            - \\(\bar{x}_1\\) and \\(\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
             - \\(s_p\\) is the pooled standard deviation,
             - \\(n_1\\) and \\(n_2\\) are the sample sizes of sample_1 and sample_2 respectively.
 

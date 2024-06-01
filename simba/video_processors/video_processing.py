@@ -2758,17 +2758,17 @@ def convert_to_mp4(path: Union[str, os.PathLike],
     Convert a directory containing videos, or a single video, to MP4 format using passed quality and codec.
 
     .. image:: _static/img/convert_to_mp4_1.webp
-       :width: 700
+       :width: 800
        :align: center
 
     .. image:: _static/img/convert_to_mp4_2.webp
-       :width: 700
+       :width: 800
        :align: center
 
     :param Union[str, os.PathLike] path: Path to directory or file.
     :param Literal['libx265', 'libx264', 'vp9', 'powerpoint'] codec:
     :param Optional[Optional[Union[str, os.PathLike]]] save_dir: Directory where to save the converted videos. If None, then creates a directory in the same directory as the input.
-    :param Optional[int] quality: Integer representing the quality: 10, 20, 30.. 100.
+    :param Optional[int] quality: If CPU codec, then integer representing the quality: 10, 20, 30.. 100. If GPU codec, then string: 'Low', 'Medium', 'High'
     :return: None.
 
     :example:
@@ -2831,8 +2831,8 @@ def convert_to_avi(path: Union[str, os.PathLike],
     """
     Convert a directory containing videos, or a single video, to AVI format using passed quality and codec.
 
-    .. image:: _static/img/convert_to_avi.webm
-       :width: 700
+    .. image:: _static/img/convert_to_avi.webp
+       :width: 800
        :align: center
 
     :param Union[str, os.PathLike] path: Path to directory or file.
@@ -2885,6 +2885,7 @@ def convert_to_avi(path: Union[str, os.PathLike],
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to AVI and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_avi.__name__,)
 
+
 def convert_to_webm(path: Union[str, os.PathLike],
                     codec: Literal['vp8', 'vp9'] = 'vp9',
                     save_dir: Optional[Union[str, os.PathLike]] = None,
@@ -2894,7 +2895,7 @@ def convert_to_webm(path: Union[str, os.PathLike],
     Convert a directory containing videos, or a single video, to WEBM format using passed quality and codec.
 
     .. image:: _static/img/convert_to_webm.webm
-       :width: 700
+       :width: 800
        :align: center
 
     :param Union[str, os.PathLike] path: Path to directory or file.
@@ -2944,6 +2945,7 @@ def convert_to_webm(path: Union[str, os.PathLike],
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to WEBM and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_webm.__name__,)
 
+#convert_to_webm(path='/Users/simon/Desktop/video_test/Screen Recording 2024-05-06 at 5.34.34 PM_converted.mp4', quality=100, codec='vp8')
 
 
 def convert_to_mov(path: Union[str, os.PathLike],

@@ -2374,7 +2374,7 @@ class Convert2MP4PopUp(PopUpMixin):
         self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", self.cpu_codec_qualities, labelwidth=25)
         self.quality_dropdown.setChoices(60)
         self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MP4_CODEC_LK.keys()), labelwidth=25, com=self.update_quality_dropdown)
-        self.codec_dropdown.setChoices('HEVC (H.265)')
+        self.codec_dropdown.setChoices('H.264 (AVC)')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
         self.codec_dropdown.grid(row=1, column=0, sticky=NW)
