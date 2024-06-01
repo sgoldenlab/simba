@@ -18,7 +18,8 @@ opencv-python == 3.4.5.20;python_version=="3.6"
 opencv-python;python_version>="3.9"
 pandas==0.25.3;python_version=="3.6"
 pandas;python_version>="3.9"
-scikit-image
+scikit-image == 0.17.2;python_version=="3.6"
+scikit-image;python_version>="3.9"
 scipy
 kaleido
 seaborn == 0.11.0

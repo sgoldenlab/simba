@@ -119,6 +119,7 @@ class Formats(Enum):
     MP4_CODEC = "mp4v"
     AVI_CODEC = "XVID"
     BATCH_CODEC = "libx264"
+    NUMERIC_DTYPES = (np.float32, np.float64, np.int64, np.int32, np.int8, np.int, np.float, int, float)
     LABELFRAME_HEADER_FORMAT = ("Helvetica", 12, "bold")
     LABELFRAME_HEADER_CLICKABLE_FORMAT = ("Helvetica", 12, "bold", "underline")
     LABELFRAME_HEADER_CLICKABLE_COLOR = f"#{5:02x}{99:02x}{193:02x}"

@@ -1348,9 +1348,7 @@ def copy_multiple_videos_to_project(
                 try:
                     os.symlink(file_path, dest1)
                 except OSError:
-                    raise PermissionError(
-                        msg="Symbolic link privilege not held. Try running SimBA in terminal opened in admin mode"
-                    )
+                    raise PermissionError(msg="Symbolic link privilege not held. Try running SimBA in terminal opened in admin mode")
             timer.stop_timer()
             if not symlink:
                 print(

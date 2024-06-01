@@ -31,7 +31,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_instance, check_int, check_str,
                                 check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_dataframe)
+                                check_valid_array, check_valid_dataframe, check_if_valid_rgb_tuple)
 from simba.utils.enums import ConfigKey, Dtypes, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
@@ -295,12 +295,11 @@ def create_color_palettes(
     return colorListofList
 
 
-def create_color_palette(
-    pallete_name: str,
-    increments: int,
-    as_rgb_ratio: Optional[bool] = False,
-    as_hex: Optional[bool] = False,
-) -> list:
+def create_color_palette(pallete_name: str,
+                         increments: int,
+                         as_rgb_ratio: Optional[bool] = False,
+                         as_hex: Optional[bool] = False,
+                         as_int: Optional[bool] = False) -> List[Union[str, float]]:
     """
     Create a list of colors in RGB from specified color palette.
 
@@ -308,6 +307,7 @@ def create_color_palette(
     :param int increments: Numbers of colors in the color palette to create.
     :param Optional[bool] as_rgb_ratio: Return RGB to ratios. Default: False
     :param Optional[bool] as_hex: Return values as HEX. Default: False
+    :param Optional[bool] as_int: Return RGB values as integers rather than float if possible. Default: False
 
     .. note::
        If **both** as_rgb_ratio and as_hex, HEX values will be returned.
@@ -330,11 +330,41 @@ def create_color_palette(
         rgb = list((cmap(i)[:3]))
         if not as_rgb_ratio:
             rgb = [i * 255 for i in rgb]
+            if as_int:
+                rgb = [int(x) for x in rgb]
         rgb.reverse()
         if as_hex:
             rgb = matplotlib.colors.to_hex(rgb)
         color_lst.append(rgb)
     return color_lst
+
+
+def interpolate_color_palette(start_color: Tuple[int, int, int],
+                              end_color: Tuple[int, int, int],
+                              n: Optional[int] = 10):
+    """
+    Generate a list of colors interpolated between two passed RGB colors.
+
+    :param start_color: Tuple of RGB values for the start color.
+    :param end_color: Tuple of RGB values for the end color.
+    :param n: Number of colors to generate.
+    :return: List of interpolated RGB colors.
+
+    :example:
+    >>> red, black = (255, 0, 0), (0, 0, 0)
+    >>> colors = interpolate_color_palette(start_color=red, end_color=black, n = 10)
+    """
+
+    check_if_valid_rgb_tuple(data=start_color)
+    check_if_valid_rgb_tuple(data=end_color)
+    check_int(name=f'{interpolate_color_palette.__name__} n', value=n, min_value=3)
+    return [(
+        int(start_color[0] + (end_color[0] - start_color[0]) * i / (n - 1)),
+        int(start_color[1] + (end_color[1] - start_color[1]) * i / (n - 1)),
+        int(start_color[2] + (end_color[2] - start_color[2]) * i / (n - 1))
+    ) for i in range(n)]
+
+
 
 
 def smooth_data_savitzky_golay(

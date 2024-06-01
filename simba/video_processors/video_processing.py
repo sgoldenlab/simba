@@ -45,7 +45,7 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ResolutionError)
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
-                                 percent_to_crf_lookup, percent_to_qv_lk)
+                                 percent_to_crf_lookup, percent_to_qv_lk, video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -557,53 +557,6 @@ def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike
     )
 
 
-# convert_video_powerpoint_compatible_format(file_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test/SI_DAY3_308_CD1_PRESENT_fps_10_fps_15.mp4", gpu=False)
-
-#
-# def convert_to_mp4(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
-#     """
-#     Convert a video file to mp4 format. The result is stored in the same directory as the
-#     input file with the ``_converted.mp4`` suffix.
-#
-#     :parameter Union[str, os.PathLike] file_path: Path to video file.
-#     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-#
-#     :example:
-#     >>> _ = convert_to_mp4(file_path='project_folder/videos/Video_1.avi')
-#     """
-#
-#     check_ffmpeg_available(raise_error=True)
-#     if gpu and not check_nvidea_gpu_available():
-#         raise FFMPEGCodecGPUError(
-#             msg="No GPU found (as evaluated by nvidea-smi returning None)",
-#             source=convert_to_mp4.__name__,
-#         )
-#     timer = SimbaTimer(start=True)
-#     check_file_exist_and_readable(file_path=file_path)
-#     dir, file_name, ext = get_fn_ext(filepath=file_path)
-#     save_name = os.path.join(dir, file_name + "_converted.mp4")
-#     if os.path.isfile(save_name):
-#         raise FileExistError(
-#             msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
-#             source=convert_to_mp4.__name__,
-#         )
-#     if gpu:
-#         command = (
-#             'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{}" -c:v h264_nvenc "{}"'.format(
-#                 file_path, save_name
-#             )
-#         )
-#     else:
-#         command = f'ffmpeg -i "{file_path}" -c:v libx264 "{save_name}"'
-#     print("Converting to mp4... ")
-#     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-#     timer.stop_timer()
-#     stdout_success(
-#         msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
-#         elapsed_time=timer.elapsed_time_str,
-#         source=convert_to_mp4.__name__,
-#     )
-
 
 def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
@@ -753,9 +706,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
 
 #superimpose_frame_count(file_path='/Users/simon/Downloads/1_LH_0_3.mp4', fontsize=90)
 
-def remove_beginning_of_video(
-    file_path: Union[str, os.PathLike], time: int, gpu: Optional[bool] = False
-) -> None:
+def remove_beginning_of_video(file_path: Union[str, os.PathLike], time: int, gpu: Optional[bool] = False) -> None:
     """
     Remove N seconds from the beginning of a video file. The result is stored in the same directory as the
     input file with the ``_shorten.mp4`` suffix.
@@ -1923,27 +1874,15 @@ def crop_single_video_circle(file_path: Union[str, os.PathLike]) -> None:
     timer = SimbaTimer(start=True)
     r = circle_selector.circle_radius
     x, y = circle_selector.circle_center[0], circle_selector.circle_center[1]
-    polygon = Polygon(
-        [
-            (x + r * np.cos(angle), y + r * np.sin(angle))
-            for angle in np.linspace(0, 2 * np.pi, 100)
-        ]
-    )
+    polygon = Polygon([(x + r * np.cos(angle), y + r * np.sin(angle)) for angle in np.linspace(0, 2 * np.pi, 100)])
     polygons = [polygon for x in range(video_meta_data["frame_count"])]
     if (platform.system() == "Darwin") and (multiprocessing.get_start_method() is None):
         multiprocessing.set_start_method("spawn", force=True)
-    polygons = ImageMixin().slice_shapes_in_imgs(
-        imgs=file_path, shapes=polygons, verbose=False
-    )
+    polygons = ImageMixin().slice_shapes_in_imgs(imgs=file_path, shapes=polygons, verbose=False)
     time.sleep(3)
-    _ = ImageMixin.img_stack_to_video(
-        imgs=polygons, save_path=save_path, fps=video_meta_data["fps"]
-    )
+    _ = ImageMixin.img_stack_to_video(imgs=polygons, save_path=save_path, fps=video_meta_data["fps"])
     timer.stop_timer()
-    stdout_success(
-        msg=f"Circle-based cropped saved at to {save_path}",
-        elapsed_time=timer.elapsed_time_str,
-    )
+    stdout_success(msg=f"Circle-based cropped saved at to {save_path}", elapsed_time=timer.elapsed_time_str,)
 
 
 def crop_multiple_videos_circles(in_dir: Union[str, os.PathLike], out_dir: Union[str, os.PathLike]) -> None:
@@ -2809,17 +2748,21 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]], frm_ids:
     else:
         stdout_success(msg=f"{len(file_paths)} video(s) clipped by frame and saved in {save_dir}", elapsed_time=timer.elapsed_time_str)
 
-# file_paths = ['/Users/simon/Downloads/1_LH.mp4']
-# frm_ids = [[1, 10]]
-# clip_videos_by_frame_ids(file_paths=file_paths, frm_ids=frm_ids)
-
 
 def convert_to_mp4(path: Union[str, os.PathLike],
-                   codec: Literal['libx265', 'libx264', 'vp9', 'powerpoint'] = 'libx265',
+                   codec: Literal['libx265', 'libx264', 'vp9', 'h264_cuvid', 'powerpoint'] = 'libx265',
                    save_dir: Optional[Union[str, os.PathLike]] = None,
                    quality: Optional[int] = 60) -> None:
     """
     Convert a directory containing videos, or a single video, to MP4 format using passed quality and codec.
+
+    .. image:: _static/img/convert_to_mp4_1.webm
+       :width: 700
+       :align: center
+
+    .. image:: _static/img/convert_to_mp4_2.webm
+       :width: 700
+       :align: center
 
     :param Union[str, os.PathLike] path: Path to directory or file.
     :param Literal['libx265', 'libx264', 'vp9', 'powerpoint'] codec:
@@ -2833,12 +2776,19 @@ def convert_to_mp4(path: Union[str, os.PathLike],
 
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
-    check_str(name=f'{convert_to_mp4.__name__} codec', value=codec, options=('libx265', 'libx264', 'powerpoint', 'vp9'))
+    check_str(name=f'{convert_to_mp4.__name__} codec', value=codec, options=('libx265', 'libx264', 'powerpoint', 'vp9', 'h264_cuvid'))
     check_instance(source=f'{convert_to_mp4.__name__} path', instance=path, accepted_types=(str,))
-    check_int(name=f'{convert_to_mp4.__name__} quality', value=quality)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
     crf_lk = percent_to_crf_lookup()
-    crf = crf_lk[str(quality)]
+    preset_lookup = video_quality_to_preset_lookup()
+    if codec != 'h264_cuvid':
+        check_int(name=f'{convert_to_mp4.__name__} quality', value=quality)
+        quality = crf_lk[str(quality)]
+    else:
+        if not check_nvidea_gpu_available():
+            raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None). Select a different codec", source=convert_to_mp4.__name__)
+        check_str(name=f'{convert_to_mp4.__name__} quality', value=quality, options=('Low', 'Medium', 'High'))
+        quality = preset_lookup[quality]
     if save_dir is not None:
         check_if_dir_exists(in_dir=save_dir, source=convert_to_mp4.__name__)
     if os.path.isfile(path):
@@ -2861,16 +2811,16 @@ def convert_to_mp4(path: Union[str, os.PathLike],
         if codec == 'powerpoint':
             cmd = f'ffmpeg -i "{file_path}" -c:v libx264 -preset slow -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf {crf} -c:v libx264 -codec:a aac "{out_path}" -loglevel error -stats -hide_banner -y'
         elif codec == 'vp9':
-            cmd = f'ffmpeg -i "{file_path}" -c:v libvpx-vp9 -crf {crf} -b:v 0 -an "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v libvpx-vp9 -crf {quality} -b:v 0 -an "{out_path}" -loglevel error -stats -hide_banner -y'
+        elif codec == 'h264_cuvid':
+            cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -c:v h264_nvenc -preset {quality} "{out_path}" -loglevel error -stats -hide_banner -y'
         else:
-            cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -crf {crf} -c:a copy -an "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -crf {quality} -c:a copy -an "{out_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to MP4 and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_mp4.__name__,)
 
-
-
-
+#convert_to_mp4(path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/temp/Together_1_frame_no.mp4', quality=100, codec='libx265')
 
 def convert_to_avi(path: Union[str, os.PathLike],
                    codec: Literal['xvid', 'divx', 'mjpeg'] = 'divx',
@@ -2880,11 +2830,18 @@ def convert_to_avi(path: Union[str, os.PathLike],
     """
     Convert a directory containing videos, or a single video, to AVI format using passed quality and codec.
 
+    .. image:: _static/img/convert_to_avi.webm
+       :width: 700
+       :align: center
+
     :param Union[str, os.PathLike] path: Path to directory or file.
     :param Literal['xvid', 'divx', 'mjpeg'] codec: Method to encode the AVI format. Default: xvid.
     :param Optional[Optional[Union[str, os.PathLike]]] save_dir: Directory where to save the converted videos. If None, then creates a directory in the same directory as the input.
     :param Optional[int] quality: Integer representing the quality: 10, 20, 30.. 100.
     :return: None.
+
+    :example:
+    >>> convert_to_avi(path='/Users/simon/Desktop/video_test/Screen Recording 2024-05-06 at 5.34.34 PM_converted.mp4', quality=100, codec='xvid')
     """
 
 
@@ -2928,6 +2885,7 @@ def convert_to_avi(path: Union[str, os.PathLike],
     stdout_success(msg=f"{len(file_paths)} video(s) converted to AVI and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_avi.__name__,)
 
 
+
 def convert_to_webm(path: Union[str, os.PathLike],
                     codec: Literal['vp8', 'vp9'] = 'vp9',
                     save_dir: Optional[Union[str, os.PathLike]] = None,
@@ -2936,11 +2894,18 @@ def convert_to_webm(path: Union[str, os.PathLike],
     """
     Convert a directory containing videos, or a single video, to WEBM format using passed quality and codec.
 
+    .. image:: _static/img/convert_to_webm.webm
+       :width: 700
+       :align: center
+
     :param Union[str, os.PathLike] path: Path to directory or file.
     :param Literal['vp8', 'vp9', 'av1'] codec: Method to encode the WEBM format. Default: vp9.
     :param Optional[Optional[Union[str, os.PathLike]]] save_dir: Directory where to save the converted videos. If None, then creates a directory in the same directory as the input.
     :param Optional[int] quality: Integer representing the quality: 10, 20, 30.. 100.
     :return: None.
+
+    :example:
+    >>> convert_to_webm(path='/Users/simon/Desktop/video_test/Screen Recording 2024-05-06 at 5.34.34 PM_converted.mp4', quality=100, codec='vp8')
     """
 
     timer = SimbaTimer(start=True)
@@ -2979,6 +2944,7 @@ def convert_to_webm(path: Union[str, os.PathLike],
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to WEBM and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_webm.__name__,)
+
 
 
 def convert_to_mov(path: Union[str, os.PathLike],
@@ -3031,6 +2997,8 @@ def convert_to_mov(path: Union[str, os.PathLike],
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to MOV and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_mov.__name__, )
+
+#convert_to_mov(path='/Users/simon/Desktop/video_test/Screen Recording 2024-05-06 at 5.34.34 PM_converted.mp4', codec='cineform')
 
 
 def superimpose_video_progressbar(video_path: Union[str, os.PathLike],
@@ -4029,7 +3997,6 @@ def flip_videos(video_path: Union[str, os.PathLike],
     :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the flipped video(s). If None, the directory of the input video(s) will be used.
     :return: None.
     """
-
 
     check_ffmpeg_available(raise_error=True)
     timer = SimbaTimer(start=True)

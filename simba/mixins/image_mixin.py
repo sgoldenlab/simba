@@ -17,11 +17,12 @@ import cv2
 import pandas as pd
 from numba import int64, jit, njit, prange, uint8
 from shapely.geometry import Polygon
+from skimage.metrics import structural_similarity
 
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_instance, check_int, check_str,
-                                check_valid_array, check_valid_lst)
+                                check_valid_array, check_valid_lst, check_valid_tuple, check_if_valid_rgb_tuple)
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import ArrayError, FrameRangeError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -770,9 +771,7 @@ class ImageMixin(object):
         return results
 
     @staticmethod
-    def read_all_img_in_dir(
-        dir: Union[str, os.PathLike], core_cnt: Optional[int] = -1
-    ) -> Dict[str, np.ndarray]:
+    def read_all_img_in_dir(dir: Union[str, os.PathLike], core_cnt: Optional[int] = -1) -> Dict[str, np.ndarray]:
         """
         Helper to read in all images within a directory using multiprocessing.
         Returns a dictionary with the image name as key and the images in array format as values.
@@ -781,11 +780,7 @@ class ImageMixin(object):
         >>> imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/Together_4_cropped_frames')
         """
         check_if_dir_exists(in_dir=dir)
-        file_paths = find_files_of_filetypes_in_directory(
-            directory=dir,
-            extensions=list(Options.ALL_IMAGE_FORMAT_OPTIONS.value),
-            raise_error=True,
-        )
+        file_paths = find_files_of_filetypes_in_directory(directory=dir, extensions=list(Options.ALL_IMAGE_FORMAT_OPTIONS.value), raise_error=True)
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         chunk_size = len(file_paths) // core_cnt
@@ -846,7 +841,22 @@ class ImageMixin(object):
     @staticmethod
     @njit([(uint8[:, :, :, :], int64), (uint8[:, :, :], int64)])
     def img_sliding_mse(imgs: np.ndarray, slide_size: int = 1) -> np.ndarray:
-        """Pairwise comparison of images in sliding windows using mean squared errors
+        """
+        Calculate the mean squared error (MSE) between pairs of images in a sliding window manner.
+
+        This function performs pairwise comparisons of images using mean squared errors (MSE).
+        It slides a window of the specified size over the sequence of images and computes the MSE
+        between each image and the image that is `slide_size` positions before it.
+
+
+        .. image:: _static/img/img_sliding_mse.webp
+           :width: 600
+           :align: center
+
+        :param imgs: 3d or 4d A numpy array of images.
+        :param slide_size: The size of the sliding window (default is 1).
+        :return: A numpy array of MSE values for each pair of images in the sliding window.
+
 
         :example:
         >>> imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/Together_4_cropped_frames')
@@ -856,9 +866,7 @@ class ImageMixin(object):
 
         results = np.full((imgs.shape[0]), 0)
         for i in prange(slide_size, imgs.shape[0]):
-            results[i] = np.sum((imgs[i - slide_size] - imgs[i]) ** 2) / float(
-                imgs[i - slide_size].shape[0] * imgs[i].shape[1]
-            )
+            results[i] = np.sum((imgs[i - slide_size] - imgs[i]) ** 2) / float(imgs[i - slide_size].shape[0] * imgs[i].shape[1])
         return results.astype(int64)
 
     @staticmethod
@@ -932,32 +940,32 @@ class ImageMixin(object):
         return results
 
     @staticmethod
-    def img_emd(
-        imgs: List[np.ndarray] = None,
-        img_1: Optional[np.ndarray] = None,
-        img_2: Optional[np.ndarray] = None,
-        lower_bound: Optional[float] = 0.5,
-    ):
+    def img_emd(imgs: List[np.ndarray] = None,
+                img_1: Optional[np.ndarray] = None,
+                img_2: Optional[np.ndarray] = None,
+                lower_bound: Optional[float] = 0.5,
+                verbose: Optional[bool] = False):
         """
         Compute Wasserstein distance between two images represented as numpy arrays.
+
+        .. note::
+           Long runtime for larger images. Consider down-sampling videos / images before caluclating wasserstein / earth mover distances.
+
+        .. image:: _static/img/img_emd.webp
+           :width: 600
+           :align: center
+
 
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/24.png', 0).astype(np.float32)
         >>> img_2 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/1984.png', 0).astype(np.float32)
-        >>> img_emd(img_1=img_1, img_2=img_3, lower_bound=0.5)
+        >>> ImageMixin.img_emd(img_1=img_1, img_2=img_2, lower_bound=0.5)
         >>> 10.658767700195312
         """
-        check_float(
-            name=f"{ImageMixin.img_emd.__name__} lower bound",
-            min_value=0.0,
-            value=lower_bound,
-        )
-        if (img_1 is None and img_1 is None and imgs is None) or (
-            img_1 is not None and img_2 is None
-        ):
-            raise InvalidInputError(
-                msg="Pass img_1 and img_2 OR imgs", source=ImageMixin.__class__.__name__
-            )
+        timer = SimbaTimer(start=True)
+        check_float(name=f"{ImageMixin.img_emd.__name__} lower bound", min_value=0.0, value=lower_bound)
+        if (img_1 is None and img_1 is None and imgs is None) or (img_1 is not None and img_2 is None):
+            raise InvalidInputError(msg="Pass img_1 and img_2 OR imgs", source=ImageMixin.__class__.__name__)
         if (img_1 is not None) and (img_2 is not None):
             check_if_valid_img(data=img_1, source=ImageMixin.img_emd.__name__)
             check_if_valid_img(data=img_2, source=ImageMixin.img_emd.__name__)
@@ -966,24 +974,53 @@ class ImageMixin(object):
             if img_2.ndim > 2:
                 img_2 = cv2.cvtColor(img_2, cv2.COLOR_BGR2GRAY)
         else:
-            check_valid_lst(
-                data=imgs,
-                source=ImageMixin.img_emd.__name__,
-                valid_dtypes=(np.ndarray,),
-                exact_len=2,
-            )
+            check_valid_lst(data=imgs, source=ImageMixin.img_emd.__name__, valid_dtypes=(np.ndarray,), exact_len=2,)
             check_if_valid_img(data=imgs[0], source=ImageMixin.img_emd.__name__)
             check_if_valid_img(data=imgs[1], source=ImageMixin.img_emd.__name__)
             if imgs[0].ndim > 2:
                 img_1 = cv2.cvtColor(imgs[0], cv2.COLOR_BGR2GRAY)
             if imgs[1].ndim > 2:
                 img_2 = cv2.cvtColor(imgs[1], cv2.COLOR_BGR2GRAY)
-        return cv2.EMD(
-            img_1.astype(np.float32),
-            img_2.astype(np.float32),
-            cv2.DIST_L2,
-            lowerBound=lower_bound,
-        )[0]
+        timer.stop_timer()
+        emd = cv2.EMD(img_1.astype(np.float32), img_2.astype(np.float32), cv2.DIST_L2, lowerBound=lower_bound)[0]
+        if verbose:
+            stdout_success(msg='EMD complete', elapsed_time=timer.elapsed_time_str)
+        return emd
+
+    @staticmethod
+    def create_uniform_img(size: Tuple[int, int],
+                           color: Tuple[int, int, int],
+                           save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, np.ndarray]:
+
+        """
+        Creates an image of specified size and color, and optionally saves it to a file.
+
+        .. image:: _static/img/create_uniform_img.webp
+           :width: 600
+           :align: center
+
+        :param Tuple[int, int] size: A tuple of two integers representing the width and height of the image.
+        :param Tuple[int, int, int] color: A tuple of three integers representing the RGB color (e.g., (255, 0, 0) for red).
+        :param Optional[Union[str, os.PathLike]] save_path: a string representing the file path to save the image.  If not provided, the function returns the image as a numpy array.
+        :return Union[None, np.ndarray]: If save_path is provided, the function saves the image to the specified path and returns None. f save_path is not provided, the function returns the image as a numpy ndarray.
+
+        :example:
+        >>> from simba.utils.data import create_color_palette
+        >>> clrs = create_color_palette(pallete_name='inferno', increments=4, as_int=True)
+        >>> imgs_stack = np.full((5, 10, 10, 3), -1)
+        >>> for cnt, i in enumerate(clrs): imgs_stack[cnt] = ImageMixin.create_uniform_img(size=(10, 10), color=tuple(i))
+
+        """
+
+        check_valid_tuple(x=size, accepted_lengths=(2,), valid_dtypes=(int,))
+        check_if_valid_rgb_tuple(data=color)
+        img = np.zeros((size[1], size[0], 3), dtype=np.uint8)
+        img[:] = color[::-1]
+        if save_path is not None:
+            check_if_dir_exists(in_dir=os.path.dirname(save_path))
+            cv2.imwrite(save_path, img)
+        else:
+            return img
 
     @staticmethod
     @jit(nopython=True)
@@ -994,6 +1031,10 @@ class ImageMixin(object):
         This function calculates the MSE between each pair of images in the input array
         and returns a symmetric matrix where each element (i, j) represents the MSE
         between the i-th and j-th images. Useful for image similarities and anomalities.
+
+        .. image:: _static/img/img_matrix_mse.webp
+           :width: 600
+           :align: center
 
         :param np.ndarray imgs: A stack of images represented as a numpy array.
         :return np.ndarray: The MSE matrix table.
@@ -1006,12 +1047,27 @@ class ImageMixin(object):
         results = np.full((imgs.shape[0], imgs.shape[0]), 0.0)
         for i in prange(imgs.shape[0]):
             for j in range(i + 1, imgs.shape[0]):
-                val = np.sum((imgs[i] - imgs[j]) ** 2) / float(
-                    imgs[i].shape[0] * imgs[j].shape[1]
-                )
+                val = np.sum((imgs[i] - imgs[j]) ** 2) / float(imgs[i].shape[0] * imgs[j].shape[1])
                 results[i, j] = val
                 results[j, i] = val
         return results.astype(np.int32)
+
+    @staticmethod
+    def img_to_greyscale(img: np.ndarray) -> np.ndarray:
+        """
+        Convert a single color image to greyscale.
+
+        The function takes an RGB image and converts it to a greyscale image using a weighted sum approach.
+        If the input image is already in greyscale (2D array), it is returned as is.
+
+        :param np.ndarray img: Input image represented as a NumPy array. For a color image, the array should have three channels (RGB).
+        :return np.ndarray: The greyscale image as a 2D NumPy array.
+        """
+        check_if_valid_img(data=img, source=ImageMixin.img_to_greyscale.__name__)
+        if len(img.shape) != 2:
+            return (0.07 * img[:, :, 2] + 0.72 * img[:, :, 1] + 0.21 * img[:, :, 0]).astype(np.uint8)
+        else:
+            return img.astype(np.uint8)
 
     @staticmethod
     @njit("(uint8[:, :, :, :],)", fastmath=True)
@@ -1031,15 +1087,9 @@ class ImageMixin(object):
         >>> imgs = np.stack(list(imgs.values()))
         >>> imgs_gray = ImageMixin.img_stack_to_greyscale(imgs=imgs)
         """
-        results = np.full((imgs.shape[0], imgs.shape[1], imgs.shape[2]), np.nan).astype(
-            np.uint8
-        )
+        results = np.full((imgs.shape[0], imgs.shape[1], imgs.shape[2]), np.nan).astype(np.uint8)
         for i in prange(imgs.shape[0]):
-            vals = (
-                0.07 * imgs[i][:, :, 2]
-                + 0.72 * imgs[i][:, :, 1]
-                + 0.21 * imgs[i][:, :, 0]
-            )
+            vals = (0.07 * imgs[i][:, :, 2] + 0.72 * imgs[i][:, :, 1] + 0.21 * imgs[i][:, :, 0])
             results[i] = vals.astype(np.uint8)
         return results
 
@@ -1068,54 +1118,38 @@ class ImageMixin(object):
         return results
 
     @staticmethod
-    def pad_img_stack(
-        image_dict: Dict[int, np.ndarray], pad_value: Optional[int] = 0
-    ) -> Dict[int, np.ndarray]:
+    def pad_img_stack(image_dict: Dict[int, np.ndarray], pad_value: Optional[int] = 0) -> Dict[int, np.ndarray]:
         """
         Pad images in a dictionary stack to have the same dimensions (the same dimension is represented by the largest image in the stack)
 
+        .. image:: _static/img/pad_img_stack.webp
+           :width: 400
+           :align: center
+
         :param Dict[int, np.ndarray] image_dict: A dictionary mapping integer keys to numpy arrays representing images.
-        :param Optional[int] pad_value: The value used for padding. Defaults to 0 (black)
+        :param Optional[int] pad_value: The value (between 0-255) used for padding. Defaults to 0 (black)
         :return Dict[int, np.ndarray]: A dictionary mapping integer keys to numpy arrays representing padded images.
         """
-        check_instance(
-            source=ImageMixin.pad_img_stack.__name__,
-            instance=image_dict,
-            accepted_types=(dict,),
-        )
-        check_int(
-            name=f"{ImageMixin.pad_img_stack.__name__} pad_value",
-            value=pad_value,
-            max_value=255,
-            min_value=0,
-        )
+
+        check_instance(source=ImageMixin.pad_img_stack.__name__, instance=image_dict,accepted_types=(dict,))
+        check_int(name=f"{ImageMixin.pad_img_stack.__name__} pad_value", value=pad_value, max_value=255, min_value=0)
         max_height = max(image.shape[0] for image in image_dict.values())
         max_width = max(image.shape[1] for image in image_dict.values())
         padded_images = {}
         for key, image in image_dict.items():
             pad_height = max_height - image.shape[0]
             pad_width = max_width - image.shape[1]
-            padded_image = np.pad(
-                image,
-                ((0, pad_height), (0, pad_width), (0, 0)),
-                mode="constant",
-                constant_values=pad_value,
-            )
+            padded_image = np.pad(image, ((0, pad_height), (0, pad_width), (0, 0)), mode="constant", constant_values=pad_value)
             padded_images[key] = padded_image
         return padded_images
 
     @staticmethod
-    def img_stack_to_video(
-        imgs: Dict[int, np.ndarray],
-        save_path: Union[str, os.PathLike],
-        fps: int,
-        verbose: Optional[bool] = True,
-    ):
+    def img_stack_to_video(imgs: Dict[int, np.ndarray], save_path: Union[str, os.PathLike], fps: int, verbose: Optional[bool] = True):
         """
         Convert a dictionary of images into a video file.
 
         .. note::
-           The input dict can be greated with ImageMixin().slice_shapes_in_imgs()
+           The input dictionary ``imgs`` can be created with ``simba.mixins.ImageMixin.slice_shapes_in_imgs``.
 
         :param Dict[int, np.ndarray] imgs: A dictionary containing frames of the video, where the keys represent frame indices and the values are numpy arrays representing the images.
         :param Union[str, os.PathLike] save_path: The path to save the output video file.
@@ -1123,11 +1157,8 @@ class ImageMixin(object):
         :param Optional[bool] verbose: If True, prints progress messages. Defaults to True.
         """
 
-        check_instance(
-            source=ImageMixin.img_stack_to_video.__name__,
-            instance=imgs,
-            accepted_types=(dict,),
-        )
+        timer = SimbaTimer(start=True)
+        check_instance(source=ImageMixin.img_stack_to_video.__name__, instance=imgs, accepted_types=(dict,))
         img_sizes = set()
         for k, v in imgs.items():
             img_sizes.add(v.shape)
@@ -1135,20 +1166,17 @@ class ImageMixin(object):
             imgs = ImageMixin.pad_img_stack(imgs)
         imgs = np.stack(imgs.values())
         fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        writer = cv2.VideoWriter(
-            save_path, fourcc, fps, (imgs[0].shape[1], imgs[0].shape[0])
-        )
+        writer = cv2.VideoWriter(save_path, fourcc, fps, (imgs[0].shape[1], imgs[0].shape[0]))
         for i in range(imgs.shape[0]):
             if verbose:
-                print(f"Writing img {i + 1}...")
+                print(f"Writing img {i + 1} / {imgs.shape[0]}...")
             writer.write(imgs[i])
         writer.release()
-        stdout_success(msg=f"Video {save_path} complete")
+        timer.stop_timer()
+        stdout_success(msg=f"Video {save_path} complete", elapsed_time=timer.elapsed_time_str)
 
     @staticmethod
-    def _slice_shapes_in_video_file_helper(
-        data: np.ndarray, video_path: Union[str, os.PathLike], verbose: bool
-    ):
+    def _slice_shapes_in_video_file_helper(data: np.ndarray, video_path: Union[str, os.PathLike], verbose: bool):
         cap = cv2.VideoCapture(video_path)
         start_frm, current_frm, end_frm = data[0][0], data[0][0], data[-1][0]
         cap.set(1, start_frm)
@@ -1163,9 +1191,7 @@ class ImageMixin(object):
             x, y, w, h = cv2.boundingRect(shape)
             roi_img = img[y : y + h, x : x + w].copy()
             mask = np.zeros_like(roi_img, np.uint8)
-            cv2.drawContours(
-                mask, [shape - (x, y)], -1, (255, 255, 255), -1, cv2.LINE_AA
-            )
+            cv2.drawContours(mask, [shape - (x, y)], -1, (255, 255, 255), -1, cv2.LINE_AA)
             results[current_frm] = cv2.bitwise_and(roi_img, mask).astype(np.uint8)
             current_frm += 1
             idx_cnt += 1
@@ -1307,6 +1333,253 @@ class ImageMixin(object):
         )
         return results
 
+    @staticmethod
+    def structural_similarity_index(img_1: np.ndarray, img_2: np.ndarray) -> float:
+        """
+        Compute the Structural Similarity Index (SSI) between two images.
+
+        The function evaluates the SSI between two input images `img_1` and `img_2`. If the images have different numbers
+        of channels, they are converted to greyscale before computing the SSI. If the images are multi-channel (e.g., RGB),
+        the SSI is computed for each channel.
+
+        .. seealso::
+           ``simba.mixins.image_mixin.ImageMixin.structural_similarity_matrix``
+           ``simba.mixins.image_mixin.ImageMixin.sliding_structural_similarity_index``
+
+        :param np.ndarray img_1: The first input image represented as a NumPy array.
+        :param np.ndarray img_2: The second input image represented as a NumPy array.
+        :return float: The SSI value representing the similarity between the two images.
+        """
+        check_if_valid_img(data=img_1, source=f'{ImageMixin.structural_similarity_index.__name__} img_1')
+        check_if_valid_img(data=img_2, source=f'{ImageMixin.structural_similarity_index.__name__} img_2')
+        multichannel = False
+        if img_1.ndim != img_2.ndim:
+            img_1 = cv2.cvtColor(img_1, cv2.COLOR_BGR2GRAY)
+            img_2 = cv2.cvtColor(img_2, cv2.COLOR_BGR2GRAY)
+        if img_1.ndim > 2: multichannel = True
+        return abs(structural_similarity(im1=img_1.astype(np.uint8), im2=img_2.astype(np.uint8), multichannel=multichannel))
+
+    @staticmethod
+    def sliding_structural_similarity_index(imgs: List[np.ndarray],
+                                            stride: Optional[int] = 1,
+                                            verbose: Optional[bool] = False) -> np.ndarray:
+
+        """
+        Computes the Structural Similarity Index (SSI) between consecutive images in an array with a specified stride.
+
+        The function evaluates the SSI between pairs of images in the input array `imgs` using a sliding window approach
+        with the specified `stride`. The SSI is computed for each pair of images and the results are stored in an output
+        array. If the images are multi-channel (e.g., RGB), the SSI is computed for each channel.
+
+        High SSI values (close to 1) indicate high similarity between images, while low SSI values (close to 0 or negative)
+        indicate low similarity.
+
+        .. seealso::
+           ``simba.mixins.image_mixin.ImageMixin.structural_similarity_matrix``
+           ``simba.mixins.image_mixin.ImageMixin.structural_similarity_index``
+
+        :param np.ndarray imgs: A list of images. Each element in the list is expected to be a numpy array representing an image.
+        :param Optional[int] stride: The number of images to skip between comparisons. Default is 1.
+        :param Optional[bool] verbose: If True, prints progress messages. Default is False.
+        :return np.ndarray: A numpy array containing the SSI values for each pair of images.
+
+        :example:
+        >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
+        >>> imgs = {k: imgs[k] for k in sorted(imgs, key=lambda x: int(x.split('.')[0]))}
+        >>> imgs = list(imgs.values())
+        >>> results = ImageMixin.sliding_structural_similarity_index(imgs=imgs, stride=1, verbose=True)
+        """
+
+        check_valid_lst(data=imgs, valid_dtypes=(np.ndarray,), min_len=2)
+        check_int(name=f'{ImageMixin.sliding_structural_similarity_index.__name__} stride', min_value=1, max_value=len(imgs), value=stride)
+        ndims, multichannel = set(), False
+        for i in imgs:
+            check_if_valid_img(data=i, source=ImageMixin.sliding_structural_similarity_index.__name__)
+            ndims.add(i.ndim)
+        if len(list(ndims)) > 1:
+            imgs = ImageMixin.img_stack_to_greyscale(imgs=imgs)
+        if imgs[0].ndim > 2: multichannel = True
+        results = np.zeros((len(imgs)), np.float32)
+        for cnt, i in enumerate(range(stride, len(imgs))):
+            img_1, img_2 = imgs[i - stride], imgs[i]
+            results[i] = structural_similarity(im1=img_1, im2=img_2, multichannel=multichannel)
+            if verbose:
+                print(f'SSI computed ({cnt + 1}/{len(imgs) - stride})')
+        return results
+
+    @staticmethod
+    def structural_similarity_matrix(imgs: List[np.array], verbose: Optional[bool] = False) -> np.array:
+        """
+        Computes a matrix of Structural Similarity Index (SSI) values for a list of images.
+
+        This function takes a list of images and computes the SSI between each pair of images and produce a symmetric matrix.
+
+        .. seealso::
+           ``simba.mixins.image_mixin.ImageMixin.sliding_structural_similarity_index``
+           ``simba.mixins.image_mixin.ImageMixin.structural_similarity_index``
+
+
+        :param List[np.array] imgs: A list of images represented as numpy arrays. If not all images are greyscale or color, they are converted and processed as greyscale.
+        :param Optional[bool] verbose: If True, prints progress messages showing which SSI values have been computed.  Default is False.
+        :return np.array: A square numpy array where the element at [i, j] represents the SSI between imgs[i] and imgs[j].
+
+        :example:
+        >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
+        >>> imgs = {k: imgs[k] for k in sorted(imgs, key=lambda x: int(x.split('.')[0]))}
+        >>> imgs = list(imgs.values())[0:10]
+        >>> results = ImageMixin.structural_similarity_matrix(imgs=imgs)
+        """
+
+        check_valid_lst(data=imgs, valid_dtypes=(np.ndarray,), min_len=2)
+        ndims, multichannel = set(), False
+        for i in imgs:
+            check_if_valid_img(data=i, source=ImageMixin.structural_similarity_matrix.__name__)
+            ndims.add(i.ndim)
+        if len(list(ndims)) > 1:
+            imgs = ImageMixin.img_stack_to_greyscale(imgs=imgs)
+        if imgs[0].ndim > 2: multichannel = True
+        results = np.ones((len(imgs), len(imgs)), np.float32)
+        for i in range(len(imgs)):
+            for j in range(i + 1, len(imgs)):
+                if verbose:
+                    print(f'SSI matrix position ({i}, {j}) complete...')
+                val = structural_similarity(im1=imgs[i], im2=imgs[j], multichannel=multichannel)
+                results[i, j] = val
+                results[j, i] = val
+        return results
+
+    @staticmethod
+    @njit(["(uint8[:, :], uint8[:, :])",
+           "(uint8[:, :, :], uint8[:, :, :])"])
+    def cross_correlation_similarity(img_1: np.ndarray, img_2: np.ndarray) -> float:
+        """
+        Computes the Normalized Cross-Correlation (NCC) similarity between two images.
+
+        The NCC measures the similarity between two images by calculating the correlation
+        coefficient of their pixel values. The output value ranges from -1 to 1, where 1 indicates perfect positive correlation, 0 indicates no correlation, and -1 indicates perfect negative correlation.
+
+        :param np.ndarray img_1: The first input image. It can be a 2D grayscale image or a 3D color image.
+        :param np.ndarray img_2:  The second input image. It must have the same dimensions as img_1.
+        :return float: The NCC value representing the similarity between the two images. Returns 0.0 if the denominator is zero, indicating no similarity.
+
+        :example:
+        >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/a.png').astype(np.uint8)
+        >>> img_2 = cv2.imread('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/f.png').astype(np.uint8)
+        >>> ImageMixin.cross_correlation_similarity(img_1=img_1, img_2=img_2)
+        """
+
+        img1_flat = img_1.flatten()
+        img2_flat = img_2.flatten()
+        mean_1, mean_2 = np.mean(img1_flat), np.mean(img2_flat)
+        N = np.sum((img1_flat - mean_1) * (img2_flat - mean_2))
+        D = np.sqrt(np.sum((img1_flat - mean_1) ** 2) * np.sum((img2_flat - mean_2) ** 2))
+        if D == 0:
+            return 0.0
+        else:
+            return N / D
+
+    @staticmethod
+    @njit(["(uint8[:, :, :], int64)",
+           "(uint8[:, :, :, :], int64)"])
+    def sliding_cross_correlation_similarity(imgs: np.ndarray,
+                                             stride: int) -> np.ndarray:
+        """
+        Computes the Normalized Cross-Correlation (NCC) similarity for a sequence of images using a sliding window approach.
+
+        This function calculates the NCC between each image and the image that is `stride` positions before it in the sequence. The result is an array of NCC values representing
+        the similarity between successive images.
+
+        .. seealso::
+           ``simba.mixins.image_mixin.ImageMixin.cross_correlation_similarity``
+           ``simba.mixins.image_mixin.ImageMixin.cross_correlation_matrix``
+
+        :param np.ndarray imgs: A 3D array (for grayscale images) or a 4D array (for color images) containing the sequence of images.  Each image should have the same size.
+        :param int stride: The stride length for comparing images. Determines how many steps back in the sequence each image is compared to.
+        :return np.ndarray: A 1D array of NCC values representing the similarity between each image and the image `stride` positions before it. The length of the array is the same as the number of images.
+
+        :example:
+        >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat11_12_frames')
+        >>> imgs = {k: imgs[k] for k in sorted(imgs, key=lambda x: int(x.split('.')[0]))}
+        >>> imgs = np.stack(list(imgs.values()))
+        >>> results = ImageMixin.sliding_cross_correlation_similarity(imgs=imgs, stride=1)
+        """
+        results = np.ones((imgs.shape[0]), dtype=np.float32)
+        for i in prange(stride, imgs.shape[0]):
+            img1_flat, img2_flat = imgs[i - stride].flatten(), imgs[i].flatten()
+            mean_1, mean_2 = np.mean(img1_flat), np.mean(img2_flat)
+            N = np.sum((img1_flat - mean_1) * (img2_flat - mean_2))
+            D = np.sqrt(np.sum((img1_flat - mean_1) ** 2) * np.sum((img2_flat - mean_2) ** 2))
+            if D == 0:
+                results[i] = 0.0
+            else:
+                results[i] = N / D
+        return results
+
+    @staticmethod
+    @njit(["(uint8[:, :, :],)",
+           "(uint8[:, :, :, :],)"])
+    def cross_correlation_matrix(imgs: np.array) -> np.array:
+        """
+        Computes the cross-correlation matrix for a given array of images.
+
+        This function calculates the cross-correlation coefficient between each pair of images in the input array.
+        The cross-correlation coefficient is a measure of similarity between two images, with values ranging from
+        -1 (completely dissimilar) to 1 (identical).
+
+        The function uses the `numba` library for Just-In-Time (JIT) compilation to optimize performance, and
+        `prange` for parallel execution over the image pairs.
+
+        .. seealso::
+           ``simba.mixins.image_mixin.ImageMixin.cross_correlation_similarity``
+           ``simba.mixins.image_mixin.ImageMixin.sliding_cross_correlation_similarity``
+
+        .. note::
+           Use greyscale images for faster runtime. Ideally should be move dto GPU.
+
+
+        :param np.array imgs: A 3D (or 4D) numpy array of images where the first dimension indexes the images,
+                              and the remaining dimensions are the image dimensions (height, width, [channels]).
+                              - For grayscale images: shape should be (n_images, height, width)
+                              - For color images: shape should be (n_images, height, width, channels)
+
+        :return np.array: A 2D numpy array representing the cross-correlation matrix, where the element at [i, j]
+                          contains the cross-correlation coefficient between the i-th and j-th images.
+
+        :example:
+        >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
+        >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat11_12_frames')
+        >>> imgs = {k: imgs[k] for k in sorted(imgs, key=lambda x: int(x.split('.')[0]))}
+        >>> imgs = np.stack(list(imgs.values()))
+        >>> imgs = ImageMixin.img_stack_to_greyscale(imgs=imgs)
+        >>> results = ImageMixin.cross_correlation_matrix(imgs=imgs)
+        """
+
+        results = np.ones((imgs.shape[0], imgs.shape[0]), dtype=np.float32)
+        for i in prange(imgs.shape[0]):
+            img1_flat = imgs[i].flatten()
+            mean_1 = np.mean(img1_flat)
+            for j in range(i + 1, imgs.shape[0]):
+                img2_flat = imgs[j].flatten()
+                mean_2 = np.mean(img2_flat)
+                N = np.sum((img1_flat - mean_1) * (img2_flat - mean_2))
+                D = np.sqrt(np.sum((img1_flat - mean_1) ** 2) * np.sum((img2_flat - mean_2) ** 2))
+                if D == 0:
+                    val = 0.0
+                else:
+                    val = N / D
+                results[i, j] = val
+                results[j, i] = val
+        return results
+
+# imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples')
+# imgs = np.stack(imgs.values())
+# mse = ImageMixin().img_sliding_mse(imgs=imgs, slide_size=2)
+
+
+# img_1 = cv2.imread('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/.png', 0).astype(np.float32)
+# img_2 = cv2.imread('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/4.png', 0).astype(np.float32)
+# ImageMixin.img_emd(img_1=img_1, img_2=img_2, lower_bound=0.5, verbose=True)
+
     #
     # def segment_img_horizontal(img: np.ndarray, pct: int, lower: Optional[bool] = True,
     #                            both: Optional[bool] = False
@@ -1322,7 +1595,9 @@ class ImageMixin(object):
 # cv2.imshow('sdsdf', bw_img)
 # cv2.waitKey(5000)
 
-# imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1.mp4', start_frm=0, end_frm=10)
+
+
+
 # imgs = np.stack(list(imgs.values()))
 # imgs_gray = ImageMixin().img_stack_to_greyscale(imgs=imgs)
 # data = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/csv/outlier_corrected_movement_location/Example_1.csv', nrows=11).fillna(-1)
@@ -1382,3 +1657,16 @@ class ImageMixin(object):
 # img_2 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/1.png').astype(np.uint8)
 # ImageMixin.get_contourmatch(img_1=img_1, img_2=img_2, method='all', canny=True)
 #
+
+#
+# from simba.utils.data import create_color_palette
+# clrs = create_color_palette(pallete_name='inferno', increments=4, as_int=True)
+# imgs_stack = np.full((5, 10, 10, 3), -1)
+# for cnt, i in enumerate(clrs): imgs_stack[cnt] = ImageMixin.create_uniform_img(size=(10, 10), color=tuple(i))
+#
+#
+#
+#
+#
+# ImageMixin.img_matrix_mse(imgs=imgs_stack)
+

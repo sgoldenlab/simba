@@ -14,8 +14,7 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional,
-                   prange, typed, types)
+from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional, prange, typed, types)
 from scipy import stats
 from scipy.stats.distributions import chi2
 from sklearn.covariance import EllipticEnvelope
@@ -251,9 +250,7 @@ class Statistics(FeatureExtractionMixin):
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * fps)
-            data_split = np.split(
-                data, list(range(window_size, data.shape[0], window_size))
-            )
+            data_split = np.split(data, list(range(window_size, data.shape[0], window_size)))
             for j in prange(1, len(data_split)):
                 window_start = int(window_size * j)
                 window_end = int(window_start + window_size)
@@ -2987,9 +2984,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit([(float32[:, :], float32[:, :]), (float32[:, :], types.misc.Omitted(None))])
-    def bray_curtis_dissimilarity(
-        x: np.ndarray, w: Optional[np.ndarray] = None
-    ) -> np.ndarray:
+    def bray_curtis_dissimilarity(x: np.ndarray, w: Optional[np.ndarray] = None) -> np.ndarray:
         """
         Jitted compute of the Bray-Curtis dissimilarity matrix between samples based on feature values.
 
@@ -3661,7 +3656,7 @@ class Statistics(FeatureExtractionMixin):
            Uses Euclidean distances.
 
         :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features).
-        :param np.ndarray y: 2D array representing cluster labels for each data point. Shape (n_samples,).
+        :param np.ndarray y: 1D array representing cluster labels for each data point. Shape (n_samples,).
         :return float: The Dunn index value
 
         :example:
@@ -3932,6 +3927,116 @@ class Statistics(FeatureExtractionMixin):
         )
         return adjusted_mutual_info_score(labels_true=x, labels_pred=y)
 
+    @staticmethod
+    @jit(nopython=True)
+    def czebyshev_distance(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
+        """
+        Calculate the Czebyshev distance between two N-dimensional samples.
+
+        The Czebyshev distance is defined as the maximum absolute difference
+        between the corresponding elements of the two arrays.
+
+        .. note::
+           Normalize arrays sample_1 and sample_2 before passing it to ensure accurate results.
+
+        .. math::
+            D_\infty(p, q) = \max_i \left| p_i - q_i \right|
+
+        :param np.ndarray sample_1: The first sample, an N-dimensional NumPy array.
+        :param np.ndarray sample_2: The second sample, an N-dimensional NumPy array.
+        :return float: The Czebyshev distance between the two samples.
+
+        :example:
+        >>> sample_1 = np.random.randint(0, 10, (10000,100))
+        >>> sample_2 = np.random.randint(0, 10, (10000,100))
+        >>> Statistics.czebyshev_distance(sample_1=sample_1, sample_2=sample_2)
+        """
+
+        c = 0.0
+        for idx in np.ndindex(sample_1.shape):
+            c = max((c, np.abs(sample_1[idx] - sample_2[idx])))
+        return c
+
+    @staticmethod
+    @njit(["(float32[:, :], float64[:], int64)", ])
+    def sliding_czebyshev_distance(x: np.ndarray, window_sizes: np.ndarray, sample_rate: float) -> np.ndarray:
+        """
+        Calculate the sliding Chebyshev distance for a given signal with different window sizes.
+
+        This function computes the sliding Chebyshev distance for a signal `x` using
+        different window sizes specified by `window_sizes`. The Chebyshev distance measures
+        the maximum absolute difference between the corresponding elements of two signals.
+
+        .. note::
+           Normalize array x before passing it to ensure accurate results.
+
+        .. math::
+           D_\infty(p, q) = \max_i \left| p_i - q_i \right|
+
+        :param np.ndarray x: Input signal, a 2D array with shape (n_samples, n_features).
+        :param np.ndarray window_sizes: Array containing window sizes for sliding computation.
+        :param float sample_rate: Sampling rate of the signal.
+        :return np.ndarray: 2D array of Chebyshev distances for each window size and position.
+
+        :example:
+        >>> sample_1 = np.random.randint(0, 10, (200,5)).astype(np.float32)
+        >>> sample_2 = np.random.randint(0, 10, (10000,100))
+        >>> Statistics.sliding_czebyshev_distance(x=sample_1, window_sizes=np.array([1.0, 2.0]), sample_rate=10.0)
+        """
+
+        result = np.full((x.shape[0], window_sizes.shape[0]), 0.0)
+        for i in range(window_sizes.shape[0]):
+            window_size = int(window_sizes[i] * sample_rate)
+            for l, r in zip(range(0, x.shape[0] + 1), range(window_size, x.shape[0] + 1)):
+                sample, c = x[l:r, :], 0.0
+                for j in range(sample.shape[1]):
+                    c = max(c, (np.abs(np.min(sample[:, j]) - np.max(sample[:, j]))))
+                result[r - 1, i] = c
+        return result
+
+    @staticmethod
+    @njit(["(int64[:], int64[:], float64[:])", "(int64[:], int64[:], types.misc.Omitted(None))",
+           "(int64[:, :], int64[:, :], float64[:])", "(int64[:, :], int64[:, :], types.misc.Omitted(None))"])
+    def sokal_michener(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None) -> float:
+        """
+        Jitted compute of the Sokal-Michener dissimilarity between two binary vectors or matrices.
+
+        Higher values indicate more dissimilar vectors or matrices, while lower values indicate more similar vectors or matrices.
+
+        The Sokal-Michener dissimilarity is a measure of dissimilarity between two sets
+        based on the presence or absence of similar attributes. This implementation supports weighted dissimilarity.
+
+        .. note::
+           Adapted from `umap <https://github.com/lmcinnes/umap/blob/e7f2fb9e5e772edd5c8f38612365ec6a35a54373/umap/distances.py#L468>`_.
+
+        .. math::
+           D(x, y) = \frac{2 \cdot \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}{N + \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}
+
+        where:
+        - :math:`x` and :math:`y` are the binary vectors or matrices.
+        - :math:`w_i` is the weight for the i-th element.
+        - :math:`\mathbb{1}(x_i \neq y_i)` is an indicator function that is 1 if :math:`x_i \neq y_i` and 0 otherwise.
+        - :math:`N` is the total number of elements in :math:`x` or :math:`y`.
+
+        :param np.ndarray x: First binary vector or matrix.
+        :param np.ndarray y: Second binary vector or matrix.
+        :param Optional[np.ndarray] w: Optional weight vector. If None, all weights are considered as 1.
+        :return float: Sokal-Michener dissimilarity between `x` and `y`.
+
+        :example:
+        >>> x = np.random.randint(0, 2, (200,))
+        >>> y = np.random.randint(0, 2, (200,))
+        >>> sokal_michener = Statistics.sokal_michener(x=x, y=y)
+        """
+
+        if w is None:
+            w = np.ones(x.shape[0]).astype(np.float64)
+        unequal_cnt = 0.0
+        for i in np.ndindex(x.shape):
+            x_i, y_i = x[i], y[i]
+            if x_i != y_i:
+                unequal_cnt += 1 * w[i[0]]
+        return (2.0 * unequal_cnt) / (x.size + unequal_cnt)
 
 # sample_1 = np.random.random_integers(low=1, high=2, size=(10, 50)).astype(np.float64)
 # sample_2 = np.random.random_integers(low=7, high=20, size=(10, 50)).astype(np.float64)

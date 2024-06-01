@@ -2366,10 +2366,12 @@ class Convert2MP4PopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CONVERT VIDEOS TO MP4")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.MP4_CODEC_LK = {'HEVC (H.265)': 'libx265', 'H.264 (AVC)': 'libx264', 'VP9': 'vp9', 'Guranteed powerpoint compatible': 'powerpoint'}
-        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.MP4_CODEC_LK = {'HEVC (H.265)': 'libx265', 'H.264 (AVC)': 'libx264', 'VP9': 'vp9', 'GPU (h264_cuvid)': 'h264_cuvid', 'Guranteed powerpoint compatible': 'powerpoint'}
+        self.cpu_codec_qualities = list(range(10, 110, 10))
+        self.gpu_codec_qualities = ['Low', 'Medium', 'High']
+        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", self.cpu_codec_qualities, labelwidth=25)
         self.quality_dropdown.setChoices(60)
-        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MP4_CODEC_LK.keys()), labelwidth=25)
+        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MP4_CODEC_LK.keys()), labelwidth=25, com=self.update_quality_dropdown)
         self.codec_dropdown.setChoices('HEVC (H.265)')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2388,8 +2390,15 @@ class Convert2MP4PopUp(PopUpMixin):
         multiple_video_frm.grid(row=2, column=0, sticky=NW)
         self.selected_video_dir.grid(row=0, column=0, sticky=NW)
         multiple_video_run.grid(row=1, column=0, sticky=NW)
+        self.main_frm.mainloop()
 
-        #self.main_frm.mainloop()
+    def update_quality_dropdown(self, k):
+        self.quality_dropdown.popupMenu['menu'].delete(0, 'end')
+        if k == 'GPU (h264_cuvid)': option_lst = self.gpu_codec_qualities
+        else: option_lst = self.cpu_codec_qualities
+        for option in option_lst:
+            self.quality_dropdown.popupMenu['menu'].add_command(label=option, command=lambda value=option: self.quality_dropdown.dropdownvar.set(value))
+        self.quality_dropdown.setChoices(option_lst[0])
 
     def run(self, multiple: bool):
         if not multiple:
@@ -2399,7 +2408,7 @@ class Convert2MP4PopUp(PopUpMixin):
             video_path = self.selected_video_dir.folder_path
             check_if_dir_exists(in_dir=video_path, source=self.__class__.__name__)
         codec = self.MP4_CODEC_LK[self.codec_dropdown.getChoices()]
-        quality = int(self.quality_dropdown.getChoices())
+        quality = self.quality_dropdown.getChoices()
         threading.Thread(target=convert_to_mp4(path=video_path, codec=codec, quality=quality))
 
 class Convert2AVIPopUp(PopUpMixin):
