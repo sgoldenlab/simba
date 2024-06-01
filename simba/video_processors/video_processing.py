@@ -2894,7 +2894,7 @@ def convert_to_webm(path: Union[str, os.PathLike],
     """
     Convert a directory containing videos, or a single video, to WEBM format using passed quality and codec.
 
-    .. image:: _static/img/convert_to_webm.webm
+    .. image:: _static/img/convert_to_webm.webp
        :width: 800
        :align: center
 
