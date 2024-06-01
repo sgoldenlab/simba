@@ -2884,8 +2884,6 @@ def convert_to_avi(path: Union[str, os.PathLike],
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to AVI and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_avi.__name__,)
 
-
-
 def convert_to_webm(path: Union[str, os.PathLike],
                     codec: Literal['vp8', 'vp9'] = 'vp9',
                     save_dir: Optional[Union[str, os.PathLike]] = None,

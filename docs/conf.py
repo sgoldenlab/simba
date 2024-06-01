@@ -21,7 +21,8 @@ myst_enable_extensions = ["html_image"]
 myst_url_schemes = ["http", "https"]
 extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.imgmath',
-              'sphinx.ext.mathjax'
+              'sphinx.ext.mathjax',
+              'sphinx-mathjax-offline',
               'sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
