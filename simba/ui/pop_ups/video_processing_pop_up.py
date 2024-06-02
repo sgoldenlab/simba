@@ -2038,11 +2038,17 @@ class BrightnessContrastPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CHANGE BRIGHTNESS / CONTRAST")
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+        setting_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.gpu_dropdown = DropDownMenu(setting_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=20)
+        self.gpu_dropdown.setChoices('FALSE')
+        setting_frm.grid(row=0, column=0, sticky="NW")
+        self.gpu_dropdown.grid(row=0, column=0, sticky="NW")
+
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHANGE BRIGHTNESS / CONTRAST SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
         run_video_btn = Button(single_video_frm, text="RUN SINGLE VIDEO", command=lambda: self.run_video(), fg="blue")
 
-        single_video_frm.grid(row=0, column=0, sticky="NW")
+        single_video_frm.grid(row=1, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
         run_video_btn.grid(row=1, column=0, sticky="NW")
 
@@ -2050,7 +2056,7 @@ class BrightnessContrastPopUp(PopUpMixin):
         self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
         run_dir_btn = Button(video_dir_frm, text="RUN VIDEO DIRECTORY", command=lambda: self.run_directory(), fg="blue")
 
-        video_dir_frm.grid(row=1, column=0, sticky="NW")
+        video_dir_frm.grid(row=2, column=0, sticky="NW")
         self.selected_dir.grid(row=0, column=0, sticky="NW")
         run_dir_btn.grid(row=1, column=0, sticky="NW")
 
@@ -2070,12 +2076,16 @@ class BrightnessContrastPopUp(PopUpMixin):
 
     def apply(self):
         timer = SimbaTimer(start=True)
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         for file_cnt, file_path in enumerate(self.video_paths):
             video_timer = SimbaTimer(start=True)
             dir, video_name, ext = get_fn_ext(filepath=file_path)
             print(f'Creating copy of {video_name}...')
             out_path = os.path.join(dir, f'{video_name}_eq_{self.datetime}{ext}')
-            cmd = f'ffmpeg -i "{file_path}" -vf "eq=brightness={self.brightness}:contrast={self.contrast}" -loglevel error -stats "{out_path}" -y'
+            if not gpu:
+                cmd = f'ffmpeg -i "{file_path}" -vf "eq=brightness={self.brightness}:contrast={self.contrast}" -loglevel error -stats "{out_path}" -y'
+            else:
+                cmd = f'ffmpeg -i -hwaccel auto "{file_path}" -vf "eq=brightness={self.brightness}:contrast={self.contrast}" -c:v h264_nvenc -loglevel error -stats "{out_path}" -y'
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
             video_timer.stop_timer()
             stdout_success(msg=f'Video {out_path} complete!', elapsed_time=video_timer.elapsed_time_str)
@@ -2146,7 +2156,7 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
         gpu_frm = LabelFrame(self.main_frm, text="GPU (REDUCED RUNTIMES)", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", padx=5, pady=5)
         self.use_gpu_var = BooleanVar(value=False)
         use_gpu_cb = Checkbutton(gpu_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var)
-        choose_video_frm.grid(row=1, column=0, sticky=NW)
+        gpu_frm.grid(row=1, column=0, sticky=NW)
         use_gpu_cb.grid(row=0, column=0, sticky=NW)
 
         custom_size_frm = LabelFrame(self.main_frm, text="CUSTOM RESOLUTION",font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black",padx=5,pady=5)
@@ -2211,7 +2221,7 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
         gpu_frm = LabelFrame(self.main_frm, text="GPU (REDUCED RUNTIMES)", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", padx=5, pady=5)
         self.use_gpu_var = BooleanVar(value=False)
         use_gpu_cb = Checkbutton(gpu_frm, text="Use GPU (reduced runtime)", variable=self.use_gpu_var)
-        choose_video_frm.grid(row=1, column=0, sticky=NW)
+        gpu_frm.grid(row=1, column=0, sticky=NW)
         use_gpu_cb.grid(row=0, column=0, sticky=NW)
 
         custom_size_frm = LabelFrame(self.main_frm, text="CUSTOM RESOLUTION",font=Formats.LABELFRAME_HEADER_FORMAT.value,fg="black",padx=5,pady=5)
@@ -2270,55 +2280,106 @@ class Convert2jpegPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CONVERT IMAGE DIRECTORY TO JPEG")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        self.quality_lbl = Label(settings_frm, text="JPEG QUALITY: ")
-        self.quality_scale = Scale(settings_frm, from_=1, to=100, orient=HORIZONTAL, length=200, label='JPEG QUALITY', fg='blue')
+        self.quality_lbl = Label(settings_frm, text="JPEG OUTPUT QUALITY: ")
+        self.quality_scale = Scale(settings_frm, from_=1, to=100, orient=HORIZONTAL, length=200, label='JPEG OUTPUT QUALITY', fg='blue')
         self.quality_scale.set(95)
-        self.create_run_frm(run_function=self.run, title='RUN JPEG CONVERSION')
         settings_frm.grid(row=0, column=0, sticky="NW")
-        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
-        self.quality_scale.grid(row=1, column=0, sticky="NW")
-        #self.main_frm.mainloop()
+        self.quality_scale.grid(row=0, column=0, sticky="NW")
 
-    def run(self):
+        img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO JPEG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        run_btn_dir = Button(img_dir_frm, text="RUN DIRECTORY JPEG CONVERSION", command=lambda: self.run_dir())
+
+        img_dir_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
+        run_btn_dir.grid(row=1, column=0, sticky="NW")
+
+        img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO JPEG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_file = FileSelect(img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
+        run_btn_img = Button(img_frm, text="RUN IMAGE JPEG CONVERSION", command=lambda: self.run_img())
+
+        img_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_file.grid(row=0, column=0, sticky="NW")
+        run_btn_img.grid(row=1, column=0, sticky="NW")
+
+    def run_dir(self):
         folder_path = self.selected_frame_dir.folder_path
         check_if_dir_exists(in_dir=folder_path)
-        _ = convert_to_jpeg(directory=folder_path, quality=int(self.quality_scale.get()), verbose=True)
+        _ = convert_to_jpeg(path=folder_path, quality=int(self.quality_scale.get()), verbose=True)
+
+    def run_img(self):
+        file_path = self.selected_file.file_path
+        check_file_exist_and_readable(file_path)
+        _ = convert_to_jpeg(path=file_path, quality=int(self.quality_scale.get()), verbose=True)
+
 
 class Convert2bmpPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT IMAGE DIRECTORY TO BMP")
-        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        self.create_run_frm(run_function=self.run, title='RUN BMP CONVERSION')
-        settings_frm.grid(row=0, column=0, sticky="NW")
-        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
-        #self.main_frm.mainloop()
+        super().__init__(title="CONVERT IMAGES TO BMP")
+        img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO BMP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        run_btn_dir = Button(img_dir_frm, text="RUN DIRECTORY BMP CONVERSION", command=lambda: self.run_dir())
 
-    def run(self):
+        img_dir_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
+        run_btn_dir.grid(row=1, column=0, sticky="NW")
+
+        img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO BMP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_file = FileSelect(img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
+        run_btn_img = Button(img_frm, text="RUN IMAGE BMP CONVERSION", command=lambda: self.run_img())
+
+        img_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_file.grid(row=0, column=0, sticky="NW")
+        run_btn_img.grid(row=1, column=0, sticky="NW")
+
+    def run_dir(self):
         folder_path = self.selected_frame_dir.folder_path
         check_if_dir_exists(in_dir=folder_path)
-        _ = convert_to_bmp(directory=folder_path, verbose=True)
+        _ = convert_to_bmp(path=folder_path, verbose=True)
+
+    def run_img(self):
+        file_path = self.selected_file.file_path
+        check_file_exist_and_readable(file_path)
+        _ = convert_to_bmp(path=file_path, verbose=True)
 
 
 class Convert2WEBPPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT IMAGE DIRECTORY TO WEBP")
+        super().__init__(title="CONVERT IMAGES TO WEBP")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        self.quality_lbl = Label(settings_frm, text="WEBP QUALITY: ")
+        self.quality_lbl = Label(settings_frm, text="WEBP OUTPUT QUALITY: ")
         self.quality_scale = Scale(settings_frm, from_=1, to=100, orient=HORIZONTAL, length=200, label='WEBP QUALITY', fg='blue')
         self.quality_scale.set(95)
-        self.create_run_frm(run_function=self.run, title='RUN WEBP CONVERSION')
         settings_frm.grid(row=0, column=0, sticky="NW")
+        self.quality_scale.grid(row=0, column=0, sticky="NW")
+
+        convert_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO WEBP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(convert_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        run_btn_dir = Button(convert_dir_frm, text="RUN IMAGE DIRECTORY WEBP CONVERSION", command=lambda: self.run_dir())
+
+        convert_dir_frm.grid(row=1, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
-        self.quality_scale.grid(row=1, column=0, sticky="NW")
+        run_btn_dir.grid(row=1, column=0, sticky="NW")
+
+        convert_img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO WEBP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_file = FileSelect(convert_img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
+        run_btn_frm = Button(convert_img_frm, text="RUN IMAGE WEBP CONVERSION", command=lambda: self.run_img())
+
+        convert_img_frm.grid(row=2, column=0, sticky="NW")
+        self.selected_file.grid(row=0, column=0, sticky="NW")
+        run_btn_frm.grid(row=1, column=0, sticky="NW")
+
         #self.main_frm.mainloop()
 
-    def run(self):
+    def run_dir(self):
         folder_path = self.selected_frame_dir.folder_path
         check_if_dir_exists(in_dir=folder_path)
-        _ = convert_to_webp(directory=folder_path, quality=int(self.quality_scale.get()), verbose=True)
+        _ = convert_to_webp(path=folder_path, quality=int(self.quality_scale.get()), verbose=True)
+
+    def run_img(self):
+        file_path = self.selected_file.file_path
+        check_file_exist_and_readable(file_path)
+        _ = convert_to_webp(path=file_path, quality=int(self.quality_scale.get()), verbose=True)
 
 class Convert2TIFFPopUp(PopUpMixin):
     def __init__(self):
@@ -2345,20 +2406,33 @@ class Convert2TIFFPopUp(PopUpMixin):
 
 class Convert2PNGPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT IMAGE DIRECTORY TO PNG")
-        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        self.create_run_frm(run_function=self.run, title='RUN PNG CONVERSION')
-        settings_frm.grid(row=0, column=0, sticky="NW")
-        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
-        #self.main_frm.mainloop()
+        super().__init__(title="CONVERT IMAGE TO PNG")
+        img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO PNG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        run_btn_dir = Button(img_dir_frm, text="RUN DIRECTORY PNG CONVERSION", command=lambda: self.run_dir())
 
-    def run(self):
+        img_dir_frm.grid(row=0, column=0, sticky="NW")
+        self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
+        run_btn_dir.grid(row=1, column=0, sticky="NW")
+
+        img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO PNG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_file_dir = FileSelect(img_frm, "IMAGE PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
+        run_btn_img = Button(img_frm, text="RUN PNG CONVERSION", command=lambda: self.run_img())
+
+        img_frm.grid(row=1, column=0, sticky="NW")
+        self.selected_file_dir.grid(row=0, column=0, sticky="NW")
+        run_btn_img.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
+
+    def run_dir(self):
         folder_path = self.selected_frame_dir.folder_path
         check_if_dir_exists(in_dir=folder_path)
-        _ = convert_to_png(directory=folder_path, verbose=True)
+        _ = convert_to_png(path=folder_path, verbose=True)
 
-
+    def run_img(self):
+        file_path = self.selected_file_dir.file_path
+        check_file_exist_and_readable(file_path)
+        _ = convert_to_png(path=file_path, verbose=True)
 
 class Convert2MP4PopUp(PopUpMixin):
     """
@@ -2504,7 +2578,6 @@ class Convert2MOVPopUp(PopUpMixin):
     :example:
     >>> Convert2MOVPopUp()
     """
-
     def __init__(self):
         super().__init__(title="CONVERT VIDEOS TO MOV")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
@@ -2545,8 +2618,6 @@ class Convert2MOVPopUp(PopUpMixin):
         quality = int(self.quality_dropdown.getChoices())
         threading.Thread(target=convert_to_mov(path=video_path, codec=codec, quality=quality))
 
-
-
 class SuperimposeWatermarkPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="WATERMARK VIDEOS")
@@ -2557,16 +2628,19 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         self.location_dropdown = DropDownMenu(settings_frm, "WATERMARK LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
         self.opacity_dropdown = DropDownMenu(settings_frm, "WATERMARK OPACITY:", opacities, labelwidth=25)
         self.size_dropdown = DropDownMenu(settings_frm, "WATERMARK SCALE %:", list(range(5, 100, 5)), labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU", ['TRUE', 'FALSE'], labelwidth=25)
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.opacity_dropdown.setChoices(0.5)
         self.size_dropdown.setChoices(5)
+        self.gpu_dropdown.setChoices('FALSE')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.selected_img.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=1, column=0, sticky=NW)
         self.opacity_dropdown.grid(row=2, column=0, sticky=NW)
         self.size_dropdown.grid(row=3, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=4, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE WATERMARK", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2586,6 +2660,7 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         img_path = self.selected_img.file_path
         loc = self.location_dropdown.getChoices()
         loc = self.LOCATIONS[loc]
@@ -2603,7 +2678,8 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         threading.Thread(target=watermark_video(video_path=data_path,
                                                 watermark_path=img_path, position=loc,
                                                 opacity=opacity,
-                                                scale=size)).start()
+                                                scale=size,
+                                                gpu=gpu)).start()
 #SuperimposeWatermarkPopUp()
 
 
@@ -2621,6 +2697,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
         self.timer_format_dropdown = DropDownMenu(settings_frm, "TIME FORMAT:", ['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'], labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.font_size_dropdown.setChoices(20)
@@ -2629,6 +2706,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_border_dropdown.setChoices('Black')
         self.font_border_width_dropdown.setChoices(2)
         self.timer_format_dropdown.setChoices('HH:MM:SS.MMMM')
+        self.gpu_dropdown.setChoices('FALSE')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2638,6 +2716,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_border_dropdown.grid(row=4, column=0, sticky=NW)
         self.font_border_width_dropdown.grid(row=5, column=0, sticky=NW)
         self.timer_format_dropdown.grid(row=6, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=7, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TIMER", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2657,6 +2736,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         loc = self.location_dropdown.getChoices()
         loc = self.LOCATIONS[loc]
         font_size = int(self.font_size_dropdown.getChoices())
@@ -2679,7 +2759,8 @@ class SuperimposeTimerPopUp(PopUpMixin):
                                                          font_border_color=font_border_clr,
                                                          font_border_width=font_border_width,
                                                          time_format=timer_format,
-                                                         position=loc)).start()
+                                                         position=loc,
+                                                         gpu=gpu)).start()
 
 
 class SuperimposeProgressBarPopUp(PopUpMixin):
@@ -2693,14 +2774,18 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         self.bar_loc_dropdown = DropDownMenu(settings_frm, "PROGRESS BAR LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
         self.bar_color_dropdown = DropDownMenu(settings_frm, "PROGRESS BAR COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.bar_size_dropdown = DropDownMenu(settings_frm, "PROGRESS BAR HEIGHT (%):", size_lst, labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+
         self.bar_color_dropdown.setChoices('Red')
         self.bar_size_dropdown.setChoices(10)
         self.bar_loc_dropdown.setChoices('BOTTOM')
+        self.gpu_dropdown.setChoices('FALSE')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.bar_loc_dropdown.grid(row=0, column=0, sticky=NW)
         self.bar_color_dropdown.grid(row=1, column=0, sticky=NW)
         self.bar_size_dropdown.grid(row=2, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=3, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE PROGRESS BAR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2720,6 +2805,7 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         loc = self.bar_loc_dropdown.getChoices()
         loc = self.LOCATIONS[loc]
         bar_clr = self.bar_color_dropdown.getChoices()
@@ -2734,7 +2820,8 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         threading.Thread(target=superimpose_video_progressbar(video_path=data_path,
                                                               bar_height=bar_size,
                                                               color=bar_clr,
-                                                              position=loc)).start()
+                                                              position=loc,
+                                                              gpu=gpu)).start()
 
 class SuperimposeVideoPopUp(PopUpMixin):
     def __init__(self):
@@ -2748,10 +2835,12 @@ class SuperimposeVideoPopUp(PopUpMixin):
         self.location_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
         self.opacity_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO OPACITY:", opacities, labelwidth=25)
         self.size_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO SCALE (%):", scales, labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.opacity_dropdown.setChoices(0.5)
         self.size_dropdown.setChoices(0.05)
+        self.gpu_dropdown.setChoices('FALSE')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.main_video_path.grid(row=0, column=0, sticky=NW)
@@ -2759,12 +2848,14 @@ class SuperimposeVideoPopUp(PopUpMixin):
         self.location_dropdown.grid(row=2, column=0, sticky=NW)
         self.opacity_dropdown.grid(row=3, column=0, sticky=NW)
         self.size_dropdown.grid(row=4, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=5, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
         #self.main_frm.mainloop()
 
     def run(self):
         loc = self.location_dropdown.getChoices()
         loc = self.LOCATIONS[loc]
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         opacity = float(self.opacity_dropdown.getChoices())
         size = float(self.size_dropdown.getChoices())
         video_path = self.main_video_path.file_path
@@ -2775,7 +2866,8 @@ class SuperimposeVideoPopUp(PopUpMixin):
                                                           overlay_video_path=overlay_path,
                                                           position=loc,
                                                           opacity=opacity,
-                                                          scale=size)).start()
+                                                          scale=size,
+                                                          gpu=gpu)).start()
 
 class SuperimposeVideoNamesPopUp(PopUpMixin):
     def __init__(self):
@@ -2791,6 +2883,9 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+
+
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.font_size_dropdown.setChoices(20)
@@ -2798,6 +2893,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         self.font_color_dropdown.setChoices('White')
         self.font_border_dropdown.setChoices('Black')
         self.font_border_width_dropdown.setChoices(2)
+        self.gpu_dropdown.setChoices('FALSE')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2806,6 +2902,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         self.font_color_dropdown.grid(row=3, column=0, sticky=NW)
         self.font_border_dropdown.grid(row=4, column=0, sticky=NW)
         self.font_border_width_dropdown.grid(row=5, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=6, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE VIDEO NAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2827,6 +2924,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
     def run(self, multiple: bool):
         loc = self.location_dropdown.getChoices()
         loc = self.LOCATIONS[loc]
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         font_size = int(self.font_size_dropdown.getChoices())
         font = self.font_dropdown.getChoices()
         font_clr = self.font_color_dropdown.getChoices()
@@ -2845,7 +2943,8 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
                                                         font_color=font_clr,
                                                         font_border_color=font_border_clr,
                                                         font_border_width=font_border_width,
-                                                        position=loc)).start()
+                                                        position=loc,
+                                                        gpu=gpu)).start()
 
 class SuperimposeTextPopUp(PopUpMixin):
     def __init__(self):
@@ -2862,6 +2961,9 @@ class SuperimposeTextPopUp(PopUpMixin):
         self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
         self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+
+
 
         self.location_dropdown.setChoices('TOP LEFT')
         self.font_size_dropdown.setChoices(20)
@@ -2869,6 +2971,7 @@ class SuperimposeTextPopUp(PopUpMixin):
         self.font_color_dropdown.setChoices('White')
         self.font_border_dropdown.setChoices('Black')
         self.font_border_width_dropdown.setChoices(2)
+        self.gpu_dropdown.setChoices('FALSE')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2878,6 +2981,7 @@ class SuperimposeTextPopUp(PopUpMixin):
         self.font_color_dropdown.grid(row=4, column=0, sticky=NW)
         self.font_border_dropdown.grid(row=5, column=0, sticky=NW)
         self.font_border_width_dropdown.grid(row=6, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=7, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TEXT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2900,6 +3004,7 @@ class SuperimposeTextPopUp(PopUpMixin):
         loc = self.location_dropdown.getChoices()
         loc = self.LOCATIONS[loc]
         text = self.text_eb.entry_get
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         check_str(name='text', value=text)
         font = self.font_dropdown.getChoices()
         font_size = int(self.font_size_dropdown.getChoices())
@@ -2920,7 +3025,8 @@ class SuperimposeTextPopUp(PopUpMixin):
                                                      font_color=font_clr,
                                                      font_border_color=font_border_clr,
                                                      font_border_width=font_border_width,
-                                                     position=loc)).start()
+                                                     position=loc,
+                                                     gpu=gpu)).start()
 
 
 class BoxBlurPopUp(PopUpMixin):
@@ -3044,13 +3150,17 @@ class RotateVideoSetDegreesPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.degrees_dropdown = DropDownMenu(settings_frm, "CLOCKWISE DEGREES:", list(range(1, 360, 1)), labelwidth=25)
         self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY (%):", list(range(10, 110, 10)), labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+
         self.quality_dropdown.setChoices(60)
         self.degrees_dropdown.setChoices('90')
+        self.gpu_dropdown.setChoices('FALSE')
         self.degrees_dropdown.grid(row=0, column=0, sticky=NW)
 
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.degrees_dropdown.grid(row=0, column=0, sticky="NW")
         self.quality_dropdown.grid(row=1, column=0, sticky="NW")
+        self.gpu_dropdown.grid(row=2, column=0, sticky="NW")
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - ROTATE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -3072,6 +3182,7 @@ class RotateVideoSetDegreesPopUp(PopUpMixin):
     def run(self, multiple: bool):
         degrees = int(self.degrees_dropdown.getChoices())
         quality = int(self.quality_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -3081,7 +3192,8 @@ class RotateVideoSetDegreesPopUp(PopUpMixin):
 
         threading.Thread(target=rotate_video(video_path=data_path,
                                              degrees=degrees,
-                                             quality=quality)).start()
+                                             quality=quality,
+                                             gpu=True)).start()
 
 
 class FlipVideosPopUp(PopUpMixin):
@@ -3091,15 +3203,18 @@ class FlipVideosPopUp(PopUpMixin):
         self.horizontal_dropdown = DropDownMenu(settings_frm, "HORIZONTAL FLIP:", ['TRUE', 'FALSE'], labelwidth=25)
         self.vertical_dropdown = DropDownMenu(settings_frm, "VERTICAL FLIP:", ['TRUE', 'FALSE'], labelwidth=25)
         self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY (%):", list(range(10, 110, 10)), labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
 
         self.horizontal_dropdown.setChoices('FALSE')
         self.vertical_dropdown.setChoices('FALSE')
+        self.gpu_dropdown.setChoices('FALSE')
         self.quality_dropdown.setChoices(60)
 
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.vertical_dropdown.grid(row=0, column=0, sticky="NW")
         self.horizontal_dropdown.grid(row=1, column=0, sticky="NW")
         self.quality_dropdown.grid(row=2, column=0, sticky="NW")
+        self.gpu_dropdown.grid(row=3, column=0, sticky="NW")
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - FLIP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -3120,6 +3235,7 @@ class FlipVideosPopUp(PopUpMixin):
     def run(self, multiple: bool):
         vertical_flip = str_2_bool(self.vertical_dropdown.getChoices())
         horizontal_flip = str_2_bool(self.horizontal_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         if not vertical_flip and not horizontal_flip:
             raise InvalidInputError(msg='Flip videos vertically and/or horizontally. Got both as False', source=self.__class__.__name__)
         quality = int(self.quality_dropdown.getChoices())
@@ -3133,7 +3249,8 @@ class FlipVideosPopUp(PopUpMixin):
         threading.Thread(target=flip_videos(video_path=data_path,
                                             vertical_flip=vertical_flip,
                                             horizontal_flip=horizontal_flip,
-                                            quality=quality)).start()
+                                            quality=quality,
+                                            gpu=gpu)).start()
 
 
 class UpsampleVideosPopUp(PopUpMixin):
@@ -3191,9 +3308,13 @@ class ReverseVideoPopUp(PopUpMixin):
         self.quality_dropdown.setChoices(60)
         self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MP4_CODEC_LK.keys()), labelwidth=25)
         self.codec_dropdown.setChoices('HEVC (H.265)')
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+        self.gpu_dropdown.setChoices('FALSE')
+
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
         self.codec_dropdown.grid(row=1, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=2, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - REVERSE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -3215,6 +3336,7 @@ class ReverseVideoPopUp(PopUpMixin):
     def run(self, multiple: bool):
         target_quality = int(self.quality_dropdown.getChoices())
         codec = self.MP4_CODEC_LK[self.codec_dropdown.getChoices()]
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -3222,7 +3344,10 @@ class ReverseVideoPopUp(PopUpMixin):
             data_path = self.selected_video_dir.folder_path
             check_if_dir_exists(in_dir=data_path)
 
-        reverse_videos(path=data_path, quality=target_quality, codec=codec)
+        reverse_videos(path=data_path,
+                       quality=target_quality,
+                       codec=codec,
+                       gpu=gpu)
 
 class Convert2BlackWhitePopUp(PopUpMixin):
     def __init__(self):
@@ -3230,10 +3355,13 @@ class Convert2BlackWhitePopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         threshold = [round(x, 2) for x in list(np.arange(0.01, 1.01, 0.01))]
         self.threshold_dropdown = DropDownMenu(settings_frm, "BLACK THRESHOLD:", threshold, labelwidth=25)
-        self.threshold_dropdown.setChoices(0.5)
+        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
 
+        self.threshold_dropdown.setChoices(0.5)
+        self.gpu_dropdown.setChoices('FALSE')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_dropdown.grid(row=0, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=1, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - CONVERT TO BLACK & WHITE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -3250,10 +3378,11 @@ class Convert2BlackWhitePopUp(PopUpMixin):
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
         multiple_videos_run.grid(row=1, column=0, sticky="NW")
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         threshold = float(self.threshold_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -3262,7 +3391,8 @@ class Convert2BlackWhitePopUp(PopUpMixin):
             check_if_dir_exists(in_dir=data_path)
 
         threading.Thread(target=video_to_bw(video_path=data_path,
-                                            threshold=threshold)).start()
+                                            threshold=threshold,
+                                            gpu=gpu)).start()
 
 
 class CreateAverageFramePopUp(PopUpMixin):
@@ -3342,6 +3472,9 @@ class ManualTemporalJoinPopUp(PopUpMixin):
         self.quality_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
         self.quality_dropdown.setChoices(60)
         self.out_format_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO FORMAT:", Options.ALL_VIDEO_FORMAT_OPTIONS.value, labelwidth=25)
+        self.gpu_dropdown = DropDownMenu(video_cnt_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+        self.gpu_dropdown.setChoices('FALSE')
+
         self.out_format_dropdown.setChoices('.mp4')
         self.video_cnt_dropdown.setChoices(2)
         video_cnt_frm.grid(row=0, column=0, sticky=NW)
@@ -3349,6 +3482,7 @@ class ManualTemporalJoinPopUp(PopUpMixin):
         self.select_video_cnt_btn.grid(row=0, column=1, sticky=NW)
         self.quality_dropdown.grid(row=1, column=0, sticky=NW)
         self.out_format_dropdown.grid(row=2, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=3, column=0, sticky=NW)
         self.main_frm.mainloop()
 
     def select(self):
@@ -3376,9 +3510,13 @@ class ManualTemporalJoinPopUp(PopUpMixin):
         unique_fps, unique_res = list(set(fps)), list(set(resolutions))
         format = self.out_format_dropdown.getChoices()
         quality = self.quality_dropdown.getChoices()
+        gpu = str_2_bool(self.gpu_dropdown.getChoices())
         if len(unique_fps) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique FPS: {unique_fps}', source=self.__class__.__name__)
         if len(unique_res) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique resolutions: {unique_res}', source=self.__class__.__name__)
-        threading.Thread(temporal_concatenation(video_paths=video_file_paths, save_format=format[1:], quality=quality)).start()
+        threading.Thread(temporal_concatenation(video_paths=video_file_paths,
+                                                save_format=format[1:],
+                                                quality=quality,
+                                                gpu=gpu)).start()
 
 class CrossfadeVideosPopUp(PopUpMixin):
     def __init__(self):
