@@ -332,6 +332,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                 height,
             )
         self.__get_print_settings()
+        print(self.text_attr)
 
         for model in self.model_dict.values():
             self.data_df[model["model_name"] + "_cumsum"] = self.data_df[
@@ -421,12 +422,16 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             )
 
 
+
+#text_settings = {'circle_scale': 5, 'font_size': 0.528, 'spacing_scale': 28, 'text_thickness': 2}
+
 # clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
 #                                              video_setting=True,
 #                                              frame_setting=False,
 #                                              rotate=False,
 #                                              video_file_path='Trial    10.mp4',
-#                                              cores=5)
+#                                              cores=5,
+#                                              text_settings=False)
 # clf_plotter.run()
 
 
