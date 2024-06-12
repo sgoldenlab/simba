@@ -2,23 +2,28 @@ __author__ = "Simon Nilsson"
 
 import os
 from copy import deepcopy
-from typing import Union, List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 import numpy as np
 import pandas as pd
-
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists, check_str, check_valid_lst, check_instance, check_if_keys_exist_in_dict
 
 from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_instance,
+                                check_str, check_valid_lst)
 from simba.utils.enums import Formats, Methods, Options
 from simba.utils.errors import BodypartColumnNotFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_all_videos_in_project, get_video_meta_data, write_df)
+from simba.utils.read_write import (find_all_videos_in_project,
+                                    get_video_meta_data, write_df)
 
 
 class MADLCImporterH5(ConfigReader, PoseImporterMixin):
