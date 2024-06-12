@@ -1,23 +1,23 @@
 __author__ = "Simon Nilsson"
 
-import glob
-import os
 
+from typing import Union
+import os
 import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.enums import ConfigKey, Dtypes
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (get_fn_ext, read_config_entry, read_df,
-                                    write_df)
+from simba.utils.read_write import (get_fn_ext, read_config_entry, read_df, write_df)
 
 
 class OutlierCorrecterLocation(ConfigReader):
     """
     Detect and amend outliers in pose-estimation data based in the location of the body-parts
-    in the current frame relative to the location of the body-part in the preceding frame. Uses critera
-    stored in the SimBA project project_config.ini under the [Outlier settings] header.
+    in the current frame relative to the location of the body-part in the preceding frame using heuristic rules.
+
+    Uses heuristic rules critera is grabbed from the SimBA project project_config.ini under the [Outlier settings] header.
 
     .. note::
        `Documentation <https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf>`_.
@@ -26,36 +26,29 @@ class OutlierCorrecterLocation(ConfigReader):
        :width: 500
        :align: center
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
+    :parameter Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
 
     Examples
     ----------
     >>> _ = OutlierCorrecterLocation(config_path='MyProjectConfig').run()
     """
 
-    def __init__(self, config_path: str):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
+
         super().__init__(config_path=config_path)
         if not os.path.exists(self.outlier_corrected_dir):
             os.makedirs(self.outlier_corrected_dir)
         if self.animal_cnt == 1:
-            self.animal_id = read_config_entry(
-                self.config,
-                ConfigKey.MULTI_ANIMAL_ID_SETTING.value,
-                ConfigKey.MULTI_ANIMAL_IDS.value,
-                Dtypes.STR.value,
-            )
+            self.animal_id = read_config_entry(self.config,
+                                               ConfigKey.MULTI_ANIMAL_ID_SETTING.value,
+                                               ConfigKey.MULTI_ANIMAL_IDS.value,
+                                               Dtypes.STR.value)
             if self.animal_id != "None":
-                self.animal_bp_dict[self.animal_id] = self.animal_bp_dict.pop(
-                    "Animal_1"
-                )
+                self.animal_bp_dict[self.animal_id] = self.animal_bp_dict.pop("Animal_1")
         self.above_criterion_dict_dict = {}
         self.below_criterion_dict_dict = {}
-        self.criterion = read_config_entry(
-            self.config,
-            ConfigKey.OUTLIER_SETTINGS.value,
-            ConfigKey.LOCATION_CRITERION.value,
-            Dtypes.FLOAT.value,
-        )
+        self.criterion = read_config_entry(self.config, ConfigKey.OUTLIER_SETTINGS.value, ConfigKey.LOCATION_CRITERION.value, Dtypes.FLOAT.value)
         self.outlier_bp_dict = {}
         for animal_name in self.animal_bp_dict.keys():
             self.outlier_bp_dict[animal_name] = {}

@@ -85,7 +85,8 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
                 self.p_cols,
                 self.clr_lst,
             )
-            self.update_bp_headers_file()
+            if self.pose_setting is Methods.USER_DEFINED.value:
+                self.update_bp_headers_file(update_bp_headers=True)
         print(f"Importing {len(list(self.data_and_videos_lk.keys()))} file(s)...")
 
     def __h5_to_dict(self, name, obj):

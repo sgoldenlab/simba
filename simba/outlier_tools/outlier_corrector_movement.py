@@ -1,11 +1,11 @@
 __author__ = "Simon Nilsson"
 
-import glob
 import os
+from typing import Union
 
 import numpy as np
 import pandas as pd
-from numba import jit, prange
+from numba import jit
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
@@ -21,7 +21,7 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
     in the current frame from preceeding frame. Uses critera stored in the SimBA project project_config.ini
     under the [Outlier settings] header.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
+    :param str config_path: path to SimBA project config file in Configparser format
 
     .. image:: _static/img/movement_outlier.png
        :width: 500
@@ -36,22 +36,15 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
     >>> outlier_correcter_movement.run()
     """
 
-    def __init__(self, config_path: str):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self)
-        if not os.path.exists(self.outlier_corrected_movement_dir):
-            os.makedirs(self.outlier_corrected_movement_dir)
+        if not os.path.exists(self.outlier_corrected_movement_dir): os.makedirs(self.outlier_corrected_movement_dir)
         if self.animal_cnt == 1:
-            self.animal_id = read_config_entry(
-                self.config,
-                ConfigKey.MULTI_ANIMAL_ID_SETTING.value,
-                ConfigKey.MULTI_ANIMAL_IDS.value,
-                Dtypes.STR.value,
-            )
+            self.animal_id = read_config_entry(self.config, ConfigKey.MULTI_ANIMAL_ID_SETTING.value, ConfigKey.MULTI_ANIMAL_IDS.value, Dtypes.STR.value)
             if self.animal_id != "None":
-                self.animal_bp_dict[self.animal_id] = self.animal_bp_dict.pop(
-                    "Animal_1"
-                )
+                self.animal_bp_dict[self.animal_id] = self.animal_bp_dict.pop("Animal_1")
         self.above_criterion_dict_dict = {}
         self.criterion = read_config_entry(
             self.config,
@@ -123,20 +116,11 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
         for file_cnt, file_path in enumerate(self.input_csv_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
-            print(
-                "Processing video {}. Video {}/{}...".format(
-                    self.video_name, str(file_cnt + 1), str(len(self.input_csv_paths))
-                )
-            )
+            print(f"Processing video {self.video_name}. Video {file_cnt+1}/{len(self.input_csv_paths)}...")
             self.above_criterion_dict_dict[self.video_name] = {}
-            save_path = os.path.join(
-                self.outlier_corrected_movement_dir,
-                self.video_name + "." + self.file_type,
-            )
+            save_path = os.path.join(self.outlier_corrected_movement_dir, f"{self.video_name}.{self.file_type}")
             self.data_df = read_df(file_path, self.file_type, check_multiindex=True)
-            self.data_df = self.insert_column_headers_for_outlier_correction(
-                data_df=self.data_df, new_headers=self.bp_headers, filepath=file_path
-            )
+            self.data_df = self.insert_column_headers_for_outlier_correction(data_df=self.data_df, new_headers=self.bp_headers, filepath=file_path)
             self.data_df_combined = self.create_shifted_df(df=self.data_df)
             self.animal_criteria = {}
             for animal_name, animal_bps in self.outlier_bp_dict.items():
@@ -152,27 +136,18 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
                     )
                     ** 2
                 )
-                self.animal_criteria[animal_name] = (
-                    animal_bp_distances.mean() * self.criterion
-                )
+                self.animal_criteria[animal_name] = (animal_bp_distances.mean() * self.criterion)
             self.__outlier_replacer()
             write_df(df=self.data_df, file_type=self.file_type, save_path=save_path)
             video_timer.stop_timer()
-            print(
-                f"Corrected movement outliers for file {self.video_name} (elapsed time: {video_timer.elapsed_time_str}s)..."
-            )
+            print(f"Corrected movement outliers for file {self.video_name} (elapsed time: {video_timer.elapsed_time_str}s)...")
         self.__save_log_file()
 
     def __save_log_file(self):
-        self.log_fn = os.path.join(
-            self.logs_path, "Outliers_movement_{}.csv".format(self.datetime)
-        )
+        self.log_fn = os.path.join(self.logs_path, f"Outliers_movement_{self.datetime}.csv")
         self.log.to_csv(self.log_fn)
         self.timer.stop_timer()
-        stdout_success(
-            msg='Log for corrected "movement outliers" saved in project_folder/logs',
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f'Log for corrected "movement outliers" saved in {self.logs_path}', elapsed_time=self.timer.elapsed_time_str)
 
 
 #

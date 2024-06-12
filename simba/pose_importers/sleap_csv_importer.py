@@ -92,7 +92,8 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 self.p_cols,
                 self.clr_lst,
             )
-            self.update_bp_headers_file()
+            if self.pose_setting is Methods.USER_DEFINED.value:
+                self.update_bp_headers_file(update_bp_headers=True)
         else:
             self.data_and_videos_lk = dict(
                 [

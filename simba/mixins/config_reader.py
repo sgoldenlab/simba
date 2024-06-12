@@ -135,12 +135,7 @@ class ConfigReader(object):
             data_type=Dtypes.STR.value,
             default_value=Dtypes.NONE.value,
         )
-        self.clf_cnt = self.read_config_entry(
-            self.config,
-            ConfigKey.SML_SETTINGS.value,
-            ConfigKey.TARGET_CNT.value,
-            Dtypes.INT.value,
-        )
+        self.clf_cnt = self.read_config_entry(self.config, ConfigKey.SML_SETTINGS.value, ConfigKey.TARGET_CNT.value, Dtypes.INT.value)
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.clf_cnt)
         self.feature_file_paths = glob.glob(self.features_dir + f"/*.{self.file_type}")
         self.target_file_paths = glob.glob(self.targets_folder + f"/*.{self.file_type}")

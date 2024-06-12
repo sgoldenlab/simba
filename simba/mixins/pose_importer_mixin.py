@@ -5,7 +5,7 @@ import os
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Dict
 
 import cv2
 import h5py
@@ -60,7 +60,15 @@ class PoseImporterMixin(object):
             space_scale / (resolution_scale / max_video_dimension)
         )
 
-    def find_data_files(self, dir: Union[str, os.PathLike], extensions: List[str]):
+    def find_data_files(self, dir: Union[str, os.PathLike], extensions: List[str]) -> List[str]:
+        """
+        Search for files with specific extensions in a given directory and return their paths.
+
+        :param Union[str, os.PathLike] dir: The directory to search for files. It can be a string or a path-like object.
+        :param  List[str] extensions: A list of file extensions to look for.
+        :return: A list of paths to the files with the specified extensions found in the directory.
+        :raises NoDataError: If no files with the specified extensions are found in the directory.
+        """
 
         data_paths = []
         paths = [f for f in next(os.walk(dir))[2] if not f[0] == "."]
@@ -70,20 +78,15 @@ class PoseImporterMixin(object):
                 if path.endswith(extension):
                     data_paths.append(path)
         if len(data_paths) == 0:
-            raise NoDataError(
-                msg=f"No files with {extensions} extensions found in {dir}.",
-                source=self.__class__.__name__,
-            )
+            raise NoDataError(msg=f"No files with {extensions} extensions found in {dir}.", source=self.__class__.__name__)
 
         return data_paths
 
-    def link_video_paths_to_data_paths(
-        self,
-        data_paths: List[str],
-        video_paths: List[str],
-        str_splits: Optional[List[str]] = None,
-        filename_cleaning_func: Optional[object] = None,
-    ) -> dict:
+    def link_video_paths_to_data_paths(self,
+                                       data_paths: List[str],
+                                       video_paths: List[str],
+                                       str_splits: Optional[List[str]] = None,
+                                       filename_cleaning_func: Optional[object] = None) -> Dict[str, str]:
         """
         Given a list of paths to video files and a separate list of paths to data files, create a dictionary
         pairing each video file to a datafile based on the file names of the video and data file.
@@ -481,7 +484,7 @@ class PoseImporterMixin(object):
             self.config.write(f)
         f.close()
 
-    def update_bp_headers_file(self):
+    def update_bp_headers_file(self, update_bp_headers: Optional[bool] = False):
         new_headers = []
         for animal_name in self.animal_bp_dict.keys():
             for bp in self.animal_bp_dict[animal_name]["X_bps"]:
@@ -491,6 +494,8 @@ class PoseImporterMixin(object):
                     new_headers.append(bp[:-2])
         new_bp_df = pd.DataFrame(new_headers)
         new_bp_df.to_csv(self.body_parts_path, index=False, header=False)
+        if update_bp_headers:
+            self.bp_headers = new_headers
 
     def update_config_animal_names(self):
         self.config.set(
@@ -571,9 +576,3 @@ class PoseImporterMixin(object):
             1, index=self.data_df.index, columns=self.data_df.columns[1::2] + 0.5
         )
         return pd.concat([self.data_df, p_cols], axis=1)  # .sort_index(axis=1)
-
-    # def import_log(self):
-    #     self.import_log = pd.DataFrame(columns=['VIDEO', 'IMPORT_TIME', 'IMPORT_SOURCE', 'INTERPOLATION_SETTING', 'SMOOTHING_SETTING'])
-    #
-
-    # import_log.loc[len(import_log)] = [self.file_name, 'MADLC', str(self.interpolation_settings), str(self.smoothing_settings)]

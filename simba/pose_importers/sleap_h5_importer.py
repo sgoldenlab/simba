@@ -72,7 +72,8 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
             self.data_and_videos_lk = self.link_video_paths_to_data_paths(data_paths=self.input_data_paths, video_paths=self.video_paths, filename_cleaning_func=clean_sleap_file_name)
             self.check_multi_animal_status()
             self.animal_bp_dict = self.create_body_part_dictionary(self.multi_animal_status,self.id_lst,self.animal_cnt,self.x_cols,self.y_cols,self.p_cols,self.clr_lst)
-            self.update_bp_headers_file()
+            if self.pose_setting is Methods.USER_DEFINED.value:
+                self.update_bp_headers_file(update_bp_headers=True)
         else:
             self.data_and_videos_lk = dict([(get_fn_ext(file_path)[1], {"DATA": file_path, "VIDEO": None}) for file_path in self.input_data_paths])
         log_event(logger_name=str(self.__class__.__name__), log_type="info", msg=f"Importing data files: {self.input_data_paths}. Interpolation: {interpolation_settings}, Smoothing: {smoothing_settings}")

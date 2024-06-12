@@ -18,15 +18,14 @@ except ImportError:
 
 import simba
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int, check_that_column_exist)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int, check_that_column_exist)
 from simba.utils.enums import Options, TagNames
 from simba.utils.errors import FrameRangeError
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
-                                    get_video_meta_data, read_config_entry,
-                                    read_df, write_df)
+from simba.utils.read_write import (get_all_clf_names, get_fn_ext, get_video_meta_data, read_config_entry, read_df, write_df)
 
+PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
+PADDING = 5
 
 class LabellingInterface(ConfigReader):
     """
@@ -40,48 +39,32 @@ class LabellingInterface(ConfigReader):
        :align: center
 
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str file_path: Path to video that is to be annotated
-    :parameter str setting: String representing annotation method. OPTIONS: ``from_scratch`` or ``pseudo``
-    :parameter dict threshold_dict: If setting ``pseudo``, threshold_dict dict contains the machine probability thresholds, with the classifier
-        names as keys and the classification probabilities as values, e.g. {'Attack': 0.40, 'Sniffing': 0.7).
-    :parameter bool continuing: If True, continouing previously started annotation session.
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str file_path: Path to video that is to be annotated
+    :param str setting: String representing annotation method. OPTIONS: ``from_scratch`` or ``pseudo``
+    :param dict threshold_dict: If setting ``pseudo``, threshold_dict dict contains the machine probability thresholds, with the classifier names as keys and the classification probabilities as values, e.g. {'Attack': 0.40, 'Sniffing': 0.7).
+    :param bool continuing: If True, continouing previously started annotation session.
 
     Examples
     ----------
     >>> select_labelling_video(config_path='MyConfigPath', threshold_dict={'Attack': 0.4}, file_path='MyVideoFilePath', setting='pseudo', continuing=False)
     """
 
-    def __init__(
-        self,
-        config_path: str,
-        file_path: str,
-        threshold_dict: Optional[Dict[str, float]] = None,
-        setting: Literal["from_scratch", "pseudo"] = "pseudo",
-        continuing: bool = False,
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 file_path: Union[str, os.PathLike],
+                 threshold_dict: Optional[Dict[str, float]] = None,
+                 setting: Literal["from_scratch", "pseudo"] = "pseudo",
+                 continuing: Optional[bool] = False):
+
         ConfigReader.__init__(self, config_path=config_path)
-        log_event(
-            logger_name=str(self.__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
-        self.padding, self.file_path = 5, file_path
-        self.frm_no, self.threshold_dict = 0, threshold_dict
+        log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
+        self.frm_no, self.threshold_dict, self.file_path = 0, threshold_dict, file_path
         self.setting = setting
-        self.play_video_script_path = os.path.join(
-            os.path.dirname(simba.__file__), "labelling/play_annotation_video.py"
-        )
         _, self.video_name, _ = get_fn_ext(filepath=file_path)
-        self.features_extracted_file_path = os.path.join(
-            self.features_dir, self.video_name + "." + self.file_type
-        )
-        self.targets_inserted_file_path = os.path.join(
-            self.targets_folder, self.video_name + "." + self.file_type
-        )
-        self.machine_results_file_path = os.path.join(
-            self.machine_results_dir, self.video_name + "." + self.file_type
-        )
+        self.features_extracted_file_path = os.path.join(self.features_dir, f"{self.video_name}.{self.file_type}")
+        self.targets_inserted_file_path = os.path.join(self.targets_folder, f"{self.video_name}.{self.file_type}")
+        self.machine_results_file_path = os.path.join(self.machine_results_dir, f"{self.video_name}.{self.file_type}")
         self.video_path = file_path
         self.cap = cv2.VideoCapture(self.video_path)
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
@@ -94,22 +77,13 @@ class LabellingInterface(ConfigReader):
             check_file_exist_and_readable(file_path=self.targets_inserted_file_path)
             check_file_exist_and_readable(file_path=self.features_extracted_file_path)
             self.data_df = read_df(self.targets_inserted_file_path, self.file_type)
-            self.data_df_features = read_df(
-                self.features_extracted_file_path, self.file_type
-            )
+            self.data_df_features = read_df(self.features_extracted_file_path, self.file_type)
             missing_idx = self.data_df_features.index.difference(self.data_df.index)
             if len(missing_idx) > 0:
-                self.data_df_features = self.data_df_features.iloc[
-                    self.data_df_features.index.difference(self.data_df.index)
-                ]
-                self.data_df = pd.concat(
-                    [self.data_df.astype(int), self.data_df_features], axis=0
-                ).sort_index()
+                self.data_df_features = self.data_df_features.iloc[self.data_df_features.index.difference(self.data_df.index)]
+                self.data_df = pd.concat([self.data_df.astype(int), self.data_df_features], axis=0).sort_index()
             self.main_window.title(
-                "SIMBA ANNOTATION INTERFACE (CONTINUING ANNOTATIONS) - {}".format(
-                    self.video_name
-                )
-            )
+                "SIMBA ANNOTATION INTERFACE (CONTINUING ANNOTATIONS) - {}".format( self.video_name))
             self.frm_no = read_config_entry(
                 self.config,
                 "Last saved frames",
@@ -218,11 +192,11 @@ class LabellingInterface(ConfigReader):
         self.folder.grid(row=0, column=1, sticky=N)
         self.buttons_frm.grid(row=1, column=0)
         self.change_frm_box.grid(row=0, column=1)
-        self.forward_btn.grid(row=1, column=3, sticky=E, padx=self.padding)
-        self.backward_btn.grid(row=1, column=1, sticky=W, padx=self.padding)
+        self.forward_btn.grid(row=1, column=3, sticky=E, padx=PADDING)
+        self.backward_btn.grid(row=1, column=1, sticky=W, padx=PADDING)
         self.change_frm_box.grid(row=1, column=1)
-        self.forward_max_btn.grid(row=1, column=4, sticky=W, padx=self.padding)
-        self.backward_max_btn.grid(row=1, column=0, sticky=W, padx=self.padding)
+        self.forward_max_btn.grid(row=1, column=4, sticky=W, padx=PADDING)
+        self.backward_max_btn.grid(row=1, column=0, sticky=W, padx=PADDING)
         self.select_frm_btn.grid(row=2, column=1, sticky=N)
         self.jump_frame.grid(row=2, column=0)
         self.jump.grid(row=0, column=0, sticky=W)
@@ -374,7 +348,7 @@ class LabellingInterface(ConfigReader):
 
     def __play_video(self):
         p = Popen(
-            "python {}".format(self.play_video_script_path),
+            "python {}".format(PLAY_VIDEO_SCRIPT_PATH),
             stdin=PIPE,
             stdout=PIPE,
             shell=True,
