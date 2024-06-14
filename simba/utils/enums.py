@@ -596,6 +596,7 @@ class GeometryEnum(Enum):
 
 class MLParamKeys(Enum):
     CLASSIFIER = "classifier"
+    RF_META_DATA = 'RF_meta_data'
     CLASSIFIER_NAME = "classifier_name"
     RF_ESTIMATORS = "rf_n_estimators"
     RF_CRITERION = "rf_criterion"
