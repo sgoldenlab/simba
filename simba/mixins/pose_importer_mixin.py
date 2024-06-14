@@ -5,7 +5,7 @@ import os
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
-from typing import List, Optional, Union, Dict
+from typing import Dict, List, Optional, Union
 
 import cv2
 import h5py

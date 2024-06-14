@@ -1,15 +1,17 @@
 __author__ = "Simon Nilsson"
 
 
-from typing import Union
 import os
+from typing import Union
+
 import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.enums import ConfigKey, Dtypes
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (get_fn_ext, read_config_entry, read_df, write_df)
+from simba.utils.read_write import (get_fn_ext, read_config_entry, read_df,
+                                    write_df)
 
 
 class OutlierCorrecterLocation(ConfigReader):
