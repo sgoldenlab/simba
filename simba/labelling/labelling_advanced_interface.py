@@ -15,7 +15,7 @@ import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_file_exist_and_readable, check_int
 from simba.utils.enums import Formats, Options, TagNames
-from simba.utils.errors import AdvancedLabellingError, FrameRangeError
+from simba.utils.errors import AdvancedLabellingError, FrameRangeError, NoDataError
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
@@ -70,6 +70,11 @@ class AdvancedLabellingInterface(ConfigReader):
         self.frame_lst = list(range(0, self.video_meta_data["frame_count"]))
         self.max_frm_no = max(self.frame_lst)
         self.target_lst = get_all_clf_names(config=self.config, target_cnt=self.clf_cnt)
+        if len(self.target_lst) == 0:
+            raise NoDataError(msg='To annotate behaviors, your SimBA project needs at least one defined classifier. Found 0', source=self.__class__.__name__)
+
+
+
         self.max_frm_size = 1080, 650
         self.main_window = Toplevel()
         if continuing:

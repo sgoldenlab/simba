@@ -1113,10 +1113,9 @@ def get_all_clf_names(config: configparser.ConfigParser, target_cnt: int) -> Lis
     >>> ['Attack', 'Sniffing']
     """
 
-    check_int(name=f'{get_all_clf_names.__name__} target_cnt', value=target_cnt, min_value=1)
     model_names = []
     for i in range(target_cnt):
-        entry_name = "target_name_{}".format(str(i + 1))
+        entry_name = f"target_name_{i + 1}"
         model_names.append(read_config_entry(config, ConfigKey.SML_SETTINGS.value, entry_name, data_type=Dtypes.STR.value))
     return model_names
 

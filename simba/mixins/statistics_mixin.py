@@ -3646,16 +3646,28 @@ class Statistics(FeatureExtractionMixin):
         """
         Calculate the Dunn index to evaluate the quality of clustered labels.
 
-        This function calculates the Dunn index, which is a measure of clustering quality.
+        This function calculates the Dunn Index, which is a measure of clustering quality.
         The index considers the ratio of the minimum inter-cluster distance to the maximum
-        intra-cluster distance. A higher Dunn index indicates better clustering.
+        intra-cluster distance. The Dunn INdex range from zero to infinity and larger values indicate better clustering.
+        The Dunn Index uses Euclidean distances.
+
+        The Dunn Index is calculated using the following steps:
+
+        1. **Inter-cluster distance**: Compute the distances between each pair of clusters and find the minimum distance.
+        2. **Intra-cluster distance**: Determine the distances within each cluster and find the maximum distance.
+
+        The Dunn Index is given by:
+
+        .. math::
+        D = \frac{\min_{i \neq j} \{ \delta(C_i, C_j) \}}{\max_k \{ \Delta(C_k) \}}
+
+        where :math:`\delta(C_i, C_j)` is the distance between clusters :math:`C_i` and :math:`C_j`, and
+        :math:`\Delta(C_k)` is the diameter of cluster :math:`C_k`.
 
         .. note::
            Modified from `jqmviegas <https://github.com/jqmviegas/jqm_cvi/>`_
 
            Wiki `https://en.wikipedia.org/wiki/Dunn_index <https://en.wikipedia.org/wiki/Dunn_index>`_
-
-           Uses Euclidean distances.
 
         :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features).
         :param np.ndarray y: 1D array representing cluster labels for each data point. Shape (n_samples,).
@@ -3667,22 +3679,9 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.dunn_index(x=x, y=y)
         """
 
-        check_valid_array(
-            data=x,
-            source=Statistics.dunn_index.__name__,
-            accepted_ndims=(2,),
-            accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),
-        )
-        check_valid_array(
-            data=y,
-            source=Statistics.dunn_index.__name__,
-            accepted_ndims=(1,),
-            accepted_shapes=[(x.shape[0],)],
-            accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),
-        )
-        distances = FeatureExtractionMixin.cdist(
-            array_1=x.astype(np.float32), array_2=x.astype(np.float32)
-        )
+        check_valid_array(data=x, source=Statistics.dunn_index.__name__, accepted_ndims=(2,), accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
+        check_valid_array(data=y, source=Statistics.dunn_index.__name__, accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),)
+        distances = FeatureExtractionMixin.cdist(array_1=x.astype(np.float32), array_2=x.astype(np.float32))
         ks = np.sort(np.unique(y)).astype(np.int64)
         deltas = np.full((ks.shape[0], ks.shape[0]), np.inf)
         big_deltas = np.zeros([ks.shape[0], 1])
@@ -3704,6 +3703,14 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/f07e0138bfee41cd2c0a5d0251dc3fe03e6e1084/sklearn/metrics/cluster/_unsupervised.py#L390>`_
+
+        .. math::
+           DB = \frac{1}{N} \sum_{i=1}^{N} \max_{j \neq i} \left( \frac{\sigma_i + \sigma_j}{d_{ij}} \right)
+
+        where:
+        - :math:`N` is the number of clusters,
+        - :math:`\sigma_i` is the average distance between each point in cluster :math:`i` and the centroid of cluster :math:`i`,
+        - :math:`d_{ij}` is the distance between the centroids of clusters :math:`i` and :math:`j`.
 
         :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
         :param np.ndarray y: 2D array representing cluster labels for each data point. Shape (n_samples,).
@@ -3766,6 +3773,17 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_unsupervised.py#L326>`_
+
+            The Calinski-Harabasz score (CH) is calculated as:
+
+        .. math::
+            CH = \frac{B}{W} \times \frac{N - k}{k - 1}
+
+        where:
+        - B is the sum of squared distances between cluster centroids,
+        - W is the sum of squared distances from each point to its assigned cluster centroid,
+        - N is the total number of data points,
+        - k is the number of clusters.
 
         :param x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
         :param y: 2D array representing cluster labels for each data point. Shape (n_samples,).
