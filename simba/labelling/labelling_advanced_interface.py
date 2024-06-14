@@ -15,7 +15,8 @@ import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_file_exist_and_readable, check_int
 from simba.utils.enums import Formats, Options, TagNames
-from simba.utils.errors import AdvancedLabellingError, FrameRangeError, NoDataError
+from simba.utils.errors import (AdvancedLabellingError, FrameRangeError,
+                                NoDataError)
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
