@@ -2473,14 +2473,8 @@ class TrainModelMixin(object):
                     meta_dict[MLParamKeys.CLASSIFIER_MAP.value]
                 )
                 for k, v in meta_dict[MLParamKeys.CLASSIFIER_MAP.value].items():
-                    errors.append(
-                        check_int(name="MULTICLASS KEYS", value=k, raise_error=False)[1]
-                    )
-                    errors.append(
-                        check_str(name="MULTICLASS VALUES", value=v, raise_error=False)[
-                            1
-                        ]
-                    )
+                    errors.append(check_int(name="MULTICLASS KEYS", value=k, raise_error=False)[1])
+                    errors.append(check_str(name="MULTICLASS VALUES", value=v, raise_error=False)[1])
 
             else:
                 meta_dict[MLParamKeys.CLASSIFIER_MAP.value] = None

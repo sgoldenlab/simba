@@ -31,7 +31,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_valid_rgb_tuple, check_instance,
                                 check_int, check_str, check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_dataframe)
+                                check_valid_array, check_valid_dataframe,
+                                check_if_df_field_is_boolean)
 from simba.utils.enums import ConfigKey, Dtypes, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
@@ -182,14 +183,23 @@ def detect_bouts_multiclass(
     return results
 
 
-def plug_holes_shortest_bout(
-    data_df: pd.DataFrame, clf_name: str, fps: int, shortest_bout: int
-) -> pd.DataFrame:
+
+def plug_holes_shortest_bout(data_df: pd.DataFrame,
+                             clf_name: str,
+                             fps: float,
+                             shortest_bout: int) -> pd.DataFrame:
+
     """
     Removes behavior "bouts" that are shorter than the minimum user-specified length within a dataframe.
 
+    .. note::
+      In the initial step the function looks for behavior "interuptions" that are the length of the ``shortest_bout`` or shorter.
+      I.e., these are ``0`` sequences that are the length of the ``shortest_bout`` or shorter with trailing **and** leading `1`s.
+      These interuptions are filled with `1`s. Next, the behavioral bouts shorter than the `shortest_bout` are removed. This operations are perfomed as it helps in preserving longer sequences of the desired behavior,
+      ensuring they aren't fragmented by brief interruptions.
+
     :param pd.DataFrame data_df: Pandas Dataframe with classifier prediction data.
-    :param str clf_name: Name of the classifier field.
+    :param str clf_name: Name of the classifier field of list of names of classifier fields
     :param int fps: The fps of the input video.
     :param int shortest_bout: The shortest valid behavior boat in milliseconds.
     :return pd.DataFrame data_df: Dataframe where behavior bouts with invalid lengths have been removed (< shortest_bout)
@@ -205,50 +215,36 @@ def plug_holes_shortest_bout(
     >>>    4       1
     """
 
-    frames_to_plug = int(int(fps) * int(shortest_bout) / 1000)
-    frames_to_plug_lst = list(range(1, frames_to_plug + 1))
-    frames_to_plug_lst.reverse()
-    patternListofLists, negPatternListofList = [], []
-    for k in frames_to_plug_lst:
-        zerosInList, oneInlist = [0] * k, [1] * k
-        currList = [1]
-        currList.extend(zerosInList)
-        currList.extend([1])
-        currListNeg = [0]
-        currListNeg.extend(oneInlist)
-        currListNeg.extend([0])
-        patternListofLists.append(currList)
-        negPatternListofList.append(currListNeg)
-    fill_patterns = np.asarray(patternListofLists)
-    remove_patterns = np.asarray(negPatternListofList)
+    check_int(name=f'{plug_holes_shortest_bout.__name__} shortest_bout', value=shortest_bout, min_value=0)
+    check_float(name=f'{plug_holes_shortest_bout.__name__} fps', value=fps, min_value=10e-6)
+    shortest_bout_frms, shortest_bout_s = int(fps * (shortest_bout / 1000)), (shortest_bout / 1000)
+    if shortest_bout_frms <= 1:
+        return data_df
+    check_instance(source=plug_holes_shortest_bout.__name__, instance=clf_name, accepted_types=(str,))
+    check_valid_dataframe(df=data_df, source=f'{plug_holes_shortest_bout.__name__} data_df', required_fields=[clf_name])
+    check_if_df_field_is_boolean(df=data_df, field=clf_name, bool_values=(0, 1))
 
-    for currPattern in fill_patterns:
-        n_obs = len(currPattern)
-        data_df["rolling_match"] = (
-            data_df[clf_name]
-            .rolling(window=n_obs, min_periods=n_obs)
-            .apply(lambda x: (x == currPattern).all())
-            .mask(lambda x: x == 0)
-            .bfill(limit=n_obs - 1)
-            .fillna(0)
-            .astype(bool)
-        )
-        data_df.loc[data_df["rolling_match"] == True, clf_name] = 1
-        data_df = data_df.drop(["rolling_match"], axis=1)
+    data = data_df[clf_name].to_frame()
+    data[f'{clf_name}_inverted'] = data[clf_name].apply(lambda x: ~x + 2)
+    clf_inverted_bouts = detect_bouts(data_df=data, target_lst=[f'{clf_name}_inverted'], fps=fps)
+    clf_inverted_bouts = clf_inverted_bouts[clf_inverted_bouts['Bout_time'] < shortest_bout_s]
+    if len(clf_inverted_bouts) > 0:
+        below_min_inverted = []
+        for i, j in zip(clf_inverted_bouts['Start_frame'].values, clf_inverted_bouts['End_frame'].values):
+            below_min_inverted.extend(np.arange(i, j+1))
+        data.loc[below_min_inverted, clf_name] = 1
+        data_df[clf_name] = data[clf_name]
 
-    for currPattern in remove_patterns:
-        n_obs = len(currPattern)
-        data_df["rolling_match"] = (
-            data_df[clf_name]
-            .rolling(window=n_obs, min_periods=n_obs)
-            .apply(lambda x: (x == currPattern).all())
-            .mask(lambda x: x == 0)
-            .bfill(limit=n_obs - 1)
-            .fillna(0)
-            .astype(bool)
-        )
-        data_df.loc[data_df["rolling_match"] == True, clf_name] = 0
-        data_df = data_df.drop(["rolling_match"], axis=1)
+    clf_bouts = detect_bouts(data_df=data_df, target_lst=[clf_name], fps=fps)
+    below_min_bouts = clf_bouts[clf_bouts['Bout_time'] <= shortest_bout_s]
+    if len(below_min_bouts) == 0:
+        return data_df
+
+    result_clf, below_min_frms = data_df[clf_name].values, []
+    for i, j in zip(below_min_bouts['Start_frame'].values, below_min_bouts['End_frame'].values):
+        below_min_frms.extend(np.arange(i, j+1))
+    result_clf[below_min_frms] = 0
+    data_df[clf_name] = result_clf
 
     return data_df
 

@@ -3642,7 +3642,7 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
+    def dunn_index(x: np.ndarray, y: np.ndarray, sample: Optional[float] = None) -> float:
         """
         Calculate the Dunn index to evaluate the quality of clustered labels.
 
@@ -3669,6 +3669,8 @@ class Statistics(FeatureExtractionMixin):
 
            Wiki `https://en.wikipedia.org/wiki/Dunn_index <https://en.wikipedia.org/wiki/Dunn_index>`_
 
+           If Dunn Index can not be calculated, `-1` is returned.
+
         :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features).
         :param np.ndarray y: 1D array representing cluster labels for each data point. Shape (n_samples,).
         :return float: The Dunn index value
@@ -3681,18 +3683,27 @@ class Statistics(FeatureExtractionMixin):
 
         check_valid_array(data=x, source=Statistics.dunn_index.__name__, accepted_ndims=(2,), accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
         check_valid_array(data=y, source=Statistics.dunn_index.__name__, accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),)
+        if sample is not None:
+            check_float(name=Statistics.dunn_index.__name__, value=sample, min_value=10e-6, max_value=1.0)
+            sample_idx = np.random.choice(np.arange(0, x.shape[0]+1), 10)
+            x, y = x[sample_idx, :], y[sample_idx]
+        y = np.nan_to_num(y, nan=-1, posinf=-1, neginf=-1)
+        x = np.nan_to_num(x, nan=-1, posinf=-1, neginf=-1)
         distances = FeatureExtractionMixin.cdist(array_1=x.astype(np.float32), array_2=x.astype(np.float32))
         ks = np.sort(np.unique(y)).astype(np.int64)
         deltas = np.full((ks.shape[0], ks.shape[0]), np.inf)
         big_deltas = np.zeros([ks.shape[0], 1])
-        for i, l in list(permutations(ks, 2)):
-            values = distances[np.where((y == i))][:, np.where((y == l))]
-            deltas[i, l] = np.min(values[np.nonzero(values)])
-        for k in ks:
-            values = distances[np.where((y == ks[k]))][:, np.where((y == ks[k]))]
-            big_deltas[k] = np.max(values)
+        for i, j in list(permutations(np.arange(0, ks.shape[0]), 2)):
+            k, l = ks[i], ks[j]
+            values = distances[np.where((y == k))][:, np.where((y == l))]
+            deltas[i, j] = np.min(values[np.nonzero(values)])
+        for m in np.arange(0, ks.shape[0]):
+            values = distances[np.where((y == ks[m]))][:, np.where((y == ks[m]))]
+            big_deltas[m] = np.max(values)
+        v = np.min(deltas) / np.max(big_deltas)
+        if v == np.inf: return -1
+        else: return v
 
-        return np.min(deltas) / np.max(big_deltas)
 
     def davis_bouldin(x: np.ndarray, y: np.ndarray) -> float:
         """
