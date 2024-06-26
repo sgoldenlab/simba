@@ -12,9 +12,9 @@ def test_detect_bouts(data_path, target_lst, fps):
     results = detect_bouts(data_df=data_df, target_lst=target_lst, fps=fps)
 
 def test_plug_holes_shortest_bout():
-    data_df = pd.DataFrame(data=[1, 0, 1, 1, 1], columns=['target'])
-    results = plug_holes_shortest_bout(data_df=data_df, clf_name='target', fps=10, shortest_bout=2000)
-    pd.testing.assert_frame_equal(results, pd.DataFrame(data=[1, 1, 1, 1, 1], columns=['target']))
+    data_df = pd.DataFrame(data=[1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0], columns=['target'])
+    results = plug_holes_shortest_bout(data_df=data_df, clf_name='target', fps=1, shortest_bout=2000)
+    pd.testing.assert_frame_equal(results, pd.DataFrame(data=[1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], columns=['target']))
 
 def test_create_color_palettes():
     results = create_color_palettes(no_animals=2, map_size=2)

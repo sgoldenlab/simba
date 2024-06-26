@@ -107,12 +107,16 @@ def convert_to_jpeg(path: Union[str, os.PathLike],
     .. note::
        Quality above 95 should be avoided; 100 disables portions of the JPEG compression algorithm, and results in large files with hardly any gain in image quality
 
+    .. image:: _static/img/convert_to_jpeg.jpeg
+       :width: 600
+       :align: center
+
     :parameter Union[str, os.PathLike] directory: Path to directory holding image files
     :parameter Optional[int] quality: The quality of the output images (0-100).
     :parameter Optional[bool] verbose: If True, prints progress. Default False.
 
     :example:
-    >>> convert_to_jpeg(directory='/Users/simon/Desktop/imgs', file_type_in='.png', quality=15)
+    >>> convert_to_jpeg(path='/Users/simon/Desktop/imgs', verbose=False, quality=15)
     """
     timer = SimbaTimer(start=True)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -137,6 +141,7 @@ def convert_to_jpeg(path: Union[str, os.PathLike],
         img.save(save_path, format='JPEG', quality=quality)
     timer.stop_timer()
     stdout_success(msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to JPEG and stored in {save_dir} directory", source=convert_to_jpeg.__name__, elapsed_time=timer.elapsed_time_str)
+
 
 def convert_to_bmp(path: Union[str, os.PathLike],
                    verbose: Optional[bool] = False) -> None:
@@ -273,6 +278,10 @@ def convert_to_webp(path: Union[str, os.PathLike],
     """
     Convert the file type of all image files within a directory to WEBP format of passed quality.
 
+    .. image:: _static/img/convert_to_webp.webp
+       :width: 600
+       :align: center
+
     :parameter Union[str, os.PathLike] directory: Path to directory holding image files
     :parameter Optional[int] quality: The quality of the output images (0-100).
     :parameter Optional[bool] verbose: If True, prints progress. Default False.
@@ -297,13 +306,11 @@ def convert_to_webp(path: Union[str, os.PathLike],
         dir, file_name, _ = get_fn_ext(filepath=file_path)
         save_path = os.path.join(save_dir, f'{file_name}.webp')
         img = cv2.imread(file_path)
-        #img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if verbose:
             print(f"Converting file {file_cnt+1}/{len(file_paths)} ...")
         cv2.imwrite(save_path, img, [cv2.IMWRITE_WEBP_QUALITY, quality])
     timer.stop_timer()
     stdout_success(msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to WEBP and stored in {save_dir} directory", source=convert_to_webp.__name__, elapsed_time=timer.elapsed_time_str)
-
 
 def clahe_enhance_video(
     file_path: Union[str, os.PathLike],

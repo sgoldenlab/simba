@@ -14,18 +14,16 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional,
-                   prange, typed, types)
+from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional, prange, typed, types)
 from scipy import stats
 from scipy.stats.distributions import chi2
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_float, check_int, check_str,
-                                check_valid_array, check_valid_dataframe)
+from simba.utils.checks import (check_float, check_int, check_str, check_valid_array, check_valid_dataframe)
 from simba.utils.data import bucket_data, fast_mean_rank, fast_minimum_rank
-from simba.utils.enums import Options
+from simba.utils.enums import Options, Formats
 from simba.utils.errors import CountError, InvalidInputError
 
 
@@ -480,13 +478,13 @@ class Statistics(FeatureExtractionMixin):
             data=sample_1,
             source=Statistics.jensen_shannon_divergence.__name__,
             accepted_ndims=(1,),
-            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_valid_array(
             data=sample_2,
             source=Statistics.jensen_shannon_divergence.__name__,
             accepted_ndims=(1,),
-            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_str(
             name=f"{self.__class__.__name__} bucket_method",
@@ -621,13 +619,13 @@ class Statistics(FeatureExtractionMixin):
             data=sample_1,
             source=Statistics.jensen_shannon_divergence.__name__,
             accepted_ndims=(1,),
-            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_valid_array(
             data=sample_2,
             source=Statistics.jensen_shannon_divergence.__name__,
             accepted_ndims=(1,),
-            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_str(
             name=f"{self.__class__.__name__} bucket_method",
@@ -744,13 +742,13 @@ class Statistics(FeatureExtractionMixin):
             data=sample_1,
             source=Statistics.jensen_shannon_divergence.__name__,
             accepted_ndims=(1,),
-            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_valid_array(
             data=sample_2,
             source=Statistics.jensen_shannon_divergence.__name__,
             accepted_ndims=(1,),
-            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_str(
             name=f"{self.__class__.__name__} bucket_method",
@@ -869,34 +867,8 @@ class Statistics(FeatureExtractionMixin):
         >>> 0.3999999761581421
         """
 
-        check_valid_array(
-            data=x,
-            source=Statistics.total_variation_distance.__name__,
-            accepted_ndims=(1,),
-            accepted_dtypes=(
-                np.int64,
-                np.int32,
-                np.int8,
-                np.float32,
-                np.float64,
-                int,
-                float,
-            ),
-        )
-        check_valid_array(
-            data=y,
-            source=Statistics.total_variation_distance.__name__,
-            accepted_ndims=(1,),
-            accepted_dtypes=(
-                np.int64,
-                np.int32,
-                np.int8,
-                np.float32,
-                np.float64,
-                int,
-                float,
-            ),
-        )
+        check_valid_array(data=x, source=Statistics.total_variation_distance.__name__, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, source=Statistics.total_variation_distance.__name__, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_str(
             name=f"{Statistics.total_variation_distance.__name__} method",
             value=bucket_method,
@@ -1916,13 +1888,7 @@ class Statistics(FeatureExtractionMixin):
         >>> names = Statistics.find_collinear_features(df=x, threshold=0.2, method='pearson', verbose=True)
         """
 
-        check_valid_dataframe(
-            df=df,
-            source=Statistics.find_collinear_features.__name__,
-            valid_dtypes=(float, int, np.float32, np.float64, np.int32, np.int64),
-            min_axis_1=1,
-            min_axis_0=1,
-        )
+        check_valid_dataframe(df=df, source=Statistics.find_collinear_features.__name__, valid_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_1=1, min_axis_0=1)
         check_float(
             name=Statistics.find_collinear_features.__name__,
             value=threshold,
@@ -2225,39 +2191,11 @@ class Statistics(FeatureExtractionMixin):
             return r
 
         if groupby_idx is None:
-            check_valid_array(
-                data=x,
-                source=Statistics.isolation_forest.__name__.__name__,
-                accepted_ndims=(2,),
-                min_axis_1=2,
-                accepted_dtypes=(
-                    np.int64,
-                    np.int32,
-                    np.int8,
-                    np.float32,
-                    np.float64,
-                    int,
-                    float,
-                ),
-            )
+            check_valid_array(data=x, source=Statistics.isolation_forest.__name__.__name__, accepted_ndims=(2,), min_axis_1=2, accepted_dtypes=Formats.NUMERIC_DTYPES.value)
             return get_if_scores(x=x, estimators=estimators)
 
         else:
-            check_valid_array(
-                data=x,
-                source=Statistics.isolation_forest.__name__.__name__,
-                accepted_ndims=(2,),
-                min_axis_1=3,
-                accepted_dtypes=(
-                    np.int64,
-                    np.int32,
-                    np.int8,
-                    np.float32,
-                    np.float64,
-                    int,
-                    float,
-                ),
-            )
+            check_valid_array(data=x, source=Statistics.isolation_forest.__name__.__name__, accepted_ndims=(2,), min_axis_1=3, accepted_dtypes=Formats.NUMERIC_DTYPES.value)
             results = []
             data_w_idx = np.hstack((np.arange(0, x.shape[0]).reshape(-1, 1), x))
             unique_c = np.unique(x[:, groupby_idx]).astype(np.float32)
@@ -2522,7 +2460,7 @@ class Statistics(FeatureExtractionMixin):
         :return float: The eta-squared value representing the proportion of variance in the dependent variable that is attributable to the grouping variable.
         """
 
-        check_valid_array(data=x, source=f'{Statistics.eta_squared.__name__} x', accepted_ndims=(1,), accepted_dtypes=(np.float64, np.int64, np.int32, np.float32, int, float))
+        check_valid_array(data=x, source=f'{Statistics.eta_squared.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=y, source=f'{Statistics.eta_squared.__name__} y', accepted_shapes=[x.shape])
         sum_square_within, sum_square_between = 0, 0
         for lbl in np.unique(y):
@@ -3040,19 +2978,18 @@ class Statistics(FeatureExtractionMixin):
         else:
             return np.sqrt(1 - result / np.sqrt(norm_x * norm_y))
 
-    def hellinger_distance(
-        self,
-        x: np.ndarray,
-        y: np.ndarray,
-        bucket_method: Optional[
-            Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]
-        ] = "auto",
-    ) -> float:
+    def hellinger_distance(self, x: np.ndarray, y: np.ndarray, bucket_method: Optional[Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]] = "auto") -> float:
         """
         Compute the Hellinger distance between two vector distribitions.
 
         .. note::
            The Hellinger distance is bounded and ranges from 0 to √2. Distance of √2 indicates that the two distributions are maximally dissimilar
+
+        .. math::
+
+           H(P, Q) = \frac{1}{\sqrt{2}} \sqrt{ \sum_{i=1}^{n} (\sqrt{P(i)} - \sqrt{Q(i)})^2 }
+
+        where \( n \) is the number of bins in the histogram representation of the distributions.
 
         :param np.ndarray x: First 1D array representing a probability distribution.
         :param np.ndarray y: Second 1D array representing a probability distribution.
@@ -3065,49 +3002,13 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics().hellinger_distance(x=x, y=y, bucket_method='auto')
         """
 
-        check_valid_array(
-            data=x,
-            source=Statistics.hellinger_distance.__name__,
-            accepted_ndims=(1,),
-            accepted_dtypes=(
-                np.int64,
-                np.int32,
-                np.int8,
-                np.float32,
-                np.float64,
-                int,
-                float,
-            ),
-        )
-        check_valid_array(
-            data=y,
-            source=Statistics.hellinger_distance.__name__,
-            accepted_ndims=(1,),
-            accepted_dtypes=(
-                np.int64,
-                np.int32,
-                np.int8,
-                np.float32,
-                np.float64,
-                int,
-                float,
-            ),
-        )
-        check_str(
-            name=f"{Statistics.hellinger_distance.__name__} method",
-            value=bucket_method,
-            options=Options.BUCKET_METHODS.value,
-        )
+        check_valid_array(data=x, source=f'{Statistics.hellinger_distance.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, source=f'{Statistics.hellinger_distance.__name__} y', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_str(name=f"{Statistics.hellinger_distance.__name__} method", value=bucket_method, options=Options.BUCKET_METHODS.value)
         bin_width, bin_count = bucket_data(data=x, method=bucket_method)
-        s1_h = self._hist_1d(
-            data=x, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)])
-        )
-        s2_h = self._hist_1d(
-            data=y, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)])
-        )
-        return self._hellinger_helper(
-            x=s1_h.astype(np.float32), y=s2_h.astype(np.float32)
-        )
+        s1_h = self._hist_1d(data=x, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]))
+        s2_h = self._hist_1d(data=y, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]))
+        return self._hellinger_helper(x=s1_h.astype(np.float32), y=s2_h.astype(np.float32))
 
     @staticmethod
     def youden_j(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
@@ -3175,7 +3076,7 @@ class Statistics(FeatureExtractionMixin):
         >>> data = np.random.randint(0, 50, (10000, 2))
         >>> Statistics.manhattan_distance_cdist(data=data)
         """
-        check_valid_array(data=data, source=f'{Statistics.manhattan_distance_cdist} data', accepted_ndims=(2,), accepted_dtypes=(np.float32, np.float64, np.int64, np.int32, int, float, np.float16, np.int8, np.int16))
+        check_valid_array(data=data, source=f'{Statistics.manhattan_distance_cdist} data', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         differences = np.abs(data[:, np.newaxis, :] - data)
         results = np.sum(differences, axis=-1)
         return results
@@ -3334,8 +3235,8 @@ class Statistics(FeatureExtractionMixin):
            Adapted from `mlextend <https://github.com/rasbt/mlxtend/blob/master/mlxtend/evaluate/mcnemar.py>`__.
 
         :param np.ndarray x: 1-dimensional Boolean array with predictions of the first model.
-        :param np.ndarray x: 1-dimensional Boolean array with predictions of the second model.
-        :param np.ndarray x: 1-dimensional Boolean array with ground truth labels.
+        :param np.ndarray y: 1-dimensional Boolean array with predictions of the second model.
+        :param np.ndarray ground_truth: 1-dimensional Boolean array with ground truth labels.
         :param Optional[bool] continuity_corrected : Whether to apply continuity correction. Default is True.
 
         :example:
@@ -3681,8 +3582,8 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.dunn_index(x=x, y=y)
         """
 
-        check_valid_array(data=x, source=Statistics.dunn_index.__name__, accepted_ndims=(2,), accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32))
-        check_valid_array(data=y, source=Statistics.dunn_index.__name__, accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),)
+        check_valid_array(data=x, source=Statistics.dunn_index.__name__, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, source=Statistics.dunn_index.__name__, accepted_ndims=(1,), accepted_shapes=[(x.shape[0],)], accepted_dtypes=Formats.NUMERIC_DTYPES.value,)
         if sample is not None:
             check_float(name=Statistics.dunn_index.__name__, value=sample, min_value=10e-6, max_value=1.0)
             sample_idx = np.random.choice(np.arange(0, x.shape[0]+1), 10)
@@ -3737,14 +3638,14 @@ class Statistics(FeatureExtractionMixin):
             data=x,
             source=Statistics.davis_bouldin.__name__,
             accepted_ndims=(2,),
-            accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_valid_array(
             data=y,
             source=Statistics.davis_bouldin.__name__,
             accepted_ndims=(1,),
             accepted_shapes=[(x.shape[0],)],
-            accepted_dtypes=(int, float, np.float64, np.float32, np.int64, np.int32),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         n_labels = np.unique(y).shape[0]
         labels = np.unique(y)
@@ -4000,9 +3901,6 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            Normalize array x before passing it to ensure accurate results.
-
-        .. math::
-           D_\infty(p, q) = \max_i \left| p_i - q_i \right|
 
         :param np.ndarray x: Input signal, a 2D array with shape (n_samples, n_features).
         :param np.ndarray window_sizes: Array containing window sizes for sliding computation.
