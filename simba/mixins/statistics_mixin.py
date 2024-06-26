@@ -14,16 +14,18 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional, prange, typed, types)
+from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional,
+                   prange, typed, types)
 from scipy import stats
 from scipy.stats.distributions import chi2
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_float, check_int, check_str, check_valid_array, check_valid_dataframe)
+from simba.utils.checks import (check_float, check_int, check_str,
+                                check_valid_array, check_valid_dataframe)
 from simba.utils.data import bucket_data, fast_mean_rank, fast_minimum_rank
-from simba.utils.enums import Options, Formats
+from simba.utils.enums import Formats, Options
 from simba.utils.errors import CountError, InvalidInputError
 
 
