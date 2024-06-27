@@ -236,7 +236,7 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
         data_df[clf_name] = data[clf_name]
 
     clf_bouts = detect_bouts(data_df=data_df, target_lst=[clf_name], fps=fps)
-    below_min_bouts = clf_bouts[clf_bouts['Bout_time'] <= shortest_bout_s]
+    below_min_bouts = clf_bouts[clf_bouts['Bout_time'] < shortest_bout_s]
     if len(below_min_bouts) == 0:
         return data_df
 
@@ -247,7 +247,6 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
     data_df[clf_name] = result_clf
 
     return data_df
-
 
 def create_color_palettes(
     no_animals: int, map_size: int, cmaps: Optional[List[str]] = None

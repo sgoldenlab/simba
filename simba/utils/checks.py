@@ -813,10 +813,7 @@ def check_valid_array(data: np.ndarray,
     check_instance(source=source, instance=data, accepted_types=np.ndarray)
     if accepted_ndims is not None:
         if data.ndim not in accepted_ndims:
-            raise ArrayError(
-                msg=f"Array not of acceptable dimensions. Found {data.ndim}, accepted: {accepted_ndims}: {source}",
-                source=check_valid_array.__name__,
-            )
+            raise ArrayError(msg=f"Array not of acceptable dimensions. Found {data.ndim}, accepted: {accepted_ndims}: {source}", source=check_valid_array.__name__)
     if accepted_sizes is not None:
         if len(data.shape) not in accepted_sizes:
             raise ArrayError(
