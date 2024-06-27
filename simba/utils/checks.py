@@ -326,15 +326,11 @@ def check_if_dir_exists(
                 os.makedirs(in_dir)
             except:
                 pass
-        if source is None:
-            raise NotDirectoryError(
-                msg=f"{in_dir} is not a valid directory",
-                source=check_if_dir_exists.__name__,
-            )
         else:
-            raise NotDirectoryError(
-                msg=f"{in_dir} is not a valid directory", source=source
-            )
+            if source is None:
+                raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=check_if_dir_exists.__name__)
+            else:
+                raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=source)
 
 
 def check_that_column_exist(
@@ -724,26 +720,15 @@ def check_valid_extension(
     :param List[str] accepted_extensions: A list of accepted file extensions. E.g., ['pickle', 'csv'].
     """
     if isinstance(accepted_extensions, (list, tuple)):
-        check_valid_lst(
-            data=accepted_extensions,
-            source=f"{check_valid_extension.__name__} accepted_extensions",
-            valid_dtypes=(str,),
-            min_len=1,
-        )
+        check_valid_lst(data=accepted_extensions, source=f"{check_valid_extension.__name__} accepted_extensions", valid_dtypes=(str,), min_len=1)
     elif isinstance(accepted_extensions, str):
-        check_str(
-            name=f"{check_valid_extension.__name__} accepted_extensions",
-            value=accepted_extensions,
-        )
+        check_str(name=f"{check_valid_extension.__name__} accepted_extensions", value=accepted_extensions)
         accepted_extensions = [accepted_extensions]
     accepted_extensions = [x.lower() for x in accepted_extensions]
     check_file_exist_and_readable(file_path=path)
     extension = get_fn_ext(filepath=path)[2][1:]
     if extension.lower() not in accepted_extensions:
-        raise InvalidFilepathError(
-            msg=f"File extension for file {path} has an invalid extension. Found {extension}, accepted: {accepted_extensions}",
-            source=check_valid_extension.__name__,
-        )
+        raise InvalidFilepathError(msg=f"File extension for file {path} has an invalid extension. Found {extension}, accepted: {accepted_extensions}", source=check_valid_extension.__name__)
 
 
 def check_if_valid_img(data: np.ndarray, source: Optional[str] = "", raise_error: Optional[bool] = True) -> Union[bool, None]:
@@ -904,16 +889,14 @@ def check_valid_array(data: np.ndarray,
             raise ArrayError(msg=f"Array contains unacceptable values. Found  {additional_vals}, accepted: {accepted_values}, {source}", source=check_valid_array.__name__,)
 
 
-def check_valid_lst(
-    data: list,
-    source: Optional[str] = "",
-    valid_dtypes: Optional[Tuple[Any]] = None,
-    valid_values: Optional[List[Any]] = None,
-    min_len: Optional[int] = 1,
-    max_len: Optional[int] = None,
-    exact_len: Optional[int] = None,
-    raise_error: Optional[bool] = True,
-) -> bool:
+def check_valid_lst(data: list,
+                    source: Optional[str] = "",
+                    valid_dtypes: Optional[Tuple[Any]] = None,
+                    valid_values: Optional[List[Any]] = None,
+                    min_len: Optional[int] = 1,
+                    max_len: Optional[int] = None,
+                    exact_len: Optional[int] = None,
+                    raise_error: Optional[bool] = True) -> bool:
     """
     Check the validity of a list based on passed  criteria.
 
@@ -930,18 +913,6 @@ def check_valid_lst(
     >>> check_valid_lst(data=[1, 2, 'three'], valid_dtypes=(int, str), min_len=2, max_len=5)
     >>> check_valid_lst(data=[1, 2, 3], valid_dtypes=(int,), min_len=3)
     """
-
-    check_instance(source=source, instance=data, accepted_types=list)
-    if valid_dtypes is not None:
-        for dtype in set([type(x) for x in data]):
-            if dtype not in valid_dtypes:
-                if raise_error:
-                    raise InvalidInputError(
-                        msg=f"Invalid data type found in list. Found {dtype}, accepted: {valid_dtypes}",
-                        source=source,
-                    )
-                else:
-                    return False
     if min_len is not None:
         check_int(
             name=f"{source} {min_len}",
@@ -957,6 +928,16 @@ def check_valid_lst(
                 )
             else:
                 return False
+
+    check_instance(source=source, instance=data, accepted_types=list)
+    if valid_dtypes is not None:
+        for dtype in set([type(x) for x in data]):
+            if dtype not in valid_dtypes:
+                if raise_error:
+                    raise InvalidInputError(msg=f"Invalid data type found in list. Found {dtype}, accepted: {valid_dtypes}", source=source)
+                else:
+                    return False
+
     if max_len is not None:
         check_int(
             name=f"{source} {max_len}",

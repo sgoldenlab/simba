@@ -97,8 +97,9 @@ def change_img_format(directory: Union[str, os.PathLike],
         source=change_img_format.__name__,
     )
 
-def convert_to_jpeg(path: Union[str, os.PathLike],
+def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
                     quality: Optional[int] = 95,
+                    save_dir: Optional[Union[str, os.PathLike]] = None,
                     verbose: Optional[bool] = False) -> None:
 
     """
@@ -111,26 +112,38 @@ def convert_to_jpeg(path: Union[str, os.PathLike],
        :width: 600
        :align: center
 
-    :parameter Union[str, os.PathLike] directory: Path to directory holding image files
+    :parameter Union[str, os.PathLike] directory: Path to directory holding image files, a single image file, or a list of paths to image files.
     :parameter Optional[int] quality: The quality of the output images (0-100).
+    :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :parameter Optional[bool] verbose: If True, prints progress. Default False.
 
     :example:
     >>> convert_to_jpeg(path='/Users/simon/Desktop/imgs', verbose=False, quality=15)
+    >>> convert_to_jpeg(path='/Users/simon/Desktop/my_image.png', verbose=False, quality=15)
+    >>> convert_to_jpeg(path=['/Users/simon/Desktop/my_image_1.png', '/Users/simon/Desktop/my_image_2.png'], verbose=True, quality=40)
+    >>> convert_to_jpeg(path='/Users/simon/Desktop/imgs', save_dir='/Users/simon/Desktop/test_jpg_/test__/HELLO', verbose=False, quality=15)
     """
+
     timer = SimbaTimer(start=True)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
-    if os.path.isdir(path):
+    if isinstance(path, list):
+        check_valid_lst(data=path, source=f'{convert_to_jpeg.__name__} path', valid_dtypes=(str,), min_len=1)
+        for i in path: check_file_exist_and_readable(file_path=i)
+        file_paths = deepcopy(path)
+    elif os.path.isdir(path):
         file_paths = find_files_of_filetypes_in_directory(directory=path, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True)
     elif os.path.isfile(path):
         file_paths = [path]
     else:
-        raise InvalidInputError(msg=f'{path} is not a valid file path or directory path',  source=convert_to_bmp.__name__)
+        raise InvalidInputError(msg=f'{path} is not a valid file path, directory path, or list of file paths',  source=convert_to_jpeg.__name__)
     directory, _, _ = get_fn_ext(filepath=file_paths[0])
+    if save_dir is None:
+        save_dir = os.path.join(directory, f'bmp_{datetime_}')
+        os.makedirs(save_dir)
+    else:
+        check_if_dir_exists(in_dir=save_dir, source=f'{convert_to_jpeg.__name__} save_dir', create_if_not_exist=True)
     check_int(name=f'{convert_to_jpeg.__name__} quality', value=quality, min_value=1, max_value=100)
     print(f"Converting {len(file_paths)} image file(s) to JPEG at quality {quality} ...")
-    save_dir = os.path.join(directory, f'jpeg_{datetime_}')
-    os.makedirs(save_dir)
     for file_cnt, file_path in enumerate(file_paths):
         dir, file_name, _ = get_fn_ext(filepath=file_path)
         save_path = os.path.join(save_dir, f'{file_name}.jpeg')
@@ -143,75 +156,104 @@ def convert_to_jpeg(path: Union[str, os.PathLike],
     stdout_success(msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to JPEG and stored in {save_dir} directory", source=convert_to_jpeg.__name__, elapsed_time=timer.elapsed_time_str)
 
 
-def convert_to_bmp(path: Union[str, os.PathLike],
+def convert_to_bmp(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
+                   save_dir: Optional[Union[str, os.PathLike]] = None,
                    verbose: Optional[bool] = False) -> None:
-
     """
     Convert images in a directory to BMP format.
 
-    :param Union[str, os.PathLike] directory: path to directory containing images or path to an image file.
+    :param Union[str, os.PathLike] path: path to directory containing images, or path to a single image file, or a list of paths to image files.
+    :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :param Optional[bool] verbose: If True, print conversion progress. Default is False.
     :return: None.
+
+    :example:
+    >>> convert_to_bmp(path='/Users/simon/Desktop/test_jpg_/landing_40.jpeg', save_dir='/Users/simon/Desktop/test_jpg_/test__')
     """
 
     timer = SimbaTimer(start=True)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
-    if os.path.isdir(path):
-        file_paths = find_files_of_filetypes_in_directory(directory=path, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True)
+    if isinstance(path, list):
+        check_valid_lst(data=path, source=f'{convert_to_bmp.__name__} path', valid_dtypes=(str,), min_len=1)
+        for i in path: check_file_exist_and_readable(file_path=i)
+        file_paths = deepcopy(path)
+    elif os.path.isdir(path):
+        file_paths = find_files_of_filetypes_in_directory(directory=path,
+                                                          extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value,
+                                                          raise_error=True)
     elif os.path.isfile(path):
         file_paths = [path]
     else:
-        raise InvalidInputError(msg=f'{path} is not a valid file path or directory path', source=convert_to_bmp.__name__)
+        raise InvalidInputError(msg=f'{path} is not a valid file path or directory path or list of file paths', source=convert_to_bmp.__name__)
     directory, _, _ = get_fn_ext(filepath=file_paths[0])
+    if save_dir is None:
+        save_dir = os.path.join(directory, f'bmp_{datetime_}')
+        os.makedirs(save_dir)
+    else:
+        check_if_dir_exists(in_dir=save_dir, source=f'{convert_to_bmp.__name__} save_dir', create_if_not_exist=True)
     print(f"Converting {len(file_paths)} image file(s) to BMP ...")
-    save_dir = os.path.join(directory, f'bmp_{datetime_}')
-    os.makedirs(save_dir)
     for file_cnt, file_path in enumerate(file_paths):
         dir, file_name, _ = get_fn_ext(filepath=file_path)
         save_path = os.path.join(save_dir, f'{file_name}.bmp')
         if verbose:
-            print(f"Converting file {file_cnt+1}/{len(file_paths)} ...")
+            print(f"Converting file {file_cnt + 1}/{len(file_paths)} ...")
         img = Image.open(file_path)
         if img.mode in ('RGBA', 'LA'): img = img.convert('RGB')
         img.save(save_path, format='BMP')
         timer.stop_timer()
-    stdout_success(msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to BMP and stored in {save_dir} directory", source=convert_to_bmp.__name__, elapsed_time=timer.elapsed_time_str)
+    stdout_success(
+        msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to BMP and stored in {save_dir} directory",
+        source=convert_to_bmp.__name__, elapsed_time=timer.elapsed_time_str)
 
 
 def convert_to_png(path: Union[str, os.PathLike],
+                   save_dir: Optional[Union[str, os.PathLike]] = None,
                    verbose: Optional[bool] = False) -> None:
-
     """
     Convert images to PNG format.
 
-    :param Union[str, os.PathLike] path: Path to directory containing images or path to an image file.
+    :param Union[str, os.PathLike] path: path to directory containing images, or path to a single image file, or a list of paths to image files.
+    :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :param Optional[bool] verbose: If True, print conversion progress. Default is False.
     :return: None.
+
+    :example:
+    >>> convert_to_png(path=['/Users/simon/Desktop/test_jpg_/test__/landing_40.bmp', '/Users/simon/Desktop/test_jpg_/landing_30.jpeg'], save_dir='/Users/simon/Desktop/test_jpg_/test__/HELLO_3')
     """
 
     timer = SimbaTimer(start=True)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
-    if os.path.isdir(path):
-        file_paths = find_files_of_filetypes_in_directory(directory=path, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True)
+    if isinstance(path, list):
+        check_valid_lst(data=path, source=f'{convert_to_png.__name__} path', valid_dtypes=(str,), min_len=1)
+        for i in path: check_file_exist_and_readable(file_path=i)
+        file_paths = deepcopy(path)
+    elif os.path.isdir(path):
+        file_paths = find_files_of_filetypes_in_directory(directory=path,
+                                                          extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value,
+                                                          raise_error=True)
     elif os.path.isfile(path):
         file_paths = [path]
     else:
-        raise InvalidInputError(msg=f'{path} is not a valid file path or directory path', source=convert_to_png.__name__)
+        raise InvalidInputError(msg=f'{path} is not a valid file path or directory path or list of file paths', source=convert_to_png.__name__)
     directory, _, _ = get_fn_ext(filepath=file_paths[0])
+    if save_dir is None:
+        save_dir = os.path.join(directory, f'bmp_{datetime_}')
+        os.makedirs(save_dir)
+    else:
+        check_if_dir_exists(in_dir=save_dir, source=f'{convert_to_png.__name__} save_dir', create_if_not_exist=True)
     print(f"Converting {len(file_paths)} image file(s) to PNG ...")
-    save_dir = os.path.join(directory, f'png_{datetime_}')
-    os.makedirs(save_dir)
     for file_cnt, file_path in enumerate(file_paths):
         dir, file_name, _ = get_fn_ext(filepath=file_path)
         save_path = os.path.join(save_dir, f'{file_name}.png')
         if verbose:
-            print(f"Converting file {file_cnt+1}/{len(file_paths)} ...")
+            print(f"Converting file {file_cnt + 1}/{len(file_paths)} ...")
         img = Image.open(file_path)
         if img.mode in ('RGBA', 'LA'): img = img.convert('RGB')
         img.save(save_path, 'PNG')
         timer.stop_timer()
-    stdout_success(msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to PNG and stored in {save_dir} directory", source=convert_to_png.__name__, elapsed_time=timer.elapsed_time_str)
-
+    stdout_success(
+        msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to PNG and stored in {save_dir} directory",
+        source=convert_to_png.__name__, elapsed_time=timer.elapsed_time_str)
 
 def convert_to_tiff(directory: Union[str, os.PathLike],
                     stack: Optional[bool] = False,
@@ -273,6 +315,7 @@ def convert_to_tiff(directory: Union[str, os.PathLike],
 
 def convert_to_webp(path: Union[str, os.PathLike],
                     quality: Optional[int] = 95,
+                    save_dir: Optional[Union[str, os.PathLike]] = None,
                     verbose: Optional[bool] = True):
 
     """
@@ -284,24 +327,33 @@ def convert_to_webp(path: Union[str, os.PathLike],
 
     :parameter Union[str, os.PathLike] directory: Path to directory holding image files
     :parameter Optional[int] quality: The quality of the output images (0-100).
+    :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :parameter Optional[bool] verbose: If True, prints progress. Default False.
 
     :example:
     >>> convert_to_webp('/Users/simon/Desktop/imgs', quality=80)
+    >>> convert_to_webp(path=['/Users/simon/Desktop/test_jpg_/test__/landing_40.bmp', '/Users/simon/Desktop/test_jpg_/landing_30.jpeg'], save_dir='/Users/simon/Desktop/test_jpg_/test__/HELLO_4')
     """
 
     timer = SimbaTimer(start=True)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
-    if os.path.isdir(path):
+    if isinstance(path, list):
+        check_valid_lst(data=path, source=f'{convert_to_png.__name__} path', valid_dtypes=(str,), min_len=1)
+        for i in path: check_file_exist_and_readable(file_path=i)
+        file_paths = deepcopy(path)
+    elif os.path.isdir(path):
         file_paths = find_files_of_filetypes_in_directory(directory=path, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True)
     elif os.path.isfile(path):
         file_paths = [path]
     else:
-        raise InvalidInputError(msg=f'{path} is not a valid file path or directory path', source=convert_to_bmp.__name__)
+        raise InvalidInputError(msg=f'{path} is not a valid file path or directory path', source=convert_to_webp.__name__)
     directory, _, _ = get_fn_ext(filepath=file_paths[0])
+    if save_dir is None:
+        save_dir = os.path.join(directory, f'bmp_{datetime_}')
+        os.makedirs(save_dir)
+    else:
+        check_if_dir_exists(in_dir=save_dir, source=f'{convert_to_png.__name__} save_dir', create_if_not_exist=True)
     print(f"Converting {len(file_paths)} image file(s) to WEBP ...")
-    save_dir = os.path.join(directory, f'webp_{datetime_}')
-    os.makedirs(save_dir)
     for file_cnt, file_path in enumerate(file_paths):
         dir, file_name, _ = get_fn_ext(filepath=file_path)
         save_path = os.path.join(save_dir, f'{file_name}.webp')
@@ -491,31 +543,39 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     stdout_success(msg=f'SIMBA COMPLETE: FPS of video {file_name} changed from {str(video_meta_data["fps"])} to {str(fps)} and saved in directory {save_path}', elapsed_time=timer.elapsed_time_str, source=change_single_video_fps.__name__)
 
 
-def change_fps_of_multiple_videos(directory: Union[str, os.PathLike],
+def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
                                   fps: int,
+                                  save_dir: Optional[Union[str, os.PathLike]] = None,
                                   gpu: Optional[bool] = False) -> None:
     """
     Change the fps of all video files in a folder. Results are stored in the same directory as in the input files with
     the suffix ``_fps_new_fps``.
 
-    :parameter Union[str, os.PathLike] directory: Path to video file directory
+    :parameter Union[str, os.PathLike] path: Path to video file directory, or a list of video file paths.
     :parameter int fps: Fps of the new video files.
+    :param Optional[bool] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_new_fps.file_extension`` suffix.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
-    >>> _ = change_fps_of_multiple_videos(directory='project_folder/videos/Video_1.mp4', fps=15)
+    >>> _ = change_fps_of_multiple_videos(path='project_folder/videos/Video_1.mp4', fps=15)
+    >>> change_fps_of_multiple_videos(path='/Users/simon/Desktop/imgs', save_dir='/Users/simon/Desktop/imgs_4', fps=15)
     """
 
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=change_fps_of_multiple_videos.__name__)
-    if not os.path.isdir(directory):
-        raise NotDirectoryError(msg=f"SIMBA ERROR: {directory} is not a valid directory", source=change_fps_of_multiple_videos.__name__,)
-    check_int(name="New fps", value=fps)
-    check_if_dir_exists(in_dir=directory)
-    video_paths = find_all_videos_in_directory(directory=directory, as_dict=True, raise_error=True).values()
-
+    check_int(name="New fps", value=fps, min_value=1)
+    if isinstance(path, list):
+        check_valid_lst(data=path, source=f'{change_fps_of_multiple_videos.__name__} path', valid_dtypes=(str,), min_len=1)
+        for i in path: check_file_exist_and_readable(file_path=i)
+        video_paths = deepcopy(path)
+    elif os.path.isdir(path):
+        video_paths = find_all_videos_in_directory(directory=path, as_dict=True, raise_error=True).values()
+    else:
+        raise InvalidInputError(msg=f'{path} is not a valid file path or directory path or list of file paths', source=change_fps_of_multiple_videos.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir, source=f'{change_fps_of_multiple_videos.__name__} save_dir', create_if_not_exist=True)
     for file_cnt, file_path in enumerate(video_paths):
         video_timer = SimbaTimer(start=True)
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
@@ -523,17 +583,20 @@ def change_fps_of_multiple_videos(directory: Union[str, os.PathLike],
         if int(fps) == int(video_meta_data["fps"]):
             SameInputAndOutputWarning(msg=f"The new FPS ({fps}) is the same or lower than the original FPS ({video_meta_data['fps']}) for video {file_name}", source=change_fps_of_multiple_videos.__name__)
         print(f"Converting FPS from {video_meta_data['fps']} to {fps} for {file_name}...")
-        save_path = os.path.join(dir_name, file_name + f"_fps_{fps}{ext}")
+        if save_dir is None:
+            save_path = os.path.join(dir_name, file_name + f"_fps_{fps}{ext}")
+        else:
+            save_path = os.path.join(save_dir, f'{file_name}{ext}')
         if ext.lower() == '.webm': codec = 'libvpx-vp9'
         elif ext.lower() == '.avi': codec = 'mpeg4'
         else: codec = 'libx264'
         if gpu:
             command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
         else:
-            command = f'ffmpeg -i {file_path} -filter:v fps=fps={fps} -c:v {codec} "{save_path}" -loglevel error -stats -hide_banner -y'
+            command = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(command, shell=True)
         video_timer.stop_timer()
-        print(f"Video {file_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)")
+        print(f"Video {file_name} complete (saved at {save_path})... (elapsed time: {video_timer.elapsed_time_str}s)")
     timer.stop_timer()
     stdout_success(msg=f"SIMBA COMPLETE: FPS of {len(video_paths)} video(s) changed to {fps}", elapsed_time=timer.elapsed_time_str, source=change_fps_of_multiple_videos.__name__,)
 
@@ -628,7 +691,9 @@ def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] =
     )
 
 
-def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
+                             save_dir: Optional[Union[str, os.PathLike]] = None,
+                             gpu: Optional[bool] = False) -> None:
     """
     Convert a directory of video file to greyscale mp4 format. The results are stored in the same directory as the
     input files with the ``_grayscale.mp4`` suffix.
@@ -637,46 +702,48 @@ def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[b
        :width: 700
        :align: center
 
-    :parameter Union[str, os.PathLike] directory: Path to directory holding video files in color.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[str, os.PathLike] path: Path to directory holding video files in color, or a list of file paths to videos in color.
+    :param Optional[bool] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_grayscale`` suffix.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
 
     :example:
-    >>> _ = batch_video_to_greyscale(directory='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_2')
+    >>> _ = batch_video_to_greyscale(path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_2')
+    >>> batch_video_to_greyscale(path='/Users/simon/Desktop/imgs_4', save_dir='/Users/simon/Desktop/imgs_4/test')
     """
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)",
-            source=batch_video_to_greyscale.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=batch_video_to_greyscale.__name__)
     timer = SimbaTimer(start=True)
-    check_if_dir_exists(in_dir=directory, source=batch_video_to_greyscale.__name__)
-    video_paths = find_all_videos_in_directory(
-        directory=directory, as_dict=True, raise_error=True
-    )
-    for file_cnt, (file_name, file_path) in enumerate(video_paths.items()):
+    if isinstance(path, list):
+        check_valid_lst(data=path, source=f'{batch_video_to_greyscale.__name__} path', valid_dtypes=(str,), min_len=1)
+        for i in path: check_file_exist_and_readable(file_path=i)
+        video_paths = deepcopy(path)
+    elif os.path.isdir(path):
+        check_if_dir_exists(in_dir=path, source=batch_video_to_greyscale.__name__)
+        video_paths = find_all_videos_in_directory(directory=path, as_dict=True, raise_error=True).values()
+    else:
+        raise InvalidInputError(msg=f'{path} is not a valid directory path or a valid list of video paths', source=batch_video_to_greyscale.__name__)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir, source=f'{batch_video_to_greyscale.__name__} save_dir', create_if_not_exist=True)
+    for file_cnt, file_path in enumerate(video_paths):
         video_timer = SimbaTimer(start=True)
-        in_dir, _, _ = get_fn_ext(filepath=file_path)
-        save_name = os.path.join(in_dir, f"{file_name}_grayscale.mp4")
+        in_dir, file_name, file_ext = get_fn_ext(filepath=file_path)
+        _ = get_video_meta_data(video_path=file_path)
+        if save_dir is None:
+            save_name = os.path.join(in_dir, f"{file_name}_grayscale.mp4")
+        else:
+            save_name = os.path.join(save_dir, f'{file_name}{file_ext}')
         if gpu:
             command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -c:a copy "{save_name}" -y'
         else:
             command = f'ffmpeg -i "{file_path}" -vf format=gray -c:v libx264 "{save_name}" -hide_banner -loglevel error -y'
-        print(
-            f"Converting {file_name} to greyscale (Video {file_cnt+1}/{len(list(video_paths.keys()))})... "
-        )
+        print(f"Converting {file_name} to greyscale (Video {file_cnt+1}/{len(video_paths)})... ")
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         video_timer.stop_timer()
-        print(
-            f"Video {save_name} complete, (elapsed time: {video_timer.elapsed_time_str}s)"
-        )
+        print(f"Video {save_name} complete (saved at {save_name}), (elapsed time: {video_timer.elapsed_time_str}s)")
     timer.stop_timer()
-    stdout_success(
-        msg=f"{len(list(video_paths.keys()))} video(s) converted to gresyscale! Saved in {directory} with '_greyscale' suffix",
-        elapsed_time=timer.elapsed_time_str,
-        source=batch_video_to_greyscale.__name__,
-    )
+    stdout_success(msg=f"{len(video_paths)} video(s) converted to grayscale!", elapsed_time=timer.elapsed_time_str, source=batch_video_to_greyscale.__name__)
 
 
 def superimpose_frame_count(file_path: Union[str, os.PathLike],
@@ -684,12 +751,13 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
                             font: Optional[str] = 'Arial',
                             font_color: Optional[str] = 'black',
                             bg_color: Optional[str] = 'white',
+                            save_path: Optional[Union[str, os.PathLike]] = None,
                             loc: Optional[Literal['top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right']] = 'bottom_middle',
                             fontsize: Optional[int] = 20) -> None:
 
     """
     Superimpose frame count on a video file. The result is stored in the same directory as the
-    input file with the ``_frame_no.mp4`` suffix.
+    input file with the ``_frame_no.mp4`` suffix if ``save_path`` is None.
 
     .. image:: _static/img/superimpose_frame_count.png
        :width: 700
@@ -702,14 +770,15 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     :parameter Union[str, os.PathLike] file_path: Path to video file.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :parameter Optional[int] fontsize: The size of the font represetnting the current frame. Default: 20.
+    :parameter Optional[Union[str, os.PathLike]] save_path: Optional save location for the video with frame numbers. If None, then the new video is saved in the same directory as the input video with the ``_frame_no`` suffix.
     :parameter Optional[str] font_color: The color of frame number text. Default: 'Black'.
     :parameter Optional[str] loc: The location of the font number text. Options: 'top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'. Default: Bottom middle.
     :parameter Optional[str] bg_color: The color of the box which the frame number is printed in. Default: 'White'.
     :parameter Optional[str] font: The font to use for the frame number. Default Arial.
 
-
     :example:
     >>> _ = superimpose_frame_count(file_path='/Users/simon/Downloads/1_LH_0_3.mp4', fontsize=90)
+    >>> superimpose_frame_count(file_path='/Users/simon/Desktop/imgs_4/test/Screen Recording 2024-02-26 at 4.43.26 PM_frame_no.mp4', save_path='/Users/simon/Desktop/imgs_4/test/blahhhh.mp4', fontsize=90)
     """
 
     timer = SimbaTimer(start=True)
@@ -723,7 +792,11 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     font_path = font_dict[font]
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
-    save_name = os.path.join(dir, f"{file_name}_frame_no.mp4")
+    if save_path is None:
+        save_name = os.path.join(dir, f"{file_name}_frame_no.mp4")
+    else:
+        check_if_dir_exists(in_dir=os.path.isdir(os.path.dirname(save_path)), source=f'{superimpose_frame_count.__name__} save_path', create_if_not_exist=True)
+        save_name = save_path
     if gpu:
         if loc == 'top_left':
             cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
@@ -737,7 +810,6 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
             cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
         else:
             cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
-
     else:
         if loc == 'top_left':
             cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
@@ -754,53 +826,48 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     timer.stop_timer()
     stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
 
+def remove_beginning_of_video(file_path: Union[str, os.PathLike],
+                              time: int,
+                              save_path: Optional[Union[str, os.PathLike]] = None,
+                              gpu: Optional[bool] = False) -> None:
 
-def remove_beginning_of_video(file_path: Union[str, os.PathLike], time: int, gpu: Optional[bool] = False) -> None:
     """
-    Remove N seconds from the beginning of a video file. The result is stored in the same directory as the
-    input file with the ``_shorten.mp4`` suffix.
+    Remove N seconds from the beginning of a video file. If save_path is not passed,
+    the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file
-    :parameter int time: Number of seconds to remove from the beginning of the video.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[str, os.PathLike] file_path: Path to video file
+    :param int time: Number of seconds to remove from the beginning of the video.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional save location for the shortened video. If None, then the new video is saved in the same directory as the input video with the ``_shortened`` suffix.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
     >>> _ = remove_beginning_of_video(file_path='project_folder/videos/Video_1.avi', time=10)
+    >>> remove_beginning_of_video(file_path=f'/Users/simon/Desktop/imgs_4/test/blahhhh.mp4', save_path='/Users/simon/Desktop/imgs_4/test/CUT.mp4', time=3)
     """
 
     check_ffmpeg_available(raise_error=True)
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=remove_beginning_of_video.__name__)
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
+    video_meta_data = get_video_meta_data(video_path=file_path)
     check_int(name="Cut time", value=time)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
-    save_name = os.path.join(dir, file_name + "_shorten.mp4")
-    if os.path.isfile(save_name):
-        raise FileExistError(
-            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
-            source=remove_beginning_of_video.__name__,
-        )
-    if gpu:
-        if not check_nvidea_gpu_available():
-            raise FFMPEGCodecGPUError(
-                msg="No GPU found (as evaluated by nvidea-smi returning None)",
-                source=remove_beginning_of_video.__name__,
-            )
-        command = 'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {} -i "{}" -c:v h264_nvenc -c:a aac "{}"'.format(
-            int(time), file_path, save_name
-        )
+    if video_meta_data['video_length_s'] <= time:
+        raise InvalidInputError(msg=f"The cut time {time}s is invalid for video {file_name} with length {video_meta_data['video_length_s']}s", source=remove_beginning_of_video.__name__)
+    if save_path is None:
+        save_name = os.path.join(dir, f"{file_name}_shorten.mp4")
     else:
-        command = f'ffmpeg -ss {int(time)} -i "{file_path}" -c:v libx264 -c:a aac "{save_name}"'
-    print("Shortening video... ")
-    subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+        check_if_dir_exists(in_dir=os.path.isdir(os.path.dirname(save_path)), source=f'{remove_beginning_of_video.__name__} save_path', create_if_not_exist=True)
+        save_name = save_path
+    if gpu:
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {time} -i "{file_path}" -c:v h264_nvenc -c:a aac "{save_name}"'
+    else:
+        cmd = f'ffmpeg -ss {time} -i "{file_path}" -c:v libx264 -c:a aac "{save_name}" -loglevel error -stats -hide_banner -y'
+    print(f"Removing initial {time}s from {file_name}... ")
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(
-        msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
-        elapsed_time=timer.elapsed_time_str,
-        source=remove_beginning_of_video.__name__,
-    )
-
-
-# remove_beginning_of_video(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_frame_no.mp4', time=10, gpu=False)
+    stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=remove_beginning_of_video.__name__)
 
 
 def clip_video_in_range(file_path: Union[str, os.PathLike],
@@ -872,9 +939,8 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
 
 def downsample_video(file_path: Union[str, os.PathLike],
                      video_height: int,
-    video_width: int,
-    gpu: Optional[bool] = False,
-) -> None:
+                     video_width: int,
+                     gpu: Optional[bool] = False) -> None:
     """
     Down-sample a video file. The result is stored in the same directory as the
     input file with the ``_downsampled.mp4`` suffix.
@@ -923,25 +989,33 @@ def gif_creator(file_path: Union[str, os.PathLike],
                 duration: int,
                 width: Optional[int] = None,
                 quality: Optional[int] = 100,
+                save_path: Optional[Union[str, os.PathLike]] = None,
                 fps: Optional[int] = 15,
                 gpu: Optional[bool] = False) -> None:
+
     """
     Create a sample gif from a video file. The result is stored in the same directory as the
-    input file with the ``.gif`` file-ending.
+    input file with the ``.gif`` file extension if ``save_path`` is passed as None.
 
     .. note::
-       The height is auto-computed to retain aspect ratio
+       The height is auto-computed to retain aspect ratio.
+
+    .. seealso:
+       GIFs are typically for online use but can be costly in terms of time to create and file size. For smaller files,
+       consider ``webm`` format which are for online publication and ``simba.video_processors.video_processing.convert_to_webm``.
 
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param int start_time: Start time of the gif in relation to the video in seconds.
     :param int duration: Duration of the gif.
     :param int width: Width of the gif. If None, then retains the width and height of the input video.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional save location for the gif. If None, then the new video is saved in the same directory.
     :param int fps: FPS of the gif. Defaults to 15.
     :param int quality: Quality of the GIF on scale 1-100. Smaller values gives smaller GIFs by filesize with worse quality. Default: 100.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
     :example:
     >>> _ = gif_creator(file_path='project_folder/videos/Video_1.avi', start_time=5, duration=10, width=600)
+    >>> gif_creator(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', start_time=5, duration=15, width=600, gpu=False, save_path='/Users/simon/Desktop/imgs_4/Test.gif')
     """
 
     check_ffmpeg_available(raise_error=True)
@@ -963,7 +1037,11 @@ def gif_creator(file_path: Union[str, os.PathLike],
     if (int(start_time) + int(duration)) > video_meta_data["video_length_s"]:
         raise FrameRangeError(msg=f'The end of the gif (start time: {start_time} + duration: {duration}) is longer than the {file_path} video: {video_meta_data["video_length_s"]}s', source=gif_creator.__name__)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
-    save_name = os.path.join(dir, f"{file_name}.gif")
+    if save_path is None:
+        save_name = os.path.join(dir, f"{file_name}.gif")
+    else:
+        check_if_dir_exists(in_dir=os.path.isdir(os.path.dirname(save_path)), source=f'{gif_creator.__name__} save_path', create_if_not_exist=True)
+        save_name = save_path
     if gpu:
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {start_time} -i "{file_path}" -to {duration} -vf "fps=10,scale={width}:-1" -c:v gif -pix_fmt rgb24 -y "{save_name}" -y'
     else:
@@ -972,9 +1050,6 @@ def gif_creator(file_path: Union[str, os.PathLike],
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=gif_creator.__name__)
-
-
-# gif_creator(file_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4', start_time=5, duration=15, width=600, gpu=False)
 
 
 def batch_convert_video_format(
@@ -1106,24 +1181,32 @@ def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
     )
 
 
-def extract_frames_single_video(file_path: Union[str, os.PathLike]) -> None:
+def extract_frames_single_video(file_path: Union[str, os.PathLike],
+                                save_dir: Optional[Union[str, os.PathLike]]) -> None:
     """
-    Extract all frames for a single. Results are stored within a subdirectory in the same
-    directory as the input file.
+    Extract all frames for a single video.
 
-    :parameter str file_path: Path to video file.
+    .. note::
+       Image frames are saved as PNG files named with integers in order of appearance, i.e., ``0.png, 1.png ...``
+
+    :parameter Union[str, os.PathLike] file_path: Path to video file.
+    :parameter Optional[Union[str, os.PathLike]] save_dir: Optional directory where to save the frames. If ``save_dir`` is not passed,
+    results are stored within a subdirectory in the same directory as the input file.
 
     :example:
     >>> _ = extract_frames_single_video(file_path='project_folder/videos/Video_1.mp4')
+    >>> extract_frames_single_video(file_path='/Users/simon/Desktop/imgs_4/test.mp4', save_dir='/Users/simon/Desktop/imgs_4/frames')
     """
 
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
     _ = get_video_meta_data(file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
-    save_dir = os.path.join(dir_name, file_name)
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
+    if save_dir is None:
+        save_dir = os.path.join(dir_name, file_name)
+        if not os.path.exists(save_dir): os.makedirs(save_dir)
+    else:
+        check_if_dir_exists(in_dir=save_dir, source=extract_frames_single_video.__name__, create_if_not_exist=True)
     print(f"Processing video {file_name}...")
     video_to_frames(file_path, save_dir, overwrite=True, every=1, chunk_size=1000)
     timer.stop_timer()

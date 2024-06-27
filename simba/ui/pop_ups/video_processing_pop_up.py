@@ -337,7 +337,7 @@ class GreyscaleSingleVideoPopUp(PopUpMixin):
     def run_dir(self):
         check_if_dir_exists(in_dir=self.dir_selected.folder_path)
         batch_video_to_greyscale(
-            directory=self.dir_selected.folder_path, gpu=self.use_gpu_var_dir.get()
+            path=self.dir_selected.folder_path, gpu=self.use_gpu_var_dir.get()
         )
 
 
@@ -889,7 +889,7 @@ class ChangeFpsMultipleVideosPopUp(PopUpMixin):
         _ = find_all_videos_in_directory(directory=video_dir, raise_error=True)
         new_fps = int(self.new_fps_dropdown.getChoices())
         gpu = self.gpu_var.get()
-        threading.Thread(change_fps_of_multiple_videos(directory=video_dir, fps=new_fps, gpu=gpu)).start()
+        threading.Thread(change_fps_of_multiple_videos(path=video_dir, fps=new_fps, gpu=gpu)).start()
 
 class ExtractSEQFramesPopUp(PopUpMixin):
     def __init__(self):

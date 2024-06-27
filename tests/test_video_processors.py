@@ -81,7 +81,7 @@ def test_change_fps_of_multiple_videos(directory, fps):
     test_dir_copy_path = os.path.join(os.path.dirname(directory), 'test_out')
     if os.path.isdir(test_dir_copy_path): shutil.rmtree(test_dir_copy_path)
     shutil.copytree(directory, test_dir_copy_path)
-    change_fps_of_multiple_videos(directory=test_dir_copy_path, fps=fps)
+    change_fps_of_multiple_videos(path=test_dir_copy_path, fps=fps)
 
 # def test_convert_video_powerpoint_compatible_format(config_video_path_args):
 #     copied_file_path = copy_file(file_path=config_video_path_args.param)
