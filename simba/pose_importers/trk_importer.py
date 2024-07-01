@@ -88,7 +88,7 @@ class TRKImporter(ConfigReader):
             )
         return animals_tracked_list
 
-    def import_trk(self):
+    def run(self):
         for file_cnt, file_path in enumerate(self.data_paths):
             _, file_name, file_ext = get_fn_ext(file_path)
             if self.animal_cnt > 0:

@@ -20,7 +20,7 @@ try:
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
+from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty)
 from simba.utils.enums import ConfigKey, Defaults, Dtypes, Keys, Paths

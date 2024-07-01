@@ -32,7 +32,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int,
                                 check_nvidea_gpu_available, check_valid_lst)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FeatureNumberMismatchError,
                                 FFMPEGCodecGPUError, FileExistError,
@@ -558,18 +558,16 @@ def get_bp_headers(body_parts_lst: List[str]) -> list:
     return bp_headers
 
 
-def read_video_info(
-    vid_info_df: pd.DataFrame, video_name: str
-) -> (pd.DataFrame, float, float):
+def read_video_info(vid_info_df: pd.DataFrame,
+                    video_name: str,
+                    raise_error: Optional[bool] = True) -> Tuple[pd.DataFrame, float, float]:
     """
     Helper to read the metadata (pixels per mm, resolution, fps etc) from the video_info.csv for a single input file/video
 
     :parameter pd.DataFrame vid_info_df: Parsed ``project_folder/logs/video_info.csv`` file. This file can be parsed by :meth:`simba.utils.read_write.read_video_info_csv`.
     :parameter str video_name: Name of the video as represented in the ``Video`` column of the ``project_folder/logs/video_info.csv`` file.
-    :returns pd.DataFrame: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file.
-    :return float: The frame rate of the video as represented in the ``project_folder/logs/video_info.csv`` file
-    :return float: The pixels per millimeter of the video as represented in the ``project_folder/logs/video_info.csv`` file
-    :raise ParametersFileError: The video is not accurately represented in the ``project_folder/logs/video_info.csv`` file.
+    :parameter Optional[bool] raise_error: If True, raises error if the video cannot be found in the ``vid_info_df`` file. If False, returns None if the video cannot be found.
+    :returns Tuple[pd.DataFrame, float, float]: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file, the frame rate of the video, and the the pixels per millimeter of the video
 
     :example:
     >>> video_info_df = read_video_info_csv(file_path='project_folder/logs/video_info.csv')
@@ -578,25 +576,19 @@ def read_video_info(
 
     video_settings = vid_info_df.loc[vid_info_df["Video"] == video_name]
     if len(video_settings) > 1:
-        raise DuplicationError(
-            msg=f"SimBA found multiple rows in the project_folder/logs/video_info.csv named {str(video_name)}. Please make sure that each video name is represented ONCE in the video_info.csv",
-            source=read_video_info.__name__,
-        )
+        raise DuplicationError(msg=f"SimBA found multiple rows in the project_folder/logs/video_info.csv named {str(video_name)}. Please make sure that each video name is represented ONCE in the video_info.csv", source=read_video_info.__name__)
     elif len(video_settings) < 1:
-        raise ParametersFileError(
-            msg=f" SimBA could not find {str(video_name)} in the video_info.csv file. Make sure all videos analyzed are represented in the project_folder/logs/video_info.csv file.",
-            source=read_video_info.__name__,
-        )
+        if raise_error:
+            raise ParametersFileError(msg=f" SimBA could not find {str(video_name)} in the video_info.csv file. Make sure all videos analyzed are represented in the project_folder/logs/video_info.csv file.", source=read_video_info.__name__)
+        else:
+            return None
     else:
         try:
             px_per_mm = float(video_settings["pixels/mm"])
             fps = float(video_settings["fps"])
             return video_settings, px_per_mm, fps
         except TypeError:
-            raise ParametersFileError(
-                msg=f"Make sure the videos that are going to be analyzed are represented with APPROPRIATE VALUES inside the project_folder/logs/video_info.csv file in your SimBA project. Could not interpret the fps, pixels per millimeter and/or fps as numerical values for video {video_name}",
-                source=read_video_info.__name__,
-            )
+            raise ParametersFileError(msg=f"Make sure the videos that are going to be analyzed are represented with APPROPRIATE VALUES inside the project_folder/logs/video_info.csv file in your SimBA project. Could not interpret the fps, pixels per millimeter and/or fps as numerical values for video {video_name}", source=read_video_info.__name__)
 
 
 def find_all_videos_in_directory(
@@ -728,17 +720,18 @@ def read_frm_of_video(
     return img
 
 
-def find_video_of_file(
-    video_dir: Union[str, os.PathLike], filename: str, raise_error: bool = False
-) -> Union[str, os.PathLike]:
+def find_video_of_file(video_dir: Union[str, os.PathLike],
+                       filename: str,
+                       raise_error: Optional[bool] = False,
+                       warning: Optional[bool] = True) -> Union[str, os.PathLike]:
     """
     Helper to find the video file with the SimBA project that represents a known data file path.
 
     :param str video_dir: Directory holding putative video file.
     :param str filename: Data file name, e.g., ``Video_1``.
-    :param bool raise_error: If True, raise error if no file can be found. Else, print warning. Default: False
+    :param Optional[bool] raise_error: If True, raise error if no file can be found. If False, returns None if no file can be found. Default: False
+    :param Optional[bool] warning: If True, print warning if no file can be found. If False, no warning is printed if file cannot be found. Default: False
     :return str: Video path.
-    :raise NoFilesFoundError: No video file representing file found.
 
     :examples:
     >>> find_video_of_file(video_dir='project_folder/videos', filename='Together_1')
@@ -746,35 +739,25 @@ def find_video_of_file(
 
     """
     try:
-        all_files_in_video_folder = [
-            f for f in next(os.walk(video_dir))[2] if not f[0] == "."
-        ]
+        all_files_in_video_folder = [f for f in next(os.walk(video_dir))[2] if not f[0] == "."]
     except StopIteration:
-        raise NoFilesFoundError(
-            msg=f"No files found in the {video_dir} directory",
-            source=find_video_of_file.__name__,
-        )
-    all_files_in_video_folder = [
-        os.path.join(video_dir, x) for x in all_files_in_video_folder
-    ]
+        if raise_error:
+            raise NoFilesFoundError(msg=f"No files found in the {video_dir} directory", source=find_video_of_file.__name__)
+        elif warning:
+            NoFileFoundWarning(msg=f"SimBA could not find a video file representing {filename} in the project video directory {video_dir}", source=find_video_of_file.__name__)
+        return None
+
+    all_files_in_video_folder = [os.path.join(video_dir, x) for x in all_files_in_video_folder]
     return_path = None
     for file_path in all_files_in_video_folder:
         _, video_filename, ext = get_fn_ext(file_path)
-        if (video_filename == filename) and (
-            (ext.lower() == ".mp4") or (ext.lower() == ".avi")
-        ):
+        if (video_filename == filename) and (ext.lower() in Options.ALL_VIDEO_FORMAT_OPTIONS.value):
             return_path = file_path
 
     if return_path is None and raise_error:
-        raise NoFilesFoundError(
-            msg=f"SimBA could not find a video file representing {filename} in the project video directory {video_dir}",
-            source=find_video_of_file.__name__,
-        )
-    elif return_path is None:
-        NoFileFoundWarning(
-            msg=f"SimBA could not find a video file representing {filename} in the project video directory {video_dir}",
-            source=find_video_of_file.__name__,
-        )
+        raise NoFilesFoundError(msg=f"SimBA could not find a video file representing {filename} in the project video directory {video_dir}", source=find_video_of_file.__name__)
+    elif return_path is None and warning:
+        NoFileFoundWarning(msg=f"SimBA could not find a video file representing {filename} in the project video directory {video_dir}", source=find_video_of_file.__name__)
     return return_path
 
 
@@ -1896,12 +1879,10 @@ def get_unique_values_in_iterable(
     return cnt
 
 
-def copy_files_to_directory(
-    file_paths: List[Union[str, os.PathLike]],
-    dir: Union[str, os.PathLike],
-    verbose: Optional[bool] = True,
-    integer_save_names: Optional[bool] = False,
-) -> List[Union[str, os.PathLike]]:
+def copy_files_to_directory(file_paths: List[Union[str, os.PathLike]],
+                            dir: Union[str, os.PathLike],
+                            verbose: Optional[bool] = True,
+                            integer_save_names: Optional[bool] = False) -> List[Union[str, os.PathLike]]:
     """
     Copy a list of files to a specified directory.
 

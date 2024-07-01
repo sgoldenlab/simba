@@ -1,5 +1,5 @@
 import simba
-from simba.pose_importers.dlc_importer_csv import import_multiple_dlc_tracking_csv_file
+from simba.pose_importers.dlc_importer_csv import import_dlc_csv_data
 from simba.outlier_tools.skip_outlier_correction import OutlierCorrectionSkipper
 from simba.utils.cli.cli_tools import feature_extraction_runner, set_video_parameters
 from simba.model.inference_batch import InferenceBatch
@@ -27,11 +27,11 @@ RESOLUTION = (600, 400) # WIDTH X HEIGHT
 
 
 # RUN THE DATA IMPORTER FOR A DIRECTORY OF FILES
-import_multiple_dlc_tracking_csv_file(config_path=CONFIG_PATH,
-                                        interpolation_setting=INTERPOLATION_SETTING,
-                                        smoothing_setting=SMOOTHING_SETTING,
-                                        smoothing_time=SMOOTHING_TIME,
-                                        data_dir=DATA_DIR)
+import_dlc_csv_data(config_path=CONFIG_PATH,
+                    interpolation_setting=INTERPOLATION_SETTING,
+                    smoothing_setting=SMOOTHING_SETTING,
+                    smoothing_time=SMOOTHING_TIME,
+                    data_path=DATA_DIR)
 
 
 # RUN THE OUTLIER CORRECTION SKIPPER

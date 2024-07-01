@@ -8,7 +8,7 @@ import subprocess
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, Any
 
 import h5py
 import numpy as np
@@ -33,7 +33,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_array, check_valid_dataframe)
-from simba.utils.enums import ConfigKey, Dtypes, Keys, Options
+from simba.utils.enums import ConfigKey, Dtypes, Keys, Options, Formats
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
                                 NoFilesFoundError)
@@ -372,6 +372,8 @@ def smooth_data_savitzky_golay(
     Perform Savitzky-Golay smoothing of pose-estimation data within a file.
 
     .. important::
+       LEGACY: USE ``savgol_smoother`` instead.
+
        Overwrites the input data with smoothened data.
 
     :param configparser.ConfigParser config: Parsed SimBA project_config.ini file.
@@ -1032,9 +1034,7 @@ def get_mode(x: np.ndarray) -> Union[float, int]:
     return counts.argmax()
 
 
-def run_user_defined_feature_extraction_class(
-    file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]
-) -> None:
+def run_user_defined_feature_extraction_class(file_path: Union[str, os.PathLike], config_path: Union[str, os.PathLike]) -> None:
     """
     Loads and executes user-defined feature extraction class within .py file.
 
@@ -1119,6 +1119,191 @@ def run_user_defined_feature_extraction_class(
 
     else:
         user_class(config_path)
+
+
+def animal_interpolator(df: pd.DataFrame,
+                        animal_bp_dict: Dict[str, Any],
+                        source: Optional[str] = '',
+                        method: Optional[Literal['nearest', 'linear', 'quadratic']] = 'nearest',
+                        verbose: Optional[bool] = True) -> pd.DataFrame:
+
+    """
+    Interpolate missing values for frames where entire animals are missing.
+
+    .. note::
+       Animals are inferred to be "missing" when all their body-parts have exactly the same value on both the x and y
+       plane (or None).
+
+    :param pd.DataFrame df: The input DataFrame containing animal body part positions.
+    :param Dict[str, Any] animal_bp_dict: A dictionary where keys are animal names and values are dictionaries with keys "X_bps"  and "Y_bps", which are lists of column names for the x and y coordinates of the animal body parts.
+    :param Optional[str] source: An optional string indicating the source of the DataFrame, used for logging and informative error messages.
+    :param Optional[Literal['nearest', 'linear', 'quadratic']] method: The interpolation method to use. Options are 'nearest', 'linear', and 'quadratic'. Defaults to 'nearest'.
+    :param Optional[bool] verbose: If True, prints the number of missing body parts being interpolated for each animal.
+    :return pd.DataFrame: The DataFrame with interpolated values for the specified animal body parts.
+
+    :example:
+    >>> animal_bp_dict = {'Animal_1': {'X_bps': ['Ear_left_1_x', 'Ear_right_1_x', 'Nose_1_x', 'Center_1_x', 'Lat_left_1_x', 'Lat_right_1_x', 'Tail_base_1_x'], 'Y_bps': ['Ear_left_1_y', 'Ear_right_1_y', 'Nose_1_y', 'Center_1_y', 'Lat_left_1_y', 'Lat_right_1_y', 'Tail_base_1_y']}, 'Animal_2': {'X_bps': ['Ear_left_2_x', 'Ear_right_2_x', 'Nose_2_x', 'Center_2_x', 'Lat_left_2_x', 'Lat_right_2_x', 'Tail_base_2_x'], 'Y_bps': ['Ear_left_2_y', 'Ear_right_2_y', 'Nose_2_y', 'Center_2_y', 'Lat_left_2_y', 'Lat_right_2_y', 'Tail_base_2_y']}}
+    >>> df = pd.read_csv('/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv', index_col=0)
+    >>> interpolated_df = animal_interpolator(df=df, animal_bp_dict=animal_bp_dict, source='test')
+
+    """
+
+    check_instance(source=source, instance=df, accepted_types=(pd.DataFrame,))
+    check_instance(source=source, instance=animal_bp_dict, accepted_types=(dict,))
+    check_valid_dataframe(df=df, source=source, valid_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_str(name='method', value=method, options=('nearest', 'linear', 'quadratic'), raise_error=True)
+
+    df = df.fillna(0).clip(lower=0).astype(int)
+    for animal_name, animal_bps in animal_bp_dict.items():
+        check_if_keys_exist_in_dict(data=animal_bps, key=["X_bps", "Y_bps"])
+        check_that_column_exist(df=df, column_name=animal_bps["X_bps"] + animal_bps["Y_bps"], file_name=source)
+        animal_df = df[animal_bps["X_bps"] + animal_bps["Y_bps"]]
+        missing_idx = list(animal_df[animal_df.eq(animal_df.iloc[:, 0], axis=0).all(axis="columns")].index)
+        if verbose:
+            print(f"Interpolating {len(missing_idx)} body-parts for animal {animal_name} in {source}...")
+        animal_df.loc[missing_idx, :] = np.nan
+        animal_df = animal_df.interpolate(method=method, axis=0).ffill().bfill()
+        df.update(animal_df)
+
+    return df.clip(lower=0)
+
+
+def body_part_interpolator(df: pd.DataFrame,
+                           animal_bp_dict: Dict[str, Any],
+                           source: Optional[str] = '',
+                           method: Optional[Literal['nearest', 'linear', 'quadratic']] = 'nearest',
+                           verbose: Optional[bool] = True) -> pd.DataFrame:
+    """
+    Interpolate missing body-parts in pose-estimation data.
+
+    .. note::
+       Data is inferred to be "missing" when data for the body-part is either "None" on both the x- and y-plane or located at
+       (0, 0).
+
+    :param pd.DataFrame df: The input DataFrame containing animal body part positions.
+    :param Dict[str, Any] animal_bp_dict: A dictionary where keys are animal names and values are dictionaries with keys "X_bps"  and "Y_bps", which are lists of column names for the x and y coordinates of the animal body parts.
+    :param Optional[str] source: An optional string indicating the source of the DataFrame, used for logging and informative error messages.
+    :param Optional[Literal['nearest', 'linear', 'quadratic']] method: The interpolation method to use. Options are 'nearest', 'linear', and 'quadratic'. Defaults to 'nearest'.
+    :param Optional[bool] verbose: If True, prints the number of missing body parts being interpolated for each animal.
+    :return pd.DataFrame: The DataFrame with interpolated values for the specified animal body parts.
+
+    :example:
+    >>> animal_bp_dict = {'Animal_1': {'X_bps': ['Ear_left_1_x', 'Ear_right_1_x', 'Nose_1_x', 'Center_1_x', 'Lat_left_1_x', 'Lat_right_1_x', 'Tail_base_1_x'], 'Y_bps': ['Ear_left_1_y', 'Ear_right_1_y', 'Nose_1_y', 'Center_1_y', 'Lat_left_1_y', 'Lat_right_1_y', 'Tail_base_1_y']}, 'Animal_2': {'X_bps': ['Ear_left_2_x', 'Ear_right_2_x', 'Nose_2_x', 'Center_2_x', 'Lat_left_2_x', 'Lat_right_2_x', 'Tail_base_2_x'], 'Y_bps': ['Ear_left_2_y', 'Ear_right_2_y', 'Nose_2_y', 'Center_2_y', 'Lat_left_2_y', 'Lat_right_2_y', 'Tail_base_2_y']}}
+    >>> df = pd.read_csv('/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv', index_col=0)
+    >>> interpolated_df = body_part_interpolator(df=df, animal_bp_dict=animal_bp_dict, source='test')
+    """
+
+    check_instance(source=source, instance=df, accepted_types=(pd.DataFrame,))
+    check_valid_dataframe(df=df, source=source, valid_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_str(name='method', value=method, options=('nearest', 'linear', 'quadratic'), raise_error=True)
+
+    df = df.fillna(0).clip(lower=0).astype(int)
+    for animal in animal_bp_dict:
+        check_if_keys_exist_in_dict(data=animal_bp_dict[animal], key=["X_bps", "Y_bps"])
+        for x_bps_name, y_bps_name in zip(animal_bp_dict[animal]["X_bps"], animal_bp_dict[animal]["Y_bps"]):
+            check_that_column_exist(df=df, column_name=[x_bps_name, y_bps_name], file_name=source)
+            bp_df = df[[x_bps_name, y_bps_name]].astype(int)
+            missing_idx = df.loc[(bp_df[x_bps_name] <= 0.0) & (bp_df[y_bps_name] <= 0.0)].index.tolist()
+            if verbose:
+                print(f"Interpolating {len(missing_idx)} {x_bps_name[:-2]} body-parts for animal {animal} in {source}...")
+            bp_df.loc[missing_idx, [x_bps_name, y_bps_name]] = np.nan
+            bp_df[x_bps_name] = bp_df[x_bps_name].interpolate(method=method, axis=0).ffill().bfill()
+            bp_df[y_bps_name] = bp_df[y_bps_name].interpolate(method=method, axis=0).ffill().bfill()
+            df.update(bp_df)
+    return df.clip(lower=0)
+
+def savgol_smoother(data: Union[pd.DataFrame, np.ndarray],
+                    fps: float,
+                    time_window: int,
+                    source: Optional[str] = '',
+                    mode: Optional[Literal['mirror', 'constant', 'nearest', 'wrap', 'interp']] = 'nearest',
+                    polyorder: Optional[int] = 3) -> Union[pd.DataFrame, np.ndarray]:
+    """
+    Apply Savitzky-Golay smoothing to the input data pose-estimation data
+
+    Applies the Savitzky-Golay filter to smooth the data in a DataFrame or a NumPy array. The filter smoothes the data using a polynomial of the specified order and a window size based on the frame rate per second (fps) and the time window.
+
+    :param Union[pd.DataFrame, np.ndarray] data: The input data to be smoothed. Can be a pandas DataFrame or a 2D NumPy array.
+    :param float fps: The frame rate per second of the data.
+    :param int time_window: The time window in milliseconds over which to apply the smoothing.
+    :param Optional[str] source: An optional string indicating the source of the data, used for logging and informative error messages.
+    :param Optional[Literal['mirror', 'constant', 'nearest', 'wrap', 'interp']] mode: The mode parameter determines the behavior at the edges of the data. Options are:'mirror', 'constant', 'nearest', 'wrap', 'interp'. Default: 'nearest'.
+    :param Optional[int] polyorder:  The order of the polynomial used to fit the samples.
+    :return Union[pd.DataFrame, np.ndarray]: The smoothed data, returned as a DataFrame if the input was a DataFrame, or a NumPy array if the input was an array.
+
+    :example:
+    >>> data = pd.read_csv('/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv', index_col=0)
+    >>> savgol_smoother(data=data.values, fps=15, time_window=1000)
+    """
+
+    check_float(name='fps', value=fps, min_value=10e-16, raise_error=True)
+    check_int(name='time_window', value=time_window, min_value=1, raise_error=True)
+    check_str(name='mode', value=mode, options=('mirror', 'constant', 'nearest', 'wrap', 'interp'), raise_error=True)
+    check_int(name='time_window', value=time_window, min_value=1, raise_error=True)
+    check_int(name='polyorder', value=polyorder, min_value=1, raise_error=True)
+    check_instance(source=source, instance=data, accepted_types=(pd.DataFrame, np.ndarray,))
+    frms_in_smoothing_window = int(time_window / (1000 / fps))
+    if frms_in_smoothing_window <= 1:
+        return data
+    if (frms_in_smoothing_window % 2) == 0:
+        frms_in_smoothing_window = frms_in_smoothing_window - 1
+    if frms_in_smoothing_window <= polyorder:
+        if polyorder % 2 == 0:
+            frms_in_smoothing_window = polyorder + 1
+        else:
+            frms_in_smoothing_window = polyorder + 2
+    if isinstance(data, pd.DataFrame):
+        check_valid_dataframe(df=data, valid_dtypes=Formats.NUMERIC_DTYPES.value, source=source)
+        data = data.clip(lower=0)
+        for c in data.columns:
+            data[c] = savgol_filter(x=data[c].to_numpy(), window_length=frms_in_smoothing_window, polyorder=polyorder, mode=mode)
+        data = data.clip(lower=0)
+    elif isinstance(data, np.ndarray):
+        check_valid_array(data=data, source=source, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        data = np.clip(a=data, a_min=0, a_max=None)
+        for c in range(data.shape[1]):
+            data[:, c] = savgol_filter(x=data[:, c], window_length=frms_in_smoothing_window, polyorder=polyorder, mode=mode)
+        data = np.clip(a=data, a_min=0, a_max=None)
+    return data
+
+def df_smoother(data: pd.DataFrame,
+               fps: float,
+               time_window: int,
+               source: Optional[str] = '',
+               std: Optional[int] = 5,
+               method: Optional[Literal['bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] = 'gaussian') -> pd.DataFrame:
+
+    """
+    Smooth the data in a DataFrame using a specified window function.
+
+    This function applies a rolling window smoothing operation to the data in the DataFrame. The type of window function
+    and the standard deviation for the smoothing can be specified. The window size is determined based on the frame rate
+    per second (fps) and the time window.
+
+    :param pd.DataFrame data: The input data to be smoothed.
+    :param float fps: The frame rate per second of the data.
+    :param int time_window: The time window in milliseconds over which to apply the smoothing.
+    :param Optional[str] source: An optional string indicating the source of the data, used for logging and informative error messages.
+    :param Optional[int] std: The standard deviation for the window function, used when the method is 'gaussian'.
+    :param Optional[Literal['bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] method:  The type of window function to use for smoothing. Default 'gaussian'.
+    :return pd.DataFrame:  The smoothed DataFrame.
+    """
+
+    check_float(name='fps', value=fps, min_value=10e-16, raise_error=True)
+    check_int(name='time_window', value=time_window, min_value=1, raise_error=True)
+    check_int(name='std', value=std, min_value=1, raise_error=True)
+    check_str(name='method', value=method, options=('bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential'), raise_error=True)
+    check_valid_dataframe(df=data, valid_dtypes=Formats.NUMERIC_DTYPES.value, source=source)
+    frms_in_smoothing_window = int(time_window / (1000 / fps))
+    if frms_in_smoothing_window <= 1:
+        return data
+    data = data.clip(lower=0)
+    for c in data.columns:
+        data[c] = data[c].rolling(window=int(frms_in_smoothing_window), win_type=method, center=True).mean(std=std).fillna(data[c]).abs()
+    return data.clip(lower=0)
+
+
+
 
 
 # run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini', file_path='/Users/simon/Desktop/fish_feature_extractor_2023_version_5.py')

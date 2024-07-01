@@ -20,68 +20,48 @@ from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
-from simba.labelling.labelling_advanced_interface import \
-    select_labelling_video_advanced
+from simba.labelling.labelling_advanced_interface import select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
-from simba.labelling.targeted_annotations_clips import \
-    select_labelling_video_targeted_clips
+from simba.labelling.targeted_annotations_clips import select_labelling_video_targeted_clips
 from simba.model.grid_search_rf import GridSearchRandomForestClassifier
 from simba.model.inference_batch import InferenceBatch
 from simba.model.inference_validation import InferenceValidation
 from simba.model.train_rf import TrainRandomForestClassifier
-from simba.outlier_tools.outlier_corrector_location import \
-    OutlierCorrecterLocation
-from simba.outlier_tools.outlier_corrector_movement import \
-    OutlierCorrecterMovement
-from simba.outlier_tools.skip_outlier_correction import \
-    OutlierCorrectionSkipper
-from simba.plotting.interactive_probability_grapher import \
-    InteractiveProbabilityGrapher
+from simba.outlier_tools.outlier_corrector_location import OutlierCorrecterLocation
+from simba.outlier_tools.outlier_corrector_movement import OutlierCorrecterMovement
+from simba.outlier_tools.skip_outlier_correction import OutlierCorrectionSkipper
+from simba.plotting.interactive_probability_grapher import InteractiveProbabilityGrapher
 from simba.roi_tools.ROI_define import *
 from simba.roi_tools.ROI_menus import *
 from simba.roi_tools.ROI_reset import *
 from simba.third_party_label_appenders.BENTO_appender import BentoAppender
 from simba.third_party_label_appenders.BORIS_appender import BorisAppender
-from simba.third_party_label_appenders.deepethogram_importer import \
-    DeepEthogramImporter
-from simba.third_party_label_appenders.ethovision_import import \
-    ImportEthovision
-from simba.third_party_label_appenders.observer_importer import \
-    NoldusObserverImporter
+from simba.third_party_label_appenders.deepethogram_importer import DeepEthogramImporter
+from simba.third_party_label_appenders.ethovision_import import ImportEthovision
+from simba.third_party_label_appenders.observer_importer import NoldusObserverImporter
 from simba.third_party_label_appenders.solomon_importer import SolomonImporter
 from simba.ui.create_project_ui import ProjectCreatorPopUp
 from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
-from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
-    AnimalDirectingAnimalPopUp
-from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
-    AppendROIFeaturesByAnimalPopUp
-from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
-    AppendROIFeaturesByBodyPartPopUp
+from simba.ui.pop_ups.animal_directing_other_animals_pop_up import AnimalDirectingAnimalPopUp
+from simba.ui.pop_ups.append_roi_features_animals_pop_up import AppendROIFeaturesByAnimalPopUp
+from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import AppendROIFeaturesByBodyPartPopUp
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
-from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
-    BooleanConditionalSlicerPopUp
-from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
-    AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
+from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import BooleanConditionalSlicerPopUp
+from simba.ui.pop_ups.clf_add_remove_print_pop_up import (AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
 from simba.ui.pop_ups.clf_by_timebins_pop_up import TimeBinsClfPopUp
-from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
-    ClfDescriptiveStatsPopUp
+from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import ClfDescriptiveStatsPopUp
 from simba.ui.pop_ups.clf_plot_pop_up import SklearnVisualizationPopUp
-from simba.ui.pop_ups.clf_probability_plot_pop_up import \
-    VisualizeClassificationProbabilityPopUp
-from simba.ui.pop_ups.clf_validation_plot_pop_up import \
-    ClassifierValidationPopUp
+from simba.ui.pop_ups.clf_probability_plot_pop_up import VisualizeClassificationProbabilityPopUp
+from simba.ui.pop_ups.clf_validation_plot_pop_up import ClassifierValidationPopUp
 from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
                                                    Parquet2CsvPopUp)
 from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
-from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import \
-    DirectingAnimalToBodyPartVisualizerPopUp
-from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
-    DirectingOtherAnimalsVisualizerPopUp
-from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
-    DirectionAnimalToBodyPartSettingsPopUp
+from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import DirectingAnimalToBodyPartVisualizerPopUp
+from simba.ui.pop_ups.directing_other_animals_plot_pop_up import DirectingOtherAnimalsVisualizerPopUp
+from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import DirectionAnimalToBodyPartSettingsPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
@@ -90,8 +70,7 @@ from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp
-from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
-    MovementAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import MovementAnalysisTimeBinsPopUp
 from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
 from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
 from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
@@ -101,23 +80,17 @@ from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
 from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
 from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp
-from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
-    ROIAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import ROIAnalysisTimeBinsPopUp
 from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
-from simba.ui.pop_ups.roi_size_standardizer_popup import \
-    ROISizeStandardizerPopUp
+from simba.ui.pop_ups.roi_size_standardizer_popup import ROISizeStandardizerPopUp
 from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
-from simba.ui.pop_ups.set_machine_model_parameters_pop_up import \
-    SetMachineModelParameters
+from simba.ui.pop_ups.set_machine_model_parameters_pop_up import SetMachineModelParameters
 from simba.ui.pop_ups.severity_analysis_pop_up import AnalyzeSeverityPopUp
-from simba.ui.pop_ups.smoothing_interpolation_pop_up import (InterpolatePopUp,
-                                                             SmoothingPopUp)
-from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
-    SpontaneousAlternationPopUp
-from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
-    FeatureSubsetExtractorPopUp
-from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
-    ThirdPartyAnnotatorAppenderPopUp
+from simba.ui.pop_ups.smoothing_popup import SmoothingPopUp
+from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
+from simba.ui.pop_ups.spontaneous_alternation_pop_up import SpontaneousAlternationPopUp
+from simba.ui.pop_ups.subset_feature_extractor_pop_up import FeatureSubsetExtractorPopUp
+from simba.ui.pop_ups.third_party_annotator_appender_pop_up import ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
@@ -141,22 +114,20 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperimposeTextPopUp, SuperimposeTimerPopUp, SuperimposeVideoNamesPopUp,
     SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, UpsampleVideosPopUp,
     VideoRotatorPopUp, VideoTemporalJoinPopUp)
-from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
-    VisualizePoseInFolderPopUp
+from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
 from simba.ui.video_info_ui import VideoInfoTable
-from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable, check_int)
+from simba.ui.import_pose_frame import ImportPoseFrame
+from simba.ui.import_videos_frame import ImportVideosFrame
+from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import OS, Defaults, Formats, Paths, TagNames
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
-                                 get_icons_paths)
+from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths)
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
-from simba.video_processors.video_processing import \
-    extract_frames_from_all_videos_in_directory
+from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
 
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
@@ -356,12 +327,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             fg="blue",
             command=lambda: None,
         )
-        interpolate_btn = Button(
-            further_methods_frm,
-            text="INTERPOLATE POSE IN SIMBA PROJECT",
-            fg="blue",
-            command=lambda: InterpolatePopUp(config_path=self.config_path),
-        )
+        interpolate_btn = Button(further_methods_frm, text="INTERPOLATE POSE IN SIMBA PROJECT", fg="blue", command=lambda: InterpolatePopUp(config_path=self.config_path))
         smooth_btn = Button(
             further_methods_frm,
             text="SMOOTH POSE IN SIMBA PROJECT",
@@ -1030,173 +996,53 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             fg="blue",
             command=lambda: MovementAnalysisTimeBinsPopUp(config_path=self.config_path),
         )
-        button_classifierbins = Button(
-            label_machineresults,
-            text="ANALYZE MACHINE PREDICTIONS: TIME-BINS",
-            fg="blue",
-            command=lambda: TimeBinsClfPopUp(config_path=self.config_path),
-        )
-        button_classifier_ROI = Button(
-            label_machineresults,
-            text="ANALYZE MACHINE PREDICTION: BY ROI",
-            fg="blue",
-            command=lambda: ClfByROIPopUp(config_path=self.config_path),
-        )
-        button_severity = Button(
-            label_machineresults,
-            text="ANALYZE MACHINE PREDICTION: BY SEVERITY",
-            fg="blue",
-            command=lambda: AnalyzeSeverityPopUp(config_path=self.config_path),
-        )
-
-        visualization_frm = CreateLabelFrameWithIcon(
-            parent=tab10,
-            header="DATA VISUALIZATIONS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VISUALIZATION.value,
-        )
-        sklearn_visualization_btn = Button(
-            visualization_frm,
-            text="VISUALIZE CLASSIFICATIONS",
-            fg="black",
-            command=lambda: SklearnVisualizationPopUp(config_path=self.config_path),
-        )
+        button_classifierbins = Button(label_machineresults, text="ANALYZE MACHINE PREDICTIONS: TIME-BINS", fg="blue", command=lambda: TimeBinsClfPopUp(config_path=self.config_path))
+        button_classifier_ROI = Button(label_machineresults, text="ANALYZE MACHINE PREDICTION: BY ROI", fg="blue", command=lambda: ClfByROIPopUp(config_path=self.config_path))
+        button_severity = Button(label_machineresults, text="ANALYZE MACHINE PREDICTION: BY SEVERITY", fg="blue", command=lambda: AnalyzeSeverityPopUp(config_path=self.config_path))
+        visualization_frm = CreateLabelFrameWithIcon(parent=tab10, header="DATA VISUALIZATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VISUALIZATION.value)
+        sklearn_visualization_btn = Button(visualization_frm, text="VISUALIZE CLASSIFICATIONS", fg="black", command=lambda: SklearnVisualizationPopUp(config_path=self.config_path))
         sklearn_visualization_btn.grid(row=0, column=0, sticky=NW)
-        gantt_visualization_btn = Button(
-            visualization_frm,
-            text="VISUALIZE GANTT",
-            fg="blue",
-            command=lambda: GanttPlotPopUp(config_path=self.config_path),
-        )
+        gantt_visualization_btn = Button(visualization_frm, text="VISUALIZE GANTT", fg="blue", command=lambda: GanttPlotPopUp(config_path=self.config_path))
         gantt_visualization_btn.grid(row=1, column=0, sticky=NW)
-        probability_visualization_btn = Button(
-            visualization_frm,
-            text="VISUALIZE PROBABILITIES",
-            fg="green",
-            command=lambda: VisualizeClassificationProbabilityPopUp(
-                config_path=self.config_path
-            ),
-        )
+        probability_visualization_btn = Button(visualization_frm, text="VISUALIZE PROBABILITIES", fg="green", command=lambda: VisualizeClassificationProbabilityPopUp(     config_path=self.config_path))
         probability_visualization_btn.grid(row=2, column=0, sticky=NW)
-        path_visualization_btn = Button(
-            visualization_frm,
-            text="VISUALIZE PATHS",
-            fg="orange",
-            command=lambda: PathPlotPopUp(config_path=self.config_path),
-        )
+        path_visualization_btn = Button(visualization_frm, text="VISUALIZE PATHS", fg="orange", command=lambda: PathPlotPopUp(config_path=self.config_path))
         path_visualization_btn.grid(row=3, column=0, sticky=NW)
-        distance_visualization_btn = Button(
-            visualization_frm,
-            text="VISUALIZE DISTANCES",
-            fg="red",
-            command=lambda: DistancePlotterPopUp(config_path=self.config_path),
-        )
+        distance_visualization_btn = Button(visualization_frm, text="VISUALIZE DISTANCES", fg="red", command=lambda: DistancePlotterPopUp(config_path=self.config_path))
         distance_visualization_btn.grid(row=4, column=0, sticky=NW)
-        heatmap_clf_visualization_btn = Button(
-            visualization_frm,
-            text="VISUALIZE CLASSIFICATION HEATMAPS",
-            fg="pink",
-            command=lambda: HeatmapClfPopUp(config_path=self.config_path),
-        )
+        heatmap_clf_visualization_btn = Button(visualization_frm, text="VISUALIZE CLASSIFICATION HEATMAPS", fg="pink", command=lambda: HeatmapClfPopUp(config_path=self.config_path))
         heatmap_clf_visualization_btn.grid(row=5, column=0, sticky=NW)
-        data_plot_visualization_btn = Button(
-            visualization_frm,
-            text="VISUALIZE DATA PLOTS",
-            fg="purple",
-            command=lambda: DataPlotterPopUp(config_path=self.config_path),
-        )
+        data_plot_visualization_btn = Button(visualization_frm, text="VISUALIZE DATA PLOTS", fg="purple", command=lambda: DataPlotterPopUp(config_path=self.config_path))
         data_plot_visualization_btn.grid(row=6, column=0, sticky=NW)
-        clf_validation_btn = Button(
-            visualization_frm,
-            text="CLASSIFIER VALIDATION CLIPS",
-            fg="blue",
-            command=lambda: ClassifierValidationPopUp(config_path=self.config_path),
-        )
+        clf_validation_btn = Button(visualization_frm, text="CLASSIFIER VALIDATION CLIPS", fg="blue", command=lambda: ClassifierValidationPopUp(config_path=self.config_path))
         clf_validation_btn.grid(row=7, column=0, sticky=NW)
-        merge_frm = CreateLabelFrameWithIcon(
-            parent=tab10,
-            header="MERGE FRAMES",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.CONCAT_VIDEOS.value,
-        )
-        merge_frm_btn = Button(
-            merge_frm,
-            text="MERGE FRAMES",
-            fg="black",
-            command=lambda: ConcatenatorPopUp(config_path=self.config_path),
-        )
-        plotlyInterface = CreateLabelFrameWithIcon(
-            parent=tab10,
-            header="PLOTLY / DASH",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.PLOTLY.value,
-        )
-        plotlyInterfaceTitles = [
-            "Sklearn results",
-            "Time bin analyses",
-            "Probabilities",
-            "Severity analysis",
-        ]
+        merge_frm = CreateLabelFrameWithIcon(parent=tab10, header="MERGE FRAMES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CONCAT_VIDEOS.value)
+        merge_frm_btn = Button(merge_frm, text="MERGE FRAMES", fg="black", command=lambda: ConcatenatorPopUp(config_path=self.config_path))
+        plotlyInterface = CreateLabelFrameWithIcon(parent=tab10, header="PLOTLY / DASH", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.PLOTLY.value)
+        plotlyInterfaceTitles = ["Sklearn results", "Time bin analyses", "Probabilities", "Severity analysis"]
         toIncludeVar = []
         for i in range(len(plotlyInterfaceTitles) + 1):
             toIncludeVar.append(IntVar())
         plotlyCheckbox = [0] * (len(plotlyInterfaceTitles) + 1)
         for i in range(len(plotlyInterfaceTitles)):
-            plotlyCheckbox[i] = Checkbutton(
-                plotlyInterface, text=plotlyInterfaceTitles[i], variable=toIncludeVar[i]
-            )
+            plotlyCheckbox[i] = Checkbutton(plotlyInterface, text=plotlyInterfaceTitles[i], variable=toIncludeVar[i])
             plotlyCheckbox[i].grid(row=i, sticky=W)
 
-        button_save_plotly_file = Button(
-            plotlyInterface,
-            text="Save SimBA / Plotly dataset",
-            command=lambda: self.generateSimBPlotlyFile(toIncludeVar),
-        )
-        self.plotly_file = FileSelect(
-            plotlyInterface,
-            "SimBA Dashboard file (H5)",
-            title="Select SimBA/Plotly dataset (h5)",
-        )
-        self.groups_file = FileSelect(
-            plotlyInterface, "SimBA Groups file (CSV)", title="Select groups file (csv"
-        )
-        button_open_plotly_interface = Button(
-            plotlyInterface,
-            text="Open SimBA / Plotly dataset",
-            fg="black",
-            command=lambda: [self.open_plotly_interface("http://127.0.0.1:8050")],
-        )
+        button_save_plotly_file = Button(plotlyInterface, text="Save SimBA / Plotly dataset", command=lambda: self.generateSimBPlotlyFile(toIncludeVar))
+        self.plotly_file = FileSelect( plotlyInterface, "SimBA Dashboard file (H5)", title="Select SimBA/Plotly dataset (h5)")
+        self.groups_file = FileSelect(plotlyInterface, "SimBA Groups file (CSV)", title="Select groups file (csv)")
+        button_open_plotly_interface = Button(plotlyInterface, text="Open SimBA / Plotly dataset", fg="black", command=lambda: [self.open_plotly_interface("http://127.0.0.1:8050")])
 
         # addons
-        lbl_addon = LabelFrame(
-            tab11,
-            text="SimBA Expansions",
-            pady=5,
-            padx=5,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        button_bel = Button(
-            lbl_addon,
-            text="Pup retrieval - Analysis Protocol 1",
-            fg="blue",
-            command=lambda: PupRetrievalPopUp(config_path=self.config_path),
-        )
-        cue_light_analyser_btn = Button(
-            lbl_addon,
-            text="Cue light analysis",
-            fg="red",
-            command=lambda: CueLightAnalyzerMenu(config_path=self.config_path),
-        )
-        anchored_roi_analysis_btn = Button(
-            lbl_addon,
-            text="Animal-anchored ROI analysis",
-            fg="orange",
-            command=lambda: BoundaryMenus(config_path=self.config_path),
-        )
+        lbl_addon = LabelFrame(tab11, text="SimBA Expansions", pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
+        button_bel = Button(lbl_addon, text="Pup retrieval - Analysis Protocol 1", fg="blue", command=lambda: PupRetrievalPopUp(config_path=self.config_path))
 
-        self.create_import_videos_menu(parent_frm=import_frm, idx_row=0, idx_column=0)
-        self.create_import_pose_menu(parent_frm=import_frm, idx_row=1, idx_column=0)
+        cue_light_analyser_btn = Button(lbl_addon, text="Cue light analysis", fg="red", command=lambda: CueLightAnalyzerMenu(config_path=self.config_path))
+        anchored_roi_analysis_btn = Button(lbl_addon, text="Animal-anchored ROI analysis", fg="orange", command=lambda: BoundaryMenus(config_path=self.config_path))
+
+
+        ImportVideosFrame(parent_frm=import_frm, config_path=config_path, idx_row=0, idx_column=0)
+        ImportPoseFrame(parent_frm=import_frm, idx_row=1, idx_column=0, config_path=config_path)
         further_methods_frm.grid(row=0, column=1, sticky=NW, pady=5, padx=5)
         extract_frm_btn.grid(row=1, column=0, sticky=NW)
         import_frm_dir_btn.grid(row=2, column=0, sticky=NW)

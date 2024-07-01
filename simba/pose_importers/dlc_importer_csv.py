@@ -1,25 +1,20 @@
 __author__ = "Simon Nilsson"
 
-import glob
 import os
 import shutil
-from typing import List, Union
-
+from typing import List, Union, Dict, Optional, Any
 import pandas as pd
 
-from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists,
-                                check_if_filepath_list_is_empty, check_int)
-from simba.utils.data import smooth_data_gaussian, smooth_data_savitzky_golay
-from simba.utils.enums import Methods
-from simba.utils.errors import FileExistError, NoFilesFoundError
+from simba.mixins.config_reader import ConfigReader
+from simba.data_processors.interpolate import Interpolate
+from simba.data_processors.smoothing import Smoothing
+from simba.utils.checks import (check_file_exist_and_readable, check_int, check_str, check_if_keys_exist_in_dict, check_instance)
+from simba.utils.errors import FileExistError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (get_fn_ext,
-                                    get_number_of_header_columns_in_df,
-                                    read_config_file,
-                                    read_project_path_and_file_type)
+from simba.utils.read_write import (get_fn_ext, get_number_of_header_columns_in_df, find_files_of_filetypes_in_directory)
 
+DLC_ = 'DLC_'
+DeepCut = 'DeepCut'
 
 def import_dlc_csv(config_path: Union[str, os.PathLike], source: str) -> List[str]:
     """
@@ -28,150 +23,104 @@ def import_dlc_csv(config_path: Union[str, os.PathLike], source: str) -> List[st
 
     :parameter str config_path: path to SimBA project config file in Configparser format
     :parameter str source: path to file or folder containing DLC pose-estimation CSV files
-    :return List[str]: Paths of imported files.
+    :return List[str]: Paths to location of imported files.
 
     :example:
     >>> import_dlc_csv(config_path='project_folder/project_config.ini', source='CSV_import/Together_1.csv')
     >>> ['project_folder/csv/input_csv/Together_1.csv']
     """
 
-    config = read_config_file(config_path=config_path)
-    project_path, file_type = read_project_path_and_file_type(config=config)
-    original_file_name_dir = os.path.join(
-        project_path, "csv", "input_csv", "original_filename"
-    )
-    input_csv_dir = os.path.join(project_path, "csv", "input_csv")
-    imported_files = glob.glob(input_csv_dir + "/*." + file_type)
-    imported_file_names, imported_file_paths = [], []
-    for file_path in imported_files:
-        _, video_name, _ = get_fn_ext(filepath=file_path)
-        imported_file_names.append(video_name)
-    if not os.path.exists(original_file_name_dir):
-        os.makedirs(original_file_name_dir)
+    check_file_exist_and_readable(file_path=config_path)
+    conf = ConfigReader(config_path=config_path)
+    original_file_name_dir = os.path.join(conf.input_csv_dir, "original_filename")
+    if not os.path.exists(original_file_name_dir): os.makedirs(original_file_name_dir)
+    prev_imported_file_paths = find_files_of_filetypes_in_directory(directory=conf.input_csv_dir, extensions=[f'.{conf.file_type}'], raise_warning=False, raise_error=False)
+    prev_imported_file_names = [get_fn_ext(x)[1] for x in prev_imported_file_paths]
     if os.path.isdir(source):
-        csv_files = glob.glob(source + "/*.csv")
-        check_if_filepath_list_is_empty(
-            csv_files,
-            error_msg=f"SIMBA ERROR: NO .csv files found in {source} directory.",
-        )
+        new_data_paths = find_files_of_filetypes_in_directory(directory=source, extensions=['.csv'], raise_warning=False, raise_error=True)
+    elif os.path.isfile(source):
+        new_data_paths = [source]
     else:
-        csv_files = [source]
+        raise InvalidInputError(msg=f'{source} is not a valid data directory path or file path.', source=import_dlc_csv.__name__)
 
-    for file_path in csv_files:
+    imported_file_paths = []
+    for file_cnt, file_path in enumerate(new_data_paths):
         video_timer = SimbaTimer(start=True)
         check_file_exist_and_readable(file_path=file_path)
         _, video_name, file_ext = get_fn_ext(filepath=file_path)
-        if "DLC_" in video_name:
-            new_file_name = video_name.split("DLC_")[0] + ".csv"
-        elif "DeepCut" in video_name:
-            new_file_name = video_name.split("DeepCut")[0] + ".csv"
+        if DLC_ in video_name:
+            new_file_name = video_name.split(DLC_)[0] + ".csv"
+        elif DeepCut in video_name:
+            new_file_name = video_name.split(DeepCut)[0] + ".csv"
         else:
             new_file_name = video_name.split(".")[0] + ".csv"
         new_file_name_wo_ext = new_file_name.split(".")[0]
         video_basename = os.path.basename(file_path)
         print(f"Importing {video_name} to SimBA project...")
-        if new_file_name_wo_ext in imported_file_names:
-            raise FileExistError(
-                "SIMBA IMPORT ERROR: {} already exist in project. Remove file from project or rename imported video file name before importing.".format(
-                    new_file_name
-                )
-            )
-        shutil.copy(file_path, input_csv_dir)
+        # if new_file_name_wo_ext in prev_imported_file_names:
+        #     raise FileExistError(f"SIMBA IMPORT ERROR: {new_file_name} already exist in project in the directory {conf.input_csv_dir}. Remove file from project or rename imported video file name before importing.")
+        shutil.copy(file_path, conf.input_csv_dir)
         shutil.copy(file_path, original_file_name_dir)
-        os.rename(
-            os.path.join(input_csv_dir, video_basename),
-            os.path.join(input_csv_dir, new_file_name),
-        )
-        df = pd.read_csv(os.path.join(input_csv_dir, new_file_name))
+        os.rename(os.path.join(conf.input_csv_dir, video_basename), os.path.join(conf.input_csv_dir, new_file_name))
+        df = pd.read_csv(os.path.join(conf.input_csv_dir, new_file_name))
         header_cols = get_number_of_header_columns_in_df(df=df)
         if header_cols == 3:
             df = df.iloc[1:]
-        if file_type == "parquet":
-            df = pd.read_csv(os.path.join(input_csv_dir, video_basename))
+        if conf.file_type == "parquet":
+            df = pd.read_csv(os.path.join(conf.input_csv_dir, video_basename))
             df = df.apply(pd.to_numeric, errors="coerce")
-            df.to_parquet(os.path.join(input_csv_dir, new_file_name))
-            os.remove(os.path.join(input_csv_dir, video_basename))
-        if file_type == "csv":
-            df.to_csv(os.path.join(input_csv_dir, new_file_name), index=False)
-        imported_file_paths.append(os.path.join(input_csv_dir, new_file_name))
+            df.to_parquet(os.path.join(conf.input_csv_dir, new_file_name))
+            os.remove(os.path.join(conf.input_csv_dir, video_basename))
+        if conf.file_type == "csv":
+            df.to_csv(os.path.join(conf.input_csv_dir, new_file_name), index=False)
+        imported_file_paths.append(os.path.join(conf.input_csv_dir, new_file_name))
         video_timer.stop_timer()
-        print(
-            f"Pose-estimation data for video {video_name} imported to SimBA project (elapsed time: {video_timer.elapsed_time_str}s)..."
-        )
+        print(f"Pose-estimation data for video {video_name} imported to SimBA project (elapsed time: {video_timer.elapsed_time_str}s)...")
     return imported_file_paths
 
+def import_dlc_csv_data(config_path: Union[str, os.PathLike],
+                        data_path: Union[str, os.PathLike],
+                        interpolation_settings: Optional[Dict[str, Any]] = None,
+                        smoothing_settings: Optional[Dict[str, Any]] = None) -> None:
 
-def import_single_dlc_tracking_csv_file(
-    config_path: str,
-    interpolation_setting: str,
-    smoothing_setting: str,
-    smoothing_time: int,
-    file_path: str,
-):
+    """
+    Import multiple DLC CSV tracking files to SimBA project and apply specified interpolation and smoothing
+    parameters to the imported data.
+
+    :param Union[str, os.PathLike] config_path: Path to SimBA config file in ConfigParser format.
+    :param Union[str, os.PathLike] data_path: Path to directory holding DLC pose-estimation data in CSV format, or path to a single CSV file with DLC pose-estimation data.
+    :param Optional[Dict[str, Any]] interpolation_settings: Dictionary holding settings for interpolation.
+    :param Optional[Dict[str, Any]] smoothing_settings: Dictionary holding settings for smoothing.
+    :return None:
+
+    :example:
+    >>> interpolation_settings = {'type': 'body-parts', 'method': 'linear'}
+    >>> smoothing_settings = None #{'time_window': 500, 'method': 'savitzky-golay'}
+    >>> import_dlc_csv_data(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/new_data', interpolation_settings=interpolation_settings, smoothing_settings=smoothing_settings)
+
+    """
+
     timer = SimbaTimer(start=True)
-    if (smoothing_setting == Methods.GAUSSIAN.value) or (
-        smoothing_setting == Methods.SAVITZKY_GOLAY.value
-    ):
-        check_int(name="SMOOTHING TIME WINDOW", value=smoothing_time, min_value=1)
-    check_file_exist_and_readable(file_path=file_path)
-    imported_file_paths = import_dlc_csv(config_path=config_path, source=file_path)
-    if interpolation_setting != "None":
-        _ = Interpolate(
-            input_path=imported_file_paths[0],
-            config_path=config_path,
-            method=interpolation_setting,
-            initial_import_multi_index=True,
-        )
-    if (smoothing_setting == Methods.GAUSSIAN.value) or (
-        smoothing_setting == Methods.SAVITZKY_GOLAY.value
-    ):
-        _ = Smooth(
-            config_path=config_path,
-            input_path=imported_file_paths[0],
-            time_window=smoothing_time,
-            smoothing_method=smoothing_setting,
-            initial_import_multi_index=True,
-        )
-    timer.stop_timer()
-    stdout_success(
-        msg=f"Imported {str(len(imported_file_paths))} pose estimation file(s)",
-        elapsed_time=timer.elapsed_time_str,
-    )
+    check_file_exist_and_readable(file_path=config_path)
+    if (not os.path.isdir(data_path)) and (not os.path.isfile(data_path)):
+        raise InvalidInputError(msg=f'{data_path} is not a valid data directory path or file path.', source=import_dlc_csv.__name__)
+    if interpolation_settings is not None:
+        check_instance(source=f'{import_dlc_csv_data.__name__} interpolation_settings', accepted_types=(dict,), instance=interpolation_settings)
+        check_if_keys_exist_in_dict(data=interpolation_settings, key=['type', 'method'])
+        check_str(name='type', value=interpolation_settings['type'].lower(), options=['animals', 'body-parts'])
+        check_str(name='method', value=interpolation_settings['method'].lower(), options=['nearest', 'linear', 'quadratic'])
+    if smoothing_settings is not None:
+        check_instance(source=f'{import_dlc_csv_data.__name__} smoothing_settings', accepted_types=(dict,), instance=smoothing_settings)
+        check_if_keys_exist_in_dict(data=smoothing_settings, key=['time_window', 'method'])
+        check_int(name='time_window', value=smoothing_settings['time_window'], min_value=1)
+        check_str(name='method', value=smoothing_settings['method'].lower(), options=['savitzky-golay', 'gaussian'])
 
-
-def import_multiple_dlc_tracking_csv_file(
-    config_path: str,
-    interpolation_setting: str,
-    smoothing_setting: str,
-    smoothing_time: int,
-    data_dir: str,
-):
-    timer = SimbaTimer(start=True)
-    if (smoothing_setting == Methods.GAUSSIAN.value) or (
-        smoothing_setting == Methods.SAVITZKY_GOLAY.value
-    ):
-        check_int(name="SMOOTHING TIME WINDOW", value=smoothing_time, min_value=1)
-    check_if_dir_exists(in_dir=data_dir)
-    imported_file_paths = import_dlc_csv(config_path=config_path, source=data_dir)
-    if interpolation_setting != "None":
-        _ = Interpolate(
-            input_path=os.path.dirname(imported_file_paths[0]),
-            config_path=config_path,
-            method=interpolation_setting,
-            initial_import_multi_index=True,
-        )
-    if (smoothing_setting == Methods.GAUSSIAN.value) or (
-        smoothing_setting == Methods.SAVITZKY_GOLAY.value
-    ):
-        _ = Smooth(
-            config_path=config_path,
-            input_path=os.path.dirname(imported_file_paths[0]),
-            time_window=int(smoothing_time),
-            smoothing_method=smoothing_setting,
-            initial_import_multi_index=True,
-        )
+    imported_file_paths = import_dlc_csv(config_path=config_path, source=data_path)
+    if interpolation_settings != None:
+        interpolator = Interpolate(config_path=config_path, data_path=imported_file_paths, type=interpolation_settings['type'], method=interpolation_settings['method'], multi_index_df_headers=True, copy_originals=False)
+        interpolator.run()
+    if smoothing_settings != None:
+        smoother = Smoothing(config_path=config_path, data_path=imported_file_paths, time_window=smoothing_settings['time_window'], method=smoothing_settings['method'], multi_index_df_headers=True, copy_originals=False)
+        smoother.run()
     timer.stop_timer()
-    stdout_success(
-        msg=f"Imported {str(len(imported_file_paths))} pose estimation file(s)",
-        elapsed_time=timer.elapsed_time_str,
-    )
+    stdout_success(msg=f"Imported {len(imported_file_paths)} pose estimation file(s) to directory", elapsed_time=timer.elapsed_time_str)

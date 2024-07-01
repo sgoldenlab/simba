@@ -2361,7 +2361,7 @@ class Convert2WEBPPopUp(PopUpMixin):
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
         run_btn_dir.grid(row=1, column=0, sticky="NW")
 
-        convert_img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO WEBP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        convert_img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE FILE TO WEBP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_file = FileSelect(convert_img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
         run_btn_frm = Button(convert_img_frm, text="RUN IMAGE WEBP CONVERSION", command=lambda: self.run_img())
 

@@ -4,36 +4,30 @@ import os
 from typing import Any, Dict, List, Union
 
 import h5py
-import numpy as np
 import pandas as pd
 
-from simba.data_processors.interpolation_smoothing import Interpolate, Smooth
+from simba.data_processors.interpolate import Interpolate
+from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists,
-                                check_if_keys_exist_in_dict, check_str)
-from simba.utils.enums import Methods, Options, TagNames
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.checks import check_str, check_int, check_if_keys_exist_in_dict, check_if_dir_exists, check_valid_lst
+from simba.utils.enums import Methods, TagNames
 from simba.utils.errors import BodypartColumnNotFoundError
-from simba.utils.printing import (SimbaTimer, log_event, stdout_success,
-                                  stdout_warning)
-from simba.utils.read_write import (clean_sleap_file_name,
-                                    find_all_videos_in_project, get_fn_ext,
-                                    get_video_meta_data, write_df)
+from simba.utils.printing import (SimbaTimer, log_event, stdout_success, stdout_warning)
+from simba.utils.read_write import (clean_sleap_file_name, find_all_videos_in_project, get_fn_ext, get_video_meta_data, write_df)
 
 
 class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
     """
     Importing SLEAP pose-estimation data into SimBA project in ``H5`` format
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str data_folder: Path to folder containing SLEAP data in `csv` format.
-    :parameter List[str] id_lst: Animal names. This will be ignored in one animal projects and default to ``Animal_1``.
-    :parameter str interpolation_settings: String defining the pose-estimation interpolation method. OPTIONS: 'None', 'Animal(s): Nearest',
-        'Animal(s): Linear', 'Animal(s): Quadratic','Body-parts: Nearest', 'Body-parts: Linear',
-        'Body-parts: Quadratic'.
-    :parameter str smoothing_settings: Dictionary defining the pose estimation smoothing method. EXAMPLE: {'Method': 'Savitzky Golay',
-        'Parameters': {'Time_window': '200'}}
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str data_folder: Path to folder containing SLEAP data in `H5` format.
+    :param List[str] id_lst: Animal names. This will be ignored in one animal projects and default to ``Animal_1``.
+    :param Optional[Dict[str, str]] interpolation_setting: Dict defining the type and method to use to perform interpolation {'type': 'animals', 'method': 'linear'}.
+    :param Optional[Dict[str, Union[str, int]]] smoothing_settings: Dictionary defining the pose estimation smoothing method {'time_window': 500, 'method': 'gaussian'}.
+
 
     .. note::
        `Multi-animal import tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md>`__.
@@ -59,8 +53,16 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
         log_event(logger_name=str(__class__.__name__),log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         check_file_exist_and_readable(file_path=config_path)
         check_if_dir_exists(in_dir=data_folder, source=self.__class__.__name__)
-        check_str(name=f'{self.__class__.__name__} interpolation_settings', value=interpolation_settings, options=Options.INTERPOLATION_OPTIONS_W_NONE.value)
-        check_if_keys_exist_in_dict(data=smoothing_settings, key='Method', name=f'{self.__class__.__name__} smoothing_settings')
+        check_valid_lst(data=id_lst, source=f'{self.__class__.__name__} id_lst', valid_dtypes=(str,), min_len=1)
+        if interpolation_settings is not None:
+            check_if_keys_exist_in_dict(data=interpolation_settings, key=['method', 'type'], name=f'{self.__class__.__name__} interpolation_settings')
+            check_str(name=f'{self.__class__.__name__} interpolation_settings type', value=interpolation_settings['type'], options=('body-parts', 'animals'))
+            check_str(name=f'{self.__class__.__name__} interpolation_settings method', value=interpolation_settings['method'], options=('linear', 'quadratic', 'nearest'))
+        if smoothing_settings is not None:
+            check_if_keys_exist_in_dict(data=smoothing_settings, key=['method', 'time_window'], name=f'{self.__class__.__name__} smoothing_settings')
+            check_str(name=f'{self.__class__.__name__} smoothing_settings method', value=smoothing_settings['method'], options=('savitzky-golay', 'gaussian'))
+            check_int(name=f'{self.__class__.__name__} smoothing_settings time_window', value=smoothing_settings['time_window'], min_value=1)
+
         self.interpolation_settings, self.smoothing_settings = interpolation_settings, smoothing_settings
         self.data_folder, self.id_lst = data_folder, id_lst
         self.import_log_path = os.path.join(self.logs_path, f"data_import_log_{self.datetime}.csv")
@@ -115,8 +117,7 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
                     f"The number of of body-parts expected by your SimBA project is {int(len(self.bp_headers) / 3)}. "
                     f'The number of of body-parts contained in data file {video_data["DATA"]} is {int(len(self.data_df.columns) / 3)}. '
                     f"Make sure you have specified the correct number of animals and body-parts in your project.",
-                    source=self.__class__.__name__,
-                )
+                    source=self.__class__.__name__)
             self.data_df.columns = self.bp_headers
             if self.animal_cnt > 1:
                 self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict, video_info=get_video_meta_data(video_data["VIDEO"]), data_df=self.data_df, video_path=video_data["VIDEO"])
@@ -126,29 +127,22 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 
             self.save_path = os.path.join(os.path.join(self.input_csv_dir, f"{self.output_filename}.{self.file_type}"))
             write_df(df=self.out_df, file_type=self.file_type, save_path=self.save_path, multi_idx_header=True)
-            if self.interpolation_settings != "None":
-                self.__run_interpolation()
-            if self.smoothing_settings["Method"] != "None":
-                self.__run_smoothing()
+            if self.interpolation_settings is not None:
+                interpolator = Interpolate(config_path=self.config_path, data_path=self.save_path, type=self.interpolation_settings['type'], method=self.interpolation_settings['method'], multi_index_df_headers=True, copy_originals=False)
+                interpolator.run()
+            if self.smoothing_settings is not None:
+                smoother = Smoothing(config_path=self.config_path, data_path=self.save_path, time_window=self.smoothing_settings['time_window'], method=self.smoothing_settings['method'], multi_index_df_headers=True, copy_originals=False)
+                smoother.run()
             video_timer.stop_timer()
             stdout_success(msg=f"Video {self.output_filename} data imported...", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
         self.timer.stop_timer()
         stdout_success(msg="All SLEAP H5 data files imported", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
-    def __run_interpolation(self):
-        print(f"Interpolating missing values in video {self.output_filename} (Method: {self.interpolation_settings})...")
-        _ = Interpolate(input_path=self.save_path, config_path=self.config_path, method=self.interpolation_settings, initial_import_multi_index=True)
-
-    def __run_smoothing(self):
-        print(f'Performing {self.smoothing_settings["Method"]} smoothing on video {self.output_filename}...')
-        Smooth(config_path=self.config_path, input_path=self.save_path, time_window=int(self.smoothing_settings["Parameters"]["Time_window"]), smoothing_method=self.smoothing_settings["Method"], initial_import_multi_index=True)
-
-
 # test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini",
-#                    data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/h5_import',
-#                    id_lst=['White', 'Black'],
-#                    interpolation_settings= "Body-parts: Nearest", #'"Body-parts: Nearest",
-#                    smoothing_settings = {'Method': 'None', 'Parameters': {'Time_window': '200'}})
+#                         data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/h5_import',
+#                         id_lst=['White', 'Black'],
+#                         interpolation_settings={'type': 'body-parts', 'method': 'nearest'},
+#                         smoothing_settings = {'time_window': 500, 'method': 'gaussian'})
 # test.run()
 
 

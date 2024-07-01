@@ -138,7 +138,7 @@ def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]]
         raise InvalidInputError(msg=f'{path} is not a valid file path, directory path, or list of file paths',  source=convert_to_jpeg.__name__)
     directory, _, _ = get_fn_ext(filepath=file_paths[0])
     if save_dir is None:
-        save_dir = os.path.join(directory, f'bmp_{datetime_}')
+        save_dir = os.path.join(directory, f'jpeg_{datetime_}')
         os.makedirs(save_dir)
     else:
         check_if_dir_exists(in_dir=save_dir, source=f'{convert_to_jpeg.__name__} save_dir', create_if_not_exist=True)
@@ -237,7 +237,7 @@ def convert_to_png(path: Union[str, os.PathLike],
         raise InvalidInputError(msg=f'{path} is not a valid file path or directory path or list of file paths', source=convert_to_png.__name__)
     directory, _, _ = get_fn_ext(filepath=file_paths[0])
     if save_dir is None:
-        save_dir = os.path.join(directory, f'bmp_{datetime_}')
+        save_dir = os.path.join(directory, f'png_{datetime_}')
         os.makedirs(save_dir)
     else:
         check_if_dir_exists(in_dir=save_dir, source=f'{convert_to_png.__name__} save_dir', create_if_not_exist=True)
@@ -349,7 +349,7 @@ def convert_to_webp(path: Union[str, os.PathLike],
         raise InvalidInputError(msg=f'{path} is not a valid file path or directory path', source=convert_to_webp.__name__)
     directory, _, _ = get_fn_ext(filepath=file_paths[0])
     if save_dir is None:
-        save_dir = os.path.join(directory, f'bmp_{datetime_}')
+        save_dir = os.path.join(directory, f'webp_{datetime_}')
         os.makedirs(save_dir)
     else:
         check_if_dir_exists(in_dir=save_dir, source=f'{convert_to_png.__name__} save_dir', create_if_not_exist=True)
