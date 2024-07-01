@@ -1,8 +1,10 @@
 import pandas as pd
+
 pd.options.mode.chained_assignment = None
 import os
-from typing import Optional, Union, List
 from copy import deepcopy
+from typing import List, Optional, Union
+
 import numpy as np
 
 try:
@@ -11,12 +13,15 @@ except ImportError:
     from typing_extensions import Literal
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_str, check_valid_lst, check_file_exist_and_readable)
+from simba.utils.checks import (check_file_exist_and_readable, check_str,
+                                check_valid_lst)
+from simba.utils.data import animal_interpolator, body_part_interpolator
 from simba.utils.enums import TagNames
 from simba.utils.errors import DataHeaderError, InvalidInputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, write_df, copy_files_to_directory)
-from simba.utils.data import animal_interpolator, body_part_interpolator
+from simba.utils.read_write import (copy_files_to_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, write_df)
 
 
 class Interpolate(ConfigReader):

@@ -8,7 +8,7 @@ import subprocess
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union, Any
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import h5py
 import numpy as np
@@ -33,7 +33,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_array, check_valid_dataframe)
-from simba.utils.enums import ConfigKey, Dtypes, Keys, Options, Formats
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
                                 NoFilesFoundError)

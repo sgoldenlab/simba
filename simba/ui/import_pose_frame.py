@@ -4,15 +4,14 @@ import os
 from tkinter import *
 from tkinter import ttk
 from typing import Dict, Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.pose_importers.trk_importer import TRKImporter
 from simba.pose_importers.dlc_importer_csv import import_dlc_csv_data
 from simba.pose_importers.import_mars import MarsImporter
 from simba.pose_importers.madlc_importer import MADLCImporterH5
@@ -21,13 +20,13 @@ from simba.pose_importers.read_DANNCE_mat import (import_DANNCE_file,
 from simba.pose_importers.sleap_csv_importer import SLEAPImporterCSV
 from simba.pose_importers.sleap_h5_importer import SLEAPImporterH5
 from simba.pose_importers.sleap_slp_importer import SLEAPImporterSLP
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect, FolderSelect)
-from simba.utils.checks import (check_int, check_str, check_instance)
-from simba.utils.enums import ConfigKey, Formats, Options, Dtypes
+from simba.pose_importers.trk_importer import TRKImporter
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
+                                        FolderSelect)
+from simba.utils.checks import check_instance, check_int, check_str
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Options
 from simba.utils.errors import InvalidInputError
-
 from simba.utils.read_write import read_config_file
-
 
 GAUSSIAN = 'Gaussian'
 SAVITZKY_GOLAY = 'Savitzky Golay'
