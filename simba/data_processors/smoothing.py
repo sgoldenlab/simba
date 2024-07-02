@@ -1,8 +1,8 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import Union, List, Optional
 from copy import deepcopy
+from typing import List, Optional, Union
 
 import pandas as pd
 
@@ -12,12 +12,17 @@ except ImportError:
     from typing_extensions import Literal
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_str, check_int, check_valid_lst, check_file_exist_and_readable)
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_str, check_valid_lst)
+from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.enums import TagNames
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext, read_video_info, get_video_meta_data, read_df, write_df, copy_files_to_directory)
-from simba.utils.data import savgol_smoother, df_smoother
+from simba.utils.read_write import (copy_files_to_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df,
+                                    read_video_info, write_df)
 
 
 class Smoothing(ConfigReader):

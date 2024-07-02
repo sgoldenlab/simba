@@ -1,16 +1,18 @@
 __author__ = "Simon Nilsson"
 
 import os
-from tkinter import *
 from copy import deepcopy
+from tkinter import *
 from typing import Union
 
 from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import DropDownMenu, FolderSelect, FileSelect, Entry_Box
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists, check_int
-from simba.utils.enums import Options, Formats
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
+                                        FolderSelect)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_int)
+from simba.utils.enums import Formats, Options
 from simba.utils.read_write import str_2_bool
 
 SMOOTHING_OPTION = {'Savitzky Golay': "savitzky-golay", "Gaussian": "gaussian"}

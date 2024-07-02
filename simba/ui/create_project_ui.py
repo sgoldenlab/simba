@@ -9,21 +9,23 @@ import pandas as pd
 import PIL.Image
 from PIL import ImageTk
 
-
-
 import simba
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.pop_ups.clf_add_remove_print_pop_up import PoseResetterPopUp
-from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import CreateUserDefinedPoseConfigurationPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FolderSelect, hxtScrollbar)
 from simba.ui.import_pose_frame import ImportPoseFrame
 from simba.ui.import_videos_frame import ImportVideosFrame
+from simba.ui.pop_ups.clf_add_remove_print_pop_up import PoseResetterPopUp
+from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
+    CreateUserDefinedPoseConfigurationPopUp
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FolderSelect, hxtScrollbar)
 from simba.utils.checks import check_if_dir_exists, check_str
 from simba.utils.config_creator import ProjectConfigCreator
 from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths
 from simba.utils.errors import DuplicationError, MissingProjectConfigEntryError
-from simba.utils.lookups import (get_body_part_configurations, get_bp_config_codes, get_icons_paths)
-from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
+from simba.utils.lookups import (get_body_part_configurations,
+                                 get_bp_config_codes, get_icons_paths)
+from simba.video_processors.video_processing import \
+    extract_frames_from_all_videos_in_directory
 
 
 class ProjectCreatorPopUp(PopUpMixin):

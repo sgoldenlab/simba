@@ -10,12 +10,17 @@ from simba.data_processors.interpolate import Interpolate
 from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.checks import check_str, check_int, check_if_keys_exist_in_dict, check_if_dir_exists, check_valid_lst
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_int,
+                                check_str, check_valid_lst)
 from simba.utils.enums import Methods, TagNames
 from simba.utils.errors import BodypartColumnNotFoundError
-from simba.utils.printing import (SimbaTimer, log_event, stdout_success, stdout_warning)
-from simba.utils.read_write import (clean_sleap_file_name, find_all_videos_in_project, get_fn_ext, get_video_meta_data, write_df)
+from simba.utils.printing import (SimbaTimer, log_event, stdout_success,
+                                  stdout_warning)
+from simba.utils.read_write import (clean_sleap_file_name,
+                                    find_all_videos_in_project, get_fn_ext,
+                                    get_video_meta_data, write_df)
 
 
 class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
