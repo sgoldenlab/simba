@@ -149,7 +149,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
         config = read_config_file(config_path=self.config_path)
         config.set(ConfigKey.MULTI_ANIMAL_ID_SETTING.value, ConfigKey.MULTI_ANIMAL_IDS.value, ",".join(animal_ids))
-        with open(config, "w") as f: config.write(f)
+        with open(self.config_path, "w") as f: config.write(f)
 
         if pose_estimation_tool == "H5 (multi-animal DLC)":
             data_importer = MADLCImporterH5(config_path=self.config_path,

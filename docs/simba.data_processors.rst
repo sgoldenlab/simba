@@ -1,7 +1,7 @@
 Data processors
 ==============================
 
-Methods for manipulating classification and pose-estimation data
+Methods for manipulating and transforming classification and pose-estimation data
 
 Aggregate classifier statistics calculator
 --------------------------------------------------
@@ -9,6 +9,23 @@ Aggregate classifier statistics calculator
 .. automodule:: simba.data_processors.agg_clf_calculator
    :members:
    :show-inheritance:
+
+
+Interpolate data
+--------------------------------------------------
+
+.. automodule:: simba.data_processors.interpolate
+   :members:
+   :show-inheritance:
+
+
+Smooth data
+--------------------------------------------------
+
+.. automodule:: simba.data_processors.smoothing
+   :members:
+   :show-inheritance:
+
 
 Directing-other-animals calculator
 -------------------------------------------------------------------

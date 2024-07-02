@@ -49,6 +49,7 @@ numba==0.59.1;python_version>="3.9"
 numexpr==2.6.9;python_version=="3.6"
 numexpr==2.10.0;python_version>="3.9"
 plotly == 4.9.0
+pyvis==0.3.2; python_version=="3.6"
 statsmodels==0.12.0;python_version=="3.6"
 statsmodels==0.14.2;python_version>="3.9"
 cefpython3 == 66.0

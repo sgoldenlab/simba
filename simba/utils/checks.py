@@ -1232,6 +1232,17 @@ def check_valid_dataframe(
                 source=source,
             )
 
+def check_valid_boolean(value: Union[Any, List[Any]], source: Optional[str] = '', raise_error: Optional[bool] = True):
+    if not isinstance(value, list):
+        value = [value]
+    for val in value:
+        if val in (True, False):
+            return True
+        else:
+            if raise_error:
+                raise InvalidInputError(msg=f'{val} is not a valid boolean', source=source)
+            else:
+                return False
 
 def check_valid_tuple(
     x: tuple,

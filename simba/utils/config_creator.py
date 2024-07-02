@@ -35,16 +35,16 @@ class ProjectConfigCreator(object):
 
     """
 
-    def __init__(
-        self,
-        project_path: str,
-        project_name: str,
-        target_list: List[str],
-        pose_estimation_bp_cnt: str,
-        body_part_config_idx: int,
-        animal_cnt: int,
-        file_type: str = "csv",
-    ):
+    def __init__(self,
+                  project_path: str,
+                  project_name: str,
+                  target_list: List[str],
+                  pose_estimation_bp_cnt: str,
+                  body_part_config_idx: int,
+                  animal_cnt: int,
+                  file_type: str = "csv"):
+
+
         self.simba_dir = os.path.dirname(simba.__file__)
         self.animal_cnt = animal_cnt
         self.os_platform = platform.system()
