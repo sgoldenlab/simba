@@ -89,11 +89,7 @@ class NetworkMixin(object):
         >>> NetworkMixin().create_multigraph(data=data)
         """
 
-        check_instance(
-            source=NetworkMixin.create_multigraph.__name__,
-            instance=data,
-            accepted_types=dict,
-        )
+        check_instance(source=NetworkMixin.create_multigraph.__name__, instance=data, accepted_types=dict)
         results, dict_data, G = {}, [], nx.MultiGraph()
         for k, v in data.items():
             check_instance(
@@ -201,6 +197,10 @@ class NetworkMixin(object):
     def graph_current_flow_closeness_centrality(graph: nx.Graph, weights: Optional[str] = "weight"):
 
         """
+
+
+
+
         :example:
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)
@@ -249,7 +249,7 @@ class NetworkMixin(object):
             instance=graph,
             accepted_types=nx.Graph,
         )
-        if levels > G.number_of_nodes():
+        if levels > graph.number_of_nodes():
             raise CountError(
                 msg=f"Number of nodes ({G.number_of_nodes()}) is less than numer of girvan newman levels ({levels}).",
                 source=NetworkMixin.__class__.__name__,
@@ -335,6 +335,9 @@ class NetworkMixin(object):
         .. raw:: html
            :file: ../docs/_static/img/network_ex.html
 
+        .. raw:: html
+	        :file: _static/img/network_ex.html
+
         .. note::
            Multi-networks created by ``simba.mixins.network_mixin.create_multigraph`` can be a little messy to look at. Instead,
            creates seperate objects and files with single edges from each time-point.
@@ -383,6 +386,7 @@ class NetworkMixin(object):
         if not multi_graph:
             network_graph = Network(f"{img_size[0]}px", f"{img_size[1]}px")
             network_graph.set_edge_smooth(smooth_type)
+            network_graph.force_atlas_2based()
             for node_cnt, node_name in enumerate(graph):
                 if isinstance(node_size, dict):
                     node_node_size = node_size[node_name]

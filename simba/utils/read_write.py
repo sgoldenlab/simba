@@ -761,12 +761,10 @@ def find_video_of_file(video_dir: Union[str, os.PathLike],
     return return_path
 
 
-def find_files_of_filetypes_in_directory(
-    directory: str,
-    extensions: list,
-    raise_warning: Optional[bool] = True,
-    raise_error: Optional[bool] = False,
-) -> List[str]:
+def find_files_of_filetypes_in_directory(directory: str,
+                                         extensions: list,
+                                         raise_warning: Optional[bool] = True,
+                                         raise_error: Optional[bool] = False) -> List[str]:
     """
     Find all files in a directory of specified extensions/types.
 

@@ -299,19 +299,19 @@ class ImageMixin(object):
         """
         Apply Canny edge detection to the input image.
         """
-        check_if_valid_img(source=f"{ImageMixin.img_moments.__name__}", data=img)
+        check_if_valid_img(source=f"{ImageMixin.canny_edge_detection.__name__}", data=img)
         check_int(
-            name=f"{ImageMixin.img_moments.__name__} threshold_1",
+            name=f"{ImageMixin.canny_edge_detection.__name__} threshold_1",
             value=threshold_1,
             min_value=1,
         )
         check_int(
-            name=f"{ImageMixin.img_moments.__name__} threshold_2",
+            name=f"{ImageMixin.canny_edge_detection.__name__} threshold_2",
             value=threshold_2,
             min_value=1,
         )
         check_int(
-            name=f"{ImageMixin.img_moments.__name__} aperture_size",
+            name=f"{ImageMixin.canny_edge_detection.__name__} aperture_size",
             value=aperture_size,
             min_value=1,
         )
