@@ -11,7 +11,7 @@ Aggregate classifier statistics calculator
    :show-inheritance:
 
 
-Interpolate data
+Interpolate pose-estimation data
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.interpolate
@@ -19,13 +19,26 @@ Interpolate data
    :show-inheritance:
 
 
-Smooth data
+Advanced pose-estimation interpolation
+--------------------------------------------------
+
+.. automodule:: simba.data_processors.advanced_interpolator
+   :members:
+   :show-inheritance:
+
+Smooth pose-estimation data
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.smoothing
    :members:
    :show-inheritance:
 
+Advanced smooth pose-estimation data
+--------------------------------------------------
+
+.. automodule:: simba.data_processors.advanced_smoothing
+   :members:
+   :show-inheritance:
 
 Directing-other-animals calculator
 -------------------------------------------------------------------
