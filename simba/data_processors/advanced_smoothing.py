@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import os
 from copy import deepcopy
 from typing import Any, Dict, Optional, Union
+
 import pandas as pd
 
 try:
@@ -11,14 +12,18 @@ except ImportError:
     from typing_extensions import Literal
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_valid_boolean, check_instance, check_str, check_int, check_that_column_exist, check_file_exist_and_readable)
+from simba.utils.checks import (check_file_exist_and_readable, check_instance,
+                                check_int, check_str, check_that_column_exist,
+                                check_valid_boolean)
+from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.enums import TagNames
-from simba.utils.errors import DataHeaderError, NoFilesFoundError, InvalidInputError
+from simba.utils.errors import (DataHeaderError, InvalidInputError,
+                                NoFilesFoundError)
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+from simba.utils.read_write import (copy_files_to_directory,
+                                    find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
-                                    get_video_meta_data, read_df, write_df, copy_files_to_directory)
-from simba.utils.data import savgol_smoother, df_smoother
+                                    get_video_meta_data, read_df, write_df)
 
 BODY_PART_TYPE = 'body-part'
 ANIMAL_TYPE = 'animal'
