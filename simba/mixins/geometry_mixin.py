@@ -11,7 +11,6 @@ import cv2
 import imutils
 import numpy as np
 import pandas as pd
-import shapely
 from numba import njit, prange
 from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
                               MultiPoint, MultiPolygon, Point, Polygon)
@@ -61,18 +60,28 @@ class GeometryMixin(object):
         pass
 
     @staticmethod
-    def bodyparts_to_polygon(
-        data: np.ndarray,
-        cap_style: Literal["round", "square", "flat"] = "round",
-        parallel_offset: int = 1,
-        pixels_per_mm: int = 1,
-        simplify_tolerance: float = 2,
-        preserve_topology: bool = True,
-    ) -> Polygon:
+    def bodyparts_to_polygon(data: np.ndarray,
+                             cap_style: Optional[Literal["round", "square", "flat"]] = "round",
+                             parallel_offset: Optional[int] = 1,
+                             pixels_per_mm: Optional[int] = 1,
+                             simplify_tolerance: Optional[float] = 2,
+                             preserve_topology: Optional[bool] = True) -> List[Polygon]:
+
+
         """
+        .. note::
+           To convert multiple frame body-part coordinates to polygon, use ``simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_polygon``
+
         .. image:: _static/img/bodyparts_to_polygon.png
            :width: 400
            :align: center
+
+        :param np.ndarray data: 3D array with body-part coordinates where rows are frames and columns are x and y coordinates.
+        :param Literal["round", "square", "flat"] cap_style: How intersections between lines are handled in the polygon. Default: round.
+        :param int parallel_offset: How much to "buffer" the polygon from the original size in millimeters. Default: 1.
+        :param int pixels_per_mm: The pixels per millimeter conversion factor used for buffering. Default: 1.
+        :param float simplify_tolerance: The higher this value, the smaller the number of vertices in the resulting polygon. Default 2.
+        :param bool preserve_topology: If True, operation will avoid creating invalid geometries (checking for collapses, ring-intersections, etc). Deafult True.
 
         :example:
         >>> data = [[[364, 308],[383, 323],[403, 335], [423, 351]]]
@@ -135,9 +144,7 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def bodyparts_to_points(
-        data: np.ndarray, buffer: Optional[int] = None, px_per_mm: Optional[int] = None
-    ) -> List[Union[Point, Polygon]]:
+    def bodyparts_to_points(data: np.ndarray, buffer: Optional[int] = None, px_per_mm: Optional[int] = None) -> List[Union[Point, Polygon]]:
         """
         Convert body-parts coordinate to Point geometries.
 
@@ -209,9 +216,9 @@ class GeometryMixin(object):
         return LineString(data)
 
     @staticmethod
-    def bodyparts_to_circle(
-        data: np.ndarray, parallel_offset: float, pixels_per_mm: Optional[int] = 1
-    ) -> Polygon:
+    def bodyparts_to_circle(data: np.ndarray,
+                            parallel_offset: float,
+                            pixels_per_mm: Optional[int] = 1) -> Polygon:
         """
         Create a circle geometry from a single body-part (x,y) coordinate.
 
@@ -276,9 +283,8 @@ class GeometryMixin(object):
         """
 
         if data.ndim != 3:
-            raise InvalidInputError(
-                msg=f"Body-parts to skeleton expects a 3D array, got {data.ndim}",
-                source=GeometryMixin.bodyparts_to_line.__name__,
+            raise InvalidInputError(msg=f"Body-parts to skeleton expects a 3D array, got {data.ndim}",
+                                    source=GeometryMixin.bodyparts_to_line.__name__,
             )
         shape_skeleton = []
         for i in data:
@@ -288,12 +294,10 @@ class GeometryMixin(object):
         return shape_skeleton
 
     @staticmethod
-    def buffer_shape(
-        shape: Union[Polygon, LineString],
-        size_mm: int,
-        pixels_per_mm: float,
-        cap_style: Literal["round", "square", "flat"] = "round",
-    ) -> Polygon:
+    def buffer_shape(shape: Union[Polygon, LineString],
+                     size_mm: int,
+                     pixels_per_mm: float,
+                     cap_style: Literal["round", "square", "flat"] = "round") -> Polygon:
         """
         Create a buffered shape by applying a buffer operation to the input polygon or linestring.
 
@@ -325,12 +329,8 @@ class GeometryMixin(object):
         )
 
     @staticmethod
-    def compute_pct_shape_overlap(
-        shapes: np.ndarray,
-        denominator: Optional[
-            Literal["difference", "shape_1", "shape_2"]
-        ] = "difference",
-    ) -> int:
+    def compute_pct_shape_overlap(shapes: np.ndarray, denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = "difference") -> int:
+
         """
         Compute the percentage of overlap between two shapes.
 
@@ -455,9 +455,7 @@ class GeometryMixin(object):
         return shapes[0].crosses(shapes[1])
 
     @staticmethod
-    def is_shape_covered(
-        shapes: List[Union[LineString, Polygon, MultiPolygon, MultiPoint]]
-    ) -> bool:
+    def is_shape_covered(shapes: List[Union[LineString, Polygon, MultiPolygon, MultiPoint]]) -> bool:
         """
         Check if one geometry fully covers another.
 
@@ -483,7 +481,7 @@ class GeometryMixin(object):
         return shapes[1].covers(shapes[0])
 
     @staticmethod
-    def area(shape: Union[MultiPolygon, Polygon], pixels_per_mm: float):
+    def area(shape: Union[MultiPolygon, Polygon], pixels_per_mm: Optional[float]) -> float:
         """
         Calculate the area of a geometry in square millimeters.
 
@@ -514,11 +512,7 @@ class GeometryMixin(object):
         return shape.area / pixels_per_mm
 
     @staticmethod
-    def shape_distance(
-        shapes: List[Union[LineString, Polygon, Point]],
-        pixels_per_mm: float,
-        unit: Literal["mm", "cm", "dm", "m"] = "mm",
-    ) -> float:
+    def shape_distance(shapes: List[Union[LineString, Polygon, Point]], pixels_per_mm: float, unit: Literal["mm", "cm", "dm", "m"] = "mm") -> float:
         """
         Calculate the distance between two geometries in specified units.
 
@@ -666,11 +660,12 @@ class GeometryMixin(object):
     @staticmethod
     def is_containing(shapes=List[Union[LineString, Polygon]]) -> bool:
         """
+        Check if the first shape in a list contains a second shape in a list.
+
         .. image:: _static/img/is_containing.png
            :width: 500
            :align: center
 
-        :example:
         """
         for i in shapes:
             check_instance(
@@ -780,35 +775,26 @@ class GeometryMixin(object):
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[1, 25], [1, 75], [110, 25], [110, 75]]))
         >>> symmetric_difference = symmetric_difference(shapes=[polygon_1, polygon_2])
         """
-        check_iterable_length(
-            source=GeometryMixin.union.__name__, val=len(shapes), min=2
-        )
+        check_iterable_length(source=GeometryMixin.union.__name__, val=len(shapes), min=2)
         for shape in shapes:
-            check_instance(
-                source=GeometryMixin.symmetric_difference.__name__,
-                instance=shape,
-                accepted_types=(LineString, Polygon, MultiPolygon),
-            )
+            check_instance(source=GeometryMixin.symmetric_difference.__name__, instance=shape, accepted_types=(LineString, Polygon, MultiPolygon))
         results = deepcopy(shapes)
         for c in itertools.combinations(list(range(0, len(shapes))), 2):
-            results[c[0]] = results[c[0]].convex_hull.difference(
-                results[c[1]].convex_hull
-            )
-            results[c[1]] = results[c[1]].convex_hull.difference(
-                results[c[0]].convex_hull
-            )
+            results[c[0]] = results[c[0]].convex_hull.difference(results[c[1]].convex_hull)
+            results[c[1]] = results[c[1]].convex_hull.difference(results[c[0]].convex_hull)
 
         results = [geometry for geometry in results if not geometry.is_empty]
         return results
 
     @staticmethod
-    def view_shapes(
-        shapes: List[Union[LineString, Polygon, MultiPolygon, MultiLineString]],
-        bg_img: Optional[np.ndarray] = None,
-        bg_clr: Optional[Tuple[int]] = None,
-        size: Optional[int] = None,
-        color_palette: Optional[str] = None,
-    ) -> np.ndarray:
+    def view_shapes(shapes: List[Union[LineString, Polygon, MultiPolygon, MultiLineString]],
+                    bg_img: Optional[np.ndarray] = None,
+                    bg_clr: Optional[Tuple[int]] = None,
+                    size: Optional[int] = None,
+                    color_palette: Optional[str] = None,
+                    thickness: Optional[int] = 2,
+                    pixel_buffer: Optional[int] = 200) -> np.ndarray:
+
         """
         Helper function to draw shapes on white canvas or specified background image. Useful for quick troubleshooting.
 
@@ -819,85 +805,41 @@ class GeometryMixin(object):
         >>> img = GeometryMixin.view_shapes(shapes=[line_1, polygon_1, multipolygon_1])
         """
 
-        check_valid_lst(
-            data=shapes,
-            source=GeometryMixin.view_shapes.__name__,
-            valid_dtypes=(LineString, Polygon, MultiPolygon, MultiLineString, Point),
-            min_len=1,
-        )
-        max_vertices = find_max_vertices_coordinates(shapes=shapes, buffer=200)
+        check_valid_lst(data=shapes, source=GeometryMixin.view_shapes.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon, MultiLineString, Point), min_len=1)
+        check_int(name='pixel_buffer', value=pixel_buffer, min_value=0)
+        max_vertices = find_max_vertices_coordinates(shapes=shapes, buffer=pixel_buffer)
         if bg_img is None:
             if bg_clr is None:
-                img = (
-                    np.ones((max_vertices[0], max_vertices[1], 3), dtype=np.uint8) * 255
-                )
+                img = (np.ones((max_vertices[0], max_vertices[1], 3), dtype=np.uint8) * 255)
             else:
-                img = np.full(
-                    (max_vertices[0], max_vertices[1], 3), bg_clr, dtype=np.uint8
-                )
+                check_if_valid_rgb_tuple(data=bg_clr)
+                img = np.full((max_vertices[0], max_vertices[1], 3), bg_clr, dtype=np.uint8)
         else:
-            img = bg_img
+            img = cv2.cvtColor(bg_img, cv2.COLOR_BGR2RGB)
         colors = create_color_palette(pallete_name="Set1", increments=len(shapes))
         for shape_cnt, shape in enumerate(shapes):
             if isinstance(shape, Polygon):
-                cv2.polylines(
-                    img,
-                    [np.array(shape.exterior.coords).astype(np.int)],
-                    True,
-                    (colors[shape_cnt][::-1]),
-                    thickness=2,
-                )
-                interior_coords = [
-                    np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2))
-                    for interior in shape.interiors
-                ]
+                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int)], True, (colors[shape_cnt][::-1]), thickness=thickness)
+                interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
                 for interior in interior_coords:
-                    cv2.polylines(
-                        img,
-                        [interior],
-                        isClosed=True,
-                        color=(colors[shape_cnt][::-1]),
-                        thickness=2,
-                    )
+                    cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]), thickness=thickness,)
             if isinstance(shape, LineString):
                 if color_palette is None:
-                    cv2.polylines(
-                        img,
-                        [np.array(shape.coords, dtype=np.int32)],
-                        False,
-                        (colors[shape_cnt][::-1]),
-                        thickness=2,
-                    )
+                    cv2.polylines(img, [np.array(shape.coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
                 else:
                     lines = np.array(shape.coords, dtype=np.int32)
-                    palette = create_color_palette(
-                        pallete_name=color_palette, increments=lines.shape[0]
-                    )
+                    palette = create_color_palette(pallete_name=color_palette, increments=lines.shape[0])
                     for i in range(1, lines.shape[0]):
                         p1, p2 = lines[i - 1], lines[i]
                         cv2.line(img, tuple(p1), tuple(p2), palette[i], 2)
 
             if isinstance(shape, MultiPolygon):
                 for polygon_cnt, polygon in enumerate(shape.geoms):
-                    polygon_np = np.array(
-                        (polygon.convex_hull.exterior.coords), dtype=np.int32
-                    )
-                    cv2.polylines(
-                        img,
-                        [polygon_np],
-                        True,
-                        (colors[shape_cnt + polygon_cnt + 1][::-1]),
-                        thickness=2,
-                    )
+                    polygon_np = np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)
+                    cv2.polylines(img, [polygon_np], True, (colors[shape_cnt + polygon_cnt + 1][::-1]), thickness=thickness)
             if isinstance(shape, MultiLineString):
                 for line_cnt, line in enumerate(shape.geoms):
-                    cv2.polylines(
-                        img,
-                        [np.array(shape[line_cnt].coords, dtype=np.int32)],
-                        False,
-                        (colors[shape_cnt][::-1]),
-                        thickness=2,
-                    )
+                    cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
             if isinstance(shape, Point):
                 cv2.circle(
                     img,
@@ -907,7 +849,7 @@ class GeometryMixin(object):
                     ),
                     0,
                     colors[shape_cnt][::-1],
-                    1,
+                    thickness,
                 )
         if size:
             return imutils.resize(img, width=size)
@@ -915,17 +857,14 @@ class GeometryMixin(object):
             return img
 
     @staticmethod
-    def geometry_video(
-        shapes: List[
-            List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint]]
-        ],
-        save_path: Union[str, os.PathLike],
-        size: Optional[Tuple[int]],
-        fps: Optional[int] = 10,
-        verbose: Optional[bool] = False,
-        bg_img: Optional[np.ndarray] = None,
-        bg_clr: Optional[Tuple[int]] = None,
-    ) -> None:
+    def geometry_video(shapes: List[List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint]]],
+                       save_path: Union[str, os.PathLike],
+                       size: Optional[Tuple[int]],
+                       fps: Optional[int] = 10,
+                       verbose: Optional[bool] = False,
+                       bg_img: Optional[np.ndarray] = None,
+                       bg_clr: Optional[Tuple[int]] = None,
+                       thickness: Optional[int] = 2) -> None:
         """
         Helper to create a geometry video from a list of shapes.
 
@@ -1004,7 +943,7 @@ class GeometryMixin(object):
                         [np.array(shape.exterior.coords).astype(np.int)],
                         True,
                         (clrs[shape_cnt][0][::-1]),
-                        thickness=2,
+                        thickness=thickness,
                     )
                     interior_coords = [
                         np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2))
@@ -1016,7 +955,7 @@ class GeometryMixin(object):
                             [interior],
                             isClosed=True,
                             color=(clrs[shape_cnt][0][::-1]),
-                            thickness=2,
+                            thickness=thickness,
                         )
                 elif isinstance(shape, LineString):
                     cv2.polylines(
@@ -1024,7 +963,7 @@ class GeometryMixin(object):
                         [np.array(shape.coords, dtype=np.int32)],
                         False,
                         (clrs[shape_cnt][0][::-1]),
-                        thickness=TextOptions.LINE_THICKNESS.value,
+                        thickness=thickness,
                     )
                 elif isinstance(shape, MultiPolygon):
                     for polygon_cnt, polygon in enumerate(shape.geoms):
@@ -1036,7 +975,7 @@ class GeometryMixin(object):
                             [polygon_np],
                             True,
                             (clrs[shape_cnt + polygon_cnt + 1][::-1]),
-                            thickness=2,
+                            thickness=thickness,
                         )
                 elif isinstance(shape, MultiLineString):
                     for line_cnt, line in enumerate(shape.geoms):
@@ -1045,12 +984,11 @@ class GeometryMixin(object):
                             [np.array(shape[line_cnt].coords, dtype=np.int32)],
                             False,
                             (clrs[shape_cnt][0][::-1]),
-                            thickness=2,
+                            thickness=thickness,
                         )
                 elif isinstance(shape, MultiPoint):
                     for point in shape:
-                        cv2.circle(
-                            frm_img,
+                        cv2.circle(frm_img,
                             (
                                 int(np.array(point.centroid)[0]),
                                 int(np.array(point.centroid)[1]),
@@ -1068,7 +1006,7 @@ class GeometryMixin(object):
                         ),
                         0,
                         clrs[shape_cnt][0][::-1],
-                        10,
+                        thickness,
                     )
 
             video_writer.write(frm_img.astype(np.uint8))
@@ -1113,11 +1051,9 @@ class GeometryMixin(object):
             return rotated_rectangle
 
     @staticmethod
-    def length(
-        shape: Union[LineString, MultiLineString],
-        pixels_per_mm: float,
-        unit: Literal["mm", "cm", "dm", "m"] = "mm",
-    ) -> float:
+    def length(shape: Union[LineString, MultiLineString],
+               pixels_per_mm: float,
+               unit: Literal["mm", "cm", "dm", "m"] = "mm") -> float:
         """
         Calculate the length of a LineString geometry.
 
@@ -1151,21 +1087,22 @@ class GeometryMixin(object):
 
         return L
 
-    def multiframe_bodyparts_to_polygon(
-        self,
-        data: np.ndarray,
-        video_name: Optional[str] = None,
-        animal_name: Optional[str] = None,
-        verbose: Optional[bool] = False,
-        cap_style: Optional[Literal["round", "square", "flat"]] = "round",
-        parallel_offset: Optional[int] = 1,
-        pixels_per_mm: Optional[float] = None,
-        simplify_tolerance: Optional[float] = 2,
-        preserve_topology: bool = True,
-        core_cnt: int = -1,
-    ) -> List[Polygon]:
+    def multiframe_bodyparts_to_polygon(self,
+                                        data: np.ndarray,
+                                        video_name: Optional[str] = None,
+                                        animal_name: Optional[str] = None,
+                                        verbose: Optional[bool] = False,
+                                        cap_style: Optional[Literal["round", "square", "flat"]] = "round",
+                                        parallel_offset: Optional[int] = 1,
+                                        pixels_per_mm: Optional[float] = None,
+                                        simplify_tolerance: Optional[float] = 2,
+                                        preserve_topology: bool = True,
+                                        core_cnt: int = -1) -> List[Polygon]:
         """
         Convert multidimensional NumPy array representing body part coordinates to a list of Polygons.
+
+        .. note::
+           To convert single frame animal body-part coordinates to polygon, use ``simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon``
 
         :param np.ndarray data: NumPy array of body part coordinates. Each subarray represents the coordinates of a body part.
         :param Literal['round', 'square', 'flat'] cap_style: Style of line cap for parallel offset. Options: 'round', 'square', 'flat'.
@@ -1240,12 +1177,10 @@ class GeometryMixin(object):
         return [l for ll in results for l in ll]
 
     @staticmethod
-    def multiframe_bodypart_to_point(
-        data: np.ndarray,
-        core_cnt: Optional[int] = -1,
-        buffer: Optional[int] = None,
-        px_per_mm: Optional[int] = None,
-    ) -> Union[List[Point], List[List[Point]]]:
+    def multiframe_bodypart_to_point(data: np.ndarray,
+                                     core_cnt: Optional[int] = -1,
+                                     buffer: Optional[int] = None,
+                                     px_per_mm: Optional[int] = None) -> Union[List[Point], List[List[Point]]]:
         """
         Process multiple frames of body part data in parallel and convert them to shapely Points.
 
@@ -1396,13 +1331,11 @@ class GeometryMixin(object):
             )
         return triangulate(MultiPoint(data.astype(np.int64)))
 
-    def multiframe_bodyparts_to_line(
-        self,
-        data: np.ndarray,
-        buffer: Optional[int] = None,
-        px_per_mm: Optional[float] = None,
-        core_cnt: Optional[int] = -1,
-    ) -> List[LineString]:
+    def multiframe_bodyparts_to_line(self,
+                                     data: np.ndarray,
+                                     buffer: Optional[int] = None,
+                                     px_per_mm: Optional[float] = None,
+                                     core_cnt: Optional[int] = -1) -> List[LineString]:
         """
         Convert multiframe body-parts data to a list of LineString objects using multiprocessing.
 
@@ -1456,18 +1389,14 @@ class GeometryMixin(object):
         pool.terminate()
         return results
 
-    def multiframe_compute_pct_shape_overlap(
-        self,
-        shape_1: List[Polygon],
-        shape_2: List[Polygon],
-        core_cnt: Optional[int] = -1,
-        video_name: Optional[str] = None,
-        verbose: Optional[bool] = False,
-        animal_names: Optional[Tuple[str]] = None,
-        denominator: Optional[
-            Literal["difference", "shape_1", "shape_2"]
-        ] = "difference",
-    ) -> List[float]:
+    def multiframe_compute_pct_shape_overlap(self,
+                                             shape_1: List[Polygon],
+                                             shape_2: List[Polygon],
+                                             core_cnt: Optional[int] = -1,
+                                             video_name: Optional[str] = None,
+                                             verbose: Optional[bool] = False,
+                                             animal_names: Optional[Tuple[str]] = None,
+                                             denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = "difference") -> List[float]:
         """
         Compute the percentage overlap between corresponding Polygons in two lists.
 
@@ -1585,7 +1514,7 @@ class GeometryMixin(object):
         if len(shape_1) != len(shape_2):
             raise InvalidInputError(
                 msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}",
-                source=GeometryMixin.multifrm_compute_pct_shape_overlap.__name__,
+                source=GeometryMixin.multiframe_compute_shape_overlap.__name__,
             )
         input_dtypes = list(
             set([type(x) for x in shape_1] + [type(x) for x in shape_2])
@@ -1803,9 +1732,7 @@ class GeometryMixin(object):
 
     @staticmethod
     @njit("(int64[:,:], int64[:])")
-    def extend_line_to_bounding_box_edges(
-        line_points: np.ndarray, bounding_box: np.ndarray
-    ) -> np.ndarray:
+    def extend_line_to_bounding_box_edges(line_points: np.ndarray, bounding_box: np.ndarray) -> np.ndarray:
         """
         Jitted extend a line segment defined by two points to fit within a bounding box.
 
@@ -1853,9 +1780,7 @@ class GeometryMixin(object):
         return intersection_points
 
     @staticmethod
-    def line_split_bounding_box(
-        intersections: np.ndarray, bounding_box: np.ndarray
-    ) -> GeometryCollection:
+    def line_split_bounding_box(intersections: np.ndarray, bounding_box: np.ndarray) -> GeometryCollection:
         """
         Split a bounding box into two parts using an extended line.
 
@@ -2302,11 +2227,9 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def get_geometry_brightness_intensity(
-        img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]],
-        geometries: List[Union[np.ndarray, Polygon]],
-        ignore_black: Optional[bool] = True,
-    ) -> np.ndarray:
+    def get_geometry_brightness_intensity(img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]],
+                                          geometries: List[Union[np.ndarray, Polygon]],
+                                          ignore_black: Optional[bool] = True) -> np.ndarray:
         """
         Calculate the average brightness intensity within a geometry region-of-interest of an image.
 
@@ -2851,9 +2774,7 @@ class GeometryMixin(object):
         return [shapes[idx] for idx in ranked]
 
     @staticmethod
-    def contours_to_geometries(
-        contours: List[np.ndarray], force_rectangles: Optional[bool] = True
-    ) -> List[Polygon]:
+    def contours_to_geometries(contours: List[np.ndarray], force_rectangles: Optional[bool] = True) -> List[Polygon]:
         """
         Convert a list of contours to a list of geometries.
 
@@ -3419,9 +3340,7 @@ class GeometryMixin(object):
             return np.cumsum(img_arr, axis=0) / fps
 
     @staticmethod
-    def hausdorff_distance(
-        geometries: List[List[Union[Polygon, LineString]]]
-    ) -> np.ndarray:
+    def hausdorff_distance(geometries: List[List[Union[Polygon, LineString]]]) -> np.ndarray:
         """
         The Hausdorff distance measure of the similarity between time-series sequential geometries. It is defined as the maximum of the distances
         from each point in one set to the nearest point in the other set.
@@ -3788,6 +3707,12 @@ class GeometryMixin(object):
                     new_val = x[i][above_p_idx[0]]
                     results[i][j] = new_val
         return results
+
+
+
+
+
+
 
 
 # data = np.array([[[364, 308], [383, 323], [403, 335], [423, 351]],

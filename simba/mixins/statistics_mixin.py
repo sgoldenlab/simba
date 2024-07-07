@@ -85,9 +85,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64, float64)", cache=True)
-    def rolling_independent_sample_t(
-        data: np.ndarray, time_window: float, fps: float
-    ) -> np.ndarray:
+    def rolling_independent_sample_t(data: np.ndarray, time_window: float, fps: float) -> np.ndarray:
         """
         Jitted compute independent-sample t-statistics for sequentially binned values in a time-series.
         E.g., compute t-test statistics when comparing ``Feature N`` in the current 1s

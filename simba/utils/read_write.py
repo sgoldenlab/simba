@@ -638,14 +638,14 @@ def find_all_videos_in_directory(
     return video_lst
 
 
-def read_frm_of_video(
-    video_path: Union[str, os.PathLike, cv2.VideoCapture],
-    frame_index: int = 0,
-    opacity: Optional[float] = None,
-    size: Optional[Tuple[int, int]] = None,
-    greyscale: Optional[bool] = False,
-    clahe: Optional[bool] = False,
-) -> np.ndarray:
+def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
+                      frame_index: int = 0,
+                      opacity: Optional[float] = None,
+                      size: Optional[Tuple[int, int]] = None,
+                      greyscale: Optional[bool] = False,
+                      bw: Optional[bool] = False,
+                      clahe: Optional[bool] = False) -> np.ndarray:
+
     """
     Reads single image from video file.
 
@@ -713,6 +713,7 @@ def read_frm_of_video(
             if len(img.shape) > 2:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             img = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
+
     else:
         NoDataFoundWarning(
             msg=f"Frame {frame_index} for video {video_path} could not be read."
