@@ -639,19 +639,18 @@ def find_all_videos_in_directory(
 
 
 def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
-                      frame_index: int = 0,
+                      frame_index: Optional[int] = 0,
                       opacity: Optional[float] = None,
                       size: Optional[Tuple[int, int]] = None,
                       greyscale: Optional[bool] = False,
-                      bw: Optional[bool] = False,
                       clahe: Optional[bool] = False) -> np.ndarray:
 
     """
     Reads single image from video file.
 
     :param Union[str, os.PathLike] video_path: Path to video file, or cv2.VideoCapture object.
-    :param int frame_index: The frame of video to return. Default: 1.
-    :param Optional[int] opacity: Value between 0 and 100 or None. If float, returns image with opacity. 100 fully opaque. 0.0 fully transparant.
+    :param int frame_index: The frame of video to return. Default: 1. Note, if frame index -1 is passed, the last frame of the video is read in.
+    :param Optional[int] opacity: Value between 0 and 100 or None. If float value, returns image with opacity. 100 fully opaque. 0.0 fully transparant.
     :param Optional[Tuple[int, int]] size: If tuple, resizes the image to size. Else, returns original image size.
     :param Optional[bool] greyscale: If true, returns the greyscale image. Default False.
     :param Optional[bool] clahe: If true, returns clahe enhanced image. Default False.
@@ -663,21 +662,16 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     >>> cv2.waitKey(5000)
     """
 
-    check_instance(
-        source=read_frm_of_video.__name__,
-        instance=video_path,
-        accepted_types=(str, cv2.VideoCapture),
-    )
+    check_instance(source=read_frm_of_video.__name__, instance=video_path, accepted_types=(str, cv2.VideoCapture))
     if type(video_path) == str:
         check_file_exist_and_readable(file_path=video_path)
         video_meta_data = get_video_meta_data(video_path=video_path)
     else:
         video_meta_data = {"frame_count": int(video_path.get(cv2.CAP_PROP_FRAME_COUNT))}
+    check_int(name='frame_index', value=frame_index, min_value=-1)
+    if frame_index == -1: frame_index = video_meta_data["frame_count"] - 1
     if (frame_index > video_meta_data["frame_count"]) or (frame_index < 0):
-        raise FrameRangeError(
-            msg=f'Frame {frame_index} is out of range: The video {video_path} contains {video_meta_data["frame_count"]} frames.',
-            source=read_frm_of_video.__name__,
-        )
+        raise FrameRangeError(msg=f'Frame {frame_index} is out of range: The video {video_path} contains {video_meta_data["frame_count"]} frames.', source=read_frm_of_video.__name__)
     if type(video_path) == str:
         capture = cv2.VideoCapture(video_path)
     else:

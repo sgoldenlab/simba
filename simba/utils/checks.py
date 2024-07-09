@@ -910,6 +910,7 @@ def check_valid_lst(data: list,
     >>> check_valid_lst(data=[1, 2, 'three'], valid_dtypes=(int, str), min_len=2, max_len=5)
     >>> check_valid_lst(data=[1, 2, 3], valid_dtypes=(int,), min_len=3)
     """
+    check_instance(source=source, instance=data, accepted_types=list)
     if min_len is not None:
         check_int(
             name=f"{source} {min_len}",

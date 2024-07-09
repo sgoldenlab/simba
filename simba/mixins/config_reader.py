@@ -215,9 +215,7 @@ class ConfigReader(object):
         """
 
         if not os.path.isfile(self.roi_coordinates_path):
-            raise NoROIDataError(
-                msg="SIMBA ERROR: No ROI definitions were found in your SimBA project. Please draw some ROIs before analyzing your ROI data",
-                source=self.__class__.__name__,
+            raise NoROIDataError(msg="SIMBA ERROR: No ROI definitions were found in your SimBA project. Please draw some ROIs before analyzing your ROI data", source=self.__class__.__name__,
             )
         else:
             self.rectangles_df = pd.read_hdf(

@@ -476,13 +476,13 @@ class Statistics(FeatureExtractionMixin):
         """
         check_valid_array(
             data=sample_1,
-            source=Statistics.jensen_shannon_divergence.__name__,
+            source=Statistics.kullback_leibler_divergence.__name__,
             accepted_ndims=(1,),
             accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_valid_array(
             data=sample_2,
-            source=Statistics.jensen_shannon_divergence.__name__,
+            source=Statistics.kullback_leibler_divergence.__name__,
             accepted_ndims=(1,),
             accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )

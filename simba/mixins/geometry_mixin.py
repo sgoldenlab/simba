@@ -32,7 +32,7 @@ from simba.utils.checks import (check_float,
                                 check_that_column_exist, check_valid_array,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette, create_color_palettes
-from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions
+from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions, Options
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
                                     find_max_vertices_coordinates, read_df,
@@ -323,10 +323,7 @@ class GeometryMixin(object):
         )
         check_int(name="BUFFER SHAPE size_mm", value=size_mm)
         check_float(name="BUFFER SHAPE pixels_per_mm", value=pixels_per_mm, min_value=1)
-        return shape.buffer(
-            distance=int(size_mm / pixels_per_mm),
-            cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style],
-        )
+        return shape.buffer(distance=int(size_mm / pixels_per_mm), cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style])
 
     @staticmethod
     def compute_pct_shape_overlap(shapes: np.ndarray, denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = "difference") -> int:
@@ -503,11 +500,7 @@ class GeometryMixin(object):
             instance=shape,
             accepted_types=(MultiPolygon, Polygon),
         )
-        check_float(
-            name=f"{GeometryMixin().area.__name__} shape",
-            value=pixels_per_mm,
-            min_value=0.01,
-        )
+        check_float(name=f"{GeometryMixin().area.__name__} shape",value=pixels_per_mm,min_value=0.01,)
 
         return shape.area / pixels_per_mm
 
@@ -755,9 +748,7 @@ class GeometryMixin(object):
         return unary_union(shapes)
 
     @staticmethod
-    def symmetric_difference(
-        shapes: List[Union[LineString, Polygon, MultiPolygon]]
-    ) -> List[Union[Polygon, MultiPolygon]]:
+    def symmetric_difference(shapes: List[Union[LineString, Polygon, MultiPolygon]]) -> List[Union[Polygon, MultiPolygon]]:
         """
         Computes a new geometry consisting of the parts that are exclusive to each input geometry.
 
@@ -815,8 +806,10 @@ class GeometryMixin(object):
                 check_if_valid_rgb_tuple(data=bg_clr)
                 img = np.full((max_vertices[0], max_vertices[1], 3), bg_clr, dtype=np.uint8)
         else:
-            img = cv2.cvtColor(bg_img, cv2.COLOR_BGR2RGB)
-        colors = create_color_palette(pallete_name="Set1", increments=len(shapes))
+            img = bg_img
+
+        check_str(name='color_palette', value=color_palette, options=Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value)
+        colors = create_color_palette(pallete_name=color_palette, increments=len(shapes)+1)
         for shape_cnt, shape in enumerate(shapes):
             if isinstance(shape, Polygon):
                 cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int)], True, (colors[shape_cnt][::-1]), thickness=thickness)
@@ -831,12 +824,13 @@ class GeometryMixin(object):
                     palette = create_color_palette(pallete_name=color_palette, increments=lines.shape[0])
                     for i in range(1, lines.shape[0]):
                         p1, p2 = lines[i - 1], lines[i]
-                        cv2.line(img, tuple(p1), tuple(p2), palette[i], 2)
+                        cv2.line(img, tuple(p1), tuple(p2), palette[i], thickness)
 
             if isinstance(shape, MultiPolygon):
+                multi_polygon_clrs = create_color_palette(pallete_name=color_palette, increments=len(shape.geoms)+1)
                 for polygon_cnt, polygon in enumerate(shape.geoms):
                     polygon_np = np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)
-                    cv2.polylines(img, [polygon_np], True, (colors[shape_cnt + polygon_cnt + 1][::-1]), thickness=thickness)
+                    cv2.polylines(img, [polygon_np], True, (multi_polygon_clrs[polygon_cnt][::-1]), thickness=thickness)
             if isinstance(shape, MultiLineString):
                 for line_cnt, line in enumerate(shape.geoms):
                     cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
@@ -903,27 +897,14 @@ class GeometryMixin(object):
         check_if_dir_exists(in_dir=os.path.dirname(save_path))
         check_int(name="fps", value=fps, min_value=1)
         if bg_img is not None:
-            check_if_valid_img(
-                data=bg_img, source=GeometryMixin.geometry_video.__name__
-            )
+            check_if_valid_img(data=bg_img, source=GeometryMixin.geometry_video.__name__)
         if bg_clr is not None:
             check_if_valid_rgb_tuple(data=bg_clr)
-        check_instance(
-            source=GeometryMixin.geometry_video.__name__,
-            instance=size,
-            accepted_types=(tuple,),
-        )
+        check_instance(source=GeometryMixin.geometry_video.__name__, instance=size, accepted_types=(tuple))
         if len(size) != 2:
-            raise InvalidInputError(
-                msg=f"Size has to be 2 values, got {len(size)}",
-                source=GeometryMixin.geometry_video.__name__,
-            )
+            raise InvalidInputError(msg=f"Size has to be 2 values, got {len(size)}", source=GeometryMixin.geometry_video.__name__)
         for i in size:
-            check_instance(
-                source=GeometryMixin.geometry_video.__name__,
-                instance=i,
-                accepted_types=(int,),
-            )
+            check_instance(source=GeometryMixin.geometry_video.__name__, instance=i, accepted_types=(int,))
         if bg_img is None:
             if bg_clr is None:
                 img = np.ones((size[0], size[1], 3), dtype=np.uint8) * 255
@@ -1072,12 +1053,8 @@ class GeometryMixin(object):
         """
 
         check_float(name="line_length pixels_per_mm", value=pixels_per_mm, min_value=0)
-        check_instance(
-            source=GeometryMixin.length.__name__,
-            instance=shape,
-            accepted_types=LineString,
-        )
-        L = shape.length
+        check_instance(source=GeometryMixin.length.__name__, instance=shape, accepted_types=LineString)
+        L = shape.length / pixels_per_mm
         if unit == "cm":
             L = L / 10
         elif unit == "dm":
@@ -1549,14 +1526,12 @@ class GeometryMixin(object):
         pool.terminate()
         return results
 
-    def multiframe_shape_distance(
-        self,
-        shape_1: List[Union[LineString, Polygon]],
-        shape_2: List[Union[LineString, Polygon]],
-        pixels_per_mm: float,
-        unit: Literal["mm", "cm", "dm", "m"] = "mm",
-        core_cnt=-1,
-    ) -> List[float]:
+    def multiframe_shape_distance(self,
+                                  shape_1: List[Union[LineString, Polygon]],
+                                  shape_2: List[Union[LineString, Polygon]],
+                                  pixels_per_mm: float,
+                                  unit: Literal["mm", "cm", "dm", "m"] = "mm",
+                                  core_cnt=-1) -> List[float]:
         """
         Compute shape distances between corresponding shapes in two lists of LineString or Polygon geometries for multiple frames.
 
@@ -1580,10 +1555,7 @@ class GeometryMixin(object):
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         if len(shape_1) != len(shape_2):
-            raise InvalidInputError(
-                msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}",
-                source=GeometryMixin.multiframe_shape_distance.__name__,
-            )
+            raise InvalidInputError(msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}", source=GeometryMixin.multiframe_shape_distance.__name__)
         check_float(name="pixels_per_mm", value=pixels_per_mm, min_value=0.0)
         data = [list(x) for x in zip(shape_1, shape_2)]
         results = []
@@ -1662,7 +1634,6 @@ class GeometryMixin(object):
         """
         Determine the relative position (left vs right) of a static point with respect to multiple lines.
 
-
         .. image:: _static/img/static_point_lineside.png
            :width: 400
            :align: center
@@ -1684,9 +1655,7 @@ class GeometryMixin(object):
         results = np.full((lines.shape[0]), np.nan)
         threshhold = 1e-9
         for i in prange(lines.shape[0]):
-            v = (lines[i][1][0] - lines[i][0][0]) * (point[1] - lines[i][0][1]) - (
-                lines[i][1][1] - lines[i][0][1]
-            ) * (point[0] - lines[i][0][0])
+            v = (lines[i][1][0] - lines[i][0][0]) * (point[1] - lines[i][0][1]) - (lines[i][1][1] - lines[i][0][1]) * (point[0] - lines[i][0][0])
             if v >= threshhold:
                 results[i] = 2
             elif v <= -threshhold:
@@ -2815,6 +2784,7 @@ class GeometryMixin(object):
     @staticmethod
     def adjust_geometry_locations(geometries: List[Polygon],
                                   shift: Tuple[int, int],
+                                  pixels_per_mm: Optional[float] = None,
                                   minimum: Optional[Tuple[int, int]] = (0, 0),
                                   maximum: Optional[Tuple[int, int]] = (np.inf, np.inf)) -> List[Polygon]:
         """
@@ -2825,7 +2795,8 @@ class GeometryMixin(object):
            :align: center
 
         :param  List[Polygon] geometries: List of input polygons to be adjusted.
-        :param Tuple[int, int] shift: Tuple specifying the shift distances in the x and y-axis.
+        :param Tuple[int, int] shift: Tuple specifying the shift distances in the x and y-axis. Interpreted as pixels if ``pixels_per_mm`` is None. Else interpreted as millimeter.
+        :param float pixels_per_mm: Pixel per millimeter conversion factor.
         :param Optional[Tuple[int, int]] minimum: Minimim allowed coordinates of Polygon points on x and y axes. Default: (0,0).
         :param Optional[Tuple[int, int]] maximum: Maximum allowed coordinates of Polygon points on x and y axes. Default: (np.inf, np.inf).
         :return List[Polygon]: List of adjusted polygons.
@@ -2838,6 +2809,9 @@ class GeometryMixin(object):
         check_valid_tuple(x=shift, source=f"{GeometryMixin.adjust_geometry_locations.__name__} minimum", accepted_lengths=(2,), valid_dtypes=(int,))
         check_valid_tuple(x=shift, source=f"{GeometryMixin.adjust_geometry_locations.__name__} maximum", accepted_lengths=(2,), valid_dtypes=(int,))
         check_valid_lst(data=geometries, source=f"{GeometryMixin.adjust_geometry_locations.__name__} geometries", valid_dtypes=(Polygon,), min_len=1)
+        if pixels_per_mm is not None:
+            check_float(name='pixels_per_mm', value=pixels_per_mm, min_value=10e-6)
+            shift = (max(0, int(shift[0] / pixels_per_mm)), (max(0, int(shift[1] / pixels_per_mm))))
         results = []
         for shape_cnt, shape in enumerate(geometries):
             shape_results = []
@@ -3438,15 +3412,14 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def locate_line_point(
-        path: Union[LineString, np.ndarray],
-        geometry: Union[LineString, Polygon, Point],
-        px_per_mm: Optional[float] = 1,
-        fps: Optional[float] = 1,
-        core_cnt: Optional[int] = -1,
-        distance_min: Optional[bool] = True,
-        time_prior: Optional[bool] = True,
-    ) -> Dict[str, float]:
+    def locate_line_point(path: Union[LineString, np.ndarray],
+                          geometry: Union[LineString, Polygon, Point],
+                          px_per_mm: Optional[float] = 1,
+                          fps: Optional[float] = 1,
+                          core_cnt: Optional[int] = -1,
+                          distance_min: Optional[bool] = True,
+                          time_prior: Optional[bool] = True) -> Dict[str, float]:
+
         """
         Compute the time and distance travelled along a path to reach the most proximal point in reference to a second geometry.
 
@@ -3529,12 +3502,14 @@ class GeometryMixin(object):
             )
             time_travelled = (distances - distance_idx) / fps
         dist_val = distances[distance_idx] / px_per_mm
+        raw_distances = np.array(distances) / px_per_mm
 
         return {
             "distance_value": dist_val,
             "distance_travelled": dist_travelled,
             "time_travelled": time_travelled,
             "distance_index": distance_idx,
+            "raw_distances": raw_distances
         }
 
     @staticmethod
@@ -3581,12 +3556,11 @@ class GeometryMixin(object):
         return ca[n_p - 1, n_q - 1]
 
     @staticmethod
-    def simba_roi_to_geometries(
-        rectangles_df: pd.DataFrame,
-        circles_df: pd.DataFrame,
-        polygons_df: pd.DataFrame,
-        color: Optional[bool] = False,
-    ) -> dict:
+    def simba_roi_to_geometries(rectangles_df: Optional[pd.DataFrame] = None,
+                                circles_df: Optional[pd.DataFrame] = None,
+                                polygons_df: Optional[pd.DataFrame] = None,
+                                color: Optional[bool] = False) -> dict:
+
         """
         Convert SimBA dataframes holding ROI geometries to nested dictionary holding Shapley polygons.
 
@@ -3597,25 +3571,11 @@ class GeometryMixin(object):
         >>> #GeometryMixin.simba_roi_to_geometries(rectangles_df=config.rectangles_df, circles_df=config.circles_df, polygons_df=config.polygon_df)
         """
 
-        check_instance(
-            source=GeometryMixin.simba_roi_to_geometries.__name__,
-            instance=rectangles_df,
-            accepted_types=(pd.DataFrame,),
-        )
-        check_instance(
-            source=GeometryMixin.simba_roi_to_geometries.__name__,
-            instance=circles_df,
-            accepted_types=(pd.DataFrame,),
-        )
-        check_instance(
-            source=GeometryMixin.simba_roi_to_geometries.__name__,
-            instance=polygons_df,
-            accepted_types=(pd.DataFrame,),
-        )
+        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=rectangles_df, accepted_types=(pd.DataFrame,))
+        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=circles_df, accepted_types=(pd.DataFrame,))
+        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=polygons_df, accepted_types=(pd.DataFrame,))
         for i in [rectangles_df, circles_df, polygons_df]:
-            check_that_column_exist(
-                df=i, column_name=["Video", "Name", "Tags", "Color BGR"], file_name=""
-            )
+            check_that_column_exist(df=i, column_name=["Video", "Name", "Tags", "Color BGR"], file_name="")
         results_roi, results_clr = {}, {}
         for video_name in rectangles_df["Video"].unique():
             if video_name not in results_roi.keys():
@@ -3659,21 +3619,11 @@ class GeometryMixin(object):
             if video_name not in results_roi.keys():
                 results_roi[video_name] = {}
                 results_clr[video_name] = {}
-            video_shapes = circles_df[["Tags", "Name", "Color BGR"]][
-                circles_df["Video"] == video_name
-            ]
+            video_shapes = circles_df[["Tags", "Name", "Color BGR", 'radius']][circles_df["Video"] == video_name]
             for shape_name in video_shapes["Name"].unique():
-                shape_data = video_shapes[
-                    video_shapes["Name"] == shape_name
-                ].reset_index(drop=True)
-                tags, name, radius = (
-                    list(shape_data["Tags"].values[0].values()),
-                    shape_data["Name"].values[0],
-                    shape_data["radius"].values[0],
-                )
-                results_roi[video_name][name] = Point(tags["Center tag"]).buffer(
-                    distance=radius
-                )
+                shape_data = video_shapes[video_shapes["Name"] == shape_name].reset_index(drop=True)
+                tags, name, radius = shape_data["Tags"].values[0], shape_data["Name"].values[0], shape_data["radius"].values[0]
+                results_roi[video_name][name] = Point(tags["Center tag"]).buffer(distance=radius)
                 results_clr[video_name][name] = shape_data["Color BGR"].values[0]
         if not color:
             return results_roi, None
