@@ -32,7 +32,8 @@ from simba.utils.checks import (check_float,
                                 check_that_column_exist, check_valid_array,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette, create_color_palettes
-from simba.utils.enums import Defaults, Formats, GeometryEnum, TextOptions, Options
+from simba.utils.enums import (Defaults, Formats, GeometryEnum, Options,
+                               TextOptions)
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
                                     find_max_vertices_coordinates, read_df,
