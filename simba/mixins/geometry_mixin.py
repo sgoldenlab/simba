@@ -217,8 +217,8 @@ class GeometryMixin(object):
 
     @staticmethod
     def bodyparts_to_circle(data: np.ndarray,
-                            parallel_offset: float,
-                            pixels_per_mm: Optional[int] = 1) -> Polygon:
+                            parallel_offset: Optional[float] = 1,
+                            pixels_per_mm: Optional[int] = 1) -> Union[Polygon, List[Polygon]]:
         """
         Create a circle geometry from a single body-part (x,y) coordinate.
 
@@ -243,22 +243,17 @@ class GeometryMixin(object):
         >>> polygon = GeometryMixin().bodyparts_to_circle(data=data, parallel_offset=10, pixels_per_mm=4)
         """
 
-        if data.shape != (2,):
-            raise InvalidInputError(
-                msg=f"Cannot create circle data is not a (2,) array: " f"{data.shape}",
-                source=GeometryMixin.bodyparts_to_circle.__name__,
-            )
-        check_float(
-            name=f"{GeometryMixin.bodyparts_to_circle.__name__} parallel_offset",
-            value=pixels_per_mm,
-            min_value=1,
-        )
-        check_float(
-            name=f"{GeometryMixin.bodyparts_to_circle.__name__} pixels_per_mm",
-            value=pixels_per_mm,
-            min_value=1,
-        )
-        return Point(data).buffer(parallel_offset / pixels_per_mm)
+        check_valid_array(data=data, accepted_ndims=([1, 2, ]), accepted_dtypes=Formats.NUMERIC_DTYPES.value, max_axis_1=2)
+        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} parallel_offset", value=pixels_per_mm, min_value=1)
+        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} pixels_per_mm", value=pixels_per_mm, min_value=1)
+
+        if data.shape == (2,):
+            return Point(data).buffer(parallel_offset / pixels_per_mm)
+        else:
+            results = []
+            for i in range(data.shape[0]):
+                results.append(Point(data[i]).buffer(parallel_offset / pixels_per_mm))
+            return results
 
     @staticmethod
     def bodyparts_to_multistring_skeleton(data: np.ndarray) -> MultiLineString:
@@ -596,8 +591,11 @@ class GeometryMixin(object):
             return LineString(data.tolist()).buffer(distance=area, cap_style=3)
 
     @staticmethod
-    def get_center(shape: Union[LineString, Polygon, MultiPolygon]) -> np.ndarray:
+    def get_center(shape: Union[LineString, Polygon, MultiPolygon, List[Union[LineString, Polygon, MultiPolygon]]]) -> np.ndarray:
         """
+        Get the center coordinate of a shape or a list of shapes.
+
+
         .. image:: _static/img/get_center.png
            :width: 500
            :align: center
@@ -608,12 +606,20 @@ class GeometryMixin(object):
         >>> [33.96969697, 62.32323232]
 
         """
-        check_instance(
-            source=GeometryMixin.get_center.__name__,
-            instance=shape,
-            accepted_types=(MultiPolygon, LineString, Polygon),
-        )
-        return np.array(shape.centroid)
+
+        check_instance(source=GeometryMixin.get_center.__name__, instance=shape, accepted_types=(MultiPolygon, LineString, Polygon, list))
+        if not isinstance(shape, list):
+            return np.array(shape.centroid)
+        else:
+            results = np.full((len(shape), 2), np.nan)
+            check_valid_lst(data=shape, source=GeometryMixin.get_center.__name__, valid_dtypes=(MultiPolygon, LineString, Polygon,), min_len=1)
+            for i in range(len(shape)):
+                results[i] = np.array(shape[i].centroid)
+            return results
+
+
+
+        return
 
     @staticmethod
     def is_touching(shapes=List[Union[LineString, Polygon]]) -> bool:
@@ -662,12 +668,12 @@ class GeometryMixin(object):
         """
         for i in shapes:
             check_instance(
-                source=GeometryMixin.get_center.__name__,
+                source=GeometryMixin.is_containing.__name__,
                 instance=i,
                 accepted_types=(LineString, Polygon),
             )
         check_iterable_length(
-            source=GeometryMixin.get_center.__name__,
+            source=GeometryMixin.is_containing.__name__,
             val=len(shapes),
             exact_accepted_length=2,
         )
@@ -852,8 +858,8 @@ class GeometryMixin(object):
 
     @staticmethod
     def geometry_video(shapes: List[List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint]]],
-                       save_path: Union[str, os.PathLike],
                        size: Optional[Tuple[int]],
+                       save_path: Optional[Union[str, os.PathLike]] = None,
                        fps: Optional[int] = 10,
                        verbose: Optional[bool] = False,
                        bg_img: Optional[np.ndarray] = None,
@@ -882,19 +888,10 @@ class GeometryMixin(object):
         timer = SimbaTimer(start=True)
         for i in shapes:
             for j in i:
-                check_instance(
-                    source=GeometryMixin.geometry_video.__name__,
-                    instance=j,
-                    accepted_types=(
-                        LineString,
-                        Polygon,
-                        MultiPolygon,
-                        MultiPoint,
-                        MultiLineString,
-                        Point,
-                    ),
-                )
-        check_if_dir_exists(in_dir=os.path.dirname(save_path))
+                check_instance(source=GeometryMixin.geometry_video.__name__, instance=j, accepted_types=( LineString, Polygon, MultiPolygon, MultiPoint, MultiLineString, Point))
+
+        if save_path is not None:
+            check_if_dir_exists(in_dir=os.path.dirname(save_path))
         check_int(name="fps", value=fps, min_value=1)
         if bg_img is not None:
             check_if_valid_img(data=bg_img, source=GeometryMixin.geometry_video.__name__)
@@ -919,87 +916,34 @@ class GeometryMixin(object):
             frm_img = deepcopy(img)
             for shape_cnt, shape in enumerate(frm_shapes):
                 if isinstance(shape, Polygon):
-                    cv2.polylines(
-                        frm_img,
-                        [np.array(shape.exterior.coords).astype(np.int)],
-                        True,
-                        (clrs[shape_cnt][0][::-1]),
-                        thickness=thickness,
-                    )
-                    interior_coords = [
-                        np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2))
-                        for interior in shape.interiors
-                    ]
+                    cv2.polylines(frm_img, [np.array(shape.exterior.coords).astype(np.int)], True, (clrs[shape_cnt][0][::-1]), thickness=thickness)
+                    interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
                     for interior in interior_coords:
-                        cv2.polylines(
-                            frm_img,
-                            [interior],
-                            isClosed=True,
-                            color=(clrs[shape_cnt][0][::-1]),
-                            thickness=thickness,
-                        )
+                        cv2.polylines(frm_img, [interior], isClosed=True, color=(clrs[shape_cnt][0][::-1]), thickness=thickness,)
                 elif isinstance(shape, LineString):
-                    cv2.polylines(
-                        frm_img,
-                        [np.array(shape.coords, dtype=np.int32)],
-                        False,
-                        (clrs[shape_cnt][0][::-1]),
-                        thickness=thickness,
-                    )
+                    cv2.polylines(frm_img, [np.array(shape.coords, dtype=np.int32)], False, (clrs[shape_cnt][0][::-1]), thickness=thickness)
                 elif isinstance(shape, MultiPolygon):
                     for polygon_cnt, polygon in enumerate(shape.geoms):
-                        polygon_np = np.array(
-                            (polygon.convex_hull.exterior.coords), dtype=np.int32
-                        )
-                        cv2.polylines(
-                            frm_img,
-                            [polygon_np],
-                            True,
-                            (clrs[shape_cnt + polygon_cnt + 1][::-1]),
-                            thickness=thickness,
-                        )
+                        polygon_np = np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)
+                        cv2.polylines(frm_img, [polygon_np], True, (clrs[shape_cnt + polygon_cnt + 1][::-1]), thickness=thickness)
                 elif isinstance(shape, MultiLineString):
                     for line_cnt, line in enumerate(shape.geoms):
-                        cv2.polylines(
-                            frm_img,
-                            [np.array(shape[line_cnt].coords, dtype=np.int32)],
-                            False,
-                            (clrs[shape_cnt][0][::-1]),
-                            thickness=thickness,
-                        )
+                        cv2.polylines(frm_img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (clrs[shape_cnt][0][::-1]), thickness=thickness)
                 elif isinstance(shape, MultiPoint):
                     for point in shape:
-                        cv2.circle(frm_img,
-                            (
-                                int(np.array(point.centroid)[0]),
-                                int(np.array(point.centroid)[1]),
-                            ),
-                            0,
-                            clrs[shape_cnt][0][::-1],
-                            10,
-                        )
+                        cv2.circle(frm_img, (int(np.array(point.centroid)[0]), int(np.array(point.centroid)[1])), 0, clrs[shape_cnt][0][::-1], thickness)
                 elif isinstance(shape, Point):
-                    cv2.circle(
-                        frm_img,
-                        (
-                            int(np.array(shape.centroid)[0]),
-                            int(np.array(shape.centroid)[1]),
-                        ),
-                        0,
-                        clrs[shape_cnt][0][::-1],
-                        thickness,
-                    )
-
+                    cv2.circle(frm_img, (int(np.array(shape.centroid)[0]), int(np.array(shape.centroid)[1])), 0, clrs[shape_cnt][0][::-1], thickness)
             video_writer.write(frm_img.astype(np.uint8))
             if verbose:
                 print(f"Geometry frame complete ({frm_cnt+1} / {len(shapes)})")
         video_writer.release()
         timer.stop_timer()
-        stdout_success(
-            msg=f"Video {save_path} complete!",
-            elapsed_time=timer.elapsed_time_str,
-            source=GeometryMixin.geometry_video.__name__,
-        )
+        if save_path is not None:
+            msg = f"Video complete and saved at {save_path}!"
+        else:
+            msg = f"Video complete!"
+        stdout_success(msg=msg, elapsed_time=timer.elapsed_time_str, source=GeometryMixin.geometry_video.__name__)
 
     @staticmethod
     def minimum_rotated_rectangle(shape=Polygon) -> Polygon:

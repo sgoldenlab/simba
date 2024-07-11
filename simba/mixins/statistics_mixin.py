@@ -954,9 +954,7 @@ class Statistics(FeatureExtractionMixin):
         )
         sample_1_hist[sample_1_hist == 0] = fill_value
         sample_2_hist[sample_2_hist == 0] = fill_value
-        sample_1_hist, sample_2_hist = sample_1_hist / np.sum(
-            sample_1_hist
-        ), sample_2_hist / np.sum(sample_2_hist)
+        sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
         samples_diff = sample_2_hist - sample_1_hist
         log = np.log(sample_2_hist / sample_1_hist)
         return np.sum(samples_diff * log)

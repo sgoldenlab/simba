@@ -362,16 +362,8 @@ class ImageMixin(object):
         """
 
         check_if_valid_img(source=f"{ImageMixin.find_contours.__name__} img", data=img)
-        check_str(
-            name=f"{ImageMixin.find_contours.__name__} mode",
-            value=mode,
-            options=list(GeometryEnum.CONTOURS_MODE_MAP.value.keys()),
-        )
-        check_str(
-            name=f"{ImageMixin.find_contours.__name__} method",
-            value=method,
-            options=list(GeometryEnum.CONTOURS_RETRIEVAL_MAP.value.keys()),
-        )
+        check_str(name=f"{ImageMixin.find_contours.__name__} mode", value=mode, options=list(GeometryEnum.CONTOURS_MODE_MAP.value.keys()))
+        check_str(name=f"{ImageMixin.find_contours.__name__} method", value=method, options=list(GeometryEnum.CONTOURS_RETRIEVAL_MAP.value.keys()))
         mode = GeometryEnum.CONTOURS_MODE_MAP.value[mode]
         method = GeometryEnum.CONTOURS_RETRIEVAL_MAP.value[method]
         if len(img.shape) >= 3:
@@ -646,9 +638,7 @@ class ImageMixin(object):
 
     @staticmethod
     @jit(nopython=True, parallel=True)
-    def segment_img_stack_horizontal(
-        imgs: np.ndarray, pct: int, lower: bool, both: bool
-    ) -> np.ndarray:
+    def segment_img_stack_horizontal(imgs: np.ndarray, pct: int, lower: bool, both: bool) -> np.ndarray:
         """
         Segment a horizontal part of all images in stack.
 
@@ -1095,9 +1085,7 @@ class ImageMixin(object):
         return results
 
     @staticmethod
-    def _slice_shapes_in_imgs_array_helper(
-        data: Tuple[np.ndarray, np.ndarray]
-    ) -> List[np.ndarray]:
+    def _slice_shapes_in_imgs_array_helper(data: Tuple[np.ndarray, np.ndarray]) -> List[np.ndarray]:
         """
         Private multiprocess helper called from ``simba.mixins.image_mixin.ImageMixins.slice_shapes_in_imgs()`` to slice shapes from
         an array of images.
@@ -1112,9 +1100,7 @@ class ImageMixin(object):
             x, y, w, h = cv2.boundingRect(shape)
             roi_img = img[y : y + h, x : x + w].copy()
             mask = np.zeros_like(roi_img, np.uint8)
-            cv2.drawContours(
-                mask, [shape - (x, y)], -1, (255, 255, 255), -1, cv2.LINE_AA
-            )
+            cv2.drawContours(mask, [shape - (x, y)], -1, (255, 255, 255), -1, cv2.LINE_AA)
             results.append(cv2.bitwise_and(roi_img, mask))
         return results
 
@@ -1145,7 +1131,10 @@ class ImageMixin(object):
         return padded_images
 
     @staticmethod
-    def img_stack_to_video(imgs: Dict[int, np.ndarray], save_path: Union[str, os.PathLike], fps: int, verbose: Optional[bool] = True):
+    def img_stack_to_video(imgs: Dict[int, np.ndarray],
+                           fps: int,
+                           save_path: Union[str, os.PathLike],
+                           verbose: Optional[bool] = True):
         """
         Convert a dictionary of images into a video file.
 
@@ -1177,7 +1166,10 @@ class ImageMixin(object):
         stdout_success(msg=f"Video {save_path} complete", elapsed_time=timer.elapsed_time_str)
 
     @staticmethod
-    def _slice_shapes_in_video_file_helper(data: np.ndarray, video_path: Union[str, os.PathLike], verbose: bool):
+    def _slice_shapes_in_video_file_helper(data: np.ndarray,
+                                           video_path: Union[str, os.PathLike],
+                                           verbose: bool):
+
         cap = cv2.VideoCapture(video_path)
         start_frm, current_frm, end_frm = data[0][0], data[0][0], data[-1][0]
         cap.set(1, start_frm)
@@ -1198,13 +1190,11 @@ class ImageMixin(object):
             idx_cnt += 1
         return results
 
-    def slice_shapes_in_imgs(
-        self,
-        imgs: Union[np.ndarray, os.PathLike],
-        shapes: Union[np.ndarray, List[Polygon]],
-        core_cnt: Optional[int] = -1,
-        verbose: Optional[bool] = False,
-    ) -> Dict[int, np.ndarray]:
+    def slice_shapes_in_imgs(self,
+                             imgs: Union[np.ndarray, os.PathLike],
+                             shapes: Union[np.ndarray, List[Polygon]],
+                             core_cnt: Optional[int] = -1,
+                             verbose: Optional[bool] = False) -> Dict[int, np.ndarray]:
         """
         Slice regions from a stack of images or a video file, where the regions are based on defined shapes. Uses multiprocessing.
 
@@ -1224,7 +1214,7 @@ class ImageMixin(object):
            :align: center
 
         :example I:
-        >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1.mp4', start_frm=0, end_frm=10)
+        >>> imgs = ImageMixin().read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1.mp4', start_frm=0, end_frm=10)
         >>> imgs = np.stack(list(imgs.values()))
         >>> imgs_gray = ImageMixin().img_stack_to_greyscale(imgs=imgs)
         >>> data = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/csv/outlier_corrected_movement_location/Example_1.csv', nrows=11).fillna(-1)
@@ -1246,92 +1236,47 @@ class ImageMixin(object):
 
         """
         timer = SimbaTimer(start=True)
-        check_int(
-            name=f"{ImageMixin().slice_shapes_in_imgs.__name__} core count",
-            value=core_cnt,
-            min_value=-1,
-        )
+        check_int(name=f"{ImageMixin().slice_shapes_in_imgs.__name__} core count",value=core_cnt,min_value=-1)
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
-        check_instance(
-            source=ImageMixin().slice_shapes_in_imgs.__name__,
-            instance=imgs,
-            accepted_types=(np.ndarray, str),
-        )
-        check_instance(
-            source=ImageMixin().slice_shapes_in_imgs.__name__,
-            instance=shapes,
-            accepted_types=(np.ndarray, list),
-        )
+        check_instance(source=ImageMixin().slice_shapes_in_imgs.__name__, instance=imgs, accepted_types=(np.ndarray, str))
+        check_instance( source=ImageMixin().slice_shapes_in_imgs.__name__, instance=shapes, accepted_types=(np.ndarray, list))
         if isinstance(shapes, np.ndarray):
-            check_valid_array(
-                data=shapes,
-                source=ImageMixin().slice_shapes_in_imgs.__name__,
-                accepted_ndims=(2,),
-                accepted_dtypes=[Polygon],
-            )
+            check_valid_array(data=shapes, source=ImageMixin().slice_shapes_in_imgs.__name__, accepted_ndims=(2,), accepted_dtypes=[Polygon])
         else:
-            check_valid_lst(
-                data=shapes,
-                source=ImageMixin().slice_shapes_in_imgs.__name__,
-                valid_dtypes=[Polygon],
-            )
+            check_valid_lst(data=shapes, source=ImageMixin().slice_shapes_in_imgs.__name__, valid_dtypes=[Polygon])
             shapes = np.array(shapes)
         if isinstance(imgs, np.ndarray):
-            check_valid_array(
-                data=imgs,
-                source=ImageMixin().slice_shapes_in_imgs.__name__,
-                accepted_ndims=(4, 3),
-            )
+            check_valid_array(data=imgs, source=ImageMixin().slice_shapes_in_imgs.__name__, accepted_ndims=(4, 3))
             if shapes.shape[0] != imgs.shape[0]:
-                raise ArrayError(
-                    msg=f"The image array ({imgs.shape[0]}) and shapes array ({shapes.shape[0]}) have unequal length.",
-                    source=ImageMixin().slice_shapes_in_imgs.__name__,
-                )
+                raise ArrayError(msg=f"The image array ({imgs.shape[0]}) and shapes array ({shapes.shape[0]}) have unequal length.", source=ImageMixin().slice_shapes_in_imgs.__name__)
         else:
             check_file_exist_and_readable(file_path=imgs)
             video_meta_data = get_video_meta_data(video_path=imgs)
             if shapes.shape[0] != video_meta_data["frame_count"]:
-                raise ArrayError(
-                    msg=f'The image array ({video_meta_data["frame_count"]}) and shapes array ({shapes.shape[0]}) have unequal length.',
-                    source=ImageMixin().slice_shapes_in_imgs.__name__,
-                )
-        results = []
+                raise ArrayError( msg=f'The image array ({video_meta_data["frame_count"]}) and shapes array ({shapes.shape[0]}) have unequal length.', source=ImageMixin().slice_shapes_in_imgs.__name__)
+
         if isinstance(imgs, np.ndarray):
-            with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-            ) as pool:
+            result_lst = []
+            with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
                 for cnt, result in enumerate(
-                    pool.imap(
-                        self._slice_shapes_in_imgs_array_helper,
-                        zip(imgs, shapes),
-                        chunksize=1,
-                    )
-                ):
-                    results.append(result)
+                    pool.imap(self._slice_shapes_in_imgs_array_helper, zip(imgs, shapes), chunksize=1)):
+                    result_lst.append(result)
+            results = {}
+            for cnt, i in enumerate(result_lst):
+                results[cnt] = i[0]
         else:
-            shapes = np.array_split(
-                np.column_stack((np.arange(len(shapes)), shapes)), core_cnt
-            )
-            with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-            ) as pool:
-                constants = functools.partial(
-                    self._slice_shapes_in_video_file_helper,
-                    video_path=imgs,
-                    verbose=verbose,
-                )
+            results = []
+            shapes = np.array_split(np.column_stack((np.arange(len(shapes)), shapes)), core_cnt)
+            with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+                constants = functools.partial( self._slice_shapes_in_video_file_helper, video_path=imgs, verbose=verbose)
                 for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
                     results.append(result)
                 results = dict(ChainMap(*results))
         pool.join()
         pool.terminate()
         timer.stop_timer()
-        stdout_success(
-            msg="Geometry image slicing complete.",
-            elapsed_time=timer.elapsed_time_str,
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg="Geometry image slicing complete.", elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)
         return results
 
     @staticmethod

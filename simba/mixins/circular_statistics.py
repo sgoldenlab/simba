@@ -815,20 +815,14 @@ class CircularStatisticsMixin(object):
         >>> CircularStatisticsMixin().kuipers_two_sample_test(sample_1=sample_1, sample_2=sample_2)
         """
 
-        sample_1, sample_2 = np.deg2rad(np.sort(sample_1)), np.deg2rad(
-            np.sort(sample_2)
-        )
+        sample_1, sample_2 = np.deg2rad(np.sort(sample_1)), np.deg2rad(np.sort(sample_2))
         cdfv1 = np.searchsorted(sample_2, sample_1) / float(len(sample_2))
         cdfv2 = np.searchsorted(sample_1, sample_2) / float(len(sample_1))
-        return np.amax(
-            cdfv1 - np.arange(len(sample_1)) / float(len(sample_1))
-        ) + np.amax(cdfv2 - np.arange(len(sample_2)) / float(len(sample_2)))
+        return np.amax(cdfv1 - np.arange(len(sample_1)) / float(len(sample_1))) + np.amax(cdfv2 - np.arange(len(sample_2)) / float(len(sample_2)))
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
-    def sliding_kuipers_two_sample_test(
-        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_kuipers_two_sample_test(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Jitted compute of Kuipers two-sample test comparing two distributions with sliding time window.
 

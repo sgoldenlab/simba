@@ -3768,14 +3768,14 @@ def create_average_frm(video_path: Union[str, os.PathLike],
 
 
 def video_bg_subtraction(video_path: Union[str, os.PathLike],
-                          bg_video_path: Optional[Union[str, os.PathLike]] = None,
-                          bg_start_frm: Optional[int] = None,
-                          bg_end_frm: Optional[int] = None,
-                          bg_start_time: Optional[str] = None,
-                          bg_end_time: Optional[str] = None,
-                          bg_color: Optional[Tuple[int, int, int]] = (0, 0, 0),
-                          fg_color: Optional[Tuple[int, int, int]] = None,
-                          save_path: Optional[Union[str, os.PathLike]] = None) -> None:
+                         bg_video_path: Optional[Union[str, os.PathLike]] = None,
+                         bg_start_frm: Optional[int] = None,
+                         bg_end_frm: Optional[int] = None,
+                         bg_start_time: Optional[str] = None,
+                         bg_end_time: Optional[str] = None,
+                         bg_color: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                         fg_color: Optional[Tuple[int, int, int]] = None,
+                         save_path: Optional[Union[str, os.PathLike]] = None) -> None:
     """
     Subtract the background from a video.
 
@@ -3828,10 +3828,8 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     if save_path is None:
         save_path = os.path.join(dir, f'{video_name}_bg_subtracted{ext}')
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-    writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'],
-                             (video_meta_data['width'], video_meta_data['height']))
-    bg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm,
-                                start_time=bg_start_time, end_time=bg_end_time)
+    writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'],(video_meta_data['width'], video_meta_data['height']))
+    bg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
     bg_frm = cv2.resize(bg_frm, (video_meta_data['width'], video_meta_data['height']))
     bg = cv2.cvtColor(np.full_like(bg_frm, bg_color), cv2.COLOR_BGR2RGB)
     cap = cv2.VideoCapture(video_path)
@@ -3867,7 +3865,8 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
                    bg_clr: Tuple[int, int, int],
                    fg_clr: Tuple[int, int, int],
                    video_meta_data: Dict[str, Any],
-                   temp_dir: Union[str, os.PathLike]):
+                   temp_dir: Union[str, os.PathLike],
+                   verbose: bool):
 
     batch, frm_range = frm_range[0], frm_range[1]
     start_frm, current_frm, end_frm = frm_range[0], frm_range[0], frm_range[-1]
@@ -3900,7 +3899,8 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
             result = cv2.add(result, fg_clr_img)
         writer.write(result)
         current_frm += 1
-        print(f'Background subtraction frame {current_frm}/{video_meta_data["frame_count"]} (Video: {video_name})')
+        if verbose:
+            print(f'Background subtraction frame {current_frm}/{video_meta_data["frame_count"]} (Video: {video_name})')
     writer.release()
     cap.release()
     return batch
@@ -3914,7 +3914,8 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
                              bg_color: Optional[Tuple[int, int, int]] = (0, 0, 0),
                              fg_color: Optional[Tuple[int, int, int]] = None,
                              save_path: Optional[Union[str, os.PathLike]] = None,
-                             core_cnt: Optional[int] = -1) -> None:
+                             core_cnt: Optional[int] = -1,
+                             verbose: Optional[bool] = True) -> None:
 
     """
     Subtract the background from a video using multiprocessing.
@@ -3989,7 +3990,8 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
                                       bg_clr=bg_color,
                                       fg_clr=fg_color,
                                       video_meta_data=video_meta_data,
-                                      temp_dir=temp_dir)
+                                      temp_dir=temp_dir,
+                                      verbose=verbose)
         for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=1)):
             print(f'Frame batch {result+1} completed...')
         pool.terminate()
