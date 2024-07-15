@@ -179,15 +179,25 @@ If clicking **YES**, SimBA will identify the ROI-based features columns inside e
 
 ### Count annotations in SimBA project
 
-If you have annotated (or appeneded annotations to) a bunch of videos in a SimBA project, you may want a count of how many frames, and how many seconds, you have annotated each behavior as present and absent in each video and the entire project. To get this, click the `Count annotations in project` button. Once clicked you will see a pop-up asking you something like: *Are you sure you want to count your annotations in your SimBA project?*.
+If you have annotated (or appended annotations to) a bunch of videos in a SimBA project, you may want a count of how many frames, how many seconds, and how many bouts of behavior present and absent
+you have annotated each behavior in each video and the entire project. To get this, click the `Count annotations in project` button. 
+
+Once clicked you will see a pop-up (like below) asking you what data you would like calculate:
+
+
+If you just click <kbd>`RUN`</kbd> and leave the checkboxes intact, you will get an Excel output file with one sheet 
+that contains the total number of frames and seconds you have annotated for each behavior present and absent. 
+
+If you check the `INLUCE ANNOTATION COUNTS PLIT BY VIDEO` you will get a further sheet taht includes the annotation counts divided
+by each annotated video.
+
+If you check the `INCLUDE ANNOTATED BOUT INFORMATION`, you will get a further sheet that includes information on each annotated bout, and there start and stop times. 
+
+For an example out the expected output file, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ANNOTATION_STATISTICS_20240714140548.xlsx)
 
 If you click yes, SimBA will open each file inside your `project_folder/csv/targets_inserted` directory and count how many frames each classifier has been annotated as present and absent for. It will also calculate how many seconds each classifier has been annotated as present and absent. You can follow the progress in the main SimBa window. Once complete, annotation counts are saved in a CSV within the project_folder/logs directory in with the annotation_counts_20240110185525.csv filename format. 
 
-For an example of expected output, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/print_project_annotation_counts_example.csv) file.
-
 > Note: Each of the videos inside the project_folder/csv/targets_inserted directory also have to be represented in the project_folder/logs/video_info.csv for this to work. This is in order for SimBA to know the FPS of the videos and accurcatly calculate the number of seconds that each behavior has been annotated as present and absent in each of the videos.
-
-
 
 #
 Author [Simon N](https://github.com/sronilsson)

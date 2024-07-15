@@ -895,10 +895,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
 
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)",
-            source=clip_video_in_range.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=clip_video_in_range.__name__)
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
@@ -907,17 +904,11 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
         dir = out_dir
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="START TIME")
     check_if_string_value_is_valid_video_timestamp(value=end_time, name="END TIME")
-    check_that_hhmmss_start_is_before_end(
-        start_time=start_time, end_time=end_time, name=f"{file_name} timestamps"
-    )
+    check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=f"{file_name} timestamps")
     if not include_clip_time_in_filename:
         save_name = os.path.join(dir, file_name + "_clipped.mp4")
     else:
-        save_name = os.path.join(
-            dir,
-            file_name
-            + f'_{start_time.replace(":", "-")}_{end_time.replace(":", "-")}.mp4',
-        )
+        save_name = os.path.join(dir, file_name + f'_{start_time.replace(":", "-")}_{end_time.replace(":", "-")}.mp4')
     if os.path.isfile(save_name) and (not overwrite):
         raise FileExistError(
             msg=f"SIMBA ERROR: The outfile file already exist: {save_name}.",

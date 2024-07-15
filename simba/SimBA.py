@@ -121,6 +121,7 @@ from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
+from simba.ui.pop_ups.clf_annotation_counts_pop_up import ClfAnnotationCountPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
     CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
@@ -157,8 +158,7 @@ from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
-from simba.video_processors.video_processing import \
-    extract_frames_from_all_videos_in_directory
+from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
 
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
@@ -844,53 +844,15 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             ),
         )
 
-        lbl_tools_frm = LabelFrame(
-            tab7,
-            text="LABELLING TOOLS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        visualize_annotation_img_btn = Button(
-            lbl_tools_frm,
-            text="Visualize annotations",
-            fg="blue",
-            command=lambda: ExtractAnnotationFramesPopUp(config_path=self.config_path),
-        )
-        third_party_annotations_btn = Button(
-            lbl_tools_frm,
-            text="Append third-party annotations",
-            fg="purple",
-            command=lambda: ThirdPartyAnnotatorAppenderPopUp(
-                config_path=self.config_path
-            ),
-        )
-        remove_roi_features_from_annotation_set = Button(
-            lbl_tools_frm,
-            text="Remove ROI features from label set",
-            fg="darkred",
-            command=lambda: RemoveROIFeaturesPopUp(
-                config_path=self.config_path, dataset="targets_inserted"
-            ),
-        )
+        lbl_tools_frm = LabelFrame(tab7, text="LABELLING TOOLS", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
+        visualize_annotation_img_btn = Button(lbl_tools_frm, text="Visualize annotations", fg="blue", command=lambda: ExtractAnnotationFramesPopUp(config_path=self.config_path))
+        third_party_annotations_btn = Button(lbl_tools_frm,text="Append third-party annotations",fg="purple",command=lambda: ThirdPartyAnnotatorAppenderPopUp(config_path=self.config_path))
+        remove_roi_features_from_annotation_set = Button(lbl_tools_frm,text="Remove ROI features from label set",fg="darkred",command=lambda: RemoveROIFeaturesPopUp(    config_path=self.config_path, dataset="targets_inserted"))
+        compute_annotation_statistics = Button(lbl_tools_frm, text="Count annotations in project", fg="orange", command=lambda: ClfAnnotationCountPopUp(config_path=self.config_path))
 
-        label_trainmachinemodel = CreateLabelFrameWithIcon(
-            parent=tab8,
-            header="TRAIN MACHINE MODELS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.TRAIN_ML_MODEL.value,
-        )
-        button_trainmachinesettings = Button(
-            label_trainmachinemodel,
-            text="SETTINGS",
-            fg="darkorange",
-            command=self.trainmachinemodelsetting,
-        )
-        button_trainmachinemodel = Button(
-            label_trainmachinemodel,
-            text="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)",
-            fg="blue",
-            command=lambda: self.train_single_model(config_path=self.config_path),
-        )
+        label_trainmachinemodel = CreateLabelFrameWithIcon(parent=tab8, header="TRAIN MACHINE MODELS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.TRAIN_ML_MODEL.value)
+        button_trainmachinesettings = Button(label_trainmachinemodel, text="SETTINGS", fg="darkorange", command=self.trainmachinemodelsetting)
+        button_trainmachinemodel = Button(label_trainmachinemodel, text="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)", fg="blue", command=lambda: self.train_single_model(config_path=self.config_path),)
 
         button_train_multimodel = Button(
             label_trainmachinemodel,
@@ -1140,8 +1102,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         lbl_tools_frm.grid(row=10, column=0, sticky=NW)
         visualize_annotation_img_btn.grid(row=0, column=0, sticky=NW)
-        third_party_annotations_btn.grid(row=1, column=0, sticky=NW)
-        remove_roi_features_from_annotation_set.grid(row=2, column=0, sticky=NW)
+        third_party_annotations_btn.grid(row=0, column=1, sticky=NW)
+        remove_roi_features_from_annotation_set.grid(row=1, column=0, sticky=NW)
+        compute_annotation_statistics.grid(row=1, column=1, sticky=NW)
 
         label_trainmachinemodel.grid(row=6, sticky=W)
         button_trainmachinesettings.grid(row=0, column=0, sticky=NW, padx=5)

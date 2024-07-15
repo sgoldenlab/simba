@@ -8,12 +8,20 @@ Extracting labelled images
    :members:
    :show-inheritance:
 
+Calculate annotation statistics in SimBA project
+-----------------------------------------------------
+
+.. automodule:: simba.labelling.extract_labelling_meta
+   :members:
+   :show-inheritance:
+
 SimBA advanced GUI labelling interface
 -----------------------------------------------------
 
 .. automodule:: simba.labelling.labelling_advanced_interface
    :members:
    :show-inheritance:
+
 
 SimBA GUI labelling interface
 -------------------------------------------

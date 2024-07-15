@@ -223,16 +223,13 @@ class ClipVideoPopUp(PopUpMixin):
         label_set_time_1 = Label(
             method_1_frm, text="Please enter the time frame in HH:MM:SS format"
         )
-        start_time = Entry_Box(method_1_frm, "Start at (s):", "8")
-        end_time = Entry_Box(method_1_frm, "End at (s):", "8")
-        CreateToolTip(
-            method_1_frm,
-            "Method 1 will retrieve the specified time input. (eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)",
-        )
+        start_time = Entry_Box(method_1_frm, "Start at (HH:MM:SS):", "15")
+        end_time = Entry_Box(method_1_frm, "End at (HH:MM:SS):", "15")
+        CreateToolTip(method_1_frm, "Method 1 will retrieve the specified time input. (eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)")
         method_2_frm = LabelFrame(
             self.main_frm, text="Method 2", font="bold", padx=5, pady=5
         )
-        method_2_time = Entry_Box(method_2_frm, "Seconds:", "8", validation="numeric")
+        method_2_time = Entry_Box(method_2_frm, "Seconds:", "15", validation="numeric")
         label_method_2 = Label(
             method_2_frm,
             text="Method 2 will retrieve from the end of the video (e.g.,: an input of 3 seconds will get rid of the first 3 seconds of the video).",

@@ -18,10 +18,7 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path)
         if not os.path.isfile(self.roi_coordinates_path):
-            raise ROICoordinatesNotFoundError(
-                expected_file_path=self.roi_coordinates_path,
-                source=self.__class__.__name__,
-            )
+            raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path, source=self.__class__.__name__)
         PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI")
         self.read_roi_data()
         body_part_menu = CreateLabelFrameWithIcon(
