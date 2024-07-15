@@ -66,6 +66,8 @@ from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
+from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
+    ClfAnnotationCountPopUp
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
 from simba.ui.pop_ups.clf_by_timebins_pop_up import TimeBinsClfPopUp
 from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
@@ -121,7 +123,6 @@ from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
-from simba.ui.pop_ups.clf_annotation_counts_pop_up import ClfAnnotationCountPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
     CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
@@ -158,7 +159,8 @@ from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
-from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
+from simba.video_processors.video_processing import \
+    extract_frames_from_all_videos_in_directory
 
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()

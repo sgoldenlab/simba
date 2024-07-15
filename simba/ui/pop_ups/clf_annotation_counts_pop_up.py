@@ -1,10 +1,10 @@
 import os
+from typing import Union
 
+from simba.labelling.extract_labelling_meta import AnnotationMetaDataExtractor
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.utils.errors import CountError
-from typing import Union
-from simba.labelling.extract_labelling_meta import AnnotationMetaDataExtractor
 
 VIDEO_SPLIT = 'INCLUDE ANNOTATION COUNTS SPLIT BY VIDEO'
 BOUT_SPLIT = 'INCLUDE ANNOTATED BOUTS INFORMATION'
