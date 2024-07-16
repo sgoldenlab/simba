@@ -116,7 +116,6 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
 
     def run(self):
         self.analysis_dict, self.save_paths_lst = defaultdict(list), []
-
         for file_cnt, (video_name, video_data) in enumerate(self.data_and_videos_lk.items()):
             print(f"Analysing {video_name}...")
             video_timer = SimbaTimer(start=True)
@@ -174,15 +173,9 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
                 smoother = Smoothing(config_path=self.config_path, data_path=self.save_path, time_window=self.smoothing_settings['time_window'], method=self.smoothing_settings['method'], multi_index_df_headers=True, copy_originals=False)
                 smoother.run()
             video_timer.stop_timer()
-            stdout_success(
-                msg=f"Video {video_name} data imported...",
-                elapsed_time=video_timer.elapsed_time_str,
-            )
+            stdout_success(msg=f"Video {video_name} data imported...", elapsed_time=video_timer.elapsed_time_str)
         self.timer.stop_timer()
-        stdout_success(
-            msg="All SLEAP SLP data files imported",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg="All SLEAP SLP data files imported", elapsed_time=self.timer.elapsed_time_str)
 
     def __create_tracks(self):
         start_frame = 0
@@ -234,18 +227,13 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
         self.data_df.columns = self.bp_headers
 
 
-
-
-
-
-
 # test = SLEAPImporterSLP(project_path="/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini",
 #                         data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/slp_import',
 #                         id_lst=['Simon', 'JJ'],
 #                         interpolation_settings={'type': 'animals', 'method': 'linear'},
 #                         smoothing_settings = {'time_window': 500, 'method': 'gaussian'}) #Savitzky Golay
 # test.run()
-#
+# #
 # print('All SLEAP imports complete.')
 
 

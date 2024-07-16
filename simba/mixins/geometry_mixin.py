@@ -2464,14 +2464,13 @@ class GeometryMixin(object):
         )
 
     @staticmethod
-    def _multifrm_geometry_histocomparison_helper(
-        frm_index: np.ndarray,
-        data: np.ndarray,
-        video_path: cv2.VideoCapture,
-        shape_type: Literal["rectangle", "circle"],
-        pixels_per_mm: int,
-        parallel_offset: int,
-    ):
+    def _multifrm_geometry_histocomparison_helper(frm_index: np.ndarray,
+                                                  data: np.ndarray,
+                                                  video_path: cv2.VideoCapture,
+                                                  shape_type: Literal["rectangle", "circle"],
+                                                  pixels_per_mm: int,
+                                                  parallel_offset: int):
+
         """Multi-proessing helper for ``multifrm_geometry_histocomparison``"""
 
         cap = cv2.VideoCapture(video_path)
@@ -2527,16 +2526,15 @@ class GeometryMixin(object):
             results.append(ImageMixin().get_histocomparison(img_1=img_1, img_2=img_2))
         return results
 
-    def multifrm_geometry_histocomparison(
-        self,
-        video_path: Union[str, os.PathLike],
-        data: np.ndarray,
-        shape_type: Literal["rectangle", "circle", "line"],
-        lag: Optional[int] = 2,
-        core_cnt: Optional[int] = -1,
-        pixels_per_mm: int = 1,
-        parallel_offset: int = 1,
-    ) -> np.ndarray:
+    def multifrm_geometry_histocomparison(self,
+                                          video_path: Union[str, os.PathLike],
+                                          data: np.ndarray,
+                                          shape_type: Literal["rectangle", "circle", "line"],
+                                          lag: Optional[int] = 2,
+                                          core_cnt: Optional[int] = -1,
+                                          pixels_per_mm: int = 1,
+                                          parallel_offset: int = 1) -> np.ndarray:
+
         """
         Perform geometry histocomparison on multiple video frames using multiprocessing.
 

@@ -57,6 +57,7 @@ pyarrow == 6.0.1
 shap == 0.35.0
 tables==3.6.1;python_version=="3.6"
 tables==3.9.2;python_version>="3.9"
+openpyxl==3.1.2;python_version=="3.6"
 xlrd==1.2.0
 trafaret==2.1.1
 geos==0.2.3

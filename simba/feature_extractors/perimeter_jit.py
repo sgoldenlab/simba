@@ -35,7 +35,6 @@ def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
        :align: center
 
 
-
     :example:
     >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(np.float32)
     >>> results = jitted_hull(points, target='area')

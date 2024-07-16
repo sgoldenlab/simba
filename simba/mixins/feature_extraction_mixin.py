@@ -100,9 +100,7 @@ class FeatureExtractionMixin(object):
 
     @staticmethod
     @jit(nopython=True, fastmath=True, cache=True)
-    def angle3pt(
-        ax: float, ay: float, bx: float, by: float, cx: float, cy: float
-    ) -> float:
+    def angle3pt(ax: float, ay: float, bx: float, by: float, cx: float, cy: float) -> float:
         """
         Jitted helper for single frame 3-point angle.
 
@@ -494,9 +492,7 @@ class FeatureExtractionMixin(object):
         """
         data_df_shifted = df.shift(periods=periods)
         data_df_shifted = data_df_shifted.combine_first(df).add_suffix("_shifted")
-        return pd.concat([df, data_df_shifted], axis=1, join="inner").reset_index(
-            drop=True
-        )
+        return pd.concat([df, data_df_shifted], axis=1, join="inner").reset_index(drop=True)
 
     def check_directionality_viable(self):
         """

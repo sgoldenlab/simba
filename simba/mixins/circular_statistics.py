@@ -362,9 +362,7 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:,:], float32[:, :], float32[:, :])")
-    def direction_three_bps(
-        nose_loc: np.ndarray, left_ear_loc: np.ndarray, right_ear_loc: np.ndarray
-    ) -> np.ndarray:
+    def direction_three_bps(nose_loc: np.ndarray, left_ear_loc: np.ndarray, right_ear_loc: np.ndarray) -> np.ndarray:
         """
         Jitted helper to compute the degree angle from three body-parts. Computes the angle in degrees left_ear <-> nose
         and right_ear_nose and returns the midpoint.
@@ -601,9 +599,8 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
-    def sliding_angular_diff(
-        data: np.ndarray, time_windows: np.ndarray, fps: float
-    ) -> np.ndarray:
+    def sliding_angular_diff(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
+
         """
         Computes the angular difference in the current frame versus N seconds previously.
         For example, if the current angle is 45 degrees, and the angle N seconds previously was 350 degrees, then the difference
@@ -618,7 +615,7 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees.
+        :parameter ndarray data: 1D array of size len(frames) representing degrees. Can be computed by `CircularStatisticsMixin().direction_three_bps` or `CircularStatisticsMixin().direction_two_bps`.
         :parameter np.ndarray time_window: Rolling time-window as float in seconds.
         :parameter int fps: fps of the recorded video
 
@@ -731,9 +728,7 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)")
-    def sliding_rao_spacing(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_rao_spacing(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Jitted compute of the uniformity of a circular dataset in sliding windows.
 

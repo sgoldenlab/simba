@@ -109,12 +109,12 @@ def import_dlc_csv_data(config_path: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=config_path)
     if (not os.path.isdir(data_path)) and (not os.path.isfile(data_path)):
         raise InvalidInputError(msg=f'{data_path} is not a valid data directory path or file path.', source=import_dlc_csv.__name__)
-    if interpolation_settings is not None:
+    if interpolation_settings != None:
         check_instance(source=f'{import_dlc_csv_data.__name__} interpolation_settings', accepted_types=(dict,), instance=interpolation_settings)
         check_if_keys_exist_in_dict(data=interpolation_settings, key=['type', 'method'])
         check_str(name='type', value=interpolation_settings['type'].lower(), options=['animals', 'body-parts'])
         check_str(name='method', value=interpolation_settings['method'].lower(), options=['nearest', 'linear', 'quadratic'])
-    if smoothing_settings is not None:
+    if smoothing_settings != None:
         check_instance(source=f'{import_dlc_csv_data.__name__} smoothing_settings', accepted_types=(dict,), instance=smoothing_settings)
         check_if_keys_exist_in_dict(data=smoothing_settings, key=['time_window', 'method'])
         check_int(name='time_window', value=smoothing_settings['time_window'], min_value=1)

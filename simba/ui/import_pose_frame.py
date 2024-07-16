@@ -97,35 +97,33 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                                             interpolation_settings: str,
                                             smoothing_setting: str,
                                             smoothing_time: Union[str, int]):
-
-        if interpolation_settings != Dtypes.NONE.value:
+        METHODS_MAP = {'Gaussian': 'gaussian', 'Savitzky Golay': 'savitzky-golay'}
+        if interpolation_settings not in [Dtypes.NONE.value, None]:
             interpolation_settings = interpolation_settings.split(':')
             interpolation_settings = {'type': INTERPOLATION_MAP[interpolation_settings[0]].lower().strip(), 'method': interpolation_settings[1].lower().strip()}
         else:
             interpolation_settings = None
-        if smoothing_setting != Dtypes.NONE.value:
+        if smoothing_setting not in [Dtypes.NONE.value, None]:
             check_int(name='SMOOTHING TIME', value=smoothing_time, min_value=1)
-            smoothing_setting = {'time_window': int(smoothing_time), 'method': SMOOTHING_MAP[smoothing_setting]}
+            smoothing_setting = {'method': METHODS_MAP[smoothing_setting], 'time_window': int(smoothing_time)}
         else:
             smoothing_setting = None
-
-        return interpolation_settings, smoothing_setting
-
+        return smoothing_setting, interpolation_settings
 
     def __import_dlc_csv_data(self,
                               interpolation_settings: str,
-                              smoothing_setting: str,
                               smoothing_time: Union[str, int],
-                              data_path: Union[str, os.PathLike]):
+                              data_path: Union[str, os.PathLike],
+                              smoothing_setting: Literal['Gaussian', 'None', 'Savitzky Golay']):
 
         if not os.path.isfile(data_path) and not os.path.isdir(data_path):
             raise InvalidInputError(msg=f'{data_path} is NOT a valid path', source=self.__class__.__name__)
-
         smoothing_settings, interpolation_settings = self.__get_smooth_interpolation_settings(interpolation_settings, smoothing_setting, smoothing_time)
+
         import_dlc_csv_data(config_path=self.config_path,
                             data_path=data_path,
                             interpolation_settings=interpolation_settings,
-                            smoothing_settings=smoothing_setting)
+                            smoothing_settings=smoothing_settings)
 
     def __multi_animal_run_call(self,
                                 pose_estimation_tool: str,
@@ -235,9 +233,9 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
             if data_type_choice == "CSV (DLC/DeepPoseKit)":
                 self.import_dir_btn = Button(self.import_directory_frm, fg="blue", text="Import DLC CSV DIRECTORY to SimBA project", command=lambda: self.__import_dlc_csv_data(interpolation_settings=self.interpolation_dropdown.getChoices(),
-                                                                                                                                                                        smoothing_setting=self.smoothing_dropdown.getChoices(),
-                                                                                                                                                                        smoothing_time=self.smoothing_time_eb.entry_get,
-                                                                                                                                                                        data_path=self.import_directory_select.folder_path))
+                                                                                                                                                                                smoothing_setting=self.smoothing_dropdown.getChoices(),
+                                                                                                                                                                                smoothing_time=self.smoothing_time_eb.entry_get,
+                                                                                                                                                                                data_path=self.import_directory_select.folder_path))
                 self.import_file_btn = Button(self.import_single_frm, fg="blue", text="Import DLC CSV FILE to SimBA project", command=lambda: self.__import_dlc_csv_data(interpolation_settings=self.interpolation_dropdown.getChoices(),
                                                                                                                                                                          smoothing_setting=self.smoothing_dropdown.getChoices(),
                                                                                                                                                                          smoothing_time=self.smoothing_time_eb.entry_get,

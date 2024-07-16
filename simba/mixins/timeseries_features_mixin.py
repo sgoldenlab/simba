@@ -264,9 +264,7 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
-    def percentile_difference(
-        data: np.ndarray, upper_pct: int, lower_pct: int
-    ) -> float:
+    def percentile_difference(data: np.ndarray, upper_pct: int, lower_pct: int) -> float:
         """
         Jitted compute of the difference between the ``upper`` and ``lower`` percentiles of the data as
         a percentage of the median value. Helps understanding the spread or variability of the data within specified percentiles.
@@ -1526,13 +1524,12 @@ class TimeseriesFeatureMixin(object):
             '(float32[:], float64, int64, types.misc.Omitted(1), types.misc.Omitted("mm"))',
         ]
     )
-    def acceleration(
-        data: np.ndarray,
-        pixels_per_mm: float,
-        fps: int,
-        time_window: float = 1,
-        unit: Literal["mm", "cm", "dm", "m"] = "mm",
-    ) -> np.ndarray:
+    def acceleration(data: np.ndarray,
+                     pixels_per_mm: float,
+                     fps: int,
+                     time_window: float = 1,
+                     unit: Literal["mm", "cm", "dm", "m"] = "mm") -> np.ndarray:
+
         """
         Compute acceleration.
 
