@@ -547,9 +547,7 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
-    def sliding_circular_correlation(
-        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float
-    ) -> np.ndarray:
+    def sliding_circular_correlation(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Jitted compute of correlations between two angular distributions in sliding time-windows
         using the cross-correlation coefficient.

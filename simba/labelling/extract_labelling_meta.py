@@ -62,7 +62,6 @@ class AnnotationMetaDataExtractor(ConfigReader):
             bouts['VIDEO'] = video_name
             bouts = bouts[['VIDEO', 'ANNOTATED CLASSIFIER', 'ANNOTATED START TIME', 'ANNOTATED END TIME', 'ANNOTATED START FRAME','ANNOTATED END FRAME','ANNOTATED BOUT TIME (S)']]
             self.bout_data.append(bouts)
-
             for clf in self.clf_names:
                 check_if_df_field_is_boolean(df=df, field=clf, df_name=file_path)
                 present_df, absent_df = df[df[clf] == 1], df[df[clf] == 0]

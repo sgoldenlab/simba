@@ -1636,9 +1636,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
-    def sliding_spearman_rank_correlation(
-        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_spearman_rank_correlation(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Given two 1D arrays of size N, create sliding window of size time_windows[i] * fps and return Spearman's rank correlation
         between the values in the two 1D arrays in each window. Address "what is the correlation between Feature 1 and
@@ -1677,9 +1675,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64, float64, float64)")
-    def sliding_autocorrelation(
-        data: np.ndarray, max_lag: float, time_window: float, fps: float
-    ):
+    def sliding_autocorrelation(data: np.ndarray, max_lag: float, time_window: float, fps: float):
         """
         Jitted computation of sliding autocorrelations, which measures the correlation of a feature with itself using lagged windows.
 
@@ -1719,15 +1715,13 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    def sliding_dominant_frequencies(
-        data: np.ndarray,
-        fps: float,
-        k: int,
-        time_windows: np.ndarray,
-        window_function: Literal["Hann", "Hamming", "Blackman"] = None,
-    ):
-        """Find the K dominant frequencies within a feature vector using sliding windows"""
+    def sliding_dominant_frequencies(data: np.ndarray,
+                                     fps: float,
+                                     k: int,
+                                     time_windows: np.ndarray,
+                                     window_function: Literal["Hann", "Hamming", "Blackman"] = None) -> np.ndarray:
 
+        """Find the K dominant frequencies within a feature vector using sliding windows"""
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for time_window_cnt in range(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
@@ -1809,9 +1803,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
-    def sliding_kendall_tau(
-        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float
-    ) -> np.ndarray:
+    def sliding_kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Compute sliding Kendall's Tau correlation coefficient.
 
@@ -1840,29 +1832,20 @@ class Statistics(FeatureExtractionMixin):
         results = np.full((sample_1.shape[0], time_windows.shape[0]), 0.0)
         for time_window_cnt in range(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
-            for left, right in zip(
-                range(0, sample_1.shape[0] + 1),
-                range(window_size, sample_1.shape[0] + 1),
-            ):
-                sliced_sample_1, sliced_sample_2 = (
-                    sample_1[left:right],
-                    sample_2[left:right],
-                )
+            for left, right in zip(range(0, sample_1.shape[0] + 1), range(window_size, sample_1.shape[0] + 1)):
+                sliced_sample_1, sliced_sample_2 = (sample_1[left:right], sample_2[left:right])
                 rnks = np.argsort(sliced_sample_1)
                 s1_rnk, s2_rnk = sliced_sample_1[rnks], sliced_sample_2[rnks]
-                cncrdnt_cnts, dscrdnt_cnts = np.full(
-                    (s1_rnk.shape[0] - 1), np.nan
-                ), np.full((s1_rnk.shape[0] - 1), np.nan)
+                cncrdnt_cnts, dscrdnt_cnts = np.full((s1_rnk.shape[0] - 1), np.nan), np.full((s1_rnk.shape[0] - 1), np.nan)
                 for i in range(s2_rnk.shape[0] - 1):
-                    cncrdnt_cnts[i] = (
-                        np.argwhere(s2_rnk[i + 1 :] > s2_rnk[i]).flatten().shape[0]
-                    )
-                    dscrdnt_cnts[i] = (
-                        np.argwhere(s2_rnk[i + 1 :] < s2_rnk[i]).flatten().shape[0]
-                    )
-                results[right][time_window_cnt] = (
-                    np.sum(cncrdnt_cnts) - np.sum(dscrdnt_cnts)
-                ) / (np.sum(cncrdnt_cnts) + np.sum(dscrdnt_cnts))
+                    cncrdnt_cnts[i] = (np.argwhere(s2_rnk[i + 1 :] > s1_rnk[i]).flatten().shape[0])
+                    dscrdnt_cnts[i] = (np.argwhere(s2_rnk[i + 1 :] < s1_rnk[i]).flatten().shape[0])
+                n = np.sum(cncrdnt_cnts) - np.sum(dscrdnt_cnts)
+                d = np.sum(cncrdnt_cnts) + np.sum(dscrdnt_cnts)
+                if d == 0:
+                    results[right][time_window_cnt] = -1
+                else:
+                    results[right][time_window_cnt] = n / d
 
         return results
 
@@ -2309,9 +2292,7 @@ class Statistics(FeatureExtractionMixin):
         )
         return results.astype(np.float32)
 
-    def rolling_shapiro_wilks(
-        self, data: np.ndarray, time_window: float, fps: int
-    ) -> np.ndarray:
+    def rolling_shapiro_wilks(self, data: np.ndarray, time_window: float, fps: int) -> np.ndarray:
         """
         Compute Shapiro-Wilks normality statistics for sequentially binned values in a time-series. E.g., compute
         the normality statistics of ``Feature N`` in each window of ``time_window`` seconds.
@@ -2350,9 +2331,8 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64,)")
-    def sliding_z_scores(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_z_scores(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
+
         """
         Calculate sliding Z-scores for a given data array over specified time windows.
 
@@ -2657,13 +2637,11 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @jit("(float32[:], float64[:], int64,)")
-    def sliding_skew(
-        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    def sliding_skew(data: np.ndarray, time_windows: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Compute the skewness of a 1D array within sliding time windows.
 
-        :param np.ndarray data: Input data array.
+        :param np.ndarray data: 1D array of input data.
         :param np.ndarray data: 1D array of time window durations in seconds.
         :param np.ndarray data: Sampling rate of the data in samples per second.
         :return np.ndarray: 2D array of skewness`1 values with rows corresponding to data points and columns corresponding to time windows.
@@ -2679,17 +2657,12 @@ class Statistics(FeatureExtractionMixin):
             for j in range(window_size, data.shape[0] + 1):
                 sample = data[j - window_size : j]
                 mean, std = np.mean(sample), np.std(sample)
-                results[j - 1][i] = (1 / sample.shape[0]) * np.sum(
-                    ((data - mean) / std) ** 3
-                )
-
+                results[j - 1][i] = (1 / sample.shape[0]) * np.sum(((data - mean) / std) ** 3)
         return results
 
     @staticmethod
     @jit("(float32[:], float64[:], int64,)")
-    def sliding_kurtosis(
-        data: np.ndarray, time_windows: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    def sliding_kurtosis(data: np.ndarray, time_windows: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Compute the kurtosis of a 1D array within sliding time windows.
 
@@ -3527,7 +3500,7 @@ class Statistics(FeatureExtractionMixin):
         >>> Statistics.sliding_mad_median_rule(data=data, k=2, time_windows=np.array([20.0]), fps=1.0)
         """
         results = np.full((data.shape[0], time_windows.shape[0]), -1)
-        for time_window in time_windows:
+        for cnt, time_window in enumerate(time_windows):
             w = int(fps * time_window)
             for i in range(w, data.shape[0] + 1, 1):
                 w_data = data[i - w : i]
@@ -3535,7 +3508,7 @@ class Statistics(FeatureExtractionMixin):
                 mad = np.median(np.abs(w_data - median))
                 threshold = k * mad
                 outliers = np.abs(w_data - median) > threshold
-                results[i - 1] = np.sum(outliers * 1)
+                results[i - 1][cnt] = np.sum(outliers * 1)
         return results
 
     @staticmethod

@@ -535,6 +535,43 @@ def video_quality_to_preset_lookup() -> Dict[str, str]:
     """
     return {"Low": "fast", "Medium": "medium", "High": "slow"}
 
+
+def get_labelling_img_kbd_bindings():
+    """
+    Returns dictionary of tkinter keyboard bindings.
+    .. notes::
+        Change ``kbd`` values to change keyboard shortcuts. For example:
+
+        Some possible examples:
+            <Key>, <KeyPress>, <KeyRelease>: Binds to any key press or release.
+            <KeyPress-A>, <Key-a>: Binds to the 'a' key press (case sensitive).
+            <Up>, <Down>, <Left>, <Right>: Binds to the arrow keys.
+            <Control-KeyPress-A>, <Control-a>: Binds to Ctrl + A or Ctrl + a
+    """
+    return \
+        {'frame+1': # MOVE FORWARD 1 FRAME
+             {'label': 'Right Arrow = +1 frame',
+              'kbd': "<Right>"},
+         'frame-1': # MOVE BACK 1 FRAME
+             {'label': 'Left Arrow = -1 frame',
+              'kbd': "<Left>"},
+         'save': # SAVE CURRENT ANNOTATIONS STATS TO DISK
+             {'label': 'Ctrl + s = Save annotations file',
+              'kbd': "<Control-s>"},
+         'frame+1_keep_choices': # MOVE FORWARD 1 FRAME AND KEEP ANNOTATION SELECTIONS OF THE CURRENT FRAME
+             {'label': 'Ctrl + a = +1 frame and keep choices',
+              'kbd': "<Control-a>"},
+         'print_annotation_statistic': # PRINT ANNOTATION STATISTICS
+             {'label': 'Ctrl + p = Show annotation statistics',
+              'kbd': "<Control-p>"},
+         'last_frame':  # SHOW LAST FRAME
+             {'label': 'Ctrl + l = Last frame',
+              'kbd': "<Control-l>"},
+         'first_frame':  # SHOW FIRT FRAME
+             {'label': 'Ctrl + o = First frame',
+              'kbd': "<Control-o>"}
+         }
+
 def get_fonts():
     """ Returns a dictionary with all fonts available in OS, with the font name as key and font path as value"""
     font_dict = {f.name: f.fname for f in matplotlib.font_manager.fontManager.ttflist if not f.name.startswith('.')}
