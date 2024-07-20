@@ -624,12 +624,11 @@ class FeatureExtractionMixin(object):
 
     @staticmethod
     @jit(nopython=True)
-    def jitted_line_crosses_to_static_targets(
-        left_ear_array: np.ndarray,
-        right_ear_array: np.ndarray,
-        nose_array: np.ndarray,
-        target_array: np.ndarray,
-    ) -> np.ndarray:
+    def jitted_line_crosses_to_static_targets(left_ear_array: np.ndarray,
+                                              right_ear_array: np.ndarray,
+                                              nose_array: np.ndarray,
+                                              target_array: np.ndarray) -> np.ndarray:
+
         """
         Jitted helper to calculate if an animal is directing towards a static location (ROI centroid),
         given the target location and the left ear, right ear, and nose coordinates of the observer.
@@ -1001,16 +1000,6 @@ class FeatureExtractionMixin(object):
             new_x = np.min(np.array((frm_bp1[0], frm_bp2[0]))) + x_dist_percentile
             new_y = np.min(np.array((frm_bp1[1], frm_bp2[1]))) + y_dist_percentile
             result[i] = np.array([new_x, new_y])
-            print(
-                [new_x, new_y],
-                bp_1[i],
-                bp_2[i],
-                axis_0_diff,
-                axis_1_diff,
-                x_dist_percentile,
-                y_dist_percentile,
-            )
-
         return result.astype(np.int64)
 
 

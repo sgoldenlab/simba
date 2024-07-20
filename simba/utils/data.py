@@ -277,6 +277,18 @@ def create_color_palettes(
             "afmhot",
             "gist_heat",
             "copper",
+            "Pastel1",
+            "Pastel2",
+            "Paired",
+            "Accent",
+            "Dark2",
+            "Set1",
+            "Set2",
+            "Set3",
+            "tab10",
+            "tab20",
+            "tab20b",
+            "tab20c"
         ]
     for colormap in range(no_animals):
         currColorMap = cm.get_cmap(cmaps[colormap], map_size)

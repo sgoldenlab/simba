@@ -10,7 +10,7 @@ import pandas as pd
 from simba.feature_extractors.perimeter_jit import jitted_centroid
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.checks import check_if_filepath_list_is_empty, check_that_column_exist
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
 
@@ -91,13 +91,12 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         for file_path in self.file_paths:
             self.__find_body_part_columns()
             _, video_name, _ = get_fn_ext(file_path)
-            print("Analysing {}...".format(video_name))
+            print(f"Analysing {video_name}...")
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
-            self.video_info, self.px_per_mm, self.fps = self.read_video_info(
-                video_name=video_name
-            )
+            self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=video_name)
             self.movement_dfs[video_name] = pd.DataFrame()
             if self.bp_list:
+                check_that_column_exist(df=self.data_df, column_name=self.bp_list, file_name=file_path)
                 self.data_df = self.data_df[self.bp_list]
                 for animal_cnt, animal_data in self.body_parts_dict.items():
                     animal_df = self.data_df[animal_data["BODY-PART HEADERS"]]

@@ -174,14 +174,10 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         PlottingMixin.__init__(self)
         check_if_keys_exist_in_dict(data=style_attr,key=STYLE_KEYS,name=f"{self.__class__.__name__} style_attr")
         if not os.path.isfile(self.roi_coordinates_path):
-            raise ROICoordinatesNotFoundError(
-                expected_file_path=self.roi_coordinates_path
-            )
+            raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
         self.read_roi_data()
         _, self.video_name, _ = get_fn_ext(video_path)
-        self.roi_dict, self.shape_names = slice_roi_dict_for_video(
-            data=self.roi_dict, video_name=self.video_name
-        )
+        self.roi_dict, self.shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
         self.core_cnt, self.style_attr = core_cnt, style_attr
         self.save_path = os.path.join(self.roi_features_save_dir, f"{self.video_name}.mp4")
         if not os.path.exists(self.roi_features_save_dir):
@@ -192,22 +188,11 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         os.makedirs(self.save_temp_dir)
         self.data_path = os.path.join(self.outlier_corrected_dir, f"{self.video_name}.{self.file_type}")
         if not os.path.isfile(self.data_path):
-            raise NoFilesFoundError(
-                msg=f"SIMBA ERROR: Could not find the file at path {self.data_path}. Make sure the data file exist to create ROI visualizations",
-                source=self.__class__.__name__,
-            )
-        check_valid_lst(
-            data=body_parts,
-            source=f"{self.__class__.__name__} body-parts",
-            valid_dtypes=(str,),
-            min_len=1,
-        )
+            raise NoFilesFoundError(msg=f"SIMBA ERROR: Could not find the file at path {self.data_path}. Make sure the data file exist to create ROI visualizations", source=self.__class__.__name__,)
+        check_valid_lst(data=body_parts, source=f"{self.__class__.__name__} body-parts", valid_dtypes=(str,), min_len=1,)
         for bp in body_parts:
             if bp not in self.body_parts_lst:
-                raise BodypartColumnNotFoundError(
-                    msg=f"The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}",
-                    source=self.__class__.__name__,
-                )
+                raise BodypartColumnNotFoundError(msg=f"The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}",source=self.__class__.__name__,)
         self.roi_feature_creator = ROIFeatureCreator(
             config_path=config_path,
             body_parts=body_parts,
@@ -252,10 +237,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         for shape, df in self.roi_dict.items():
             if not df["Name"].is_unique:
                 df = df.drop_duplicates(subset=["Name"], keep="first")
-                DuplicateNamesWarning(
-                    msg=f'Some of your ROIs with the same shape ({shape}) has the same names for video {self.video_name}. E.g., you have two rectangles named "My rectangle". SimBA prefers ROI shapes with unique names. SimBA will keep one of the unique shape names and drop the rest.',
-                    source=self.__class__.__name__,
-                )
+                DuplicateNamesWarning(msg=f'Some of your ROIs with the same shape ({shape}) has the same names for video {self.video_name}. E.g., you have two rectangles named "My rectangle". SimBA prefers ROI shapes with unique names. SimBA will keep one of the unique shape names and drop the rest.', source=self.__class__.__name__,)
             d = df.set_index("Name").to_dict(orient="index")
             shape_dicts = {**shape_dicts, **d}
         return shape_dicts

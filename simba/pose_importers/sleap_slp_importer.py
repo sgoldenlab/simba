@@ -96,22 +96,13 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
 
     def __check_that_all_animals_exist_in_frame(self):
         existing_animals = list(self.frame_dict.keys())
-        missing_animals = [
-            x for x in range(self.animal_cnt) if x not in existing_animals
-        ]
+        missing_animals = [x for x in range(self.animal_cnt) if x not in existing_animals]
         for missing_animal in missing_animals:
-            self.frame_dict[missing_animal] = (
-                [0] * ((len(self.analysis_dict["ordered_bps"]))) * 3
-            )
+            self.frame_dict[missing_animal] = ([0] * ((len(self.analysis_dict["ordered_bps"]))) * 3)
 
     def __fill_missing_indexes(self):
-        missing_indexes = list(
-            set(list(range(0, self.video_info["frame_count"])))
-            - set(list(self.data_df.index))
-        )
-        missing_df = pd.DataFrame(
-            0, index=missing_indexes, columns=self.analysis_dict["xyp_headers"]
-        )
+        missing_indexes = list(set(list(range(0, self.video_info["frame_count"]))) - set(list(self.data_df.index)))
+        missing_df = pd.DataFrame(0, index=missing_indexes, columns=self.analysis_dict["xyp_headers"])
         self.data_df = pd.concat([self.data_df, missing_df], axis=0)
 
     def run(self):
@@ -225,6 +216,10 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
         self.__fill_missing_indexes()
         self.data_df.sort_index(inplace=True)
         self.data_df.columns = self.bp_headers
+
+
+
+
 
 
 # test = SLEAPImporterSLP(project_path="/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini",

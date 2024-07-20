@@ -30,7 +30,7 @@ from simba.utils.checks import (check_float,
                                 check_instance, check_int,
                                 check_iterable_length, check_str,
                                 check_that_column_exist, check_valid_array,
-                                check_valid_lst, check_valid_tuple)
+                                check_valid_lst, check_valid_tuple, check_valid_boolean)
 from simba.utils.data import create_color_palette, create_color_palettes
 from simba.utils.enums import (Defaults, Formats, GeometryEnum, Options,
                                TextOptions)
@@ -1180,19 +1180,11 @@ class GeometryMixin(object):
         """
 
         timer = SimbaTimer(start=True)
-        check_int(
-            name="CORE COUNT",
-            value=core_cnt,
-            min_value=-1,
-            max_value=find_core_cnt()[0],
-            raise_error=True,
-        )
+        check_int( name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True,)
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results = []
-        with multiprocessing.Pool(
-            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
             constants = functools.partial(
                 GeometryMixin.bodyparts_to_circle,
                 parallel_offset=parallel_offset,
@@ -2812,13 +2804,12 @@ class GeometryMixin(object):
         return points
 
     @staticmethod
-    def bucket_img_into_grid_square(
-        img_size: Iterable[int],
-        bucket_grid_size_mm: Optional[float] = None,
-        bucket_grid_size: Optional[Iterable[int]] = None,
-        px_per_mm: Optional[float] = None,
-        add_correction: Optional[bool] = True,
-    ) -> Tuple[Dict[Tuple[int, int], Polygon], float]:
+    def bucket_img_into_grid_square(img_size: Iterable[int],
+                                    bucket_grid_size_mm: Optional[float] = None,
+                                    bucket_grid_size: Optional[Iterable[int]] = None,
+                                    px_per_mm: Optional[float] = None,
+                                    add_correction: Optional[bool] = True,
+                                    verbose: Optional[bool] = True) -> Tuple[Dict[Tuple[int, int], Polygon], float]:
         """
         Bucketize an image into squares and return a dictionary of polygons representing the bucket locations.
 
@@ -2831,6 +2822,7 @@ class GeometryMixin(object):
         :param Optional[Iterable[int]] bucket_grid_size: 2-value tuple, list or array representing the grid square in number of horizontal squares x number of vertical squares. If None, then buckets will be defined by the ``bucket_size_mm`` argument.
         :param Optional[float] px_per_mm: Pixels per millimeter conversion factor. Necessery if buckets are defined by ``bucket_size_mm`` argument.
         :param Optional[bool] add_correction: If True, performs correction by adding extra columns or rows to cover any remaining space if using ``bucket_size_mm``. Default True.
+        :param Optional[bool] verbose: If True, prints progress / completion information. Default True.
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-01-21 at 10.15.55 AM.png', 1)
@@ -2842,42 +2834,19 @@ class GeometryMixin(object):
 
         timer = SimbaTimer(start=True)
         if bucket_grid_size is not None and bucket_grid_size_mm is not None:
-            raise InvalidInputError(
-                msg="bucket_size_mm and bucket_grid_size are both not None. Either provide bucket size in millimeters, OR provide the grid size",
-                source=GeometryMixin().bucket_img_into_grid_square.__name__,
-            )
-        check_instance(
-            source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size",
-            instance=img_size,
-            accepted_types=(tuple, np.ndarray),
-        )
-        check_iterable_length(
-            source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size",
-            val=len(img_size),
-            exact_accepted_length=2,
-        )
-        check_int(
-            name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size height",
-            value=img_size[0],
-        )
-        check_int(
-            name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size width",
-            value=img_size[1],
-        )
+            raise InvalidInputError(msg="bucket_size_mm and bucket_grid_size are both not None. Either provide bucket size in millimeters, OR provide the grid size", source=GeometryMixin().bucket_img_into_grid_square.__name__,)
+        check_instance(source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size", instance=img_size, accepted_types=(tuple, np.ndarray),)
+        check_iterable_length(source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size", val=len(img_size),exact_accepted_length=2,)
+        check_int(name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size height", value=img_size[0],)
+        check_int(name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size width", value=img_size[1],)
+        check_valid_boolean(value=verbose, source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} verbose")
         polygons = {}
         if bucket_grid_size_mm is not None:
-            check_float(
-                name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} bucket_size_mm",
-                value=bucket_grid_size_mm,
-            )
+            check_float(name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} bucket_size_mm", value=bucket_grid_size_mm,)
             bin_size_px = int(px_per_mm * bucket_grid_size_mm)
-            h_bin_cnt, v_bin_cnt = divmod(img_size[0], bin_size_px), divmod(
-                img_size[1], bin_size_px
-            )
+            h_bin_cnt, v_bin_cnt = divmod(img_size[0], bin_size_px), divmod(img_size[1], bin_size_px)
             if (img_size[0] < bin_size_px) or (img_size[1] < bin_size_px):
-                raise InvalidInputError(
-                    msg=f"The bucket square size {bin_size_px} is larger than the video size in pixels {img_size}"
-                )
+                raise InvalidInputError(msg=f"The bucket square size {bin_size_px} is larger than the video size in pixels {img_size}")
             if add_correction:
                 if h_bin_cnt[1] != 0:
                     h_bin_cnt = (h_bin_cnt[0] + 1, h_bin_cnt[1])
@@ -2889,18 +2858,12 @@ class GeometryMixin(object):
                     x2, y2 = x1 + bin_size_px, y1 + bin_size_px
                     polygons[(i, j)] = Polygon([(x1, y1), (x2, y1), (x2, y2), (x1, y2)])
             timer.stop_timer()
-            stdout_success(
-                msg="Bucket image into grid squares complete",
-                elapsed_time=timer.elapsed_time_str,
-            )
+            if verbose:
+                stdout_success(msg="Bucket image into grid squares complete", elapsed_time=timer.elapsed_time_str,)
             return polygons, round((v_bin_cnt[0] / h_bin_cnt[0]), 3)
 
         if bucket_grid_size is not None:
-            check_instance(
-                source=f"{GeometryMixin.__name__} bucket_grid_size",
-                instance=bucket_grid_size,
-                accepted_types=(tuple, np.ndarray, list),
-            )
+            check_instance( source=f"{GeometryMixin.__name__} bucket_grid_size", instance=bucket_grid_size, accepted_types=(tuple, np.ndarray, list),)
             check_iterable_length(
                 source=f"{GeometryMixin.__name__} bucket_grid_size",
                 val=len(bucket_grid_size),
@@ -2932,10 +2895,8 @@ class GeometryMixin(object):
                         [top_left, bottom_left, bottom_right, top_right]
                     )
             timer.stop_timer()
-            stdout_success(
-                msg="Bucket image into grid squares complete",
-                elapsed_time=timer.elapsed_time_str,
-            )
+            if verbose:
+                stdout_success(msg="Bucket image into grid squares complete", elapsed_time=timer.elapsed_time_str)
             return polygons, round((bucket_grid_size[1] / bucket_grid_size[0]), 3)
 
     @staticmethod
@@ -3514,60 +3475,45 @@ class GeometryMixin(object):
         >>> #GeometryMixin.simba_roi_to_geometries(rectangles_df=config.rectangles_df, circles_df=config.circles_df, polygons_df=config.polygon_df)
         """
 
-        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=rectangles_df, accepted_types=(pd.DataFrame,))
-        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=circles_df, accepted_types=(pd.DataFrame,))
-        check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=polygons_df, accepted_types=(pd.DataFrame,))
-        for i in [rectangles_df, circles_df, polygons_df]:
-            check_that_column_exist(df=i, column_name=["Video", "Name", "Tags", "Color BGR"], file_name="")
         results_roi, results_clr = {}, {}
-        for video_name in rectangles_df["Video"].unique():
-            if video_name not in results_roi.keys():
-                results_roi[video_name] = {}
-                results_clr[video_name] = {}
-            video_shapes = rectangles_df[["Tags", "Name", "Color BGR"]][
-                rectangles_df["Video"] == video_name
-            ]
-            for shape_name in video_shapes["Name"].unique():
-                shape_data = video_shapes[
-                    video_shapes["Name"] == shape_name
-                ].reset_index(drop=True)
-                tags, name = (
-                    list(shape_data["Tags"].values[0].values()),
-                    shape_data["Name"].values[0],
-                )
-                results_roi[video_name][name] = Polygon(
-                    Polygon(tags).convex_hull.exterior.coords
-                )
-                results_clr[video_name][name] = shape_data["Color BGR"].values[0]
-        for video_name in polygons_df["Video"].unique():
-            if video_name not in results_roi.keys():
-                results_roi[video_name] = {}
-                results_clr[video_name] = {}
-            video_shapes = polygons_df[["Tags", "Name", "Color BGR"]][
-                polygons_df["Video"] == video_name
-            ]
-            for shape_name in video_shapes["Name"].unique():
-                shape_data = video_shapes[
-                    video_shapes["Name"] == shape_name
-                ].reset_index(drop=True)
-                tags, name = (
-                    list(shape_data["Tags"].values[0].values()),
-                    shape_data["Name"].values[0],
-                )
-                results_roi[video_name][name] = Polygon(
-                    Polygon(tags).convex_hull.exterior.coords
-                )
-                results_clr[video_name][name] = shape_data["Color BGR"].values[0]
-        for video_name in circles_df["Video"].unique():
-            if video_name not in results_roi.keys():
-                results_roi[video_name] = {}
-                results_clr[video_name] = {}
-            video_shapes = circles_df[["Tags", "Name", "Color BGR", 'radius']][circles_df["Video"] == video_name]
-            for shape_name in video_shapes["Name"].unique():
-                shape_data = video_shapes[video_shapes["Name"] == shape_name].reset_index(drop=True)
-                tags, name, radius = shape_data["Tags"].values[0], shape_data["Name"].values[0], shape_data["radius"].values[0]
-                results_roi[video_name][name] = Point(tags["Center tag"]).buffer(distance=radius)
-                results_clr[video_name][name] = shape_data["Color BGR"].values[0]
+        if rectangles_df is not None:
+            check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=rectangles_df, accepted_types=(pd.DataFrame,))
+            for video_name in rectangles_df["Video"].unique():
+                if video_name not in results_roi.keys():
+                    results_roi[video_name] = {}
+                    results_clr[video_name] = {}
+                video_shapes = rectangles_df[["Tags", "Name", "Color BGR"]][rectangles_df["Video"] == video_name]
+                for shape_name in video_shapes["Name"].unique():
+                    shape_data = video_shapes[video_shapes["Name"] == shape_name].reset_index(drop=True)
+                    tags, name = (list(shape_data["Tags"].values[0].values()), shape_data["Name"].values[0])
+                    results_roi[video_name][name] = Polygon(Polygon(tags).convex_hull.exterior.coords)
+                    results_clr[video_name][name] = shape_data["Color BGR"].values[0]
+
+        if polygons_df is not None:
+            check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=polygons_df, accepted_types=(pd.DataFrame,))
+            for video_name in polygons_df["Video"].unique():
+                if video_name not in results_roi.keys():
+                    results_roi[video_name] = {}
+                    results_clr[video_name] = {}
+                video_shapes = polygons_df[["Tags", "Name", "Color BGR"]][ polygons_df["Video"] == video_name]
+                for shape_name in video_shapes["Name"].unique():
+                    shape_data = video_shapes[video_shapes["Name"] == shape_name].reset_index(drop=True)
+                    tags, name = (list(shape_data["Tags"].values[0].values()), shape_data["Name"].values[0])
+                    results_roi[video_name][name] = Polygon(Polygon(tags).convex_hull.exterior.coords)
+                    results_clr[video_name][name] = shape_data["Color BGR"].values[0]
+
+        if circles_df is not None:
+            check_instance(source=GeometryMixin.simba_roi_to_geometries.__name__, instance=circles_df, accepted_types=(pd.DataFrame,))
+            for video_name in circles_df["Video"].unique():
+                if video_name not in results_roi.keys():
+                    results_roi[video_name] = {}
+                    results_clr[video_name] = {}
+                video_shapes = circles_df[["Tags", "Name", "Color BGR", 'radius']][circles_df["Video"] == video_name]
+                for shape_name in video_shapes["Name"].unique():
+                    shape_data = video_shapes[video_shapes["Name"] == shape_name].reset_index(drop=True)
+                    tags, name, radius = shape_data["Tags"].values[0], shape_data["Name"].values[0], shape_data["radius"].values[0]
+                    results_roi[video_name][name] = Point(tags["Center tag"]).buffer(distance=radius)
+                    results_clr[video_name][name] = shape_data["Color BGR"].values[0]
         if not color:
             return results_roi, None
         else:

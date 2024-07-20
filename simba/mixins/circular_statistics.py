@@ -704,7 +704,7 @@ class CircularStatisticsMixin(object):
 
         :example:
         >>> data = np.random.randint(0, 360, (5000,)).astype(np.float32)
-        >>> rao_spacing(data=data)
+        >>> CircularStatisticsMixin.rao_spacing(data=data)
         """
 
         data = np.sort(data)

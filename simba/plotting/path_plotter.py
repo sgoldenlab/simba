@@ -194,20 +194,14 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
         for file_cnt, file_path in enumerate(self.files_found):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
-            self.video_info, _, self.fps = self.read_video_info(
-                video_name=self.video_name
-            )
+            self.video_info, _, self.fps = self.read_video_info(video_name=self.video_name)
             self.data_df = read_df(file_path, self.file_type)
             line_data, colors, animal_names = [], [], []
             for k, v in self.animal_attr.items():
-                check_if_keys_exist_in_dict(
-                    data=v, key=["bp", "color"], name=f"animal attr {k}"
-                )
-                line_data.append(
-                    self.data_df[[f'{v["bp"]}_x', f'{v["bp"]}_y']].values.astype(
-                        np.int64
-                    )
-                )
+                check_if_keys_exist_in_dict(data=v, key=["bp", "color"], name=f"animal attr {k}")
+                data_cols = [f'{v["bp"]}_x', f'{v["bp"]}_y']
+                check_that_column_exist(df=self.data_df, column_name=data_cols, file_name=file_path)
+                line_data.append(self.data_df[data_cols].values.astype(np.int64))
                 colors.append(v["color"])
                 if self.print_animal_names:
                     animal_names.append(

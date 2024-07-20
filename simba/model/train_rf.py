@@ -393,19 +393,11 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         if not os.listdir(self.model_dir_out):
             os.makedirs(self.model_dir_out)
         self.save_rf_model(self.rf_clf, self.clf_name, self.model_dir_out)
-        stdout_success(
-            msg=f"Classifier {self.clf_name} saved in models/generated_models directory",
-            elapsed_time=self.timer.elapsed_time_str,
-            source=self.__class__.__name__,
-        )
-        stdout_success(
-            msg=f"Evaluation files are in models/generated_models/model_evaluations folders",
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg=f"Classifier {self.clf_name} saved in models/generated_models directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(msg=f"Evaluation files are in models/generated_models/model_evaluations folders", source=self.__class__.__name__)
 
 
-#
-# test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini')
+# test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini')
 # test.run()
 # test.save()
 

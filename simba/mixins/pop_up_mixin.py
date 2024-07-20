@@ -196,8 +196,9 @@ class PopUpMixin(object):
         self.time_bin_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 
     def create_run_frm(self,run_function: Callable,
-        title: Optional[str] = "RUN",
-        btn_txt_clr: Optional[str] = "black",
+                       title: Optional[str] = "RUN",
+                       btn_txt_clr: Optional[str] = "black",
+                       idx: Optional[int] = None,
     ) -> None:
         """
         Create a label frame with a single button with a specified callback.
@@ -215,10 +216,11 @@ class PopUpMixin(object):
             font=Formats.LABELFRAME_HEADER_FORMAT.value,
             fg=btn_txt_clr,
         )
-        self.run_btn = Button(
-            self.run_frm, text=title, fg="blue", command=lambda: run_function()
-        )
-        self.run_frm.grid(row=self.children_cnt_main() + 1, column=0, sticky=NW)
+        self.run_btn = Button(self.run_frm, text=title, fg="blue", command=lambda: run_function())
+        if idx is None:
+            self.run_frm.grid(row=self.children_cnt_main() + 1, column=0, sticky=NW)
+        else:
+            self.run_frm.grid(row=idx, column=0, sticky=NW)
         self.run_btn.grid(row=0, column=0, sticky=NW)
 
     def create_choose_number_of_body_parts_frm(self, project_body_parts: List[str], run_function: object):

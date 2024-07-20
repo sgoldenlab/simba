@@ -778,9 +778,7 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
-    def sliding_variance(
-        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    def sliding_variance(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Jitted compute of the variance of data within sliding windows of varying sizes applied to
         the input data array. Variance is a measure of data dispersion or spread.
@@ -817,24 +815,7 @@ class TimeseriesFeatureMixin(object):
         fastmath=True,
         cache=True,
     )
-    def sliding_descriptive_statistics(
-        data: np.ndarray,
-        window_sizes: np.ndarray,
-        sample_rate: int,
-        statistics: Literal[
-            "var",
-            "max",
-            "min",
-            "std",
-            "median",
-            "mean",
-            "mad",
-            "sum",
-            "mac",
-            "rms",
-            "absenergy",
-        ],
-    ) -> np.ndarray:
+    def sliding_descriptive_statistics(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int, statistics: Literal["var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]) -> np.ndarray:
         """
         Jitted compute of descriptive statistics over sliding windows in 1D data array.
 
@@ -864,9 +845,7 @@ class TimeseriesFeatureMixin(object):
         for j in prange(len(statistics)):
             for i in prange(window_sizes.shape[0]):
                 window_size = int(window_sizes[i] * sample_rate)
-                for l, r in zip(
-                    prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-                ):
+                for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                     sample = data[l:r]
                     if statistics[j] == "var":
                         results[j, r - 1, i] = np.var(sample)
@@ -881,9 +860,7 @@ class TimeseriesFeatureMixin(object):
                     elif statistics[j] == "mean":
                         results[j, r - 1, i] = np.mean(sample)
                     elif statistics[j] == "mad":
-                        results[j, r - 1, i] = np.median(
-                            np.abs(sample - np.median(sample))
-                        )
+                        results[j, r - 1, i] = np.median(np.abs(sample - np.median(sample)))
                     elif statistics[j] == "sum":
                         results[j, r - 1, i] = np.sum(sample)
                     elif statistics[j] == "mac":

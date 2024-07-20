@@ -255,8 +255,8 @@ def get_meta_data_file_headers() -> List[str]:
         "under_sample_ratio",
         "under_sample_setting",
         "class_weight",
+        'rf_max_depth',
     ]
-
 
 def get_cmaps() -> List[str]:
     """

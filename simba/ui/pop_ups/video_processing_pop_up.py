@@ -42,7 +42,7 @@ from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    seconds_to_timestamp, str_2_bool, timestamp_to_seconds)
+    seconds_to_timestamp, str_2_bool, timestamp_to_seconds, find_video_of_file)
 from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.brightness_contrast_ui import \
     brightness_contrast_ui
@@ -1376,54 +1376,76 @@ class ImportFrameDirectoryPopUp(PopUpMixin, ConfigReader):
 
 
 class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
-        PopUpMixin.__init__(
-            self, config_path=config_path, title="EXTRACT ANNOTATED FRAMES"
-        )
+    """
+    :example:
+    >>> ExtractAnnotationFramesPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+    """
+
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
-        self.create_clf_checkboxes(main_frm=self.main_frm, clfs=self.clf_names)
-        self.settings_frm = LabelFrame(
-            self.main_frm,
-            text="STYLE SETTINGS",
-            font=("Helvetica", 12, "bold"),
-            pady=5,
-            padx=5,
-        )
+        if len(self.target_file_paths) == 0:
+            raise NoFilesFoundError(msg=f'Cannot extract annotation images: No data files found in {self.targets_folder}.')
+        self.video_dict = {}
+        for file_path in self.target_file_paths:
+            self.video_dict[get_fn_ext(filepath=file_path)[1]] = file_path
+
+        PopUpMixin.__init__(self, config_path=config_path, title="EXTRACT ANNOTATED FRAMES")
+        self.clf_frame = LabelFrame(self.main_frm, text="CHOOSE CLASSIFIERS", font=("Helvetica", 12, "bold"), pady=5, padx=5)
+        self.create_clf_checkboxes(main_frm=self.clf_frame, clfs=self.clf_names)
+        self.choose_video_frm = LabelFrame(self.main_frm, text="CHOOSE VIDEOS", font=("Helvetica", 12, "bold"), pady=5, padx=5)
+        video_options = ["ALL"] + list(self.video_dict.keys())
+        self.video_dropdown = DropDownMenu(self.choose_video_frm, "Video:", video_options, "25")
+        self.video_dropdown.setChoices('ALL')
+        self.settings_frm = LabelFrame(self.main_frm, text="STYLE SETTINGS", font=("Helvetica", 12, "bold"), pady=5, padx=5)
         down_sample_resolution_options = ["None", "2x", "3x", "4x", "5x"]
-        self.resolution_downsample_dropdown = DropDownMenu(
-            self.settings_frm,
-            "Down-sample images:",
-            down_sample_resolution_options,
-            "25",
-        )
-        self.resolution_downsample_dropdown.setChoices(
-            down_sample_resolution_options[0]
-        )
-        self.settings_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
+        img_format_options = ['png', 'jpg', 'webp']
+        self.resolution_downsample_dropdown = DropDownMenu(self.settings_frm, "Down-sample images:", down_sample_resolution_options, "25")
+        self.resolution_downsample_dropdown.setChoices(down_sample_resolution_options[0])
+        self.img_format_dropdown = DropDownMenu(self.settings_frm, "Image format:", img_format_options, "25")
+        self.img_format_dropdown.setChoices(img_format_options[0])
+        self.greyscale_dropdown = DropDownMenu(self.settings_frm, "Image grayscale:", ['TRUE', 'FALSE'], "25")
+        self.greyscale_dropdown.setChoices('FALSE')
+
+        self.choose_video_frm.grid(row=self.children_cnt_main()+2, column=0, sticky=NW)
+        self.video_dropdown.grid(row=0, column=0, sticky=NW)
+        self.settings_frm.grid(row=self.children_cnt_main()+1, column=0, sticky=NW)
         self.resolution_downsample_dropdown.grid(row=0, column=0, sticky=NW)
-        self.create_run_frm(run_function=self.run)
+        self.img_format_dropdown.grid(row=1, column=0, sticky=NW)
+        self.greyscale_dropdown.grid(row=2, column=0, sticky=NW)
+
+        self.run_btn = Button(self.main_frm, text="RUN", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black", command=lambda: self.run())
+        self.run_btn.grid(row=self.children_cnt_main()+3, column=0, sticky=NW)
+        self.main_frm.mainloop()
 
     def run(self):
-        check_if_filepath_list_is_empty(
-            self.target_file_paths,
-            error_msg=f"SIMBA ERROR: Zero files found in the {self.targets_folder} directory",
-        )
-        downsample_setting = self.resolution_downsample_dropdown.getChoices()
-        if downsample_setting != Dtypes.NONE.value:
-            downsample_setting = int("".join(filter(str.isdigit, downsample_setting)))
+        downsample = self.resolution_downsample_dropdown.getChoices()
+        if downsample != Dtypes.NONE.value: downsample = int("".join(filter(str.isdigit, downsample)))
+        else: downsample = None
+        greyscale = str_2_bool(input_str=self.greyscale_dropdown.getChoices())
+        img_format = self.img_format_dropdown.getChoices()
         clfs = []
         for clf_name, selection in self.clf_selections.items():
             if selection.get():
                 clfs.append(clf_name)
         if len(clfs) == 0:
             raise NoChoosenClassifierError(source=self.__class__.__name__)
-        settings = {"downsample": downsample_setting}
+        video_selection = self.video_dropdown.getChoices()
+        if video_selection == 'ALL':
+            data_paths = list(self.video_dict.values())
+        else:
+            data_paths = [self.video_dict[video_selection]]
 
-        frame_extractor = AnnotationFrameExtractor(
-            config_path=self.config_path, clfs=clfs, settings=settings
-        )
+        for data_path in data_paths:
+            _ = find_video_of_file(video_dir=self.video_dir, filename=get_fn_ext(filepath=data_path)[1], raise_error=True)
+
+        frame_extractor = AnnotationFrameExtractor(config_path=self.config_path,
+                                                   clfs=clfs,
+                                                   downsample=downsample,
+                                                   img_format=img_format,
+                                                   greyscale=greyscale,
+                                                   data_paths=data_paths)
         frame_extractor.run()
-
 
 class DownsampleVideoPopUp(PopUpMixin):
     def __init__(self):

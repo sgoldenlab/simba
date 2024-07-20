@@ -220,6 +220,19 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
             stdout_success(msg=f"Heatmap location videos visualizations for {len(self.data_paths)} videos created in {self.heatmap_location_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
+
+# test = HeatMapperLocationMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/platea/project_folder/project_config.ini',
+#                                       style_attr = {'palette': 'magma', 'shading': 'gouraud', 'bin_size': 80, 'max_scale': 'auto'},
+#                                       final_img_setting=True,
+#                                       video_setting=True,
+#                                       frame_setting=False,
+#                                       bodypart='NOSE',
+#                                       core_cnt=5,
+#                                       data_paths=['/Users/simon/Desktop/envs/simba/troubleshooting/platea/project_folder/csv/outlier_corrected_movement_location/Video_1.csv'])
+# test.run()
+
+
+
 # test = HeatMapperLocationMultiprocess(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                                       style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 80, 'max_scale': 'auto'},
 #                                       final_img_setting=True,

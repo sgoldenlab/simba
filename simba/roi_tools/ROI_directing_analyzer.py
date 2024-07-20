@@ -11,7 +11,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.data import slice_roi_dict_for_video
-from simba.utils.errors import InvalidInputError, ROICoordinatesNotFoundError
+from simba.utils.errors import InvalidInputError, ROICoordinatesNotFoundError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 
@@ -207,16 +207,10 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             video_timer = SimbaTimer(start=True)
             print(f"Analyzing ROI directionality in video {self.video_name}...")
             data_df = read_df(file_path=file_path, file_type=self.file_type)
-            video_roi_dict, shape_names = slice_roi_dict_for_video(
-                data=self.roi_dict, video_name=self.video_name
-            )
+            video_roi_dict, shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
             for animal_name, bps in self.direct_bp_dict.items():
-                ear_left_arr = data_df[
-                    [bps["Ear_left"]["X_bps"], bps["Ear_left"]["Y_bps"]]
-                ].values
-                ear_right_arr = data_df[
-                    [bps["Ear_right"]["X_bps"], bps["Ear_right"]["Y_bps"]]
-                ].values
+                ear_left_arr = data_df[[bps["Ear_left"]["X_bps"], bps["Ear_left"]["Y_bps"]]].values
+                ear_right_arr = data_df[[bps["Ear_right"]["X_bps"], bps["Ear_right"]["Y_bps"]]].values
                 nose_arr = data_df[[bps["Nose"]["X_bps"], bps["Nose"]["Y_bps"]]].values
                 for roi_type, roi_type_data in video_roi_dict.items():
                     for _, row in roi_type_data.iterrows():
@@ -251,9 +245,9 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                             pd.concat([bp_data, eye_roi_intersections], axis=1)
                         )
             video_timer.stop_timer()
-            print(
-                f"ROI directionality analyzed in video {self.video_name}... (elapsed time: {video_timer.elapsed_time_str}s)"
-            )
+            print(f"ROI directionality analyzed in video {self.video_name}... (elapsed time: {video_timer.elapsed_time_str}s)")
+        if len(self.results) == 0:
+            raise NoDataError(msg=f'No ROI DATA exists for data files {self.data_paths}', source=self.__class__.__name__)
         self.results_df = pd.concat(self.results, axis=0)
 
     def save(self, path: Optional[Union[str, os.PathLike]] = None):

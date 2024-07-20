@@ -23,6 +23,7 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, find_video_of_file,
                                     get_video_meta_data)
 from simba.utils.warnings import FrameRangeWarning
+from simba.utils.data import create_color_palettes
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]
 FRAME_COUNT = "frame_count"
@@ -33,10 +34,12 @@ def geometry_visualizer(data: np.ndarray,
                         video_meta_data: dict,
                         thickness: int,
                         verbose: bool,
-                        bg_opacity: float):
+                        bg_opacity: float,
+                        palette: str):
 
     group = int(data[0][-1])
-    colors = list(get_color_dict().values())
+    colors = create_color_palettes(no_animals=1, map_size=120, cmaps=[palette])
+    colors = [x for xs in colors for x in xs]
     start_frm, end_frm = data[0][-2], data[-1][-2]
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     video_save_path = os.path.join(video_temp_dir, f"{group}.mp4")
@@ -103,6 +106,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  thickness: Optional[int] = 2,
                  bg_opacity: Optional[float] = 1,
+                 palette: Optional[str] = 'jet',
                  verbose: Optional[bool] = True):
 
         check_file_exist_and_readable(file_path=config_path)
@@ -112,12 +116,12 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         check_int(name="thickness", value=thickness, min_value=1)
         check_float(name="video_opacity", value=bg_opacity, min_value=0.0, max_value=1.0)
         check_valid_boolean(value=verbose, source='verbose', raise_error=True)
-        shape_types = set()
-        for i in geometries:
-            shape_types.update(set([type(x) for x in i]))
-        for i in shape_types:
-            if i not in ACCEPTED_TYPES:
-                raise InvalidInputError(msg=f"geometries contain an invalid datatype {i}. Accepted: {ACCEPTED_TYPES}",source=self.__class__.__name__)
+        # shape_types = set()
+        # for i in geometries:
+        #     shape_types.update(set([type(x) for x in i]))
+        # for i in shape_types:
+        #     if i not in ACCEPTED_TYPES:
+        #         raise InvalidInputError(msg=f"geometries contain an invalid datatype {i}. Accepted: {ACCEPTED_TYPES}",source=self.__class__.__name__)
         check_int( name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
@@ -132,7 +136,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         self.geometry_dir = os.path.join(self.frames_output_dir, "geometry_visualization")
         if not os.path.isdir(self.geometry_dir): os.makedirs(self.geometry_dir)
         self.temp_dir = os.path.join(self.frames_output_dir, self.geometry_dir, video_name, "temp")
-        self.verbose, self.bg_opacity = verbose, bg_opacity
+        self.verbose, self.bg_opacity, self.palette = verbose, bg_opacity, palette
         if not os.path.isdir(self.temp_dir):
             os.makedirs(self.temp_dir)
         if save_path is None:
@@ -151,7 +155,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
             data[i] = np.concatenate((data[i], new_col), axis=1)
 
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(geometry_visualizer, video_path=self.video_path, video_temp_dir=self.temp_dir, video_meta_data=self.video_meta_data, thickness=self.thickness, verbose=self.verbose, bg_opacity=self.bg_opacity)
+            constants = functools.partial(geometry_visualizer, video_path=self.video_path, video_temp_dir=self.temp_dir, video_meta_data=self.video_meta_data, thickness=self.thickness, verbose=self.verbose, bg_opacity=self.bg_opacity, palette=self.palette)
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 print(f"Section {result}/{len(data)} complete...")
             pool.terminate()

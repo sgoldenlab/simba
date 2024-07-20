@@ -15,7 +15,7 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_float, check_if_keys_exist_in_dict,
-    check_int, check_valid_lst)
+    check_int, check_valid_lst, check_that_column_exist)
 from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
@@ -176,7 +176,9 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
                 if os.path.exists(self.save_video_folder):
                     shutil.rmtree(self.save_video_folder)
                 os.makedirs(self.save_video_folder)
-            self.data_df = read_df(file_path, self.file_type)[self.bp_lst]
+            self.data_df = read_df(file_path, self.file_type)
+            check_that_column_exist(df=self.data_df, column_name=self.bp_lst, file_name=file_path)
+            self.data_df = self.data_df[self.bp_lst]
             squares, aspect_ratio = GeometryMixin().bucket_img_into_grid_square(bucket_grid_size_mm=self.style_attr[STYLE_BIN_SIZE], img_size=(self.width, self.height), px_per_mm=self.px_per_mm)
             location_array = GeometryMixin().cumsum_coord_geometries(data=self.data_df.values, fps=self.fps, geometries=squares)
 
@@ -221,6 +223,18 @@ class HeatmapperLocationSingleCore(ConfigReader, PlottingMixin):
             print(f"Heatmap plot for video {self.video_name} saved (elapsed time: {video_timer.elapsed_time_str}s")
         self.timer.stop_timer()
         stdout_success(msg=f"Created heatmaps for {len(self.data_paths)} videos", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__,)
+
+
+# test = HeatmapperLocationSingleCore(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/platea/project_folder/project_config.ini',
+#                                       style_attr = {'palette': 'jet', 'shading': 'flat', 'bin_size': 30, 'max_scale': 2},
+#                                       final_img_setting=True,
+#                                       video_setting=True,
+#                                       frame_setting=False,
+#                                       bodypart='CENTER',
+#                                       data_paths=['/Users/simon/Desktop/envs/simba/troubleshooting/platea/project_folder/csv/outlier_corrected_movement_location/Video_1.csv'])
+# test.run()
+
+
 
 
 

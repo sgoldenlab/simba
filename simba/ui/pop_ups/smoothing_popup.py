@@ -50,7 +50,7 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
 
         self.multiple_file_frm = LabelFrame(self.main_frm, text="SMOOTH DIRECTORY OF DATA", font=Formats.LABELFRAME_HEADER_FORMAT.value)
         self.selected_dir = FolderSelect(self.multiple_file_frm, "SELECT DIRECTORY OF DATA FILES:", lblwidth=35, initialdir=self.project_path)
-        self.run_btn_multiple = Button(self.multiple_file_frm, text="RUN SINGLE DATA FILE SMOOTHING", fg="blue", command=lambda: self.run(multiple=True))
+        self.run_btn_multiple = Button(self.multiple_file_frm, text="RUN DATA DIRECTORY SMOOTHING", fg="blue", command=lambda: self.run(multiple=True))
 
         self.multiple_file_frm.grid(row=2, column=0, sticky=NW)
         self.selected_dir.grid(row=0, column=0, sticky=NW)

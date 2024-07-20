@@ -1783,22 +1783,10 @@ class Statistics(FeatureExtractionMixin):
             (s1_rnk.shape[0] - 1), np.nan
         )
         for i in range(s2_rnk.shape[0] - 1):
-            cncrdnt_cnts[i] = (
-                np.argwhere(s2_rnk[i + 1 :] > s2_rnk[i]).flatten().shape[0]
-            )
-            dscrdnt_cnts[i] = (
-                np.argwhere(s2_rnk[i + 1 :] < s2_rnk[i]).flatten().shape[0]
-            )
-        t = (np.sum(cncrdnt_cnts) - np.sum(dscrdnt_cnts)) / (
-            np.sum(cncrdnt_cnts) + np.sum(dscrdnt_cnts)
-        )
-        z = (
-            3
-            * t
-            * (np.sqrt(s1_rnk.shape[0] * (s1_rnk.shape[0] - 1)))
-            / np.sqrt(2 * ((2 * s1_rnk.shape[0]) + 5))
-        )
-
+            cncrdnt_cnts[i] = (np.argwhere(s2_rnk[i + 1 :] > s1_rnk[i]).flatten().shape[0])
+            dscrdnt_cnts[i] = (np.argwhere(s2_rnk[i + 1 :] < s1_rnk[i]).flatten().shape[0])
+        t = (np.sum(cncrdnt_cnts) - np.sum(dscrdnt_cnts)) / (np.sum(cncrdnt_cnts) + np.sum(dscrdnt_cnts))
+        z = (3 * t * (np.sqrt(s1_rnk.shape[0] * (s1_rnk.shape[0] - 1))) / np.sqrt(2 * ((2 * s1_rnk.shape[0]) + 5)))
         return t, z
 
     @staticmethod
@@ -3071,7 +3059,7 @@ class Statistics(FeatureExtractionMixin):
 
         :example:
         >>> data = np.random.randint(0, 50, (1000, 200)).astype(np.float32)
-        >>> x = mahalanobis_distance_cdist(data=data)
+        >>> x = Statistics.mahalanobis_distance_cdist(data=data)
         """
 
         covariance_matrix = np.cov(data, rowvar=False)
