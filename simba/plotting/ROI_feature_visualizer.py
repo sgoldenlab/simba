@@ -229,12 +229,12 @@ class ROIfeatureVisualizer(ConfigReader):
         )
 
 
-style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'lines', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}
-test = ROIfeatureVisualizer(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
-                            video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4',
-                            style_attr=style_attr,
-                            body_parts=['Nose'])
-test.run()
+# style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'lines', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}
+# test = ROIfeatureVisualizer(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
+#                             video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4',
+#                             style_attr=style_attr,
+#                             body_parts=['Nose'])
+# test.run()
 
 
 # style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'funnel', 'border_color': (0, 128, 0), 'pose_estimation': True, 'animal_names': True}

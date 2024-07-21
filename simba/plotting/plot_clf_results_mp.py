@@ -288,14 +288,14 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
 #text_settings = {'circle_scale': 5, 'font_size': 0.528, 'spacing_scale': 28, 'text_thickness': 2}
 
-clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
-                                             video_setting=True,
-                                             frame_setting=False,
-                                             rotate=False,
-                                             video_file_path='Trial    10.mp4',
-                                             cores=5,
-                                             text_settings=False)
-clf_plotter.run()
+# clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
+#                                              video_setting=True,
+#                                              frame_setting=False,
+#                                              rotate=False,
+#                                              video_file_path='Trial    10.mp4',
+#                                              cores=5,
+#                                              text_settings=False)
+# clf_plotter.run()
 
 
 # clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini', video_setting=True, frame_setting=False, rotate=False, video_file_path='Together_1.avi', cores=5)
