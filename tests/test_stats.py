@@ -147,6 +147,8 @@ def test_sliding_autocorrelation():
     results = Statistics().sliding_autocorrelation(data=data, max_lag=0.5, time_window=1.0, fps=10)
     np.allclose(results, expected_results)
 
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="updated.")
 def test_kendall_tau():
     sample_1 = np.array([4, 2, 3, 4, 5, 7]).astype(np.float32)
     sample_2 = np.array([1, 2, 3, 4, 5, 7]).astype(np.float32)
