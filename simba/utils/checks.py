@@ -1272,12 +1272,10 @@ def check_valid_tuple(
             )
 
 
-def check_video_and_data_frm_count_align(
-    video: Union[str, os.PathLike, cv2.VideoCapture],
-    data: Union[str, os.PathLike, pd.DataFrame],
-    name: Optional[str] = "",
-    raise_error: Optional[bool] = True,
-) -> None:
+def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.VideoCapture],
+                                         data: Union[str, os.PathLike, pd.DataFrame],
+                                         name: Optional[str] = "",
+                                         raise_error: Optional[bool] = True) -> None:
     """
     Check if the frame count of a video matches the row count of a data file.
 

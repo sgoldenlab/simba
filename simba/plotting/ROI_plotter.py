@@ -117,17 +117,24 @@ class ROIPlot(ConfigReader):
     def __calc_text_locs(self) -> dict:
         loc_dict = {}
         line_spacer = TextOptions.FIRST_LINE_SPACING.value
+        txt_strs = []
+        for animal_cnt, animal_name in enumerate(self.animal_names):
+            for shape in self.shape_names:
+                txt_strs.append(animal_name + ' ' + shape + ' entries')
+        longest_text_str = max(txt_strs, key=len)
+        self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15), text_thickness=TextOptions.TEXT_THICKNESS.value)
+        self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["height"])), circle_frame_ratio=100)
         for animal_cnt, animal_name in enumerate(self.animal_names):
             loc_dict[animal_name] = {}
             for shape in self.shape_names:
                 loc_dict[animal_name][shape] = {}
                 loc_dict[animal_name][shape]["timer_text"] = f"{shape} {animal_name} timer:"
                 loc_dict[animal_name][shape]["entries_text"] = f"{shape} {animal_name} entries:"
-                loc_dict[animal_name][shape]["timer_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + self.scalers["space_size"] * line_spacer))
-                loc_dict[animal_name][shape]["timer_data_loc"] = (int(self.border_img_w - (self.border_img_w / 8)), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + self.scalers["space_size"] * line_spacer))
+                loc_dict[animal_name][shape]["timer_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * line_spacer))
+                loc_dict[animal_name][shape]["timer_data_loc"] = (int(self.video_meta_data["width"] + x_spacer + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * line_spacer))
                 line_spacer += TextOptions.LINE_SPACING.value
-                loc_dict[animal_name][shape]["entries_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + self.scalers["space_size"] * line_spacer))
-                loc_dict[animal_name][shape]["entries_data_loc"] = (int(self.border_img_w - (self.border_img_w / 8)), (self.video_meta_data["height"]- (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + self.scalers["space_size"] * line_spacer))
+                loc_dict[animal_name][shape]["entries_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * line_spacer))
+                loc_dict[animal_name][shape]["entries_data_loc"] = (int(self.video_meta_data["width"] + x_spacer + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"]- (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * line_spacer))
                 line_spacer += TextOptions.LINE_SPACING.value
         return loc_dict
 
@@ -135,8 +142,8 @@ class ROIPlot(ConfigReader):
         for animal_name in self.animal_names:
             for _, shape in shape_df.iterrows():
                 shape_name, shape_color = shape["Name"], shape["Color BGR"]
-                cv2.putText(self.border_img, self.loc_dict[animal_name][shape_name]["timer_text"], self.loc_dict[animal_name][shape_name]["timer_text_loc"], TextOptions.FONT.value, self.scalers["font_size"], shape_color, TextOptions.TEXT_THICKNESS.value)
-                cv2.putText(self.border_img, self.loc_dict[animal_name][shape_name]["entries_text"], self.loc_dict[animal_name][shape_name]["entries_text_loc"], TextOptions.FONT.value, self.scalers["font_size"], shape_color, TextOptions.TEXT_THICKNESS.value)
+                cv2.putText(self.border_img, self.loc_dict[animal_name][shape_name]["timer_text"], self.loc_dict[animal_name][shape_name]["timer_text_loc"], TextOptions.FONT.value, self.font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
+                cv2.putText(self.border_img, self.loc_dict[animal_name][shape_name]["entries_text"], self.loc_dict[animal_name][shape_name]["entries_text_loc"], TextOptions.FONT.value, self.font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
 
     def __create_counters(self) -> dict:
         cnt_dict = {}
@@ -179,11 +186,6 @@ class ROIPlot(ConfigReader):
 
     def run(self):
         video_timer = SimbaTimer(start=True)
-        max_dim = max(self.video_meta_data["width"], self.video_meta_data["height"])
-        self.scalers = {}
-        self.scalers["circle_size"] = int(TextOptions.RADIUS_SCALER.value / (TextOptions.RESOLUTION_SCALER.value / max_dim))
-        self.scalers["font_size"] = float(TextOptions.FONT_SCALER.value / (TextOptions.RESOLUTION_SCALER.value / max_dim))
-        self.scalers["space_size"] = int(TextOptions.SPACE_SCALER.value / (TextOptions.RESOLUTION_SCALER.value / max_dim))
         color_lst = create_color_palettes(self.roi_analyzer.animal_cnt, len(self.body_parts))[0]
         self.border_img_h, self.border_img_w = self.__get_bordered_img_size()
         fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
@@ -206,15 +208,15 @@ class ROIPlot(ConfigReader):
                     bp_data = (self.data_df.loc[frame_cnt, self.bp_dict[animal_name]].fillna(0.0).values)
                     if self.threshold < bp_data[2]:
                         if self.style_attr[SHOW_BODY_PARTS]:
-                            cv2.circle(self.border_img, (int(bp_data[0]), int(bp_data[1])), self.scalers["circle_size"], color_lst[animal_cnt], -1)
+                            cv2.circle(self.border_img, (int(bp_data[0]), int(bp_data[1])), self.circle_size, color_lst[animal_cnt], -1)
                         if self.style_attr[SHOW_ANIMAL_NAMES]:
-                            cv2.putText(self.border_img, animal_name, (int(bp_data[0]), int(bp_data[1])), self.font, self.scalers["font_size"], color_lst[animal_cnt], TextOptions.TEXT_THICKNESS.value)
+                            cv2.putText(self.border_img, animal_name, (int(bp_data[0]), int(bp_data[1])), self.font, self.font_size, color_lst[animal_cnt], TextOptions.TEXT_THICKNESS.value)
                 for animal_cnt, animal_name in enumerate(self.animal_names):
                     for shape in self.shape_names:
                         time = str(round(self.data_df.loc[frame_cnt, f"{animal_name}_{shape}_cum_sum_time"], 2))
                         entries = str(int(self.data_df.loc[frame_cnt, f"{animal_name}_{shape}_cum_sum_entries"]))
-                        cv2.putText(self.border_img, time, self.loc_dict[animal_name][shape]["timer_data_loc"], self.font, self.scalers["font_size"], self.shape_dicts[shape]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
-                        cv2.putText(self.border_img, entries, self.loc_dict[animal_name][shape]["entries_data_loc"], self.font, self.scalers["font_size"], self.shape_dicts[shape]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
+                        cv2.putText(self.border_img, time, self.loc_dict[animal_name][shape]["timer_data_loc"], self.font, self.font_size, self.shape_dicts[shape]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
+                        cv2.putText(self.border_img, entries, self.loc_dict[animal_name][shape]["entries_data_loc"], self.font, self.font_size, self.shape_dicts[shape]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
                 writer.write(self.border_img)
                 print(f"Frame: {frame_cnt+1} / {self.video_meta_data['frame_count']}, Video: {self.video_name}.")
                 frame_cnt += 1

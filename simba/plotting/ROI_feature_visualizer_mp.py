@@ -53,7 +53,6 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                animal_names: list,
                                roi_dict: dict,
                                bp_lk: dict,
-                               animal_bps: dict,
                                animal_bp_names: List[str],
                                animal_bp_dict: dict,
                                roi_features_df: pd.DataFrame,
@@ -153,8 +152,12 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
 
 
     :example:
-    >>> style_attr = {'ROI_centers': True, 'ROI_ear_tags': True, 'Directionality': True, 'Directionality_style': 'Funnel', 'Border_color': (0, 128, 0), 'Pose_estimation': True}
-    >>> _ = ROIfeatureVisualizerMultiprocess(config_path='test_/project_folder/project_config.ini', video_name='Together_1.avi', style_attr=style_attr, core_cnt=3).run()
+    >>> style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'funnel', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}
+    >>> test = ROIfeatureVisualizerMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',
+    >>>                             video_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/videos/NOR ENCODING FExMP8.mp4',
+    >>>                             style_attr=style_attr,
+    >>>                             body_parts=['Center'], core_cnt=-1)
+    >>> test.run()
     """
 
     def __init__(self,
@@ -164,8 +167,6 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                  style_attr: Dict[str, Any],
                  core_cnt: Optional[int] = -1):
 
-        if platform.system() == "Darwin":
-            multiprocessing.set_start_method("spawn", force=True)
         check_int(name=f"{self.__class__.__name__} core_cnt",value=core_cnt,min_value=-1,max_value=find_core_cnt()[0])
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
@@ -193,12 +194,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         for bp in body_parts:
             if bp not in self.body_parts_lst:
                 raise BodypartColumnNotFoundError(msg=f"The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}",source=self.__class__.__name__,)
-        self.roi_feature_creator = ROIFeatureCreator(
-            config_path=config_path,
-            body_parts=body_parts,
-            append_data=False,
-            data_path=self.data_path,
-        )
+        self.roi_feature_creator = ROIFeatureCreator(config_path=config_path, body_parts=body_parts, append_data=False, data_path=self.data_path)
         self.roi_feature_creator.run()
         self.bp_lk = self.roi_feature_creator.bp_lk
         self.animal_names = [v[0] for v in self.bp_lk.values()]
@@ -206,31 +202,15 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         self.video_meta_data = get_video_meta_data(video_path)
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         self.cap = cv2.VideoCapture(video_path)
-        self.max_dim = max(
-            self.video_meta_data["width"], self.video_meta_data["height"]
-        )
-        self.circle_size = int(
-            TextOptions.RADIUS_SCALER.value
-            / (TextOptions.RESOLUTION_SCALER.value / self.max_dim)
-        )
-        self.font_size = float(
-            TextOptions.FONT_SCALER.value
-            / (TextOptions.RESOLUTION_SCALER.value / self.max_dim)
-        )
-        self.spacing_scale = int(
-            TextOptions.SPACE_SCALER.value
-            / (TextOptions.RESOLUTION_SCALER.value / self.max_dim)
-        )
-        check_video_and_data_frm_count_align(
-            video=video_path, data=self.data_path, name=video_path, raise_error=False
-        )
-        self.style_attr = style_attr
+        check_video_and_data_frm_count_align(video=video_path, data=self.data_path, name=video_path, raise_error=False)
         self.direct_viable = self.roi_feature_creator.roi_directing_viable
         self.data_df = read_df(file_path=self.data_path, file_type=self.file_type)
         self.shape_dicts = self.__create_shape_dicts()
         self.directing_df = self.roi_feature_creator.dr
         self.video_path = video_path
         self.roi_features_df = self.roi_feature_creator.out_df
+        if platform.system() == "Darwin":
+            multiprocessing.set_start_method("spawn", force=True)
 
     def __create_shape_dicts(self):
         shape_dicts = {}
@@ -245,6 +225,13 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
     def __calc_text_locs(self):
         add_spacer = TextOptions.FIRST_LINE_SPACING.value
         self.loc_dict = {}
+        txt_strs = []
+        for animal_cnt, animal_name in enumerate(self.animal_names):
+            for shape in self.shape_names:
+                txt_strs.append(animal_name + ' ' + shape + ' center distance')
+        longest_text_str = max(txt_strs, key=len)
+        self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15), text_thickness=TextOptions.TEXT_THICKNESS.value)
+        self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["height"])), circle_frame_ratio=100)
         for animal_cnt, animal_data in self.bp_lk.items():
             animal, animal_bp, _ = animal_data
             animal_name = f"{animal} {animal_bp}"
@@ -252,82 +239,26 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             self.loc_dict[animal] = {}
             for shape in self.shape_names:
                 self.loc_dict[animal_name][shape] = {}
-                self.loc_dict[animal_name][shape][
-                    "in_zone_text"
-                ] = f"{shape} {animal_name} in zone"
-                self.loc_dict[animal_name][shape][
-                    "distance_text"
-                ] = f"{shape} {animal_name} distance"
-                self.loc_dict[animal_name][shape]["in_zone_text_loc"] = (
-                    (self.video_meta_data["width"] + 5),
-                    (
-                        self.video_meta_data["height"]
-                        - (self.video_meta_data["height"] + 10)
-                        + self.spacing_scale * add_spacer
-                    ),
-                )
-                self.loc_dict[animal_name][shape]["in_zone_data_loc"] = (
-                    int(self.img_w_border_w - (self.img_w_border_w / 8)),
-                    (
-                        self.video_meta_data["height"]
-                        - (self.video_meta_data["height"] + 10)
-                        + self.spacing_scale * add_spacer
-                    ),
-                )
+                self.loc_dict[animal_name][shape]["in_zone_text"] = f"{shape} {animal_name} in zone"
+                self.loc_dict[animal_name][shape]["distance_text"] = f"{shape} {animal_name} distance"
+                self.loc_dict[animal_name][shape]["in_zone_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
+                self.loc_dict[animal_name][shape]["in_zone_data_loc"] = (int(self.video_meta_data["width"] + x_spacer + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
                 add_spacer += 1
-                self.loc_dict[animal_name][shape]["distance_text_loc"] = (
-                    (self.video_meta_data["width"] + 5),
-                    (
-                        self.video_meta_data["height"]
-                        - (self.video_meta_data["height"] + 10)
-                        + self.spacing_scale * add_spacer
-                    ),
-                )
-                self.loc_dict[animal_name][shape]["distance_data_loc"] = (
-                    int(self.img_w_border_w - (self.img_w_border_w / 8)),
-                    (
-                        self.video_meta_data["height"]
-                        - (self.video_meta_data["height"] + 10)
-                        + self.spacing_scale * add_spacer
-                    ),
-                )
+                self.loc_dict[animal_name][shape]["distance_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
+                self.loc_dict[animal_name][shape]["distance_data_loc"] = (int(self.video_meta_data["width"] + x_spacer + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
                 add_spacer += 1
                 if self.direct_viable and self.style_attr[DIRECTIONALITY]:
                     self.loc_dict[animal][shape] = {}
-                    self.loc_dict[animal][shape][
-                        "directing_text"
-                    ] = f"{shape} {animal} facing"
-                    self.loc_dict[animal][shape]["directing_text_loc"] = (
-                        (self.video_meta_data["width"] + 5),
-                        (
-                            self.video_meta_data["height"]
-                            - (self.video_meta_data["height"] + 10)
-                            + self.spacing_scale * add_spacer
-                        ),
-                    )
-                    self.loc_dict[animal][shape]["directing_data_loc"] = (
-                        int(self.img_w_border_w - (self.img_w_border_w / 8)),
-                        (
-                            self.video_meta_data["height"]
-                            - (self.video_meta_data["height"] + 10)
-                            + self.spacing_scale * add_spacer
-                        ),
-                    )
+                    self.loc_dict[animal][shape]["directing_text"] = f"{shape} {animal} facing"
+                    self.loc_dict[animal][shape]["directing_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
+                    self.loc_dict[animal][shape]["directing_data_loc"] = (int(self.video_meta_data["width"] + x_spacer + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
                     add_spacer += 1
 
     def __get_border_img_size(self, video_path: Union[str, os.PathLike]):
         cap = cv2.VideoCapture(video_path)
         cap.set(1, 1)
         _, img = self.cap.read()
-        bordered_img = cv2.copyMakeBorder(
-            img,
-            0,
-            0,
-            0,
-            int(self.video_meta_data["width"]),
-            borderType=cv2.BORDER_CONSTANT,
-            value=[0, 0, 0],
-        )
+        bordered_img = cv2.copyMakeBorder(img, 0, 0, 0, int(self.video_meta_data["width"]), borderType=cv2.BORDER_CONSTANT, value=[0, 0, 0])
         cap.release()
         return bordered_img.shape[0], bordered_img.shape[1]
 
@@ -357,8 +288,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                                           animal_names=self.animal_names,
                                           animal_bp_dict=self.animal_bp_dict,
                                           bp_lk=self.bp_lk,
-                                          roi_features_df=self.roi_features_df,
-                                          animal_bps=self.animal_bp_dict)
+                                          roi_features_df=self.roi_features_df)
             for cnt, result in enumerate(pool.imap(constants, frame_range, chunksize=self.multiprocess_chunksize)):
                print(f"Batch core {result+1}/{self.core_cnt} complete...")
             print(f"Joining {self.video_name} multi-processed video...")
@@ -366,7 +296,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             self.timer.stop_timer()
             pool.terminate()
             pool.join()
-            stdout_success(msg=f"Video {self.video_name} complete. Video saved in project_folder/frames/output/ROI_features.", elapsed_time=self.timer.elapsed_time_str)
+            stdout_success(msg=f"Video {self.video_name} complete. Video saved in directory {self.roi_features_save_dir}.", elapsed_time=self.timer.elapsed_time_str)
 
 
 

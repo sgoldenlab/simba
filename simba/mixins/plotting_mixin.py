@@ -30,7 +30,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_valid_rgb_tuple, check_instance,
                                 check_int, check_str, check_that_column_exist,
                                 check_valid_array, check_valid_dataframe,
-                                check_valid_lst)
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.enums import Formats, Keys, Options, TextOptions
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
@@ -1795,6 +1795,61 @@ class PlottingMixin(object):
                     -1,
                 )
         return img
+
+
+    def get_optimal_font_scales(self,
+                                text: Union[str, List[str]],
+                                accepted_px_width: int,
+                                accepted_px_height: int,
+                                text_thickness: Optional[int] = 2,
+                                font: Optional[int] = cv2.FONT_HERSHEY_TRIPLEX) -> Tuple[float, int, int]:
+
+        """
+        Get the optimal font size, column-wise and row-wise text distance of printed text for printing on images.
+
+        :param str text: The text to be printed. Either a string or a list of strings. If a list, then the longest string will be used to evaluate spacings/font.
+        :param int accepted_px_width: The widest allowed string in pixels. E.g., 1/4th of the image width.
+        :param int accepted_px_height: The highest allowed string in pixels. E.g., 1/10th of the image size.
+        :param Optional[int] text_thickness: The thickness of the font. Default: 2.
+        :param Optional[int] font: The font integer representation 0-7. See ``simba.utils.enums.Options.CV2_FONTS.values
+        :returns Tuple[int, int, int]: The font size, the shift on x between successive columns, the shift in y between successive rows.
+
+        :example:
+        >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-07-08 at 4.46.03 PM.png')
+        >>> accepted_px_width = int(img.shape[1] / 4)
+        >>> accepted_px_height = int(img.shape[0] / 10)
+        >>>>text = 'HELLO MY FELLOW'
+        >>> PlottingMixin().get_optimal_font_scales(text=text, accepted_px_width=accepted_px_width, accepted_px_height=accepted_px_height, text_thickness=2)
+        """
+
+        check_int(name='accepted_px_width', value=accepted_px_width, min_value=1)
+        check_int(name='accepted_px_height', value=accepted_px_height, min_value=1)
+        check_int(name='text_thickness', value=text_thickness, min_value=1)
+        check_int(name='font', value=font, min_value=0, max_value=7)
+        if isinstance(text, list):
+            check_valid_lst(data=text, valid_dtypes=(str,), min_len=1)
+            text = max(text, key=len)
+        else:
+            check_str(name='text', value=text)
+        for scale in reversed(range(0, 100, 1)):
+            text_size = cv2.getTextSize(text, fontFace=font, fontScale=scale / 10, thickness=text_thickness)
+            new_width, new_height = text_size[0][0], text_size[0][1]
+            if (new_width <= accepted_px_width) and (new_height <= accepted_px_height):
+                font_scale = scale / 10
+                x_shift = new_width + text_size[1]
+                y_shift = new_height + text_size[1]
+                return (font_scale, x_shift, y_shift)
+        return (1, 1, 1)
+
+    def get_optimal_circle_size(self,
+                                frame_size: Tuple[int, int],
+                                circle_frame_ratio: Optional[int] = 100) -> int:
+
+        check_int(name='accepted_circle_size', value=circle_frame_ratio, min_value=1)
+        check_valid_tuple(x=frame_size, source='frame_size', accepted_lengths=(2,), valid_dtypes=(int,))
+        for i in frame_size:
+            check_int(name='frame_size', value=i, min_value=1)
+        return int(min(frame_size[0], frame_size[1]) / circle_frame_ratio)
 
 
 # from sklearn.datasets import make_blobs

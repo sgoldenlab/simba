@@ -1845,227 +1845,51 @@ class TrainModelMixin(object):
 
     def read_model_settings_from_config(self, config: configparser.ConfigParser):
 
-        self.model_dir_out = os.path.join(
-            read_config_entry(
-                config,
-                ConfigKey.SML_SETTINGS.value,
-                ConfigKey.MODEL_DIR.value,
-                data_type=Dtypes.STR.value,
-            ),
-            "generated_models",
-        )
+        self.model_dir_out = os.path.join(read_config_entry(config, ConfigKey.SML_SETTINGS.value, ConfigKey.MODEL_DIR.value, data_type=Dtypes.STR.value), "generated_models")
         if not os.path.exists(self.model_dir_out):
             os.makedirs(self.model_dir_out)
         self.eval_out_path = os.path.join(self.model_dir_out, "model_evaluations")
         if not os.path.exists(self.eval_out_path):
             os.makedirs(self.eval_out_path)
-        self.clf_name = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.CLASSIFIER.value,
-            data_type=Dtypes.STR.value,
-        )
-        self.tt_size = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.TT_SIZE.value,
-            data_type=Dtypes.FLOAT.value,
-        )
-        self.algo = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.MODEL_TO_RUN.value,
-            data_type=Dtypes.STR.value,
-            default_value="rf",
-        )
-        self.split_type = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value,
-            data_type=Dtypes.STR.value,
-            options=Options.TRAIN_TEST_SPLIT.value,
-            default_value=Methods.SPLIT_TYPE_FRAMES.value,
-        )
-        self.under_sample_setting = (
-            read_config_entry(
-                config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.UNDERSAMPLE_SETTING.value,
-                data_type=Dtypes.STR.value,
-            )
-            .lower()
-            .strip()
-        )
-        self.over_sample_setting = (
-            read_config_entry(
-                config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.OVERSAMPLE_SETTING.value,
-                data_type=Dtypes.STR.value,
-            )
-            .lower()
-            .strip()
-        )
-        self.n_estimators = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.RF_ESTIMATORS.value,
-            data_type=Dtypes.INT.value,
-        )
-        self.rf_max_depth = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.RF_MAX_DEPTH.value,
-            data_type=Dtypes.INT.value,
-            default_value=Dtypes.NONE.value,
-        )
+        self.clf_name = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.CLASSIFIER.value, data_type=Dtypes.STR.value)
+        self.tt_size = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.TT_SIZE.value, data_type=Dtypes.FLOAT.value)
+        self.algo = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.MODEL_TO_RUN.value, data_type=Dtypes.STR.value, default_value="rf")
+        self.split_type = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value, data_type=Dtypes.STR.value, options=Options.TRAIN_TEST_SPLIT.value, default_value=Methods.SPLIT_TYPE_FRAMES.value)
+        self.under_sample_setting = (read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.UNDERSAMPLE_SETTING.value, data_type=Dtypes.STR.value).lower().strip())
+        self.over_sample_setting = (read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.OVERSAMPLE_SETTING.value, data_type=Dtypes.STR.value).lower().strip())
+        self.n_estimators = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.RF_ESTIMATORS.value, data_type=Dtypes.INT.value)
+        self.rf_max_depth = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.RF_MAX_DEPTH.value, data_type=Dtypes.INT.value, default_value=Dtypes.NONE.value)
         if self.rf_max_depth == "None":
             self.rf_max_depth = None
-        self.max_features = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.RF_MAX_FEATURES.value,
-            data_type=Dtypes.STR.value,
-        )
-        self.criterion = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.RF_CRITERION.value,
-            data_type=Dtypes.STR.value,
-            options=Options.CLF_CRITERION.value,
-        )
-        self.min_sample_leaf = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.MIN_LEAF.value,
-            data_type=Dtypes.INT.value,
-        )
-        self.compute_permutation_importance = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.PERMUTATION_IMPORTANCE.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.generate_learning_curve = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.LEARNING_CURVE.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.generate_precision_recall_curve = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.PRECISION_RECALL.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.generate_example_decision_tree = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.EX_DECISION_TREE.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.generate_classification_report = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.CLF_REPORT.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.generate_features_importance_log = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.IMPORTANCE_LOG.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.generate_features_importance_bar_graph = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.IMPORTANCE_LOG.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.generate_example_decision_tree_fancy = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.EX_DECISION_TREE_FANCY.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.generate_shap_scores = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.SHAP_SCORES.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.save_meta_data = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.RF_METADATA.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.compute_partial_dependency = read_config_entry(
-            config,
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-            MLParamKeys.PARTIAL_DEPENDENCY.value,
-            data_type=Dtypes.STR.value,
-            default_value=False,
-        )
-        self.save_train_test_frm_info = str_2_bool(
-            read_config_entry(
-                config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.SAVE_TRAIN_TEST_FRM_IDX.value,
-                data_type=Dtypes.STR.value,
-                default_value="False",
-            )
-        )
+        self.max_features = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.RF_MAX_FEATURES.value, data_type=Dtypes.STR.value)
+        self.criterion = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.RF_CRITERION.value, data_type=Dtypes.STR.value, options=Options.CLF_CRITERION.value)
+        self.min_sample_leaf = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.MIN_LEAF.value, data_type=Dtypes.INT.value)
+        self.compute_permutation_importance = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.PERMUTATION_IMPORTANCE.value, data_type=Dtypes.STR.value, default_value=False)
+        self.generate_learning_curve = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.LEARNING_CURVE.value, data_type=Dtypes.STR.value, default_value=False)
+        self.generate_precision_recall_curve = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.PRECISION_RECALL.value, data_type=Dtypes.STR.value, default_value=False)
+        self.generate_example_decision_tree = read_config_entry( config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.EX_DECISION_TREE.value, data_type=Dtypes.STR.value, default_value=False)
+        self.generate_classification_report = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.CLF_REPORT.value, data_type=Dtypes.STR.value, default_value=False)
+        self.generate_features_importance_log = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.IMPORTANCE_LOG.value, data_type=Dtypes.STR.value, default_value=False)
+        self.generate_features_importance_bar_graph = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.IMPORTANCE_LOG.value, data_type=Dtypes.STR.value, default_value=False)
+        self.generate_example_decision_tree_fancy = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.EX_DECISION_TREE_FANCY.value, data_type=Dtypes.STR.value, default_value=False)
+        self.generate_shap_scores = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.SHAP_SCORES.value, data_type=Dtypes.STR.value, default_value=False)
+        self.save_meta_data = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.RF_METADATA.value, data_type=Dtypes.STR.value, default_value=False)
+        self.compute_partial_dependency = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.PARTIAL_DEPENDENCY.value, data_type=Dtypes.STR.value, default_value=False)
+        self.save_train_test_frm_info = str_2_bool(read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.SAVE_TRAIN_TEST_FRM_IDX.value, data_type=Dtypes.STR.value, default_value="False"))
 
         if self.under_sample_setting == Methods.RANDOM_UNDERSAMPLE.value:
-            self.under_sample_ratio = read_config_entry(
-                config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.UNDERSAMPLE_RATIO.value,
-                data_type=Dtypes.FLOAT.value,
-                default_value=Dtypes.NAN.value,
-            )
-            check_float(
-                name=MLParamKeys.UNDERSAMPLE_RATIO.value, value=self.under_sample_ratio
-            )
+            self.under_sample_ratio = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.UNDERSAMPLE_RATIO.value, data_type=Dtypes.FLOAT.value, default_value=Dtypes.NAN.value)
+            check_float(name=MLParamKeys.UNDERSAMPLE_RATIO.value, value=self.under_sample_ratio)
         else:
             self.under_sample_ratio = Dtypes.NAN.value
-        if (self.over_sample_setting == Methods.SMOTEENN.value.lower()) or (
-            self.over_sample_setting == Methods.SMOTE.value.lower()
-        ):
-            self.over_sample_ratio = read_config_entry(
-                config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.OVERSAMPLE_RATIO.value,
-                data_type=Dtypes.FLOAT.value,
-                default_value=Dtypes.NAN.value,
-            )
-            check_float(
-                name=MLParamKeys.OVERSAMPLE_RATIO.value, value=self.over_sample_ratio
-            )
+        if (self.over_sample_setting == Methods.SMOTEENN.value.lower()) or (self.over_sample_setting == Methods.SMOTE.value.lower()):
+            self.over_sample_ratio = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.OVERSAMPLE_RATIO.value, data_type=Dtypes.FLOAT.value, default_value=Dtypes.NAN.value)
+            check_float(name=MLParamKeys.OVERSAMPLE_RATIO.value, value=self.over_sample_ratio)
         else:
             self.over_sample_ratio = Dtypes.NAN.value
 
-        if config.has_option(
-            ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.CLASS_WEIGHTS.value
-        ):
-            self.class_weights = read_config_entry(
-                config,
-                ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                MLParamKeys.CLASS_WEIGHTS.value,
-                data_type=Dtypes.STR.value,
-                default_value=Dtypes.NONE.value,
-            )
+        if config.has_option(ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.CLASS_WEIGHTS.value):
+            self.class_weights = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.CLASS_WEIGHTS.value, data_type=Dtypes.STR.value, default_value=Dtypes.NONE.value)
             if self.class_weights == "custom":
                 self.class_weights = ast.literal_eval(
                     read_config_entry(

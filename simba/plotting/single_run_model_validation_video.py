@@ -16,7 +16,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_keys_exist_in_dict, check_int)
+                                check_if_keys_exist_in_dict, check_int, check_video_and_data_frm_count_align)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.printing import log_event, stdout_success
@@ -58,155 +58,73 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
     >>> test.run()
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        feature_file_path: Union[str, os.PathLike],
-        model_path: Union[str, os.PathLike],
-        settings: Dict[str, Any],
-        discrimination_threshold: Optional[float] = 0.0,
-        shortest_bout: Optional[int] = 0.0,
-        create_gantt: Optional[Union[None, int]] = None,
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 feature_file_path: Union[str, os.PathLike],
+                 model_path: Union[str, os.PathLike],
+                 settings: Dict[str, Any],
+                 discrimination_threshold: Optional[float] = 0.0,
+                 shortest_bout: Optional[int] = 0.0,
+                 create_gantt: Optional[Union[None, int]] = None):
 
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         TrainModelMixin.__init__(self)
-        log_event(
-            logger_name=str(__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
-        check_int(
-            name=f"{self.__class__.__name__} shortest_bout",
-            value=shortest_bout,
-            min_value=0,
-        )
-        check_float(
-            name=f"{self.__class__.__name__} discrimination_threshold",
-            value=discrimination_threshold,
-            min_value=0,
-            max_value=1.0,
-        )
-        check_int(
-            name=f"{self.__class__.__name__} cores", value=shortest_bout, min_value=-1
-        )
-        check_int(
-            name=f"{self.__class__.__name__} cores", value=shortest_bout, min_value=-1
-        )
+        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
+        check_int(name=f"{self.__class__.__name__} shortest_bout", value=shortest_bout, min_value=0)
+        check_float(name=f"{self.__class__.__name__} discrimination_threshold", value=discrimination_threshold, min_value=0, max_value=1.0)
+        check_int(name=f"{self.__class__.__name__} cores", value=shortest_bout, min_value=-1)
+        check_int(name=f"{self.__class__.__name__} cores", value=shortest_bout, min_value=-1)
         check_file_exist_and_readable(file_path=feature_file_path)
         check_file_exist_and_readable(file_path=model_path)
-        check_if_keys_exist_in_dict(
-            data=settings,
-            key=["pose", "animal_names", "styles"],
-            name=f"{self.__class__.__name__} settings",
-        )
+        check_if_keys_exist_in_dict(data=settings, key=["pose", "animal_names", "styles"], name=f"{self.__class__.__name__} settings")
         if create_gantt is not None:
-            check_int(
-                name=f"{self.__class__.__name__} create gantt",
-                value=create_gantt,
-                max_value=2,
-                min_value=1,
-            )
+            check_int(name=f"{self.__class__.__name__} create gantt", value=create_gantt, max_value=2, min_value=1)
         _, self.feature_filename, ext = get_fn_ext(feature_file_path)
         if not os.path.exists(self.single_validation_video_save_dir):
             os.makedirs(self.single_validation_video_save_dir)
         _, _, self.fps = self.read_video_info(video_name=self.feature_filename)
         self.video_path = self.find_video_of_file(self.video_dir, self.feature_filename)
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
-        self.clf_name, self.feature_file_path = (
-            os.path.basename(model_path).replace(".sav", ""),
-            feature_file_path,
-        )
-        self.vid_output_path = os.path.join(
-            self.single_validation_video_save_dir,
-            f"{self.feature_filename} {self.clf_name}.mp4",
-        )
-        self.clf_data_save_path = os.path.join(
-            self.clf_data_validation_dir, self.feature_filename + ".csv"
-        )
+        self.clf_name, self.feature_file_path = (os.path.basename(model_path).replace(".sav", ""), feature_file_path)
+        self.vid_output_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename} {self.clf_name}.mp4")
+        self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, self.feature_filename + ".csv")
         self.clf = read_pickle(data_path=model_path, verbose=True)
         self.data_df = read_df(feature_file_path, self.file_type)
         self.x_df = self.drop_bp_cords(df=self.data_df)
-        (
-            self.discrimination_threshold,
-            self.shortest_bout,
-            self.create_gantt,
-            self.settings,
-        ) = (float(discrimination_threshold), shortest_bout, create_gantt, settings)
+        (self.discrimination_threshold, self.shortest_bout, self.create_gantt, self.settings) = (float(discrimination_threshold), shortest_bout, create_gantt, settings)
+        check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.feature_filename, raise_error=False)
 
     def run(self):
         self.prob_col_name = f"Probability_{self.clf_name}"
-        self.data_df[self.prob_col_name] = self.clf_predict_proba(
-            clf=self.clf,
-            x_df=self.x_df,
-            model_name=self.clf_name,
-            data_path=self.feature_file_path,
-        )
-        self.data_df[self.clf_name] = np.where(
-            self.data_df[self.prob_col_name] > self.discrimination_threshold, 1, 0
-        )
+        self.data_df[self.prob_col_name] = self.clf_predict_proba(clf=self.clf, x_df=self.x_df, model_name=self.clf_name, data_path=self.feature_file_path)
+        self.data_df[self.clf_name] = np.where(self.data_df[self.prob_col_name] > self.discrimination_threshold, 1, 0)
         if self.shortest_bout > 1:
-            self.data_df = plug_holes_shortest_bout(
-                data_df=self.data_df,
-                clf_name=self.clf_name,
-                fps=self.fps,
-                shortest_bout=self.shortest_bout,
-            )
-        _ = write_df(
-            df=self.data_df, file_type=self.file_type, save_path=self.clf_data_save_path
-        )
+            self.data_df = plug_holes_shortest_bout(data_df=self.data_df, clf_name=self.clf_name, fps=self.fps, shortest_bout=self.shortest_bout)
+        _ = write_df(df=self.data_df, file_type=self.file_type, save_path=self.clf_data_save_path)
         print(f"Predictions created for video {self.feature_filename}...")
         cap = cv2.VideoCapture(self.video_path)
         fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_COMPLEX
         if self.create_gantt is not None:
-            self.bouts_df = self.get_bouts_for_gantt(
-                data_df=self.data_df, clf_name=self.clf_name, fps=self.fps
-            )
-            self.final_gantt_img = self.create_gantt_img(
-                self.bouts_df,
-                self.clf_name,
-                len(self.data_df),
-                self.fps,
-                "Behavior gantt chart (entire session)",
-            )
-            self.final_gantt_img = self.resize_gantt(
-                self.final_gantt_img, self.video_meta_data["height"]
-            )
-            video_size = (
-                int(self.video_meta_data["width"] + self.final_gantt_img.shape[1]),
-                int(self.video_meta_data["height"]),
-            )
-            writer = cv2.VideoWriter(
-                self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size
-            )
+            self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.fps)
+            self.final_gantt_img = self.create_gantt_img(self.bouts_df, self.clf_name, len(self.data_df), self.fps, "Behavior gantt chart (entire session)")
+            self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
+            video_size = (int(self.video_meta_data["width"] + self.final_gantt_img.shape[1]), int(self.video_meta_data["height"]))
+            writer = cv2.VideoWriter(self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size)
         else:
-            video_size = (
-                int(self.video_meta_data["width"]),
-                int(self.video_meta_data["height"]),
-            )
-            writer = cv2.VideoWriter(
-                self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size
-            )
+            video_size = (int(self.video_meta_data["width"]), int(self.video_meta_data["height"]))
+            writer = cv2.VideoWriter(self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size)
+
         if self.settings["styles"] is None:
             self.settings["styles"] = {}
-            max_dim = max(self.video_meta_data["width"], self.video_meta_data["height"])
-            self.settings["styles"]["circle size"] = int(
-                TextOptions.RADIUS_SCALER.value
-                / (TextOptions.RESOLUTION_SCALER.value / max_dim)
-            )
-            self.settings["styles"]["font size"] = float(
-                TextOptions.FONT_SCALER.value
-                / (TextOptions.RESOLUTION_SCALER.value / max_dim)
-            )
-            self.settings["styles"]["space_scale"] = int(
-                TextOptions.SPACE_SCALER.value
-                / (TextOptions.RESOLUTION_SCALER.value / max_dim)
-            )
+            longest_str = max(['ENSEMBLE PREDICTION', 'BEHAVIOR TIMER:', self.clf_name], key=len)
+            font_size, x_shift, y_shift = self.get_optimal_font_scales(text=longest_str, accepted_px_height=int(self.video_meta_data["height"] / 10), accepted_px_width=int(self.video_meta_data["width"] / 3))
+            circle_size = self.get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["width"])), circle_frame_ratio=100)
+            self.settings["styles"]["font size"] = font_size
+            self.settings["styles"]["space_scale"] = y_shift
+            self.settings["styles"]["circle size"] = circle_size
 
-        self.data_df = self.data_df.head(
-            min(len(self.data_df), self.video_meta_data["frame_count"])
-        )
+        self.data_df = self.data_df.head(min(len(self.data_df), self.video_meta_data["frame_count"]))
         frm_cnt, clf_frm_cnt = 0, 0
         print("Creating video...")
         while (cap.isOpened()) and (frm_cnt < len(self.data_df)):
@@ -214,9 +132,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             clf_val = int(self.data_df.loc[frm_cnt, self.clf_name])
             clf_frm_cnt += clf_val
             if self.settings["pose"]:
-                for animal_cnt, (animal_name, animal_data) in enumerate(
-                    self.animal_bp_dict.items()
-                ):
+                for animal_cnt, (animal_name, animal_data) in enumerate(self.animal_bp_dict.items()):
                     for bp_cnt, bp in enumerate(range(len(animal_data["X_bps"]))):
                         x_header, y_header = (
                             animal_data["X_bps"][bp],
@@ -259,7 +175,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             target_timer = round((1 / self.fps) * clf_frm_cnt, 2)
             cv2.putText(
                 frame,
-                "Timer",
+                "TIMER:",
                 (
                     TextOptions.BORDER_BUFFER_Y.value,
                     int(self.settings["styles"]["space_scale"]),
@@ -285,7 +201,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             addSpacer += 1
             cv2.putText(
                 frame,
-                "Ensemble prediction",
+                "ENSAMBLE PREDICTION:",
                 (
                     TextOptions.BORDER_BUFFER_Y.value,
                     self.settings["styles"]["space_scale"] * addSpacer,
