@@ -41,8 +41,9 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory,
-    find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    seconds_to_timestamp, str_2_bool, timestamp_to_seconds, find_video_of_file)
+    find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext,
+    get_video_meta_data, seconds_to_timestamp, str_2_bool,
+    timestamp_to_seconds)
 from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.brightness_contrast_ui import \
     brightness_contrast_ui

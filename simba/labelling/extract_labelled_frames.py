@@ -1,19 +1,25 @@
 __author__ = "Simon Nilsson"
 
 import os.path
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
 import cv2
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_that_column_exist, check_valid_lst, check_float, check_str, check_valid_boolean, check_file_exist_and_readable
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_str, check_that_column_exist,
+                                check_valid_boolean, check_valid_lst)
 from simba.utils.enums import Dtypes
 from simba.utils.errors import FrameRangeError
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (find_video_of_file, get_fn_ext, get_video_meta_data, read_df, read_frm_of_video)
+from simba.utils.read_write import (find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df,
+                                    read_frm_of_video)
 
 
 class AnnotationFrameExtractor(ConfigReader):
