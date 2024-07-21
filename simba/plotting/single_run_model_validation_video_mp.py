@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import warnings
+
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import functools
@@ -18,6 +19,7 @@ except:
     from typing_extensions import Literal
 
 import shutil
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,7 +30,8 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict, check_int,
-                                check_valid_extension, check_video_and_data_frm_count_align)
+                                check_valid_extension,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TextOptions
 from simba.utils.printing import stdout_success

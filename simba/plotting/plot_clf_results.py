@@ -14,7 +14,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int, check_if_keys_exist_in_dict, check_valid_boolean,
+                                check_if_keys_exist_in_dict, check_int,
+                                check_valid_boolean,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames, TextOptions
@@ -22,7 +23,6 @@ from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
                                     read_config_entry, read_df)
-
 
 CIRCLE_SCALE = 'circle_scale'
 FONT_SIZE = 'font_size'
