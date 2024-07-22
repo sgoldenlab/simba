@@ -50,7 +50,7 @@ from simba.video_processors.brightness_contrast_ui import \
 from simba.video_processors.clahe_ui import interactive_clahe_ui
 from simba.video_processors.extract_seqframes import extract_seq_frames
 from simba.video_processors.multi_cropper import MultiCropper
-from simba.video_processors.px_to_mm import get_coordinates_nilsson
+from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.video_processors.video_processing import (
     VideoRotator, batch_convert_video_format, batch_create_frames,
     batch_video_to_greyscale, change_fps_of_multiple_videos, change_img_format,
@@ -1008,6 +1008,13 @@ class CreateGIFPopUP(PopUpMixin):
                                             quality=int(quality))).start()
 
 class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
+
+    """
+    .. video:: _static/img/GetPixelsPerMillimeterInterface.webm
+       :width: 800
+       :autoplay:
+       :loop:
+    """
     def __init__(self):
         PopUpMixin.__init__(self, title="CALCULATE PIXELS PER MILLIMETER IN VIDEO", size=(550, 550))
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
@@ -1018,14 +1025,15 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
         self.video_path.grid(row=0, column=0, pady=10, sticky=NW)
         self.known_distance.grid(row=1, column=0, pady=10, sticky=NW)
         run_btn.grid(row=2, column=0, pady=10, sticky=NW)
-        #self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def run(self):
         check_file_exist_and_readable(file_path=self.video_path.file_path)
         check_int(name="Distance", value=self.known_distance.entry_get, min_value=1)
         _ = get_video_meta_data(video_path=self.video_path.file_path)
-        mm_cnt = get_coordinates_nilsson(self.video_path.file_path, self.known_distance.entry_get)
-        print(f"ONE (1) PIXEL REPRESENTS {round(mm_cnt, 4)} MILLIMETERS IN VIDEO {os.path.basename(self.video_path.file_path)}.")
+        px_per_mm_interface = GetPixelsPerMillimeterInterface(video_path=self.video_path.file_path, known_metric_mm=float(self.known_distance.entry_get))
+        px_per_mm_interface.run()
+        print(f"ONE (1) PIXEL REPRESENTS {round(px_per_mm_interface.ppm, 4)} MILLIMETERS IN VIDEO {os.path.basename(self.video_path.file_path)}.")
 
 class ConcatenatingVideosPopUp(PopUpMixin):
     def __init__(self):

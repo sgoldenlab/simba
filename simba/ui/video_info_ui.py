@@ -9,16 +9,12 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, hxtScrollbar
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, Paths,
-                               TagNames)
-from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
-                                ParametersFileError, PermissionError)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, Paths, TagNames)
+from simba.utils.errors import (InvalidInputError, NoFilesFoundError, ParametersFileError, PermissionError)
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (find_all_videos_in_project, get_fn_ext,
-                                    get_video_meta_data, read_config_entry,
-                                    read_video_info_csv)
+from simba.utils.read_write import (find_all_videos_in_project, get_fn_ext, get_video_meta_data, read_config_entry, read_video_info_csv)
 from simba.utils.warnings import DuplicateNamesWarning, InvalidValueWarning
-from simba.video_processors.px_to_mm import get_coordinates_nilsson
+from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 
 
 class VideoInfoTable(ConfigReader, PopUpMixin):
@@ -307,19 +303,12 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         try:
             distance = float(distance)
         except:
-            raise InvalidInputError(
-                msg=f"The *DISTANCE IN MM* for video {video_name} is not an integer or float value. The *DISTANCE IN MM* has to be a numerical value.",
-                source=self.__class__.__name__,
-            )
+            raise InvalidInputError(msg=f"The *DISTANCE IN MM* for video {video_name} is not an integer or float value. The *DISTANCE IN MM* has to be a numerical value.", source=self.__class__.__name__,)
         if distance <= 0:
-            raise InvalidInputError(
-                msg=f"The *DISTANCE IN MM* for video {video_name} is <=0. The *DISTANCE IN MM* has to be a value above 0.",
-                source=self.__class__.__name__,
-            )
-        video_pixels_per_mm = get_coordinates_nilsson(
-            os.path.join(self.video_dir, video_name), distance
-        )
-        self.videos[video_name]["px_mm"].set(str(round(video_pixels_per_mm, 5)))
+            raise InvalidInputError(msg=f"The *DISTANCE IN MM* for video {video_name} is <=0. The *DISTANCE IN MM* has to be a value above 0.", source=self.__class__.__name__)
+        px_per_mm_interface = GetPixelsPerMillimeterInterface(video_path=os.path.join(self.video_dir, video_name), known_metric_mm=float(distance))
+        px_per_mm_interface.run()
+        self.videos[video_name]["px_mm"].set(str(round(px_per_mm_interface.ppm, 5)))
 
     def __duplicate_idx_1_px_mm(self):
         px_value = self.videos[list(self.videos.keys())[0]]["px_mm_entry"].get()
@@ -357,21 +346,13 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.video_df.drop_duplicates(subset=["Video"], inplace=True)
         self.video_df = self.video_df.set_index("Video")
         try:
-            self.video_df.to_csv(
-                os.path.join(self.project_path, Paths.VIDEO_INFO.value)
-            )
+            self.video_df.to_csv(os.path.join(self.project_path, Paths.VIDEO_INFO.value))
         except PermissionError:
-            raise PermissionError(
-                msg="SimBA tried to write to project_folder/logs/video_info.csv, but was not allowed. If this file is open in another program, try closing it.",
-                source=self.__class__.__name__,
-            )
-        stdout_success(
-            msg="Video info saved at project_folder/logs/video_info.csv",
-            source=self.__class__.__name__,
-        )
+            raise PermissionError(msg="SimBA tried to write to project_folder/logs/video_info.csv, but was not allowed. If this file is open in another program, try closing it.", source=self.__class__.__name__)
+        stdout_success(msg="Video info saved at project_folder/logs/video_info.csv", source=self.__class__.__name__)
 
 
-# test = VideoInfoTable(config_path='/Users/simon/Desktop/envs/troubleshooting/locomotion/project_folder/project_config.ini')
+# test = VideoInfoTable(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini')
 # test.create_window()
 # test.main_frm.mainloop()
 

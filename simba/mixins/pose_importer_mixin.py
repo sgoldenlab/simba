@@ -30,20 +30,13 @@ class PoseImporterMixin(object):
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
         pass
 
-    def initialize_multi_animal_ui(
-        self,
-        animal_bp_dict: dict,
-        video_info: dict,
-        data_df: pd.DataFrame,
-        video_path: str,
-    ):
+    def initialize_multi_animal_ui(self,
+                                   animal_bp_dict: dict,
+                                   video_info: dict,
+                                   data_df: pd.DataFrame,
+                                   video_path: str):
 
-        self.video_info, self.data_df, self.frame_no, self.add_spacer = (
-            video_info,
-            data_df,
-            0,
-            2,
-        )
+        self.video_info, self.data_df, self.frame_no, self.add_spacer = (video_info, data_df, 0, 2,)
         self.animal_bp_dict, self.cap = animal_bp_dict, cv2.VideoCapture(video_path)
         _, self.video_name, _ = get_fn_ext(video_path)
         self.get_video_scalers(video_info=video_info)
