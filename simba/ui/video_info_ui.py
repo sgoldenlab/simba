@@ -8,13 +8,17 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, hxtScrollbar
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, Paths, TagNames)
-from simba.utils.errors import (InvalidInputError, NoFilesFoundError, ParametersFileError, PermissionError)
-from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (find_all_videos_in_project, get_fn_ext, get_video_meta_data, read_config_entry, read_video_info_csv)
-from simba.utils.warnings import DuplicateNamesWarning, InvalidValueWarning
 from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, hxtScrollbar
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, Paths,
+                               TagNames)
+from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
+                                ParametersFileError, PermissionError)
+from simba.utils.printing import log_event, stdout_success
+from simba.utils.read_write import (find_all_videos_in_project, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_video_info_csv)
+from simba.utils.warnings import DuplicateNamesWarning, InvalidValueWarning
 
 
 class VideoInfoTable(ConfigReader, PopUpMixin):

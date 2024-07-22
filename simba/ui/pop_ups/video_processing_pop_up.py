@@ -18,6 +18,7 @@ from simba.labelling.extract_labelled_frames import AnnotationFrameExtractor
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
+from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect)
@@ -50,7 +51,6 @@ from simba.video_processors.brightness_contrast_ui import \
 from simba.video_processors.clahe_ui import interactive_clahe_ui
 from simba.video_processors.extract_seqframes import extract_seq_frames
 from simba.video_processors.multi_cropper import MultiCropper
-from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.video_processors.video_processing import (
     VideoRotator, batch_convert_video_format, batch_create_frames,
     batch_video_to_greyscale, change_fps_of_multiple_videos, change_img_format,
