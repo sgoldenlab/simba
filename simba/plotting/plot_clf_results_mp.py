@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import platform
 from copy import deepcopy
-from typing import Dict, Optional, Union, Tuple
+from typing import Dict, Optional, Tuple, Union
 
 import cv2
 import numpy as np
