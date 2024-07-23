@@ -16,7 +16,8 @@ from numba import jit, prange
 
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.enums import ConfigKey
-from simba.utils.errors import (CountError, IntegerError, InvalidInputError, NoDataError, NoFilesFoundError)
+from simba.utils.errors import (CountError, IntegerError, InvalidInputError,
+                                NoDataError, NoFilesFoundError)
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import FrameRangeWarning
 

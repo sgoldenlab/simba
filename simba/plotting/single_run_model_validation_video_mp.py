@@ -8,7 +8,7 @@ import functools
 import multiprocessing
 import os
 import platform
-from typing import Any, Dict, List, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cv2
 import pandas as pd
@@ -29,10 +29,10 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_keys_exist_in_dict, check_int,
-                                check_valid_extension,
-                                check_video_and_data_frm_count_align,
-                                check_valid_tuple, check_if_valid_rgb_tuple)
+                                check_if_keys_exist_in_dict,
+                                check_if_valid_rgb_tuple, check_int,
+                                check_valid_extension, check_valid_tuple,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TextOptions
 from simba.utils.printing import stdout_success
