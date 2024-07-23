@@ -1852,6 +1852,34 @@ class PlottingMixin(object):
         return int(min(frame_size[0], frame_size[1]) / circle_frame_ratio)
 
 
+    def put_text(self,
+                  img: np.ndarray,
+                  text: str,
+                  pos: Tuple[int, int],
+                  font_size: int,
+                  font_thickness: Optional[int] = 2,
+                  font: Optional[int] = cv2.FONT_HERSHEY_DUPLEX,
+                  text_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
+                  text_color_bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                  text_bg_alpha: float = 0.8):
+
+        check_valid_tuple(x=pos, accepted_lengths=(2,), valid_dtypes=(int,))
+        check_int(name='font_thickness', value=font_thickness, min_value=1)
+        check_int(name='font', value=font, min_value=0, max_value=7)
+        check_if_valid_rgb_tuple(data=text_color)
+        check_if_valid_rgb_tuple(data=text_color_bg)
+        check_float(name='text_bg_alpha', value=text_bg_alpha, min_value=0, max_value=1.0)
+        x, y = pos
+        text_size, px_buffer = cv2.getTextSize(text, font, font_size, font_thickness)
+        w, h = text_size
+        overlay, output = img.copy(), img.copy()
+        cv2.rectangle(overlay, (x, y-h), (x + w, y + px_buffer), text_color_bg, -1)
+        cv2.addWeighted(overlay, text_bg_alpha, output, 1 - text_bg_alpha, 0, output)
+        cv2.putText(output, text, (x, y), font, font_size, text_color, font_thickness)
+        return output
+
+
+
 # from sklearn.datasets import make_blobs
 # #from sklearn.datasets import ma
 #

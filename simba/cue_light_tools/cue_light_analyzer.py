@@ -270,25 +270,16 @@ class CueLightAnalyzer(ConfigReader):
             )
             self.video_path = find_video_of_file(self.video_dir, self.video_name)
             self.video_meta_data = get_video_meta_data(self.video_path)
-            if (
-                len(self.video_recs) + len(self.video_circs) + len(self.video_polys)
-                == 0
-            ):
-                NoDataFoundWarning(
-                    msg=f"No roi data found for video {self.video_name}. Skipping analysis of {self.video_name}..."
-                )
+            if (len(self.video_recs) + len(self.video_circs) + len(self.video_polys) == 0):
+                NoDataFoundWarning(msg=f"No roi data found for video {self.video_name}. Skipping analysis of {self.video_name}...")
                 continue
 
             self.frm_lst = list(range(0, self.video_meta_data["frame_count"], 1))
-            self.frame_chunks = np.array_split(
-                self.frm_lst, int(self.video_meta_data["frame_count"] / self.fps)
-            )
+            self.frame_chunks = np.array_split(self.frm_lst, int(self.video_meta_data["frame_count"] / self.fps))
             imgs_peer_loop = len(self.frame_chunks[0])
             self.intensity_results = {}
 
-            with multiprocessing.pool.Pool(
-                self.cpu_cnt_to_use, maxtasksperchild=self.maxtasksperchild
-            ) as pool:
+            with multiprocessing.pool.Pool(self.cpu_cnt_to_use, maxtasksperchild=self.maxtasksperchild) as pool:
                 functools.partial(
                     get_intensity_scores_in_rois,
                     b=self.video_recs,

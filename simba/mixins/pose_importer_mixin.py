@@ -14,9 +14,9 @@ import pandas as pd
 import scipy.io as sio
 from numba import jit, prange
 
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.enums import ConfigKey
-from simba.utils.errors import (CountError, IntegerError, InvalidInputError,
-                                NoDataError, NoFilesFoundError)
+from simba.utils.errors import (CountError, IntegerError, InvalidInputError, NoDataError, NoFilesFoundError)
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import FrameRangeWarning
 
@@ -36,22 +36,18 @@ class PoseImporterMixin(object):
                                    data_df: pd.DataFrame,
                                    video_path: str):
 
-        self.video_info, self.data_df, self.frame_no, self.add_spacer = (video_info, data_df, 0, 2,)
+        self.video_info, self.data_df, self.frame_no, self.add_spacer = (video_info, data_df, 0, 2)
         self.animal_bp_dict, self.cap = animal_bp_dict, cv2.VideoCapture(video_path)
         _, self.video_name, _ = get_fn_ext(video_path)
         self.get_video_scalers(video_info=video_info)
 
     def get_video_scalers(self, video_info: dict):
         self.scalers = {}
-        space_scale, radius_scale, resolution_scale, font_scale = 40, 10, 1500, 1.2
-        max_video_dimension = max(video_info["width"], video_info["height"])
-        self.scalers["circle"] = int(
-            radius_scale / (resolution_scale / max_video_dimension)
-        )
-        self.scalers["font"] = font_scale / (resolution_scale / max_video_dimension)
-        self.scalers["space"] = int(
-            space_scale / (resolution_scale / max_video_dimension)
-        )
+        w, h = int(video_info["width"]), int(video_info["height"])
+        self.scalers["circle"] = PlottingMixin().get_optimal_circle_size(frame_size=(w, h), circle_frame_ratio=100)
+        self.scalers["font"], _, self.scalers["space"] = PlottingMixin().get_optimal_font_scales(text="Press 'c' to continue to start assigning identities using this frame", accepted_px_width=w, accepted_px_height=int(h/6))
+        print(self.scalers["font"], self.scalers["space"])
+
 
     def find_data_files(self, dir: Union[str, os.PathLike], extensions: List[str]) -> List[str]:
         """
@@ -107,14 +103,9 @@ class PoseImporterMixin(object):
             video_idx = [i for i, x in enumerate(video_names) if x in data_file_names]
             if len(video_idx) == 0:
                 raise NoFilesFoundError(
-                    msg=f"SimBA could not locate a video file in your SimBA project for data file {data_file_name}",
-                    source=self.__class__.__name__,
-                )
+                    msg=f"SimBA could not locate a video file in your SimBA project for data file {data_file_name}", source=self.__class__.__name__)
             _, video_name, _ = get_fn_ext(video_paths[video_idx[0]])
-            results[video_name] = {
-                "DATA": data_path,
-                "VIDEO": video_paths[video_idx[0]],
-            }
+            results[video_name] = {"DATA": data_path, "VIDEO": video_paths[video_idx[0]]}
         return results
 
     def get_x_y_loc_of_mouse_click(self, event, x, y, flags, param):
@@ -128,14 +119,7 @@ class PoseImporterMixin(object):
         for animal, bp_data in body_parts.items():
             for bp_cnt, bp_tuple in enumerate(bp_data):
                 try:
-                    cv2.circle(
-                        img,
-                        bp_tuple,
-                        self.scalers["circle"],
-                        self.animal_bp_dict[animal]["colors"][bp_cnt],
-                        -1,
-                        lineType=cv2.LINE_AA,
-                    )
+                    cv2.circle(img, bp_tuple, self.scalers["circle"], self.animal_bp_dict[animal]["colors"][bp_cnt], -1, lineType=cv2.LINE_AA)
                 except Exception as err:
                     if type(err) == OverflowError:
                         raise IntegerError(
@@ -147,15 +131,7 @@ class PoseImporterMixin(object):
 
     def insert_animal_names(self):
         for animal_cnt, animal_data in self.id_cords.items():
-            cv2.putText(
-                self.new_frame,
-                animal_data["name"],
-                animal_data["cord"],
-                cv2.FONT_HERSHEY_SIMPLEX,
-                self.scalers["font"],
-                (255, 255, 255),
-                3,
-            )
+            cv2.putText(self.new_frame, animal_data["name"], animal_data["cord"], cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 3)
 
     def multianimal_identification(self):
         cv2.destroyAllWindows()
@@ -164,73 +140,25 @@ class PoseImporterMixin(object):
         cv2.namedWindow("Define animal IDs", cv2.WINDOW_NORMAL)
         _, self.img = self.cap.read()
         self.img_overlay, self.img_bp_cords = deepcopy(self.img), defaultdict(list)
-        for animal_cnt, (animal_name, animal_bps) in enumerate(
-            self.animal_bp_dict.items()
-        ):
+        for animal_cnt, (animal_name, animal_bps) in enumerate(self.animal_bp_dict.items()):
             self.img_bp_cords[animal_name] = []
             for x_name, y_name in zip(animal_bps["X_bps"], animal_bps["Y_bps"]):
-                self.img_bp_cords[animal_name].append(
-                    tuple(
-                        self.data_df.loc[self.frame_no, [x_name, y_name]].values.astype(
-                            int
-                        )
-                    )
-                )
-        self.insert_all_bodyparts_into_img(
-            img=self.img_overlay, body_parts=self.img_bp_cords
-        )
-        side_img = np.ones(
-            (int(self.video_info["height"] / 2), self.video_info["width"], 3)
-        )
-        cv2.putText(
-            side_img,
-            f"Current video: {self.video_name}",
-            (10, self.scalers["space"]),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            self.scalers["font"],
-            (255, 255, 255),
-            3,
-        )
-        cv2.putText(
-            side_img,
-            "Can you assign identities based on the displayed frame ?",
-            (10, int(self.scalers["space"] * (self.add_spacer * 2))),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            self.scalers["font"],
-            (255, 255, 255),
-            2,
-        )
-        cv2.putText(
-            side_img,
-            'Press "x" to display new, random, frame',
-            (10, int(self.scalers["space"] * (self.add_spacer * 3))),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            self.scalers["font"],
-            (255, 255, 0),
-            3,
-        )
-        cv2.putText(
-            side_img,
-            'Press "c" to continue to start assigning identities using this frame',
-            (10, int(self.scalers["space"] * (self.add_spacer * 4))),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            self.scalers["font"],
-            (0, 255, 0),
-            2,
-        )
+                self.img_bp_cords[animal_name].append(tuple(self.data_df.loc[self.frame_no, [x_name, y_name]].values.astype(int)))
+        self.insert_all_bodyparts_into_img(img=self.img_overlay, body_parts=self.img_bp_cords)
+        side_img = np.ones((int(self.video_info["height"] / 2), self.video_info["width"], 3))
+        cv2.putText(side_img, f"Current video: {self.video_name}", (10, self.scalers["space"]), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 3)
+        cv2.putText(side_img, "Can you assign identities based on the displayed frame ?", (10, int(self.scalers["space"] * (self.add_spacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
+        cv2.putText(side_img, 'Press "x" to display new, random, frame', (10, int(self.scalers["space"] * (self.add_spacer * 3))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 0), 3)
+        cv2.putText(side_img, 'Press "c" to continue to start assigning identities using this frame', (10, int(self.scalers["space"] * (self.add_spacer * 4))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (0, 255, 0), 2)
         self.img_concat = np.uint8(np.concatenate((self.img_overlay, side_img), axis=0))
         cv2.imshow("Define animal IDs", self.img_concat)
-        cv2.resizeWindow(
-            "Define animal IDs", self.video_info["height"], self.video_info["width"]
-        )
+        cv2.resizeWindow("Define animal IDs", self.video_info["height"], self.video_info["width"])
         keyboard_choice = False
         while not keyboard_choice:
             k = cv2.waitKey(20)
             if (k == ord("x")) or (k == ord("X")):
                 if self.frame_no + 50 > len(self.data_df):
-                    FrameRangeWarning(
-                        msg=f"Cannot proceed to new frame: the frame {self.frame_no+50} does not exist in video {self.video_name}. The video {self.video_name} has {len(self.data_df)} frames."
-                    )
+                    FrameRangeWarning(msg=f"Cannot proceed to new frame: the frame {self.frame_no+50} does not exist in video {self.video_name}. The video {self.video_name} has {len(self.data_df)} frames.")
                 else:
                     cv2.destroyWindow("Define animal IDs")
                     cv2.waitKey(0)
@@ -249,116 +177,40 @@ class PoseImporterMixin(object):
             self.animal_name, self.cnt = animal, cnt
             self.new_overlay = deepcopy(self.img_overlay)
             cv2.namedWindow("Define animal IDs", cv2.WINDOW_NORMAL)
-            self.side_img = np.ones(
-                (int(self.video_info["height"] / 2), self.video_info["width"], 3)
-            )
-            cv2.putText(
-                self.side_img,
-                "Left mouse click on:",
-                (10, self.scalers["space"]),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                self.scalers["font"],
-                (255, 255, 255),
-                3,
-            )
-            cv2.putText(
-                self.side_img,
-                animal,
-                (10, int(self.scalers["space"] * (self.add_spacer * 2))),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                self.scalers["font"],
-                (255, 255, 0),
-                3,
-            )
+            self.side_img = np.ones((int(self.video_info["height"] / 2), self.video_info["width"], 3))
+            cv2.putText(self.side_img, "Left mouse click on:", (10, self.scalers["space"]), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 3)
+            cv2.putText(self.side_img, animal, (10, int(self.scalers["space"] * (self.add_spacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 0), 3)
             for id in self.id_cords.keys():
-                cv2.putText(
-                    self.new_overlay,
-                    self.id_cords[id]["name"],
-                    self.id_cords[id]["cord"],
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    self.scalers["font"],
-                    (255, 255, 255),
-                    3,
-                )
-            self.new_overlay = np.uint8(
-                np.concatenate((self.new_overlay, self.side_img), axis=0)
-            )
+                cv2.putText(self.new_overlay, self.id_cords[id]["name"], self.id_cords[id]["cord"], cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255),  3)
+            self.new_overlay = np.uint8(np.concatenate((self.new_overlay, self.side_img), axis=0))
             cv2.imshow("Define animal IDs", self.new_overlay)
-            cv2.resizeWindow(
-                "Define animal IDs", self.video_info["height"], self.video_info["width"]
-            )
+            cv2.resizeWindow("Define animal IDs", self.video_info["height"], self.video_info["width"])
             while cnt not in self.id_cords.keys():
-                cv2.setMouseCallback(
-                    "Define animal IDs", self.get_x_y_loc_of_mouse_click
-                )
+                cv2.setMouseCallback("Define animal IDs", self.get_x_y_loc_of_mouse_click)
                 cv2.waitKey(200)
         self.confirm_ui()
 
     def confirm_ui(self):
         cv2.destroyAllWindows()
         cv2.namedWindow("Define animal IDs", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow(
-            "Define animal IDs", self.video_info["height"], self.video_info["width"]
-        )
+        cv2.resizeWindow("Define animal IDs", self.video_info["height"], self.video_info["width"])
         self.new_frame = deepcopy(self.img)
-        self.side_img = np.ones(
-            (int(self.video_info["height"] / 2), self.video_info["width"], 3)
-        )
-        cv2.putText(
-            self.side_img,
-            f"Current video: {self.video_name}",
-            (10, self.scalers["space"]),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            self.scalers["font"],
-            (255, 255, 255),
-            3,
-        )
-        cv2.putText(
-            self.side_img,
-            "Are you happy with your assigned identities ?",
-            (10, int(self.scalers["space"] * (self.add_spacer * 2))),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            self.scalers["font"],
-            (255, 255, 255),
-            2,
-        )
-        cv2.putText(
-            self.side_img,
-            'Press "c" to continue (to finish, or proceed to the next video)',
-            (10, int(self.scalers["space"] * (self.add_spacer * 3))),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            self.scalers["font"],
-            (255, 255, 0),
-            2,
-        )
-        cv2.putText(
-            self.side_img,
-            'Press "x" to re-start assigning identities',
-            (10, int(self.scalers["space"] * (self.add_spacer * 4))),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            self.scalers["font"],
-            (0, 255, 255),
-            2,
-        )
-        self.insert_all_bodyparts_into_img(
-            img=self.new_frame, body_parts=self.img_bp_cords
-        )
+        self.side_img = np.ones((int(self.video_info["height"] / 2), self.video_info["width"], 3))
+        cv2.putText(self.side_img, f"Current video: {self.video_name}", (10, self.scalers["space"]), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 3)
+        cv2.putText(self.side_img, "Are you happy with your assigned identities ?", (10, int(self.scalers["space"] * (self.add_spacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
+        cv2.putText(self.side_img, 'Press "c" to continue (to finish, or proceed to the next video)', (10, int(self.scalers["space"] * (self.add_spacer * 3))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 0), 2)
+        cv2.putText(self.side_img, 'Press "x" to re-start assigning identities', (10, int(self.scalers["space"] * (self.add_spacer * 4))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (0, 255, 255), 2,)
+        self.insert_all_bodyparts_into_img(img=self.new_frame, body_parts=self.img_bp_cords)
         self.insert_animal_names()
-        self.img_concat = np.uint8(
-            np.concatenate((self.new_frame, self.side_img), axis=0)
-        )
+        self.img_concat = np.uint8(np.concatenate((self.new_frame, self.side_img), axis=0))
         cv2.imshow("Define animal IDs", self.img_concat)
-        cv2.resizeWindow(
-            "Define animal IDs", self.video_info["height"], self.video_info["width"]
-        )
+        cv2.resizeWindow("Define animal IDs", self.video_info["height"], self.video_info["width"])
         keyboard_choice = False
         while not keyboard_choice:
             k = cv2.waitKey(20)
             if (k == ord("x")) or (k == ord("X")):
                 if self.frame_no + 50 > len(self.data_df):
-                    FrameRangeWarning(
-                        msg=f"Cannot proceed to new frame: the frame {self.frame_no+50} does not exist in video {self.video_name}. The video {self.video_name} has {len(self.data_df)} frames."
-                    )
+                    FrameRangeWarning(msg=f"Cannot proceed to new frame: the frame {self.frame_no+50} does not exist in video {self.video_name}. The video {self.video_name} has {len(self.data_df)} frames.")
                 else:
                     cv2.destroyWindow("Define animal IDs")
                     cv2.waitKey(1)
@@ -539,6 +391,7 @@ class PoseImporterMixin(object):
                 else:
                     data = np.swapaxes(t_second, 0, 2)
                     track_cnt = 1
+
         if track_cnt != self.animal_cnt:
             raise CountError(
                 msg=f"There are {str(track_cnt)} tracks in the .trk file {file_path}. But your SimBA project expects {str(self.animal_cnt)} tracks.",
@@ -549,23 +402,13 @@ class PoseImporterMixin(object):
             animal_df_lst = []
             for animal in data:
                 m, n, r = animal.shape
-                out_arr = np.column_stack(
-                    (np.repeat(np.arange(m), n), animal.reshape(m * n, -1))
-                )
-                animal_df_lst.append(
-                    pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True)
-                )
+                out_arr = np.column_stack((np.repeat(np.arange(m), n), animal.reshape(m * n, -1)))
+                animal_df_lst.append(pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True))
                 self.data_df = pd.concat(animal_df_lst, axis=1).fillna(0).astype(np.int)
         else:
             m, n, r = data.shape
-            out_arr = np.column_stack(
-                (np.repeat(np.arange(m), n), data.reshape(m * n, -1))
-            )
-            self.data_df = (
-                pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True).astype(np.int)
-            )
+            out_arr = np.column_stack((np.repeat(np.arange(m), n), data.reshape(m * n, -1)))
+            self.data_df = (pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True).astype(np.int))
 
-        p_cols = pd.DataFrame(
-            1, index=self.data_df.index, columns=self.data_df.columns[1::2] + 0.5
-        )
+        p_cols = pd.DataFrame(1, index=self.data_df.index, columns=self.data_df.columns[1::2] + 0.5)
         return pd.concat([self.data_df, p_cols], axis=1)  # .sort_index(axis=1)

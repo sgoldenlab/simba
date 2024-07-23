@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import platform
 from copy import deepcopy
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Tuple
 
 import cv2
 import numpy as np
@@ -46,13 +46,32 @@ def _multiprocess_sklearn_video(data: np.array,
                                 frame_setting: bool,
                                 pose_threshold: float):
 
-    fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_COMPLEX
+    def _put_text(img: np.ndarray,
+                  text: str,
+                  pos: Tuple[int, int],
+                  font_size: int,
+                  font_thickness: Optional[int] = 2,
+                  font: Optional[int] = cv2.FONT_HERSHEY_DUPLEX,
+                  text_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
+                  text_color_bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                  text_bg_alpha: float = 0.8):
+
+        x, y = pos
+        text_size, px_buffer = cv2.getTextSize(text, font, font_size, font_thickness)
+        w, h = text_size
+        overlay, output = img.copy(), img.copy()
+        cv2.rectangle(overlay, (x, y-h), (x + w, y + px_buffer), text_color_bg, -1)
+        cv2.addWeighted(overlay, text_bg_alpha, output, 1 - text_bg_alpha, 0, output)
+        cv2.putText(output, text, (x, y), font, font_size, text_color, font_thickness)
+        return output
+
+    fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     video_meta_data = get_video_meta_data(video_path=video_path)
     cap = cv2.VideoCapture(video_path)
     group = data["group"].iloc[0]
     start_frm, current_frm, end_frm = (data["index"].iloc[0], data["index"].iloc[0], data["index"].iloc[-1])
     if video_setting:
-        video_save_path = os.path.join(video_save_dir, "{}.mp4".format(str(group)))
+        video_save_path = os.path.join(video_save_dir, f"{group}.mp4")
         video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
     cap.set(1, start_frm)
     while current_frm < end_frm:
@@ -67,9 +86,6 @@ def _multiprocess_sklearn_video(data: np.array,
                 bp_cords = data.loc[current_frm, [x_bp, y_bp, p_bp]]
                 if bp_cords[p_bp] > pose_threshold:
                     cv2.circle(img, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), text_attr["circle_scale"], bp_clr, -1)
-
-
-                    #cv2.circle(img, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), 0, bp_clr, text_attr["circle_scale"])
                     if x_bp.lower() in CENTER_BP_TXT:
                         id_flag_cords = (int(bp_cords[x_bp]), int(bp_cords[y_bp]))
 
@@ -79,19 +95,22 @@ def _multiprocess_sklearn_video(data: np.array,
         if rotate:
             img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
         if print_timers:
-            cv2.putText(img, "TIMERS:", (TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE]), font, text_attr[FONT_SIZE], (0, 255, 0), text_attr[TEXT_THICKNESS])
+            img = _put_text(img=img, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE]), font_size=text_attr[FONT_SIZE], font_thickness=text_attr[TEXT_THICKNESS], font=font, text_color=(255, 255, 255))
+            #cv2.putText(img, "TIMERS:", (TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE]), font, text_attr[FONT_SIZE], (0, 255, 0), text_attr[TEXT_THICKNESS])
         frame_results = {}
         for model in models_info.values():
             frame_results[model["model_name"]] = data.loc[current_frm, model["model_name"]]
             if print_timers:
                 cumulative_time = round(data.loc[current_frm, model["model_name"] + "_cumsum"] / video_meta_data["fps"], 3)
-                cv2.putText(img, f"{model['model_name']} {cumulative_time}s", (TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE] * add_spacer),font,text_attr[FONT_SIZE], TextOptions.COLOR.value, text_attr[TEXT_THICKNESS])
+                img = _put_text(img=img, text=f"{model['model_name']} {cumulative_time}s", pos=(TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE] * add_spacer), font_size=text_attr[FONT_SIZE], font_thickness=text_attr[TEXT_THICKNESS], font=font, text_color=(255, 255, 255))
+                #cv2.putText(img, f"{model['model_name']} {cumulative_time}s", (TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE] * add_spacer),font,text_attr[FONT_SIZE], TextOptions.COLOR.value, text_attr[TEXT_THICKNESS])
                 add_spacer += 1
-        cv2.putText(img, "ENSEMBLE PREDICTION:", (TextOptions.BORDER_BUFFER_Y.value, int(text_attr[SPACE_SCALE] * add_spacer)), font, text_attr[FONT_SIZE], (0, 255, 0), text_attr[TEXT_THICKNESS])
+        img = _put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE] * add_spacer), font_size=text_attr[FONT_SIZE], font_thickness=text_attr[TEXT_THICKNESS], font=font, text_color=(255, 255, 255))
+        #cv2.putText(img, "ENSEMBLE PREDICTION:", (TextOptions.BORDER_BUFFER_Y.value, int(text_attr[SPACE_SCALE] * add_spacer)), font, text_attr[FONT_SIZE], (0, 255, 0), text_attr[TEXT_THICKNESS])
         add_spacer += 1
         for clf_cnt, (clf_name, clf_results) in enumerate(frame_results.items()):
             if clf_results == 1:
-                cv2.putText(img, clf_name, (TextOptions.BORDER_BUFFER_Y.value, int(text_attr[SPACE_SCALE] * add_spacer)), font, text_attr[FONT_SIZE], clf_colors[clf_cnt], text_attr[TEXT_THICKNESS])
+                img = _put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE] * add_spacer), font_size=text_attr[FONT_SIZE], font_thickness=text_attr[TEXT_THICKNESS], font=font, text_color=TextOptions.COLOR.value)
                 add_spacer += 1
         if video_setting:
             video_writer.write(img)
@@ -178,8 +197,8 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             check_file_exist_and_readable(os.path.join(self.video_dir, video_file_path))
             self.data_files = video_file_path
 
-        if platform.system() == "Darwin":
-            multiprocessing.set_start_method("spawn", force=True)
+        # if platform.system() == "Darwin":
+        #     multiprocessing.set_start_method("spawn", force=True)
 
     def __get_print_settings(self):
         self.text_attr = {}
@@ -287,7 +306,6 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             stdout_success(f"Frames for {len(self.files_found)} videos saved in sub-folders within {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 #text_settings = {'circle_scale': 5, 'font_size': 0.528, 'spacing_scale': 28, 'text_thickness': 2}
-
 # clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
 #                                              video_setting=True,
 #                                              frame_setting=False,

@@ -8,7 +8,7 @@ import functools
 import multiprocessing
 import os
 import platform
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Tuple
 
 import cv2
 import pandas as pd
@@ -31,7 +31,8 @@ from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict, check_int,
                                 check_valid_extension,
-                                check_video_and_data_frm_count_align)
+                                check_video_and_data_frm_count_align,
+                                check_valid_tuple, check_if_valid_rgb_tuple)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TextOptions
 from simba.utils.printing import stdout_success
@@ -41,7 +42,7 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     write_df)
 
 
-def validation_video_mp(data: pd.DataFrame,
+def _validation_video_mp(data: pd.DataFrame,
                         bp_dict: dict,
                         video_save_dir: str,
                         settings: dict,
@@ -54,7 +55,27 @@ def validation_video_mp(data: pd.DataFrame,
                         clf_name: str,
                         bouts_df: pd.DataFrame):
 
-    def create_gantt(bouts_df: pd.DataFrame, clf_name: str, image_index: int, fps: int):
+    def _put_text(img: np.ndarray,
+                  text: str,
+                  pos: Tuple[int, int],
+                  font_size: int,
+                  font_thickness: Optional[int] = 2,
+                  font: Optional[int] = cv2.FONT_HERSHEY_DUPLEX,
+                  text_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
+                  text_color_bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                  text_bg_alpha: float = 0.8):
+
+        x, y = pos
+        text_size, px_buffer = cv2.getTextSize(text, font, font_size, font_thickness)
+        w, h = text_size
+        overlay, output = img.copy(), img.copy()
+        cv2.rectangle(overlay, (x, y-h), (x + w, y + px_buffer), text_color_bg, -1)
+        cv2.addWeighted(overlay, text_bg_alpha, output, 1 - text_bg_alpha, 0, output)
+        cv2.putText(output, text, (x, y), font, font_size, text_color, font_thickness)
+        return output
+
+
+    def _create_gantt(bouts_df: pd.DataFrame, clf_name: str, image_index: int, fps: int):
 
         fig, ax = plt.subplots(figsize=(final_gantt.shape[1] / dpi, final_gantt.shape[0] / dpi))
         matplotlib.font_manager._get_font.cache_clear()
@@ -81,7 +102,7 @@ def validation_video_mp(data: pd.DataFrame,
         return img
 
     dpi = plt.rcParams["figure.dpi"]
-    fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_COMPLEX
+    fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     cap = cv2.VideoCapture(video_path)
     group = data["group"].iloc[0]
     start_frm, current_frm, end_frm = data.index[0], data.index[0], data.index[-1]
@@ -110,19 +131,19 @@ def validation_video_mp(data: pd.DataFrame,
                     cv2.putText(img, animal_name, (int(animal_cords[0]), int(animal_cords[1])), font, settings["styles"]["font size"], clrs[animal_cnt][0], TextOptions.TEXT_THICKNESS.value)
 
             target_timer = round((1 / video_meta_data["fps"]) * clf_frm_cnt, 2)
-            cv2.putText(img, "BEHAVIOR TIMER:", (TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"]), font, settings["styles"]["font size"], TextOptions.COLOR.value, TextOptions.TEXT_THICKNESS.value)
+            img = _put_text(img=img, text="BEHAVIOR TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"]), font_size=settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value)
             addSpacer = 2
-            cv2.putText(img, (f"{clf_name} {target_timer}s"), (TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font, settings["styles"]["font size"], TextOptions.COLOR.value, TextOptions.TEXT_THICKNESS.value)
+            img = _put_text(img=img, text=f"{clf_name} {target_timer}s", pos=(TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font_size=settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value)
             addSpacer += 1
-            cv2.putText(img, "ENSEMBLE PREDICTION:", (TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font, settings["styles"]["font size"], TextOptions.COLOR.value, TextOptions.TEXT_THICKNESS.value)
+            img = _put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font_size=settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value)
             addSpacer += 1
             if clf_data[current_frm] == 1:
-                cv2.putText(img, clf_name, (TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font, settings["styles"]["font size"], TextOptions.COLOR.value, TextOptions.TEXT_THICKNESS.value)
+                img = _put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font_size=settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=TextOptions.COLOR.value)
             addSpacer += 1
             if gantt_setting == 1:
                 img = np.concatenate((img, final_gantt), axis=1)
             elif gantt_setting == 2:
-                gantt_img = create_gantt(bouts_df, clf_name, current_frm, video_meta_data["fps"])
+                gantt_img = _create_gantt(bouts_df, clf_name, current_frm, video_meta_data["fps"])
                 img = np.concatenate((img, gantt_img), axis=1)
             img = cv2.resize(img, video_size, interpolation=cv2.INTER_LINEAR)
             writer.write(np.uint8(img))
@@ -237,7 +258,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         if self.settings["styles"] is None:
             self.settings["styles"] = {}
             longest_str = max(['ENSEMBLE PREDICTION', 'BEHAVIOR TIMER:', self.clf_name], key=len)
-            font_size, x_shift, y_shift = self.get_optimal_font_scales(text=longest_str, accepted_px_height=int(self.video_meta_data["height"] / 10), accepted_px_width=int(self.video_meta_data["width"] / 3))
+            font_size, x_shift, y_shift = self.get_optimal_font_scales(text=longest_str, accepted_px_height=int(self.video_meta_data["height"] / 8), accepted_px_width=int(self.video_meta_data["width"] / 2))
             circle_size = self.get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["width"])), circle_frame_ratio=100)
             self.settings["styles"]["font size"] = font_size
             self.settings["styles"]["space_scale"] = y_shift
@@ -247,7 +268,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         frm_per_core = data[0].shape[0]
         data = self.__index_df_for_multiprocessing(data=data)
         pool = multiprocessing.Pool(self.cores, maxtasksperchild=self.maxtasksperchild)
-        constants = functools.partial(validation_video_mp,
+        constants = functools.partial(_validation_video_mp,
                                       bp_dict=self.animal_bp_dict,
                                       video_save_dir=self.temp_dir,
                                       settings=self.settings,

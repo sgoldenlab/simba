@@ -119,8 +119,8 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         if self.settings["styles"] is None:
             self.settings["styles"] = {}
             longest_str = max(['ENSEMBLE PREDICTION', 'BEHAVIOR TIMER:', self.clf_name], key=len)
-            font_size, x_shift, y_shift = self.get_optimal_font_scales(text=longest_str, accepted_px_height=int(self.video_meta_data["height"] / 10), accepted_px_width=int(self.video_meta_data["width"] / 3))
-            circle_size = self.get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["width"])), circle_frame_ratio=100)
+            font_size, x_shift, y_shift = self.get_optimal_font_scales(text=longest_str, accepted_px_height=int(self.video_meta_data["height"] / 10), accepted_px_width=int(self.video_meta_data["width"] / 2))
+            circle_size = self.get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["width"])), circle_frame_ratio=80)
             self.settings["styles"]["font size"] = font_size
             self.settings["styles"]["space_scale"] = y_shift
             self.settings["styles"]["circle size"] = circle_size
@@ -135,135 +135,49 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             if self.settings["pose"]:
                 for animal_cnt, (animal_name, animal_data) in enumerate(self.animal_bp_dict.items()):
                     for bp_cnt, bp in enumerate(range(len(animal_data["X_bps"]))):
-                        x_header, y_header = (
-                            animal_data["X_bps"][bp],
-                            animal_data["Y_bps"][bp],
-                        )
-                        animal_cords = tuple(
-                            self.data_df.loc[
-                                self.data_df.index[frm_cnt], [x_header, y_header]
-                            ]
-                        )
-                        cv2.circle(
-                            frame,
-                            (int(animal_cords[0]), int(animal_cords[1])),
-                            0,
-                            self.clr_lst[animal_cnt][bp_cnt],
-                            self.settings["styles"]["circle size"],
-                        )
+                        x_header, y_header = (animal_data["X_bps"][bp], animal_data["Y_bps"][bp])
+                        animal_cords = tuple(self.data_df.loc[self.data_df.index[frm_cnt], [x_header, y_header]])
+                        cv2.circle(frame, (int(animal_cords[0]), int(animal_cords[1])), 0, self.clr_lst[animal_cnt][bp_cnt], self.settings["styles"]["circle size"])
             if self.settings["animal_names"]:
-                for animal_cnt, (animal_name, animal_data) in enumerate(
-                    self.animal_bp_dict.items()
-                ):
-                    x_header, y_header = (
-                        animal_data["X_bps"][0],
-                        animal_data["Y_bps"][0],
-                    )
-                    animal_cords = tuple(
-                        self.data_df.loc[
-                            self.data_df.index[frm_cnt], [x_header, y_header]
-                        ]
-                    )
-                    cv2.putText(
-                        frame,
-                        animal_name,
-                        (int(animal_cords[0]), int(animal_cords[1])),
-                        self.font,
-                        self.settings["styles"]["font size"],
-                        self.clr_lst[animal_cnt][0],
-                        1,
-                    )
+                for animal_cnt, (animal_name, animal_data) in enumerate(self.animal_bp_dict.items()):
+                    x_header, y_header = ( animal_data["X_bps"][0], animal_data["Y_bps"][0])
+                    animal_cords = tuple(self.data_df.loc[self.data_df.index[frm_cnt], [x_header, y_header]])
+                    cv2.putText(frame, animal_name, (int(animal_cords[0]), int(animal_cords[1])), self.font, self.settings["styles"]["font size"], self.clr_lst[animal_cnt][0], 1)
             target_timer = round((1 / self.fps) * clf_frm_cnt, 2)
-            cv2.putText(
-                frame,
-                "TIMER:",
-                (
-                    TextOptions.BORDER_BUFFER_Y.value,
-                    int(self.settings["styles"]["space_scale"]),
-                ),
-                self.font,
-                self.settings["styles"]["font size"],
-                TextOptions.COLOR.value,
-                2,
-            )
+            frame = PlottingMixin().put_text(img=frame, text="TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.settings["styles"]["space_scale"]), font_size=self.settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer = 2
-            cv2.putText(
-                frame,
-                (f"{self.clf_name} {target_timer}s"),
-                (
-                    TextOptions.BORDER_BUFFER_Y.value,
-                    self.settings["styles"]["space_scale"] * addSpacer,
-                ),
-                self.font,
-                self.settings["styles"]["font size"],
-                TextOptions.COLOR.value,
-                2,
-            )
+            frame = PlottingMixin().put_text(img=frame, text=(f"{self.clf_name} {target_timer}s"), pos=(TextOptions.BORDER_BUFFER_Y.value, self.settings["styles"]["space_scale"] * addSpacer), font_size=self.settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer += 1
-            cv2.putText(
-                frame,
-                "ENSAMBLE PREDICTION:",
-                (
-                    TextOptions.BORDER_BUFFER_Y.value,
-                    self.settings["styles"]["space_scale"] * addSpacer,
-                ),
-                self.font,
-                self.settings["styles"]["font size"],
-                TextOptions.COLOR.value,
-                2,
-            )
+            frame = PlottingMixin().put_text(img=frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.settings["styles"]["space_scale"] * addSpacer), font_size=self.settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer += 2
             if clf_val == 1:
-                cv2.putText(
-                    frame,
-                    self.clf_name,
-                    (
-                        TextOptions.BORDER_BUFFER_Y.value,
-                        +self.settings["styles"]["space_scale"] * addSpacer,
-                    ),
-                    self.font,
-                    self.settings["styles"]["font size"],
-                    TextOptions.COLOR.value,
-                    2,
-                )
+                frame = PlottingMixin().put_text(img=frame, text=self.clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, self.settings["styles"]["space_scale"] * addSpacer), font_size=self.settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=TextOptions.COLOR.value)
                 addSpacer += 1
             if self.create_gantt == 1:
                 frame = np.concatenate((frame, self.final_gantt_img), axis=1)
             elif self.create_gantt == 2:
-                gantt_img = self.create_gantt_img(
-                    self.bouts_df,
-                    self.clf_name,
-                    frm_cnt,
-                    self.fps,
-                    "Behavior gantt chart",
-                )
+                gantt_img = self.create_gantt_img(self.bouts_df, self.clf_name, frm_cnt, self.fps, "Behavior gantt chart")
                 gantt_img = self.resize_gantt(gantt_img, self.video_meta_data["height"])
                 frame = np.concatenate((frame, gantt_img), axis=1)
             frame = cv2.resize(frame, video_size, interpolation=cv2.INTER_LINEAR)
             writer.write(np.uint8(frame))
-            print(
-                f"Frame created: for video {self.feature_filename} ({frm_cnt + 1} / {len(self.data_df)})..."
-            )
+            print(f"Frame created: for video {self.feature_filename} ({frm_cnt + 1} / {len(self.data_df)})...")
             frm_cnt += 1
 
         cap.release()
         writer.release()
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"Validation video saved at {self.vid_output_path}",
-            elapsed_time=self.timer.elapsed_time_str,
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg=f"Validation video saved at {self.vid_output_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-# test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',
-#                              feature_file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/features_extracted/SI_DAY3_308_CD1_PRESENT.csv',
-#                              model_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/models/generated_models/Running.sav',
-#                              discrimination_threshold=0.6,
-#                              shortest_bout=50,
-#                              settings={'pose': True, 'animal_names': True, 'styles': None},
-#                              create_gantt=None)
-# test.run()
+test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',
+                             feature_file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/features_extracted/SI_DAY3_308_CD1_PRESENT.csv',
+                             model_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/models/generated_models/Running.sav',
+                             discrimination_threshold=0.6,
+                             shortest_bout=50,
+                             settings={'pose': True, 'animal_names': True, 'styles': None},
+                             create_gantt=None)
+test.run()
 
 # test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                              feature_file_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/features_extracted/Together_1.csv',
