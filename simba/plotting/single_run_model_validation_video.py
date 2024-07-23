@@ -170,14 +170,14 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         stdout_success(msg=f"Validation video saved at {self.vid_output_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',
-                             feature_file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/features_extracted/SI_DAY3_308_CD1_PRESENT.csv',
-                             model_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/models/generated_models/Running.sav',
-                             discrimination_threshold=0.6,
-                             shortest_bout=50,
-                             settings={'pose': True, 'animal_names': True, 'styles': None},
-                             create_gantt=None)
-test.run()
+# test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',
+#                              feature_file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/features_extracted/SI_DAY3_308_CD1_PRESENT.csv',
+#                              model_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/models/generated_models/Running.sav',
+#                              discrimination_threshold=0.6,
+#                              shortest_bout=50,
+#                              settings={'pose': True, 'animal_names': True, 'styles': None},
+#                              create_gantt=None)
+# test.run()
 
 # test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                              feature_file_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/features_extracted/Together_1.csv',
