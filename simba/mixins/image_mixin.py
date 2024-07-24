@@ -1517,6 +1517,57 @@ class ImageMixin(object):
                 results[j, i] = val
         return results
 
+
+    @staticmethod
+    def find_first_non_uniform_clr_frm(video_path: Union[str, os.PathLike, cv2.VideoCapture],
+                                       start_idx: Optional[int] = 0,
+                                       end_idx: Optional[int] = None) -> np.ndarray:
+        """
+        Find the first frame of non-uniform color in a video.
+
+        .. note::
+           Helpful in the ``GetPixelsPerMillimeterInterface`` to ensure that a viable frame is pulled up.
+
+        :param Union[str, os.PathLike, cv2.VideoCapture] video_path: The path to a video file on disk, or a cv2.VideoCapture object.
+        :param Optional[int] start_idx: The first frame (where to start searching for the non-uniform color image). Default: 0 which equals the first frame. None also equals start searching at the first frame.
+        :param Optional[int] end_idx: The last frame (where to end searching for the non-uniform color image). Default: None, which equals 1s into the video.
+        """
+
+        check_instance(source='find_first_non_uniform_clr_frm', instance=video_path, accepted_types=(str, cv2.VideoCapture))
+        video_meta_data = get_video_meta_data(video_path=video_path)
+        if isinstance(start_idx, int) and isinstance(end_idx, int):
+            if start_idx >= end_idx:
+                raise FrameRangeError(msg=f'Start frame ({start_idx}) has to be before the end frame ({end_idx})', source='find_first_non_uniform_clr_frm')
+        if isinstance(start_idx, int):
+            check_int(name='start_idx', value=start_idx, min_value=0)
+            if start_idx > (video_meta_data['frame_count'] - 1):
+                start_idx = int(video_meta_data['frame_count'] - 1)
+        elif start_idx is None:
+            start_idx = 0
+        else:
+            raise FrameRangeError(msg=f'Start frame idx {(start_idx)} has to be None or an integer', source='find_first_non_uniform_clr_frm')
+        if isinstance(end_idx, int):
+            check_int(name='end_idx', value=start_idx, min_value=0)
+            if end_idx > (video_meta_data['frame_count']):
+                end_idx = int(video_meta_data['frame_count'])
+        elif end_idx is None:
+            end_idx = int(video_meta_data['fps'])
+        else:
+            raise FrameRangeError(msg=f'End frame idx {(end_idx)} has to be None or an integer', source='find_first_non_uniform_clr_frm')
+
+        first_frm = read_frm_of_video(video_path=video_path, frame_index=0)
+        for frame_index in range(int(start_idx), int(end_idx)):
+            frame = read_frm_of_video(video_path=video_path, frame_index=frame_index)
+            if frame.ndim == 2:
+                clr_cnt = np.unique(frame).shape[0]
+            else:
+                clr_cnt = np.unique(frame.reshape(-1, frame.shape[-1]), axis=0).shape[0]
+            if clr_cnt > 1:
+                return frame
+        return first_frm
+
+
+
 # imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples')
 # imgs = np.stack(imgs.values())
 # mse = ImageMixin().img_sliding_mse(imgs=imgs, slide_size=2)

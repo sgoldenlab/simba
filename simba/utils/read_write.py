@@ -414,9 +414,7 @@ def read_config_file(config_path: Union[str, os.PathLike]) -> configparser.Confi
     return config
 
 
-def get_video_meta_data(
-    video_path: Union[str, os.PathLike], fps_as_int: bool = True
-) -> dict:
+def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], fps_as_int: bool = True) -> Dict[str, Any]:
     """
     Read video metadata (fps, resolution, frame cnt etc.) from video file (e.g., mp4).
 
@@ -430,7 +428,13 @@ def get_video_meta_data(
     """
 
     video_data = {}
-    cap = cv2.VideoCapture(video_path)
+    if isinstance(video_path, str):
+        check_file_exist_and_readable(file_path=video_path)
+        cap = cv2.VideoCapture(video_path)
+    elif isinstance(video_path, cv2.VideoCapture):
+        cap = video_path
+    else:
+        raise InvalidInputError(msg=f'video_path is neither a file path or a cv2.VideoCapture: {type(video_path)}', source=get_video_meta_data.__name__)
     _, video_data["video_name"], _ = get_fn_ext(video_path)
     video_data["fps"] = cap.get(cv2.CAP_PROP_FPS)
     if fps_as_int:
@@ -440,13 +444,8 @@ def get_video_meta_data(
     video_data["frame_count"] = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     for k, v in video_data.items():
         if v == 0:
-            raise InvalidVideoFileError(
-                msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).',
-                source=get_video_meta_data.__name__,
-            )
-    video_data["resolution_str"] = str(
-        f'{video_data["width"]} x {video_data["height"]}'
-    )
+            raise InvalidVideoFileError(msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).', source=get_video_meta_data.__name__)
+    video_data["resolution_str"] = str(f'{video_data["width"]} x {video_data["height"]}')
     video_data["video_length_s"] = int(video_data["frame_count"] / video_data["fps"])
     return video_data
 

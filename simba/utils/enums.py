@@ -75,9 +75,7 @@ class Paths(Enum):
     BODY_PART_DIRECTIONALITY_DF_DIR = Path("logs/body_part_directionality_dataframes/")
     DIRECTING_ANIMALS_OUTPUT_PATH = Path("frames/output/ROI_directionality_visualize/")
     DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH = Path("frames/output/Directing_animals/")
-    DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH = Path(
-        "frames/output/Body_part_directing_animals/"
-    )
+    DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH = Path("frames/output/Body_part_directing_animals/")
     BP_NAMES = Path("logs/measures/pose_configs/bp_names/project_bp_names.csv")
     SIMBA_BP_CONFIG_PATH = Path("pose_configurations/bp_names/bp_names.csv")
     SIMBA_SHAP_CATEGORIES_PATH = Path(
@@ -114,6 +112,9 @@ class Paths(Enum):
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
     CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
 
+class FontPaths(Enum):
+    POPPINS_REGULAR = Path("assets/fonts/Poppins Regular.ttf")
+    PLAYWRIGHT = Path("assets/fonts/Playwrite ES Deco.ttf")
 
 class Formats(Enum):
     MP4_CODEC = "mp4v"
@@ -133,6 +134,7 @@ class Formats(Enum):
     ROOT_WINDOW_SIZE = "750x750"
     FONT = cv2.FONT_HERSHEY_TRIPLEX
     TKINTER_FONT = ("Rockwell", 11)
+    POPPINS_FONT = ('Poppins Regular', 11)
     DLC_NETWORK_FILE_NAMES = [
         "dlc_resnet50",
         "dlc_resnet_50",

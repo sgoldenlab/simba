@@ -27,7 +27,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
     >>> VisualizePoseInFolderPopUp()
     """
     def __init__(self):
-        PopUpMixin.__init__(self, title="VISUALIZE POSE_ESTIMATION DATA", size=(700, 650))
+        PopUpMixin.__init__(self, title="VISUALIZE POSE_ESTIMATION DATA", size=(800, 800))
         self.keypoint_sizes = list(range(1, 101))
         self.keypoint_sizes.insert(0, AUTO)
         self.video_lengths = list(range(10, 210, 10))

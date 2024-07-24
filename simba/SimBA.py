@@ -154,8 +154,7 @@ from simba.utils.checks import (check_ffmpeg_available,
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import OS, Defaults, Formats, Paths, TagNames
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
-                                 get_icons_paths)
+from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths, load_simba_fonts)
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
@@ -173,25 +172,9 @@ class LoadProjectPopUp(object):
         self.main_frm = Toplevel()
         self.main_frm.minsize(300, 200)
         self.main_frm.wm_title("Load SimBA project (project_config.ini file)")
-        self.load_project_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="LOAD SIMBA PROJECT_CONFIG.INI",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.LOAD_PROJECT.value,
-        )
-        self.selected_file = FileSelect(
-            self.load_project_frm,
-            "Select file: ",
-            title="Select project_config.ini file",
-            file_types=[("SimBA Project .ini", "*.ini")],
-        )
-        load_project_btn = Button(
-            self.load_project_frm,
-            text="LOAD PROJECT",
-            fg="blue",
-            command=lambda: self.launch_project(),
-        )
-
+        self.load_project_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD SIMBA PROJECT_CONFIG.INI", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
+        self.selected_file = FileSelect(self.load_project_frm, "Select file: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")])
+        load_project_btn = Button(self.load_project_frm, text="LOAD PROJECT", fg="blue", command=lambda: self.launch_project())
         self.load_project_frm.grid(row=0, sticky=NW)
         self.selected_file.grid(row=0, sticky=NW)
         load_project_btn.grid(row=1, pady=10, sticky=NW)
@@ -227,14 +210,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         simongui.rowconfigure(0, weight=1)
 
         self.btn_icons = get_icons_paths()
+
         for k in self.btn_icons.keys():
-            self.btn_icons[k]["img"] = ImageTk.PhotoImage(
-                image=PIL.Image.open(
-                    os.path.join(
-                        os.path.dirname(__file__), self.btn_icons[k]["icon_path"]
-                    )
-                )
-            )
+            self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.btn_icons[k]["icon_path"])))
 
         tab_parent = ttk.Notebook(hxtScrollbar(simongui))
 
@@ -1377,6 +1355,9 @@ class App(object):
         icon_path_windows = os.path.join(os.path.dirname(__file__), Paths.LOGO_ICON_WINDOWS_PATH.value)
         icon_path_darwin = os.path.join(os.path.dirname(__file__), Paths.LOGO_ICON_DARWIN_PATH.value)
         self.menu_icons = get_icons_paths()
+        self.poppins_header = ('Poppins Regular', 14, "bold")
+        self.poppins_regular = ('Poppins Regular', 12)
+        load_simba_fonts()
         self.root = Tk()
         self.root.title("SimBA")
         self.root.minsize(750, 750)
@@ -1399,284 +1380,158 @@ class App(object):
 
         file_menu = Menu(menu)
         menu.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(
-            label="Create a new project",
-            compound="left",
-            image=self.menu_icons["create"]["img"],
-            command=lambda: ProjectCreatorPopUp(),
-        )
-        file_menu.add_command(
-            label="Load project",
-            compound="left",
-            image=self.menu_icons["load"]["img"],
-            command=lambda: LoadProjectPopUp(),
-        )
+        file_menu.add_command(label="Create a new project", compound="left", image=self.menu_icons["create"]["img"], command=lambda: ProjectCreatorPopUp(), font=self.poppins_regular)
+        file_menu.add_command(label="Load project", compound="left", image=self.menu_icons["load"]["img"], command=lambda: LoadProjectPopUp(), font=self.poppins_regular)
         file_menu.add_separator()
-        file_menu.add_command(
-            label="Restart",
-            compound="left",
-            image=self.menu_icons["restart"]["img"],
-            command=lambda: self.restart(),
-        )
+        file_menu.add_command(label="Restart", compound="left", image=self.menu_icons["restart"]["img"], command=lambda: self.restart(), font=self.poppins_regular)
         file_menu.add_separator()
-        file_menu.add_command(
-            label="Exit",
-            compound="left",
-            image=self.menu_icons["exit"]["img"],
-            command=self.root.destroy,
-        )
+        file_menu.add_command(label="Exit", compound="left", image=self.menu_icons["exit"]["img"], command=self.root.destroy, font=self.poppins_regular)
 
         batch_process_menu = Menu(menu)
         menu.add_cascade(label="Process Videos", menu=batch_process_menu)
-        batch_process_menu.add_command(
-            label="Batch pre-process videos",
-            compound="left",
-            image=self.menu_icons["factory"]["img"],
-            command=lambda: BatchPreProcessPopUp(),
-        )
+        batch_process_menu.add_command(label="Batch pre-process videos", compound="left", image=self.menu_icons["factory"]["img"], command=lambda: BatchPreProcessPopUp(), font=self.poppins_regular)
 
         video_process_menu = Menu(menu)
         fps_menu = Menu(video_process_menu)
-        fps_menu.add_command(label="Change FPS for single video", command=ChangeFpsSingleVideoPopUp)
-        fps_menu.add_command(label="Change FPS for multiple videos", command=ChangeFpsMultipleVideosPopUp)
-        fps_menu.add_command(label="Up-sample fps with interpolation", command=UpsampleVideosPopUp)
+        fps_menu.add_command(label="Change FPS for single video", command=ChangeFpsSingleVideoPopUp, font=self.poppins_regular)
+        fps_menu.add_command(label="Change FPS for multiple videos", command=ChangeFpsMultipleVideosPopUp, font=self.poppins_regular)
+        fps_menu.add_command(label="Up-sample fps with interpolation", command=UpsampleVideosPopUp, font=self.poppins_regular)
 
         menu.add_cascade(label="Tools", menu=video_process_menu)
-        video_process_menu.add_cascade(label="Change FPS...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu)
+        video_process_menu.add_cascade(label="Change FPS...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu, font=self.poppins_regular)
 
         clip_video_menu = Menu(menu)
-        clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp)
-        clip_video_menu.add_command(
-            label="Clip multiple videos",
-            command=InitiateClipMultipleVideosByTimestampsPopUp,
-        )
+        clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp, font=self.poppins_regular)
+        clip_video_menu.add_command(label="Clip multiple videos", command=InitiateClipMultipleVideosByTimestampsPopUp, font=self.poppins_regular)
 
-        clip_video_menu.add_command(
-            label="Clip video into multiple videos", command=MultiShortenPopUp
-        )
-        clip_video_menu.add_command(
-            label="Clip single video by frame numbers",
-            command=ClipSingleVideoByFrameNumbers,
-        )
-        clip_video_menu.add_command(
-            label="Clip multiple videos by frame numbers",
-            command=InitiateClipMultipleVideosByFrameNumbersPopUp,
-        )
+        clip_video_menu.add_command(label="Clip video into multiple videos", command=MultiShortenPopUp, font=self.poppins_regular)
+        clip_video_menu.add_command(label="Clip single video by frame numbers", command=ClipSingleVideoByFrameNumbers, font=self.poppins_regular)
+        clip_video_menu.add_command(label="Clip multiple videos by frame numbers", command=InitiateClipMultipleVideosByFrameNumbersPopUp, font=self.poppins_regular)
 
-        video_process_menu.add_cascade(
-            label="Clip videos...",
-            compound="left",
-            image=self.menu_icons["clip"]["img"],
-            menu=clip_video_menu,
-        )
+        video_process_menu.add_cascade(label="Clip videos...", compound="left", image=self.menu_icons["clip"]["img"], menu=clip_video_menu, font=self.poppins_regular)
 
         crop_video_menu = Menu(menu)
-        crop_video_menu.add_command(label="Crop videos", compound="left", image=self.menu_icons["crop"]["img"], command=CropVideoPopUp)
-        crop_video_menu.add_command(label="Crop videos (circles)", compound="left", image=self.menu_icons["circle"]["img"], command=CropVideoCirclesPopUp)
-        crop_video_menu.add_command(label="Crop videos (polygons)", compound="left", image=self.menu_icons["polygon"]["img"], command=CropVideoPolygonsPopUp)
-        crop_video_menu.add_command(label="Multi-crop", compound="left", image=self.menu_icons["crop"]["img"], command=MultiCropPopUp)
-        video_process_menu.add_cascade(label="Crop videos...", compound="left", image=self.menu_icons["crop"]["img"], menu=crop_video_menu)
+        crop_video_menu.add_command(label="Crop videos", compound="left", image=self.menu_icons["crop"]["img"], command=CropVideoPopUp, font=self.poppins_regular)
+        crop_video_menu.add_command(label="Crop videos (circles)", compound="left", image=self.menu_icons["circle"]["img"], command=CropVideoCirclesPopUp, font=self.poppins_regular)
+        crop_video_menu.add_command(label="Crop videos (polygons)", compound="left", image=self.menu_icons["polygon"]["img"], command=CropVideoPolygonsPopUp, font=self.poppins_regular)
+        crop_video_menu.add_command(label="Multi-crop", compound="left", image=self.menu_icons["crop"]["img"], command=MultiCropPopUp, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Crop videos...", compound="left", image=self.menu_icons["crop"]["img"], menu=crop_video_menu, font=self.poppins_regular)
 
         format_menu = Menu(video_process_menu)
         img_format_menu = Menu(format_menu)
         video_format_menu = Menu(format_menu)
 
-        img_format_menu.add_command(label="Convert images to PNG", command=Convert2PNGPopUp)
-        img_format_menu.add_command(label="Convert images  to JPEG", command=Convert2jpegPopUp)
-        img_format_menu.add_command(label="Convert images to BMP", command=Convert2bmpPopUp)
-        img_format_menu.add_command(label="Convert images  to TIFF", command=Convert2TIFFPopUp)
-        img_format_menu.add_command(label="Convert images  to WEBP", command=Convert2WEBPPopUp)
-        video_format_menu.add_command(label="Convert videos to MP4", command=Convert2MP4PopUp)
-        video_format_menu.add_command(label="Convert videos to AVI", command=Convert2AVIPopUp)
-        video_format_menu.add_command(label="Convert videos to WEBM", command=Convert2WEBMPopUp)
-        video_format_menu.add_command(label="Convert videos to MOV", command=Convert2MOVPopUp)
-        format_menu.add_cascade(label="Convert image file formats...", compound="left", menu=img_format_menu)
-        format_menu.add_cascade(label="Change video file formats...", compound="left", menu=video_format_menu)
-        video_process_menu.add_cascade(label="Convert file formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu)
+        img_format_menu.add_command(label="Convert images to PNG", command=Convert2PNGPopUp, font=self.poppins_regular)
+        img_format_menu.add_command(label="Convert images  to JPEG", command=Convert2jpegPopUp, font=self.poppins_regular)
+        img_format_menu.add_command(label="Convert images to BMP", command=Convert2bmpPopUp, font=self.poppins_regular)
+        img_format_menu.add_command(label="Convert images  to TIFF", command=Convert2TIFFPopUp, font=self.poppins_regular)
+        img_format_menu.add_command(label="Convert images  to WEBP", command=Convert2WEBPPopUp, font=self.poppins_regular)
+        video_format_menu.add_command(label="Convert videos to MP4", command=Convert2MP4PopUp, font=self.poppins_regular)
+        video_format_menu.add_command(label="Convert videos to AVI", command=Convert2AVIPopUp, font=self.poppins_regular)
+        video_format_menu.add_command(label="Convert videos to WEBM", command=Convert2WEBMPopUp, font=self.poppins_regular)
+        video_format_menu.add_command(label="Convert videos to MOV", command=Convert2MOVPopUp, font=self.poppins_regular)
+        format_menu.add_cascade(label="Convert image file formats...", compound="left", menu=img_format_menu, font=self.poppins_regular)
+        format_menu.add_cascade(label="Change video file formats...", compound="left", menu=video_format_menu, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Convert file formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu, font=self.poppins_regular)
 
         rm_clr_menu = Menu(video_process_menu)
-        rm_clr_menu.add_command(label="Convert to grayscale", compound="left", image=self.menu_icons["greyscale"]["img"], command=lambda: GreyscaleSingleVideoPopUp())
-        rm_clr_menu.add_command(label="Convert to black and white", compound="left", image=self.menu_icons["bw"]["img"],  command=Convert2BlackWhitePopUp)
-        rm_clr_menu.add_command(label="CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=CLAHEPopUp)
-        rm_clr_menu.add_command(label="Interactively CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=InteractiveClahePopUp)
-        video_process_menu.add_cascade(label="Remove color from videos...", compound="left", image=self.menu_icons["clahe"]["img"], menu=rm_clr_menu)
+        rm_clr_menu.add_command(label="Convert to grayscale", compound="left", image=self.menu_icons["greyscale"]["img"], command=lambda: GreyscaleSingleVideoPopUp(), font=self.poppins_regular)
+        rm_clr_menu.add_command(label="Convert to black and white", compound="left", image=self.menu_icons["bw"]["img"],  command=Convert2BlackWhitePopUp, font=self.poppins_regular)
+        rm_clr_menu.add_command(label="CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=CLAHEPopUp, font=self.poppins_regular)
+        rm_clr_menu.add_command(label="Interactively CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=InteractiveClahePopUp, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Remove color from videos...", compound="left", image=self.menu_icons["clahe"]["img"], menu=rm_clr_menu, font=self.poppins_regular)
 
         concatenate_menu = Menu(video_process_menu)
-        concatenate_menu.add_command(label="Concatenate two videos", compound="left", image=self.menu_icons["concat"]["img"], command=ConcatenatingVideosPopUp)
-        concatenate_menu.add_command(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat_videos"]["img"], command=lambda: ConcatenatorPopUp(config_path=None))
-        video_process_menu.add_cascade(label="Concatenate (stack) videos...", compound="left", image=self.menu_icons["concat"]["img"], menu=concatenate_menu)
-        video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp())
+        concatenate_menu.add_command(label="Concatenate two videos", compound="left", image=self.menu_icons["concat"]["img"], command=ConcatenatingVideosPopUp, font=self.poppins_regular)
+        concatenate_menu.add_command(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat_videos"]["img"], command=lambda: ConcatenatorPopUp(config_path=None), font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Concatenate (stack) videos...", compound="left", image=self.menu_icons["concat"]["img"], menu=concatenate_menu, font=self.poppins_regular)
+        video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp(), font=self.poppins_regular)
         convert_data_menu = Menu(video_process_menu)
-        convert_data_menu.add_command(label="Convert CSV to parquet", command=Csv2ParquetPopUp)
-        convert_data_menu.add_command(label="Convert parquet o CSV", command=Parquet2CsvPopUp)
+        convert_data_menu.add_command(label="Convert CSV to parquet", command=Csv2ParquetPopUp, font=self.poppins_regular)
+        convert_data_menu.add_command(label="Convert parquet o CSV", command=Parquet2CsvPopUp, font=self.poppins_regular)
 
-        video_process_menu.add_cascade(label="Convert working file type...", compound="left", image=self.menu_icons["change"]["img"], menu=convert_data_menu,)
+        video_process_menu.add_cascade(label="Convert working file type...", compound="left", image=self.menu_icons["change"]["img"], menu=convert_data_menu, font=self.poppins_regular)
 
-        video_process_menu.add_command(
-            label="Create path plot",
-            compound="left",
-            image=self.menu_icons["path"]["img"],
-            command=MakePathPlotPopUp,
-        )
+        video_process_menu.add_command(label="Create path plot", compound="left", image=self.menu_icons["path"]["img"], command=MakePathPlotPopUp, font=self.poppins_regular)
 
         downsample_video_menu = Menu(video_process_menu)
-        downsample_video_menu.add_command(label="Down-sample single video", command=DownsampleSingleVideoPopUp)
-        downsample_video_menu.add_command(label="Down-sample multiple videos", command=DownsampleMultipleVideosPopUp)
-        video_process_menu.add_cascade(label="Down-sample video...", compound="left", image=self.menu_icons["sample"]["img"], menu=downsample_video_menu)
-        video_process_menu.add_cascade(
-            label="Drop body-parts from tracking data",
-            compound="left",
-            image=self.menu_icons["trash"]["img"],
-            command=DropTrackingDataPopUp,
-        )
-        extract_frames_menu = Menu(video_process_menu)
-        extract_frames_menu.add_command(
-            label="Extract defined frames", command=ExtractSpecificFramesPopUp
-        )
-        extract_frames_menu.add_command(
-            label="Extract frames", command=ExtractAllFramesPopUp
-        )
-        extract_frames_menu.add_command(
-            label="Extract frames from seq files", command=ExtractSEQFramesPopUp
-        )
-        video_process_menu.add_cascade(
-            label="Extract frames...",
-            compound="left",
-            image=self.menu_icons["frames"]["img"],
-            menu=extract_frames_menu,
-        )
+        downsample_video_menu.add_command(label="Down-sample single video", command=DownsampleSingleVideoPopUp, font=self.poppins_regular)
+        downsample_video_menu.add_command(label="Down-sample multiple videos", command=DownsampleMultipleVideosPopUp, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Down-sample video...", compound="left", image=self.menu_icons["sample"]["img"], menu=downsample_video_menu, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Drop body-parts from tracking data", compound="left", image=self.menu_icons["trash"]["img"], command=DropTrackingDataPopUp, font=self.poppins_regular)
+        extract_frames_menu = Menu(video_process_menu, font=self.poppins_regular)
+        extract_frames_menu.add_command(label="Extract defined frames", command=ExtractSpecificFramesPopUp, font=self.poppins_regular)
+        extract_frames_menu.add_command(label="Extract frames", command=ExtractAllFramesPopUp, font=self.poppins_regular)
+        extract_frames_menu.add_command(label="Extract frames from seq files", command=ExtractSEQFramesPopUp, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Extract frames...", compound="left", image=self.menu_icons["frames"]["img"], menu=extract_frames_menu, font=self.poppins_regular)
 
-        video_process_menu.add_command(
-            label="Create GIFs",
-            compound="left",
-            image=self.menu_icons["gif"]["img"],
-            command=CreateGIFPopUP,
-        )
+        video_process_menu.add_command(label="Create GIFs", compound="left", image=self.menu_icons["gif"]["img"], command=CreateGIFPopUP, font=self.poppins_regular)
 
-        video_process_menu.add_command(label="Get metric conversion factor (pixels/millimeter)", compound="left", image=self.menu_icons["calipher"]["img"], command=CalculatePixelsPerMMInVideoPopUp)
-        video_process_menu.add_command(label="Change video brightness / contrast", compound="left", image=self.menu_icons["brightness"]["img"], command=BrightnessContrastPopUp)
-        video_process_menu.add_command(
-            label="Merge frames to video",
-            compound="left",
-            image=self.menu_icons["merge"]["img"],
-            command=MergeFrames2VideoPopUp,
-        )
-        video_process_menu.add_command(
-            label="Print classifier info...",
-            compound="left",
-            image=self.menu_icons["print"]["img"],
-            command=PrintModelInfoPopUp,
-        )
+        video_process_menu.add_command(label="Get metric conversion factor (pixels/millimeter)", compound="left", image=self.menu_icons["calipher"]["img"], command=CalculatePixelsPerMMInVideoPopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Change video brightness / contrast", compound="left", image=self.menu_icons["brightness"]["img"], command=BrightnessContrastPopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Merge frames to video", compound="left", image=self.menu_icons["merge"]["img"], command=MergeFrames2VideoPopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Print classifier info...", compound="left", image=self.menu_icons["print"]["img"], command=PrintModelInfoPopUp, font=self.poppins_regular)
 
-        video_process_menu.add_cascade(
-            label="Reorganize Tracking Data",
-            compound="left",
-            image=self.menu_icons["reorganize"]["img"],
-            command=PoseReorganizerPopUp,
-        )
+        video_process_menu.add_cascade(label="Reorganize Tracking Data", compound="left", image=self.menu_icons["reorganize"]["img"], command=PoseReorganizerPopUp, font=self.poppins_regular)
 
         rotate_menu = Menu(menu)
-        rotate_menu.add_command(label="Rotate videos", command=RotateVideoSetDegreesPopUp)
-        rotate_menu.add_command(label="Interactively rotate videos", command=VideoRotatorPopUp)
-        rotate_menu.add_command(label="Flip videos", command=FlipVideosPopUp)
-        rotate_menu.add_command(label="Reverse videos", command=ReverseVideoPopUp)
-        video_process_menu.add_cascade(label="Rotate / flip / reverse videos...", compound="left", image=self.menu_icons["rotate"]["img"], menu=rotate_menu)
+        rotate_menu.add_command(label="Rotate videos", command=RotateVideoSetDegreesPopUp, font=self.poppins_regular)
+        rotate_menu.add_command(label="Interactively rotate videos", command=VideoRotatorPopUp, font=self.poppins_regular)
+        rotate_menu.add_command(label="Flip videos", command=FlipVideosPopUp, font=self.poppins_regular)
+        rotate_menu.add_command(label="Reverse videos", command=ReverseVideoPopUp, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Rotate / flip / reverse videos...", compound="left", image=self.menu_icons["rotate"]["img"], menu=rotate_menu, font=self.poppins_regular)
 
         superimpose_menu = Menu(menu)
-        superimpose_menu.add_command(label="Superimpose frame numbers", command=SuperImposeFrameCountPopUp)
-        superimpose_menu.add_command(label="Superimpose watermark", command=SuperimposeWatermarkPopUp)
-        superimpose_menu.add_command(label="Superimpose timer", command=SuperimposeTimerPopUp)
-        superimpose_menu.add_command(label="Superimpose progress-bar", command=SuperimposeProgressBarPopUp)
-        superimpose_menu.add_command(label="Superimpose video on video", command=SuperimposeVideoPopUp)
-        superimpose_menu.add_command(label="Superimpose video names", command=SuperimposeVideoNamesPopUp)
-        superimpose_menu.add_command(label="Superimpose free-text", command=SuperimposeTextPopUp)
-        video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu)
+        superimpose_menu.add_command(label="Superimpose frame numbers", command=SuperImposeFrameCountPopUp, font=self.poppins_regular)
+        superimpose_menu.add_command(label="Superimpose watermark", command=SuperimposeWatermarkPopUp, font=self.poppins_regular)
+        superimpose_menu.add_command(label="Superimpose timer", command=SuperimposeTimerPopUp, font=self.poppins_regular)
+        superimpose_menu.add_command(label="Superimpose progress-bar", command=SuperimposeProgressBarPopUp, font=self.poppins_regular)
+        superimpose_menu.add_command(label="Superimpose video on video", command=SuperimposeVideoPopUp, font=self.poppins_regular)
+        superimpose_menu.add_command(label="Superimpose video names", command=SuperimposeVideoNamesPopUp, font=self.poppins_regular)
+        superimpose_menu.add_command(label="Superimpose free-text", command=SuperimposeTextPopUp, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu, font=self.poppins_regular)
 
         temporal_join_videos = Menu(menu)
-        temporal_join_videos.add_command(label="Temporal join all videos in directory", command=VideoTemporalJoinPopUp)
-        temporal_join_videos.add_command(label="Temporal join selected videos", command=ManualTemporalJoinPopUp)
-        video_process_menu.add_cascade(label="Temporal join videos...", compound="left", image=self.menu_icons["stopwatch"]["img"], menu=temporal_join_videos)
-        video_process_menu.add_command(label="Box blur videos", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp)
-        video_process_menu.add_command(label="Cross-fade videos", compound="left", image=self.menu_icons["crossfade"]["img"], command=CrossfadeVideosPopUp)
-        video_process_menu.add_command(label="Create average frames from videos", compound="left", image=self.menu_icons["average"]["img"], command=CreateAverageFramePopUp)
-        video_process_menu.add_command(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp)
-        video_process_menu.add_command(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp)
+        temporal_join_videos.add_command(label="Temporal join all videos in directory", command=VideoTemporalJoinPopUp, font=self.poppins_regular)
+        temporal_join_videos.add_command(label="Temporal join selected videos", command=ManualTemporalJoinPopUp, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Temporal join videos...", compound="left", image=self.menu_icons["stopwatch"]["img"], menu=temporal_join_videos, font=self.poppins_regular)
+        video_process_menu.add_command(label="Box blur videos", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Cross-fade videos", compound="left", image=self.menu_icons["crossfade"]["img"], command=CrossfadeVideosPopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Create average frames from videos", compound="left", image=self.menu_icons["average"]["img"], command=CreateAverageFramePopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp, font=self.poppins_regular)
         help_menu = Menu(menu)
         menu.add_cascade(label="Help", menu=help_menu)
 
         links_menu = Menu(help_menu)
-        links_menu.add_command(
-            label="Download weights",
-            command=lambda: webbrowser.open_new(str(r"https://osf.io/sr3ck/")),
-        )
-        links_menu.add_command(
-            label="Download classifiers",
-            command=lambda: webbrowser.open_new(str(r"https://osf.io/kwge8/")),
-        )
-        links_menu.add_command(
-            label="Ex. feature list",
-            command=lambda: webbrowser.open_new(
-                str(
-                    r"https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv"
-                )
-            ),
-        )
-        links_menu.add_command(
-            label="SimBA github",
-            command=lambda: webbrowser.open_new(
-                str(r"https://github.com/sgoldenlab/simba")
-            ),
-        )
-        links_menu.add_command(
-            label="Gitter Chatroom",
-            command=lambda: webbrowser.open_new(
-                str(r"https://gitter.im/SimBA-Resource/community")
-            ),
-        )
-        links_menu.add_command(
-            label="Install FFmpeg",
-            command=lambda: webbrowser.open_new(
-                str(r"https://m.wikihow.com/Install-FFmpeg-on-Windows")
-            ),
-        )
-        links_menu.add_command(
-            label="Install graphviz",
-            command=lambda: webbrowser.open_new(
-                str(
-                    r"https://bobswift.atlassian.net/wiki/spaces/GVIZ/pages/20971549/How+to+install+Graphviz+software"
-                )
-            ),
-        )
-        help_menu.add_cascade(
-            label="Links",
-            menu=links_menu,
-            compound="left",
-            image=self.menu_icons["link"]["img"],
-        )
-        help_menu.add_command(
-            label="About",
-            compound="left",
-            image=self.menu_icons["about"]["img"],
-            command=AboutSimBAPopUp,
-        )
+        links_menu.add_command(label="Download weights", command=lambda: webbrowser.open_new(str(r"https://osf.io/sr3ck/")), font=self.poppins_regular)
+        links_menu.add_command(label="Download classifiers", command=lambda: webbrowser.open_new(str(r"https://osf.io/kwge8/")), font=self.poppins_regular)
+        links_menu.add_command(label="Ex. feature list", command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv")), font=self.poppins_regular)
+        links_menu.add_command(label="SimBA github", command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba")), font=self.poppins_regular)
+        links_menu.add_command(label="Gitter Chatroom", command=lambda: webbrowser.open_new(str(r"https://gitter.im/SimBA-Resource/community")), font=self.poppins_regular)
+        links_menu.add_command(label="Install FFmpeg", command=lambda: webbrowser.open_new(str(r"https://m.wikihow.com/Install-FFmpeg-on-Windows")), font=self.poppins_regular)
+        links_menu.add_command(label="Install graphviz",command=lambda: webbrowser.open_new(str(r"https://bobswift.atlassian.net/wiki/spaces/GVIZ/pages/20971549/How+to+install+Graphviz+software")), font=self.poppins_regular)
+        links_menu.add_command(label="SimBA API",command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/")), font=self.poppins_regular)
+        help_menu.add_cascade(label="Links", menu=links_menu, compound="left", image=self.menu_icons["link"]["img"], font=self.poppins_regular)
+        help_menu.add_command(label="About", compound="left", image=self.menu_icons["about"]["img"], command=AboutSimBAPopUp, font=self.poppins_regular)
 
         self.frame = Frame(background, bd=2, relief=SUNKEN, width=750, height=300)
         self.r_click_menu = Menu(self.root, tearoff=0)
-        self.r_click_menu.add_command(label="Copy selection", command=lambda: self.copy_selection_to_clipboard())
-        self.r_click_menu.add_command(label="Copy all", command=lambda: self.copy_all_to_clipboard())
-        self.r_click_menu.add_command(label="Paste", command=lambda: self.paste_to_txt())
+        self.r_click_menu.add_command(label="Copy selection", command=lambda: self.copy_selection_to_clipboard(), font=self.poppins_regular)
+        self.r_click_menu.add_command(label="Copy all", command=lambda: self.copy_all_to_clipboard(), font=self.poppins_regular)
+        self.r_click_menu.add_command(label="Paste", command=lambda: self.paste_to_txt(), font=self.poppins_regular)
         self.r_click_menu.add_separator()
-        self.r_click_menu.add_command(label="Clear", command=lambda: self.clean_txt())
+        self.r_click_menu.add_command(label="Clear", command=lambda: self.clean_txt(), font=self.poppins_regular)
         y_sb = Scrollbar(self.frame, orient=VERTICAL)
         self.frame.pack(expand=True)
         self.txt = Text(self.frame, bg="white", insertborderwidth=2, height=30, width=100, yscrollcommand=y_sb)
         if currentPlatform == OS.WINDOWS.value: self.txt.bind("<Button-3>", self.show_right_click_pop_up)
         elif currentPlatform == OS.MAC.value: self.txt.bind("<Button-2>", self.show_right_click_pop_up)
         self.txt.tag_configure(TagNames.GREETING.value, justify="center", foreground="blue", font=("Rockwell", 16, "bold"))
-        self.txt.tag_configure(TagNames.ERROR.value, justify="left", foreground="red", font=Formats.TKINTER_FONT.value)
-        self.txt.tag_configure(TagNames.STANDARD.value, justify="left", foreground="black", font=Formats.TKINTER_FONT.value)
-        self.txt.tag_configure(TagNames.COMPLETE.value, justify="left", foreground="darkgreen", font=Formats.TKINTER_FONT.value)
-        self.txt.tag_configure(TagNames.WARNING.value, justify="left", foreground="darkorange", font=Formats.TKINTER_FONT.value)
+        self.txt.tag_configure(TagNames.ERROR.value, justify="left", foreground="red", font=Formats.POPPINS_FONT.value)
+        self.txt.tag_configure(TagNames.STANDARD.value, justify="left", foreground="black", font=Formats.POPPINS_FONT.value)
+        self.txt.tag_configure(TagNames.COMPLETE.value, justify="left", foreground="darkgreen", font=Formats.POPPINS_FONT.value)
+        self.txt.tag_configure(TagNames.WARNING.value, justify="left", foreground="darkorange", font=Formats.POPPINS_FONT.value)
         self.txt.tag_configure("TABLE",foreground="darkorange", font=("Consolas", 10), wrap="none", borderwidth=0)
         if PRINT_EMOJIS:
             self.txt.insert(INSERT, Defaults.WELCOME_MSG.value + emojis["relaxed"] + "\n" * 2)

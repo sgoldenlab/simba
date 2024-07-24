@@ -6,18 +6,18 @@ import platform
 import re
 import struct
 import sys
-from multiprocessing import Lock, Process, Value
+from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
+import pyglet
 
 import matplotlib.font_manager
 import pandas as pd
 from matplotlib import cm
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
-from simba.utils.enums import OS, Methods, Paths
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
+from simba.utils.enums import OS, Methods, Paths, FontPaths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
 
@@ -138,6 +138,12 @@ def get_icons_paths() -> Dict[str, Union[str, os.PathLike]]:
         icons[icon_name]["icon_path"] = icon_path
     return icons
 
+def load_simba_fonts():
+    """ Load fonts defined in simba.utils.enums.FontPaths into memory"""
+    simba_dir = os.path.dirname(simba.__file__)
+    font_enum = {i.name: i.value for i in FontPaths}
+    for k, v in font_enum.items():
+        pyglet.font.add_file(os.path.join(simba_dir, v))
 
 def get_third_party_appender_file_formats() -> Dict[str, str]:
     """
