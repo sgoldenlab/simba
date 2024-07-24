@@ -11,12 +11,16 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_float, check_if_valid_rgb_tuple, check_int, check_str, check_that_column_exist, check_valid_lst)
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
+                                check_int, check_str, check_that_column_exist,
+                                check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, get_video_meta_data, read_df, remove_files)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, read_df, remove_files)
 from simba.utils.warnings import NoDataFoundWarning
 
 SPACE_SCALE = 60
