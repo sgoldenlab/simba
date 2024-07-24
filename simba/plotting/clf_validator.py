@@ -8,10 +8,12 @@ import cv2
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_float, check_if_valid_rgb_tuple, check_int, check_str, check_that_column_exist, check_valid_lst)
+from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
+                                check_int, check_str, check_that_column_exist,
+                                check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats, TextOptions
-from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
