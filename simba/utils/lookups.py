@@ -9,15 +9,16 @@ import sys
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
-import pyglet
 
 import matplotlib.font_manager
 import pandas as pd
+import pyglet
 from matplotlib import cm
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
-from simba.utils.enums import OS, Methods, Paths, FontPaths
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.enums import OS, FontPaths, Methods, Paths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
 
