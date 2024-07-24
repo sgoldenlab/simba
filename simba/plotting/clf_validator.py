@@ -8,11 +8,10 @@ import cv2
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
-                                check_int, check_str, check_that_column_exist,
-                                check_valid_lst)
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple, check_int, check_str, check_that_column_exist, check_valid_lst)
 from simba.utils.data import detect_bouts
-from simba.utils.enums import Formats
+from simba.utils.enums import Formats, TextOptions
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
@@ -69,7 +68,7 @@ class ClassifierValidationClips(ConfigReader):
         self.p_col = f"Probability_{self.clf_name}"
         self.text_clr, self.data_paths = text_clr, data_paths
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        self.font = cv2.FONT_HERSHEY_SIMPLEX
+        self.font = cv2.FONT_HERSHEY_DUPLEX
         if not os.path.exists(self.clf_validation_dir):
             os.makedirs(self.clf_validation_dir)
         print(f"Processing {len(self.data_paths)} files...")
@@ -95,11 +94,7 @@ class ClassifierValidationClips(ConfigReader):
             self.fps = int(self.video_info["fps"])
             self.video_fps = int(self.fps * self.video_speed)
             if self.video_fps < 1: self.video_fps = 1
-            self.space_scale, self.radius_scale, self.res_scale, self.font_scale = (60, 12, 1500, 1.5)
-            self.max_dim = max(self.video_info["width"], self.video_info["height"])
-            self.circle_scale = int(self.radius_scale / (self.res_scale / self.max_dim))
-            self.font_size = float(self.font_scale / (self.res_scale / self.max_dim))
-            self.spacing_scale = int(self.space_scale / (self.res_scale / self.max_dim))
+            self.font_size, x_scaler, self.spacing_scale = PlottingMixin().get_optimal_font_scales(text="Total frames of event: '999999'", accepted_px_width=int(self.video_info["width"] / 2), accepted_px_height=int(self.video_info["height"] / 5), text_thickness=TextOptions.TEXT_THICKNESS.value)
             cap = cv2.VideoCapture(self.video_path)
             clf_bouts = detect_bouts(data_df=self.data_df, target_lst=[self.clf_name], fps=self.fps).reset_index(drop=True)
             if len(clf_bouts) == 0:
@@ -128,18 +123,23 @@ class ClassifierValidationClips(ConfigReader):
                     ret, img = cap.read()
                     p, clf_val = round(float(self.data_df.loc[current_frm, self.p_col]), 3), int(self.data_df.loc[current_frm, self.clf_name])
                     self.add_spacer = 2
-                    cv2.putText(img, f"{self.clf_name} event # {self.bout_cnt + 1}", (10, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
+                    img = PlottingMixin().put_text(img=img, text=f"{self.clf_name} event # {self.bout_cnt + 1}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.text_clr)
+                    #cv2.putText(img, f"{self.clf_name} event # {self.bout_cnt + 1}", (10, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
-                    cv2.putText(img, f"Total frames of event: {event_frm_count}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
+                    img = PlottingMixin().put_text(img=img, text=f"Total frames of event: {event_frm_count}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.text_clr)
+                    #cv2.putText(img, f"Total frames of event: {event_frm_count}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
-                    cv2.putText(img, f"Frames of event {start_window} to {end_window}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
+                    img = PlottingMixin().put_text(img=img, text=f"Frames of event {start_window} to {end_window}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.text_clr)
+                    #cv2.putText(img, f"Frames of event {start_window} to {end_window}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
-                    cv2.putText(img, f"Frame number: {current_frm}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
+                    img = PlottingMixin().put_text(img=img, text=f"Frame number: {current_frm}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.text_clr)
+                    #cv2.putText(img, f"Frame number: {current_frm}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
                     if (self.highlight_clr != None) and (clf_val == 1):
-                        cv2.putText(img, f"Frame {self.clf_name} probability: {p}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.highlight_clr, 2)
+                        img = PlottingMixin().put_text(img=img, text=f"Frame {self.clf_name} probability: {p}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.highlight_clr)
                     else:
-                        cv2.putText(img, f"Frame {self.clf_name} probability: {p}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
+                        img = PlottingMixin().put_text(img=img, text=f"Frame {self.clf_name} probability: {p}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
+                        #cv2.putText(img, f"Frame {self.clf_name} probability: {p}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     print(f"Frame {frm_cnt+1} / {event_frm_count}, Event {self.bout_cnt+1}/{len(clf_bouts)}, Video {file_cnt+1}/{len(self.machine_results_paths)}...")
                     if self.clips:
                         bout_writer.write(img)
@@ -162,7 +162,7 @@ class ClassifierValidationClips(ConfigReader):
 #                                  clf_name='Attack',
 #                                  clips=False,
 #                                  concat_video=True,
-#                                  highlight_clr=(255, 0, 0),
+#                                  highlight_clr=None,
 #                                  video_speed=0.5,
 #                                  text_clr=(0, 0, 255),
 #                                  data_paths=['/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'])

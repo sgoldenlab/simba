@@ -10,16 +10,13 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
-                                check_int, check_str, check_that_column_exist,
-                                check_valid_lst)
+from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple, check_int, check_str, check_that_column_exist, check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, get_fn_ext,
-                                    get_video_meta_data, read_df, remove_files)
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_fn_ext, get_video_meta_data, read_df, remove_files)
 from simba.utils.warnings import NoDataFoundWarning
 
 SPACE_SCALE = 60
@@ -39,147 +36,73 @@ def val_clip_createror_mp(data: np.ndarray,
                           clf_data: pd.Series,
                           highlight_clr: tuple,
                           text_clr: tuple):
-    def __insert_inter_frms(
-        bg_color: Tuple[int, int, int] = (49, 32, 189),
-        fg_color: Tuple[int, int, int] = (0, 0, 0),
-    ):
+
+    def _put_text(img: np.ndarray,
+                  text: str,
+                  pos: Tuple[int, int],
+                  font_size: int,
+                  font_thickness: Optional[int] = 2,
+                  font: Optional[int] = cv2.FONT_HERSHEY_DUPLEX,
+                  text_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
+                  text_color_bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                  text_bg_alpha: float = 0.8):
+
+        x, y = pos
+        text_size, px_buffer = cv2.getTextSize(text, font, font_size, font_thickness)
+        w, h = text_size
+        overlay, output = img.copy(), img.copy()
+        cv2.rectangle(overlay, (x, y-h), (x + w, y + px_buffer), text_color_bg, -1)
+        cv2.addWeighted(overlay, text_bg_alpha, output, 1 - text_bg_alpha, 0, output)
+        cv2.putText(output, text, (x, y), font, font_size, text_color, font_thickness)
+        return output
+
+
+
+    def __insert_inter_frms(bg_color: Tuple[int, int, int] = (49, 32, 189), fg_color: Tuple[int, int, int] = (0, 0, 0)):
         """
         Helper to create N blank frames separating the classified event bouts with defined BGR colors.
         """
         for i in range(int(fps)):
-            inter_frm = np.full(
-                (int(video_meta_data["height"]), int(video_meta_data["width"]), 3),
-                bg_color,
-            ).astype(np.uint8)
-            cv2.putText(
-                inter_frm,
-                f"Bout #{bount_cnt}",
-                (
-                    10,
-                    (video_meta_data["height"] - video_meta_data["height"])
-                    + scalers["space"],
-                ),
-                TextOptions.FONT.value,
-                scalers["font"],
-                fg_color,
-                TextOptions.TEXT_THICKNESS.value,
-            )
+            inter_frm = np.full((int(video_meta_data["height"]), int(video_meta_data["width"]), 3), bg_color).astype(np.uint8)
+            inter_frm = _put_text(img=inter_frm, text=f"Bout #{bount_cnt}", pos=(TextOptions.BORDER_BUFFER_X.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"]), font_size=scalers["font"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=fg_color, text_bg_alpha=0.0)
+            #cv2.putText(inter_frm, f"Bout #{bount_cnt}", (10, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"]), TextOptions.FONT.value, scalers["font"], fg_color, TextOptions.TEXT_THICKNESS.value)
             writer.write(inter_frm)
 
     SPACER = 2
     cap = cv2.VideoCapture(video_path)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-    start_frm, end_frame, save_path, c_frm, bount_cnt = (
-        int(data[1]),
-        int(data[2]),
-        data[3],
-        int(data[1]),
-        int(data[0]),
-    )
+    start_frm, end_frame, save_path, c_frm, bount_cnt = (int(data[1]), int(data[2]), data[3], int(data[1]), int(data[0]))
     bout_frm_cnt = end_frame - start_frm
-    writer = cv2.VideoWriter(
-        save_path,
-        fourcc,
-        fps,
-        (int(video_meta_data["width"]), int(video_meta_data["height"])),
-    )
+    writer = cv2.VideoWriter(save_path, fourcc, fps, (int(video_meta_data["width"]), int(video_meta_data["height"])))
     __insert_inter_frms()
     frm_cnt = 0
     while c_frm < end_frame:
         p, clf_val = round(float(p_data.loc[c_frm]), 3), int(clf_data.loc[c_frm])
         cap.set(1, c_frm)
         ret, img = cap.read()
-        cv2.putText(
-            img,
-            f"{clf_name} event # {bount_cnt}",
-            (
-                TextOptions.BORDER_BUFFER_Y.value,
-                (video_meta_data["height"] - video_meta_data["height"])
-                + scalers["space"] * SPACER,
-            ),
-            TextOptions.FONT.value,
-            scalers["font"],
-            text_clr,
-            TextOptions.TEXT_THICKNESS.value + 1,
-        )
+        img = _put_text(img=img, text=f"{clf_name} event # {bount_cnt}", pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"] * SPACER), font_size=scalers["font"], font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_color=text_clr)
+        #cv2.putText(img, f"{clf_name} event # {bount_cnt}", (TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"] * SPACER), TextOptions.FONT.value, scalers["font"], text_clr, TextOptions.TEXT_THICKNESS.value + 1)
         SPACER += 1
-        cv2.putText(
-            img,
-            f"Total frames of event: {end_frame-start_frm+1}",
-            (
-                TextOptions.BORDER_BUFFER_Y.value,
-                (video_meta_data["height"] - video_meta_data["height"])
-                + scalers["space"] * SPACER,
-            ),
-            TextOptions.FONT.value,
-            scalers["font"],
-            text_clr,
-            TextOptions.TEXT_THICKNESS.value + 1,
-        )
+        img = _put_text(img=img, text=f"Total frames of event: {end_frame-start_frm+1}", pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"] * SPACER), font_size=scalers["font"], font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_color=text_clr)
+        #cv2.putText(img, f"Total frames of event: {end_frame-start_frm+1}", (TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"] * SPACER), TextOptions.FONT.value, scalers["font"], text_clr, TextOptions.TEXT_THICKNESS.value + 1)
         SPACER += 1
-        cv2.putText(
-            img,
-            f"Frames of event {start_frm} to {end_frame}",
-            (
-                TextOptions.BORDER_BUFFER_Y.value,
-                (video_meta_data["height"] - video_meta_data["height"])
-                + scalers["space"] * SPACER,
-            ),
-            TextOptions.FONT.value,
-            scalers["font"],
-            text_clr,
-            TextOptions.TEXT_THICKNESS.value + 1,
-        )
+        img = _put_text(img=img, text=f"Frames of event {start_frm} to {end_frame}", pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"] * SPACER), font_size=scalers["font"], font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_color=text_clr)
+        #cv2.putText(img, f"Frames of event {start_frm} to {end_frame}", (     TextOptions.BORDER_BUFFER_Y.value,     (video_meta_data["height"] - video_meta_data["height"])     + scalers["space"] * SPACER, ), TextOptions.FONT.value, scalers["font"], text_clr, TextOptions.TEXT_THICKNESS.value + 1)
         SPACER += 1
-        cv2.putText(
-            img,
-            f"Frame number: {c_frm}",
-            (
-                TextOptions.BORDER_BUFFER_Y.value,
-                (video_meta_data["height"] - video_meta_data["height"])
-                + scalers["space"] * SPACER,
-            ),
-            TextOptions.FONT.value,
-            scalers["font"],
-            text_clr,
-            TextOptions.TEXT_THICKNESS.value + 1,
-        )
+        img = _put_text(img=img, text=f"Frame number: {c_frm}", pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"] * SPACER), font_size=scalers["font"], font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_color=text_clr)
+        #cv2.putText( img, f"Frame number: {c_frm}", (     TextOptions.BORDER_BUFFER_Y.value,     (video_meta_data["height"] - video_meta_data["height"])     + scalers["space"] * SPACER, ), TextOptions.FONT.value, scalers["font"], text_clr, TextOptions.TEXT_THICKNESS.value + 1)
         SPACER += 1
         if (highlight_clr != None) and (clf_val == 1):
-            cv2.putText(
-                img,
-                f"Frame {clf_name} probability: {p}",
-                (
-                    TextOptions.BORDER_BUFFER_Y.value,
-                    (video_meta_data["height"] - video_meta_data["height"])
-                    + scalers["space"] * SPACER,
-                ),
-                TextOptions.FONT.value,
-                scalers["font"],
-                highlight_clr,
-                TextOptions.TEXT_THICKNESS.value + 1,
-            )
+            img = _put_text(img=img, text=f"Frame {clf_name} probability: {p}", pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"] * SPACER), font_size=scalers["font"], font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_color=highlight_clr)
+            #cv2.putText(img,f"Frame {clf_name} probability: {p}",(    TextOptions.BORDER_BUFFER_Y.value,    (video_meta_data["height"] - video_meta_data["height"])    + scalers["space"] * SPACER,),TextOptions.FONT.value,scalers["font"],highlight_clr,TextOptions.TEXT_THICKNESS.value + 1)
         else:
-            cv2.putText(
-                img,
-                f"Frame {clf_name} probability: {p}",
-                (
-                    TextOptions.BORDER_BUFFER_Y.value,
-                    (video_meta_data["height"] - video_meta_data["height"])
-                    + scalers["space"] * SPACER,
-                ),
-                TextOptions.FONT.value,
-                scalers["font"],
-                text_clr,
-                TextOptions.TEXT_THICKNESS.value + 1,
-            )
+            img = _put_text(img=img, text=f"Frame {clf_name} probability: {p}", pos=(TextOptions.BORDER_BUFFER_Y.value, (video_meta_data["height"] - video_meta_data["height"]) + scalers["space"] * SPACER), font_size=scalers["font"], font_thickness=TextOptions.TEXT_THICKNESS.value + 1, text_color=text_clr)
+            #cv2.putText(img,f"Frame {clf_name} probability: {p}",(    TextOptions.BORDER_BUFFER_Y.value,    (video_meta_data["height"] - video_meta_data["height"])    + scalers["space"] * SPACER,),TextOptions.FONT.value,scalers["font"],text_clr,TextOptions.TEXT_THICKNESS.value + 1)
         writer.write(img)
         c_frm += 1
         SPACER = 2
         frm_cnt += 1
-        print(
-            f'Multiprocessing frame {frm_cnt}/{bout_frm_cnt} (Bout: {bount_cnt+1}/{bout_total_cnt}, Video: {video_meta_data["video_name"]})'
-        )
+        print(f'Multiprocessing frame {frm_cnt}/{bout_frm_cnt} (Bout: {bount_cnt+1}/{bout_total_cnt}, Video: {video_meta_data["video_name"]})')
     writer.release()
     cap.release()
 
@@ -221,7 +144,6 @@ class ClassifierValidationClipsMultiprocess(ConfigReader):
 
 
         ConfigReader.__init__(self, config_path=config_path)
-
         if (not clips) and (not concat_video):
             raise NoSpecifiedOutputError(msg="Please select to create clips and/or a concatenated video", source=self.__class__.__name__)
 
@@ -255,10 +177,8 @@ class ClassifierValidationClipsMultiprocess(ConfigReader):
             self.fps = int(self.video_info["fps"])
             self.video_fps = int(self.fps * self.video_speed)
             if self.video_fps < 1: self.video_fps = 1
-            self.max_dim = max(self.video_info["width"], self.video_info["height"])
-            self.circle_scale = int(RADIUS_SCALE / (RESOLUTION_SCALE / self.max_dim))
-            self.font_size = float(FONT_SCALE / (RESOLUTION_SCALE / self.max_dim))
-            self.spacing_scale = int(SPACE_SCALE / (RESOLUTION_SCALE / self.max_dim))
+
+            self.font_size, x_scaler, self.spacing_scale = PlottingMixin().get_optimal_font_scales(text="Total frames of event: '999999'", accepted_px_width=int(self.video_info["width"] / 2), accepted_px_height=int(self.video_info["height"] / 5), text_thickness=TextOptions.TEXT_THICKNESS.value)
             clf_bouts = detect_bouts(data_df=self.data_df, target_lst=[self.clf_name], fps=self.fps).reset_index(drop=True)
             if len(clf_bouts) == 0:
                 NoDataFoundWarning(msg=f"Skipping video {file_name}: No classified behavior {self.clf_name} detected...", source=self.__class__.__name__)
@@ -281,7 +201,7 @@ class ClassifierValidationClipsMultiprocess(ConfigReader):
             with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
                 constants = functools.partial(val_clip_createror_mp,
                                               video_path=self.video_path,
-                                              scalers={"circle": self.circle_scale,"font": self.font_size,"space": self.spacing_scale},
+                                              scalers={"font": self.font_size, "space": self.spacing_scale},
                                               fps=self.video_fps,
                                               clf_name=self.clf_name,
                                               bout_total_cnt=len(clf_bouts),

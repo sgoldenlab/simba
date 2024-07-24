@@ -2937,7 +2937,7 @@ class Statistics(FeatureExtractionMixin):
 
     def hellinger_distance(self, x: np.ndarray, y: np.ndarray, bucket_method: Optional[Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]] = "auto") -> float:
         """
-        Compute the Hellinger distance between two vector distribitions.
+        Compute the Hellinger distance between two vector distributions.
 
         .. note::
            The Hellinger distance is bounded and ranges from 0 to √2. Distance of √2 indicates that the two distributions are maximally dissimilar
