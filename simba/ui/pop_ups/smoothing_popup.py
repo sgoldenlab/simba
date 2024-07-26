@@ -28,7 +28,7 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         ConfigReader.__init__(self, config_path=config_path)
         self.config_path = config_path
 
-        self.settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        self.settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
         self.time_window = Entry_Box(self.settings_frm, "TIME WINDOW (MILLISECONDS):", "35", validation="numeric")
         self.method_dropdown = DropDownMenu(self.settings_frm, "SMOOTHING METHOD:", Options.SMOOTHING_OPTIONS.value, "35")
         self.save_originals_dropdown = DropDownMenu(self.settings_frm, "SAVE ORIGINALS:", Options.BOOL_STR_OPTIONS.value, "35")
@@ -40,17 +40,17 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         self.method_dropdown.grid(row=1, column=0, sticky=NW)
         self.save_originals_dropdown.grid(row=2, column=0, sticky=NW)
 
-        self.single_file_frm = LabelFrame(self.main_frm, text="SMOOTH SINGLE DATA FILE", font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        self.single_file_frm = LabelFrame(self.main_frm, text="SMOOTH SINGLE DATA FILE", font=Formats.FONT_HEADER.value)
         self.selected_file = FileSelect(self.single_file_frm, "DATA PATH:", lblwidth=35, file_types=[("VIDEO FILE", ".csv .parquet")], initialdir=self.project_path)
-        self.run_btn_single = Button(self.single_file_frm, text="RUN SINGLE DATA FILE SMOOTHING", fg="blue", command=lambda: self.run(multiple=False))
+        self.run_btn_single = Button(self.single_file_frm, text="RUN SINGLE DATA FILE SMOOTHING", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
 
         self.single_file_frm.grid(row=1, column=0, sticky=NW)
         self.selected_file.grid(row=0, column=0, sticky=NW)
         self.run_btn_single.grid(row=1, column=0, sticky=NW)
 
-        self.multiple_file_frm = LabelFrame(self.main_frm, text="SMOOTH DIRECTORY OF DATA", font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        self.multiple_file_frm = LabelFrame(self.main_frm, text="SMOOTH DIRECTORY OF DATA", font=Formats.FONT_HEADER.value)
         self.selected_dir = FolderSelect(self.multiple_file_frm, "SELECT DIRECTORY OF DATA FILES:", lblwidth=35, initialdir=self.project_path)
-        self.run_btn_multiple = Button(self.multiple_file_frm, text="RUN DATA DIRECTORY SMOOTHING", fg="blue", command=lambda: self.run(multiple=True))
+        self.run_btn_multiple = Button(self.multiple_file_frm, text="RUN DATA DIRECTORY SMOOTHING", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
 
         self.multiple_file_frm.grid(row=2, column=0, sticky=NW)
         self.selected_dir.grid(row=0, column=0, sticky=NW)

@@ -39,7 +39,7 @@ class TargetedAnnotationsWClipsPopUp(PopUpMixin, ConfigReader):
             settings_frm, "# of clips", "10", validation="numeric"
         )
         confirm_settings_btn = Button(
-            settings_frm, text="Confirm", command=lambda: self.show_start_stop()
+            settings_frm, text="Confirm", font=Formats.FONT_REGULAR.value, command=lambda: self.show_start_stop()
         )
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.selected_video.grid(row=0, column=0, sticky=NW)
@@ -53,9 +53,9 @@ class TargetedAnnotationsWClipsPopUp(PopUpMixin, ConfigReader):
             self.table.destroy()
         self.table = LabelFrame(self.main_frm)
         self.table.grid(row=2, column=0, sticky=NW)
-        Label(self.table, text="Clip #").grid(row=0, column=0)
-        Label(self.table, text="Start Time").grid(row=0, column=1, sticky=NW)
-        Label(self.table, text="Stop Time").grid(row=0, column=2, sticky=NW)
+        Label(self.table, text="Clip #", font=Formats.FONT_REGULAR.value).grid(row=0, column=0)
+        Label(self.table, text="Start Time", font=Formats.FONT_REGULAR.value).grid(row=0, column=1, sticky=NW)
+        Label(self.table, text="Stop Time", font=Formats.FONT_REGULAR.value).grid(row=0, column=2, sticky=NW)
         self.clip_names, self.start_times, self.end_times = [], [], []
         for i in range(int(self.clip_cnt.entry_get)):
             Label(self.table, text="Clip " + str(i + 1)).grid(row=i + 2, sticky=W)
@@ -70,7 +70,7 @@ class TargetedAnnotationsWClipsPopUp(PopUpMixin, ConfigReader):
             text="RUN",
             command=lambda: self.run(),
             fg="navy",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_REGULAR.value,
         )
         run_button.grid(row=int(self.clip_cnt.entry_get) + 2, column=2, sticky=W)
 

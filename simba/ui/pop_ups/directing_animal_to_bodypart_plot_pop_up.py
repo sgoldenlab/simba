@@ -25,39 +25,18 @@ class DirectingAnimalToBodyPartVisualizerPopUp(PopUpMixin, ConfigReader):
         self.color_lst.insert(0, "Random")
         self.size_lst = list(range(1, 11))
         self.data_path = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
-        self.files_found_dict = get_file_name_info_in_directory(
-            directory=self.data_path, file_type=self.file_type
-        )
+        self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
 
         self.show_pose_var = BooleanVar(value=True)
         self.merge_directionality_lines_var = BooleanVar(value=False)
         self.multiprocess_var = BooleanVar(value=False)
 
-        self.style_settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="STYLE SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.DIRECTING_ANIMALS_PLOTS.value,
-        )
-        self.show_pose_cb = Checkbutton(
-            self.style_settings_frm,
-            text="Show pose-estimated body-parts",
-            variable=self.show_pose_var,
-        )
-        self.merge_directionality_lines_cb = Checkbutton(
-            self.style_settings_frm,
-            text="Polyfill direction lines",
-            variable=self.merge_directionality_lines_var,
-        )
-        self.direction_clr_dropdown = DropDownMenu(
-            self.style_settings_frm, "Direction color:", self.color_lst, "16"
-        )
-        self.pose_size_dropdown = DropDownMenu(
-            self.style_settings_frm, "Pose circle size:", self.size_lst, "16"
-        )
-        self.line_thickness = DropDownMenu(
-            self.style_settings_frm, "Line thickness:", self.size_lst, "16"
-        )
+        self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="STYLE SETTINGS",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.DIRECTING_ANIMALS_PLOTS.value,)
+        self.show_pose_cb = Checkbutton(self.style_settings_frm,font=Formats.FONT_REGULAR.value,text="Show pose-estimated body-parts",variable=self.show_pose_var)
+        self.merge_directionality_lines_cb = Checkbutton(self.style_settings_frm,font=Formats.FONT_REGULAR.value,text="Polyfill direction lines",variable=self.merge_directionality_lines_var,)
+        self.direction_clr_dropdown = DropDownMenu(self.style_settings_frm, "Direction color:", self.color_lst, "16")
+        self.pose_size_dropdown = DropDownMenu(self.style_settings_frm, "Pose circle size:", self.size_lst, "16")
+        self.line_thickness = DropDownMenu(self.style_settings_frm, "Line thickness:", self.size_lst, "16")
         self.line_thickness.setChoices(choice=4)
         self.pose_size_dropdown.setChoices(choice=3)
         self.direction_clr_dropdown.setChoices(choice="Random")
@@ -76,45 +55,15 @@ class DirectingAnimalToBodyPartVisualizerPopUp(PopUpMixin, ConfigReader):
         # self.multiprocess_dropdown.setChoices(2)
         # self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(
-            self.main_frm,
-            text="RUN",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_frm = LabelFrame(
-            self.run_frm,
-            text="SINGLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_btn = Button(
-            self.run_single_video_frm,
-            text="Create single video",
-            fg="blue",
-            command=lambda: self.__create_directionality_plots(multiple_videos=False),
-        )
-        self.single_video_dropdown = DropDownMenu(
-            self.run_single_video_frm,
-            "Video:",
-            list(self.files_found_dict.keys()),
-            "12",
-        )
+        self.run_frm = LabelFrame( self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
+        self.run_single_video_frm = LabelFrame( self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
+        self.run_single_video_btn = Button( self.run_single_video_frm, font=Formats.FONT_REGULAR.value, text="Create single video", fg="blue", command=lambda: self.__create_directionality_plots(multiple_videos=False),)
+        self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12")
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
-        self.run_multiple_videos = LabelFrame(
-            self.run_frm,
-            text="MULTIPLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
+        self.run_multiple_videos = LabelFrame( self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
         self.run_multiple_video_btn = Button(
             self.run_multiple_videos,
+            font=Formats.FONT_REGULAR.value,
             text="Create multiple videos ({} video(s) found)".format(
                 str(len(list(self.files_found_dict.keys())))
             ),

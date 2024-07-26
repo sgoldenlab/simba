@@ -5,7 +5,7 @@ import platform
 import webbrowser
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
-from typing import Optional, Union
+from typing import Optional, Union, Tuple, Callable
 
 import PIL.Image
 from PIL import ImageTk
@@ -84,18 +84,17 @@ def form_validator_is_numeric(inStr, acttyp):
 
 
 class DropDownMenu(Frame):
-    def __init__(
-        self,
-        parent=None,
-        dropdownLabel="",
-        choice_dict=None,
-        labelwidth="",
-        com=None,
-        **kw
-    ):
+    def __init__(self,
+                 parent=None,
+                 dropdownLabel="",
+                 choice_dict=None,
+                 labelwidth="",
+                 com=None,
+                 **kw):
+
         Frame.__init__(self, master=parent, **kw)
         self.dropdownvar = StringVar()
-        self.lblName = Label(self, text=dropdownLabel, width=labelwidth, anchor=W)
+        self.lblName = Label(self, text=dropdownLabel, width=labelwidth, anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0)
         self.choices = choice_dict
         self.popupMenu = OptionMenu(self, self.dropdownvar, *self.choices, command=com)
@@ -115,18 +114,15 @@ class DropDownMenu(Frame):
 
 
 class FileSelect(Frame):
-    def __init__(
-        self,
-        parent=None,
-        fileDescription="",
-        color=None,
-        title=None,
-        lblwidth=None,
-        file_types=None,
-        dropdown: DropDownMenu = None,
-        initialdir: Optional[Union[str, os.PathLike]] = None,
-        **kw
-    ):
+    def __init__(self,
+                 parent=None,
+                 fileDescription="",
+                 color=None,
+                 title=None,
+                 lblwidth=None,
+                 file_types=None,
+                 dropdown: DropDownMenu = None,
+                 initialdir: Optional[Union[str, os.PathLike]] = None, **kw):
 
         self.title, self.dropdown, self.initialdir = title, dropdown, initialdir
         self.file_type = file_types
@@ -134,28 +130,13 @@ class FileSelect(Frame):
         self.lblwidth = lblwidth if lblwidth is not None else 0
         self.parent = parent
         Frame.__init__(self, master=parent, **kw)
-        browse_icon = ImageTk.PhotoImage(
-            image=PIL.Image.open(MENU_ICONS["browse"]["icon_path"])
-        )
+        browse_icon = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["browse"]["icon_path"]))
         self.filePath = StringVar()
-        self.lblName = Label(
-            self,
-            text=fileDescription,
-            fg=str(self.color),
-            width=str(self.lblwidth),
-            anchor=W,
-        )
+        self.lblName = Label(self, text=fileDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0, sticky=W)
-        self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN)
+        self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value)
         self.entPath.grid(row=0, column=1)
-        self.btnFind = Button(
-            self,
-            text=Defaults.BROWSE_FILE_BTN_TEXT.value,
-            compound="left",
-            image=browse_icon,
-            relief=RAISED,
-            command=self.setFilePath,
-        )
+        self.btnFind = Button(self, text=Defaults.BROWSE_FILE_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, command=self.setFilePath, font=Formats.FONT_REGULAR.value)
         self.btnFind.image = browse_icon
         self.btnFind.grid(row=0, column=2)
         self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
@@ -168,16 +149,9 @@ class FileSelect(Frame):
                 pass
 
         if self.file_type:
-            file_selected = askopenfilename(
-                title=self.title,
-                parent=self.parent,
-                filetypes=self.file_type,
-                initialdir=self.initialdir,
-            )
+            file_selected = askopenfilename(title=self.title, parent=self.parent, filetypes=self.file_type, initialdir=self.initialdir)
         else:
-            file_selected = askopenfilename(
-                title=self.title, parent=self.parent, initialdir=self.initialdir
-            )
+            file_selected = askopenfilename(title=self.title, parent=self.parent, initialdir=self.initialdir)
         if file_selected:
             if self.dropdown is not None:
                 self.dropdown.setChoices(os.path.basename(file_selected))
@@ -198,44 +172,27 @@ class FileSelect(Frame):
 
 
 class Entry_Box(Frame):
-    def __init__(
-        self,
-        parent=None,
-        fileDescription="",
-        labelwidth="",
-        status=None,
-        validation=None,
-        entry_box_width=None,
-        **kw
-    ):
+    def __init__(self,
+                 parent=None,
+                 fileDescription="",
+                 labelwidth="",
+                 status=None,
+                 validation=None,
+                 entry_box_width=None,
+                 **kw):
+
         super(Entry_Box, self).__init__(master=parent)
-        self.validation_methods = {
-            "numeric": (self.register(form_validator_is_numeric), "%P", "%d"),
-        }
+        self.validation_methods = {"numeric": (self.register(form_validator_is_numeric), "%P", "%d")}
         self.status = status if status is not None else NORMAL
         self.labelname = fileDescription
         Frame.__init__(self, master=parent, **kw)
         self.filePath = StringVar()
-        self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W)
+        self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0)
         if not entry_box_width:
-            self.entPath = Entry(
-                self,
-                textvariable=self.filePath,
-                state=self.status,
-                validate="key",
-                validatecommand=self.validation_methods.get(validation, None),
-            )
+            self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=Formats.FONT_REGULAR.value)
         else:
-            self.entPath = Entry(
-                self,
-                textvariable=self.filePath,
-                state=self.status,
-                width=entry_box_width,
-                validate="key",
-                validatecommand=self.validation_methods.get(validation, None),
-            )
-
+            self.entPath = Entry(self, textvariable=self.filePath, state=self.status, width=entry_box_width, validate="key", font=Formats.FONT_REGULAR.value, validatecommand=self.validation_methods.get(validation, None))
         self.entPath.grid(row=0, column=1)
 
     @property
@@ -258,44 +215,27 @@ class Entry_Box(Frame):
 
 
 class FolderSelect(Frame):
-    def __init__(
-        self,
-        parent: Frame,
-        folderDescription: Optional[str] = "",
-        color: Optional[str] = None,
-        title: Optional[str] = "",
-        lblwidth: Optional[int] = 0,
-        initialdir: Optional[Union[str, os.PathLike]] = None,
-        **kw
-    ):
+    def __init__(self,
+                 parent: Frame,
+                 folderDescription: Optional[str] = "",
+                 color: Optional[str] = None,
+                 title: Optional[str] = "",
+                 lblwidth: Optional[int] = 0,
+                 initialdir: Optional[Union[str, os.PathLike]] = None,
+                 **kw):
 
         self.title, self.initialdir = title, initialdir
         self.color = color if color is not None else "black"
         self.lblwidth = lblwidth if lblwidth is not None else 0
         self.parent = parent
         Frame.__init__(self, master=parent, **kw)
-        browse_icon = ImageTk.PhotoImage(
-            image=PIL.Image.open(MENU_ICONS["browse"]["icon_path"])
-        )
+        browse_icon = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["browse"]["icon_path"]))
         self.folderPath = StringVar()
-        self.lblName = Label(
-            self,
-            text=folderDescription,
-            fg=str(self.color),
-            width=str(self.lblwidth),
-            anchor=W,
-        )
+        self.lblName = Label(self, text=folderDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0, sticky=W)
-        self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN)
+        self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=Formats.FONT_REGULAR.value)
         self.entPath.grid(row=0, column=1)
-        self.btnFind = Button(
-            self,
-            text=Defaults.BROWSE_FOLDER_BTN_TEXT.value,
-            compound="left",
-            image=browse_icon,
-            relief=RAISED,
-            command=self.setFolderPath,
-        )
+        self.btnFind = Button(self, text=Defaults.BROWSE_FOLDER_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, font=Formats.FONT_REGULAR.value, command=self.setFolderPath)
         self.btnFind.image = browse_icon
         self.btnFind.grid(row=0, column=2)
         self.folderPath.set("No folder selected")
@@ -306,9 +246,7 @@ class FolderSelect(Frame):
                 self.initialdir = None
             else:
                 pass
-        folder_selected = askdirectory(
-            title=str(self.title), parent=self.parent, initialdir=self.initialdir
-        )
+        folder_selected = askdirectory(title=str(self.title), parent=self.parent, initialdir=self.initialdir)
         if folder_selected:
             self.folderPath.set(folder_selected)
         else:
@@ -369,14 +307,15 @@ def CreateToolTip(widget, text):
     widget.bind("<Leave>", leave)
 
 
-def CreateLabelFrameWithIcon(
-    parent: Toplevel, header: str, icon_name: str, icon_link: str or None = None
-):
+def CreateLabelFrameWithIcon(parent: Toplevel,
+                             header: str,
+                             icon_name: str,
+                             icon_link: Optional[Union[str, None]] = None):
 
     icon = PIL.Image.open(MENU_ICONS[icon_name]["icon_path"])
     icon = ImageTk.PhotoImage(icon)
     frm = Frame(parent)
-    label_text = Label(frm, text=header, font=Formats.LABELFRAME_HEADER_FORMAT.value)
+    label_text = Label(frm, text=header, font=Formats.FONT_HEADER.value)
     label_text.grid(row=0, column=0)
     label_image = Label(frm, image=icon)
     label_image.image = icon
@@ -464,3 +403,40 @@ class TwoOptionQuestionPopUp(object):
     def run(self, selected_option):
         self.selected_option = selected_option
         self.main_frm.destroy()
+
+
+def SimbaButton(parent: Union[Frame, Canvas],
+                txt: str,
+                txt_clr: Optional[str] = 'black',
+                bg_clr: Optional[str] = None,
+                font: Optional[Tuple] = Formats.FONT_REGULAR.value,
+                cmd: Optional[Callable] = None,
+                width: Optional[str] = None,
+                height: Optional[str] = None,
+                img: Optional[Union[ImageTk.PhotoImage, str]] = None) -> Button:
+
+
+
+    if isinstance(img, str):
+        img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
+
+    btn = Button(master=parent,
+                 text=txt,
+                 compound="left",
+                 image=img,
+                 relief=RAISED,
+                 fg=txt_clr,
+                 font=font,
+                 bg=bg_clr,
+                 command= lambda: cmd())
+
+    if img is not None:
+        btn.image = img
+
+    # button_setscale = Button(label_setscale, text="CONFIGURE VIDEO PARAMETERS", compound="left",
+    #                          image=self.btn_icons["calipher"]["img"], relief=RAISED, fg="blue",
+    #                          font=Formats.FONT_REGULAR.value, command=lambda: self.create_video_info_table())
+
+    if width is not None: btn.config(width=width)
+    if height is not None: btn.config(height=height)
+    return btn

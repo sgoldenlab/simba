@@ -57,6 +57,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.auto_compute_styles = Checkbutton(
             self.style_settings_frm,
             text="Auto-compute styles",
+            font=Formats.FONT_REGULAR.value,
             variable=self.autocompute_var,
             command=self.enable_style_settings,
         )
@@ -123,7 +124,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.body_parts_frm = LabelFrame(
             self.main_frm,
             text="CHOOSE BODY-PARTS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
         )
@@ -139,7 +140,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.video_slicing_frm = LabelFrame(
             self.main_frm,
             text="SEGMENTS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
         )
@@ -155,6 +156,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.slice_cb = Checkbutton(
             self.video_slicing_frm,
             text="Plot only defined time-segment",
+            font=Formats.FONT_REGULAR.value,
             variable=self.slice_var,
             command=lambda: self.enable_entrybox_from_checkbox(
                 check_box_var=self.slice_var,
@@ -168,7 +170,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.clf_frm = LabelFrame(
             self.main_frm,
             text="CHOOSE CLASSIFICATION VISUALIZATION",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
         )
@@ -176,6 +178,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.include_clf_locations_cb = Checkbutton(
             self.clf_frm,
             text="Include classification locations",
+            font=Formats.FONT_REGULAR.value,
             variable=self.include_clf_locations_var,
             command=self.populate_clf_location_data,
         )
@@ -186,7 +189,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.settings_frm = LabelFrame(
             self.main_frm,
             text="VISUALIZATION SETTINGS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
         )
@@ -197,23 +200,25 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.include_animal_names_var = BooleanVar(value=True)
 
         path_frames_cb = Checkbutton(
-            self.settings_frm, text="Create frames", variable=self.path_frames_var
+            self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.path_frames_var
         )
         path_videos_cb = Checkbutton(
-            self.settings_frm, text="Create videos", variable=self.path_videos_var
+            self.settings_frm, text="Create videos", font=Formats.FONT_REGULAR.value, variable=self.path_videos_var
         )
         path_last_frm_cb = Checkbutton(
-            self.settings_frm, text="Create last frame", variable=self.path_last_frm_var
+            self.settings_frm, text="Create last frame", font=Formats.FONT_REGULAR.value, variable=self.path_last_frm_var
         )
         self.include_animal_names_cb = Checkbutton(
             self.settings_frm,
             text="Include animal names",
+            font=Formats.FONT_REGULAR.value,
             variable=self.include_animal_names_var,
         )
 
         self.multiprocess_cb = Checkbutton(
             self.settings_frm,
             text="Multiprocess videos (faster)",
+            font=Formats.FONT_REGULAR.value,
             variable=self.multiprocessing_var,
             command=lambda: self.enable_dropdown_from_checkbox(
                 check_box_var=self.multiprocessing_var,
@@ -229,7 +234,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.run_frm = LabelFrame(
             self.main_frm,
             text="RUN",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
             fg="black",
@@ -237,7 +242,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.run_single_video_frm = LabelFrame(
             self.run_frm,
             text="SINGLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
             fg="black",
@@ -245,6 +250,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.run_single_video_btn = Button(
             self.run_single_video_frm,
             text="Create single video",
+            font=Formats.FONT_REGULAR.value,
             fg="blue",
             command=lambda: self.__create_path_plots(multiple_videos=False),
         )
@@ -259,7 +265,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.run_multiple_videos = LabelFrame(
             self.run_frm,
             text="MULTIPLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
             fg="black",
@@ -270,6 +276,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
                 str(len(list(self.files_found_dict.keys())))
             ),
             fg="blue",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.__create_path_plots(multiple_videos=True),
         )
 

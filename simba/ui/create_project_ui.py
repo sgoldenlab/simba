@@ -41,7 +41,6 @@ class ProjectCreatorPopUp(PopUpMixin):
     """
 
     def __init__(self):
-        #PopUpMixin.__init__(self, title='')
         self.main_frm = Toplevel()
         self.main_frm.minsize(750, 750)
         self.main_frm.wm_title("PROJECT CONFIGURATION")
@@ -64,7 +63,7 @@ class ProjectCreatorPopUp(PopUpMixin):
         parent_tab.grid(row=0, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CREATE_PROJECT.value)
-        self.general_settings_frm = LabelFrame(self.settings_frm, text="GENERAL PROJECT SETTINGS", fg="black", font=Formats.LABELFRAME_HEADER_FORMAT.value, padx=5, pady=5)
+        self.general_settings_frm = LabelFrame(self.settings_frm, text="GENERAL PROJECT SETTINGS", fg="black", font=Formats.FONT_HEADER.value, padx=5, pady=5)
 
         self.project_dir_select = FolderSelect(self.general_settings_frm, "Project directory:", lblwidth="25")
         self.project_name_eb = Entry_Box(self.general_settings_frm, "Project name:", labelwidth="25")
@@ -72,11 +71,11 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.file_type_dropdown.setChoices(choice=Options.WORKFLOW_FILE_TYPE_OPTIONS.value[0])
 
         self.clf_name_entries = []
-        self.ml_settings_frm = LabelFrame(self.settings_frm, text="MACHINE LEARNING SETTINGS", font=Formats.LABELFRAME_HEADER_FORMAT.value, padx=5, pady=5)
+        self.ml_settings_frm = LabelFrame(self.settings_frm, text="MACHINE LEARNING SETTINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.clf_cnt = Entry_Box(self.ml_settings_frm, "Number of classifiers (behaviors): ", "25", validation="numeric")
-        add_clf_btn = Button(self.ml_settings_frm, text="<Add predictive classifier(s)>", fg="blue", command=lambda: self.create_entry_boxes_from_entrybox(count=self.clf_cnt.entry_get, parent=self.ml_settings_frm, current_entries=self.clf_name_entries))
+        add_clf_btn = Button(self.ml_settings_frm, text="<Add predictive classifier(s)>", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.create_entry_boxes_from_entrybox(count=self.clf_cnt.entry_get, parent=self.ml_settings_frm, current_entries=self.clf_name_entries))
 
-        self.animal_settings_frm = LabelFrame(self.settings_frm, text="ANIMAL SETTINGS", font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        self.animal_settings_frm = LabelFrame(self.settings_frm, text="ANIMAL SETTINGS", font=Formats.FONT_HEADER.value)
         self.tracking_type_dropdown = DropDownMenu(self.animal_settings_frm, "Type of Tracking", Options.TRACKING_TYPE_OPTIONS.value, "25", com=self.update_body_part_dropdown)
         self.tracking_type_dropdown.setChoices(Options.TRACKING_TYPE_OPTIONS.value[0])
 
@@ -104,10 +103,10 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.three_dim_tracking_options.extend(self.user_defined_options)
         self.selected_tracking_dropdown = DropDownMenu(self.animal_settings_frm, "Body-part config", Options.CLASSICAL_TRACKING_OPTIONS.value, "25", com=self.update_img)
         self.selected_tracking_dropdown.setChoices(self.classical_tracking_options[0])
-        self.img_lbl = Label(self.animal_settings_frm, image=self.bp_lu[self.classical_tracking_options[0]]["img"])
-        reset_btn = Button(self.animal_settings_frm, text="RESET USER DEFINED POSE-CONFIGS", fg="red", command=lambda: PoseResetterPopUp())
+        self.img_lbl = Label(self.animal_settings_frm, image=self.bp_lu[self.classical_tracking_options[0]]["img"], font=Formats.FONT_REGULAR.value)
+        reset_btn = Button(self.animal_settings_frm, text="RESET USER DEFINED POSE-CONFIGS", font=Formats.FONT_REGULAR.value, fg="red", command=lambda: PoseResetterPopUp())
         run_frm = Frame(master=self.settings_frm)
-        create_project_btn = Button(run_frm, text="CREATE PROJECT CONFIG", fg="navy", font=("Helvetica", 16, "bold"), command=lambda: self.run())
+        create_project_btn = Button(run_frm, text="CREATE PROJECT CONFIG", fg="navy", font=Formats.FONT_HEADER.value, command=lambda: self.run())
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.general_settings_frm.grid(row=0, column=0, sticky=NW)
         self.project_dir_select.grid(row=0, column=0, sticky=NW)
@@ -128,9 +127,9 @@ class ProjectCreatorPopUp(PopUpMixin):
 
         ImportVideosFrame(parent_frm=self.import_videos_tab, config_path=None, idx_row=0, idx_column=0)
         ImportPoseFrame(parent_frm=self.import_data_tab, config_path=None, idx_row=0, idx_column=0)
-        extract_frames_frm = LabelFrame(self.extract_frms_tab, text="EXTRACT FRAMES INTO PROJECT", fg="black", font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
-        extract_frames_note = Label(extract_frames_frm, text="Note: Frame extraction is not needed for any of the parts of the SimBA pipeline.\n Caution: This extract all frames from all videos in project. \n and is computationally expensive if there is a lot of videos at high frame rates/resolution.")
-        extract_frames_btn = Button(extract_frames_frm, text="EXTRACT FRAMES", fg="blue", command=lambda: None)
+        extract_frames_frm = LabelFrame(self.extract_frms_tab, text="EXTRACT FRAMES INTO PROJECT", fg="black", font=Formats.FONT_HEADER.value, pady=5, padx=5)
+        extract_frames_note = Label(extract_frames_frm, text="Note: Frame extraction is not needed for any of the parts of the SimBA pipeline.\n Caution: This extract all frames from all videos in project. \n and is computationally expensive if there is a lot of videos at high frame rates/resolution.", font=Formats.FONT_REGULAR.value)
+        extract_frames_btn = Button(extract_frames_frm, text="EXTRACT FRAMES", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: None)
 
         extract_frames_frm.grid(row=0, column=0, sticky=NW)
         extract_frames_note.grid(row=0, column=0, sticky=NW)

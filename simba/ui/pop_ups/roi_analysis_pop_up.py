@@ -29,6 +29,7 @@ class ROIAnalysisPopUp(ConfigReader, PopUpMixin):
         self.animal_cnt_confirm_btn = Button(
             self.animal_cnt_frm,
             text="Confirm",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.create_settings_frm(),
         )
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
@@ -42,31 +43,33 @@ class ROIAnalysisPopUp(ConfigReader, PopUpMixin):
             self.body_part_frm.destroy()
 
         self.setting_frm = LabelFrame(
-            self.main_frm, text="SETTINGS", font=Formats.LABELFRAME_HEADER_FORMAT.value
+            self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value
         )
         self.choose_bp_frm(parent=self.setting_frm, bp_options=self.body_parts_lst)
         self.choose_bp_threshold_frm(parent=self.setting_frm)
         self.calculate_distances_frm = LabelFrame(
             self.setting_frm,
             text="CALCULATE DISTANCES",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
         )
         self.calculate_distance_moved_var = BooleanVar(value=False)
         self.calculate_distance_moved_cb = Checkbutton(
             self.calculate_distances_frm,
             text="Compute distances moved within ROIs",
+            font=Formats.FONT_REGULAR.value,
             variable=self.calculate_distance_moved_var,
         )
         self.calculate_distance_moved_cb.grid(row=0, column=0, sticky=NW)
         self.detailed_roi_frm = LabelFrame(
             self.setting_frm,
             text="DETAILED ROI BOUT DATA",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
         )
         self.detailed_roi_var = BooleanVar(value=False)
         self.detailed_roi_cb = Checkbutton(
             self.detailed_roi_frm,
             text="Save detailed ROI bout data",
+            font=Formats.FONT_REGULAR.value,
             variable=self.detailed_roi_var,
         )
         self.detailed_roi_cb.grid(row=1, column=0, sticky=NW)

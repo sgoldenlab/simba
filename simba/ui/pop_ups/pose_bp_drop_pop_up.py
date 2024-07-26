@@ -35,7 +35,7 @@ class DropTrackingDataPopUp(PopUpMixin):
             file_settings_frm, "# body-parts to remove", "20", validation="numeric"
         )
         confirm_btn = Button(
-            file_settings_frm, text="Confirm", command=lambda: self.confirm()
+            file_settings_frm, text="Confirm", font=Formats.FONT_REGULAR.value, command=lambda: self.confirm()
         )
         file_settings_frm.grid(row=0, sticky=NW)
         self.data_folder_path.grid(row=0, sticky=W, columnspan=3)

@@ -65,12 +65,13 @@ class AnalyzeSeverityPopUp(PopUpMixin, ConfigReader):
         self.savet_brackets_info_cb = Checkbutton(
             self.settings_frm,
             text="Save bracket definitions",
+            font=Formats.FONT_REGULAR.value,
             variable=self.save_bracket_cut_off_points_var,
         )
         self.further_settings_frm = LabelFrame(
             self.main_frm,
             text="Further settings",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
             fg="black",
@@ -78,13 +79,13 @@ class AnalyzeSeverityPopUp(PopUpMixin, ConfigReader):
         run_frm = LabelFrame(
             self.main_frm,
             text="RUN",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
             fg="black",
         )
         run_btn = Button(
-            run_frm, text="RUN SEVERITY ANALYSIS", command=lambda: self.run()
+            run_frm, text="RUN SEVERITY ANALYSIS", font=Formats.FONT_REGULAR.value, command=lambda: self.run()
         )
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.clf_dropdown.grid(row=0, column=0, sticky=NW)
@@ -110,12 +111,14 @@ class AnalyzeSeverityPopUp(PopUpMixin, ConfigReader):
         self.visualize_cb = Checkbutton(
             self.further_settings_frm,
             text="Visualize",
+            font=Formats.FONT_REGULAR.value,
             variable=self.visualize_var,
             command=self.enable_visualization_options,
         )
         self.show_pose_cb = Checkbutton(
             self.further_settings_frm,
             text="Show pose-estimated locations",
+            font=Formats.FONT_REGULAR.value,
             variable=self.show_pose_var,
         )
         self.video_speed_dropdown = DropDownMenu(
@@ -141,10 +144,11 @@ class AnalyzeSeverityPopUp(PopUpMixin, ConfigReader):
             self.frame_cnt_cb = Checkbutton(
                 self.further_settings_frm,
                 text="FRAME COUNT",
+                font=Formats.FONT_REGULAR.value,
                 variable=self.frame_cnt_var,
             )
             self.seconds_cnt_cb = Checkbutton(
-                self.further_settings_frm, text="SECONDS", variable=self.seconds_cnt_var
+                self.further_settings_frm, text="SECONDS", font=Formats.FONT_REGULAR.value, variable=self.seconds_cnt_var
             )
             self.frame_cnt_cb.grid(row=4, column=0, sticky=NW)
             self.seconds_cnt_cb.grid(row=5, column=0, sticky=NW)

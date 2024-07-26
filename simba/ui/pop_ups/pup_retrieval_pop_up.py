@@ -95,15 +95,17 @@ class PupRetrievalPopUp(object):
         self.create_distance_plots_cb = Checkbutton(
             self.main_frm,
             text="Create distance plots (pre- and post tracking smoothing",
+            font=Formats.FONT_REGULAR.value,
             variable=self.distance_plots_var,
         )
         self.swarm_plot_cb = Checkbutton(
             self.main_frm,
             text="Create results swarm plot",
+            font=Formats.FONT_REGULAR.value,
             variable=self.swarm_plot_var,
         )
         self.log_cb = Checkbutton(
-            self.main_frm, text="Create log-file", variable=self.log_var
+            self.main_frm, text="Create log-file", font=Formats.FONT_REGULAR.value,  variable=self.log_var
         )
 
         self.pup_track_p_entry.entry_set(0.025)
@@ -125,7 +127,7 @@ class PupRetrievalPopUp(object):
         button_run = Button(
             self.main_frm,
             text="RUN",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_REGULAR.value,
             fg="red",
             command=lambda: self.run(),
         )

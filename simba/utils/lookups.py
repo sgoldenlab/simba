@@ -9,8 +9,6 @@ import sys
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
-import pyglet
-
 import matplotlib.font_manager
 import pandas as pd
 from matplotlib import cm
@@ -20,6 +18,10 @@ from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exis
 from simba.utils.enums import OS, Methods, Paths, FontPaths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
+import pyglet
+if platform.system() == OS.WINDOWS.value:
+    from pyglet.libs.win32 import constants
+    constants.COINIT_MULTITHREADED = 0x2  # 0x2 = COINIT_APARTMENTTHREADED
 
 
 class SharedCounter(object):
@@ -586,6 +588,15 @@ def get_fonts():
     if platform.system() == OS.WINDOWS.value:
         font_dict = {key: str(Path(value.replace('C:', '')).as_posix()) for key, value in font_dict.items()}
     return font_dict
+
+
+def get_linux_fonts():
+    """ Get fonts on linux system, to clean up when time allows"""
+    fonts = ['Noto Serif CJK JP', 'DejaVu Sans', 'FreeSerif', 'Nimbus Sans']
+    font_dict = get_fonts()
+    for font in font_dict.keys():
+        if font in fonts:
+            return (font, 8), (font, 10, "bold")
 
 def get_log_config():
     return {

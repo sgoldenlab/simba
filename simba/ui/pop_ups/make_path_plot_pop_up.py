@@ -7,7 +7,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, FileSelect)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_valid_rgb_tuple, check_int, check_str)
-from simba.utils.enums import Keys, Links, Options
+from simba.utils.enums import Keys, Links, Options, Formats
 from simba.utils.lookups import get_color_dict
 
 
@@ -61,6 +61,7 @@ class MakePathPlotPopUp(PopUpMixin):
         Label(
             settings_frm,
             fg="green",
+            font=Formats.FONT_REGULAR.value,
             text=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab after loading your SimBA project",
         ).grid(row=8, sticky=W)
         self.create_run_frm(run_function=self.run)

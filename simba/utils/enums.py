@@ -4,12 +4,11 @@ import os
 import sys
 from enum import Enum
 from pathlib import Path
-
 import cv2
 import numpy as np
 import pkg_resources
-
 import simba
+import platform
 
 
 class ConfigKey(Enum):
@@ -112,6 +111,12 @@ class Paths(Enum):
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
     CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
 
+class OS(Enum):
+    WINDOWS = "Windows"
+    LINUX = "Linux"
+    MAC = "Darwin"
+    PYTHON_VER = str(f"{sys.version_info.major}.{sys.version_info.minor}")
+
 class FontPaths(Enum):
     POPPINS_REGULAR = Path("assets/fonts/Poppins Regular.ttf")
     PLAYWRIGHT = Path("assets/fonts/Playwrite ES Deco.ttf")
@@ -133,8 +138,20 @@ class Formats(Enum):
     H5 = "h5"
     ROOT_WINDOW_SIZE = "750x750"
     FONT = cv2.FONT_HERSHEY_TRIPLEX
-    TKINTER_FONT = ("Rockwell", 11)
-    POPPINS_FONT = ('Poppins Regular', 11)
+    if (platform.system() == OS.MAC.value):
+        FONT_REGULAR = ('Poppins Regular', 13)
+        FONT_HEADER = ('Poppins Regular', 13, "bold")
+        FONT_LARGE = ('Poppins Regular', 15, "bold")
+        FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
+    elif (platform.system() == OS.WINDOWS.value):
+        FONT_REGULAR = ('Poppins Regular', 8)
+        FONT_HEADER = ('Poppins Regular', 10, "bold")
+        FONT_LARGE = ('Poppins Regular', 13, "bold")
+        FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
+    else:
+        FONT_REGULAR = ('DejaVu Sans', 8)
+        FONT_HEADER = ('DejaVu Sans', 10, "bold")
+        FONT_LARGE = ('DejaVu Sans', 13, "bold")
     DLC_NETWORK_FILE_NAMES = [
         "dlc_resnet50",
         "dlc_resnet_50",
@@ -484,11 +501,6 @@ class Methods(Enum):
     THIRD_PARTY_ANNOTATION_FILE_NOT_FOUND = "Annotations data file NOT FOUND"
 
 
-class OS(Enum):
-    WINDOWS = "Windows"
-    LINUX = "Linux"
-    MAC = "Darwin"
-    PYTHON_VER = str(f"{sys.version_info.major}.{sys.version_info.minor}")
 
 
 class Links(Enum):

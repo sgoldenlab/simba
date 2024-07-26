@@ -86,37 +86,38 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             self.video_basename_lst.append(video_basename)
             self.videos[name] = {}
             self.videos[name]["video_idx_lbl"] = Label(
-                self.video_frm, text=str(cnt), width=6
+                self.video_frm, text=str(cnt), font=Formats.FONT_REGULAR.value,  width=6
             )
             self.videos[name]["video_name_lbl"] = Label(
-                self.video_frm, text=video_basename, width=self.max_char_vid_name
+                self.video_frm, text=video_basename, font=Formats.FONT_REGULAR.value,  width=self.max_char_vid_name
             )
             self.videos[name]["video_name_w_ext"] = name
             video_meta = get_video_meta_data(os.path.join(self.video_dir, name))
             self.videos[name]["fps_var"] = IntVar()
             self.videos[name]["fps_var"].set(video_meta["fps"])
             self.videos[name]["fps_entry"] = Entry(
-                self.video_frm, width=20, textvariable=self.videos[name]["fps_var"]
+                self.video_frm, width=20, font=Formats.FONT_REGULAR.value, textvariable=self.videos[name]["fps_var"]
             )
             self.videos[name]["width_var"] = IntVar()
             self.videos[name]["width_var"].set(video_meta["width"])
             self.videos[name]["width_entry"] = Entry(
-                self.video_frm, width=20, textvariable=self.videos[name]["width_var"]
+                self.video_frm, width=20, font=Formats.FONT_REGULAR.value, textvariable=self.videos[name]["width_var"]
             )
             self.videos[name]["height_var"] = IntVar()
             self.videos[name]["height_var"].set(video_meta["height"])
             self.videos[name]["height_entry"] = Entry(
-                self.video_frm, width=20, textvariable=self.videos[name]["height_var"]
+                self.video_frm, width=20, font=Formats.FONT_REGULAR.value, textvariable=self.videos[name]["height_var"]
             )
             self.videos[name]["distance"] = StringVar()
             self.videos[name]["distance"].set(self.distance_mm)
             self.videos[name]["distance_entry"] = Entry(
-                self.video_frm, width=20, textvariable=self.videos[name]["distance"]
+                self.video_frm, width=20, font=Formats.FONT_REGULAR.value, textvariable=self.videos[name]["distance"]
             )
             self.videos[name]["find_dist_btn"] = Button(
                 self.video_frm,
                 text="Calculate distance",
                 fg="black",
+                font=Formats.FONT_REGULAR.value,
                 command=lambda k=(
                     self.videos[name]["video_name_w_ext"],
                     self.videos[name]["distance"],
@@ -125,7 +126,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             self.videos[name]["px_mm"] = StringVar()
             self.videos[name]["px_mm"].set(0)
             self.videos[name]["px_mm_entry"] = Entry(
-                self.video_frm, width=20, textvariable=self.videos[name]["px_mm"]
+                self.video_frm, width=20, font=Formats.FONT_REGULAR.value, textvariable=self.videos[name]["px_mm"]
             )
             if isinstance(self.video_info_df, pd.DataFrame):
                 prior_data = None
@@ -193,29 +194,30 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.intructions_label_1 = Label(
             self.instructions_frm,
             text='1. Enter the known distance (millimeters) in the "DISTANCE IN MM" column. Consider using the "autopopulate" entry box in the main project window you have a lot of videos.',
-            font=("Helvetica", 15),
+            font=Formats.FONT_REGULAR.value,
         )
         self.intructions_label_2 = Label(
             self.instructions_frm,
             text='2. Click on "Calculate distance" button(s) to calculate pixels/mm for each video.',
-            font=("Helvetica", 15),
+            font=Formats.FONT_REGULAR.value,
         )
         self.intructions_label_3 = Label(
             self.instructions_frm,
             text="3. Click <SAVE DATA> when all the data are filled in.",
-            font=("Helvetica", 15),
+            font=Formats.FONT_REGULAR.value,
         )
         self.instructions_frm.grid(row=0, column=0, sticky=W)
         self.intructions_label_1.grid(row=0, column=0, sticky=W)
         self.intructions_label_2.grid(row=1, column=0, sticky=W)
         self.intructions_label_3.grid(row=2, column=0, sticky=W)
         self.execute_frm = LabelFrame(
-            self.main_frm, text="EXECUTE", font=Formats.LABELFRAME_HEADER_FORMAT.value
+            self.main_frm, text="EXECUTE", font=Formats.FONT_HEADER.value
         )
         self.save_data_btn = Button(
             self.execute_frm,
             text="SAVE DATA",
             fg="green",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.__save_data(),
         )
         self.execute_frm.grid(row=1, column=0, sticky=W)
@@ -223,7 +225,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.video_frm = LabelFrame(
             self.main_frm,
             text="PROJECT VIDEOS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
         )
         self.column_names = [
             "INDEX",
@@ -253,7 +255,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
                 self.video_frm,
                 text=col_name,
                 width=col_width,
-                font=Formats.LABELFRAME_HEADER_FORMAT.value,
+                font=Formats.FONT_HEADER.value,
             )
             col_header_label.grid(row=0, column=cnt, sticky=W)
         self.videos = {}
@@ -270,6 +272,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             self.video_frm,
             text="Duplicate index 1 pixels/mm (CAUTION!)",
             fg="red",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.__duplicate_idx_1_px_mm(),
         )
         self.duplicate_btn.grid(row=1, column=7, sticky=W, padx=5)
@@ -298,7 +301,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             self.execute_frm,
             text=f"THE PROJECT CONTAINS {len(self.videos.keys())} VIDEOS",
             fg="blue",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             padx=20,
         ).grid(row=0, column=1, sticky=NW)
 

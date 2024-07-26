@@ -38,6 +38,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.animal_cnt_confirm_btn = Button(
             self.animal_cnt_frm,
             text="Confirm",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.create_settings_frm(),
         )
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
@@ -51,15 +52,15 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
             self.body_part_frm.destroy()
 
         self.setting_frm = LabelFrame(
-            self.main_frm, text="SETTINGS", font=Formats.LABELFRAME_HEADER_FORMAT.value
+            self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value
         )
         self.choose_bp_frm(parent=self.setting_frm, bp_options=self.body_parts_lst)
         self.plots_frm = LabelFrame(
-            self.setting_frm, text="Plots", font=Formats.LABELFRAME_HEADER_FORMAT.value
+            self.setting_frm, text="Plots", font=Formats.FONT_HEADER.value
         )
         self.plots_var = BooleanVar()
         self.plots_cb = Checkbutton(
-            self.plots_frm, text="Create plots", variable=self.plots_var
+            self.plots_frm, text="Create plots", font=Formats.FONT_REGULAR.value, variable=self.plots_var
         )
         self.plots_frm.grid(
             row=self.frame_children(frame=self.setting_frm), column=0, sticky=NW

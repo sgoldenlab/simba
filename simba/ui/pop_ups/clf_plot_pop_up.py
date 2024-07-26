@@ -27,33 +27,15 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.rotate_img_var = BooleanVar()
         self.multiprocess_var = BooleanVar()
 
-        bp_threshold_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="BODY-PART VISUALIZATION THRESHOLD",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.SKLEARN_PLOTS.value,
-        )
-        self.bp_threshold_lbl = Label(
-            bp_threshold_frm,
-            text="Body-parts detected below the set threshold won't be shown in the output videos.",
-            font=("Helvetica", 11, "italic"),
-        )
-        self.bp_threshold_entry = Entry_Box(
-            bp_threshold_frm, "Body-part probability threshold", "32"
-        )
+        bp_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BODY-PART VISUALIZATION THRESHOLD", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.SKLEARN_PLOTS.value)
+        self.bp_threshold_lbl = Label( bp_threshold_frm, text="Body-parts detected below the set threshold won't be shown in the output videos.", font=("Helvetica", 11, "italic"))
+        self.bp_threshold_entry = Entry_Box(bp_threshold_frm, "Body-part probability threshold", "32")
         self.get_bp_probability_threshold()
-
-        self.style_settings_frm = LabelFrame(
-            self.main_frm,
-            text="STYLE SETTINGS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
+        self.style_settings_frm = LabelFrame(self.main_frm, text="STYLE SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
         self.auto_compute_font_cb = Checkbutton(
             self.style_settings_frm,
             text="Auto-compute font/key-point settings",
+            font=Formats.FONT_REGULAR.value,
             variable=self.use_default_font_settings_val,
             command=lambda: self.enable_entrybox_from_checkbox(
                 check_box_var=self.use_default_font_settings_val,
@@ -66,47 +48,23 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                 ],
             ),
         )
-        self.sklearn_text_size_entry_box = Entry_Box(
-            self.style_settings_frm, "Text size: ", "12"
-        )
-        self.sklearn_text_spacing_entry_box = Entry_Box(
-            self.style_settings_frm, "Text spacing: ", "12"
-        )
-        self.sklearn_text_thickness_entry_box = Entry_Box(
-            self.style_settings_frm, "Text thickness: ", "12"
-        )
-        self.sklearn_circle_size_entry_box = Entry_Box(
-            self.style_settings_frm, "Circle size: ", "12"
-        )
+        self.sklearn_text_size_entry_box = Entry_Box(self.style_settings_frm, "Text size: ", "12")
+        self.sklearn_text_spacing_entry_box = Entry_Box(self.style_settings_frm, "Text spacing: ", "12")
+        self.sklearn_text_thickness_entry_box = Entry_Box(self.style_settings_frm, "Text thickness: ", "12")
+        self.sklearn_circle_size_entry_box = Entry_Box(self.style_settings_frm, "Circle size: ", "12")
         self.sklearn_text_size_entry_box.set_state("disable")
         self.sklearn_text_spacing_entry_box.set_state("disable")
         self.sklearn_text_thickness_entry_box.set_state("disable")
         self.sklearn_circle_size_entry_box.set_state("disable")
 
-        self.settings_frm = LabelFrame(
-            self.main_frm,
-            text="VISUALIZATION SETTINGS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.create_videos_cb = Checkbutton(
-            self.settings_frm, text="Create video", variable=self.create_videos_var
-        )
-        self.create_frames_cb = Checkbutton(
-            self.settings_frm, text="Create frames", variable=self.create_frames_var
-        )
-        self.timers_cb = Checkbutton(
-            self.settings_frm,
-            text="Include timers overlay",
-            variable=self.include_timers_var,
-        )
-        self.rotate_cb = Checkbutton(
-            self.settings_frm, text="Rotate video 90°", variable=self.rotate_img_var
-        )
+        self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
+        self.create_videos_cb = Checkbutton(self.settings_frm, text="Create video", font=Formats.FONT_REGULAR.value, variable=self.create_videos_var)
+        self.create_frames_cb = Checkbutton(self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.create_frames_var)
+        self.timers_cb = Checkbutton( self.settings_frm, text="Include timers overlay", font=Formats.FONT_REGULAR.value, variable=self.include_timers_var)
+        self.rotate_cb = Checkbutton(self.settings_frm, text="Rotate video 90°", font=Formats.FONT_REGULAR.value, variable=self.rotate_img_var)
         self.multiprocess_cb = Checkbutton(
             self.settings_frm,
+            font=Formats.FONT_REGULAR.value,
             text="Multiprocess videos (faster)",
             variable=self.multiprocess_var,
             command=lambda: self.enable_dropdown_from_checkbox(
@@ -114,65 +72,20 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                 dropdown_menus=[self.multiprocess_dropdown],
             ),
         )
-        self.multiprocess_dropdown = DropDownMenu(
-            self.settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12"
-        )
+        self.multiprocess_dropdown = DropDownMenu(self.settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(
-            self.main_frm,
-            text="RUN",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_frm = LabelFrame(
-            self.run_frm,
-            text="SINGLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_btn = Button(
-            self.run_single_video_frm,
-            text="Create single video",
-            fg="blue",
-            command=lambda: self.__initiate_video_creation(multiple_videos=False),
-        )
-        self.single_video_dropdown = DropDownMenu(
-            self.run_single_video_frm,
-            "Video:",
-            self.video_lst,
-            "12",
-            com=lambda x: self.__update_single_video_file_path(filename=x),
-        )
-        self.select_video_file_select = FileSelect(
-            self.run_single_video_frm,
-            "",
-            lblwidth="1",
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-            dropdown=self.single_video_dropdown,
-        )
+        self.run_frm = LabelFrame(self.main_frm,text="RUN",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
+        self.run_single_video_frm = LabelFrame( self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
+        self.run_single_video_btn = Button(self.run_single_video_frm, font=Formats.FONT_REGULAR.value, text="Create single video", fg="blue", command=lambda: self.__initiate_video_creation(multiple_videos=False),)
+        self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", self.video_lst, "12", com=lambda x: self.__update_single_video_file_path(filename=x),)
+        self.select_video_file_select = FileSelect(self.run_single_video_frm, "", lblwidth="1", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], dropdown=self.single_video_dropdown,)
         self.single_video_dropdown.setChoices(self.video_lst[0])
         self.select_video_file_select.filePath.set(self.video_lst[0])
 
-        self.run_multiple_videos = LabelFrame(
-            self.run_frm,
-            text="MULTIPLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_multiple_video_btn = Button(
-            self.run_multiple_videos,
-            text=f"Create multiple videos ({len(self.machine_results_paths)} video(s) found)",
-            fg="blue",
-            command=lambda: self.__initiate_video_creation(multiple_videos=True),
-        )
+        self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
+        self.run_multiple_video_btn = Button(self.run_multiple_videos, text=f"Create multiple videos ({len(self.machine_results_paths)} video(s) found)", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.__initiate_video_creation(multiple_videos=True),)
 
         bp_threshold_frm.grid(row=0, sticky=NW)
         self.bp_threshold_lbl.grid(row=0, sticky=NW)

@@ -16,9 +16,7 @@ class ROI_menu:
         self.config_path = config_path
         config = ConfigParser()
         config.read(config_path)
-        self.project_path = config.get(
-            ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value
-        )
+        self.project_path = config.get(ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value)
         self.measures_dir = os.path.join(self.project_path, "logs", "measures")
         self.video_dir = os.path.join(self.project_path, "videos")
         self.roi_table_menu()

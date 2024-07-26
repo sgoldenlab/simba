@@ -44,19 +44,19 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
                                                       icon_name=Keys.DOCUMENTATION.value,
                                                       icon_link=Links.TRAIN_ML_MODEL.value,)
         self.select_config_file = FileSelect(load_meta_data_frm, "CONFIG PATH:")
-        load_config_btn = Button(load_meta_data_frm, text="LOAD", fg="blue", command=lambda: self.load_config())
-        label_link = Label(load_meta_data_frm, text="[MODEL SETTINGS TUTORIAL]", fg="blue")
+        load_config_btn = Button(load_meta_data_frm, text="LOAD", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.load_config())
+        label_link = Label(load_meta_data_frm, text="[MODEL SETTINGS TUTORIAL]", fg="blue", font=Formats.FONT_REGULAR.value)
         label_link.bind("<Button-1>", lambda e: webbrowser.open_new("https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model"))
 
-        machine_model_frm = LabelFrame(self.main_frm,text="MACHINE MODEL ALGORITHM",font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        machine_model_frm = LabelFrame(self.main_frm,text="MACHINE MODEL ALGORITHM",font=Formats.FONT_HEADER.value)
         self.machine_model_dropdown = DropDownMenu(machine_model_frm, "ALGORITHM: ", self.clf_options, "25")
         self.machine_model_dropdown.setChoices(self.clf_options[0])
 
-        behavior_frm = LabelFrame(self.main_frm, text="BEHAVIOR", font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        behavior_frm = LabelFrame(self.main_frm, text="BEHAVIOR", font=Formats.FONT_HEADER.value)
         self.behavior_name_dropdown = DropDownMenu(behavior_frm, "BEHAVIOR: ", self.clf_names, "25")
         self.behavior_name_dropdown.setChoices(self.clf_names[0])
 
-        self.hyperparameters_frm = LabelFrame(self.main_frm,text="HYPER-PARAMETERS",font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        self.hyperparameters_frm = LabelFrame(self.main_frm,text="HYPER-PARAMETERS",font=Formats.FONT_HEADER.value)
         self.estimators_entrybox = Entry_Box(self.hyperparameters_frm,"Random forest estimators:","25",validation="numeric")
         self.estimators_entrybox.entry_set(val=2000)
         self.max_features_dropdown = DropDownMenu(self.hyperparameters_frm, "Max features: ", self.max_features_options, "25")
@@ -78,7 +78,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.class_weights_dropdown = DropDownMenu(self.hyperparameters_frm,"Class-weights setting: ",self.class_weighing_options,"25",com=lambda x: self.create_class_weight_table())
         self.class_weights_dropdown.setChoices(Dtypes.NONE.value)
 
-        self.evaluations_frm = LabelFrame(self.main_frm,text="MODEL EVALUATION SETTINGS",font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        self.evaluations_frm = LabelFrame(self.main_frm,text="MODEL EVALUATION SETTINGS",font=Formats.FONT_HEADER.value)
         self.create_meta_data_file_var = BooleanVar()
         self.create_example_decision_tree_graphviz_var = BooleanVar()
         self.create_example_decision_tree_dtreeviz_var = BooleanVar()
@@ -90,13 +90,13 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.calc_shap_scores_var = BooleanVar()
         self.learning_curve_var = BooleanVar()
 
-        self.meta_data_file_cb = Checkbutton(self.evaluations_frm, text="Create model meta data file", variable=self.create_meta_data_file_var)
-        self.decision_tree_graphviz_cb = Checkbutton(self.evaluations_frm, text='Create Example Decision Tree (requires "graphviz")', variable=self.create_example_decision_tree_graphviz_var)
-        self.decision_tree_dtreeviz_cb = Checkbutton(self.evaluations_frm, text='Create Fancy Example Decision Tree (requires "dtreeviz")', variable=self.create_example_decision_tree_dtreeviz_var)
-        self.clf_report_cb = Checkbutton(self.evaluations_frm,text="Create Classification Report",variable=self.create_clf_report_var)
-        self.n_features_bars_entry_box = Entry_Box(self.evaluations_frm,"# Features: ","25",status=DISABLED,validation="numeric")
-        self.bar_graph_cb = Checkbutton(self.evaluations_frm,text="Create Features Importance Bar Graph",variable=self.create_clf_importance_bars_var,command=lambda: self.enable_entrybox_from_checkbox(    check_box_var=self.create_clf_importance_bars_var,    entry_boxes=[self.n_features_bars_entry_box],))
-        self.feature_permutation_cb = Checkbutton(self.evaluations_frm,text="Compute Feature Permutation Importances (Note: CPU intensive)",variable=self.feature_permutation_importance_var)
+        self.meta_data_file_cb = Checkbutton(self.evaluations_frm, text="Create model meta data file", font=Formats.FONT_REGULAR.value, variable=self.create_meta_data_file_var)
+        self.decision_tree_graphviz_cb = Checkbutton(self.evaluations_frm, text='Create Example Decision Tree (requires "graphviz")', font=Formats.FONT_REGULAR.value, variable=self.create_example_decision_tree_graphviz_var)
+        self.decision_tree_dtreeviz_cb = Checkbutton(self.evaluations_frm, text='Create Fancy Example Decision Tree (requires "dtreeviz")', font=Formats.FONT_REGULAR.value,  variable=self.create_example_decision_tree_dtreeviz_var)
+        self.clf_report_cb = Checkbutton(self.evaluations_frm,text="Create Classification Report", font=Formats.FONT_REGULAR.value, variable=self.create_clf_report_var)
+        self.n_features_bars_entry_box = Entry_Box(self.evaluations_frm,"# Features: ","25", status=DISABLED,validation="numeric")
+        self.bar_graph_cb = Checkbutton(self.evaluations_frm,text="Create Features Importance Bar Graph", font=Formats.FONT_REGULAR.value,  variable=self.create_clf_importance_bars_var,command=lambda: self.enable_entrybox_from_checkbox(    check_box_var=self.create_clf_importance_bars_var,    entry_boxes=[self.n_features_bars_entry_box],))
+        self.feature_permutation_cb = Checkbutton(self.evaluations_frm,text="Compute Feature Permutation Importances (Note: CPU intensive)", font=Formats.FONT_REGULAR.value, variable=self.feature_permutation_importance_var)
         self.learning_curve_k_splits_entry_box = Entry_Box(
             self.evaluations_frm,
             "Learning Curve Shuffle K Splits",
@@ -114,6 +114,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.learning_curve_cb = Checkbutton(
             self.evaluations_frm,
             text="Create Learning Curves (Note: CPU intensive)",
+            font=Formats.FONT_REGULAR.value,
             variable=self.learning_curve_var,
             command=lambda: self.enable_entrybox_from_checkbox(
                 check_box_var=self.learning_curve_var,
@@ -125,6 +126,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         )
         self.create_pr_curve_cb = Checkbutton(
             self.evaluations_frm,
+            font=Formats.FONT_REGULAR.value,
             text="Create Precision Recall Curves",
             variable=self.create_pr_curve_var,
         )
@@ -162,12 +164,14 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
 
         self.partial_dependency_cb = Checkbutton(
             self.evaluations_frm,
+            font=Formats.FONT_REGULAR.value,
             text="Calculate partial dependencies (Note: CPU intensive)",
             variable=self.partial_dependency_var,
         )
         self.calculate_shap_scores_cb = Checkbutton(
             self.evaluations_frm,
             text="Calculate SHAP scores",
+            font=Formats.FONT_REGULAR.value,
             variable=self.calc_shap_scores_var,
             command=lambda: [
                 self.enable_entrybox_from_checkbox(
@@ -184,29 +188,17 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             ],
         )
         self.save_frame = LabelFrame(
-            self.main_frm, text="SAVE", font=Formats.LABELFRAME_HEADER_FORMAT.value
+            self.main_frm, text="SAVE", font=Formats.FONT_HEADER.value
         )
         save_global_btn = Button(
             self.save_frame,
             text="SAVE SETTINGS (GLOBAL ENVIRONMENT)",
-            font=("Helvetica", 12, "bold"),
+            font=Formats.FONT_REGULAR.value,
             fg="blue",
             command=lambda: self.save_global(),
         )
-        save_meta_btn = Button(
-            self.save_frame,
-            text="SAVE SETTINGS (SPECIFIC MODEL)",
-            font=("Helvetica", 12, "bold"),
-            fg="green",
-            command=lambda: self.save_config(),
-        )
-        clear_cache_btn = Button(
-            self.save_frame,
-            text="CLEAR CACHE",
-            font=("Helvetica", 12, "bold"),
-            fg="red",
-            command=lambda: self.clear_cache(),
-        )
+        save_meta_btn = Button(self.save_frame, text="SAVE SETTINGS (SPECIFIC MODEL)", font=Formats.FONT_REGULAR.value, fg="green", command=lambda: self.save_config())
+        clear_cache_btn = Button(self.save_frame, text="CLEAR CACHE", font=Formats.FONT_REGULAR.value, fg="red", command=lambda: self.clear_cache())
 
         load_meta_data_frm.grid(row=0, column=0, sticky=NW)
         self.select_config_file.grid(row=0, column=0, sticky=NW)

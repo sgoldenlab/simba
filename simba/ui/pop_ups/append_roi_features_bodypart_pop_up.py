@@ -13,16 +13,9 @@ class AppendROIFeaturesByBodyPartPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
         if not os.path.isfile(self.roi_coordinates_path):
-            raise NoROIDataError(
-                msg="SIMBA ERROR: No ROIs have been defined. Please define ROIs before appending ROI-based features",
-                source=self.__class__.__name__,
-            )
-        PopUpMixin.__init__(
-            self, config_path=config_path, title="APPEND ROI FEATURES: BY BODY-PARTS"
-        )
-        self.create_choose_number_of_body_parts_frm(
-            project_body_parts=self.project_bps, run_function=self.run
-        )
+            raise NoROIDataError(msg="SIMBA ERROR: No ROIs have been defined. Please define ROIs before appending ROI-based features",source=self.__class__.__name__,)
+        PopUpMixin.__init__(self, config_path=config_path, title="APPEND ROI FEATURES: BY BODY-PARTS")
+        self.create_choose_number_of_body_parts_frm(project_body_parts=self.project_bps, run_function=self.run)
         self.main_frm.mainloop()
 
     def run(self):

@@ -15,42 +15,21 @@ class FSTTCPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, title="FORWARD SPIKE TIME TILING COEFFICIENTS")
         ConfigReader.__init__(self, config_path=config_path)
-        settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.FSTTC.value,
-        )
-        self.time_delta_eb = Entry_Box(
-            settings_frm, "TIME-DELTA", "10", validation="numeric"
-        )
+        settings_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.FSTTC.value,)
+        self.time_delta_eb = Entry_Box(settings_frm, "TIME-DELTA", "10", validation="numeric")
         self.graph_cb_var = BooleanVar(value=False)
-        graph_cb = Checkbutton(
-            settings_frm, text="CREATE GRAPH", variable=self.graph_cb_var
-        )
+        graph_cb = Checkbutton(settings_frm, font=Formats.FONT_REGULAR.value, text="CREATE GRAPH", variable=self.graph_cb_var)
         self.join_bouts_within_delta_var = BooleanVar(value=False)
-        join_bouts_within_delta_cb = Checkbutton(
-            settings_frm,
-            text="JOIN BOUTS WITHIN TIME-DELTA",
-            variable=self.join_bouts_within_delta_var,
-        )
+        join_bouts_within_delta_cb = Checkbutton(settings_frm, text="JOIN BOUTS WITHIN TIME-DELTA", font=Formats.FONT_REGULAR.value, variable=self.join_bouts_within_delta_var,)
         self.time_delta_at_onset_var = BooleanVar(value=False)
-        time_delta_at_onset_cb = Checkbutton(
-            settings_frm,
-            text="TIME-DELTA AT BOUT START",
-            variable=self.time_delta_at_onset_var,
-        )
+        time_delta_at_onset_cb = Checkbutton( settings_frm, text="TIME-DELTA AT BOUT START", font=Formats.FONT_REGULAR.value, variable=self.time_delta_at_onset_var)
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.time_delta_eb.grid(row=0, column=0, sticky="NW")
         join_bouts_within_delta_cb.grid(row=1, column=0, sticky="NW")
         time_delta_at_onset_cb.grid(row=2, column=0, sticky="NW")
         graph_cb.grid(row=3, column=0, sticky="NW")
-        self.clf_cb_dict = self.create_cb_frame(
-            main_frm=self.main_frm, cb_titles=self.clf_names, frm_title="BEHAVIORS"
-        )
-
+        self.clf_cb_dict = self.create_cb_frame(main_frm=self.main_frm, cb_titles=self.clf_names, frm_title="BEHAVIORS")
         self.create_run_frm(run_function=self.run, title="RUN")
-
         self.main_frm.mainloop()
 
     def run(self):

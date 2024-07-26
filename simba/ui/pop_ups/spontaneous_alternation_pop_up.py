@@ -120,13 +120,14 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
         self.run_analysis_frm = LabelFrame(
             self.main_frm,
             text="RUN ANALYSIS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
         self.run_analysis_btn = Button(
             self.run_analysis_frm,
             text="RUN ANALYSIS",
             fg="blue",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: threading.Thread(target=self.run_analysis()).start(),
         )
 
@@ -136,13 +137,14 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
         self.run_visualization_frm = LabelFrame(
             self.main_frm,
             text="RUN VISUALIZATION",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
         self.video_run_btn = Button(
             self.run_visualization_frm,
             text="CREATE VIDEO",
             fg="blue",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.run_visualization(),
         )
         self.single_video_dropdown = DropDownMenu(

@@ -25,22 +25,22 @@ class SetMachineModelParameters(PopUpMixin, ConfigReader):
         Label(
             self.clf_table_frm,
             text="CLASSIFIER",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
         ).grid(row=0, column=0)
         Label(
             self.clf_table_frm,
             text="MODEL PATH (.SAV)",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
         ).grid(row=0, column=1, sticky=NW)
         Label(
             self.clf_table_frm,
             text="DISCRIMINATION THRESHOLD",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
         ).grid(row=0, column=2, sticky=NW)
         Label(
             self.clf_table_frm,
             text="MINIMUM BOUT LENGTH (MS)",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
         ).grid(row=0, column=3, sticky=NW)
         self.clf_data = {}
         for clf_cnt, clf_name in enumerate(self.clf_names):
@@ -48,7 +48,7 @@ class SetMachineModelParameters(PopUpMixin, ConfigReader):
             Label(
                 self.clf_table_frm,
                 text=clf_name,
-                font=Formats.LABELFRAME_HEADER_FORMAT.value,
+                font=Formats.FONT_HEADER.value,
             ).grid(row=clf_cnt + 1, column=0, sticky=NW)
             self.clf_data[clf_name]["path"] = FileSelect(
                 self.clf_table_frm, title="Select model (.sav) file"
@@ -68,7 +68,7 @@ class SetMachineModelParameters(PopUpMixin, ConfigReader):
         set_btn = Button(
             self.main_frm,
             text="SET MODEL(S)",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_REGULAR.value,
             fg="red",
             command=lambda: self.set(),
         )

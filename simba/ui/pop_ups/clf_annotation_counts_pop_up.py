@@ -21,9 +21,7 @@ class ClfAnnotationCountPopUp(PopUpMixin, ConfigReader):
         if len(self.clf_names) == 0:
             raise CountError(msg=f'No classifier names associated with SimBA project {config_path}', source=self.__class__.__name__)
         if len(self.target_file_paths) == 0:
-            raise CountError(msg=f'No data files found inside the {self.targets_folder} directory. '
-                                 f'Cannot analyze annotation count without annotated data', source=self.__class__.__name__)
-
+            raise CountError(msg=f'No data files found inside the {self.targets_folder} directory. ' f'Cannot analyze annotation count without annotated data', source=self.__class__.__name__)
         self.settings_dict = self.create_cb_frame(cb_titles=[VIDEO_SPLIT, BOUT_SPLIT], main_frm=self.main_frm, frm_title='SETTINGS')
         self.create_run_frm(run_function=self.run, title='RUN')
         self.main_frm.mainloop()

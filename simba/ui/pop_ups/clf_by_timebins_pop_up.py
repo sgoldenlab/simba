@@ -18,37 +18,19 @@ class TimeBinsClfPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="CLASSIFICATION BY TIME BINS")
         ConfigReader.__init__(self, config_path=config_path)
         cbox_titles = Options.TIMEBINS_MEASURMENT_OPTIONS.value
-        self.timebin_entrybox = Entry_Box(
-            self.main_frm, "Set time bin size (s)", "15", validation="numeric"
-        )
-        measures_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="MEASUREMENTS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ANALYZE_ML_RESULTS.value,
-        )
-        clf_frm = LabelFrame(
-            self.main_frm,
-            text="CLASSIFIERS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
+        self.timebin_entrybox = Entry_Box(self.main_frm, "Set time bin size (s)", "15", validation="numeric")
+        measures_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MEASUREMENTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ANALYZE_ML_RESULTS.value)
+        clf_frm = LabelFrame(self.main_frm, text="CLASSIFIERS", font=Formats.FONT_HEADER.value, fg="black")
         self.measurements_var_dict, self.clf_var_dict = {}, {}
         for cnt, title in enumerate(cbox_titles):
             self.measurements_var_dict[title] = BooleanVar()
-            cbox = Checkbutton(
-                measures_frm, text=title, variable=self.measurements_var_dict[title]
-            )
+            cbox = Checkbutton(measures_frm, text=title, variable=self.measurements_var_dict[title], font=Formats.FONT_REGULAR.value)
             cbox.grid(row=cnt, sticky=NW)
         for cnt, clf_name in enumerate(self.clf_names):
             self.clf_var_dict[clf_name] = BooleanVar()
-            cbox = Checkbutton(
-                clf_frm, text=clf_name, variable=self.clf_var_dict[clf_name]
-            )
+            cbox = Checkbutton(clf_frm, text=clf_name, variable=self.clf_var_dict[clf_name], font=Formats.FONT_REGULAR.value)
             cbox.grid(row=cnt, sticky=NW)
-        run_button = Button(
-            self.main_frm, text="Run", command=lambda: self.run_time_bins_clf()
-        )
+        run_button = Button(self.main_frm, text="Run", font=Formats.FONT_REGULAR.value, command=lambda: self.run_time_bins_clf())
         measures_frm.grid(row=0, sticky=NW)
         clf_frm.grid(row=1, sticky=NW)
         self.timebin_entrybox.grid(row=2, sticky=NW)

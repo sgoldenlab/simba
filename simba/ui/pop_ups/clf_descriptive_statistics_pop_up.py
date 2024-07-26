@@ -11,59 +11,24 @@ from simba.utils.errors import (NoChoosenClassifierError,
 
 class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
-        PopUpMixin.__init__(
-            self,
-            title="ANALYZE CLASSIFICATIONS: DESCRIPTIVE STATISTICS",
-            size=(400, 500),
-        )
+        PopUpMixin.__init__( self, title="ANALYZE CLASSIFICATIONS: DESCRIPTIVE STATISTICS", size=(400, 500))
         ConfigReader.__init__(self, config_path=config_path)
-        measures_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="MEASUREMENTS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ANALYZE_ML_RESULTS.value,
-        )
-        clf_frm = LabelFrame(
-            self.main_frm,
-            text="CLASSIFIERS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        detailed_data_frm = LabelFrame(
-            self.main_frm,
-            text="DETAILED BOUT DATA",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        video_meta_data_frm = LabelFrame(
-            self.main_frm,
-            text="METADATA",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
-        output_options_frm = LabelFrame(
-            self.main_frm,
-            text="OUTPUT OPTIONS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="black",
-        )
+        measures_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MEASUREMENTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ANALYZE_ML_RESULTS.value)
+        clf_frm = LabelFrame( self.main_frm, text="CLASSIFIERS", font=Formats.FONT_HEADER.value, fg="black")
+        detailed_data_frm = LabelFrame(self.main_frm, text="DETAILED BOUT DATA", font=Formats.FONT_HEADER.value, fg="black")
+        video_meta_data_frm = LabelFrame( self.main_frm, text="METADATA", font=Formats.FONT_HEADER.value, fg="black")
+        output_options_frm = LabelFrame( self.main_frm, text="OUTPUT OPTIONS", font=Formats.FONT_HEADER.value, fg="black")
         self.measurements_var_dict, self.clf_var_dict = {}, {}
         cbox_titles = Options.CLF_DESCRIPTIVES_OPTIONS.value
         for cnt, title in enumerate(cbox_titles):
             self.measurements_var_dict[title] = BooleanVar()
-            cbox = Checkbutton(
-                measures_frm, text=title, variable=self.measurements_var_dict[title]
-            )
+            cbox = Checkbutton(measures_frm, text=title, font=Formats.FONT_REGULAR.value, variable=self.measurements_var_dict[title])
             cbox.grid(row=cnt, sticky=NW)
         for cnt, clf_name in enumerate(self.clf_names):
             self.clf_var_dict[clf_name] = BooleanVar()
-            cbox = Checkbutton(
-                clf_frm, text=clf_name, variable=self.clf_var_dict[clf_name]
-            )
+            cbox = Checkbutton(clf_frm, text=clf_name, font=Formats.FONT_REGULAR.value, variable=self.clf_var_dict[clf_name])
             cbox.grid(row=cnt, sticky=NW)
-        run_button = Button(
-            self.main_frm, text="Run", command=lambda: self.run_descriptive_analysis()
-        )
+        run_button = Button(self.main_frm, text="Run", font=Formats.FONT_REGULAR.value, command=lambda: self.run_descriptive_analysis())
         measures_frm.grid(row=0, sticky=NW)
         clf_frm.grid(row=1, sticky=NW)
         (
@@ -72,24 +37,10 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
             self.detailed_bout_var,
             self.transpose_output_var,
         ) = (BooleanVar(), BooleanVar(), BooleanVar(), BooleanVar())
-        metadata_frm_cnt_cb = Checkbutton(
-            video_meta_data_frm, text="Frame count", variable=self.metadata_frm_cnt_var
-        )
-        metadata_frm_video_length_cb = Checkbutton(
-            video_meta_data_frm,
-            text="Video length (s)",
-            variable=self.metadata_video_length_var,
-        )
-        detailed_bout_cb = Checkbutton(
-            detailed_data_frm,
-            text="Detailed bout data",
-            variable=self.detailed_bout_var,
-        )
-        transpose_output_cb = Checkbutton(
-            output_options_frm,
-            text="Transpose output",
-            variable=self.transpose_output_var,
-        )
+        metadata_frm_cnt_cb = Checkbutton(video_meta_data_frm, font=Formats.FONT_REGULAR.value, text="Frame count", variable=self.metadata_frm_cnt_var)
+        metadata_frm_video_length_cb = Checkbutton( video_meta_data_frm, text="Video length (s)", font=Formats.FONT_REGULAR.value, variable=self.metadata_video_length_var)
+        detailed_bout_cb = Checkbutton( detailed_data_frm, text="Detailed bout data", font=Formats.FONT_REGULAR.value, variable=self.detailed_bout_var)
+        transpose_output_cb = Checkbutton( output_options_frm, text="Transpose output", font=Formats.FONT_REGULAR.value, variable=self.transpose_output_var)
         detailed_data_frm.grid(row=2, sticky=NW)
         detailed_bout_cb.grid(row=0, column=0, sticky=NW)
         transpose_output_cb.grid(row=0, column=0, sticky=NW)

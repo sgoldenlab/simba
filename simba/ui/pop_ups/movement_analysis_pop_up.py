@@ -30,6 +30,7 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         self.animal_cnt_confirm_btn = Button(
             self.animal_cnt_frm,
             text="Confirm",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.create_settings_frm(),
         )
         self.body_part_options = deepcopy(self.body_parts_lst)
@@ -46,7 +47,7 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
             self.body_part_frm.destroy()
 
         self.setting_frm = LabelFrame(
-            self.main_frm, text="SETTINGS", font=Formats.LABELFRAME_HEADER_FORMAT.value
+            self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value
         )
         self.choose_bp_frm(parent=self.setting_frm, bp_options=self.body_part_options)
         self.choose_bp_threshold_frm(parent=self.setting_frm)

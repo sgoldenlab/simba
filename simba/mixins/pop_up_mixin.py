@@ -72,11 +72,11 @@ class PopUpMixin(object):
 
         """
 
-        self.choose_clf_frm = LabelFrame(self.main_frm, text=title, font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        self.choose_clf_frm = LabelFrame(self.main_frm, text=title, font=Formats.FONT_HEADER.value)
         self.clf_selections = {}
         for clf_cnt, clf in enumerate(clfs):
             self.clf_selections[clf] = BooleanVar(value=False)
-            self.calculate_distance_moved_cb = Checkbutton(self.choose_clf_frm, text=clf, variable=self.clf_selections[clf])
+            self.calculate_distance_moved_cb = Checkbutton(self.choose_clf_frm, text=clf, font=Formats.FONT_REGULAR.value, variable=self.clf_selections[clf])
             self.calculate_distance_moved_cb.grid(row=clf_cnt, column=0, sticky=NW)
         self.choose_clf_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 
@@ -110,21 +110,20 @@ class PopUpMixin(object):
 
         check_valid_lst(data=cb_titles, source=f'{PopUpMixin.create_cb_frame.__name__} cb_titles', valid_dtypes=(str,), min_len=1)
         check_int(name=f'{PopUpMixin.create_cb_frame.__name__} idx_row', value=idx_row, min_value=-1)
-
         if main_frm is not None:
             check_instance(source=f'{PopUpMixin.create_cb_frame.__name__} parent_frm', accepted_types=(Frame, Canvas, LabelFrame, ttk.Frame), instance=main_frm)
         else:
             main_frm = Toplevel(); main_frm.minsize(960, 720); main_frm.lift()
         if idx_row == -1:
             idx_row = int(len(list(main_frm.children.keys())))
-        cb_frm = LabelFrame(main_frm, text=frm_title, font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        cb_frm = LabelFrame(main_frm, text=frm_title, font=Formats.FONT_HEADER.value)
         cb_dict = {}
         for cnt, title in enumerate(cb_titles):
             cb_dict[title] = BooleanVar(value=False)
             if command is not None:
-                cb = Checkbutton(cb_frm, text=title, variable=cb_dict[title], command=lambda k=cb_titles[cnt]: command(k))
+                cb = Checkbutton(cb_frm, text=title, variable=cb_dict[title], font=Formats.FONT_REGULAR.value, command=lambda k=cb_titles[cnt]: command(k))
             else:
-                cb = Checkbutton(cb_frm, text=title, variable=cb_dict[title])
+                cb = Checkbutton(cb_frm, text=title, variable=cb_dict[title], font=Formats.FONT_REGULAR.value)
             cb.grid(row=cnt, column=0, sticky=NW)
         cb_frm.grid(row=idx_row, column=0, sticky=NW)
         # main_frm.mainloop()
@@ -173,7 +172,7 @@ class PopUpMixin(object):
             main_frm = Toplevel(); main_frm.minsize(960, 720); main_frm.lift()
         if idx_row == -1:
             idx_row = int(len(list(main_frm.children.keys())))
-        dropdown_frm = LabelFrame(main_frm, text=frm_title, font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        dropdown_frm = LabelFrame(main_frm, text=frm_title, font=Formats.FONT_HEADER.value)
         dropdown_dict = {}
         for cnt, title in enumerate(drop_down_titles):
             dropdown_dict[title] = DropDownMenu(dropdown_frm, title, drop_down_options, "35")
@@ -187,7 +186,7 @@ class PopUpMixin(object):
         if hasattr(self, "time_bin_frm"):
             self.time_bin_frm.destroy()
         self.time_bin_frm = LabelFrame(
-            self.main_frm, text="TIME BIN", font=Formats.LABELFRAME_HEADER_FORMAT.value
+            self.main_frm, text="TIME BIN", font=Formats.FONT_HEADER.value
         )
         self.time_bin_entrybox = Entry_Box(
             self.time_bin_frm, "Time-bin size (s): ", "12"
@@ -198,8 +197,7 @@ class PopUpMixin(object):
     def create_run_frm(self,run_function: Callable,
                        title: Optional[str] = "RUN",
                        btn_txt_clr: Optional[str] = "black",
-                       idx: Optional[int] = None,
-    ) -> None:
+                       idx: Optional[int] = None) -> None:
         """
         Create a label frame with a single button with a specified callback.
 
@@ -210,13 +208,8 @@ class PopUpMixin(object):
         if hasattr(self, "run_frm"):
             self.run_frm.destroy()
             self.run_btn.destroy()
-        self.run_frm = LabelFrame(
-            self.main_frm,
-            text=title,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg=btn_txt_clr,
-        )
-        self.run_btn = Button(self.run_frm, text=title, fg="blue", command=lambda: run_function())
+        self.run_frm = LabelFrame(self.main_frm, text=title, font=Formats.FONT_HEADER.value, fg=btn_txt_clr)
+        self.run_btn = Button(self.run_frm, text=title, fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: run_function())
         if idx is None:
             self.run_frm.grid(row=self.children_cnt_main() + 1, column=0, sticky=NW)
         else:
@@ -234,23 +227,10 @@ class PopUpMixin(object):
         :param object run_function: Function tied to the choice in the dropdown menu.
         """
 
-        self.bp_cnt_frm = LabelFrame(
-            self.main_frm,
-            text="SELECT NUMBER OF BODY-PARTS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-        )
-        self.bp_cnt_dropdown = DropDownMenu(
-            self.bp_cnt_frm,
-            "# of body-parts",
-            list(range(1, len(project_body_parts) + 1)),
-            "12",
-        )
+        self.bp_cnt_frm = LabelFrame( self.main_frm, text="SELECT NUMBER OF BODY-PARTS", font=Formats.FONT_HEADER.value,)
+        self.bp_cnt_dropdown = DropDownMenu( self.bp_cnt_frm, "# of body-parts", list(range(1, len(project_body_parts) + 1)), "12",)
         self.bp_cnt_dropdown.setChoices(1)
-        self.bp_cnt_confirm_btn = Button(
-            self.bp_cnt_frm,
-            text="Confirm",
-            command=lambda: self.create_choose_bp_frm(project_body_parts, run_function),
-        )
+        self.bp_cnt_confirm_btn = Button( self.bp_cnt_frm, text="Confirm", font=Formats.FONT_REGULAR.value, command=lambda: self.create_choose_bp_frm(project_body_parts, run_function),)
         self.bp_cnt_frm.grid(row=0, sticky=NW)
         self.bp_cnt_dropdown.grid(row=0, column=0, sticky=NW)
         self.bp_cnt_confirm_btn.grid(row=0, column=1, sticky=NW)
@@ -327,12 +307,7 @@ class PopUpMixin(object):
         if hasattr(self, "body_part_frm"):
             self.body_part_frm.destroy()
         self.body_parts_dropdowns = {}
-        self.body_part_frm = LabelFrame(
-            self.main_frm,
-            text="CHOOSE ANIMAL BODY-PARTS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            name="choose animal body-parts",
-        )
+        self.body_part_frm = LabelFrame(self.main_frm, text="CHOOSE ANIMAL BODY-PARTS", font=Formats.FONT_HEADER.value, name="choose animal body-parts",)
         self.body_part_frm.grid(row=self.children_cnt_main(), sticky=NW)
         for bp_cnt in range(int(self.bp_cnt_dropdown.getChoices())):
             self.body_parts_dropdowns[bp_cnt] = DropDownMenu(
@@ -347,12 +322,7 @@ class PopUpMixin(object):
 
     def choose_bp_frm(self, parent: LabelFrame, bp_options: list):
         self.body_parts_dropdowns = {}
-        self.body_part_frm = LabelFrame(
-            parent,
-            text="CHOOSE ANIMAL BODY-PARTS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            name="choose animal body-parts",
-        )
+        self.body_part_frm = LabelFrame(parent, text="CHOOSE ANIMAL BODY-PARTS", font=Formats.FONT_HEADER.value, name="choose animal body-parts",)
         self.body_part_frm.grid(row=self.frame_children(frame=parent), sticky=NW)
         for bp_cnt in range(int(self.animal_cnt_dropdown.getChoices())):
             self.body_parts_dropdowns[bp_cnt] = DropDownMenu(
@@ -389,17 +359,9 @@ class PopUpMixin(object):
             self.smoothing_time_eb.grid(row=0, column=1, sticky=E)
 
     def choose_bp_threshold_frm(self, parent: LabelFrame):
-        self.probability_frm = LabelFrame(
-            parent,
-            text="PROBABILITY THRESHOLD",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-        )
-        self.probability_frm.grid(
-            row=self.frame_children(frame=parent), column=0, sticky=NW
-        )
-        self.probability_entry = Entry_Box(
-            self.probability_frm, "Probability threshold: ", labelwidth=20
-        )
+        self.probability_frm = LabelFrame(parent, text="PROBABILITY THRESHOLD", font=Formats.FONT_HEADER.value)
+        self.probability_frm.grid(row=self.frame_children(frame=parent), column=0, sticky=NW)
+        self.probability_entry = Entry_Box(self.probability_frm, "Probability threshold: ", labelwidth=20)
         self.probability_entry.entry_set("0.00")
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 

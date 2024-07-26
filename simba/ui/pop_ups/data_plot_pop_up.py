@@ -19,39 +19,16 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         ConfigReader.__init__(self, config_path=config_path)
         self.color_lst = list(self.colors_dict.keys())
         self.data_path = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
-        self.files_found_dict = get_file_name_info_in_directory(
-            directory=self.data_path, file_type=self.file_type
-        )
+        self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
         self.animal_cnt_options = list(range(1, self.animal_cnt + 1))
-        self.style_settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="STYLE SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.DATA_TABLES.value,
-        )
+        self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_TABLES.value,)
         self.rounding_decimals_options = list(range(0, 11))
         self.font_thickness_options = list(range(1, 11))
-        self.resolution_dropdown = DropDownMenu(
-            self.style_settings_frm, "RESOLUTION:", self.resolutions, "18"
-        )
-        self.rounding_decimals_dropdown = DropDownMenu(
-            self.style_settings_frm,
-            "DECIMAL ACCURACY:",
-            self.rounding_decimals_options,
-            "18",
-        )
-        self.background_color_dropdown = DropDownMenu(
-            self.style_settings_frm, "BACKGROUND COLOR: ", self.color_lst, "18"
-        )
-        self.font_color_dropdown = DropDownMenu(
-            self.style_settings_frm, "HEADER COLOR: ", self.color_lst, "18"
-        )
-        self.font_thickness_dropdown = DropDownMenu(
-            self.style_settings_frm,
-            "FONT THICKNESS: ",
-            self.font_thickness_options,
-            "18",
-        )
+        self.resolution_dropdown = DropDownMenu(self.style_settings_frm, "RESOLUTION:", self.resolutions, "18")
+        self.rounding_decimals_dropdown = DropDownMenu(self.style_settings_frm, "DECIMAL ACCURACY:", self.rounding_decimals_options, "18")
+        self.background_color_dropdown = DropDownMenu(self.style_settings_frm, "BACKGROUND COLOR: ", self.color_lst, "18")
+        self.font_color_dropdown = DropDownMenu(self.style_settings_frm, "HEADER COLOR: ", self.color_lst, "18")
+        self.font_thickness_dropdown = DropDownMenu(self.style_settings_frm, "FONT THICKNESS: ", self.font_thickness_options, "18")
 
         self.background_color_dropdown.setChoices(choice="White")
         self.font_color_dropdown.setChoices(choice="Black")
@@ -59,84 +36,24 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.rounding_decimals_dropdown.setChoices(2)
         self.font_thickness_dropdown.setChoices(1)
 
-        self.body_parts_frm = LabelFrame(
-            self.main_frm,
-            text="CHOOSE BODY-PARTS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-        )
-        self.number_of_animals_dropdown = DropDownMenu(
-            self.body_parts_frm,
-            "# Animals:",
-            self.animal_cnt_options,
-            "16",
-            com=self.__populate_body_parts_menu,
-        )
+        self.body_parts_frm = LabelFrame( self.main_frm, text="CHOOSE BODY-PARTS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
+        self.number_of_animals_dropdown = DropDownMenu( self.body_parts_frm, "# Animals:", self.animal_cnt_options, "16", com=self.__populate_body_parts_menu,)
         self.number_of_animals_dropdown.setChoices(self.animal_cnt_options[0])
         self.__populate_body_parts_menu(self.animal_cnt_options[0])
 
-        self.settings_frm = LabelFrame(
-            self.main_frm,
-            text="VISUALIZATION SETTINGS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-        )
+        self.settings_frm = LabelFrame( self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5,)
         self.data_frames_var = BooleanVar()
         self.data_videos_var = BooleanVar()
-        data_frames_cb = Checkbutton(
-            self.settings_frm, text="Create frames", variable=self.data_frames_var
-        )
-        data_videos_cb = Checkbutton(
-            self.settings_frm, text="Create videos", variable=self.data_videos_var
-        )
+        data_frames_cb = Checkbutton(self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.data_frames_var)
+        data_videos_cb = Checkbutton(self.settings_frm, text="Create videos", font=Formats.FONT_REGULAR.value, variable=self.data_videos_var)
 
-        self.run_frm = LabelFrame(
-            self.main_frm,
-            text="RUN",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_frm = LabelFrame(
-            self.run_frm,
-            text="SINGLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_btn = Button(
-            self.run_single_video_frm,
-            text="Create single video",
-            fg="blue",
-            command=lambda: self.__create_data_plots(multiple_videos=False),
-        )
-        self.single_video_dropdown = DropDownMenu(
-            self.run_single_video_frm,
-            "Video:",
-            list(self.files_found_dict.keys()),
-            "12",
-        )
+        self.run_frm = LabelFrame( self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
+        self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
+        self.run_single_video_btn = Button(self.run_single_video_frm, text="Create single video", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.__create_data_plots(multiple_videos=False),)
+        self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12")
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
-        self.run_multiple_videos = LabelFrame(
-            self.run_frm,
-            text="MULTIPLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_multiple_video_btn = Button(
-            self.run_multiple_videos,
-            text="Create multiple videos ({} video(s) found)".format(
-                str(len(list(self.files_found_dict.keys())))
-            ),
-            fg="blue",
-            command=lambda: self.__create_data_plots(multiple_videos=True),
-        )
+        self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
+        self.run_multiple_video_btn = Button(self.run_multiple_videos,font=Formats.FONT_REGULAR.value,text="Create multiple videos ({} video(s) found)".format(    str(len(list(self.files_found_dict.keys())))),fg="blue",command=lambda: self.__create_data_plots(multiple_videos=True),)
 
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=0, sticky=NW)

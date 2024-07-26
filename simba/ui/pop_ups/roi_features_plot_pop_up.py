@@ -68,27 +68,28 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
         self.show_animal_names_var = BooleanVar(value=False)
         self.show_direction_var = BooleanVar(value=False)
         self.multiprocess_var = BooleanVar(value=False)
-        show_pose_cb = Checkbutton(
-            self.settings_frm, text="Show pose", variable=self.show_pose_var
-        )
+        show_pose_cb = Checkbutton(self.settings_frm, text="Show pose", font=Formats.FONT_REGULAR.value, variable=self.show_pose_var)
         show_roi_center_cb = Checkbutton(
             self.settings_frm,
             text="Show ROI centers",
+            font=Formats.FONT_REGULAR.value,
             variable=self.show_ROI_centers_var,
         )
         show_roi_tags_cb = Checkbutton(
-            self.settings_frm, text="Show ROI ear tags", variable=self.show_ROI_tags_var
+            self.settings_frm, text="Show ROI ear tags", font=Formats.FONT_REGULAR.value, variable=self.show_ROI_tags_var
         )
 
         show_animal_names_cb = Checkbutton(
             self.settings_frm,
             text="Show animal names",
+            font=Formats.FONT_REGULAR.value,
             variable=self.show_animal_names_var,
         )
 
         show_roi_directionality_cb = Checkbutton(
             self.settings_frm,
             text="Show directionality",
+            font=Formats.FONT_REGULAR.value,
             variable=self.show_direction_var,
             command=lambda: self.enable_dropdown_from_checkbox(
                 check_box_var=self.show_direction_var,
@@ -99,6 +100,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
         multiprocess_cb = Checkbutton(
             self.settings_frm,
             text="Multi-process (faster)",
+            font=Formats.FONT_REGULAR.value,
             variable=self.multiprocess_var,
             command=lambda: self.enable_dropdown_from_checkbox(
                 check_box_var=self.multiprocess_var,
@@ -121,7 +123,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
             self.main_frm,
             text="SELECT BODY-PARTS",
             pady=10,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
         self.animal_cnt_dropdown = DropDownMenu(
@@ -139,7 +141,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
             text="Visualize ROI features on SINGLE video",
             pady=10,
             padx=10,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
         self.single_video_dropdown = DropDownMenu(
@@ -149,6 +151,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
         self.single_video_btn = Button(
             self.single_video_frm,
             text="Visualize ROI features for SINGLE video",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.run(multiple=False),
         )
 
@@ -157,13 +160,14 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
             text="Visualize ROI features on ALL videos",
             pady=10,
             padx=10,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
 
         self.all_videos_btn = Button(
             self.all_videos_frm,
             text="Generate ROI visualization on ALL videos",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.run(multiple=True),
         )
         self.settings_frm.grid(row=0, column=0, sticky=NW)

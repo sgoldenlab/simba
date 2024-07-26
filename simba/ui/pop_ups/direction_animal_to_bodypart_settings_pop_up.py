@@ -23,36 +23,16 @@ class DirectionAnimalToBodyPartSettingsPopUp(PopUpMixin, ConfigReader):
         for animal_name, animal_data in self.animal_bp_dict.items():
             self.animal_bps[animal_name] = [x[:-2] for x in animal_data["X_bps"]]
 
-        self.location_correction_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="BODY PART SELECTION",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.OULIERS.value,
-        )
+        self.location_correction_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="BODY PART SELECTION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OULIERS.value,)
         bp_entry_cnt, self.criterion_dropdowns = 0, {}
         for animal_cnt, animal_name in enumerate(self.animal_bp_dict.keys()):
             self.criterion_dropdowns[animal_name] = {}
-            self.criterion_dropdowns[animal_name]["bp"] = DropDownMenu(
-                self.location_correction_frm,
-                "Choose {} body part:".format(animal_name),
-                self.animal_bps[animal_name],
-                "30",
-            )
-            self.criterion_dropdowns[animal_name]["bp"].setChoices(
-                self.animal_bps[animal_name][0]
-            )
-            self.criterion_dropdowns[animal_name]["bp"].grid(
-                row=bp_entry_cnt, column=0, sticky=NW
-            )
+            self.criterion_dropdowns[animal_name]["bp"] = DropDownMenu(self.location_correction_frm, "Choose {} body part:".format(animal_name), self.animal_bps[animal_name], "30",)
+            self.criterion_dropdowns[animal_name]["bp"].setChoices(self.animal_bps[animal_name][0])
+            self.criterion_dropdowns[animal_name]["bp"].grid(row=bp_entry_cnt, column=0, sticky=NW)
             bp_entry_cnt += 1
         self.location_correction_frm.grid(row=0, column=0, sticky=NW)
-        run_btn = Button(
-            self.main_frm,
-            text="RUN ANALYSIS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            fg="red",
-            command=lambda: self.run(),
-        )
+        run_btn = Button( self.main_frm, text="RUN ANALYSIS", font=Formats.FONT_HEADER.value, fg="red", command=lambda: self.run(),)
         run_btn.grid(row=3, column=0, sticky=NW)
 
     def run(self):

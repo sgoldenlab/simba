@@ -17,11 +17,8 @@ from simba.utils.read_write import tabulate_clf_info
 class AddClfPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, config_path=config_path, title="ADD CLASSIFIER")
-        ConfigReader.__init__(self, config_path=config_path)
-        self.clf_eb = Entry_Box(self.main_frm, "CLASSIFIER NAME", "15")
-        add_btn = Button(
-            self.main_frm, text="ADD CLASSIFIER", command=lambda: self.run()
-        )
+        ConfigReader.__init__(self, config_path=config_path) .clf_eb = Entry_Box(self.main_frm, "CLASSIFIER NAME", "15")
+        add_btn = Button(self.main_frm, text="ADD CLASSIFIER", command=lambda: self.run())
         self.clf_eb.grid(row=0, column=0, sticky=NW)
         add_btn.grid(row=1, column=0, sticky=NW)
 

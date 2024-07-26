@@ -11,27 +11,14 @@ from simba.utils.enums import Formats, Keys, Links
 
 class PoseReorganizerPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(
-            self, title="RE-ORGANIZE POSE_ESTIMATION DATA", size=(500, 800)
-        )
-        settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
+        PopUpMixin.__init__(self, title="RE-ORGANIZE POSE_ESTIMATION DATA", size=(500, 800))
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.data_folder = FolderSelect(settings_frm, "DATA FOLDER: ", lblwidth="10")
-        self.pose_tool_dropdown = DropDownMenu(
-            settings_frm, "Tracking tool", ["DLC", "maDLC"], "10"
-        )
+        self.pose_tool_dropdown = DropDownMenu(settings_frm, "Tracking tool", ["DLC", "maDLC"], "10")
         self.pose_tool_dropdown.setChoices("DLC")
-        self.file_format = DropDownMenu(
-            settings_frm, "FILE TYPE: ", ["csv", "h5"], "10"
-        )
+        self.file_format = DropDownMenu(settings_frm, "FILE TYPE: ", ["csv", "h5"], "10")
         self.file_format.setChoices("csv")
-        confirm_btn = Button(
-            settings_frm, text="Confirm", command=lambda: self.confirm()
-        )
+        confirm_btn = Button(settings_frm, text="Confirm", font=Formats.FONT_REGULAR.value, command=lambda: self.confirm())
         settings_frm.grid(row=0, sticky=NW)
         self.data_folder.grid(row=0, sticky=NW, columnspan=3)
         self.pose_tool_dropdown.grid(row=1, sticky=NW)

@@ -29,59 +29,32 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
         if self.animal_cnt == 1:
-            raise AnimalNumberError(
-                msg="Cannot visualize directionality between animals in a 1 animal project.",
-                source=self.__class__.__name__,
-            )
+            raise AnimalNumberError(msg="Cannot visualize directionality between animals in a 1 animal project.", source=self.__class__.__name__,)
         PopUpMixin.__init__(self, title="CREATE ANIMAL DIRECTION VIDEOS")
         self.color_dict = get_color_dict()
         self.color_lst = list(self.color_dict.keys())
         self.color_lst.insert(0, "random")
         self.size_lst = list(range(1, 11))
-        self.files_found_dict = find_all_videos_in_directory(
-            directory=self.video_dir, as_dict=True
-        )
+        self.files_found_dict = find_all_videos_in_directory(directory=self.video_dir, as_dict=True)
         self.show_pose_var = BooleanVar(value=True)
         self.show_animal_names_var = BooleanVar(value=True)
         self.highlight_direction_endpoints_var = BooleanVar(value=True)
         self.multiprocess_var = BooleanVar(value=False)
 
-        self.style_settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="STYLE SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.DIRECTING_ANIMALS_PLOTS.value,
-        )
-        self.show_pose_cb = Checkbutton(
-            self.style_settings_frm,
-            text="Show pose-estimated body-parts",
-            variable=self.show_pose_var,
-        )
-        self.highlight_direction_endpoints_cb = Checkbutton(
-            self.style_settings_frm,
-            text="Highlight direction end-points",
-            variable=self.highlight_direction_endpoints_var,
-        )
-        self.show_animal_names_cb = Checkbutton(
-            self.style_settings_frm,
-            text="Show animal names",
-            variable=self.show_animal_names_var,
-        )
+        self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DIRECTING_ANIMALS_PLOTS.value,)
+        self.show_pose_cb = Checkbutton(self.style_settings_frm, text="Show pose-estimated body-parts", font=Formats.FONT_REGULAR.value, variable=self.show_pose_var,)
+        self.highlight_direction_endpoints_cb = Checkbutton( self.style_settings_frm, text="Highlight direction end-points", font=Formats.FONT_REGULAR.value, variable=self.highlight_direction_endpoints_var,)
+        self.show_animal_names_cb = Checkbutton( self.style_settings_frm, text="Show animal names", font=Formats.FONT_REGULAR.value, variable=self.show_animal_names_var,)
 
-        self.direction_clr_dropdown = DropDownMenu(
-            self.style_settings_frm, "Direction color:", self.color_lst, "16"
-        )
-        self.pose_size_dropdown = DropDownMenu(
-            self.style_settings_frm, "Pose circle size:", self.size_lst, "16"
-        )
-        self.line_thickness = DropDownMenu(
-            self.style_settings_frm, "Line thickness:", self.size_lst, "16"
-        )
+        self.direction_clr_dropdown = DropDownMenu(self.style_settings_frm, "Direction color:", self.color_lst, "16")
+        self.pose_size_dropdown = DropDownMenu(self.style_settings_frm, "Pose circle size:", self.size_lst, "16")
+        self.line_thickness = DropDownMenu(self.style_settings_frm, "Line thickness:", self.size_lst, "16")
         self.line_thickness.setChoices(choice=4)
         self.pose_size_dropdown.setChoices(choice=3)
         self.direction_clr_dropdown.setChoices(choice="random")
         multiprocess_cb = Checkbutton(
             self.style_settings_frm,
+            font=Formats.FONT_REGULAR.value,
             text="Multi-process (faster)",
             variable=self.multiprocess_var,
             command=lambda: self.enable_dropdown_from_checkbox(
@@ -89,55 +62,17 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
                 dropdown_menus=[self.multiprocess_dropdown],
             ),
         )
-        self.multiprocess_dropdown = DropDownMenu(
-            self.style_settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12"
-        )
+        self.multiprocess_dropdown = DropDownMenu(self.style_settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(
-            self.main_frm,
-            text="RUN",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_frm = LabelFrame(
-            self.run_frm,
-            text="SINGLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_btn = Button(
-            self.run_single_video_frm,
-            text="Create single video",
-            fg="blue",
-            command=lambda: self.__create_directionality_plots(multiple_videos=False),
-        )
-        self.single_video_dropdown = DropDownMenu(
-            self.run_single_video_frm,
-            "Video:",
-            list(self.files_found_dict.keys()),
-            "12",
-        )
+        self.run_frm = LabelFrame(self.main_frm,text="RUN",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
+        self.run_single_video_frm = LabelFrame( self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
+        self.run_single_video_btn = Button( self.run_single_video_frm, font=Formats.FONT_REGULAR.value, text="Create single video", fg="blue", command=lambda: self.__create_directionality_plots(multiple_videos=False),)
+        self.single_video_dropdown = DropDownMenu(self.run_single_video_frm,"Video:",list(self.files_found_dict.keys()),"12",)
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
-        self.run_multiple_videos = LabelFrame(
-            self.run_frm,
-            text="MULTIPLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_multiple_video_btn = Button(
-            self.run_multiple_videos,
-            text=f"Create multiple videos ({len(list(self.files_found_dict.keys()))} video(s) found)",
-            fg="blue",
-            command=lambda: self.__create_directionality_plots(multiple_videos=True),
-        )
+        self.run_multiple_videos = LabelFrame(self.run_frm,text="MULTIPLE VIDEO",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black",)
+        self.run_multiple_video_btn = Button(self.run_multiple_videos,font=Formats.FONT_REGULAR.value,text=f"Create multiple videos ({len(list(self.files_found_dict.keys()))} video(s) found)",fg="blue",command=lambda: self.__create_directionality_plots(multiple_videos=True),)
 
         self.style_settings_frm.grid(row=0, column=0, sticky=NW)
         self.show_pose_cb.grid(row=0, column=0, sticky=NW)

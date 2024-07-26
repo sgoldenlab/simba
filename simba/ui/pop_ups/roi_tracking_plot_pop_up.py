@@ -47,14 +47,16 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.show_pose_cb = Checkbutton(
             self.settings_frm,
             text="Show pose-estimated location",
+            font=Formats.FONT_REGULAR.value,
             variable=self.show_pose_var,
         )
         self.show_animal_name_cb = Checkbutton(
-            self.settings_frm, text="Show animal names", variable=self.animal_name_var
+            self.settings_frm, text="Show animal names", font=Formats.FONT_REGULAR.value, variable=self.animal_name_var
         )
         self.multiprocess_cb = Checkbutton(
             self.settings_frm,
             text="Multi-process (faster)",
+            font=Formats.FONT_REGULAR.value,
             variable=self.multiprocess_var,
             command=lambda: self.enable_dropdown_from_checkbox(
                 check_box_var=self.multiprocess_var,
@@ -70,7 +72,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
             self.main_frm,
             text="SELECT BODY-PARTS",
             pady=10,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
         self.animal_cnt_dropdown = DropDownMenu(
@@ -86,14 +88,14 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
             self.main_frm,
             text="RUN VISUALIZATION",
             pady=10,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
         self.single_video_frm = LabelFrame(
             self.run_frm,
             text="SINGLE video",
             pady=10,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
         self.single_video_dropdown = DropDownMenu(
@@ -124,7 +126,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
             self.run_frm,
             text="ALL videos",
             pady=10,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             fg="black",
         )
         self.all_videos_btn = Button(

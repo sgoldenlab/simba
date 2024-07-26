@@ -22,13 +22,8 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="HEATMAPS: LOCATION")
         ConfigReader.__init__(self, config_path=config_path)
         self.data_path = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
-        self.files_found_dict = get_file_name_info_in_directory(
-            directory=self.data_path, file_type=self.file_type
-        )
-        check_if_filepath_list_is_empty(
-            filepaths=list(self.files_found_dict.keys()),
-            error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/outlier_corrected_movement_location directory. ",
-        )
+        self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_typ)
+        check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()),error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/outlier_corrected_movement_location directory. ",)
         max_scales = list(np.arange(5, 105, 5))
         max_scales.insert(0, "Auto-compute")
         self.style_settings_frm = CreateLabelFrameWithIcon(
@@ -65,7 +60,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.settings_frm = LabelFrame(
             self.main_frm,
             text="VISUALIZATION SETTINGS",
-            font=("Helvetica", 14, "bold"),
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
         )
@@ -74,19 +69,21 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.heatmap_last_frm_var = BooleanVar()
         self.multiprocessing_var = BooleanVar()
         heatmap_frames_cb = Checkbutton(
-            self.settings_frm, text="Create frames", variable=self.heatmap_frames_var
+            self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.heatmap_frames_var
         )
         heatmap_videos_cb = Checkbutton(
-            self.settings_frm, text="Create videos", variable=self.heatmap_videos_var
+            self.settings_frm, text="Create videos", font=Formats.FONT_REGULAR.value, variable=self.heatmap_videos_var
         )
         heatmap_last_frm_cb = Checkbutton(
             self.settings_frm,
             text="Create last frame",
+            font=Formats.FONT_REGULAR.value,
             variable=self.heatmap_last_frm_var,
         )
         self.multiprocess_cb = Checkbutton(
             self.settings_frm,
             text="Multiprocess videos (faster)",
+            font=Formats.FONT_REGULAR.value,
             variable=self.multiprocessing_var,
             command=lambda: self.enable_dropdown_from_checkbox(
                 check_box_var=self.multiprocessing_var,
@@ -102,7 +99,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.run_frm = LabelFrame(
             self.main_frm,
             text="RUN",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
             fg="black",
@@ -110,7 +107,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.run_single_video_frm = LabelFrame(
             self.run_frm,
             text="SINGLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
             fg="black",
@@ -118,6 +115,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.run_single_video_btn = Button(
             self.run_single_video_frm,
             text="Create single video",
+            font=Formats.FONT_REGULAR.value,
             fg="blue",
             command=lambda: self.__create_heatmap_plots(multiple_videos=False),
         )
@@ -131,7 +129,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.run_multiple_videos = LabelFrame(
             self.run_frm,
             text="MULTIPLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
             fg="black",
@@ -142,6 +140,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
                 str(len(list(self.files_found_dict.keys())))
             ),
             fg="blue",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.__create_heatmap_plots(multiple_videos=False),
         )
 

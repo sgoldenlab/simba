@@ -20,72 +20,50 @@ from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
-from simba.labelling.labelling_advanced_interface import \
-    select_labelling_video_advanced
+from simba.labelling.labelling_advanced_interface import select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
-from simba.labelling.targeted_annotations_clips import \
-    select_labelling_video_targeted_clips
+from simba.labelling.targeted_annotations_clips import select_labelling_video_targeted_clips
 from simba.model.grid_search_rf import GridSearchRandomForestClassifier
 from simba.model.inference_batch import InferenceBatch
 from simba.model.inference_validation import InferenceValidation
 from simba.model.train_rf import TrainRandomForestClassifier
-from simba.outlier_tools.outlier_corrector_location import \
-    OutlierCorrecterLocation
-from simba.outlier_tools.outlier_corrector_movement import \
-    OutlierCorrecterMovement
-from simba.outlier_tools.skip_outlier_correction import \
-    OutlierCorrectionSkipper
-from simba.plotting.interactive_probability_grapher import \
-    InteractiveProbabilityGrapher
+from simba.outlier_tools.outlier_corrector_location import OutlierCorrecterLocation
+from simba.outlier_tools.outlier_corrector_movement import OutlierCorrecterMovement
+from simba.outlier_tools.skip_outlier_correction import OutlierCorrectionSkipper
+from simba.plotting.interactive_probability_grapher import InteractiveProbabilityGrapher
 from simba.roi_tools.ROI_define import *
 from simba.roi_tools.ROI_menus import *
 from simba.roi_tools.ROI_reset import *
 from simba.third_party_label_appenders.BENTO_appender import BentoAppender
 from simba.third_party_label_appenders.BORIS_appender import BorisAppender
-from simba.third_party_label_appenders.deepethogram_importer import \
-    DeepEthogramImporter
-from simba.third_party_label_appenders.ethovision_import import \
-    ImportEthovision
-from simba.third_party_label_appenders.observer_importer import \
-    NoldusObserverImporter
+from simba.third_party_label_appenders.deepethogram_importer import DeepEthogramImporter
+from simba.third_party_label_appenders.ethovision_import import ImportEthovision
+from simba.third_party_label_appenders.observer_importer import NoldusObserverImporter
 from simba.third_party_label_appenders.solomon_importer import SolomonImporter
 from simba.ui.create_project_ui import ProjectCreatorPopUp
 from simba.ui.import_pose_frame import ImportPoseFrame
 from simba.ui.import_videos_frame import ImportVideosFrame
 from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
-from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
-    AnimalDirectingAnimalPopUp
-from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
-    AppendROIFeaturesByAnimalPopUp
-from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
-    AppendROIFeaturesByBodyPartPopUp
+from simba.ui.pop_ups.animal_directing_other_animals_pop_up import AnimalDirectingAnimalPopUp
+from simba.ui.pop_ups.append_roi_features_animals_pop_up import AppendROIFeaturesByAnimalPopUp
+from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import AppendROIFeaturesByBodyPartPopUp
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
-from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
-    BooleanConditionalSlicerPopUp
-from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
-    AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
-from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
-    ClfAnnotationCountPopUp
+from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import BooleanConditionalSlicerPopUp
+from simba.ui.pop_ups.clf_add_remove_print_pop_up import (AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
+from simba.ui.pop_ups.clf_annotation_counts_pop_up import ClfAnnotationCountPopUp
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
 from simba.ui.pop_ups.clf_by_timebins_pop_up import TimeBinsClfPopUp
-from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
-    ClfDescriptiveStatsPopUp
+from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import ClfDescriptiveStatsPopUp
 from simba.ui.pop_ups.clf_plot_pop_up import SklearnVisualizationPopUp
-from simba.ui.pop_ups.clf_probability_plot_pop_up import \
-    VisualizeClassificationProbabilityPopUp
-from simba.ui.pop_ups.clf_validation_plot_pop_up import \
-    ClassifierValidationPopUp
-from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
-                                                   Parquet2CsvPopUp)
+from simba.ui.pop_ups.clf_probability_plot_pop_up import VisualizeClassificationProbabilityPopUp
+from simba.ui.pop_ups.clf_validation_plot_pop_up import ClassifierValidationPopUp
+from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp, Parquet2CsvPopUp)
 from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
-from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import \
-    DirectingAnimalToBodyPartVisualizerPopUp
-from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
-    DirectingOtherAnimalsVisualizerPopUp
-from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
-    DirectionAnimalToBodyPartSettingsPopUp
+from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import DirectingAnimalToBodyPartVisualizerPopUp
+from simba.ui.pop_ups.directing_other_animals_plot_pop_up import DirectingOtherAnimalsVisualizerPopUp
+from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import DirectionAnimalToBodyPartSettingsPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
@@ -95,8 +73,7 @@ from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp
-from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
-    MovementAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import MovementAnalysisTimeBinsPopUp
 from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
 from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
 from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
@@ -106,22 +83,16 @@ from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
 from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
 from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp
-from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
-    ROIAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import ROIAnalysisTimeBinsPopUp
 from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
-from simba.ui.pop_ups.roi_size_standardizer_popup import \
-    ROISizeStandardizerPopUp
+from simba.ui.pop_ups.roi_size_standardizer_popup import ROISizeStandardizerPopUp
 from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
-from simba.ui.pop_ups.set_machine_model_parameters_pop_up import \
-    SetMachineModelParameters
+from simba.ui.pop_ups.set_machine_model_parameters_pop_up import SetMachineModelParameters
 from simba.ui.pop_ups.severity_analysis_pop_up import AnalyzeSeverityPopUp
 from simba.ui.pop_ups.smoothing_popup import SmoothingPopUp
-from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
-    SpontaneousAlternationPopUp
-from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
-    FeatureSubsetExtractorPopUp
-from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
-    ThirdPartyAnnotatorAppenderPopUp
+from simba.ui.pop_ups.spontaneous_alternation_pop_up import SpontaneousAlternationPopUp
+from simba.ui.pop_ups.subset_feature_extractor_pop_up import FeatureSubsetExtractorPopUp
+from simba.ui.pop_ups.third_party_annotator_appender_pop_up import ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
@@ -134,7 +105,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ConvertROIDefinitionsPopUp, CreateAverageFramePopUp, CreateGIFPopUP,
     CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
     CrossfadeVideosPopUp, DownsampleMultipleVideosPopUp,
-    DownsampleSingleVideoPopUp, DownsampleVideoPopUp, ExtractAllFramesPopUp,
+    DownsampleSingleVideoPopUp, ExtractAllFramesPopUp,
     ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
     ExtractSpecificFramesPopUp, FlipVideosPopUp, GreyscaleSingleVideoPopUp,
     ImportFrameDirectoryPopUp, InitiateClipMultipleVideosByFrameNumbersPopUp,
@@ -145,21 +116,18 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperimposeTextPopUp, SuperimposeTimerPopUp, SuperimposeVideoNamesPopUp,
     SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, UpsampleVideosPopUp,
     VideoRotatorPopUp, VideoTemporalJoinPopUp)
-from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
-    VisualizePoseInFolderPopUp
+from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
 from simba.ui.video_info_ui import VideoInfoTable
-from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable, check_int)
+from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import OS, Defaults, Formats, Paths, TagNames
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths, load_simba_fonts)
+from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths, load_simba_fonts, get_linux_fonts)
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
-from simba.video_processors.video_processing import \
-    extract_frames_from_all_videos_in_directory
+from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
 
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
@@ -174,7 +142,7 @@ class LoadProjectPopUp(object):
         self.main_frm.wm_title("Load SimBA project (project_config.ini file)")
         self.load_project_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD SIMBA PROJECT_CONFIG.INI", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
         self.selected_file = FileSelect(self.load_project_frm, "Select file: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")])
-        load_project_btn = Button(self.load_project_frm, text="LOAD PROJECT", fg="blue", command=lambda: self.launch_project())
+        load_project_btn = Button(self.load_project_frm, text="LOAD PROJECT", fg="blue", command=lambda: self.launch_project(), font=Formats.FONT_REGULAR.value)
         self.load_project_frm.grid(row=0, sticky=NW)
         self.selected_file.grid(row=0, sticky=NW)
         load_project_btn.grid(row=1, pady=10, sticky=NW)
@@ -227,66 +195,16 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         tab10 = ttk.Frame(tab_parent)
         tab11 = ttk.Frame(tab_parent)
 
-        tab_parent.add(
-            tab2,
-            text=f"{'[ Further imports (data/video/frames) ]':20s}",
-            compound="left",
-            image=self.btn_icons["pose"]["img"],
-        )
-        tab_parent.add(
-            tab3,
-            text=f"{'[ Video parameters ]':20s}",
-            compound="left",
-            image=self.btn_icons["calipher"]["img"],
-        )
-        tab_parent.add(
-            tab4,
-            text=f"{'[ Outlier correction ]':20s}",
-            compound="left",
-            image=self.btn_icons["outlier"]["img"],
-        )
-        tab_parent.add(
-            tab6,
-            text=f"{'[ ROI ]':10s}",
-            compound="left",
-            image=self.btn_icons["roi"]["img"],
-        )
-        tab_parent.add(
-            tab5,
-            text=f"{'[ Extract features ]':20s}",
-            compound="left",
-            image=self.btn_icons["features"]["img"],
-        )
-        tab_parent.add(
-            tab7,
-            text=f"{'[ Label behavior] ':20s}",
-            compound="left",
-            image=self.btn_icons["label"]["img"],
-        )
-        tab_parent.add(
-            tab8,
-            text=f"{'[ Train machine model ]':20s}",
-            compound="left",
-            image=self.btn_icons["clf"]["img"],
-        )
-        tab_parent.add(
-            tab9,
-            text=f"{'[ Run machine model ]':20s}",
-            compound="left",
-            image=self.btn_icons["clf_2"]["img"],
-        )
-        tab_parent.add(
-            tab10,
-            text=f"{'[ Visualizations ]':20s}",
-            compound="left",
-            image=self.btn_icons["visualize"]["img"],
-        )
-        tab_parent.add(
-            tab11,
-            text=f"{'[ Add-ons ]':20s}",
-            compound="left",
-            image=self.btn_icons["add_on"]["img"],
-        )
+        tab_parent.add(tab2, text=f"{'[ Further imports (data/video/frames) ]':20s}", compound="left", image=self.btn_icons["pose"]["img"])
+        tab_parent.add(tab3, text=f"{'[ Video parameters ]':20s}", compound="left", image=self.btn_icons["calipher"]["img"])
+        tab_parent.add(tab4, text=f"{'[ Outlier correction ]':20s}", compound="left", image=self.btn_icons["outlier"]["img"])
+        tab_parent.add(tab6, text=f"{'[ ROI ]':10s}", compound="left", image=self.btn_icons["roi"]["img"])
+        tab_parent.add(tab5, text=f"{'[ Extract features ]':20s}", compound="left", image=self.btn_icons["features"]["img"])
+        tab_parent.add(tab7, text=f"{'[ Label behavior] ':20s}", compound="left", image=self.btn_icons["label"]["img"])
+        tab_parent.add(tab8, text=f"{'[ Train machine model ]':20s}", compound="left", image=self.btn_icons["clf"]["img"])
+        tab_parent.add(tab9, text=f"{'[ Run machine model ]':20s}", compound="left", image=self.btn_icons["clf_2"]["img"])
+        tab_parent.add(tab10, text=f"{'[ Visualizations ]':20s}", compound="left", image=self.btn_icons["visualize"]["img"])
+        tab_parent.add(tab11, text=f"{'[ Add-ons ]':20s}", compound="left", image=self.btn_icons["add_on"]["img"])
 
         tab_parent.grid(row=0)
         tab_parent.enable_traversal()
@@ -294,121 +212,31 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         import_frm = LabelFrame(tab2)
         import_frm.grid(row=0, column=0, sticky=NW)
 
-        further_methods_frm = CreateLabelFrameWithIcon(
-            parent=import_frm,
-            header="FURTHER METHODS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ADDITIONAL_IMPORTS.value,
-        )
-        extract_frm_btn = Button(
-            further_methods_frm,
-            text="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT",
-            fg="blue",
-            command=lambda: extract_frames_from_all_videos_in_directory(
-                config_path=self.config_path, directory=self.video_dir
-            ),
-        )
-        import_frm_dir_btn = Button(
-            further_methods_frm,
-            text="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT",
-            fg="blue",
-            command=lambda: ImportFrameDirectoryPopUp(config_path=self.config_path),
-        )
-        add_clf_btn = Button(
-            further_methods_frm,
-            text="ADD CLASSIFIER TO SIMBA PROJECT",
-            fg="blue",
-            command=lambda: AddClfPopUp(config_path=self.config_path),
-        )
-        remove_clf_btn = Button(
-            further_methods_frm,
-            text="REMOVE CLASSIFIER FROM SIMBA PROJECT",
-            fg="blue",
-            command=lambda: RemoveAClassifierPopUp(config_path=self.config_path),
-        )
-        archive_files_btn = Button(
-            further_methods_frm,
-            text="ARCHIVE PROCESSED FILES IN SIMBA PROJECT",
-            fg="blue",
-            command=lambda: ArchiveProcessedFilesPopUp(config_path=self.config_path),
-        )
-        reverse_btn = Button(
-            further_methods_frm,
-            text="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT",
-            fg="blue",
-            command=lambda: None,
-        )
-        interpolate_btn = Button(further_methods_frm, text="INTERPOLATE POSE IN SIMBA PROJECT", fg="blue", command=lambda: InterpolatePopUp(config_path=self.config_path))
-        smooth_btn = Button(
-            further_methods_frm,
-            text="SMOOTH POSE IN SIMBA PROJECT",
-            fg="blue",
-            command=lambda: SmoothingPopUp(config_path=self.config_path),
-        )
+        further_methods_frm = CreateLabelFrameWithIcon(parent=import_frm, header="FURTHER METHODS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADDITIONAL_IMPORTS.value)
+        extract_frm_btn = Button(further_methods_frm, text="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: extract_frames_from_all_videos_in_directory(config_path=self.config_path, directory=self.video_dir))
+        import_frm_dir_btn = Button(further_methods_frm, text="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ImportFrameDirectoryPopUp(config_path=self.config_path))
+        add_clf_btn = Button(further_methods_frm, text="ADD CLASSIFIER TO SIMBA PROJECT", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: AddClfPopUp(config_path=self.config_path),)
+        remove_clf_btn = Button(further_methods_frm, text="REMOVE CLASSIFIER FROM SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: RemoveAClassifierPopUp(config_path=self.config_path))
+        archive_files_btn = Button(further_methods_frm, text="ARCHIVE PROCESSED FILES IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ArchiveProcessedFilesPopUp(config_path=self.config_path))
+        reverse_btn = Button(further_methods_frm, text="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: None)
+        interpolate_btn = Button(further_methods_frm, text="INTERPOLATE POSE IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: InterpolatePopUp(config_path=self.config_path))
+        smooth_btn = Button(further_methods_frm, text="SMOOTH POSE IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: SmoothingPopUp(config_path=self.config_path))
 
-        label_setscale = CreateLabelFrameWithIcon(
-            parent=tab3,
-            header="VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_PARAMETERS.value,
-        )
-        # label_setscale = LabelFrame(tab3,text='VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)', font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5,padx=5,fg='black')
-        self.distance_in_mm_eb = Entry_Box(
-            label_setscale, "KNOWN DISTANCE (MILLIMETERS)", "25", validation="numeric"
-        )
-        button_setdistanceinmm = Button(
-            label_setscale,
-            text="AUTO-POPULATE",
-            fg="green",
-            command=lambda: self.set_distance_mm(),
-        )
+        label_setscale = CreateLabelFrameWithIcon(parent=tab3, header="VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
+        self.distance_in_mm_eb = Entry_Box(label_setscale, "KNOWN DISTANCE (MILLIMETERS)", "25", validation="numeric")
+        button_setdistanceinmm = Button(label_setscale, text="AUTO-POPULATE", fg="green", command=lambda: self.set_distance_mm(), font=Formats.FONT_REGULAR.value)
 
-        button_setscale = Button(
-            label_setscale,
-            text="CONFIGURE VIDEO PARAMETERS",
-            compound="left",
-            image=self.btn_icons["calipher"]["img"],
-            relief=RAISED,
-            fg="blue",
-            command=lambda: self.create_video_info_table(),
-        )
+        button_setscale = Button(label_setscale, text="CONFIGURE VIDEO PARAMETERS", compound="left", image=self.btn_icons["calipher"]["img"], relief=RAISED, fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.create_video_info_table())
         button_setscale.image = self.btn_icons["calipher"]["img"]
 
-        self.new_ROI_frm = CreateLabelFrameWithIcon(
-            parent=tab6,
-            header="SIMBA ROI INTERFACE",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ROI.value,
-        )
-        self.start_new_ROI = Button(
-            self.new_ROI_frm,
-            text="DEFINE ROIs",
-            fg="green",
-            compound="left",
-            image=self.btn_icons["roi"]["img"],
-            relief=RAISED,
-            command=lambda: ROI_menu(self.config_path),
-        )
+        self.new_ROI_frm = CreateLabelFrameWithIcon(parent=tab6, header="SIMBA ROI INTERFACE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI.value)
+        self.start_new_ROI = Button(self.new_ROI_frm, text="DEFINE ROIs", fg="green", compound="left", font=Formats.FONT_REGULAR.value, image=self.btn_icons["roi"]["img"], relief=RAISED, command=lambda: ROI_menu(self.config_path))
         self.start_new_ROI.image = self.btn_icons["roi"]["img"]
 
-        self.delete_all_ROIs = Button(
-            self.new_ROI_frm,
-            text="DELETE ALL ROI DEFINITIONS",
-            fg="red",
-            compound="left",
-            image=self.btn_icons["trash"]["img"],
-            command=lambda: delete_all_ROIs(self.config_path),
-        )
+        self.delete_all_ROIs = Button(self.new_ROI_frm, text="DELETE ALL ROI DEFINITIONS", fg="red", compound="left", image=self.btn_icons["trash"]["img"], font=Formats.FONT_REGULAR.value, command=lambda: delete_all_ROIs(self.config_path))
         self.delete_all_ROIs.image = self.btn_icons["trash"]["img"]
 
-        self.standardize_roi_size_popup_btn = Button(
-            self.new_ROI_frm,
-            text="STANDARDIZE ROI SIZES",
-            fg="blue",
-            compound="left",
-            image=self.btn_icons["calipher"]["img"],
-            command=lambda: ROISizeStandardizerPopUp(config_path=self.config_path),
-        )
+        self.standardize_roi_size_popup_btn = Button(self.new_ROI_frm, text="STANDARDIZE ROI SIZES", fg="blue", compound="left", image=self.btn_icons["calipher"]["img"], font=Formats.FONT_REGULAR.value, command=lambda: ROISizeStandardizerPopUp(config_path=self.config_path))
         self.standardize_roi_size_popup_btn.image = self.btn_icons["calipher"]["img"]
 
         self.new_ROI_frm.grid(row=0, sticky=NW)
@@ -416,127 +244,38 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.delete_all_ROIs.grid(row=1, column=0, sticky=NW)
         self.standardize_roi_size_popup_btn.grid(row=2, column=0, sticky=NW)
 
-        self.roi_draw = LabelFrame(
-            tab6, text="ANALYZE ROI DATA", font=Formats.LABELFRAME_HEADER_FORMAT.value
-        )
-        analyze_roi_btn = Button(
-            self.roi_draw,
-            text="ANALYZE ROI DATA: AGGREGATES",
-            fg="green",
-            command=lambda: ROIAnalysisPopUp(config_path=self.config_path),
-        )
-        analyze_roi_time_bins_btn = Button(
-            self.roi_draw,
-            text="ANALYZE ROI DATA: TIME-BINS",
-            fg="blue",
-            command=lambda: ROIAnalysisTimeBinsPopUp(config_path=self.config_path),
-        )
+        self.roi_draw = LabelFrame(tab6, text="ANALYZE ROI DATA", font=Formats.FONT_HEADER.value)
+        analyze_roi_btn = Button(self.roi_draw, text="ANALYZE ROI DATA: AGGREGATES", fg="green", font=Formats.FONT_REGULAR.value, command=lambda: ROIAnalysisPopUp(config_path=self.config_path))
+        analyze_roi_time_bins_btn = Button( self.roi_draw, text="ANALYZE ROI DATA: TIME-BINS", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ROIAnalysisTimeBinsPopUp(config_path=self.config_path))
 
         self.roi_draw.grid(row=0, column=1, sticky=N)
         analyze_roi_btn.grid(row=0, sticky="NW")
         analyze_roi_time_bins_btn.grid(row=1, sticky="NW")
 
-        ###plot roi
-        self.roi_draw1 = LabelFrame(
-            tab6, text="VISUALIZE ROI DATA", font=Formats.LABELFRAME_HEADER_FORMAT.value
-        )
+        self.roi_draw1 = LabelFrame(tab6, text="VISUALIZE ROI DATA", font=Formats.FONT_HEADER.value)
 
-        # button
-        visualizeROI = Button(
-            self.roi_draw1,
-            text="VISUALIZE ROI TRACKING",
-            fg="green",
-            command=lambda: VisualizeROITrackingPopUp(config_path=self.config_path),
-        )
-        visualizeROIfeature = Button(
-            self.roi_draw1,
-            text="VISUALIZE ROI FEATURES",
-            fg="blue",
-            command=lambda: VisualizeROIFeaturesPopUp(config_path=self.config_path),
-        )
+        visualizeROI = Button(self.roi_draw1, text="VISUALIZE ROI TRACKING", fg="green", font=Formats.FONT_REGULAR.value, command=lambda: VisualizeROITrackingPopUp(config_path=self.config_path))
+        visualizeROIfeature = Button(self.roi_draw1,text="VISUALIZE ROI FEATURES",fg="blue",font=Formats.FONT_REGULAR.value, command=lambda: VisualizeROIFeaturesPopUp(config_path=self.config_path))
 
         ##organize
         self.roi_draw1.grid(row=0, column=2, sticky=N)
         visualizeROI.grid(row=0, sticky="NW")
         visualizeROIfeature.grid(row=1, sticky="NW")
 
-        processmovementdupLabel = LabelFrame(
-            tab6,
-            text="OTHER ANALYSES / VISUALIZATIONS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-        )
-        analyze_distances_velocity_btn = Button(
-            processmovementdupLabel,
-            text="ANALYZE DISTANCES / VELOCITY: AGGREGATES",
-            fg="green",
-            command=lambda: MovementAnalysisPopUp(config_path=self.config_path),
-        )
-        analyze_distances_velocity_timebins_btn = Button(
-            processmovementdupLabel,
-            text="ANALYZE DISTANCES / VELOCITY: TIME-BINS",
-            fg="blue",
-            command=lambda: MovementAnalysisTimeBinsPopUp(config_path=self.config_path),
-        )
+        processmovementdupLabel = LabelFrame( tab6, text="OTHER ANALYSES / VISUALIZATIONS", font=Formats.FONT_HEADER.value)
+        analyze_distances_velocity_btn = Button(processmovementdupLabel, text="ANALYZE DISTANCES / VELOCITY: AGGREGATES", fg="green", font=Formats.FONT_REGULAR.value, command=lambda: MovementAnalysisPopUp(config_path=self.config_path))
+        analyze_distances_velocity_timebins_btn = Button( processmovementdupLabel, text="ANALYZE DISTANCES / VELOCITY: TIME-BINS", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: MovementAnalysisTimeBinsPopUp(config_path=self.config_path))
 
-        heatmaps_location_button = Button(
-            processmovementdupLabel,
-            text="CREATE LOCATION HEATMAPS",
-            fg="red",
-            command=lambda: HeatmapLocationPopup(config_path=self.config_path),
-        )
+        heatmaps_location_button = Button( processmovementdupLabel, text="CREATE LOCATION HEATMAPS", fg="red", font=Formats.FONT_REGULAR.value, command=lambda: HeatmapLocationPopup(config_path=self.config_path))
 
-        button_lineplot = Button(
-            processmovementdupLabel,
-            text="CREATE PATH PLOTS",
-            fg="orange",
-            command=lambda: QuickLineplotPopup(config_path=self.config_path),
-        )
-        button_analyzeDirection = Button(
-            processmovementdupLabel,
-            text="ANALYZE DIRECTIONALITY BETWEEN ANIMALS",
-            fg="pink",
-            command=lambda: AnimalDirectingAnimalPopUp(config_path=self.config_path),
-        )
-        button_visualizeDirection = Button(
-            processmovementdupLabel,
-            text="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS",
-            fg="brown",
-            command=lambda: DirectingOtherAnimalsVisualizerPopUp(
-                config_path=self.config_path
-            ),
-        )
-        button_analyzeDirection_bp = Button(
-            processmovementdupLabel,
-            text="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS",
-            fg="purple",
-            command=lambda: DirectionAnimalToBodyPartSettingsPopUp(
-                config_path=self.config_path
-            ),
-        )
-        button_visualizeDirection_bp = Button(
-            processmovementdupLabel,
-            text="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS",
-            fg="black",
-            command=lambda: DirectingAnimalToBodyPartVisualizerPopUp(
-                config_path=self.config_path
-            ),
-        )
-        btn_agg_boolean_conditional_statistics = Button(
-            processmovementdupLabel,
-            text="AGGREGATE BOOLEAN CONDITIONAL STATISTICS",
-            fg="grey",
-            command=lambda: BooleanConditionalSlicerPopUp(config_path=self.config_path),
-        )
-        spontaneous_alternation_pop_up_btn = Button(
-            processmovementdupLabel,
-            text="SPONTANEOUS ALTERNATION",
-            fg="navy",
-            command=lambda: threading.Thread(
-                target=SpontaneousAlternationPopUp(config_path=self.config_path)
-            ).start(),
-        )
+        button_lineplot = Button(processmovementdupLabel, text="CREATE PATH PLOTS", fg="orange", font=Formats.FONT_REGULAR.value, command=lambda: QuickLineplotPopup(config_path=self.config_path))
+        button_analyzeDirection = Button(processmovementdupLabel, text="ANALYZE DIRECTIONALITY BETWEEN ANIMALS", fg="pink", font=Formats.FONT_REGULAR.value, command=lambda: AnimalDirectingAnimalPopUp(config_path=self.config_path))
+        button_visualizeDirection = Button(processmovementdupLabel,text="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS",fg="brown", font=Formats.FONT_REGULAR.value, command=lambda: DirectingOtherAnimalsVisualizerPopUp(config_path=self.config_path))
+        button_analyzeDirection_bp = Button(processmovementdupLabel,text="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS",fg="purple", font=Formats.FONT_REGULAR.value, command=lambda: DirectionAnimalToBodyPartSettingsPopUp(config_path=self.config_path))
+        button_visualizeDirection_bp = Button(processmovementdupLabel, text="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS", font=Formats.FONT_REGULAR.value, fg="black", command=lambda: DirectingAnimalToBodyPartVisualizerPopUp(config_path=self.config_path ))
+        btn_agg_boolean_conditional_statistics = Button( processmovementdupLabel, text="AGGREGATE BOOLEAN CONDITIONAL STATISTICS", font=Formats.FONT_REGULAR.value, fg="grey", command=lambda: BooleanConditionalSlicerPopUp(config_path=self.config_path))
+        spontaneous_alternation_pop_up_btn = Button(processmovementdupLabel,text="SPONTANEOUS ALTERNATION",fg="navy", font=Formats.FONT_REGULAR.value, command=lambda: threading.Thread(    target=SpontaneousAlternationPopUp(config_path=self.config_path)).start())
 
-        # organize
         processmovementdupLabel.grid(row=0, column=3, sticky=NW)
         analyze_distances_velocity_btn.grid(row=0, sticky=NW)
         heatmaps_location_button.grid(row=1, sticky=NW)
@@ -549,49 +288,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         btn_agg_boolean_conditional_statistics.grid(row=8, sticky=NW)
         spontaneous_alternation_pop_up_btn.grid(row=9, sticky=NW)
 
-        label_outliercorrection = CreateLabelFrameWithIcon(
-            parent=tab4,
-            header="OUTLIER CORRECTION",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.OUTLIERS_DOC.value,
-        )
-        # label_outliercorrection = LabelFrame(tab4,text='OUTLIER CORRECTION',font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5,padx=5,fg='black')
-        button_settings_outlier = Button(
-            label_outliercorrection,
-            text="SETTINGS",
-            fg="blue",
-            command=lambda: OutlierSettingsPopUp(config_path=self.config_path),
-        )
-        button_outliercorrection = Button(
-            label_outliercorrection,
-            text="RUN OUTLIER CORRECTION",
-            fg="green",
-            command=lambda: threading.Thread(target=self.correct_outlier).start(),
-        )
-        button_skipOC = Button(
-            label_outliercorrection,
-            text="SKIP OUTLIER CORRECTION (CAUTION)",
-            fg="red",
-            command=lambda: threading.Thread(
-                target=self.initiate_skip_outlier_correction
-            ).start(),
-        )
+        label_outliercorrection = CreateLabelFrameWithIcon(parent=tab4, header="OUTLIER CORRECTION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUTLIERS_DOC.value)
+        button_settings_outlier = Button(label_outliercorrection, text="SETTINGS", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: OutlierSettingsPopUp(config_path=self.config_path))
+        button_outliercorrection = Button(label_outliercorrection, text="RUN OUTLIER CORRECTION", fg="green", font=Formats.FONT_REGULAR.value, command=lambda: threading.Thread(target=self.correct_outlier).start())
+        button_skipOC = Button(label_outliercorrection,text="SKIP OUTLIER CORRECTION (CAUTION)",fg="red", font=Formats.FONT_REGULAR.value, command=lambda: threading.Thread(target=self.initiate_skip_outlier_correction).start())
 
-        # extract features
-        label_extractfeatures = CreateLabelFrameWithIcon(
-            parent=tab5,
-            header="EXTRACT FEATURES",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.EXTRACT_FEATURES.value,
-        )
-        button_extractfeatures = Button(
-            label_extractfeatures,
-            text="EXTRACT FEATURES",
-            fg="blue",
-            command=lambda: threading.Thread(
-                target=self.run_feature_extraction
-            ).start(),
-        )
+
+        label_extractfeatures = CreateLabelFrameWithIcon(parent=tab5, header="EXTRACT FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.EXTRACT_FEATURES.value)
+        button_extractfeatures = Button(label_extractfeatures,text="EXTRACT FEATURES",fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: threading.Thread(    target=self.run_feature_extraction).start())
 
         def activate(box, *args):
             for entry in args:
@@ -601,70 +305,23 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                     entry.configure(state="normal")
 
         labelframe_usrdef = LabelFrame(label_extractfeatures)
-        self.scriptfile = FileSelect(
-            labelframe_usrdef, "Script path", file_types=[("Python .py file", "*.py")]
-        )
+        self.scriptfile = FileSelect(labelframe_usrdef, "Script path", file_types=[("Python .py file", "*.py")])
         self.scriptfile.btnFind.configure(state="disabled")
         self.user_defined_var = BooleanVar(value=False)
-        userscript = Checkbutton(
-            labelframe_usrdef,
-            text="Apply user-defined feature extraction script",
-            variable=self.user_defined_var,
-            command=lambda: activate(self.user_defined_var, self.scriptfile.btnFind),
-        )
+        userscript = Checkbutton(labelframe_usrdef, text="Apply user-defined feature extraction script", font=Formats.FONT_REGULAR.value, variable=self.user_defined_var, command=lambda: activate(self.user_defined_var, self.scriptfile.btnFind))
 
-        roi_feature_frm = CreateLabelFrameWithIcon(
-            parent=tab5,
-            header="APPEND ROI FEATURES",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.APPEND_ROI_FEATURES.value,
-        )
-        append_roi_features_by_animal = Button(
-            roi_feature_frm,
-            text="APPEND ROI DATA TO FEATURES: BY ANIMAL (CAUTION)",
-            fg="red",
-            command=lambda: AppendROIFeaturesByAnimalPopUp(
-                config_path=self.config_path
-            ),
-        )
-        append_roi_features_by_body_part = Button(
-            roi_feature_frm,
-            text="APPEND ROI DATA TO FEATURES: BY BODY-PARTS (CAUTION)",
-            fg="orange",
-            command=lambda: AppendROIFeaturesByBodyPartPopUp(
-                config_path=self.config_path
-            ),
-        )
-        remove_roi_features_from_feature_set = Button(
-            roi_feature_frm,
-            text="REMOVE ROI FEATURES FROM FEATURE SET",
-            fg="darkred",
-            command=lambda: RemoveROIFeaturesPopUp(
-                config_path=self.config_path, dataset="features_extracted"
-            ),
-        )
+        roi_feature_frm = CreateLabelFrameWithIcon(parent=tab5, header="APPEND ROI FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.APPEND_ROI_FEATURES.value)
+        append_roi_features_by_animal = Button(roi_feature_frm, text="APPEND ROI DATA TO FEATURES: BY ANIMAL (CAUTION)", fg="red", font=Formats.FONT_REGULAR.value, command=lambda: AppendROIFeaturesByAnimalPopUp(     config_path=self.config_path ))
+        append_roi_features_by_body_part = Button( roi_feature_frm, text="APPEND ROI DATA TO FEATURES: BY BODY-PARTS (CAUTION)", fg="orange", font=Formats.FONT_REGULAR.value, command=lambda: AppendROIFeaturesByBodyPartPopUp(     config_path=self.config_path ))
+        remove_roi_features_from_feature_set = Button( roi_feature_frm, text="REMOVE ROI FEATURES FROM FEATURE SET", fg="darkred", font=Formats.FONT_REGULAR.value,  command=lambda: RemoveROIFeaturesPopUp(     config_path=self.config_path, dataset="features_extracted" ))
 
-        feature_tools_frm = LabelFrame(
-            tab5,
-            text="FEATURE TOOLS",
-            pady=5,
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-        )
-        compute_feature_subset_btn = Button(
-            feature_tools_frm,
-            text="CALCULATE FEATURE SUBSETS",
-            fg="blue",
-            command=lambda: FeatureSubsetExtractorPopUp(config_path=self.config_path),
-        )
+        feature_tools_frm = LabelFrame(tab5, text="FEATURE TOOLS", pady=5, font=Formats.FONT_HEADER.value)
+        compute_feature_subset_btn = Button(feature_tools_frm, text="CALCULATE FEATURE SUBSETS", fg="blue", font=Formats.FONT_REGULAR.value,  command=lambda: FeatureSubsetExtractorPopUp(config_path=self.config_path))
 
-        label_behavior_frm = CreateLabelFrameWithIcon(
-            parent=tab7,
-            header="LABEL BEHAVIOR",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.LABEL_BEHAVIOR.value,
-        )
+        label_behavior_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LABEL_BEHAVIOR.value)
         select_video_btn_new = Button(
             label_behavior_frm,
+            font=Formats.FONT_REGULAR.value,
             text="Select video (create new video annotation)",
             command=lambda: select_labelling_video(
                 config_path=self.config_path,
@@ -675,6 +332,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         )
         select_video_btn_continue = Button(
             label_behavior_frm,
+            font=Formats.FONT_REGULAR.value,
             text="Select video (continue existing video annotation)",
             command=lambda: select_labelling_video(
                 config_path=self.config_path,
@@ -683,75 +341,20 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
                 continuing=True,
             ),
         )
-        label_thirdpartyann = CreateLabelFrameWithIcon(
-            parent=tab7,
-            header="IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.THIRD_PARTY_ANNOTATION.value,
-        )
-        button_importmars = Button(
-            label_thirdpartyann,
-            text="Import MARS Annotation (select folder with .annot files)",
-            fg="blue",
-            command=self.importMARS,
-        )
-        button_importboris = Button(
-            label_thirdpartyann,
-            text="Import BORIS Annotation (select folder with .csv files)",
-            fg="green",
-            command=self.importBoris,
-        )
-        button_importsolomon = Button(
-            label_thirdpartyann,
-            text="Import SOLOMON Annotation (select folder with .csv files",
-            fg="purple",
-            command=self.importSolomon,
-        )
-        button_importethovision = Button(
-            label_thirdpartyann,
-            text="Import ETHOVISION Annotation (select folder with .xls/xlsx files)",
-            fg="blue",
-            command=self.import_ethovision,
-        )
-        button_importdeepethogram = Button(
-            label_thirdpartyann,
-            text="Import DEEPETHOGRAM Annotation (select folder with .csv files)",
-            fg="green",
-            command=self.import_deepethogram,
-        )
-        import_observer_btn = Button(
-            label_thirdpartyann,
-            text="Import NOLDUS OBSERVER Annotation (select folder with .xls/xlsx files)",
-            fg="purple",
-            command=self.import_noldus_observer,
-        )
+        label_thirdpartyann = CreateLabelFrameWithIcon(parent=tab7, header="IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.THIRD_PARTY_ANNOTATION.value)
+        button_importmars = Button(label_thirdpartyann, text="Import MARS Annotation (select folder with .annot files)", font=Formats.FONT_REGULAR.value, fg="blue", command=self.importMARS)
+        button_importboris = Button(label_thirdpartyann, text="Import BORIS Annotation (select folder with .csv files)", fg="green", font=Formats.FONT_REGULAR.value, command=self.importBoris)
+        button_importsolomon = Button( label_thirdpartyann, text="Import SOLOMON Annotation (select folder with .csv files", fg="purple", font=Formats.FONT_REGULAR.value, command=self.importSolomon)
+        button_importethovision = Button( label_thirdpartyann, text="Import ETHOVISION Annotation (select folder with .xls/xlsx files)", fg="blue", font=Formats.FONT_REGULAR.value, command=self.import_ethovision)
+        button_importdeepethogram = Button(label_thirdpartyann,text="Import DEEPETHOGRAM Annotation (select folder with .csv files)", font=Formats.FONT_REGULAR.value, fg="green",command=self.import_deepethogram)
+        import_observer_btn = Button(label_thirdpartyann,text="Import NOLDUS OBSERVER Annotation (select folder with .xls/xlsx files)",fg="purple", font=Formats.FONT_REGULAR.value, command=self.import_noldus_observer)
 
-        label_pseudo = CreateLabelFrameWithIcon(
-            parent=tab7,
-            header="PSEUDO-LABELLING",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.PSEUDO_LBL.value,
-        )
-        pseudo_intructions_lbl_1 = Label(
-            label_pseudo,
-            text="Note that SimBA pseudo-labelling require initial machine predictions.",
-        )
-        pseudo_intructions_lbl_2 = Label(
-            label_pseudo,
-            text="Click here more information on how to use the SimBA pseudo-labelling interface.",
-            cursor="hand2",
-            fg="blue",
-        )
-        pseudo_intructions_lbl_2.bind(
-            "<Button-1>",
-            lambda e: self.callback(
-                "https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md"
-            ),
-        )
+        label_pseudo = CreateLabelFrameWithIcon(parent=tab7,header="PSEUDO-LABELLING",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.PSEUDO_LBL.value)
+        pseudo_intructions_lbl_1 = Label(label_pseudo,text="Note: SimBA pseudo-labelling require initial machine predictions.", font=Formats.FONT_REGULAR.value)
+        pseudo_intructions_lbl_2 = Label( label_pseudo, text="Click here more information on how to use the SimBA pseudo-labelling interface.", font=Formats.FONT_REGULAR.value, cursor="hand2", fg="blue")
+        pseudo_intructions_lbl_2.bind("<Button-1>", lambda e: self.callback("https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md"))
         pLabel_framedir = FileSelect(label_pseudo, "Video Path", lblwidth="10")
-        plabelframe_threshold = LabelFrame(
-            label_pseudo, text="Threshold", pady=5, padx=5
-        )
+        plabelframe_threshold = LabelFrame(label_pseudo, text="Threshold", pady=5, padx=5, font=Formats.FONT_HEADER.value)
         plabel_threshold = [0] * len(self.clf_names)
         for count, i in enumerate(list(self.clf_names)):
             plabel_threshold[count] = Entry_Box(plabelframe_threshold, str(i), "20")
@@ -759,6 +362,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         pseudo_lbl_btn = Button(
             label_pseudo,
+            font=Formats.FONT_REGULAR.value,
             text="Correct labels",
             command=lambda: select_labelling_video(
                 config_path=self.config_path,
@@ -769,228 +373,76 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             ),
         )
 
-        label_adv_label = CreateLabelFrameWithIcon(
-            parent=tab7,
-            header="ADVANCED LABEL BEHAVIOR",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ADVANCED_LBL.value,
-        )
-        label_adv_note_1 = Label(
-            label_adv_label,
-            text="Note that you will have to specify the presence of *both* behavior and non-behavior on your own.",
-        )
-        label_adv_note_2 = Label(
-            label_adv_label,
-            text="Click here more information on how to use the SimBA labelling interface.",
-            cursor="hand2",
-            fg="blue",
-        )
-        label_adv_note_2.bind(
-            "<Button-1>",
-            lambda e: self.callback(
-                "https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md"
-            ),
-        )
-        adv_label_btn_new = Button(
-            label_adv_label,
-            text="Select video (create new video annotation)",
-            command=lambda: select_labelling_video_advanced(
-                config_path=self.config_path, continuing=False
-            ),
-        )
-        adv_label_btn_continue = Button(
-            label_adv_label,
-            text="Select video (continue existing video annotation)",
-            command=lambda: select_labelling_video_advanced(
-                config_path=self.config_path, continuing=True
-            ),
-        )
+        label_adv_label = CreateLabelFrameWithIcon(parent=tab7, header="ADVANCED LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADVANCED_LBL.value)
+        label_adv_note_1 = Label(label_adv_label, text="Note that you will have to specify the presence of *both* behavior and non-behavior on your own.", font=Formats.FONT_REGULAR.value)
+        label_adv_note_2 = Label(label_adv_label, text="Click here more information on how to use the SimBA labelling interface.", font=Formats.FONT_REGULAR.value, cursor="hand2", fg="blue")
+        label_adv_note_2.bind("<Button-1>", lambda e: self.callback("https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md"))
+        adv_label_btn_new = Button(label_adv_label,text="Select video (create new video annotation)", font=Formats.FONT_REGULAR.value,  command=lambda: select_labelling_video_advanced(    config_path=self.config_path, continuing=False))
+        adv_label_btn_continue = Button(label_adv_label,text="Select video (continue existing video annotation)",font=Formats.FONT_REGULAR.value, command=lambda: select_labelling_video_advanced(    config_path=self.config_path, continuing=True))
 
-        targeted_clip_annotator_frm = CreateLabelFrameWithIcon(
-            parent=tab7,
-            header="TARGETED CLIP ANNOTATOR",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ADVANCED_LBL.value,
-        )
-        targeted_clip_annotator_note = Label(
-            targeted_clip_annotator_frm,
-            text="A bout annotator that creates annotated clips from videos associated with ML results.",
-        )
-        targeted_clip_annotator_btn = Button(
-            targeted_clip_annotator_frm,
-            text="Select video",
-            command=lambda: select_labelling_video_targeted_clips(
-                config_path=self.config_path
-            ),
-        )
+        targeted_clip_annotator_frm = CreateLabelFrameWithIcon(parent=tab7,header="TARGETED CLIP ANNOTATOR",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.ADVANCED_LBL.value)
+        targeted_clip_annotator_note = Label(targeted_clip_annotator_frm, font=Formats.FONT_REGULAR.value, text="A bout annotator that creates annotated clips from videos associated with ML results.")
+        targeted_clip_annotator_btn = Button(targeted_clip_annotator_frm,text="Select video", font=Formats.FONT_REGULAR.value, command=lambda: select_labelling_video_targeted_clips(    config_path=self.config_path))
 
-        lbl_tools_frm = LabelFrame(tab7, text="LABELLING TOOLS", font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
-        visualize_annotation_img_btn = Button(lbl_tools_frm, text="Visualize annotations", fg="blue", command=lambda: ExtractAnnotationFramesPopUp(config_path=self.config_path))
-        third_party_annotations_btn = Button(lbl_tools_frm,text="Append third-party annotations",fg="purple",command=lambda: ThirdPartyAnnotatorAppenderPopUp(config_path=self.config_path))
-        remove_roi_features_from_annotation_set = Button(lbl_tools_frm,text="Remove ROI features from label set",fg="darkred",command=lambda: RemoveROIFeaturesPopUp(    config_path=self.config_path, dataset="targets_inserted"))
-        compute_annotation_statistics = Button(lbl_tools_frm, text="Count annotations in project", fg="orange", command=lambda: ClfAnnotationCountPopUp(config_path=self.config_path))
+        lbl_tools_frm = LabelFrame(tab7, text="LABELLING TOOLS", font=Formats.FONT_HEADER.value, fg="black")
+        visualize_annotation_img_btn = Button(lbl_tools_frm, text="Visualize annotations", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ExtractAnnotationFramesPopUp(config_path=self.config_path))
+        third_party_annotations_btn = Button(lbl_tools_frm,text="Append third-party annotations",fg="purple",font=Formats.FONT_REGULAR.value, command=lambda: ThirdPartyAnnotatorAppenderPopUp(config_path=self.config_path))
+        remove_roi_features_from_annotation_set = Button(lbl_tools_frm,text="Remove ROI features from label set",font=Formats.FONT_REGULAR.value, fg="darkred",command=lambda: RemoveROIFeaturesPopUp(    config_path=self.config_path, dataset="targets_inserted"))
+        compute_annotation_statistics = Button(lbl_tools_frm, text="Count annotations in project", font=Formats.FONT_REGULAR.value, fg="orange", command=lambda: ClfAnnotationCountPopUp(config_path=self.config_path))
 
         label_trainmachinemodel = CreateLabelFrameWithIcon(parent=tab8, header="TRAIN MACHINE MODELS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.TRAIN_ML_MODEL.value)
-        button_trainmachinesettings = Button(label_trainmachinemodel, text="SETTINGS", fg="darkorange", command=self.trainmachinemodelsetting)
-        button_trainmachinemodel = Button(label_trainmachinemodel, text="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)", fg="blue", command=lambda: self.train_single_model(config_path=self.config_path),)
+        button_trainmachinesettings = Button(label_trainmachinemodel, text="SETTINGS", font=Formats.FONT_REGULAR.value, fg="darkorange", command=self.trainmachinemodelsetting)
+        button_trainmachinemodel = Button(label_trainmachinemodel, text="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.train_single_model(config_path=self.config_path),)
 
-        button_train_multimodel = Button(
-            label_trainmachinemodel,
-            text="TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)",
-            fg="green",
-            command=lambda: self.train_multiple_models_from_meta(
-                config_path=self.config_path
-            ),
-        )
+        button_train_multimodel = Button(label_trainmachinemodel,text="TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)",fg="green",font=Formats.FONT_REGULAR.value, command=lambda: self.train_multiple_models_from_meta(    config_path=self.config_path))
 
-        label_model_validation = CreateLabelFrameWithIcon(
-            parent=tab9,
-            header="VALIDATE MODEL ON SINGLE VIDEO",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value,
-        )
-        # label_model_validation = LabelFrame(tab9, text='VALIDATE MODEL ON SINGLE VIDEO', pady=5, padx=5, font=("Helvetica", 12, 'bold'), fg='blue')
-        self.csvfile = FileSelect(
-            label_model_validation,
-            "SELECT DATA FEATURE FILE",
-            color="blue",
-            lblwidth=30,
-            file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")],
-            initialdir=os.path.join(
-                self.project_path, Paths.FEATURES_EXTRACTED_DIR.value
-            ),
-        )
-        self.modelfile = FileSelect(
-            label_model_validation,
-            "SELECT MODEL FILE",
-            color="blue",
-            lblwidth=30,
-            initialdir=self.project_path,
-        )
-        button_runvalidmodel = Button(
-            label_model_validation,
-            text="RUN MODEL",
-            fg="blue",
-            command=lambda: threading.Thread(
-                target=self.validate_model_first_step
-            ).start(),
-        )
+        label_model_validation = CreateLabelFrameWithIcon( parent=tab9, header="VALIDATE MODEL ON SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value)
+        self.csvfile = FileSelect(label_model_validation,"SELECT DATA FEATURE FILE",color="blue",lblwidth=30,file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")],initialdir=os.path.join(    self.project_path, Paths.FEATURES_EXTRACTED_DIR.value))
+        self.modelfile = FileSelect(label_model_validation,"SELECT MODEL FILE",color="blue",lblwidth=30,initialdir=self.project_path)
+        button_runvalidmodel = Button(label_model_validation,text="RUN MODEL", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: threading.Thread(    target=self.validate_model_first_step).start())
 
-        button_generateplot = Button(
-            label_model_validation,
-            text="INTERACTIVE PROBABILITY PLOT",
-            fg="blue",
-            command=lambda: self.launch_interactive_plot(),
-        )
-        self.dis_threshold = Entry_Box(
-            label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", "30"
-        )
-        self.min_behaviorbout = Entry_Box(
-            label_model_validation,
-            "MINIMUM BOUT LENGTH (MS):",
-            "30",
-            validation="numeric",
-        )
-        button_validate_model = Button(
-            label_model_validation,
-            text="CREATE VALIDATION VIDEO",
-            fg="blue",
-            command=lambda: ValidationVideoPopUp(
-                config_path=config_path, simba_main_frm=self
-            ),
-        )
+        button_generateplot = Button( label_model_validation, text="INTERACTIVE PROBABILITY PLOT", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.launch_interactive_plot())
+        self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", "30")
+        self.min_behaviorbout = Entry_Box(label_model_validation,"MINIMUM BOUT LENGTH (MS):","30",validation="numeric")
+        button_validate_model = Button( label_model_validation, text="CREATE VALIDATION VIDEO", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ValidationVideoPopUp(     config_path=config_path, simba_main_frm=self ),)
 
-        label_runmachinemodel = CreateLabelFrameWithIcon(
-            parent=tab9,
-            header="RUN MACHINE MODEL",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.SCENARIO_2.value,
-        )
-        button_run_rfmodelsettings = Button(
-            label_runmachinemodel,
-            text="MODEL SETTINGS",
-            fg="green",
-            compound="left",
-            image=self.btn_icons["settings"]["img"],
-            command=lambda: SetMachineModelParameters(config_path=self.config_path),
-        )
+        label_runmachinemodel = CreateLabelFrameWithIcon(parent=tab9,header="RUN MACHINE MODEL",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.SCENARIO_2.value)
+        button_run_rfmodelsettings = Button( label_runmachinemodel, text="MODEL SETTINGS", fg="green", compound="left", font=Formats.FONT_REGULAR.value, image=self.btn_icons["settings"]["img"], command=lambda: SetMachineModelParameters(config_path=self.config_path))
         button_run_rfmodelsettings.image = self.btn_icons["settings"]["img"]
 
-        button_runmachinemodel = Button(
-            label_runmachinemodel,
-            text="RUN MODELS",
-            fg="green",
-            compound="left",
-            image=self.btn_icons["clf"]["img"],
-            command=lambda: threading.Thread(target=self.runrfmodel).start(),
-        )
+        button_runmachinemodel = Button( label_runmachinemodel, text="RUN MODELS", fg="green", compound="left", font=Formats.FONT_REGULAR.value, image=self.btn_icons["clf"]["img"], command=lambda: threading.Thread(target=self.runrfmodel).start())
         button_runmachinemodel.image = self.btn_icons["clf"]["img"]
 
-        kleinberg_button = Button(
-            label_runmachinemodel,
-            text="KLEINBERG SMOOTHING",
-            fg="green",
-            command=lambda: KleinbergPopUp(config_path=self.config_path),
-        )
-        fsttc_button = Button(
-            label_runmachinemodel,
-            text="FSTTC",
-            fg="green",
-            command=lambda: FSTTCPopUp(config_path=self.config_path),
-        )
-        mutual_exclusivity = Button(
-            label_runmachinemodel,
-            text="MUTUAL EXCLUSIVITY CORRECTION",
-            fg="green",
-            command=lambda: MutualExclusivityPupUp(config_path=self.config_path),
-        )
+        kleinberg_button = Button( label_runmachinemodel, text="KLEINBERG SMOOTHING", fg="green", font=Formats.FONT_REGULAR.value, command=lambda: KleinbergPopUp(config_path=self.config_path))
+        fsttc_button = Button(label_runmachinemodel,text="FSTTC",fg="green", font=Formats.FONT_REGULAR.value, command=lambda: FSTTCPopUp(config_path=self.config_path))
+        mutual_exclusivity = Button(label_runmachinemodel,text="MUTUAL EXCLUSIVITY CORRECTION",fg="green", font=Formats.FONT_REGULAR.value, command=lambda: MutualExclusivityPupUp(config_path=self.config_path))
 
-        label_machineresults = CreateLabelFrameWithIcon(
-            parent=tab9,
-            header="ANALYZE MACHINE RESULTS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ANALYZE_ML_RESULTS.value,
-        )
-        button_process_datalog = Button(
-            label_machineresults,
-            text="ANALYZE MACHINE PREDICTIONS: AGGREGATES",
-            fg="blue",
-            command=lambda: ClfDescriptiveStatsPopUp(config_path=self.config_path),
-        )
-        button_process_movement = Button(
-            label_machineresults,
-            text="ANALYZE DISTANCES/VELOCITY: AGGREGATES",
-            fg="blue",
-            command=lambda: MovementAnalysisPopUp(config_path=self.config_path),
-        )
-        button_movebins = Button(
-            label_machineresults,
-            text="ANALYZE DISTANCES/VELOCITY: TIME BINS",
-            fg="blue",
-            command=lambda: MovementAnalysisTimeBinsPopUp(config_path=self.config_path),
-        )
-        button_classifierbins = Button(label_machineresults, text="ANALYZE MACHINE PREDICTIONS: TIME-BINS", fg="blue", command=lambda: TimeBinsClfPopUp(config_path=self.config_path))
-        button_classifier_ROI = Button(label_machineresults, text="ANALYZE MACHINE PREDICTION: BY ROI", fg="blue", command=lambda: ClfByROIPopUp(config_path=self.config_path))
-        button_severity = Button(label_machineresults, text="ANALYZE MACHINE PREDICTION: BY SEVERITY", fg="blue", command=lambda: AnalyzeSeverityPopUp(config_path=self.config_path))
+        label_machineresults = CreateLabelFrameWithIcon( parent=tab9, header="ANALYZE MACHINE RESULTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ANALYZE_ML_RESULTS.value)
+        button_process_datalog = Button( label_machineresults, text="ANALYZE MACHINE PREDICTIONS: AGGREGATES", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ClfDescriptiveStatsPopUp(config_path=self.config_path))
+        button_process_movement = Button(label_machineresults,text="ANALYZE DISTANCES/VELOCITY: AGGREGATES",fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: MovementAnalysisPopUp(config_path=self.config_path))
+        button_movebins = Button( label_machineresults, text="ANALYZE DISTANCES/VELOCITY: TIME BINS", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: MovementAnalysisTimeBinsPopUp(config_path=self.config_path),)
+        button_classifierbins = Button(label_machineresults, text="ANALYZE MACHINE PREDICTIONS: TIME-BINS", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: TimeBinsClfPopUp(config_path=self.config_path))
+        button_classifier_ROI = Button(label_machineresults, text="ANALYZE MACHINE PREDICTION: BY ROI", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ClfByROIPopUp(config_path=self.config_path))
+        button_severity = Button(label_machineresults, text="ANALYZE MACHINE PREDICTION: BY SEVERITY", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: AnalyzeSeverityPopUp(config_path=self.config_path))
         visualization_frm = CreateLabelFrameWithIcon(parent=tab10, header="DATA VISUALIZATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VISUALIZATION.value)
-        sklearn_visualization_btn = Button(visualization_frm, text="VISUALIZE CLASSIFICATIONS", fg="black", command=lambda: SklearnVisualizationPopUp(config_path=self.config_path))
+        sklearn_visualization_btn = Button(visualization_frm, text="VISUALIZE CLASSIFICATIONS", fg="black", font=Formats.FONT_REGULAR.value, command=lambda: SklearnVisualizationPopUp(config_path=self.config_path))
         sklearn_visualization_btn.grid(row=0, column=0, sticky=NW)
-        gantt_visualization_btn = Button(visualization_frm, text="VISUALIZE GANTT", fg="blue", command=lambda: GanttPlotPopUp(config_path=self.config_path))
+        gantt_visualization_btn = Button(visualization_frm, text="VISUALIZE GANTT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: GanttPlotPopUp(config_path=self.config_path))
         gantt_visualization_btn.grid(row=1, column=0, sticky=NW)
-        probability_visualization_btn = Button(visualization_frm, text="VISUALIZE PROBABILITIES", fg="green", command=lambda: VisualizeClassificationProbabilityPopUp(     config_path=self.config_path))
+        probability_visualization_btn = Button(visualization_frm, text="VISUALIZE PROBABILITIES", font=Formats.FONT_REGULAR.value, fg="green", command=lambda: VisualizeClassificationProbabilityPopUp(     config_path=self.config_path))
         probability_visualization_btn.grid(row=2, column=0, sticky=NW)
-        path_visualization_btn = Button(visualization_frm, text="VISUALIZE PATHS", fg="orange", command=lambda: PathPlotPopUp(config_path=self.config_path))
+        path_visualization_btn = Button(visualization_frm, text="VISUALIZE PATHS", fg="orange", font=Formats.FONT_REGULAR.value, command=lambda: PathPlotPopUp(config_path=self.config_path))
         path_visualization_btn.grid(row=3, column=0, sticky=NW)
-        distance_visualization_btn = Button(visualization_frm, text="VISUALIZE DISTANCES", fg="red", command=lambda: DistancePlotterPopUp(config_path=self.config_path))
+        distance_visualization_btn = Button(visualization_frm, text="VISUALIZE DISTANCES", fg="red", font=Formats.FONT_REGULAR.value, command=lambda: DistancePlotterPopUp(config_path=self.config_path))
         distance_visualization_btn.grid(row=4, column=0, sticky=NW)
-        heatmap_clf_visualization_btn = Button(visualization_frm, text="VISUALIZE CLASSIFICATION HEATMAPS", fg="pink", command=lambda: HeatmapClfPopUp(config_path=self.config_path))
+        heatmap_clf_visualization_btn = Button(visualization_frm, text="VISUALIZE CLASSIFICATION HEATMAPS", fg="pink", font=Formats.FONT_REGULAR.value, command=lambda: HeatmapClfPopUp(config_path=self.config_path))
         heatmap_clf_visualization_btn.grid(row=5, column=0, sticky=NW)
-        data_plot_visualization_btn = Button(visualization_frm, text="VISUALIZE DATA PLOTS", fg="purple", command=lambda: DataPlotterPopUp(config_path=self.config_path))
+        data_plot_visualization_btn = Button(visualization_frm, text="VISUALIZE DATA PLOTS", fg="purple", font=Formats.FONT_REGULAR.value,command=lambda: DataPlotterPopUp(config_path=self.config_path))
         data_plot_visualization_btn.grid(row=6, column=0, sticky=NW)
-        clf_validation_btn = Button(visualization_frm, text="CLASSIFIER VALIDATION CLIPS", fg="blue", command=lambda: ClassifierValidationPopUp(config_path=self.config_path))
+        clf_validation_btn = Button(visualization_frm, text="CLASSIFIER VALIDATION CLIPS", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ClassifierValidationPopUp(config_path=self.config_path))
         clf_validation_btn.grid(row=7, column=0, sticky=NW)
         merge_frm = CreateLabelFrameWithIcon(parent=tab10, header="MERGE FRAMES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CONCAT_VIDEOS.value)
-        merge_frm_btn = Button(merge_frm, text="MERGE FRAMES", fg="black", command=lambda: ConcatenatorPopUp(config_path=self.config_path))
+        merge_frm_btn = Button(merge_frm, text="MERGE FRAMES", fg="black", font=Formats.FONT_REGULAR.value, command=lambda: ConcatenatorPopUp(config_path=self.config_path))
         plotlyInterface = CreateLabelFrameWithIcon(parent=tab10, header="PLOTLY / DASH", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.PLOTLY.value)
         plotlyInterfaceTitles = ["Sklearn results", "Time bin analyses", "Probabilities", "Severity analysis"]
         toIncludeVar = []
@@ -1004,14 +456,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_save_plotly_file = Button(plotlyInterface, text="Save SimBA / Plotly dataset", command=lambda: self.generateSimBPlotlyFile(toIncludeVar))
         self.plotly_file = FileSelect( plotlyInterface, "SimBA Dashboard file (H5)", title="Select SimBA/Plotly dataset (h5)")
         self.groups_file = FileSelect(plotlyInterface, "SimBA Groups file (CSV)", title="Select groups file (csv)")
-        button_open_plotly_interface = Button(plotlyInterface, text="Open SimBA / Plotly dataset", fg="black", command=lambda: [self.open_plotly_interface("http://127.0.0.1:8050")])
+        button_open_plotly_interface = Button(plotlyInterface, text="Open SimBA / Plotly dataset", font=Formats.FONT_REGULAR.value, fg="black", command=lambda: [self.open_plotly_interface("http://127.0.0.1:8050")])
 
         # addons
-        lbl_addon = LabelFrame(tab11, text="SimBA Expansions", pady=5, padx=5, font=Formats.LABELFRAME_HEADER_FORMAT.value, fg="black")
-        button_bel = Button(lbl_addon, text="Pup retrieval - Analysis Protocol 1", fg="blue", command=lambda: PupRetrievalPopUp(config_path=self.config_path))
+        lbl_addon = LabelFrame(tab11, text="SimBA Expansions", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
+        button_bel = Button(lbl_addon, text="Pup retrieval - Analysis Protocol 1", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: PupRetrievalPopUp(config_path=self.config_path))
 
-        cue_light_analyser_btn = Button(lbl_addon, text="Cue light analysis", fg="red", command=lambda: CueLightAnalyzerMenu(config_path=self.config_path))
-        anchored_roi_analysis_btn = Button(lbl_addon, text="Animal-anchored ROI analysis", fg="orange", command=lambda: BoundaryMenus(config_path=self.config_path))
+        cue_light_analyser_btn = Button(lbl_addon, text="Cue light analysis", fg="red", font=Formats.FONT_REGULAR.value, command=lambda: CueLightAnalyzerMenu(config_path=self.config_path))
+        anchored_roi_analysis_btn = Button(lbl_addon, text="Animal-anchored ROI analysis", font=Formats.FONT_REGULAR.value, fg="orange", command=lambda: BoundaryMenus(config_path=self.config_path))
 
 
         ImportVideosFrame(parent_frm=import_frm, config_path=config_path, idx_row=0, idx_column=0)
@@ -1132,7 +584,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         if UNSUPERVISED_INTERFACE:
             from simba.unsupervised.unsupervised_main import UnsupervisedGUI
-            unsupervised_btn = Button(lbl_addon, text="Unsupervised analysis", fg="purple", command=lambda: UnsupervisedGUI(config_path=self.config_path))
+            unsupervised_btn = Button(lbl_addon, text="Unsupervised analysis", fg="purple", font=Formats.FONT_REGULAR.value, command=lambda: UnsupervisedGUI(config_path=self.config_path))
             unsupervised_btn.grid(row=3, sticky=NW)
 
     def create_video_info_table(self):
@@ -1140,17 +592,11 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         video_info_tabler.create_window()
 
     def initiate_skip_outlier_correction(self):
-        outlier_correction_skipper = OutlierCorrectionSkipper(
-            config_path=self.config_path
-        )
+        outlier_correction_skipper = OutlierCorrectionSkipper(config_path=self.config_path)
         outlier_correction_skipper.run()
 
     def validate_model_first_step(self):
-        _ = InferenceValidation(
-            config_path=self.config_path,
-            input_file_path=self.csvfile.file_path,
-            clf_path=self.modelfile.file_path,
-        )
+        _ = InferenceValidation(config_path=self.config_path, input_file_path=self.csvfile.file_path, clf_path=self.modelfile.file_path)
 
     def train_single_model(self, config_path=None):
         model_trainer = TrainRandomForestClassifier(config_path=config_path)
@@ -1163,38 +609,28 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
     def importBoris(self):
         ann_folder = askdirectory()
-        boris_appender = BorisAppender(
-            config_path=self.config_path, data_dir=ann_folder
-        )
+        boris_appender = BorisAppender(config_path=self.config_path, data_dir=ann_folder)
         boris_appender.create_boris_master_file()
         threading.Thread(target=boris_appender.run).start()
 
     def importSolomon(self):
         ann_folder = askdirectory()
-        solomon_importer = SolomonImporter(
-            config_path=self.config_path, data_dir=ann_folder
-        )
+        solomon_importer = SolomonImporter(config_path=self.config_path, data_dir=ann_folder)
         threading.Thread(target=solomon_importer.run).start()
 
     def import_ethovision(self):
         ann_folder = askdirectory()
-        ethovision_importer = ImportEthovision(
-            config_path=self.config_path, data_dir=ann_folder
-        )
+        ethovision_importer = ImportEthovision(config_path=self.config_path, data_dir=ann_folder)
         threading.Thread(target=ethovision_importer.run).start()
 
     def import_deepethogram(self):
         ann_folder = askdirectory()
-        deepethogram_importer = DeepEthogramImporter(
-            config_path=self.config_path, data_dir=ann_folder
-        )
+        deepethogram_importer = DeepEthogramImporter(config_path=self.config_path, data_dir=ann_folder)
         threading.Thread(target=deepethogram_importer.run).start()
 
     def import_noldus_observer(self):
         directory = askdirectory()
-        noldus_observer_importer = NoldusObserverImporter(
-            config_path=self.config_path, data_dir=directory
-        )
+        noldus_observer_importer = NoldusObserverImporter(config_path=self.config_path, data_dir=directory)
         threading.Thread(target=noldus_observer_importer.run).start()
 
     def importMARS(self):
@@ -1225,11 +661,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.path_plot_animal_bp_frm.grid(row=2, column=0, sticky=NW)
 
     def launch_interactive_plot(self):
-        interactive_grapher = InteractiveProbabilityGrapher(
-            config_path=self.config_path,
-            file_path=self.csvfile.file_path,
-            model_path=self.modelfile.file_path,
-        )
+        interactive_grapher = InteractiveProbabilityGrapher(config_path=self.config_path,file_path=self.csvfile.file_path,model_path=self.modelfile.file_path)
         interactive_grapher.run()
 
     def generateSimBPlotlyFile(self, var):
@@ -1288,61 +720,33 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
     def run_feature_extraction(self):
         print("Running feature extraction...")
-        print(
-            f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts..."
-        )
+        print(f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts...")
         feature_extractor_classes = get_bp_config_code_class_pairs()
         if self.user_defined_var.get():
-            custom_feature_extractor = CustomFeatureExtractor(
-                extractor_file_path=self.scriptfile.file_path,
-                config_path=self.config_path,
-            )
+            custom_feature_extractor = CustomFeatureExtractor(extractor_file_path=self.scriptfile.file_path,config_path=self.config_path)
             custom_feature_extractor.run()
-            stdout_success(
-                msg="Custom feature extraction complete!",
-                source=self.__class__.__name__,
-            )
+            stdout_success(msg="Custom feature extraction complete!",source=self.__class__.__name__)
         else:
             if self.pose_setting not in feature_extractor_classes.keys():
-                raise InvalidInputError(
-                    msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}. Check the pose-estimation setting in the project_config.ini",
-                    source=self.__class__.__name__,
-                )
+                raise InvalidInputError(msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}. Check the pose-estimation setting in the project_config.ini", source=self.__class__.__name__)
             if self.pose_setting == "8":
-                feature_extractor = feature_extractor_classes[self.pose_setting][
-                    self.animal_cnt
-                ](config_path=self.config_path)
+                feature_extractor = feature_extractor_classes[self.pose_setting][self.animal_cnt](config_path=self.config_path)
             else:
-                feature_extractor = feature_extractor_classes[self.pose_setting](
-                    config_path=self.config_path
-                )
+                feature_extractor = feature_extractor_classes[self.pose_setting](config_path=self.config_path)
             feature_extractor.run()
 
     def set_distance_mm(self):
-        check_int(
-            name="DISTANCE IN MILLIMETER",
-            value=self.distance_in_mm_eb.entry_get,
-            min_value=1,
-        )
-        self.config.set(
-            "Frame settings", "distance_mm", self.distance_in_mm_eb.entry_get
-        )
+        check_int(name="DISTANCE IN MILLIMETER",value=self.distance_in_mm_eb.entry_get,min_value=1)
+        self.config.set("Frame settings", "distance_mm", self.distance_in_mm_eb.entry_get)
         with open(self.config_path, "w") as f:
             self.config.write(f)
 
     def correct_outlier(self):
-        outlier_correcter_movement = OutlierCorrecterMovement(
-            config_path=self.config_path
-        )
+        outlier_correcter_movement = OutlierCorrecterMovement(config_path=self.config_path)
         outlier_correcter_movement.run()
-        outlier_correcter_location = OutlierCorrecterLocation(
-            config_path=self.config_path
-        )
+        outlier_correcter_location = OutlierCorrecterLocation(config_path=self.config_path)
         outlier_correcter_location.run()
-        stdout_success(
-            msg='Outlier corrected files located in "project_folder/csv/outlier_corrected_movement_location" directory',
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg='Outlier corrected files located in "project_folder/csv/outlier_corrected_movement_location" directory',source=self.__class__.__name__)
 
     def callback(self, url):
         webbrowser.open_new(url)
@@ -1355,9 +759,6 @@ class App(object):
         icon_path_windows = os.path.join(os.path.dirname(__file__), Paths.LOGO_ICON_WINDOWS_PATH.value)
         icon_path_darwin = os.path.join(os.path.dirname(__file__), Paths.LOGO_ICON_DARWIN_PATH.value)
         self.menu_icons = get_icons_paths()
-        self.poppins_header = ('Poppins Regular', 14, "bold")
-        self.poppins_regular = ('Poppins Regular', 12)
-        load_simba_fonts()
         self.root = Tk()
         self.root.title("SimBA")
         self.root.minsize(750, 750)
@@ -1365,8 +766,10 @@ class App(object):
         self.root.rowconfigure(0, weight=1)
         self.root.columnconfigure(0, weight=1)
         if currentPlatform == OS.WINDOWS.value:
+            load_simba_fonts()
             self.root.iconbitmap(icon_path_windows)
         if currentPlatform == OS.MAC.value:
+            load_simba_fonts()
             self.root.iconphoto(False, ImageTk.PhotoImage(PIL.Image.open(icon_path_darwin)))
         for k in self.menu_icons.keys():
             self.menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.menu_icons[k]["icon_path"])))
@@ -1377,162 +780,160 @@ class App(object):
 
         menu = Menu(self.root)
         self.root.config(menu=menu)
-
         file_menu = Menu(menu)
         menu.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="Create a new project", compound="left", image=self.menu_icons["create"]["img"], command=lambda: ProjectCreatorPopUp(), font=self.poppins_regular)
-        file_menu.add_command(label="Load project", compound="left", image=self.menu_icons["load"]["img"], command=lambda: LoadProjectPopUp(), font=self.poppins_regular)
+        file_menu.add_command(label="Create a new project", compound="left", image=self.menu_icons["create"]["img"], command=lambda: ProjectCreatorPopUp(), font=Formats.FONT_REGULAR.value)
+        file_menu.add_command(label="Load project", compound="left", image=self.menu_icons["load"]["img"], command=lambda: LoadProjectPopUp(), font=Formats.FONT_REGULAR.value)
         file_menu.add_separator()
-        file_menu.add_command(label="Restart", compound="left", image=self.menu_icons["restart"]["img"], command=lambda: self.restart(), font=self.poppins_regular)
+        file_menu.add_command(label="Restart", compound="left", image=self.menu_icons["restart"]["img"], command=lambda: self.restart(), font=Formats.FONT_REGULAR.value)
         file_menu.add_separator()
-        file_menu.add_command(label="Exit", compound="left", image=self.menu_icons["exit"]["img"], command=self.root.destroy, font=self.poppins_regular)
+        file_menu.add_command(label="Exit", compound="left", image=self.menu_icons["exit"]["img"], command=self.root.destroy, font=Formats.FONT_REGULAR.value)
 
         batch_process_menu = Menu(menu)
         menu.add_cascade(label="Process Videos", menu=batch_process_menu)
-        batch_process_menu.add_command(label="Batch pre-process videos", compound="left", image=self.menu_icons["factory"]["img"], command=lambda: BatchPreProcessPopUp(), font=self.poppins_regular)
+        batch_process_menu.add_command(label="Batch pre-process videos", compound="left", image=self.menu_icons["factory"]["img"], command=lambda: BatchPreProcessPopUp(), font=Formats.FONT_REGULAR.value)
 
         video_process_menu = Menu(menu)
         fps_menu = Menu(video_process_menu)
-        fps_menu.add_command(label="Change FPS for single video", command=ChangeFpsSingleVideoPopUp, font=self.poppins_regular)
-        fps_menu.add_command(label="Change FPS for multiple videos", command=ChangeFpsMultipleVideosPopUp, font=self.poppins_regular)
-        fps_menu.add_command(label="Up-sample fps with interpolation", command=UpsampleVideosPopUp, font=self.poppins_regular)
+        fps_menu.add_command(label="Change FPS for single video", command=ChangeFpsSingleVideoPopUp, font=Formats.FONT_REGULAR.value)
+        fps_menu.add_command(label="Change FPS for multiple videos", command=ChangeFpsMultipleVideosPopUp, font=Formats.FONT_REGULAR.value)
+        fps_menu.add_command(label="Up-sample fps with interpolation", command=UpsampleVideosPopUp, font=Formats.FONT_REGULAR.value)
 
         menu.add_cascade(label="Tools", menu=video_process_menu)
-        video_process_menu.add_cascade(label="Change FPS...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Change FPS...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu, font=Formats.FONT_REGULAR.value)
 
         clip_video_menu = Menu(menu)
-        clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp, font=self.poppins_regular)
-        clip_video_menu.add_command(label="Clip multiple videos", command=InitiateClipMultipleVideosByTimestampsPopUp, font=self.poppins_regular)
+        clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp, font=Formats.FONT_REGULAR.value)
+        clip_video_menu.add_command(label="Clip multiple videos", command=InitiateClipMultipleVideosByTimestampsPopUp, font=Formats.FONT_REGULAR.value)
 
-        clip_video_menu.add_command(label="Clip video into multiple videos", command=MultiShortenPopUp, font=self.poppins_regular)
-        clip_video_menu.add_command(label="Clip single video by frame numbers", command=ClipSingleVideoByFrameNumbers, font=self.poppins_regular)
-        clip_video_menu.add_command(label="Clip multiple videos by frame numbers", command=InitiateClipMultipleVideosByFrameNumbersPopUp, font=self.poppins_regular)
+        clip_video_menu.add_command(label="Clip video into multiple videos", command=MultiShortenPopUp, font=Formats.FONT_REGULAR.value)
+        clip_video_menu.add_command(label="Clip single video by frame numbers", command=ClipSingleVideoByFrameNumbers, font=Formats.FONT_REGULAR.value)
+        clip_video_menu.add_command(label="Clip multiple videos by frame numbers", command=InitiateClipMultipleVideosByFrameNumbersPopUp, font=Formats.FONT_REGULAR.value)
 
-        video_process_menu.add_cascade(label="Clip videos...", compound="left", image=self.menu_icons["clip"]["img"], menu=clip_video_menu, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Clip videos...", compound="left", image=self.menu_icons["clip"]["img"], menu=clip_video_menu, font=Formats.FONT_REGULAR.value)
 
         crop_video_menu = Menu(menu)
-        crop_video_menu.add_command(label="Crop videos", compound="left", image=self.menu_icons["crop"]["img"], command=CropVideoPopUp, font=self.poppins_regular)
-        crop_video_menu.add_command(label="Crop videos (circles)", compound="left", image=self.menu_icons["circle"]["img"], command=CropVideoCirclesPopUp, font=self.poppins_regular)
-        crop_video_menu.add_command(label="Crop videos (polygons)", compound="left", image=self.menu_icons["polygon"]["img"], command=CropVideoPolygonsPopUp, font=self.poppins_regular)
-        crop_video_menu.add_command(label="Multi-crop", compound="left", image=self.menu_icons["crop"]["img"], command=MultiCropPopUp, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Crop videos...", compound="left", image=self.menu_icons["crop"]["img"], menu=crop_video_menu, font=self.poppins_regular)
+        crop_video_menu.add_command(label="Crop videos", compound="left", image=self.menu_icons["crop"]["img"], command=CropVideoPopUp, font=Formats.FONT_REGULAR.value)
+        crop_video_menu.add_command(label="Crop videos (circles)", compound="left", image=self.menu_icons["circle"]["img"], command=CropVideoCirclesPopUp, font=Formats.FONT_REGULAR.value)
+        crop_video_menu.add_command(label="Crop videos (polygons)", compound="left", image=self.menu_icons["polygon"]["img"], command=CropVideoPolygonsPopUp, font=Formats.FONT_REGULAR.value)
+        crop_video_menu.add_command(label="Multi-crop", compound="left", image=self.menu_icons["crop"]["img"], command=MultiCropPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Crop videos...", compound="left", image=self.menu_icons["crop"]["img"], menu=crop_video_menu, font=Formats.FONT_REGULAR.value)
 
         format_menu = Menu(video_process_menu)
         img_format_menu = Menu(format_menu)
         video_format_menu = Menu(format_menu)
 
-        img_format_menu.add_command(label="Convert images to PNG", command=Convert2PNGPopUp, font=self.poppins_regular)
-        img_format_menu.add_command(label="Convert images  to JPEG", command=Convert2jpegPopUp, font=self.poppins_regular)
-        img_format_menu.add_command(label="Convert images to BMP", command=Convert2bmpPopUp, font=self.poppins_regular)
-        img_format_menu.add_command(label="Convert images  to TIFF", command=Convert2TIFFPopUp, font=self.poppins_regular)
-        img_format_menu.add_command(label="Convert images  to WEBP", command=Convert2WEBPPopUp, font=self.poppins_regular)
-        video_format_menu.add_command(label="Convert videos to MP4", command=Convert2MP4PopUp, font=self.poppins_regular)
-        video_format_menu.add_command(label="Convert videos to AVI", command=Convert2AVIPopUp, font=self.poppins_regular)
-        video_format_menu.add_command(label="Convert videos to WEBM", command=Convert2WEBMPopUp, font=self.poppins_regular)
-        video_format_menu.add_command(label="Convert videos to MOV", command=Convert2MOVPopUp, font=self.poppins_regular)
-        format_menu.add_cascade(label="Convert image file formats...", compound="left", menu=img_format_menu, font=self.poppins_regular)
-        format_menu.add_cascade(label="Change video file formats...", compound="left", menu=video_format_menu, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Convert file formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu, font=self.poppins_regular)
+        img_format_menu.add_command(label="Convert images to PNG", command=Convert2PNGPopUp, font=Formats.FONT_REGULAR.value)
+        img_format_menu.add_command(label="Convert images  to JPEG", command=Convert2jpegPopUp, font=Formats.FONT_REGULAR.value)
+        img_format_menu.add_command(label="Convert images to BMP", command=Convert2bmpPopUp, font=Formats.FONT_REGULAR.value)
+        img_format_menu.add_command(label="Convert images  to TIFF", command=Convert2TIFFPopUp, font=Formats.FONT_REGULAR.value)
+        img_format_menu.add_command(label="Convert images  to WEBP", command=Convert2WEBPPopUp, font=Formats.FONT_REGULAR.value)
+        video_format_menu.add_command(label="Convert videos to MP4", command=Convert2MP4PopUp, font=Formats.FONT_REGULAR.value)
+        video_format_menu.add_command(label="Convert videos to AVI", command=Convert2AVIPopUp, font=Formats.FONT_REGULAR.value)
+        video_format_menu.add_command(label="Convert videos to WEBM", command=Convert2WEBMPopUp, font=Formats.FONT_REGULAR.value)
+        video_format_menu.add_command(label="Convert videos to MOV", command=Convert2MOVPopUp, font=Formats.FONT_REGULAR.value)
+        format_menu.add_cascade(label="Convert image file formats...", compound="left", menu=img_format_menu, font=Formats.FONT_REGULAR.value)
+        format_menu.add_cascade(label="Change video file formats...", compound="left", menu=video_format_menu, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Convert file formats...", compound="left", image=self.menu_icons["convert"]["img"], menu=format_menu, font=Formats.FONT_REGULAR.value)
 
         rm_clr_menu = Menu(video_process_menu)
-        rm_clr_menu.add_command(label="Convert to grayscale", compound="left", image=self.menu_icons["greyscale"]["img"], command=lambda: GreyscaleSingleVideoPopUp(), font=self.poppins_regular)
-        rm_clr_menu.add_command(label="Convert to black and white", compound="left", image=self.menu_icons["bw"]["img"],  command=Convert2BlackWhitePopUp, font=self.poppins_regular)
-        rm_clr_menu.add_command(label="CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=CLAHEPopUp, font=self.poppins_regular)
-        rm_clr_menu.add_command(label="Interactively CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=InteractiveClahePopUp, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Remove color from videos...", compound="left", image=self.menu_icons["clahe"]["img"], menu=rm_clr_menu, font=self.poppins_regular)
+        rm_clr_menu.add_command(label="Convert to grayscale", compound="left", image=self.menu_icons["greyscale"]["img"], command=lambda: GreyscaleSingleVideoPopUp(), font=Formats.FONT_REGULAR.value)
+        rm_clr_menu.add_command(label="Convert to black and white", compound="left", image=self.menu_icons["bw"]["img"], command=Convert2BlackWhitePopUp, font=Formats.FONT_REGULAR.value)
+        rm_clr_menu.add_command(label="CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=CLAHEPopUp, font=Formats.FONT_REGULAR.value)
+        rm_clr_menu.add_command(label="Interactively CLAHE enhance videos", compound="left", image=self.menu_icons["clahe"]["img"], command=InteractiveClahePopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Remove color from videos...", compound="left", image=self.menu_icons["clahe"]["img"], menu=rm_clr_menu, font=Formats.FONT_REGULAR.value)
 
         concatenate_menu = Menu(video_process_menu)
-        concatenate_menu.add_command(label="Concatenate two videos", compound="left", image=self.menu_icons["concat"]["img"], command=ConcatenatingVideosPopUp, font=self.poppins_regular)
-        concatenate_menu.add_command(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat_videos"]["img"], command=lambda: ConcatenatorPopUp(config_path=None), font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Concatenate (stack) videos...", compound="left", image=self.menu_icons["concat"]["img"], menu=concatenate_menu, font=self.poppins_regular)
-        video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp(), font=self.poppins_regular)
+        concatenate_menu.add_command(label="Concatenate two videos", compound="left", image=self.menu_icons["concat"]["img"], command=ConcatenatingVideosPopUp, font=Formats.FONT_REGULAR.value)
+        concatenate_menu.add_command(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat_videos"]["img"], command=lambda: ConcatenatorPopUp(config_path=None), font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Concatenate (stack) videos...", compound="left", image=self.menu_icons["concat"]["img"], menu=concatenate_menu, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp(), font=Formats.FONT_REGULAR.value)
         convert_data_menu = Menu(video_process_menu)
-        convert_data_menu.add_command(label="Convert CSV to parquet", command=Csv2ParquetPopUp, font=self.poppins_regular)
-        convert_data_menu.add_command(label="Convert parquet o CSV", command=Parquet2CsvPopUp, font=self.poppins_regular)
+        convert_data_menu.add_command(label="Convert CSV to parquet", command=Csv2ParquetPopUp, font=Formats.FONT_REGULAR.value)
+        convert_data_menu.add_command(label="Convert parquet o CSV", command=Parquet2CsvPopUp, font=Formats.FONT_REGULAR.value)
 
-        video_process_menu.add_cascade(label="Convert working file type...", compound="left", image=self.menu_icons["change"]["img"], menu=convert_data_menu, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Convert working file type...", compound="left", image=self.menu_icons["change"]["img"], menu=convert_data_menu, font=Formats.FONT_REGULAR.value)
 
-        video_process_menu.add_command(label="Create path plot", compound="left", image=self.menu_icons["path"]["img"], command=MakePathPlotPopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Create path plot", compound="left", image=self.menu_icons["path"]["img"], command=MakePathPlotPopUp, font=Formats.FONT_REGULAR.value)
 
         downsample_video_menu = Menu(video_process_menu)
-        downsample_video_menu.add_command(label="Down-sample single video", command=DownsampleSingleVideoPopUp, font=self.poppins_regular)
-        downsample_video_menu.add_command(label="Down-sample multiple videos", command=DownsampleMultipleVideosPopUp, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Down-sample video...", compound="left", image=self.menu_icons["sample"]["img"], menu=downsample_video_menu, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Drop body-parts from tracking data", compound="left", image=self.menu_icons["trash"]["img"], command=DropTrackingDataPopUp, font=self.poppins_regular)
-        extract_frames_menu = Menu(video_process_menu, font=self.poppins_regular)
-        extract_frames_menu.add_command(label="Extract defined frames", command=ExtractSpecificFramesPopUp, font=self.poppins_regular)
-        extract_frames_menu.add_command(label="Extract frames", command=ExtractAllFramesPopUp, font=self.poppins_regular)
-        extract_frames_menu.add_command(label="Extract frames from seq files", command=ExtractSEQFramesPopUp, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Extract frames...", compound="left", image=self.menu_icons["frames"]["img"], menu=extract_frames_menu, font=self.poppins_regular)
+        downsample_video_menu.add_command(label="Down-sample single video", command=DownsampleSingleVideoPopUp, font=Formats.FONT_REGULAR.value)
+        downsample_video_menu.add_command(label="Down-sample multiple videos", command=DownsampleMultipleVideosPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Down-sample video...", compound="left", image=self.menu_icons["sample"]["img"], menu=downsample_video_menu, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Drop body-parts from tracking data", compound="left", image=self.menu_icons["trash"]["img"], command=DropTrackingDataPopUp, font=Formats.FONT_REGULAR.value)
+        extract_frames_menu = Menu(video_process_menu, font=Formats.FONT_REGULAR.value)
+        extract_frames_menu.add_command(label="Extract defined frames", command=ExtractSpecificFramesPopUp, font=Formats.FONT_REGULAR.value)
+        extract_frames_menu.add_command(label="Extract frames", command=ExtractAllFramesPopUp, font=Formats.FONT_REGULAR.value)
+        extract_frames_menu.add_command(label="Extract frames from seq files", command=ExtractSEQFramesPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Extract frames...", compound="left", image=self.menu_icons["frames"]["img"], menu=extract_frames_menu, font=Formats.FONT_REGULAR.value)
 
-        video_process_menu.add_command(label="Create GIFs", compound="left", image=self.menu_icons["gif"]["img"], command=CreateGIFPopUP, font=self.poppins_regular)
+        video_process_menu.add_command(label="Create GIFs", compound="left", image=self.menu_icons["gif"]["img"], command=CreateGIFPopUP, font=Formats.FONT_REGULAR.value)
 
-        video_process_menu.add_command(label="Get metric conversion factor (pixels/millimeter)", compound="left", image=self.menu_icons["calipher"]["img"], command=CalculatePixelsPerMMInVideoPopUp, font=self.poppins_regular)
-        video_process_menu.add_command(label="Change video brightness / contrast", compound="left", image=self.menu_icons["brightness"]["img"], command=BrightnessContrastPopUp, font=self.poppins_regular)
-        video_process_menu.add_command(label="Merge frames to video", compound="left", image=self.menu_icons["merge"]["img"], command=MergeFrames2VideoPopUp, font=self.poppins_regular)
-        video_process_menu.add_command(label="Print classifier info...", compound="left", image=self.menu_icons["print"]["img"], command=PrintModelInfoPopUp, font=self.poppins_regular)
+        video_process_menu.add_command(label="Get metric conversion factor (pixels/millimeter)", compound="left", image=self.menu_icons["calipher"]["img"], command=CalculatePixelsPerMMInVideoPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Change video brightness / contrast", compound="left", image=self.menu_icons["brightness"]["img"], command=BrightnessContrastPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Merge frames to video", compound="left", image=self.menu_icons["merge"]["img"], command=MergeFrames2VideoPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Print classifier info...", compound="left", image=self.menu_icons["print"]["img"], command=PrintModelInfoPopUp, font=Formats.FONT_REGULAR.value)
 
-        video_process_menu.add_cascade(label="Reorganize Tracking Data", compound="left", image=self.menu_icons["reorganize"]["img"], command=PoseReorganizerPopUp, font=self.poppins_regular)
+        video_process_menu.add_cascade(label="Reorganize Tracking Data", compound="left", image=self.menu_icons["reorganize"]["img"], command=PoseReorganizerPopUp, font=Formats.FONT_REGULAR.value)
 
         rotate_menu = Menu(menu)
-        rotate_menu.add_command(label="Rotate videos", command=RotateVideoSetDegreesPopUp, font=self.poppins_regular)
-        rotate_menu.add_command(label="Interactively rotate videos", command=VideoRotatorPopUp, font=self.poppins_regular)
-        rotate_menu.add_command(label="Flip videos", command=FlipVideosPopUp, font=self.poppins_regular)
-        rotate_menu.add_command(label="Reverse videos", command=ReverseVideoPopUp, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Rotate / flip / reverse videos...", compound="left", image=self.menu_icons["rotate"]["img"], menu=rotate_menu, font=self.poppins_regular)
+        rotate_menu.add_command(label="Rotate videos", command=RotateVideoSetDegreesPopUp, font=Formats.FONT_REGULAR.value)
+        rotate_menu.add_command(label="Interactively rotate videos", command=VideoRotatorPopUp, font=Formats.FONT_REGULAR.value)
+        rotate_menu.add_command(label="Flip videos", command=FlipVideosPopUp, font=Formats.FONT_REGULAR.value)
+        rotate_menu.add_command(label="Reverse videos", command=ReverseVideoPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Rotate / flip / reverse videos...", compound="left", image=self.menu_icons["rotate"]["img"], menu=rotate_menu, font=Formats.FONT_REGULAR.value)
 
         superimpose_menu = Menu(menu)
-        superimpose_menu.add_command(label="Superimpose frame numbers", command=SuperImposeFrameCountPopUp, font=self.poppins_regular)
-        superimpose_menu.add_command(label="Superimpose watermark", command=SuperimposeWatermarkPopUp, font=self.poppins_regular)
-        superimpose_menu.add_command(label="Superimpose timer", command=SuperimposeTimerPopUp, font=self.poppins_regular)
-        superimpose_menu.add_command(label="Superimpose progress-bar", command=SuperimposeProgressBarPopUp, font=self.poppins_regular)
-        superimpose_menu.add_command(label="Superimpose video on video", command=SuperimposeVideoPopUp, font=self.poppins_regular)
-        superimpose_menu.add_command(label="Superimpose video names", command=SuperimposeVideoNamesPopUp, font=self.poppins_regular)
-        superimpose_menu.add_command(label="Superimpose free-text", command=SuperimposeTextPopUp, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu, font=self.poppins_regular)
+        superimpose_menu.add_command(label="Superimpose frame numbers", command=SuperImposeFrameCountPopUp, font=Formats.FONT_REGULAR.value)
+        superimpose_menu.add_command(label="Superimpose watermark", command=SuperimposeWatermarkPopUp, font=Formats.FONT_REGULAR.value)
+        superimpose_menu.add_command(label="Superimpose timer", command=SuperimposeTimerPopUp, font=Formats.FONT_REGULAR.value)
+        superimpose_menu.add_command(label="Superimpose progress-bar", command=SuperimposeProgressBarPopUp, font=Formats.FONT_REGULAR.value)
+        superimpose_menu.add_command(label="Superimpose video on video", command=SuperimposeVideoPopUp, font=Formats.FONT_REGULAR.value)
+        superimpose_menu.add_command(label="Superimpose video names", command=SuperimposeVideoNamesPopUp, font=Formats.FONT_REGULAR.value)
+        superimpose_menu.add_command(label="Superimpose free-text", command=SuperimposeTextPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu, font=Formats.FONT_REGULAR.value)
 
         temporal_join_videos = Menu(menu)
-        temporal_join_videos.add_command(label="Temporal join all videos in directory", command=VideoTemporalJoinPopUp, font=self.poppins_regular)
-        temporal_join_videos.add_command(label="Temporal join selected videos", command=ManualTemporalJoinPopUp, font=self.poppins_regular)
-        video_process_menu.add_cascade(label="Temporal join videos...", compound="left", image=self.menu_icons["stopwatch"]["img"], menu=temporal_join_videos, font=self.poppins_regular)
-        video_process_menu.add_command(label="Box blur videos", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp, font=self.poppins_regular)
-        video_process_menu.add_command(label="Cross-fade videos", compound="left", image=self.menu_icons["crossfade"]["img"], command=CrossfadeVideosPopUp, font=self.poppins_regular)
-        video_process_menu.add_command(label="Create average frames from videos", compound="left", image=self.menu_icons["average"]["img"], command=CreateAverageFramePopUp, font=self.poppins_regular)
-        video_process_menu.add_command(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp, font=self.poppins_regular)
-        video_process_menu.add_command(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp, font=self.poppins_regular)
+        temporal_join_videos.add_command(label="Temporal join all videos in directory", command=VideoTemporalJoinPopUp, font=Formats.FONT_REGULAR.value)
+        temporal_join_videos.add_command(label="Temporal join selected videos", command=ManualTemporalJoinPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Temporal join videos...", compound="left", image=self.menu_icons["stopwatch"]["img"], menu=temporal_join_videos, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Box blur videos", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Cross-fade videos", compound="left", image=self.menu_icons["crossfade"]["img"], command=CrossfadeVideosPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Create average frames from videos", compound="left", image=self.menu_icons["average"]["img"], command=CreateAverageFramePopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp, font=Formats.FONT_REGULAR.value)
         help_menu = Menu(menu)
         menu.add_cascade(label="Help", menu=help_menu)
-
         links_menu = Menu(help_menu)
-        links_menu.add_command(label="Download weights", command=lambda: webbrowser.open_new(str(r"https://osf.io/sr3ck/")), font=self.poppins_regular)
-        links_menu.add_command(label="Download classifiers", command=lambda: webbrowser.open_new(str(r"https://osf.io/kwge8/")), font=self.poppins_regular)
-        links_menu.add_command(label="Ex. feature list", command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv")), font=self.poppins_regular)
-        links_menu.add_command(label="SimBA github", command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba")), font=self.poppins_regular)
-        links_menu.add_command(label="Gitter Chatroom", command=lambda: webbrowser.open_new(str(r"https://gitter.im/SimBA-Resource/community")), font=self.poppins_regular)
-        links_menu.add_command(label="Install FFmpeg", command=lambda: webbrowser.open_new(str(r"https://m.wikihow.com/Install-FFmpeg-on-Windows")), font=self.poppins_regular)
-        links_menu.add_command(label="Install graphviz",command=lambda: webbrowser.open_new(str(r"https://bobswift.atlassian.net/wiki/spaces/GVIZ/pages/20971549/How+to+install+Graphviz+software")), font=self.poppins_regular)
-        links_menu.add_command(label="SimBA API",command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/")), font=self.poppins_regular)
-        help_menu.add_cascade(label="Links", menu=links_menu, compound="left", image=self.menu_icons["link"]["img"], font=self.poppins_regular)
-        help_menu.add_command(label="About", compound="left", image=self.menu_icons["about"]["img"], command=AboutSimBAPopUp, font=self.poppins_regular)
+        links_menu.add_command(label="Download weights", command=lambda: webbrowser.open_new(str(r"https://osf.io/sr3ck/")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="Download classifiers", command=lambda: webbrowser.open_new(str(r"https://osf.io/kwge8/")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="Ex. feature list", command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="SimBA github", command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="Gitter Chatroom", command=lambda: webbrowser.open_new(str(r"https://gitter.im/SimBA-Resource/community")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="Install FFmpeg", command=lambda: webbrowser.open_new(str(r"https://m.wikihow.com/Install-FFmpeg-on-Windows")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="Install graphviz", command=lambda: webbrowser.open_new(str(r"https://bobswift.atlassian.net/wiki/spaces/GVIZ/pages/20971549/How+to+install+Graphviz+software")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="SimBA API", command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/")), font=Formats.FONT_REGULAR.value)
+        help_menu.add_cascade(label="Links", menu=links_menu, compound="left", image=self.menu_icons["link"]["img"], font=Formats.FONT_REGULAR.value)
+        help_menu.add_command(label="About", compound="left", image=self.menu_icons["about"]["img"], command=AboutSimBAPopUp, font=Formats.FONT_REGULAR.value)
 
         self.frame = Frame(background, bd=2, relief=SUNKEN, width=750, height=300)
         self.r_click_menu = Menu(self.root, tearoff=0)
-        self.r_click_menu.add_command(label="Copy selection", command=lambda: self.copy_selection_to_clipboard(), font=self.poppins_regular)
-        self.r_click_menu.add_command(label="Copy all", command=lambda: self.copy_all_to_clipboard(), font=self.poppins_regular)
-        self.r_click_menu.add_command(label="Paste", command=lambda: self.paste_to_txt(), font=self.poppins_regular)
+        self.r_click_menu.add_command(label="Copy selection", command=lambda: self.copy_selection_to_clipboard(), font=Formats.FONT_REGULAR.value)
+        self.r_click_menu.add_command(label="Copy all", command=lambda: self.copy_all_to_clipboard(), font=Formats.FONT_REGULAR.value)
+        self.r_click_menu.add_command(label="Paste", command=lambda: self.paste_to_txt(), font=Formats.FONT_REGULAR.value)
         self.r_click_menu.add_separator()
-        self.r_click_menu.add_command(label="Clear", command=lambda: self.clean_txt(), font=self.poppins_regular)
+        self.r_click_menu.add_command(label="Clear", command=lambda: self.clean_txt(), font=Formats.FONT_REGULAR.value)
         y_sb = Scrollbar(self.frame, orient=VERTICAL)
         self.frame.pack(expand=True)
         self.txt = Text(self.frame, bg="white", insertborderwidth=2, height=30, width=100, yscrollcommand=y_sb)
         if currentPlatform == OS.WINDOWS.value: self.txt.bind("<Button-3>", self.show_right_click_pop_up)
         elif currentPlatform == OS.MAC.value: self.txt.bind("<Button-2>", self.show_right_click_pop_up)
-        self.txt.tag_configure(TagNames.GREETING.value, justify="center", foreground="blue", font=("Rockwell", 16, "bold"))
-        self.txt.tag_configure(TagNames.ERROR.value, justify="left", foreground="red", font=Formats.POPPINS_FONT.value)
-        self.txt.tag_configure(TagNames.STANDARD.value, justify="left", foreground="black", font=Formats.POPPINS_FONT.value)
-        self.txt.tag_configure(TagNames.COMPLETE.value, justify="left", foreground="darkgreen", font=Formats.POPPINS_FONT.value)
-        self.txt.tag_configure(TagNames.WARNING.value, justify="left", foreground="darkorange", font=Formats.POPPINS_FONT.value)
-        self.txt.tag_configure("TABLE",foreground="darkorange", font=("Consolas", 10), wrap="none", borderwidth=0)
+        self.txt.tag_configure(TagNames.GREETING.value, justify="center", foreground="blue", font=Formats.FONT_LARGE.value)
+        self.txt.tag_configure(TagNames.ERROR.value, justify="left", foreground="red", font=Formats.FONT_REGULAR.value)
+        self.txt.tag_configure(TagNames.STANDARD.value, justify="left", foreground="black", font=Formats.FONT_REGULAR.value)
+        self.txt.tag_configure(TagNames.COMPLETE.value, justify="left", foreground="darkgreen", font=Formats.FONT_REGULAR.value)
+        self.txt.tag_configure(TagNames.WARNING.value, justify="left", foreground="darkorange", font=Formats.FONT_REGULAR.value)
+        self.txt.tag_configure("TABLE", foreground="darkorange", font=Formats.FONT_REGULAR.value, wrap="none", borderwidth=0)
         if PRINT_EMOJIS:
             self.txt.insert(INSERT, Defaults.WELCOME_MSG.value + emojis["relaxed"] + "\n" * 2)
         else:
@@ -1541,7 +942,7 @@ class App(object):
         y_sb.pack(side=RIGHT, fill=Y)
         self.txt.pack(expand=True, fill="both")
         y_sb.config(command=self.txt.yview)
-        self.txt.config(state=DISABLED, font=Formats.TKINTER_FONT.value)
+        self.txt.config(state=DISABLED, font=Formats.FONT_REGULAR.value)
 
         clear_txt_btn = Button(self.frame, text=" CLEAR", compound=LEFT, image=self.menu_icons["clean"]["img"], font=Formats.LABELFRAME_HEADER_FORMAT.value, command=lambda: self.clean_txt())
         clear_txt_btn.pack(side=BOTTOM, fill=X)

@@ -9,7 +9,7 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         FolderSelect)
 from simba.utils.checks import check_if_dir_exists
-from simba.utils.enums import Links
+from simba.utils.enums import Links, Formats
 from simba.utils.errors import InvalidInputError
 
 
@@ -42,16 +42,19 @@ class FeatureSubsetExtractorPopUp(PopUpMixin, ConfigReader):
         self.append_to_features_cb = Checkbutton(
             self.settings_frm,
             text="APPEND RESULTS TO FEATURES EXTRACTED FILES",
+            font=Formats.FONT_REGULAR.value,
             variable=self.append_to_features_extracted_var,
         )
         self.append_to_targets_inserted_cb = Checkbutton(
             self.settings_frm,
             text="APPEND RESULTS TO TARGET INSERTED FILES",
+            font=Formats.FONT_REGULAR.value,
             variable=self.append_to_targets_inserted_var,
         )
         self.include_file_checks_cb = Checkbutton(
             self.settings_frm,
             text="INCLUDE INTEGRITY CHECKS BEFORE APPENDING NEW DATA (RECOMMENDED)",
+            font=Formats.FONT_REGULAR.value,
             variable=self.include_file_checks,
         )
         self.settings_frm.grid(row=0, column=0, sticky=NW)

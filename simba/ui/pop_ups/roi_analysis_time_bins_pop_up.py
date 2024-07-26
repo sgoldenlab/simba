@@ -29,6 +29,7 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.animal_cnt_confirm_btn = Button(
             self.animal_cnt_frm,
             text="Confirm",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.create_settings_frm(),
         )
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
@@ -41,7 +42,7 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
             self.setting_frm.destroy()
             self.body_part_frm.destroy()
         self.setting_frm = LabelFrame(
-            self.main_frm, text="SETTINGS", font=Formats.LABELFRAME_HEADER_FORMAT.value
+            self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value
         )
         self.choose_bp_frm(parent=self.setting_frm, bp_options=self.body_parts_lst)
         self.choose_bp_threshold_frm(parent=self.setting_frm)
@@ -51,12 +52,13 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         calc_distances_frm = LabelFrame(
             self.main_frm,
             text="CALCULATE DISTANCES",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
         )
         self.distances_var = BooleanVar()
         self.distances_cb = Checkbutton(
             calc_distances_frm,
             text="Compute distances moved within ROIs in each time-bin",
+            font=Formats.FONT_REGULAR.value,
             variable=self.distances_var,
         )
 

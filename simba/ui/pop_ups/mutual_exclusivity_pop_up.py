@@ -43,31 +43,31 @@ class MutualExclusivityPupUp(PopUpMixin, ConfigReader):
         self.rule_definitions_frame = LabelFrame(
             self.main_frm,
             text="RULE DEFINITIONS",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
         )
         self.rule_definitions_frame.grid(row=1, column=0, sticky="NW")
-        Label(self.rule_definitions_frame, text="RULE #").grid(
+        Label(self.rule_definitions_frame, text="RULE #", font=Formats.FONT_REGULAR.value, ).grid(
             row=0, column=0, sticky=NW
         )
         for cnt, clf_name in enumerate(self.clf_names):
-            Label(self.rule_definitions_frame, text=clf_name).grid(
+            Label(self.rule_definitions_frame, text=clf_name, font=Formats.FONT_REGULAR.value, ).grid(
                 row=0, column=cnt + 1, sticky=NW
             )
-        Label(self.rule_definitions_frame, text="WINNER").grid(
+        Label(self.rule_definitions_frame, text="WINNER", font=Formats.FONT_REGULAR.value).grid(
             row=0, column=self.clf_cnt + 1, sticky=NW
         )
-        Label(self.rule_definitions_frame, text="THRESHOLD").grid(
+        Label(self.rule_definitions_frame, text="THRESHOLD", font=Formats.FONT_REGULAR.value).grid(
             row=0, column=self.clf_cnt + 2, sticky=NW
         )
-        Label(self.rule_definitions_frame, text="HIGHEST PROBABILITY").grid(
+        Label(self.rule_definitions_frame, text="HIGHEST PROBABILITY", font=Formats.FONT_REGULAR.value).grid(
             row=0, column=self.clf_cnt + 3, sticky=NW
         )
-        Label(self.rule_definitions_frame, text="TIE BREAK").grid(
+        Label(self.rule_definitions_frame, text="TIE BREAK", font=Formats.FONT_REGULAR.value).grid(
             row=0, column=self.clf_cnt + 4, sticky=NW
         )
-        Label(self.rule_definitions_frame, text="SKIP ON EQUAL").grid(
+        Label(self.rule_definitions_frame, text="SKIP ON EQUAL", font=Formats.FONT_REGULAR.value).grid(
             row=0, column=self.clf_cnt + 5, sticky=NW
         )
 
@@ -78,7 +78,7 @@ class MutualExclusivityPupUp(PopUpMixin, ConfigReader):
             Label(
                 self.rule_definitions_frame,
                 text=str(rule_cnt),
-                font=Formats.LABELFRAME_HEADER_FORMAT.value,
+                font=Formats.FONT_HEADER.value,
             ).grid(row=rule_cnt, column=0, sticky=NW)
             for clf_cnt, clf_name in enumerate(self.clf_names):
                 self.rules_dict[rule_cnt]["subordinates"][clf_name] = {}

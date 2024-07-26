@@ -13,6 +13,7 @@ from simba.utils.errors import NoFilesFoundError
 from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
                                     read_video_info)
+from simba.utils.enums import Formats
 
 
 class QuickLineplotPopup(PopUpMixin, ConfigReader):
@@ -32,7 +33,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         self.video_filepaths = {
             get_fn_ext(filepath=i)[1]: i for i in self.outlier_corrected_paths
         }
-        settings_frm = LabelFrame(self.main_frm, text="SETTINGS")
+        settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
         color_lst = list(get_color_dict().keys())
         self.video_dropdown = DropDownMenu(
             settings_frm, "VIDEO: ", list(self.video_filepaths.keys()), "18"
@@ -71,6 +72,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         Label(
             settings_frm,
             fg="green",
+            font=Formats.FONT_REGULAR.value,
             text=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab",
         ).grid(row=8, sticky=W)
         self.create_run_frm(run_function=self.run)

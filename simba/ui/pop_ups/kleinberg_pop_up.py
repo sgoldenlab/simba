@@ -7,7 +7,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, Entry_Box
 from simba.utils.checks import check_float, check_int
-from simba.utils.enums import Keys, Links
+from simba.utils.enums import Keys, Links, Formats
 from simba.utils.errors import NoChoosenClassifierError
 
 
@@ -35,20 +35,19 @@ class KleinbergPopUp(PopUpMixin, ConfigReader):
         self.h_search_lbl_val_cb = Checkbutton(
             kleinberg_settings_frm, variable=self.h_search_lbl_val
         )
-        kleinberg_table_frame = LabelFrame(
-            self.main_frm, text="Choose classifier(s) to apply Kleinberg smoothing"
-        )
+        kleinberg_table_frame = LabelFrame(self.main_frm, text="Choose classifier(s) to apply Kleinberg smoothing", font=Formats.FONT_HEADER.value)
         clf_var_dict, clf_cb_dict = {}, {}
         for clf_cnt, clf in enumerate(self.clf_names):
             clf_var_dict[clf] = BooleanVar()
             clf_cb_dict[clf] = Checkbutton(
-                kleinberg_table_frame, text=clf, variable=clf_var_dict[clf]
+                kleinberg_table_frame, text=clf, font=Formats.FONT_REGULAR.value, variable=clf_var_dict[clf]
             )
             clf_cb_dict[clf].grid(row=clf_cnt, sticky=NW)
 
         run_kleinberg_btn = Button(
             self.main_frm,
             text="Apply Kleinberg Smoother",
+            font=Formats.FONT_REGULAR.value,
             command=lambda: self.run_kleinberg(
                 behaviors_dict=clf_var_dict,
                 hierarchical_search=self.h_search_lbl_val.get(),

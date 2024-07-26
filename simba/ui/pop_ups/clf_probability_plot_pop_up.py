@@ -49,7 +49,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         self.line_width.entry_set(val=6)
         self.max_y_dropdown.setChoices(choice="auto")
 
-        self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.LABELFRAME_HEADER_FORMAT.value, pady=5, padx=5)
+        self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         self.probability_frames_var = BooleanVar()
         self.probability_videos_var = BooleanVar()
         self.probability_last_frm_var = BooleanVar()
@@ -57,12 +57,13 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
         self.clf_dropdown = DropDownMenu(self.settings_frm, "Classifier:", self.clf_names, "16")
         self.clf_dropdown.setChoices(self.clf_names[0])
-        probability_frames_cb = Checkbutton(self.settings_frm,text="Create frames",variable=self.probability_frames_var)
-        probability_videos_cb = Checkbutton(self.settings_frm,text="Create videos",variable=self.probability_videos_var,)
-        probability_last_frm_cb = Checkbutton(self.settings_frm,text="Create last frame",variable=self.probability_last_frm_var)
+        probability_frames_cb = Checkbutton(self.settings_frm,text="Create frames",variable=self.probability_frames_var, font=Formats.FONT_REGULAR.value)
+        probability_videos_cb = Checkbutton(self.settings_frm,text="Create videos",variable=self.probability_videos_var, font=Formats.FONT_REGULAR.value)
+        probability_last_frm_cb = Checkbutton(self.settings_frm,text="Create last frame",variable=self.probability_last_frm_var, font=Formats.FONT_REGULAR.value)
         probability_multiprocess_cb = Checkbutton(
             self.settings_frm,
             text="Multi-process (faster)",
+            font=Formats.FONT_REGULAR.value,
             variable=self.probability_multiprocess_var,
             command=lambda: self.enable_dropdown_from_checkbox(
                 check_box_var=self.probability_multiprocess_var,
@@ -70,34 +71,18 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
             ),
         )
 
-        self.multiprocess_dropdown = DropDownMenu(
-            self.settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12"
-        )
+        self.multiprocess_dropdown = DropDownMenu(self.settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(self.main_frm,text="RUN",font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5,padx=5,fg="black")
-        self.run_single_video_frm = LabelFrame(self.run_frm,text="SINGLE VIDEO",font=Formats.LABELFRAME_HEADER_FORMAT.value,pady=5,padx=5,fg="black")
-        self.run_single_video_btn = Button(self.run_single_video_frm,text="Create single video",fg="blue",command=lambda: self.__create_probability_plots(multiple_videos=False))
+        self.run_frm = LabelFrame(self.main_frm,text="RUN",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
+        self.run_single_video_frm = LabelFrame(self.run_frm,text="SINGLE VIDEO",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
+        self.run_single_video_btn = Button(self.run_single_video_frm, font=Formats.FONT_REGULAR.value, text="Create single video",fg="blue",command=lambda: self.__create_probability_plots(multiple_videos=False))
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm,"Video:",list(self.files_found_dict.keys()),"12")
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
 
-        self.run_multiple_videos = LabelFrame(
-            self.run_frm,
-            text="MULTIPLE VIDEO",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_multiple_video_btn = Button(
-            self.run_multiple_videos,
-            text="Create multiple videos ({} video(s) found)".format(
-                str(len(list(self.files_found_dict.keys())))
-            ),
-            fg="blue",
-            command=lambda: self.__create_probability_plots(multiple_videos=True),
-        )
+        self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
+        self.run_multiple_video_btn = Button(self.run_multiple_videos,text="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.__create_probability_plots(multiple_videos=True),)
 
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=0, sticky=NW)

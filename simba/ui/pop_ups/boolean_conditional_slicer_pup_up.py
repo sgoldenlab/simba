@@ -1,11 +1,9 @@
 from tkinter import *
 
-from simba.data_processors.boolean_conditional_calculator import \
-    BooleanConditionalCalculator
+from simba.data_processors.boolean_conditional_calculator import BooleanConditionalCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, Label, LabelFrame)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Label, LabelFrame)
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import CountError, DuplicationError
@@ -15,40 +13,19 @@ from simba.utils.read_write import read_df
 class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path)
-        PopUpMixin.__init__(
-            self, title="CONDITIONAL BOOLEAN AGGREGATE STATISTICS", size=(600, 400)
-        )
-        self.rule_cnt_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="CONDITIONAL RULES #",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.AGGREGATE_BOOL_STATS.value,
-        )
-        self.rule_cnt_dropdown = DropDownMenu(
-            self.rule_cnt_frm,
-            "# RULES:",
-            list(range(2, 21)),
-            "25",
-            com=self.create_rules_frames,
-        )
+        PopUpMixin.__init__(self, title="CONDITIONAL BOOLEAN AGGREGATE STATISTICS", size=(600, 400))
+        self.rule_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONDITIONAL RULES #", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.AGGREGATE_BOOL_STATS.value,)
+        self.rule_cnt_dropdown = DropDownMenu(self.rule_cnt_frm,"# RULES:",list(range(2, 21)),"25",com=self.create_rules_frames)
         self.rule_cnt_dropdown.setChoices(2)
         self.rule_cnt_frm.grid(row=0, column=0, sticky="NW")
         self.rule_cnt_dropdown.grid(row=0, column=0, sticky="NW")
 
         self.create_run_frm(run_function=self.run)
-        check_if_filepath_list_is_empty(
-            filepaths=self.feature_file_paths,
-            error_msg=f"No data found in {self.features_dir}",
-        )
-        data_df = read_df(
-            file_path=self.feature_file_paths[0], file_type=self.file_type
-        )
+        check_if_filepath_list_is_empty( filepaths=self.feature_file_paths, error_msg=f"No data found in {self.features_dir}")
+        data_df = read_df(file_path=self.feature_file_paths[0], file_type=self.file_type)
         self.bool_cols = data_df.columns[data_df.apply(self._is_bool)]
         if len(self.bool_cols) < 2:
-            raise CountError(
-                msg=f"The data file {self.feature_file_paths[0]} contains less than 2 boolean columns",
-                source=self.__class__.__name__,
-            )
+            raise CountError(msg=f"The data file {self.feature_file_paths[0]} contains less than 2 boolean columns",source=self.__class__.__name__)
         self.create_rules_frames(rules_cnt=2)
         self.main_frm.mainloop()
 

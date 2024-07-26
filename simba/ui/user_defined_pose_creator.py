@@ -12,7 +12,7 @@ import simba
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.data import create_color_palettes
-from simba.utils.enums import Paths
+from simba.utils.enums import Paths, TextOptions
 from simba.utils.errors import InvalidFileTypeError
 
 
@@ -35,48 +35,34 @@ class PoseConfigCreator(PlottingMixin):
     >>> pose_config_creator.launch()
     """
 
-    def __init__(
-        self,
-        pose_name: str,
-        no_animals: int,
-        img_path: Union[str, os.PathLike],
-        bp_list: List[str],
-        animal_id_int_list: List[str],
-    ):
+    def __init__(self,
+                 pose_name: str,
+                 no_animals: int,
+                 img_path: Union[str, os.PathLike],
+                 bp_list: List[str],
+                 animal_id_int_list: List[str]):
+
+
         PlottingMixin.__init__(self)
         self.pose_name, self.img_path = pose_name, img_path
         self.bp_list, self.animal_id_int_list = bp_list, animal_id_int_list
         check_file_exist_and_readable(img_path)
-        self.no_animals, self.font = no_animals, cv2.FONT_HERSHEY_SIMPLEX
+        self.no_animals, self.font = no_animals, cv2.FONT_HERSHEY_DUPLEX
         self.img = cv2.imread(img_path)
         if not isinstance(self.img, (list, tuple, np.ndarray)):
-            raise InvalidFileTypeError(
-                msg=f"The chosen image file could not be read as an image ({img_path})"
-            )
+            raise InvalidFileTypeError(msg=f"The chosen image file could not be read as an image ({img_path})")
         self.img_height, self.img_width = int(self.img.shape[0]), int(self.img.shape[1])
         if self.img_width < 300:
             self.img = imutils.resize(self.img, width=800)
-            self.img_height, self.img_width = int(self.img.shape[0]), int(
-                self.img.shape[1]
-            )
+            self.img_height, self.img_width = int(self.img.shape[0]), int(self.img.shape[1])
             self.img = np.uint8(self.img)
-        self.space_scale, self.radius_scale, self.res_scale, self.font_scale = (
-            60,
-            12,
-            1500,
-            1.5,
-        )
-        self.max_dim = max(self.img_width, self.img_height)
-        self.circle_scale = int(self.radius_scale / (self.res_scale / self.max_dim))
-        self.font_size = float(self.font_scale / (self.res_scale / self.max_dim))
-        self.spacing_scale = int(self.space_scale / (self.res_scale / self.max_dim))
+        self.circle_scale = self.get_optimal_circle_size(frame_size=(self.img_height, self.img_width), circle_frame_ratio=50)
+        self.font_size, self.x_scale, self.y_scale = self.get_optimal_font_scales(text='Left click on body part XXXXXXXXXX',accepted_px_width=self.img_width, accepted_px_height=int(self.img_height/10))
         cv2.namedWindow("Define pose", cv2.WINDOW_NORMAL)
         self.overlay = self.img.copy()
 
         if self.no_animals > 1:
-            for cnt, (bp_name, animal_number_id) in enumerate(
-                zip(self.bp_list, self.animal_id_int_list)
-            ):
+            for cnt, (bp_name, animal_number_id) in enumerate(zip(self.bp_list, self.animal_id_int_list)):
                 self.bp_list[cnt] = "{}_{}".format(bp_name, animal_number_id)
         self.color_lst = create_color_palettes(1, len(self.bp_list))[0]
 
@@ -97,7 +83,7 @@ class PoseConfigCreator(PlottingMixin):
                     cv2.FONT_HERSHEY_SIMPLEX,
                     self.font_size,
                     self.color_lst[self.bp_cnt],
-                    2,
+                    TextOptions.TEXT_THICKNESS.value,
                 )
                 self.cord_written = True
 
@@ -114,7 +100,7 @@ class PoseConfigCreator(PlottingMixin):
                 self.font,
                 self.font_size,
                 self.color_lst[bp_cnt],
-                2,
+                TextOptions.TEXT_THICKNESS.value,
             )
             img_concat = cv2.vconcat([self.side_img, self.overlay])
             cv2.namedWindow("Define pose", cv2.WINDOW_NORMAL)

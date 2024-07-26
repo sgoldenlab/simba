@@ -65,7 +65,7 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
         self.movement_correction_frm = LabelFrame(
             self.main_frm,
             text="MOVEMENT CORRECTION",
-            font=("Times", 12, "bold"),
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
         )
@@ -106,7 +106,7 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
         agg_type_frm = LabelFrame(
             self.main_frm,
             text="AGGREGATION METHOD",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_HEADER.value,
             pady=5,
             padx=5,
         )
@@ -120,7 +120,7 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
         run_btn = Button(
             self.main_frm,
             text="CONFIRM",
-            font=Formats.LABELFRAME_HEADER_FORMAT.value,
+            font=Formats.FONT_REGULAR.value,
             fg="red",
             command=lambda: self.run(),
         )

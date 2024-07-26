@@ -47,25 +47,25 @@ class ImportVideosFrame(PopUpMixin, ConfigReader):
         check_int(name=f'{ImportVideosFrame} idx_row', value=idx_row, min_value=0)
         check_int(name=f'{ImportVideosFrame} idx_column', value=idx_column, min_value=0)
 
-        import_videos_frm = LabelFrame(parent_frm, text="IMPORT VIDEOS", fg="black", font=Formats.LABELFRAME_HEADER_FORMAT.value)
+        import_videos_frm = LabelFrame(parent_frm, text="IMPORT VIDEOS", fg="black", font=Formats.FONT_HEADER.value)
         if config_path is None:
-            Label(import_videos_frm, text="Please CREATE PROJECT CONFIG before importing VIDEOS \n").grid(row=0, column=0, sticky=NW)
+            Label(import_videos_frm, text="Please CREATE PROJECT CONFIG before importing VIDEOS \n", font=Formats.FONT_REGULAR.value).grid(row=0, column=0, sticky=NW)
             import_videos_frm.grid(row=0, column=0, sticky=NW)
         else:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-            import_multiple_videos_frm = LabelFrame(import_videos_frm, text="IMPORT MULTIPLE VIDEOS")
+            import_multiple_videos_frm = LabelFrame(import_videos_frm, text="IMPORT MULTIPLE VIDEOS", font=Formats.FONT_HEADER.value)
             self.video_directory_select = FolderSelect(import_multiple_videos_frm, "VIDEO DIRECTORY: ", lblwidth=25)
             self.video_type = DropDownMenu(import_multiple_videos_frm, "VIDEO FILE FORMAT: ", Options.VIDEO_FORMAT_OPTIONS.value, "25")
             self.video_type.setChoices(Options.VIDEO_FORMAT_OPTIONS.value[0])
-            import_multiple_btn = Button(import_multiple_videos_frm, text="Import MULTIPLE videos", fg="blue", command=lambda: self.__run_video_import(multiple_videos=True))
+            import_multiple_btn = Button(import_multiple_videos_frm, text="Import MULTIPLE videos", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.__run_video_import(multiple_videos=True))
             self.multiple_videos_symlink_var = BooleanVar(value=False)
-            multiple_videos_symlink_cb = Checkbutton(import_multiple_videos_frm, text="Import SYMLINKS", variable=self.multiple_videos_symlink_var)
+            multiple_videos_symlink_cb = Checkbutton(import_multiple_videos_frm, text="Import SYMLINKS", font=Formats.FONT_REGULAR.value, variable=self.multiple_videos_symlink_var)
 
-            import_single_frm = LabelFrame(import_videos_frm, text="IMPORT SINGLE VIDEO", pady=5, padx=5)
+            import_single_frm = LabelFrame(import_videos_frm, text="IMPORT SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5)
             self.video_file_select = FileSelect(import_single_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-            import_single_btn = Button(import_single_frm, text="Import SINGLE video", fg="blue", command=lambda: self.__run_video_import(multiple_videos=False))
+            import_single_btn = Button(import_single_frm, text="Import SINGLE video", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.__run_video_import(multiple_videos=False))
             self.single_video_symlink_var = BooleanVar(value=False)
-            single_video_symlink_cb = Checkbutton(import_single_frm, text="Import SYMLINK", variable=self.single_video_symlink_var)
+            single_video_symlink_cb = Checkbutton(import_single_frm, text="Import SYMLINK", font=Formats.FONT_REGULAR.value, variable=self.single_video_symlink_var)
 
             import_videos_frm.grid(row=0, column=0, sticky=NW)
             import_multiple_videos_frm.grid(row=0, sticky=W)
