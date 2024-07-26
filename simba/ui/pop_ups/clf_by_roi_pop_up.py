@@ -8,7 +8,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_clf_calculator import ROIClfCalculator
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
-from simba.utils.enums import Keys, Links, Formats
+from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import (NoChoosenClassifierError,
                                 NoChoosenMeasurementError, NoChoosenROIError,
                                 ROICoordinatesNotFoundError)

@@ -7,7 +7,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, FileSelect)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_valid_rgb_tuple, check_int, check_str)
-from simba.utils.enums import Keys, Links, Options, Formats
+from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.lookups import get_color_dict
 
 

@@ -5,7 +5,7 @@ from tkinter import *
 
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FolderSelect
-from simba.utils.enums import Keys, Links, Formats
+from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import DuplicationError, NotDirectoryError
 from simba.video_processors.batch_process_menus import BatchProcessFrame
 
