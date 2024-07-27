@@ -5,7 +5,7 @@ import platform
 import webbrowser
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
-from typing import Optional, Union, Tuple, Callable, Dict, Any
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import PIL.Image
 from PIL import ImageTk
