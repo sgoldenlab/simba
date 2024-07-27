@@ -1,14 +1,16 @@
 __author__ = "Simon Nilsson"
 
 import os
+import platform
 import sys
 from enum import Enum
 from pathlib import Path
+
 import cv2
 import numpy as np
 import pkg_resources
+
 import simba
-import platform
 
 
 class ConfigKey(Enum):

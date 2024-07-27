@@ -9,11 +9,11 @@ from simba.plotting.ez_path_plot import EzPathPlot
 from simba.ui.tkinter_functions import DropDownMenu
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_valid_rgb_tuple, check_int, check_str)
+from simba.utils.enums import Formats
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
                                     read_video_info)
-from simba.utils.enums import Formats
 
 
 class QuickLineplotPopup(PopUpMixin, ConfigReader):

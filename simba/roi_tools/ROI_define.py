@@ -16,7 +16,7 @@ from simba.roi_tools.ROI_size_calculations import (circle_size_calc,
                                                    rectangle_size_calc)
 from simba.ui.tkinter_functions import hxtScrollbar
 from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.enums import TagNames, Formats
+from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import NoROIDataError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import log_event, stdout_success

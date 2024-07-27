@@ -9,7 +9,7 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         FolderSelect)
 from simba.utils.checks import check_if_dir_exists
-from simba.utils.enums import Links, Formats
+from simba.utils.enums import Formats, Links
 from simba.utils.errors import InvalidInputError
 
 
