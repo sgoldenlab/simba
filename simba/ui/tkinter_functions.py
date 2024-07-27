@@ -5,7 +5,7 @@ import platform
 import webbrowser
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
-from typing import Optional, Union, Tuple, Callable
+from typing import Optional, Union, Tuple, Callable, Dict, Any
 
 import PIL.Image
 from PIL import ImageTk
@@ -307,7 +307,7 @@ def CreateToolTip(widget, text):
     widget.bind("<Leave>", leave)
 
 
-def CreateLabelFrameWithIcon(parent: Toplevel,
+def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
                              header: str,
                              icon_name: str,
                              icon_link: Optional[Union[str, None]] = None):
@@ -410,32 +410,28 @@ def SimbaButton(parent: Union[Frame, Canvas],
                 txt_clr: Optional[str] = 'black',
                 bg_clr: Optional[str] = None,
                 font: Optional[Tuple] = Formats.FONT_REGULAR.value,
-                cmd: Optional[Callable] = None,
                 width: Optional[str] = None,
                 height: Optional[str] = None,
-                img: Optional[Union[ImageTk.PhotoImage, str]] = None) -> Button:
+                img: Optional[Union[ImageTk.PhotoImage, str]] = None,
+                cmd: Optional[Callable] = None,
+                cmd_kwargs: Dict[Any, Any] = None) -> Button:
 
 
 
     if isinstance(img, str):
         img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
 
-    btn = Button(master=parent,
-                 text=txt,
-                 compound="left",
-                 image=img,
-                 relief=RAISED,
-                 fg=txt_clr,
-                 font=font,
-                 bg=bg_clr,
-                 command= lambda: cmd())
+    if (cmd is not None) and (cmd_kwargs is not None):
+        btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr, command=lambda: cmd(**cmd_kwargs))
+
+    elif (cmd is not None) and (cmd_kwargs is None):
+        btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr, command=lambda: cmd())
+
+    else:
+        btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr)
 
     if img is not None:
         btn.image = img
-
-    # button_setscale = Button(label_setscale, text="CONFIGURE VIDEO PARAMETERS", compound="left",
-    #                          image=self.btn_icons["calipher"]["img"], relief=RAISED, fg="blue",
-    #                          font=Formats.FONT_REGULAR.value, command=lambda: self.create_video_info_table())
 
     if width is not None: btn.config(width=width)
     if height is not None: btn.config(height=height)

@@ -9,7 +9,6 @@ import sys
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
-import pyglet
 
 import matplotlib.font_manager
 import pandas as pd
@@ -20,6 +19,11 @@ from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exis
 from simba.utils.enums import OS, Methods, Paths, FontPaths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
+
+import pyglet
+if platform.system() == OS.WINDOWS.value:
+    from pyglet.libs.win32 import constants
+    constants.COINIT_MULTITHREADED = 0x2  # 0x2 = COINIT_APARTMENTTHREADED
 
 
 class SharedCounter(object):

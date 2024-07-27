@@ -117,13 +117,13 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, UpsampleVideosPopUp,
     VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import VisualizePoseInFolderPopUp
-from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect
+from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, FileSelect, SimbaButton
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import OS, Defaults, Formats, Paths, TagNames
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths, load_simba_fonts, get_linux_fonts)
+from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths, load_simba_fonts)
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
@@ -142,7 +142,8 @@ class LoadProjectPopUp(object):
         self.main_frm.wm_title("Load SimBA project (project_config.ini file)")
         self.load_project_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD SIMBA PROJECT_CONFIG.INI", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
         self.selected_file = FileSelect(self.load_project_frm, "Select file: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")])
-        load_project_btn = Button(self.load_project_frm, text="LOAD PROJECT", fg="blue", command=lambda: self.launch_project(), font=Formats.FONT_REGULAR.value)
+
+        load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project)
         self.load_project_frm.grid(row=0, sticky=NW)
         self.selected_file.grid(row=0, sticky=NW)
         load_project_btn.grid(row=1, pady=10, sticky=NW)
@@ -213,23 +214,24 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         import_frm.grid(row=0, column=0, sticky=NW)
 
         further_methods_frm = CreateLabelFrameWithIcon(parent=import_frm, header="FURTHER METHODS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADDITIONAL_IMPORTS.value)
-        extract_frm_btn = Button(further_methods_frm, text="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: extract_frames_from_all_videos_in_directory(config_path=self.config_path, directory=self.video_dir))
-        import_frm_dir_btn = Button(further_methods_frm, text="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ImportFrameDirectoryPopUp(config_path=self.config_path))
-        add_clf_btn = Button(further_methods_frm, text="ADD CLASSIFIER TO SIMBA PROJECT", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: AddClfPopUp(config_path=self.config_path),)
-        remove_clf_btn = Button(further_methods_frm, text="REMOVE CLASSIFIER FROM SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: RemoveAClassifierPopUp(config_path=self.config_path))
-        archive_files_btn = Button(further_methods_frm, text="ARCHIVE PROCESSED FILES IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: ArchiveProcessedFilesPopUp(config_path=self.config_path))
-        reverse_btn = Button(further_methods_frm, text="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: None)
-        interpolate_btn = Button(further_methods_frm, text="INTERPOLATE POSE IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: InterpolatePopUp(config_path=self.config_path))
-        smooth_btn = Button(further_methods_frm, text="SMOOTH POSE IN SIMBA PROJECT", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: SmoothingPopUp(config_path=self.config_path))
+        extract_frm_btn = SimbaButton(parent=further_methods_frm, txt="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=extract_frames_from_all_videos_in_directory, cmd_kwargs={'config_path': self.config_path, 'directory': self.video_dir})
+        import_frm_dir_btn = SimbaButton(parent=further_methods_frm, txt="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=ImportFrameDirectoryPopUp, cmd_kwargs={'config_path': self.config_path})
+        add_clf_btn = SimbaButton(parent=further_methods_frm, txt="ADD CLASSIFIER TO SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=AddClfPopUp, cmd_kwargs={'config_path': self.config_path})
+        remove_clf_btn = SimbaButton(parent=further_methods_frm, txt="REMOVE CLASSIFIER FROM SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=RemoveAClassifierPopUp, cmd_kwargs={'config_path': self.config_path})
+        archive_files_btn = SimbaButton(parent=further_methods_frm, txt="ARCHIVE PROCESSED FILES IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=ArchiveProcessedFilesPopUp, cmd_kwargs={'config_path': self.config_path})
+        reverse_btn = SimbaButton(parent=further_methods_frm, txt="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=None)
+        interpolate_btn = SimbaButton(parent=further_methods_frm, txt="INTERPOLATE POSE IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=InterpolatePopUp, cmd_kwargs={'config_path': self.config_path})
+        smooth_btn = SimbaButton(parent=further_methods_frm, txt="SMOOTH POSE IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=SmoothingPopUp, cmd_kwargs={'config_path': self.config_path})
 
         label_setscale = CreateLabelFrameWithIcon(parent=tab3, header="VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
         self.distance_in_mm_eb = Entry_Box(label_setscale, "KNOWN DISTANCE (MILLIMETERS)", "25", validation="numeric")
-        button_setdistanceinmm = Button(label_setscale, text="AUTO-POPULATE", fg="green", command=lambda: self.set_distance_mm(), font=Formats.FONT_REGULAR.value)
+        button_setdistanceinmm = SimbaButton(parent=label_setscale, txt="AUTO-POPULATE", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.set_distance_mm)
 
-        button_setscale = Button(label_setscale, text="CONFIGURE VIDEO PARAMETERS", compound="left", image=self.btn_icons["calipher"]["img"], relief=RAISED, fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.create_video_info_table())
-        button_setscale.image = self.btn_icons["calipher"]["img"]
-
+        button_setscale = SimbaButton(parent=label_setscale, txt="CONFIGURE VIDEO PARAMETERS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.create_video_info_table, img='calipher')
         self.new_ROI_frm = CreateLabelFrameWithIcon(parent=tab6, header="SIMBA ROI INTERFACE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI.value)
+        self.start_new_ROI = SimbaButton(parent=label_setscale, txt="DEFINE ROIs", txt_clr='green', font=Formats.FONT_REGULAR.value, img='roi', cmd=ROI_menu, cmd_kwargs={'config_path': self.config_path})
+
+
         self.start_new_ROI = Button(self.new_ROI_frm, text="DEFINE ROIs", fg="green", compound="left", font=Formats.FONT_REGULAR.value, image=self.btn_icons["roi"]["img"], relief=RAISED, command=lambda: ROI_menu(self.config_path))
         self.start_new_ROI.image = self.btn_icons["roi"]["img"]
 
@@ -944,7 +946,7 @@ class App(object):
         y_sb.config(command=self.txt.yview)
         self.txt.config(state=DISABLED, font=Formats.FONT_REGULAR.value)
 
-        clear_txt_btn = Button(self.frame, text=" CLEAR", compound=LEFT, image=self.menu_icons["clean"]["img"], font=Formats.LABELFRAME_HEADER_FORMAT.value, command=lambda: self.clean_txt())
+        clear_txt_btn = SimbaButton(parent=self.frame, txt=" CLEAR", txt_clr='blue', img='clean', cmd=self.clean_txt, font=Formats.FONT_HEADER.value)
         clear_txt_btn.pack(side=BOTTOM, fill=X)
         sys.stdout = StdRedirector(self.txt)
 

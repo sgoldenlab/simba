@@ -231,8 +231,8 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.feature_filename, raise_error=False)
 
 
-        # if platform.system() == "Darwin":
-        #     multiprocessing.set_start_method("spawn", force=True)
+        if platform.system() == "Darwin":
+            multiprocessing.set_start_method("spawn", force=True)
 
 
     def __index_df_for_multiprocessing(self, data: List[np.ndarray]) -> List[np.ndarray]:
@@ -267,30 +267,46 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         data = np.array_split(self.data_df, self.cores)
         frm_per_core = data[0].shape[0]
         data = self.__index_df_for_multiprocessing(data=data)
-        pool = multiprocessing.Pool(self.cores, maxtasksperchild=self.maxtasksperchild)
-        constants = functools.partial(_validation_video_mp,
-                                      bp_dict=self.animal_bp_dict,
-                                      video_save_dir=self.temp_dir,
-                                      settings=self.settings,
-                                      video_meta_data=self.video_meta_data,
-                                      video_path=self.video_path,
-                                      gantt_setting=self.create_gantt,
-                                      final_gantt=self.final_gantt_img,
-                                      clf_data=self.data_df[self.clf_name].values,
-                                      clrs=self.clr_lst,
-                                      clf_name=self.clf_name,
-                                      bouts_df=self.bouts_df)
+        with multiprocessing.Pool(self.cores, maxtasksperchild=self.maxtasksperchild) as pool:
+
+            constants = functools.partial(_validation_video_mp,
+                                          bp_dict=self.animal_bp_dict,
+                                          video_save_dir=self.temp_dir,
+                                          settings=self.settings,
+                                          video_meta_data=self.video_meta_data,
+                                          video_path=self.video_path,
+                                          gantt_setting=self.create_gantt,
+                                          final_gantt=self.final_gantt_img,
+                                          clf_data=self.data_df[self.clf_name].values,
+                                          clrs=self.clr_lst,
+                                          clf_name=self.clf_name,
+                                          bouts_df=self.bouts_df)
 
 
 
-        print("Creating video...")
-        for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
-            print(f"Image {int(frm_per_core * (cnt + 1))}/{len(self.data_df)}, Video {self.feature_filename}...")
+            print("Creating video...")
+            for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
+                print(f"Image {int(frm_per_core * (cnt + 1))}/{len(self.data_df)}, Video {self.feature_filename}...")
         pool.terminate()
         pool.join()
         concatenate_videos_in_folder(in_folder=self.temp_dir, save_path=self.video_save_path)
         self.timer.stop_timer()
         stdout_success(msg=f"Video complete, saved at {self.video_save_path}", elapsed_time=self.timer.elapsed_time_str)
+
+
+# if __name__ == "__main__":
+#     test = ValidateModelOneVideoMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                     feature_file_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\FRR_gq_Saline_0620.csv",
+#                                     model_path=r"C:\troubleshooting\mitra\models\validations\rearing_3\rearing.sav",
+#                                     discrimination_threshold=0.35,
+#                                     shortest_bout=200,
+#                                     cores=-1,
+#                                     settings={'pose': True, 'animal_names': True, 'styles': None},
+#                                     create_gantt=None)
+#     test.run()
+
+
+
 
 
 # test = ValidateModelOneVideoMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',

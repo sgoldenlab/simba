@@ -3,16 +3,14 @@ __author__ = "Simon Nilsson"
 import os
 import threading
 from tkinter import *
-from typing import Union, Optional, Tuple, Callable
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import NoROIDataError
 from simba.utils.warnings import ROIWarning
-from PIL import ImageTk
 
 class AppendROIFeaturesByAnimalPopUp(ConfigReader, PopUpMixin):
     def __init__(self, config_path: Union[str, os.PathLike]):

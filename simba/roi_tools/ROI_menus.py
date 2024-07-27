@@ -2,6 +2,7 @@ import os
 import platform
 from configparser import ConfigParser
 from tkinter import *
+from typing import Union
 
 from simba.roi_tools.ROI_define import ROI_definitions
 from simba.roi_tools.ROI_multiply import multiply_ROIs
@@ -12,7 +13,7 @@ from simba.utils.errors import NoFilesFoundError
 
 
 class ROI_menu:
-    def __init__(self, config_path, new_roi=True):
+    def __init__(self, config_path: Union[str, os.PathLike], new_roi=True):
         self.config_path = config_path
         config = ConfigParser()
         config.read(config_path)

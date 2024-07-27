@@ -1794,9 +1794,9 @@ class VideoRotator(ConfigReader):
         self.main_frm.mainloop()
 
 
-def extract_frames_from_all_videos_in_directory(
-    config_path: Union[str, os.PathLike], directory: Union[str, os.PathLike]
-) -> None:
+def extract_frames_from_all_videos_in_directory(config_path: Union[str, os.PathLike],
+                                                directory: Union[str, os.PathLike]) -> None:
+
     """
     Extract all frames from all videos in a directory. The results are saved in the project_folder/frames/input directory of the SimBA project
 
@@ -1808,43 +1808,22 @@ def extract_frames_from_all_videos_in_directory(
     """
 
     timer = SimbaTimer(start=True)
-    video_paths, video_types = [], [".avi", ".mp4"]
-    files_in_folder = glob.glob(directory + "/*")
-    for file_path in files_in_folder:
-        _, _, ext = get_fn_ext(filepath=file_path)
-        if ext.lower() in video_types:
-            video_paths.append(file_path)
-    if len(video_paths) == 0:
-        raise NoFilesFoundError(
-            msg=f"SIMBA ERROR: 0 video files in mp4 or avi format found in {directory}",
-            source=extract_frames_from_all_videos_in_directory.__name__,
-        )
+    video_paths = find_all_videos_in_directory(directory=directory, as_dict=True, raise_error=True)
+    video_paths = list(video_paths.values())
     config = read_config_file(config_path)
-    project_path = read_config_entry(
-        config, "General settings", "project_path", data_type="folder_path"
-    )
+    project_path = read_config_entry(config, "General settings", "project_path", data_type="folder_path")
 
-    print(
-        "Extracting frames for {} videos into project_folder/frames/input directory...".format(
-            len(video_paths)
-        )
-    )
+    print(f"Extracting frames for {len(video_paths)} video(s) into project_folder/frames/input directory...")
     for video_path in video_paths:
         dir_name, video_name, ext = get_fn_ext(video_path)
         save_path = os.path.join(project_path, "frames", "input", video_name)
         if not os.path.exists(save_path):
             os.makedirs(save_path)
         else:
-            print(
-                f"Frames for video {video_name} already extracted. SimBA is overwriting prior frames..."
-            )
+            print(f"Frames for video {video_name} already extracted. SimBA is overwriting prior frames...")
         video_to_frames(video_path, save_path, overwrite=True, every=1, chunk_size=1000)
     timer.stop_timer()
-    stdout_success(
-        f"Frames created for {str(len(video_paths))} videos",
-        elapsed_time=timer.elapsed_time_str,
-        source=extract_frames_from_all_videos_in_directory.__name__,
-    )
+    stdout_success(f"Frames created for {str(len(video_paths))} videos",elapsed_time=timer.elapsed_time_str, source=extract_frames_from_all_videos_in_directory.__name__)
 
 
 def copy_img_folder(
