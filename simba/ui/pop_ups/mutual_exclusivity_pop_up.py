@@ -2,13 +2,16 @@ import os
 from tkinter import *
 from typing import Union
 
-from simba.data_processors.mutual_exclusivity_corrector import MutualExclusivityCorrector
+from simba.data_processors.mutual_exclusivity_corrector import \
+    MutualExclusivityCorrector
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, Label, LabelFrame)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, Label, LabelFrame)
 from simba.utils.checks import check_float
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import (DuplicationError, InvalidInputError, NoSpecifiedOutputError)
+from simba.utils.errors import (DuplicationError, InvalidInputError,
+                                NoSpecifiedOutputError)
 
 
 class MutualExclusivityPupUp(PopUpMixin, ConfigReader):

@@ -4,7 +4,8 @@ from tkinter import *
 from simba.data_processors.movement_calculator import MovementCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, SimbaButton)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 
