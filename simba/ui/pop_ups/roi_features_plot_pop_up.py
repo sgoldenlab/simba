@@ -1,22 +1,19 @@
 __author__ = "Simon Nilsson"
 
-
+import os
 import threading
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ROI_feature_visualizer import ROIfeatureVisualizer
-from simba.plotting.ROI_feature_visualizer_mp import \
-    ROIfeatureVisualizerMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box)
+from simba.plotting.ROI_feature_visualizer_mp import ROIfeatureVisualizerMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.read_write import (find_all_videos_in_directory,
-                                    find_files_of_filetypes_in_directory,
-                                    get_fn_ext)
+from simba.utils.read_write import (find_all_videos_in_directory, find_files_of_filetypes_in_directory, get_fn_ext)
 
 ROI_CENTERS = "roi_centers"
 ROI_EAR_TAGS = "roi_ear_tags"
@@ -28,38 +25,25 @@ ANIMAL_NAMES = "animal_names"
 
 
 class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="VISUALIZE ROI FEATURES", size=(400, 500))
+
+    """
+    :example:
+    >>> _ = VisualizeROIFeaturesPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini')
+    """
+    def __init__(self, config_path: Union[str, os.PathLike]):
+
         ConfigReader.__init__(self, config_path=config_path)
-        self.video_file_paths = find_all_videos_in_directory(
-            directory=self.video_dir, as_dict=True
-        )
+        self.video_file_paths = find_all_videos_in_directory(directory=self.video_dir, as_dict=True)
         self.video_list = [k for k in self.video_file_paths.keys()]
-
         if len(self.video_list) == 0:
-            raise NoFilesFoundError(
-                msg="SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI features.",
-                source=self.__class__.__name__,
-            )
+            raise NoFilesFoundError(msg="SIMBA ERROR: No videos in SimBA project. Import videos into you SimBA project to visualize ROI features.",source=self.__class__.__name__,)
+        PopUpMixin.__init__(self, title="VISUALIZE ROI FEATURES")
 
-        self.settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ROI_FEATURES_PLOT.value,
-        )
-        self.threshold_entry_box = Entry_Box(
-            self.settings_frm, "Probability threshold", "15"
-        )
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_FEATURES_PLOT.value)
+        self.threshold_entry_box = Entry_Box(self.settings_frm, "Probability threshold", "15")
         self.threshold_entry_box.entry_set(0.0)
-        threshold_label = Label(
-            self.settings_frm,
-            text="Note: body-part locations detected with probabilities below this threshold will be filtered out.",
-            font=("Helvetica", 10, "italic"),
-        )
-        self.border_clr_dropdown = DropDownMenu(
-            self.settings_frm, "Border color:", list(self.colors_dict.keys()), "12"
-        )
+        threshold_label = Label(self.settings_frm, text="Note: body-part locations detected with probabilities below this threshold will be filtered out.", font=("Helvetica", 10, "italic"))
+        self.border_clr_dropdown = DropDownMenu(self.settings_frm, "Border color:", list(self.colors_dict.keys()), "12")
         self.border_clr_dropdown.setChoices("Black")
 
         self.show_pose_var = BooleanVar(value=True)
@@ -69,15 +53,8 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
         self.show_direction_var = BooleanVar(value=False)
         self.multiprocess_var = BooleanVar(value=False)
         show_pose_cb = Checkbutton(self.settings_frm, text="Show pose", font=Formats.FONT_REGULAR.value, variable=self.show_pose_var)
-        show_roi_center_cb = Checkbutton(
-            self.settings_frm,
-            text="Show ROI centers",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.show_ROI_centers_var,
-        )
-        show_roi_tags_cb = Checkbutton(
-            self.settings_frm, text="Show ROI ear tags", font=Formats.FONT_REGULAR.value, variable=self.show_ROI_tags_var
-        )
+        show_roi_center_cb = Checkbutton(self.settings_frm, text="Show ROI centers", font=Formats.FONT_REGULAR.value, variable=self.show_ROI_centers_var)
+        show_roi_tags_cb = Checkbutton(self.settings_frm, text="Show ROI ear tags", font=Formats.FONT_REGULAR.value, variable=self.show_ROI_tags_var)
 
         show_animal_names_cb = Checkbutton(
             self.settings_frm,
@@ -107,69 +84,27 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
                 dropdown_menus=[self.multiprocess_dropdown],
             ),
         )
-        self.multiprocess_dropdown = DropDownMenu(
-            self.settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12"
-        )
+        self.multiprocess_dropdown = DropDownMenu(self.settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.directionality_type_dropdown = DropDownMenu(
-            self.settings_frm, "Direction type:", ["funnel", "Lines"], "12"
-        )
+        self.directionality_type_dropdown = DropDownMenu(self.settings_frm, "Direction type:", ["funnel", "Lines"], "12")
         self.directionality_type_dropdown.setChoices(choice="funnel")
         self.directionality_type_dropdown.disable()
 
-        self.body_parts_frm = LabelFrame(
-            self.main_frm,
-            text="SELECT BODY-PARTS",
-            pady=10,
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-        )
-        self.animal_cnt_dropdown = DropDownMenu(
-            self.body_parts_frm,
-            "Number of animals",
-            list(range(1, self.animal_cnt + 1)),
-            "20",
-            com=lambda x: self.__populate_bp_dropdown(bp_cnt=x),
-        )
+        self.body_parts_frm = LabelFrame(self.main_frm, text="SELECT BODY-PARTS", pady=10, font=Formats.FONT_HEADER.value, fg="black")
+        self.animal_cnt_dropdown = DropDownMenu( self.body_parts_frm, "Number of animals", list(range(1, self.animal_cnt + 1)), "20", com=lambda x: self.__populate_bp_dropdown(bp_cnt=x))
         self.animal_cnt_dropdown.setChoices(1)
         self.__populate_bp_dropdown(bp_cnt=1)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
-        self.single_video_frm = LabelFrame(
-            self.main_frm,
-            text="Visualize ROI features on SINGLE video",
-            pady=10,
-            padx=10,
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-        )
-        self.single_video_dropdown = DropDownMenu(
-            self.single_video_frm, "Select video", self.video_list, "15"
-        )
+        self.single_video_frm = LabelFrame(self.main_frm, text="Visualize ROI features on SINGLE video", pady=10, padx=10, font=Formats.FONT_HEADER.value, fg="black")
+        self.single_video_dropdown = DropDownMenu(self.single_video_frm, "Select video", self.video_list, "15")
         self.single_video_dropdown.setChoices(self.video_list[0])
-        self.single_video_btn = Button(
-            self.single_video_frm,
-            text="Visualize ROI features for SINGLE video",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.run(multiple=False),
-        )
 
-        self.all_videos_frm = LabelFrame(
-            self.main_frm,
-            text="Visualize ROI features on ALL videos",
-            pady=10,
-            padx=10,
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-        )
+        self.single_video_btn = SimbaButton(parent=self.single_video_frm, txt="Visualize ROI features for SINGLE video", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': False})
+        self.all_videos_frm = LabelFrame(self.main_frm, text="Visualize ROI features on ALL videos", pady=10, padx=10, font=Formats.FONT_HEADER.value, fg="black")
 
-        self.all_videos_btn = Button(
-            self.all_videos_frm,
-            text="Generate ROI visualization on ALL videos",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.run(multiple=True),
-        )
+        self.all_videos_btn = SimbaButton(parent=self.all_videos_frm, txt="Generate ROI visualization on ALL videos", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True})
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_entry_box.grid(row=0, sticky=NW)
         threshold_label.grid(row=1, sticky=NW)
@@ -251,7 +186,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
             threading.Thread(target=roi_feature_visualizer.run()).start()
 
 
-# _ = VisualizeROIFeaturesPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini')
+#_ = VisualizeROIFeaturesPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini')
 
 
 # _ = VisualizeROIFeaturesPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')

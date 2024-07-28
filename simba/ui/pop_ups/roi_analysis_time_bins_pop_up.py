@@ -1,37 +1,30 @@
+import os
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_time_bin_calculator import ROITimebinCalculator
-from simba.ui.tkinter_functions import (Checkbutton, CreateLabelFrameWithIcon,
-                                        DropDownMenu)
+from simba.ui.tkinter_functions import (Checkbutton, CreateLabelFrameWithIcon, DropDownMenu, SimbaButton)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 
 
 class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
-    def __init__(self, config_path: str):
+
+    """
+    :example:
+    >>> _ = ROIAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+
+    """
+    def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
         PopUpMixin.__init__(self, title="ROI ANALYSIS: TIME-BINS", size=(400, 400))
-        self.animal_cnt_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SELECT NUMBER OF ANIMALS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.ROI_DATA_ANALYSIS.value,
-        )
-        self.animal_cnt_dropdown = DropDownMenu(
-            self.animal_cnt_frm,
-            "# of animals",
-            list(range(1, self.animal_cnt + 1)),
-            labelwidth=20,
-        )
+        self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_ANALYSIS.value)
+        self.animal_cnt_dropdown = DropDownMenu(self.animal_cnt_frm, "# of animals", list(range(1, self.animal_cnt + 1)), labelwidth=20)
         self.animal_cnt_dropdown.setChoices(1)
-        self.animal_cnt_confirm_btn = Button(
-            self.animal_cnt_frm,
-            text="Confirm",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.create_settings_frm(),
-        )
+
+        self.animal_cnt_confirm_btn = SimbaButton(parent=self.animal_cnt_frm, txt="CONFIRM", img='tick', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.create_settings_frm)
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_confirm_btn.grid(row=0, column=1, sticky=NW)
@@ -102,4 +95,4 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.root.destroy()
 
 
-# _ = ROIAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#_ = ROIAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
