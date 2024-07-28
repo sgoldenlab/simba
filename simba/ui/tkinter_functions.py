@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import os.path
 import platform
 import webbrowser
+import threading
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from typing import Optional, Union, Tuple, Callable, Dict, Any
@@ -405,7 +406,7 @@ class TwoOptionQuestionPopUp(object):
         self.main_frm.destroy()
 
 
-def SimbaButton(parent: Union[Frame, Canvas],
+def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 txt: str,
                 txt_clr: Optional[str] = 'black',
                 bg_clr: Optional[str] = None,
@@ -414,7 +415,8 @@ def SimbaButton(parent: Union[Frame, Canvas],
                 height: Optional[str] = None,
                 img: Optional[Union[ImageTk.PhotoImage, str]] = None,
                 cmd: Optional[Callable] = None,
-                cmd_kwargs: Dict[Any, Any] = None) -> Button:
+                cmd_kwargs: Dict[Any, Any] = None,
+                thread: Optional[bool] = False) -> Button:
 
 
 
@@ -422,10 +424,16 @@ def SimbaButton(parent: Union[Frame, Canvas],
         img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
 
     if (cmd is not None) and (cmd_kwargs is not None):
-        btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr, command=lambda: cmd(**cmd_kwargs))
+        if not thread:
+            btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr, command=lambda: cmd(**cmd_kwargs))
+        else:
+            btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr, command=lambda: threading.Thread(target=cmd(**cmd_kwargs)).start())
 
     elif (cmd is not None) and (cmd_kwargs is None):
-        btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr, command=lambda: cmd())
+        if not thread:
+            btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr, command=lambda: cmd())
+        else:
+            btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr, command=lambda: threading.Thread(target=cmd()).start())
 
     else:
         btn = Button(master=parent, text=txt, compound="left", image=img, relief=RAISED, fg=txt_clr, font=font, bg=bg_clr)

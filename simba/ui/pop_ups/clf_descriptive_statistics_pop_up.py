@@ -3,7 +3,7 @@ from tkinter import *
 from simba.data_processors.agg_clf_calculator import AggregateClfCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimbaButton
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import (NoChoosenClassifierError,
                                 NoChoosenMeasurementError)
@@ -28,7 +28,8 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
             self.clf_var_dict[clf_name] = BooleanVar()
             cbox = Checkbutton(clf_frm, text=clf_name, font=Formats.FONT_REGULAR.value, variable=self.clf_var_dict[clf_name])
             cbox.grid(row=cnt, sticky=NW)
-        run_button = Button(self.main_frm, text="Run", font=Formats.FONT_REGULAR.value, command=lambda: self.run_descriptive_analysis())
+
+        run_button = SimbaButton(parent=self.main_frm, txt="Run", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run_descriptive_analysis)
         measures_frm.grid(row=0, sticky=NW)
         clf_frm.grid(row=1, sticky=NW)
         (

@@ -157,6 +157,11 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
         stdout_success(msg=f"All {len(list(self.meta_dicts.keys()))} model(s) and their evaluations complete. The models/evaluation files are saved in {self.model_dir_out} directory", source=self.__class__.__name__)
 
 
+
+
+# test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
+
 # test = GridSearchRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini')
 # test.run()
 

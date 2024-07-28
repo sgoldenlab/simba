@@ -9,16 +9,12 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect, hxtScrollbar)
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int)
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links,
-                               MLParamKeys, Options)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, hxtScrollbar, SimbaButton)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, MLParamKeys, Options)
 from simba.utils.errors import InvalidHyperparametersFileError
 from simba.utils.printing import stdout_success, stdout_trash, stdout_warning
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext)
 
 
 class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
@@ -44,7 +40,8 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
                                                       icon_name=Keys.DOCUMENTATION.value,
                                                       icon_link=Links.TRAIN_ML_MODEL.value,)
         self.select_config_file = FileSelect(load_meta_data_frm, "CONFIG PATH:")
-        load_config_btn = Button(load_meta_data_frm, text="LOAD", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.load_config())
+
+        load_config_btn = SimbaButton(parent=load_meta_data_frm, txt="LOAD", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.load_config)
         label_link = Label(load_meta_data_frm, text="[MODEL SETTINGS TUTORIAL]", fg="blue", font=Formats.FONT_REGULAR.value)
         label_link.bind("<Button-1>", lambda e: webbrowser.open_new("https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model"))
 
@@ -190,15 +187,10 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.save_frame = LabelFrame(
             self.main_frm, text="SAVE", font=Formats.FONT_HEADER.value
         )
-        save_global_btn = Button(
-            self.save_frame,
-            text="SAVE SETTINGS (GLOBAL ENVIRONMENT)",
-            font=Formats.FONT_REGULAR.value,
-            fg="blue",
-            command=lambda: self.save_global(),
-        )
-        save_meta_btn = Button(self.save_frame, text="SAVE SETTINGS (SPECIFIC MODEL)", font=Formats.FONT_REGULAR.value, fg="green", command=lambda: self.save_config())
-        clear_cache_btn = Button(self.save_frame, text="CLEAR CACHE", font=Formats.FONT_REGULAR.value, fg="red", command=lambda: self.clear_cache())
+
+        save_global_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (GLOBAL ENVIRONMENT)", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.save_global)
+        save_meta_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (SPECIFIC MODEL)", txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=self.save_config)
+        clear_cache_btn = SimbaButton(parent=self.save_frame, txt="CLEAR CACHE", txt_clr='red', font=Formats.FONT_REGULAR.value, cmd=self.clear_cache)
 
         load_meta_data_frm.grid(row=0, column=0, sticky=NW)
         self.select_config_file.grid(row=0, column=0, sticky=NW)

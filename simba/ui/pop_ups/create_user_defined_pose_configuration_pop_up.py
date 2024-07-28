@@ -1,10 +1,9 @@
 from tkinter import *
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import Entry_Box, FileSelect, hxtScrollbar
+from simba.ui.tkinter_functions import Entry_Box, FileSelect, hxtScrollbar, SimbaButton
 from simba.ui.user_defined_pose_creator import PoseConfigCreator
-from simba.utils.checks import (check_file_exist_and_readable, check_int,
-                                check_str)
+from simba.utils.checks import (check_file_exist_and_readable, check_int,check_str)
 from simba.utils.enums import Formats
 from simba.utils.errors import DuplicationError
 from simba.utils.printing import stdout_success
@@ -30,8 +29,9 @@ class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):
         self.no_body_parts_entry_box = Entry_Box(self.main_frm, "# of Body-parts (per animal)", "23", validation="numeric")
         self.img_path_file_select = FileSelect(self.main_frm, "Image path", lblwidth=23)
         self.master, self.project_config_class = master, project_config_class
-        self.confirm_btn = Button(self.main_frm, font=Formats.FONT_REGULAR.value, text="CONFIRM", fg="blue", command=lambda: self.create_bodypart_table())
-        self.save_btn = Button( self.main_frm, font=Formats.FONT_REGULAR.value, text="SAVE USER-DEFINED POSE-CONFIG", fg="blue", command=lambda: self.save_pose_config(),)
+
+        self.confirm_btn = SimbaButton(parent=self.main_frm, txt=f"CONFIRM", img='tick', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.create_bodypart_table)
+        self.save_btn = SimbaButton(parent=self.main_frm, txt="SAVE USER-DEFINED POSE-CONFIG", img='tick', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.save_pose_config)
         self.save_btn.config(state="disabled")
 
         self.config_name_entry_box.grid(row=0, sticky=W)

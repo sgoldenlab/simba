@@ -6,7 +6,7 @@ from tkinter import *
 from simba.data_processors.timebins_clf_calculator import TimeBinsClfCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, Entry_Box
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, Entry_Box, SimbaButton
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import (NoChoosenClassifierError,
@@ -30,7 +30,8 @@ class TimeBinsClfPopUp(PopUpMixin, ConfigReader):
             self.clf_var_dict[clf_name] = BooleanVar()
             cbox = Checkbutton(clf_frm, text=clf_name, variable=self.clf_var_dict[clf_name], font=Formats.FONT_REGULAR.value)
             cbox.grid(row=cnt, sticky=NW)
-        run_button = Button(self.main_frm, text="Run", font=Formats.FONT_REGULAR.value, command=lambda: self.run_time_bins_clf())
+
+        run_button = SimbaButton(parent=self.main_frm, txt="Run", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run_time_bins_clf)
         measures_frm.grid(row=0, sticky=NW)
         clf_frm.grid(row=1, sticky=NW)
         self.timebin_entrybox.grid(row=2, sticky=NW)

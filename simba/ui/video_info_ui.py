@@ -9,11 +9,9 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, hxtScrollbar
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, Paths,
-                               TagNames)
-from simba.utils.errors import (InvalidInputError, NoFilesFoundError,
-                                ParametersFileError, PermissionError)
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, hxtScrollbar, SimbaButton
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, Paths, TagNames)
+from simba.utils.errors import (InvalidInputError, NoFilesFoundError, ParametersFileError, PermissionError)
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (find_all_videos_in_project, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
@@ -210,16 +208,10 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.intructions_label_1.grid(row=0, column=0, sticky=W)
         self.intructions_label_2.grid(row=1, column=0, sticky=W)
         self.intructions_label_3.grid(row=2, column=0, sticky=W)
-        self.execute_frm = LabelFrame(
-            self.main_frm, text="EXECUTE", font=Formats.FONT_HEADER.value
-        )
-        self.save_data_btn = Button(
-            self.execute_frm,
-            text="SAVE DATA",
-            fg="green",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.__save_data(),
-        )
+        self.execute_frm = LabelFrame(self.main_frm, text="EXECUTE", font=Formats.FONT_HEADER.value)
+
+
+        self.save_data_btn = SimbaButton(parent=self.execute_frm, txt="SAVE DATA", txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=self.__save_data)
         self.execute_frm.grid(row=1, column=0, sticky=W)
         self.save_data_btn.grid(row=0, column=0, sticky=W)
         self.video_frm = LabelFrame(
@@ -261,20 +253,11 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.videos = {}
         self.__append_videos_from_video_folder()
         self.__check_for_duplicate_names()
-        self.duplicate_distance_btn = Button(
-            self.video_frm,
-            text="Duplicate index 1 distance/mm (CAUTION!)",
-            fg="red",
-            command=lambda: self.__duplicate_idx_1_distance_mm(),
-        )
+
+        self.duplicate_distance_btn = SimbaButton(parent=self.video_frm, txt="Duplicate index 1 distance/mm (CAUTION!)", txt_clr='red', font=Formats.FONT_REGULAR.value, cmd=self.__duplicate_idx_1_distance_mm)
         self.duplicate_distance_btn.grid(row=1, column=5, sticky=W, padx=5)
-        self.duplicate_btn = Button(
-            self.video_frm,
-            text="Duplicate index 1 pixels/mm (CAUTION!)",
-            fg="red",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.__duplicate_idx_1_px_mm(),
-        )
+
+        self.duplicate_btn = SimbaButton(parent=self.video_frm, txt="Duplicate index 1 pixels/mm (CAUTION!)", txt_clr='red', font=Formats.FONT_REGULAR.value, cmd=self.__duplicate_idx_1_px_mm)
         self.duplicate_btn.grid(row=1, column=7, sticky=W, padx=5)
 
         for vid_cnt, name in enumerate(self.videos.keys()):

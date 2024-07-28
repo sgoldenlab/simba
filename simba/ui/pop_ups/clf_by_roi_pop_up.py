@@ -7,11 +7,9 @@ from tkinter import *
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_clf_calculator import ROIClfCalculator
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import (NoChoosenClassifierError,
-                                NoChoosenMeasurementError, NoChoosenROIError,
-                                ROICoordinatesNotFoundError)
+from simba.utils.errors import (NoChoosenClassifierError, NoChoosenMeasurementError, NoChoosenROIError, ROICoordinatesNotFoundError)
 
 
 class ClfByROIPopUp(PopUpMixin, ConfigReader):
@@ -47,7 +45,9 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         self.choose_bp = DropDownMenu(body_part_menu, "Body part", self.body_parts_lst, "12")
         self.choose_bp.setChoices(self.body_parts_lst[0])
         self.choose_bp.grid(row=0, sticky=W)
-        run_analysis_button = Button(self.main_frm, text="Analyze classifications in each ROI", command=lambda: self.run_clf_by_ROI_analysis(),)
+
+
+        run_analysis_button = SimbaButton(parent=self.main_frm, txt="Analyze classifications in each ROI", font=Formats.FONT_REGULAR.value, cmd=self.run_clf_by_ROI_analysis)
         body_part_menu.grid(row=0, sticky=W, padx=10, pady=10)
         ROI_menu.grid(row=1, sticky=W, padx=10, pady=10)
         classifier_menu.grid(row=2, sticky=W, padx=10, pady=10)

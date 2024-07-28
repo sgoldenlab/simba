@@ -8,8 +8,7 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.clf_validator import ClassifierValidationClips
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton)
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.read_write import get_file_name_info_in_directory
@@ -39,11 +38,13 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
 
         self.run_frm = LabelFrame(self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm,text="SINGLE VIDEO",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
-        self.run_single_video_btn = Button(self.run_single_video_frm,text="Create single video",fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple_videos=False))
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple_videos': False})
+
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm,"Video:",list(self.files_found_dict.keys()),"12")
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
         self.run_multiple_videos = LabelFrame(self.run_frm,text="MULTIPLE VIDEO",font=Formats.FONT_HEADER.value, pady=5,padx=5,fg="black")
-        self.run_multiple_video_btn = Button(self.run_multiple_videos, text=f"Create multiple videos ({len(list(self.files_found_dict.keys()))} video(s) found)", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.run(multiple_videos=True))
+
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(list(self.files_found_dict.keys()))} video(s) found)", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple_videos': True})
         self.settings_frm.grid(row=0, sticky=NW)
         self.seconds_entry.grid(row=0, sticky=NW)
         self.clf_dropdown.grid(row=1, sticky=NW)

@@ -7,8 +7,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.plot_clf_results import PlotSklearnResultsSingleCore
 from simba.plotting.plot_clf_results_mp import PlotSklearnResultsMultiProcess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, SimbaButton)
 from simba.utils.checks import check_float
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import NoFilesFoundError
@@ -78,15 +77,16 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
 
         self.run_frm = LabelFrame(self.main_frm,text="RUN",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
         self.run_single_video_frm = LabelFrame( self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
-        self.run_single_video_btn = Button(self.run_single_video_frm, font=Formats.FONT_REGULAR.value, text="Create single video", fg="blue", command=lambda: self.__initiate_video_creation(multiple_videos=False),)
+
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__initiate_video_creation, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", self.video_lst, "12", com=lambda x: self.__update_single_video_file_path(filename=x),)
         self.select_video_file_select = FileSelect(self.run_single_video_frm, "", lblwidth="1", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], dropdown=self.single_video_dropdown,)
         self.single_video_dropdown.setChoices(self.video_lst[0])
         self.select_video_file_select.filePath.set(self.video_lst[0])
 
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_multiple_video_btn = Button(self.run_multiple_videos, text=f"Create multiple videos ({len(self.machine_results_paths)} video(s) found)", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.__initiate_video_creation(multiple_videos=True),)
 
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(self.machine_results_paths)} video(s) found)", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__initiate_video_creation, cmd_kwargs={'multiple_videos': True})
         bp_threshold_frm.grid(row=0, sticky=NW)
         self.bp_threshold_lbl.grid(row=0, sticky=NW)
         self.bp_threshold_entry.grid(row=1, sticky=NW)

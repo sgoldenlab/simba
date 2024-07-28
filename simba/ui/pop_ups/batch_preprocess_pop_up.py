@@ -4,7 +4,7 @@ import os
 from tkinter import *
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FolderSelect
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FolderSelect, SimbaButton
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import DuplicationError, NotDirectoryError
 from simba.video_processors.batch_process_menus import BatchProcessFrame
@@ -16,7 +16,8 @@ class BatchPreProcessPopUp(PopUpMixin):
         selections_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECTIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.BATCH_PREPROCESS.value,)
         self.input_folder_select = FolderSelect(selections_frm, "INPUT VIDEO DIRECTORY:", title="Select Folder with Input Videos", lblwidth=20,)
         self.output_folder_select = FolderSelect(selections_frm, "OUTPUT VIDEO DIRECTORY:", title="Select Folder for Output videos", lblwidth=20)
-        confirm_btn = Button(selections_frm, text="CONFIRM", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.run())
+
+        confirm_btn = SimbaButton(parent=selections_frm, txt="CONFIRM", img='tick', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run)
         selections_frm.grid(row=0, column=0, sticky=NW)
         self.input_folder_select.grid(row=0, column=0, sticky=NW)
         self.output_folder_select.grid(row=1, column=0, sticky=NW)

@@ -1,13 +1,13 @@
 __author__ = "Simon Nilsson"
 
+import os
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.pose_processors.pose_reset import PoseResetter
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect,
-                                        TwoOptionQuestionPopUp)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, TwoOptionQuestionPopUp, SimbaButton)
 from simba.utils.checks import check_str
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.printing import stdout_success, stdout_trash
@@ -15,7 +15,8 @@ from simba.utils.read_write import tabulate_clf_info
 
 
 class AddClfPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
+
         PopUpMixin.__init__(self, config_path=config_path, title="ADD CLASSIFIER")
         ConfigReader.__init__(self, config_path=config_path) .clf_eb = Entry_Box(self.main_frm, "CLASSIFIER NAME", "15")
         add_btn = Button(self.main_frm, text="ADD CLASSIFIER", command=lambda: self.run())

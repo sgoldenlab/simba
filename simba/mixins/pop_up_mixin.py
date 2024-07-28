@@ -9,8 +9,7 @@ import PIL.Image
 from PIL import ImageTk
 
 from simba.mixins.config_reader import ConfigReader
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
-                                        hxtScrollbar)
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect, hxtScrollbar, SimbaButton)
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_valid_lst)
 from simba.utils.enums import Formats, Options
@@ -194,13 +193,19 @@ class PopUpMixin(object):
         self.time_bin_entrybox.grid(row=0, column=0, sticky=NW)
         self.time_bin_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 
-    def create_run_frm(self,run_function: Callable,
+    def create_run_frm(self,
+                       run_function: Callable,
                        title: Optional[str] = "RUN",
                        btn_txt_clr: Optional[str] = "black",
-                       idx: Optional[int] = None) -> None:
+                       idx: Optional[int] = None,
+                       btn_icon_name: Optional[str] = 'rocket') -> None:
+
         """
         Create a label frame with a single button with a specified callback.
 
+        :param btn_txt_clr: The color of the text on the execute button.
+        :param idx: If not none, then the index of the main frame where to insert the RUN labelframe.
+        :param btn_icon_name: Name of the icon to use for the run button. If None, then no icon.
         :param object run_function: The function/method callback of the button.
         :param str title: The title of the frame.
         """
@@ -209,7 +214,7 @@ class PopUpMixin(object):
             self.run_frm.destroy()
             self.run_btn.destroy()
         self.run_frm = LabelFrame(self.main_frm, text=title, font=Formats.FONT_HEADER.value, fg=btn_txt_clr)
-        self.run_btn = Button(self.run_frm, text=title, fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: run_function())
+        self.run_btn = SimbaButton(parent=self.run_frm, txt=title, txt_clr=btn_txt_clr, font=Formats.FONT_REGULAR.value, img=btn_icon_name, cmd=run_function)
         if idx is None:
             self.run_frm.grid(row=self.children_cnt_main() + 1, column=0, sticky=NW)
         else:
@@ -230,6 +235,9 @@ class PopUpMixin(object):
         self.bp_cnt_frm = LabelFrame( self.main_frm, text="SELECT NUMBER OF BODY-PARTS", font=Formats.FONT_HEADER.value,)
         self.bp_cnt_dropdown = DropDownMenu( self.bp_cnt_frm, "# of body-parts", list(range(1, len(project_body_parts) + 1)), "12",)
         self.bp_cnt_dropdown.setChoices(1)
+
+
+
         self.bp_cnt_confirm_btn = Button( self.bp_cnt_frm, text="Confirm", font=Formats.FONT_REGULAR.value, command=lambda: self.create_choose_bp_frm(project_body_parts, run_function),)
         self.bp_cnt_frm.grid(row=0, sticky=NW)
         self.bp_cnt_dropdown.grid(row=0, column=0, sticky=NW)

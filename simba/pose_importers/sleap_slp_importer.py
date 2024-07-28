@@ -146,16 +146,15 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
             frames_lst = [l.tolist() for l in self.analysis_dict["frames"]]
             self.analysis_dict["animals_in_each_frame"] = [x[4] - x[3] for x in frames_lst]
             self.__create_tracks()
-
-            self.initialize_multi_animal_ui(
-                animal_bp_dict=self.animal_bp_dict,
-                video_info=self.video_info,
-                data_df=self.data_df,
-                video_path=video_data["VIDEO"],
-            )
             if self.animal_cnt > 1:
                 self.multianimal_identification()
+                self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict, video_info=self.video_info, data_df=self.data_df, video_path=video_data["VIDEO"])
+            else:
+                self.out_df = self.insert_multi_idx_columns(df=self.data_df.fillna(0))
             self.save_path = os.path.join(os.path.join(self.input_csv_dir, f"{self.video_name}.{self.file_type}"))
+
+
+
             write_df(df=self.out_df, file_type=self.file_type, save_path=self.save_path, multi_idx_header=True)
             if self.interpolation_settings is not None:
                 interpolator = Interpolate(config_path=self.config_path, data_path=self.save_path, type=self.interpolation_settings['type'], method=self.interpolation_settings['method'], multi_index_df_headers=True, copy_originals=False)
@@ -215,11 +214,19 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
         self.data_df.fillna(0, inplace=True)
         self.__fill_missing_indexes()
         self.data_df.sort_index(inplace=True)
-        self.data_df.columns = self.bp_headers
+        self.data_df = self.insert_column_headers_for_outlier_correction(data_df=self.data_df, new_headers=self.bp_headers, filepath=self.video_name)
 
 
 
 
+
+
+# test = SLEAPImporterSLP(project_path=r"C:\troubleshooting\slp_single_rat\project_folder\project_config.ini",
+#                         data_folder=r"C:\troubleshooting\slp_single_rat\slp",
+#                         id_lst=['Jarryd'],
+#                         interpolation_settings=None,
+#                         smoothing_settings = None) #Savitzky Golay
+# test.run()
 
 
 # test = SLEAPImporterSLP(project_path="/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini",
