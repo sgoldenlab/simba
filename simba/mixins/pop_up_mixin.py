@@ -9,7 +9,8 @@ import PIL.Image
 from PIL import ImageTk
 
 from simba.mixins.config_reader import ConfigReader
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect, hxtScrollbar, SimbaButton)
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
+                                        SimbaButton, hxtScrollbar)
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_valid_lst)
 from simba.utils.enums import Formats, Options

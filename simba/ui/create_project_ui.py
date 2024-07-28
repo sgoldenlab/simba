@@ -16,7 +16,9 @@ from simba.ui.import_videos_frame import ImportVideosFrame
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import PoseResetterPopUp
 from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
     CreateUserDefinedPoseConfigurationPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FolderSelect, hxtScrollbar, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FolderSelect, SimbaButton,
+                                        hxtScrollbar)
 from simba.utils.checks import check_if_dir_exists, check_str
 from simba.utils.config_creator import ProjectConfigCreator
 from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths

@@ -3,7 +3,8 @@ from tkinter import *
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import FolderSelect, SimbaButton
 from simba.utils.enums import Formats
-from simba.utils.read_write import (convert_csv_to_parquet, convert_parquet_to_csv)
+from simba.utils.read_write import (convert_csv_to_parquet,
+                                    convert_parquet_to_csv)
 
 
 class Csv2ParquetPopUp(PopUpMixin):

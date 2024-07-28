@@ -2,8 +2,8 @@ __author__ = "Simon Nilsson"
 
 import os.path
 import platform
-import webbrowser
 import threading
+import webbrowser
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from typing import Any, Callable, Dict, Optional, Tuple, Union
