@@ -1,35 +1,23 @@
+import os
 from tkinter import *
+from typing import Union
 
-from simba.data_processors.mutual_exclusivity_corrector import \
-    MutualExclusivityCorrector
+from simba.data_processors.mutual_exclusivity_corrector import MutualExclusivityCorrector
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, Label, LabelFrame)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, Label, LabelFrame)
 from simba.utils.checks import check_float
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import (DuplicationError, InvalidInputError,
-                                NoSpecifiedOutputError)
+from simba.utils.errors import (DuplicationError, InvalidInputError, NoSpecifiedOutputError)
 
 
 class MutualExclusivityPupUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
         PopUpMixin.__init__(self, title="MUTUAL EXCLUSIVITY", size=(1000, 400))
 
-        self.rule_cnt_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="EXCLUSIVITY RULES #",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.PATH_PLOTS.value,
-        )
-        self.rule_cnt_dropdown = DropDownMenu(
-            self.rule_cnt_frm,
-            "# RULES:",
-            list(range(1, 21)),
-            "25",
-            com=self.create_rules_frames,
-        )
+        self.rule_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="EXCLUSIVITY RULES #", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.PATH_PLOTS.value)
+        self.rule_cnt_dropdown = DropDownMenu(self.rule_cnt_frm, "# RULES:", list(range(1, 21)), "25", com=self.create_rules_frames)
         self.rule_cnt_dropdown.setChoices(1)
         self.rule_cnt_frm.grid(row=0, column=0, sticky="NW")
         self.rule_cnt_dropdown.grid(row=0, column=0, sticky="NW")

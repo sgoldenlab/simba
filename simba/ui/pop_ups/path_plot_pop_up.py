@@ -25,17 +25,9 @@ from simba.utils.read_write import get_file_name_info_in_directory
 class PathPlotPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path)
-        self.data_path = os.path.join(
-            self.project_path, Paths.MACHINE_RESULTS_DIR.value
-        )
-        self.files_found_dict = get_file_name_info_in_directory(
-            directory=self.data_path, file_type=self.file_type
-        )
-        check_if_filepath_list_is_empty(
-            filepaths=list(self.files_found_dict.keys()),
-            error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing path plots",
-        )
-
+        self.data_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
+        self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
+        check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()), error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing path plots")
         PopUpMixin.__init__(self, title="CREATE PATH PLOTS", size=(550, 850))
         self.resolution_options = deepcopy(self.resolutions)
         self.resolution_options.insert(0, "As input")
@@ -47,61 +39,18 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.animal_cnt_options = list(range(1, self.animal_cnt + 1))
         self.custom_rgb_selections = {}
 
-        self.style_settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="STYLE SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.PATH_PLOTS.value,
-        )
+        self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.PATH_PLOTS.value)
         self.autocompute_var = BooleanVar(value=True)
-        self.auto_compute_styles = Checkbutton(
-            self.style_settings_frm,
-            text="Auto-compute styles",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.autocompute_var,
-            command=self.enable_style_settings,
-        )
-        self.max_prior_lines_dropdown = DropDownMenu(
-            self.style_settings_frm,
-            "Max prior lines:",
-            ["Entire video", "Specify milliseconds"],
-            "16",
-            com=self.enable_entrybox_from_dropdown,
-        )
-        self.max_lines_entry = Entry_Box(
-            self.style_settings_frm,
-            "Max prior lines (ms): ",
-            "16",
-            validation="numeric",
-        )
-        self.resolution_dropdown = DropDownMenu(
-            self.style_settings_frm, "Resolution:", self.resolution_options, "16"
-        )
-        self.bg_clr_dropdown = DropDownMenu(
-            self.style_settings_frm,
-            "Background:",
-            self.bg_clr_options,
-            "16",
-            com=lambda x: self.__activate_settings(choice=x),
-        )
-        self.line_width = Entry_Box(
-            self.style_settings_frm, "Line width: ", "16", validation="numeric"
-        )
-        self.font_size = Entry_Box(
-            self.style_settings_frm, "Font size: ", "16", validation="numeric"
-        )
-        self.font_thickness = Entry_Box(
-            self.style_settings_frm, "Font thickness: ", "16", validation="numeric"
-        )
-        self.bg_opacity_dropdown = DropDownMenu(
-            self.style_settings_frm,
-            "Background opacity:",
-            self.bg_opacity_options,
-            "16",
-        )
-        self.circle_size = Entry_Box(
-            self.style_settings_frm, "Circle size: ", "16", validation="numeric"
-        )
+        self.auto_compute_styles = Checkbutton(self.style_settings_frm, text="Auto-compute styles", font=Formats.FONT_REGULAR.value, variable=self.autocompute_var, command=self.enable_style_settings)
+        self.max_prior_lines_dropdown = DropDownMenu(self.style_settings_frm, "Max prior lines:", ["Entire video", "Specify milliseconds"], "16", com=self.enable_entrybox_from_dropdown)
+        self.max_lines_entry = Entry_Box(self.style_settings_frm, "Max prior lines (ms): ", "16", validation="numeric")
+        self.resolution_dropdown = DropDownMenu(self.style_settings_frm, "Resolution:", self.resolution_options, "16")
+        self.bg_clr_dropdown = DropDownMenu(self.style_settings_frm, "Background:", self.bg_clr_options, "16", com=lambda x: self.__activate_settings(choice=x))
+        self.line_width = Entry_Box(self.style_settings_frm, "Line width: ", "16", validation="numeric")
+        self.font_size = Entry_Box(self.style_settings_frm, "Font size: ", "16", validation="numeric")
+        self.font_thickness = Entry_Box(self.style_settings_frm, "Font thickness: ", "16", validation="numeric")
+        self.bg_opacity_dropdown = DropDownMenu(self.style_settings_frm, "Background opacity:", self.bg_opacity_options, "16")
+        self.circle_size = Entry_Box(self.style_settings_frm, "Circle size: ", "16", validation="numeric")
         self.resolution_dropdown.setChoices(self.resolution_options[0])
         self.line_width.entry_set(val=6)
         self.bg_clr_dropdown.setChoices("White")
@@ -121,33 +70,13 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.max_lines_entry.set_state("disable")
         self.font_thickness.set_state("disable")
 
-        self.body_parts_frm = LabelFrame(
-            self.main_frm,
-            text="CHOOSE BODY-PARTS",
-            font=Formats.FONT_HEADER.value,
-            pady=5,
-            padx=5,
-        )
-        self.number_of_animals_dropdown = DropDownMenu(
-            self.body_parts_frm,
-            "# Animals:",
-            self.animal_cnt_options,
-            "16",
-            com=self.populate_body_parts_menu,
-        )
+        self.body_parts_frm = LabelFrame(self.main_frm, text="CHOOSE BODY-PARTS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
+        self.number_of_animals_dropdown = DropDownMenu(self.body_parts_frm, "# Animals:", self.animal_cnt_options, "16", com=self.populate_body_parts_menu)
         self.number_of_animals_dropdown.setChoices(self.animal_cnt_options[0])
 
-        self.video_slicing_frm = LabelFrame(
-            self.main_frm,
-            text="SEGMENTS",
-            font=Formats.FONT_HEADER.value,
-            pady=5,
-            padx=5,
-        )
+        self.video_slicing_frm = LabelFrame(self.main_frm, text="SEGMENTS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         self.slice_var = BooleanVar(value=False)
-        self.video_start_time_entry = Entry_Box(
-            self.video_slicing_frm, "Start time:", "16"
-        )
+        self.video_start_time_entry = Entry_Box(self.video_slicing_frm, "Start time:", "16")
         self.video_end_time_entry = Entry_Box(self.video_slicing_frm, "End time:", "16")
         self.video_start_time_entry.entry_set("00:00:00")
         self.video_end_time_entry.entry_set("00:00:00")
@@ -167,53 +96,24 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.video_start_time_entry.grid(row=1, column=0, sticky=NW)
         self.video_end_time_entry.grid(row=2, column=0, sticky=NW)
 
-        self.clf_frm = LabelFrame(
-            self.main_frm,
-            text="CHOOSE CLASSIFICATION VISUALIZATION",
-            font=Formats.FONT_HEADER.value,
-            pady=5,
-            padx=5,
-        )
+        self.clf_frm = LabelFrame(self.main_frm, text="CHOOSE CLASSIFICATION VISUALIZATION", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         self.include_clf_locations_var = BooleanVar(value=False)
-        self.include_clf_locations_cb = Checkbutton(
-            self.clf_frm,
-            text="Include classification locations",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.include_clf_locations_var,
-            command=self.populate_clf_location_data,
-        )
+        self.include_clf_locations_cb = Checkbutton(self.clf_frm, text="Include classification locations", font=Formats.FONT_REGULAR.value, variable=self.include_clf_locations_var, command=self.populate_clf_location_data)
         self.include_clf_locations_cb.grid(row=0, sticky=NW)
         self.populate_clf_location_data()
 
         self.populate_body_parts_menu(self.animal_cnt_options[0])
-        self.settings_frm = LabelFrame(
-            self.main_frm,
-            text="VISUALIZATION SETTINGS",
-            font=Formats.FONT_HEADER.value,
-            pady=5,
-            padx=5,
-        )
+        self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         self.path_frames_var = BooleanVar()
         self.path_videos_var = BooleanVar()
         self.path_last_frm_var = BooleanVar()
         self.multiprocessing_var = BooleanVar()
         self.include_animal_names_var = BooleanVar(value=True)
 
-        path_frames_cb = Checkbutton(
-            self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.path_frames_var
-        )
-        path_videos_cb = Checkbutton(
-            self.settings_frm, text="Create videos", font=Formats.FONT_REGULAR.value, variable=self.path_videos_var
-        )
-        path_last_frm_cb = Checkbutton(
-            self.settings_frm, text="Create last frame", font=Formats.FONT_REGULAR.value, variable=self.path_last_frm_var
-        )
-        self.include_animal_names_cb = Checkbutton(
-            self.settings_frm,
-            text="Include animal names",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.include_animal_names_var,
-        )
+        path_frames_cb = Checkbutton(self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.path_frames_var)
+        path_videos_cb = Checkbutton(self.settings_frm, text="Create videos", font=Formats.FONT_REGULAR.value, variable=self.path_videos_var)
+        path_last_frm_cb = Checkbutton(self.settings_frm, text="Create last frame", font=Formats.FONT_REGULAR.value, variable=self.path_last_frm_var)
+        self.include_animal_names_cb = Checkbutton( self.settings_frm, text="Include animal names", font=Formats.FONT_REGULAR.value, variable=self.include_animal_names_var)
 
         self.multiprocess_cb = Checkbutton(
             self.settings_frm,
@@ -225,28 +125,12 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
                 dropdown_menus=[self.multiprocess_dropdown],
             ),
         )
-        self.multiprocess_dropdown = DropDownMenu(
-            self.settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12"
-        )
+        self.multiprocess_dropdown = DropDownMenu(self.settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
         self.multiprocess_dropdown.setChoices(2)
         self.multiprocess_dropdown.disable()
 
-        self.run_frm = LabelFrame(
-            self.main_frm,
-            text="RUN",
-            font=Formats.FONT_HEADER.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_single_video_frm = LabelFrame(
-            self.run_frm,
-            text="SINGLE VIDEO",
-            font=Formats.FONT_HEADER.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
+        self.run_frm = LabelFrame( self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
+        self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_btn = Button(
             self.run_single_video_frm,
             text="Create single video",

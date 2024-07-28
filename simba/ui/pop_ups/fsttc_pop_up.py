@@ -1,6 +1,8 @@
 __author__ = "Simon Nilsson"
 
+import os
 from tkinter import *
+from typing import Union
 
 from simba.data_processors.fsttc_calculator import FSTTCCalculator
 from simba.mixins.config_reader import ConfigReader
@@ -12,7 +14,8 @@ from simba.utils.errors import CountError
 
 
 class FSTTCPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
+
         PopUpMixin.__init__(self, title="FORWARD SPIKE TIME TILING COEFFICIENTS")
         ConfigReader.__init__(self, config_path=config_path)
         settings_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.FSTTC.value,)

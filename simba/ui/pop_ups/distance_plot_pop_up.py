@@ -11,8 +11,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.distance_plotter import DistancePlotterSingleCore
 from simba.plotting.distance_plotter_mp import DistancePlotterMultiCore
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton)
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import DuplicationError
@@ -71,20 +70,13 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
 
         self.run_frm = LabelFrame(self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_single_video_btn = Button(self.run_single_video_frm, text="Create single video", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.__create_distance_plots(multiple_videos=False),)
+
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_distance_plots, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu( self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12")
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
 
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_multiple_video_btn = Button(
-            self.run_multiple_videos,
-            font=Formats.FONT_REGULAR.value,
-            text="Create multiple videos ({} video(s) found)".format(
-                str(len(list(self.files_found_dict.keys())))
-            ),
-            fg="blue",
-            command=lambda: self.__create_distance_plots(multiple_videos=True),
-        )
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_distance_plots, cmd_kwargs={'multiple_videos': True})
 
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=0, sticky=NW)
@@ -216,7 +208,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
         threading.Thread(distance_plotter.run()).start()
 
 
-# _ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#_ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 
 
 # _ = DistancePlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

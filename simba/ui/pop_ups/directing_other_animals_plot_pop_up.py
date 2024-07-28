@@ -7,11 +7,9 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.directing_animals_visualizer import \
-    DirectingOtherAnimalsVisualizer
-from simba.plotting.directing_animals_visualizer_mp import \
-    DirectingOtherAnimalsVisualizerMultiprocess
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.plotting.directing_animals_visualizer import DirectingOtherAnimalsVisualizer
+from simba.plotting.directing_animals_visualizer_mp import DirectingOtherAnimalsVisualizerMultiprocess
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import AnimalNumberError
 from simba.utils.lookups import get_color_dict
@@ -68,12 +66,14 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
 
         self.run_frm = LabelFrame(self.main_frm,text="RUN",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
         self.run_single_video_frm = LabelFrame( self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_single_video_btn = Button( self.run_single_video_frm, font=Formats.FONT_REGULAR.value, text="Create single video", fg="blue", command=lambda: self.__create_directionality_plots(multiple_videos=False),)
+
+
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", font=Formats.FONT_REGULAR.value, cmd=self.__create_directionality_plots, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm,"Video:",list(self.files_found_dict.keys()),"12",)
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
         self.run_multiple_videos = LabelFrame(self.run_frm,text="MULTIPLE VIDEO",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black",)
-        self.run_multiple_video_btn = Button(self.run_multiple_videos,font=Formats.FONT_REGULAR.value,text=f"Create multiple videos ({len(list(self.files_found_dict.keys()))} video(s) found)",fg="blue",command=lambda: self.__create_directionality_plots(multiple_videos=True),)
 
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(list(self.files_found_dict.keys()))} video(s) found)", font=Formats.FONT_REGULAR.value, cmd=self.__create_directionality_plots, cmd_kwargs={'multiple_videos': True})
         self.style_settings_frm.grid(row=0, column=0, sticky=NW)
         self.show_pose_cb.grid(row=0, column=0, sticky=NW)
         self.highlight_direction_endpoints_cb.grid(row=1, column=0, sticky=NW)
@@ -132,5 +132,5 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
             threading.Thread(target=visualizer.run()).start()
 
 
-# _ = DirectingOtherAnimalsVisualizerPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#_ = DirectingOtherAnimalsVisualizerPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # _ = DirectingOtherAnimalsVisualizerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')

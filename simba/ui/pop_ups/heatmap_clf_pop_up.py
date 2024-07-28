@@ -3,21 +3,21 @@ __author__ = "Simon Nilsson"
 import multiprocessing
 import os
 from tkinter import *
-
+from typing import Union
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.heat_mapper_clf import HeatMapperClfSingleCore
 from simba.plotting.heat_mapper_clf_mp import HeatMapperClfMultiprocess
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class HeatmapClfPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
 
         self.data_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
@@ -66,20 +66,13 @@ class HeatmapClfPopUp(PopUpMixin, ConfigReader):
 
         self.run_frm = LabelFrame(self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_single_video_btn = Button(self.run_single_video_frm, text="Create single video", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.__create_heatmap_plots(multiple_videos=False),)
+
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_heatmap_plots, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12",)
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_multiple_video_btn = Button(
-            self.run_multiple_videos,
-            text="Create multiple videos ({} video(s) found)".format(
-                str(len(list(self.files_found_dict.keys())))
-            ),
-            fg="blue",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.__create_heatmap_plots(multiple_videos=False),
-        )
 
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_heatmap_plots, cmd_kwargs={'multiple_videos': True})
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.palette_dropdown.grid(row=0, sticky=NW)
         self.shading_dropdown.grid(row=1, sticky=NW)

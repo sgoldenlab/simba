@@ -2,20 +2,20 @@ __author__ = "Simon Nilsson"
 
 import os
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.gantt_creator import GanttCreatorSingleProcess
 from simba.plotting.gantt_creator_mp import GanttCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton)
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class GanttPlotPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, config_path=config_path, title="VISUALIZE GANTT PLOTS")
         ConfigReader.__init__(self, config_path=config_path)
         self.data_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
@@ -61,21 +61,14 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
 
         self.run_frm = LabelFrame( self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
         self.run_single_video_frm = LabelFrame(self.run_frm,text="SINGLE VIDEO",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black",)
-        self.run_single_video_btn = Button( self.run_single_video_frm, text="Create single video", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.__create_gantt_plots(multiple_videos=False),)
+
+
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm,"Video:",list(self.files_found_dict.keys()),"12",)
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
 
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_multiple_video_btn = Button(
-            self.run_multiple_videos,
-            text="Create multiple videos ({} video(s) found)".format(
-                str(len(list(self.files_found_dict.keys())))
-            ),
-            font=Formats.FONT_REGULAR.value,
-            fg="blue",
-            command=lambda: self.__create_gantt_plots(multiple_videos=True),
-        )
-
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple_videos': True})
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.auto_compute_style_cb.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=1, sticky=NW)

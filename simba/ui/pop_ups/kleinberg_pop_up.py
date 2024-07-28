@@ -1,28 +1,23 @@
 __author__ = "Simon Nilsson"
 
+import os
 from tkinter import *
+from typing import Union
 
 from simba.data_processors.kleinberg_calculator import KleinbergCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, Entry_Box
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, Entry_Box, SimbaButton
 from simba.utils.checks import check_float, check_int
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import NoChoosenClassifierError
 
 
 class KleinbergPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
-        PopUpMixin.__init__(
-            self, title="APPLY KLEINBERG BEHAVIOR CLASSIFICATION SMOOTHING"
-        )
+    def __init__(self, config_path: Union[str, os.PathLike]):
+        PopUpMixin.__init__(self, title="APPLY KLEINBERG BEHAVIOR CLASSIFICATION SMOOTHING")
         ConfigReader.__init__(self, config_path=config_path)
-        kleinberg_settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="Kleinberg Settings",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.KLEINBERG.value,
-        )
+        kleinberg_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="Kleinberg Settings", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.KLEINBERG.value)
         self.k_sigma = Entry_Box(kleinberg_settings_frm, "Sigma", "10")
         self.k_sigma.entry_set("2")
         self.k_gamma = Entry_Box(kleinberg_settings_frm, "Gamma", "10")
@@ -32,9 +27,7 @@ class KleinbergPopUp(PopUpMixin, ConfigReader):
         self.h_search_lbl = Label(kleinberg_settings_frm, text="Hierarchical search: ")
         self.h_search_lbl_val = BooleanVar()
         self.h_search_lbl_val.set(False)
-        self.h_search_lbl_val_cb = Checkbutton(
-            kleinberg_settings_frm, variable=self.h_search_lbl_val
-        )
+        self.h_search_lbl_val_cb = Checkbutton(kleinberg_settings_frm, variable=self.h_search_lbl_val)
         kleinberg_table_frame = LabelFrame(self.main_frm, text="Choose classifier(s) to apply Kleinberg smoothing", font=Formats.FONT_HEADER.value)
         clf_var_dict, clf_cb_dict = {}, {}
         for clf_cnt, clf in enumerate(self.clf_names):
@@ -44,16 +37,9 @@ class KleinbergPopUp(PopUpMixin, ConfigReader):
             )
             clf_cb_dict[clf].grid(row=clf_cnt, sticky=NW)
 
-        run_kleinberg_btn = Button(
-            self.main_frm,
-            text="Apply Kleinberg Smoother",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.run_kleinberg(
-                behaviors_dict=clf_var_dict,
-                hierarchical_search=self.h_search_lbl_val.get(),
-            ),
-        )
 
+
+        run_kleinberg_btn = SimbaButton(parent=self.main_frm, txt="APPLY KLEINBERG SMOOTHER", img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.run_kleinberg, cmd_kwargs={'behaviors_dict': clf_var_dict, 'hierarchical_search': self.h_search_lbl_val.get()})
         kleinberg_settings_frm.grid(row=0, sticky=W, padx=10)
         self.k_sigma.grid(row=0, sticky=W)
         self.k_gamma.grid(row=1, sticky=W)

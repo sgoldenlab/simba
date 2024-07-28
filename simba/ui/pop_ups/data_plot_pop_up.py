@@ -6,7 +6,7 @@ from tkinter import *
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.data_plotter import DataPlotter
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import get_file_name_info_in_directory
@@ -36,7 +36,7 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.rounding_decimals_dropdown.setChoices(2)
         self.font_thickness_dropdown.setChoices(1)
 
-        self.body_parts_frm = LabelFrame( self.main_frm, text="CHOOSE BODY-PARTS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
+        self.body_parts_frm = LabelFrame(self.main_frm, text="CHOOSE BODY-PARTS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         self.number_of_animals_dropdown = DropDownMenu( self.body_parts_frm, "# Animals:", self.animal_cnt_options, "16", com=self.__populate_body_parts_menu,)
         self.number_of_animals_dropdown.setChoices(self.animal_cnt_options[0])
         self.__populate_body_parts_menu(self.animal_cnt_options[0])
@@ -49,12 +49,12 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
 
         self.run_frm = LabelFrame( self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_single_video_btn = Button(self.run_single_video_frm, text="Create single video", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.__create_data_plots(multiple_videos=False),)
+
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", font=Formats.FONT_REGULAR.value, cmd=self.__create_data_plots, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12")
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_multiple_video_btn = Button(self.run_multiple_videos,font=Formats.FONT_REGULAR.value,text="Create multiple videos ({} video(s) found)".format(    str(len(list(self.files_found_dict.keys())))),fg="blue",command=lambda: self.__create_data_plots(multiple_videos=True),)
-
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), font=Formats.FONT_REGULAR.value, cmd=self.__create_data_plots, cmd_kwargs={'multiple_videos': True})
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=0, sticky=NW)
         self.rounding_decimals_dropdown.grid(row=1, sticky=NW)
