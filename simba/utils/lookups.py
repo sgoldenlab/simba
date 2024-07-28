@@ -22,7 +22,6 @@ from simba.utils.enums import OS, FontPaths, Methods, Paths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
 
-import pyglet
 if platform.system() == OS.WINDOWS.value:
     from pyglet.libs.win32 import constants
     constants.COINIT_MULTITHREADED = 0x2  # 0x2 = COINIT_APARTMENTTHREADED
