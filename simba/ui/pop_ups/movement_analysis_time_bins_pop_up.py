@@ -3,10 +3,12 @@ __author__ = "Simon Nilsson"
 from tkinter import *
 from typing import Union
 
-from simba.data_processors.timebins_movement_calculator import TimeBinsMovementCalculator
+from simba.data_processors.timebins_movement_calculator import \
+    TimeBinsMovementCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        SimbaButton)
 from simba.utils.checks import check_float, check_int
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 

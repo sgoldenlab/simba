@@ -4,13 +4,15 @@ import multiprocessing
 import os
 from tkinter import *
 from typing import Union
+
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.heat_mapper_clf import HeatMapperClfSingleCore
 from simba.plotting.heat_mapper_clf_mp import HeatMapperClfMultiprocess
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        SimbaButton)
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.read_write import get_file_name_info_in_directory

@@ -11,7 +11,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.distance_plotter import DistancePlotterSingleCore
 from simba.plotting.distance_plotter_mp import DistancePlotterMultiCore
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, SimbaButton)
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import DuplicationError

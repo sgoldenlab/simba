@@ -7,9 +7,12 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.directing_animals_visualizer import DirectingOtherAnimalsVisualizer
-from simba.plotting.directing_animals_visualizer_mp import DirectingOtherAnimalsVisualizerMultiprocess
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
+from simba.plotting.directing_animals_visualizer import \
+    DirectingOtherAnimalsVisualizer
+from simba.plotting.directing_animals_visualizer_mp import \
+    DirectingOtherAnimalsVisualizerMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        SimbaButton)
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import AnimalNumberError
 from simba.utils.lookups import get_color_dict

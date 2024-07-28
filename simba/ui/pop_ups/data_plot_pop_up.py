@@ -6,7 +6,8 @@ from tkinter import *
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.data_plotter import DataPlotter
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        SimbaButton)
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import get_file_name_info_in_directory
