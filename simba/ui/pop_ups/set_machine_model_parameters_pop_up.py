@@ -6,8 +6,10 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimbaButton)
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FileSelect, SimbaButton)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int)
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.printing import stdout_success
 
