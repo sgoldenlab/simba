@@ -8,10 +8,8 @@ from typing import Union
 from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
-                                        FolderSelect)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_int)
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect, FolderSelect, SimbaButton)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_int)
 from simba.utils.enums import Formats, Options
 from simba.utils.read_write import str_2_bool
 
@@ -42,16 +40,17 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
 
         self.single_file_frm = LabelFrame(self.main_frm, text="SMOOTH SINGLE DATA FILE", font=Formats.FONT_HEADER.value)
         self.selected_file = FileSelect(self.single_file_frm, "DATA PATH:", lblwidth=35, file_types=[("VIDEO FILE", ".csv .parquet")], initialdir=self.project_path)
-        self.run_btn_single = Button(self.single_file_frm, text="RUN SINGLE DATA FILE SMOOTHING", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
 
+
+        self.run_btn_single = SimbaButton(parent=self.single_file_frm, txt="RUN SINGLE DATA FILE SMOOTHING", img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': False})
         self.single_file_frm.grid(row=1, column=0, sticky=NW)
         self.selected_file.grid(row=0, column=0, sticky=NW)
         self.run_btn_single.grid(row=1, column=0, sticky=NW)
 
         self.multiple_file_frm = LabelFrame(self.main_frm, text="SMOOTH DIRECTORY OF DATA", font=Formats.FONT_HEADER.value)
         self.selected_dir = FolderSelect(self.multiple_file_frm, "SELECT DIRECTORY OF DATA FILES:", lblwidth=35, initialdir=self.project_path)
-        self.run_btn_multiple = Button(self.multiple_file_frm, text="RUN DATA DIRECTORY SMOOTHING", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
 
+        self.run_btn_multiple = SimbaButton(parent=self.multiple_file_frm, txt="RUN DATA DIRECTORY SMOOTHING", img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True})
         self.multiple_file_frm.grid(row=2, column=0, sticky=NW)
         self.selected_dir.grid(row=0, column=0, sticky=NW)
         self.run_btn_multiple.grid(row=1, column=0, sticky=NW)
@@ -81,3 +80,6 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
                               multi_index_df_headers=multi_index_df_headers,
                               copy_originals=copy_originals)
         smoothing.run()
+
+
+#SmoothingPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
