@@ -19,7 +19,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
 from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, CreateToolTip, DropDownMenu, Entry_Box, FileSelect, FolderSelect, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+                                        CreateToolTip, DropDownMenu, Entry_Box,
+                                        FileSelect, FolderSelect, SimbaButton)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,

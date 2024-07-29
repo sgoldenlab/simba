@@ -7,9 +7,12 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.single_run_model_validation_video import ValidateModelOneVideo
-from simba.plotting.single_run_model_validation_video_mp import ValidateModelOneVideoMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box)
+from simba.plotting.single_run_model_validation_video import \
+    ValidateModelOneVideo
+from simba.plotting.single_run_model_validation_video_mp import \
+    ValidateModelOneVideoMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box)
 from simba.utils.checks import check_float, check_int
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.read_write import check_file_exist_and_readable, str_2_bool
