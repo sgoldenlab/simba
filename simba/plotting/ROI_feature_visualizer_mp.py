@@ -299,6 +299,15 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             stdout_success(msg=f"Video {self.video_name} complete. Video saved in directory {self.roi_features_save_dir}.", elapsed_time=self.timer.elapsed_time_str)
 
 
+# if __name__ == '__main__':
+#     style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'funnel', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': False}
+#     test = ROIfeatureVisualizerMultiprocess(config_path=r"C:\troubleshooting\platea\project_folder\project_config.ini",
+#                               video_path=r"C:\troubleshooting\platea\project_folder\videos\Video_1.mp4",
+#                               body_parts=['NOSE'],
+#                               style_attr=style_attr)
+#     test.run()
+
+
 
 # style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'funnel', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}
 # test = ROIfeatureVisualizerMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',

@@ -12,7 +12,7 @@ class Csv2ParquetPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="Convert CSV directory to parquet", size=(300, 300))
         frm = LabelFrame(self.main_frm, font=Formats.FONT_REGULAR.value, text="Select CSV directory", padx=5, pady=5)
         folder_path = FolderSelect(frm, "CSV folder path", title=" Select CSV folder")
-        run_btn = SimbaButton(parent=frm, txt="Convert CSV to parquet", font=Formats.FONT_REGULAR.value, cmd=convert_csv_to_parquet, cmd_kwargs={'directory': folder_path.folder_path})
+        run_btn = SimbaButton(parent=frm, txt="Convert CSV to parquet", font=Formats.FONT_REGULAR.value, cmd=convert_csv_to_parquet, cmd_kwargs={'directory': lambda: folder_path.folder_path})
         frm.grid(row=1, sticky=W, pady=10)
         folder_path.grid(row=0, sticky=W)
         run_btn.grid(row=1, sticky=W, pady=10)

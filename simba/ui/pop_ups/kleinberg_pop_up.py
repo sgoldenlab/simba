@@ -40,7 +40,7 @@ class KleinbergPopUp(PopUpMixin, ConfigReader):
 
 
 
-        run_kleinberg_btn = SimbaButton(parent=self.main_frm, txt="APPLY KLEINBERG SMOOTHER", img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.run_kleinberg, cmd_kwargs={'behaviors_dict': clf_var_dict, 'hierarchical_search': self.h_search_lbl_val.get()})
+        run_kleinberg_btn = SimbaButton(parent=self.main_frm, txt="APPLY KLEINBERG SMOOTHER", img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.run_kleinberg, cmd_kwargs={'behaviors_dict': lambda: clf_var_dict, 'hierarchical_search': lambda: self.h_search_lbl_val.get()})
         kleinberg_settings_frm.grid(row=0, sticky=W, padx=10)
         self.k_sigma.grid(row=0, sticky=W)
         self.k_gamma.grid(row=1, sticky=W)

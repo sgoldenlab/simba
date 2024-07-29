@@ -61,7 +61,7 @@ class PopUpMixin(object):
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
 
     def create_clf_checkboxes(self,
-                              main_frm: Frame,
+                              main_frm: Union[Frame, LabelFrame, Toplevel, Canvas],
                               clfs: List[str],
                               title: str = "SELECT CLASSIFIER ANNOTATIONS"):
         """

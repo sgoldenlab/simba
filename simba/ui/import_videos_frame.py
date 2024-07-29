@@ -59,13 +59,13 @@ class ImportVideosFrame(PopUpMixin, ConfigReader):
             self.video_type = DropDownMenu(import_multiple_videos_frm, "VIDEO FILE FORMAT: ", Options.VIDEO_FORMAT_OPTIONS.value, "25")
             self.video_type.setChoices(Options.VIDEO_FORMAT_OPTIONS.value[0])
 
-            import_multiple_btn = SimbaButton(parent=import_multiple_videos_frm, txt="Import MULTIPLE videos", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run_video_import, cmd_kwargs={"multiple_videos": True})
+            import_multiple_btn = SimbaButton(parent=import_multiple_videos_frm, txt="Import MULTIPLE videos", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run_video_import, cmd_kwargs={"multiple_videos": lambda: True})
             self.multiple_videos_symlink_var = BooleanVar(value=False)
             multiple_videos_symlink_cb = Checkbutton(import_multiple_videos_frm, text="Import SYMLINKS", font=Formats.FONT_REGULAR.value, variable=self.multiple_videos_symlink_var)
 
             import_single_frm = LabelFrame(import_videos_frm, text="IMPORT SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5)
             self.video_file_select = FileSelect(import_single_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-            import_single_btn = SimbaButton(parent=import_single_frm, txt="Import SINGLE video", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run_video_import, cmd_kwargs={"multiple_videos": False})
+            import_single_btn = SimbaButton(parent=import_single_frm, txt="Import SINGLE video", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run_video_import, cmd_kwargs={"multiple_videos": lambda: False})
             self.single_video_symlink_var = BooleanVar(value=False)
             single_video_symlink_cb = Checkbutton(import_single_frm, text="Import SYMLINK", font=Formats.FONT_REGULAR.value, variable=self.single_video_symlink_var)
 

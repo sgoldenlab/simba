@@ -79,7 +79,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.run_frm = LabelFrame(self.main_frm,text="RUN",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
         self.run_single_video_frm = LabelFrame( self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
 
-        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__initiate_video_creation, cmd_kwargs={'multiple_videos': False})
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__initiate_video_creation, cmd_kwargs={'multiple_videos': lambda: False})
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", self.video_lst, "12", com=lambda x: self.__update_single_video_file_path(filename=x),)
         self.select_video_file_select = FileSelect(self.run_single_video_frm, "", lblwidth="1", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], dropdown=self.single_video_dropdown,)
         self.single_video_dropdown.setChoices(self.video_lst[0])
@@ -87,7 +87,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
 
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
 
-        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(self.machine_results_paths)} video(s) found)", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__initiate_video_creation, cmd_kwargs={'multiple_videos': True})
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(self.machine_results_paths)} video(s) found)", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__initiate_video_creation, cmd_kwargs={'multiple_videos': lambda: True})
         bp_threshold_frm.grid(row=0, sticky=NW)
         self.bp_threshold_lbl.grid(row=0, sticky=NW)
         self.bp_threshold_entry.grid(row=1, sticky=NW)

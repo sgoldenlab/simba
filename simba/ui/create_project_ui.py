@@ -75,7 +75,7 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.ml_settings_frm = LabelFrame(self.settings_frm, text="MACHINE LEARNING SETTINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.clf_cnt = Entry_Box(self.ml_settings_frm, "Number of classifiers (behaviors): ", "25", validation="numeric")
 
-        add_clf_btn = SimbaButton(parent=self.ml_settings_frm, txt="<Add predictive classifier(s)>", txt_clr='blue', img='add_on', cmd=self.create_entry_boxes_from_entrybox, cmd_kwargs={'count': self.clf_cnt.entry_get, 'parent': self.ml_settings_frm, 'current_entries': self.clf_name_entries})
+        add_clf_btn = SimbaButton(parent=self.ml_settings_frm, txt="<Add predictive classifier(s)>", txt_clr='blue', img='add_on', cmd=self.create_entry_boxes_from_entrybox, cmd_kwargs={'count': lambda: self.clf_cnt.entry_get, 'parent': lambda: self.ml_settings_frm, 'current_entries': lambda: self.clf_name_entries})
 
         self.animal_settings_frm = LabelFrame(self.settings_frm, text="ANIMAL SETTINGS", font=Formats.FONT_HEADER.value)
         self.tracking_type_dropdown = DropDownMenu(self.animal_settings_frm, "Type of Tracking", Options.TRACKING_TYPE_OPTIONS.value, "25", com=self.update_body_part_dropdown)

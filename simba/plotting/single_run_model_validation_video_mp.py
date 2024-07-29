@@ -293,16 +293,16 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self.timer.stop_timer()
         stdout_success(msg=f"Video complete, saved at {self.video_save_path}", elapsed_time=self.timer.elapsed_time_str)
 
-
+#
 # if __name__ == "__main__":
 #     test = ValidateModelOneVideoMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                     feature_file_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\FRR_gq_Saline_0620.csv",
-#                                     model_path=r"C:\troubleshooting\mitra\models\validations\rearing_3\rearing.sav",
+#                                     feature_file_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\844_MA131_gq_CNO_0624.csv",
+#                                     model_path=r"C:\troubleshooting\mitra\models\validations\lay-on-belly_1\lay-on-belly.sav",
 #                                     discrimination_threshold=0.35,
 #                                     shortest_bout=200,
 #                                     cores=-1,
-#                                     settings={'pose': True, 'animal_names': True, 'styles': None},
-#                                     create_gantt=None)
+#                                     settings={'pose': True, 'animal_names': False, 'styles': None},
+#                                     create_gantt=2)
 #     test.run()
 
 

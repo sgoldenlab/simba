@@ -311,11 +311,12 @@ class ROIPlotMultiprocess(ConfigReader):
             stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.video_save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
 
 
-# test = ROIPlotMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
-#                           video_path="/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4",
-#                           body_parts=['Nose'],
-#                           style_attr={'show_body_part': True, 'show_animal_name': False})
-# test.run()
+# if __name__ == '__main__':
+#     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\platea\project_folder\project_config.ini",
+#                               video_path=r"C:\troubleshooting\platea\project_folder\videos\Video_1.mp4",
+#                               body_parts=['NOSE'],
+#                               style_attr={'show_body_part': True, 'show_animal_name': False})
+#     test.run()
 
 # test = ROIPlotMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini',
 #                           video_path="/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/videos/raw_clip1.mp4",

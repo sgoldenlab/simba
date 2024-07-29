@@ -19,9 +19,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
 from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
-                                        CreateToolTip, DropDownMenu, Entry_Box,
-                                        FileSelect, FolderSelect)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, CreateToolTip, DropDownMenu, Entry_Box, FileSelect, FolderSelect, SimbaButton)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -82,15 +80,15 @@ class CLAHEPopUp(PopUpMixin):
                                                     icon_name=Keys.DOCUMENTATION.value,
                                                     icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
-        run_single_video_btn = Button(single_video_frm, text="Apply CLAHE on VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run_single_video(),  fg="blue")
 
-        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm,
-                                                       header="MULTIPLE VIDEOs - Contrast Limited Adaptive Histogram Equalization",
-                                                       icon_name=Keys.DOCUMENTATION.value,
-                                                       icon_link=Links.VIDEO_TOOLS.value)
+
+
+        run_single_video_btn = SimbaButton(parent=single_video_frm, txt="Apply CLAHE on VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_single_video)
+
+        multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOs - Contrast Limited Adaptive Histogram Equalization", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
-        run_multiple_btn = Button(multiple_videos_frm, text="Apply CLAHE on DIRECTORY", font=Formats.FONT_REGULAR.value, command=lambda: self.run_directory(), fg="blue")
 
+        run_multiple_btn = SimbaButton(parent=multiple_videos_frm, txt="Apply CLAHE on DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory)
         single_video_frm.grid(row=0, column=0, sticky=NW)
         self.selected_video.grid(row=0, column=0, sticky=NW)
         run_single_video_btn.grid(row=1, column=0, sticky=NW)
@@ -121,70 +119,19 @@ class CLAHEPopUp(PopUpMixin):
 class CropVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CROP SINGLE VIDEO")
-        crop_video_lbl_frm = LabelFrame(
-            self.main_frm,
-            text="Crop Video",
-            font=Formats.FONT_HEADER.value,
-        )
-        selected_video = FileSelect(
-            crop_video_lbl_frm,
-            "Video path",
-            title="Select a video file",
-            lblwidth=20,
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
+        crop_video_lbl_frm = LabelFrame( self.main_frm, text="Crop Video", font=Formats.FONT_HEADER.value)
+        selected_video = FileSelect(crop_video_lbl_frm, "Video path", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         use_gpu_var_single = BooleanVar(value=False)
-        use_gpu_cb_single = Checkbutton(
-            crop_video_lbl_frm,
-            text="Use GPU (reduced runtime)",
-            font=Formats.FONT_REGULAR.value,
-            variable=use_gpu_var_single,
-        )
-        button_crop_video_single = Button(
-            crop_video_lbl_frm,
-            text="Crop Video",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: crop_single_video(
-                file_path=selected_video.file_path, gpu=use_gpu_var_single.get()
-            ),
-        )
+        use_gpu_cb_single = Checkbutton(crop_video_lbl_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=use_gpu_var_single)
 
-        crop_video_lbl_frm_multiple = LabelFrame(
-            self.main_frm,
-            text="Fixed coordinates crop for multiple videos",
-            font=Formats.FONT_HEADER.value,
-            padx=5,
-            pady=5,
-        )
-        input_folder = FolderSelect(
-            crop_video_lbl_frm_multiple,
-            "Video directory:",
-            title="Select Folder with videos",
-            lblwidth=20,
-        )
-        output_folder = FolderSelect(
-            crop_video_lbl_frm_multiple,
-            "Output directory:",
-            title="Select a folder for your output videos",
-            lblwidth=20,
-        )
+        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': lambda: use_gpu_var_single.get()})
+        crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="Fixed coordinates crop for multiple videos", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        input_folder = FolderSelect(crop_video_lbl_frm_multiple, "Video directory:", title="Select Folder with videos", lblwidth=20)
+        output_folder = FolderSelect(crop_video_lbl_frm_multiple,"Output directory:",title="Select a folder for your output videos",lblwidth=20)
         use_gpu_var_multiple = BooleanVar(value=False)
-        use_gpu_cb_multiple = Checkbutton(
-            crop_video_lbl_frm_multiple,
-            text="Use GPU (reduced runtime)",
-            font=Formats.FONT_REGULAR.value,
-            variable=use_gpu_var_multiple,
-        )
-        button_crop_video_multiple = Button(
-            crop_video_lbl_frm_multiple,
-            text="Crop Videos",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: crop_multiple_videos(
-                directory_path=input_folder.folder_path,
-                output_path=output_folder.folder_path,
-                gpu=use_gpu_var_multiple.get(),
-            ),
-        )
+        use_gpu_cb_multiple = Checkbutton(crop_video_lbl_frm_multiple, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=use_gpu_var_multiple)
+
+        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path,  'gpu': use_gpu_var_multiple.get()})
         crop_video_lbl_frm.grid(row=0, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
         use_gpu_cb_single.grid(row=1, column=0, sticky=NW)
@@ -194,33 +141,20 @@ class CropVideoPopUp(PopUpMixin):
         output_folder.grid(row=1, sticky=NW)
         use_gpu_cb_multiple.grid(row=2, sticky=NW)
         button_crop_video_multiple.grid(row=3, sticky=NW)
+        self.main_frm.mainloop()
 
-
-#         self.main_frm.mainloop()
-#
-# _ = CropVideoPopUp()
+#_ = CropVideoPopUp()
 
 
 class ClipVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLIP VIDEO")
-        selected_video_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="Video path",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        selected_video = FileSelect(
-            selected_video_frm,
-            "FILE PATH: ",
-            file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
+        selected_video_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="Video path", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        selected_video = FileSelect(selected_video_frm, "FILE PATH: ", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         selected_video.grid(row=0, column=0, sticky="NW")
         use_gpu_frm = LabelFrame(self.main_frm, text="GPU", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.use_gpu_var = BooleanVar(value=False)
-        self.use_gpu_cb = Checkbutton(
-            use_gpu_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var
-        )
+        self.use_gpu_cb = Checkbutton(use_gpu_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
         self.use_gpu_cb.grid(row=0, column=0, sticky=NW)
         method_1_frm = LabelFrame(self.main_frm, text="Method 1", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         label_set_time_1 = Label(method_1_frm, text="Please enter the time frame in HH:MM:SS format", font=Formats.FONT_REGULAR.value)
@@ -230,27 +164,10 @@ class ClipVideoPopUp(PopUpMixin):
         method_2_frm = LabelFrame(self.main_frm, text="Method 2", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         method_2_time = Entry_Box(method_2_frm, "Seconds:", "15", validation="numeric")
         label_method_2 = Label(method_2_frm, text="Method 2 will retrieve from the end of the video (e.g.,: an input of 3 seconds will get rid of the first 3 seconds of the video).", font=Formats.FONT_REGULAR.value)
-        button_cutvideo_method_1 = Button(
-            method_1_frm,
-            text="Cut Video",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: clip_video_in_range(
-                file_path=selected_video.file_path,
-                start_time=start_time.entry_get,
-                end_time=end_time.entry_get,
-                gpu=self.use_gpu_var.get(),
-            ),
-        )
-        button_cutvideo_method_2 = Button(
-            method_2_frm,
-            text="Cut Video",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: remove_beginning_of_video(
-                file_path=selected_video.file_path,
-                time=method_2_time.entry_get,
-                gpu=self.use_gpu_var.get(),
-            ),
-        )
+
+
+        button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'start_time': lambda:start_time.entry_get, 'end_time': lambda:end_time.entry_get, 'gpu': lambda: self.use_gpu_var.get()})
+        button_cutvideo_method_2 = SimbaButton(parent=method_2_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_beginning_of_video, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'time': lambda:method_2_time.entry_get, 'gpu': lambda:self.use_gpu_var.get()})
         selected_video_frm.grid(row=0, sticky=NW)
         use_gpu_frm.grid(row=1, column=0, sticky=NW)
         method_1_frm.grid(row=2, sticky=NW, pady=5)
@@ -264,53 +181,20 @@ class ClipVideoPopUp(PopUpMixin):
         button_cutvideo_method_2.grid(row=3, sticky=NW)
 
 
-#       self.main_frm.mainloop()
-# _ = ClipVideoPopUp()
-
 
 class GreyscaleSingleVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="GREYSCALE VIDEO")
-        video_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="GREYSCALE VIDEO",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        self.selected_video = FileSelect(
-            video_frm,
-            "VIDEO FILE PATH",
-            title="Select a video file",
-            lblwidth=20,
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
+        video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GREYSCALE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect( video_frm, "VIDEO FILE PATH", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         self.use_gpu_var_video = BooleanVar(value=False)
-        use_gpu_video_cb = Checkbutton(
-            video_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var_video
-        )
-        run_video_btn = Button(
-            video_frm, text="RUN", font=Formats.FONT_REGULAR.value, command=lambda: self.run_video(), fg="blue"
-        )
-
-        dir_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="GREYSCALE VIDEO DIRECTORY",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        self.dir_selected = FolderSelect(
-            dir_frm,
-            "VIDEO DIRECTORY PATH",
-            title="Select folder with videos",
-            lblwidth=20,
-        )
+        use_gpu_video_cb = Checkbutton(video_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var_video)
+        run_video_btn = SimbaButton(parent=video_frm, txt="RUN ON SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video)
+        dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GREYSCALE VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.dir_selected = FolderSelect(dir_frm, "VIDEO DIRECTORY PATH", title="Select folder with videos", lblwidth=20)
         self.use_gpu_var_dir = BooleanVar(value=False)
-        use_gpu_dir_cb = Checkbutton(
-            dir_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var_dir
-        )
-        run_dir_btn = Button(
-            dir_frm, text="RUN", font=Formats.FONT_REGULAR.value, command=lambda: self.run_dir(), fg="blue"
-        )
+        use_gpu_dir_cb = Checkbutton(dir_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var_dir)
+        run_dir_btn = SimbaButton(parent=dir_frm, txt="RUN ON DIRECTORY OF VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
 
         video_frm.grid(row=0, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
@@ -359,7 +243,8 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE FRAME COUNT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run_single_video())
+
+        single_video_run = SimbaButton(parent=single_video_frm, txt="RUN - SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_single_video)
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
@@ -367,7 +252,7 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE FRAME COUNT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run_multiple_videos())
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_multiple_videos)
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -409,57 +294,30 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
 class MultiShortenPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLIP VIDEO INTO MULTIPLE VIDEOS", size=(800, 200))
-        settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="Split videos into different parts",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        self.selected_video = FileSelect(
-            settings_frm,
-            "Video path",
-            title="Select a video file",
-            lblwidth=10,
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        self.clip_cnt = Entry_Box(
-            settings_frm, "# of clips", "10", validation="numeric"
-        )
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="Split videos into different parts",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(settings_frm, "Video path", title="Select a video file", lblwidth=10, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.clip_cnt = Entry_Box(settings_frm, "# of clips", "10", validation="numeric")
         self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(
-            settings_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var
-        )
-        confirm_settings_btn = Button(
-            settings_frm, text="Confirm", font=Formats.FONT_REGULAR.value, command=lambda: self.show_start_stop()
-        )
+        use_gpu_cb = Checkbutton(settings_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
+
+        confirm_settings_btn = SimbaButton(parent=settings_frm, txt="CONFIRM", img='tick', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.show_start_stop)
         settings_frm.grid(row=0, sticky=NW)
         self.selected_video.grid(row=1, sticky=NW, columnspan=2)
         self.clip_cnt.grid(row=2, sticky=NW)
         confirm_settings_btn.grid(row=2, column=1, sticky=W)
         use_gpu_cb.grid(row=3, column=0, sticky=W)
-        instructions = Label(
-            settings_frm,
-            text="Enter clip start and stop times in HH:MM:SS format",
-            fg="navy", font=Formats.FONT_REGULAR.value,
-        )
+        instructions = Label(settings_frm, text="Enter clip start and stop times in HH:MM:SS format", fg="navy", font=Formats.FONT_REGULAR.value)
         instructions.grid(row=4, column=0)
 
-        batch_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="Batch change time",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
+        batch_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="Batch change time", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.batch_start_entry = Entry_Box(batch_frm, "START:", "10")
         self.batch_start_entry.entry_set("00:00:00")
         self.batch_end_entry = Entry_Box(batch_frm, "END", "10")
         self.batch_end_entry.entry_set("00:00:00")
-        batch_start_apply = Button(
-            batch_frm, text="APPLY", font=Formats.FONT_REGULAR.value, command=lambda: self.batch_change(value="start")
-        )
-        batch_end_apply = Button(
-            batch_frm, text="APPLY", font=Formats.FONT_REGULAR.value, command=lambda: self.batch_change(value="end")
-        )
+
+
+        batch_start_apply = SimbaButton(parent=batch_frm, txt="APPLY", font=Formats.FONT_REGULAR.value, cmd=self.batch_change, cmd_kwargs={'value': "start"})
+        batch_end_apply = SimbaButton(parent=batch_frm, txt="APPLY", font=Formats.FONT_REGULAR.value, cmd=self.batch_change, cmd_kwargs={'value': "end"})
 
         batch_frm.grid(row=0, column=1, sticky=NW)
         self.batch_start_entry.grid(row=0, column=0, sticky=NW)
@@ -467,7 +325,7 @@ class MultiShortenPopUp(PopUpMixin):
         self.batch_end_entry.grid(row=1, column=0, sticky=NW)
         batch_end_apply.grid(row=1, column=1, sticky=NW)
 
-        # self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def show_start_stop(self):
         check_int(name="Number of clips", value=self.clip_cnt.entry_get)
@@ -522,39 +380,19 @@ class MultiShortenPopUp(PopUpMixin):
         )
 
 
-# _ = MultiShortenPopUp()
+#_ = MultiShortenPopUp()
 
 
 class ChangeImageFormatPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CHANGE IMAGE FORMAT")
 
-        self.input_folder_selected = FolderSelect(
-            self.main_frm, "Image directory", title="Select folder with images:"
-        )
-        set_input_format_frm = LabelFrame(
-            self.main_frm,
-            text="Original image format",
-            font=Formats.FONT_HEADER.value,
-            padx=15,
-            pady=5,
-        )
-        set_output_format_frm = LabelFrame(
-            self.main_frm,
-            text="Output image format",
-            font=Formats.FONT_HEADER.value,
-            padx=15,
-            pady=5,
-        )
+        self.input_folder_selected = FolderSelect(self.main_frm, "Image directory", title="Select folder with images:")
+        set_input_format_frm = LabelFrame(self.main_frm, text="Original image format", font=Formats.FONT_HEADER.value, padx=15, pady=5)
+        set_output_format_frm = LabelFrame(self.main_frm, text="Output image format", font=Formats.FONT_HEADER.value, padx=15, pady=5)
 
         self.input_file_type, self.out_file_type = StringVar(), StringVar()
-        input_png_rb = Radiobutton(
-            set_input_format_frm,
-            text=".png",
-            variable=self.input_file_type,
-            value="png",
-            font=Formats.FONT_REGULAR.value
-        )
+        input_png_rb = Radiobutton(set_input_format_frm, text=".png", variable=self.input_file_type, value="png", font=Formats.FONT_REGULAR.value)
         input_jpeg_rb = Radiobutton(
             set_input_format_frm,
             text=".jpg",
@@ -731,8 +569,9 @@ class ExtractSpecificFramesPopUp(PopUpMixin):
         select_frames_frm = LabelFrame(self.main_frm, text="FRAME RANGE TO BE EXTRACTED", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.start_frm = Entry_Box(select_frames_frm, "START FRAME:", "15", validation='numeric')
         self.end_frm = Entry_Box(select_frames_frm, "END FRAME:", "15", validation='numeric')
-        run_btn = Button(select_frames_frm,text="RUN", font=Formats.FONT_REGULAR.value, command=lambda: self.start_frm_extraction())
 
+
+        run_btn = SimbaButton(parent=select_frames_frm, txt="RUN", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.start_frm_extraction)
         self.video_file_selected.grid(row=0, column=0, sticky=NW, pady=10)
         select_frames_frm.grid(row=1, column=0, sticky=NW)
         self.start_frm.grid(row=2, column=0, sticky=NW)
@@ -761,41 +600,13 @@ class ExtractSpecificFramesPopUp(PopUpMixin):
 class ExtractAllFramesPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="EXTRACT ALL FRAMES")
-        single_video_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SINGLE VIDEO",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        video_path = FileSelect(
-            single_video_frm,
-            "VIDEO PATH:",
-            title="Select a video file",
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        single_video_btn = Button(
-            single_video_frm,
-            text="Extract Frames (Single video)",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: extract_frames_single_video(file_path=video_path.file_path),
-        )
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SINGLE VIDEO",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.VIDEO_TOOLS.value)
+        video_path = FileSelect( single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        single_video_btn = SimbaButton(parent=single_video_frm, txt="Extract Frames (Single video)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=extract_frames_single_video, cmd_kwargs={'file_path': lambda:video_path.file_path})
+        multiple_videos_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
 
-        multiple_videos_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="MULTIPLE VIDEOS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-
-        folder_path = FolderSelect(
-            multiple_videos_frm, "DIRECTORY PATH:", title=" Select video folder"
-        )
-        multiple_video_btn = Button(
-            multiple_videos_frm,
-            text="Extract Frames (Multiple videos)",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: batch_create_frames(directory=folder_path.folder_path),
-        )
+        folder_path = FolderSelect(multiple_videos_frm, "DIRECTORY PATH:", title=" Select video folder")
+        multiple_video_btn = SimbaButton(parent=multiple_videos_frm, txt="Extract Frames (Multiple videos)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=batch_create_frames, cmd_kwargs={'directory': lambda:folder_path.folder_path})
         single_video_frm.grid(row=0, sticky=NW, pady=10)
         video_path.grid(row=0, sticky=NW)
         single_video_btn.grid(row=1, sticky=W, pady=10)
@@ -807,23 +618,15 @@ class ExtractAllFramesPopUp(PopUpMixin):
 class MultiCropPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="MULTI-CROP", size=(500, 300))
-        self.input_folder = FolderSelect(
-            self.main_frm, "Input Video Folder", lblwidth=15
-        )
+        self.input_folder = FolderSelect(self.main_frm, "Input Video Folder", lblwidth=15)
         self.output_folder = FolderSelect(self.main_frm, "Output Folder", lblwidth=15)
         video_options = ["mp4", "avi", "mov", "flv", "m4v"]
-        self.video_type_dropdown = DropDownMenu(
-            self.main_frm, "Video type:", video_options, "15"
-        )
+        self.video_type_dropdown = DropDownMenu(self.main_frm, "Video type:", video_options, "15")
         self.video_type_dropdown.setChoices("mp4")
-        self.crop_cnt_dropdown = DropDownMenu(
-            self.main_frm, "Crop count:", list(range(1, 31)), "15"
-        )
+        self.crop_cnt_dropdown = DropDownMenu(self.main_frm, "Crop count:", list(range(1, 31)), "15")
         self.crop_cnt_dropdown.setChoices(2)
         self.use_gpu_var = BooleanVar(value=False)
-        self.use_gpu_cb = Checkbutton(
-            self.main_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var
-        )
+        self.use_gpu_cb = Checkbutton(self.main_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
         self.create_run_frm(run_function=self.run)
         self.input_folder.grid(row=0, sticky=NW)
         self.output_folder.grid(row=1, sticky=NW)
@@ -1026,7 +829,7 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.video_path = FileSelect(settings_frm, "Select a video file: ",  title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=30)
         self.known_distance = Entry_Box(settings_frm, "Known real-life metric distance (mm): ", "30", validation="numeric")
-        run_btn = Button(settings_frm, text="GET PIXELS PER MILLIMETER", command=lambda: self.run())
+        run_btn = SimbaButton(parent=settings_frm, txt="GET PIXELS PER MILLIMETER", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run)
         settings_frm.grid(row=0, column=0, pady=10, sticky=NW)
         self.video_path.grid(row=0, column=0, pady=10, sticky=NW)
         self.known_distance.grid(row=1, column=0, pady=10, sticky=NW)
@@ -1090,24 +893,15 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Optional[Union[str, os.PathLike]] = None):
         PopUpMixin.__init__(self, title="MERGE (CONCATENATE) VIDEOS")
         self.config_path = config_path
-        self.select_video_cnt_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="VIDEOS #",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.CONCAT_VIDEOS.value,
-        )
-        self.select_video_cnt_dropdown = DropDownMenu(
-            self.select_video_cnt_frm, "VIDEOS #", list(range(2, 21)), "15"
-        )
+        self.select_video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEOS #", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CONCAT_VIDEOS.value)
+        self.select_video_cnt_dropdown = DropDownMenu( self.select_video_cnt_frm, "VIDEOS #", list(range(2, 21)), "15")
         self.select_video_cnt_dropdown.setChoices(2)
-        self.select_video_cnt_btn = Button(
-            self.select_video_cnt_frm,
-            text="SELECT",
-            command=lambda: self.populate_table(),
-        )
+
+        self.select_video_cnt_btn  = SimbaButton(parent=self.select_video_cnt_frm, txt="APPLY", img='tick', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.populate_table)
         self.select_video_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.select_video_cnt_dropdown.grid(row=0, column=0, sticky=NW)
         self.select_video_cnt_btn.grid(row=0, column=1, sticky=NW)
+        self.main_frm.mainloop()
 
     def populate_table(self):
         if hasattr(self, "video_table_frm"):
@@ -1227,80 +1021,34 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         threading.Thread(target=video_merger.run())
 
 
-# ConcatenatorPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#ConcatenatorPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#ConcatenatorPopUp(config_path=None)
+
 
 
 class VideoRotatorPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="ROTATE VIDEOS")
-        self.save_dir_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SAVE LOCATION",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
+        self.save_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SAVE LOCATION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.save_dir = FolderSelect(self.save_dir_frm, "Save directory:", lblwidth=20)
 
-        self.setting_frm = LabelFrame(
-            self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value
-        )
+        self.setting_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
         self.use_gpu_var = BooleanVar(value=False)
         self.use_ffmpeg_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(
-            self.setting_frm,
-            text="Use GPU (reduced runtime)",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.use_gpu_var,
-        )
-        use_ffmpeg_cb = Checkbutton(
-            self.setting_frm,
-            text="Use FFMpeg (reduced runtime over default OpenCV)",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.use_ffmpeg_var,
-        )
+        use_gpu_cb = Checkbutton(self.setting_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
+        use_ffmpeg_cb = Checkbutton(self.setting_frm, text="Use FFMpeg (reduced runtime over default OpenCV)", font=Formats.FONT_REGULAR.value, variable=self.use_ffmpeg_var)
         use_gpu_cb.grid(row=0, column=0, sticky=NW)
         use_ffmpeg_cb.grid(row=1, column=0, sticky=NW)
 
-        self.rotate_dir_frm = LabelFrame(
-            self.main_frm,
-            text="ROTATE VIDEOS IN DIRECTORY",
-            font=Formats.FONT_HEADER.value,
-        )
-        self.input_dir = FolderSelect(
-            self.rotate_dir_frm, "Video directory:", lblwidth=20
-        )
-        self.run_dir = Button(
-            self.rotate_dir_frm,
-            text="RUN",
-            fg="blue",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.run(
-                input_path=self.input_dir.folder_path,
-                output_path=self.save_dir.folder_path,
-            ),
-        )
+        self.rotate_dir_frm = LabelFrame(self.main_frm, text="ROTATE VIDEOS IN DIRECTORY", font=Formats.FONT_HEADER.value)
+        self.input_dir = FolderSelect(self.rotate_dir_frm, "Video directory:", lblwidth=20)
 
-        self.rotate_video_frm = LabelFrame(
-            self.main_frm,
-            text="ROTATE SINGLE VIDEO",
-            font=Formats.FONT_HEADER.value,
-        )
-        self.input_file = FileSelect(
-            self.rotate_video_frm,
-            "Video path:",
-            lblwidth=20,
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        self.run_file = Button(
-            self.rotate_video_frm,
-            text="RUN",
-            fg="blue",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.run(
-                input_path=self.input_file.file_path,
-                output_path=self.save_dir.folder_path,
-            ),
-        )
+        self.run_dir  = SimbaButton(parent=self.rotate_dir_frm, txt="RUN", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'input_path': lambda:self.input_dir.folder_path, 'output_path': lambda:self.save_dir.folder_path})
+
+        self.rotate_video_frm = LabelFrame( self.main_frm, text="ROTATE SINGLE VIDEO", font=Formats.FONT_HEADER.value)
+        self.input_file = FileSelect( self.rotate_video_frm, "Video path:", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+
+        self.run_file = SimbaButton(parent=self.rotate_video_frm, txt="RUN", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'input_path': lambda:self.input_file.file_path, 'output_path': lambda:self.save_dir.folder_path})
 
         self.save_dir_frm.grid(row=0, column=0, sticky=NW)
         self.save_dir.grid(row=0, column=0, sticky=NW)
@@ -1372,17 +1120,11 @@ class ImportFrameDirectoryPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, title="IMPORT FRAME DIRECTORY")
         ConfigReader.__init__(self, config_path=config_path)
-        self.frame_folder = FolderSelect(
-            self.main_frm,
-            "FRAME DIRECTORY:",
-            title="Select the main directory with frame folders",
-        )
-        import_btn = Button(
-            self.main_frm, text="IMPORT FRAMES", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.run()
-        )
-
+        self.frame_folder = FolderSelect(self.main_frm, "FRAME DIRECTORY:", title="Select the main directory with frame folders")
+        import_btn  = SimbaButton(parent=self.main_frm, txt="IMPORT FRAMES", img='import', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run)
         self.frame_folder.grid(row=0, column=0, sticky=NW)
         import_btn.grid(row=1, column=0, sticky=NW)
+        self.main_frm.mainloop()
 
     def run(self):
         if not os.path.isdir(self.frame_folder.folder_path):
@@ -1394,6 +1136,8 @@ class ImportFrameDirectoryPopUp(PopUpMixin, ConfigReader):
             config_path=self.config_path, source=self.frame_folder.folder_path
         )
 
+
+#ImportFrameDirectoryPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 
 class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
     """
@@ -1434,7 +1178,9 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
         self.img_format_dropdown.grid(row=1, column=0, sticky=NW)
         self.greyscale_dropdown.grid(row=2, column=0, sticky=NW)
 
-        self.run_btn = Button(self.main_frm, text="RUN", font=Formats.FONT_REGULAR.value, fg="black", command=lambda: self.run())
+
+
+        self.run_btn = SimbaButton(parent=self.main_frm, txt="RUN", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run)
         self.run_btn.grid(row=self.children_cnt_main()+3, column=0, sticky=NW)
         self.main_frm.mainloop()
 
@@ -1510,13 +1256,11 @@ class DownsampleVideoPopUp(PopUpMixin):
         self.entry_width = Entry_Box(custom_frm, "Width", "10", validation="numeric")
         self.entry_height = Entry_Box(custom_frm, "Height", "10", validation="numeric")
 
-        self.custom_downsample_btn = Button(
-            custom_frm,
-            text="Downsample to custom resolution",
-            font=Formats.FONT_REGULAR.value,
-            fg="black",
-            command=lambda: self.custom_downsample(),
-        )
+
+
+
+        self.custom_downsample_btn = SimbaButton(parent=custom_frm, txt="Downsample to custom resolution", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.custom_downsample)
+
         default_frm = LabelFrame(
             self.main_frm, text="Default resolution", font=Formats.FONT_HEADER.value, padx=5, pady=5
         )
@@ -1532,12 +1276,10 @@ class DownsampleVideoPopUp(PopUpMixin):
             )
             self.radio_btns[resolution_radiobtn].grid(row=custom_cnt, sticky=NW)
 
-        self.default_downsample_btn = Button(
-            default_frm,
-            text="Downsample to default resolution",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.default_downsample(),
-        )
+        self.default_downsample_btn = SimbaButton(parent=default_frm, txt="Downsample to default resolution", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.default_downsample)
+
+
+
         instructions.grid(row=0, sticky=NW, pady=10)
         choose_video_frm.grid(row=1, column=0, sticky=NW)
         gpu_frm.grid(row=2, column=0, sticky=NW)
@@ -1582,87 +1324,30 @@ class DownsampleVideoPopUp(PopUpMixin):
 class ConvertROIDefinitionsPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CONVERT ROI DEFINITIONS")
-        settings_frm = LabelFrame(
-            self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value
-        )
-        self.roi_definitions_file_select = FileSelect(
-            settings_frm,
-            "ROI DEFINITIONS PATH (H5)",
-            title="SELECT H5 FILE",
-            lblwidth=20,
-            file_types=[("H5 FILE", (".h5", ".H5"))],
-        )
-        self.save_dir = FolderSelect(
-            settings_frm, "SAVE DIRECTORY", title="SELECT H5 FILE", lblwidth=20
-        )
+        settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
+        self.roi_definitions_file_select = FileSelect(settings_frm, "ROI DEFINITIONS PATH (H5)", title="SELECT H5 FILE", lblwidth=20, file_types=[("H5 FILE", (".h5", ".H5"))])
+        self.save_dir = FolderSelect(settings_frm, "SAVE DIRECTORY", title="SELECT H5 FILE", lblwidth=20)
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.roi_definitions_file_select.grid(row=0, column=0, sticky=NW)
         self.save_dir.grid(row=1, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
     def run(self):
-        check_file_exist_and_readable(
-            file_path=self.roi_definitions_file_select.file_path
-        )
+        check_file_exist_and_readable(file_path=self.roi_definitions_file_select.file_path)
         check_if_dir_exists(in_dir=self.save_dir.folder_path)
-        _ = convert_roi_definitions(
-            roi_definitions_path=self.roi_definitions_file_select.file_path,
-            save_dir=self.save_dir.folder_path,
-        )
+        convert_roi_definitions(roi_definitions_path=self.roi_definitions_file_select.file_path, save_dir=self.save_dir.folder_path)
 
 
 class CropVideoCirclesPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (CIRCLES)")
-        crop_video_lbl_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="Crop Video (CIRCLES)",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.CIRCLE_CROP.value,
-        )
-        selected_video = FileSelect(
-            crop_video_lbl_frm,
-            "Video path",
-            title="Select a video file",
-            lblwidth=20,
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        button_crop_video_single = Button(
-            crop_video_lbl_frm,
-            text="Crop Video",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: crop_single_video_circle(
-                file_path=selected_video.file_path
-            ),
-        )
-        crop_video_lbl_frm_multiple = LabelFrame(
-            self.main_frm,
-            text="Fixed CIRCLE coordinates crop for multiple videos",
-            font=Formats.FONT_HEADER.value,
-            padx=5,
-            pady=5,
-        )
-        input_folder = FolderSelect(
-            crop_video_lbl_frm_multiple,
-            "Video directory:",
-            title="Select Folder with videos",
-            lblwidth=20,
-        )
-        output_folder = FolderSelect(
-            crop_video_lbl_frm_multiple,
-            "Output directory:",
-            title="Select a folder for your output videos",
-            lblwidth=20,
-        )
-        button_crop_video_multiple = Button(
-            crop_video_lbl_frm_multiple,
-            text="Crop Videos",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: crop_multiple_videos_circles(
-                in_dir=input_folder.folder_path, out_dir=output_folder.folder_path
-            ),
-        )
-
+        crop_video_lbl_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="Crop Video (CIRCLES)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CIRCLE_CROP.value)
+        selected_video = FileSelect(crop_video_lbl_frm, "Video path", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP VIDEO", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_circle, cmd_kwargs={'file_path': lambda:selected_video.file_path})
+        crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="Fixed CIRCLE coordinates crop for multiple videos", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        input_folder = FolderSelect(crop_video_lbl_frm_multiple,"Video directory:",title="Select Folder with videos",lblwidth=20)
+        output_folder = FolderSelect(crop_video_lbl_frm_multiple, "Output directory:", title="Select a folder for your output videos", lblwidth=20)
+        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEOS", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_circle, cmd_kwargs={'in_dir': lambda:input_folder.folder_path, 'out_dir': lambda:output_folder.folder_path})
         crop_video_lbl_frm.grid(row=0, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
         button_crop_video_single.grid(row=3, sticky=NW)
@@ -1678,54 +1363,14 @@ class CropVideoCirclesPopUp(PopUpMixin):
 class CropVideoPolygonsPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (POLYGONS)")
-        crop_video_lbl_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="Crop Video (POLYGONS)",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.CIRCLE_CROP.value,
-        )
-        selected_video = FileSelect(
-            crop_video_lbl_frm,
-            "Video path",
-            title="Select a video file",
-            lblwidth=20,
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        button_crop_video_single = Button(
-            crop_video_lbl_frm,
-            text="Crop Video",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: crop_single_video_polygon(
-                file_path=selected_video.file_path
-            ),
-        )
-        crop_video_lbl_frm_multiple = LabelFrame(
-            self.main_frm,
-            text="Fixed POLYGON coordinates crop for multiple videos",
-            font=Formats.FONT_HEADER.value,
-            padx=5,
-            pady=5,
-        )
-        input_folder = FolderSelect(
-            crop_video_lbl_frm_multiple,
-            "Video directory:",
-            title="Select Folder with videos",
-            lblwidth=20,
-        )
-        output_folder = FolderSelect(
-            crop_video_lbl_frm_multiple,
-            "Output directory:",
-            title="Select a folder for your output videos",
-            lblwidth=20,
-        )
-        button_crop_video_multiple = Button(
-            crop_video_lbl_frm_multiple,
-            text="Crop Videos",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: crop_multiple_videos_polygons(
-                in_dir=input_folder.folder_path, out_dir=output_folder.folder_path
-            ),
-        )
+        crop_video_lbl_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="Crop Video (POLYGONS)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CIRCLE_CROP.value)
+        selected_video = FileSelect( crop_video_lbl_frm, "Video path", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+
+        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP VIDEO", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_polygon, cmd_kwargs={'file_path': lambda:selected_video.file_path})
+        crop_video_lbl_frm_multiple = LabelFrame( self.main_frm, text="Fixed POLYGON coordinates crop for multiple videos", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        input_folder = FolderSelect( crop_video_lbl_frm_multiple, "Video directory:", title="Select Folder with videos", lblwidth=20)
+        output_folder = FolderSelect( crop_video_lbl_frm_multiple, "Output directory:", title="Select a folder for your output videos", lblwidth=20)
+        button_crop_video_multiple = Button(crop_video_lbl_frm_multiple, text="Crop Videos", font=Formats.FONT_REGULAR.value, command=lambda: crop_multiple_videos_polygons(     in_dir=input_folder.folder_path, out_dir=output_folder.folder_path))
 
         crop_video_lbl_frm.grid(row=0, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
@@ -1739,25 +1384,10 @@ class CropVideoPolygonsPopUp(PopUpMixin):
 class ClipSingleVideoByFrameNumbers(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLIP SINGLE VIDEO BY FRAME NUMBERS")
-        settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        self.selected_video = FileSelect(
-            settings_frm,
-            "VIDEO PATH: ",
-            title="Select a video file",
-            file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-            lblwidth=15,
-        )
-        self.start_frm_eb = Entry_Box(
-            settings_frm, "START FRAME: ", "15", validation="numeric"
-        )
-        self.end_frm_eb = Entry_Box(
-            settings_frm, "END FRAME: ", "15", validation="numeric"
-        )
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.selected_video = FileSelect(settings_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=15)
+        self.start_frm_eb = Entry_Box(settings_frm, "START FRAME: ", "15", validation="numeric")
+        self.end_frm_eb = Entry_Box(settings_frm, "END FRAME: ", "15", validation="numeric")
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.selected_video.grid(row=0, column=0, sticky=NW)
@@ -1814,33 +1444,16 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         >>> ClipMultipleVideosByFrameNumbersPopUp(data_dir='/Users/simon/Downloads/test__/test__', save_dir='/Users/simon/Downloads/test__/res')
         """
 
-        check_if_dir_exists(
-            in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False
-        )
-        check_if_dir_exists(
-            in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True
-        )
-        self.video_paths = find_all_videos_in_directory(
-            directory=data_dir, as_dict=True, raise_error=True
-        )
-        self.video_meta_data = [
-            get_video_meta_data(video_path=x)["frame_count"]
-            for x in list(self.video_paths.values())
-        ]
+        check_if_dir_exists(in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False )
+        check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
+        self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
+        self.video_meta_data = [get_video_meta_data(video_path=x)["frame_count"]for x in list(self.video_paths.values())]
         max_video_name_len = len(max(list(self.video_paths.keys())))
         super().__init__(title="CLIP MULTIPLE VIDEOS BY FRAME NUMBERS")
         self.save_dir = save_dir
-        data_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="VIDEO SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
+        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         data_frm.grid(row=0, column=0, sticky=NW)
-        Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(
-            row=0, column=0, sticky=NW
-        )
-        Label(data_frm, text="TOTAL FRAMES", font=Formats.FONT_REGULAR.value, width=10).grid(row=0, column=1)
+        Label(data_frm, text="VIDEO NAME", width=max_video_name_len, font=Formats.FONT_REGULAR.value).grid(row=0, column=0, sticky=NW)
         Label(data_frm, text="START FRAME", font=Formats.FONT_REGULAR.value, width=10).grid(row=0, column=2)
         Label(data_frm, text="END FRAME", font=Formats.FONT_REGULAR.value, width=10).grid(row=0, column=3)
         self.entry_boxes = {}
@@ -2091,7 +1704,7 @@ class BrightnessContrastPopUp(PopUpMixin):
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHANGE BRIGHTNESS / CONTRAST SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
-        run_video_btn = Button(single_video_frm, text="RUN SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run_video(), fg="blue")
+        run_video_btn = SimbaButton(parent=single_video_frm, txt="RUN SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video)
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
@@ -2099,7 +1712,8 @@ class BrightnessContrastPopUp(PopUpMixin):
 
         video_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHANGE BRIGHTNESS / CONTRAST MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
-        run_dir_btn = Button(video_dir_frm, text="RUN VIDEO DIRECTORY", font=Formats.FONT_REGULAR.value, command=lambda: self.run_directory(), fg="blue")
+
+        run_dir_btn = SimbaButton(parent=video_dir_frm, txt="RUN VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory)
 
         video_dir_frm.grid(row=2, column=0, sticky="NW")
         self.selected_dir.grid(row=0, column=0, sticky="NW")
@@ -2151,7 +1765,8 @@ class InteractiveClahePopUp(PopUpMixin):
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INTERACTIVE CLAHE - SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
-        run_video_btn = Button(single_video_frm, text="RUN SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run_video(), fg="blue")
+        run_video_btn = SimbaButton(parent=single_video_frm, txt="RUN SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video)
+
 
         single_video_frm.grid(row=0, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
@@ -2159,8 +1774,7 @@ class InteractiveClahePopUp(PopUpMixin):
 
         video_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INTERACTIVE CLAHE - MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
-        run_dir_btn = Button(video_dir_frm, text="RUN VIDEO DIRECTORY", command=lambda: self.run_directory(), fg="blue")
-
+        run_dir_btn = SimbaButton(parent=video_dir_frm, txt="RUN VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory)
         video_dir_frm.grid(row=1, column=0, sticky="NW")
         self.selected_dir.grid(row=0, column=0, sticky="NW")
         run_dir_btn.grid(row=1, column=0, sticky="NW")
@@ -2207,7 +1821,8 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
         custom_size_frm = LabelFrame(self.main_frm, text="CUSTOM RESOLUTION",font=Formats.FONT_HEADER.value,fg="black",padx=5,pady=5)
         self.entry_width = Entry_Box(custom_size_frm, "Width", "10", validation="numeric")
         self.entry_height = Entry_Box(custom_size_frm, "Height", "10", validation="numeric")
-        self.custom_downsample_btn = Button(custom_size_frm, text="DOWN-SAMPLE USING CUSTOM RESOLUTION", font=Formats.FONT_REGULAR.value, fg="black", command=lambda: self.downsample_custom())
+        self.custom_downsample_btn = SimbaButton(parent=custom_size_frm, txt="DOWN-SAMPLE USING CUSTOM RESOLUTION", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.downsample_custom)
+
 
         custom_size_frm.grid(row=2, column=0, sticky=NW)
         self.entry_width.grid(row=0, column=0, sticky=NW)
@@ -2219,7 +1834,8 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
         self.height_dropdown = DropDownMenu(default_size_frm, "HEIGHT:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
         self.width_dropdown.setChoices(640)
         self.height_dropdown.setChoices("AUTO")
-        self.default_downsample_btn = Button(default_size_frm, text="DOWN-SAMPLE USING DEFAULT RESOLUTION", font=Formats.FONT_REGULAR.value, fg="black", command=lambda: self.downsample_default())
+
+        self.default_downsample_btn = SimbaButton(parent=default_size_frm, txt="DOWN-SAMPLE USING DEFAULT RESOLUTION", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.downsample_default)
 
         default_size_frm.grid(row=3, column=0, sticky=NW)
         self.width_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2272,7 +1888,8 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
         custom_size_frm = LabelFrame(self.main_frm, text="CUSTOM RESOLUTION",font=Formats.FONT_HEADER.value,fg="black",padx=5,pady=5)
         self.entry_width = Entry_Box(custom_size_frm, "Width", "10", validation="numeric")
         self.entry_height = Entry_Box(custom_size_frm, "Height", "10", validation="numeric")
-        self.custom_downsample_btn = Button(custom_size_frm, text="DOWN-SAMPLE USING CUSTOM RESOLUTION", font=Formats.FONT_HEADER.value, fg="black", command=lambda: self.downsample_custom())
+
+        self.custom_downsample_btn = SimbaButton(parent=custom_size_frm, txt="DOWN-SAMPLE USING CUSTOM RESOLUTION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.downsample_custom)
 
         custom_size_frm.grid(row=2, column=0, sticky=NW)
         self.entry_width.grid(row=0, column=0, sticky=NW)
@@ -2284,7 +1901,8 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
         self.height_dropdown = DropDownMenu(default_size_frm, "HEIGHT:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
         self.width_dropdown.setChoices(640)
         self.height_dropdown.setChoices("AUTO")
-        self.default_downsample_btn = Button(default_size_frm, text="DOWN-SAMPLE USING DEFAULT RESOLUTION", font=Formats.FONT_REGULAR.value, fg="black", command=lambda: self.downsample_default())
+
+        self.default_downsample_btn = SimbaButton(parent=default_size_frm, txt="DOWN-SAMPLE USING DEFAULT RESOLUTION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.downsample_default)
 
         default_size_frm.grid(row=3, column=0, sticky=NW)
         self.width_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2333,16 +1951,16 @@ class Convert2jpegPopUp(PopUpMixin):
 
         img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO JPEG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        run_btn_dir = Button(img_dir_frm, text="RUN DIRECTORY JPEG CONVERSION", font=Formats.FONT_REGULAR.value, command=lambda: self.run_dir())
 
+        run_btn_dir = SimbaButton(parent=img_dir_frm, txt="RUN DIRECTORY JPEG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
         img_dir_frm.grid(row=1, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
         run_btn_dir.grid(row=1, column=0, sticky="NW")
 
         img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO JPEG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_file = FileSelect(img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
-        run_btn_img = Button(img_frm, text="RUN IMAGE JPEG CONVERSION", font=Formats.FONT_REGULAR.value, command=lambda: self.run_img())
 
+        run_btn_img = SimbaButton(parent=img_frm, txt="RUN IMAGE JPEG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_img)
         img_frm.grid(row=2, column=0, sticky="NW")
         self.selected_file.grid(row=0, column=0, sticky="NW")
         run_btn_img.grid(row=1, column=0, sticky="NW")
@@ -2363,8 +1981,8 @@ class Convert2bmpPopUp(PopUpMixin):
         super().__init__(title="CONVERT IMAGES TO BMP")
         img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO BMP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        run_btn_dir = Button(img_dir_frm, text="RUN DIRECTORY BMP CONVERSION", font=Formats.FONT_REGULAR.value, command=lambda: self.run_dir())
 
+        run_btn_dir = SimbaButton(parent=img_dir_frm, txt="RUN DIRECTORY BMP CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
         img_dir_frm.grid(row=0, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
         run_btn_dir.grid(row=1, column=0, sticky="NW")
@@ -2400,7 +2018,8 @@ class Convert2WEBPPopUp(PopUpMixin):
 
         convert_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO WEBP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_frame_dir = FolderSelect(convert_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        run_btn_dir = Button(convert_dir_frm, text="RUN IMAGE DIRECTORY WEBP CONVERSION", font=Formats.FONT_REGULAR.value, command=lambda: self.run_dir())
+
+        run_btn_dir = SimbaButton(parent=convert_dir_frm, txt="RUN IMAGE DIRECTORY WEBP CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
 
         convert_dir_frm.grid(row=1, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
@@ -2408,8 +2027,9 @@ class Convert2WEBPPopUp(PopUpMixin):
 
         convert_img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE FILE TO WEBP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_file = FileSelect(convert_img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
-        run_btn_frm = Button(convert_img_frm, text="RUN IMAGE WEBP CONVERSION", font=Formats.FONT_REGULAR.value, command=lambda: self.run_img())
 
+
+        run_btn_frm = SimbaButton(parent=convert_img_frm, txt="RUN IMAGE WEBP CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_img)
         convert_img_frm.grid(row=2, column=0, sticky="NW")
         self.selected_file.grid(row=0, column=0, sticky="NW")
         run_btn_frm.grid(row=1, column=0, sticky="NW")
