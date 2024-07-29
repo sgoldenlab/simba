@@ -5,7 +5,8 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_time_bin_calculator import ROITimebinCalculator
-from simba.ui.tkinter_functions import (Checkbutton, CreateLabelFrameWithIcon, DropDownMenu, SimbaButton)
+from simba.ui.tkinter_functions import (Checkbutton, CreateLabelFrameWithIcon,
+                                        DropDownMenu, SimbaButton)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 

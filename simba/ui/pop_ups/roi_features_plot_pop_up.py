@@ -8,12 +8,16 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ROI_feature_visualizer import ROIfeatureVisualizer
-from simba.plotting.ROI_feature_visualizer_mp import ROIfeatureVisualizerMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton)
+from simba.plotting.ROI_feature_visualizer_mp import \
+    ROIfeatureVisualizerMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, SimbaButton)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 from simba.utils.errors import NoFilesFoundError
-from simba.utils.read_write import (find_all_videos_in_directory, find_files_of_filetypes_in_directory, get_fn_ext)
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
 
 ROI_CENTERS = "roi_centers"
 ROI_EAR_TAGS = "roi_ear_tags"
