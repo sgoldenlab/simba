@@ -10,12 +10,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.path_plotter import PathPlotterSingleCore
 from simba.plotting.path_plotter_mp import PathPlotterMulticore
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box)
-from simba.utils.checks import (check_if_filepath_list_is_empty,
-                                check_if_string_value_is_valid_video_timestamp,
-                                check_if_valid_rgb_str, check_int,
-                                check_that_hhmmss_start_is_before_end)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaCheckbox, SimbaButton)
+from simba.utils.checks import (check_if_filepath_list_is_empty, check_if_string_value_is_valid_video_timestamp, check_if_valid_rgb_str, check_int, check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.errors import FrameRangeError
 from simba.utils.lookups import get_color_dict
@@ -40,8 +36,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.custom_rgb_selections = {}
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.PATH_PLOTS.value)
-        self.autocompute_var = BooleanVar(value=True)
-        self.auto_compute_styles = Checkbutton(self.style_settings_frm, text="Auto-compute styles", font=Formats.FONT_REGULAR.value, variable=self.autocompute_var, command=self.enable_style_settings)
+        self.auto_compute_styles, self.autocompute_var = SimbaCheckbox(parent=self.style_settings_frm, txt="AUTO-COMPUTE STYLES", txt_img='system', cmd=self.enable_style_settings, val=True)
         self.max_prior_lines_dropdown = DropDownMenu(self.style_settings_frm, "Max prior lines:", ["Entire video", "Specify milliseconds"], "16", com=self.enable_entrybox_from_dropdown)
         self.max_lines_entry = Entry_Box(self.style_settings_frm, "Max prior lines (ms): ", "16", validation="numeric")
         self.resolution_dropdown = DropDownMenu(self.style_settings_frm, "Resolution:", self.resolution_options, "16")
@@ -98,22 +93,19 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
         self.clf_frm = LabelFrame(self.main_frm, text="CHOOSE CLASSIFICATION VISUALIZATION", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         self.include_clf_locations_var = BooleanVar(value=False)
+
         self.include_clf_locations_cb = Checkbutton(self.clf_frm, text="Include classification locations", font=Formats.FONT_REGULAR.value, variable=self.include_clf_locations_var, command=self.populate_clf_location_data)
         self.include_clf_locations_cb.grid(row=0, sticky=NW)
         self.populate_clf_location_data()
 
         self.populate_body_parts_menu(self.animal_cnt_options[0])
         self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        self.path_frames_var = BooleanVar()
-        self.path_videos_var = BooleanVar()
-        self.path_last_frm_var = BooleanVar()
         self.multiprocessing_var = BooleanVar()
-        self.include_animal_names_var = BooleanVar(value=True)
 
-        path_frames_cb = Checkbutton(self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.path_frames_var)
-        path_videos_cb = Checkbutton(self.settings_frm, text="Create videos", font=Formats.FONT_REGULAR.value, variable=self.path_videos_var)
-        path_last_frm_cb = Checkbutton(self.settings_frm, text="Create last frame", font=Formats.FONT_REGULAR.value, variable=self.path_last_frm_var)
-        self.include_animal_names_cb = Checkbutton( self.settings_frm, text="Include animal names", font=Formats.FONT_REGULAR.value, variable=self.include_animal_names_var)
+        path_frames_cb, self.path_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames')
+        path_videos_cb, self.path_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video')
+        path_last_frm_cb, self.path_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish')
+        self.include_animal_names_cb, self.include_animal_names_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='id_card', val=True)
 
         self.multiprocess_cb = Checkbutton(
             self.settings_frm,
@@ -131,38 +123,12 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
         self.run_frm = LabelFrame( self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
-        self.run_single_video_btn = Button(
-            self.run_single_video_frm,
-            text="Create single video",
-            font=Formats.FONT_REGULAR.value,
-            fg="blue",
-            command=lambda: self.__create_path_plots(multiple_videos=False),
-        )
-        self.single_video_dropdown = DropDownMenu(
-            self.run_single_video_frm,
-            "Video:",
-            list(self.files_found_dict.keys()),
-            "12",
-        )
-        self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt='CREATE SINGLE VIDEO', img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__create_path_plots, cmd_kwargs={'multiple_videos': False})
 
-        self.run_multiple_videos = LabelFrame(
-            self.run_frm,
-            text="MULTIPLE VIDEO",
-            font=Formats.FONT_HEADER.value,
-            pady=5,
-            padx=5,
-            fg="black",
-        )
-        self.run_multiple_video_btn = Button(
-            self.run_multiple_videos,
-            text="Create multiple videos ({} video(s) found)".format(
-                str(len(list(self.files_found_dict.keys())))
-            ),
-            fg="blue",
-            font=Formats.FONT_REGULAR.value,
-            command=lambda: self.__create_path_plots(multiple_videos=True),
-        )
+        self.single_video_dropdown = DropDownMenu( self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12")
+        self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
+        self.run_multiple_videos = LabelFrame( self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), font=Formats.FONT_REGULAR.value, img='rocket', txt_clr='blue', cmd=self.__create_path_plots, cmd_kwargs={'multiple_videos': True})
 
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.auto_compute_styles.grid(row=0, sticky=NW)
@@ -495,6 +461,9 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
         threading.Thread(target=path_plotter.run()).start()
 
+
+
+# _ = PathPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
 
 # _ = PathPlotPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini')
 

@@ -9,21 +9,17 @@ from typing import Tuple, Union
 import cv2
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end)
-from simba.utils.enums import Keys, Links, Options
+from simba.utils.enums import Keys, Links, Options, Formats
 from simba.utils.errors import FFMPEGCodecGPUError, NoFilesFoundError
-from simba.utils.lookups import (percent_to_crf_lookup,
-                                 video_quality_to_preset_lookup)
+from simba.utils.lookups import (percent_to_crf_lookup, video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (
-    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
-    get_video_meta_data)
-from simba.video_processors.batch_process_create_ffmpeg_commands import \
-    FFMPEGCommandCreator
+from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data)
+from simba.video_processors.batch_process_create_ffmpeg_commands import FFMPEGCommandCreator
 from simba.video_processors.roi_selector import ROISelector
 
 
@@ -95,106 +91,55 @@ class BatchProcessFrame(PopUpMixin):
                 self.videos_in_dir_dict[video_name]["file_path"] = file_path
 
     def create_main_window(self):
-        self.quick_settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="QUICK SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.BATCH_PREPROCESS.value,
-        )
-        self.clip_video_settings_frm = LabelFrame(
-            self.quick_settings_frm, text="Clip Videos Settings", padx=5
-        )
-        self.quick_clip_start_entry_lbl = Label(
-            self.clip_video_settings_frm, text="Start Time: "
-        )
+        self.quick_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="QUICK SETTINGS",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.BATCH_PREPROCESS.value)
+        self.clip_video_settings_frm = LabelFrame(self.quick_settings_frm, text="Clip Videos Settings", padx=5)
+        self.quick_clip_start_entry_lbl = Label(self.clip_video_settings_frm, text="Start Time: ")
         self.quick_clip_start_entry_box_val = StringVar()
         self.quick_clip_start_entry_box_val.set("00:00:00")
-        self.quick_clip_start_entry_box = Entry(
-            self.clip_video_settings_frm,
-            width=15,
-            textvariable=self.quick_clip_start_entry_box_val,
-        )
-        self.quick_clip_end_entry_lbl = Label(
-            self.clip_video_settings_frm, text="End Time: "
-        )
+        self.quick_clip_start_entry_box = Entry(self.clip_video_settings_frm,width=18,textvariable=self.quick_clip_start_entry_box_val)
+        self.quick_clip_end_entry_lbl = Label(self.clip_video_settings_frm, text="End Time: ")
         self.quick_clip_end_entry_box_val = StringVar()
         self.quick_clip_end_entry_box_val.set("00:00:00")
-        self.quick_clip_end_entry_box = Entry(
-            self.clip_video_settings_frm,
-            width=15,
-            textvariable=self.quick_clip_end_entry_box_val,
-        )
-        self.quick_clip_apply = Button(
-            self.clip_video_settings_frm,
-            text="Apply",
-            command=lambda: self.apply_trim_to_all(),
-        )
-        self.quick_downsample_frm = LabelFrame(
-            self.quick_settings_frm, text="Downsample Videos", padx=5
-        )
-        self.quick_downsample_width_lbl = Label(
-            self.quick_downsample_frm, text="Width: "
-        )
+        self.quick_clip_end_entry_box = Entry(self.clip_video_settings_frm,width=18,textvariable=self.quick_clip_end_entry_box_val)
+
+        self.quick_clip_apply = SimbaButton(parent=self.clip_video_settings_frm, txt='APPLY', img='arrow_down_green', cmd=self.apply_trim_to_all)
+
+
+        self.quick_downsample_frm = LabelFrame(self.quick_settings_frm, text="Downsample Videos", padx=5)
+        self.quick_downsample_width_lbl = Label(self.quick_downsample_frm, text="Width: ")
         self.quick_downsample_width_val = IntVar()
         self.quick_downsample_width_val.set(400)
-        self.quick_downsample_width = Entry(
-            self.quick_downsample_frm,
-            width=15,
-            textvariable=self.quick_downsample_width_val,
-        )
-        self.quick_downsample_height_lbl = Label(
-            self.quick_downsample_frm, text="Height: "
-        )
+        self.quick_downsample_width = Entry(self.quick_downsample_frm, width=15, textvariable=self.quick_downsample_width_val,)
+        self.quick_downsample_height_lbl = Label(self.quick_downsample_frm, text="Height: ")
         self.quick_downsample_height_val = IntVar()
         self.quick_downsample_height_val.set(600)
-        self.quick_downsample_height = Entry(
-            self.quick_downsample_frm,
-            width=15,
-            textvariable=self.quick_downsample_height_val,
-        )
-        self.quick_downsample_apply = Button(
-            self.quick_downsample_frm,
-            text="Apply",
-            command=lambda: self.apply_resolution_to_all(),
-        )
-        self.quick_set_fps = LabelFrame(
-            self.quick_settings_frm, text="Change FPS", padx=5, pady=5
-        )
+        self.quick_downsample_height = Entry(self.quick_downsample_frm, width=15, textvariable=self.quick_downsample_height_val)
+
+
+        self.quick_downsample_apply = SimbaButton(parent=self.quick_downsample_frm, txt='APPLY', img='arrow_down_green', cmd=self.apply_resolution_to_all)
+
+        self.quick_set_fps = LabelFrame(self.quick_settings_frm, text="Change FPS", padx=5, pady=5)
         self.quick_fps_lbl = Label(self.quick_set_fps, text="FPS: ")
         self.quick_set_fps_val = DoubleVar()
         self.quick_set_fps_val.set(15.0)
-        self.quick_fps_entry_box = Entry(
-            self.quick_set_fps, width=15, textvariable=self.quick_set_fps_val
-        )
+        self.quick_fps_entry_box = Entry(self.quick_set_fps, width=15, textvariable=self.quick_set_fps_val)
         self.quick_set_fps_empty_row = Label(self.quick_set_fps, text=" ")
-        self.quick_fps_apply = Button(
-            self.quick_set_fps, text="Apply", command=lambda: self.apply_fps_to_all()
-        )
 
-        self.quick_set_quality = LabelFrame(
-            self.quick_settings_frm, text="Output Video Quality", padx=5, pady=5
-        )
-        self.quick_set_quality_dropdown = DropDownMenu(
-            self.quick_set_quality, "Video Quality % ", self.cpu_video_quality, "14"
-        )
+        self.quick_fps_apply = SimbaButton(parent=self.quick_set_fps, txt='APPLY', img='arrow_down_green', cmd=self.apply_fps_to_all)
+
+
+
+        self.quick_set_quality = LabelFrame(self.quick_settings_frm, text="Output Video Quality", padx=5, pady=5)
+        self.quick_set_quality_dropdown = DropDownMenu(self.quick_set_quality, "Video Quality % ", self.cpu_video_quality, "14")
         self.quick_set_quality_dropdown.setChoices(100)
         self.quick_set_qualitys_empty_row = Label(self.quick_set_quality, text=" ")
-        self.quick_set_quality_apply = Button(
-            self.quick_set_quality,
-            text="Apply",
-            command=lambda: self.apply_quality_to_all(),
-        )
 
-        self.use_gpu_frm = LabelFrame(
-            self.quick_settings_frm, text="GPU", padx=5, pady=10
-        )
-        self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(
-            self.use_gpu_frm,
-            text="Use GPU (reduced runtime)",
-            variable=self.use_gpu_var,
-            command=lambda: self.change_quality_options_cpu_gpu(),
-        )
+        self.quick_set_quality_apply = SimbaButton(parent=self.quick_set_quality, txt='APPLY', img='arrow_down_green', cmd=self.apply_quality_to_all)
+
+        self.use_gpu_frm = LabelFrame(self.quick_settings_frm, text="GPU", padx=5, pady=10)
+
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.use_gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2', cmd=self.change_quality_options_cpu_gpu)
+
         use_gpu_cb.grid(row=0, column=0, sticky=NW)
         Label(self.use_gpu_frm, text=" ").grid(row=1, column=0)
         Label(self.use_gpu_frm, text=" ").grid(row=2, column=0)
@@ -443,13 +388,13 @@ class BatchProcessFrame(PopUpMixin):
             self.videos[name]["start_time_var"].set("00:00:00")
             self.videos[name]["start_entry"] = Entry(
                 self.videos_frm,
-                width=6,
+                width=8,
                 textvariable=self.videos[name]["start_time_var"],
             )
             self.videos[name]["end_time_var"] = StringVar()
             self.videos[name]["end_time_var"].set(data["video_length"])
             self.videos[name]["end_entry"] = Entry(
-                self.videos_frm, width=6, textvariable=self.videos[name]["end_time_var"]
+                self.videos_frm, width=8, textvariable=self.videos[name]["end_time_var"]
             )
             self.videos[name]["clip_cb_var"] = BooleanVar()
             self.videos[name]["clip_cb"] = Checkbutton(
@@ -458,12 +403,12 @@ class BatchProcessFrame(PopUpMixin):
             self.videos[name]["width_var"] = IntVar()
             self.videos[name]["width_var"].set(data["width"])
             self.videos[name]["width_entry"] = Entry(
-                self.videos_frm, width=6, textvariable=self.videos[name]["width_var"]
+                self.videos_frm, width=8, textvariable=self.videos[name]["width_var"]
             )
             self.videos[name]["height_var"] = IntVar()
             self.videos[name]["height_var"].set(data["height"])
             self.videos[name]["height_entry"] = Entry(
-                self.videos_frm, width=6, textvariable=self.videos[name]["height_var"]
+                self.videos_frm, width=8, textvariable=self.videos[name]["height_var"]
             )
             self.videos[name]["downsample_cb_var"] = BooleanVar()
             self.videos[name]["downsample_cb"] = Checkbutton(
@@ -535,29 +480,10 @@ class BatchProcessFrame(PopUpMixin):
             )
 
     def create_execute_btn(self):
-        self.execute_frm = LabelFrame(
-            self.main_frm,
-            text="EXECUTE",
-            font=("Helvetica", 15, "bold"),
-            pady=5,
-            padx=15,
-        )
-        self.reset_all_btn = Button(
-            self.execute_frm,
-            text="RESET ALL",
-            fg="red",
-            command=lambda: self.create_video_rows(),
-        )
-        self.reset_crop_btn = Button(
-            self.execute_frm,
-            text="RESET CROP",
-            fg="orange",
-            command=lambda: self.reset_crop(),
-        )
-        self.execute_btn = Button(
-            self.execute_frm, text="EXECUTE", fg="blue", command=lambda: self.execute()
-        )
-
+        self.execute_frm = LabelFrame( self.main_frm, text="EXECUTE", font=Formats.FONT_HEADER.value, pady=5, padx=15)
+        self.reset_all_btn = SimbaButton(parent=self.execute_frm, txt='RESET ALL', txt_clr='red', img='trash', cmd=self.create_video_rows)
+        self.reset_crop_btn = SimbaButton(parent=self.execute_frm, txt='RESET CROP', txt_clr='darkorange', img='trash', cmd=self.reset_crop)
+        self.execute_btn = SimbaButton(parent=self.execute_frm, txt='EXECUTE', txt_clr='blue', img='rocket', cmd=self.execute)
         self.execute_frm.grid(row=2, column=0, sticky=W, padx=5, pady=30)
         self.reset_all_btn.grid(row=0, column=0, sticky=W, padx=5)
         self.reset_crop_btn.grid(row=0, column=1, sticky=W, padx=5)
@@ -754,8 +680,8 @@ class BatchProcessFrame(PopUpMixin):
         )
 
 
-# test = BatchProcessFrame(input_dir=r'/Users/simon/Desktop',
-#                          output_dir=r'/Users/simon/Desktop/edited')
+# test = BatchProcessFrame(input_dir=r'C:\Users\sroni\OneDrive\Desktop',
+#                          output_dir=r"C:\Users\sroni\OneDrive\Desktop\edited")
 # test.create_main_window()
 # test.create_video_table_headings()
 # test.create_video_rows()

@@ -8,13 +8,18 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.gantt_creator import GanttCreatorSingleProcess
 from simba.plotting.gantt_creator_mp import GanttCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class GanttPlotPopUp(PopUpMixin, ConfigReader):
+
+    """
+    :example:
+    >>>  _ = GanttPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
+    """
     def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, config_path=config_path, title="VISUALIZE GANTT PLOTS")
         ConfigReader.__init__(self, config_path=config_path)
@@ -36,14 +41,11 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         self.font_rotation_entry.set_state("disable")
 
         self.settings_frm = LabelFrame( self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5,)
-        self.gantt_frames_var = BooleanVar()
-        self.gantt_last_frame_var = BooleanVar()
-        self.gantt_videos_var = BooleanVar()
         self.gantt_multiprocess_var = BooleanVar()
 
-        gantt_frames_cb = Checkbutton(self.settings_frm, font=Formats.FONT_REGULAR.value, text="Create frames", variable=self.gantt_frames_var)
-        gantt_videos_cb = Checkbutton(self.settings_frm, font=Formats.FONT_REGULAR.value, text="Create videos", variable=self.gantt_videos_var)
-        gantt_last_frame_cb = Checkbutton(self.settings_frm, font=Formats.FONT_REGULAR.value, text="Create last frame", variable=self.gantt_last_frame_var,)
+        gantt_frames_cb, self.gantt_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames')
+        gantt_videos_cb, self.gantt_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video')
+        gantt_last_frame_cb, self.gantt_last_frame_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish')
         gantt_multiprocess_cb = Checkbutton(
             self.settings_frm,
             text="Multi-process (faster)",
@@ -63,12 +65,12 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         self.run_single_video_frm = LabelFrame(self.run_frm,text="SINGLE VIDEO",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black",)
 
 
-        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple_videos': False})
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm,"Video:",list(self.files_found_dict.keys()),"12",)
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
 
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple_videos': True})
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_gantt_plots, cmd_kwargs={'multiple_videos': True})
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.auto_compute_style_cb.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=1, sticky=NW)
@@ -89,6 +91,8 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
 
         self.run_multiple_videos.grid(row=1, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
+
+        self.main_frm.mainloop()
 
     def enable_text_settings(self):
         if not self.use_default_style_bool.get():
@@ -140,4 +144,4 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         gantt_creator.run()
 
 
-# _ = GanttPlotPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
+ # _ = GanttPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")

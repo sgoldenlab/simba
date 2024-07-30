@@ -3,28 +3,35 @@ __author__ = "Simon Nilsson"
 import multiprocessing
 import os
 from tkinter import *
+from typing import Union
 
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.heat_mapper_location import HeatmapperLocationSingleCore
-from simba.plotting.heat_mapper_location_mp import \
-    HeatMapperLocationMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        SimbaButton)
+from simba.plotting.heat_mapper_location_mp import HeatMapperLocationMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class HeatmapLocationPopup(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="HEATMAPS: LOCATION")
+
+    """
+    :example:
+    >>> _ = HeatmapLocationPopup(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
+
+    """
+
+    def __init__(self, config_path: Union[str, os.PathLike]):
+
         ConfigReader.__init__(self, config_path=config_path)
         self.data_path = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
         check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()),error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/outlier_corrected_movement_location directory. ",)
+        PopUpMixin.__init__(self, title="HEATMAPS: LOCATION")
         max_scales = list(np.arange(5, 105, 5))
         max_scales.insert(0, "Auto-compute")
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.HEATMAP_LOCATION.value)
@@ -41,22 +48,12 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.bin_size_dropdown.setChoices("80×80")
 
         self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        self.heatmap_frames_var = BooleanVar()
-        self.heatmap_videos_var = BooleanVar()
-        self.heatmap_last_frm_var = BooleanVar()
         self.multiprocessing_var = BooleanVar()
-        heatmap_frames_cb = Checkbutton(
-            self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.heatmap_frames_var
-        )
-        heatmap_videos_cb = Checkbutton(
-            self.settings_frm, text="Create videos", font=Formats.FONT_REGULAR.value, variable=self.heatmap_videos_var
-        )
-        heatmap_last_frm_cb = Checkbutton(
-            self.settings_frm,
-            text="Create last frame",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.heatmap_last_frm_var,
-        )
+
+        heatmap_frames_cb, self.heatmap_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames')
+        heatmap_videos_cb, self.heatmap_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video')
+        heatmap_last_frm_cb, self.heatmap_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish')
+
         self.multiprocess_cb = Checkbutton(
             self.settings_frm,
             text="Multiprocess videos (faster)",
@@ -91,7 +88,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         )
 
 
-        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_heatmap_plots, cmd_kwargs={'multiple_videos': False})
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", txt_clr="blue", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.__create_heatmap_plots, cmd_kwargs={'multiple_videos': False})
         self.single_video_dropdown = DropDownMenu(
             self.run_single_video_frm,
             "Video:",
@@ -101,7 +98,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
 
-        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_heatmap_plots, cmd_kwargs={'multiple_videos': True})
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), img='rocket', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self.__create_heatmap_plots, cmd_kwargs={'multiple_videos': True})
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.palette_dropdown.grid(row=0, sticky=NW)
         self.shading_dropdown.grid(row=1, sticky=NW)
@@ -124,7 +121,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         self.run_multiple_videos.grid(row=1, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
 
-        # self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def __create_heatmap_plots(self, multiple_videos: bool):
         if multiple_videos:
@@ -177,4 +174,3 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
             heatmapper_clf.run()
 
 
-# _ = HeatmapLocationPopup(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

@@ -21,11 +21,10 @@ from simba.plotting.frame_mergerer_ffmpeg import FrameMergererFFmpeg
 from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
-                                        FileSelect, FolderSelect, SimbaButton)
+                                        FileSelect, FolderSelect, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
-                                check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
                                 check_str,
@@ -123,16 +122,14 @@ class CropVideoPopUp(PopUpMixin):
         super().__init__(title="CROP SINGLE VIDEO")
         crop_video_lbl_frm = LabelFrame( self.main_frm, text="Crop Video", font=Formats.FONT_HEADER.value)
         selected_video = FileSelect(crop_video_lbl_frm, "Video path", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        use_gpu_var_single = BooleanVar(value=False)
-        use_gpu_cb_single = Checkbutton(crop_video_lbl_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=use_gpu_var_single)
 
+        use_gpu_cb_single, use_gpu_var_single = SimbaCheckbox(parent=crop_video_lbl_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': lambda: use_gpu_var_single.get()})
         crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="Fixed coordinates crop for multiple videos", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         input_folder = FolderSelect(crop_video_lbl_frm_multiple, "Video directory:", title="Select Folder with videos", lblwidth=20)
         output_folder = FolderSelect(crop_video_lbl_frm_multiple,"Output directory:",title="Select a folder for your output videos",lblwidth=20)
-        use_gpu_var_multiple = BooleanVar(value=False)
-        use_gpu_cb_multiple = Checkbutton(crop_video_lbl_frm_multiple, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=use_gpu_var_multiple)
 
+        use_gpu_cb_multiple, use_gpu_var_multiple = SimbaCheckbox(parent=crop_video_lbl_frm_multiple, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path,  'gpu': use_gpu_var_multiple.get()})
         crop_video_lbl_frm.grid(row=0, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
@@ -155,19 +152,16 @@ class ClipVideoPopUp(PopUpMixin):
         selected_video = FileSelect(selected_video_frm, "FILE PATH: ", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         selected_video.grid(row=0, column=0, sticky="NW")
         use_gpu_frm = LabelFrame(self.main_frm, text="GPU", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.use_gpu_var = BooleanVar(value=False)
-        self.use_gpu_cb = Checkbutton(use_gpu_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
+        self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=use_gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         self.use_gpu_cb.grid(row=0, column=0, sticky=NW)
         method_1_frm = LabelFrame(self.main_frm, text="Method 1", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         label_set_time_1 = Label(method_1_frm, text="Please enter the time frame in HH:MM:SS format", font=Formats.FONT_REGULAR.value)
-        start_time = Entry_Box(method_1_frm, "Start at (HH:MM:SS):", "15")
-        end_time = Entry_Box(method_1_frm, "End at (HH:MM:SS):", "15")
+        start_time = Entry_Box(method_1_frm, "Start at (HH:MM:SS):", "22")
+        end_time = Entry_Box(method_1_frm, "End at (HH:MM:SS):", "22")
         CreateToolTip(method_1_frm, "Method 1 will retrieve the specified time input. (eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)")
         method_2_frm = LabelFrame(self.main_frm, text="Method 2", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        method_2_time = Entry_Box(method_2_frm, "Seconds:", "15", validation="numeric")
+        method_2_time = Entry_Box(method_2_frm, "Seconds:", "22", validation="numeric")
         label_method_2 = Label(method_2_frm, text="Method 2 will retrieve from the end of the video (e.g.,: an input of 3 seconds will get rid of the first 3 seconds of the video).", font=Formats.FONT_REGULAR.value)
-
-
         button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'start_time': lambda:start_time.entry_get, 'end_time': lambda:end_time.entry_get, 'gpu': lambda: self.use_gpu_var.get()})
         button_cutvideo_method_2 = SimbaButton(parent=method_2_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_beginning_of_video, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'time': lambda:method_2_time.entry_get, 'gpu': lambda:self.use_gpu_var.get()})
         selected_video_frm.grid(row=0, sticky=NW)
@@ -182,20 +176,20 @@ class ClipVideoPopUp(PopUpMixin):
         method_2_time.grid(row=2, sticky=NW)
         button_cutvideo_method_2.grid(row=3, sticky=NW)
 
-
+#ClipVideoPopUp()
 
 class GreyscaleSingleVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="GREYSCALE VIDEO")
         video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GREYSCALE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect( video_frm, "VIDEO FILE PATH", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect( video_frm, "VIDEO FILE PATH", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         self.use_gpu_var_video = BooleanVar(value=False)
-        use_gpu_video_cb = Checkbutton(video_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var_video)
+        use_gpu_video_cb, self.use_gpu_var_video = SimbaCheckbox(parent=video_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         run_video_btn = SimbaButton(parent=video_frm, txt="RUN ON SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video)
         dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GREYSCALE VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.dir_selected = FolderSelect(dir_frm, "VIDEO DIRECTORY PATH", title="Select folder with videos", lblwidth=20)
-        self.use_gpu_var_dir = BooleanVar(value=False)
-        use_gpu_dir_cb = Checkbutton(dir_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var_dir)
+        self.dir_selected = FolderSelect(dir_frm, "VIDEO DIRECTORY PATH", title="Select folder with videos", lblwidth=25)
+
+        use_gpu_dir_cb, self.use_gpu_var_dir = SimbaCheckbox(parent=dir_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         run_dir_btn = SimbaButton(parent=dir_frm, txt="RUN ON DIRECTORY OF VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
 
         video_frm.grid(row=0, column=0, sticky="NW")
@@ -217,15 +211,14 @@ class GreyscaleSingleVideoPopUp(PopUpMixin):
         check_if_dir_exists(in_dir=self.dir_selected.folder_path)
         batch_video_to_greyscale(path=self.dir_selected.folder_path, gpu=self.use_gpu_var_dir.get())
 
-
 class SuperImposeFrameCountPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="SUPERIMPOSE FRAME COUNT")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         color_dict = list(get_color_dict().keys())
         font_dict = get_fonts()
-        self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(settings_frm, text="USE GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
+
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(1, 101, 2)), labelwidth=25)
         self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", color_dict, labelwidth=25)
         self.font_bg_color_dropdown = DropDownMenu(settings_frm, "FONT BACKGROUND COLOR:", color_dict, labelwidth=25)
@@ -259,6 +252,7 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
         multiple_videos_run.grid(row=1, column=0, sticky="NW")
+        self.main_frm.mainloop()
 
     def run_single_video(self):
         video_path = self.selected_video.file_path
@@ -299,9 +293,7 @@ class MultiShortenPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="Split videos into different parts",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(settings_frm, "Video path", title="Select a video file", lblwidth=10, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         self.clip_cnt = Entry_Box(settings_frm, "# of clips", "10", validation="numeric")
-        self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(settings_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
-
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         confirm_settings_btn = SimbaButton(parent=settings_frm, txt="CONFIRM", img='tick', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.show_start_stop)
         settings_frm.grid(row=0, sticky=NW)
         self.selected_video.grid(row=1, sticky=NW, columnspan=2)
@@ -627,8 +619,8 @@ class MultiCropPopUp(PopUpMixin):
         self.video_type_dropdown.setChoices("mp4")
         self.crop_cnt_dropdown = DropDownMenu(self.main_frm, "Crop count:", list(range(1, 31)), "15")
         self.crop_cnt_dropdown.setChoices(2)
-        self.use_gpu_var = BooleanVar(value=False)
-        self.use_gpu_cb = Checkbutton(self.main_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
+
+        self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.main_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         self.create_run_frm(run_function=self.run)
         self.input_folder.grid(row=0, sticky=NW)
         self.output_folder.grid(row=1, sticky=NW)
@@ -658,8 +650,7 @@ class ChangeFpsSingleVideoPopUp(PopUpMixin):
         self.video_path = FileSelect(self.main_frm, "VIDEO PATH:", title="Select a video file", lblwidth=15, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         self.new_fps_dropdown = DropDownMenu(self.main_frm, "NEW FPS:", list(range(1, 101, 1)), labelwidth=15)
         self.new_fps_dropdown.setChoices(15)
-        self.gpu_var = BooleanVar(value=False)
-        gpu_cb = Checkbutton(self.main_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.gpu_var)
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=self.main_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         self.video_path.grid(row=0, sticky=NW)
         self.new_fps_dropdown.grid(row=1, sticky=NW)
         gpu_cb.grid(row=2, sticky=NW)
@@ -683,8 +674,7 @@ class ChangeFpsMultipleVideosPopUp(PopUpMixin):
         self.directory_path = FolderSelect(self.main_frm, "VIDEO DIRECTORY PATH:", title="Select folder with videos: ", lblwidth="25")
         self.new_fps_dropdown = DropDownMenu(self.main_frm, "NEW FPS:", list(range(1, 101, 1)), labelwidth=25)
         self.new_fps_dropdown.setChoices(15)
-        self.gpu_var = BooleanVar(value=False)
-        gpu_cb = Checkbutton(self.main_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.gpu_var)
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=self.main_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         self.directory_path.grid(row=0, sticky=NW)
         self.new_fps_dropdown.grid(row=1, sticky=NW)
         gpu_cb.grid(row=2, sticky=NW)
@@ -728,8 +718,7 @@ class MergeFrames2VideoPopUp(PopUpMixin):
         self.video_fps_dropdown = DropDownMenu(settings_frm, "VIDEO FPS:", list(range(1, 101, 1)), labelwidth=25)
         self.video_quality_dropdown = DropDownMenu(settings_frm, "VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
         self.video_format_dropdown = DropDownMenu(settings_frm, "VIDEO FORMAT:", ['mp4', 'avi', 'webm'], labelwidth=25)
-        self.gpu_var = BooleanVar(value=False)
-        gpu_cb = Checkbutton(settings_frm, text="Use GPU (decreased runtime)", variable=self.gpu_var)
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         self.video_quality_dropdown.setChoices(60)
         self.video_format_dropdown.setChoices('mp4')
         self.video_fps_dropdown.setChoices(30)
@@ -771,8 +760,8 @@ class CreateGIFPopUP(PopUpMixin):
         fps_lst = list(range(1, 101, 1))
         fps_lst.insert(0, 'AUTO')
         self.fps_dropdown = DropDownMenu(settings_frm, "GIF FPS:", fps_lst, "40")
-        self.gpu_var = BooleanVar()
-        gpu_cb = Checkbutton(settings_frm, text="USE GPU (decreased runtime)", font=Formats.FONT_REGULAR.value, variable=self.gpu_var)
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+
         self.quality_dropdown.setChoices(100)
         self.resolution_dropdown.setChoices('AUTO')
         self.fps_dropdown.setChoices('AUTO')
@@ -984,10 +973,10 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             font=Formats.FONT_HEADER.value,
             fg="black",
         )
-        self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(
-            self.gpu_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var
-        )
+
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+
+
         use_gpu_cb.grid(row=0, column=0, sticky="NW")
         self.resolution_frm.grid(row=3, column=0, sticky=NW)
         self.gpu_frm.grid(row=4, column=0, sticky="NW")
@@ -1035,17 +1024,16 @@ class VideoRotatorPopUp(PopUpMixin):
         self.save_dir = FolderSelect(self.save_dir_frm, "Save directory:", lblwidth=20)
 
         self.setting_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
-        self.use_gpu_var = BooleanVar(value=False)
-        self.use_ffmpeg_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(self.setting_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
-        use_ffmpeg_cb = Checkbutton(self.setting_frm, text="Use FFMpeg (reduced runtime over default OpenCV)", font=Formats.FONT_REGULAR.value, variable=self.use_ffmpeg_var)
+
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.setting_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        use_ffmpeg_cb, self.use_ffmpeg_var = SimbaCheckbox(parent=self.setting_frm, txt="Use GPU (reduced runtime)")
         use_gpu_cb.grid(row=0, column=0, sticky=NW)
         use_ffmpeg_cb.grid(row=1, column=0, sticky=NW)
 
         self.rotate_dir_frm = LabelFrame(self.main_frm, text="ROTATE VIDEOS IN DIRECTORY", font=Formats.FONT_HEADER.value)
         self.input_dir = FolderSelect(self.rotate_dir_frm, "Video directory:", lblwidth=20)
 
-        self.run_dir  = SimbaButton(parent=self.rotate_dir_frm, txt="RUN", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'input_path': lambda:self.input_dir.folder_path, 'output_path': lambda:self.save_dir.folder_path})
+        self.run_dir = SimbaButton(parent=self.rotate_dir_frm, txt="RUN", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'input_path': lambda:self.input_dir.folder_path, 'output_path': lambda:self.save_dir.folder_path})
 
         self.rotate_video_frm = LabelFrame( self.main_frm, text="ROTATE SINGLE VIDEO", font=Formats.FONT_HEADER.value)
         self.input_file = FileSelect( self.rotate_video_frm, "Video path:", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -1085,19 +1073,11 @@ class VideoTemporalJoinPopUp(PopUpMixin):
             icon_name=Keys.DOCUMENTATION.value,
             icon_link=Links.VIDEO_TOOLS.value,
         )
-        self.input_dir = FolderSelect(
-            self.settings_frm, "INPUT DIRECTORY:", lblwidth=20
-        )
-        self.file_format = DropDownMenu(
-            self.settings_frm, "INPUT FORMAT:", Options.VIDEO_FORMAT_OPTIONS.value, "20"
-        )
-        self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(
-            self.settings_frm,
-            text="Use GPU (reduced runtime)",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.use_gpu_var,
-        )
+        self.input_dir = FolderSelect( self.settings_frm, "INPUT DIRECTORY:", lblwidth=20)
+        self.file_format = DropDownMenu(self.settings_frm, "INPUT FORMAT:", Options.VIDEO_FORMAT_OPTIONS.value, "20")
+
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+
         self.file_format.setChoices(Options.VIDEO_FORMAT_OPTIONS.value[0])
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.input_dir.grid(row=0, column=0, sticky=NW)
@@ -1242,10 +1222,7 @@ class DownsampleVideoPopUp(PopUpMixin):
             padx=5,
             pady=5,
         )
-        self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(
-            gpu_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var
-        )
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         use_gpu_cb.grid(row=0, column=0, sticky="NW")
         custom_frm = LabelFrame(
             self.main_frm,
@@ -1815,8 +1792,8 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
         self.video_path_selected.grid(row=0, column=0, sticky=NW)
 
         gpu_frm = LabelFrame(self.main_frm, text="GPU (REDUCED RUNTIMES)", font=Formats.FONT_HEADER.value, fg="black", padx=5, pady=5)
-        self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(gpu_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+
         gpu_frm.grid(row=1, column=0, sticky=NW)
         use_gpu_cb.grid(row=0, column=0, sticky=NW)
 
@@ -1882,8 +1859,8 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
         self.video_dir_selected.grid(row=0, column=0, sticky=NW)
 
         gpu_frm = LabelFrame(self.main_frm, text="GPU (REDUCED RUNTIMES)", font=Formats.FONT_HEADER.value, fg="black", padx=5, pady=5)
-        self.use_gpu_var = BooleanVar(value=False)
-        use_gpu_cb = Checkbutton(gpu_frm, text="Use GPU (reduced runtime)", font=Formats.FONT_REGULAR.value, variable=self.use_gpu_var)
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+
         gpu_frm.grid(row=1, column=0, sticky=NW)
         use_gpu_cb.grid(row=0, column=0, sticky=NW)
 

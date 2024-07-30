@@ -345,7 +345,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         stdout_success(msg="Video info saved at project_folder/logs/video_info.csv", source=self.__class__.__name__)
 
 
-# test = VideoInfoTable(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini')
+# test = VideoInfoTable(config_path=r"C:\troubleshooting\beepboop174\project_folder\project_config.ini")
 # test.create_window()
 # test.main_frm.mainloop()
 

@@ -76,4 +76,4 @@ class KleinbergPopUp(PopUpMixin, ConfigReader):
         kleinberg_analyzer.run()
 
 
-_ = KleinbergPopUp(config_path=r"C:\troubleshooting\platea\project_folder\project_config.ini")
+#_ = KleinbergPopUp(config_path=r"C:\troubleshooting\platea\project_folder\project_config.ini")

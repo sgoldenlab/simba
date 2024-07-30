@@ -5,8 +5,7 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_time_bin_calculator import ROITimebinCalculator
-from simba.ui.tkinter_functions import (Checkbutton, CreateLabelFrameWithIcon,
-                                        DropDownMenu, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 
@@ -43,22 +42,16 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.setting_frm.grid(row=1, column=0, sticky=NW)
         self.create_time_bin_entry()
 
-        calc_distances_frm = LabelFrame(
-            self.main_frm,
-            text="CALCULATE DISTANCES",
-            font=Formats.FONT_HEADER.value,
-        )
-        self.distances_var = BooleanVar()
-        self.distances_cb = Checkbutton(
-            calc_distances_frm,
-            text="Compute distances moved within ROIs in each time-bin",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.distances_var,
-        )
+        calc_distances_frm = LabelFrame(self.main_frm, text="CALCULATE DISTANCES", font=Formats.FONT_HEADER.value)
+
+        self.distances_cb, self.distances_var = SimbaCheckbox(parent=calc_distances_frm, txt='Compute distances moved within ROIs in each time-bin', txt_img='path')
+
 
         calc_distances_frm.grid(row=3, column=0, sticky=NW)
         self.distances_cb.grid(row=0, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
+
+        self.main_frm.mainloop()
 
     def run(self):
         check_float(
@@ -96,4 +89,4 @@ class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.root.destroy()
 
 
-#_ = ROIAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#_ = ROIAnalysisTimeBinsPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")

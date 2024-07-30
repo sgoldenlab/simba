@@ -413,7 +413,7 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 txt: str,
                 txt_clr: Optional[str] = 'black',
                 bg_clr: Optional[str] = None,
-                font: Optional[Tuple] = ('Arial', 12),
+                font: Optional[Tuple] = Formats.FONT_REGULAR.value,
                 width: Optional[str] = None,
                 height: Optional[str] = None,
                 img: Optional[Union[ImageTk.PhotoImage, str]] = None,
@@ -472,13 +472,18 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
                   txt_img_location: Literal['left', 'right', 'top', 'bottom'] = RIGHT,
                   font: Optional[Tuple[str, str, int]] = Formats.FONT_REGULAR.value,
                   val: Optional[bool] = False,
-                  state: Literal["disabled", 'normal'] = NORMAL):
+                  state: Literal["disabled", 'normal'] = NORMAL,
+                  cmd: Optional[Callable] = None):
 
     var = BooleanVar(value=False)
     if val: var.set(True)
     if isinstance(txt_img, str):
         txt_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[txt_img]["icon_path"]))
-    cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var)
+
+    if cmd is None:
+        cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var)
+    else:
+        cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var, command=cmd)
     if txt_img is not None:
         cb.image = txt_img
     if state == DISABLED:

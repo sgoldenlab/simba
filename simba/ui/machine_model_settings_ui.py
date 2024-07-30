@@ -9,22 +9,17 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect, SimbaButton,
-                                        hxtScrollbar)
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int)
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links,
-                               MLParamKeys, Options)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, SimbaButton, hxtScrollbar, SimbaCheckbox)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, MLParamKeys, Options)
 from simba.utils.errors import InvalidHyperparametersFileError
 from simba.utils.printing import stdout_success, stdout_trash, stdout_warning
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext)
 
 
 class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
     """
-    Launch GUI window for specifying ML model training parameters.
+    GUI window for specifying ML model training parameters.
     """
 
     def __init__(self, config_path: str):
@@ -81,38 +76,21 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.class_weights_dropdown.setChoices(Dtypes.NONE.value)
 
         self.evaluations_frm = LabelFrame(self.main_frm,text="MODEL EVALUATION SETTINGS",font=Formats.FONT_HEADER.value)
-        self.create_meta_data_file_var = BooleanVar()
-        self.create_example_decision_tree_graphviz_var = BooleanVar()
-        self.create_example_decision_tree_dtreeviz_var = BooleanVar()
-        self.create_clf_report_var = BooleanVar()
         self.create_clf_importance_bars_var = BooleanVar()
-        self.feature_permutation_importance_var = BooleanVar()
-        self.create_pr_curve_var = BooleanVar()
-        self.partial_dependency_var = BooleanVar()
         self.calc_shap_scores_var = BooleanVar()
         self.learning_curve_var = BooleanVar()
 
-        self.meta_data_file_cb = Checkbutton(self.evaluations_frm, text="Create model meta data file", font=Formats.FONT_REGULAR.value, variable=self.create_meta_data_file_var)
-        self.decision_tree_graphviz_cb = Checkbutton(self.evaluations_frm, text='Create Example Decision Tree (requires "graphviz")', font=Formats.FONT_REGULAR.value, variable=self.create_example_decision_tree_graphviz_var)
-        self.decision_tree_dtreeviz_cb = Checkbutton(self.evaluations_frm, text='Create Fancy Example Decision Tree (requires "dtreeviz")', font=Formats.FONT_REGULAR.value,  variable=self.create_example_decision_tree_dtreeviz_var)
-        self.clf_report_cb = Checkbutton(self.evaluations_frm,text="Create Classification Report", font=Formats.FONT_REGULAR.value, variable=self.create_clf_report_var)
+        self.meta_data_file_cb, self.create_meta_data_file_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Create model meta data file")
+        self.decision_tree_graphviz_cb, self.create_example_decision_tree_graphviz_var = SimbaCheckbox(parent=self.evaluations_frm, txt='Create Example Decision Tree (requires "graphviz")')
+        self.decision_tree_dtreeviz_cb, self.create_example_decision_tree_dtreeviz_var = SimbaCheckbox(parent=self.evaluations_frm, txt='Create Fancy Example Decision Tree (requires "dtreeviz")')
+        self.clf_report_cb, self.create_clf_report_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Create Classification Report")
         self.n_features_bars_entry_box = Entry_Box(self.evaluations_frm,"# Features: ","25", status=DISABLED,validation="numeric")
         self.bar_graph_cb = Checkbutton(self.evaluations_frm,text="Create Features Importance Bar Graph", font=Formats.FONT_REGULAR.value,  variable=self.create_clf_importance_bars_var,command=lambda: self.enable_entrybox_from_checkbox(    check_box_var=self.create_clf_importance_bars_var,    entry_boxes=[self.n_features_bars_entry_box],))
-        self.feature_permutation_cb = Checkbutton(self.evaluations_frm,text="Compute Feature Permutation Importances (Note: CPU intensive)", font=Formats.FONT_REGULAR.value, variable=self.feature_permutation_importance_var)
-        self.learning_curve_k_splits_entry_box = Entry_Box(
-            self.evaluations_frm,
-            "Learning Curve Shuffle K Splits",
-            "25",
-            status=DISABLED,
-            validation="numeric",
-        )
-        self.learning_curve_data_splits_entry_box = Entry_Box(
-            self.evaluations_frm,
-            "Learning Curve Shuffle Data Splits",
-            "25",
-            status=DISABLED,
-            validation="numeric",
-        )
+
+        self.feature_permutation_cb, self.feature_permutation_importance_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Compute Feature Permutation Importances (Note: INTENSIVE)")
+
+        self.learning_curve_k_splits_entry_box = Entry_Box(self.evaluations_frm, "Learning Curve Shuffle K Splits", "30", status=DISABLED, validation="numeric")
+        self.learning_curve_data_splits_entry_box = Entry_Box(self.evaluations_frm, "Learning Curve Shuffle Data Splits", "30", status=DISABLED, validation="numeric" )
         self.learning_curve_cb = Checkbutton(
             self.evaluations_frm,
             text="Create Learning Curves (Note: CPU intensive)",
@@ -126,50 +104,20 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
                 ],
             ),
         )
-        self.create_pr_curve_cb = Checkbutton(
-            self.evaluations_frm,
-            font=Formats.FONT_REGULAR.value,
-            text="Create Precision Recall Curves",
-            variable=self.create_pr_curve_var,
-        )
-        self.shap_present = Entry_Box(
-            self.evaluations_frm,
-            "# target present",
-            "25",
-            status=DISABLED,
-            validation="numeric",
-        )
-        self.shap_absent = Entry_Box(
-            self.evaluations_frm,
-            "# target absent",
-            "25",
-            status=DISABLED,
-            validation="numeric",
-        )
-        self.shap_save_it_dropdown = DropDownMenu(
-            self.evaluations_frm,
-            "SHAP save cadence: ",
-            [1, 10, 100, 1000, "ALL FRAMES"],
-            "25",
-        )
+
+        self.create_pr_curve_cb, self.create_pr_curve_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Create Precision Recall Curves")
+        self.shap_present = Entry_Box( self.evaluations_frm, "# target present", "25", status=DISABLED, validation="numeric",)
+        self.shap_absent = Entry_Box( self.evaluations_frm, "# target absent", "25", status=DISABLED, validation="numeric",)
+        self.shap_save_it_dropdown = DropDownMenu(self.evaluations_frm,"SHAP save cadence: ",[1, 10, 100, 1000, "ALL FRAMES"],"25")
         self.shap_save_it_dropdown.setChoices("ALL FRAMES")
         self.shap_save_it_dropdown.disable()
-        self.shap_multiprocess_dropdown = DropDownMenu(
-            self.evaluations_frm,
-            "Multi-process SHAP values: ",
-            ["True", "False"],
-            "25",
-            com=lambda x: self.change_shap_cadence_options(x),
-        )
+        self.shap_multiprocess_dropdown = DropDownMenu(self.evaluations_frm,"Multi-process SHAP values: ",["True", "False"],"25",com=lambda x: self.change_shap_cadence_options(x))
         self.shap_multiprocess_dropdown.setChoices("False")
         self.shap_multiprocess_dropdown.disable()
 
-        self.partial_dependency_cb = Checkbutton(
-            self.evaluations_frm,
-            font=Formats.FONT_REGULAR.value,
-            text="Calculate partial dependencies (Note: CPU intensive)",
-            variable=self.partial_dependency_var,
-        )
+
+        self.partial_dependency_cb, self.partial_dependency_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Calculate partial dependencies (Note: INTENSIVE)")
+
         self.calculate_shap_scores_cb = Checkbutton(
             self.evaluations_frm,
             text="Calculate SHAP scores",
@@ -189,9 +137,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
                 ),
             ],
         )
-        self.save_frame = LabelFrame(
-            self.main_frm, text="SAVE", font=Formats.FONT_HEADER.value
-        )
+        self.save_frame = LabelFrame(self.main_frm, text="SAVE", font=Formats.FONT_HEADER.value)
 
         save_global_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (GLOBAL ENVIRONMENT)", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.save_global)
         save_meta_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (SPECIFIC MODEL)", txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=self.save_config)
@@ -656,4 +602,4 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         ]
 
 
-#_ = MachineModelSettingsPopUp(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini')
+#_ = MachineModelSettingsPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
