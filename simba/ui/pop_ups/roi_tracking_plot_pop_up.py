@@ -9,7 +9,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ROI_plotter import ROIPlot
 from simba.plotting.ROI_plotter_mp import ROIPlotMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, SimbaButton, SimbaCheckbox)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect, SimbaButton,
+                                        SimbaCheckbox)
 from simba.utils.checks import check_file_exist_and_readable, check_float
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.read_write import find_all_videos_in_directory
