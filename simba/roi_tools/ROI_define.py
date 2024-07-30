@@ -11,10 +11,8 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_image import ROI_image_class
 from simba.roi_tools.ROI_move_shape import move_edge, update_all_tags
 from simba.roi_tools.ROI_multiply import create_emty_df
-from simba.roi_tools.ROI_size_calculations import (circle_size_calc,
-                                                   polygon_size_calc,
-                                                   rectangle_size_calc)
-from simba.ui.tkinter_functions import hxtScrollbar
+from simba.roi_tools.ROI_size_calculations import (circle_size_calc, polygon_size_calc, rectangle_size_calc)
+from simba.ui.tkinter_functions import hxtScrollbar, SimbaButton
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import NoROIDataError
@@ -139,12 +137,13 @@ class ROI_definitions(ConfigReader, PopUpMixin):
     def select_img(self):
         self.img_no_frame = LabelFrame(self.master, text="Change image", font=Formats.FONT_REGULAR.value, padx=5, pady=5)
         self.img_no_frame.grid_configure(ipadx=100)
-        self.pos_1s = Button(self.img_no_frame, text="+1s", fg=self.non_select_color, font=Formats.FONT_REGULAR.value, command=lambda: self.set_current_image("plus"))
-        self.neg_1s = Button(self.img_no_frame, text="-1s", fg=self.non_select_color, font=Formats.FONT_REGULAR.value, command=lambda: self.set_current_image("minus"))
-        self.reset_btn = Button(self.img_no_frame,text="Reset first frame", font=Formats.FONT_REGULAR.value, fg=self.non_select_color,command=lambda: self.set_current_image("reset"))
+
+        self.pos_1s = SimbaButton(parent=self.img_no_frame, txt="+1s", img='plus', font=Formats.FONT_REGULAR.value, txt_clr=self.non_select_color, cmd=self.set_current_image, cmd_kwargs={'stride': 'plus'})
+        self.neg_1s = SimbaButton(parent=self.img_no_frame, txt="-1s", img='minus', font=Formats.FONT_REGULAR.value, txt_clr=self.non_select_color, cmd=self.set_current_image, cmd_kwargs={'stride': 'minus'})
+        self.reset_btn = SimbaButton(parent=self.img_no_frame, txt="RESET FIRST FRAME", img='restart', font=Formats.FONT_REGULAR.value, txt_clr=self.non_select_color, cmd=self.set_current_image, cmd_kwargs={'stride': 'reset'})
         self.seconds_fw_label = Label(self.img_no_frame, font=Formats.FONT_REGULAR.value, text="Seconds forward: ")
         self.seconds_fw_entry = Entry(self.img_no_frame, width=4, font=Formats.FONT_REGULAR.value)
-        self.custom_run_seconds = Button(self.img_no_frame, text="Move", fg=self.non_select_color, font=Formats.FONT_REGULAR.value, command=lambda: self.set_current_image("custom"),)
+        self.custom_run_seconds = SimbaButton(parent=self.img_no_frame, txt="MOVE", img='fast_forward', font=Formats.FONT_REGULAR.value, txt_clr=self.non_select_color, cmd=self.set_current_image, cmd_kwargs={'stride': 'custom'})
         self.img_no_frame.grid(row=1, sticky=W)
         self.pos_1s.grid(row=1, column=0, sticky=W, pady=10, padx=10)
         self.neg_1s.grid(row=1, column=1, sticky=W, pady=10, padx=10)
@@ -153,7 +152,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.custom_run_seconds.grid(row=1, column=4, sticky=W, pady=10)
         self.reset_btn.grid(row=1, column=5, sticky=W, pady=10, padx=10)
 
-    def set_current_image(self, stride):
+    def set_current_image(self, stride: str):
         if stride == "plus":
             img_no = self.img_no + self.curr_fps
             if (img_no > 0) and (img_no < self.video_frame_count):
@@ -242,68 +241,24 @@ class ROI_definitions(ConfigReader, PopUpMixin):
 
     def apply_from_other_videos_menu(self):
         self.get_other_videos_w_data()
-        self.apply_from_other_video = LabelFrame(
-            self.master,
-            text="Apply shapes from another video",
-            font=("Arial", 16, "bold"),
-            padx=5,
-            pady=5,
-        )
-        self.select_video_label = Label(
-            self.apply_from_other_video, text="Select video: "
-        ).grid(row=1, column=0)
+        self.apply_from_other_video = LabelFrame( self.master, text="Apply shapes from another video", font=("Arial", 16, "bold"), padx=5, pady=5)
+        self.select_video_label = Label(self.apply_from_other_video, text="Select video: ").grid(row=1, column=0)
         self.selected_other_video = StringVar()
         self.selected_other_video.set(self.other_videos_w_ROIs[0])
-        self.video_dropdown = OptionMenu(
-            self.apply_from_other_video,
-            self.selected_other_video,
-            *self.other_videos_w_ROIs,
-        )
-        self.apply_button = Button(
-            self.apply_from_other_video,
-            text="Apply",
-            fg=self.non_select_color,
-            command=lambda: self.apply_rois_from_other_video(),
-        )
+        self.video_dropdown = OptionMenu(self.apply_from_other_video, self.selected_other_video, *self.other_videos_w_ROIs)
+
+        self.apply_button = SimbaButton(parent=self.apply_from_other_video, txt='APPLY', img='tick', txt_clr=self.non_select_color, cmd=self.apply_rois_from_other_video)
         self.apply_from_other_video.grid(row=7, sticky=W)
         self.video_dropdown.grid(row=1, column=1, sticky=W, pady=10)
         self.apply_button.grid(row=1, column=3, sticky=W, pady=10)
 
     def select_shape(self):
-        self.new_shape_frame = LabelFrame(
-            self.master,
-            text="New shape",
-            font=("Arial", 16, "bold"),
-            padx=5,
-            pady=5,
-            bd=5,
-        )
-        self.shape_frame = LabelFrame(
-            self.new_shape_frame,
-            text="Shape type",
-            font=("Arial", 14, "bold"),
-            padx=5,
-            pady=5,
-        )
-        self.rectangle_button = Button(
-            self.shape_frame,
-            text="Rectangle",
-            fg=self.non_select_color,
-            command=lambda: self.set_current_shape("rectangle"),
-        )
-        self.circle_button = Button(
-            self.shape_frame,
-            text="Circle",
-            fg=self.non_select_color,
-            command=lambda: self.set_current_shape("circle"),
-        )
-        self.polygon_button = Button(
-            self.shape_frame,
-            text="Polygon",
-            fg=self.non_select_color,
-            command=lambda: self.set_current_shape("polygon"),
-        )
+        self.new_shape_frame = LabelFrame(self.master, text="New shape", font=("Arial", 16, "bold"), padx=5, pady=5, bd=5)
+        self.shape_frame = LabelFrame(self.new_shape_frame, text="Shape type", font=("Arial", 14, "bold"), padx=5, pady=5)
 
+        self.rectangle_button = SimbaButton(parent=self.shape_frame, txt='RECTANGLE', txt_clr=self.non_select_color, font=Formats.FONT_REGULAR.value, img='rectangle', cmd=self.set_current_shape, cmd_kwargs={'c_shape': lambda: "rectangle"})
+        self.circle_button = SimbaButton(parent=self.shape_frame, txt='CIRCLE', txt_clr=self.non_select_color, font=Formats.FONT_REGULAR.value, img='circle_2', cmd=self.set_current_shape, cmd_kwargs={'c_shape': lambda: "circle"})
+        self.polygon_button = SimbaButton(parent=self.shape_frame, txt='POLYGON', txt_clr=self.non_select_color, font=Formats.FONT_REGULAR.value, img='polygon_2', cmd=self.set_current_shape, cmd_kwargs={'c_shape': lambda: "polygon"})
         self.new_shape_frame.grid(row=3, sticky=W)
         self.shape_frame.grid(row=1, sticky=W)
         self.rectangle_button.grid(row=1, sticky=W, pady=10, padx=10)
@@ -311,121 +266,58 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.polygon_button.grid(row=1, column=2, sticky=W, pady=10, padx=10)
 
     def select_shape_attr(self):
-        self.shape_attr_frame = LabelFrame(
-            self.new_shape_frame,
-            text="Shape attributes",
-            font=("Arial", 16, "bold"),
-            padx=5,
-            pady=5,
-        )
+        self.shape_attr_frame = LabelFrame(self.new_shape_frame, text="Shape attributes", font=("Arial", 16, "bold"), padx=5, pady=5)
         self.shape_attr_frame.grid_configure(ipadx=50)
         self.thickness_label = Label(self.shape_attr_frame, text="Shape thickness: ")
         self.color_label = Label(self.shape_attr_frame, text="Shape color: ")
         self.shape_thickness = IntVar()
         self.shape_thickness.set(5)
-        self.shape_thickness_dropdown = OptionMenu(
-            self.shape_attr_frame,
-            self.shape_thickness,
-            *self.shape_thickness_list,
-            command=None,
-        )
+        self.shape_thickness_dropdown = OptionMenu(self.shape_attr_frame, self.shape_thickness, *self.shape_thickness_list, command=None)
         self.shape_thickness_dropdown.config(width=3)
 
         self.ear_tag_sizes_lbl = Label(self.shape_attr_frame, text="Ear tag size: ")
         self.ear_tag_size = IntVar()
         self.ear_tag_size.set(10)
-        self.ear_tag_size_dropdown = OptionMenu(
-            self.shape_attr_frame, self.ear_tag_size, *list(self.ear_tag_size_list)
-        )
+        self.ear_tag_size_dropdown = OptionMenu(self.shape_attr_frame, self.ear_tag_size, *list(self.ear_tag_size_list))
 
         self.color_var = StringVar()
         self.color_var.set("Red")
-        self.color_dropdown = OptionMenu(
-            self.shape_attr_frame, self.color_var, *list(self.named_shape_colors.keys())
-        )
+        self.color_dropdown = OptionMenu(self.shape_attr_frame, self.color_var, *list(self.named_shape_colors.keys()))
 
         self.shape_attr_frame.grid(row=2, sticky=W, pady=10)
         self.thickness_label.grid(row=1, column=0)
-        self.shape_thickness_dropdown.grid(
-            row=1, column=1, sticky=W, pady=10, padx=(0, 10)
-        )
+        self.shape_thickness_dropdown.grid(row=1, column=1, sticky=W, pady=10, padx=(0, 10))
         self.ear_tag_sizes_lbl.grid(row=1, column=2)
-        self.ear_tag_size_dropdown.grid(
-            row=1, column=3, sticky=W, pady=10, padx=(0, 10)
-        )
+        self.ear_tag_size_dropdown.grid(row=1, column=3, sticky=W, pady=10, padx=(0, 10))
         self.color_label.grid(row=1, column=4)
         self.color_dropdown.grid(row=1, column=5, sticky=W, pady=10)
 
     def select_shape_name(self):
-        self.set_shape_name = LabelFrame(
-            self.new_shape_frame,
-            text="Shape name",
-            font=("Arial", 16, "bold"),
-            padx=5,
-            pady=5,
-        )
+        self.set_shape_name = LabelFrame(self.new_shape_frame, text="Shape name", font=("Arial", 16, "bold"), padx=5, pady=5)
         self.set_shape_name.grid_configure(ipadx=105)
-        self.name_label = Label(self.set_shape_name, text="Shape name: ").grid(
-            row=1, column=0
-        )
+        self.name_label = Label(self.set_shape_name, text="Shape name: ").grid(row=1, column=0)
         self.name_box = Entry(self.set_shape_name, width=55)
         self.set_shape_name.grid(row=3, sticky=W, pady=10)
         self.name_box.grid(row=1, column=2, sticky=W, pady=10)
 
     def interact_menus(self):
-        self.interact_frame = LabelFrame(
-            self.master,
-            text="Shape interaction",
-            font=("Arial", 16, "bold"),
-            padx=5,
-            pady=5,
-        )
+        self.interact_frame = LabelFrame(self.master, text="Shape interaction", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.interact_frame.grid_configure(ipadx=30)
-        self.move_shape_button = Button(
-            self.interact_frame,
-            text="Move shape",
-            fg=self.non_select_color,
-            command=lambda: self.set_interact_state("move_shape"),
-        )
-        self.zoom_in_button = Button(
-            self.interact_frame,
-            text="Zoom IN",
-            fg=self.non_select_color,
-            state=DISABLED,
-            command=lambda: self.set_interact_state("zoom_in"),
-        )
-        self.zoom_out_button = Button(
-            self.interact_frame,
-            text="Zoom OUT",
-            fg=self.non_select_color,
-            state=DISABLED,
-            command=lambda: self.set_interact_state("zoom_out"),
-        )
-        self.zoom_home = Button(
-            self.interact_frame,
-            text="Zoom HOME",
-            fg=self.non_select_color,
-            state=DISABLED,
-            command=lambda: self.set_interact_state("zoom_home"),
-        )
-        self.zoom_pct_label = Label(self.interact_frame, text="Zoom %: ").grid(
-            row=1, column=5, padx=(10, 0)
-        )
+
+
+        self.move_shape_button = SimbaButton(parent=self.interact_frame, txt="MOVE SHAPE", img='move', txt_clr=self.non_select_color, cmd=self.set_interact_state, cmd_kwargs={'c_interact': lambda: 'move_shape'})
+
+        self.zoom_in_button = SimbaButton(parent=self.interact_frame, txt="Zoom IN", img='zoom_in', txt_clr=self.non_select_color, enabled=False, cmd=self.set_interact_state, cmd_kwargs={'c_interact': lambda: 'zoom_in'})
+        self.zoom_out_button = SimbaButton(parent=self.interact_frame, txt="Zoom OUT", img='zoom_out', txt_clr=self.non_select_color, enabled=False, cmd=self.set_interact_state, cmd_kwargs={'c_interact': lambda: 'zoom_out'})
+        self.zoom_home = SimbaButton(parent=self.interact_frame, txt="Zoom HOME", img='home', txt_clr=self.non_select_color, enabled=False, cmd=self.set_interact_state, cmd_kwargs={'c_interact': lambda: 'zoom_home'})
+
+        self.zoom_pct_label = Label(self.interact_frame, text="Zoom %: ").grid(row=1, column=5, padx=(10, 0))
         self.zoom_pct = Entry(self.interact_frame, width=4, state=DISABLED)
         self.zoom_pct.insert(0, 10)
-        self.pan = Button(
-            self.interact_frame,
-            text="Pan",
-            fg=self.non_select_color,
-            state=DISABLED,
-            command=lambda: self.set_interact_state("pan"),
-        )
-        self.shape_info_btn = Button(
-            self.interact_frame,
-            text="Show shape info.",
-            fg=self.non_select_color,
-            command=lambda: self.show_shape_information(),
-        )
+
+        self.pan = Button(self.interact_frame, text="Pan", fg=self.non_select_color, state=DISABLED, command=lambda: self.set_interact_state("pan"))
+        self.shape_info_btn = SimbaButton(parent=self.interact_frame, txt="SHOW SHAPE INFO", img='info', txt_clr=self.non_select_color, enabled=False, cmd=self.show_shape_information)
+
 
         self.interact_frame.grid(row=6, sticky=W)
         self.move_shape_button.grid(row=1, column=0, sticky=W, pady=10, padx=10)
@@ -437,7 +329,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.shape_info_btn.grid(row=1, column=7, sticky=W, pady=10)
 
     def call_remove_ROI(self):
-        self.shape_info_btn.configure(text="Show shape info.")
+        self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         self.apply_delete_button.configure(fg=self.select_color)
         self.image_data.remove_ROI(self.selected_video.get())
         self.video_ROIs.remove(self.selected_video.get())
@@ -447,45 +339,18 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.update_delete_ROI_menu()
 
     def draw_menu(self):
-        self.draw_frame = LabelFrame(
-            self.master, text="Draw", font=("Arial", 16, "bold"), padx=5, pady=5
-        )
-        self.draw_button = Button(
-            self.draw_frame,
-            text="Draw",
-            fg=self.non_select_color,
-            command=lambda: self.create_draw(),
-        )
-        self.delete_all_rois_btn = Button(
-            self.draw_frame,
-            text="Delete ALL",
-            fg=self.non_select_color,
-            command=lambda: self.call_delete_all_rois(),
-        )
-        self.select_roi_label = Label(self.draw_frame, text="Select ROI: ")
+        self.draw_frame = LabelFrame(self.master, text="Draw", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.draw_button = SimbaButton(parent=self.draw_frame, txt='DRAW', img='paint', txt_clr=self.non_select_color, cmd=self.create_draw)
+        self.delete_all_rois_btn = SimbaButton(parent=self.draw_frame, txt='DELETE ALL', img='trash', txt_clr=self.non_select_color, cmd=self.call_delete_all_rois)
+
+        self.select_roi_label = Label(self.draw_frame, text="Select ROI: ", font=Formats.FONT_REGULAR.value)
         self.selected_video = StringVar()
         self.selected_video.set(self.video_ROIs[0])
-        self.roi_dropdown = OptionMenu(
-            self.draw_frame, self.selected_video, *self.video_ROIs
-        )
-        self.apply_delete_button = Button(
-            self.draw_frame,
-            text="Delete ROI",
-            fg=self.non_select_color,
-            command=lambda: self.call_remove_ROI(),
-        )
-        self.duplicate_ROI_btn = Button(
-            self.draw_frame,
-            text="Duplicate ROI",
-            fg=self.non_select_color,
-            command=lambda: self.call_duplicate_ROI(),
-        )
-        self.chg_attr_btn = Button(
-            self.draw_frame,
-            text="Change ROI",
-            fg=self.non_select_color,
-            command=lambda: self.ChangeAttrMenu(self, self.image_data),
-        )
+        self.roi_dropdown = OptionMenu(self.draw_frame, self.selected_video, *self.video_ROIs)
+
+        self.apply_delete_button = SimbaButton(parent=self.draw_frame, txt='DELETE ROI', img='trash', txt_clr=self.non_select_color, cmd=self.call_remove_ROI)
+        self.duplicate_ROI_btn = SimbaButton(parent=self.draw_frame, txt='DUPLICATE ROI', img='duplicate', txt_clr=self.non_select_color, cmd=self.call_duplicate_ROI)
+        self.chg_attr_btn = SimbaButton(parent=self.draw_frame, txt='CHANGE ROI', img='edit', txt_clr=self.non_select_color, cmd=self.ChangeAttrMenu, cmd_kwargs={'shape_data': lambda: self, 'image_data': lambda: self.image_data})
 
         self.draw_frame.grid(row=5, sticky=W)
         self.draw_button.grid(row=1, column=1, sticky=W, pady=2, padx=10)
@@ -505,7 +370,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         ):
             print("No shapes to print info for.")
 
-        elif self.shape_info_btn.cget("text") == "Show shape info.":
+        elif self.shape_info_btn.cget("text") == "SHOW SHAPE INFO":
             if len(self.image_data.out_rectangles) > 0:
                 self.rectangle_size_dict = {}
                 self.rectangle_size_dict["Rectangles"] = {}
@@ -534,28 +399,21 @@ class ROI_definitions(ConfigReader, PopUpMixin):
                 self.image_data.polygon_size_dict = self.polygon_size_dict
 
             self.image_data.insert_all_ROIs_into_image(show_size_info=True)
-            self.shape_info_btn.configure(text="Hide shape info.")
+            self.shape_info_btn.configure(text="HIDE SHAPE INFO")
 
-        elif self.shape_info_btn.cget("text") == "Hide shape info.":
-            self.shape_info_btn.configure(text="Show shape info.")
+        elif self.shape_info_btn.cget("text") == "HIDE SHAPE INFO":
+            self.shape_info_btn.configure(text="SHOW SHAPE INFO")
             self.image_data.insert_all_ROIs_into_image()
 
     def save_menu(self):
-        self.save_frame = LabelFrame(
-            self.master, text="Save", font=("Arial", 16, "bold"), padx=5, pady=5
-        )
-        self.save_button = Button(
-            self.save_frame,
-            text="Save ROI data",
-            fg=self.non_select_color,
-            command=lambda: self.save_data(),
-        )
+        self.save_frame = LabelFrame(self.master, text="Save", font=("Arial", 16, "bold"), padx=5, pady=5)
+        self.save_button = SimbaButton(parent=self.save_frame, txt="Save ROI data", img='save', txt_clr=self.non_select_color, cmd=self.save_data)
         self.save_frame.grid(row=8, sticky=W)
         self.save_button.grid(row=1, column=3, sticky=W, pady=10)
 
-    def set_current_shape(self, c_shape):
+    def set_current_shape(self, c_shape: str):
         self.c_shape = c_shape
-        self.shape_info_btn.configure(text="Show shape info.")
+        self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         if self.c_shape == self.stored_shape:
             self.rectangle_button.configure(fg=self.non_select_color)
             self.circle_button.configure(fg=self.non_select_color)
@@ -587,8 +445,8 @@ class ROI_definitions(ConfigReader, PopUpMixin):
             self.zoom_home.configure(fg=self.non_select_color)
             self.stored_interact = None
 
-    def set_interact_state(self, c_interact):
-        self.shape_info_btn.configure(text="Show shape info.")
+    def set_interact_state(self, c_interact: str):
+        self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         if c_interact == self.stored_interact:
             self.move_shape_button.configure(fg=self.non_select_color)
             self.zoom_in_button.configure(fg=self.non_select_color)
@@ -608,10 +466,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
                 else:
                     self.reset_selected_buttons("interact")
                     c_interact = None
-                    NoDataFoundWarning(
-                        msg="You have no shapes that can be moved.",
-                        source=self.__class__.__name__,
-                    )
+                    NoDataFoundWarning(msg="You have no shapes that can be moved.", source=self.__class__.__name__)
 
             if c_interact == "zoom_in":
                 self.move_shape_button.configure(fg=self.non_select_color)
@@ -646,7 +501,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.reset_selected_buttons("interact")
 
     def call_delete_all_rois(self):
-        self.shape_info_btn.configure(text="Show shape info.")
+        self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         if (
             len(self.image_data.out_rectangles)
             + len(self.image_data.out_circles)
@@ -720,7 +575,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
 
     def call_duplicate_ROI(self):
         shape_name = self.selected_video.get().split(": ")
-        self.shape_info_btn.configure(text="Show shape info.")
+        self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         if shape_name[0] != "None":
             all_roi_list = (
                 self.image_data.out_rectangles
@@ -771,7 +626,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
             print("No ROI selected.")
 
     def create_draw(self):
-        self.shape_info_btn.configure(text="Show shape info.")
+        self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         if self.stored_shape is None:
             raise NoROIDataError(
                 msg="No shape type selected.", source=self.__class__.__name__
@@ -944,30 +799,17 @@ class ROI_definitions(ConfigReader, PopUpMixin):
                 selected_shape_color_lbl = Label(self.attr_win, text="Shape color: ")
                 self.selected_shape_color = StringVar()
                 self.selected_shape_color.set(current_shape_data["Color name"])
-                selected_shape_color_dropdown = OptionMenu(
-                    self.attr_win,
-                    self.selected_shape_color,
-                    *list(shape_data.named_shape_colors.keys()),
-                )
+                selected_shape_color_dropdown = OptionMenu(self.attr_win, self.selected_shape_color, *list(shape_data.named_shape_colors.keys()))
 
-                save_button = Button(
-                    self.attr_win,
-                    text="Save",
-                    fg=shape_data.non_select_color,
-                    command=lambda: self.save_attr_changes(shape_data, image_data),
-                )
+                save_button = SimbaButton(parent=self.attr_win, txt='SAVE', txt_clr=shape_data.non_select_color, img='save', cmd=self.save_attr_changes, cmd_kwargs={'shape_data': lambda: shape_data, 'image_data': lambda: image_data})
 
                 attr_lbl_frame.grid(row=1, sticky=W)
                 selected_shape_name_lbl.grid(row=1, column=0, sticky=W, pady=10)
                 selected_shape_name_entry.grid(row=1, column=1, sticky=W, pady=10)
                 selected_shape_thickness_lbl.grid(row=2, column=0, sticky=W, pady=10)
-                selected_shape_thickness_dropdown.grid(
-                    row=2, column=1, sticky=W, pady=10
-                )
+                selected_shape_thickness_dropdown.grid(row=2, column=1, sticky=W, pady=10)
                 selected_shape_eartag_size_lbl.grid(row=3, column=0, sticky=W, pady=10)
-                selected_shape_eartag_size_dropdown.grid(
-                    row=3, column=1, sticky=W, pady=10
-                )
+                selected_shape_eartag_size_dropdown.grid(row=3, column=1, sticky=W, pady=10)
                 selected_shape_color_lbl.grid(row=4, column=0, sticky=W, pady=10)
                 selected_shape_color_dropdown.grid(row=4, column=1, sticky=W, pady=10)
                 save_button.grid(row=5, column=0, sticky=W, pady=10)
@@ -975,7 +817,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
             else:
                 raise TypeError("No ROI selected.")
 
-        def save_attr_changes(self, shape_data, image_data):
+        def save_attr_changes(self, shape_data: str, image_data: str):
             new_shape_name = self.selected_shape_name_entry_txt.get()
             new_shape_thickness = self.selected_shape_thickness.get()
             new_shape_ear_tag_size = self.selected_shape_eartag_size.get()
@@ -1063,16 +905,9 @@ class PreferenceMenu:
         duplicate_jump_size_list = list(range(1, 100, 5))
         self.duplicate_jump_size = IntVar()
         self.duplicate_jump_size.set(20)
-        duplicate_jump_size_dropdown = OptionMenu(
-            pref_lbl_frame, self.duplicate_jump_size, *duplicate_jump_size_list
-        )
-        pref_save_btn = Button(
-            pref_lbl_frame,
-            text="Save",
-            fg="black",
-            command=lambda: self.save_prefs(image_data),
-        )
+        duplicate_jump_size_dropdown = OptionMenu(pref_lbl_frame, self.duplicate_jump_size, *duplicate_jump_size_list)
 
+        pref_save_btn = SimbaButton(parent=pref_lbl_frame, txt="SAVE", img='save', font=Formats.FONT_REGULAR.value, cmd=self.save_prefs, cmd_kwargs={'image_data': lambda: image_data})
         pref_lbl_frame.grid(row=1, sticky=W)
         line_type_label.grid(row=1, column=0, sticky=W, pady=10)
         line_type_dropdown.grid(row=1, column=1, sticky=W, pady=10)
@@ -1097,8 +932,8 @@ class PreferenceMenu:
         )
 
 
-# test = ROI_definitions(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini',
-#                       video_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/videos/F1 HAB.mp4')
+# test = ROI_definitions(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+#                       video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi')
 
 
 # test = ROI_definitions(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi')

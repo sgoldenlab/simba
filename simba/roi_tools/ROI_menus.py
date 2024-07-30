@@ -7,7 +7,7 @@ from typing import Union
 from simba.roi_tools.ROI_define import ROI_definitions
 from simba.roi_tools.ROI_multiply import multiply_ROIs
 from simba.roi_tools.ROI_reset import reset_video_ROIs
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimbaButton
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.errors import NoFilesFoundError
 
@@ -77,11 +77,12 @@ class roitableRow(Frame):
         self.index.grid(row=0, column=0)
         self.lblName = Label(self, text=filename, width=widths, anchor=W)
         self.lblName.grid(row=0, column=1, sticky=W)
-        self.btnset = Button(self, text="Draw", command=self.draw)
+
+        self.btnset = SimbaButton(parent=self, txt='DRAW', img='paint', cmd=self.draw)
         self.btnset.grid(row=0, column=2)
-        self.btnreset = Button(self, text="Reset", command=self.reset)
+        self.btnreset = SimbaButton(parent=self, txt='RESET', img='trash', cmd=self.reset)
         self.btnreset.grid(row=0, column=3)
-        self.btnapplyall = Button(self, text="Apply to all", command=self.applyall)
+        self.btnapplyall = SimbaButton(parent=self, txt='APPLY TO ALL', img='add_on', cmd=self.applyall)
         self.btnapplyall.grid(row=0, column=4)
 
     def draw(self):

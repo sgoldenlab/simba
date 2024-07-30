@@ -263,7 +263,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         button_setscale = SimbaButton(parent=label_setscale, txt="CONFIGURE VIDEO PARAMETERS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.create_video_info_table, img='calipher')
         self.new_ROI_frm = CreateLabelFrameWithIcon(parent=tab6, header="SIMBA ROI INTERFACE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI.value)
-        self.start_new_ROI = SimbaButton(parent=label_setscale, txt="DEFINE ROIs", txt_clr='green', font=Formats.FONT_REGULAR.value, img='roi', cmd=ROI_menu, cmd_kwargs={'config_path': lambda:self.config_path})
+        self.start_new_ROI = SimbaButton(parent=self.new_ROI_frm, txt="DEFINE ROIs", txt_clr='green', font=Formats.FONT_REGULAR.value, img='roi', cmd=ROI_menu, cmd_kwargs={'config_path': lambda:self.config_path})
 
         self.delete_all_ROIs = SimbaButton(parent=self.new_ROI_frm, txt="DELETE ALL ROI DEFINITIONS", txt_clr='red', font=Formats.FONT_REGULAR.value, img='trash', cmd=delete_all_ROIs, cmd_kwargs={'config_path': lambda:self.config_path})
         self.standardize_roi_size_popup_btn = SimbaButton(parent=self.new_ROI_frm, txt="STANDARDIZE ROI SIZES", txt_clr='blue', font=Formats.FONT_REGULAR.value, img='calipher', cmd=ROISizeStandardizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})

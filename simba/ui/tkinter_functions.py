@@ -405,19 +405,18 @@ class TwoOptionQuestionPopUp(object):
         self.selected_option = selected_option
         self.main_frm.destroy()
 
-def SimbaButton(
-        parent: Union[Frame, Canvas, LabelFrame, Toplevel],
-        txt: str,
-        txt_clr: Optional[str] = 'black',
-        bg_clr: Optional[str] = None,
-        font: Optional[Tuple] = ('Arial', 12),
-        width: Optional[str] = None,
-        height: Optional[str] = None,
-        img: Optional[Union[ImageTk.PhotoImage, str]] = None,
-        cmd: Optional[Callable] = None,
-        cmd_kwargs: Optional[Dict[Any, Any]] = None,
-        thread: Optional[bool] = False
-) -> Button:
+def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
+                txt: str,
+                txt_clr: Optional[str] = 'black',
+                bg_clr: Optional[str] = None,
+                font: Optional[Tuple] = ('Arial', 12),
+                width: Optional[str] = None,
+                height: Optional[str] = None,
+                img: Optional[Union[ImageTk.PhotoImage, str]] = None,
+                cmd: Optional[Callable] = None,
+                cmd_kwargs: Optional[Dict[Any, Any]] = None,
+                enabled: Optional[bool] = True,
+                thread: Optional[bool] = False) -> Button:
 
     if isinstance(img, str):
         img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
@@ -432,26 +431,21 @@ def SimbaButton(
 
     if cmd is not None:
         if thread:
-            # Start a new thread for command execution
             command = lambda: threading.Thread(target=execute_command).start()
         else:
-            # Execute the command directly
             command = execute_command
     else:
-        # No command to execute
         command = None
 
-    btn = Button(
-        master=parent,
-        text=txt,
-        compound="left",
-        image=img,
-        relief=RAISED,
-        fg=txt_clr,
-        font=font,
-        bg=bg_clr,
-        command=command
-    )
+    btn = Button(master=parent,
+                 text=txt,
+                 compound="left",
+                 image=img,
+                 relief=RAISED,
+                 fg=txt_clr,
+                 font=font,
+                 bg=bg_clr,
+                 command=command)
 
     if img is not None:
         btn.image = img
@@ -460,5 +454,8 @@ def SimbaButton(
         btn.config(width=width)
     if height is not None:
         btn.config(height=height)
+
+    if not enabled:
+        btn.config(state=DISABLED)
 
     return btn

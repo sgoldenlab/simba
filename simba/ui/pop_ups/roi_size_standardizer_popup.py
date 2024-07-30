@@ -15,9 +15,9 @@ from simba.utils.errors import NoROIDataError
 
 class ROISizeStandardizerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
-        PopUpMixin.__init__(self, title="ROI SIZE NORMALIZER PY PIXELS PER MILLIMETER")
         ConfigReader.__init__(self, config_path=config_path)
         check_file_exist_and_readable(file_path=self.roi_coordinates_path)
+        PopUpMixin.__init__(self, title="ROI SIZE NORMALIZER PY PIXELS PER MILLIMETER")
         self.read_roi_data()
         if len(self.video_names_w_rois) <= 1:
             raise NoROIDataError(f"SimBA could only find {len(self.video_names_w_rois)} videos with ROIs in your project. You need at least 2 videos with ROIs to standardize ROI sizes")
