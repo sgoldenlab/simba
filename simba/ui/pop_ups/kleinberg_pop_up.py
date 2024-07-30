@@ -7,10 +7,12 @@ from typing import Union
 from simba.data_processors.kleinberg_calculator import KleinbergCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaButton, SimbaCheckbox)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_float, check_int
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import NoChoosenClassifierError
+
 
 class KleinbergPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):

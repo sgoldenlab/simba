@@ -2,12 +2,14 @@ import os
 from tkinter import *
 from typing import Union
 
-from simba.data_processors.directing_other_animals_calculator import DirectingOtherAnimalsAnalyzer
+from simba.data_processors.directing_other_animals_calculator import \
+    DirectingOtherAnimalsAnalyzer
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon,SimbaCheckbox
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimbaCheckbox
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import (AnimalNumberError, InvalidInputError, NoFilesFoundError)
+from simba.utils.errors import (AnimalNumberError, InvalidInputError,
+                                NoFilesFoundError)
 
 
 class AnimalDirectingAnimalPopUp(ConfigReader, PopUpMixin):

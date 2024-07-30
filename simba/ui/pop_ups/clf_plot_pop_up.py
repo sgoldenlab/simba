@@ -7,7 +7,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.plot_clf_results import PlotSklearnResultsSingleCore
 from simba.plotting.plot_clf_results_mp import PlotSklearnResultsMultiProcess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, SimbaButton, SimbaCheckbox)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect, SimbaButton,
+                                        SimbaCheckbox)
 from simba.utils.checks import check_float
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import NoFilesFoundError

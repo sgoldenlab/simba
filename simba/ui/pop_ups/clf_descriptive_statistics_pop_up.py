@@ -3,9 +3,11 @@ from tkinter import *
 from simba.data_processors.agg_clf_calculator import AggregateClfCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimbaButton, SimbaCheckbox
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
+                                        SimbaCheckbox)
 from simba.utils.enums import Formats, Keys, Links, Options
-from simba.utils.errors import (NoChoosenClassifierError, NoChoosenMeasurementError)
+from simba.utils.errors import (NoChoosenClassifierError,
+                                NoChoosenMeasurementError)
 
 
 class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
