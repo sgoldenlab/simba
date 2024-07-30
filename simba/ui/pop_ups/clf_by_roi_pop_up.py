@@ -7,15 +7,18 @@ from tkinter import *
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_clf_calculator import ROIClfCalculator
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox)
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import (NoChoosenClassifierError,
-                                NoChoosenMeasurementError, NoChoosenROIError,
-                                ROICoordinatesNotFoundError)
+from simba.utils.errors import (NoChoosenClassifierError, NoChoosenMeasurementError, NoChoosenROIError, ROICoordinatesNotFoundError)
 
 
 class ClfByROIPopUp(PopUpMixin, ConfigReader):
+
+    """
+    :example:
+    >>> _ = ClfByROIPopUp(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini")
+    """
+
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path)
         if not os.path.isfile(self.roi_coordinates_path):
@@ -26,12 +29,12 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         ROI_menu = LabelFrame(self.main_frm, text="Select ROI(s)", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         classifier_menu = LabelFrame(self.main_frm, text="Select classifier(s)", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         measurements_menu = LabelFrame(self.main_frm, text="Select measurements", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.total_time_var = BooleanVar()
-        self.start_bouts_var = BooleanVar()
-        self.end_bouts_var = BooleanVar()
-        self.total_time_cb = Checkbutton( measurements_menu, font=Formats.FONT_REGULAR.value, text="Total time by ROI (s)", variable=self.total_time_var,)
-        self.start_bouts_cb = Checkbutton( measurements_menu, font=Formats.FONT_REGULAR.value, text="Started bouts by ROI (count)", variable=self.start_bouts_var,)
-        self.end_bouts_cb = Checkbutton(measurements_menu, text="Ended bouts by ROI (count)", font=Formats.FONT_REGULAR.value, variable=self.end_bouts_var,)
+
+
+        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=measurements_menu, txt="Total time by ROI (s)", txt_img='timer')
+        self.start_bouts_cb, self.start_bouts_var = SimbaCheckbox(parent=measurements_menu, txt="Started bouts by ROI (count)", txt_img='counter')
+        self.end_bouts_cb, self.end_bouts_var = SimbaCheckbox(parent=measurements_menu, txt="Ended bouts by ROI (count)", txt_img='counter')
+
         self.ROI_check_boxes_status_dict = {}
         self.clf_check_boxes_status_dict = {}
 
@@ -109,5 +112,5 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
             )
 
 
-#
-# _ = ClfByROIPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+
+

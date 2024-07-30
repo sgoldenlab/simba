@@ -8,20 +8,24 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.clf_validator import ClassifierValidationClips
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
+
+    """
+    :example:
+    >>> _ = ClassifierValidationPopUp(config_path=r'C:\troubleshooting\RAT_NOR\project_folder\project_config.ini')
+
+    """
     def __init__(self, config_path: Union[str, os.PathLike]):
+
         PopUpMixin.__init__(self, title="SIMBA CLASSIFIER VALIDATION CLIPS")
         ConfigReader.__init__(self, config_path=config_path)
         color_names = list(self.colors_dict.keys())
-        self.one_vid_per_bout_var = BooleanVar(value=False)
-        self.one_vid_per_video_var = BooleanVar(value=True)
         self.files_found_dict = get_file_name_info_in_directory(directory=self.machine_results_dir, file_type=self.file_type)
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SETTINGS",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.CLF_VALIDATION.value)
         self.seconds_entry = Entry_Box(self.settings_frm, "SECONDS PADDING: ", "20", validation="numeric")
@@ -34,8 +38,9 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
         self.seconds_entry.entry_set(val=2)
         self.highlight_clr_dropdown.setChoices("None")
         self.video_speed_dropdown.setChoices(1.0)
-        self.individual_bout_clips_cb = Checkbutton(self.settings_frm, text="CREATE ONE CLIP PER BOUT", font=Formats.FONT_REGULAR.value, variable=self.one_vid_per_bout_var)
-        self.individual_clip_per_video_cb = Checkbutton(self.settings_frm, text="CREATE ONE CLIP PER VIDEO", font=Formats.FONT_REGULAR.value, variable=self.one_vid_per_video_var)
+
+        self.individual_bout_clips_cb, self.one_vid_per_bout_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE ONE CLIP PER BOUT", txt_img='segment', val=False)
+        self.individual_clip_per_video_cb, self.one_vid_per_video_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE ONE CLIP PER BOUT", txt_img='video', val=True)
 
         self.run_frm = LabelFrame(self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm,text="SINGLE VIDEO",font=Formats.FONT_HEADER.value,pady=5,padx=5,fg="black")
@@ -88,4 +93,3 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
         threading.Thread(target=clf_validator.run()).start()
 
 
-#_ = ClassifierValidationPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

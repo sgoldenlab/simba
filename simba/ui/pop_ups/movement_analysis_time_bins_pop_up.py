@@ -7,8 +7,7 @@ from simba.data_processors.timebins_movement_calculator import \
     TimeBinsMovementCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_float, check_int
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
 
@@ -19,6 +18,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
 
     :example:
     >>> _ =  MovementAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+    >>> _ =  MovementAnalysisTimeBinsPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
     """
 
     def __init__(self, config_path: str):
@@ -40,9 +40,10 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
 
         self.setting_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
         self.choose_bp_frm(parent=self.setting_frm, bp_options=self.body_parts_lst)
-        self.plots_frm = LabelFrame(self.setting_frm, text="Plots", font=Formats.FONT_HEADER.value)
+        self.plots_frm = LabelFrame(self.setting_frm, text="PLOTS", font=Formats.FONT_HEADER.value)
         self.plots_var = BooleanVar()
-        self.plots_cb = Checkbutton(self.plots_frm, text="Create plots", font=Formats.FONT_REGULAR.value, variable=self.plots_var)
+
+        self.plots_cb, self.plots_var = SimbaCheckbox(parent=self.plots_frm, txt='CREATE PLOTS', txt_img='plot')
         self.plots_frm.grid(row=self.frame_children(frame=self.setting_frm), column=0, sticky=NW)
         self.plots_cb.grid(row=0, column=0, sticky=NW)
         self.setting_frm.grid(row=1, column=0, sticky=NW)
@@ -61,4 +62,4 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         time_bin_movement_analyzer.run()
         time_bin_movement_analyzer.save()
 
-#_ =  MovementAnalysisTimeBinsPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# _ =  MovementAnalysisTimeBinsPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")

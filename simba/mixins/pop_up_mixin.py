@@ -185,12 +185,8 @@ class PopUpMixin(object):
     def create_time_bin_entry(self):
         if hasattr(self, "time_bin_frm"):
             self.time_bin_frm.destroy()
-        self.time_bin_frm = LabelFrame(
-            self.main_frm, text="TIME BIN", font=Formats.FONT_HEADER.value
-        )
-        self.time_bin_entrybox = Entry_Box(
-            self.time_bin_frm, "Time-bin size (s): ", "12"
-        )
+        self.time_bin_frm = LabelFrame(self.main_frm, text="TIME BIN", font=Formats.FONT_HEADER.value)
+        self.time_bin_entrybox = Entry_Box(self.time_bin_frm, "TIME-BIN SIZE (S): ", "15")
         self.time_bin_entrybox.grid(row=0, column=0, sticky=NW)
         self.time_bin_frm.grid(row=self.children_cnt_main(), column=0, sticky=NW)
 
@@ -348,7 +344,7 @@ class PopUpMixin(object):
 
         return int(len(list(self.main_frm.children.keys())))
 
-    def frame_children(self, frame: Frame) -> int:
+    def frame_children(self, frame: Union[Frame, Toplevel, Canvas, LabelFrame]) -> int:
         """
         Find the number of children (e.g., labelframes) currently exist within specified frame.Similar to ``children_cnt_main``,
         but accepts a specific frame rather than the main frame beeing hardcoded.

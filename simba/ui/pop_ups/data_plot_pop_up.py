@@ -2,19 +2,19 @@ __author__ = "Simon Nilsson"
 
 import os
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.data_plotter import DataPlotter
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox)
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import get_file_name_info_in_directory
 
 
 class DataPlotterPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
 
         PopUpMixin.__init__(self, title="CREATE DATA PLOTS")
         ConfigReader.__init__(self, config_path=config_path)
@@ -25,11 +25,11 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_TABLES.value,)
         self.rounding_decimals_options = list(range(0, 11))
         self.font_thickness_options = list(range(1, 11))
-        self.resolution_dropdown = DropDownMenu(self.style_settings_frm, "RESOLUTION:", self.resolutions, "18")
-        self.rounding_decimals_dropdown = DropDownMenu(self.style_settings_frm, "DECIMAL ACCURACY:", self.rounding_decimals_options, "18")
-        self.background_color_dropdown = DropDownMenu(self.style_settings_frm, "BACKGROUND COLOR: ", self.color_lst, "18")
-        self.font_color_dropdown = DropDownMenu(self.style_settings_frm, "HEADER COLOR: ", self.color_lst, "18")
-        self.font_thickness_dropdown = DropDownMenu(self.style_settings_frm, "FONT THICKNESS: ", self.font_thickness_options, "18")
+        self.resolution_dropdown = DropDownMenu(self.style_settings_frm, "RESOLUTION:", self.resolutions, "22")
+        self.rounding_decimals_dropdown = DropDownMenu(self.style_settings_frm, "DECIMAL ACCURACY:", self.rounding_decimals_options, "22")
+        self.background_color_dropdown = DropDownMenu(self.style_settings_frm, "BACKGROUND COLOR: ", self.color_lst, "22")
+        self.font_color_dropdown = DropDownMenu(self.style_settings_frm, "HEADER COLOR: ", self.color_lst, "22")
+        self.font_thickness_dropdown = DropDownMenu(self.style_settings_frm, "FONT THICKNESS: ", self.font_thickness_options, "22")
 
         self.background_color_dropdown.setChoices(choice="White")
         self.font_color_dropdown.setChoices(choice="Black")
@@ -43,10 +43,9 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.__populate_body_parts_menu(self.animal_cnt_options[0])
 
         self.settings_frm = LabelFrame( self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5,)
-        self.data_frames_var = BooleanVar()
-        self.data_videos_var = BooleanVar()
-        data_frames_cb = Checkbutton(self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.data_frames_var)
-        data_videos_cb = Checkbutton(self.settings_frm, text="Create videos", font=Formats.FONT_REGULAR.value, variable=self.data_videos_var)
+
+        data_frames_cb, self.data_frames_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE FRAMES", txt_img='frames', val=False)
+        data_videos_cb, self.data_videos_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE VIDEOS", txt_img='video', val=False)
 
         self.run_frm = LabelFrame( self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
@@ -55,7 +54,7 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12")
         self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
         self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_multiple_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), font=Formats.FONT_REGULAR.value, cmd=self.__create_data_plots, cmd_kwargs={'multiple_videos': True})
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), font=Formats.FONT_REGULAR.value, cmd=self.__create_data_plots, cmd_kwargs={'multiple_videos': True})
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=0, sticky=NW)
         self.rounding_decimals_dropdown.grid(row=1, sticky=NW)
@@ -142,5 +141,5 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         _ = data_plotter.run()
 
 
-# _ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
+# _ = DataPlotterPopUp(config_path=r'C:\troubleshooting\RAT_NOR\project_folder\project_config.ini')
 # _ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

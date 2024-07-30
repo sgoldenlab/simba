@@ -7,17 +7,13 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.probability_plot_creator import \
-    TresholdPlotCreatorSingleProcess
-from simba.plotting.probability_plot_creator_mp import \
-    TresholdPlotCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, SimbaButton)
+from simba.plotting.probability_plot_creator import TresholdPlotCreatorSingleProcess
+from simba.plotting.probability_plot_creator_mp import TresholdPlotCreatorMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import (check_if_filepath_list_is_empty,
-                                    get_file_name_info_in_directory)
+from simba.utils.read_write import (check_if_filepath_list_is_empty, get_file_name_info_in_directory)
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'
@@ -27,6 +23,13 @@ STYLE_YMAX = 'y_max'
 STYLE_COLOR = 'color'
 
 class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
+
+    """
+    :example:
+    >>> _ = VisualizeClassificationProbabilityPopUp(config_path=r'C:\troubleshooting\RAT_NOR\project_folder\project_config.ini')
+    """
+
+
     def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="CREATE CLASSIFICATION PROBABILITY PLOTS")
         ConfigReader.__init__(self, config_path=config_path)
@@ -50,16 +53,18 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         self.max_y_dropdown.setChoices(choice="auto")
 
         self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        self.probability_frames_var = BooleanVar()
         self.probability_videos_var = BooleanVar()
         self.probability_last_frm_var = BooleanVar()
         self.probability_multiprocess_var = BooleanVar()
 
         self.clf_dropdown = DropDownMenu(self.settings_frm, "Classifier:", self.clf_names, "16")
         self.clf_dropdown.setChoices(self.clf_names[0])
-        probability_frames_cb = Checkbutton(self.settings_frm,text="Create frames",variable=self.probability_frames_var, font=Formats.FONT_REGULAR.value)
-        probability_videos_cb = Checkbutton(self.settings_frm,text="Create videos",variable=self.probability_videos_var, font=Formats.FONT_REGULAR.value)
-        probability_last_frm_cb = Checkbutton(self.settings_frm,text="Create last frame",variable=self.probability_last_frm_var, font=Formats.FONT_REGULAR.value)
+
+        probability_frames_cb, self.probability_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames')
+        probability_videos_cb, self.probability_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', font=Formats.FONT_REGULAR.value, txt_img='video')
+        probability_last_frm_cb, self.probability_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FINAL FRAME', font=Formats.FONT_REGULAR.value, txt_img='finish')
+
+
         probability_multiprocess_cb = Checkbutton(
             self.settings_frm,
             text="Multi-process (faster)",
@@ -149,7 +154,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
         threading.Thread(target=probability_plot_creator.run).start()
 
-#_ = VisualizeClassificationProbabilityPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+
 
 
 

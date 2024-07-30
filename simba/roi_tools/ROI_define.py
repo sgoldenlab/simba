@@ -243,8 +243,8 @@ class ROI_definitions(ConfigReader, PopUpMixin):
 
     def apply_from_other_videos_menu(self):
         self.get_other_videos_w_data()
-        self.apply_from_other_video = LabelFrame( self.master, text="Apply shapes from another video", font=("Arial", 16, "bold"), padx=5, pady=5)
-        self.select_video_label = Label(self.apply_from_other_video, text="Select video: ").grid(row=1, column=0)
+        self.apply_from_other_video = LabelFrame( self.master, text="APPLY SHAPES FROM ANOTHER VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.select_video_label = Label(self.apply_from_other_video, text="SELECT VIDEO: ", font=Formats.FONT_REGULAR.value).grid(row=1, column=0)
         self.selected_other_video = StringVar()
         self.selected_other_video.set(self.other_videos_w_ROIs[0])
         self.video_dropdown = OptionMenu(self.apply_from_other_video, self.selected_other_video, *self.other_videos_w_ROIs)
@@ -255,8 +255,8 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.apply_button.grid(row=1, column=3, sticky=W, pady=10)
 
     def select_shape(self):
-        self.new_shape_frame = LabelFrame(self.master, text="New shape", font=("Arial", 16, "bold"), padx=5, pady=5, bd=5)
-        self.shape_frame = LabelFrame(self.new_shape_frame, text="Shape type", font=("Arial", 14, "bold"), padx=5, pady=5)
+        self.new_shape_frame = LabelFrame(self.master, text="NEW SHAPE", font=Formats.FONT_HEADER.value, padx=5, pady=5, bd=5)
+        self.shape_frame = LabelFrame(self.new_shape_frame, text="SHAPE TYPE", font=Formats.FONT_REGULAR.value, padx=5, pady=5)
 
         self.rectangle_button = SimbaButton(parent=self.shape_frame, txt='RECTANGLE', txt_clr=self.non_select_color, font=Formats.FONT_REGULAR.value, img='rectangle', cmd=self.set_current_shape, cmd_kwargs={'c_shape': lambda: "rectangle"})
         self.circle_button = SimbaButton(parent=self.shape_frame, txt='CIRCLE', txt_clr=self.non_select_color, font=Formats.FONT_REGULAR.value, img='circle_2', cmd=self.set_current_shape, cmd_kwargs={'c_shape': lambda: "circle"})
@@ -268,16 +268,16 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.polygon_button.grid(row=1, column=2, sticky=W, pady=10, padx=10)
 
     def select_shape_attr(self):
-        self.shape_attr_frame = LabelFrame(self.new_shape_frame, text="Shape attributes", font=("Arial", 16, "bold"), padx=5, pady=5)
+        self.shape_attr_frame = LabelFrame(self.new_shape_frame, text="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.shape_attr_frame.grid_configure(ipadx=50)
-        self.thickness_label = Label(self.shape_attr_frame, text="Shape thickness: ")
-        self.color_label = Label(self.shape_attr_frame, text="Shape color: ")
+        self.thickness_label = Label(self.shape_attr_frame, text="SHAPE THICKNESS: ", font=Formats.FONT_REGULAR.value)
+        self.color_label = Label(self.shape_attr_frame, text="SHAPE COLOR: ", font=Formats.FONT_REGULAR.value)
         self.shape_thickness = IntVar()
         self.shape_thickness.set(5)
         self.shape_thickness_dropdown = OptionMenu(self.shape_attr_frame, self.shape_thickness, *self.shape_thickness_list, command=None)
         self.shape_thickness_dropdown.config(width=3)
 
-        self.ear_tag_sizes_lbl = Label(self.shape_attr_frame, text="Ear tag size: ")
+        self.ear_tag_sizes_lbl = Label(self.shape_attr_frame, text="EAR TAG SIZE: ", font=Formats.FONT_REGULAR.value)
         self.ear_tag_size = IntVar()
         self.ear_tag_size.set(10)
         self.ear_tag_size_dropdown = OptionMenu(self.shape_attr_frame, self.ear_tag_size, *list(self.ear_tag_size_list))
@@ -295,15 +295,15 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.color_dropdown.grid(row=1, column=5, sticky=W, pady=10)
 
     def select_shape_name(self):
-        self.set_shape_name = LabelFrame(self.new_shape_frame, text="Shape name", font=("Arial", 16, "bold"), padx=5, pady=5)
+        self.set_shape_name = LabelFrame(self.new_shape_frame, text="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.set_shape_name.grid_configure(ipadx=105)
-        self.name_label = Label(self.set_shape_name, text="Shape name: ").grid(row=1, column=0)
+        self.name_label = Label(self.set_shape_name, text="SHAPE NAME: ", font=Formats.FONT_REGULAR.value).grid(row=1, column=0)
         self.name_box = Entry(self.set_shape_name, width=55)
         self.set_shape_name.grid(row=3, sticky=W, pady=10)
         self.name_box.grid(row=1, column=2, sticky=W, pady=10)
 
     def interact_menus(self):
-        self.interact_frame = LabelFrame(self.master, text="Shape interaction", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.interact_frame = LabelFrame(self.master, text="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.interact_frame.grid_configure(ipadx=30)
 
 
@@ -345,7 +345,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.draw_button = SimbaButton(parent=self.draw_frame, txt='DRAW', img='paint', txt_clr=self.non_select_color, cmd=self.create_draw)
         self.delete_all_rois_btn = SimbaButton(parent=self.draw_frame, txt='DELETE ALL', img='trash', txt_clr=self.non_select_color, cmd=self.call_delete_all_rois)
 
-        self.select_roi_label = Label(self.draw_frame, text="Select ROI: ", font=Formats.FONT_REGULAR.value)
+        self.select_roi_label = Label(self.draw_frame, text="SELECT ROI: ", font=Formats.FONT_REGULAR.value)
         self.selected_video = StringVar()
         self.selected_video.set(self.video_ROIs[0])
         self.roi_dropdown = OptionMenu(self.draw_frame, self.selected_video, *self.video_ROIs)
@@ -408,8 +408,8 @@ class ROI_definitions(ConfigReader, PopUpMixin):
             self.image_data.insert_all_ROIs_into_image()
 
     def save_menu(self):
-        self.save_frame = LabelFrame(self.master, text="Save", font=("Arial", 16, "bold"), padx=5, pady=5)
-        self.save_button = SimbaButton(parent=self.save_frame, txt="Save ROI data", img='save', txt_clr=self.non_select_color, cmd=self.save_data)
+        self.save_frame = LabelFrame(self.master, text="SAVE", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.save_button = SimbaButton(parent=self.save_frame, txt="SAVE ROI DATA", img='save', txt_clr=self.non_select_color, cmd=self.save_data)
         self.save_frame.grid(row=8, sticky=W)
         self.save_button.grid(row=1, column=3, sticky=W, pady=10)
 
@@ -880,13 +880,13 @@ class PreferenceMenu:
             padx=5,
             fg="black",
         )
-        line_type_label = Label(pref_lbl_frame, text="Shape line type: ")
-        text_size_label = Label(pref_lbl_frame, text="Text size: ")
-        text_thickness_label = Label(pref_lbl_frame, text="Text thickness: ")
+        line_type_label = Label(pref_lbl_frame, text="SHAPE LINE TYPE: ", font=Formats.FONT_REGULAR.value)
+        text_size_label = Label(pref_lbl_frame, text="TEXT SIZE: ",font=Formats.FONT_REGULAR.value)
+        text_thickness_label = Label(pref_lbl_frame, text="TEXT THICKNESS: ", font=Formats.FONT_REGULAR.value)
         line_type_list = [4, 8, 16, -1]
         text_size_list = list(range(1, 20))
         text_thickness_list = list(range(1, 15))
-        click_sensitivity_lbl = Label(pref_lbl_frame, text="Mouse click sensitivity: ")
+        click_sensitivity_lbl = Label(pref_lbl_frame, text="MOUSE CLICK SENSITIVITY (PIXELS): ", font=Formats.FONT_REGULAR.value)
         click_sensitivity_list = list(range(1, 50, 5))
         self.click_sens = IntVar()
         self.line_type = IntVar()
@@ -896,14 +896,12 @@ class PreferenceMenu:
         self.text_size.set(text_size_list[0])
         self.click_sens.set(click_sensitivity_list[0])
         line_type_dropdown = OptionMenu(pref_lbl_frame, self.line_type, *line_type_list)
-        text_thickness_dropdown = OptionMenu(
-            pref_lbl_frame, self.text_thickness, *text_thickness_list
-        )
+        text_thickness_dropdown = OptionMenu(pref_lbl_frame, self.text_thickness, *text_thickness_list)
         text_size_dropdown = OptionMenu(pref_lbl_frame, self.text_size, *text_size_list)
         click_sens_dropdown = OptionMenu(
             pref_lbl_frame, self.click_sens, *click_sensitivity_list
         )
-        duplicate_jump_size_lbl = Label(pref_lbl_frame, text="Duplicate shape jump: ")
+        duplicate_jump_size_lbl = Label(pref_lbl_frame, text="DUPLICATE SHAPE JUMP: ", font=Formats.FONT_REGULAR.value)
         duplicate_jump_size_list = list(range(1, 100, 5))
         self.duplicate_jump_size = IntVar()
         self.duplicate_jump_size.set(20)
@@ -929,9 +927,7 @@ class PreferenceMenu:
         image_data.text_thickness = self.text_thickness.get()
         image_data.line_type = self.line_type.get()
         image_data.duplicate_jump_size = self.duplicate_jump_size.get()
-        stdout_success(
-            msg="Saved ROI preference settings.", source=self.__class__.__name__
-        )
+        stdout_success(msg="Saved ROI preference settings.", source=self.__class__.__name__)
 
 
 # test = ROI_definitions(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',

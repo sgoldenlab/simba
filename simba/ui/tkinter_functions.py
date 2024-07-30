@@ -7,6 +7,10 @@ import webbrowser
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from typing import Any, Callable, Dict, Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import PIL.Image
 from PIL import ImageTk
@@ -459,3 +463,24 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
         btn.config(state=DISABLED)
 
     return btn
+
+
+def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
+                  txt: str,
+                  txt_clr: Optional[str] = 'black',
+                  txt_img: Optional[str] = None,
+                  txt_img_location: Literal['left', 'right', 'top', 'bottom'] = RIGHT,
+                  font: Optional[Tuple[str, str, int]] = Formats.FONT_REGULAR.value,
+                  val: Optional[bool] = False,
+                  state: Literal["disabled", 'normal'] = NORMAL):
+
+    var = BooleanVar(value=False)
+    if val: var.set(True)
+    if isinstance(txt_img, str):
+        txt_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[txt_img]["icon_path"]))
+    cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var)
+    if txt_img is not None:
+        cb.image = txt_img
+    if state == DISABLED:
+        cb.configure(state=DISABLED)
+    return cb, var

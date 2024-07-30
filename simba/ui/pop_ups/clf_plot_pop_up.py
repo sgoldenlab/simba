@@ -7,8 +7,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.plot_clf_results import PlotSklearnResultsSingleCore
 from simba.plotting.plot_clf_results_mp import PlotSklearnResultsMultiProcess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_float
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import NoFilesFoundError
@@ -16,15 +15,17 @@ from simba.utils.read_write import find_all_videos_in_directory
 
 
 class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
+
+    """
+    :example:
+    >>> _ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
+    """
+
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, title="VISUALIZE CLASSIFICATION (SKLEARN) RESULTS")
         ConfigReader.__init__(self, config_path=config_path)
         self.video_lst = find_all_videos_in_directory(directory=self.video_dir)
         self.use_default_font_settings_val = BooleanVar(value=True)
-        self.create_videos_var = BooleanVar()
-        self.create_frames_var = BooleanVar()
-        self.include_timers_var = BooleanVar()
-        self.rotate_img_var = BooleanVar()
         self.multiprocess_var = BooleanVar()
 
         bp_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BODY-PART VISUALIZATION THRESHOLD", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.SKLEARN_PLOTS.value)
@@ -57,11 +58,14 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.sklearn_text_thickness_entry_box.set_state("disable")
         self.sklearn_circle_size_entry_box.set_state("disable")
 
-        self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.create_videos_cb = Checkbutton(self.settings_frm, text="Create video", font=Formats.FONT_REGULAR.value, variable=self.create_videos_var)
-        self.create_frames_cb = Checkbutton(self.settings_frm, text="Create frames", font=Formats.FONT_REGULAR.value, variable=self.create_frames_var)
-        self.timers_cb = Checkbutton( self.settings_frm, text="Include timers overlay", font=Formats.FONT_REGULAR.value, variable=self.include_timers_var)
-        self.rotate_cb = Checkbutton(self.settings_frm, text="Rotate video 90°", font=Formats.FONT_REGULAR.value, variable=self.rotate_img_var)
+        self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
+
+        self.create_videos_cb, self.create_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEO', font=Formats.FONT_REGULAR.value, txt_img='video')
+        self.create_frames_cb, self.create_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames')
+        self.timers_cb, self.include_timers_var = SimbaCheckbox(parent=self.settings_frm, txt='INCLUDE TIMERS OVERLAY', font=Formats.FONT_REGULAR.value, txt_img='timer')
+        self.rotate_cb, self.rotate_img_var = SimbaCheckbox(parent=self.settings_frm, txt="Rotate video 90°", font=Formats.FONT_REGULAR.value, txt_img='rotate')
+
+
         self.multiprocess_cb = Checkbutton(
             self.settings_frm,
             font=Formats.FONT_REGULAR.value,
@@ -192,4 +196,4 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         simba_plotter.run()
 
 
-# _ = SklearnVisualizationPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# _ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
