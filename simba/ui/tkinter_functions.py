@@ -7,6 +7,7 @@ import webbrowser
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from typing import Any, Callable, Dict, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
