@@ -10,8 +10,12 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.path_plotter import PathPlotterSingleCore
 from simba.plotting.path_plotter_mp import PathPlotterMulticore
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaCheckbox, SimbaButton)
-from simba.utils.checks import (check_if_filepath_list_is_empty, check_if_string_value_is_valid_video_timestamp, check_if_valid_rgb_str, check_int, check_that_hhmmss_start_is_before_end)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, SimbaButton, SimbaCheckbox)
+from simba.utils.checks import (check_if_filepath_list_is_empty,
+                                check_if_string_value_is_valid_video_timestamp,
+                                check_if_valid_rgb_str, check_int,
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Keys, Links, Paths
 from simba.utils.errors import FrameRangeError
 from simba.utils.lookups import get_color_dict
