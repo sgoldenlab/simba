@@ -217,8 +217,11 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         for k in self.btn_icons.keys():
             self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.btn_icons[k]["icon_path"])))
 
-        tab_parent = ttk.Notebook(hxtScrollbar(simongui))
+        tab_style = ttk.Style()
+        tab_style.configure(style='Custom.TNotebook.Tab', font=Formats.FONT_REGULAR.value)
+        tab_style.map('Custom.TNotebook.Tab', foreground=[('selected', 'navy')], font=[('selected', Formats.FONT_REGULAR_BOLD.value)])
 
+        tab_parent = ttk.Notebook(hxtScrollbar(simongui), style='Custom.TNotebook')
         tab2 = ttk.Frame(tab_parent)
         tab3 = ttk.Frame(tab_parent)
         tab4 = ttk.Frame(tab_parent)
@@ -231,15 +234,15 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         tab11 = ttk.Frame(tab_parent)
 
         tab_parent.add(tab2, text=f"{'[ Further imports (data/video/frames) ]':20s}", compound="left", image=self.btn_icons["pose"]["img"])
-        tab_parent.add(tab3, text=f"{'[ Video parameters ]':20s}", compound="left", image=self.btn_icons["calipher"]["img"])
-        tab_parent.add(tab4, text=f"{'[ Outlier correction ]':20s}", compound="left", image=self.btn_icons["outlier"]["img"])
+        tab_parent.add(tab3, text=f"{'[ Video parameters ]':15s}", compound="left", image=self.btn_icons["calipher"]["img"])
+        tab_parent.add(tab4, text=f"{'[ Outlier correction ]':15s}", compound="left", image=self.btn_icons["outlier"]["img"])
         tab_parent.add(tab6, text=f"{'[ ROI ]':10s}", compound="left", image=self.btn_icons["roi"]["img"])
-        tab_parent.add(tab5, text=f"{'[ Extract features ]':20s}", compound="left", image=self.btn_icons["features"]["img"])
-        tab_parent.add(tab7, text=f"{'[ Label behavior] ':20s}", compound="left", image=self.btn_icons["label"]["img"])
-        tab_parent.add(tab8, text=f"{'[ Train machine model ]':20s}", compound="left", image=self.btn_icons["clf"]["img"])
-        tab_parent.add(tab9, text=f"{'[ Run machine model ]':20s}", compound="left", image=self.btn_icons["clf_2"]["img"])
-        tab_parent.add(tab10, text=f"{'[ Visualizations ]':20s}", compound="left", image=self.btn_icons["visualize"]["img"])
-        tab_parent.add(tab11, text=f"{'[ Add-ons ]':20s}", compound="left", image=self.btn_icons["add_on"]["img"])
+        tab_parent.add(tab5, text=f"{'[ Extract features ]':15s}", compound="left", image=self.btn_icons["features"]["img"])
+        tab_parent.add(tab7, text=f"{'[ Label behavior] ':15s}", compound="left", image=self.btn_icons["label"]["img"])
+        tab_parent.add(tab8, text=f"{'[ Train machine model ]':15s}", compound="left", image=self.btn_icons["clf"]["img"])
+        tab_parent.add(tab9, text=f"{'[ Run machine model ]':15s}", compound="left", image=self.btn_icons["clf_2"]["img"])
+        tab_parent.add(tab10, text=f"{'[ Visualizations ]':10s}", compound="left", image=self.btn_icons["visualize"]["img"])
+        tab_parent.add(tab11, text=f"{'[ Add-ons ]':10s}", compound="left", image=self.btn_icons["add_on"]["img"])
 
         tab_parent.grid(row=0)
         tab_parent.enable_traversal()
