@@ -277,8 +277,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.standardize_roi_size_popup_btn.grid(row=2, column=0, sticky=NW)
 
         self.roi_draw = LabelFrame(tab6, text="ANALYZE ROI DATA", font=Formats.FONT_HEADER.value)
-        analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='analyze_green', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', img='analyze_blue', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         self.roi_draw.grid(row=0, column=1, sticky=N)
         analyze_roi_btn.grid(row=0, sticky="NW")
@@ -287,8 +287,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.roi_draw1 = LabelFrame(tab6, text="VISUALIZE ROI DATA", font=Formats.FONT_HEADER.value)
 
 
-        visualizeROI = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI TRACKING", txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=VisualizeROITrackingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        visualizeROIfeature = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI FEATURES", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=VisualizeROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        visualizeROI = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI TRACKING", txt_clr='green', img='visualize_green', font=Formats.FONT_REGULAR.value, cmd=VisualizeROITrackingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        visualizeROIfeature = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI FEATURES", txt_clr='blue', img='visualize_blue', font=Formats.FONT_REGULAR.value, cmd=VisualizeROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         ##organize
         self.roi_draw1.grid(row=0, column=2, sticky=N)
@@ -323,10 +323,10 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         spontaneous_alternation_pop_up_btn.grid(row=9, sticky=NW)
 
         label_outliercorrection = CreateLabelFrameWithIcon(parent=tab4, header="OUTLIER CORRECTION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUTLIERS_DOC.value)
-        button_settings_outlier = SimbaButton(parent=label_outliercorrection, txt="SETTINGS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=OutlierSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_settings_outlier = SimbaButton(parent=label_outliercorrection, txt="SETTINGS", txt_clr='blue', img='settings', font=Formats.FONT_REGULAR.value, cmd=OutlierSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        button_outliercorrection = SimbaButton(parent=label_outliercorrection, txt="RUN OUTLIER CORRECTION", txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=self.correct_outlier, thread=True)
-        button_skipOC = SimbaButton(parent=label_outliercorrection, txt="SKIP OUTLIER CORRECTION (CAUTION)", txt_clr='red', font=Formats.FONT_REGULAR.value, cmd=self.initiate_skip_outlier_correction, thread=True)
+        button_outliercorrection = SimbaButton(parent=label_outliercorrection, txt="RUN OUTLIER CORRECTION", txt_clr='green', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.correct_outlier, thread=True)
+        button_skipOC = SimbaButton(parent=label_outliercorrection, txt="SKIP OUTLIER CORRECTION (CAUTION)", txt_clr='red', img='skip_2', font=Formats.FONT_REGULAR.value, cmd=self.initiate_skip_outlier_correction, thread=True)
 
         label_extractfeatures = CreateLabelFrameWithIcon(parent=tab5, header="EXTRACT FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.EXTRACT_FEATURES.value)
 
@@ -405,7 +405,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         label_trainmachinemodel = CreateLabelFrameWithIcon(parent=tab8, header="TRAIN MACHINE MODELS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.TRAIN_ML_MODEL.value)
 
 
-        button_trainmachinesettings = SimbaButton(parent=label_trainmachinemodel, txt="SETTINGS", txt_clr='darkorange', cmd=self.trainmachinemodelsetting, thread=False)
+        button_trainmachinesettings = SimbaButton(parent=label_trainmachinemodel, txt="SETTINGS", img='settings', txt_clr='darkorange', cmd=self.trainmachinemodelsetting, thread=False)
         button_trainmachinemodel = SimbaButton(parent=label_trainmachinemodel, txt="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)", txt_clr='blue', cmd=self.train_single_model, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
         button_train_multimodel = SimbaButton(parent=label_trainmachinemodel, txt="TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)", txt_clr='green', cmd=self.train_multiple_models_from_meta, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
