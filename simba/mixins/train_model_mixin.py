@@ -1,7 +1,9 @@
 __author__ = "Simon Nilsson"
 
-from . import cuRF
 import warnings
+
+from . import cuRF
+
 warnings.filterwarnings("ignore")
 import ast
 import concurrent

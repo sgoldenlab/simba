@@ -1,6 +1,7 @@
 import os
 from tkinter import *
 from typing import Union
+
 from simba.data_processors.agg_clf_calculator import AggregateClfCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
