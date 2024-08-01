@@ -24,7 +24,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                  simba_main_frm: object):
 
         PopUpMixin.__init__(self, title="CREATE VALIDATION VIDEO")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.feature_file_path = simba_main_frm.csvfile.file_path
         self.model_path = simba_main_frm.modelfile.file_path
         self.discrimination_threshold = simba_main_frm.dis_threshold.entry_get

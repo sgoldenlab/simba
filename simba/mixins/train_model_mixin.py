@@ -1,17 +1,14 @@
 __author__ = "Simon Nilsson"
 
-
+from . import cuRF
 import warnings
-
 warnings.filterwarnings("ignore")
-
 import ast
 import concurrent
 import configparser
 import os
 import pickle
 import platform
-import subprocess
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from copy import deepcopy
@@ -68,7 +65,7 @@ from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
                                 FaultyTrainingSetError,
                                 FeatureNumberMismatchError, InvalidInputError,
                                 MissingColumnsError, NoDataError,
-                                SamplingError)
+                                SamplingError, SimBAModuleNotFoundError)
 from simba.utils.lookups import get_meta_data_file_headers
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
@@ -843,9 +840,7 @@ class TrainModelMixin(object):
                 out_df_shap.to_csv(self.out_df_shap_path)
                 out_df_raw.to_csv(self.out_df_raw_path)
             shap_frm_timer.stop_timer()
-            print(
-                f"SHAP frame: {cnt + 1} / {len(shap_df)}, elapsed time: {shap_frm_timer.elapsed_time_str}..."
-            )
+            print( f"SHAP frame: {cnt + 1} / {len(shap_df)}, elapsed time: {shap_frm_timer.elapsed_time_str}...")
 
         shap_timer.stop_timer()
         stdout_success(
@@ -1287,16 +1282,13 @@ class TrainModelMixin(object):
                 f"Partial dependencies for {feature_name} complete ({feature_cnt+1}/{len(x_df.columns)})..."
             )
 
-    def clf_predict_proba(
-        self,
-        clf: RandomForestClassifier,
-        x_df: pd.DataFrame,
-        multiclass: bool = False,
-        model_name: Optional[str] = None,
-        data_path: Optional[Union[str, os.PathLike]] = None,
-    ) -> np.ndarray:
+    def clf_predict_proba( self,
+                          clf: RandomForestClassifier,
+                          x_df: pd.DataFrame,
+                          multiclass: bool = False,
+                          model_name: Optional[str] = None,
+                          data_path: Optional[Union[str, os.PathLike]] = None) -> np.ndarray:
         """
-
         :param RandomForestClassifier clf: Random forest classifier object
         :param pd.DataFrame x_df: Features df
         :param bool multiclass: If True, the classifier predicts more than 2 targets. Else, boolean classifier.
@@ -1342,9 +1334,54 @@ class TrainModelMixin(object):
         else:
             return p_vals
 
-    def clf_fit(
-        self, clf: RandomForestClassifier, x_df: pd.DataFrame, y_df: pd.DataFrame
-    ) -> RandomForestClassifier:
+
+
+    def clf_define(self,
+                   n_estimators: Optional[int] = 2000,
+                   max_depth: Optional[int] = None,
+                   max_features: Optional[Union[str, int]] = 'sqrt',
+                   n_jobs: Optional[int] = -1,
+                   criterion: Optional[str] = 'gini',
+                   min_samples_leaf: Optional[int] = 1,
+                   bootstrap: Optional[bool] = True,
+                   verbose: Optional[int] = 1,
+                   class_weight: Optional[dict] = None,
+                   cuda: Optional[bool] = False) -> RandomForestClassifier:
+
+
+        if not cuda:
+            return RandomForestClassifier(n_estimators=n_estimators,
+                                           max_depth=max_depth,
+                                           max_features=max_features,
+                                           n_jobs=n_jobs,
+                                           criterion=criterion,
+                                           min_samples_leaf=min_samples_leaf,
+                                           bootstrap=bootstrap,
+                                           verbose=verbose,
+                                           class_weight=class_weight)
+
+        else:
+            if cuRF is not None:
+                return cuRF(n_estimators=n_estimators,
+                            split_criterion=criterion,
+                            bootstrap=bootstrap,
+                            max_depth=max_depth,
+                            max_features=max_features,
+                            min_samples_leaf=min_samples_leaf,
+                            verbose=verbose)
+            else:
+                raise SimBAModuleNotFoundError(msg='SimBA could not find the cuml library for GPU machine learning algorithms.', source=self.__class__.__name__)
+
+
+
+
+
+    def clf_fit(self,
+                clf: Union[RandomForestClassifier, cuRF],
+                x_df: pd.DataFrame,
+                y_df: pd.DataFrame,
+                ) -> RandomForestClassifier:
+
         """
         Helper to fit clf model
 
@@ -1357,23 +1394,20 @@ class TrainModelMixin(object):
         nan_target = y_df.loc[pd.to_numeric(y_df).isna()]
         if len(nan_features) > 0:
             raise FaultyTrainingSetError(
-                msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values",
-                source=self.__class__.__name__,
-            )
+                msg=f"{len(nan_features)} frame(s) in your project_folder/csv/targets_inserted directory contains FEATURES with non-numerical values", source=self.__class__.__name__)
         if len(nan_target) > 0:
-            raise FaultyTrainingSetError(
-                msg=f"{len(nan_target)} frame(s) in your project_folder/csv/targets_inserted directory contains ANNOTATIONS with non-numerical values",
-                source=self.__class__.__name__,
-            )
-        return clf.fit(x_df, y_df)
+            raise FaultyTrainingSetError( msg=f"{len(nan_target)} frame(s) in your project_folder/csv/targets_inserted directory contains ANNOTATIONS with non-numerical values", source=self.__class__.__name__)
+
+        clf.fit(x_df, y_df)
+
+        return clf
 
     @staticmethod
-    def _read_data_file_helper(
-        file_path: str,
-        file_type: str,
-        clf_names: Optional[List[str]] = None,
-        raise_bool_clf_error: bool = True,
-    ):
+    def _read_data_file_helper(file_path: str,
+                               file_type: str,
+                               clf_names: Optional[List[str]] = None,
+                               raise_bool_clf_error: bool = True):
+
         """
         Private function called by :meth:`simba.train_model_functions.read_all_files_in_folder_mp`
         """
@@ -1400,9 +1434,7 @@ class TrainModelMixin(object):
                         source=TrainModelMixin._read_data_file_helper.__name__,
                     )
         timer.stop_timer()
-        print(
-            f"Reading complete {vid_name} (elapsed time: {timer.elapsed_time_str}s)..."
-        )
+        print(f"Reading complete {vid_name} (elapsed time: {timer.elapsed_time_str}s)...")
 
         return df, frame_numbers
 

@@ -20,7 +20,7 @@ class AddClfPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
 
         PopUpMixin.__init__(self, config_path=config_path, title="ADD CLASSIFIER")
-        ConfigReader.__init__(self, config_path=config_path) .clf_eb = Entry_Box(self.main_frm, "CLASSIFIER NAME", "15")
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False) .clf_eb = Entry_Box(self.main_frm, "CLASSIFIER NAME", "15")
         add_btn = Button(self.main_frm, text="ADD CLASSIFIER", command=lambda: self.run())
         self.clf_eb.grid(row=0, column=0, sticky=NW)
         add_btn.grid(row=1, column=0, sticky=NW)

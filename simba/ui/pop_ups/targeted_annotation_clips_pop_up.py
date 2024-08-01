@@ -21,7 +21,7 @@ from simba.video_processors.video_processing import multi_split_video
 class TargetedAnnotationsWClipsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="TAGETED ANNOTATIONS WITH CLIPS")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         settings_frm = CreateLabelFrameWithIcon(
             parent=self.main_frm,
             header="Split videos into different parts",

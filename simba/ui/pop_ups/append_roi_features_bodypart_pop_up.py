@@ -11,7 +11,7 @@ from simba.utils.errors import NoROIDataError
 
 class AppendROIFeaturesByBodyPartPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if not os.path.isfile(self.roi_coordinates_path):
             raise NoROIDataError(msg="SIMBA ERROR: No ROIs have been defined. Please define ROIs before appending ROI-based features",source=self.__class__.__name__,)
         PopUpMixin.__init__(self, config_path=config_path, title="APPEND ROI FEATURES: BY BODY-PARTS")

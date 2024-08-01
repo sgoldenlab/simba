@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import os
 from collections import defaultdict
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
@@ -22,8 +23,8 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
     >>> _ = ClfByROIPopUp(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini")
     """
 
-    def __init__(self, config_path: str):
-        ConfigReader.__init__(self, config_path=config_path)
+    def __init__(self, config_path: Union[str, os.PathLike]):
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if not os.path.isfile(self.roi_coordinates_path):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path, source=self.__class__.__name__)
         PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI")

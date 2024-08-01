@@ -22,7 +22,7 @@ class SetMachineModelParameters(PopUpMixin, ConfigReader):
 
     """
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PopUpMixin.__init__(self, title="SET MODEL PARAMETERS")
         self.clf_table_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.SET_RUN_ML_PARAMETERS.value)
         Label(self.clf_table_frm,text="CLASSIFIER",font=Formats.FONT_HEADER.value).grid(row=0, column=0)

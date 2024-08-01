@@ -24,7 +24,7 @@ from simba.utils.read_write import get_file_name_info_in_directory
 
 class PathPlotPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.data_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
         check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()), error_msg="SIMBA ERROR: Zero files found in the project_folder/csv/machine_results directory. Create classification results before visualizing path plots")

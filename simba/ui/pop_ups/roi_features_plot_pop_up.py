@@ -36,7 +36,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader):
     """
     def __init__(self, config_path: Union[str, os.PathLike]):
 
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.video_file_paths = find_all_videos_in_directory(directory=self.video_dir, as_dict=True)
         self.video_list = [k for k in self.video_file_paths.keys()]
         if len(self.video_list) == 0:

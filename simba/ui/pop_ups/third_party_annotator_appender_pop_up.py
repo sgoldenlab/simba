@@ -20,7 +20,7 @@ class ThirdPartyAnnotatorAppenderPopUp(PopUpMixin, ConfigReader):
     def __init__(self,
                  config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="APPEND THIRD-PARTY ANNOTATIONS")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         apps_lst = Options.THIRD_PARTY_ANNOTATION_APPS_OPTIONS.value
         warnings_lst = Options.THIRD_PARTY_ANNOTATION_ERROR_OPTIONS.value
         app_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="THIRD-PARTY APPLICATION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.THIRD_PARTY_ANNOTATION_NEW.value)

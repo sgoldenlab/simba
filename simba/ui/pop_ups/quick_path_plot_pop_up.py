@@ -25,7 +25,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
 
         check_file_exist_and_readable(file_path=config_path)
         PopUpMixin.__init__(self, title="SIMPLE LINE PLOT")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if len(self.outlier_corrected_paths) == 0:
             raise NoFilesFoundError(
                 msg=f"No data found in the {self.outlier_corrected_paths} directory. Place files in this directory to create quick path plots."

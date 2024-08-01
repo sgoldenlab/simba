@@ -2,6 +2,7 @@ __author__ = "Simon Nilsson"
 
 import os.path
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
@@ -23,7 +24,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
     >>> _ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
     """
 
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="VISUALIZE CLASSIFICATION (SKLEARN) RESULTS")
         ConfigReader.__init__(self, config_path=config_path)
         self.video_lst = find_all_videos_in_directory(directory=self.video_dir)

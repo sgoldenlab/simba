@@ -29,7 +29,7 @@ class DistancePlotterPopUp(PopUpMixin, ConfigReader):
     """
 
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.data_path = os.path.join(self.project_path, "csv", "outlier_corrected_movement_location")
         self.max_y_lst = list(range(10, 510, 10))
         self.max_y_lst.insert(0, "auto")

@@ -16,7 +16,7 @@ from simba.utils.errors import NoSpecifiedOutputError
 class AnalyzeSeverityPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, title="SIMBA SEVERITY ANALYSIS")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
 
         if len(self.multi_animal_id_list) > 1:
             self.multi_animal_id_list.insert(0, "ALL ANIMALS")

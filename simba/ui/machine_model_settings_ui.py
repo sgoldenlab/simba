@@ -4,6 +4,7 @@ import ast
 import os
 import webbrowser
 from tkinter import *
+from typing import Union
 
 import pandas as pd
 
@@ -27,8 +28,8 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
     GUI window for specifying ML model training parameters.
     """
 
-    def __init__(self, config_path: str):
-        ConfigReader.__init__(self, config_path=config_path)
+    def __init__(self, config_path: Union[str, os.PathLike]):
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PopUpMixin.__init__(self, title="MACHINE MODEL SETTINGS", size=(450, 800))
         if not os.path.exists(self.configs_meta_dir):
             os.makedirs(self.configs_meta_dir)

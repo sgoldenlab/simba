@@ -15,7 +15,7 @@ from simba.utils.errors import NoROIDataError
 
 class ROISizeStandardizerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         check_file_exist_and_readable(file_path=self.roi_coordinates_path)
         PopUpMixin.__init__(self, title="ROI SIZE NORMALIZER PY PIXELS PER MILLIMETER")
         self.read_roi_data()

@@ -10,6 +10,7 @@ import re
 import shutil
 import subprocess
 import threading
+from copy import deepcopy
 import webbrowser
 from configparser import ConfigParser
 from datetime import datetime, timedelta
@@ -34,7 +35,6 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available, check_valid_lst)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
-                                FeatureNumberMismatchError,
                                 FFMPEGCodecGPUError, FileExistError,
                                 FrameRangeError, IntegerError,
                                 InvalidFilepathError, InvalidFileTypeError,
@@ -1964,3 +1964,71 @@ def read_data_paths(path: Union[str, os.PathLike, None],
     else:
         raise NoFilesFoundError(msg=f"{type(path)} is not a valid type for path", source=read_data_paths.__name__)
     return data_paths
+
+def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
+                                  start_frm: Optional[int] = None,
+                                  end_frm: Optional[int] = None,
+                                  verbose: Optional[bool] = False) -> Dict[int, np.ndarray]:
+
+    """
+    Reads a batch of frames from a video file using GPU acceleration.
+
+    This function uses FFmpeg with CUDA acceleration to read frames from a specified range in a video file.
+    It supports both RGB and greyscale video formats. Frames are returned as a dictionary where the keys are
+    frame indices and the values are NumPy arrays representing the image data.
+
+    :param video_path: Path to the video file. Can be a string or an os.PathLike object.
+    :param start_frm: The starting frame index to read. If None, starts from the beginning of the video.
+    :param end_frm: The ending frame index to read. If None, reads until the end of the video.
+    :param verbose: If True, prints progress information to the console.
+    :return: A dictionary where keys are frame indices (integers) and values are NumPy arrays containing the image data of each frame.
+    """
+
+    check_file_exist_and_readable(file_path=video_path)
+    video_meta_data = get_video_meta_data(video_path=video_path)
+    if start_frm is not None:
+        check_int(name=read_img_batch_from_video_gpu.__name__, value=start_frm, min_value=0, max_value=video_meta_data["frame_count"])
+    else:
+        start_frm = 0
+    if end_frm is not None:
+        check_int(name=read_img_batch_from_video_gpu.__name__,value=end_frm, min_value=0,max_value=video_meta_data["frame_count"])
+    else:
+        end_frm = video_meta_data["frame_count"]
+
+    start_time, end_time = start_frm / video_meta_data["fps"], end_frm / video_meta_data["fps"]
+    duration = end_time - start_time
+
+    frame_width = video_meta_data['width']
+    frame_height = video_meta_data['height']
+    if video_meta_data['color_format'] == 'rgb':
+        frame_size = frame_width * frame_height * 3
+        color_format = 'bgr24'
+    else:
+        frame_size = frame_width * frame_height
+        color_format = 'grey'
+
+    ffmpeg_cmd = ['ffmpeg',
+                  '-hwaccel', 'cuda',
+                  '-ss', f'{start_time:.10f}',
+                  '-i', video_path,
+                  '-t', f'{duration:.10f}',
+                  '-f', 'rawvideo',
+                  '-pix_fmt', f'{color_format}',
+                  '-']
+
+    ffmpeg_process = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    frames = {}
+    frm_cnt = deepcopy(start_frm)
+    while True:
+        if verbose:
+            print(f'Reading frame {frm_cnt} / {end_frm} ...')
+        raw_frame = ffmpeg_process.stdout.read(frame_size)
+        if len(raw_frame) == 0:
+            break
+        if color_format == 'bgr24':
+            frames[frm_cnt] = np.frombuffer(raw_frame, dtype=np.uint8).reshape((frame_height, frame_width, 3))
+        else:
+            frames[frm_cnt] = np.frombuffer(raw_frame, dtype=np.uint8).reshape((frame_height, frame_width))
+        frm_cnt += 1
+
+    return frames

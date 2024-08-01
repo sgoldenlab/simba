@@ -36,7 +36,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
     def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="CREATE CLASSIFICATION PROBABILITY PLOTS")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         color_names = get_color_dict().keys()
         self.max_y_lst = [x for x in range(10, 110, 10)]
         self.max_y_lst.insert(0, "auto")

@@ -19,7 +19,7 @@ class AnimalDirectingAnimalPopUp(ConfigReader, PopUpMixin):
     >>> test = AnimalDirectingAnimalPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
     """
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if self.animal_cnt < 2:
             raise AnimalNumberError(msg=f"Directionality between animals require at least two animals. The SimBA project is set to use {self.animal_cnt} animal.", source=self.__class__.__name__,)
         if len(self.outlier_corrected_paths) == 0:

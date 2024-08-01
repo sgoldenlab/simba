@@ -25,7 +25,7 @@ class HeatmapClfPopUp(PopUpMixin, ConfigReader):
     """
 
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.data_path = os.path.join(self.project_path, Paths.MACHINE_RESULTS_DIR.value)
 
         self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)

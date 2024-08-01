@@ -36,7 +36,7 @@ def import_dlc_csv(config_path: Union[str, os.PathLike], source: str) -> List[st
     """
 
     check_file_exist_and_readable(file_path=config_path)
-    conf = ConfigReader(config_path=config_path)
+    conf = ConfigReader(config_path=config_path, read_video_info=False)
     original_file_name_dir = os.path.join(conf.input_csv_dir, "original_filename")
     if not os.path.exists(original_file_name_dir): os.makedirs(original_file_name_dir)
     prev_imported_file_paths = find_files_of_filetypes_in_directory(directory=conf.input_csv_dir, extensions=[f'.{conf.file_type}'], raise_warning=False, raise_error=False)
@@ -62,8 +62,8 @@ def import_dlc_csv(config_path: Union[str, os.PathLike], source: str) -> List[st
         new_file_name_wo_ext = new_file_name.split(".")[0]
         video_basename = os.path.basename(file_path)
         print(f"Importing {video_name} to SimBA project...")
-        # if new_file_name_wo_ext in prev_imported_file_names:
-        #     raise FileExistError(f"SIMBA IMPORT ERROR: {new_file_name} already exist in project in the directory {conf.input_csv_dir}. Remove file from project or rename imported video file name before importing.")
+        if new_file_name_wo_ext in prev_imported_file_names:
+            raise FileExistError(f"SIMBA IMPORT ERROR: {new_file_name} already exist in project in the directory {conf.input_csv_dir}. Remove file from project or rename imported video file name before importing.")
         shutil.copy(file_path, conf.input_csv_dir)
         shutil.copy(file_path, original_file_name_dir)
         os.rename(os.path.join(conf.input_csv_dir, video_basename), os.path.join(conf.input_csv_dir, new_file_name))

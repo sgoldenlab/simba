@@ -1,5 +1,6 @@
 __author__ = "Simon Nilsson"
 
+import os
 from tkinter import *
 from typing import Union
 
@@ -22,8 +23,8 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
     >>> _ =  MovementAnalysisTimeBinsPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
     """
 
-    def __init__(self, config_path: str):
-        ConfigReader.__init__(self, config_path=config_path)
+    def __init__(self, config_path: Union[str, os.PathLike]):
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PopUpMixin.__init__(self, title="TIME BINS: DISTANCE/VELOCITY", size=(400, 400))
         self.animal_cnt_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_ANALYSIS.value)
         self.animal_cnt_dropdown = DropDownMenu(self.animal_cnt_frm, "# of animals", list(range(1, self.animal_cnt + 1)), labelwidth=20)

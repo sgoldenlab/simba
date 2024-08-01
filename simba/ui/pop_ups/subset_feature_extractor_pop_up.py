@@ -16,7 +16,7 @@ from simba.utils.errors import InvalidInputError
 class FeatureSubsetExtractorPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, title="EXTRACT FEATURE SUBSETS", size=(500, 500))
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.feature_subset_options = [
             "Two-point body-part distances (mm)",
             "Within-animal three-point body-part angles (degrees)",

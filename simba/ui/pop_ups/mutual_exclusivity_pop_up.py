@@ -16,7 +16,7 @@ from simba.utils.errors import (DuplicationError, InvalidInputError,
 
 class MutualExclusivityPupUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PopUpMixin.__init__(self, title="MUTUAL EXCLUSIVITY", size=(1000, 400))
 
         self.rule_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="EXCLUSIVITY RULES #", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.PATH_PLOTS.value)

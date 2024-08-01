@@ -15,7 +15,7 @@ class ClfAnnotationCountPopUp(PopUpMixin, ConfigReader):
     >>> ClfAnnotationCountPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     """
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.config_path = config_path
         PopUpMixin.__init__(self, title='COUNT NUMBER OF ANNOTATIONS IN SIMBA PROJECT', config_path=config_path)
         if len(self.clf_names) == 0:

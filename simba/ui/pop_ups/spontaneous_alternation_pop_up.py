@@ -30,7 +30,7 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
     """
 
     def __init__(self, config_path: Union[str, os.PathLike]):
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if not os.path.isfile(self.roi_coordinates_path):
             raise NoROIDataError(
                 msg=f"Spontaneous alternation requires user-defined ROIs. No ROI data found at {self.roi_coordinates_path}",

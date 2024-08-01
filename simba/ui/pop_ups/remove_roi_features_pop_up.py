@@ -22,7 +22,7 @@ class RemoveROIFeaturesPopUp:
         )
 
         if answer:
-            config = ConfigReader(config_path=config_path)
+            config = ConfigReader(config_path=config_path, read_video_info=False)
             config.read_roi_data()
             if dataset == "targets_inserted":
                 config.remove_roi_features(config.targets_folder)

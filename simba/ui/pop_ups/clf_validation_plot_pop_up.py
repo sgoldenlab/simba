@@ -25,7 +25,7 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
 
         PopUpMixin.__init__(self, title="SIMBA CLASSIFIER VALIDATION CLIPS")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         color_names = list(self.colors_dict.keys())
         self.files_found_dict = get_file_name_info_in_directory(directory=self.machine_results_dir, file_type=self.file_type)
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SETTINGS",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.CLF_VALIDATION.value)

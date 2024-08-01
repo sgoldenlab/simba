@@ -13,7 +13,7 @@ from simba.utils.read_write import archive_processed_files
 class ArchiveProcessedFilesPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         PopUpMixin.__init__(self, title="ADD CLASSIFIER")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.archive_eb = Entry_Box(self.main_frm, "ARCHIVE DIRECTORY NAME", "25")
         archive_btn = Button(self.main_frm, text="RUN ARCHIVE", font=Formats.FONT_REGULAR.value, fg="blue", command=lambda: self.run())
         self.archive_eb.grid(row=0, column=0, sticky=NW)

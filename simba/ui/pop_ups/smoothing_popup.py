@@ -25,7 +25,7 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
     """
     def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="SMOOTH POSE-ESTIMATION DATA")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.config_path = config_path
 
         self.settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)

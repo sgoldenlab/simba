@@ -1,7 +1,9 @@
 __author__ = "Simon Nilsson"
 
 import multiprocessing
+import os
 from tkinter import *
+from typing import Union
 
 from simba.data_processors.timebins_clf_calculator import TimeBinsClfCalculator
 from simba.mixins.config_reader import ConfigReader
@@ -15,9 +17,9 @@ from simba.utils.errors import (NoChoosenClassifierError,
 
 
 class TimeBinsClfPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="CLASSIFICATION BY TIME BINS")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         cbox_titles = Options.TIMEBINS_MEASURMENT_OPTIONS.value
         self.timebin_entrybox = Entry_Box(self.main_frm, "Set time bin size (s)", "15", validation="numeric")
         measures_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MEASUREMENTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ANALYZE_ML_RESULTS.value)

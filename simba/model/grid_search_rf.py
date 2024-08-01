@@ -87,16 +87,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             print(f"MODEL {config_cnt+1} settings")
             self.print_machine_model_information(meta_dict)
             print(f"# {len(self.feature_names)} features.")
-            self.rf_clf = RandomForestClassifier(n_estimators=meta_dict[MLParamKeys.RF_ESTIMATORS.value],
-                                                 max_features=meta_dict[MLParamKeys.RF_MAX_FEATURES.value],
-                                                 max_depth=meta_dict[MLParamKeys.RF_MAX_DEPTH.value],
-                                                 n_jobs=-1,
-                                                 criterion=meta_dict[MLParamKeys.RF_CRITERION.value],
-                                                 min_samples_leaf=meta_dict[MLParamKeys.MIN_LEAF.value],
-                                                 bootstrap=True,
-                                                 verbose=1,
-                                                 class_weight=meta_dict[MLParamKeys.CLASS_WEIGHTS.value])
-
+            self.rf_clf = self.clf_define(n_estimators=meta_dict[MLParamKeys.RF_ESTIMATORS.value],  max_depth=meta_dict[MLParamKeys.RF_MAX_DEPTH.value], max_features=meta_dict[MLParamKeys.RF_MAX_FEATURES.value], n_jobs=-1, criterion=meta_dict[MLParamKeys.RF_CRITERION.value], min_samples_leaf=meta_dict[MLParamKeys.MIN_LEAF.value], bootstrap=True, verbose=1, class_weight=meta_dict[MLParamKeys.CLASS_WEIGHTS.value])
             print(f"Fitting {self.clf_name} model...")
             self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
             if (meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value] in Options.PERFORM_FLAGS.value):

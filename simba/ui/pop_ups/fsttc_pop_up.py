@@ -17,7 +17,7 @@ class FSTTCPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
 
         PopUpMixin.__init__(self, title="FORWARD SPIKE TIME TILING COEFFICIENTS")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         settings_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.FSTTC.value,)
         self.time_delta_eb = Entry_Box(settings_frm, "TIME-DELTA", "10", validation="numeric")
         self.graph_cb_var = BooleanVar(value=False)

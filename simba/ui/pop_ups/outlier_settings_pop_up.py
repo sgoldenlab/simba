@@ -16,7 +16,7 @@ from simba.utils.printing import stdout_success
 class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="OUTLIER SETTINGS")
-        ConfigReader.__init__(self, config_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.animal_bps = {}
         for animal_name, animal_data in self.animal_bp_dict.items():
             self.animal_bps[animal_name] = [x[:-2] for x in animal_data["X_bps"]]

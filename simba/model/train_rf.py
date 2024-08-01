@@ -5,15 +5,13 @@ import os
 from typing import Union
 
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods,
-                               MLParamKeys, Options, TagNames)
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods, MLParamKeys, Options)
+from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import read_config_entry, write_df
 
 
@@ -235,17 +233,9 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                     name=MLParamKeys.SHAP_ABSENT.value, value=shap_target_absent_cnt
                 )
 
-            self.rf_clf = RandomForestClassifier(
-                n_estimators=n_estimators,
-                max_depth=self.rf_max_depth,
-                max_features=max_features,
-                n_jobs=-1,
-                criterion=criterion,
-                min_samples_leaf=min_sample_leaf,
-                bootstrap=True,
-                verbose=1,
-                class_weight=class_weights,
-            )
+
+
+            self.rf_clf = self.clf_define(n_estimators=n_estimators, max_depth=self.rf_max_depth, max_features=max_features, n_jobs=-1, criterion=criterion, min_samples_leaf=min_sample_leaf, verbose=1, class_weight=class_weights)
 
             print(f"Fitting {self.clf_name} model...")
             self.rf_clf = self.clf_fit(
@@ -397,7 +387,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         stdout_success(msg=f"Evaluation files are in models/generated_models/model_evaluations folders", source=self.__class__.__name__)
 
 
-# test = TrainRandomForestClassifier(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini')
+# test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # test.run()
 # test.save()
 
