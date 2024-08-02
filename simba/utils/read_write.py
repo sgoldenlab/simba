@@ -10,9 +10,9 @@ import re
 import shutil
 import subprocess
 import threading
-from copy import deepcopy
 import webbrowser
 from configparser import ConfigParser
+from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
