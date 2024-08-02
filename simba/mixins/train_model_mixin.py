@@ -27,7 +27,7 @@ from numba import njit, typed, types
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
-from sklearn.metrics import precision_recall_curve, classification_report
+from sklearn.metrics import classification_report, precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
 from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
                                    StandardScaler)
