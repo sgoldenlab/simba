@@ -19,8 +19,13 @@ class MakePathPlotPopUp(PopUpMixin):
         self.body_part = Entry_Box(settings_frm, "BODY PART: ", "30")
         self.data_path = FileSelect(settings_frm, "DATA PATH (e.g., H5 or CSV file): ", lblwidth="30")
         color_lst = list(get_color_dict().keys())
+
+
         self.background_color = DropDownMenu(settings_frm, "BACKGROUND COLOR: ", color_lst, "30")
         self.background_color.setChoices(choice="White")
+
+
+
         self.line_color = DropDownMenu(settings_frm, "LINE COLOR: ", color_lst, "30")
         self.line_color.setChoices(choice="Red")
         self.line_thickness = DropDownMenu(settings_frm, "LINE THICKNESS: ", list(range(1, 11)), "30")
@@ -82,4 +87,4 @@ class MakePathPlotPopUp(PopUpMixin):
         threading.Thread(target=plotter.run).start()
 
 
-# MakePathPlotPopUp()
+#MakePathPlotPopUp()

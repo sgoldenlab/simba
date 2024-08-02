@@ -50,7 +50,7 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
                  config_path: Union[str, os.PathLike],
                  data_folder: Union[str, os.PathLike],
                  id_lst: List[str],
-                 interpolation_settings: str,
+                 interpolation_settings: Union[str, None],
                  smoothing_settings: Union[Dict[str, Any], None]):
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
@@ -102,11 +102,13 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 
             csv_rows = []
             n_frames, n_nodes, _, n_tracks = tracks.shape
+            print(tracks)
             for frame_ind in range(n_frames):
                 csv_row = []
                 for track_ind in range(n_tracks):
                     for node_ind in range(n_nodes):
                         for xyp in range(3):
+                            #print(tracks[frame_ind])
                             if xyp == 0 or xyp == 1:
                                 data = tracks[frame_ind, node_ind, xyp, track_ind]
                             else:
@@ -142,6 +144,19 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
             stdout_success(msg=f"Video {self.output_filename} data imported...", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
         self.timer.stop_timer()
         stdout_success(msg="All SLEAP H5 data files imported", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+
+#
+#
+# test = SLEAPImporterH5(config_path=r"C:\troubleshooting\slp_single_rat\project_folder\project_config.ini",
+#                         data_folder=r"C:\troubleshooting\slp_single_rat\h5",
+#                         id_lst=['Jarryd'],
+#                         interpolation_settings=None,
+#                         smoothing_settings = None)
+# test.run()
+
+
 
 # test = SLEAPImporterH5(config_path="/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini",
 #                         data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/h5_import',

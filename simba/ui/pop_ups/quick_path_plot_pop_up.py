@@ -25,7 +25,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
 
         check_file_exist_and_readable(file_path=config_path)
         PopUpMixin.__init__(self, title="SIMPLE LINE PLOT")
-        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
+        ConfigReader.__init__(self, config_path=config_path)
         if len(self.outlier_corrected_paths) == 0:
             raise NoFilesFoundError(
                 msg=f"No data found in the {self.outlier_corrected_paths} directory. Place files in this directory to create quick path plots."
@@ -81,9 +81,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
     def run(self):
         video_name = self.video_dropdown.getChoices()
         data_path = self.video_filepaths[video_name]
-        meta_data, _, fps = read_video_info(
-            vid_info_df=self.video_info_df, video_name=video_name
-        )
+        meta_data, _, fps = read_video_info(vid_info_df=self.video_info_df, video_name=video_name)
         size = (int(meta_data["Resolution_width"]), int(meta_data["Resolution_height"]))
         last_frm = self.last_frm_only_dropdown.getChoices()
         if last_frm == "TRUE":

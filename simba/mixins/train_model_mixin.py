@@ -25,7 +25,7 @@ from numba import njit, typed, types
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import precision_recall_curve, classification_report
 from sklearn.model_selection import ShuffleSplit, learning_curve
 from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
                                    StandardScaler)
@@ -321,6 +321,7 @@ class TrainModelMixin(object):
             return smt.fit_sample(x_train, y_train)
         else:
             return smt.fit_resample(x_train, y_train)
+
 
     def calc_permutation_importance(self,
                                     x_test: np.ndarray,
@@ -1373,9 +1374,6 @@ class TrainModelMixin(object):
                 raise SimBAModuleNotFoundError(msg='SimBA could not find the cuml library for GPU machine learning algorithms.', source=self.__class__.__name__)
 
 
-
-
-
     def clf_fit(self,
                 clf: Union[RandomForestClassifier, cuRF],
                 x_df: pd.DataFrame,
@@ -1852,9 +1850,7 @@ class TrainModelMixin(object):
                 save_file_no=save_file_no,
             )
 
-    def check_df_dataset_integrity(
-        self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]
-    ) -> None:
+    def check_df_dataset_integrity(self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]) -> None:
         """
         Helper to check for non-numerical np.inf, -np.inf, NaN, None in a single dataframe.
         :parameter pd.DataFrame x_df: Features
@@ -2684,6 +2680,8 @@ class TrainModelMixin(object):
                 source=TrainModelMixin.find_low_variance_fields.__name__,
             )
         return low_variance_fields
+
+
 
 
 # test = TrainModelMixin()
