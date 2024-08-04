@@ -687,9 +687,7 @@ def convert_roi_definitions(
             )
 
 
-def slice_roi_dict_for_video(
-    data: Dict[str, pd.DataFrame], video_name: str
-) -> Tuple[Dict[str, pd.DataFrame], List[str]]:
+def slice_roi_dict_for_video(data: Dict[str, pd.DataFrame], video_name: str) -> Tuple[Dict[str, pd.DataFrame], List[str]]:
     """
     Given a dictionary of dataframes representing different ROIs (created by ``simba.mixins.config_reader.ConfigReader.read_roi_data``),
     retain only the ROIs belonging to the specified video.
