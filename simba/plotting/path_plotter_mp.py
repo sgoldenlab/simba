@@ -20,10 +20,7 @@ from simba.utils.data import find_frame_numbers_from_time_stamp, slice_roi_dict_
 from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import FrameRangeError, NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, find_video_of_file,
-                                    get_fn_ext, get_video_meta_data, read_df,
-                                    read_frm_of_video, remove_a_folder)
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_video_of_file, get_fn_ext, get_video_meta_data, read_df, read_frm_of_video, remove_a_folder)
 
 from simba.utils.warnings import ROIWarning
 
@@ -107,8 +104,6 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
     :param Optional[dict] input_clf_attr: Dict reprenting classified behavior locations, their color and size. If None, then no classified behavior locations are shown.
     :param Optional[dict] slicing: If Dict, start time and end time of video slice to create path plot from. E.g., {'start_time': '00:00:01', 'end_time': '00:00:03'}. If None, creates path plot for entire video.
     :param Optional[bool] roi: If True, also plots the ROIs associated with the video. Default False.
-
-
     :param int cores: Number of cores to use.
 
     .. note::
@@ -187,12 +182,12 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
             else:
                 pass
         else:
-            space_scaler, radius_scaler, res_scaler, font_scaler = 25, 10, 1500, 0.8
+            font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='MY LONG TEXT STRING', accepted_px_width=int(self.video_info["Resolution_width"] / 10), accepted_px_height=int(self.video_info["Resolution_width"] / 10))
+            circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_info["Resolution_width"]), int(self.video_info["Resolution_height"])), circle_frame_ratio=100)
             self.style_attr["width"] = int(self.video_info["Resolution_width"].values[0])
             self.style_attr["height"] = int(self.video_info["Resolution_height"].values[0])
-            max_res = max(self.style_attr["width"], self.style_attr["height"])
-            self.style_attr["circle size"] = int(radius_scaler / (res_scaler / max_res))
-            self.style_attr["font size"] = font_scaler / (res_scaler / max_res)
+            self.style_attr["circle size"] = circle_size
+            self.style_attr["font size"] = font_size
             self.style_attr["bg color"] = self.color_dict["White"]
             self.style_attr["print_animal_names"] = self.print_animal_names
             self.style_attr["max lines"] = len(self.data_df)
@@ -332,15 +327,15 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
 
 # animal_attr = {0: {'bp': 'Ear_right', 'color': (255, 0, 0)}, 1: {'bp': 'Tail_base', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
-# # style_attr = {'width': 'As input',
-# #               'height': 'As input',
-# #               'line width': 2,
-# #               'font size': 0.9,
-# #               'font thickness': 2,
-# #               'circle size': 5,
-# #               'bg color': {'type': 'moving', 'opacity': 50, 'frame_index': 200}, #{'type': 'static', 'opacity': 100, 'frame_index': 200}
-# #               'max lines': 'entire video'}
-# # clf_attr = {'Nose to Nose': {'color': (155, 1, 10), 'size': 30}, 'Nose to Tailbase': {'color': (155, 90, 10), 'size': 30}}
+# style_attr = {'width': 'As input',
+#               'height': 'As input',
+#               'line width': 2,
+#               'font size': 0.9,
+#               'font thickness': 2,
+#               'circle size': 5,
+#               'bg color': {'type': 'moving', 'opacity': 50, 'frame_index': 200}, #{'type': 'static', 'opacity': 100, 'frame_index': 200}
+#               'max lines': 'entire video'}
+# clf_attr = {'Nose to Nose': {'color': (155, 1, 10), 'size': 30}, 'Nose to Tailbase': {'color': (155, 90, 10), 'size': 30}}
 # clf_attr=None
 #
 # path_plotter = PathPlotterMulticore(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',

@@ -130,12 +130,13 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
             else:
                 pass
         else:
-            space_scaler, radius_scaler, res_scaler, font_scaler = 25, 10, 1500, 0.8
+            font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='MY LONG TEXT STRING', accepted_px_width=int(self.video_info["Resolution_width"] / 10), accepted_px_height=int(self.video_info["Resolution_width"] / 10))
+            circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_info["Resolution_width"]), int(self.video_info["Resolution_height"])), circle_frame_ratio=100)
             self.style_attr["width"] = int(self.video_info["Resolution_width"].values[0])
             self.style_attr["height"] = int(self.video_info["Resolution_height"].values[0])
             max_res = max(self.style_attr["width"], self.style_attr["height"])
-            self.style_attr["circle size"] = int(radius_scaler / (res_scaler / max_res))
-            self.style_attr["font size"] = min(0.5, (font_scaler / (res_scaler / max_res)))
+            self.style_attr["circle size"] = circle_size
+            self.style_attr["font size"] = font_size
             self.style_attr["bg color"] = self.color_dict["White"]
             self.style_attr["print_animal_names"] = self.print_animal_names
             self.style_attr["max lines"] = len(self.data_df)
@@ -279,9 +280,9 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
 
         self.timer.stop_timer()
         stdout_success(msg=f"Path visualizations for {len(self.files_found)} video(s) saved in {self.path_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
-
-
 #
+#
+# #
 # style_attr = {'width': 'As input',
 #               'height': 'As input',
 #               'line width': 2,
