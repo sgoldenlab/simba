@@ -22,9 +22,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_that_column_exist)
 from simba.utils.enums import Options, TagNames
 from simba.utils.errors import FrameRangeError, NoDataError
-from simba.utils.lookups import get_labelling_img_kbd_bindings, get_labelling_video_kbd_bindings
+from simba.utils.lookups import (get_labelling_img_kbd_bindings,
+                                 get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_all_clf_names, get_fn_ext, get_video_meta_data, read_config_entry, read_df, write_df)
+from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_df, write_df)
 
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
 PADDING = 5

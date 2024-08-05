@@ -3,15 +3,17 @@ __author__ = "Simon Nilsson"
 import os
 import signal
 import sys
+
 import cv2
 import numpy as np
 
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import TextOptions
-from simba.utils.read_write import get_video_meta_data, read_frm_of_video, get_fn_ext
-from simba.utils.warnings import FrameRangeWarning
-from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.lookups import get_labelling_video_kbd_bindings
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_frm_of_video)
+from simba.utils.warnings import FrameRangeWarning
 
 
 def annotation_video_player():
