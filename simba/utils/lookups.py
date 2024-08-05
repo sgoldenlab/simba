@@ -604,7 +604,7 @@ def get_labelling_video_kbd_bindings() -> dict:
     return \
         {'Pause/Play': #
              {'label': 'p = Pause/Play',
-              'kbd': 32},
+              'kbd': 'p'},
          'forward_two_frames':  #
              {'label': 'o = +2 frames',
               'kbd': "o"},
