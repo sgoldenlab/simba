@@ -2910,7 +2910,7 @@ def convert_to_mp4(path: Union[str, os.PathLike],
         _ = get_video_meta_data(video_path=file_path)
         out_path = os.path.join(save_dir, f'{video_name}.mp4')
         if codec == 'powerpoint':
-            cmd = f'ffmpeg -i "{file_path}" -c:v libx264 -preset slow -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf {crf} -c:v libx264 -codec:a aac "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v libx264 -preset slow -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf {quality} -c:v libx264 -codec:a aac "{out_path}" -loglevel error -stats -hide_banner -y'
         elif codec == 'vp9':
             cmd = f'ffmpeg -i "{file_path}" -c:v libvpx-vp9 -crf {quality} -b:v 0 -an "{out_path}" -loglevel error -stats -hide_banner -y'
         elif codec == 'h264_cuvid':

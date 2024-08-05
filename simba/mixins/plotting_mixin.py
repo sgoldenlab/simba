@@ -1625,47 +1625,17 @@ class PlottingMixin(object):
         return img
 
     @staticmethod
-    def roi_dict_onto_img(
-        img: np.ndarray,
-        roi_dict: Dict[str, pd.DataFrame],
-        circle_size: Optional[int] = 2,
-        show_center: Optional[bool] = False,
-        show_tags: Optional[bool] = False,
-    ) -> np.ndarray:
+    def roi_dict_onto_img(img: np.ndarray,
+                          roi_dict: Dict[str, pd.DataFrame],
+                          circle_size: Optional[int] = 2,
+                          show_center: Optional[bool] = False,
+                          show_tags: Optional[bool] = False) -> np.ndarray:
 
-        check_valid_array(
-            data=img, source=f"{PlottingMixin.roi_dict_onto_img.__name__} img"
-        )
-        check_if_keys_exist_in_dict(
-            data=roi_dict,
-            key=[
-                Keys.ROI_POLYGONS.value,
-                Keys.ROI_CIRCLES.value,
-                Keys.ROI_RECTANGLES.value,
-            ],
-            name=PlottingMixin.roi_dict_onto_img.__name__,
-        )
-        img = PlottingMixin.rectangles_onto_image(
-            img=img,
-            rectangles=roi_dict[Keys.ROI_RECTANGLES.value],
-            circle_size=circle_size,
-            show_center=show_center,
-            show_tags=show_tags,
-        )
-        img = PlottingMixin.circles_onto_image(
-            img=img,
-            circles=roi_dict[Keys.ROI_CIRCLES.value],
-            circle_size=circle_size,
-            show_center=show_center,
-            show_tags=show_tags,
-        )
-        img = PlottingMixin.polygons_onto_image(
-            img=img,
-            polygons=roi_dict[Keys.ROI_POLYGONS.value],
-            circle_size=circle_size,
-            show_center=show_center,
-            show_tags=show_tags,
-        )
+        check_valid_array(data=img, source=f"{PlottingMixin.roi_dict_onto_img.__name__} img")
+        check_if_keys_exist_in_dict(data=roi_dict, key=[Keys.ROI_POLYGONS.value, Keys.ROI_CIRCLES.value, Keys.ROI_RECTANGLES.value], name=PlottingMixin.roi_dict_onto_img.__name__)
+        img = PlottingMixin.rectangles_onto_image(img=img, rectangles=roi_dict[Keys.ROI_RECTANGLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
+        img = PlottingMixin.circles_onto_image(img=img, circles=roi_dict[Keys.ROI_CIRCLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
+        img = PlottingMixin.polygons_onto_image(img=img, polygons=roi_dict[Keys.ROI_POLYGONS.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
         return img
 
     @staticmethod
