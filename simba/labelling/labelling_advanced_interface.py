@@ -15,13 +15,12 @@ import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_file_exist_and_readable, check_int
 from simba.utils.enums import Formats, Options, TagNames
-from simba.utils.errors import (AdvancedLabellingError, FrameRangeError,
-                                NoDataError)
-from simba.utils.lookups import get_labelling_img_kbd_bindings
+from simba.utils.errors import (AdvancedLabellingError, FrameRangeError, NoDataError)
+from simba.utils.lookups import get_labelling_img_kbd_bindings, get_labelling_video_kbd_bindings
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
-                                    read_df, write_df)
+                                    read_df)
 
 
 class AdvancedLabellingInterface(ConfigReader):
@@ -57,7 +56,9 @@ class AdvancedLabellingInterface(ConfigReader):
         self.machine_results_file_path = os.path.join(self.machine_results_dir, self.video_name + "." + self.file_type)
         self.cap = cv2.VideoCapture(self.video_path)
         self.img_kbd_bindings = get_labelling_img_kbd_bindings()
+        self.video_kbd_bindings = get_labelling_video_kbd_bindings()
         self.__create_key_presses_lbl()
+        self.__create_video_key_presses_lbl()
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
         self.frame_lst = list(range(0, self.video_meta_data["frame_count"]))
         self.max_frm_no = max(self.frame_lst)
@@ -179,14 +180,7 @@ class AdvancedLabellingInterface(ConfigReader):
         self.video_player_frm.grid(row=0, column=2, sticky=N)
         self.play_video_btn = Button(self.video_player_frm, text="Open Video", command=self.play_video)
         self.play_video_btn.grid(sticky=N, pady=10)
-        self.video_key_lbls = Label(self.video_player_frm,
-                                    text="\n\n  Keyboard shortcuts for video navigation: \n p = Pause/Play"
-                                    "\n\n After pressing pause:"
-                                    "\n o = +2 frames \n e = +10 frames \n w = +1 second"
-                                    "\n\n t = -2 frames \n s = -10 frames \n x = -1 second"
-                                    "\n\n q = Close video window \n\n")
-
-        self.video_key_lbls.grid(sticky=W)
+        Label(self.video_player_frm, text=self.video_presses_lbl).grid(sticky=W)
         self.update_img_from_video = Button(self.video_player_frm, text="Show current video frame", command=self.update_frame_from_video)
         self.update_img_from_video.grid(sticky=N)
         self.bind_shortcut_keys()
@@ -208,6 +202,12 @@ class AdvancedLabellingInterface(ConfigReader):
         self.main_window.bind(self.img_kbd_bindings['frame-1']['kbd'], lambda x: self.advance_frame(new_frm_number=int(self.current_frm_n.get() - 1)))
         self.main_window.bind(self.img_kbd_bindings['last_frame']['kbd'], lambda x: self.advance_frame(new_frm_number=self.max_frm_no))
         self.main_window.bind(self.img_kbd_bindings['first_frame']['kbd'], lambda x: self.advance_frame(0))
+
+    def __create_video_key_presses_lbl(self):
+        self.video_presses_lbl = "\n\n Keyboard shortcuts for video navigation: "
+        for k, v in self.video_kbd_bindings.items():
+            self.video_presses_lbl += '\n'
+            self.video_presses_lbl += v['label']
 
     def find_last_next_annotation(self, forwards: bool, present: bool):
         if forwards:
@@ -558,5 +558,5 @@ def select_labelling_video_advanced(
     )
 #
 #
-# test = select_labelling_video_advanced(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
+# test = select_labelling_video_advanced(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
 #                                       continuing=False)

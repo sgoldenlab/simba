@@ -20,7 +20,7 @@ class ConfigKey(Enum):
     VIDEO_INFO_CSV = "video_info.csv"
     FOLDER_PATH = "folder_path"
     FILE_TYPE = "workflow_file_type"
-    TARGET_CNT = "No_targets"
+    TARGET_CNT = "no_targets"
     ANIMAL_CNT = "animal_no"
     PROJECT_NAME = "project_name"
     OS = "OS_system"

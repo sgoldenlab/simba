@@ -353,10 +353,10 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
 
         feature_tools_frm = LabelFrame(tab5, text="FEATURE TOOLS", pady=5, font=Formats.FONT_HEADER.value)
-        compute_feature_subset_btn = SimbaButton(parent=feature_tools_frm, txt="CALCULATE FEATURE SUBSETS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=FeatureSubsetExtractorPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        compute_feature_subset_btn = SimbaButton(parent=feature_tools_frm, txt="CALCULATE FEATURE SUBSETS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=FeatureSubsetExtractorPopUp, cmd_kwargs={'config_path': lambda: self.config_path}, thread=False)
 
         label_behavior_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LABEL_BEHAVIOR.value)
-        select_video_btn_new = SimbaButton(parent=label_behavior_frm, txt="Select video (create new video annotation)", img='label_blue', txt_clr='navy', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda:self.config_path, 'threshold_dict': lambda:None, 'setting': lambda: "from_scratch", lambda: 'continuing': False}, thread=False)
+        select_video_btn_new = SimbaButton(parent=label_behavior_frm, txt="Select video (create new video annotation)", img='label_blue', txt_clr='navy', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda :self.config_path, 'threshold_dict': lambda: None, 'setting': lambda: "from_scratch", 'continuing': lambda: False}, thread=False)
         select_video_btn_continue = SimbaButton(parent=label_behavior_frm, txt="Select video (continue existing video annotation)", img='label_yellow', txt_clr='darkgoldenrod', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda: self.config_path, 'threshold_dict': lambda:None, 'setting': lambda:None, 'continuing': lambda:True}, thread=False)
 
         label_thirdpartyann = CreateLabelFrameWithIcon(parent=tab7, header="IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.THIRD_PARTY_ANNOTATION.value)

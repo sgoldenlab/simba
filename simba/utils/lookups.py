@@ -547,10 +547,10 @@ def video_quality_to_preset_lookup() -> Dict[str, str]:
     return {"Low": "fast", "Medium": "medium", "High": "slow"}
 
 
-def get_labelling_img_kbd_bindings():
+def get_labelling_img_kbd_bindings() -> dict:
     """
     Returns dictionary of tkinter keyboard bindings.
-    .. notes::
+    .. note::
         Change ``kbd`` values to change keyboard shortcuts. For example:
 
         Some possible examples:
@@ -582,6 +582,53 @@ def get_labelling_img_kbd_bindings():
              {'label': 'Ctrl + o = First frame',
               'kbd': "<Control-o>"}
          }
+
+def get_labelling_video_kbd_bindings() -> dict:
+    """
+    Returns dictionary of OpenCV keyboard bindings.
+
+    .. note::
+        Change ``kbd`` values to change keyboard shortcuts. Note that OpenCV keyboard bindings are different from tkinter
+        keyboard bindings as used in ``get_labelling_img_kbd_bindings``.
+
+        Use either letters as below, or integer ASCII code for non-letters. For example:
+            - Space bar: 32
+            - Left arrow: 81
+            - Right arrow: 83
+
+        e.g., {'Pause/Play': {'label': 'p = Pause/Play', 'kbd': 32} would remap the space-bar to pause.
+
+    """
+
+
+    return \
+        {'Pause/Play': #
+             {'label': 'p = Pause/Play',
+              'kbd': 32},
+         'forward_two_frames':  #
+             {'label': 'o = +2 frames',
+              'kbd': "o"},
+         'forward_ten_frames':  #
+             {'label': 'e = +10 frames',
+              'kbd': "e"},
+         'forward_one_second':  #
+             {'label': 'w = +1 second',
+              'kbd': "w"},
+         'backwards_two_frames':  #
+             {'label': 't = -2 frames',
+              'kbd': "t"},
+         'backwards_ten_frames':  #
+             {'label': 's = -10 frames',
+              'kbd': "s"},
+         'backwards_one_second':  #
+             {'label': 'x = -1 second',
+              'kbd': "x"},
+         'close_window':  #
+             {'label': 'q = Close video window',
+              'kbd': "q"},
+         }
+
+
 
 def get_fonts():
     """ Returns a dictionary with all fonts available in OS, with the font name as key and font path as value"""

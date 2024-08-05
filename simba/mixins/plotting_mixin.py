@@ -1826,7 +1826,7 @@ class PlottingMixin(object):
                   img: np.ndarray,
                   text: str,
                   pos: Tuple[int, int],
-                  font_size: int,
+                  font_size: Union[int, float],
                   font_thickness: Optional[int] = 2,
                   font: Optional[int] = cv2.FONT_HERSHEY_DUPLEX,
                   text_color: Optional[Tuple[int, int, int]] = (255, 255, 255),

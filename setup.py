@@ -24,7 +24,7 @@ with open(ARM_REQUIREMENTS_PATH, "r") as f:
 # Setup configuration
 setuptools.setup(
     name="Simba-UW-tf-dev",
-    version="1.99.9",
+    version="2.0.1",
     author="Simon Nilsson, Jia Jie Choong, Sophia Hwang",
     author_email="sronilsson@gmail.com",
     description="Toolkit for computer classification and analysis of behaviors in experimental animals",
