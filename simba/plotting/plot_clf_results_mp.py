@@ -96,17 +96,14 @@ def _multiprocess_sklearn_video(data: np.array,
             img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
         if print_timers:
             img = _put_text(img=img, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE]), font_size=text_attr[FONT_SIZE], font_thickness=text_attr[TEXT_THICKNESS], font=font, text_color=(255, 255, 255))
-            #cv2.putText(img, "TIMERS:", (TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE]), font, text_attr[FONT_SIZE], (0, 255, 0), text_attr[TEXT_THICKNESS])
         frame_results = {}
         for model in models_info.values():
             frame_results[model["model_name"]] = data.loc[current_frm, model["model_name"]]
             if print_timers:
                 cumulative_time = round(data.loc[current_frm, model["model_name"] + "_cumsum"] / video_meta_data["fps"], 3)
                 img = _put_text(img=img, text=f"{model['model_name']} {cumulative_time}s", pos=(TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE] * add_spacer), font_size=text_attr[FONT_SIZE], font_thickness=text_attr[TEXT_THICKNESS], font=font, text_color=(255, 255, 255))
-                #cv2.putText(img, f"{model['model_name']} {cumulative_time}s", (TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE] * add_spacer),font,text_attr[FONT_SIZE], TextOptions.COLOR.value, text_attr[TEXT_THICKNESS])
                 add_spacer += 1
         img = _put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_attr[SPACE_SCALE] * add_spacer), font_size=text_attr[FONT_SIZE], font_thickness=text_attr[TEXT_THICKNESS], font=font, text_color=(255, 255, 255))
-        #cv2.putText(img, "ENSEMBLE PREDICTION:", (TextOptions.BORDER_BUFFER_Y.value, int(text_attr[SPACE_SCALE] * add_spacer)), font, text_attr[FONT_SIZE], (0, 255, 0), text_attr[TEXT_THICKNESS])
         add_spacer += 1
         for clf_cnt, (clf_name, clf_results) in enumerate(frame_results.items()):
             if clf_results == 1:

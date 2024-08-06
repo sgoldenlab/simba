@@ -38,7 +38,6 @@ def annotation_video_player():
     time_between_frames = int(1000 / video_meta_data["fps"])
     cv2.namedWindow(video_name, cv2.WINDOW_NORMAL)
 
-
     def print_video_txt(frame: np.ndarray,
                         frame_number: int,
                         video_info: dict) -> np.ndarray:

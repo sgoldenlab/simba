@@ -47,7 +47,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
                                                       icon_link=Links.TRAIN_ML_MODEL.value,)
         self.select_config_file = FileSelect(load_meta_data_frm, "CONFIG PATH:")
 
-        load_config_btn = SimbaButton(parent=load_meta_data_frm, txt="LOAD", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.load_config)
+        load_config_btn = SimbaButton(parent=load_meta_data_frm, txt="LOAD", img='load_blue',  txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.load_config)
         label_link = Label(load_meta_data_frm, text="[MODEL SETTINGS TUTORIAL]", fg="blue", font=Formats.FONT_REGULAR.value)
         label_link.bind("<Button-1>", lambda e: webbrowser.open_new("https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model"))
 
@@ -145,9 +145,9 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         )
         self.save_frame = LabelFrame(self.main_frm, text="SAVE", font=Formats.FONT_HEADER.value)
 
-        save_global_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (GLOBAL ENVIRONMENT)", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.save_global)
-        save_meta_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (SPECIFIC MODEL)", txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=self.save_config)
-        clear_cache_btn = SimbaButton(parent=self.save_frame, txt="CLEAR CACHE", txt_clr='red', font=Formats.FONT_REGULAR.value, cmd=self.clear_cache)
+        save_global_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (GLOBAL ENVIRONMENT)", txt_clr='blue', img='save_blue', font=Formats.FONT_REGULAR.value, cmd=self.save_global)
+        save_meta_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (SPECIFIC MODEL)", txt_clr='green', img='save_green', font=Formats.FONT_REGULAR.value, cmd=self.save_config)
+        clear_cache_btn = SimbaButton(parent=self.save_frame, txt="CLEAR CACHE", txt_clr='red', img='trash_red', font=Formats.FONT_REGULAR.value, cmd=self.clear_cache)
 
         load_meta_data_frm.grid(row=0, column=0, sticky=NW)
         self.select_config_file.grid(row=0, column=0, sticky=NW)
@@ -608,4 +608,4 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         ]
 
 
-#_ = MachineModelSettingsPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+#_ = MachineModelSettingsPopUp(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini")

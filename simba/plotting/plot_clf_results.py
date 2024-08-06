@@ -169,7 +169,6 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
                         self.frame = np.array(Image.fromarray(self.frame).rotate(90, Image.BICUBIC, expand=True))
                     if self.print_timers:
                         self.frame = PlottingMixin().put_text(img=self.frame, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale)), font_size=self.font_size, font_thickness=self.text_thickness, font=self.font)
-                        #cv2.putText(self.frame, "TIMERS:", (TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale)), self.font, self.font_size, TextOptions.COLOR.value, self.text_thickness)
                     self.add_spacer = 2
                     for model_no, model_info in self.video_model_dict.items():
                         frame_results = self.data_df.loc[row_n, model_info["model_name"]]
@@ -177,14 +176,12 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
                         self.video_model_dict[model_no]["time"] += (frame_results / self.fps)
                         if self.print_timers:
                             self.frame = PlottingMixin().put_text(img=self.frame, text=model_info["model_name"] + " " + str(round(self.video_model_dict[model_no]["time"], 2)), pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale * self.add_spacer)), font_size=self.font_size, font_thickness=self.text_thickness, font=self.font)
-                            #cv2.putText(self.frame, model_info["model_name"] + " " + str(round(self.video_model_dict[model_no]["time"], 2)) + str("s"), (TextOptions.BORDER_BUFFER_Y.value, (self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, TextOptions.COLOR.value, self.text_thickness)
                             self.add_spacer += 1
                     self.frame = PlottingMixin().put_text(img=self.frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale * self.add_spacer)), font_size=self.font_size, font_thickness=self.text_thickness, font=self.font)
                     self.add_spacer += 1
                     for model_cnt, model_info in self.video_model_dict.items():
                         if self.video_model_dict[model_cnt]["frame_results"] == 1:
                             self.frame = PlottingMixin().put_text(img=self.frame, text=model_info["model_name"], pos=(TextOptions.BORDER_BUFFER_Y.value, (self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=self.text_thickness, font=self.font, text_color=TextOptions.COLOR.value)
-                            #cv2.putText(self.frame, model_info["model_name"], (TextOptions.BORDER_BUFFER_Y.value, (self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.clr_lst[model_cnt], self.text_thickness)
                             self.add_spacer += 1
                     if self.video_setting:
                         self.writer.write(self.frame)

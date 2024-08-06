@@ -126,16 +126,12 @@ class ClassifierValidationClips(ConfigReader):
                     p, clf_val = round(float(self.data_df.loc[current_frm, self.p_col]), 3), int(self.data_df.loc[current_frm, self.clf_name])
                     self.add_spacer = 2
                     img = PlottingMixin().put_text(img=img, text=f"{self.clf_name} event # {self.bout_cnt + 1}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.text_clr)
-                    #cv2.putText(img, f"{self.clf_name} event # {self.bout_cnt + 1}", (10, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
                     img = PlottingMixin().put_text(img=img, text=f"Total frames of event: {event_frm_count}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.text_clr)
-                    #cv2.putText(img, f"Total frames of event: {event_frm_count}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
                     img = PlottingMixin().put_text(img=img, text=f"Frames of event {start_window} to {end_window}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.text_clr)
-                    #cv2.putText(img, f"Frames of event {start_window} to {end_window}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
                     img = PlottingMixin().put_text(img=img, text=f"Frame number: {current_frm}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.text_clr)
-                    #cv2.putText(img, f"Frame number: {current_frm}", (10, (self.video_info["height"] - self.video_info["height"]) + self.spacing_scale * self.add_spacer), self.font, self.font_size, self.text_clr, 2)
                     self.add_spacer += 1
                     if (self.highlight_clr != None) and (clf_val == 1):
                         img = PlottingMixin().put_text(img=img, text=f"Frame {self.clf_name} probability: {p}", pos=(TextOptions.BORDER_BUFFER_X.value, (self.video_info["height"] - self.video_info["height"])+ self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=self.highlight_clr)
