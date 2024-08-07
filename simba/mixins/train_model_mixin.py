@@ -16,11 +16,12 @@ from concurrent.futures.process import BrokenProcessPool
 from copy import deepcopy
 from datetime import datetime
 from itertools import repeat
-from subprocess import call
 from json import loads
+from subprocess import call
 
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import shap
 from imblearn.combine import SMOTEENN
 from imblearn.over_sampling import SMOTE
@@ -28,13 +29,13 @@ from numba import njit, typed, types
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
-from sklearn.metrics import precision_recall_curve, classification_report
+from sklearn.metrics import classification_report, precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
-from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer, StandardScaler)
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
+                                   StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
 from tabulate import tabulate
-import seaborn as sns
 
 try:
     from dtreeviz.trees import dtreeviz, tree
@@ -52,6 +53,7 @@ try:
 except:
     from typing_extensions import Literal
 
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.plotting.shap_agg_stats_visualizer import \
     ShapAggregateStatisticsVisualizer
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
@@ -77,7 +79,6 @@ from simba.utils.warnings import (MissingUserInputWarning,
                                   MultiProcessingFailedWarning,
                                   NoModuleWarning, NotEnoughDataWarning,
                                   SamplingWarning, ShapWarning)
-from simba.mixins.plotting_mixin import PlottingMixin
 
 plt.switch_backend("agg")
 
