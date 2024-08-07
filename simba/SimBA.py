@@ -251,14 +251,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         import_frm.grid(row=0, column=0, sticky=NW)
 
         further_methods_frm = CreateLabelFrameWithIcon(parent=import_frm, header="FURTHER METHODS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADDITIONAL_IMPORTS.value)
-        extract_frm_btn = SimbaButton(parent=further_methods_frm, txt="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=extract_frames_from_all_videos_in_directory, cmd_kwargs={'config_path': lambda:self.config_path, 'directory': lambda:self.video_dir})
-        import_frm_dir_btn = SimbaButton(parent=further_methods_frm, txt="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=ImportFrameDirectoryPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        add_clf_btn = SimbaButton(parent=further_methods_frm, txt="ADD CLASSIFIER TO SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=AddClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        remove_clf_btn = SimbaButton(parent=further_methods_frm, txt="REMOVE CLASSIFIER FROM SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=RemoveAClassifierPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        archive_files_btn = SimbaButton(parent=further_methods_frm, txt="ARCHIVE PROCESSED FILES IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=ArchiveProcessedFilesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        reverse_btn = SimbaButton(parent=further_methods_frm, txt="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=None)
-        interpolate_btn = SimbaButton(parent=further_methods_frm, txt="INTERPOLATE POSE IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=InterpolatePopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        smooth_btn = SimbaButton(parent=further_methods_frm, txt="SMOOTH POSE IN SIMBA PROJECT", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=SmoothingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        extract_frm_btn = SimbaButton(parent=further_methods_frm, txt="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", txt_clr='blue', compound='right', img='image', font=Formats.FONT_REGULAR.value, cmd=extract_frames_from_all_videos_in_directory, cmd_kwargs={'config_path': lambda:self.config_path, 'directory': lambda:self.video_dir})
+        import_frm_dir_btn = SimbaButton(parent=further_methods_frm, txt="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT", txt_clr='blue', compound='right', img='import', font=Formats.FONT_REGULAR.value, cmd=ImportFrameDirectoryPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        add_clf_btn = SimbaButton(parent=further_methods_frm, txt="ADD CLASSIFIER TO SIMBA PROJECT", txt_clr='blue', compound='right', img='plus', font=Formats.FONT_REGULAR.value, cmd=AddClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        remove_clf_btn = SimbaButton(parent=further_methods_frm, txt="REMOVE CLASSIFIER FROM SIMBA PROJECT", txt_clr='blue', compound='right', img='trash', font=Formats.FONT_REGULAR.value, cmd=RemoveAClassifierPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        archive_files_btn = SimbaButton(parent=further_methods_frm, txt="ARCHIVE PROCESSED FILES IN SIMBA PROJECT", txt_clr='blue', compound='right', img='archive', font=Formats.FONT_REGULAR.value, cmd=ArchiveProcessedFilesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        reverse_btn = SimbaButton(parent=further_methods_frm, txt="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT", txt_clr='blue', compound='right', img='reverse_blue', font=Formats.FONT_REGULAR.value, cmd=None)
+        interpolate_btn = SimbaButton(parent=further_methods_frm, txt="INTERPOLATE POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='line_chart_blue', font=Formats.FONT_REGULAR.value, cmd=InterpolatePopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        smooth_btn = SimbaButton(parent=further_methods_frm, txt="SMOOTH POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='wand_blue', font=Formats.FONT_REGULAR.value, cmd=SmoothingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         label_setscale = CreateLabelFrameWithIcon(parent=tab3, header="VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
         self.distance_in_mm_eb = Entry_Box(label_setscale, "KNOWN DISTANCE (MILLIMETERS)", "25", validation="numeric")
@@ -347,13 +347,13 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         roi_feature_frm = CreateLabelFrameWithIcon(parent=tab5, header="APPEND ROI FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.APPEND_ROI_FEATURES.value)
 
-        append_roi_features_by_animal = SimbaButton(parent=roi_feature_frm, txt="APPEND ROI DATA TO FEATURES: BY ANIMAL (CAUTION)", txt_clr='red', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=True)
-        append_roi_features_by_body_part = SimbaButton(parent=roi_feature_frm, txt="APPEND ROI DATA TO FEATURES: BY BODY-PARTS (CAUTION)", txt_clr='orange', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByBodyPartPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
-        remove_roi_features_from_feature_set = SimbaButton(parent=roi_feature_frm, txt="REMOVE ROI FEATURES FROM FEATURE SET", txt_clr='darkred', font=Formats.FONT_REGULAR.value, cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'features_extracted'}, thread=False)
+        append_roi_features_by_animal = SimbaButton(parent=roi_feature_frm, txt="APPEND ROI DATA TO FEATURES: BY ANIMAL (CAUTION)", txt_clr='red', img='join_red', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=True)
+        append_roi_features_by_body_part = SimbaButton(parent=roi_feature_frm, txt="APPEND ROI DATA TO FEATURES: BY BODY-PARTS (CAUTION)", img='join_yellow', txt_clr='orange', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByBodyPartPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        remove_roi_features_from_feature_set = SimbaButton(parent=roi_feature_frm, txt="REMOVE ROI FEATURES FROM FEATURE SET", txt_clr='darkred', img='trash', font=Formats.FONT_REGULAR.value, cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'features_extracted'}, thread=False)
 
 
         feature_tools_frm = LabelFrame(tab5, text="FEATURE TOOLS", pady=5, font=Formats.FONT_HEADER.value)
-        compute_feature_subset_btn = SimbaButton(parent=feature_tools_frm, txt="CALCULATE FEATURE SUBSETS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=FeatureSubsetExtractorPopUp, cmd_kwargs={'config_path': lambda: self.config_path}, thread=False)
+        compute_feature_subset_btn = SimbaButton(parent=feature_tools_frm, txt="CALCULATE FEATURE SUBSETS", txt_clr='blue', img='subset_blue', font=Formats.FONT_REGULAR.value, cmd=FeatureSubsetExtractorPopUp, cmd_kwargs={'config_path': lambda: self.config_path}, thread=False)
 
         label_behavior_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LABEL_BEHAVIOR.value)
         select_video_btn_new = SimbaButton(parent=label_behavior_frm, txt="Select video (create new video annotation)", img='label_blue', txt_clr='navy', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda :self.config_path, 'threshold_dict': lambda: None, 'setting': lambda: "from_scratch", 'continuing': lambda: False}, thread=False)
@@ -426,10 +426,10 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_run_rfmodelsettings = SimbaButton(parent=label_runmachinemodel, txt="MODEL SETTINGS", txt_clr='green', img='settings', cmd=SetMachineModelParameters, cmd_kwargs={'config_path': lambda:config_path})
         button_runmachinemodel = SimbaButton(parent=label_runmachinemodel, txt="RUN MODELS", txt_clr='green', img='clf', cmd=self.runrfmodel, thread=True)
 
-        kleinberg_button = SimbaButton(parent=label_runmachinemodel, txt="KLEINBERG SMOOTHING", txt_clr='green', cmd=KleinbergPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        fsttc_button = SimbaButton(parent=label_runmachinemodel, txt="FSTTC", txt_clr='green', cmd=FSTTCPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        kleinberg_button = SimbaButton(parent=label_runmachinemodel, txt="KLEINBERG SMOOTHING", txt_clr='green', img='feather_green', cmd=KleinbergPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        fsttc_button = SimbaButton(parent=label_runmachinemodel, txt="FSTTC", txt_clr='green', img='tile_green', cmd=FSTTCPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        mutual_exclusivity = SimbaButton(parent=label_runmachinemodel, txt="MUTUAL EXCLUSIVITY CORRECTION", txt_clr='green', cmd=MutualExclusivityPupUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        mutual_exclusivity = SimbaButton(parent=label_runmachinemodel, txt="MUTUAL EXCLUSIVITY CORRECTION", img='seperate_green', txt_clr='green', cmd=MutualExclusivityPupUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         label_machineresults = CreateLabelFrameWithIcon( parent=tab9, header="ANALYZE MACHINE RESULTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ANALYZE_ML_RESULTS.value)
 
