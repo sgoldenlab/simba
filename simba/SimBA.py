@@ -853,7 +853,7 @@ class App(object):
         video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp(), font=Formats.FONT_REGULAR.value)
         convert_data_menu = Menu(video_process_menu)
         convert_data_menu.add_command(label="Convert CSV to parquet", compound="left", image=self.menu_icons["parquet"]["img"], command=Csv2ParquetPopUp, font=Formats.FONT_REGULAR.value)
-        convert_data_menu.add_command(label="Convert parquet o CSV", compound="left", image=self.menu_icons["csv"]["img"], command=Parquet2CsvPopUp, font=Formats.FONT_REGULAR.value)
+        convert_data_menu.add_command(label="Convert parquet o CSV", compound="left", image=self.menu_icons["csv_grey"]["img"], command=Parquet2CsvPopUp, font=Formats.FONT_REGULAR.value)
 
         video_process_menu.add_cascade(label="Convert working file type...", compound="left", image=self.menu_icons["change"]["img"], menu=convert_data_menu, font=Formats.FONT_REGULAR.value)
 
