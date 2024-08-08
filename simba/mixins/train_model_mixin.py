@@ -670,23 +670,23 @@ class TrainModelMixin(object):
 
         print("Creating feature importance log...")
         timer = SimbaTimer(start=True)
-        if isinstance(rf_clf, cuRF):
-            cuml_tree_nodes = loads(rf_clf.get_json())
-            importances = self.cuml_rf_x_importances(nodes=cuml_tree_nodes, n_features=len(x_names))
-        else:
-            importances = list(rf_clf.feature_importances_)
-        feature_importances = [(feature, round(importance, 25)) for feature, importance in zip(x_names, importances)]
-        df = pd.DataFrame(feature_importances, columns=["FEATURE", "FEATURE_IMPORTANCE"]).sort_values(
-            by=["FEATURE_IMPORTANCE"], ascending=False)
         if save_file_no != None:
-            self.f_importance_save_path = os.path.join(save_dir,
-                                                       f"{clf_name}_{save_file_no}_feature_importance_log.csv")
+            self.f_importance_save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_feature_importance_log.csv")
         else:
             self.f_importance_save_path = os.path.join(save_dir, f"{clf_name}_feature_importance_log.csv")
+        if cuRF is not None and isinstance(rf_clf, cuRF):
+            cuml_tree_nodes = loads(rf_clf.get_json())
+            importances = list(self.cuml_rf_x_importances(nodes=cuml_tree_nodes, n_features=len(x_names)))
+            std_importances = [np.nan] * len(importances)
+        else:
+            importances_per_tree = np.array([tree.feature_importances_ for tree in rf_clf.estimators_])
+            importances = list(np.mean(importances_per_tree, axis=0))
+            std_importances = list(np.std(importances_per_tree, axis=0))
+        importances = [round(importance, 25) for importance in importances]
+        df = pd.DataFrame({'FEATURE': x_names,'FEATURE_IMPORTANCE_MEAN': importances, 'FEATURE_IMPORTANCE_STDEV': std_importances}).sort_values(by=["FEATURE_IMPORTANCE_MEAN"], ascending=False)
         df.to_csv(self.f_importance_save_path, index=False)
         timer.stop_timer()
-        print(
-            f'Feature importance log saved at {self.f_importance_save_path} (elapsed time: {timer.elapsed_time_str}s)')
+        stdout_success(msg=f'Feature importance log saved at {self.f_importance_save_path}!', elapsed_time=timer.elapsed_time_str)
 
     def create_x_importance_bar_chart(self,
                                       rf_clf: RandomForestClassifier,
@@ -717,24 +717,23 @@ class TrainModelMixin(object):
         check_int(name="FEATURE IMPORTANCE BAR COUNT", value=n_bars, min_value=1)
         print("Creating feature importance bar chart...")
         timer = SimbaTimer(start=True)
-        self.create_x_importance_log(rf_clf, x_names, clf_name, save_dir)
-        importances_df = pd.read_csv(os.path.join(save_dir, f"{clf_name}_feature_importance_log.csv"))
-        importances_head = importances_df.head(n_bars)
-        colors = create_color_palette(pallete_name=palette, increments=n_bars, as_rgb_ratio=True)
-        colors = [x[::-1] for x in colors]
-        ax = importances_head.plot.bar(x="FEATURE", y="FEATURE_IMPORTANCE", legend=False, rot=90, fontsize=6,
-                                       color=colors)
-        plt.ylabel("Feature importances' (mean decrease impurity)", fontsize=6)
-        plt.tight_layout()
         if save_file_no != None:
             save_file_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_feature_importance_bar_graph.png")
         else:
             save_file_path = os.path.join(save_dir, f"{clf_name}_feature_importance_bar_graph.png")
-        plt.savefig(save_file_path, dpi=600)
-        plt.close("all")
+        self.create_x_importance_log(rf_clf, x_names, clf_name, save_dir)
+        importances_df = pd.read_csv(os.path.join(save_dir, f"{clf_name}_feature_importance_log.csv"))
+        importances_head = importances_df.head(n_bars)
+        _ = PlottingMixin.plot_bar_chart(df=importances_head,
+                                         x='FEATURE',
+                                         y="FEATURE_IMPORTANCE_MEAN",
+                                         error='FEATURE_IMPORTANCE_STDEV',
+                                         x_label='FEATURE',
+                                         y_label='IMPORTANCE',
+                                         title=f'SimBA feature importances {clf_name}',
+                                         save_path=save_file_path)
         timer.stop_timer()
-        print(
-            f'Feature importance bar chart complete, saved at {save_file_path} (elapsed time: {timer.elapsed_time_str}s)')
+        print(f'Feature importance bar chart complete, saved at {save_file_path} (elapsed time: {timer.elapsed_time_str}s)')
 
     def dviz_classification_visualization(
             self,

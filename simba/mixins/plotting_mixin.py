@@ -1718,15 +1718,14 @@ class PlottingMixin(object):
         return img
 
     @staticmethod
-    def draw_lines_on_img(
-        img: np.ndarray,
-        start_positions: np.ndarray,
-        end_positions: np.ndarray,
-        color: Tuple[int, int, int],
-        highlight_endpoint: Optional[bool] = False,
-        thickness: Optional[int] = 2,
-        circle_size: Optional[int] = 2,
-    ) -> np.ndarray:
+    def draw_lines_on_img(img: np.ndarray,
+                          start_positions: np.ndarray,
+                          end_positions: np.ndarray,
+                          color: Tuple[int, int, int],
+                          highlight_endpoint: Optional[bool] = False,
+                          thickness: Optional[int] = 2,
+                          circle_size: Optional[int] = 2) -> np.ndarray:
+
         """
         Helper to draw a set of lines onto an image.
 
@@ -1737,7 +1736,6 @@ class PlottingMixin(object):
         :param Optional[bool] highlight_endpoint: If True, highlights the ends of the lines with circles.
         :param Optional[int] thickness: The thickness of the lines.
         :param Optional[int] circle_size: If ``highlight_endpoint`` is True, the size of the highlighted points.
-
         :return np.ndarray: The image with the lines overlayed.
         """
 
@@ -1826,6 +1824,18 @@ class PlottingMixin(object):
     def get_optimal_circle_size(self,
                                 frame_size: Tuple[int, int],
                                 circle_frame_ratio: Optional[int] = 100) -> int:
+        """
+        Calculate the optimal circle size for fitting within a rectangular frame based on a given ratio.
+
+        This method computes the diameter of a circle that fits within the smallest dimension of a rectangular
+        frame, scaled by a specified ratio. The resulting circle size ensures that it fits within the bounds of
+        the frame while maintaining the specified size ratio.
+
+        :param Tuple[int, int] frame_size: A tuple representing the dimensions of the rectangular frame (width, height).
+        :param Optional[int] circle_frame_ratio: An integer representing the ratio between the frame's smallest dimension and the circle's diameter.  A lower ratio results in a larger circle, and a higher ratio results in a smaller circle.
+        :returns int: The computed diameter of the circle that fits within the smallest dimension of the frame, scaled by  the `circle_frame_ratio`.
+        """
+
 
         check_int(name='accepted_circle_size', value=circle_frame_ratio, min_value=1)
         check_valid_tuple(x=frame_size, source='frame_size', accepted_lengths=(2,), valid_dtypes=(int,))
@@ -1843,7 +1853,26 @@ class PlottingMixin(object):
                   font: Optional[int] = cv2.FONT_HERSHEY_DUPLEX,
                   text_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
                   text_color_bg: Optional[Tuple[int, int, int]] = (0, 0, 0),
-                  text_bg_alpha: float = 0.8):
+                  text_bg_alpha: float = 0.8) -> np.ndarray:
+
+        """
+        Draws text on an image with a background color and transparency.
+
+        This method overlays text on an image at the specified position, with options for adjusting font size,
+        thickness, background color, and background transparency. The text is drawn with an optional background
+        rectangle that can have a specified transparency level to ensure readability over various image backgrounds.
+
+        :param img: The image on which the text is to be drawn. This is a NumPy array representing the image data.
+        :param text: The text string to be drawn on the image.
+        :param pos: The position (x, y) where the text will be placed on the image. The coordinates correspond to the  bottom-left corner of the text.
+        :param font_size: The size of the font. It determines the scale factor that is multiplied by the font-specific base size.
+        :param font_thickness: The thickness of the text strokes. It is an integer specifying the number of pixels for the thickness.
+        :param font: The font type used to render the text. It corresponds to one of the predefined OpenCV font types.
+        :param text_color: The color of the text in RGB format. By default, the text color is white.
+        :param text_color_bg: The background color for the text in RGB format. By default, the background color is black.
+        :param text_bg_alpha: The transparency level of the background rectangle. A value between 0 and 1, where 0 is fully transparent  and 1 is fully opaque.
+        :return:  The image with the overlaid text and background rectangle.
+        """
 
         check_valid_tuple(x=pos, accepted_lengths=(2,), valid_dtypes=(int,))
         check_int(name='font_thickness', value=font_thickness, min_value=1)
@@ -1860,7 +1889,46 @@ class PlottingMixin(object):
         cv2.putText(output, text, (x, y), font, font_size, text_color, font_thickness)
         return output
 
+    @staticmethod
+    def plot_bar_chart(df: pd.DataFrame,
+                       x: str,
+                       y: str,
+                       error: Optional[str] = None,
+                       x_label: Optional[str] = None,
+                       y_label: Optional[str] = None,
+                       title: Optional[str] = None,
+                       fig_size: Optional[Tuple[int, int]] = (10, 8),
+                       palette: Optional[str] = 'magma',
+                       save_path: Optional[Union[str, os.PathLike]] = None):
 
+        check_instance(source=f"{PlottingMixin.plot_bar_chart.__name__} df", instance=df, accepted_types=(pd.DataFrame))
+        check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} x", value=x, options=tuple(df.columns))
+        check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} y", value=y, options=tuple(df.columns))
+        check_valid_lst(data=list(df[y]), source=f"{PlottingMixin.plot_bar_chart.__name__} y", valid_dtypes=Formats.NUMERIC_DTYPES.value)
+        fig, ax = plt.subplots(figsize=fig_size)
+        sns.barplot(x=x, y=y, data=df, palette=palette, ax=ax)
+        ax.set_xticklabels(df[x], rotation=90, fontsize=8)
+        if error is not None:
+            check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} error", value=error, options=tuple(df.columns))
+            check_valid_lst(data=list(df[error]), source=f"{PlottingMixin.plot_bar_chart.__name__} error",valid_dtypes=Formats.NUMERIC_DTYPES.value)
+            for i, (value, error) in enumerate(zip(df['FEATURE_IMPORTANCE_MEAN'], df['FEATURE_IMPORTANCE_STDEV'])):
+                ax.errorbar(i, value, yerr=[[0], [error]], fmt='o', color='grey', capsize=2)
+
+        if x_label is not None:
+            check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} x_label", value=x_label)
+            plt.xlabel(x_label)
+        if y_label is not None:
+            check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} y_label", value=y_label)
+            plt.ylabel(y_label)
+        if title is not None:
+            check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} title", value=title)
+            plt.title(title, ha="center", fontsize=15)
+        if save_path is not None:
+            check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} save_path", value=save_path)
+            check_if_dir_exists(in_dir=os.path.dirname(save_path))
+            fig.savefig(save_path, dpi=600, bbox_inches='tight')
+        else:
+            return fig
 
 # from sklearn.datasets import make_blobs
 # #from sklearn.datasets import ma
