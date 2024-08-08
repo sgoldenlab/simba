@@ -1313,6 +1313,22 @@ def df_smoother(data: pd.DataFrame,
     return data.clip(lower=0)
 
 
+def get_library_version(library_name: str) -> str:
+    """
+
+    :param str library_name: Name of library.
+    :return str: Library version name, if installed
+
+    :example:
+    >>> get_library_version(library_name='sklearn')
+    >>> 0.22.2
+    """
+
+    try:
+        lib = importlib.import_module(library_name)
+        return getattr(lib, '__version__', 'Version information not available')
+    except ImportError:
+        return f'Library "{library_name}" is not installed'
 
 
 

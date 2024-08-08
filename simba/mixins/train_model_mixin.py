@@ -61,7 +61,7 @@ from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_if_valid_input, check_instance,
                                 check_int, check_str, check_that_column_exist)
 from simba.utils.data import (create_color_palette, detect_bouts,
-                              detect_bouts_multiclass)
+                              detect_bouts_multiclass, get_library_version)
 from simba.utils.enums import (ConfigKey, Defaults, Dtypes, Methods,
                                MLParamKeys, Options)
 from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
@@ -783,8 +783,7 @@ class TrainModelMixin(object):
             )
 
     @staticmethod
-    def split_and_group_df(df: pd.DataFrame, splits: int, include_split_order: bool = True) -> (
-    List[pd.DataFrame], int):
+    def split_and_group_df(df: pd.DataFrame, splits: int, include_split_order: bool = True) -> (List[pd.DataFrame], int):
         """
         Helper to split a dataframe for multiprocessing. If include_split_order, then include the group number
         in split data as a column. Returns split data and approximations of number of observations per split.
@@ -1247,7 +1246,7 @@ class TrainModelMixin(object):
         pairs of columns that have a correlation coefficient greater than the specified threshold. For every pair of correlated
         features identified, the function returns the field name of one feature. These field names can later be dropped from the input data to reduce memory requirements and collinearity.
 
-        :param np.ndarray data: Two dimensional numpy array with features represented as columns and frames represented as rows.
+        :param np.ndarray data: Two dimension numpy array with features represented as columns and frames represented as rows.
         :param float threshold: Threshold value for significant collinearity.
         :param List[str] field_names: List mapping the column names in data to a field name. Use types.ListType(types.unicode_type) to take advantage of JIT compilation
         :return List[str]: Unique field names that correlates with at least one other field above the threshold value.
@@ -1321,14 +1320,15 @@ class TrainModelMixin(object):
                     source=self.__class__.__name__,
                 )
 
-    def partial_dependence_calculator(
-            self,
-            clf: RandomForestClassifier,
-            x_df: pd.DataFrame,
-            clf_name: str,
-            save_dir: Union[str, os.PathLike],
-            clf_cnt: Optional[int] = None,
-    ) -> None:
+    def partial_dependence_calculator(self,
+                                      clf: RandomForestClassifier,
+                                      x_df: pd.DataFrame,
+                                      clf_name: str,
+                                      save_dir: Union[str, os.PathLike],
+                                      clf_cnt: Optional[int] = None,
+                                      grid_resolution: Optional[int] = 50,
+                                      plot: Optional[bool] = True) -> None:
+
         """
         Compute feature partial dependencies for every feature in training set.
 
@@ -1336,34 +1336,45 @@ class TrainModelMixin(object):
         :parameter pd.DataFrame x_df: Features training set
         :parameter str clf_name: Name of classifier
         :parameter str save_dir: Directory where to save the data
-        :parameter Optional[int] clf_cnt: If integer, represents the count of the classifier within a grid search. If none, the classifier is not
-            part of a grid search.
+        :parameter Optional[int] clf_cnt: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
         """
+
+        timer = SimbaTimer(start=True)
         print(f"Calculating partial dependencies for {len(x_df.columns)} features...")
         clf.verbose = 0
         check_if_dir_exists(save_dir)
+        scikit_version = get_library_version(library_name='sklearn')
         if clf_cnt:
-            save_dir = os.path.join(
-                save_dir, f"partial_dependencies_{clf_name}_{clf_cnt}"
-            )
+            save_dir = os.path.join(save_dir, f"partial_dependencies_{clf_name}_{clf_cnt}")
         else:
             save_dir = os.path.join(save_dir, f"partial_dependencies_{clf_name}")
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         for feature_cnt, feature_name in enumerate(x_df.columns):
+            feature_timer = SimbaTimer(start=True)
             save_path = os.path.join(save_dir, f"{feature_name}.csv")
-            pdp, axes = partial_dependence(
-                clf,
-                features=[feature_name],
-                X=x_df,
-                percentiles=(0, 1),
-                grid_resolution=30,
-            )
-            df = pd.DataFrame({"partial dependence": pdp[0], "feature value": axes[0]})
+            plot_path = os.path.join(save_dir, f"{feature_name}.png")
+            if scikit_version == '0.22.2':
+                pdp, axes = partial_dependence(clf, features=[feature_name], X=x_df, percentiles=(0, 1), grid_resolution=grid_resolution)
+                df = pd.DataFrame({feature_name: axes[0], clf_name: pdp[0]})
+            else:
+                pdp = partial_dependence(clf, features=[feature_name], X=x_df, percentiles=(0, 1), grid_resolution=grid_resolution, kind='both')
+                pdp, axes = pdp['values'], pdp['average']
+                df = pd.DataFrame({feature_name: pdp[0], clf_name: axes[0]})
+            if plot:
+                _ = PlottingMixin.line_plot(df=df,
+                                            x=feature_name,
+                                            y=clf_name,
+                                            save_path=plot_path,
+                                            y_label='PARTIAL DEPENDENCE',
+                                            x_label=feature_name,
+                                            title=f'SimBA partial dependence {clf_name}')
             df.to_csv(save_path)
-            print(
-                f"Partial dependencies for {feature_name} complete ({feature_cnt + 1}/{len(x_df.columns)})..."
-            )
+            feature_timer.stop_timer()
+            print(f"Partial dependencies for {feature_name} complete ({feature_cnt + 1}/{len(x_df.columns)}) (elapsed time: {feature_timer.elapsed_time_str}s)...")
+
+        timer.stop_timer()
+        stdout_success(msg=f'Partial dependencies for {len(x_df.columns)} features saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
     def clf_predict_proba(self,
                           clf: Union[RandomForestClassifier, cuRF],
@@ -1386,8 +1397,7 @@ class TrainModelMixin(object):
         elif hasattr(clf, "n_features_in_"):
             clf_n_features = clf.n_features_in_
         else:
-            raise InvalidInputError(msg=f"Could not determine the number of features in the classifier {model_name}",
-                                    source=self.__class__.__name__)
+            raise InvalidInputError(msg=f"Could not determine the number of features in the classifier {model_name}", source=self.__class__.__name__)
 
         if hasattr(clf, "n_classes_"):
             clf_n_classes = clf.n_classes_
