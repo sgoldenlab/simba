@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import cv2
 import h5py
 import numpy as np
 import pandas as pd
@@ -17,13 +18,14 @@ from numba import jit, prange, typed
 from pylab import *
 from scipy import stats
 from scipy.signal import savgol_filter
-import cv2
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 from joblib import Parallel, delayed
+
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_df_field_is_boolean,
                                 check_if_dir_exists,

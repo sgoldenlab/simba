@@ -7,10 +7,9 @@ from .is_inside_circle import is_inside_circle
 from .is_inside_polygon import is_inside_polygon
 from .is_inside_rectangle import is_inside_rectangle
 from .sliding_mean import sliding_mean
-from .sliding_std import sliding_std
 from .sliding_min import sliding_min
+from .sliding_std import sliding_std
 from .sliding_sum import sliding_sum
-
 
 __all__ = ['get_3pt_angle',
            'get_convex_hull',

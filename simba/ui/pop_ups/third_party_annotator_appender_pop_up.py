@@ -7,12 +7,14 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.third_party_label_appenders.third_party_appender import ThirdPartyLabelAppender
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, FolderSelect)
-from simba.utils.read_write import find_core_cnt
+from simba.third_party_label_appenders.third_party_appender import \
+    ThirdPartyLabelAppender
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FolderSelect)
 from simba.utils.checks import check_if_dir_exists
-from simba.utils.enums import Formats, Keys, Links, Options, Defaults
+from simba.utils.enums import Defaults, Formats, Keys, Links, Options
 from simba.utils.lookups import get_third_party_appender_file_formats
+from simba.utils.read_write import find_core_cnt
 
 
 class ThirdPartyAnnotatorAppenderPopUp(PopUpMixin, ConfigReader):

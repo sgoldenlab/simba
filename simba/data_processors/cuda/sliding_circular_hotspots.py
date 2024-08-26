@@ -2,12 +2,15 @@ __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
 from typing import Optional
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 import cupy as cp
 import numpy as np
+
 
 def sliding_circular_hotspots(x: np.ndarray,
                               time_window: float,

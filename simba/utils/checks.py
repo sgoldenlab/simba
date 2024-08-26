@@ -22,7 +22,8 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 NoDataError, NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
                                 StringError)
-from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning, NoDataFoundWarning, InvalidValueWarning)
+from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
+                                  InvalidValueWarning, NoDataFoundWarning)
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
