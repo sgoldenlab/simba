@@ -387,7 +387,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         stdout_success(msg=f"Classifier {self.clf_name} saved in models/generated_models directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
         stdout_success(msg=f"Evaluation files are in models/generated_models/model_evaluations folders", source=self.__class__.__name__)
 
-
+#
 # test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # test.run()
 # test.save()

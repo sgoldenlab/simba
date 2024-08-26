@@ -64,6 +64,7 @@ class Paths(Enum):
     CLF_VALIDATION_DIR = Path("frames/output/classifier_validation/")
     CLF_DATA_VALIDATION_DIR = Path("csv/validation/")
     TEST_PATH = "/Users/simon/Desktop/envs/simba_dev/simba/"
+    BLOB_POSITION_PATH = Path("csv/output/blob_positions/")
     SINGLE_CLF_VALIDATION = Path("frames/output/validation/")
     INPUT_FRAMES_DIR = Path("frames/input/")
     ICON_ASSETS = Path("assets/icons/")
@@ -406,6 +407,7 @@ class Defaults(Enum):
     MAX_TASK_PER_CHILD = 10
     LARGE_MAX_TASK_PER_CHILD = 1000
     MAXIMUM_MAX_TASK_PER_CHILD = 8000
+    THREADSAFE_CORE_COUNT = 61
     CHUNK_SIZE = 1
     SPLASH_TIME = 2500
     try:

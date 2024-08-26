@@ -22,6 +22,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_that_column_exist)
 from simba.utils.enums import Options, TagNames
 from simba.utils.errors import FrameRangeError, NoDataError
+from simba.utils.warnings import FrameRangeWarning
 from simba.utils.lookups import (get_labelling_img_kbd_bindings,
                                  get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
@@ -156,6 +157,8 @@ class LabellingInterface(ConfigReader):
         for target_cnt, target in enumerate(self.target_lst):
             self.checkboxes[target] = {}
             self.checkboxes[target]["name"] = target
+            if self.current_frm_n.get() not in list(self.data_df_targets.index):
+                raise FrameRangeError(msg=f'Frame data {self.current_frm_n.get()} could not be found in video {self.video_name}. Modify the [Last saved frames] section in the project config if needed.', source=self.__class__.__name__)
             self.checkboxes[target]["var"] = IntVar(value=self.data_df_targets[target].iloc[self.current_frm_n.get()])
             self.checkboxes[target]["cb"] = Checkbutton(self.check_frame,
                 text=target,
@@ -323,39 +326,23 @@ class LabellingInterface(ConfigReader):
         with open(self.config_path, "w") as configfile:
             self.config.write(configfile)
 
-    def __create_print_statements(
-        self, frame_range: bool = None, start_frame: int = None, end_frame: int = None
-    ):
+    def __create_print_statements(self, frame_range: bool = None, start_frame: int = None, end_frame: int = None):
         print("USER FRAME SELECTION(S):")
         if not frame_range:
             for target in self.target_lst:
                 target_present_choice = self.checkboxes[target]["var"].get()
                 if target_present_choice == 0:
-                    print(
-                        "{} ABSENT IN FRAME {}".format(target, self.current_frm_n.get())
-                    )
+                    print("{} ABSENT IN FRAME {}".format(target, self.current_frm_n.get()))
                 if target_present_choice == 1:
-                    print(
-                        "{} PRESENT IN FRAME {}".format(
-                            target, self.current_frm_n.get()
-                        )
-                    )
+                    print("{} PRESENT IN FRAME {}".format(target, self.current_frm_n.get()))
 
         if frame_range:
             for target in self.target_lst:
                 target_present_choice = self.checkboxes[target]["var"].get()
                 if target_present_choice == 1:
-                    print(
-                        "{} PRESENT IN FRAMES {} to {}".format(
-                            target, str(start_frame), str(end_frame)
-                        )
-                    )
+                    print("{} PRESENT IN FRAMES {} to {}".format(target, str(start_frame), str(end_frame)))
                 elif target_present_choice == 0:
-                    print(
-                        "{} ABSENT IN FRAMES {} to {}".format(
-                            target, str(start_frame), str(end_frame)
-                        )
-                    )
+                    print("{} ABSENT IN FRAMES {} to {}".format(target, str(start_frame), str(end_frame)))
 
 
 def select_labelling_video(config_path: Union[str, os.PathLike],
@@ -388,8 +375,8 @@ def select_labelling_video(config_path: Union[str, os.PathLike],
         continuing=continuing,
     )
 
-
+#
 # test = select_labelling_video(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
 #                               threshold_dict={'Attack': 0.4},
 #                               setting='from_scratch',
-#                               continuing=False)
+#                               continuing=True)

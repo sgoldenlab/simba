@@ -42,8 +42,7 @@ class DeepEthogramImporter(ConfigReader):
         self.data_dir = data_dir
         check_if_dir_exists(in_dir=self.data_dir)
         self.deepethogram_files_found = glob.glob(self.data_dir + "/*.csv")
-        check_if_filepath_list_is_empty(
-            filepaths=self.deepethogram_files_found,
+        check_if_filepath_list_is_empty(filepaths=self.deepethogram_files_found,
             error_msg=f"SIMBA ERROR: ZERO DeepEthogram CSV files found in {self.data_dir} directory",
         )
         check_if_filepath_list_is_empty(

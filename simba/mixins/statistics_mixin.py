@@ -69,7 +69,7 @@ class Statistics(FeatureExtractionMixin):
            For non-heuristic rules for bin counts and bin ranges, see ``simba.data.freedman_diaconis`` or simba.data.bucket_data``.
 
         :parameter np.ndarray data: 1d array containing feature values.
-        :parameter int bins: The number of bins.
+        :parameter int bin_count: The number of bins.
         :parameter: np.ndarray range: 1d array with two values representing minimum and maximum value to bin.
         :parameter: Optional[bool] normalize: If True, then the counts are returned as a ratio of all values. If False, then the raw counts. Pass normalize as True if the datasets are unequal counts. Default: True.
         """
@@ -986,10 +986,8 @@ class Statistics(FeatureExtractionMixin):
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * fps)
-            data_split = np.split(
-                data, list(range(window_size, data.shape[0], window_size))
-            )
-            for j in prange(1, len(data_split)):
+            data_split = np.split(data, list(range(window_size, data.shape[0], window_size)))
+            for j in range(1, len(data_split)):
                 window_start = int(window_size * j)
                 window_end = int(window_start + window_size)
                 sample_1, sample_2 = data_split[j - 1].astype(np.float32), data_split[
@@ -1008,9 +1006,7 @@ class Statistics(FeatureExtractionMixin):
                 )
                 sample_1_hist[sample_1_hist == 0] = fill_value
                 sample_2_hist[sample_2_hist == 0] = fill_value
-                sample_1_hist, sample_2_hist = sample_1_hist / np.sum(
-                    sample_1_hist
-                ), sample_2_hist / np.sum(sample_2_hist)
+                sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
                 samples_diff = sample_2_hist - sample_1_hist
                 log = np.log(sample_2_hist / sample_1_hist)
                 psi = np.sum(samples_diff * log)
@@ -1661,14 +1657,12 @@ class Statistics(FeatureExtractionMixin):
         results = np.full((sample_1.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * fps)
-            for left, right in zip(
-                prange(0, sample_1.shape[0] + 1),
-                prange(window_size, sample_1.shape[0] + 1),
-            ):
+            for left, right in zip(range(0, sample_1.shape[0] + 1), range(window_size, sample_1.shape[0] + 1)):
                 s1, s2 = sample_1[left:right], sample_2[left:right]
                 rank_x, rank_y = np.argsort(np.argsort(s1)), np.argsort(np.argsort(s2))
                 d_squared = np.sum((rank_x - rank_y) ** 2)
-                s = 1 - (6 * d_squared) / (len(s1) * (len(s2) ** 2 - 1))
+                n = s1.shape[0]
+                s = 1 - (6 * d_squared) / (n * (n ** 2 - 1))
                 results[right - 1, i] = s
 
         return results

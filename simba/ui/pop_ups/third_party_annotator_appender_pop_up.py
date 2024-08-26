@@ -7,12 +7,11 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.third_party_label_appenders.third_party_appender import \
-    ThirdPartyLabelAppender
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        FolderSelect)
+from simba.third_party_label_appenders.third_party_appender import ThirdPartyLabelAppender
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, FolderSelect)
+from simba.utils.read_write import find_core_cnt
 from simba.utils.checks import check_if_dir_exists
-from simba.utils.enums import Formats, Keys, Links, Options
+from simba.utils.enums import Formats, Keys, Links, Options, Defaults
 from simba.utils.lookups import get_third_party_appender_file_formats
 
 
@@ -32,7 +31,6 @@ class ThirdPartyAnnotatorAppenderPopUp(PopUpMixin, ConfigReader):
         self.data_folder = FolderSelect(select_data_frm, "DATA DIRECTORY:", lblwidth=35, initialdir=self.project_path)
         select_data_frm.grid(row=1, column=0, sticky=NW)
         self.data_folder.grid(row=0, column=0, sticky=NW)
-
         self.error_dropdown_dict = self.create_dropdown_frame( main_frm=self.main_frm, drop_down_titles=warnings_lst, drop_down_options=["WARNING", "ERROR"], frm_title="WARNINGS AND ERRORS")
         log_frm = LabelFrame(self.main_frm, text="LOGGING", font=Formats.FONT_HEADER.value)
         self.log_var = BooleanVar(value=True)
@@ -40,6 +38,7 @@ class ThirdPartyAnnotatorAppenderPopUp(PopUpMixin, ConfigReader):
         log_frm.grid(row=5, column=0, sticky=NW)
         self.log_cb.grid(row=0, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
+        self.core_cnt = find_core_cnt()[0]
         self.main_frm.mainloop()
 
     def run(self):
@@ -58,8 +57,10 @@ class ThirdPartyAnnotatorAppenderPopUp(PopUpMixin, ConfigReader):
                                                        file_format=file_format,
                                                        error_settings=error_settings,
                                                        log=log)
-
-        threading.Thread(target=third_party_importer.run()).start()
+        if self.core_cnt > Defaults.THREADSAFE_CORE_COUNT.value:
+            third_party_importer.run()
+        else:
+            threading.Thread(target=third_party_importer.run()).start()
 
 
 #_ = ThirdPartyAnnotatorAppenderPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

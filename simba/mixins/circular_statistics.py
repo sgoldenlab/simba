@@ -76,16 +76,12 @@ class CircularStatisticsMixin(object):
 
         data = np.deg2rad(data)
         mean_angles = np.arctan2(np.mean(np.sin(data)), np.mean(np.cos(data)))
-        return np.sqrt(
-            np.sum(np.cos(data - mean_angles)) ** 2
-            + np.sum(np.sin(data - mean_angles)) ** 2
-        ) / len(data)
+        return np.sqrt(np.sum(np.cos(data - mean_angles)) ** 2 + np.sum(np.sin(data - mean_angles)) ** 2) / len(data)
 
     @staticmethod
     @njit("(float32[:], float64, float64[:])")
-    def sliding_mean_resultant_vector_length(
-        data: np.ndarray, fps: int, time_windows: np.ndarray
-    ) -> np.ndarray:
+    def sliding_mean_resultant_vector_length(data: np.ndarray, fps: float, time_windows: np.ndarray) -> np.ndarray:
+
         """
         Jitted compute of the mean resultant vector within sliding time window. Captures the overall "pull" or "tendency" of the
         data points towards a central direction on the circle with a range between 0 and 1.
@@ -98,7 +94,7 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
-        :parameter np.ndarray data: 1D array of size len(frames) representing degrees.
+        :parameter np.ndarray data: 1D array of size len(data) representing degrees.
         :parameter np.ndarray time_window: Rolling time-window as float in seconds.
         :parameter int fps: fps of the recorded video
         :returns np.ndarray: Size len(data) x len(time_windows) representing resultant vector length in the prior ``time_window``.
@@ -114,15 +110,11 @@ class CircularStatisticsMixin(object):
         for time_window_cnt in prange(time_windows.shape[0]):
             window_size = int(time_windows[time_window_cnt] * fps)
             for window_end in prange(window_size, data.shape[0] + 1, 1):
-                window_data = data[window_end - window_size : window_end]
-                mean_angles = np.arctan2(
-                    np.mean(np.sin(window_data)), np.mean(np.cos(window_data))
-                )
-                r = np.sqrt(
-                    np.sum(np.cos(window_data - mean_angles)) ** 2
-                    + np.sum(np.sin(window_data - mean_angles)) ** 2
-                ) / len(window_data)
-                results[window_end - 1] = r
+                window_data = data[window_end - window_size: window_end]
+                cos_sum = np.sum(np.cos(window_data))
+                sin_sum = np.sum(np.sin(window_data))
+                r = np.sqrt(cos_sum ** 2 + sin_sum ** 2) / len(window_data)
+                results[window_end - 1, time_window_cnt] = r
         return results
 
     @staticmethod
@@ -153,9 +145,7 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], float64)")
-    def sliding_circular_mean(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_circular_mean(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the circular mean in degrees within sliding temporal windows.
 
@@ -183,12 +173,9 @@ class CircularStatisticsMixin(object):
             window_size = int(time_windows[time_window] * fps)
             for current_frm in range(window_size - 1, results.shape[0]):
                 data_window = data[(current_frm - window_size) + 1 : current_frm + 1]
-                m = np.rad2deg(
-                    np.arctan2(
-                        np.mean(np.sin(data_window)), np.mean(np.cos(data_window))
-                    )
-                )
-                results[current_frm, time_window] = np.abs(np.round(m, 4))
+                m = np.rad2deg(np.arctan2(np.mean(np.sin(data_window)), np.mean(np.cos(data_window))))
+                m = (m + 360) % 360
+                results[current_frm, time_window] = np.round(m, 4)
         return results
 
     @staticmethod
@@ -222,7 +209,7 @@ class CircularStatisticsMixin(object):
         )
 
     @staticmethod
-    @njit("(float32[:], int64, float64[:])")
+    @njit("(float32[:], int64, float64[:])", parallel=True)
     def sliding_circular_std(
         data: np.ndarray, fps: int, time_windows: np.ndarray
     ) -> np.ndarray:
@@ -249,9 +236,7 @@ class CircularStatisticsMixin(object):
             window_size = int(time_windows[time_window_cnt] * fps)
             for window_end in prange(window_size, data.shape[0] + 1, 1):
                 window_data = data[window_end - window_size : window_end]
-                m = np.rad2deg(
-                    np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * window_data)))))
-                )
+                m = np.rad2deg(np.sqrt(-2 * np.log(np.abs(np.mean(np.exp(1j * window_data))))))
                 results[window_end - 1][time_window_cnt] = np.abs(np.round(m, 4))
 
         return results.astype(np.float32)
@@ -412,8 +397,8 @@ class CircularStatisticsMixin(object):
            :width: 1200
            :align: center
 
-        :parameter np.ndarray bp_x: Size len(frames) x 2 representing x and y coordinates for first body-part.
-        :parameter np.ndarray bp_y: Size len(frames) x 2 representing x and y coordinates for second body-part.
+        :parameter np.ndarray anterior_loc: Size len(frames) x 2 representing x and y coordinates for first body-part.
+        :parameter np.ndarray posterior_loc: Size len(frames) x 2 representing x and y coordinates for second body-part.
         :return np.ndarray: Frame-wise directionality in degrees.
 
         :example:
@@ -472,10 +457,8 @@ class CircularStatisticsMixin(object):
         return len(data) * R**2, p
 
     @staticmethod
-    @njit("(float32[:], float64[:], float64)")
-    def rolling_rayleigh_z(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    @njit("(float32[:], float64[:], float64)", parallel=True)
+    def sliding_rayleigh_z(data: np.ndarray, time_windows: np.ndarray, fps: int) -> Tuple[np.ndarray, np.ndarray]:
         """
         Jitted compute of Rayleigh Z (test of non-uniformity) of circular data within sliding time-window.
 
@@ -489,25 +472,18 @@ class CircularStatisticsMixin(object):
 
         :example:
         >>> data = np.random.randint(low=0, high=361, size=(100,)).astype(np.float32)
-        >>> CircularStatisticsMixin().rolling_rayleigh_z(data=data, time_windows=np.array([0.5, 1.0]), fps=10)
+        >>> CircularStatisticsMixin().sliding_rayleigh_z(data=data, time_windows=np.array([0.5, 1.0]), fps=10)
         """
 
         data = np.deg2rad(data)
-        Z_results, P_results = np.full(
-            (data.shape[0], time_windows.shape[0]), 0.0
-        ), np.full((data.shape[0], time_windows.shape[0]), 0.0)
-        for i in prange(time_windows.shape[0]):
+        Z_results, P_results = np.full((data.shape[0], time_windows.shape[0]), 0.0), np.full((data.shape[0], time_windows.shape[0]), 0.0)
+        for i in range(time_windows.shape[0]):
             win_size = int(time_windows[i] * fps)
             for j in prange(win_size, len(data) + 1):
                 data_win = data[j - win_size : j]
-                R = np.sqrt(
-                    np.sum(np.cos(data_win)) ** 2 + np.sum(np.sin(data_win)) ** 2
-                ) / len(data_win)
+                R = np.sqrt(np.sum(np.cos(data_win)) ** 2 + np.sum(np.sin(data_win)) ** 2) / len(data_win)
                 Z_results[j - 1][i] = len(data_win) * R**2
-                P_results[j - 1][i] = np.exp(
-                    np.sqrt(1 + 4 * len(data_win) + 4 * (len(data_win) ** 2 - R**2))
-                    - (1 + 2 * len(data_win))
-                )
+                P_results[j - 1][i] = np.exp(np.sqrt(1 + 4 * len(data_win) + 4 * (len(data_win) ** 2 - R**2)) - (1 + 2 * len(data_win)))
         return Z_results, P_results
 
     @staticmethod
@@ -688,7 +664,7 @@ class CircularStatisticsMixin(object):
         return np.rint(results)
 
     @staticmethod
-    @njit("(float32[:],)")
+    @njit("(float32[:],)", parallel=True)
     def rao_spacing(data: np.array):
         """
         Jitted compute of Rao's spacing for angular data.
@@ -710,8 +686,7 @@ class CircularStatisticsMixin(object):
         data = np.sort(data)
         Ti, TiL = np.full((data.shape[0]), np.nan), np.full((data.shape[0]), np.nan)
         l = np.int8(360 / len(data))
-        Ti[-1] = np.rad2deg(
-            np.pi - np.abs(np.pi - np.abs(np.deg2rad(data[0]) - np.deg2rad(data[-1])))
+        Ti[-1] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(data[0]) - np.deg2rad(data[-1])))
         )
         for j in prange(data.shape[0] - 1, -1, -1):
             Ti[j] = np.rad2deg(
@@ -725,7 +700,7 @@ class CircularStatisticsMixin(object):
         return U
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)")
+    @njit("(float32[:], float64[:], int64)", parallel=True)
     def sliding_rao_spacing(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Jitted compute of the uniformity of a circular dataset in sliding windows.
@@ -763,24 +738,11 @@ class CircularStatisticsMixin(object):
             window_size = int(time_windows[win_cnt] * fps)
             for i in range(window_size, data.shape[0]):
                 w_data = np.sort(data[i - window_size : i])
-                Ti, TiL = np.full((w_data.shape[0]), np.nan), np.full(
-                    (w_data.shape[0]), np.nan
-                )
-                l = np.int8(360 / len(w_data))
-                Ti[-1] = np.rad2deg(
-                    np.pi
-                    - np.abs(
-                        np.pi - np.abs(np.deg2rad(w_data[0]) - np.deg2rad(w_data[-1]))
-                    )
-                )
-                for j in prange(w_data.shape[0] - 1, -1, -1):
-                    Ti[j] = np.rad2deg(
-                        np.pi
-                        - np.abs(
-                            np.pi
-                            - np.abs(np.deg2rad(w_data[j]) - np.deg2rad(w_data[j - 1]))
-                        )
-                    )
+                Ti, TiL = np.full((w_data.shape[0]), np.nan), np.full((w_data.shape[0]), np.nan)
+                l = np.int16(360 / len(w_data))
+                Ti[-1] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(w_data[0]) - np.deg2rad(w_data[-1]))))
+                for j in range(w_data.shape[0] - 1, -1, -1):
+                    Ti[j] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(w_data[j]) - np.deg2rad(w_data[j - 1]))))
                 for k in prange(Ti.shape[0]):
                     TiL[int(k)] = max((l, Ti[k])) - min((l, Ti[k]))
                 S = np.sum(TiL)
@@ -923,10 +885,8 @@ class CircularStatisticsMixin(object):
         return np.ceil(np.rad2deg(min(2 * np.pi - circular_range, data[-1] - data[0])))
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)")
-    def sliding_circular_range(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    @njit("(float32[:], float64[:], int64)", parallel=True)
+    def sliding_circular_range(data: np.ndarray, time_windows: np.ndarray, fps: int ) -> np.ndarray:
         """
         Jitted compute of sliding circular range for a time series of circular data. The range is defined as the angular span of the
         shortest arc that can contain all the data points. Measures the circular spread of data within sliding time windows of specified duration.
@@ -953,19 +913,11 @@ class CircularStatisticsMixin(object):
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for time_window_cnt in prange(time_windows.shape[0]):
             win_size = int(time_windows[time_window_cnt] * fps)
-            for left, right in zip(
-                range(0, (data.shape[0] - win_size) + 1), range(win_size, data.shape[0])
-            ):
+            for left, right in zip(range(0, (data.shape[0] - win_size) + 1), range(win_size-1, data.shape[0])):
                 sample = np.sort(np.deg2rad(data[left : right + 1]))
                 angular_diffs = np.diff(sample)
                 circular_range = np.max(angular_diffs)
-                results[right][time_window_cnt] = np.abs(
-                    np.rint(
-                        np.rad2deg(
-                            min(2 * np.pi - circular_range, sample[-1] - sample[0])
-                        )
-                    )
-                )
+                results[right][time_window_cnt] = np.abs(np.rint(np.rad2deg(min(2 * np.pi - circular_range, sample[-1] - sample[0]))))
         return results
 
     @staticmethod
@@ -984,7 +936,7 @@ class CircularStatisticsMixin(object):
            bins = np.array([[270, 0], [0, 90], [90, 180], [180, 270]]) is not.
 
         :parameter ndarray data: 1D array of circular data measured in degrees.
-        :parameter ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive..
+        :parameter ndarray bins: 2D array of shape representing circular bins defining [start_degree, end_degree] inclusive.
         :return np.ndarray: 1D array containing the proportion of data points that fall within each specified circular bin.
 
         :example:
@@ -1021,14 +973,18 @@ class CircularStatisticsMixin(object):
         :parameter float time_window: The size of the sliding window in seconds.
         :parameter float fps: The frame-rate of the video.
 
-        :return np.ndarray: A 2D numpy array where each row corresponds to a time point in `data`, and each column represents a circular bin. The values in the array represent the proportion of data points
-                            within each bin at each time point.
+        :return np.ndarray: A 2D numpy array where each row corresponds to a time point in `data`, and each column represents a circular bin. The values in the array represent the proportion of data points within each bin at each time point.
 
         .. note::
            - The function utilizes the Numba JIT compiler for improved performance.
            - Circular bin definitions should follow the convention where angles are specified in degrees
              within the range [0, 360], and the bins are defined using start and end angles inclusive.
              For example, (0, 90) represents the first quadrant in a circular space.
+
+             For example, bins = np.array([[270, 90], [91, 269]]) divides the space into a top and bottom circular space.
+
+              bins = np.array([[0, 179], [180, 364]]) divides the space into a left and right circular space.
+
 
              Output data in the beginning of the series where a full time-window is not satisfied (e.g., first 9 observations when
              fps equals 10 and time_windows = [1.0], will be populated by ``0``.
@@ -1042,7 +998,7 @@ class CircularStatisticsMixin(object):
 
         :example:
         >>> data = np.array([270, 360, 10, 20, 90, 91, 180, 185, 260, 265]).astype(np.float32)
-        >>> bins = np.array([[270, 90], [91, 268]])
+        >>> bins = np.array([[270, 90], [91, 269]])
         >>> CircularStatisticsMixin().sliding_circular_hotspots(data=data, bins=bins, time_window=0.5, fps=10)
         >>> [[-1. , -1. ],
         >>>  [-1. , -1. ],
@@ -1058,21 +1014,14 @@ class CircularStatisticsMixin(object):
         """
         results = np.full((data.shape[0], bins.shape[0]), 0.0)
         win_size = int(time_window * fps)
-        for left, right in zip(
-            prange(0, (data.shape[0] - win_size) + 1),
-            prange(win_size - 1, data.shape[0] + 1),
-        ):
+        for left, right in zip(prange(0, (data.shape[0] - win_size) + 1), prange(win_size - 1, data.shape[0] + 1)):
             sample = data[left : right + 1]
             for bin_cnt in range(bins.shape[0]):
                 if bins[bin_cnt][0] > bins[bin_cnt][1]:
-                    mask = ((sample >= bins[bin_cnt][0]) & (sample <= 360)) | (
-                        (sample >= 0) & (sample <= bins[bin_cnt][1])
-                    )
+                    mask = ((sample >= bins[bin_cnt][0]) & (sample <= 360)) | ((sample >= 0) & (sample <= bins[bin_cnt][1]))
                 else:
                     mask = (sample >= bins[bin_cnt][0]) & (sample <= bins[bin_cnt][1])
-                results[right][bin_cnt] = np.float32(
-                    data[mask].shape[0] / sample.shape[0]
-                )
+                results[right][bin_cnt] = np.float32(data[mask].shape[0] / sample.shape[0])
         return results
 
     @staticmethod

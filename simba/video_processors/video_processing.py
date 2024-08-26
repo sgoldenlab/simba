@@ -915,9 +915,9 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
             source=clip_video_in_range.__name__,
         )
     if gpu:
-        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -y'
+        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
-        command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v libvpx-vp9 "{save_name}" -y'
+        command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v libvpx-vp9 "{save_name}" -loglevel error -stats -hide_banner -y'
     print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
@@ -946,23 +946,23 @@ def downsample_video(file_path: Union[str, os.PathLike],
     """
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)",
-            source=downsample_video.__name__,
-        )
+        raise FFMPEGCodecGPUError( msg="No GPU found (as evaluated by nvidea-smi returning None)", source=downsample_video.__name__)
     timer = SimbaTimer(start=True)
     check_int(name="Video height", value=video_height)
     check_int(name="Video width", value=video_width)
+    video_height = int(video_height)
+    video_width = int(video_width)
+    if video_width % 2 != 0:
+        video_width += 1
+    if video_height % 2 != 0:
+        video_height += 1
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
     save_name = os.path.join(dir, file_name + "_downsampled.mp4")
     if os.path.isfile(save_name):
-        raise FileExistError(
-            "SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
-            source=downsample_video.__name__,
-        )
+        raise FileExistError("SIMBA ERROR: The outfile file already exist: {}.".format(save_name), source=downsample_video.__name__,)
     if gpu:
-        command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc "{save_name}"'
+        command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale_cuda=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc "{save_name}"'
     else:
         command = f'ffmpeg -i "{file_path}" -vf scale={video_width}:{video_height} -c:v libx264 "{save_name}" -loglevel error -stats -hide_banner'
     print("Down-sampling video... ")
@@ -973,6 +973,7 @@ def downsample_video(file_path: Union[str, os.PathLike],
         elapsed_time=timer.elapsed_time_str,
         source=downsample_video.__name__,
     )
+
 
 
 def gif_creator(file_path: Union[str, os.PathLike],
@@ -3745,7 +3746,8 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
                          bg_end_time: Optional[str] = None,
                          bg_color: Optional[Tuple[int, int, int]] = (0, 0, 0),
                          fg_color: Optional[Tuple[int, int, int]] = None,
-                         save_path: Optional[Union[str, os.PathLike]] = None) -> None:
+                         save_path: Optional[Union[str, os.PathLike]] = None,
+                         verbose: Optional[bool] = True) -> None:
     """
     Subtract the background from a video.
 
@@ -3797,6 +3799,8 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     dir, video_name, ext = get_fn_ext(filepath=video_path)
     if save_path is None:
         save_path = os.path.join(dir, f'{video_name}_bg_subtracted{ext}')
+    else:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=video_bg_substraction_mp.__name__)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'],(video_meta_data['width'], video_meta_data['height']))
     bg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
@@ -3822,12 +3826,14 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
             result = cv2.add(result, fg_clr)
         writer.write(result)
         frm_cnt += 1
-        print(f'Background subtraction frame {frm_cnt}/{video_meta_data["frame_count"]} (Video: {video_name})')
+        if verbose:
+            print(f'Background subtraction frame {frm_cnt}/{video_meta_data["frame_count"]} (Video: {video_name})')
 
     writer.release()
     cap.release()
     timer.stop_timer()
-    stdout_success(msg=f'Background subtracted from {video_name} and saved at {save_path}', elapsed_time=timer.elapsed_time)
+    if verbose:
+        stdout_success(msg=f'Background subtracted from {video_name} and saved at {save_path}', elapsed_time=timer.elapsed_time)
 
 def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
                    video_path: Union[str, os.PathLike],
@@ -3885,7 +3891,8 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
                              fg_color: Optional[Tuple[int, int, int]] = None,
                              save_path: Optional[Union[str, os.PathLike]] = None,
                              core_cnt: Optional[int] = -1,
-                             verbose: Optional[bool] = True) -> None:
+                             verbose: Optional[bool] = True,
+                             gpu: Optional[bool] = False) -> None:
 
     """
     Subtract the background from a video using multiprocessing.
@@ -3941,6 +3948,8 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
     dir, video_name, ext = get_fn_ext(filepath=video_path)
     if save_path is None:
         save_path = os.path.join(dir, f'{video_name}_bg_subtracted{ext}')
+    else:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=video_bg_substraction_mp.__name__)
     dt = datetime.now().strftime("%Y%m%d%H%M%S")
     temp_dir = os.path.join(dir, f'temp_{video_name}_{dt}')
     os.makedirs(temp_dir)
@@ -3968,10 +3977,12 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
         pool.join()
 
     print(f"Joining {video_name} multiprocessed video...")
-    concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True)
+    concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True, gpu=gpu)
     timer.stop_timer()
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
+
+#video_bg_subtraction(video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\TheVideoName_text_superimposed_0.mp4", bg_color=(0, 0, 0), fg_color=(255, 255, 255))
 
 def superimpose_video_names(video_path: Union[str, os.PathLike],
                             font: Optional[str] = 'Arial',

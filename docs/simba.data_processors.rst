@@ -1,7 +1,7 @@
 Data processors
 ==============================
 
-Methods for manipulating and transforming classification and pose-estimation data
+Methods for manipulating animal detection and transforming classification and pose-estimation data
 
 Aggregate classifier statistics calculator
 --------------------------------------------------
@@ -146,5 +146,13 @@ Spontaneous alternation calculator
 ------------------------------------------------------------
 
 .. automodule:: simba.data_processors.spontaneous_alternation_calculator
+   :members:
+   :show-inheritance:
+
+
+"Blob" location detector
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.blob_location_computer
    :members:
    :show-inheritance:

@@ -234,3 +234,10 @@ Spontaneous alternation plotter
    :members:
    :show-inheritance:
 
+"Blob" plotter
+---------------------------------------------------------------
+
+.. automodule:: simba.plotting.blob_plotter
+   :members:
+   :show-inheritance:
+

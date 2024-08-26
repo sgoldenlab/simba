@@ -9,14 +9,18 @@ import platform
 import re
 import shutil
 import subprocess
-import threading
 import webbrowser
 from configparser import ConfigParser
 from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 from urllib.parse import urlparse
+from numba import prange, njit
 
 import cv2
 import numpy as np
@@ -442,6 +446,10 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
     video_data["width"] = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     video_data["height"] = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     video_data["frame_count"] = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if cap.get(cv2.CAP_PROP_CHANNEL) == 3:
+        video_data["color_format"] = 'rgb'
+    else:
+        video_data["color_format"] = 'grey'
     for k, v in video_data.items():
         if v == 0:
             raise InvalidVideoFileError(msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).', source=get_video_meta_data.__name__)
@@ -455,16 +463,14 @@ def remove_a_folder(folder_dir: Union[str, os.PathLike]) -> None:
     shutil.rmtree(folder_dir, ignore_errors=True)
 
 
-def concatenate_videos_in_folder(
-    in_folder: Union[str, os.PathLike],
-    save_path: Union[str, os.PathLike],
-    file_paths: Optional[List[Union[str, os.PathLike]]] = None,
-    video_format: Optional[str] = "mp4",
-    substring: Optional[str] = None,
-    remove_splits: Optional[bool] = True,
-    gpu: Optional[bool] = False,
-    verbose: Optional[bool] = True,
-) -> None:
+def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
+                                 save_path: Union[str, os.PathLike],
+                                 file_paths: Optional[List[Union[str, os.PathLike]]] = None,
+                                 video_format: Optional[str] = "mp4",
+                                 substring: Optional[str] = None,
+                                 remove_splits: Optional[bool] = True,
+                                 gpu: Optional[bool] = False,
+                                 verbose: Optional[bool] = True) -> None:
     """
     Concatenate (temporally) all video files in a folder into a single video.
 
@@ -484,10 +490,7 @@ def concatenate_videos_in_folder(
     """
 
     if not check_nvidea_gpu_available() and gpu:
-        raise FFMPEGCodecGPUError(
-            msg="No FFMpeg GPU codec found.",
-            source=concatenate_videos_in_folder.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="No FFMpeg GPU codec found.", source=concatenate_videos_in_folder.__name__)
     timer = SimbaTimer(start=True)
     if file_paths is None:
         files = glob.glob(in_folder + "/*.{}".format(video_format))
@@ -495,10 +498,7 @@ def concatenate_videos_in_folder(
         for file_path in file_paths:
             check_file_exist_and_readable(file_path=file_path)
         files = file_paths
-    check_if_filepath_list_is_empty(
-        filepaths=files,
-        error_msg=f"SIMBA ERROR: Cannot join videos in directory {in_folder}. The directory contain ZERO files in format {video_format}",
-    )
+    check_if_filepath_list_is_empty(filepaths=files, error_msg=f"SIMBA ERROR: Cannot join videos in directory {in_folder}. The directory contain ZERO files in format {video_format}")
     if substring is not None:
         sliced_paths = []
         for file_path in files:
@@ -517,12 +517,10 @@ def concatenate_videos_in_folder(
         for file in files:
             f.write("file '" + str(Path(file)) + "'\n")
 
-    if os.path.exists(save_path):
-        os.remove(save_path)
     if check_nvidea_gpu_available() and gpu:
-        returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}"')
+        returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}" -y')
     else:
-        returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info')
+        returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info -y')
     while True:
         if returned != 0:
             pass
@@ -1965,10 +1963,32 @@ def read_data_paths(path: Union[str, os.PathLike, None],
         raise NoFilesFoundError(msg=f"{type(path)} is not a valid type for path", source=read_data_paths.__name__)
     return data_paths
 
+@njit("(uint8[:, :, :, :],)", fastmath=True, parallel=True)
+def img_stack_to_greyscale(imgs: np.ndarray):
+    """
+    Jitted conversion of a 4D stack of color images (RGB format) to grayscale.
+    .. image:: _static/img/img_stack_to_greyscale.png
+       :width: 600
+       :align: center
+    :parameter np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
+    :returns np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
+    :example:
+    >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
+    >>> imgs = np.stack(list(imgs.values()))
+    >>> imgs_gray = ImageMixin.img_stack_to_greyscale(imgs=imgs)
+    """
+    results = np.full((imgs.shape[0], imgs.shape[1], imgs.shape[2]), np.nan).astype(np.uint8)
+    for i in prange(imgs.shape[0]):
+        vals = (0.07 * imgs[i][:, :, 2] + 0.72 * imgs[i][:, :, 1] + 0.21 * imgs[i][:, :, 0])
+        results[i] = vals.astype(np.uint8)
+    return results
+
 def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
                                   start_frm: Optional[int] = None,
                                   end_frm: Optional[int] = None,
-                                  verbose: Optional[bool] = False) -> Dict[int, np.ndarray]:
+                                  verbose: Optional[bool] = False,
+                                  greyscale: Optional[bool] = False,
+                                  out_format: Literal['dict', 'array'] = 'dict') -> Union[Dict[int, np.ndarray], np.ndarray]:
 
     """
     Reads a batch of frames from a video file using GPU acceleration.
@@ -1992,21 +2012,16 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
         start_frm = 0
     if end_frm is not None:
         check_int(name=read_img_batch_from_video_gpu.__name__,value=end_frm, min_value=0,max_value=video_meta_data["frame_count"])
+        end_frm = end_frm + 1
     else:
-        end_frm = video_meta_data["frame_count"]
+        end_frm = video_meta_data["frame_count"] + 1
 
     start_time, end_time = start_frm / video_meta_data["fps"], end_frm / video_meta_data["fps"]
     duration = end_time - start_time
-
     frame_width = video_meta_data['width']
     frame_height = video_meta_data['height']
-    if video_meta_data['color_format'] == 'rgb':
-        frame_size = frame_width * frame_height * 3
-        color_format = 'bgr24'
-    else:
-        frame_size = frame_width * frame_height
-        color_format = 'grey'
-
+    frame_size = frame_width * frame_height * 3
+    color_format = 'bgr24'
     ffmpeg_cmd = ['ffmpeg',
                   '-hwaccel', 'cuda',
                   '-ss', f'{start_time:.10f}',
@@ -2016,19 +2031,61 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
                   '-pix_fmt', f'{color_format}',
                   '-']
 
+
     ffmpeg_process = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    frames = {}
+    if out_format == 'dict':
+        frames = {}
+    else:
+        frames = np.zeros((end_frm-start_frm, frame_height, frame_width, 3), dtype=np.uint8)
     frm_cnt = deepcopy(start_frm)
-    while True:
+    video_name = get_fn_ext(filepath=video_path)[1]
+    iteration_frm_cnt = 0
+    while frm_cnt < end_frm:
         if verbose:
-            print(f'Reading frame {frm_cnt} / {end_frm} ...')
+            print(f'Reading frame {frm_cnt+1} / {end_frm} ... ({video_name})')
         raw_frame = ffmpeg_process.stdout.read(frame_size)
         if len(raw_frame) == 0:
             break
         if color_format == 'bgr24':
-            frames[frm_cnt] = np.frombuffer(raw_frame, dtype=np.uint8).reshape((frame_height, frame_width, 3))
+            img = np.frombuffer(raw_frame, dtype=np.uint8).reshape((frame_height, frame_width, 3))
         else:
-            frames[frm_cnt] = np.frombuffer(raw_frame, dtype=np.uint8).reshape((frame_height, frame_width))
+            img = np.frombuffer(raw_frame, dtype=np.uint8).reshape((frame_height, frame_width))
+        if out_format == 'dict':
+            frames[frm_cnt] = img
+        else:
+            frames[iteration_frm_cnt] = img
         frm_cnt += 1
+        iteration_frm_cnt += 1
+    if greyscale:
+        if out_format == 'dict':
+            greyscale_imgs = img_stack_to_greyscale(imgs=np.stack(list(frames.values()), axis=0)).astype(np.uint8)
+            for cnt, i in enumerate(range(start_frm, end_frm)):
+                frames[i] = greyscale_imgs[cnt]
+        else:
+            frames = img_stack_to_greyscale(imgs=frames).astype(np.uint8)
 
     return frames
+
+
+def find_largest_blob_location(imgs: dict, verbose: Optional[bool] = False, video_name: Optional[str] = None):
+
+
+
+    results = {}
+    for frm_idx, img in imgs.items():
+        if verbose:
+            if video_name is None:
+                print(f'Finding blob in image {frm_idx}...')
+            else:
+                print(f'Finding blob in image {frm_idx} (Video {video_name})...')
+        try:
+            num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(img, connectivity=8)
+            if num_labels == 1:
+                results[frm_idx] = np.array([0, 0]).astype(np.int32)
+            else:
+                largest_blob_label = 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA])
+                results[frm_idx] = centroids[largest_blob_label].astype(np.int32)
+        except Exception as e:
+            print(e.args)
+            results[frm_idx] = np.array([np.nan, np.nan])
+    return results

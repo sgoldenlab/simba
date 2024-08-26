@@ -13,16 +13,17 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import h5py
 import numpy as np
 import pandas as pd
-from numba import jit, prange
+from numba import jit, prange, typed
 from pylab import *
 from scipy import stats
 from scipy.signal import savgol_filter
+import cv2
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-
+from joblib import Parallel, delayed
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_df_field_is_boolean,
                                 check_if_dir_exists,
@@ -742,6 +743,40 @@ def freedman_diaconis(data: np.array) -> (float, int):
 def hist_1d(data: np.ndarray, bins: int, range: np.ndarray):
     return np.histogram(data, bins, (range[0], range[1]))[0]
 
+@jit(nopython=True)
+def hist_1d_mp(data: np.ndarray, bin_counts: np.ndarray, bin_widths: np.ndarray, normalize: Optional[bool] = False) -> typed.List:
+    """
+    Jitted helper to compute 1D histograms with counts or rations (if normalize is True) for a 2D dataset
+
+    .. note::
+       For non-heuristic rules for bin counts and bin ranges, see ``simba.data.freedman_diaconis`` or simba.data.bucket_data``.
+
+       For computing a single 1D histogram from 1d data, use : func: `hist_1d_`
+
+    :parameter np.ndarray data: 1d array containing feature values.
+    :parameter int bin_count: The number of bins.
+    :parameter: np.ndarray range: 1d array with two values representing minimum and maximum value to bin.
+    :parameter: Optional[bool] normalize: If True, then the counts are returned as a ratio of all values. If False, then the raw counts. Pass normalize as True if the datasets are unequal counts. Default: True.
+
+    :example:
+    >>> data = np.random.randint(0, 100, (900, 300))
+    >>> bin_counts, bin_widths = bucket_data_mp(data=data)
+    >>> r = hist_1d_mp(data=data, bin_counts=bin_counts, bin_widths=bin_widths, normalize=True)
+    """
+
+    results = typed.List()
+    for i in prange(data.shape[0]):
+        hist = np.histogram(data[i], bin_counts[i], (0, int(bin_widths[i]) * bin_counts[i]))[0]
+        if normalize:
+            total_sum = np.sum(hist)
+            if total_sum == 0:
+                pass
+            else:
+                results.append(hist / total_sum)
+        else:
+            results.append(hist.astype(np.float64))
+    return results
+
 
 def bucket_data(
     data: np.ndarray,
@@ -753,7 +788,7 @@ def bucket_data(
     Computes the optimal bin count and bin width non-heuristically using specified method.
 
     :param np.ndarray data: 1D array of numerical data.
-    :param np.ndarray data: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
+    :param np.ndarray method: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
     :returns Tuple[float, int]: A tuple containing the optimal bin width and bin count.
 
     :example:
@@ -765,16 +800,38 @@ def bucket_data(
     """
 
     check_valid_array(data=data, source=bucket_data.__name__, accepted_ndims=(1,))
-    check_str(
-        name=f"{bucket_data.__name__} method",
-        value=method,
-        options=Options.BUCKET_METHODS.value,
-    )
+    check_str(name=f"{bucket_data.__name__} method", value=method, options=Options.BUCKET_METHODS.value)
     bin_edges = np.histogram_bin_edges(a=data, bins=method)
     bin_counts = bin_edges.shape[0]
     bin_width = bin_edges[1] - bin_edges[0]
 
     return bin_width, bin_counts
+
+
+def _bucket_data_mp_helper(array, bins='auto'):
+    return np.histogram_bin_edges(array, bins=bins)
+
+def bucket_data_mp(data: np.ndarray,
+                   method: Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"] = "auto",
+                   n_jobs: Optional[int] = -1) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Compute histogram bin edges for many inputs in parallel using CPU with Joblib.
+
+    :param data: 2D input arrays for which to calculate histogram bin edges.
+    :param np.ndarray method: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
+    :param n_jobs: Number of CPU cores to use for parallelism (-1 uses all available cores).
+    :returns Tuple[float, int]: A tuple containing the optimal bin width and bin count.
+    """
+
+    check_valid_array(data=data, source=bucket_data_mp.__name__, accepted_ndims=(2,))
+    check_str(name=f"{bucket_data_mp.__name__} method", value=method, options=Options.BUCKET_METHODS.value)
+    bin_edges = Parallel(n_jobs=n_jobs)(delayed(_bucket_data_mp_helper)(obs, bins=method) for obs in data)
+    bin_counts = np.array([x.shape[0] for x in bin_edges])
+    bin_width = np.array([x[1] - x[0] for x in bin_edges])
+    return bin_counts, bin_width
+
+
+
 
 
 @jit(nopython=True)

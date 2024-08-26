@@ -820,7 +820,7 @@ class GeometryMixin(object):
         colors = create_color_palette(pallete_name=color_palette, increments=len(shapes)+1)
         for shape_cnt, shape in enumerate(shapes):
             if isinstance(shape, Polygon):
-                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int)], True, (colors[shape_cnt][::-1]), thickness=thickness)
+                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]), thickness=thickness)
                 interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
                 for interior in interior_coords:
                     cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]), thickness=thickness,)

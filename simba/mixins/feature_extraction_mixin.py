@@ -266,7 +266,7 @@ class FeatureExtractionMixin(object):
            :align: center
 
         :parameter np.ndarray bp_location:  2d numeric np.ndarray size len(frames) x 2
-        :parameter np.ndarray roi_coords: 2d numeric np.ndarray size 2x2 (top left[x, y], bottom right[x, y)
+        :parameter np.ndarray roi_coords: 2d numeric np.ndarray size 2x2 (top left[x, y], bottom right[x, y])
         :return ndarray: 2d numeric boolean np.ndarray size len(frames) x 1 with 0 representing outside the rectangle and 1 representing inside the rectangle
 
         :example:
@@ -292,9 +292,7 @@ class FeatureExtractionMixin(object):
 
     @staticmethod
     @jit(nopython=True)
-    def framewise_inside_polygon_roi(
-        bp_location: np.ndarray, roi_coords: np.ndarray
-    ) -> np.ndarray:
+    def framewise_inside_polygon_roi(bp_location: np.ndarray, roi_coords: np.ndarray) -> np.ndarray:
         """
         Jitted helper for frame-wise detection if animal is inside static polygon ROI.
 
@@ -588,7 +586,7 @@ class FeatureExtractionMixin(object):
 
         :return np.ndarray: 2D array of size len(frames) x 4. First column represent the side of the observer that the target is in view. 0 = Left side, 1 = Right side, 2 = Not in view.
         Second and third column represent the x and y location of the observer animals ``eye`` (half-way between the ear and the nose).
-        Fourth column represent if target is is view (bool).
+        Fourth column represent if target is in view (bool).
 
         """
 
@@ -967,8 +965,7 @@ class FeatureExtractionMixin(object):
     @staticmethod
     @njit("(int64[:,:], int64[:,:], float64)")
     def find_midpoints(
-        bp_1: np.ndarray, bp_2: np.ndarray, percentile: float = 0.5
-    ) -> np.ndarray:
+        bp_1: np.ndarray, bp_2: np.ndarray, percentile: float) -> np.ndarray:
         """
         Compute the midpoints between two sets of 2D points based on a given percentile.
 
@@ -989,18 +986,20 @@ class FeatureExtractionMixin(object):
         >>> [[ 5,  3], [25,  6]]
         """
 
-        result = np.full(bp_1.shape, np.nan)
-        for i in range(bp_1.shape[0]):
-            frm_bp1, frm_bp2 = bp_1[i], bp_2[i]
-            axis_0_diff = np.abs(np.diff(np.array((frm_bp1[0], frm_bp2[0]))))[0]
-            axis_1_diff = np.abs(np.diff(np.array((frm_bp1[1], frm_bp2[1]))))[0]
-            x_dist_percentile, y_dist_percentile = int(axis_0_diff * percentile), int(
-                axis_1_diff * percentile
-            )
-            new_x = np.min(np.array((frm_bp1[0], frm_bp2[0]))) + x_dist_percentile
-            new_y = np.min(np.array((frm_bp1[1], frm_bp2[1]))) + y_dist_percentile
-            result[i] = np.array([new_x, new_y])
-        return result.astype(np.int64)
+        result = np.empty_like(bp_1)
+        for i in prange(bp_1.shape[0]):
+            frm_bp1_x, frm_bp1_y = bp_1[i, 0], bp_1[i, 1]
+            frm_bp2_x, frm_bp2_y = bp_2[i, 0], bp_2[i, 1]
+            axis_0_diff = abs(frm_bp1_x - frm_bp2_x)
+            axis_1_diff = abs(frm_bp1_y - frm_bp2_y)
+            x_dist_percentile = int(axis_0_diff * percentile)
+            y_dist_percentile = int(axis_1_diff * percentile)
+            new_x = min(frm_bp1_x, frm_bp2_x) + x_dist_percentile
+            new_y = min(frm_bp1_y, frm_bp2_y) + y_dist_percentile
+            result[i, 0] = new_x
+            result[i, 1] = new_y
+        return result
+
 
 
 # bp_1 = np.array([[1, 3],

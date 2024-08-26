@@ -57,13 +57,10 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.plotting.shap_agg_stats_visualizer import \
     ShapAggregateStatisticsVisualizer
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
-from simba.utils.checks import (check_float, check_if_dir_exists,
-                                check_if_valid_input, check_instance,
-                                check_int, check_str, check_that_column_exist)
-from simba.utils.data import (create_color_palette, detect_bouts,
-                              detect_bouts_multiclass, get_library_version)
+from simba.utils.checks import (check_float, check_if_dir_exists, check_if_valid_input, check_instance, check_int, check_str, check_that_column_exist, check_file_exist_and_readable)
+from simba.utils.data import (detect_bouts, detect_bouts_multiclass, get_library_version)
 from simba.utils.enums import (ConfigKey, Defaults, Dtypes, Methods,
-                               MLParamKeys, Options)
+                               MLParamKeys, Options, OS)
 from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
                                 CorruptedFileError, DataHeaderError,
                                 FaultyTrainingSetError,
@@ -1021,40 +1018,19 @@ class TrainModelMixin(object):
         model_dict = {}
         for n in range(model_cnt):
             try:
-                model_dict[n] = {}
                 if config.get("SML settings", "model_path_" + str(n + 1)) == "":
-                    MissingUserInputWarning(
-                        msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: no path set to model file',
-                        source=self.__class__.__name__,
-                    )
+                    MissingUserInputWarning(msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: no path set to model file', source=self.__class__.__name__)
                     continue
-                if (
-                        config.get("SML settings", "model_path_" + str(n + 1))
-                        == "No file selected"
-                ):
-                    MissingUserInputWarning(
-                        msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: The classifier path is set to "No file selected',
-                        source=self.__class__.__name__,
-                    )
+                if (config.get("SML settings", "model_path_" + str(n + 1)) == "No file selected"):
+                    MissingUserInputWarning(msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: The classifier path is set to "No file selected', source=self.__class__.__name__,)
                     continue
-                model_dict[n]["model_path"] = config.get(
-                    ConfigKey.SML_SETTINGS.value, "model_path_" + str(n + 1)
-                )
-                model_dict[n]["model_name"] = config.get(
-                    ConfigKey.SML_SETTINGS.value, "target_name_" + str(n + 1)
-                )
+                model_dict[n] = {}
+                model_dict[n]["model_path"] = config.get(ConfigKey.SML_SETTINGS.value, "model_path_" + str(n + 1))
+                model_dict[n]["model_name"] = config.get(ConfigKey.SML_SETTINGS.value, "target_name_" + str(n + 1))
                 check_str("model_name", model_dict[n]["model_name"])
-                model_dict[n]["threshold"] = config.getfloat(
-                    ConfigKey.THRESHOLD_SETTINGS.value, "threshold_" + str(n + 1)
-                )
-                check_float(
-                    "threshold",
-                    model_dict[n]["threshold"],
-                    min_value=0.0,
-                    max_value=1.0,
-                )
-                model_dict[n]["minimum_bout_length"] = config.getfloat(
-                    ConfigKey.MIN_BOUT_LENGTH.value, "min_bout_" + str(n + 1)
+                model_dict[n]["threshold"] = config.getfloat(ConfigKey.THRESHOLD_SETTINGS.value, "threshold_" + str(n + 1))
+                check_float( "threshold", model_dict[n]["threshold"], min_value=0.0, max_value=1.0)
+                model_dict[n]["minimum_bout_length"] = config.getfloat(ConfigKey.MIN_BOUT_LENGTH.value, "min_bout_" + str(n + 1)
                 )
                 check_int("minimum_bout_length", model_dict[n]["minimum_bout_length"])
                 if config.has_option(
@@ -1073,10 +1049,8 @@ class TrainModelMixin(object):
                         )
 
             except ValueError:
-                MissingUserInputWarning(
-                    msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: missing information (e.g., no discrimination threshold and/or minimum bout set in the project_config.ini',
-                    source=self.__class__.__name__,
-                )
+                model_dict.pop(n, None)
+                MissingUserInputWarning(msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: missing information (e.g., no discrimination threshold and/or minimum bout set in the project_config.ini',source=self.__class__.__name__)
 
         if len(model_dict.keys()) == 0:
             raise NoDataError(
@@ -1145,22 +1119,19 @@ class TrainModelMixin(object):
             data_df.columns = new_headers
             return data_df
 
-    def read_pickle(self, file_path: Union[str, os.PathLike]) -> object:
+    def read_pickle(self, file_path: Union[str, os.PathLike]) -> RandomForestClassifier:
         """
-        Read pickle file
+        Read pickled RandomForestClassifier object.
 
         :parameter str file_path: Path to pickle file on disk.
-        :return dict
-
+        :return RandomForestClassifier
         """
 
+        check_file_exist_and_readable(file_path=file_path)
         try:
             clf = pickle.load(open(file_path, "rb"))
         except pickle.UnpicklingError:
-            raise CorruptedFileError(
-                msg=f"Can not read {file_path} as a classifier file (pickle).",
-                source=self.__class__.__name__,
-            )
+            raise CorruptedFileError(msg=f"Can not read {file_path} as a classifier file (pickle).", source=self.__class__.__name__)
         return clf
 
     def bout_train_test_splitter(
@@ -1377,13 +1348,14 @@ class TrainModelMixin(object):
 
     def clf_predict_proba(self,
                           clf: Union[RandomForestClassifier, cuRF],
-                          x_df: pd.DataFrame,
+                          x_df: Union[pd.DataFrame, np.ndarray],
                           multiclass: bool = False,
                           model_name: Optional[str] = None,
                           data_path: Optional[Union[str, os.PathLike]] = None) -> np.ndarray:
+
         """
         :param RandomForestClassifier clf: Random forest classifier object
-        :param pd.DataFrame x_df: Features df
+        :param Union[pd.DataFrame, np.ndarray] x_df: Features for data to predict as a dataframe or array of size (M,N).
         :param bool multiclass: If True, the classifier predicts more than 2 targets. Else, boolean classifier.
         :param Optional[str] model_name: Name of model
         :param Optional[str] data_path: Path to model on disk
@@ -1397,7 +1369,6 @@ class TrainModelMixin(object):
             clf_n_features = clf.n_features_in_
         else:
             raise InvalidInputError(msg=f"Could not determine the number of features in the classifier {model_name}", source=self.__class__.__name__)
-
         if hasattr(clf, "n_classes_"):
             clf_n_classes = clf.n_classes_
         elif hasattr(clf, "classes_"):
@@ -1406,24 +1377,17 @@ class TrainModelMixin(object):
             raise InvalidInputError(msg=f"Could not determine the number of classes in the classifier {model_name}", source=self.__class__.__name__)
 
         if not multiclass and clf_n_classes != 2:
-            raise ClassifierInferenceError(
-                msg=f"The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes. The classifier is not a binary classifier and does not predict two targets (absence and presence of behavior). One or more files inside the project_folder/csv/targets_inserted directory has an annotation column with a value other than 0 or 1",
-                source=self.__class__.__name__, )
-        if len(x_df.columns) != clf_n_features:
+            raise ClassifierInferenceError(msg=f"The classifier {model_name} (data path {data_path}) has not been created properly. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes. The classifier is not a binary classifier and does not predict two targets (absence and presence of behavior). One or more files inside the project_folder/csv/targets_inserted directory has an annotation column with a value other than 0 or 1", source=self.__class__.__name__,)
+        if isinstance(x_df, pd.DataFrame):
+            x_df = x_df.values
+        if x_df.shape[1] != clf_n_features:
             if model_name and data_path:
-                raise FeatureNumberMismatchError(
-                    f"Mismatch in the number of features in input file {data_path}, and what is expected by the model {model_name}. The model expects {clf_n_features} features. The data contains {len(x_df.columns)} features.",
-                    source=self.__class__.__name__)
+                raise FeatureNumberMismatchError(f"Mismatch in the number of features in input file {data_path}, and what is expected by the model {model_name}. The model expects {clf_n_features} features. The data contains {x_df.shape[1]} features.", source=self.__class__.__name__)
             else:
-                raise FeatureNumberMismatchError(
-                    f"The model expects {clf_n_features} features. The data contains {len(x_df.columns)} features.",
-                    source=self.__class__.__name__)
+                raise FeatureNumberMismatchError(f"The model expects {clf_n_features} features. The data contains {x_df.shape[1]} features.", source=self.__class__.__name__)
         p_vals = clf.predict_proba(x_df)
         if multiclass and (clf.n_classes_ != p_vals.shape[1]):
-            raise ClassifierInferenceError(
-                msg=f"The classifier {model_name} (data path: {data_path}) is a multiclassifier expected to create {clf.n_classes_} behavior probabilities. However, it produced probabilities for {p_vals.shape[1]} behaviors. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes.",
-                source=self.__class__.__name__,
-            )
+            raise ClassifierInferenceError(msg=f"The classifier {model_name} (data path: {data_path}) is a multiclassifier expected to create {clf.n_classes_} behavior probabilities. However, it produced probabilities for {p_vals.shape[1]} behaviors. See The SimBA GitHub FAQ page or Gitter for more information and suggested fixes.", source=self.__class__.__name__)
         if not multiclass:
             if isinstance(p_vals, pd.DataFrame):
                 return p_vals[1].values
@@ -1445,6 +1409,11 @@ class TrainModelMixin(object):
                    cuda: Optional[bool] = False) -> RandomForestClassifier:
 
         if not cuda:
+            # NOTE: LOKY ISSUES ON WINDOWS WITH SCIKIT IF THE CORE COUNT EXCEEDS 61.
+            # if n_jobs == -1:
+            #     n_jobs = find_core_cnt()[0]
+            # if (n_jobs > Defaults.THREADSAFE_CORE_COUNT.value) and (platform.system() == OS.WINDOWS.value):
+            #     n_jobs = Defaults.THREADSAFE_CORE_COUNT.value
             return RandomForestClassifier(n_estimators=n_estimators,
                                           max_depth=max_depth,
                                           max_features=max_features,
@@ -1662,18 +1631,14 @@ class TrainModelMixin(object):
 
         """
         try:
-            if (platform.system() == "Darwin") and (
-                    multiprocessing.get_start_method() != "spawn"
-            ):
+            if (platform.system() == "Darwin") and (multiprocessing.get_start_method() != "spawn"):
                 multiprocessing.set_start_method("spawn", force=True)
             cpu_cnt, _ = find_core_cnt()
+            if (cpu_cnt > Defaults.THREADSAFE_CORE_COUNT.value) and (platform.system() == OS.WINDOWS.value):
+                cpu_cnt = Defaults.THREADSAFE_CORE_COUNT.value
             df_lst, frm_number_list = [], []
-            with concurrent.futures.ProcessPoolExecutor(
-                    max_workers=cpu_cnt
-            ) as executor:
-                results = [
-                    executor.submit(
-                        self._read_data_file_helper_futures,
+            with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cnt) as executor:
+                results = [executor.submit(self._read_data_file_helper_futures,
                         data,
                         file_type,
                         classifier_names,
@@ -1684,9 +1649,7 @@ class TrainModelMixin(object):
                 for result in concurrent.futures.as_completed(results):
                     df_lst.append(result.result()[0])
                     frm_number_list.extend((result.result()[-1]))
-                    print(
-                        f"Reading complete {result.result()[1]} (elapsed time: {result.result()[2]}s)..."
-                    )
+                    print(f"Reading complete {result.result()[1]} (elapsed time: {result.result()[2]}s)...")
             df_concat = pd.concat(df_lst, axis=0).round(4)
             if "scorer" in df_concat.columns:
                 df_concat = df_concat.drop(["scorer"], axis=1)
@@ -1694,9 +1657,7 @@ class TrainModelMixin(object):
             return df_concat, frm_number_list
 
         except Exception as e:
-            MultiProcessingFailedWarning(
-                msg=f"Multi-processing file read failed, reverting to single core (increased run-time on large datasets). Exception: {e.args}"
-            )
+            MultiProcessingFailedWarning(msg=f"Multi-processing file read failed, reverting to single core (increased run-time on large datasets). Exception: {e.args}")
             return self.read_all_files_in_folder(
                 file_paths=annotations_file_paths,
                 file_type=file_type,

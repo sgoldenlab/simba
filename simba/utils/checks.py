@@ -22,8 +22,7 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 NoDataError, NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
                                 StringError)
-from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
-                                  NoDataFoundWarning)
+from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning, NoDataFoundWarning, InvalidValueWarning)
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
@@ -225,22 +224,22 @@ def check_iterable_length(
         )
 
 
-def check_instance(
-    source: str, instance: object, accepted_types: Union[Tuple[Any], Any]
-) -> None:
+def check_instance(source: str, instance: object, accepted_types: Union[Tuple[Any], Any], raise_error: Optional[bool] = True) -> None:
     """
     Check if an instance is an acceptable type.
 
     :param str name: Arbitrary name of instance used for interpretable error msg. Can also be the name of the method.
     :param object instance: A data object.
     :param Union[Tuple[object], object] accepted_types: Accepted instance types. E.g., (Polygon, pd.DataFrame) or Polygon.
+    :param Optional[bool] raise_error: If True, raises error. Else, prints warning.
     """
 
     if not isinstance(instance, accepted_types):
-        raise InvalidInputError(
-            msg=f"{source} requires {accepted_types}, got {type(instance)}",
-            source=source,
-        )
+        msg = f"{source} requires {accepted_types}, got {type(instance)}"
+        if raise_error:
+            raise InvalidInputError(msg=msg, source=source)
+        else:
+            InvalidValueWarning(msg=msg, source=source)
 
 
 def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
@@ -349,11 +348,7 @@ def check_that_column_exist(
         column_name = [column_name]
     for column in column_name:
         if column not in df.columns:
-            raise ColumnNotFoundError(
-                column_name=column,
-                file_name=file_name,
-                source=check_that_column_exist.__name__,
-            )
+            raise ColumnNotFoundError(column_name=column, file_name=file_name, source=check_that_column_exist.__name__)
 
 
 def check_if_valid_input(

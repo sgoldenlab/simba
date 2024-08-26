@@ -307,11 +307,11 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 #                                              video_setting=True,
 #                                              frame_setting=False,
 #                                              rotate=False,
-#                                              video_file_path='Trial    10.mp4',
-#                                              cores=5,
+#                                              video_file_path='592_MA147_Gq_CNO_0515.mp4',
+#                                              cores=-1,
 #                                              text_settings=False)
 # clf_plotter.run()
-
+#
 
 # clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini', video_setting=True, frame_setting=False, rotate=False, video_file_path='Together_1.avi', cores=5)
 # clf_plotter.run()

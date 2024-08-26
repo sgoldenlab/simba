@@ -59,7 +59,7 @@ from simba.video_processors.video_processing import (
     convert_to_mov, convert_to_mp4, convert_to_png, convert_to_tiff,
     convert_to_webm, convert_to_webp,
     convert_video_powerpoint_compatible_format, copy_img_folder,
-    create_average_frm, crop_multiple_videos, crop_multiple_videos_circles,
+    create_average_frm, crop_multiple_videos,
     crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
     crop_single_video_polygon, crossfade_two_videos, downsample_video,
     extract_frame_range, extract_frames_single_video, flip_videos,
@@ -1537,78 +1537,57 @@ class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
 
 
 class ClipMultipleVideosByTimestamps(PopUpMixin):
-
+    """
+    :example:
+    >>> ClipMultipleVideosByTimestamps(data_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test", save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test\out")
+    """
     def __init__(self, data_dir: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]):
 
         check_if_dir_exists(in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False)
         check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
-        self.video_paths = find_all_videos_in_directory(
-            directory=data_dir, as_dict=True, raise_error=True
-        )
-        self.video_meta_data = [
-            get_video_meta_data(video_path=x) for x in list(self.video_paths.values())
-        ]
-        max_video_name_len = len(max(list(self.video_paths.keys())))
+        self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
+        self.video_meta_data = [get_video_meta_data(video_path=x) for x in list(self.video_paths.values())]
+        max_video_name_len = len(max(list(self.video_paths.keys()))) + 5
         super().__init__(title="CLIP MULTIPLE VIDEOS BY TIME-STAMPS")
         self.save_dir = save_dir
-        data_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="VIDEO SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
+        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         data_frm.grid(row=0, column=0, sticky=NW)
         self.save_dir = save_dir
-        data_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="VIDEO SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
+        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         data_frm.grid(row=0, column=0, sticky=NW)
-        Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(
-            row=0, column=0, sticky=NW
-        )
-        Label(data_frm, text="VIDEO LENGTH", width=10).grid(row=0, column=1)
+        Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(row=0, column=0, sticky=NW)
+        Label(data_frm, text="VIDEO LENGTH", width=12).grid(row=0, column=1)
         Label(data_frm, text="START TIME (HH:MM:SS)", width=18).grid(row=0, column=2)
         Label(data_frm, text="END TIME (HH:MM:SS)", width=18).grid(row=0, column=3)
 
         self.entry_boxes = {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
-            Label(data_frm, text=video_name, width=max_video_name_len).grid(
-                row=cnt + 1, column=0, sticky=NW
-            )
+            Label(data_frm, text=video_name, width=max_video_name_len).grid(row=cnt + 1, column=0, sticky=NW)
             video_length = self.video_meta_data[cnt]["video_length_s"]
             video_length_hhmmss = seconds_to_timestamp(seconds=video_length)
-            Label(data_frm, text=video_length_hhmmss, width=max_video_name_len).grid(
-                row=cnt + 1, column=1, sticky=NW
-            )
+            Label(data_frm, text=video_length_hhmmss, width=max_video_name_len).grid(row=cnt + 1, column=1, sticky=NW)
             self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, "", 5)
             self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, "", 5)
             self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
+
+        gpu_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=gpu_frm, txt='USE GPU', txt_img='gpu')
+        gpu_frm.grid(row=1, column=0, sticky=NW)
+        gpu_cb.grid(row=0, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
+        self.main_frm.mainloop()
 
     def run(self):
         timer = SimbaTimer(start=True)
         for cnt, (video_name, v) in enumerate(self.entry_boxes.items()):
             start, end = v["start"].entry_get, v["end"].entry_get
-            check_if_string_value_is_valid_video_timestamp(
-                value=start, name=f"{video_name} START TIME"
-            )
-            check_if_string_value_is_valid_video_timestamp(
-                value=end, name=f"{video_name} END TIME"
-            )
-            check_that_hhmmss_start_is_before_end(
-                start_time=start, end_time=end, name=video_name
-            )
-            check_if_hhmmss_timestamp_is_valid_part_of_video(
-                timestamp=start, video_path=self.video_paths[video_name]
-            )
-            check_if_hhmmss_timestamp_is_valid_part_of_video(
-                timestamp=end, video_path=self.video_paths[video_name]
-            )
+            check_if_string_value_is_valid_video_timestamp(value=start, name=f"{video_name} START TIME" )
+            check_if_string_value_is_valid_video_timestamp(value=end, name=f"{video_name} END TIME")
+            check_that_hhmmss_start_is_before_end(start_time=start, end_time=end, name=video_name)
+            check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start, video_path=self.video_paths[video_name])
+            check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end, video_path=self.video_paths[video_name])
             clip_video_in_range(
                 file_path=self.video_paths[video_name],
                 start_time=start,
@@ -1616,6 +1595,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
                 out_dir=self.save_dir,
                 overwrite=True,
                 include_clip_time_in_filename=False,
+                gpu=self.gpu_var.get(),
             )
         timer.stop_timer()
         stdout_success(

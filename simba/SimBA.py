@@ -158,7 +158,7 @@ from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
                                  get_icons_paths, load_simba_fonts)
 from simba.utils.printing import stdout_success, stdout_warning
-from simba.utils.read_write import get_video_meta_data
+from simba.utils.read_write import get_video_meta_data, find_core_cnt
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
 from simba.video_processors.video_processing import \
     extract_frames_from_all_videos_in_directory
@@ -211,7 +211,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         simongui.wm_title("LOAD PROJECT")
         simongui.columnconfigure(0, weight=1)
         simongui.rowconfigure(0, weight=1)
-
+        self.core_cnt = find_core_cnt()[0]
         self.btn_icons = get_icons_paths()
 
         for k in self.btn_icons.keys():
@@ -640,7 +640,10 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
     def import_deepethogram(self):
         ann_folder = askdirectory()
         deepethogram_importer = DeepEthogramImporter(config_path=self.config_path, data_dir=ann_folder)
-        threading.Thread(target=deepethogram_importer.run).start()
+        if self.core_cnt > Defaults.THREADSAFE_CORE_COUNT.value:
+            deepethogram_importer.run()
+        else:
+            threading.Thread(target=deepethogram_importer.run).start()
 
     def import_noldus_observer(self):
         directory = askdirectory()
@@ -651,17 +654,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         bento_dir = askdirectory()
         bento_appender = BentoAppender(config_path=self.config_path, data_dir=bento_dir)
         threading.Thread(target=bento_appender.run).start()
-
-    def choose_animal_bps(self):
-        if hasattr(self, "path_plot_animal_bp_frm"):
-            self.path_plot_animal_bp_frm.destroy()
-        self.path_plot_animal_bp_frm = LabelFrame( self.path_plot_frm, text="CHOOSE ANIMAL BODY-PARTS", font=("Helvetica", 10, "bold"), pady=5, padx=5)
-        self.path_plot_bp_dict = {}
-        for animal_cnt in range(int(self.path_animal_cnt_dropdown.getChoices())):
-            self.path_plot_bp_dict[animal_cnt] = DropDownMenu( self.path_plot_animal_bp_frm, "Animal {} bodypart".format(str(animal_cnt + 1)), self.bp_set, "15")
-            self.path_plot_bp_dict[animal_cnt].setChoices(self.bp_set[animal_cnt])
-            self.path_plot_bp_dict[animal_cnt].grid(row=animal_cnt, sticky=NW)
-        self.path_plot_animal_bp_frm.grid(row=2, column=0, sticky=NW)
 
     def launch_interactive_plot(self):
         interactive_grapher = InteractiveProbabilityGrapher(config_path=self.config_path,file_path=self.csvfile.file_path,model_path=self.modelfile.file_path)

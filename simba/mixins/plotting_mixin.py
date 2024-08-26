@@ -31,12 +31,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_that_column_exist,
                                 check_valid_array, check_valid_dataframe,
                                 check_valid_lst, check_valid_tuple)
-from simba.utils.enums import Formats, Keys, Options, TextOptions
+from simba.utils.enums import Formats, Keys, Options
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
                                  get_named_colors)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_fn_ext, read_frm_of_video
+from simba.utils.read_write import read_frm_of_video, get_video_meta_data
 
 
 class PlottingMixin(object):
@@ -1930,10 +1930,26 @@ class PlottingMixin(object):
         else:
             return fig
 
-# from sklearn.datasets import make_blobs
-# #from sklearn.datasets import ma
-#
-# x, lbls = make_blobs(n_samples=10000, n_features=2, centers=10, random_state=42)
-# x = np.hstack((x, lbls.reshape(-1, 1)))
-#
-# PlottingMixin.categorical_scatter(data=x, columns=('X', 'Y', 'MY CLUSTERS'), save_path='/Users/simon/Desktop/make_line_plot_plotly.png', show_box=True)
+    @staticmethod
+    def _plot_blobs(data: np.ndarray,
+                    verbose: bool,
+                    circle_size: float,
+                    circle_clr: tuple,
+                    video_path: os.PathLike,
+                    temp_dir: os.PathLike):
+
+        group = int(data[0, 0])
+        fourcc = cv2.VideoWriter_fourcc(*"DIVX")
+        temp_video_save_path = os.path.join(temp_dir, f"{group}.avi")
+        video_meta_data = get_video_meta_data(video_path=video_path)
+        video_writer = cv2.VideoWriter(temp_video_save_path, fourcc, video_meta_data['fps'], (video_meta_data["width"], video_meta_data["height"]))
+        for frm_idx in range(data.shape[0]):
+            frame_id = data[frm_idx][1]
+            bps = data[frm_idx][2:4]
+            frm = read_frm_of_video(video_path=video_path, frame_index=frame_id)
+            cv2.circle(frm, center=(int(bps[0]), int(bps[1])), radius=circle_size, color=circle_clr, thickness=-1).astype(np.uint8)
+            video_writer.write(frm)
+            if verbose:
+                print(f'Writing frame {frame_id} (frames count: {video_meta_data["frame_count"]}, Video: {video_meta_data["video_name"]})...')
+        video_writer.release()
+        return group

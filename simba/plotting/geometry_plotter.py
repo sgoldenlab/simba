@@ -35,7 +35,8 @@ def geometry_visualizer(data: np.ndarray,
                         thickness: int,
                         verbose: bool,
                         bg_opacity: float,
-                        palette: str):
+                        palette: str,
+                        circle_size: int):
 
     group = int(data[0][-1])
     colors = create_color_palettes(no_animals=1, map_size=120, cmaps=[palette])
@@ -55,7 +56,7 @@ def geometry_visualizer(data: np.ndarray,
             img = cv2.addWeighted(img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
         for shape_cnt, shape in enumerate(data[frm_cnt][0:-2]):
             if isinstance(shape, Polygon):
-                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int)], True, (colors[shape_cnt][::-1]), thickness=thickness)
+                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]), thickness=thickness)
                 interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
                 for interior in interior_coords:
                     cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]), thickness=thickness)
@@ -68,7 +69,9 @@ def geometry_visualizer(data: np.ndarray,
                 for line_cnt, line in enumerate(shape.geoms):
                     cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
             elif isinstance(shape, Point):
-                cv2.circle(img, (int(np.array(shape.centroid)[0]), int(np.array(shape.centroid)[1])), 0, colors[shape_cnt][::-1], thickness)
+                arr = np.array((shape.coords)).astype(np.int32)
+                x, y = arr[0][0], arr[0][1]
+                cv2.circle(img,(x, y),circle_size, colors[shape_cnt][::-1], thickness)
         video_writer.write(img.astype(np.uint8))
         if verbose:
             print(f"Creating frame {frm_id} (core: {group})")
@@ -106,6 +109,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  thickness: Optional[int] = 2,
                  bg_opacity: Optional[float] = 1,
+                 circle_size: Optional[int] = 3,
                  palette: Optional[str] = 'jet',
                  verbose: Optional[bool] = True):
 
@@ -114,14 +118,9 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         check_iterable_length(source=self.__class__.__name__, val=len(geometries), min=1)
         check_str(name="Video name", value=video_name)
         check_int(name="thickness", value=thickness, min_value=1)
+        check_int(name="circle_size", value=circle_size, min_value=1)
         check_float(name="video_opacity", value=bg_opacity, min_value=0.0, max_value=1.0)
         check_valid_boolean(value=verbose, source='verbose', raise_error=True)
-        # shape_types = set()
-        # for i in geometries:
-        #     shape_types.update(set([type(x) for x in i]))
-        # for i in shape_types:
-        #     if i not in ACCEPTED_TYPES:
-        #         raise InvalidInputError(msg=f"geometries contain an invalid datatype {i}. Accepted: {ACCEPTED_TYPES}",source=self.__class__.__name__)
         check_int( name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
@@ -137,6 +136,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         if not os.path.isdir(self.geometry_dir): os.makedirs(self.geometry_dir)
         self.temp_dir = os.path.join(self.frames_output_dir, self.geometry_dir, video_name, "temp")
         self.verbose, self.bg_opacity, self.palette = verbose, bg_opacity, palette
+        self.circles_size = circle_size
         if not os.path.isdir(self.temp_dir):
             os.makedirs(self.temp_dir)
         if save_path is None:
@@ -155,7 +155,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
             data[i] = np.concatenate((data[i], new_col), axis=1)
 
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(geometry_visualizer, video_path=self.video_path, video_temp_dir=self.temp_dir, video_meta_data=self.video_meta_data, thickness=self.thickness, verbose=self.verbose, bg_opacity=self.bg_opacity, palette=self.palette)
+            constants = functools.partial(geometry_visualizer, video_path=self.video_path, video_temp_dir=self.temp_dir, video_meta_data=self.video_meta_data, thickness=self.thickness, verbose=self.verbose, bg_opacity=self.bg_opacity, palette=self.palette, circle_size=self.circles_size)
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 print(f"Section {result}/{len(data)} complete...")
             pool.terminate()
