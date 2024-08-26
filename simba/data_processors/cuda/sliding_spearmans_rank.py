@@ -1,9 +1,10 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
-import numpy as np
-import cupy as cp
 from typing import Optional
+
+import cupy as cp
+import numpy as np
 
 
 def sliding_spearmans_rank(x: np.ndarray,

@@ -1,10 +1,11 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
-from numba import cuda, njit
-from copy import deepcopy
-import numpy as np
 import time
+from copy import deepcopy
+
+import numpy as np
+from numba import cuda, njit
 
 THREADS_PER_BLOCK = 128
 

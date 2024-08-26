@@ -1,24 +1,33 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
-from typing import List, Tuple
 import os
-from typing import Union, Optional
+from typing import List, Optional, Tuple, Union
+
 import numpy as np
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext, remove_files, get_video_meta_data, find_core_cnt, concatenate_videos_in_folder
-from simba.utils.checks import check_if_dir_exists, check_valid_boolean, check_int, check_nvidea_gpu_available, check_str, check_if_valid_rgb_tuple
-from simba.utils.enums import Options, TextOptions, Defaults
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.errors import InvalidInputError, FFMPEGCodecGPUError
+
+import functools
+import multiprocessing
+
+from numba import jit
+
 from simba.data_processors.blob_location_computer import BlobLocationComputer
 from simba.mixins.plotting_mixin import PlottingMixin
-import multiprocessing
-import functools
-from numba import jit
+from simba.utils.checks import (check_if_dir_exists, check_if_valid_rgb_tuple,
+                                check_int, check_nvidea_gpu_available,
+                                check_str, check_valid_boolean)
+from simba.utils.enums import Defaults, Options, TextOptions
+from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_all_videos_in_directory,
+                                    find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, remove_files)
 
 
 class BlobPlotter(PlottingMixin):

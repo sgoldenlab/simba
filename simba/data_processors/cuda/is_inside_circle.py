@@ -1,9 +1,10 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
+import math
+
 import numpy as np
 from numba import cuda
-import math
 
 THREADS_PER_BLOCK = 1024
 @cuda.jit
