@@ -1,17 +1,21 @@
 import os
-import shap
+from typing import List, Optional, Tuple, Union
+
 import numpy as np
-from simba.utils.read_write import read_df, write_df
-from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import check_instance, check_valid_lst, check_str, check_int, check_valid_array, \
-    check_valid_dataframe, check_if_dir_exists, check_nvidea_gpu_available
-from typing import Union, Optional, List, Tuple
-from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
+import shap
+from sklearn.ensemble import RandomForestClassifier
+
+from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.utils.checks import (check_if_dir_exists, check_instance, check_int,
+                                check_nvidea_gpu_available, check_str,
+                                check_valid_array, check_valid_dataframe,
+                                check_valid_lst)
 from simba.utils.enums import Formats
-from simba.utils.warnings import NotEnoughDataWarning
-from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.errors import FFMPEGCodecGPUError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import read_df, write_df
+from simba.utils.warnings import NotEnoughDataWarning
 
 
 def create_shap_log(rf_clf: Union[str, os.PathLike, RandomForestClassifier],

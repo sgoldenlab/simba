@@ -1,7 +1,9 @@
 import numpy as np
 from numba import cuda
-from simba.utils.read_write import read_img_batch_from_video_gpu
+
 from simba.utils.checks import check_if_valid_img, check_instance
+from simba.utils.read_write import read_img_batch_from_video_gpu
+
 
 @cuda.jit()
 def _img_stack_to_grayscale(data, results):

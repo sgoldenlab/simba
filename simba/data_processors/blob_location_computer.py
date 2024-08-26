@@ -1,21 +1,30 @@
 import os
-from typing import Union, Optional
-import numpy as np
 from copy import deepcopy
+from typing import Optional, Union
+
+import numpy as np
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext, remove_files, get_video_meta_data
-from simba.video_processors.video_processing import video_bg_subtraction, video_bg_substraction_mp
-from simba.mixins.image_mixin import ImageMixin
-from simba.utils.checks import check_if_dir_exists, check_valid_boolean, check_int, check_nvidea_gpu_available, check_str
-from simba.utils.enums import Formats, Options, Methods
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import write_df
-from simba.utils.errors import InvalidInputError, FFMPEGCodecGPUError
-from simba.utils.data import savgol_smoother, df_smoother
+
 import pandas as pd
+
+from simba.mixins.image_mixin import ImageMixin
+from simba.utils.checks import (check_if_dir_exists, check_int,
+                                check_nvidea_gpu_available, check_str,
+                                check_valid_boolean)
+from simba.utils.data import df_smoother, savgol_smoother
+from simba.utils.enums import Formats, Methods, Options
+from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
+                                    get_video_meta_data, remove_files,
+                                    write_df)
+from simba.video_processors.video_processing import (video_bg_substraction_mp,
+                                                     video_bg_subtraction)
+
 
 class BlobLocationComputer(object):
     def __init__(self,

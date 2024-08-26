@@ -1,17 +1,24 @@
-from typing import Union, Optional
 import os
+from typing import Optional, Union
+
+import cupy as cp
 import cv2
 import numpy as np
-import cupy as cp
-
-from simba.utils.errors import InvalidInputError, FFMPEGCodecGPUError
-from simba.utils.checks import check_file_exist_and_readable, check_int, check_if_string_value_is_valid_video_timestamp, \
-    check_that_hhmmss_start_is_before_end, check_if_dir_exists, check_nvidea_gpu_available, check_instance, check_if_valid_img
-from simba.utils.read_write import get_video_meta_data, check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, \
-    read_img_batch_from_video_gpu
-from simba.utils.data import find_frame_numbers_from_time_stamp
-from simba.utils.printing import stdout_success
 from numba import cuda
+
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_string_value_is_valid_video_timestamp,
+                                check_if_valid_img, check_instance, check_int,
+                                check_nvidea_gpu_available,
+                                check_that_hhmmss_start_is_before_end)
+from simba.utils.data import find_frame_numbers_from_time_stamp
+from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    get_video_meta_data, read_img_batch_from_video_gpu)
+
 
 def average_3d_stack_cupy(image_stack: np.ndarray) -> np.ndarray:
     num_frames, height, width, _ = image_stack.shape

@@ -57,10 +57,14 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.plotting.shap_agg_stats_visualizer import \
     ShapAggregateStatisticsVisualizer
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
-from simba.utils.checks import (check_float, check_if_dir_exists, check_if_valid_input, check_instance, check_int, check_str, check_that_column_exist, check_file_exist_and_readable)
-from simba.utils.data import (detect_bouts, detect_bouts_multiclass, get_library_version)
-from simba.utils.enums import (ConfigKey, Defaults, Dtypes, Methods,
-                               MLParamKeys, Options, OS)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_if_valid_input,
+                                check_instance, check_int, check_str,
+                                check_that_column_exist)
+from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
+                              get_library_version)
+from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Methods,
+                               MLParamKeys, Options)
 from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
                                 CorruptedFileError, DataHeaderError,
                                 FaultyTrainingSetError,

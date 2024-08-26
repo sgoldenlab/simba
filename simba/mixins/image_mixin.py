@@ -22,16 +22,21 @@ from skimage.metrics import structural_similarity
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_if_valid_rgb_tuple, check_instance,
-                                check_int, check_str, check_valid_array,
-                                check_valid_lst, check_valid_tuple, check_valid_boolean,
-                                check_nvidea_gpu_available)
+                                check_int, check_nvidea_gpu_available,
+                                check_str, check_valid_array,
+                                check_valid_boolean, check_valid_lst,
+                                check_valid_tuple)
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
-from simba.utils.errors import ArrayError, FrameRangeError, InvalidInputError, FFMPEGCodecGPUError, NotDirectoryError
+from simba.utils.errors import (ArrayError, FFMPEGCodecGPUError,
+                                FrameRangeError, InvalidInputError,
+                                NotDirectoryError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, write_df,
-                                    read_frm_of_video, read_img_batch_from_video_gpu, find_largest_blob_location)
+                                    find_largest_blob_location, get_fn_ext,
+                                    get_video_meta_data, read_frm_of_video,
+                                    read_img_batch_from_video_gpu, write_df)
+
 
 class ImageMixin(object):
     """

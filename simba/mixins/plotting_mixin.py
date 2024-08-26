@@ -36,7 +36,7 @@ from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
                                  get_named_colors)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import read_frm_of_video, get_video_meta_data
+from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 
 
 class PlottingMixin(object):

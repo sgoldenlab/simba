@@ -1,10 +1,12 @@
 import time
 from typing import Optional
+
 import cupy as cp
 import numpy as np
 
-from simba.utils.read_write import read_img_batch_from_video_gpu
 from simba.utils.checks import check_if_valid_img, check_instance
+from simba.utils.read_write import read_img_batch_from_video_gpu
+
 
 def img_stack_to_grayscale_cupy(imgs: np.ndarray,
                                 batch_size: Optional[int] = 250) -> np.ndarray:

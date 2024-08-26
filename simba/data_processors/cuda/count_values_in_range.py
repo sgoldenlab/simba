@@ -1,5 +1,5 @@
-from numba import cuda
 import numpy as np
+from numba import cuda
 
 THREADS_PER_BLOCK = 256
 

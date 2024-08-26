@@ -1,6 +1,7 @@
+import math
+
 import numpy as np
 from numba import cuda
-import math
 
 THREADS_PER_BLOCK = 1024
 

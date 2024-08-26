@@ -1,7 +1,9 @@
 import time
-import numpy as np
-import cupy
 from typing import Optional
+
+import cupy
+import numpy as np
+
 
 def sliding_circular_mean(x: np.ndarray,
                           time_window: float,

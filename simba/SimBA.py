@@ -158,7 +158,7 @@ from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
                                  get_icons_paths, load_simba_fonts)
 from simba.utils.printing import stdout_success, stdout_warning
-from simba.utils.read_write import get_video_meta_data, find_core_cnt
+from simba.utils.read_write import find_core_cnt, get_video_meta_data
 from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
 from simba.video_processors.video_processing import \
     extract_frames_from_all_videos_in_directory

@@ -15,18 +15,20 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 from urllib.parse import urlparse
-from numba import prange, njit
 
 import cv2
 import numpy as np
 import pandas as pd
 import pkg_resources
 import pyarrow as pa
+from numba import njit, prange
 from pyarrow import csv
 from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
                               Polygon)
